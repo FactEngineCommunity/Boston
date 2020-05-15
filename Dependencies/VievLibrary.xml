@@ -1,0 +1,45 @@
+﻿<?xml version="1.0"?>
+<doc>
+<assembly>
+<name>
+VievLibrary
+</name>
+</assembly>
+<members>
+<member name="P:Viev.My.Resources.Resources.ResourceManager">
+	<summary>
+  Returns the cached ResourceManager instance used by this class.
+</summary>
+</member><member name="P:Viev.My.Resources.Resources.Culture">
+	<summary>
+  Overrides the current thread's CurrentUICulture property for all
+  resource lookups using this strongly typed resource class.
+</summary>
+</member><member name="T:Viev.My.Resources.Resources">
+	<summary>
+  A strongly-typed resource class, for looking up localized strings, etc.
+</summary>
+</member><member name="M:Viev.Enumeration.EnumDescConverter.GetEnumDescription(System.Enum)">
+	<summary>
+ Gets Enum Value's Description Attribute
+ This function calls GetEnumDescript(Type,String)
+ </summary>
+	<param name="value">The value you want the description attribute for</param>
+	<returns>The description, if any, else it's .ToString()</returns>
+</member><member name="M:Viev.Enumeration.EnumDescConverter.GetEnumDescription(System.Type,System.String)">
+	<summary>
+ Gets the description for certaing named value in an Enumeration
+ </summary>
+	<param name="value">The type of the Enumeration</param>
+	<param name="name">The name of the Enumeration value</param>
+	<returns>The description, if any, else the passed name</returns>
+</member><member name="M:Viev.Enumeration.EnumDescConverter.GetEnumValue(System.Type,System.String)">
+	<summary>
+ Gets the value of an Enum, based on it's Description Attribute or named value
+ </summary>
+	<param name="value">The Enum type</param>
+	<param name="description">The description or name of the element</param>
+	<returns>The value, or the passed in description, if it was not found</returns>
+</member>
+</members>
+</doc>
