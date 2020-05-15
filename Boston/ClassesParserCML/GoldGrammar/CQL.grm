@@ -1,0 +1,308 @@
+! Welcome to GOLD Parser Builder 5.2
+
+"Name"    = 'My Programming Language'
+"Version" = '1.0 beta'
+"Author"  = 'John Q. Public'
+
+"About"   = 'This is a test declaration.'
+          | 'You can use multiple lines by using the "pipe" symbol'
+
+"Case Sensitive" = 'True'
+                 
+"Start Symbol" = <Statements> 
+               
+AtMostOnePredicate = 'at most one' 
+               
+CamelcaseWords = (({&41 .. &5A}+({&61 .. &7A}?)+){Space}?)+               
+
+{ClosingBracket} = [)]
+
+{ClosingSet} = [}]
+               
+CommentLine = '*' ({String Ch 1}+{Space}?)+            
+                      
+! DataTypeUnsignedInteger = 'Unsigned Integer'{OpeningBracket}{Digit}+{ClosingBracket}
+            
+DataType = 'Auto Counter'
+         | 'Char'
+         | 'Date'
+         | 'Date Time'
+         | 'Decimal'
+         | 'Image'
+         | 'Money'
+         | 'Text'
+         | 'Signed Integer'
+         | 'Unsigned Integer'
+         | 'String'  
+         | 'Int'
+!         | 'Char'{OpeningBracket}{Digit}+{ClosingBracket}
+!         | 'Real'{OpeningBracket}{Digit}+{ClosingBracket}         
+!         | 'Signed Integer'{OpeningBracket}{Digit}+{ClosingBracket} 
+!         | 'String'{OpeningBracket}{Digit}+{ClosingBracket} 
+!         | 'Unsigned Integer'{OpeningBracket}{Digit}+{ClosingBracket}         
+                  
+Embellishment = 'independent'
+              | 'static'
+              | 'satellite'
+              | 'separate'
+         
+BracketedNumber = {OpeningBracket}{Digit}+{ClosingBracket}
+                
+ValueTypeParameter = {OpeningBracket}{Digit}+','{Digit}+{ClosingBracket}
+                
+InlineComment = '//'{Space}?({String Ch 1}?)+
+                
+LowercaseWordString = ({&61 .. &7A}+('-'{&61 .. &7A})?('_')?)+                   
+                    
+OnePredicate = 'one'
+                 
+{OpeningBracket} = [(]
+                 
+{OpeningSet} = [{]          
+             
+PreboundReadingText = ({&61 .. &7A}+'_'?)+'-'
+                    
+RingConstraintType = 'acyclic'
+                   | 'stronglyintransitive'
+                   | 'symmetric'
+                    
+Schemadeclaration = 'schema' | 'vocabulary'
+             
+{SignedUnsigned} = ['Signed''Unsigned']
+             
+{String Ch 1} = {Printable} - [''] - [/]
+{String Ch 2} = {Printable} - ["] - [/]
+              
+DateLiteral = ''{Digit}+'/'{Digit}+'/'{Digit}+''
+             
+StringLiteral = '' {String Ch 1}+ ''
+              | '"' {String Ch 2}+ '"'
+
+
+NumberLiteral = {Digit}+('.'{Digit}+)?                 
+               
+<Statements>  ::=  <SchemaClause> <Clauses>              
+               
+<Clauses> ::= <Statement> <Clauses>
+              | <CommentBlock> <Clauses>
+              | <Statement>
+              
+<Statement> ::= <ValueTypeStatement>
+              | <ValueTypeStatementEach>
+              | <EachStatement>
+              | <EntityTypeStatement>
+!              | <EntityTypeStatementEach>              
+              | <FactTypeStatement>
+              | <FactTypeStatementComma> <ReverseFactTypeReading>             
+              | <InclusiveOrStatement>
+              | InlineComment
+              | <ObjectifiedFactTypeStatement>
+              | <SubsetConstraint>
+              | <EqualityConstraint>
+              | <ExclusiveOrConstraint1>
+              | <ExclusiveOrConstraint2>
+              | <ExclusionConstraint> 
+              | <ExternalUniquenessConstraint>
+              | <InclusiveOrConstraint>
+              | <SubtypeStatement>
+              
+<AndExtension> ::= 'and' <ModelElementName>
+                | 'and' <ModelElementName> <AndExtension>
+                | 'and' <ModelElementName> <PredicateClause>              
+             
+<CommentBlock> ::= <CommentStart> <CommentLines> <CommentEnd>
+                
+<CommentLines> ::= CommentLine
+                | CommentLine <CommentLines>
+
+<CommentStart> ::= '/*'
+                
+<CommentEnd> ::= '*/'
+              
+<EmbellishmentList> ::= Embellishment
+                      | Embellishment ',' <EmbellishmentList>
+                      
+<EachStatement> ::= 'each' <EntityTypeStatement>
+                  | 'each' <ObjectifiedFactTypeStatement>
+                  | 'each' <InclusiveOrConstraint>
+              
+!<EntityTypeStatementEach> ::= <EntityTypeStatement>
+              
+<EntityTypeStatement> ::= <ModelElementName> <IsIdentifiedClause> <ModelElementName> ';'
+                        | <ModelElementName> <IsIdentifiedClause> <ModelElementName> <AndExtension> 'where' <FactTypeReadingSet> ';'
+                        | <ModelElementName> <IsIdentifiedClause> <ModelElementName> <RestrictedToClause> ';'                       
+                        | <ModelElementName> <IsIdentifiedClause> <ModelElementName> 'where' <FactTypeReadingSet> ';'                       
+!                        | <ModelElementName> 'is identified by its' <ModelElementName> ';'
+!                        | <ModelElementName> 'is identified by its' <ModelElementName> <AndExtension> 'where' <FactTypeReadingSet> ';'
+!                        | <ModelElementName> 'is identified by its' <ModelElementName> <RestrictedToClause> ';'                       
+!                        | <ModelElementName> 'is identified by its' <ModelElementName> 'where' <FactTypeReadingSet> ';'                        
+!                        | <ModelElementName> 'is independent identified by' <ModelElementName> ';'
+!                        | <ModelElementName> 'is independent identified by' <ModelElementName> <AndExtension> 'where' <FactTypeReadingSet> ';'
+!                        | <ModelElementName> 'is independent identified by' <ModelElementName> <RestrictedToClause> ';'                       
+!                        | <ModelElementName> 'is independent identified by' <ModelElementName> 'where' <FactTypeReadingSet> ';'                                              
+!                        | <ModelElementName> 'is independent identified by its' <ModelElementName> ';'
+!                        | <ModelElementName> 'is independent identified by its' <ModelElementName> <AndExtension> 'where' <FactTypeReadingSet> ';'
+!                        | <ModelElementName> 'is independent identified by its' <ModelElementName> <RestrictedToClause> ';'                       
+!                        | <ModelElementName> 'is independent identified by its' <ModelElementName> 'where' <FactTypeReadingSet> ';'                        
+
+<IsIdentifiedClause> ::= <IsIdentifiedBy>
+                      | <IsIdentifiedBy> 'its'
+                      | <IdentifiedBy>
+                      | <Independent> <IdentifiedBy> 
+                      | <Independent> <IdentifiedBy> 'its'
+                      | '['<EmbellishmentList>']' <IdentifiedBy>
+                      | '['<EmbellishmentList>']' <IsIdentifiedBy> 'its'
+                      | '['<EmbellishmentList>']' <Independent> <IdentifiedBy> 
+                      | '['<EmbellishmentList>']' <Independent> <IdentifiedBy> 'its'
+                                            
+<IsIdentifiedBy> ::= 'is identified by'
+                  
+<IdentifiedBy> ::= 'identified by'
+                
+<InclusiveOrStatement> ::= 'either' <FactTypeStatementSO> 'or' <FactTypeStatementSO> ';'
+                 
+<Independent> ::= 'is independent'
+               
+<EqualityConstraint> ::= <FactTypeStatementSO> 'if and only if' <FactTypeStatement>
+
+<ExclusiveOrConstraint1> ::= 'for each' <ModelElementNameSet> 'exactly one of these holds:' <FactTypeReadingSet> ';'
+                          
+<ExclusiveOrConstraint2> ::= 'either' <FactTypeStatementSO> 'or' <FactTypeStatementSO> 'but not both;'
+                          
+<ExclusionConstraint> ::= 'for each' <ModelElementNameSet> 'at most one of these holds:' <FactTypeReadingSet> ';'                     
+                       
+<ExternalUniquenessConstraint> ::= 'each combination' <ModelElementNameSet> 'occurs at most one time in' <FactTypeReadingSet> ';'
+                                                 
+<FactTypeReadingSet> ::= <FactTypeStatementSO>
+                      | <FactTypeStatementComma> <FactTypeReadingSet>
+
+<FactTypeStatementSO> ::= <ModelElementName> <PredicateExtension>  
+                     | 'some' <ModelElementName> <PredicateExtension>
+                     | 'that' <ModelElementName> <PredicateExtension>                     
+                     |  <ModelElementName> <PredicateExtension> <RingConstraintTypeClause>
+                     | <ModelElementName> <InWhichStatement> <PredicateExtension>
+                     | <FrontText> <ModelElementName> <PredicateExtension>                     
+                     | <FrontText> <ModelElementName> <InWhichStatement> <PredicateExtension>                                          
+                                   
+<FactTypeStatement> ::= <ModelElementName> <PredicateExtension> ';'
+                     | <FrontText> <ModelElementName> <PredicateExtension> ';'
+                     | <ModelElementName> <PredicateExtension> <RingConstraintTypeClause> ';'                     
+                     
+!<FactTypeStatementThat> ::= <ModelElementName> <PredicateExtensionThat> ';'
+                     
+<FactTypeStatementComma> ::= <ModelElementName> <PredicateExtension> ',' 
+                           | 'some' <ModelElementName> <PredicateExtension> ','                           
+                           | 'that' <ModelElementName> <PredicateExtension> ','                           
+                           | <ModelElementName> <PredicateExtension> <RingConstraintTypeClause> ','
+                          
+<FrontText> ::= <LowercaseWords>
+             
+<InclusiveOrConstraint> ::= <ModelElementName> 'occurs at least one time in' <FactTypeReadingSet> ';'
+                          
+<InWhichStatement> ::= '(in which' <FactTypeStatementSO> ')'
+                    
+<LowercaseWords> ::= LowercaseWordString
+                   | LowercaseWordString <LowercaseWords>
+                   
+<CamelcaseWordString> ::= CamelcaseWords
+                        | CamelcaseWords <CamelcaseWordString>
+                       
+<ModelElementName> ::= <CamelcaseWordString>
+                    | <CamelcaseWordString> '(as' <CamelcaseWordString> ')'
+                    | <CamelcaseWordString> '(as' LowercaseWordString ')'                    
+                    | PreboundReadingText <CamelcaseWordString>
+                    | DataType
+                    | PreboundReadingText DataType
+                    
+<ModelElementNameSet> ::= <ModelElementName>
+                        | <ModelElementName> ',' <ModelElementNameSet>
+                    
+<ObjectifiedFactTypeStatement> ::= <ModelElementName> 'is where' <FactTypeReadingSet> ';'
+                                | <ModelElementName> '['<EmbellishmentList>']' 'is where' <FactTypeReadingSet> ';'
+                       
+<PredicateClause> ::= <PredicatePart> <PredicateClause>
+                    | <PredicatePart>
+
+<PredicateExtension> ::= <PredicateClause>
+                       | <PredicateClause> 'that'
+                       | 'that' <PredicateClause>
+                       | 'that' <PredicateClause> 'that'
+                       | 'that' <PredicateClause> 'that' <ModelElementName>                       
+                       | 'that' <PredicateClause> <ModelElementName>                                              
+                       | 'that' <PredicateClause> <ModelElementName> <PredicateExtension>                       
+                       | 'that' <PredicateClause> <ModelElementName> <Subscript> <PredicateExtension>
+                       | <PredicateClause> <ModelElementName>
+                       | <PredicateClause> 'some' <ModelElementName>
+                       | <PredicateClause> 'that' <ModelElementName>                       
+                       | <PredicateClause> <ModelElementName> <PredicateExtension>         
+                       | <PredicateClause> 'that' <ModelElementName> <PredicateExtension>                                                           
+                       | <PredicateClause> 'some' <ModelElementName> <PredicateExtension>                       
+                       | <PredicateClause> <ModelElementName> <Subscript>
+                       | <PredicateClause> <ModelElementName> <Subscript> <PredicateExtension>                
+                       | <PredicateClause> <ModelElementName> <RestrictedToClause>
+                       | <PredicateClause> <ModelElementName> <InWhichStatement> <PredicateExtension>
+                       | <PredicateClause> <ModelElementName> <InWhichStatement>                       
+
+!<PredicateExtensionThat> ::= <PredicateClause> <ModelElementName> <PredicateExtensionThat>                       
+!                          | 'that' <PredicateClause> 'that'
+!                          | 'that' <PredicateClause> <ModelElementName>                   
+!                          | 'that' <PredicateClause> 'that' <ModelElementName>                                             
+!                          | 'that' <PredicateClause> 'some' <ModelElementName>
+!                          | 'that' <PredicateClause> <ModelElementName> <PredicateExtensionThat>                                                                      
+                                                                 
+<PredicatePart> ::= LowercaseWordString 
+                  | LowercaseWordString OnePredicate 
+                  | LowercaseWordString AtMostOnePredicate
+                                               
+<RestrictedToClause> ::= 'restricted to {' <ValueSet> '}'               
+                      
+<ReverseFactTypeReading> ::= <FactTypeStatement>
+                          
+<RingConstraintTypeClause> ::= '[' <RingConstraintTypeSet> ']'                             
+                            
+<RingConstraintTypeSet> ::= RingConstraintType
+                         | RingConstraintType ',' <RingConstraintTypeSet>
+                      
+<SchemaClause> ::= Schemadeclaration CamelcaseWords ';'               
+                
+<SubsetConstraint> ::= <FactTypeStatementSO> 'only if' <FactTypeStatement>
+                   |  <FactTypeStatementSO> 'only if that' <FactTypeStatement>                  
+!                   |  <FactTypeStatementSO> 'only if' <FactTypeStatementThat>                                     
+
+<Subscript> ::= BracketedNumber
+                   
+<SubtypeStatement> ::= <ModelElementName> 'is a kind of' <ModelElementName> ';'
+                     | <ModelElementName> 'is a kind of' <ModelElementName> '['<EmbellishmentList>']' ';'
+                     | 'each' <ModelElementName> 'is a kind of' <ModelElementName> ';'
+                     | 'each' <ModelElementName> 'is a kind of' <ModelElementName> '['<EmbellishmentList>']' ';'
+                     | <ModelElementName> 'is a kind of' <ModelElementName> <IsIdentifiedClause> <ModelElementName> 'where' <FactTypeReadingSet> ';'
+                     
+                      
+<Value> ::= DateLiteral
+          | DateLiteral '..'
+          | DateLiteral '..' DateLiteral          
+          | NumberLiteral
+          | NumberLiteral '..'
+          | NumberLiteral '..' NumberLiteral
+          | StringLiteral
+         
+<ValueSet> ::= <Value>
+             | <Value> ',' <ValueSet>
+             
+<DataTypeFuckYou> ::= DataType
+                    | DataType BracketedNumber
+                    | DataType ValueTypeParameter
+                    | CamelcaseWords
+
+<ValueTypeStatementEach> ::= 'each' <ValueTypeStatement>
+                                     
+<ValueTypeStatement> ::= <ModelElementName> <IsWrittenAsFuckYou> <DataTypeFuckYou> ';'
+                       | <ModelElementName> <IsWrittenAsFuckYou> <DataTypeFuckYou> <RestrictedToClause> ';'
+!'                      | <ModelElementName> <IsWrittenAsFuckYou> DataType DataTypeExtension ';'                      
+!'                      | <ModelElementName> <IsWrittenAsFuckYou> DataType DataTypeExtension <RestrictedToClause> ';'
+                      
+<IsWrittenAsFuckYou> ::= 'is written as'
+                      | 'is written as an'
+                      | 'is written as a'                      
+            
+

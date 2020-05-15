@@ -1,0 +1,19 @@
+CREATE TABLE [ClientServerUser] (
+	[Id] TEXT(40) WITH COMPRESSION,
+	[Username] TEXT(60) WITH COMPRESSION,
+	[PasswordHash] TEXT(255) WITH COMPRESSION,
+	[ResetPassword] BIT NOT NULL DEFAULT 0,
+	[IsActive] BIT NOT NULL DEFAULT 0,
+	[IsSuperUser] BIT NOT NULL DEFAULT 0,
+	[FirstName] TEXT(60) WITH COMPRESSION,
+	[LastName] TEXT(60) WITH COMPRESSION,
+	CONSTRAINT [PrimaryKey] PRIMARY KEY ([Id])
+);
+ALTER TABLE [ClientServerUser] DENY ZERO LENGTH [Id];
+ALTER TABLE [ClientServerUser] DENY ZERO LENGTH [Username];
+ALTER TABLE [ClientServerUser] ALLOW ZERO LENGTH [PasswordHash];
+ALTER TABLE [ClientServerUser] ALLOW ZERO LENGTH [FirstName];
+ALTER TABLE [ClientServerUser] ALLOW ZERO LENGTH [LastName];
+ALTER TABLE [ClientServerUser] FORMAT [ResetPassword] SET "Yes/No";
+ALTER TABLE [ClientServerUser] FORMAT [IsActive] SET "Yes/No";
+ALTER TABLE [ClientServerUser] FORMAT [IsSuperUser] SET "Yes/No";

@@ -1,0 +1,15 @@
+D:\Viev\02-Marketing\01-Product\01-Products\Boston\Versions\SVN\Boston\ClientServerWebService\WebService\WCFServiceLibrary\WcfServiceLibrary\bin\Debug\BostonWCFServiceLibrary.dll.config
+D:\Viev\02-Marketing\01-Product\01-Products\Boston\Versions\SVN\Boston\ClientServerWebService\WebService\WCFServiceLibrary\WcfServiceLibrary\bin\Debug\BostonWCFServiceLibrary.dll
+D:\Viev\02-Marketing\01-Product\01-Products\Boston\Versions\SVN\Boston\ClientServerWebService\WebService\WCFServiceLibrary\WcfServiceLibrary\bin\Debug\BostonWCFServiceLibrary.pdb
+D:\Viev\02-Marketing\01-Product\01-Products\Boston\Versions\SVN\Boston\ClientServerWebService\WebService\WCFServiceLibrary\WcfServiceLibrary\bin\Debug\BostonWCFServiceLibrary.xml
+D:\Viev\02-Marketing\01-Product\01-Products\Boston\Versions\SVN\Boston\ClientServerWebService\WebService\WCFServiceLibrary\WcfServiceLibrary\bin\Debug\VievFBMInterface.dll
+D:\Viev\02-Marketing\01-Product\01-Products\Boston\Versions\SVN\Boston\ClientServerWebService\WebService\WCFServiceLibrary\WcfServiceLibrary\bin\Debug\VievPluginFramework.dll
+D:\Viev\02-Marketing\01-Product\01-Products\Boston\Versions\SVN\Boston\ClientServerWebService\WebService\WCFServiceLibrary\WcfServiceLibrary\bin\Debug\WeifenLuo.WinFormsUI.Docking.dll
+D:\Viev\02-Marketing\01-Product\01-Products\Boston\Versions\SVN\Boston\ClientServerWebService\WebService\WCFServiceLibrary\WcfServiceLibrary\bin\Debug\VievFBMInterface.pdb
+D:\Viev\02-Marketing\01-Product\01-Products\Boston\Versions\SVN\Boston\ClientServerWebService\WebService\WCFServiceLibrary\WcfServiceLibrary\bin\Debug\VievFBMInterface.xml
+D:\Viev\02-Marketing\01-Product\01-Products\Boston\Versions\SVN\Boston\ClientServerWebService\WebService\WCFServiceLibrary\WcfServiceLibrary\obj\Debug\BostonWCFServiceLibrary.vbprojResolveAssemblyReference.cache
+D:\Viev\02-Marketing\01-Product\01-Products\Boston\Versions\SVN\Boston\ClientServerWebService\WebService\WCFServiceLibrary\WcfServiceLibrary\obj\Debug\BostonWCFServiceLibrary.Resources.resources
+D:\Viev\02-Marketing\01-Product\01-Products\Boston\Versions\SVN\Boston\ClientServerWebService\WebService\WCFServiceLibrary\WcfServiceLibrary\obj\Debug\BostonWCFServiceLibrary.vbproj.GenerateResource.Cache
+D:\Viev\02-Marketing\01-Product\01-Products\Boston\Versions\SVN\Boston\ClientServerWebService\WebService\WCFServiceLibrary\WcfServiceLibrary\obj\Debug\BostonWCFServiceLibrary.dll
+D:\Viev\02-Marketing\01-Product\01-Products\Boston\Versions\SVN\Boston\ClientServerWebService\WebService\WCFServiceLibrary\WcfServiceLibrary\obj\Debug\BostonWCFServiceLibrary.xml
+D:\Viev\02-Marketing\01-Product\01-Products\Boston\Versions\SVN\Boston\ClientServerWebService\WebService\WCFServiceLibrary\WcfServiceLibrary\obj\Debug\BostonWCFServiceLibrary.pdb

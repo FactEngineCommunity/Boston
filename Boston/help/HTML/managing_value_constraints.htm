@@ -1,0 +1,86 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- saved from url=(0029)http://www.helpandmanual.com/ -->
+<head><script type="text/javascript" src="helpman_topicinit.js"></script>
+<!-- Redirect browser to frame page if page is not in the content frame. -->
+<script type="text/javascript">
+<!--
+if (top.location.search.lastIndexOf("toc=0")<=0) {
+  if (top.frames.length==0) { top.location.href="index.html?managing_value_constraints.htm"; }
+  else { parent.quicksync('a3.5.1.2'); }
+}
+//-->
+</script>
+   <title>Managing Value Constraints</title>
+   <meta name="generator" content="Help &amp; Manual" />
+   <meta name="keywords" content="Value Type,Reference Mode" />
+   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+   <meta http-equiv="Content-Style-Type" content="text/css" />
+   <link type="text/css" href="default.css" rel="stylesheet" />
+</head>
+<body style="margin: 0px 0px 0px 0px; background: #FFFFFF;">
+<div id="hmpopupDiv" style="visibility:hidden; position:absolute; z-index:1000; "></div>
+
+
+<table width="100%" border="0" cellspacing="0" cellpadding="5" bgcolor="#649CCC">
+  <tr valign="middle">
+    <td align="left">
+      <p class="p_Heading1"><span class="f_Heading1">Managing Value Constraints</span></p>
+
+    </td>
+    <td align="right">
+     <span style="font-size: 9pt">
+     <a href="introduction.htm">Top</a>&nbsp;
+     <a href="managing_value_type_properties.htm">Previous</a>&nbsp;
+     <a href="adding_value_constraints_to_a_.htm">Next</a>
+     </span>
+    </td>
+  </tr>
+</table>
+
+
+<!-- Placeholder for topic body. -->
+<table width="100%" border="0" cellspacing="0" cellpadding="5"><tr valign="top"><td align="left">
+<p>This chapter outlines how to maintain Value Constraints for a Value Type.</p>
+<p>&nbsp;</p>
+<p>Help topics include:</p>
+<p>&nbsp;</p>
+<p><a href="adding_value_constraints_to_a_.htm">Adding Value Constraints to a Value Type</a></p>
+<p>&nbsp;</p>
+<p class="p_Heading1"><span class="f_Heading1">Value Constraints</span></p>
+<p class="p_Heading1"><span class="f_Heading1">&nbsp;</span></p>
+<p>Value Constraints have three main types:</p>
+<p>&nbsp;</p>
+<div style="text-align: left; text-indent: 0px; padding: 0px 0px 0px 0px; margin: 0px 0px 0px 0px;"><table border="0" cellpadding="0" cellspacing="0" style="line-height: normal;"><tr style="vertical-align:baseline" valign="baseline"><td width="15"><span style="font-size: 10pt; font-family: 'Arial'; color: #000000;">1.</span></td><td>Enumerations</td></tr></table></div><div style="text-align: left; text-indent: 0px; padding: 0px 0px 0px 0px; margin: 0px 0px 0px 0px;"><table border="0" cellpadding="0" cellspacing="0" style="line-height: normal;"><tr style="vertical-align:baseline" valign="baseline"><td width="15"><span style="font-size: 10pt; font-family: 'Arial'; color: #000000;">2.</span></td><td>Value Ranges</td></tr></table></div><div style="text-align: left; text-indent: 0px; padding: 0px 0px 0px 0px; margin: 0px 0px 0px 0px;"><table border="0" cellpadding="0" cellspacing="0" style="line-height: normal;"><tr style="vertical-align:baseline" valign="baseline"><td width="15"><span style="font-size: 10pt; font-family: 'Arial'; color: #000000;">3.</span></td><td>Multiple Combinations of Enumerations and/or Value Ranges</td></tr></table></div><p>&nbsp;</p>
+<p class="p_Heading2"><span class="f_Heading2">Enumerations</span></p>
+<p class="p_Heading2"><span class="f_Heading2">&nbsp;</span></p>
+<p>An Enumerated Value Constraint lists the discrete Values that are valid for a Value Type.</p>
+<p>&nbsp;</p>
+<p>The picture below shows an Enumerated Value Constraint for the Value Type, 'SexCode', which in this instance forms the Reference Mode for the Entity Type, 'Sex'.</p>
+<p>The discrete values are 'M' for Male and 'F' for Female.</p>
+<p>&nbsp;</p>
+<p style="text-align: center;"><img src="modelvalueconstraintenumerationmalefemale.png" width="107" height="96" border="0" alt="modelValueConstraintEnumerationMaleFemale"></p>
+<p style="text-align: center;"><span class="f_ImageCaption">Enumerated Value Constraint</span></p>
+<p>&nbsp;</p>
+<p class="p_Heading2"><span class="f_Heading2">Value Ranges</span></p>
+<p>&nbsp;</p>
+<p>A Value Constraint may constrain a Value Type to a range of values.</p>
+<p>&nbsp;</p>
+<p>The picture below shows a Value Constraint Range for the Value Type, 'LowercaseChar', limiting the values to the letters 'a' through 'z'.</p>
+<p>&nbsp;</p>
+<p style="text-align: center;"><img src="modelvalueconstraintrangelowercasechar.png" width="132" height="88" border="0" alt="modelValueConstraintRangeLowercaseChar"></p>
+<p style="text-align: center;"><span class="f_ImageCaption">Value Constraint Range</span></p>
+<p>&nbsp;</p>
+<p class="p_Heading2"><span class="f_Heading2">Multiple Value Constraints</span></p>
+<p class="p_Heading2"><span class="f_Heading2">&nbsp;</span></p>
+<p>A Value Type may have multiple Value Constraints.</p>
+<p>&nbsp;</p>
+<p>The picture below shows a Value Type, 'WheelCount' (e.g. the number of wheels on a vehicle), with values limited in the ranges, 2..4 and 16..18</p>
+<p style="text-align: center;">&nbsp;</p>
+<p style="text-align: center;"><img src="modelvalueconstraintmultiplewheelcount.png" width="115" height="88" border="0" alt="modelValueConstraintMultipleWheelCount"></p>
+<p class="p_ImageCaption" style="text-align: center;"><span class="f_ImageCaption">Multiple Value Constraints</span></p>
+
+</td></tr></table>
+
+</body>
+</html>

@@ -1,0 +1,430 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageParserRules>
+	<LanguagePhrases>
+		<LanguagePhrase PhraseId="73" PhraseType="Resolving" ResolvesToLanguagePhraseId="74" Example="Part is since UsedMode">
+			<TokenSequence>
+				<LPTSWS LanguagePhraseId="73" Token="*" SequenceNr="1" WordSense="Noun"/>
+				<LPTSWS LanguagePhraseId="73" Token="*" SequenceNr="2" WordSense="Noun"/>
+				<LPTSWS LanguagePhraseId="73" Token="*" SequenceNr="2" WordSense="Verb"/>
+				<LPTSWS LanguagePhraseId="73" Token="*" SequenceNr="3" WordSense="SubordinateConjunction"/>
+				<LPTSWS LanguagePhraseId="73" Token="*" SequenceNr="4" WordSense="Noun"/>
+				<LPTSWS LanguagePhraseId="73" Token="*" SequenceNr="4" WordSense="Verb"/>
+			</TokenSequence>
+		</LanguagePhrase>
+		<LanguagePhrase PhraseId="74" PhraseType="Resolved" ResolvesToLanguagePhraseId="" Example="">
+			<TokenSequence>
+				<LPTSWS LanguagePhraseId="74" Token="*" SequenceNr="1" WordSense="Noun"/>
+				<LPTSWS LanguagePhraseId="74" Token="*" SequenceNr="2" WordSense="Verb"/>
+				<LPTSWS LanguagePhraseId="74" Token="*" SequenceNr="3" WordSense="SubordinateConjunction"/>
+				<LPTSWS LanguagePhraseId="74" Token="*" SequenceNr="4" WordSense="Noun"/>
+			</TokenSequence>
+		</LanguagePhrase>
+		<LanguagePhrase PhraseId="75" PhraseType="Resolving" ResolvesToLanguagePhraseId="76" Example="Person has pet AnimalType">
+			<TokenSequence>
+				<LPTSWS LanguagePhraseId="75" Token="*" SequenceNr="1" WordSense="Noun"/>
+				<LPTSWS LanguagePhraseId="75" Token="*" SequenceNr="2" WordSense="Noun"/>
+				<LPTSWS LanguagePhraseId="75" Token="*" SequenceNr="2" WordSense="Verb"/>
+				<LPTSWS LanguagePhraseId="75" Token="*" SequenceNr="3" WordSense="Noun"/>
+				<LPTSWS LanguagePhraseId="75" Token="*" SequenceNr="3" WordSense="Verb"/>
+				<LPTSWS LanguagePhraseId="75" Token="*" SequenceNr="3" WordSense="Adjective"/>
+				<LPTSWS LanguagePhraseId="75" Token="*" SequenceNr="4" WordSense="Noun"/>
+			</TokenSequence>
+		</LanguagePhrase>
+		<LanguagePhrase PhraseId="76" PhraseType="Resolved" ResolvesToLanguagePhraseId="" Example="">
+			<TokenSequence>
+				<LPTSWS LanguagePhraseId="76" Token="*" SequenceNr="1" WordSense="Noun"/>
+				<LPTSWS LanguagePhraseId="76" Token="*" SequenceNr="2" WordSense="Verb"/>
+				<LPTSWS LanguagePhraseId="76" Token="*" SequenceNr="3" WordSense="Adjective"/>
+				<LPTSWS LanguagePhraseId="76" Token="*" SequenceNr="4" WordSense="Noun"/>
+			</TokenSequence>
+		</LanguagePhrase>
+		<LanguagePhrase PhraseId="77" PhraseType="Resolving" ResolvesToLanguagePhraseId="78" Example="has pet Dog">
+			<TokenSequence>
+				<LPTSWS LanguagePhraseId="77" Token="*" SequenceNr="1" WordSense="Noun"/>
+				<LPTSWS LanguagePhraseId="77" Token="*" SequenceNr="1" WordSense="Verb"/>
+				<LPTSWS LanguagePhraseId="77" Token="*" SequenceNr="2" WordSense="Noun"/>
+				<LPTSWS LanguagePhraseId="77" Token="*" SequenceNr="2" WordSense="Verb"/>
+				<LPTSWS LanguagePhraseId="77" Token="*" SequenceNr="2" WordSense="Adjective"/>
+				<LPTSWS LanguagePhraseId="77" Token="*" SequenceNr="3" WordSense="Noun"/>
+				<LPTSWS LanguagePhraseId="77" Token="*" SequenceNr="3" WordSense="Verb"/>
+			</TokenSequence>
+		</LanguagePhrase>
+		<LanguagePhrase PhraseId="78" PhraseType="Resolved" ResolvesToLanguagePhraseId="" Example="">
+			<TokenSequence>
+				<LPTSWS LanguagePhraseId="78" Token="*" SequenceNr="1" WordSense="Verb"/>
+				<LPTSWS LanguagePhraseId="78" Token="*" SequenceNr="2" WordSense="Adjective"/>
+				<LPTSWS LanguagePhraseId="78" Token="*" SequenceNr="3" WordSense="Noun"/>
+			</TokenSequence>
+		</LanguagePhrase>
+		<LanguagePhrase PhraseId="79" PhraseType="Resolving" ResolvesToLanguagePhraseId="80" Example="has pet Dog">
+			<TokenSequence>
+				<LPTSWS LanguagePhraseId="79" Token="*" SequenceNr="1" WordSense="Verb"/>
+				<LPTSWS LanguagePhraseId="79" Token="*" SequenceNr="2" WordSense="Noun"/>
+				<LPTSWS LanguagePhraseId="79" Token="*" SequenceNr="2" WordSense="Adjective"/>
+				<LPTSWS LanguagePhraseId="79" Token="*" SequenceNr="3" WordSense="Noun"/>
+			</TokenSequence>
+		</LanguagePhrase>
+		<LanguagePhrase PhraseId="80" PhraseType="Resolved" ResolvesToLanguagePhraseId="" Example="">
+			<TokenSequence>
+				<LPTSWS LanguagePhraseId="80" Token="*" SequenceNr="1" WordSense="Verb"/>
+				<LPTSWS LanguagePhraseId="80" Token="*" SequenceNr="2" WordSense="Adjective"/>
+				<LPTSWS LanguagePhraseId="80" Token="*" SequenceNr="3" WordSense="Noun"/>
+			</TokenSequence>
+		</LanguagePhrase>
+		<LanguagePhrase PhraseId="81" PhraseType="Resolving" ResolvesToLanguagePhraseId="82" Example="has pet Dog">
+			<TokenSequence>
+				<LPTSWS LanguagePhraseId="81" Token="*" SequenceNr="1" WordSense="Noun"/>
+				<LPTSWS LanguagePhraseId="81" Token="*" SequenceNr="2" WordSense="Verb"/>
+				<LPTSWS LanguagePhraseId="81" Token="*" SequenceNr="3" WordSense="Adjective"/>
+				<LPTSWS LanguagePhraseId="81" Token="*" SequenceNr="3" WordSense="Noun"/>
+				<LPTSWS LanguagePhraseId="81" Token="*" SequenceNr="4" WordSense="Noun"/>
+			</TokenSequence>
+		</LanguagePhrase>
+		<LanguagePhrase PhraseId="82" PhraseType="Resolved" ResolvesToLanguagePhraseId="" Example="">
+			<TokenSequence>
+				<LPTSWS LanguagePhraseId="82" Token="*" SequenceNr="1" WordSense="Noun"/>
+				<LPTSWS LanguagePhraseId="82" Token="*" SequenceNr="2" WordSense="Verb"/>
+				<LPTSWS LanguagePhraseId="82" Token="*" SequenceNr="3" WordSense="Adjective"/>
+				<LPTSWS LanguagePhraseId="82" Token="*" SequenceNr="4" WordSense="Noun"/>
+			</TokenSequence>
+		</LanguagePhrase>
+		<LanguagePhrase PhraseId="83" PhraseType="Resolving" ResolvesToLanguagePhraseId="84" Example="has pet Dog">
+			<TokenSequence>
+				<LPTSWS LanguagePhraseId="83" Token="*" SequenceNr="1" WordSense="Verb"/>
+				<LPTSWS LanguagePhraseId="83" Token="*" SequenceNr="2" WordSense="Noun"/>
+				<LPTSWS LanguagePhraseId="83" Token="*" SequenceNr="2" WordSense="Verb"/>
+				<LPTSWS LanguagePhraseId="83" Token="*" SequenceNr="2" WordSense="Adjective"/>
+				<LPTSWS LanguagePhraseId="83" Token="*" SequenceNr="3" WordSense="Noun"/>
+			</TokenSequence>
+		</LanguagePhrase>
+		<LanguagePhrase PhraseId="84" PhraseType="Resolved" ResolvesToLanguagePhraseId="" Example="">
+			<TokenSequence>
+				<LPTSWS LanguagePhraseId="84" Token="*" SequenceNr="1" WordSense="Verb"/>
+				<LPTSWS LanguagePhraseId="84" Token="*" SequenceNr="2" WordSense="Adjective"/>
+				<LPTSWS LanguagePhraseId="84" Token="*" SequenceNr="3" WordSense="Noun"/>
+			</TokenSequence>
+		</LanguagePhrase>
+		<LanguagePhrase PhraseId="85" PhraseType="Resolving" ResolvesToLanguagePhraseId="86" Example="Person is learning skill">
+			<TokenSequence>
+				<LPTSWS LanguagePhraseId="85" Token="*" SequenceNr="1" WordSense="Noun"/>
+				<LPTSWS LanguagePhraseId="85" Token="*" SequenceNr="2" WordSense="Verb"/>
+				<LPTSWS LanguagePhraseId="85" Token="*" SequenceNr="2" WordSense="Adjective"/>
+				<LPTSWS LanguagePhraseId="85" Token="*" SequenceNr="3" WordSense="Noun"/>
+				<LPTSWS LanguagePhraseId="85" Token="*" SequenceNr="3" WordSense="Verb"/>
+				<LPTSWS LanguagePhraseId="85" Token="*" SequenceNr="4" WordSense="Noun"/>
+			</TokenSequence>
+		</LanguagePhrase>
+		<LanguagePhrase PhraseId="86" PhraseType="Resolved" ResolvesToLanguagePhraseId="" Example="">
+			<TokenSequence>
+				<LPTSWS LanguagePhraseId="86" Token="*" SequenceNr="1" WordSense="Noun"/>
+				<LPTSWS LanguagePhraseId="86" Token="*" SequenceNr="2" WordSense="Verb"/>
+				<LPTSWS LanguagePhraseId="86" Token="*" SequenceNr="3" WordSense="Verb"/>
+				<LPTSWS LanguagePhraseId="86" Token="*" SequenceNr="4" WordSense="Noun"/>
+			</TokenSequence>
+		</LanguagePhrase>
+		<LanguagePhrase PhraseId="87" PhraseType="Resolving" ResolvesToLanguagePhraseId="88" Example="Person is learning skill">
+			<TokenSequence>
+				<LPTSWS LanguagePhraseId="87" Token="*" SequenceNr="1" WordSense="Verb"/>
+				<LPTSWS LanguagePhraseId="87" Token="*" SequenceNr="1" WordSense="Adjective"/>
+				<LPTSWS LanguagePhraseId="87" Token="*" SequenceNr="2" WordSense="Noun"/>
+				<LPTSWS LanguagePhraseId="87" Token="*" SequenceNr="2" WordSense="Verb"/>
+				<LPTSWS LanguagePhraseId="87" Token="*" SequenceNr="3" WordSense="Noun"/>
+			</TokenSequence>
+		</LanguagePhrase>
+		<LanguagePhrase PhraseId="88" PhraseType="Resolved" ResolvesToLanguagePhraseId="" Example="">
+			<TokenSequence>
+				<LPTSWS LanguagePhraseId="88" Token="*" SequenceNr="1" WordSense="Verb"/>
+				<LPTSWS LanguagePhraseId="88" Token="*" SequenceNr="2" WordSense="Verb"/>
+				<LPTSWS LanguagePhraseId="88" Token="*" SequenceNr="3" WordSense="Noun"/>
+			</TokenSequence>
+		</LanguagePhrase>
+		<LanguagePhrase PhraseId="89" PhraseType="Resolving" ResolvesToLanguagePhraseId="90" Example="Person is learning skill">
+			<TokenSequence>
+				<LPTSWS LanguagePhraseId="89" Token="*" SequenceNr="1" WordSense="Noun"/>
+				<LPTSWS LanguagePhraseId="89" Token="*" SequenceNr="2" WordSense="Verb"/>
+				<LPTSWS LanguagePhraseId="89" Token="*" SequenceNr="3" WordSense="Noun"/>
+				<LPTSWS LanguagePhraseId="89" Token="*" SequenceNr="3" WordSense="Verb"/>
+				<LPTSWS LanguagePhraseId="89" Token="*" SequenceNr="4" WordSense="Noun"/>
+			</TokenSequence>
+		</LanguagePhrase>
+		<LanguagePhrase PhraseId="90" PhraseType="Resolved" ResolvesToLanguagePhraseId="" Example="">
+			<TokenSequence>
+				<LPTSWS LanguagePhraseId="90" Token="*" SequenceNr="1" WordSense="Noun"/>
+				<LPTSWS LanguagePhraseId="90" Token="*" SequenceNr="2" WordSense="Verb"/>
+				<LPTSWS LanguagePhraseId="90" Token="*" SequenceNr="3" WordSense="Verb"/>
+				<LPTSWS LanguagePhraseId="90" Token="*" SequenceNr="4" WordSense="Noun"/>
+			</TokenSequence>
+		</LanguagePhrase>
+		<LanguagePhrase PhraseId="91" PhraseType="Resolving" ResolvesToLanguagePhraseId="92" Example="Person since Date">
+			<TokenSequence>
+				<LPTSWS LanguagePhraseId="91" Token="*" SequenceNr="1" WordSense="Noun"/>
+				<LPTSWS LanguagePhraseId="91" Token="*" SequenceNr="2" WordSense="SubordinateConjunction"/>
+				<LPTSWS LanguagePhraseId="91" Token="*" SequenceNr="3" WordSense="Noun"/>
+				<LPTSWS LanguagePhraseId="91" Token="*" SequenceNr="3" WordSense="Verb"/>
+			</TokenSequence>
+		</LanguagePhrase>
+		<LanguagePhrase PhraseId="92" PhraseType="Resolved" ResolvesToLanguagePhraseId="" Example="">
+			<TokenSequence>
+				<LPTSWS LanguagePhraseId="92" Token="*" SequenceNr="1" WordSense="Noun"/>
+				<LPTSWS LanguagePhraseId="92" Token="*" SequenceNr="2" WordSense="SubordinateConjunction"/>
+				<LPTSWS LanguagePhraseId="92" Token="*" SequenceNr="3" WordSense="Noun"/>
+			</TokenSequence>
+		</LanguagePhrase>
+		<LanguagePhrase PhraseId="93" PhraseType="Resolving" ResolvesToLanguagePhraseId="94" Example="Person since Date">
+			<TokenSequence>
+				<LPTSWS LanguagePhraseId="93" Token="*" SequenceNr="1" WordSense="Noun"/>
+				<LPTSWS LanguagePhraseId="93" Token="*" SequenceNr="1" WordSense="Adjective"/>
+				<LPTSWS LanguagePhraseId="93" Token="*" SequenceNr="1" WordSense="Adverb"/>
+				<LPTSWS LanguagePhraseId="93" Token="*" SequenceNr="1" WordSense="Preposition"/>
+				<LPTSWS LanguagePhraseId="93" Token="*" SequenceNr="2" WordSense="Noun"/>
+				<LPTSWS LanguagePhraseId="93" Token="*" SequenceNr="2" WordSense="Verb"/>
+				<LPTSWS LanguagePhraseId="93" Token="*" SequenceNr="3" WordSense="Noun"/>
+				<LPTSWS LanguagePhraseId="93" Token="*" SequenceNr="3" WordSense="Adjective"/>
+				<LPTSWS LanguagePhraseId="93" Token="*" SequenceNr="3" WordSense="Adverb"/>
+				<LPTSWS LanguagePhraseId="93" Token="*" SequenceNr="3" WordSense="Preposition"/>
+			</TokenSequence>
+		</LanguagePhrase>
+		<LanguagePhrase PhraseId="94" PhraseType="Resolved" ResolvesToLanguagePhraseId="" Example="">
+			<TokenSequence>
+				<LPTSWS LanguagePhraseId="94" Token="*" SequenceNr="1" WordSense="Preposition"/>
+				<LPTSWS LanguagePhraseId="94" Token="*" SequenceNr="2" WordSense="Noun"/>
+				<LPTSWS LanguagePhraseId="94" Token="*" SequenceNr="3" WordSense="Preposition"/>
+			</TokenSequence>
+		</LanguagePhrase>
+		<LanguagePhrase PhraseId="95" PhraseType="Resolving" ResolvesToLanguagePhraseId="96" Example="is in a bin in a">
+			<TokenSequence>
+				<LPTSWS LanguagePhraseId="95" Token="*" SequenceNr="1" WordSense="Verb"/>
+				<LPTSWS LanguagePhraseId="95" Token="*" SequenceNr="2" WordSense="Preposition"/>
+				<LPTSWS LanguagePhraseId="95" Token="*" SequenceNr="3" WordSense="Article"/>
+				<LPTSWS LanguagePhraseId="95" Token="*" SequenceNr="4" WordSense="Noun"/>
+				<LPTSWS LanguagePhraseId="95" Token="*" SequenceNr="5" WordSense="Preposition"/>
+				<LPTSWS LanguagePhraseId="95" Token="*" SequenceNr="6" WordSense="Article"/>
+			</TokenSequence>
+		</LanguagePhrase>
+		<LanguagePhrase PhraseId="96" PhraseType="Resolved" ResolvesToLanguagePhraseId="" Example="">
+			<TokenSequence>
+				<LPTSWS LanguagePhraseId="96" Token="*" SequenceNr="1" WordSense="Verb"/>
+				<LPTSWS LanguagePhraseId="96" Token="*" SequenceNr="2" WordSense="Preposition"/>
+				<LPTSWS LanguagePhraseId="96" Token="*" SequenceNr="3" WordSense="Article"/>
+				<LPTSWS LanguagePhraseId="96" Token="*" SequenceNr="4" WordSense="Noun"/>
+				<LPTSWS LanguagePhraseId="96" Token="*" SequenceNr="5" WordSense="Preposition"/>
+				<LPTSWS LanguagePhraseId="96" Token="*" SequenceNr="6" WordSense="Article"/>
+			</TokenSequence>
+		</LanguagePhrase>
+		<LanguagePhrase PhraseId="97" PhraseType="Resolving" ResolvesToLanguagePhraseId="98" Example="part is in a bin in a warehouse">
+			<TokenSequence>
+				<LPTSWS LanguagePhraseId="97" Token="*" SequenceNr="1" WordSense="Noun"/>
+				<LPTSWS LanguagePhraseId="97" Token="*" SequenceNr="2" WordSense="Verb"/>
+				<LPTSWS LanguagePhraseId="97" Token="*" SequenceNr="3" WordSense="Preposition"/>
+				<LPTSWS LanguagePhraseId="97" Token="*" SequenceNr="4" WordSense="Article"/>
+				<LPTSWS LanguagePhraseId="97" Token="*" SequenceNr="5" WordSense="Noun"/>
+				<LPTSWS LanguagePhraseId="97" Token="*" SequenceNr="6" WordSense="Preposition"/>
+				<LPTSWS LanguagePhraseId="97" Token="*" SequenceNr="7" WordSense="Article"/>
+				<LPTSWS LanguagePhraseId="97" Token="*" SequenceNr="8" WordSense="Noun"/>
+			</TokenSequence>
+		</LanguagePhrase>
+		<LanguagePhrase PhraseId="98" PhraseType="Resolved" ResolvesToLanguagePhraseId="" Example="">
+			<TokenSequence>
+				<LPTSWS LanguagePhraseId="98" Token="*" SequenceNr="1" WordSense="Noun"/>
+				<LPTSWS LanguagePhraseId="98" Token="*" SequenceNr="2" WordSense="Verb"/>
+				<LPTSWS LanguagePhraseId="98" Token="*" SequenceNr="3" WordSense="Preposition"/>
+				<LPTSWS LanguagePhraseId="98" Token="*" SequenceNr="4" WordSense="Article"/>
+				<LPTSWS LanguagePhraseId="98" Token="*" SequenceNr="5" WordSense="Noun"/>
+				<LPTSWS LanguagePhraseId="98" Token="*" SequenceNr="6" WordSense="Preposition"/>
+				<LPTSWS LanguagePhraseId="98" Token="*" SequenceNr="7" WordSense="Article"/>
+				<LPTSWS LanguagePhraseId="98" Token="*" SequenceNr="8" WordSense="Noun"/>
+			</TokenSequence>
+		</LanguagePhrase>
+		<LanguagePhrase PhraseId="99" PhraseType="Resolving" ResolvesToLanguagePhraseId="100" Example="a bin in a warehouse">
+			<TokenSequence>
+				<LPTSWS LanguagePhraseId="99" Token="*" SequenceNr="1" WordSense="Noun"/>
+				<LPTSWS LanguagePhraseId="99" Token="*" SequenceNr="1" WordSense="Article"/>
+				<LPTSWS LanguagePhraseId="99" Token="*" SequenceNr="2" WordSense="Noun"/>
+				<LPTSWS LanguagePhraseId="99" Token="*" SequenceNr="2" WordSense="Verb"/>
+				<LPTSWS LanguagePhraseId="99" Token="*" SequenceNr="3" WordSense="Preposition"/>
+				<LPTSWS LanguagePhraseId="99" Token="*" SequenceNr="4" WordSense="Noun"/>
+				<LPTSWS LanguagePhraseId="99" Token="*" SequenceNr="4" WordSense="Article"/>
+				<LPTSWS LanguagePhraseId="99" Token="*" SequenceNr="5" WordSense="Noun"/>
+			</TokenSequence>
+		</LanguagePhrase>
+		<LanguagePhrase PhraseId="100" PhraseType="Resolved" ResolvesToLanguagePhraseId="" Example="">
+			<TokenSequence>
+				<LPTSWS LanguagePhraseId="100" Token="*" SequenceNr="1" WordSense="Article"/>
+				<LPTSWS LanguagePhraseId="100" Token="*" SequenceNr="2" WordSense="Noun"/>
+				<LPTSWS LanguagePhraseId="100" Token="*" SequenceNr="3" WordSense="Preposition"/>
+				<LPTSWS LanguagePhraseId="100" Token="*" SequenceNr="4" WordSense="Article"/>
+				<LPTSWS LanguagePhraseId="100" Token="*" SequenceNr="5" WordSense="Noun"/>
+			</TokenSequence>
+		</LanguagePhrase>
+		<LanguagePhrase PhraseId="101" PhraseType="Resolving" ResolvesToLanguagePhraseId="102" Example="person comes from country">
+			<TokenSequence>
+				<LPTSWS LanguagePhraseId="101" Token="*" SequenceNr="1" WordSense="Noun"/>
+				<LPTSWS LanguagePhraseId="101" Token="*" SequenceNr="2" WordSense="Noun"/>
+				<LPTSWS LanguagePhraseId="101" Token="*" SequenceNr="2" WordSense="Verb"/>
+				<LPTSWS LanguagePhraseId="101" Token="*" SequenceNr="3" WordSense="Preposition"/>
+				<LPTSWS LanguagePhraseId="101" Token="*" SequenceNr="4" WordSense="Noun"/>
+			</TokenSequence>
+		</LanguagePhrase>
+		<LanguagePhrase PhraseId="102" PhraseType="Resolved" ResolvesToLanguagePhraseId="" Example="">
+			<TokenSequence>
+				<LPTSWS LanguagePhraseId="102" Token="*" SequenceNr="1" WordSense="Noun"/>
+				<LPTSWS LanguagePhraseId="102" Token="*" SequenceNr="2" WordSense="Verb"/>
+				<LPTSWS LanguagePhraseId="102" Token="*" SequenceNr="3" WordSense="Preposition"/>
+				<LPTSWS LanguagePhraseId="102" Token="*" SequenceNr="4" WordSense="Noun"/>
+			</TokenSequence>
+		</LanguagePhrase>
+		<LanguagePhrase PhraseId="103" PhraseType="Resolving" ResolvesToLanguagePhraseId="104" Example="person was born in country">
+			<TokenSequence>
+				<LPTSWS LanguagePhraseId="103" Token="*" SequenceNr="1" WordSense="Noun"/>
+				<LPTSWS LanguagePhraseId="103" Token="*" SequenceNr="2" WordSense="Noun"/>
+				<LPTSWS LanguagePhraseId="103" Token="*" SequenceNr="2" WordSense="Verb"/>
+				<LPTSWS LanguagePhraseId="103" Token="*" SequenceNr="3" WordSense="Noun"/>
+				<LPTSWS LanguagePhraseId="103" Token="*" SequenceNr="3" WordSense="Verb"/>
+				<LPTSWS LanguagePhraseId="103" Token="*" SequenceNr="3" WordSense="Adjective"/>
+				<LPTSWS LanguagePhraseId="103" Token="*" SequenceNr="4" WordSense="Noun"/>
+				<LPTSWS LanguagePhraseId="103" Token="*" SequenceNr="4" WordSense="Preposition"/>
+				<LPTSWS LanguagePhraseId="103" Token="*" SequenceNr="5" WordSense="Noun"/>
+			</TokenSequence>
+		</LanguagePhrase>
+		<LanguagePhrase PhraseId="104" PhraseType="Resolved" ResolvesToLanguagePhraseId="" Example="">
+			<TokenSequence>
+				<LPTSWS LanguagePhraseId="104" Token="*" SequenceNr="1" WordSense="Noun"/>
+				<LPTSWS LanguagePhraseId="104" Token="*" SequenceNr="2" WordSense="Verb"/>
+				<LPTSWS LanguagePhraseId="104" Token="*" SequenceNr="3" WordSense="Verb"/>
+				<LPTSWS LanguagePhraseId="104" Token="*" SequenceNr="4" WordSense="Preposition"/>
+				<LPTSWS LanguagePhraseId="104" Token="*" SequenceNr="5" WordSense="Noun"/>
+			</TokenSequence>
+		</LanguagePhrase>
+		<LanguagePhrase PhraseId="105" PhraseType="Resolving" ResolvesToLanguagePhraseId="106" Example="part is in bin in warehouse">
+			<TokenSequence>
+				<LPTSWS LanguagePhraseId="105" Token="*" SequenceNr="1" WordSense="Noun"/>
+				<LPTSWS LanguagePhraseId="105" Token="*" SequenceNr="2" WordSense="Verb"/>
+				<LPTSWS LanguagePhraseId="105" Token="*" SequenceNr="3" WordSense="Noun"/>
+				<LPTSWS LanguagePhraseId="105" Token="*" SequenceNr="3" WordSense="Preposition"/>
+				<LPTSWS LanguagePhraseId="105" Token="*" SequenceNr="4" WordSense="Noun"/>
+				<LPTSWS LanguagePhraseId="105" Token="*" SequenceNr="4" WordSense="Verb"/>
+				<LPTSWS LanguagePhraseId="105" Token="*" SequenceNr="5" WordSense="Preposition"/>
+				<LPTSWS LanguagePhraseId="105" Token="*" SequenceNr="6" WordSense="Noun"/>
+			</TokenSequence>
+		</LanguagePhrase>
+		<LanguagePhrase PhraseId="106" PhraseType="Resolved" ResolvesToLanguagePhraseId="" Example="">
+			<TokenSequence>
+				<LPTSWS LanguagePhraseId="106" Token="*" SequenceNr="1" WordSense="Noun"/>
+				<LPTSWS LanguagePhraseId="106" Token="*" SequenceNr="2" WordSense="Verb"/>
+				<LPTSWS LanguagePhraseId="106" Token="*" SequenceNr="3" WordSense="Preposition"/>
+				<LPTSWS LanguagePhraseId="106" Token="*" SequenceNr="4" WordSense="Noun"/>
+				<LPTSWS LanguagePhraseId="106" Token="*" SequenceNr="5" WordSense="Preposition"/>
+				<LPTSWS LanguagePhraseId="106" Token="*" SequenceNr="6" WordSense="Noun"/>
+			</TokenSequence>
+		</LanguagePhrase>
+		<LanguagePhrase PhraseId="107" PhraseType="Resolving" ResolvesToLanguagePhraseId="108" Example="warehouse holds bin with part">
+			<TokenSequence>
+				<LPTSWS LanguagePhraseId="107" Token="*" SequenceNr="1" WordSense="Noun"/>
+				<LPTSWS LanguagePhraseId="107" Token="*" SequenceNr="1" WordSense="Verb"/>
+				<LPTSWS LanguagePhraseId="107" Token="*" SequenceNr="2" WordSense="Noun"/>
+				<LPTSWS LanguagePhraseId="107" Token="*" SequenceNr="2" WordSense="Verb"/>
+				<LPTSWS LanguagePhraseId="107" Token="*" SequenceNr="3" WordSense="Noun"/>
+				<LPTSWS LanguagePhraseId="107" Token="*" SequenceNr="3" WordSense="Verb"/>
+				<LPTSWS LanguagePhraseId="107" Token="*" SequenceNr="4" WordSense="Preposition"/>
+				<LPTSWS LanguagePhraseId="107" Token="*" SequenceNr="5" WordSense="Verb"/>
+				<LPTSWS LanguagePhraseId="107" Token="*" SequenceNr="5" WordSense="Noun"/>
+			</TokenSequence>
+		</LanguagePhrase>
+		<LanguagePhrase PhraseId="108" PhraseType="Resolved" ResolvesToLanguagePhraseId="" Example="">
+			<TokenSequence>
+				<LPTSWS LanguagePhraseId="108" Token="*" SequenceNr="1" WordSense="Noun"/>
+				<LPTSWS LanguagePhraseId="108" Token="*" SequenceNr="2" WordSense="Verb"/>
+				<LPTSWS LanguagePhraseId="108" Token="*" SequenceNr="3" WordSense="Noun"/>
+				<LPTSWS LanguagePhraseId="108" Token="*" SequenceNr="4" WordSense="Preposition"/>
+				<LPTSWS LanguagePhraseId="108" Token="*" SequenceNr="5" WordSense="Noun"/>
+			</TokenSequence>
+		</LanguagePhrase>
+		<LanguagePhrase PhraseId="109" PhraseType="Resolving" ResolvesToLanguagePhraseId="110" Example="warehouse holds bin">
+			<TokenSequence>
+				<LPTSWS LanguagePhraseId="109" Token="*" SequenceNr="1" WordSense="Noun"/>
+				<LPTSWS LanguagePhraseId="109" Token="*" SequenceNr="1" WordSense="Verb"/>
+				<LPTSWS LanguagePhraseId="109" Token="*" SequenceNr="2" WordSense="Noun"/>
+				<LPTSWS LanguagePhraseId="109" Token="*" SequenceNr="2" WordSense="Verb"/>
+				<LPTSWS LanguagePhraseId="109" Token="*" SequenceNr="3" WordSense="Noun"/>
+				<LPTSWS LanguagePhraseId="109" Token="*" SequenceNr="3" WordSense="Verb"/>
+			</TokenSequence>
+		</LanguagePhrase>
+		<LanguagePhrase PhraseId="110" PhraseType="Resolved" ResolvesToLanguagePhraseId="" Example="">
+			<TokenSequence>
+				<LPTSWS LanguagePhraseId="110" Token="*" SequenceNr="1" WordSense="Noun"/>
+				<LPTSWS LanguagePhraseId="110" Token="*" SequenceNr="2" WordSense="Verb"/>
+				<LPTSWS LanguagePhraseId="110" Token="*" SequenceNr="3" WordSense="Noun"/>
+			</TokenSequence>
+		</LanguagePhrase>
+		<LanguagePhrase PhraseId="111" PhraseType="Resolving" ResolvesToLanguagePhraseId="112" Example="AnimalType is pet of Person">
+			<TokenSequence>
+				<LPTSWS LanguagePhraseId="111" Token="*" SequenceNr="1" WordSense="Noun"/>
+				<LPTSWS LanguagePhraseId="111" Token="*" SequenceNr="2" WordSense="Verb"/>
+				<LPTSWS LanguagePhraseId="111" Token="*" SequenceNr="2" WordSense="Adjective"/>
+				<LPTSWS LanguagePhraseId="111" Token="*" SequenceNr="3" WordSense="Noun"/>
+				<LPTSWS LanguagePhraseId="111" Token="*" SequenceNr="3" WordSense="Verb"/>
+				<LPTSWS LanguagePhraseId="111" Token="*" SequenceNr="3" WordSense="Adjective"/>
+				<LPTSWS LanguagePhraseId="111" Token="*" SequenceNr="4" WordSense="Preposition"/>
+				<LPTSWS LanguagePhraseId="111" Token="*" SequenceNr="5" WordSense="Noun"/>
+			</TokenSequence>
+		</LanguagePhrase>
+		<LanguagePhrase PhraseId="112" PhraseType="Resolved" ResolvesToLanguagePhraseId="" Example="">
+			<TokenSequence>
+				<LPTSWS LanguagePhraseId="112" Token="*" SequenceNr="1" WordSense="Noun"/>
+				<LPTSWS LanguagePhraseId="112" Token="*" SequenceNr="2" WordSense="Verb"/>
+				<LPTSWS LanguagePhraseId="112" Token="*" SequenceNr="3" WordSense="Adjective"/>
+				<LPTSWS LanguagePhraseId="112" Token="*" SequenceNr="4" WordSense="Preposition"/>
+				<LPTSWS LanguagePhraseId="112" Token="*" SequenceNr="5" WordSense="Noun"/>
+			</TokenSequence>
+		</LanguagePhrase>
+		<LanguagePhrase PhraseId="113" PhraseType="Resolving" ResolvesToLanguagePhraseId="114" Example="warehouse houses bin holding part">
+			<TokenSequence>
+				<LPTSWS LanguagePhraseId="113" Token="*" SequenceNr="1" WordSense="Noun"/>
+				<LPTSWS LanguagePhraseId="113" Token="*" SequenceNr="1" WordSense="Verb"/>
+				<LPTSWS LanguagePhraseId="113" Token="*" SequenceNr="2" WordSense="Noun"/>
+				<LPTSWS LanguagePhraseId="113" Token="*" SequenceNr="2" WordSense="Verb"/>
+				<LPTSWS LanguagePhraseId="113" Token="*" SequenceNr="3" WordSense="Noun"/>
+				<LPTSWS LanguagePhraseId="113" Token="*" SequenceNr="3" WordSense="Verb"/>
+				<LPTSWS LanguagePhraseId="113" Token="*" SequenceNr="4" WordSense="Noun"/>
+				<LPTSWS LanguagePhraseId="113" Token="*" SequenceNr="4" WordSense="Verb"/>
+				<LPTSWS LanguagePhraseId="113" Token="*" SequenceNr="5" WordSense="Noun"/>
+				<LPTSWS LanguagePhraseId="113" Token="*" SequenceNr="5" WordSense="Verb"/>
+			</TokenSequence>
+		</LanguagePhrase>
+		<LanguagePhrase PhraseId="114" PhraseType="Resolved" ResolvesToLanguagePhraseId="" Example="">
+			<TokenSequence>
+				<LPTSWS LanguagePhraseId="114" Token="*" SequenceNr="1" WordSense="Noun"/>
+				<LPTSWS LanguagePhraseId="114" Token="*" SequenceNr="2" WordSense="Verb"/>
+				<LPTSWS LanguagePhraseId="114" Token="*" SequenceNr="3" WordSense="Noun"/>
+				<LPTSWS LanguagePhraseId="114" Token="*" SequenceNr="4" WordSense="Verb"/>
+				<LPTSWS LanguagePhraseId="114" Token="*" SequenceNr="5" WordSense="Noun"/>
+			</TokenSequence>
+		</LanguagePhrase>
+		<LanguagePhrase PhraseId="115" PhraseType="Resolving" ResolvesToLanguagePhraseId="116" Example="fuck you">
+			<TokenSequence>
+				<LPTSWS LanguagePhraseId="115" Token="*" SequenceNr="1" WordSense="Noun"/>
+				<LPTSWS LanguagePhraseId="115" Token="*" SequenceNr="1" WordSense="Verb"/>
+				<LPTSWS LanguagePhraseId="115" Token="*" SequenceNr="2" WordSense="PersonalDeterminer"/>
+			</TokenSequence>
+		</LanguagePhrase>
+		<LanguagePhrase PhraseId="116" PhraseType="Resolved" ResolvesToLanguagePhraseId="" Example="">
+			<TokenSequence>
+				<LPTSWS LanguagePhraseId="116" Token="*" SequenceNr="1" WordSense="Verb"/>
+				<LPTSWS LanguagePhraseId="116" Token="*" SequenceNr="2" WordSense="PersonalDeterminer"/>
+			</TokenSequence>
+		</LanguagePhrase>
+		<LanguagePhrase PhraseId="117" PhraseType="Resolving" ResolvesToLanguagePhraseId="118" Example="you suck">
+			<TokenSequence>
+				<LPTSWS LanguagePhraseId="117" Token="*" SequenceNr="1" WordSense="PersonalDeterminer"/>
+				<LPTSWS LanguagePhraseId="117" Token="*" SequenceNr="2" WordSense="Noun"/>
+				<LPTSWS LanguagePhraseId="117" Token="*" SequenceNr="2" WordSense="Verb"/>
+			</TokenSequence>
+		</LanguagePhrase>
+		<LanguagePhrase PhraseId="118" PhraseType="Resolved" ResolvesToLanguagePhraseId="" Example="">
+			<TokenSequence>
+				<LPTSWS LanguagePhraseId="118" Token="*" SequenceNr="1" WordSense="PersonalDeterminer"/>
+				<LPTSWS LanguagePhraseId="118" Token="*" SequenceNr="2" WordSense="Verb"/>
+			</TokenSequence>
+		</LanguagePhrase>
+	</LanguagePhrases>
+</LanguageParserRules>

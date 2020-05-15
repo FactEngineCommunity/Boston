@@ -1,0 +1,7 @@
+CREATE TABLE [ClientServerUserRole] (
+	[UserId] TEXT(40) WITH COMPRESSION,
+	[RoleId] TEXT(40) WITH COMPRESSION,
+	CONSTRAINT [PrimaryKey] PRIMARY KEY ([UserId], [RoleId])
+);
+ALTER TABLE [ClientServerUserRole] DENY ZERO LENGTH [UserId];
+ALTER TABLE [ClientServerUserRole] DENY ZERO LENGTH [RoleId];

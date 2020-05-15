@@ -1,0 +1,14 @@
+D:\Viev\02-Marketing\01-Product\01-Products\Boston\Versions\SVN\Boston\ClientServerWebService\WebService\WCFDuplexServiceHost\bin\Debug\BostonDuplexServiceHost.exe.config
+D:\Viev\02-Marketing\01-Product\01-Products\Boston\Versions\SVN\Boston\ClientServerWebService\WebService\WCFDuplexServiceHost\bin\Debug\BostonDuplexServiceHost.exe
+D:\Viev\02-Marketing\01-Product\01-Products\Boston\Versions\SVN\Boston\ClientServerWebService\WebService\WCFDuplexServiceHost\bin\Debug\BostonDuplexServiceHost.pdb
+D:\Viev\02-Marketing\01-Product\01-Products\Boston\Versions\SVN\Boston\ClientServerWebService\WebService\WCFDuplexServiceHost\bin\Debug\BostonWCFServiceLibrary.dll
+D:\Viev\02-Marketing\01-Product\01-Products\Boston\Versions\SVN\Boston\ClientServerWebService\WebService\WCFDuplexServiceHost\bin\Debug\VievFBMInterface.dll
+D:\Viev\02-Marketing\01-Product\01-Products\Boston\Versions\SVN\Boston\ClientServerWebService\WebService\WCFDuplexServiceHost\bin\Debug\VievPluginFramework.dll
+D:\Viev\02-Marketing\01-Product\01-Products\Boston\Versions\SVN\Boston\ClientServerWebService\WebService\WCFDuplexServiceHost\bin\Debug\WeifenLuo.WinFormsUI.Docking.dll
+D:\Viev\02-Marketing\01-Product\01-Products\Boston\Versions\SVN\Boston\ClientServerWebService\WebService\WCFDuplexServiceHost\bin\Debug\BostonWCFServiceLibrary.pdb
+D:\Viev\02-Marketing\01-Product\01-Products\Boston\Versions\SVN\Boston\ClientServerWebService\WebService\WCFDuplexServiceHost\bin\Debug\BostonWCFServiceLibrary.xml
+D:\Viev\02-Marketing\01-Product\01-Products\Boston\Versions\SVN\Boston\ClientServerWebService\WebService\WCFDuplexServiceHost\bin\Debug\VievFBMInterface.pdb
+D:\Viev\02-Marketing\01-Product\01-Products\Boston\Versions\SVN\Boston\ClientServerWebService\WebService\WCFDuplexServiceHost\bin\Debug\VievFBMInterface.xml
+D:\Viev\02-Marketing\01-Product\01-Products\Boston\Versions\SVN\Boston\ClientServerWebService\WebService\WCFDuplexServiceHost\obj\x86\Debug\DuplexServiceHost.vbprojResolveAssemblyReference.cache
+D:\Viev\02-Marketing\01-Product\01-Products\Boston\Versions\SVN\Boston\ClientServerWebService\WebService\WCFDuplexServiceHost\obj\x86\Debug\BostonDuplexServiceHost.exe
+D:\Viev\02-Marketing\01-Product\01-Products\Boston\Versions\SVN\Boston\ClientServerWebService\WebService\WCFDuplexServiceHost\obj\x86\Debug\BostonDuplexServiceHost.pdb

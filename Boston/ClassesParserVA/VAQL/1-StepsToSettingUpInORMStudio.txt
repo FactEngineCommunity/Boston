@@ -1,0 +1,21 @@
+Steps
+=====
+1. For each of the following files, append the prefix "tVAQL"
+
+	Parser.vb		becomes tORMQLParser.vb
+	ParseTree.vb		becomes tORMQLParseTree.vb
+	Scanner.vb		becomes tORMQLScanner.vb
+	TextHighlighter.vb	becomes tORMQLTextHighlighter.vb
+
+2. Move the three files (above) to \Bradford\Versions\SVN\Bradford\Classes\Database\ORMQLParser\TinyPG
+	(write over existing files)
+
+3. If Bradford is open in Visual Studio do the following:
+
+	Click [Yes to All] to the message box reading: "This file has been modified outside the source editor. Do you want to reload it?"
+
+4. Remove the unused variables that appear in the ErrorList of the Project (for completeness)
+
+
+
+

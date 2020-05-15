@@ -1,0 +1,9 @@
+CREATE TABLE [ClientServerProjectUserPermission] (
+	[ProjectId] TEXT(40) WITH COMPRESSION,
+	[UserId] TEXT(40) WITH COMPRESSION,
+	[Permission] TEXT(20) WITH COMPRESSION,
+	CONSTRAINT [PrimaryKey] PRIMARY KEY ([ProjectId], [UserId], [Permission])
+);
+ALTER TABLE [ClientServerProjectUserPermission] DENY ZERO LENGTH [ProjectId];
+ALTER TABLE [ClientServerProjectUserPermission] DENY ZERO LENGTH [UserId];
+ALTER TABLE [ClientServerProjectUserPermission] DENY ZERO LENGTH [Permission];

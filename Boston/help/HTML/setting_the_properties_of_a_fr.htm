@@ -1,0 +1,110 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- saved from url=(0029)http://www.helpandmanual.com/ -->
+<head><script type="text/javascript" src="helpman_topicinit.js"></script>
+<!-- Redirect browser to frame page if page is not in the content frame. -->
+<script type="text/javascript">
+<!--
+if (top.location.search.lastIndexOf("toc=0")<=0) {
+  if (top.frames.length==0) { top.location.href="index.html?setting_the_properties_of_a_fr.htm"; }
+  else { parent.quicksync('a3.5.4.10.1'); }
+}
+//-->
+</script>
+   <title>Setting the properties of a Frequency Constraint</title>
+   <meta name="generator" content="Help &amp; Manual" />
+   <meta name="keywords" content="Role Constraint" />
+   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+   <meta http-equiv="Content-Style-Type" content="text/css" />
+   <link type="text/css" href="default.css" rel="stylesheet" />
+</head>
+<body style="margin: 0px 0px 0px 0px; background: #FFFFFF;">
+<div id="hmpopupDiv" style="visibility:hidden; position:absolute; z-index:1000; "></div>
+
+
+<table width="100%" border="0" cellspacing="0" cellpadding="5" bgcolor="#649CCC">
+  <tr valign="middle">
+    <td align="left">
+      <p class="p_Heading1"><span class="f_Heading1">Setting the properties of a Frequency Constraint</span></p>
+
+    </td>
+    <td align="right">
+     <span style="font-size: 9pt">
+     <a href="introduction.htm">Top</a>&nbsp;
+     <a href="managing_frequency_constraints.htm">Previous</a>&nbsp;
+     <a href="managing_model_notes.htm">Next</a>
+     </span>
+    </td>
+  </tr>
+</table>
+
+
+<!-- Placeholder for topic body. -->
+<table width="100%" border="0" cellspacing="0" cellpadding="5"><tr valign="top"><td align="left">
+<p>This help topic outlines how to set the properties of a Frequency Constraint within the Properties Toolbox.</p>
+<p>&nbsp;</p>
+<p>Frequency Constraints have additional properties that are not on other Role Constraints. These are:</p>
+<p>&nbsp;</p>
+<p>1. MinimumFrequencyCount; and</p>
+<p>2. MaximumFrequencyCount</p>
+<p>&nbsp;</p>
+<p style="text-align: center;"><img src="embim1.png" width="328" height="358" vspace="1" hspace="1" border="0" alt=""></p>
+<p style="text-align: center;">&nbsp;</p>
+<p class="p_ImageCaption" style="text-align: center;"><span class="f_ImageCaption">Extra Properties on a Frequency Constraint</span></p>
+<p>&nbsp;</p>
+<p>Together, the value of these properties manage a Frequency Constraint's range.</p>
+<p>&nbsp;</p>
+<p>The following table outlines how the value of the properties MinimumFrequencyCount and MaximumFrequencyCount affect the appearance of a Frequency Constraint within an ORM Diagram and the interpretted meaning of the Frequency Constraint.</p>
+<p>&nbsp;</p>
+<div style="text-align: left; text-indent: 0px; padding: 0px 0px 0px 0px; margin: 0px 0px 0px 0px;"><table width="75%" cellspacing="0" cellpadding="0" border="1" style="border: solid 2px #000000; border-spacing:0px; border-collapse: collapse;">
+<tr style="text-align:left;vertical-align:top;">
+<td valign="top" width="330" style="width:330px; border: solid 1px #000000;"><p style="text-align: center; background: #c0c0c0;"><span style="font-weight: bold;"> Relative values of MinimumFrequencyCount and MaximumFreqencyCount</span></p>
+</td>
+<td valign="top" width="369" style="width:369px; border: solid 1px #000000;"><p style="text-align: center; background: #c0c0c0;"><span style="font-weight: bold;">Outcome</span></p>
+</td>
+<td valign="top" width="227" style="width:227px; border: solid 1px #000000;"><p style="text-align: center; background: #c0c0c0;"><span style="font-weight: bold;">Appearance on an ORM Diagram</span></p>
+</td>
+</tr>
+<tr style="text-align:left;vertical-align:top;">
+<td valign="top" width="330" style="width:330px; border: solid 1px #000000;"><p>MinimumFrequencyCount = 0</p>
+<p>MaximumFrequencyCount &gt; 0</p>
+</td>
+<td valign="top" width="369" style="width:369px; border: solid 1px #000000;"><p>Sets the Frequency Constraint to a 'Less than or equal to' Frequency Constraint</p>
+</td>
+<td valign="top" width="227" style="width:227px; border: solid 1px #000000;"><p><img src="modelfrequencyconstraintlessthanorequalto.png" width="272" height="111" border="0" alt="modelFrequencyConstraintLessThanOREqualTo"></p>
+</td>
+</tr>
+<tr style="text-align:left;vertical-align:top;">
+<td valign="top" width="330" style="width:330px; border: solid 1px #000000;"><p>MinimumFrequencyCount &lt; MaximumFrequencyCount</p>
+</td>
+<td valign="top" width="369" style="width:369px; border: solid 1px #000000;"><p>Sets a range from the MinimumFrequencyCount to the MaximumFrequencyCount for the Frequency Constraint</p>
+</td>
+<td valign="top" width="227" style="width:227px; border: solid 1px #000000;"><p><img src="modelfrequencyconstraintrange.png" width="273" height="108" border="0" alt="modelFrequencyConstraintRange"></p>
+</td>
+</tr>
+<tr style="text-align:left;vertical-align:top;">
+<td valign="top" width="330" style="width:330px; border: solid 1px #000000;"><p>MinimumFrequencyCount = MaximumFrequencyCount</p>
+</td>
+<td valign="top" width="369" style="width:369px; border: solid 1px #000000;"><p>Sets a discrete value for the Frequency Constraint</p>
+</td>
+<td valign="top" width="227" style="width:227px; border: solid 1px #000000;"><p><img src="modelfrequencyconstraintequalto.png" width="268" height="98" border="0" alt="modelFrequencyConstraintEqualTo"></p>
+</td>
+</tr>
+<tr style="text-align:left;vertical-align:top;">
+<td valign="top" width="330" style="width:330px; border: solid 1px #000000;"><p>MinimumFrequencyCount &gt; 0</p>
+<p>MaximumFrequencyCount = 0</p>
+</td>
+<td valign="top" width="369" style="width:369px; border: solid 1px #000000;"><p>Sets the Frequency Constraint to a 'Greater than or equal to' Frequency Constraint</p>
+</td>
+<td valign="top" width="227" style="width:227px; border: solid 1px #000000;"><p><img src="modelfrequencyconstraintgreaterthanorequalto.png" width="281" height="118" border="0" alt="modelFrequencyConstraintGreaterThanOREqualTo"></p>
+</td>
+</tr>
+</table>
+</div>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+
+</td></tr></table>
+
+</body>
+</html>

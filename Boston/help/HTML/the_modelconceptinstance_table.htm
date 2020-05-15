@@ -1,0 +1,139 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- saved from url=(0029)http://www.helpandmanual.com/ -->
+<head><script type="text/javascript" src="helpman_topicinit.js"></script>
+<!-- Redirect browser to frame page if page is not in the content frame. -->
+<script type="text/javascript">
+<!--
+if (top.location.search.lastIndexOf("toc=0")<=0) {
+  if (top.frames.length==0) { top.location.href="index.html?the_modelconceptinstance_table.htm"; }
+  else { parent.quicksync('a5.2.17'); }
+}
+//-->
+</script>
+   <title>The ModelConceptInstance table</title>
+   <meta name="generator" content="Help &amp; Manual" />
+   <meta name="keywords" content="" />
+   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+   <meta http-equiv="Content-Style-Type" content="text/css" />
+   <link type="text/css" href="default.css" rel="stylesheet" />
+</head>
+<body style="margin: 0px 0px 0px 0px; background: #FFFFFF;">
+<div id="hmpopupDiv" style="visibility:hidden; position:absolute; z-index:1000; "></div>
+
+
+<table width="100%" border="0" cellspacing="0" cellpadding="5" bgcolor="#649CCC">
+  <tr valign="middle">
+    <td align="left">
+      <p class="p_Heading1"><span class="f_Heading1">The ModelConceptInstance table</span></p>
+
+    </td>
+    <td align="right">
+     <span style="font-size: 9pt">
+     <a href="introduction.htm">Top</a>&nbsp;
+     <a href="the_metamodelvaluetypeconstrai.htm">Previous</a>&nbsp;
+     <a href="the_modellanguage_table.htm">Next</a>
+     </span>
+    </td>
+  </tr>
+</table>
+
+
+<!-- Placeholder for topic body. -->
+<table width="100%" border="0" cellspacing="0" cellpadding="5"><tr valign="top"><td align="left">
+<p>The ModelConceptInstance table stores the set of Concepts (identified by their 'Symbol') that appear on a Page within a Model.</p>
+<p>&nbsp;</p>
+<div style="text-align: left; text-indent: 0px; padding: 0px 0px 0px 0px; margin: 0px 0px 0px 0px;"><table cellspacing="0" cellpadding="3" border="0" style="border: none; border-spacing:0px; border-collapse: collapse;">
+<tr style="text-align:left;vertical-align:top;">
+<td valign="top" width="194" style="width:194px; border: solid 1px #000000;"><p style="text-align: center; border-color: #000000; border-style: solid; border-width: 1px; background: #c0c0c0;">Field</p>
+</td>
+<td valign="top" width="105" style="width:105px; border: solid 1px #000000;"><p style="text-align: center; border-color: #000000; border-style: solid; border-width: 1px; background: #c0c0c0;">Data Type</p>
+</td>
+<td valign="top" width="2204" style="width:2204px; border: solid 1px #000000;"><p style="border-color: #000000; border-style: solid; border-width: 1px; background: #c0c0c0;"> Description</p>
+</td>
+</tr>
+<tr style="text-align:left;vertical-align:top;">
+<td valign="top" width="194" style="width:194px; border: solid 1px #000000;"><p>ModelId</p>
+</td>
+<td valign="top" width="105" style="width:105px; border: solid 1px #000000;"><br>
+</td>
+<td valign="top" width="2204" style="width:2204px; border: solid 1px #000000;"><p>The unique identifier of the Model to which the Model Element belongs.</p>
+</td>
+</tr>
+<tr style="text-align:left;vertical-align:top;">
+<td valign="top" width="194" style="width:194px; border: solid 1px #000000;"><p>PageId</p>
+</td>
+<td valign="top" width="105" style="width:105px; border: solid 1px #000000;"><br>
+</td>
+<td valign="top" width="2204" style="width:2204px; border: solid 1px #000000;"><p>Foreign Key reference to the Page table. The Page for which the Model Element is included on that Page within the Model.</p>
+</td>
+</tr>
+<tr style="text-align:left;vertical-align:top;">
+<td valign="top" width="194" style="width:194px; border: solid 1px #000000;"><p>Symbol</p>
+</td>
+<td valign="top" width="105" style="width:105px; border: solid 1px #000000;"><br>
+</td>
+<td valign="top" width="2204" style="width:2204px; border: solid 1px #000000;"><p>The unique identifier of the Model Element included on the Page within the Model.</p>
+</td>
+</tr>
+<tr style="text-align:left;vertical-align:top;">
+<td valign="top" width="194" style="width:194px; border: solid 1px #000000;"><p>ConceptType</p>
+</td>
+<td valign="top" width="105" style="width:105px; border: solid 1px #000000;"><br>
+</td>
+<td valign="top" width="2204" style="width:2204px; border: solid 1px #000000;"><p>The Concept Type of the Model Element included on the Page within the Model.</p>
+</td>
+</tr>
+<tr style="text-align:left;vertical-align:top;">
+<td valign="top" width="194" style="width:194px; border: solid 1px #000000;"><p>RoleId</p>
+</td>
+<td valign="top" width="105" style="width:105px; border: solid 1px #000000;"><p>Text</p>
+</td>
+<td valign="top" width="2204" style="width:2204px; border: solid 1px #000000;"><p>Where the 'ConceptType' of the Model Element is 'RoleName' or 'Value', set to the RoleId of the corresponding 'Role Name' or the 'Fact Data' to which the Model Element belongs.</p>
+</td>
+</tr>
+<tr style="text-align:left;vertical-align:top;">
+<td valign="top" width="194" style="width:194px; border: solid 1px #000000;"><p>X</p>
+</td>
+<td valign="top" width="105" style="width:105px; border: solid 1px #000000;"><p>Number</p>
+</td>
+<td valign="top" width="2204" style="width:2204px; border: solid 1px #000000;"><p>The X-Coordinate of the Model Object as it appears on the Page within the Model. i.e. Within the GUI interface displaying the Page, the Y-Coordinate of the Model Element.</p>
+<p><span style="font-weight: bold;">NB</span> Where the X-Coordinate of the Model Element is not required to display the Model Element within the Page, set to '0'.</p>
+</td>
+</tr>
+<tr style="text-align:left;vertical-align:top;">
+<td valign="top" width="194" style="width:194px; border: solid 1px #000000;"><p>Y</p>
+</td>
+<td valign="top" width="105" style="width:105px; border: solid 1px #000000;"><p>Number</p>
+</td>
+<td valign="top" width="2204" style="width:2204px; border: solid 1px #000000;"><p>The Y-Coordinate of the Model Object as it appears on the Page within the Model. i.e. Within the GUI interface displaying the Page, the Y-Coordinate of the Model Element.</p>
+<p><span style="font-weight: bold;">NB</span> Where the X-Coordinate of the Model Element is not required to display the Model Element within the Page, set to '0'.</p>
+</td>
+</tr>
+<tr style="text-align:left;vertical-align:top;">
+<td valign="top" width="194" style="width:194px; border: solid 1px #000000;"><p>Orientation</p>
+</td>
+<td valign="top" width="105" style="width:105px; border: solid 1px #000000;"><p>Number</p>
+</td>
+<td valign="top" width="2204" style="width:2204px; border: solid 1px #000000;"><p>Not used by this version of Boston. Always set to '100' (Horizontal) in this version of Boston.</p>
+</td>
+</tr>
+<tr style="text-align:left;vertical-align:top;">
+<td valign="top" width="194" style="width:194px; border: solid 1px #000000;"><p>IsVisible</p>
+</td>
+<td valign="top" width="105" style="width:105px; border: solid 1px #000000;"><p>Boolean</p>
+</td>
+<td valign="top" width="2204" style="width:2204px; border: solid 1px #000000;"><p>Not used by this version of Boston. Always set to False in this version of Boston.</p>
+</td>
+</tr>
+</table>
+</div>
+<p>&nbsp;</p>
+<p>See also:</p>
+<p><a href="the_modelpage_table.htm">The ModelPage table</a></p>
+<p>&nbsp;</p>
+
+</td></tr></table>
+
+</body>
+</html>

@@ -1,0 +1,58 @@
+﻿
+Namespace FBM
+
+    <Serializable()> _
+    Public Class FactPredicate
+        Inherits FBM.Concept
+        Implements IEquatable(Of FBM.Fact)
+
+        Public WithEvents data As New List(Of FBM.FactData)
+
+        Public DictionarySet As New Dictionary(Of String, String)
+
+
+        Public Overridable Shadows Function Equals(ByVal other As FBM.Fact) As Boolean Implements System.IEquatable(Of FBM.Fact).Equals
+
+            Dim lr_data As FBM.FactData
+            Dim lbFound As Boolean = False
+
+            For Each lr_data In Me.data
+                Select Case other.GetType.ToString
+                    Case Is = GetType(FBM.Fact).ToString
+                        If other.Data.Find(AddressOf lr_data.EqualsByRoleNameData) Is Nothing Then
+                            lbFound = False
+                            Return False
+                        Else
+                            lbFound = True
+                        End If
+                    Case Else
+                        Throw New Exception("Unknown type in Equals comparrison.")
+                End Select
+            Next
+            Return lbFound
+
+        End Function
+
+        Public Overridable Shadows Function EqualsByRoleIdData(ByVal other As FBM.Fact) As Boolean
+
+            Dim lr_data As FBM.FactData
+            Dim lbFound As Boolean = False
+
+            For Each lr_data In Me.data
+                Select Case other.GetType.ToString
+                    Case Is = GetType(FBM.Fact).ToString
+                        If other.Data.Find(AddressOf lr_data.EqualsByRoleIdData) Is Nothing Then
+                            lbFound = False
+                            Return False
+                        Else
+                            lbFound = True
+                        End If
+                End Select
+            Next
+            Return lbFound
+
+        End Function
+
+    End Class
+
+End Namespace

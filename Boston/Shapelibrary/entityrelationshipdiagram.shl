@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<shapes xmlns="http://mindfusion.org/flowchart">
+  <shape id="Entity" fill-mode="Winding">
+    <outline>
+      <line dash-style="Custom" width="-1">
+        <point x="0" y="100" />
+        <point x="100" y="100" />
+      </line>
+      <line dash-style="Custom" width="-1">
+        <point x="100" y="100" />
+        <point x="100" y="0" />
+      </line>
+      <line dash-style="Custom" width="-1">
+        <point x="100" y="0" />
+        <point x="0" y="0" />
+      </line>
+      <line dash-style="Custom" width="-1">
+        <point x="0" y="0" />
+        <point x="0" y="100" />
+      </line>
+    </outline>
+    <decorations>
+      <line dash-style="Custom" width="-1">
+        <point x="0" y="15" />
+        <point x="100" y="15" />
+      </line>
+    </decorations>
+    <textarea>
+      <line dash-style="Custom" width="-1">
+        <point x="0" y="15" />
+        <point x="100" y="15" />
+      </line>
+      <line dash-style="Custom" width="-1">
+        <point x="100" y="15" />
+        <point x="100" y="100" />
+      </line>
+      <line dash-style="Custom" width="-1">
+        <point x="100" y="100" />
+        <point x="0" y="100" />
+      </line>
+      <line dash-style="Custom" width="-1">
+        <point x="0" y="100" />
+        <point x="0" y="15" />
+      </line>
+    </textarea>
+  </shape>
+</shapes>

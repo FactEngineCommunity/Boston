@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:mstns="http://www.viev.com" xmlns="http://www.viev.com" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://www.viev.com" id="LanguageParserRules" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element msdata:Prefix="LPIO" name="LPTSWS">
+    <xs:complexType>
+      <xs:attribute form="unqualified" name="LanguagePhraseId" type="xs:string" />
+      <xs:attribute form="unqualified" name="Token" type="xs:string" />
+      <xs:attribute form="unqualified" name="SequenceNr" type="xs:string" />
+      <xs:attribute form="unqualified" name="WordSense" type="xs:string" />
+    </xs:complexType>
+  </xs:element>
+  <xs:element msdata:IsDataSet="true" msdata:Locale="en-US" msdata:Prefix="LPIO" name="LanguageParserRules">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element msdata:Prefix="LPIO" name="LanguagePhrase">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element form="unqualified" name="TokenSequence">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element ref="mstns:LPTSWS" />
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+            <xs:attribute form="unqualified" name="PhraseId" type="xs:string" />
+            <xs:attribute form="unqualified" name="PhraseType" type="xs:string" />
+            <xs:attribute form="unqualified" name="ResolvesToLanguagePhraseId" type="xs:string" />
+            <xs:attribute form="unqualified" name="Example" type="xs:string" />
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

@@ -1,0 +1,3 @@
+VAQL Syntax is documented using the freeware EBNF-Visualiser.
+
+See: Downloads/Software/Installed.

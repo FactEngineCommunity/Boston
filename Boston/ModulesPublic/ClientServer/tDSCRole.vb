@@ -1,0 +1,70 @@
+﻿Namespace DuplexServiceClient
+
+    Partial Public Class DuplexServiceClient
+
+        Private Sub HandleModelAddRoleToFactType(ByRef arModel As FBM.Model, ByRef arInterfaceModel As Viev.FBM.Interface.Model)
+
+            Dim lrInterfaceFactType As Viev.FBM.Interface.FactType
+            Dim lrInterfaceRole As Viev.FBM.Interface.Role
+            Dim lrFactType As FBM.FactType
+            Dim lrRole As FBM.Role
+
+            lrInterfaceFactType = arInterfaceModel.FactType(0)
+            lrInterfaceRole = lrInterfaceFactType.RoleGroup(0)
+
+            lrFactType = New FBM.FactType(arModel, lrInterfaceFactType.Name, True)
+            lrFactType.IsIndependent = lrInterfaceFactType.IsIndependent
+            lrFactType.IsStored = lrInterfaceFactType.IsStored
+
+            Dim lrJoinedModelElement As New FBM.ModelObject
+
+            lrJoinedModelElement = arModel.GetModelObjectByName(lrInterfaceRole.JoinedObjectTypeId)
+
+            lrRole = New FBM.Role(lrFactType,
+                                  lrInterfaceRole.Id,
+                                  False,
+                                  lrJoinedModelElement)
+
+            lrInterfaceRole.Mandatory = lrRole.Mandatory
+            lrInterfaceRole.Name = lrRole.Name
+
+            lrFactType = arModel.FactType.Find(Function(x) x.Id = lrInterfaceFactType.Id)
+
+            Call lrFactType.AddRole(lrRole, False)
+
+        End Sub
+
+        Private Sub HandleModelRoleReassignJoinedModelObject(ByRef arModel As FBM.Model, ByRef arInterfaceModel As Viev.FBM.Interface.Model)
+
+            Dim lrInterfaceRole As Viev.FBM.Interface.Role
+            lrInterfaceRole = arInterfaceModel.FactType(0).RoleGroup(0)
+
+            Dim lrRole As FBM.Role
+            lrRole = arModel.Role.Find(Function(x) x.Id = lrInterfaceRole.Id)
+
+            Dim lrModelObject As FBM.ModelObject
+            lrModelObject = arModel.GetModelObjectByName(lrInterfaceRole.JoinedObjectTypeId)
+
+            Call lrRole.ReassignJoinedModelObject(lrModelObject, False, Nothing)
+
+        End Sub
+
+        Private Sub HandleModelUpdateRole(ByRef arModel As FBM.Model, ByRef arInterfaceModel As Viev.FBM.Interface.Model)
+
+            Dim lrInterfaceRole As Viev.FBM.Interface.Role
+            lrInterfaceRole = arInterfaceModel.FactType(0).RoleGroup(0)
+
+            Dim lrRole As FBM.Role
+            lrRole = arModel.Role.Find(Function(x) x.Id = lrInterfaceRole.Id)
+
+            If lrInterfaceRole.Name <> lrRole.Name Then
+                Call lrRole.SetName(lrInterfaceRole.Name, False)
+            ElseIf lrInterfaceRole.Mandatory <> lrRole.Mandatory Then
+                Call lrRole.SetMandatory(lrInterfaceRole.Mandatory, False)
+            End If
+
+        End Sub
+
+    End Class
+
+End Namespace

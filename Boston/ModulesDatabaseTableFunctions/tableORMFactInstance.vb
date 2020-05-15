@@ -1,0 +1,142 @@
+﻿Module tableORMFactInstance
+    '-----------------------------------------------------------------------
+    'FactInstances are stored in the ConceptInstance table in this version
+    '  of Richmond, but it is expedient to have this module seperate
+    '  in case FactInstance ever becomes it's own Table
+    '-----------------------------------------------------------------------
+
+    Public Sub GetFactsForFactTypeInstance(ByRef arFactTypeInstance As FBM.FactTypeInstance)
+
+        Dim liInd As Integer = 0
+        Dim ls_Symbol_list As String = ""
+        Dim ls_tuple_field_name As String = ""
+        Dim ls_FactSymbol As String = Nothing 'The unique identifier for a Tuple (like an ORACLE 'RowId')
+        Dim lrFactInstance As New FBM.FactInstance(arFactTypeInstance)
+        Dim lrRoleInstance As FBM.RoleInstance
+        Dim lsFactId As String = ""
+
+        Dim lsSQLQuery As String = ""
+        Dim lRecordset As New ADODB.Recordset
+
+        Dim lrFact As FBM.Fact
+
+        lRecordset.ActiveConnection = pdbConnection
+        lRecordset.CursorType = pcOpenStatic
+
+        '        GetFactsForFactTypeInstance = New List(Of FBM.FactInstance)
+
+        Try
+
+            lsSQLQuery = "  SELECT f.Symbol, fci.x, fci.y, fd.RoleId, fd.ValueSymbol, fdci.x, fdci.y"
+            lsSQLQuery &= "   FROM MetaModelFact f,"
+            lsSQLQuery &= "        MetaModelFactData fd,"
+            lsSQLQuery &= "        ModelConceptInstance fci," 'Fact
+            lsSQLQuery &= "        ModelConceptInstance fdci"  'FactData
+            lsSQLQuery &= "  WHERE f.ModelId = '" & Trim(arFactTypeInstance.Model.ModelId) & "'"
+            lsSQLQuery &= "    AND f.FactTypeId = '" & Trim(CStr(arFactTypeInstance.Id)) & "'"
+            lsSQLQuery &= "    AND fd.ModelId = '" & Trim(arFactTypeInstance.Model.ModelId) & "'"
+            lsSQLQuery &= "    AND f.Symbol = fd.FactSymbol"
+            lsSQLQuery &= "    AND fci.ModelId = '" & Trim(arFactTypeInstance.Model.ModelId) & "'"
+            lsSQLQuery &= "    AND fd.FactSymbol = fci.Symbol"
+            lsSQLQuery &= "    AND fci.PageId = '" & arFactTypeInstance.Page.PageId & "'"
+            lsSQLQuery &= "    AND fdci.ModelId = '" & Trim(arFactTypeInstance.Model.ModelId) & "'"
+            lsSQLQuery &= "    AND fdci.PageId = '" & arFactTypeInstance.Page.PageId & "'"
+            lsSQLQuery &= "    AND fci.ConceptType = '" & pcenumConceptType.Fact.ToString & "'"
+            lsSQLQuery &= "    AND fd.ValueSymbol = fdci.Symbol"
+            lsSQLQuery &= "    AND fdci.ConceptType = '" & pcenumConceptType.Value.ToString & "'"
+            lsSQLQuery &= "    AND fdci.RoleId = fd.RoleId"
+            lsSQLQuery &= "  ORDER BY f.Symbol, fd.RoleId" 'Symbol equates to FactId
+
+            lRecordset.Open(lsSQLQuery)
+
+            If Not lRecordset.EOF Then
+                lRecordset.MoveFirst()
+                While Not lRecordset.EOF
+                    lsFactId = lRecordset("Symbol").Value
+                    lrFactInstance = New FBM.FactInstance(lsFactId, arFactTypeInstance)
+
+                    lrFactInstance.X = lRecordset("fci.x").Value
+                    lrFactInstance.Y = lRecordset("fci.y").Value
+                    Dim lrFactDataInstance As New FBM.FactDataInstance
+                    For liInd = 1 To arFactTypeInstance.Arity
+
+                        If lRecordset("Symbol").Value = lsFactId Then
+
+                            '-----------------------------------
+                            'Find the RoleInstance for the Data
+                            '-----------------------------------
+                            'lrRoleInstance = New FBM.RoleInstance
+                            'lrRoleInstance.Id = lRecordset("RoleId").Value
+                            lrRoleInstance = arFactTypeInstance.RoleGroup.Find(Function(x) x.Id = lRecordset("RoleId").Value) ' AddressOf lrRoleInstance.Equals)
+                            If lrRoleInstance Is Nothing Then
+                                Throw New ApplicationException("Error: FetFactsForFactTypeInstance: Could not find RoleInstance for RoleId: " & lRecordset("RoleId").Value & ", for FactType: " & arFactTypeInstance.Name)
+                            End If
+                            '-------------------------------
+                            'Create a Concept for the Data
+                            '-------------------------------
+                            Dim lrConcept As New FBM.Concept(lRecordset("ValueSymbol").Value)
+
+                            '----------------------------
+                            'Create the FactDataInstance
+                            '----------------------------
+                            lrFactDataInstance = New FBM.FactDataInstance(arFactTypeInstance.Page, lrFactInstance, lrRoleInstance, lrConcept)
+                            lrFactDataInstance.X = lRecordset("fdci.x").Value
+                            lrFactDataInstance.Y = lRecordset("fdci.y").Value
+
+                            '-------------------------------------
+                            'Add the FactDataInstance to the Role
+                            '-------------------------------------
+                            lrRoleInstance.Data.Add(lrFactDataInstance)
+                            '-------------------------------------
+                            'Add the FactDataInstance to the Fact
+                            '-------------------------------------
+                            lrFactInstance.Data.Add(lrFactDataInstance)
+                            '-------------------------------------
+                            'Add the FactDataInstance to the Page
+                            '  Most useful in XML Export
+                            '-------------------------------------
+                            'SyncLock arFactTypeInstance.Page.ValueInstance
+                            arFactTypeInstance.Page.ValueInstance.Add(lrFactDataInstance)
+                            'End SyncLock
+
+
+                            lRecordset.MoveNext()
+                        Else
+                            lrFact = arFactTypeInstance.FactType.Fact.Find(Function(x) x.Id = lsFactId)
+                            lrFactInstance = lrFact.CloneInstance(arFactTypeInstance.Page, True)
+                            For Each lrFactDataInstance In lrFactInstance.Data
+                                arFactTypeInstance.Page.ValueInstance.Add(lrFactDataInstance)
+                                lrFactDataInstance.Role.Data.AddUnique(lrFactDataInstance)
+                            Next
+                            lrFactInstance.Save()
+                            Exit For
+                        End If
+                    Next liInd
+                    'GetFactsForFactTypeInstance.Add(lrFactInstance)
+                    'SyncLock arFactTypeInstance.Page.FactInstance
+                    arFactTypeInstance.Page.FactInstance.Add(lrFactInstance)
+                    'End SyncLock
+
+
+                    'SyncLock arFactTypeInstance.Fact
+                    arFactTypeInstance.Fact.Add(lrFactInstance)
+                    'End SyncLock
+
+                End While
+            End If
+
+            lRecordset.Close()
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            lsMessage = "Error: GetFactsForFactTypeInstance:"
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            lsMessage &= vbCrLf & vbCrLf & "PageId: " & arFactTypeInstance.Page.PageId & vbCrLf & ", FactTypeId: " & arFactTypeInstance.Id & vbCrLf & ", FactId:" & lsFactId
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+            lRecordset.Close()
+        End Try
+
+    End Sub
+
+End Module

@@ -1,0 +1,323 @@
+<?xml version="1.0" encoding="ISO-8859-15"?>
+<aiml>
+	<!--author: Viev-->
+	<!--licence: Standard-->
+	<!--created with: GaitoBot AIML Editor V2.7.0.37793-->
+	<category>
+		<pattern>FAREWELL</pattern>
+		<template>
+
+
+
+
+
+
+
+
+Goodbye
+																														<think>
+				<set name="topic">farewell</set>
+			</think>
+		</template>
+	</category>
+	<category>
+		<pattern>SHOW FACTTYPE NAMES</pattern>
+		<template>
+
+
+
+show facttype names																									<think>
+				<set name="topic">show facttype names</set>
+			</think>
+		</template>
+	</category>
+	<category>
+		<pattern>SHOWBRIANA</pattern>
+		<template>
+
+
+
+
+Okay																											<think>
+				<set name="topic">showbriana</set>
+			</think>
+		</template>
+	</category>
+	<category>
+		<pattern>HIDEBRIANA</pattern>
+		<template>
+
+
+
+
+Okay																											<think>
+				<set name="topic">hidebriana</set>
+			</think>
+		</template>
+	</category>
+	<category>
+		<pattern>QUIETMODEOFF</pattern>
+		<template>
+
+
+
+
+
+
+Hello																					<think>
+				<set name="topic">quietmodeoff</set>
+			</think>
+		</template>
+	</category>
+	<category>
+		<pattern>QUIETMODEON</pattern>
+		<template>
+
+
+
+
+
+Okay																		<think>
+				<set name="topic">quietmodeon</set>
+			</think>
+		</template>
+	</category>
+	<category>
+		<pattern>YES</pattern>
+		<template>
+
+
+
+
+
+
+
+
+Yes
+																														<think>
+				<set name="topic">yes</set>
+			</think>
+		</template>
+	</category>
+	<category>
+		<pattern>LETSSTICKTOTHEFACTS</pattern>
+		<template>
+
+
+
+
+
+
+
+
+Let's stick to the facts, I do
+																														<think>
+				<set name="topic">sticktothefacts</set>
+			</think>
+		</template>
+	</category>
+	<category>
+		<pattern>ADIOS</pattern>
+		<template>
+			<srai>FAREWELL</srai>
+		</template>
+	</category>
+	<category>
+		<pattern>STATUS</pattern>
+		<template>
+
+
+
+
+
+
+
+
+All systems good
+																														<think>
+				<set name="topic">status</set>
+			</think>
+		</template>
+	</category>
+	<category>
+		<pattern>HOW ARE YOU</pattern>
+		<template>
+			<srai>STATUS</srai>
+		</template>
+	</category>
+	<category>
+		<pattern>HELLO</pattern>
+		<template>
+
+
+
+
+
+
+
+
+Hello
+																														<think>
+				<set name="topic">hello</set>
+			</think>
+		</template>
+	</category>
+	<category>
+		<pattern>CIAO</pattern>
+		<template>
+			<srai>HELLO</srai>
+		</template>
+	</category>
+	<category>
+		<pattern>YES DO THAT</pattern>
+		<template>
+			<srai>YES</srai>
+		</template>
+	</category>
+	<category>
+		<pattern>YES GO AHEAD</pattern>
+		<template>
+			<srai>YES</srai>
+		</template>
+	</category>
+	<category>
+		<pattern>I THINK YOU ARE *</pattern>
+		<template>
+			<srai>LETSSTICKTOTHEFACTS</srai>
+		</template>
+	</category>
+	<category>
+		<pattern>GOODBYE</pattern>
+		<template>
+			<srai>FAREWELL</srai>
+		</template>
+	</category>
+	<category>
+		<pattern>SPEAK TO ME</pattern>
+		<template>
+			<srai>QUIETMODEOFF</srai>
+		</template>
+	</category>
+	<category>
+		<pattern>BE QUIET</pattern>
+		<template>
+			<srai>QUIETMODEON</srai>
+		</template>
+	</category>
+	<category>
+		<pattern>SHUTUP</pattern>
+		<template>
+			<srai>QUIETMODEON</srai>
+		</template>
+	</category>
+	<category>
+		<pattern>SHOOSH</pattern>
+		<template>
+			<srai>QUIETMODEON</srai>
+		</template>
+	</category>
+	<category>
+		<pattern>STOP TALKING</pattern>
+		<template>
+			<srai>QUIETMODEON</srai>
+		</template>
+	</category>
+	<category>
+		<pattern>SILENCE</pattern>
+		<template>
+			<srai>QUIETMODEON</srai>
+		</template>
+	</category>
+	<category>
+		<pattern>SHOW BRIANA</pattern>
+		<template>
+			<srai>SHOWBRIANA</srai>
+		</template>
+	</category>
+	<category>
+		<pattern>HIDE BRIANA</pattern>
+		<template>
+			<srai>HIDEBRIANA</srai>
+		</template>
+	</category>
+	<category>
+		<pattern>I WANT YOU TO *</pattern>
+		<template>
+			<srai>
+				<Star/>
+			</srai>
+		</template>
+	</category>
+	<category>
+		<pattern>YOU ARE *</pattern>
+		<template>
+			<srai>LETSSTICKTOTHEFACTS</srai>
+		</template>
+	</category>
+	<category>
+		<pattern>I THINK THAT *</pattern>
+		<template>
+			<srai>
+				<Star/>
+			</srai>
+		</template>
+	</category>
+	<category>
+		<pattern>THANK YOU</pattern>
+		<template>
+thankyou			<think>
+				<set name="topic">thankyou</set>
+			</think>
+		</template>
+	</category>
+	<category>
+		<pattern>HELP</pattern>
+		<template>
+help			<think>
+				<set name="topic">help</set>
+			</think>
+		</template>
+	</category>
+	<category>
+		<pattern>TURN OFF AUTOLAYOUT</pattern>
+		<template>
+Okay. Turning off AutoLayout			<think>
+				<set name="topic">turnoffautolayout</set>
+			</think>
+		</template>
+	</category>
+	<category>
+		<pattern>TURN ON AUTOLAYOUT</pattern>
+		<template>
+Okay. Turning on AutoLayout			<think>
+				<set name="topic">turnonautolayout</set>
+			</think>
+		</template>
+	</category>
+	<category>
+		<pattern>TALK TO ME</pattern>
+		<template>
+			<srai>QUIETMODEOFF</srai>
+		</template>
+	</category>
+	<category>
+		<pattern>TALK</pattern>
+		<template>
+			<srai>QUIETMODEOFF</srai>
+		</template>
+	</category>
+	<category>
+		<pattern>SPEAK</pattern>
+		<template>
+			<srai>QUIETMODEOFF</srai>
+		</template>
+	</category>
+	<category>
+		<pattern>WHAT DO YOU THINK</pattern>
+		<template>
+I model, therefore I am			<think>
+				<set name="topic">easteregg</set>
+			</think>
+		</template>
+	</category>
+</aiml>

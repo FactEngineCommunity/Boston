@@ -1,0 +1,11 @@
+CREATE TABLE [ClientServerNamespace] (
+	[Id] TEXT(40) WITH COMPRESSION,
+	[Namespace] TEXT(100) WITH COMPRESSION,
+	[Number] TEXT(100) WITH COMPRESSION,
+	[ProjectId] TEXT(40) WITH COMPRESSION,
+	CONSTRAINT [PrimaryKey] PRIMARY KEY ([Id])
+);
+ALTER TABLE [ClientServerNamespace] DENY ZERO LENGTH [Id];
+ALTER TABLE [ClientServerNamespace] DENY ZERO LENGTH [Namespace];
+ALTER TABLE [ClientServerNamespace] ALLOW ZERO LENGTH [Number];
+ALTER TABLE [ClientServerNamespace] DENY ZERO LENGTH [ProjectId];

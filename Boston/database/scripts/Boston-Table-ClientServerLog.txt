@@ -1,0 +1,10 @@
+CREATE TABLE [ClientServerLog] (
+	[DateTime] DATETIME,
+	[UserId] TEXT(40) WITH COMPRESSION,
+	[LogType] TEXT(10) WITH COMPRESSION,
+	[IPAddress] TEXT(40) WITH COMPRESSION,
+	CONSTRAINT [PrimaryKey] PRIMARY KEY ([DateTime], [UserId])
+);
+ALTER TABLE [ClientServerLog] DENY ZERO LENGTH [UserId];
+ALTER TABLE [ClientServerLog] DENY ZERO LENGTH [LogType];
+ALTER TABLE [ClientServerLog] ALLOW ZERO LENGTH [IPAddress];

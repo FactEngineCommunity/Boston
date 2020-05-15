@@ -1,0 +1,132 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="My" GeneratedClassName="MySettings" UseMySettingsClassName="true">
+  <Profiles />
+  <Settings>
+    <Setting Name="DatabaseVersionNumber" Type="System.String" Scope="User">
+      <Value Profile="(Default)">1.22</Value>
+    </Setting>
+    <Setting Name="DisplayStatusBar" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="ShowModelExplorer" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="ShowStandardToolbar" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="LoadToolboxWithPage" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="HelpfileLocation" Type="System.String" Scope="User">
+      <Value Profile="(Default)">.\help\Boston.chm</Value>
+    </Setting>
+    <Setting Name="DatabaseConnectionString" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Provider=Microsoft.Jet.OLEDB.4.0; Data Source=C:\ProgramData\Viev Pty Ltd\Boston\4.0.0.0\database\boston.vdb</Value>
+    </Setting>
+    <Setting Name="ThrowCriticalDebugMessagesToScreen" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="DebugMode" Type="System.String" Scope="User">
+      <Value Profile="(Default)">DebugCriticalErrorsOnly</Value>
+    </Setting>
+    <Setting Name="WordNetDictionaryEnglishPath" Type="System.String" Scope="User">
+      <Value Profile="(Default)">.\wordnet\</Value>
+    </Setting>
+    <Setting Name="DefaultLanguage" Type="System.String" Scope="User">
+      <Value Profile="(Default)">English</Value>
+    </Setting>
+    <Setting Name="ThrowInformationDebugMessagesToScreen" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="ToolboxDragOffersSelection" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="ShowFactTypeNamesOnORMModelLoad" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="UsecaseShapeLibrary" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="ORMShapeLibrary" Type="System.String" Scope="User">
+      <Value Profile="(Default)">.\shapelibrary\orm.shl</Value>
+    </Setting>
+    <Setting Name="DatabaseType" Type="System.String" Scope="User">
+      <Value Profile="(Default)">MSJet</Value>
+    </Setting>
+    <Setting Name="ShowFactTablesOnORMModelLoad" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="EnterpriseTreeSearchList" Type="System.Collections.Specialized.StringCollection" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="DefaultBrainMode" Type="System.String" Scope="User">
+      <Value Profile="(Default)">NaturalLanguage</Value>
+    </Setting>
+    <Setting Name="RecentFilesName" Type="System.String" Scope="User">
+      <Value Profile="(Default)">SavedRecentNodes.xml</Value>
+    </Setting>
+    <Setting Name="ERDShapeLibrary" Type="System.String" Scope="User">
+      <Value Profile="(Default)">.\shapelibrary\entityrelationshipdiagram.shl</Value>
+    </Setting>
+    <Setting Name="DisplayCoreMetaModel" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="SuperuserMode" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="DisplayLanguageModel" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="SilentPreConfiguration" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="DisplayBrianaVirtualAnalyst" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="StartVirtualAnalystInQuietMode" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="AIMLDirectory" Type="System.String" Scope="User">
+      <Value Profile="(Default)">\AIML\</Value>
+    </Setting>
+    <Setting Name="DefaultAIMLFile" Type="System.String" Scope="User">
+      <Value Profile="(Default)">english.aiml</Value>
+    </Setting>
+    <Setting Name="FirstRun" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="AllowModelConfiguration" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="UseVirtualUI" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="UseClientServer" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="LoggingOutEndsSession" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="RequireLoginAtStartup" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="UseWindowsAuthenticationVirtualUI" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="InitialiseClient" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="ShowProjectUserMenuItems" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="DefaultPageZoomFactor" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">80</Value>
+    </Setting>
+    <Setting Name="ShapeLibraryClassDiagram" Type="System.String" Scope="User">
+      <Value Profile="(Default)">N/A At this time. UML Class Diagrams Not Implemented.</Value>
+    </Setting>
+    <Setting Name="StateTransitionShapeLibrary" Type="System.String" Scope="User">
+      <Value Profile="(Default)">.\shapelibrary\statetransition.shl</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

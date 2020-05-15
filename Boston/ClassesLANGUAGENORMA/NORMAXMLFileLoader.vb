@@ -1,0 +1,2448 @@
+﻿Imports System.Text.RegularExpressions
+Imports System.Xml.Serialization
+Imports System.Xml.Linq
+Imports System.Reflection
+
+Imports <xmlns:orm="http://schemas.neumont.edu/ORM/2006-04/ORMCore">
+Imports <xmlns:ormDiagram="http://schemas.neumont.edu/ORM/2006-04/ORMDiagram">
+
+Namespace NORMA
+
+    Public Class NORMAXMLFileLoader
+
+        Public Sub New()
+
+        End Sub
+
+        Public Sub LoadEntityTypes(ByRef arModel As FBM.Model, ByRef arNORMAXMLDOC As XDocument)
+
+            Dim lrEntityType As New FBM.EntityType
+            Dim loEnumElementQueryResult As IEnumerable(Of XElement)
+            Dim loElement As XElement
+
+            loEnumElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:EntityType> _
+                                       Select ModelInformation _
+                                       Order By ModelInformation.Attribute("Name").Value
+
+            '---------------------------------
+            'Add the EntiyTypes to the Model
+            '---------------------------------
+            For Each loElement In loEnumElementQueryResult
+                lrEntityType = New FBM.EntityType(arModel, pcenumLanguage.ORMModel, loElement.Attribute("Name").Value, loElement.Attribute("id").Value, Nothing)
+                arModel.AddEntityType(lrEntityType)
+            Next
+
+            '-----------------------------------------------------
+            'Check for Subtype relationships for each EntityType
+            '-----------------------------------------------------
+            For Each lrEntityType In arModel.EntityType
+                loEnumElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Facts>.<orm:SubtypeFact> _
+                                           From FactRoles In ModelInformation.<orm:FactRoles> _
+                                           From SubtypeMetaRole In FactRoles.<orm:SubtypeMetaRole> _
+                                           From RolePlayer In SubtypeMetaRole.<orm:RolePlayer> _
+                                          Where RolePlayer.Attribute("ref") = lrEntityType.Id _
+                                         Select ModelInformation
+
+                If IsSomething(loEnumElementQueryResult(0)) Then
+                    For Each loElement In loEnumElementQueryResult
+
+                        Dim lrSupertypeEntityType As New FBM.EntityType(arModel, pcenumLanguage.ORMModel)
+
+                        Dim loSuprtypeElement As IEnumerable(Of XElement)
+                        loSuprtypeElement = From FactRoles In loElement.<orm:FactRoles> _
+                                            From SupertypeMetaRole In FactRoles.<orm:SupertypeMetaRole> _
+                                            From RolePlayer In SupertypeMetaRole.<orm:RolePlayer> _
+                                            Select RolePlayer
+
+                        lrSupertypeEntityType.Id = loSuprtypeElement(0).Attribute("ref").Value
+
+                        lrSupertypeEntityType = arModel.EntityType.Find(AddressOf lrSupertypeEntityType.Equals)
+                        Call lrEntityType.CreateSubtypeRelationship(lrSupertypeEntityType)
+                    Next
+                End If
+            Next
+
+        End Sub
+
+        Public Sub LoadValueTypes(ByRef arModel As FBM.Model, ByRef arNORMAXMLDOC As XDocument)
+
+            Dim lrValueType As New FBM.ValueType
+            Dim loEnumElementQueryResult As IEnumerable(Of XElement)
+            Dim loElement As XElement
+
+            loEnumElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:ValueType> _
+                                     Select ModelInformation _
+                                      Order By ModelInformation.Attribute("Name").Value
+
+            '---------------------------------
+            'Add the ValueTypes to the Model
+            '---------------------------------            
+            For Each loElement In loEnumElementQueryResult
+                lrValueType = New FBM.ValueType(arModel, pcenumLanguage.ORMModel, loElement.Attribute("Name").Value, loElement.Attribute("id").Value)
+
+                If Not arModel.ValueType.Exists(AddressOf lrValueType.EqualsByName) Then
+                    arModel.AddValueType(lrValueType)
+                End If
+
+                Dim loIsNORMAUnaryFactTypeValueType As IEnumerable(Of XElement)
+                loIsNORMAUnaryFactTypeValueType = From ValueRange In loElement.<orm:ValueRestriction>.<orm:ValueConstraint>.<orm:ValueRanges>.<orm:ValueRange> _
+                                                  Select ValueRange
+
+                Dim loValueRange As XElement
+
+                For Each loValueRange In loIsNORMAUnaryFactTypeValueType
+                    If loValueRange.Attribute("MinValue").Value = "True" And _
+                       loValueRange.Attribute("MaxValue").Value = "True" Then
+                        lrValueType.NORMAIsUnaryFactTypeValueType = True
+                    End If
+                Next
+            Next
+
+        End Sub
+
+        ''' <summary>
+        ''' Loads a specific FactType from the NORMAXMLDOC
+        ''' </summary>
+        ''' <param name="arFactType">The FactType that is to be loaded. Must be prepopulated with the .Model and .Id of the FactType that is to be loaded.</param>
+        ''' <param name="arNORMAXMLDOC">The opened XDocument reference to the NORMA XML document that is being imported into Richmond.</param>
+        ''' <remarks></remarks>
+        Public Sub LoadFactType(ByRef arFactType As FBM.FactType, ByRef arNORMAXMLDOC As XDocument)
+
+            Dim lrJoinedEntityType As New FBM.EntityType
+            Dim lrJoinedFactType As New FBM.FactType
+            Dim lrValueType As New FBM.ValueType
+            Dim lrFactType As New FBM.FactType
+            Dim lrRole As New FBM.Role
+            Dim loEnumElementQueryResult As IEnumerable(Of XElement)
+            Dim loXMLElementQueryResult As IEnumerable(Of XElement)
+            Dim lrRoleXElement As XElement
+            Dim loElement As XElement
+
+            lrFactType = arFactType
+
+            loEnumElementQueryResult = From FactTypeInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Facts>.<orm:Fact> _
+                                      Where FactTypeInformation.Attribute("id").Value = lrFactType.Id _
+                                     Select FactTypeInformation
+
+            For Each loElement In loEnumElementQueryResult
+
+                lrFactType = New FBM.FactType(lrFactType.Model, loElement.Attribute("_Name").Value, loElement.Attribute("id").Value)
+                lrFactType.Name = lrFactType.Model.CreateUniqueFactTypeName(lrFactType.Name, 0)
+
+                If lrFactType.Model.FactType.Exists(AddressOf lrFactType.Equals) Then
+                    lrFactType = lrFactType.Model.FactType.Find(AddressOf lrFactType.EqualsByName)
+                Else
+                    lrFactType.Model.AddFactType(lrFactType) 'Don't use Model.CreateFactType because need to keep NORMA's FactType.Id for now.
+
+                    '---------------------------------------------
+                    'Check to see if the FactType is Objectified
+                    '---------------------------------------------
+                    loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:ObjectifiedType> _
+                                             Where ModelInformation.Attribute("Name") = lrFactType.Name _
+                                            Select ModelInformation
+
+                    If IsSomething(loXMLElementQueryResult(0)) Then
+                        lrFactType.IsObjectified = True
+                    End If
+
+                    '---------------------------
+                    'Add the Roles to the Model
+                    '---------------------------
+                    For Each lrRoleXElement In loElement.<orm:FactRoles>.<orm:Role>
+
+                        Dim lsNORMARoleId As String = lrRoleXElement.Attribute("id").Value
+
+                        lrRole = New FBM.Role(lrFactType, lsNORMARoleId, True)
+                        lrRole.Name = lrRoleXElement.Attribute("Name").Value
+
+                        '----------------------------------------------
+                        'Find the ModelObject within the NORMA Model
+                        '----------------------------------------------
+                        Dim lrModelObject As New FBM.ModelObject
+
+                        lrModelObject.Id = lrRoleXElement.<orm:RolePlayer>(0).Attribute("ref").Value
+
+                        '-------------------------------------
+                        'Check to see if it is an EntityType
+                        '-------------------------------------
+                        lrJoinedEntityType = New FBM.EntityType
+                        loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:EntityType> _
+                                                   Where ModelInformation.Attribute("id") = lrModelObject.Id
+
+                        If IsSomething(loXMLElementQueryResult(0)) Then
+                            lrModelObject.Name = loXMLElementQueryResult(0).Attribute("Name")
+                            lrJoinedEntityType = lrFactType.Model.EntityType.Find(AddressOf lrModelObject.EqualsByName)
+                        Else
+                            lrJoinedEntityType = Nothing
+                        End If
+
+                        '-------------------------------------
+                        'Check to see if it is an ValueType
+                        '-------------------------------------
+                        lrValueType = New FBM.ValueType
+                        loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:ValueType> _
+                               Where ModelInformation.Attribute("id") = lrModelObject.Id
+
+                        If IsSomething(loXMLElementQueryResult(0)) Then
+                            lrModelObject.Name = loXMLElementQueryResult(0).Attribute("Name")
+                            lrValueType = lrFactType.Model.ValueType.Find(AddressOf lrModelObject.EqualsByName)
+                        Else
+                            lrValueType = Nothing
+                        End If
+                        '-------------------------------------
+                        'Check to see if it is an FactType
+                        '-------------------------------------
+                        lrJoinedFactType = New FBM.FactType
+                        loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Facts>.<orm:Fact> _
+                                                 Where ModelInformation.Attribute("id") = lrModelObject.Id _
+                                                Select ModelInformation
+
+                        If IsSomething(loXMLElementQueryResult(0)) Then
+                            lrModelObject.Name = loXMLElementQueryResult(0).Attribute("Name")
+                            lrJoinedFactType = lrFactType.Model.FactType.Find(AddressOf lrModelObject.EqualsByName)
+                        Else
+                            lrJoinedFactType = Nothing
+                        End If
+
+                        '-----------------------------------------------
+                        'Check to see if it is an Objectified FactType
+                        '-----------------------------------------------
+                        lrJoinedFactType = New FBM.FactType
+                        loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:ObjectifiedType> _
+                                                 Where ModelInformation.Attribute("id") = lrModelObject.Id _
+                                                Select ModelInformation
+
+                        If IsSomething(loXMLElementQueryResult(0)) Then
+                            lrModelObject.Name = loXMLElementQueryResult(0).Attribute("Name")
+
+                            Dim loXMLNestedPredicateElement As IEnumerable(Of XElement)
+                            loXMLNestedPredicateElement = From NestedPredicateElement In loXMLElementQueryResult(0).<orm:NestedPredicate> _
+                                                        Select NestedPredicateElement
+                            lrModelObject.Id = loXMLNestedPredicateElement(0).Attribute("ref").Value
+
+                            lrJoinedFactType.Model = lrFactType.Model
+                            lrJoinedFactType.Id = lrModelObject.Id
+                            lrJoinedFactType.Name = lrModelObject.Name
+                            If lrFactType.Model.FactType.Exists(AddressOf lrModelObject.Equals) Then
+                                '------------------------------
+                                'All okay, found the FactType
+                                '------------------------------
+                                lrJoinedFactType = lrFactType.Model.FactType.Find(AddressOf lrModelObject.Equals)
+                            Else
+                                Call Me.LoadFactType(lrJoinedFactType, arNORMAXMLDOC)
+                            End If
+                        Else
+                            lrJoinedFactType = Nothing
+                        End If
+
+                        If IsSomething(lrJoinedEntityType) Then
+                            '---------------------------------------------------------
+                            'Check to see if the Role already exists in the FactType
+                            '---------------------------------------------------------
+                            If lrFactType.RoleGroup.Exists(AddressOf lrRole.Equals) Then
+                                '--------------------------------
+                                'Update the JoinedORMObject etc
+                                '--------------------------------
+                                lrRole = New FBM.Role
+                                lrRole = lrFactType.RoleGroup.Find(AddressOf lrRole.Equals)
+                                lrRole.TypeOfJoin = pcenumRoleJoinType.EntityType
+                                lrRole.JoinedORMObject = lrJoinedEntityType
+                                lrRole.JoinsEntityType = lrJoinedEntityType
+                                lrRole.JoinsFactType = Nothing
+                                lrRole.JoinsValueType = Nothing
+                            Else
+                                lrRole = New FBM.Role
+                                lrRole = lrFactType.CreateRole(lrJoinedEntityType)
+                                lrRole.Id = lsNORMARoleId
+                                lrRole.Name = lrRoleXElement.Attribute("Name").Value
+                                lrRole.TypeOfJoin = pcenumRoleJoinType.EntityType
+                                lrRole.Mandatory = Convert.ToBoolean(lrRoleXElement.Attribute("_IsMandatory").Value)
+                            End If
+                        ElseIf IsSomething(lrValueType) Then
+                            '---------------------------------------------------------
+                            'Check to see if the Role already exists in the FactType
+                            '---------------------------------------------------------
+                            If lrFactType.RoleGroup.Exists(AddressOf lrRole.Equals) Then
+                                '--------------------------------
+                                'Update the JoinedORMObject etc
+                                '--------------------------------
+                                lrRole = New FBM.Role
+                                lrRole = lrFactType.RoleGroup.Find(AddressOf lrRole.Equals)
+                                lrRole.TypeOfJoin = pcenumRoleJoinType.ValueType
+                                lrRole.JoinedORMObject = lrValueType
+                                lrRole.JoinsEntityType = Nothing
+                                lrRole.JoinsFactType = Nothing
+                                lrRole.JoinsValueType = lrValueType
+                            Else
+                                lrRole = New FBM.Role
+                                lrRole = lrFactType.CreateRole(lrValueType)
+                                lrRole.Id = lsNORMARoleId
+                                lrRole.Name = lrRoleXElement.Attribute("Name").Value
+                                lrRole.TypeOfJoin = pcenumRoleJoinType.ValueType
+                                lrRole.Mandatory = Convert.ToBoolean(lrRoleXElement.Attribute("_IsMandatory").Value)
+                                If lrValueType.NORMAIsUnaryFactTypeValueType Then
+                                    lrRole.NORMALinksToUnaryFactTypeValueType = True
+                                End If
+                            End If
+                        ElseIf IsSomething(lrJoinedFactType) Then
+                            '---------------------------------------------------------
+                            'Check to see if the Role already exists in the FactType
+                            '---------------------------------------------------------
+                            If lrFactType.RoleGroup.Exists(AddressOf lrRole.Equals) Then
+                                '--------------------------------
+                                'Update the JoinedORMObject etc
+                                '--------------------------------
+                                lrRole = New FBM.Role
+                                lrRole = lrFactType.RoleGroup.Find(AddressOf lrRole.Equals)
+                                lrRole.TypeOfJoin = pcenumRoleJoinType.FactType
+                                lrRole.JoinedORMObject = lrJoinedFactType
+                                lrRole.JoinsEntityType = Nothing
+                                lrRole.JoinsFactType = lrJoinedFactType
+                                lrRole.JoinsValueType = Nothing
+                            Else
+                                lrRole = New FBM.Role
+                                lrRole = lrFactType.CreateRole(lrJoinedFactType)
+                                lrRole.Id = lsNORMARoleId
+                                lrRole.Name = lrRoleXElement.Attribute("Name").Value
+                                lrRole.Mandatory = Convert.ToBoolean(lrRoleXElement.Attribute("_IsMandatory").Value)
+                            End If
+                        End If
+
+                        'If lrRole.JoinedORMObject Is Nothing Then
+                        '    '----------------------------------------------------------------------------
+                        '    'Don't add the Role to the FactType.RoleGroup because it references nothing
+                        '    '----------------------------------------------------------------------------
+                        '    lrFactType.RoleGroup.Remove(lrRole)
+                        '    lrFactType.Model.Role.Remove(lrRole)
+                        '    Dim lsMessage As String = ""
+                        '    lsMessage = "Warning: Error loading NORMA XML (.orm) file"
+                        '    lsMessage &= vbCrLf & "NORMA Role.Id: " & lrRole.Id
+                        '    prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning)
+                        'End If
+                    Next 'Role
+
+                    '--------------------------------------------
+                    'Load the FactTypeReadings for the FactType
+                    '--------------------------------------------
+                    Call Me.LoadFactTypeReadings(lrFactType.Model, lrFactType, loElement)
+
+                    '---------------------------------
+                    'Load the Facts for the FactType
+                    '---------------------------------
+                    Call Me.LoadFactTypeFacts(lrFactType, arNORMAXMLDOC, loElement)
+
+
+                End If 'Adding new FactType to the Model.
+
+
+            Next
+
+
+        End Sub
+
+        Public Sub LoadFactTypes(ByRef arModel As FBM.Model, ByRef arNORMAXMLDOC As XDocument)
+
+            Dim lrJoinedEntityType As New FBM.EntityType
+            Dim lrJoinedFactType As New FBM.FactType
+            Dim lrValueType As New FBM.ValueType
+            Dim lrFactType As New FBM.FactType
+            Dim lrRole As New FBM.Role
+            Dim loEnumElementQueryResult As IEnumerable(Of XElement)
+            Dim loElement As XElement
+            Dim lrRoleXElement As XElement
+            Dim loXMLElementQueryResult As IEnumerable(Of XElement)
+
+            '--------------------------------------------------------------------------------------------
+            '  PSEUDOCODE
+            '  * Load all of the FactTypes regardless of whether the FactType has a Role referencing
+            '      a(FactType) not yet loaded.
+            '  * Update all of those FactTypes loaded that have a Role of TypeOfJoin=FactType and where
+            '      JoinedORMObject = Nothing to FactTypes already loaded in the previous step.
+            '      Update the JoinedORMObject to the FactType that was missing on the initial load.
+            '--------------------------------------------------------------------------------------------
+
+            loEnumElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Facts>.<orm:Fact> _
+                                     Select ModelInformation _
+                                     Order By ModelInformation.Attribute("_Name").Value
+
+            '---------------------------------
+            'Add the FactTypes to the Model
+            '---------------------------------     
+
+            For Each loElement In loEnumElementQueryResult
+
+                lrFactType = New FBM.FactType(arModel, loElement.Attribute("_Name").Value, loElement.Attribute("id").Value)
+                lrFactType.Name = arModel.CreateUniqueFactTypeName(lrFactType.Name, 0)
+
+
+                If arModel.FactType.Exists(AddressOf lrFactType.Equals) Then
+                    lrFactType = arModel.FactType.Find(AddressOf lrFactType.EqualsByName)
+                Else
+                    arModel.AddFactType(lrFactType) 'Don't use Model.CreateFactType because need to keep NORMA's FactType.Id for now.
+
+                    '---------------------------------------------
+                    'Check to see if the FactType is Objectified
+                    '---------------------------------------------
+                    loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:ObjectifiedType> _
+                                             Where ModelInformation.Attribute("Name") = lrFactType.Name _
+                                            Select ModelInformation
+
+                    If IsSomething(loXMLElementQueryResult(0)) Then
+                        lrFactType.IsObjectified = True
+                    End If
+
+
+                    '---------------------------
+                    'Add the Roles to the Model
+                    '---------------------------
+                    For Each lrRoleXElement In loElement.<orm:FactRoles>.<orm:Role>
+
+                        Dim lsNORMARoleId As String = lrRoleXElement.Attribute("id").Value
+
+                        lrRole = New FBM.Role(lrFactType, lsNORMARoleId, True)
+                        lrRole.Name = lrRoleXElement.Attribute("Name").Value
+
+                        '----------------------------------------------
+                        'Find the ModelObject within the NORMA Model
+                        '----------------------------------------------
+                        Dim lrModelObject As New FBM.ModelObject
+
+                        lrModelObject.Id = lrRoleXElement.<orm:RolePlayer>(0).Attribute("ref").Value
+
+                        '-------------------------------------
+                        'Check to see if it is an EntityType
+                        '-------------------------------------
+                        lrJoinedEntityType = New FBM.EntityType
+                        loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:EntityType> _
+                                                   Where ModelInformation.Attribute("id") = lrModelObject.Id
+
+                        If IsSomething(loXMLElementQueryResult(0)) Then
+                            lrModelObject.Name = loXMLElementQueryResult(0).Attribute("Name")
+                            lrJoinedEntityType = arModel.EntityType.Find(AddressOf lrModelObject.EqualsByName)
+                        Else
+                            lrJoinedEntityType = Nothing
+                        End If
+
+                        '-------------------------------------
+                        'Check to see if it is an ValueType
+                        '-------------------------------------
+                        lrValueType = New FBM.ValueType
+                        loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:ValueType> _
+                                                 Where ModelInformation.Attribute("id") = lrModelObject.Id
+
+                        If IsSomething(loXMLElementQueryResult(0)) Then
+                            lrModelObject.Name = loXMLElementQueryResult(0).Attribute("Name")
+                            lrValueType = arModel.ValueType.Find(AddressOf lrModelObject.EqualsByName)
+                        Else
+                            lrValueType = Nothing
+                        End If
+                        '-------------------------------------
+                        'Check to see if it is an FactType
+                        '-------------------------------------
+                        lrJoinedFactType = New FBM.FactType
+                        loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Facts>.<orm:Fact> _
+                                                 Where ModelInformation.Attribute("id") = lrModelObject.Id _
+                                                Select ModelInformation
+
+                        If IsSomething(loXMLElementQueryResult(0)) Then
+                            lrModelObject.Name = loXMLElementQueryResult(0).Attribute("Name")
+                            lrJoinedFactType = arModel.FactType.Find(AddressOf lrModelObject.EqualsByName)
+                        Else
+                            lrJoinedFactType = Nothing
+                        End If
+
+                        '-----------------------------------------------
+                        'Check to see if it is an Objectified FactType
+                        '-----------------------------------------------
+                        lrJoinedFactType = New FBM.FactType
+                        loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:ObjectifiedType> _
+                                                 Where ModelInformation.Attribute("id") = lrModelObject.Id _
+                                                Select ModelInformation
+
+                        If IsSomething(loXMLElementQueryResult(0)) Then
+
+                            lrModelObject.Name = loXMLElementQueryResult(0).Attribute("Name")
+
+                            Dim loXMLNestedPredicateElement As IEnumerable(Of XElement)
+                            loXMLNestedPredicateElement = From NestedPredicateElement In loXMLElementQueryResult(0).<orm:NestedPredicate> _
+                                                        Select NestedPredicateElement
+                            lrModelObject.Id = loXMLNestedPredicateElement(0).Attribute("ref").Value
+
+                            lrJoinedFactType.Model = arModel
+                            lrJoinedFactType.Id = lrModelObject.Id
+                            lrJoinedFactType.Name = lrModelObject.Name
+                            If arModel.FactType.Exists(AddressOf lrModelObject.Equals) Then
+                                '------------------------------
+                                'All okay, found the FactType
+                                '------------------------------
+                                lrJoinedFactType = arModel.FactType.Find(AddressOf lrModelObject.Equals)
+                            Else
+                                Call Me.LoadFactType(lrJoinedFactType, arNORMAXMLDOC)
+                            End If
+                        Else
+                            lrJoinedFactType = Nothing
+                        End If
+
+                        If IsSomething(lrJoinedEntityType) Then
+                            '---------------------------------------------------------
+                            'Check to see if the Role already exists in the FactType
+                            '---------------------------------------------------------
+                            If lrFactType.RoleGroup.Exists(AddressOf lrRole.Equals) Then
+                                '--------------------------------
+                                'Update the JoinedORMObject etc
+                                '--------------------------------
+                                lrRole = New FBM.Role
+                                lrRole = lrFactType.RoleGroup.Find(AddressOf lrRole.Equals)
+                                lrRole.TypeOfJoin = pcenumRoleJoinType.EntityType
+                                lrRole.JoinedORMObject = lrJoinedEntityType
+                                lrRole.JoinsEntityType = lrJoinedEntityType
+                                lrRole.JoinsFactType = Nothing
+                                lrRole.JoinsValueType = Nothing
+                            Else
+                                lrRole = New FBM.Role
+                                lrRole = lrFactType.CreateRole(lrJoinedEntityType)
+                                lrRole.Id = lsNORMARoleId
+                                lrRole.Name = lrRoleXElement.Attribute("Name").Value
+                                lrRole.TypeOfJoin = pcenumRoleJoinType.EntityType
+                                lrRole.Mandatory = Convert.ToBoolean(lrRoleXElement.Attribute("_IsMandatory").Value)
+                            End If
+                        ElseIf IsSomething(lrValueType) Then
+                            '---------------------------------------------------------
+                            'Check to see if the Role already exists in the FactType
+                            '---------------------------------------------------------
+                            If lrFactType.RoleGroup.Exists(AddressOf lrRole.Equals) Then
+                                '--------------------------------
+                                'Update the JoinedORMObject etc
+                                '--------------------------------
+                                lrRole = New FBM.Role
+                                lrRole = lrFactType.RoleGroup.Find(AddressOf lrRole.Equals)
+                                lrRole.TypeOfJoin = pcenumRoleJoinType.ValueType
+                                lrRole.JoinedORMObject = lrValueType
+                                lrRole.JoinsEntityType = Nothing
+                                lrRole.JoinsFactType = Nothing
+                                lrRole.JoinsValueType = lrValueType
+                            Else
+                                lrRole = New FBM.Role
+                                lrRole = lrFactType.CreateRole(lrValueType)
+                                lrRole.Id = lsNORMARoleId
+                                lrRole.Name = lrRoleXElement.Attribute("Name").Value
+                                lrRole.TypeOfJoin = pcenumRoleJoinType.ValueType
+                                lrRole.Mandatory = Convert.ToBoolean(lrRoleXElement.Attribute("_IsMandatory").Value)
+                                If lrValueType.NORMAIsUnaryFactTypeValueType Then
+                                    lrRole.NORMALinksToUnaryFactTypeValueType = True
+                                End If
+                            End If
+                        ElseIf IsSomething(lrJoinedFactType) Then
+                            '---------------------------------------------------------
+                            'Check to see if the Role already exists in the FactType
+                            '---------------------------------------------------------
+                            If lrFactType.RoleGroup.Exists(AddressOf lrRole.Equals) Then
+                                '--------------------------------
+                                'Update the JoinedORMObject etc
+                                '--------------------------------
+                                lrRole = New FBM.Role
+                                lrRole = lrFactType.RoleGroup.Find(AddressOf lrRole.Equals)
+                                lrRole.TypeOfJoin = pcenumRoleJoinType.FactType
+                                lrRole.JoinedORMObject = lrJoinedFactType
+                                lrRole.JoinsEntityType = Nothing
+                                lrRole.JoinsFactType = lrJoinedFactType
+                                lrRole.JoinsValueType = Nothing
+                            Else
+                                lrRole = New FBM.Role
+                                lrRole = lrFactType.CreateRole(lrJoinedFactType)
+                                lrRole.Id = lsNORMARoleId
+                                lrRole.Name = lrRoleXElement.Attribute("Name").Value
+                                lrRole.Mandatory = Convert.ToBoolean(lrRoleXElement.Attribute("_IsMandatory").Value)
+                            End If
+                        End If
+
+                        'If lrRole.JoinedORMObject Is Nothing Then
+                        '    '----------------------------------------------------------------------------
+                        '    'Don't add the Role to the FactType.RoleGroup because it references nothing
+                        '    '----------------------------------------------------------------------------
+                        '    lrFactType.RoleGroup.Remove(lrRole)
+                        '    arModel.Role.Remove(lrRole)
+                        '    Dim lsMessage As String = ""
+                        '    lsMessage = "Warning: Error loading NORMA XML (.orm) file"
+                        '    lsMessage &= vbCrLf & "NORMA Role.Id: " & lrRole.Id
+                        '    prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning)
+                        'End If
+                    Next 'Role
+
+                    '--------------------------------------------
+                    'Load the FactTypeReadings for the FactType
+                    '--------------------------------------------
+                    Call Me.LoadFactTypeReadings(arModel, lrFactType, loElement)
+
+                    '---------------------------------
+                    'Load the Facts for the FactType
+                    '---------------------------------
+                    Call Me.LoadFactTypeFacts(lrFactType, arNORMAXMLDOC, loElement)
+
+                End If 'FactType exists in Model
+            Next 'FactType
+
+            Dim larFaultyFactTypes = From FactType In arModel.FactType _
+                                     From Role In FactType.RoleGroup _
+                                    Where Role.JoinedORMObject Is Nothing _
+                                   Select FactType
+
+            For Each lrFactType In larFaultyFactTypes
+
+                Dim larRole = From Role In lrFactType.RoleGroup _
+                             Where Role.JoinedORMObject Is Nothing _
+                            Select Role
+
+                For Each lrRole In larRole
+
+                    loEnumElementQueryResult = From FactType In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Facts>.<orm:Fact> _
+                                               From Role In FactType.<orm:FactRoles>.<orm:Role> _
+                                              Where Role.Attribute("id").Value = lrRole.Id _
+                                             Select Role
+
+                    For Each lrRoleXElement In loEnumElementQueryResult.<orm:RolePlayer>
+                        '------------------------------------------------
+                        'Find the ModelObject within the Richmond Model
+                        '------------------------------------------------
+                        lrJoinedFactType = New FBM.FactType
+                        lrJoinedFactType.Id = lrRoleXElement.<orm:RolePlayer>(0).Attribute("ref").Value
+                        lrJoinedFactType = arModel.FactType.Find(AddressOf lrJoinedFactType.Equals)
+
+                        lrRole.TypeOfJoin = pcenumRoleJoinType.FactType
+                        lrRole.JoinedORMObject = lrJoinedFactType
+                        lrRole.JoinsEntityType = Nothing
+                        lrRole.JoinsFactType = lrJoinedFactType
+                        lrRole.JoinsValueType = Nothing
+
+                    Next 'Seach in NORMAXMLDOC
+                Next 'Role
+            Next 'FaultyFactType
+
+        End Sub
+
+        Public Sub LoadRoleConstraintInternalUniquenessConstraints(ByRef arModel As FBM.Model, ByRef arNORMAXMLDOC As XDocument)
+
+            Dim lrRole As New FBM.Role
+            Dim loEnumElementQueryResult As IEnumerable(Of XElement)
+            Dim loElement As XElement
+            Dim lrRoleXElement As XElement
+
+            loEnumElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Constraints>.<orm:UniquenessConstraint> _
+                                       Select ModelInformation _
+                                       Order By ModelInformation.Attribute("Name").Value
+
+            For Each loElement In loEnumElementQueryResult
+                '-------------------------------------------------------------------------
+                'Create the list of Roles that are to be added to the new RoleConstraint
+                '-------------------------------------------------------------------------
+                Dim larRoleList As New List(Of FBM.Role)
+                Dim lbRolesFound As Boolean = True
+                For Each lrRoleXElement In loElement.<orm:RoleSequence>.<orm:Role>
+                    lrRole = New FBM.Role
+                    '--------------------------------
+                    'Find the Role within the Model
+                    '--------------------------------
+                    lrRole.Id = lrRoleXElement.Attribute("ref").Value
+                    lrRole = arModel.Role.Find(AddressOf lrRole.Equals)
+                    If IsSomething(lrRole) Then
+                        If lrRole.NORMALinksToUnaryFactTypeValueType = True Then
+                            '------------------------------------------
+                            'Don't add the Role to the RoleConstraint
+                            '------------------------------------------
+                        Else
+                            larRoleList.Add(lrRole)
+                        End If
+                    Else
+                        lbRolesFound = False
+
+                        Dim lsMessage As String = ""
+                        lsMessage = "Warning: Loading NORMA XML (.orm) file"
+                        lsMessage &= vbCrLf & " No Role found for RoleConstraint.Id: "
+                        lsMessage &= vbCrLf & " Role.Id: " & lrRoleXElement.Attribute("ref").Value
+                        prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning)
+                    End If
+                Next
+
+                If lbRolesFound Then
+                    If arModel.AreRolesWithinTheSameFactType(larRoleList) Then
+                        '---------------------------
+                        'Create the RoleConstraint
+                        '---------------------------
+                        Dim lrRoleConstraint As FBM.RoleConstraint
+                        lrRoleConstraint = arModel.CreateRoleConstraint(pcenumRoleConstraintType.InternalUniquenessConstraint, larRoleList, loElement.Attribute("Name").Value)
+                        arModel.AddRoleConstraint(lrRoleConstraint)
+                    End If
+                End If
+            Next
+
+        End Sub
+
+        Public Sub LoadRoleConstraintExternalUniquenessConstraints(ByRef arModel As FBM.Model, ByRef arNORMAXMLDOC As XDocument)
+
+            Dim lrRole As New FBM.Role
+            Dim loEnumElementQueryResult As IEnumerable(Of XElement)
+            Dim loElement As XElement
+            Dim lrRoleXElement As XElement
+
+            loEnumElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Constraints>.<orm:UniquenessConstraint> _
+                                       Select ModelInformation _
+                                       Order By ModelInformation.Attribute("Name").Value
+
+            For Each loElement In loEnumElementQueryResult
+                '-------------------------------------------------------------------------
+                'Create the list of Roles that are to be added to the new RoleConstraint
+                '-------------------------------------------------------------------------
+                Dim larRoleList As New List(Of FBM.Role)
+                Dim lbRolesFound As Boolean = True
+                For Each lrRoleXElement In loElement.<orm:RoleSequence>.<orm:Role>
+                    lrRole = New FBM.Role
+                    '--------------------------------
+                    'Find the Role within the Model
+                    '--------------------------------
+                    lrRole.Id = lrRoleXElement.Attribute("ref").Value
+                    lrRole = arModel.Role.Find(AddressOf lrRole.Equals)
+                    If IsSomething(lrRole) Then
+                        If lrRole.NORMALinksToUnaryFactTypeValueType = True Then
+                            '------------------------------------------
+                            'Don't add the Role to the RoleConstraint
+                            '------------------------------------------
+                        Else
+                            larRoleList.Add(lrRole)
+                        End If
+                    Else
+                        lbRolesFound = False
+
+                        Dim lsMessage As String = ""
+                        lsMessage = "Warning: Loading NORMA XML (.orm) file"
+                        lsMessage &= vbCrLf & " No Role found for RoleConstraint.Id: "
+                        lsMessage &= vbCrLf & " Role.Id: " & lrRoleXElement.Attribute("ref").Value
+                        prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning)
+                    End If
+                Next
+
+                If lbRolesFound Then
+                    If arModel.AreRolesWithinTheSameFactType(larRoleList) Then
+                        '----------------------------------------------------------
+                        'Represents an Internal Uniqueness Constraint, do nothing
+                        '----------------------------------------------------------
+                    Else
+                        '---------------------------
+                        'Create the RoleConstraint
+                        '---------------------------
+                        Dim lrRoleConstraint As FBM.RoleConstraint
+                        lrRoleConstraint = arModel.CreateRoleConstraint(pcenumRoleConstraintType.ExternalUniquenessConstraint, larRoleList, loElement.Attribute("Name").Value)
+                        lrRoleConstraint.Id = loElement.Attribute("id")
+                        arModel.AddRoleConstraint(lrRoleConstraint)
+                    End If
+                End If
+            Next
+
+        End Sub
+
+        Public Sub LoadRoleConstraintEqualityConstraints(ByRef arModel As FBM.Model, ByRef arNORMAXMLDOC As XDocument)
+
+            Dim lrRole As New FBM.Role
+            Dim loEnumElementQueryResult As IEnumerable(Of XElement)
+            Dim loElement As XElement
+            Dim lrRoleXElement As XElement
+
+            loEnumElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Constraints>.<orm:EqualityConstraint> _
+                                       Select ModelInformation _
+                                       Order By ModelInformation.Attribute("Name").Value
+
+            For Each loElement In loEnumElementQueryResult
+                '-------------------------------------------------------------------------
+                'Create the list of Roles that are to be added to the new RoleConstraint
+                '-------------------------------------------------------------------------
+
+                '---------------------------
+                'Create the RoleConstraint
+                '---------------------------
+                Dim lrRoleConstraint As FBM.RoleConstraint
+                lrRoleConstraint = arModel.CreateRoleConstraint(pcenumRoleConstraintType.EqualityConstraint, Nothing, loElement.Attribute("Name").Value)
+                lrRoleConstraint.Id = loElement.Attribute("id").Value
+
+                Dim lrRoleSequencesXElement As XElement
+                Dim lrRoleSequenceXElement As XElement
+
+                For Each lrRoleSequencesXElement In loElement.<orm:RoleSequences>
+                    Dim liRoleSequenceNr As Integer = 1
+                    For Each lrRoleSequenceXElement In lrRoleSequencesXElement.<orm:RoleSequence>
+
+                        Dim lbRolesFound As Boolean = True
+                        Dim larRoleList As New List(Of FBM.Role)
+
+                        For Each lrRoleXElement In lrRoleSequenceXElement.<orm:Role>
+                            lrRole = New FBM.Role
+                            '--------------------------------
+                            'Find the Role within the Model
+                            '--------------------------------
+                            lrRole.Id = lrRoleXElement.Attribute("ref").Value
+                            lrRole = arModel.Role.Find(AddressOf lrRole.Equals)
+                            If IsSomething(lrRole) Then
+                                If lrRole.NORMALinksToUnaryFactTypeValueType = True Then
+                                    '------------------------------------------
+                                    'Don't add the Role to the RoleConstraint
+                                    '------------------------------------------
+                                Else
+                                    larRoleList.Add(lrRole)
+                                End If
+                            Else
+                                lbRolesFound = False
+
+                                Dim lsMessage As String = ""
+                                lsMessage = "Warning: Loading NORMA XML (.orm) file"
+                                lsMessage &= vbCrLf & " No Role found for RoleConstraint.Id: "
+                                lsMessage &= vbCrLf & " Role.Id: " & lrRoleXElement.Attribute("ref").Value
+                                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning)
+                            End If
+
+                        Next
+
+                        If lbRolesFound Then
+                            Dim lrRoleConstraintRole As FBM.RoleConstraintRole
+                            For Each lrRole In larRoleList
+                                If liRoleSequenceNr = 1 Then
+                                    '----------
+                                    'Is Entry
+                                    '----------
+                                    '------------------------------------------------------------------------
+                                    'Create a new RoleConstraintRole for the RoleConstraint/Role combination
+                                    '------------------------------------------------------------------------
+                                    lrRoleConstraintRole = New FBM.RoleConstraintRole(lrRole, lrRoleConstraint, True, False, liRoleSequenceNr)
+                                Else
+                                    '--------
+                                    'Is Exit
+                                    '--------
+                                    '------------------------------------------------------------------------
+                                    'Create a new RoleConstraintRole for the RoleConstraint/Role combination
+                                    '------------------------------------------------------------------------
+                                    lrRoleConstraintRole = New FBM.RoleConstraintRole(lrRole, lrRoleConstraint, False, True, liRoleSequenceNr)
+                                End If
+
+                                '------------------------------------
+                                'Add the Role to the RoleConstraint
+                                '------------------------------------
+                                lrRoleConstraint.Role.Add(lrRole)
+
+                                '------------------------------------------
+                                'Attach the RoleConstraintRole to the Role
+                                '------------------------------------------
+                                lrRole.RoleConstraintRole.Add(lrRoleConstraintRole)
+
+                                '----------------------------------------------------
+                                'Attach the RoleConstraintRole to the RoleConstraint
+                                '----------------------------------------------------
+                                lrRoleConstraint.RoleConstraintRole.Add(lrRoleConstraintRole)
+                            Next 'Role
+                        End If
+                        liRoleSequenceNr += 1
+                    Next 'Role Sequence                    
+                Next 'Role Sequences
+                arModel.AddRoleConstraint(lrRoleConstraint)
+            Next 'Equality Constraint
+
+        End Sub
+
+        Public Sub LoadRoleConstraintExclusiveOrConstraints(ByRef arModel As FBM.Model, ByRef arNORMAXMLDOC As XDocument)
+
+            Dim lrRole As New FBM.Role
+            Dim loEnumElementQueryResult As IEnumerable(Of XElement)
+            Dim loElement As XElement
+            Dim lrRoleXElement As XElement
+
+            loEnumElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Constraints>.<orm:ExclusionConstraint> _
+                                       Select ModelInformation _
+                                       Order By ModelInformation.Attribute("Name").Value
+
+            For Each loElement In loEnumElementQueryResult
+                If loElement.<orm:ExclusiveOrMandatoryConstraint>.Count = 1 Then
+                    '-------------------------------------------------------------------------
+                    'Create the list of Roles that are to be added to the new RoleConstraint
+                    '-------------------------------------------------------------------------
+
+                    '---------------------------
+                    'Create the RoleConstraint
+                    '---------------------------
+                    Dim lrRoleConstraint As FBM.RoleConstraint
+                    lrRoleConstraint = arModel.CreateRoleConstraint(pcenumRoleConstraintType.ExclusiveORConstraint, Nothing, loElement.Attribute("Name").Value)
+                    lrRoleConstraint.Id = loElement.Attribute("id").Value
+
+                    Dim lrRoleSequencesXElement As XElement
+                    Dim lrRoleSequenceXElement As XElement
+
+                    For Each lrRoleSequencesXElement In loElement.<orm:RoleSequences>
+                        Dim liRoleSequenceNr As Integer = 1
+                        For Each lrRoleSequenceXElement In lrRoleSequencesXElement.<orm:RoleSequence>
+
+                            Dim lbRolesFound As Boolean = True
+                            Dim larRoleList As New List(Of FBM.Role)
+
+                            For Each lrRoleXElement In lrRoleSequenceXElement.<orm:Role>
+                                lrRole = New FBM.Role
+                                '--------------------------------
+                                'Find the Role within the Model
+                                '--------------------------------
+                                lrRole.Id = lrRoleXElement.Attribute("ref").Value
+                                lrRole = arModel.Role.Find(AddressOf lrRole.Equals)
+                                If IsSomething(lrRole) Then
+                                    If lrRole.NORMALinksToUnaryFactTypeValueType = True Then
+                                        '------------------------------------------
+                                        'Don't add the Role to the RoleConstraint
+                                        '------------------------------------------
+                                    Else
+                                        larRoleList.Add(lrRole)
+                                    End If
+                                Else
+                                    lbRolesFound = False
+
+                                    Dim lsMessage As String = ""
+                                    lsMessage = "Warning: Loading NORMA XML (.orm) file"
+                                    lsMessage &= vbCrLf & " No Role found for RoleConstraint.Id: "
+                                    lsMessage &= vbCrLf & " Role.Id: " & lrRoleXElement.Attribute("ref").Value
+                                    prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning)
+                                End If
+
+                            Next
+
+                            If lbRolesFound Then
+                                Dim lrRoleConstraintRole As FBM.RoleConstraintRole
+                                For Each lrRole In larRoleList
+                                    If liRoleSequenceNr = 1 Then
+                                        '----------
+                                        'Is Entry
+                                        '----------
+                                        '------------------------------------------------------------------------
+                                        'Create a new RoleConstraintRole for the RoleConstraint/Role combination
+                                        '------------------------------------------------------------------------
+                                        lrRoleConstraintRole = New FBM.RoleConstraintRole(lrRole, lrRoleConstraint, True, False, liRoleSequenceNr)
+                                    Else
+                                        '--------
+                                        'Is Exit
+                                        '--------
+                                        '------------------------------------------------------------------------
+                                        'Create a new RoleConstraintRole for the RoleConstraint/Role combination
+                                        '------------------------------------------------------------------------
+                                        lrRoleConstraintRole = New FBM.RoleConstraintRole(lrRole, lrRoleConstraint, False, True, liRoleSequenceNr)
+                                    End If
+
+                                    '------------------------------------
+                                    'Add the Role to the RoleConstraint
+                                    '------------------------------------
+                                    lrRoleConstraint.Role.Add(lrRole)
+
+                                    '------------------------------------------
+                                    'Attach the RoleConstraintRole to the Role
+                                    '------------------------------------------
+                                    lrRole.RoleConstraintRole.Add(lrRoleConstraintRole)
+
+                                    '----------------------------------------------------
+                                    'Attach the RoleConstraintRole to the RoleConstraint
+                                    '----------------------------------------------------
+                                    lrRoleConstraint.RoleConstraintRole.Add(lrRoleConstraintRole)
+                                Next 'Role
+                            End If
+                            liRoleSequenceNr += 1
+                        Next 'Role Sequence                    
+                    Next 'Role Sequences
+                    arModel.AddRoleConstraint(lrRoleConstraint)
+                End If
+            Next 'Exclusive OR Constraint
+
+        End Sub
+
+        Public Sub LoadRoleConstraintExclusionConstraints(ByRef arModel As FBM.Model, ByRef arNORMAXMLDOC As XDocument)
+
+            Dim lrRole As New FBM.Role
+            Dim loEnumElementQueryResult As IEnumerable(Of XElement)
+            Dim loElement As XElement
+            Dim lrRoleXElement As XElement
+
+            loEnumElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Constraints>.<orm:ExclusionConstraint> _
+                                       Select ModelInformation _
+                                       Order By ModelInformation.Attribute("Name").Value
+
+            For Each loElement In loEnumElementQueryResult
+                If loElement.<orm:ExclusiveOrMandatoryConstraint>.Count = 0 Then
+                    '-------------------------------------------------------------------------
+                    'Create the list of Roles that are to be added to the new RoleConstraint
+                    '-------------------------------------------------------------------------
+
+                    '---------------------------
+                    'Create the RoleConstraint
+                    '---------------------------
+                    Dim lrRoleConstraint As FBM.RoleConstraint
+                    lrRoleConstraint = arModel.CreateRoleConstraint(pcenumRoleConstraintType.ExclusionConstraint, Nothing, loElement.Attribute("Name").Value)
+                    lrRoleConstraint.Id = loElement.Attribute("id").Value
+
+                    Dim lrRoleSequencesXElement As XElement
+                    Dim lrRoleSequenceXElement As XElement
+
+                    For Each lrRoleSequencesXElement In loElement.<orm:RoleSequences>
+                        Dim liRoleSequenceNr As Integer = 1
+                        For Each lrRoleSequenceXElement In lrRoleSequencesXElement.<orm:RoleSequence>
+
+                            Dim lbRolesFound As Boolean = True
+                            Dim larRoleList As New List(Of FBM.Role)
+
+                            For Each lrRoleXElement In lrRoleSequenceXElement.<orm:Role>
+                                lrRole = New FBM.Role
+                                '--------------------------------
+                                'Find the Role within the Model
+                                '--------------------------------
+                                lrRole.Id = lrRoleXElement.Attribute("ref").Value
+                                lrRole = arModel.Role.Find(AddressOf lrRole.Equals)
+                                If IsSomething(lrRole) Then
+                                    If lrRole.NORMALinksToUnaryFactTypeValueType = True Then
+                                        '------------------------------------------
+                                        'Don't add the Role to the RoleConstraint
+                                        '------------------------------------------
+                                    Else
+                                        larRoleList.Add(lrRole)
+                                    End If
+                                Else
+                                    lbRolesFound = False
+
+                                    Dim lsMessage As String = ""
+                                    lsMessage = "Warning: Loading NORMA XML (.orm) file"
+                                    lsMessage &= vbCrLf & " No Role found for RoleConstraint.Id: "
+                                    lsMessage &= vbCrLf & " Role.Id: " & lrRoleXElement.Attribute("ref").Value
+                                    prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning)
+                                End If
+
+                            Next
+
+                            If lbRolesFound Then
+                                Dim lrRoleConstraintRole As FBM.RoleConstraintRole
+                                For Each lrRole In larRoleList
+                                    If liRoleSequenceNr = 1 Then
+                                        '----------
+                                        'Is Entry
+                                        '----------
+                                        '------------------------------------------------------------------------
+                                        'Create a new RoleConstraintRole for the RoleConstraint/Role combination
+                                        '------------------------------------------------------------------------
+                                        lrRoleConstraintRole = New FBM.RoleConstraintRole(lrRole, lrRoleConstraint, True, False, liRoleSequenceNr)
+                                    Else
+                                        '--------
+                                        'Is Exit
+                                        '--------
+                                        '------------------------------------------------------------------------
+                                        'Create a new RoleConstraintRole for the RoleConstraint/Role combination
+                                        '------------------------------------------------------------------------
+                                        lrRoleConstraintRole = New FBM.RoleConstraintRole(lrRole, lrRoleConstraint, False, True, liRoleSequenceNr)
+                                    End If
+
+                                    '------------------------------------
+                                    'Add the Role to the RoleConstraint
+                                    '------------------------------------
+                                    lrRoleConstraint.Role.Add(lrRole)
+
+                                    '------------------------------------------
+                                    'Attach the RoleConstraintRole to the Role
+                                    '------------------------------------------
+                                    lrRole.RoleConstraintRole.Add(lrRoleConstraintRole)
+
+                                    '----------------------------------------------------
+                                    'Attach the RoleConstraintRole to the RoleConstraint
+                                    '----------------------------------------------------
+                                    lrRoleConstraint.RoleConstraintRole.Add(lrRoleConstraintRole)
+                                Next 'Role
+                            End If
+                            liRoleSequenceNr += 1
+                        Next 'Role Sequence                    
+                    Next 'Role Sequences
+                    arModel.AddRoleConstraint(lrRoleConstraint)
+                End If
+            Next 'Subset Constraint
+
+
+        End Sub
+
+        Public Sub LoadRoleConstraintFrequencyConstraints(ByRef arModel As FBM.Model, ByRef arNORMAXMLDOC As XDocument)
+
+            Dim lrRole As New FBM.Role
+            Dim loEnumElementQueryResult As IEnumerable(Of XElement)
+            Dim loElement As XElement
+            Dim lrRoleXElement As XElement
+
+            loEnumElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Constraints>.<orm:FrequencyConstraint> _
+                                       Select ModelInformation _
+                                       Order By ModelInformation.Attribute("Name").Value
+
+            For Each loElement In loEnumElementQueryResult
+                '-------------------------------------------------------------------------
+                'Create the list of Roles that are to be added to the new RoleConstraint
+                '-------------------------------------------------------------------------
+
+                '---------------------------
+                'Create the RoleConstraint
+                '---------------------------
+                Dim lrRoleConstraint As FBM.RoleConstraint
+                lrRoleConstraint = arModel.CreateRoleConstraint(pcenumRoleConstraintType.FrequencyConstraint, Nothing, loElement.Attribute("Name").Value)
+                lrRoleConstraint.Id = loElement.Attribute("id").Value
+                lrRoleConstraint.MaximumFrequencyCount = loElement.Attribute("MaxFrequency").Value
+                lrRoleConstraint.MinimumFrequencyCount = loElement.Attribute("MinFrequency").Value
+
+                If (lrRoleConstraint.MinimumFrequencyCount = 0) And (lrRoleConstraint.MaximumFrequencyCount > 0) Then
+                    lrRoleConstraint.CardinalityRangeType = pcenumCardinalityRangeType.LessThanOREqual
+                ElseIf (lrRoleConstraint.MinimumFrequencyCount > 0) And (lrRoleConstraint.MaximumFrequencyCount = 0) Then
+                    lrRoleConstraint.CardinalityRangeType = pcenumCardinalityRangeType.GreaterThanOREqual
+                ElseIf lrRoleConstraint.MinimumFrequencyCount = lrRoleConstraint.MaximumFrequencyCount Then
+                    lrRoleConstraint.CardinalityRangeType = pcenumCardinalityRangeType.Equal
+                End If
+
+                lrRoleConstraint.Cardinality = lrRoleConstraint.MinimumFrequencyCount
+                If lrRoleConstraint.MaximumFrequencyCount > lrRoleConstraint.MinimumFrequencyCount Then
+                    lrRoleConstraint.Cardinality = lrRoleConstraint.MaximumFrequencyCount
+                End If
+
+                Dim lrRoleSequenceXElement As XElement
+                Dim liRoleSequenceNr As Integer = 1
+
+                For Each lrRoleSequenceXElement In loElement.<orm:RoleSequence>
+
+                    Dim lbRolesFound As Boolean = True
+                    Dim larRoleList As New List(Of FBM.Role)
+
+                    For Each lrRoleXElement In lrRoleSequenceXElement.<orm:Role>
+                        lrRole = New FBM.Role
+                        '--------------------------------
+                        'Find the Role within the Model
+                        '--------------------------------
+                        lrRole.Id = lrRoleXElement.Attribute("ref").Value
+                        lrRole = arModel.Role.Find(AddressOf lrRole.Equals)
+                        If IsSomething(lrRole) Then
+                            If lrRole.NORMALinksToUnaryFactTypeValueType = True Then
+                                '------------------------------------------
+                                'Don't add the Role to the RoleConstraint
+                                '------------------------------------------
+                            Else
+                                larRoleList.Add(lrRole)
+                            End If
+                        Else
+                            lbRolesFound = False
+
+                            Dim lsMessage As String = ""
+                            lsMessage = "Warning: Loading NORMA XML (.orm) file"
+                            lsMessage &= vbCrLf & " No Role found for RoleConstraint.Id: "
+                            lsMessage &= vbCrLf & " Role.Id: " & lrRoleXElement.Attribute("ref").Value
+                            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning)
+                        End If
+
+                    Next
+
+                    If lbRolesFound Then
+                        Dim lrRoleConstraintRole As FBM.RoleConstraintRole
+                        For Each lrRole In larRoleList
+                            If liRoleSequenceNr = 1 Then
+                                '----------
+                                'Is Entry
+                                '----------
+                                '------------------------------------------------------------------------
+                                'Create a new RoleConstraintRole for the RoleConstraint/Role combination
+                                '------------------------------------------------------------------------
+                                lrRoleConstraintRole = New FBM.RoleConstraintRole(lrRole, lrRoleConstraint, True, False, liRoleSequenceNr)
+                            Else
+                                '--------
+                                'Is Exit
+                                '--------
+                                '------------------------------------------------------------------------
+                                'Create a new RoleConstraintRole for the RoleConstraint/Role combination
+                                '------------------------------------------------------------------------
+                                lrRoleConstraintRole = New FBM.RoleConstraintRole(lrRole, lrRoleConstraint, False, True, liRoleSequenceNr)
+                            End If
+
+                            '------------------------------------
+                            'Add the Role to the RoleConstraint
+                            '------------------------------------
+                            lrRoleConstraint.Role.Add(lrRole)
+
+                            '------------------------------------------
+                            'Attach the RoleConstraintRole to the Role
+                            '------------------------------------------
+                            lrRole.RoleConstraintRole.Add(lrRoleConstraintRole)
+
+                            '----------------------------------------------------
+                            'Attach the RoleConstraintRole to the RoleConstraint
+                            '----------------------------------------------------
+                            lrRoleConstraint.RoleConstraintRole.Add(lrRoleConstraintRole)
+                        Next 'Role
+                    End If
+                    liRoleSequenceNr += 1
+                Next 'Role Sequence                    
+
+                arModel.AddRoleConstraint(lrRoleConstraint)
+            Next 'Subset Constraint
+
+
+        End Sub
+
+        Public Sub LoadRoleConstraintInclusiveOrConstraints(ByRef arModel As FBM.Model, ByRef arNORMAXMLDOC As XDocument)
+
+            Dim lrRole As New FBM.Role
+            Dim loEnumElementQueryResult As IEnumerable(Of XElement)
+            Dim loElement As XElement
+            Dim lrRoleXElement As XElement
+
+            loEnumElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Constraints>.<orm:MandatoryConstraint> _
+                                       Select ModelInformation _
+                                       Order By ModelInformation.Attribute("Name").Value
+
+            For Each loElement In loEnumElementQueryResult
+                If loElement.<orm:ExclusiveOrExclusionConstraint>.Count = 0 Then
+                    '-------------------------------------------------------------------------
+                    'Create the list of Roles that are to be added to the new RoleConstraint
+                    '-------------------------------------------------------------------------
+                    If (loElement.<orm:RoleSequence>.<orm:Role>.Count > 1) And (loElement.<orm:ImpliedByObjectType>.Count = 0) Then
+                        '---------------------------
+                        'Create the RoleConstraint
+                        '---------------------------
+                        Dim lrRoleConstraint As FBM.RoleConstraint
+                        lrRoleConstraint = arModel.CreateRoleConstraint(pcenumRoleConstraintType.InclusiveORConstraint, Nothing, loElement.Attribute("Name").Value)
+                        lrRoleConstraint.Id = loElement.Attribute("id").Value
+
+
+                        Dim lrRoleSequenceXElement As XElement
+
+
+                        Dim liRoleSequenceNr As Integer = 1
+                        For Each lrRoleSequenceXElement In loElement.<orm:RoleSequence>
+
+                            Dim lbRolesFound As Boolean = True
+                            Dim larRoleList As New List(Of FBM.Role)
+
+                            For Each lrRoleXElement In lrRoleSequenceXElement.<orm:Role>
+                                lrRole = New FBM.Role
+                                '--------------------------------
+                                'Find the Role within the Model
+                                '--------------------------------
+                                lrRole.Id = lrRoleXElement.Attribute("ref").Value
+                                lrRole = arModel.Role.Find(AddressOf lrRole.Equals)
+                                If IsSomething(lrRole) Then
+                                    If lrRole.NORMALinksToUnaryFactTypeValueType = True Then
+                                        '------------------------------------------
+                                        'Don't add the Role to the RoleConstraint
+                                        '------------------------------------------
+                                    Else
+                                        larRoleList.Add(lrRole)
+                                    End If
+                                Else
+                                    lbRolesFound = False
+
+                                    Dim lsMessage As String = ""
+                                    lsMessage = "Warning: Loading NORMA XML (.orm) file"
+                                    lsMessage &= vbCrLf & " No Role found for RoleConstraint.Id: "
+                                    lsMessage &= vbCrLf & " Role.Id: " & lrRoleXElement.Attribute("ref").Value
+                                    prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning)
+                                End If
+
+                            Next
+
+                            If lbRolesFound Then
+                                Dim lrRoleConstraintRole As FBM.RoleConstraintRole
+                                For Each lrRole In larRoleList
+                                    If liRoleSequenceNr = 1 Then
+                                        '----------
+                                        'Is Entry
+                                        '----------
+                                        '------------------------------------------------------------------------
+                                        'Create a new RoleConstraintRole for the RoleConstraint/Role combination
+                                        '------------------------------------------------------------------------
+                                        lrRoleConstraintRole = New FBM.RoleConstraintRole(lrRole, lrRoleConstraint, True, False, liRoleSequenceNr)
+                                    Else
+                                        '--------
+                                        'Is Exit
+                                        '--------
+                                        '------------------------------------------------------------------------
+                                        'Create a new RoleConstraintRole for the RoleConstraint/Role combination
+                                        '------------------------------------------------------------------------
+                                        lrRoleConstraintRole = New FBM.RoleConstraintRole(lrRole, lrRoleConstraint, False, True, liRoleSequenceNr)
+                                    End If
+
+                                    '------------------------------------
+                                    'Add the Role to the RoleConstraint
+                                    '------------------------------------
+                                    lrRoleConstraint.Role.Add(lrRole)
+
+                                    '------------------------------------------
+                                    'Attach the RoleConstraintRole to the Role
+                                    '------------------------------------------
+                                    lrRole.RoleConstraintRole.Add(lrRoleConstraintRole)
+
+                                    '----------------------------------------------------
+                                    'Attach the RoleConstraintRole to the RoleConstraint
+                                    '----------------------------------------------------
+                                    lrRoleConstraint.RoleConstraintRole.Add(lrRoleConstraintRole)
+                                Next 'Role
+                            End If
+                            liRoleSequenceNr += 1
+                        Next 'Role Sequence                    
+                        arModel.AddRoleConstraint(lrRoleConstraint)
+                    End If 'RoleSequence Count > 1
+                End If
+            Next 'Subset Constraint
+
+
+        End Sub
+
+        Public Sub LoadRoleConstraintRingConstraints(ByRef arModel As FBM.Model, ByRef arNORMAXMLDOC As XDocument)
+
+            Dim lrRole As New FBM.Role
+            Dim loEnumElementQueryResult As IEnumerable(Of XElement)
+            Dim loElement As XElement
+            Dim lrRoleXElement As XElement
+
+            loEnumElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Constraints>.<orm:RingConstraint> _
+                                       Select ModelInformation _
+                                       Order By ModelInformation.Attribute("Name").Value
+
+            For Each loElement In loEnumElementQueryResult
+                '-------------------------------------------------------------------------
+                'Create the list of Roles that are to be added to the new RoleConstraint
+                '-------------------------------------------------------------------------
+
+                '---------------------------
+                'Create the RoleConstraint
+                '---------------------------
+                Dim lrRoleConstraint As FBM.RoleConstraint
+                lrRoleConstraint = arModel.CreateRoleConstraint(pcenumRoleConstraintType.RingConstraint, Nothing, loElement.Attribute("Name").Value)
+                lrRoleConstraint.Id = loElement.Attribute("id").Value
+                lrRoleConstraint.RingConstraintType = CType([Enum].Parse(GetType(pcenumRingConstraintType), loElement.Attribute("Type").Value), pcenumRingConstraintType)
+
+
+                Dim lrRoleSequenceXElement As XElement
+
+
+                Dim liRoleSequenceNr As Integer = 1
+                For Each lrRoleSequenceXElement In loElement.<orm:RoleSequence>
+
+                    Dim lbRolesFound As Boolean = True
+                    Dim larRoleList As New List(Of FBM.Role)
+
+                    For Each lrRoleXElement In lrRoleSequenceXElement.<orm:Role>
+                        lrRole = New FBM.Role
+                        '--------------------------------
+                        'Find the Role within the Model
+                        '--------------------------------
+                        lrRole.Id = lrRoleXElement.Attribute("ref").Value
+                        lrRole = arModel.Role.Find(AddressOf lrRole.Equals)
+                        If IsSomething(lrRole) Then
+                            If lrRole.NORMALinksToUnaryFactTypeValueType = True Then
+                                '------------------------------------------
+                                'Don't add the Role to the RoleConstraint
+                                '------------------------------------------
+                            Else
+                                larRoleList.Add(lrRole)
+                            End If
+                        Else
+                            lbRolesFound = False
+
+                            Dim lsMessage As String = ""
+                            lsMessage = "Warning: Loading NORMA XML (.orm) file"
+                            lsMessage &= vbCrLf & " No Role found for RoleConstraint.Id: "
+                            lsMessage &= vbCrLf & " Role.Id: " & lrRoleXElement.Attribute("ref").Value
+                            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning)
+                        End If
+
+                    Next
+
+                    If lbRolesFound Then
+                        Dim lrRoleConstraintRole As FBM.RoleConstraintRole
+                        For Each lrRole In larRoleList
+                            If liRoleSequenceNr = 1 Then
+                                '----------
+                                'Is Entry
+                                '----------
+                                '------------------------------------------------------------------------
+                                'Create a new RoleConstraintRole for the RoleConstraint/Role combination
+                                '------------------------------------------------------------------------
+                                lrRoleConstraintRole = New FBM.RoleConstraintRole(lrRole, lrRoleConstraint, True, False, liRoleSequenceNr)
+                            Else
+                                '--------
+                                'Is Exit
+                                '--------
+                                '------------------------------------------------------------------------
+                                'Create a new RoleConstraintRole for the RoleConstraint/Role combination
+                                '------------------------------------------------------------------------
+                                lrRoleConstraintRole = New FBM.RoleConstraintRole(lrRole, lrRoleConstraint, False, True, liRoleSequenceNr)
+                            End If
+
+                            '------------------------------------
+                            'Add the Role to the RoleConstraint
+                            '------------------------------------
+                            lrRoleConstraint.Role.Add(lrRole)
+
+                            '------------------------------------------
+                            'Attach the RoleConstraintRole to the Role
+                            '------------------------------------------
+                            lrRole.RoleConstraintRole.Add(lrRoleConstraintRole)
+
+                            '----------------------------------------------------
+                            'Attach the RoleConstraintRole to the RoleConstraint
+                            '----------------------------------------------------
+                            lrRoleConstraint.RoleConstraintRole.Add(lrRoleConstraintRole)
+                        Next 'Role
+                    End If
+                    liRoleSequenceNr += 1
+                Next 'Role Sequence                    
+
+                arModel.AddRoleConstraint(lrRoleConstraint)
+            Next 'Subset Constraint
+
+
+        End Sub
+
+        Public Sub LoadRoleConstraintSubsetConstraints(ByRef arModel As FBM.Model, ByRef arNORMAXMLDOC As XDocument)
+
+            Dim lrRole As New FBM.Role
+            Dim loEnumElementQueryResult As IEnumerable(Of XElement)
+            Dim loElement As XElement
+            Dim lrRoleXElement As XElement
+
+            loEnumElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Constraints>.<orm:SubsetConstraint> _
+                                       Select ModelInformation _
+                                       Order By ModelInformation.Attribute("Name").Value
+
+            For Each loElement In loEnumElementQueryResult
+                '-------------------------------------------------------------------------
+                'Create the list of Roles that are to be added to the new RoleConstraint
+                '-------------------------------------------------------------------------
+
+                '---------------------------
+                'Create the RoleConstraint
+                '---------------------------
+                Dim lrRoleConstraint As FBM.RoleConstraint
+                lrRoleConstraint = arModel.CreateRoleConstraint(pcenumRoleConstraintType.SubsetConstraint, Nothing, loElement.Attribute("Name").Value)
+                lrRoleConstraint.Id = loElement.Attribute("id").Value
+
+                Dim lrRoleSequencesXElement As XElement
+                Dim lrRoleSequenceXElement As XElement
+
+                For Each lrRoleSequencesXElement In loElement.<orm:RoleSequences>
+                    Dim liRoleSequenceNr As Integer = 1
+                    For Each lrRoleSequenceXElement In lrRoleSequencesXElement.<orm:RoleSequence>
+
+                        Dim lbRolesFound As Boolean = True
+                        Dim larRoleList As New List(Of FBM.Role)
+
+                        For Each lrRoleXElement In lrRoleSequenceXElement.<orm:Role>
+                            lrRole = New FBM.Role
+                            '--------------------------------
+                            'Find the Role within the Model
+                            '--------------------------------
+                            lrRole.Id = lrRoleXElement.Attribute("ref").Value
+                            lrRole = arModel.Role.Find(AddressOf lrRole.Equals)
+                            If IsSomething(lrRole) Then
+                                If lrRole.NORMALinksToUnaryFactTypeValueType = True Then
+                                    '------------------------------------------
+                                    'Don't add the Role to the RoleConstraint
+                                    '------------------------------------------
+                                Else
+                                    larRoleList.Add(lrRole)
+                                End If
+                            Else
+                                lbRolesFound = False
+
+                                Dim lsMessage As String = ""
+                                lsMessage = "Warning: Loading NORMA XML (.orm) file"
+                                lsMessage &= vbCrLf & " No Role found for RoleConstraint.Id: "
+                                lsMessage &= vbCrLf & " Role.Id: " & lrRoleXElement.Attribute("ref").Value
+                                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning)
+                            End If
+
+                        Next
+
+                        If lbRolesFound Then
+                            Dim lrRoleConstraintRole As FBM.RoleConstraintRole
+                            For Each lrRole In larRoleList
+                                If liRoleSequenceNr = 1 Then
+                                    '----------
+                                    'Is Entry
+                                    '----------
+                                    '------------------------------------------------------------------------
+                                    'Create a new RoleConstraintRole for the RoleConstraint/Role combination
+                                    '------------------------------------------------------------------------
+                                    lrRoleConstraintRole = New FBM.RoleConstraintRole(lrRole, lrRoleConstraint, True, False, liRoleSequenceNr)
+                                Else
+                                    '--------
+                                    'Is Exit
+                                    '--------
+                                    '------------------------------------------------------------------------
+                                    'Create a new RoleConstraintRole for the RoleConstraint/Role combination
+                                    '------------------------------------------------------------------------
+                                    lrRoleConstraintRole = New FBM.RoleConstraintRole(lrRole, lrRoleConstraint, False, True, liRoleSequenceNr)
+                                End If
+
+                                '------------------------------------
+                                'Add the Role to the RoleConstraint
+                                '------------------------------------
+                                lrRoleConstraint.Role.Add(lrRole)
+
+                                '------------------------------------------
+                                'Attach the RoleConstraintRole to the Role
+                                '------------------------------------------
+                                lrRole.RoleConstraintRole.Add(lrRoleConstraintRole)
+
+                                '----------------------------------------------------
+                                'Attach the RoleConstraintRole to the RoleConstraint
+                                '----------------------------------------------------
+                                lrRoleConstraint.RoleConstraintRole.Add(lrRoleConstraintRole)
+                            Next 'Role
+                        End If
+                        liRoleSequenceNr += 1
+                    Next 'Role Sequence                    
+                Next 'Role Sequences
+                arModel.AddRoleConstraint(lrRoleConstraint)
+            Next 'Subset Constraint
+
+
+        End Sub
+
+        Public Sub GetRidOfRolesInFactTypesThatReferToUnaryFactTypeValueTypes(ByRef arModel As FBM.Model)
+
+            Dim liInd As Integer = 0
+            Dim lrFactType As New FBM.FactType
+            Dim lrRole As FBM.Role
+
+            Dim liFactTypeInd As Integer = 0
+            For liFactTypeInd = 1 To arModel.FactType.Count
+                If liFactTypeInd <= arModel.FactType.Count Then
+                    lrFactType = arModel.FactType(liFactTypeInd - 1)
+
+                    For liInd = 1 To lrFactType.RoleGroup.Count
+                        lrRole = lrFactType.RoleGroup(liInd - 1)
+                        If lrRole.NORMALinksToUnaryFactTypeValueType = True Then
+                            Call lrRole.FactType.RemoveRole(lrRole, False, True)
+                            liFactTypeInd = 1
+                            Exit For
+                        End If
+                    Next
+                End If
+            Next
+
+        End Sub
+
+        Public Sub LoadPageModelInstances(ByRef arModel As FBM.Model, ByRef arNORMAXMLDOC As XDocument)
+
+            Dim lrPage As FBM.Page
+            Dim lrEntityType As FBM.EntityType
+            Dim lrValueType As FBM.ValueType
+            Dim lrFactType As FBM.FactType
+            Dim lrRole As FBM.Role
+            Dim lrFact As FBM.Fact
+            Dim lrEntityTypeInstance As FBM.EntityTypeInstance
+            Dim lrRoleInstance As FBM.RoleInstance
+            Dim loEnumElementQueryResult As IEnumerable(Of XElement)
+
+            Dim lrFactTypeInstance As FBM.FactTypeInstance
+
+            loEnumElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<ormDiagram:ORMDiagram> _
+                                     Select ModelInformation
+
+            '---------------------------------------------------------------------------
+            'Add the ModelObjects to the Pages.
+            '  i.e. ModelObjects that are either EntityTypes, ValueTypes or FactTypes
+            '---------------------------------------------------------------------------
+            Dim lrObjectTypeShapeXElement As XElement
+            Dim lrObjectTypeXElement As XElement
+            Dim lrPageXElement As XElement
+            '.<ormDiagram:Shapes>.<ormDiagram:ObjectTypeShape>
+            For Each lrPageXElement In loEnumElementQueryResult
+                '-------------
+                'Get the Page
+                '-------------
+                lrPage = New FBM.Page
+                lrPage.PageId = lrPageXElement.Attribute("id").Value
+                lrPage = arModel.Page.Find(AddressOf lrPage.Equals)
+
+                '---------------------------------------------
+                'Load the ModelObjectInstances onto the Page
+                '---------------------------------------------
+                For Each lrObjectTypeShapeXElement In lrPageXElement.<ormDiagram:Shapes>.<ormDiagram:ObjectTypeShape>
+                    lrObjectTypeXElement = lrObjectTypeShapeXElement.<ormDiagram:Subject>(0)
+
+                    Dim loXMLElementQueryResult As IEnumerable(Of XElement)
+                    '-----------------------
+                    'EntityType
+                    '-----------------------
+                    lrEntityType = New FBM.EntityType
+                    lrEntityType.Id = lrObjectTypeXElement.Attribute("ref").Value
+                    loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:EntityType> _
+                                                 Where ModelInformation.Attribute("id") = lrEntityType.Id
+
+                    If IsSomething(loXMLElementQueryResult(0)) Then
+                        lrEntityType.Name = loXMLElementQueryResult(0).Attribute("Name")
+                        lrEntityType = arModel.EntityType.Find(AddressOf lrEntityType.EqualsByName)
+                    Else
+                        lrEntityType = Nothing
+                    End If
+                    '-----------------------
+                    'ValueType
+                    '-----------------------
+                    lrValueType = New FBM.ValueType
+                    lrValueType.Id = lrObjectTypeXElement.Attribute("ref").Value
+                    loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:ValueType> _
+                                                 Where ModelInformation.Attribute("id") = lrValueType.Id
+
+                    If IsSomething(loXMLElementQueryResult(0)) Then
+                        lrValueType.Name = loXMLElementQueryResult(0).Attribute("Name")
+                        lrValueType = arModel.ValueType.Find(AddressOf lrValueType.EqualsByName)
+                    Else
+                        lrValueType = Nothing
+                    End If
+
+
+                    '---------------------------------------------------------------------------------------------------------------------
+                    'FactType
+                    '  NB Normally, should not find a FactType in <ormDiagram:ObjectTypeShape> because is in <ormDiagram:FactTypeShape>.
+                    '  See further below where FactTypeInstance are loaded by searching <ormDiagram:FactTypeShape>
+                    '---------------------------------------------------------------------------------------------------------------------
+                    lrFactType = New FBM.FactType
+                    lrFactType.Id = lrObjectTypeXElement.Attribute("ref").Value
+                    loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Facts>.<orm:Fact> _
+                                                 Where ModelInformation.Attribute("id") = lrFactType.Id
+
+                    If IsSomething(loXMLElementQueryResult(0)) Then
+                        lrFactType.Name = loXMLElementQueryResult(0).Attribute("Name")
+                        lrFactType = arModel.FactType.Find(AddressOf lrFactType.EqualsByName)
+                    Else
+                        lrFactType = Nothing
+                    End If
+
+
+                    If IsSomething(lrEntityType) Then
+                        lrEntityTypeInstance = New FBM.EntityTypeInstance
+                        lrEntityTypeInstance = lrEntityType.CloneInstance(lrPage)
+                        Dim lsBounds() As String
+                        If lrPage.EntityTypeInstance.Exists(AddressOf lrEntityTypeInstance.Equals) Then
+                            lrEntityTypeInstance = lrPage.EntityTypeInstance.Find(AddressOf lrEntityTypeInstance.Equals)
+                        Else
+                            Richmond.WriteToStatusBar("Loading Entity Type Instance")
+                            lrPage.EntityTypeInstance.Add(lrEntityTypeInstance)
+                        End If
+                        lsBounds = lrObjectTypeShapeXElement.Attribute("AbsoluteBounds").Value.Split(",")
+                        lrEntityTypeInstance.x = Int(CSng(Trim(lsBounds(0))) * 25.4)
+                        lrEntityTypeInstance.y = Int(CSng(Trim(lsBounds(1))) * 25.4)
+                    ElseIf IsSomething(lrValueType) Then
+                        Dim lrValueTypeInstance As New FBM.ValueTypeInstance
+                        lrValueTypeInstance = lrValueType.CloneInstance(lrPage)
+                        If lrPage.ValueTypeInstance.Exists(AddressOf lrValueTypeInstance.Equals) Then
+                            lrValueTypeInstance = lrPage.ValueTypeInstance.Find(AddressOf lrValueTypeInstance.Equals)
+                        Else
+                            Richmond.WriteToStatusBar("Loading Value Type Instance")
+                            lrPage.ValueTypeInstance.Add(lrValueTypeInstance)
+                        End If
+                        Dim lsBounds() As String
+                        lsBounds = lrObjectTypeShapeXElement.Attribute("AbsoluteBounds").Value.Split(",")
+                        lrValueTypeInstance.x = Int(CSng(Trim(lsBounds(0))) * 25.4)
+                        lrValueTypeInstance.y = Int(CSng(Trim(lsBounds(1))) * 25.4)
+                    ElseIf IsSomething(lrFactType) Then
+                        lrFactTypeInstance = New FBM.FactTypeInstance
+                        lrFactTypeInstance = lrFactType.CloneInstance(lrPage)
+                        If lrPage.FactTypeInstance.Exists(AddressOf lrFactTypeInstance.Equals) Then
+                            lrFactTypeInstance = lrPage.FactTypeInstance.Find(AddressOf lrFactTypeInstance.Equals)
+                        Else
+                            Richmond.WriteToStatusBar("Loading Fact Type Instance")
+                            lrPage.FactTypeInstance.AddUnique(lrFactTypeInstance)
+                        End If
+                        Dim lsBounds() As String
+                        lsBounds = lrObjectTypeShapeXElement.Attribute("AbsoluteBounds").Value.Split(",")
+                        lrFactTypeInstance.x = Int(CSng(Trim(lsBounds(0))) * 25.4)
+                        lrFactTypeInstance.y = Int(CSng(Trim(lsBounds(1))) * 25.4)
+                    End If
+                Next 'lrPageXElement.<ormDiagram:Shapes>.<ormDiagram:ObjectTypeShape>
+
+                '--------------------
+                'Parent EntityTypes
+                '--------------------
+                For Each lrEntityTypeInstance In lrPage.EntityTypeInstance.ToArray
+                    If lrEntityTypeInstance.EntityType.parentModelObjectList.Count > 0 Then
+                        For Each lrEntityType In lrEntityTypeInstance.EntityType.parentModelObjectList.ToArray
+                            Dim lrParentEntityTypeInstance As FBM.EntityTypeInstance = lrEntityType.CloneEntityTypeInstance(lrPage)
+                            lrParentEntityTypeInstance = lrPage.EntityTypeInstance.Find(AddressOf lrParentEntityTypeInstance.Equals)
+                            If IsSomething(lrParentEntityTypeInstance) Then
+                                Dim lrSubtypeInstance As FBM.SubtypeRelationshipInstance = New FBM.SubtypeRelationshipInstance(lrPage, lrEntityTypeInstance, lrPage.EntityTypeInstance.Find(AddressOf lrParentEntityTypeInstance.Equals))
+                                lrEntityTypeInstance.SubtypeRelationship.Add(lrSubtypeInstance)
+                            End If
+                        Next
+                    End If
+                Next
+
+                '-----------------------------------
+                'Add FactTypeInstances to the Page
+                '-----------------------------------
+                For Each lrObjectTypeShapeXElement In lrPageXElement.<ormDiagram:Shapes>.<ormDiagram:FactTypeShape>
+                    lrObjectTypeXElement = lrObjectTypeShapeXElement.<ormDiagram:Subject>(0)
+
+                    '--------------------------------
+                    'Find the FactType in the Model
+                    '--------------------------------
+                    lrFactType = New FBM.FactType
+                    lrFactType.Id = lrObjectTypeXElement.Attribute("ref").Value
+
+                    loEnumElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Facts>.<orm:Fact> _
+                                               Where ModelInformation.Attribute("id") = lrFactType.Id
+
+                    lrFactType = arModel.FactType.Find(AddressOf lrFactType.Equals)
+
+                    If IsSomething(lrFactType) Then
+                        '------------------------------------
+                        'Clone an Instance of the FactType
+                        '------------------------------------
+                        lrFactTypeInstance = New FBM.FactTypeInstance(arModel, lrPage, pcenumLanguage.ORMModel)
+                        Dim lsBounds() As String
+
+                        lrFactTypeInstance = lrFactType.CloneInstance(lrPage)
+                        Richmond.WriteToStatusBar("Loading Fact Type Instance: '" & lrFactTypeInstance.Name & "'")
+                        lsBounds = lrObjectTypeShapeXElement.Attribute("AbsoluteBounds").Value.Split(",")
+                        lrFactTypeInstance.x = Int(CSng(Trim(lsBounds(0))) * 25.4)
+                        lrFactTypeInstance.y = Int(CSng(Trim(lsBounds(1))) * 25.4)
+
+                        '-----------------------------------------------------------------------
+                        'If the FactTypeInstance doesn't exist on the Page, add it to the Page
+                        '-----------------------------------------------------------------------
+                        If Not lrPage.FactTypeInstance.Exists(AddressOf lrFactTypeInstance.Equals) Then
+
+                            '-----------------------------------------------------------------------------
+                            'Add the FactTypeInstance to the Page, because Role.CloneInstance
+                            '  automatically looks for and adds the ROleInstance to the FactTypeInstance
+                            '-----------------------------------------------------------------------------
+                            lrPage.FactTypeInstance.AddUnique(lrFactTypeInstance)
+
+                            '-----------------------------------------------
+                            'Create RoleInstances for the FactTypeInstance
+                            '-----------------------------------------------
+                            For Each lrRole In lrFactType.RoleGroup
+                                lrRoleInstance = lrRole.CloneInstance(lrPage, True, False)
+                                lrFactTypeInstance.RoleGroup.Add(lrRoleInstance)
+
+                                '---------------------------------------------------------------
+                                'Add the RoleInstance to the list of RoleInstances on the Page
+                                '---------------------------------------------------------------
+                                lrPage.RoleInstance.AddUnique(lrRoleInstance)
+                            Next
+
+                            '------------------------------------
+                            'Load the FactInstances to the Page
+                            '------------------------------------
+                            For Each lrFact In lrFactType.Fact
+                                lrFactTypeInstance.AddFact(lrFact, False)
+                            Next
+
+                        End If
+                    End If 'IsSomething(lrFactType)
+                Next 'FactTypeShape in NORMA XML 
+
+                Dim larFaultyFactTypeInstances = From Page In arModel.Page _
+                                                 From FactTypeInstance In Page.FactTypeInstance _
+                                                 From Role In FactTypeInstance.RoleGroup _
+                                                Where Page.PageId = lrPage.PageId _
+                                                  And Role.JoinedORMObject Is Nothing _
+                                               Select FactTypeInstance
+
+                For Each lrFactTypeInstance In larFaultyFactTypeInstances
+
+                    Dim larRoleInstance = From RoleInstance In lrFactTypeInstance.RoleGroup _
+                                         Where RoleInstance.JoinedORMObject Is Nothing _
+                                        Select RoleInstance
+
+                    For Each lrRoleInstance In larRoleInstance
+
+                        '------------------------------------------------
+                        'Find the ModelObject within the Richmond Model
+                        '------------------------------------------------
+                        Dim lrJoinedFactTypeInstance As FBM.FactTypeInstance
+                        lrJoinedFactTypeInstance = New FBM.FactTypeInstance
+                        lrJoinedFactTypeInstance.Id = lrRoleInstance.JoinsFactType.Id
+                        lrJoinedFactTypeInstance = lrPage.FactTypeInstance.Find(AddressOf lrJoinedFactTypeInstance.Equals)
+
+                        lrRoleInstance.TypeOfJoin = pcenumRoleJoinType.FactType
+                        lrRoleInstance.JoinedORMObject = lrJoinedFactTypeInstance
+                        lrRoleInstance.JoinsEntityType = Nothing
+                        lrRoleInstance.JoinsFactType = lrJoinedFactTypeInstance
+                        lrRoleInstance.JoinsValueType = Nothing
+
+                        'MsgBox("Aha found one")
+
+
+                    Next 'Role
+                Next 'FaultyFactTypeInstance
+
+
+                '---------------------------------------------------------------------
+                'Load the UniquenessConstraint RoleConstraintInstances for the Page.
+                '---------------------------------------------------------------------
+                Dim lrRoleConstraint As FBM.RoleConstraint
+                Dim lrRoleConstraintRole As FBM.RoleConstraintRole
+                Dim lbCanAddRoleConstraintToPage As Boolean = True
+
+                For Each lrRoleConstraint In arModel.RoleConstraint
+                    If lrRoleConstraint.RoleConstraintType = pcenumRoleConstraintType.InternalUniquenessConstraint Then
+                        '--------------------------------------------------------------------------------------------
+                        'If all of the Roles in the RoleConstraintRole group for the RoleConstraint
+                        '  are on the Page, then add the RoleConstraint to the Page as a new RoleConstraintInstance
+                        '--------------------------------------------------------------------------------------------
+                        lbCanAddRoleConstraintToPage = True
+                        For Each lrRoleConstraintRole In lrRoleConstraint.RoleConstraintRole
+                            lrRoleInstance = New FBM.RoleInstance(arModel, lrPage, lrRoleConstraintRole.Role)
+                            lrRoleInstance = lrPage.RoleInstance.Find(AddressOf lrRoleInstance.Equals)
+                            If IsSomething(lrRoleInstance) Then
+                                '---------------------------------------
+                                'Okay, the RoleInstance is on the Page
+                                '---------------------------------------
+                                'MsgBox("Found something at least")
+                            Else
+                                lbCanAddRoleConstraintToPage = False
+                            End If
+                        Next
+                        If lbCanAddRoleConstraintToPage Then
+                            lrPage.RoleConstraintInstance.Add(lrRoleConstraint.CloneInstance(lrPage))
+                            'MsgBox("Adding")
+                        End If
+                    End If
+                Next
+
+                '------------------
+                'Ring Constraints
+                '------------------
+                For Each lrObjectTypeShapeXElement In lrPageXElement.<ormDiagram:Shapes>.<ormDiagram:RingConstraintShape>
+                    lrObjectTypeXElement = lrObjectTypeShapeXElement.<ormDiagram:Subject>(0)
+
+                    Dim loXMLElementQueryResult As IEnumerable(Of XElement)
+                    '-----------------------
+                    'Ring Constraint
+                    '-----------------------
+                    lrRoleConstraint = New FBM.RoleConstraint
+                    lrRoleConstraint.Id = lrObjectTypeXElement.Attribute("ref").Value
+                    loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Constraints>.<orm:RingConstraint> _
+                                                 Where ModelInformation.Attribute("id") = lrRoleConstraint.Id
+
+                    If IsSomething(loXMLElementQueryResult(0)) Then
+                        lrRoleConstraint.Name = loXMLElementQueryResult(0).Attribute("Name")
+                        lrRoleConstraint = arModel.RoleConstraint.Find(AddressOf lrRoleConstraint.Equals)
+
+                        Dim lrRoleConstraintInstance As New FBM.RoleConstraintInstance(pcenumRoleConstraintType.RingConstraint)
+                        lrRoleConstraintInstance = lrRoleConstraint.CloneInstance(lrPage)
+                        lrRoleConstraintInstance = lrRoleConstraintInstance.CloneRingConstraintInstance(lrPage)
+                        Dim lsBounds() As String
+                        If lrPage.RoleConstraintInstance.Exists(AddressOf lrRoleConstraintInstance.Equals) Then
+                            lrRoleConstraintInstance = lrPage.RoleConstraintInstance.Find(AddressOf lrRoleConstraintInstance.Equals)
+                        Else
+                            Richmond.WriteToStatusBar("Loading Ring Constraint Instance")
+                            lrPage.RoleConstraintInstance.Add(lrRoleConstraintInstance)
+                        End If
+                        lsBounds = lrObjectTypeShapeXElement.Attribute("AbsoluteBounds").Value.Split(",")
+                        lrRoleConstraintInstance.X = Int(CSng(Trim(lsBounds(0))) * 25.4)
+                        lrRoleConstraintInstance.Y = Int(CSng(Trim(lsBounds(1))) * 25.4)
+                    Else
+                        lrRoleConstraint = Nothing
+                    End If
+
+                Next
+
+                '------------------
+                'Frequency Constraints
+                '------------------
+                For Each lrObjectTypeShapeXElement In lrPageXElement.<ormDiagram:Shapes>.<ormDiagram:FrequencyConstraintShape>
+                    lrObjectTypeXElement = lrObjectTypeShapeXElement.<ormDiagram:Subject>(0)
+
+                    Dim loXMLElementQueryResult As IEnumerable(Of XElement)
+                    '-----------------------
+                    'Frequency Constraint
+                    '-----------------------
+                    lrRoleConstraint = New FBM.RoleConstraint
+                    lrRoleConstraint.Id = lrObjectTypeXElement.Attribute("ref").Value
+                    loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Constraints>.<orm:FrequencyConstraint> _
+                                                 Where ModelInformation.Attribute("id") = lrRoleConstraint.Id
+
+                    If IsSomething(loXMLElementQueryResult(0)) Then
+                        lrRoleConstraint.Name = loXMLElementQueryResult(0).Attribute("Name")
+                        lrRoleConstraint = arModel.RoleConstraint.Find(AddressOf lrRoleConstraint.Equals)
+
+                        Dim lrRoleConstraintInstance As New FBM.RoleConstraintInstance
+                        lrRoleConstraintInstance = lrRoleConstraint.CloneInstance(lrPage)
+                        lrRoleConstraintInstance = lrRoleConstraintInstance.CloneFrequencyConstraintInstance(lrPage)
+                        'lrRoleConstraintInstance.MinimumFrequencyCount = lrRoleConstraint.MinimumFrequencyCount
+                        'lrRoleConstraintInstance.MaximumFrequencyCount = lrRoleConstraint.MaximumFrequencyCount
+
+                        Dim lsBounds() As String
+                        If lrPage.RoleConstraintInstance.Exists(AddressOf lrRoleConstraintInstance.Equals) Then
+                            lrRoleConstraintInstance = lrPage.RoleConstraintInstance.Find(AddressOf lrRoleConstraintInstance.Equals)
+                        Else
+                            Richmond.WriteToStatusBar("Loading Ring Constraint Instance")
+                            lrPage.RoleConstraintInstance.Add(lrRoleConstraintInstance)
+                        End If
+                        lsBounds = lrObjectTypeShapeXElement.Attribute("AbsoluteBounds").Value.Split(",")
+                        lrRoleConstraintInstance.X = Int(CSng(Trim(lsBounds(0))) * 25.4)
+                        lrRoleConstraintInstance.Y = Int(CSng(Trim(lsBounds(1))) * 25.4)
+                    Else
+                        lrRoleConstraint = Nothing
+                    End If
+
+                Next
+
+                '---------------------------------
+                'External Uniqueness Constraints
+                '---------------------------------
+                For Each lrObjectTypeShapeXElement In lrPageXElement.<ormDiagram:Shapes>.<ormDiagram:ExternalConstraintShape>
+                    lrObjectTypeXElement = lrObjectTypeShapeXElement.<ormDiagram:Subject>(0)
+
+                    Dim loXMLElementQueryResult As IEnumerable(Of XElement)
+                    '--------------------------------
+                    'External Uniqueness Constraint
+                    '--------------------------------
+                    lrRoleConstraint = New FBM.RoleConstraint
+                    lrRoleConstraint.Id = lrObjectTypeXElement.Attribute("ref").Value
+                    loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Constraints>.<orm:UniquenessConstraint> _
+                                                 Where ModelInformation.Attribute("id") = lrRoleConstraint.Id
+
+                    If IsSomething(loXMLElementQueryResult(0)) Then
+                        lrRoleConstraint.Name = loXMLElementQueryResult(0).Attribute("Name")
+                        lrRoleConstraint = arModel.RoleConstraint.Find(AddressOf lrRoleConstraint.Equals)
+
+                        Dim lrRoleConstraintInstance As New FBM.RoleConstraintInstance(pcenumRoleConstraintType.ExternalUniquenessConstraint)
+                        lrRoleConstraintInstance = lrRoleConstraint.CloneInstance(lrPage)
+                        Dim lsBounds() As String
+                        If lrPage.RoleConstraintInstance.Exists(AddressOf lrRoleConstraintInstance.Equals) Then
+                            lrRoleConstraintInstance = lrPage.RoleConstraintInstance.Find(AddressOf lrRoleConstraintInstance.Equals)
+                        Else
+                            Richmond.WriteToStatusBar("Loading Subset Constraint Instance")
+                            lrPage.RoleConstraintInstance.Add(lrRoleConstraintInstance)
+                        End If
+                        lsBounds = lrObjectTypeShapeXElement.Attribute("AbsoluteBounds").Value.Split(",")
+                        lrRoleConstraintInstance.X = Int(CSng(Trim(lsBounds(0))) * 25.4)
+                        lrRoleConstraintInstance.Y = Int(CSng(Trim(lsBounds(1))) * 25.4)
+                    Else
+                        lrRoleConstraint = Nothing
+                    End If
+                Next
+
+
+                '------------------
+                'Subset Constraints
+                '------------------
+                For Each lrObjectTypeShapeXElement In lrPageXElement.<ormDiagram:Shapes>.<ormDiagram:ExternalConstraintShape>
+                    lrObjectTypeXElement = lrObjectTypeShapeXElement.<ormDiagram:Subject>(0)
+
+                    Dim loXMLElementQueryResult As IEnumerable(Of XElement)
+                    '-----------------------
+                    'Subset Constraint
+                    '-----------------------
+                    lrRoleConstraint = New FBM.RoleConstraint
+                    lrRoleConstraint.Id = lrObjectTypeXElement.Attribute("ref").Value
+                    loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Constraints>.<orm:SubsetConstraint> _
+                                                 Where ModelInformation.Attribute("id") = lrRoleConstraint.Id
+
+                    If IsSomething(loXMLElementQueryResult(0)) Then
+                        lrRoleConstraint.Name = loXMLElementQueryResult(0).Attribute("Name")
+                        lrRoleConstraint = arModel.RoleConstraint.Find(AddressOf lrRoleConstraint.Equals)
+
+                        Dim lrRoleConstraintInstance As New FBM.RoleConstraintInstance(pcenumRoleConstraintType.SubsetConstraint)
+                        lrRoleConstraintInstance = lrRoleConstraint.CloneInstance(lrPage)
+                        Dim lsBounds() As String
+                        If lrPage.RoleConstraintInstance.Exists(AddressOf lrRoleConstraintInstance.Equals) Then
+                            lrRoleConstraintInstance = lrPage.RoleConstraintInstance.Find(AddressOf lrRoleConstraintInstance.Equals)
+                        Else
+                            Richmond.WriteToStatusBar("Loading Subset Constraint Instance")
+                            lrPage.RoleConstraintInstance.Add(lrRoleConstraintInstance)
+                        End If
+                        lsBounds = lrObjectTypeShapeXElement.Attribute("AbsoluteBounds").Value.Split(",")
+                        lrRoleConstraintInstance.X = Int(CSng(Trim(lsBounds(0))) * 25.4)
+                        lrRoleConstraintInstance.Y = Int(CSng(Trim(lsBounds(1))) * 25.4)
+                    Else
+                        lrRoleConstraint = Nothing
+                    End If
+                Next
+
+                '------------------
+                'InclusiveOR Constraints
+                '------------------
+                For Each lrObjectTypeShapeXElement In lrPageXElement.<ormDiagram:Shapes>.<ormDiagram:ExternalConstraintShape>
+                    lrObjectTypeXElement = lrObjectTypeShapeXElement.<ormDiagram:Subject>(0)
+
+                    Dim loXMLElementQueryResult As IEnumerable(Of XElement)
+                    '-----------------------
+                    'EntityType
+                    '-----------------------
+                    lrRoleConstraint = New FBM.RoleConstraint
+                    lrRoleConstraint.Id = lrObjectTypeXElement.Attribute("ref").Value
+
+                    loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Constraints>.<orm:MandatoryConstraint> _
+                                                 Where ModelInformation.Attribute("id") = lrRoleConstraint.Id
+
+                    If IsSomething(loXMLElementQueryResult(0)) Then
+                        If loXMLElementQueryResult.<orm:ExclusiveOrExclusionConstraint>.Count = 0 Then
+                            lrRoleConstraint.Name = loXMLElementQueryResult(0).Attribute("Name")
+                            lrRoleConstraint = arModel.RoleConstraint.Find(AddressOf lrRoleConstraint.Equals)
+
+                            Dim lrRoleConstraintInstance As New FBM.RoleConstraintInstance(pcenumRoleConstraintType.InclusiveORConstraint)
+                            lrRoleConstraintInstance = lrRoleConstraint.CloneInstance(lrPage)
+                            Dim lsBounds() As String
+                            If lrPage.RoleConstraintInstance.Exists(AddressOf lrRoleConstraintInstance.Equals) Then
+                                lrRoleConstraintInstance = lrPage.RoleConstraintInstance.Find(AddressOf lrRoleConstraintInstance.Equals)
+                            Else
+                                Richmond.WriteToStatusBar("Loading Subset Constraint Instance")
+                                lrPage.RoleConstraintInstance.Add(lrRoleConstraintInstance)
+                            End If
+                            lsBounds = lrObjectTypeShapeXElement.Attribute("AbsoluteBounds").Value.Split(",")
+                            lrRoleConstraintInstance.X = Int(CSng(Trim(lsBounds(0))) * 25.4)
+                            lrRoleConstraintInstance.Y = Int(CSng(Trim(lsBounds(1))) * 25.4)
+                        Else
+                            lrRoleConstraint = Nothing
+                        End If
+                    Else
+                        lrRoleConstraint = Nothing
+                    End If
+                Next
+
+                '-------------------------
+                'ExclusiveOR Constraints
+                '-------------------------
+                For Each lrObjectTypeShapeXElement In lrPageXElement.<ormDiagram:Shapes>.<ormDiagram:ExternalConstraintShape>
+
+                    lrObjectTypeXElement = lrObjectTypeShapeXElement.<ormDiagram:Subject>(0)
+
+                    Dim loXMLElementQueryResult As IEnumerable(Of XElement)
+                    '-----------------------
+                    'ExclusiveOR
+                    '-----------------------
+                    lrRoleConstraint = New FBM.RoleConstraint
+                    lrRoleConstraint.Id = lrObjectTypeXElement.Attribute("ref").Value
+
+                    loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Constraints>.<orm:MandatoryConstraint> _
+                                                 Where ModelInformation.Attribute("id") = lrRoleConstraint.Id
+
+                    If loXMLElementQueryResult.<orm:ExclusiveOrExclusionConstraint>.Count = 1 Then
+                        If IsSomething(loXMLElementQueryResult(0)) Then
+
+                            lrRoleConstraint.Id = loXMLElementQueryResult(0).<orm:ExclusiveOrExclusionConstraint>(0).Attribute("ref").Value
+
+                            loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Constraints>.<orm:ExclusionConstraint> _
+                                                         Where ModelInformation.Attribute("id") = lrRoleConstraint.Id
+
+                            lrRoleConstraint = arModel.RoleConstraint.Find(AddressOf lrRoleConstraint.Equals)
+                            lrRoleConstraint.Name = loXMLElementQueryResult(0).Attribute("Name")
+
+
+                            Dim lrRoleConstraintInstance As New FBM.RoleConstraintInstance(pcenumRoleConstraintType.ExclusiveORConstraint)
+                            lrRoleConstraintInstance = lrRoleConstraint.CloneInstance(lrPage)
+                            Dim lsBounds() As String
+                            If lrPage.RoleConstraintInstance.Exists(AddressOf lrRoleConstraintInstance.Equals) Then
+                                lrRoleConstraintInstance = lrPage.RoleConstraintInstance.Find(AddressOf lrRoleConstraintInstance.Equals)
+                            Else
+                                Richmond.WriteToStatusBar("Loading Subset Constraint Instance")
+                                lrPage.RoleConstraintInstance.Add(lrRoleConstraintInstance)
+                            End If
+                            lsBounds = lrObjectTypeShapeXElement.Attribute("AbsoluteBounds").Value.Split(",")
+                            lrRoleConstraintInstance.X = Int(CSng(Trim(lsBounds(0))) * 25.4)
+                            lrRoleConstraintInstance.Y = Int(CSng(Trim(lsBounds(1))) * 25.4)
+                        Else
+                            lrRoleConstraint = Nothing
+                        End If
+                    Else
+                        lrRoleConstraint = Nothing
+                    End If
+                Next
+
+                '------------------
+                'Exclusion Constraints
+                '------------------
+                For Each lrObjectTypeShapeXElement In lrPageXElement.<ormDiagram:Shapes>.<ormDiagram:ExternalConstraintShape>
+                    lrObjectTypeXElement = lrObjectTypeShapeXElement.<ormDiagram:Subject>(0)
+
+                    Dim loXMLElementQueryResult As IEnumerable(Of XElement)
+
+                    lrRoleConstraint = New FBM.RoleConstraint
+                    lrRoleConstraint.Id = lrObjectTypeXElement.Attribute("ref").Value
+
+                    loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Constraints>.<orm:ExclusionConstraint> _
+                                                 Where ModelInformation.Attribute("id") = lrRoleConstraint.Id
+
+                    If IsSomething(loXMLElementQueryResult(0)) Then
+                        lrRoleConstraint.Name = loXMLElementQueryResult(0).Attribute("Name")
+                        lrRoleConstraint = arModel.RoleConstraint.Find(AddressOf lrRoleConstraint.Equals)
+
+                        Dim lrRoleConstraintInstance As New FBM.RoleConstraintInstance(pcenumRoleConstraintType.ExclusionConstraint)
+                        lrRoleConstraintInstance = lrRoleConstraint.CloneInstance(lrPage)
+                        Dim lsBounds() As String
+                        If lrPage.RoleConstraintInstance.Exists(AddressOf lrRoleConstraintInstance.Equals) Then
+                            lrRoleConstraintInstance = lrPage.RoleConstraintInstance.Find(AddressOf lrRoleConstraintInstance.Equals)
+                        Else
+                            Richmond.WriteToStatusBar("Loading Subset Constraint Instance")
+                            lrPage.RoleConstraintInstance.Add(lrRoleConstraintInstance)
+                        End If
+                        lsBounds = lrObjectTypeShapeXElement.Attribute("AbsoluteBounds").Value.Split(",")
+                        lrRoleConstraintInstance.X = Int(CSng(Trim(lsBounds(0))) * 25.4)
+                        lrRoleConstraintInstance.Y = Int(CSng(Trim(lsBounds(1))) * 25.4)
+
+                    Else
+                        lrRoleConstraint = Nothing
+                    End If
+                Next
+
+                '------------------
+                'Equality Constraints
+                '------------------
+                For Each lrObjectTypeShapeXElement In lrPageXElement.<ormDiagram:Shapes>.<ormDiagram:ExternalConstraintShape>
+                    lrObjectTypeXElement = lrObjectTypeShapeXElement.<ormDiagram:Subject>(0)
+
+                    Dim loXMLElementQueryResult As IEnumerable(Of XElement)
+                    '-----------------------
+                    'EntityType
+                    '-----------------------
+                    lrRoleConstraint = New FBM.RoleConstraint
+                    lrRoleConstraint.Id = lrObjectTypeXElement.Attribute("ref").Value
+
+                    loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Constraints>.<orm:EqualityConstraint> _
+                                                 Where ModelInformation.Attribute("id") = lrRoleConstraint.Id
+
+                    If IsSomething(loXMLElementQueryResult(0)) Then
+                        lrRoleConstraint.Name = loXMLElementQueryResult(0).Attribute("Name")
+                        lrRoleConstraint = arModel.RoleConstraint.Find(AddressOf lrRoleConstraint.Equals)
+
+                        Dim lrRoleConstraintInstance As New FBM.RoleConstraintInstance(pcenumRoleConstraintType.EqualityConstraint)
+                        lrRoleConstraintInstance = lrRoleConstraint.CloneInstance(lrPage)
+                        Dim lsBounds() As String
+                        If lrPage.RoleConstraintInstance.Exists(AddressOf lrRoleConstraintInstance.Equals) Then
+                            lrRoleConstraintInstance = lrPage.RoleConstraintInstance.Find(AddressOf lrRoleConstraintInstance.Equals)
+                        Else
+                            Richmond.WriteToStatusBar("Loading Subset Constraint Instance")
+                            lrPage.RoleConstraintInstance.Add(lrRoleConstraintInstance)
+                        End If
+                        lsBounds = lrObjectTypeShapeXElement.Attribute("AbsoluteBounds").Value.Split(",")
+                        lrRoleConstraintInstance.X = Int(CSng(Trim(lsBounds(0))) * 25.4)
+                        lrRoleConstraintInstance.Y = Int(CSng(Trim(lsBounds(1))) * 25.4)
+
+                    Else
+                        lrRoleConstraint = Nothing
+                    End If
+                Next
+
+                lrPage.IsDirty = True
+            Next 'Page in NORMA XML
+
+        End Sub
+
+        Public Sub LoadFactTypeReadings(ByRef arModel As FBM.Model, ByRef arFactType As FBM.FactType, ByRef arElement As XElement)
+
+            '--------------------------
+            'Get the FactTypeReadings
+            '--------------------------
+            Dim lrFactTypeReadingXElement As XElement
+            Dim lrPredicatePartXElement As XElement
+            Dim lrPredicatePartRoleXElement As XElement
+            Dim lrFactTypeReading As FBM.FactTypeReading
+            'Dim lsNORMAPredicateList As String                    
+            Dim lasPredicateParts() As String
+            Dim lsPredicatePart As String
+            Dim lrPredicatePart As FBM.PredicatePart
+            Dim lrRoleHashTable As New Hashtable()
+
+            For Each lrFactTypeReadingXElement In arElement.<orm:ReadingOrders>.<orm:ReadingOrder>
+                lrFactTypeReading = New FBM.FactTypeReading(arFactType)
+
+                For Each lrPredicatePartXElement In lrFactTypeReadingXElement.<orm:Readings>.<orm:Reading>.<orm:Data>
+                    lrPredicatePart = New FBM.PredicatePart(arModel, lrFactTypeReading)
+                    'MsgBox(lrPredicatePartXElement.Value)
+                    Dim lsNORMAPredicateList As New Regex("(\{.*?\})|([a-z][A-Z]\s)")
+                    lasPredicateParts = lsNORMAPredicateList.Split(lrPredicatePartXElement.Value).Where(Function(s) Not String.IsNullOrEmpty(s)).ToArray()
+
+                    Dim liRoleSequenceNr As Integer = 0
+                    lrRoleHashTable.Clear()
+                    For Each lrPredicatePartRoleXElement In lrFactTypeReadingXElement.<orm:RoleSequence>.<orm:Role>
+                        'MsgBox(lrPredicatePartRoleXElement.Attribute("ref").Value)
+                        lrRoleHashTable.Add("{" & liRoleSequenceNr.ToString & "}", lrPredicatePartRoleXElement.Attribute("ref").Value)
+                        liRoleSequenceNr += 1
+                    Next
+
+                    '-------------------------------------------------------------------------------------------
+                    '--------------------------------------------------------
+                    'Perform Left-2-Right parsing to get the PredicateParts
+                    '--------------------------------------------------------
+                    Dim larModelObjectList As New List(Of FBM.ModelObject)
+                    Dim liSequenceNr As Integer = 0
+                    Dim liPredicatePartSequenceNr As Integer = 0
+                    Dim lsPrefix As String = ""
+                    Dim lsSuffix As String = ""
+                    Dim larPredicateParts = New List(Of FBM.PredicatePart)
+                    Dim lrPredicateRole As FBM.Role
+
+                    For Each lsPredicatePart In lasPredicateParts
+                        '----------------------------------------
+                        'Check to see if the word is one of the
+                        '  ORM Object Types within the reading
+                        '----------------------------------------            
+
+                        'If lrHashList.Contains(lsPredicatePart) Then
+                        If lsPredicatePart Like "{#}" Then
+                            '----------------------------------------
+                            'The word is one of the ORM Object Types
+                            '----------------------------------------
+                            lrPredicateRole = New FBM.Role(arFactType, lrRoleHashTable(lsPredicatePart), True)
+                            lrPredicateRole = arModel.Role.Find(AddressOf lrPredicateRole.Equals)
+                            If IsSomething(lrPredicateRole) Then
+                                If IsSomething(lrPredicateRole.JoinedORMObject) Then
+                                    larModelObjectList.Add(New FBM.ModelObject(lrPredicateRole.JoinedORMObject.Name))
+                                Else
+                                    larModelObjectList.Add(New FBM.ModelObject(lsPredicatePart))
+                                End If
+                            Else
+                                larModelObjectList.Add(New FBM.ModelObject(lsPredicatePart))
+                            End If
+
+
+                            liSequenceNr += 1
+                            If liSequenceNr = 1 Then
+                                lrPredicateRole = New FBM.Role(arFactType, lrRoleHashTable(lsPredicatePart), True)
+                                lrPredicateRole = arModel.Role.Find(AddressOf lrPredicateRole.Equals)
+                                If IsSomething(lrPredicateRole) Then
+                                    If IsSomething(lrPredicateRole.JoinedORMObject) Then
+                                        '---------------------------------------------------------
+                                        'No longer supported (v1.13 of the database Model).
+                                        'lrPredicatePart.ObjectType1 = New FBM.ModelObject(lrPredicateRole.JoinedORMObject.Name)
+                                    Else
+                                        '---------------------------------------------------------
+                                        'No longer supported (v1.13 of the database Model).
+                                        'lrPredicatePart.ObjectType1 = New FBM.ModelObject(lsPredicatePart)
+                                    End If
+                                Else
+                                    '----------------------------------------------------------------
+                                    'No longer supported (v1.13 of the database Model).
+                                    'lrPredicatePart.ObjectType1 = New FBM.ModelObject(lsPredicatePart)
+                                End If
+
+                                liPredicatePartSequenceNr += 1
+                                lrPredicatePart.SequenceNr = liPredicatePartSequenceNr
+                            ElseIf (liSequenceNr = 2) Then
+                                lrPredicateRole = New FBM.Role(arFactType, lrRoleHashTable(lsPredicatePart), True)
+                                lrPredicateRole = arModel.Role.Find(AddressOf lrPredicateRole.Equals)
+                                If IsSomething(lrPredicateRole) Then
+                                    If IsSomething(lrPredicateRole.JoinedORMObject) Then
+                                        '-------------------------------------------------------------
+                                        'No longer supported (v1.13 of the database Model).
+                                        'lrPredicatePart.ObjectType2 = New FBM.ModelObject(lrPredicateRole.JoinedORMObject.Name)
+                                    Else
+                                        '-------------------------------------------------------------
+                                        'No longer supported (v1.13 of the database Model).
+                                        'lrPredicatePart.ObjectType2 = New FBM.ModelObject(lsPredicatePart)
+                                    End If
+                                Else
+                                    '-------------------------------------------------------
+                                    'No longer supported (v1.13 of the database Model).
+                                    'lrPredicatePart.ObjectType2 = New FBM.ModelObject(lsPredicatePart)
+                                End If
+                                lrPredicatePart.PredicatePartText = Trim(lsSuffix)
+                                lsPrefix = ""
+                                lsSuffix = ""
+
+                                larPredicateParts.Add(lrPredicatePart)
+                                '----------------------------
+                                'Create a new PredicatePart
+                                '----------------------------
+                                lrPredicatePart = New FBM.PredicatePart(lrFactTypeReading.Model, lrFactTypeReading)
+                                '--------------------------------------------------------------------
+                                'No longer supported (v1.13 of the database Model).
+                                'lrPredicatePart.ObjectType1 = New FBM.ModelObject(larModelObjectList(larModelObjectList.Count - 1).Symbol) 'was New FBM.ModelObject(lsPredicatePart)
+                                liPredicatePartSequenceNr += 1
+                                lrPredicatePart.SequenceNr = liPredicatePartSequenceNr
+                                liSequenceNr = 1
+                            End If
+                        Else
+                            If liSequenceNr = 0 Then
+                                lsPrefix &= " " & lsPredicatePart
+                            Else
+                                lsSuffix &= " " & lsPredicatePart
+                                lrPredicatePart.PredicatePartText = Trim(lsSuffix)
+                            End If
+                        End If
+                    Next
+
+                    If ((arFactType.Arity = 1) And (lrPredicatePart.SequenceNr = 1)) Then
+                        larPredicateParts.Add(lrPredicatePart)
+                    ElseIf arFactType.Arity = 2 Then
+                        If arFactType.RoleGroup(1).NORMALinksToUnaryFactTypeValueType Then
+                            larPredicateParts.Add(lrPredicatePart)
+                        End If
+                    End If
+
+                    lrFactTypeReading.PredicatePart = larPredicateParts
+                    '------------------------------------------------------------------------------
+                    'No Longer supported (v1.13 of the database Model).
+                    'lrFactTypeReading.ObjectTypeList = larModelObjectList
+                    '-------------------------------------------------------------------------------------------
+                Next 'FactTypeReading.PredicatePart
+                arFactType.FactTypeReading.Add(lrFactTypeReading)
+            Next 'FactTypeReading
+
+        End Sub
+
+        Public Sub LoadFactTypeFacts(ByRef arFactType As FBM.FactType, ByRef arNORMAXMLDOC As XDocument, ByRef arElement As XElement)
+
+            '---------------------------------
+            'Load the Facts for the FactType
+            '---------------------------------
+            Dim lrRole As FBM.Role
+            Dim lrFact As FBM.Fact
+            Dim lrFactData As FBM.FactData
+            Dim lrFactXElement As XElement
+            Dim lrFactDataXElement As XElement
+            Dim lrFactTypeRoleInstance As XElement
+            Dim lrFactDataData As IEnumerable(Of XElement)
+            Dim lrEntityTypeRoleInstance As XElement
+
+            Try
+                For Each lrFactXElement In arElement.<orm:Instances>.<orm:FactTypeInstance>
+                    lrFact = New FBM.Fact(arFactType)
+
+                    For Each lrFactDataXElement In lrFactXElement.<orm:RoleInstances>.<orm:FactTypeRoleInstance>
+
+                        Dim lrNORMAFactTypeRoleInstance = From RoleInstance In arElement.<orm:FactRoles>.<orm:Role>.<orm:RoleInstances>.<orm:FactTypeRoleInstance> _
+                                                           Where RoleInstance.Attribute("id").Value = lrFactDataXElement.Attribute("ref").Value
+
+                        For Each lrFactTypeRoleInstance In lrNORMAFactTypeRoleInstance
+                            lrRole = New FBM.Role
+                            lrRole.Id = lrFactTypeRoleInstance.Parent.Parent.Attribute("id").Value
+                            lrRole = arFactType.RoleGroup.Find(AddressOf lrRole.Equals)
+
+                            '-----------------------------------------------------------------------------
+                            'Set the initial value of the FactData to the NORMA FactTypeRoleInstance.ref
+                            '  NB This isn't the actual Data (in NORMA) but a reference to the Data
+                            '-----------------------------------------------------------------------------
+                            lrFactData = New FBM.FactData(lrRole, New FBM.Concept(lrFactTypeRoleInstance.Attribute("ref").Value), lrFact)
+                            lrFactData.Id = lrFactDataXElement.Attribute("ref").Value
+
+                            Select Case lrRole.TypeOfJoin
+                                Case Is = pcenumRoleJoinType.ValueType
+                                    lrFactDataData = From ValueType In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:ValueType>.<orm:Instances>.<orm:ValueTypeInstance> _
+                                                     Where ValueType.Attribute("id").Value = lrFactData.Data
+
+                                    If lrFactDataData.<orm:Value>.Value = "" Then
+                                        lrFactData.Data = "a"
+                                    Else
+                                        lrFactData.Data = lrFactDataData.<orm:Value>.Value
+                                    End If
+
+                                    lrFact.Data.Add(lrFactData)
+                                Case Is = pcenumRoleJoinType.EntityType
+
+                                    lrFactDataData = From ValueType In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:EntityType>.<orm:Instances>.<orm:EntityTypeInstance> _
+                                                      Where ValueType.Attribute("id").Value = lrFactData.Data
+
+                                    If lrFactDataData.Any Then
+                                        Dim lrEntityTypeRoleInstanceXAttributeList As IEnumerable(Of XElement)
+                                        Dim lrEntityTypeRoleInstanceXAttribute As XElement
+                                        lrEntityTypeRoleInstanceXAttributeList = From EntityTypeRoleInstance In lrFactDataData.<orm:RoleInstances>.<orm:EntityTypeRoleInstance> _
+                                                                            Select EntityTypeRoleInstance
+
+                                        lrEntityTypeRoleInstanceXAttribute = lrEntityTypeRoleInstanceXAttributeList(0)
+                                        lrFactData.Data = lrEntityTypeRoleInstanceXAttribute.Attribute("ref").Value
+
+                                        lrFactDataData = From RoleInstance In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Facts>.<orm:Fact>.<orm:FactRoles>.<orm:Role>.<orm:RoleInstances>.<orm:EntityTypeRoleInstance> _
+                                                        Where RoleInstance.Attribute("id").Value = lrFactData.Data _
+                                                       Select RoleInstance
+
+                                        lrEntityTypeRoleInstanceXAttribute = lrFactDataData(0)
+                                        lrFactData.Data = lrEntityTypeRoleInstanceXAttribute.Attribute("ref").Value
+
+                                        lrFactDataData = From ValueType In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:ValueType>.<orm:Instances>.<orm:ValueTypeInstance> _
+                                                        Where ValueType.Attribute("id").Value = lrFactData.Data
+
+                                        lrFactData.Data = lrFactDataData.<orm:Value>.Value
+                                    Else
+                                        lrFactData.Data = "a"
+                                    End If
+
+                                    lrFact.Data.Add(lrFactData)
+
+                                Case Is = pcenumRoleJoinType.FactType
+
+                                    lrFactDataData = From ValueType In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:ObjectifiedType>.<orm:Instances>.<orm:EntityTypeInstance> _
+                                                      Where ValueType.Attribute("id").Value = lrFactData.Data
+
+                                    Dim lrEntityTypeRoleInstanceXAttributeList As IEnumerable(Of XElement)
+                                    Dim lrEntityTypeRoleInstanceXAttribute As XElement
+                                    lrEntityTypeRoleInstanceXAttributeList = From EntityTypeRoleInstance In lrFactDataData.<orm:RoleInstances>.<orm:EntityTypeRoleInstance> _
+                                                                        Select EntityTypeRoleInstance
+
+                                    Dim lrObjectifiedObjectTypeFact As New FBM.Fact(lrRole.JoinedORMObject)
+                                    Dim lrObjectifiedObjectTypeFactData As FBM.FactData
+
+                                    For Each lrEntityTypeRoleInstance In lrEntityTypeRoleInstanceXAttributeList
+
+                                        lrObjectifiedObjectTypeFactData = New FBM.FactData(lrRole, New FBM.Concept(""), lrObjectifiedObjectTypeFact)
+
+                                        lrObjectifiedObjectTypeFactData.Data = lrEntityTypeRoleInstance.Attribute("ref").Value
+
+                                        lrFactDataData = From RoleInstance In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Facts>.<orm:Fact>.<orm:FactRoles>.<orm:Role>.<orm:RoleInstances>.<orm:EntityTypeRoleInstance> _
+                                                        Where RoleInstance.Attribute("id").Value = lrObjectifiedObjectTypeFactData.Data _
+                                                       Select RoleInstance
+
+                                        lrEntityTypeRoleInstanceXAttribute = lrFactDataData(0)
+                                        lrObjectifiedObjectTypeFactData.Data = lrEntityTypeRoleInstanceXAttribute.Attribute("ref").Value
+
+                                        lrFactDataData = From ValueType In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:EntityType>.<orm:Instances>.<orm:EntityTypeInstance> _
+                                                          Where ValueType.Attribute("id").Value = lrObjectifiedObjectTypeFactData.Data
+
+                                        lrEntityTypeRoleInstanceXAttributeList = From EntityTypeRoleInstance In lrFactDataData.<orm:RoleInstances>.<orm:EntityTypeRoleInstance> _
+                                                                            Select EntityTypeRoleInstance
+
+                                        lrEntityTypeRoleInstanceXAttribute = lrEntityTypeRoleInstanceXAttributeList(0)
+                                        lrObjectifiedObjectTypeFactData.Data = lrEntityTypeRoleInstanceXAttribute.Attribute("ref").Value
+
+                                        lrFactDataData = From RoleInstance In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Facts>.<orm:Fact>.<orm:FactRoles>.<orm:Role>.<orm:RoleInstances>.<orm:EntityTypeRoleInstance> _
+                                                        Where RoleInstance.Attribute("id").Value = lrObjectifiedObjectTypeFactData.Data _
+                                                       Select RoleInstance
+
+                                        lrEntityTypeRoleInstanceXAttribute = lrFactDataData(0)
+                                        lrObjectifiedObjectTypeFactData.Data = lrEntityTypeRoleInstanceXAttribute.Attribute("ref").Value
+
+                                        lrFactDataData = From ValueType In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:ValueType>.<orm:Instances>.<orm:ValueTypeInstance> _
+                                                        Where ValueType.Attribute("id").Value = lrObjectifiedObjectTypeFactData.Data
+
+                                        lrObjectifiedObjectTypeFactData.Data = lrFactDataData.<orm:Value>.Value
+
+                                        lrObjectifiedObjectTypeFact.Data.Add(lrObjectifiedObjectTypeFactData)
+                                    Next
+
+                                    lrObjectifiedObjectTypeFact = lrRole.JoinsFactType.Fact.Find(AddressOf lrObjectifiedObjectTypeFact.EqualsByData)
+
+                                    If IsSomething(lrObjectifiedObjectTypeFact) Then
+                                        lrFactData.Data = lrObjectifiedObjectTypeFact.Id
+                                    Else
+                                        If lrRole.JoinsFactType.Fact.Count > 0 Then
+                                            lrFactData.Data = lrRole.JoinsFactType.Fact(0).Id
+                                        Else
+                                            '-----------------------------------
+                                            'Need to abort loading of the Fact
+                                            '-----------------------------------                                            
+                                        End If
+                                    End If
+                                    lrFact.Data.Add(lrFactData)
+                                    '---------------------------------
+                                    'End - Select Case Is = FactType
+                                    '---------------------------------
+                            End Select
+                            lrRole.Data.Add(lrFactData)
+                        Next 'Role
+                    Next 'FactData
+
+                    arFactType.Fact.Add(lrFact)
+                    arFactType.Model.AddModelDictionaryEntry(New FBM.DictionaryEntry(arFactType.Model, lrFact.Id, pcenumConceptType.Fact))
+
+                Next 'Fact
+
+            Catch ex As Exception
+                Dim lsMessage1 As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
+    End Class
+
+End Namespace

@@ -1,0 +1,288 @@
+﻿Imports System.Xml.Serialization
+Imports System.Reflection
+
+Namespace RDS
+
+
+    <Serializable()> _
+    Public Class Model
+
+        <XmlIgnore()> _
+        <NonSerialized()> _
+        Public Model As FBM.Model
+
+
+        <XmlElement()> _
+        Public Table As New List(Of RDS.Table)
+
+        <XmlElement()> _
+        Public DataType As New List(Of RDS.DataType)
+
+        <XmlElement()> _
+        Public Index As New List(Of RDS.Index)
+
+        <XmlElement()> _
+        Public Relation As New List(Of RDS.Relation)
+
+        <XmlIgnore()> _
+        <NonSerialized()> _
+        Public TargetDatabaseType As pcenumDatabaseType = Nothing
+
+        Public Event IndexAdded(ByRef arIndex As RDS.Index)
+        Public Event IndexRemoved(ByRef arIndex As RDS.Index)
+        Public Event RelationAdded(ByRef arRelation As RDS.Relation)
+        Public Event RelationRemoved(ByVal arRelation As RDS.Relation)
+        Public Event TableAdded(ByRef arTable As RDS.Table)
+        Public Event TableRemoved(ByRef arTable As RDS.Table)
+
+        ''' <summary>
+        ''' Parameterless New for serialisation.
+        ''' </summary>
+        ''' <remarks></remarks>
+        Public Sub New()
+        End Sub
+
+        Public Sub New(ByRef arModel As FBM.Model)
+            Me.Model = arModel
+        End Sub
+
+        Public Sub addRelation(ByRef arRelation As RDS.Relation)
+
+            Try
+                Me.Relation.Add(arRelation)
+
+                Call Me.Model.createCMMLRelation(arRelation)
+
+                RaiseEvent RelationAdded(arRelation)
+
+            Catch ex As Exception
+                Dim lsMessage1 As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
+        Public Sub addTable(ByRef arTable As RDS.Table)
+
+            Try
+                Dim lrTable As RDS.Table = arTable
+                'CodeSafe - Check that the Table doesn't already exist
+                If Me.Table.Find(Function(x) x.Name = lrTable.Name) IsNot Nothing Then
+                    Throw New Exception("Table with name, " & arTable.Name & ", already exists in the Relational Data Structure.")
+                End If
+
+                Me.Table.AddUnique(arTable)
+
+                Call Me.Model.createCMMLTable(arTable)
+
+                RaiseEvent TableAdded(arTable)
+
+            Catch ex As Exception
+                Dim lsMessage1 As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
+
+        Public Function getColumnsThatReferenceValueType(ByVal arValueType As FBM.ValueType) As List(Of Column)
+
+            'Direct Columns
+            Dim larDirectColumn = From Table In Me.Table
+                                  From Column In Table.Column
+                                  Where Column.ActiveRole.JoinedORMObject.Id = arValueType.Id
+                                  Select Column Distinct
+
+            'Indirect Columns
+            Dim larSimpleReferenceSchemeEntityTypes = From EntityType In Me.Model.EntityType _
+                                                      Where EntityType.ReferenceModeValueType IsNot Nothing _
+                                                      Select EntityType
+
+            Dim larIndirectColumns = From EntityType In larSimpleReferenceSchemeEntityTypes _
+                                     From Table In Me.Table _
+                                     From Column In Table.Column _
+                                     Where Column.ActiveRole.JoinedORMObject.Id = EntityType.Id _
+                                     And EntityType.ReferenceModeValueType.Id = arValueType.Id _
+                                     Select Column Distinct
+
+            Dim larReturnColumn As List(Of RDS.Column)
+
+            larReturnColumn = larDirectColumn.ToList
+            larReturnColumn.AddRange(larIndirectColumns.ToList)
+
+            Return larReturnColumn
+
+        End Function
+
+        ''' <summary>
+        ''' Gets a Relation by its ResponsibleFactType. NB Returns an error if there is no Relation or more than one Relation is returned.
+        ''' </summary>
+        ''' <param name="arFactType"></param>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public Function getRelationByResponsibleFactType(ByVal arFactType As FBM.FactType) As RDS.Relation
+
+            Try
+
+                Dim larRelation = From Relation In Me.Relation _
+                                  Where Relation.ResponsibleFactType Is arFactType _
+                                  Select Relation
+
+                If larRelation.Count > 1 Then
+                    Throw New Exception("More than one Relation returned.")
+                ElseIf larRelation.Count = 0 Then
+                    Throw New Exception("Returned no Relations at all.")
+                Else
+                    Return larRelation.First
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage1 As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return New RDS.Relation
+
+            End Try
+        End Function
+
+        Public Function getRelationsByOriginTableOriginColumns(ByVal arOriginTable As RDS.Table, _
+                                                               ByVal aarOriginColumn As List(Of RDS.Column)
+                                                               ) As List(Of RDS.Relation)
+
+            Try
+                Dim larRelation = From Relation In Me.Relation _
+                                  Where Relation.OriginTable.Name = arOriginTable.Name _
+                                  And Relation.OriginColumns.CompareWith(aarOriginColumn) = 0 _
+                                  Select Relation Distinct
+
+
+                Return larRelation.ToList
+
+            Catch ex As Exception
+                Dim lsMessage1 As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return New List(Of RDS.Relation)
+            End Try
+
+        End Function
+
+
+        Public Function getTableByName(ByVal asTableName As String) As RDS.Table
+
+            Return Me.Table.Find(Function(x) x.Name = asTableName)
+
+        End Function
+
+        Public Sub removeIndex(ByRef arIndex As RDS.Index)
+
+            Dim lrIndex As RDS.Index = arIndex
+
+            '-------------------------------------------------------------------
+            'Columns
+            'Remove the Index from all Columns that are involved with the Index
+            Dim larColumn = From Table In Me.Table _
+                            From Column In Table.Column _
+                            Where Column.Index.Contains(lrIndex) _
+                            Select Column
+
+            For Each lrColumn In larColumn
+                Call lrColumn.removeIndex(arIndex)
+            Next
+
+            'Remove the Index from the Table.
+            arIndex.Table.Index.Remove(arIndex)
+
+            '-------------------------------------------------------------------
+            'Remove the Index from the RDS Model level.
+            Me.Index.Remove(arIndex)
+
+            '-------------------------------------------------------------------
+            'Remove the Index from the CMML level.
+            Call Me.Model.removeCMMLIndex(arIndex)
+
+            RaiseEvent IndexRemoved(arIndex)
+
+        End Sub
+
+        Public Sub removeRelation(ByRef arRelation As RDS.Relation)
+
+            Me.Relation.Remove(arRelation)
+
+            Call Me.Model.removeCMMLRelation(arRelation)
+
+            RaiseEvent RelationRemoved(arRelation)
+
+        End Sub
+
+        Public Sub removeTable(ByRef arTable As RDS.Table)
+
+            Try
+                Dim lrTable As RDS.Table = arTable
+
+                '-----------------------------------------------------------------------------------------------------
+                'Indexes
+                For Each lrIndex In arTable.Index.ToList
+                    Call Me.removeIndex(lrIndex)
+                Next
+
+                '-----------------------------------------------------------------------------------------------------
+                'Relations
+                '  NB All relations should have been removed before removing the Table. But just for completeness, remove the Relations if there are any.
+                Dim larRelation = From Relation In Me.Relation _
+                                  From OriginColumn In Relation.OriginColumns _
+                                  Where lrTable.Column.Contains(OriginColumn) _
+                                  Select Relation
+
+                For Each lrRelation In larRelation.ToArray
+                    Call Me.removeRelation(lrRelation)
+                Next
+
+                larRelation = From Relation In Me.Relation _
+                              From DestinationColumn In Relation.DestinationColumns _
+                              Where lrTable.Column.Contains(DestinationColumn) _
+                              Select Relation
+
+                For Each lrRelation In larRelation
+                    Call Me.removeRelation(lrRelation)
+                Next
+
+                'Remove the Table fromm the RDS Model.
+                Call Me.Table.Remove(arTable)
+
+                'Remove at the CMML Model level
+                Call Me.Model.removeCMMLEntityByRDSTable(arTable)
+
+                RaiseEvent TableRemoved(arTable)
+
+            Catch ex As Exception
+                Dim lsMessage1 As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
+
+    End Class
+
+End Namespace

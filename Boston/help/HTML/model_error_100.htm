@@ -1,0 +1,67 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- saved from url=(0029)http://www.helpandmanual.com/ -->
+<head><script type="text/javascript" src="helpman_topicinit.js"></script>
+<!-- Redirect browser to frame page if page is not in the content frame. -->
+<script type="text/javascript">
+<!--
+if (top.location.search.lastIndexOf("toc=0")<=0) {
+  if (top.frames.length==0) { top.location.href="index.html?model_error_100.htm"; }
+  else { parent.quicksync('a3.8.1.1'); }
+}
+//-->
+</script>
+   <title>Model Error 100</title>
+   <meta name="generator" content="Help &amp; Manual" />
+   <meta name="keywords" content="" />
+   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+   <meta http-equiv="Content-Style-Type" content="text/css" />
+   <link type="text/css" href="default.css" rel="stylesheet" />
+</head>
+<body style="margin: 0px 0px 0px 0px; background: #FFFFFF;">
+<div id="hmpopupDiv" style="visibility:hidden; position:absolute; z-index:1000; "></div>
+
+
+<table width="100%" border="0" cellspacing="0" cellpadding="5" bgcolor="#649CCC">
+  <tr valign="middle">
+    <td align="left">
+      <p class="p_Heading1"><span class="f_Heading1">Model Error 100</span></p>
+
+    </td>
+    <td align="right">
+     <span style="font-size: 9pt">
+     <a href="introduction.htm">Top</a>&nbsp;
+     <a href="model_errors.htm">Previous</a>&nbsp;
+     <a href="model_error_106.htm">Next</a>
+     </span>
+    </td>
+  </tr>
+</table>
+
+
+<!-- Placeholder for topic body. -->
+<table width="100%" border="0" cellspacing="0" cellpadding="5"><tr valign="top"><td align="left">
+<p class="p_Heading1"><span class="f_Heading1">Population Uniqueness Error</span></p>
+<p>&nbsp;</p>
+<p>An Internal Uniqueness Constraint ranging over one or more Roles within a Fact Type has been violated by at least one Fact within a Data Population within the Fact Table of that Fact Type.</p>
+<p>&nbsp;</p>
+<p>The Internal Uniqueness Constraint in question is listed within the Error.</p>
+<p>&nbsp;</p>
+<p class="p_Heading1"><span class="f_Heading1">Error Resolution</span></p>
+<p>&nbsp;</p>
+<p>To resolve this error, perform <span style="font-weight: bold;">one</span> of the following:</p>
+<p>&nbsp;</p>
+<p>1. Modify the Internal Uniqueness Constraint to better suit the type of data that will be captured for the Fact Type; <span style="font-weight: bold;">OR</span></p>
+<p>2. Remove the violating Data Population from the Fact Table of the Fact Type associated with the Internal Uniqueness Constraint.</p>
+<p>&nbsp;</p>
+<p class="p_Heading1"><span class="f_Heading1">Example</span></p>
+<p>&nbsp;</p>
+<p>The following ORM Diagram shows a Data Population for a Fact Type where the Internal Uniqueness Constraint ranging over the Fact Type is violated.</p>
+<p><img src="internaluniquenessconstraintpopulationviolation.png" width="339" height="186" border="0" alt="InternalUniquenessConstraintPopulationViolation"></p>
+<p><span class="f_ImageCaption">&nbsp;</span></p>
+<p>i.e. The Internal Uniqueness Constraint necessitates that each instance of Person in the Fact Type, "Person drives Car", is unique. There are two Facts with a Person instance of "Peter", and so the Internal Uniqueness Constraint is violated.</p>
+
+</td></tr></table>
+
+</body>
+</html>

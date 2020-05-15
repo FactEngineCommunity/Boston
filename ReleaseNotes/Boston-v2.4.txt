@@ -1,0 +1,10 @@
+The following are the release notes for Boston v2.5:
+
+Release Date: 
+
+- Fixed bug where EntityTypes with no direct Reference Scheme, but with a topmost Supertype with a Reference Scheme, were labeled as having an error of "No Reference Scheme".
+- Fixed minor usability error where, having pressed [Enter] to add a Fact Type Reading...the AutoComplete box still showed obscuring view of the newly created Fact Type Reading.
+- Fixed minor usability error where pressing [Enter] or the [Down] key on the keyboard while creating a new Fact Type Reading in the Fact Type Reading toolbox...resulted in a 'Beep' sound through the computer speaker.
+
+============ End of Document =============
+

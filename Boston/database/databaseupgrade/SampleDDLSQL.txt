@@ -1,0 +1,5 @@
+
+ALTER TABLE [Applicant Table] ADD
+   CONSTRAINT Applicant_ID__not_zero_length 
+      CHECK (LEN([Applicant ID]) > 0);
+

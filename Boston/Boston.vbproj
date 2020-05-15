@@ -1,0 +1,1957 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.21022</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{2EF147C3-A7CB-4A22-9665-8AA25C6DB51F}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <StartupObject>Boston.My.MyApplication</StartupObject>
+    <RootNamespace>Boston</RootNamespace>
+    <AssemblyName>Boston</AssemblyName>
+    <FileAlignment>512</FileAlignment>
+    <MyType>WindowsForms</MyType>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <OptionExplicit>On</OptionExplicit>
+    <OptionCompare>Binary</OptionCompare>
+    <OptionStrict>Off</OptionStrict>
+    <OptionInfer>On</OptionInfer>
+    <ApplicationIcon>Boston.ico</ApplicationIcon>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <TargetFrameworkProfile />
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.5.2.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DocumentationFile>Boston.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+    <PlatformTarget>x86</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <DefineDebug>false</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DocumentationFile>Boston.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+    <PlatformTarget>x86</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationManifest>My Project\app.manifest</ApplicationManifest>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="adodb, Version=7.0.3300.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+    <Reference Include="AIMLbot, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Dependencies\AIMLbot.dll</HintPath>
+    </Reference>
+    <Reference Include="Animator, Version=1.0.5637.34436, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Dependencies\Animator.dll</HintPath>
+    </Reference>
+    <Reference Include="BostonWCFServiceLibrary, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Dependencies\BostonWCFServiceLibrary.dll</HintPath>
+    </Reference>
+    <Reference Include="CharmNotification">
+      <HintPath>..\Dependencies\CharmNotification.dll</HintPath>
+    </Reference>
+    <Reference Include="CheckBoxComboBox, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Dependencies\CheckBoxComboBox.dll</HintPath>
+    </Reference>
+    <Reference Include="CircularProgressBar, Version=2.2.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Dependencies\CircularProgressBar.dll</HintPath>
+    </Reference>
+    <Reference Include="DxfExport, Version=5.1.1.19449, Culture=neutral, PublicKeyToken=21bf4734c13246ea, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Dependencies\DxfExport.dll</HintPath>
+    </Reference>
+    <Reference Include="DynamicClassLibrary, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Dependencies\DynamicClassLibrary.dll</HintPath>
+    </Reference>
+    <Reference Include="DynamicTypeDescriptor, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Dependencies\DynamicTypeDescriptor.dll</HintPath>
+    </Reference>
+    <Reference Include="EffectsProvider, Version=5.1.1.19448, Culture=neutral, PublicKeyToken=21bf4734c13246ea, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Dependencies\EffectsProvider.dll</HintPath>
+    </Reference>
+    <Reference Include="FilteredPropertyGrid, Version=1.0.5547.36338, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Dependencies\FilteredPropertyGrid.dll</HintPath>
+    </Reference>
+    <Reference Include="Gios.Word">
+      <HintPath>..\Dependencies\Gios.Word.dll</HintPath>
+    </Reference>
+    <Reference Include="LinFu.Common, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Dependencies\LinFu.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="LinFu.Delegates, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Dependencies\LinFu.Delegates.dll</HintPath>
+    </Reference>
+    <Reference Include="LinFu.DynamicProxy, Version=1.0.3133.28097, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Dependencies\LinFu.DynamicProxy.dll</HintPath>
+    </Reference>
+    <Reference Include="LinFu.Reflection, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Dependencies\LinFu.Reflection.dll</HintPath>
+    </Reference>
+    <Reference Include="MindFusion.Common, Version=1.2.3214.16975, Culture=neutral, PublicKeyToken=7fed53ada5b92263, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Dependencies\MindFusion.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="MindFusion.Diagramming, Version=5.1.1.19446, Culture=neutral, PublicKeyToken=21bf4734c13246ea, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Dependencies\MindFusion.Diagramming.dll</HintPath>
+    </Reference>
+    <Reference Include="MindFusion.Diagramming.WinForms, Version=5.1.1.19447, Culture=neutral, PublicKeyToken=21bf4734c13246ea, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Dependencies\MindFusion.Diagramming.WinForms.dll</HintPath>
+    </Reference>
+    <Reference Include="MindFusion.Pdf, Version=1.0.3214.17068, Culture=neutral, PublicKeyToken=193ac5531bee7b09, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Dependencies\MindFusion.Pdf.dll</HintPath>
+    </Reference>
+    <Reference Include="MindFusion.Svg, Version=1.0.3214.17189, Culture=neutral, PublicKeyToken=cb2acc0bcf38be91, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Dependencies\MindFusion.Svg.dll</HintPath>
+    </Reference>
+    <Reference Include="MTGCCombobox">
+      <HintPath>..\Dependencies\MTGCCombobox.dll</HintPath>
+    </Reference>
+    <Reference Include="NotificationBar">
+      <HintPath>..\Dependencies\NotificationBar.dll</HintPath>
+    </Reference>
+    <Reference Include="Overview, Version=5.1.1.19450, Culture=neutral, PublicKeyToken=21bf4734c13246ea, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Dependencies\Overview.dll</HintPath>
+    </Reference>
+    <Reference Include="PdfExport, Version=5.1.1.19448, Culture=neutral, PublicKeyToken=21bf4734c13246ea, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Dependencies\PdfExport.dll</HintPath>
+    </Reference>
+    <Reference Include="Ruler, Version=5.1.1.19449, Culture=neutral, PublicKeyToken=21bf4734c13246ea, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Dependencies\Ruler.dll</HintPath>
+    </Reference>
+    <Reference Include="ShapeDesignerCtrl, Version=5.1.1.19448, Culture=neutral, PublicKeyToken=21bf4734c13246ea, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Dependencies\ShapeDesignerCtrl.dll</HintPath>
+    </Reference>
+    <Reference Include="ShapeListBox, Version=5.1.1.19448, Culture=neutral, PublicKeyToken=21bf4734c13246ea, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Dependencies\ShapeListBox.dll</HintPath>
+    </Reference>
+    <Reference Include="ShapeToolBar, Version=5.1.1.19450, Culture=neutral, PublicKeyToken=21bf4734c13246ea, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Dependencies\ShapeToolBar.dll</HintPath>
+    </Reference>
+    <Reference Include="SvgExport, Version=5.0.1.29914, Culture=neutral, PublicKeyToken=21bf4734c13246ea, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Dependencies\SvgExport.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Design" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data.DataSetExtensions">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="ToolBox, Version=1.0.4.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Dependencies\ToolBox.dll</HintPath>
+    </Reference>
+    <Reference Include="Viev.FBM.Generic.Modules, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Dependencies\Viev.FBM.Generic.Modules.dll</HintPath>
+    </Reference>
+    <Reference Include="VievFBMInterface, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Dependencies\VievFBMInterface.dll</HintPath>
+    </Reference>
+    <Reference Include="VievLibrary, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Dependencies\VievLibrary.dll</HintPath>
+    </Reference>
+    <Reference Include="VievLogger">
+      <HintPath>..\Dependencies\VievLogger.dll</HintPath>
+    </Reference>
+    <Reference Include="VievPluginFramework">
+      <HintPath>..\Dependencies\VievPluginFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="VisioExport, Version=5.1.1.19449, Culture=neutral, PublicKeyToken=21bf4734c13246ea, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Dependencies\VisioExport.dll</HintPath>
+    </Reference>
+    <Reference Include="VisioImport, Version=5.1.1.19449, Culture=neutral, PublicKeyToken=21bf4734c13246ea, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Dependencies\VisioImport.dll</HintPath>
+    </Reference>
+    <Reference Include="WeifenLuo.WinFormsUI.Docking, Version=3.0.4.0, Culture=neutral, PublicKeyToken=5cded1a1a0a7b481, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Dependencies\WeifenLuo.WinFormsUI.Docking.dll</HintPath>
+    </Reference>
+    <Reference Include="WinFormAnimation, Version=1.3.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Dependencies\WinFormAnimation.dll</HintPath>
+    </Reference>
+    <Reference Include="WordNetClasses, Version=1.0.5533.15398, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Dependencies\WordNetClasses.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Import Include="Microsoft.VisualBasic" />
+    <Import Include="MindFusion.Layout.Layout3D" />
+    <Import Include="System" />
+    <Import Include="System.Collections" />
+    <Import Include="System.Collections.Generic" />
+    <Import Include="System.Data" />
+    <Import Include="System.Drawing" />
+    <Import Include="System.Diagnostics" />
+    <Import Include="System.Linq" />
+    <Import Include="System.Runtime.Serialization" />
+    <Import Include="System.Windows.Forms" />
+    <Import Include="System.Xml" />
+    <Import Include="System.Xml.Linq" />
+    <Import Include="Viev" />
+    <Import Include="Viev.Animator" />
+    <Import Include="Viev.Enumeration" />
+    <Import Include="Viev.FBM" />
+    <Import Include="Viev.Functions" />
+    <Import Include="Viev.PluginFramework" />
+    <Import Include="Viev.Relational" />
+    <Import Include="Viev.Strings" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ApplicationEvents.vb" />
+    <Compile Include="ClassesBrain\tBrainActions.vb" />
+    <Compile Include="ClassesBrain\tBrainResponseChecking.vb" />
+    <Compile Include="ClassesBrain\tPlan.vb" />
+    <Compile Include="ClassesBrain\tPredicatePart.vb" />
+    <Compile Include="ClassesBrain\tStep.vb" />
+    <Compile Include="ClassesClientServer\tFunction.vb" />
+    <Compile Include="ClassesClientServer\tGroup.vb" />
+    <Compile Include="ClassesClientServer\tInvitation.vb" />
+    <Compile Include="ClassesClientServer\tLog.vb" />
+    <Compile Include="ClassesClientServer\tNamespace.vb" />
+    <Compile Include="ClassesClientServer\tNotificationGeneral.vb" />
+    <Compile Include="ClassesClientServer\tPermission.vb" />
+    <Compile Include="ClassesClientServer\tProject.vb" />
+    <Compile Include="ClassesClientServer\tProjectGroupPermission.vb" />
+    <Compile Include="ClassesClientServer\tProjectUserPermission.vb" />
+    <Compile Include="ClassesClientServer\tRole.vb" />
+    <Compile Include="ClassesClientServer\tUser.vb" />
+    <Compile Include="ClassesFBMInterfaceHost\tFBMInterfaceHost.vb" />
+    <Compile Include="ClassesGeneral\classVievToopTip.vb" />
+    <Compile Include="ClassesGeneral\FlexibleListBox.Designer.vb">
+      <DependentUpon>FlexibleListBox.vb</DependentUpon>
+    </Compile>
+    <Compile Include="ClassesGeneral\FlexibleListBox.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="ClassesGeneral\GroupInviter.Designer.vb">
+      <DependentUpon>GroupInviter.vb</DependentUpon>
+    </Compile>
+    <Compile Include="ClassesGeneral\GroupInviter.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="ClassesGeneral\GroupNotificationBar.Designer.vb">
+      <DependentUpon>GroupNotificationBar.vb</DependentUpon>
+    </Compile>
+    <Compile Include="ClassesGeneral\GroupNotificationBar.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="ClassesGeneral\NotificationBarGeneralNotification.Designer.vb">
+      <DependentUpon>NotificationBarGeneralNotification.vb</DependentUpon>
+    </Compile>
+    <Compile Include="ClassesGeneral\NotificationBarGeneralNotification.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="ClassesGeneral\NotificationBarGroupToProjectInvitation.Designer.vb">
+      <DependentUpon>NotificationBarGroupToProjectInvitation.vb</DependentUpon>
+    </Compile>
+    <Compile Include="ClassesGeneral\NotificationBarGroupToProjectInvitation.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="ClassesGeneral\ProjectUserDetails.Designer.vb">
+      <DependentUpon>ProjectUserDetails.vb</DependentUpon>
+    </Compile>
+    <Compile Include="ClassesGeneral\ProjectUserDetails.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="ClassesGeneral\tMorphVector.vb" />
+    <Compile Include="ClassesGeneral\tRecentNodes.vb" />
+    <Compile Include="ClassesGeneral\tRichtextCell.vb" />
+    <Compile Include="ClassesGeneral\tRichtextColumn.vb" />
+    <Compile Include="ClassesGeneral\tRichtextEditingControl.designer.vb">
+      <DependentUpon>tRichtextEditingControl.vb</DependentUpon>
+    </Compile>
+    <Compile Include="ClassesGeneral\tRichtextEditingControl.vb">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ClassesGeneral\tStack.vb" />
+    <Compile Include="ClassesGeneral\tTube.vb" />
+    <Compile Include="ClassesGeneral\tUndoRedoObject.vb" />
+    <Compile Include="ClassesGeneral\UserInviter.Designer.vb">
+      <DependentUpon>UserInviter.vb</DependentUpon>
+    </Compile>
+    <Compile Include="ClassesGeneral\UserInviter.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="ClassesGeneral\WaitCursor.vb" />
+    <Compile Include="ClassesLANGUAGECMML\tCMML.vb" />
+    <Compile Include="ClassesLANGUAGECMML\tCMMLActor.vb" />
+    <Compile Include="ClassesLANGUAGECMML\tCMMLActorName.vb" />
+    <Compile Include="ClassesLANGUAGECMML\tCMMLModel.vb" />
+    <Compile Include="ClassesLANGUAGECMML\tCMMLPage.vb" />
+    <Compile Include="ClassesLANGUAGECMML\tCMMLProcess.vb" />
+    <Compile Include="ClassesLANGUAGESTD\tCMMLEndStateIndicator.vb" />
+    <Compile Include="ClassesLANGUAGESTD\tCMMLStartStateIndicator.vb" />
+    <Compile Include="ClassesLANGUAGEDFD\tDFDDataStore.vb" />
+    <Compile Include="ClassesLANGUAGEERD\Interfaces\iERDLinkObject.vb" />
+    <Compile Include="ClassesLANGUAGEERD\tERDAttribute.vb" />
+    <Compile Include="ClassesLANGUAGEERD\tERDEntity.vb" />
+    <Compile Include="ClassesLANGUAGEERD\tERDEntityInstance.vb" />
+    <Compile Include="ClassesLANGUAGEERD\tERDiagram.vb" />
+    <Compile Include="ClassesLANGUAGEERD\tERDLink.vb" />
+    <Compile Include="ClassesLANGUAGEERD\tERDRelation.vb" />
+    <Compile Include="ClassesLANGUAGEERD\tERDTableNode.vb" />
+    <Compile Include="ClassesLANGUAGEERD\tLink.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.6\tXMLModelEntityType.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.6\tXMLModelFact.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.6\tXMLModelFactData.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.6\tXMLModelFactType.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.6\tXMLModelFactTypeReading.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.6\tXMLModelJoinPath.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.6\tXMLModelModel.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.6\tXMLModelModelNote.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.6\tXMLModelORMModel.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.6\tXMLModelPage.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.6\tXMLModelPredicatePart.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.6\tXMLModelRole.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.6\tXMLModelRoleConstraint.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.6\tXMLModelRoleConstraintArgument.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.6\tXMLModelRoleConstraintRole.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.6\tXMLModelRoleReference.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.6\tXMLModelSubtypeRelationship.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.6\tXMLModelValueType.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.5\tXMLModelEntityType.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.5\tXMLModelFact.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.5\tXMLModelFactData.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.5\tXMLModelFactType.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.5\tXMLModelFactTypeReading.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.5\tXMLModelJoinPath.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.5\tXMLModelModel.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.5\tXMLModelModelNote.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.5\tXMLModelORMModel.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.5\tXMLModelPage.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.5\tXMLModelPredicatePart.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.5\tXMLModelRole.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.5\tXMLModelRoleConstraint.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.5\tXMLModelRoleConstraintArgument.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.5\tXMLModelRoleConstraintRole.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.5\tXMLModelRoleReference.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.5\tXMLModelSubtypeRelationship.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.5\tXMLModelValueType.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.4\tXMLModelEntityType.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.4\tXMLModelFact.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.4\tXMLModelFactData.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.4\tXMLModelFactType.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.4\tXMLModelFactTypeReading.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.4\tXMLModelJoinPath.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.4\tXMLModelModel.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.4\tXMLModelModelNote.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.4\tXMLModelORMModel.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.4\tXMLModelPage.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.4\tXMLModelPredicatePart.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.4\tXMLModelRole.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.4\tXMLModelRoleConstraint.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.4\tXMLModelRoleConstraintArgument.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.4\tXMLModelRoleConstraintRole.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.4\tXMLModelRoleReference.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.4\tXMLModelSubtypeRelationship.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.4\tXMLModelValueType.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.3\tXMLModelEntityType.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.3\tXMLModelFact.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.3\tXMLModelFactData.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.3\tXMLModelFactType.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.3\tXMLModelFactTypeReading.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.3\tXMLModelJoinPath.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.3\tXMLModelModel.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.3\tXMLModelModelNote.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.3\tXMLModelORMModel.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.3\tXMLModelPage.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.3\tXMLModelPredicatePart.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.3\tXMLModelRole.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.3\tXMLModelRoleConstraint.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.3\tXMLModelRoleConstraintArgument.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.3\tXMLModelRoleConstraintRole.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.3\tXMLModelRoleReference.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.3\tXMLModelSubtypeRelationship.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.3\tXMLModelValueType.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.2\tXMLModelJoinPath.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.2\tXMLModelRoleConstraintArgument.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.2\tXMLModelEntityType.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.2\tXMLModelFact.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.2\tXMLModelFactData.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.2\tXMLModelFactType.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.2\tXMLModelFactTypeReading.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.2\tXMLModelModel.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.2\tXMLModelModelNote.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.2\tXMLModelORMModel.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.2\tXMLModelPage.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.2\tXMLModelPredicatePart.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.2\tXMLModelRole.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.2\tXMLModelRoleConstraint.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.2\tXMLModelRoleConstraintRole.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.2\tXMLModelSubtypeRelationship.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.2\tXMLModelRoleReference.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.2\tXMLModelValueType.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.1\tXMLModelEntityType.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.1\tXMLModelFact.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.1\tXMLModelFactData.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.1\tXMLModelFactType.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.1\tXMLModelFactTypeReading.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.1\tXMLModelModel.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.1\tXMLModelModelNote.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.1\tXMLModelORMModel.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.1\tXMLModelPage.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.1\tXMLModelPredicatePart.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.1\tXMLModelRole.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.1\tXMLModelRoleConstraint.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.1\tXMLModelRoleConstraintRole.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.1\tXMLModelSubtypeRelationship.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.1\tXMLModelValueType.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.0\tXMLModelEntityType.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.0\tXMLModelFact.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.0\tXMLModelFactData.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.0\tXMLModelFactType.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.0\tXMLModelFactTypeReading.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.0\tXMLModelModelNote.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.0\tXMLModelORMModel.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.0\tXMLModelPage.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.0\tXMLModelModel.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.0\tXMLModelSubtypeRelationship.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.0\tXMLModelPredicatePart.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.0\tXMLModelRole.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.0\tXMLModelRoleConstraint.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.0\tXMLModelRoleConstraintRole.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.0\tXMLModelValueType.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v0.81\tXMLModelEntityType.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v0.81\tXMLModelFact.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v0.81\tXMLModelFactData.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v0.81\tXMLModelFactType.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v0.81\tXMLModelFactTypeReading.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v0.81\tXMLModelModel.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v0.81\tXMLModelModelNote.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v0.81\tXMLModelORMModel.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v0.81\tXMLModelPage.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v0.81\tXMLModelPredicatePart.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v0.81\tXMLModelRole.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v0.81\tXMLModelRoleConstraint.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v0.81\tXMLModelRoleConstraintRole.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v0.81\tXMLModelSubtypeRelationship.vb" />
+    <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v0.81\tXMLModelValueType.vb" />
+    <Compile Include="ClassesLANGUAGEKL\tKLProofGenerator.vb" />
+    <Compile Include="ClassesLANGUAGEKL\tKLProofStep.vb" />
+    <Compile Include="ClassesLANGUAGENORMA\NORMAXMLFileLoader.vb" />
+    <Compile Include="ClassesLANGUAGEORM\FBMGeneral\FBMGeneral.vb" />
+    <Compile Include="ClassesLANGUAGEORM\ORMCMML\tORMModel.vb" />
+    <Compile Include="ClassesLANGUAGEORM\ORMCMML\tORMPage.vb" />
+    <Compile Include="ClassesLANGUAGEORM\ORMDiagramSpyPage\tORMDiagramSpyPage.vb" />
+    <Compile Include="ClassesLANGUAGEORM\ORMInstances\tORMDiagrammingShapeNode.vb" />
+    <Compile Include="ClassesLANGUAGEORM\ORMInstances\tORMFactTypeDerivationText.vb" />
+    <Compile Include="ClassesLANGUAGEORM\ORMInstances\tRoleConstraintLink.vb" />
+    <Compile Include="ClassesLANGUAGEORM\ORMInterfaces\iORMIndependence.vb" />
+    <Compile Include="ClassesLANGUAGEORM\ORMInterfaces\iORMMDAObject.vb" />
+    <Compile Include="ClassesLANGUAGEORM\ORMInterfaces\iORMModelObject.vb" />
+    <Compile Include="ClassesLANGUAGEORM\ORMInterfaces\iORMVerbaliser.vb" />
+    <Compile Include="ClassesLANGUAGEORM\ORMModelValidator\tErrorChecker105EntityTypeRequiresReferenceSchemeError.vb" />
+    <Compile Include="ClassesLANGUAGEORM\ORMRDS\tORMModel.vb" />
+    <Compile Include="ClassesLANGUAGEORM\ORMRDS\tORMPage.vb" />
+    <Compile Include="ClassesLANGUAGEORM\ORMWordVerbaliser\tORMEntityType.vb" />
+    <Compile Include="ClassesLANGUAGEORM\ORMWordVerbaliser\tORMFactTypeReading.vb" />
+    <Compile Include="ClassesLANGUAGEORM\ORMWordVerbaliser\tORMRoleConstraint.vb" />
+    <Compile Include="ClassesLANGUAGEORM\ORMWordVerbaliser\tORMValueType.vb" />
+    <Compile Include="ClassesLANGUAGEORM\ORMWordVerbaliser\tORMWordVerbailser.vb" />
+    <Compile Include="ClassesLANGUAGEORM\ORMVerbaliser\tORMVerbailser.vb" />
+    <Compile Include="ClassesLANGUAGEORM\ORM\tORMConcept.vb" />
+    <Compile Include="ClassesLANGUAGEORM\ORM\tORMDictionaryEntry.vb" />
+    <Compile Include="ClassesLANGUAGEORM\ORM\tORMEntityType.vb" />
+    <Compile Include="ClassesLANGUAGEORM\ORM\tORMFact.vb" />
+    <Compile Include="ClassesLANGUAGEORM\ORM\tORMFactData.vb" />
+    <Compile Include="ClassesLANGUAGEORM\ORM\tORMFactPredicate.vb" />
+    <Compile Include="ClassesLANGUAGEORM\ORM\tORMFactType.vb" />
+    <Compile Include="ClassesLANGUAGEORM\ORM\tORMFactTypeReading.vb" />
+    <Compile Include="ClassesLANGUAGEORM\ORM\tORMFactTypeReadingRole.vb" />
+    <Compile Include="ClassesLANGUAGEORM\ORM\tORMJoinPath.vb" />
+    <Compile Include="ClassesLANGUAGEORM\ORM\tORMJoinPathRole.vb" />
+    <Compile Include="ClassesLANGUAGEORM\ORM\tORMModel.vb" />
+    <Compile Include="ClassesLANGUAGEORM\ORM\tORMModelError.vb" />
+    <Compile Include="ClassesLANGUAGEORM\ORM\tORMModelNote.vb" />
+    <Compile Include="ClassesLANGUAGEORM\ORM\tORMModelObject.vb" />
+    <Compile Include="ClassesLANGUAGEORM\ORM\tORMPage.vb" />
+    <Compile Include="ClassesLANGUAGEORM\ORM\tORMPredicatePart.vb" />
+    <Compile Include="ClassesLANGUAGEORM\ORM\tORMRole.vb" />
+    <Compile Include="ClassesLANGUAGEORM\ORM\tORMRoleConstraint.vb" />
+    <Compile Include="ClassesLANGUAGEORM\ORM\tORMRoleConstraintArgument.vb" />
+    <Compile Include="ClassesLANGUAGEORM\ORM\tORMRoleConstraintRole.vb" />
+    <Compile Include="ClassesLANGUAGEORM\ORM\tORMSubtypeRelationship.vb" />
+    <Compile Include="ClassesLANGUAGEORM\ORM\tORMValueType.vb" />
+    <Compile Include="ClassesLANGUAGEPGS\tPGSLink.vb" />
+    <Compile Include="ClassesLANGUAGEPGS\tPGSNode.vb" />
+    <Compile Include="ClassesLANGUAGEPHRASEIMPORTEXPORT\tLanguageParserRules.vb" />
+    <Compile Include="ClassesLANGUAGEPHRASEIMPORTEXPORT\tLanguagePhrase.vb" />
+    <Compile Include="ClassesLANGUAGEPHRASEIMPORTEXPORT\tLanguagePhraseTokenSequenceWordSense.vb" />
+    <Compile Include="ClassesLANGUAGERDS\tRDSColumn.vb" />
+    <Compile Include="ClassesLANGUAGERDS\tRDSDataType.vb" />
+    <Compile Include="ClassesLANGUAGERDS\tRDSIndex.vb" />
+    <Compile Include="ClassesLANGUAGERDS\tRDSModel.vb" />
+    <Compile Include="ClassesLANGUAGERDS\tRDSRelation.vb" />
+    <Compile Include="ClassesLANGUAGERDS\tRDSTable.vb" />
+    <Compile Include="ClassesLANGUAGESTD\tCMMLSTDStateTransition.vb" />
+    <Compile Include="ClassesLANGUAGESTD\tStateTransitionDiagram.vb" />
+    <Compile Include="ClassesLANGUAGESTD\tCMMLSTDState.vb" />
+    <Compile Include="ClassesLANGUAGEUMLClassDiagram\tUMLMultiplicity.vb" />
+    <Compile Include="ClassesLANGUAGEORM\ORMModelValidator\tErrorChecker129RoleConstraintConflictError.vb" />
+    <Compile Include="ClassesLANGUAGEORM\ORMModelValidator\tErrorChecker113FrequencyConstraintMinMaxError.vb" />
+    <Compile Include="ClassesLANGUAGEORM\ORMModelValidator\tErrorChecker126TooFewRoleSequencesError.vb" />
+    <Compile Include="ClassesLANGUAGEORM\ORMModelValidator\tErrorChecker115FactTypeRequiresReadingError.vb" />
+    <Compile Include="ClassesLANGUAGEORM\ORMModelValidator\tErrorChecker127DataTypeNotSpecifiedError.vb" />
+    <Compile Include="ClassesLANGUAGEORM\ORMModelValidator\tErrorChecker106FactTypeRequiresIUCError.vb" />
+    <Compile Include="ClassesLANGUAGEORM\ORMModelValidator\Interfaces\iFBMValidationErrorHandler.vb" />
+    <Compile Include="ClassesLANGUAGEORM\ORMModelValidator\tErrorChecker.vb" />
+    <Compile Include="ClassesLANGUAGEORM\ORMModelValidator\tErrorChecker100PopulationUniquenessError.vb" />
+    <Compile Include="ClassesLANGUAGEORM\ORMModelValidator\tModelValidator.vb" />
+    <Compile Include="ClassesParserFTR\TinyPG\tFTRParser.vb" />
+    <Compile Include="ClassesParserFTR\TinyPG\tFTRParseTree.vb" />
+    <Compile Include="ClassesParserFTR\TinyPG\tFTRScanner.vb" />
+    <Compile Include="ClassesParserFTR\TinyPG\tFTRTextHighlighter.vb" />
+    <Compile Include="ClassesParserFTR\tFTRProcessor.vb" />
+    <Compile Include="ClassesParserVA\TinyPG\tVAQLParser.vb" />
+    <Compile Include="ClassesParserVA\TinyPG\tVAQLParseTree.vb" />
+    <Compile Include="ClassesParserVA\TinyPG\tVAQLScanner.vb" />
+    <Compile Include="ClassesParserVA\TinyPG\tVAQLTextHighlighter.vb" />
+    <Compile Include="ClassesParserVA\tVAQLProcessor.vb" />
+    <Compile Include="ClassesPluginServices\PluginServices.vb" />
+    <Compile Include="Forms\CRUD\ClientServer\frmCRUDEditRole.Designer.vb">
+      <DependentUpon>frmCRUDEditRole.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\CRUD\ClientServer\frmCRUDEditRole.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\CRUD\ClientServer\frmCRUDAddRole.Designer.vb">
+      <DependentUpon>frmCRUDAddRole.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\CRUD\ClientServer\frmCRUDAddRole.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\CRUD\ClientServer\frmCRUDEditNamespace.Designer.vb">
+      <DependentUpon>frmCRUDEditNamespace.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\CRUD\ClientServer\frmCRUDEditNamespace.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\CRUD\ClientServer\frmCRUDAddNamespace.Designer.vb">
+      <DependentUpon>frmCRUDAddNamespace.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\CRUD\ClientServer\frmCRUDAddNamespace.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\CRUD\ClientServer\frmCRUDEditGroup.Designer.vb">
+      <DependentUpon>frmCRUDEditGroup.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\CRUD\ClientServer\frmCRUDEditGroup.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\CRUD\ClientServer\frmCRUDEditProject.Designer.vb">
+      <DependentUpon>frmCRUDEditProject.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\CRUD\ClientServer\frmCRUDEditProject.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\CRUD\ClientServer\frmCRUDAddProject.Designer.vb">
+      <DependentUpon>frmCRUDAddProject.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\CRUD\ClientServer\frmCRUDAddProject.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\CRUD\ClientServer\frmCRUDAddGroup.Designer.vb">
+      <DependentUpon>frmCRUDAddGroup.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\CRUD\ClientServer\frmCRUDAddGroup.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\CRUD\ClientServer\frmCRUDAddUser.designer.vb">
+      <DependentUpon>frmCRUDAddUser.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\CRUD\ClientServer\frmCRUDAddUser.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\CRUD\ClientServer\frmCRUDEditUser.designer.vb">
+      <DependentUpon>frmCRUDEditUser.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\CRUD\ClientServer\frmCRUDEditUser.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\CRUD\ClientServer\frmInviteUserToProject.Designer.vb">
+      <DependentUpon>frmInviteUserToProject.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\CRUD\ClientServer\frmInviteUserToProject.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\CRUD\ClientServer\frmLogin.designer.vb">
+      <DependentUpon>frmLogin.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\CRUD\ClientServer\frmLogin.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\CRUD\frmCRUDModel.Designer.vb">
+      <DependentUpon>frmCRUDModel.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\CRUD\frmCRUDModel.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\CRUD\frmCRUDImportFact.Designer.vb">
+      <DependentUpon>frmCRUDImportFact.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\CRUD\frmCRUDImportFact.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\CRUD\frmCRUDRemoveUnneededConcepts.Designer.vb">
+      <DependentUpon>frmCRUDRemoveUnneededConcepts.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\CRUD\frmCRUDRemoveUnneededConcepts.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\CRUD\frmCRUDRoleInstance.designer.vb">
+      <DependentUpon>frmCRUDRoleInstance.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\CRUD\frmCRUDRoleInstance.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\CRUD\LANGUAGEERD\frmCRUDAddAttribute.Designer.vb">
+      <DependentUpon>frmCRUDAddAttribute.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\CRUD\LANGUAGEERD\frmCRUDAddAttribute.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\CRUD\LANGUAGEERD\frmCRUDAddRelationship.Designer.vb">
+      <DependentUpon>frmCRUDAddRelationship.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\CRUD\LANGUAGEERD\frmCRUDAddRelationship.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\CRUD\LANGUAGEERD\frmCRUDEditAttribute.Designer.vb">
+      <DependentUpon>frmCRUDEditAttribute.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\CRUD\LANGUAGEERD\frmCRUDEditAttribute.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\CRUD\LANGUAGEERD\frmCRUDEditRelationship.Designer.vb">
+      <DependentUpon>frmCRUDEditRelationship.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\CRUD\LANGUAGEERD\frmCRUDEditRelationship.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Diagrams\frmDiagramERD.Designer.vb">
+      <DependentUpon>frmDiagramERD.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Diagrams\frmDiagramERD.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Diagrams\frmDiagramORMForGlossary.designer.vb">
+      <DependentUpon>frmDiagramORMForGlossary.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Diagrams\frmDiagramORMForGlossary.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Diagrams\frmDiagramPGS.Designer.vb">
+      <DependentUpon>frmDiagramPGS.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Diagrams\frmDiagramPGS.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Diagrams\frmDiagramSTD.designer.vb">
+      <DependentUpon>frmDiagramSTD.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Diagrams\frmDiagramSTD.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\frmBroadcastEventMonitor.Designer.vb">
+      <DependentUpon>frmBroadcastEventMonitor.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\frmBroadcastEventMonitor.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\frmDocumentGeneratorSettings.Designer.vb">
+      <DependentUpon>frmDocumentGeneratorSettings.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\frmDocumentGeneratorSettings.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\frmFlashCard.Designer.vb">
+      <DependentUpon>frmFlashCard.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\frmFlashCard.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\frmGenericSelectMultiColumn.designer.vb">
+      <DependentUpon>frmGenericSelectMultiColumn.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\frmGenericSelectMultiColumn.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\frmGenericSelect.designer.vb">
+      <DependentUpon>frmGenericSelect.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\frmGenericSelect.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\frmGlossary.Designer.vb">
+      <DependentUpon>frmGlossary.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\frmGlossary.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\frmLicences.Designer.vb">
+      <DependentUpon>frmLicences.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\frmLicences.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\frmNotifications.Designer.vb">
+      <DependentUpon>frmNotifications.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\frmNotifications.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\frmStartup.Designer.vb">
+      <DependentUpon>frmStartup.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\frmStartup.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\frmPluginViewer.designer.vb">
+      <DependentUpon>frmPluginViewer.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\frmPluginViewer.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Toolboxes\frmAutoComplete.Designer.vb">
+      <DependentUpon>frmAutoComplete.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Toolboxes\frmAutoComplete.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Toolboxes\frmToolboxCypher.Designer.vb">
+      <DependentUpon>frmToolboxCypher.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Toolboxes\frmToolboxCypher.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GlobalSuppressions.vb" />
+    <Compile Include="ModulesDatabaseTableFunctions\tableClientServerGroup.vb" />
+    <Compile Include="ModulesDatabaseTableFunctions\tableClientServerGroupUser.vb" />
+    <Compile Include="ModulesDatabaseTableFunctions\tableClientServerInvitation.vb" />
+    <Compile Include="ModulesDatabaseTableFunctions\tableClientServerLog.vb" />
+    <Compile Include="ModulesDatabaseTableFunctions\tableClientServerNamespace.vb" />
+    <Compile Include="ModulesDatabaseTableFunctions\tableClientServerNotifications.vb" />
+    <Compile Include="ModulesDatabaseTableFunctions\tableClientServerProject.vb" />
+    <Compile Include="ModulesDatabaseTableFunctions\tableClientServerProjectGroup.vb" />
+    <Compile Include="ModulesDatabaseTableFunctions\tableClientServerProjectUserRole.vb" />
+    <Compile Include="ModulesDatabaseTableFunctions\tableClientServerProjectUser.vb" />
+    <Compile Include="ModulesDatabaseTableFunctions\tableClientServerProjectGroupPermission.vb" />
+    <Compile Include="ModulesDatabaseTableFunctions\tableClientServerProjectUserPermission.vb" />
+    <Compile Include="ModulesDatabaseTableFunctions\tableClientServerRole.vb" />
+    <Compile Include="ModulesDatabaseTableFunctions\tableClientServerRoleFunction.vb" />
+    <Compile Include="ModulesDatabaseTableFunctions\tableClientServerUser.vb" />
+    <Compile Include="ModulesDatabaseTableFunctions\tableClientServerUserRole.vb" />
+    <Compile Include="ModulesDatabaseTableFunctions\tableORMFactTypeDerivationText.vb" />
+    <Compile Include="ModulesDatabaseTableFunctions\tableORMFactTypeReadingRole.vb" />
+    <Compile Include="ModulesDatabaseTableFunctions\tableORMJoinPathRole.vb" />
+    <Compile Include="ModulesDatabaseTableFunctions\tableORMRoleConstraintArgument.vb" />
+    <Compile Include="ModulesPublic\ClassDummyToolStripItem.vb">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ModulesPublic\ClientServer\tDSCFactType.vb" />
+    <Compile Include="ModulesPublic\ClientServer\tDSCPage.vb" />
+    <Compile Include="ModulesPublic\ClientServer\tDSCRole.vb" />
+    <Compile Include="ModulesPublic\ClientServer\tDSCRoleConstraint.vb" />
+    <Compile Include="ModulesPublic\ClientServer\tDSCValueType.vb" />
+    <Compile Include="ModulesPublic\ClientServer\tDuplexServiceClient.vb" />
+    <Compile Include="ModulesPublic\ClientServer\PublicConstantsFunctions\tHash.vb" />
+    <Compile Include="ModulesPublic\ClientServer\PublicConstantsFunctions\publicConstants.vb" />
+    <Compile Include="ModulesPublic\ClientServer\PublicConstantsFunctions\publicModule.vb" />
+    <Compile Include="ModulesPublic\ClientServer\tDSCModel.vb" />
+    <Compile Include="ModulesPublic\Conversion.vb" />
+    <Compile Include="ModulesPublic\ClientServer\tDuplexCallback.vb" />
+    <Compile Include="ModulesPublic\CQL\publicFunctions.vb" />
+    <Compile Include="ModulesPublic\MyMethodExtensions.vb" />
+    <Compile Include="ModulesPublic\publicConstantsFBM.vb" />
+    <Compile Include="ModulesPublic\PublicConstantsODBC.vb" />
+    <Compile Include="ModulesPublic\publicDatabase.vb" />
+    <Compile Include="ModulesPublic\publicFBMConstants.vb" />
+    <Compile Include="ModulesPublic\publicORMFunctions.vb" />
+    <Compile Include="ModulesPublic\publicPermutations.vb" />
+    <Compile Include="ModulesPublic\publicAccessControl.vb" />
+    <Compile Include="ModulesPublic\publicCMML.vb" />
+    <Compile Include="ModulesPublic\publicConstantsModelValidator.vb" />
+    <Compile Include="ModulesPublic\publicConstantsPGS.vb" />
+    <Compile Include="ModulesPublic\publicDatabaseUpgradeFunctions.vb" />
+    <Compile Include="ModulesPublic\ClientServer\tDSCEntityType.vb" />
+    <Compile Include="My Project\AssemblyInfo.vb" />
+    <Compile Include="My Project\Application.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Application.myapp</DependentUpon>
+    </Compile>
+    <Compile Include="My Project\Resources.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="My Project\Settings.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="ClassesBrain\tBrain.vb" />
+    <Compile Include="ClassesBrain\tDirective.vb" />
+    <Compile Include="ClassesBrain\tQuestion.vb" />
+    <Compile Include="ClassesBrain\tSentence.vb" />
+    <Compile Include="ClassesDatabaseUpgrade\tDatabaseUpgrade.vb" />
+    <Compile Include="ClassesDatabaseUpgrade\tDatabaseUpgradeSQL.vb" />
+    <Compile Include="ClassesGeneral\tComboBox.vb" />
+    <Compile Include="ClassesGeneral\tEnterpriseEnterpriseView.vb" />
+    <Compile Include="ClassesGeneral\tErrorLogger.vb" />
+    <Compile Include="ClassesGeneral\tGenericSelection.vb" />
+    <Compile Include="ClassesGeneral\tGlobalForTypeCoverter.vb" />
+    <Compile Include="ClassesGeneral\tMyConverter.vb" />
+    <Compile Include="ClassesGeneral\tNodeDragItem.vb" />
+    <Compile Include="ClassesGeneral\tReferenceFieldValue.vb" />
+    <Compile Include="ClassesGeneral\tRichmond.vb" />
+    <Compile Include="ClassesGeneral\tSpecialDragMode.vb" />
+    <Compile Include="ClassesGeneral\tStringCollectionEditor.vb" />
+    <Compile Include="ClassesGeneral\tUserAction.vb" />
+    <Compile Include="ClassesGeneral\tWorkingEnvironment.vb" />
+    <Compile Include="ClassesLANGUAGEGeneric\tLanguageAnalysis.vb" />
+    <Compile Include="ClassesLANGUAGEGeneric\tLanguageGeneric.vb" />
+    <Compile Include="ClassesLANGUAGEGeneric\tLanguagePhrase.vb" />
+    <Compile Include="ClassesLANGUAGEGeneric\tLanguagePhraseTokenSequence.vb" />
+    <Compile Include="ClassesLANGUAGEGeneric\tLanguagePhraseTokenSequenceWordSense.vb" />
+    <Compile Include="ClassesLANGUAGEGeneric\tLanguageWordQualification.vb" />
+    <Compile Include="ClassesLANGUAGEGeneric\tLanguageWordResolved.vb" />
+    <Compile Include="ClassesLANGUAGEGeneric\tLanguageWordSenseWeighting.vb" />
+    <Compile Include="ClassesLANGUAGEORMQL\tORMQL.vb" />
+    <Compile Include="ClassesLANGUAGEORMQL\tORMQLParser.vb" />
+    <Compile Include="ClassesLANGUAGEORMQL\tORMQLParseTree.vb" />
+    <Compile Include="ClassesLANGUAGEORMQL\tORMQLRecordset.vb" />
+    <Compile Include="ClassesLANGUAGEORMQL\tORMQLScanner.vb" />
+    <Compile Include="ClassesLANGUAGEORMQL\tORMQLTextHighlighter.vb" />
+    <Compile Include="ClassesLANGUAGEORM\ORMInstances\tORMConceptInstance.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ClassesLANGUAGEORM\ORMInstances\tORMEntityTypeInstance.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ClassesLANGUAGEORM\ORMInstances\tORMEntityTypeName.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ClassesLANGUAGEORM\ORMInstances\tORMFactDataInstance.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ClassesLANGUAGEORM\ORMInstances\tORMFactInstance.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ClassesLANGUAGEORM\ORMInstances\tORMFactTable.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ClassesLANGUAGEORM\ORMInstances\tORMFactTypeInstance.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ClassesLANGUAGEORM\ORMInstances\tORMFactTypeName.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ClassesLANGUAGEORM\ORMInstances\tORMFactTypeReadingInstance.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ClassesLANGUAGEORM\ORMInstances\tORMModelNoteInstance.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ClassesLANGUAGEORM\ORMInstances\tORMPageObject.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ClassesLANGUAGEORM\ORMInstances\tORMRoleConstraintFrequencyConstraint.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ClassesLANGUAGEORM\ORMInstances\tORMRoleConstraintInstance.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ClassesLANGUAGEORM\ORMInstances\tORMRoleConstraintRingConstraint.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ClassesLANGUAGEORM\ORMInstances\tORMRoleConstraintRoleInstance.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ClassesLANGUAGEORM\ORMInstances\tORMRoleConstraintUniqueness.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ClassesLANGUAGEORM\ORMInstances\tORMRoleInstance.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ClassesLANGUAGEORM\ORMInstances\tORMRoleName.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ClassesLANGUAGEORM\ORMInstances\tORMSubtypeRelationshipInstance.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ClassesLANGUAGEORM\ORMInstances\tORMValueConstraintInstance.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ClassesLANGUAGEORM\ORMInstances\tORMValueTypeInstance.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ClassesLANGUAGEORM\ORMInterfaces\iORMPageObject.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Forms\CRUD\frmCRUDBostonConfiguration.Designer.vb">
+      <DependentUpon>frmCRUDBostonConfiguration.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\CRUD\frmCRUDBostonConfiguration.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Diagrams\frmDiagramORM.designer.vb">
+      <DependentUpon>frmDiagramORM.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Diagrams\frmDiagramORM.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Diagrams\frmDiagramOverview.Designer.vb">
+      <DependentUpon>frmDiagramOverview.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Diagrams\frmDiagramOverview.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\frmAbout.designer.vb">
+      <DependentUpon>frmAbout.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\frmAbout.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\frmDatabaseUpgrade.designer.vb">
+      <DependentUpon>frmDatabaseUpgrade.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\frmDatabaseUpgrade.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\frmMain.Designer.vb">
+      <DependentUpon>frmMain.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\frmMain.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\frmSignatueResolution.Designer.vb">
+      <DependentUpon>frmSignatueResolution.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\frmSignatueResolution.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\frmSplash.designer.vb">
+      <DependentUpon>frmSplash.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\frmSplash.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Toolboxes\frmToolbox.Designer.vb">
+      <DependentUpon>frmToolbox.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Toolboxes\frmToolbox.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Toolboxes\frmToolboxBrainBox.Designer.vb">
+      <DependentUpon>frmToolboxBrainBox.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Toolboxes\frmToolboxBrainBox.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Toolboxes\frmToolboxEnterpriseExplorer.Designer.vb">
+      <DependentUpon>frmToolboxEnterpriseExplorer.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Toolboxes\frmToolboxEnterpriseExplorer.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Toolboxes\frmToolboxErrorList.Designer.vb">
+      <DependentUpon>frmToolboxErrorList.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Toolboxes\frmToolboxErrorList.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Toolboxes\frmToolboxKLTheoremWriter.Designer.vb">
+      <DependentUpon>frmToolboxKLTheoremWriter.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Toolboxes\frmToolboxKLTheoremWriter.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Toolboxes\frmToolboxModelDictionary.Designer.vb">
+      <DependentUpon>frmToolboxModelDictionary.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Toolboxes\frmToolboxModelDictionary.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Toolboxes\frmToolboxORMReadingEditor.designer.vb">
+      <DependentUpon>frmToolboxORMReadingEditor.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Toolboxes\frmToolboxORMReadingEditor.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Toolboxes\frmToolboxORMVerbalisation.Designer.vb">
+      <DependentUpon>frmToolboxORMVerbalisation.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Toolboxes\frmToolboxORMVerbalisation.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Toolboxes\frmToolboxOverview.Designer.vb">
+      <DependentUpon>frmToolboxOverview.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Toolboxes\frmToolboxOverview.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Toolboxes\frmToolboxProperties.Designer.vb">
+      <DependentUpon>frmToolboxProperties.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Toolboxes\frmToolboxProperties.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ModulesDatabaseTableFunctions\tableDatabaseUpgrade.vb" />
+    <Compile Include="ModulesDatabaseTableFunctions\tableDatabasUpgradeSQL.vb" />
+    <Compile Include="ModulesDatabaseTableFunctions\tableLanguagePhrase.vb" />
+    <Compile Include="ModulesDatabaseTableFunctions\tableLanguagePhraseTokenSequenceWordSense.vb" />
+    <Compile Include="ModulesDatabaseTableFunctions\tableORMConcept.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ModulesDatabaseTableFunctions\tableORMConceptInstance.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ModulesDatabaseTableFunctions\tableORMEntityType.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ModulesDatabaseTableFunctions\tableORMEntityTypeInstance.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ModulesDatabaseTableFunctions\tableORMFact.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ModulesDatabaseTableFunctions\tableORMFactData.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ModulesDatabaseTableFunctions\tableORMFactInstance.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ModulesDatabaseTableFunctions\tableORMFactTableInstance.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ModulesDatabaseTableFunctions\tableORMFactType.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ModulesDatabaseTableFunctions\tableORMFactTypeInstance.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ModulesDatabaseTableFunctions\tableORMFactTypeName.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ModulesDatabaseTableFunctions\tableORMFactTypeReading.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ModulesDatabaseTableFunctions\tableORMModel.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ModulesDatabaseTableFunctions\tableORMModelDictionary.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ModulesDatabaseTableFunctions\tableORMModelNote.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ModulesDatabaseTableFunctions\tableORMModelNoteInstance.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ModulesDatabaseTableFunctions\tableORMPage.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ModulesDatabaseTableFunctions\tableORMSubtypeRelationship.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ModulesDatabaseTableFunctions\tableORMPredicatePart.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ModulesDatabaseTableFunctions\tableORMReferenceField.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ModulesDatabaseTableFunctions\tableORMReferenceFieldValue.vb" />
+    <Compile Include="ModulesDatabaseTableFunctions\tableORMReferenceTable.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ModulesDatabaseTableFunctions\tableORMRole.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ModulesDatabaseTableFunctions\tableORMRoleConstraint.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ModulesDatabaseTableFunctions\tableORMRoleConstraintInstance.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ModulesDatabaseTableFunctions\tableORMRoleConstraintRole.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ModulesDatabaseTableFunctions\tableORMRoleName.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ModulesDatabaseTableFunctions\tableORMValueType.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ModulesDatabaseTableFunctions\tableORMValueTypeInstance.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ModulesDatabaseTableFunctions\tableORMValueTypeValueConstraint.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ModulesPublic\publicConstants.vb" />
+    <Compile Include="ModulesPublic\publicConstantsBrain.vb" />
+    <Compile Include="ModulesPublic\publicFunctions.vb" />
+    <Compile Include="ModulesPublic\publicVariables.vb" />
+    <Compile Include="MenuImagesMain.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>MenuImagesMain.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Resources\MenuImages.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>MenuImages.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Resources\ORMShapes.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ORMShapes.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Resources\Icons.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Icons.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Resources\General.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>General.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Resources\CMML.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>CMML.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Resources\BarkerERImages.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>BarkerERImages.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Resources\Viev.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Viev.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Resources\Splash.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Splash.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Settings.vb" />
+    <Compile Include="Thinfinity.VirtualUI.vb" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="ClassesGeneral\FlexibleListBox.resx">
+      <DependentUpon>FlexibleListBox.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ClassesGeneral\GroupInviter.resx">
+      <DependentUpon>GroupInviter.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ClassesGeneral\GroupNotificationBar.resx">
+      <DependentUpon>GroupNotificationBar.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ClassesGeneral\NotificationBarGeneralNotification.resx">
+      <DependentUpon>NotificationBarGeneralNotification.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ClassesGeneral\NotificationBarGroupToProjectInvitation.resx">
+      <DependentUpon>NotificationBarGroupToProjectInvitation.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ClassesGeneral\ProjectUserDetails.resx">
+      <DependentUpon>ProjectUserDetails.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ClassesGeneral\tRichtextEditingControl.resx">
+      <DependentUpon>tRichtextEditingControl.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ClassesGeneral\UserInviter.resx">
+      <DependentUpon>UserInviter.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\CRUD\ClientServer\frmCRUDEditRole.resx">
+      <DependentUpon>frmCRUDEditRole.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\CRUD\ClientServer\frmCRUDAddRole.resx">
+      <DependentUpon>frmCRUDAddRole.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\CRUD\ClientServer\frmCRUDEditNamespace.resx">
+      <DependentUpon>frmCRUDEditNamespace.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\CRUD\ClientServer\frmCRUDAddNamespace.resx">
+      <DependentUpon>frmCRUDAddNamespace.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\CRUD\ClientServer\frmCRUDEditGroup.resx">
+      <DependentUpon>frmCRUDEditGroup.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\CRUD\ClientServer\frmCRUDEditProject.resx">
+      <DependentUpon>frmCRUDEditProject.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\CRUD\ClientServer\frmCRUDAddProject.resx">
+      <DependentUpon>frmCRUDAddProject.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\CRUD\ClientServer\frmCRUDAddGroup.resx">
+      <DependentUpon>frmCRUDAddGroup.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\CRUD\ClientServer\frmCRUDAddUser.resx">
+      <DependentUpon>frmCRUDAddUser.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\CRUD\ClientServer\frmCRUDEditUser.resx">
+      <DependentUpon>frmCRUDEditUser.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\CRUD\ClientServer\frmInviteUserToProject.resx">
+      <DependentUpon>frmInviteUserToProject.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\CRUD\ClientServer\frmLogin.resx">
+      <DependentUpon>frmLogin.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\CRUD\frmCRUDModel.resx">
+      <DependentUpon>frmCRUDModel.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\CRUD\frmCRUDImportFact.resx">
+      <DependentUpon>frmCRUDImportFact.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\CRUD\frmCRUDRemoveUnneededConcepts.resx">
+      <DependentUpon>frmCRUDRemoveUnneededConcepts.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\CRUD\frmCRUDBostonConfiguration.resx">
+      <DependentUpon>frmCRUDBostonConfiguration.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\CRUD\frmCRUDRoleInstance.resx">
+      <DependentUpon>frmCRUDRoleInstance.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\CRUD\LANGUAGEERD\frmCRUDAddAttribute.resx">
+      <DependentUpon>frmCRUDAddAttribute.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\CRUD\LANGUAGEERD\frmCRUDAddRelationship.resx">
+      <DependentUpon>frmCRUDAddRelationship.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\CRUD\LANGUAGEERD\frmCRUDEditAttribute.resx">
+      <DependentUpon>frmCRUDEditAttribute.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\CRUD\LANGUAGEERD\frmCRUDEditRelationship.resx">
+      <DependentUpon>frmCRUDEditRelationship.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Diagrams\frmDiagramERD.resx">
+      <DependentUpon>frmDiagramERD.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Diagrams\frmDiagramORMForGlossary.resx">
+      <DependentUpon>frmDiagramORMForGlossary.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Diagrams\frmDiagramPGS.resx">
+      <DependentUpon>frmDiagramPGS.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Diagrams\frmDiagramORM.resx">
+      <DependentUpon>frmDiagramORM.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Diagrams\frmDiagramOverview.resx">
+      <DependentUpon>frmDiagramOverview.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Diagrams\frmDiagramSTD.resx">
+      <DependentUpon>frmDiagramSTD.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\frmAbout.resx">
+      <DependentUpon>frmAbout.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\frmBroadcastEventMonitor.resx">
+      <DependentUpon>frmBroadcastEventMonitor.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\frmDatabaseUpgrade.resx">
+      <DependentUpon>frmDatabaseUpgrade.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\frmDocumentGeneratorSettings.resx">
+      <DependentUpon>frmDocumentGeneratorSettings.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\frmFlashCard.resx">
+      <DependentUpon>frmFlashCard.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\frmGenericSelectMultiColumn.resx">
+      <DependentUpon>frmGenericSelectMultiColumn.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\frmGenericSelect.resx">
+      <DependentUpon>frmGenericSelect.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\frmGlossary.resx">
+      <DependentUpon>frmGlossary.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\frmLicences.resx">
+      <DependentUpon>frmLicences.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\frmMain.resx">
+      <DependentUpon>frmMain.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\frmNotifications.resx">
+      <DependentUpon>frmNotifications.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\frmSignatueResolution.resx">
+      <DependentUpon>frmSignatueResolution.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\frmSplash.resx">
+      <DependentUpon>frmSplash.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\frmStartup.resx">
+      <DependentUpon>frmStartup.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\frmPluginViewer.resx">
+      <DependentUpon>frmPluginViewer.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Toolboxes\frmAutoComplete.resx">
+      <DependentUpon>frmAutoComplete.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Toolboxes\frmToolbox.resx">
+      <DependentUpon>frmToolbox.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Toolboxes\frmToolboxBrainBox.resx">
+      <DependentUpon>frmToolboxBrainBox.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Toolboxes\frmToolboxCypher.resx">
+      <DependentUpon>frmToolboxCypher.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Toolboxes\frmToolboxEnterpriseExplorer.resx">
+      <DependentUpon>frmToolboxEnterpriseExplorer.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Toolboxes\frmToolboxErrorList.resx">
+      <DependentUpon>frmToolboxErrorList.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Toolboxes\frmToolboxKLTheoremWriter.resx">
+      <DependentUpon>frmToolboxKLTheoremWriter.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Toolboxes\frmToolboxModelDictionary.resx">
+      <DependentUpon>frmToolboxModelDictionary.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Toolboxes\frmToolboxORMReadingEditor.resx">
+      <DependentUpon>frmToolboxORMReadingEditor.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Toolboxes\frmToolboxORMVerbalisation.resx">
+      <DependentUpon>frmToolboxORMVerbalisation.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Toolboxes\frmToolboxOverview.resx">
+      <DependentUpon>frmToolboxOverview.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Toolboxes\frmToolboxProperties.resx">
+      <DependentUpon>frmToolboxProperties.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="My Project\licenses.licx" />
+    <EmbeddedResource Include="My Project\Resources.resx">
+      <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.vb</LastGenOutput>
+      <CustomToolNamespace>My.Resources</CustomToolNamespace>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MenuImagesMain.resx">
+      <CustomToolNamespace>My.Resources</CustomToolNamespace>
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>MenuImagesMain.Designer.vb</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\MenuImages.resx">
+      <CustomToolNamespace>My.Resources</CustomToolNamespace>
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>MenuImages.Designer.vb</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\ORMShapes.resx">
+      <CustomToolNamespace>My.Resources</CustomToolNamespace>
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>ORMShapes.Designer.vb</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Icons.resx">
+      <CustomToolNamespace>My.Resources</CustomToolNamespace>
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Icons.Designer.vb</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\General.resx">
+      <CustomToolNamespace>My.Resources</CustomToolNamespace>
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>General.Designer.vb</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\CMML.resx">
+      <CustomToolNamespace>My.Resources</CustomToolNamespace>
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>CMML.Designer.vb</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\BarkerERImages.resx">
+      <CustomToolNamespace>My.Resources</CustomToolNamespace>
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>BarkerERImages.Designer.vb</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Viev.resx">
+      <CustomToolNamespace>My.Resources</CustomToolNamespace>
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Viev.Designer.vb</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Splash.resx">
+      <CustomToolNamespace>My.Resources</CustomToolNamespace>
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Splash.Designer.vb</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="My Project\app.manifest">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="My Project\Application.myapp">
+      <Generator>MyApplicationCodeGenerator</Generator>
+      <LastGenOutput>Application.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="My Project\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <CustomToolNamespace>My</CustomToolNamespace>
+      <LastGenOutput>Settings.Designer.vb</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shapelibrary\ORMShapes\acyclic.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shapelibrary\ORMShapes\acyclic_intransitive.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shapelibrary\ORMShapes\Acyclic+Intransative.PNG" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shapelibrary\ORMShapes\Antisymmetric.PNG" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shapelibrary\ORMShapes\Asymmetric.PNG" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shapelibrary\ORMShapes\asymmetric_intransitive.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shapelibrary\ORMShapes\Asymmetric+Intransative.PNG" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shapelibrary\ORMShapes\asymmetric1.PNG" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shapelibrary\ORMShapes\deontic_acyclic.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shapelibrary\ORMShapes\deontic_acyclic_intransitive.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shapelibrary\ORMShapes\deontic_antisymetric.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shapelibrary\ORMShapes\deontic_antisymmetric.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shapelibrary\ORMShapes\deontic_asymmetric.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shapelibrary\ORMShapes\deontic_asymmetric_intransitive.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shapelibrary\ORMShapes\deontic_equality.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shapelibrary\ORMShapes\deontic_exclusion.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shapelibrary\ORMShapes\deontic_exclusiveOr.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shapelibrary\ORMShapes\deontic_external_preferred_uniqueness.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shapelibrary\ORMShapes\deontic_external_uniqueness.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shapelibrary\ORMShapes\deontic_inclusive_or.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shapelibrary\ORMShapes\deontic_intransitive.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shapelibrary\ORMShapes\deontic_irreflexive.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shapelibrary\ORMShapes\deontic_purely_reflexive.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shapelibrary\ORMShapes\deontic_subset_constraint.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shapelibrary\ORMShapes\deontic_symetric_intransative.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shapelibrary\ORMShapes\deontic_symmetric.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shapelibrary\ORMShapes\deontic_symmetric_intransitive.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shapelibrary\ORMShapes\deontic_symmetric_irreflexive.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shapelibrary\ORMShapes\deontic_uniqueness.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shapelibrary\ORMShapes\deontic_value_comparison_greater.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shapelibrary\ORMShapes\deontic_value_comparison_greater_equal.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shapelibrary\ORMShapes\deontic_value_comparrison_less.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shapelibrary\ORMShapes\deontic_value_comparrison_less_than.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shapelibrary\ORMShapes\equality.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shapelibrary\ORMShapes\exclusion.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shapelibrary\ORMShapes\exclusiveOr.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shapelibrary\ORMShapes\exlusiveOR.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shapelibrary\ORMShapes\externalUniqueness.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shapelibrary\ORMShapes\externalUniqueness.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shapelibrary\ORMShapes\frequency_ge.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shapelibrary\ORMShapes\inclusive_or.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shapelibrary\ORMShapes\inclusive_or.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shapelibrary\ORMShapes\intransative.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shapelibrary\ORMShapes\intransitive.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shapelibrary\ORMShapes\irreflexive.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shapelibrary\ORMShapes\l.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shapelibrary\ORMShapes\m.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shapelibrary\ORMShapes\mandatory.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shapelibrary\ORMShapes\model_dictionary.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shapelibrary\ORMShapes\model_dictionary_entity_type.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shapelibrary\ORMShapes\model_dictionary_value_type.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shapelibrary\ORMShapes\preferred_uniqueness.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shapelibrary\ORMShapes\preferred_uniqueness_p.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shapelibrary\ORMShapes\purely_reflexive.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shapelibrary\ORMShapes\subset.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shapelibrary\ORMShapes\symmetric.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shapelibrary\ORMShapes\symmetric_intransitive.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shapelibrary\ORMShapes\symmetric_irreflexive.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shapelibrary\ORMShapes\symmetric+intransative.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shapelibrary\ORMShapes\symmetric+irreflixive.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shapelibrary\ORMShapes\uniqueness.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shapelibrary\ORMShapes\uniqueness_u.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shapelibrary\ORMShapes\value_comparison_greater.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shapelibrary\ORMShapes\value_comparison_greater_equal.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shapelibrary\ORMShapes\value_comparrison_less.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shapelibrary\ORMShapes\value_comparrison_less_than.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Images\MenuImages\dictionary16x16.png" />
+    <None Include="Images\MenuImages\ErrorList.png" />
+    <None Include="Images\MenuImages\FactTables16x16.png" />
+    <None Include="Images\MenuImages\FactTypeReading16x16.png" />
+    <None Include="Images\MenuImages\Properties216x16.jpg" />
+    <None Include="Images\MenuImages\Toolbox16x16B&amp;W.jpg" />
+    <None Include="Images\MenuImages\HelpTips16x16.png" />
+    <None Include="Images\MenuImages\Grid.jpg" />
+    <None Include="Images\MenuImages\Layout16x16.png" />
+    <None Include="Images\MenuImages\Camera16x16.jpg" />
+    <None Include="Images\MenuImages\FactTypeObjectified16x16.png" />
+    <None Include="Images\MenuImages\FactTypeRemoveUniquenessConstraints16x16.png" />
+    <None Include="My Project\DataSources\Boston.ERD.Attribute.datasource" />
+    <None Include="Shapelibrary\ORM.shl" />
+    <None Include="Images\Icons\orm_icon.ico" />
+    <None Include="Images\Icons\SubtypeConnectorCursor.ico" />
+    <None Include="Images\CMML\actor.PNG" />
+    <None Include="Images\BarkerER\1.png" />
+    <None Include="Images\BarkerER\2.png" />
+    <None Include="Images\BarkerER\3.png" />
+    <None Include="Images\BarkerER\4.png" />
+    <None Include="Images\BarkerER\5.png" />
+    <None Include="Images\BarkerER\6.png" />
+    <None Include="Images\BarkerER\7.png" />
+    <None Include="Images\BarkerER\8.png" />
+    <None Include="Images\BarkerER\9.png" />
+    <None Include="Images\BarkerER\10.png" />
+    <None Include="Images\BarkerER\11.png" />
+    <None Include="Images\BarkerER\12.png" />
+    <None Include="Images\BarkerER\13.png" />
+    <None Include="Images\BarkerER\14.png" />
+    <None Include="Images\BarkerER\15.png" />
+    <None Include="Images\BarkerER\16.png" />
+    <None Include="Images\BarkerER\17.png" />
+    <None Include="Images\BarkerER\18.png" />
+    <None Include="Images\BarkerER\19.png" />
+    <None Include="Images\BarkerER\20.png" />
+    <None Include="Images\BarkerER\21.png" />
+    <None Include="Images\BarkerER\22.png" />
+    <None Include="Images\BarkerER\23.png" />
+    <None Include="Images\BarkerER\24.png" />
+    <None Include="Images\BarkerER\25.png" />
+    <None Include="Images\BarkerER\26.png" />
+    <None Include="Images\BarkerER\27.png" />
+    <None Include="Images\BarkerER\28.png" />
+    <None Include="Images\BarkerER\29.png" />
+    <None Include="Images\BarkerER\30.png" />
+    <None Include="Images\BarkerER\31.png" />
+    <None Include="Images\BarkerER\32.png" />
+    <None Include="Images\BarkerER\Attribute.png" />
+    <None Include="Images\BarkerER\AttributeMandatory.png" />
+    <None Include="Images\BarkerER\AttributeOptional.png" />
+    <None Include="Images\BarkerER\AttributePartOfPrimaryKey.png" />
+    <None Include="Images\BarkerER\AttributePrimaryKey.png" />
+    <None Include="Images\BarkerER\AttributeSelfReferenceManyToOne.png" />
+    <None Include="Images\BarkerER\AttributeSelfReferenceOneToOne.png" />
+    <None Include="Images\BarkerER\DefaultGrayed.png" />
+    <None Include="Images\BarkerER\DefaultGrayedTransparent.png" />
+    <None Include="Images\BarkerER\DefaultGrayedTransparentAll.png" />
+    <None Include="Images\BarkerER\ManyToOne.png" />
+    <None Include="Images\BarkerER\OneToOne.png" />
+    <None Include="Images\MenuImages\About16x16.jpg" />
+    <None Include="Images\MenuImages\backup16x16.jpg" />
+    <Content Include="Boston.ico" />
+    <Content Include="ClassesFBMInterfaceHost\ReadMe.txt" />
+    <Content Include="ClassesParserVA\VAQLProcessorReflection\ReadMe.txt" />
+    <None Include="Images\Icons\SubtypeConnectorSmallCursor.ico" />
+    <Content Include="Images\MenuImages\Camera16x16.jpg" />
+    <None Include="Images\MenuImages\delete16x16.png" />
+    <None Include="Images\MenuImages\deleteround16x16.png" />
+    <None Include="Images\MenuImages\Copy16x16.png" />
+    <None Include="Images\MenuImages\core16x16.jpg" />
+    <None Include="Images\MenuImages\Database16x16.jpg" />
+    <None Include="Images\MenuImages\DatabaseAdd16x16.jpg" />
+    <None Include="Images\MenuImages\Cloud216x16.jpg" />
+    <None Include="Images\MenuImages\Configuration16x16.jpg" />
+    <None Include="Images\MenuImages\CQL16x16.png" />
+    <Content Include="Images\MenuImages\dictionary16x16.png" />
+    <None Include="Images\MenuImages\edit16x16.jpg" />
+    <None Include="Images\MenuImages\empty16x16.jpg" />
+    <None Include="Images\MenuImages\email16x16.jpg" />
+    <None Include="Images\MenuImages\Down16x16.jpg" />
+    <None Include="Images\MenuImages\ERD16x16.png" />
+    <Content Include="Images\MenuImages\ErrorList.png" />
+    <None Include="Images\MenuImages\Export16x16.png" />
+    <Content Include="Images\MenuImages\FactTables16x16.png" />
+    <Content Include="Images\MenuImages\FactTypeObjectified16x16.png" />
+    <Content Include="Images\MenuImages\FactTypeReading16x16.png" />
+    <Content Include="Images\MenuImages\FactTypeRemoveUniquenessConstraints16x16.png" />
+    <None Include="Images\MenuImages\Glossary16x16.png" />
+    <Content Include="Images\MenuImages\Grid.jpg" />
+    <None Include="Images\MenuImages\Help16x16.png" />
+    <None Include="Images\MenuImages\Group16x16.png" />
+    <Content Include="Images\MenuImages\HelpTips16x16.png" />
+    <None Include="Images\MenuImages\Import16x16.png" />
+    <None Include="Images\MenuImages\ImportExport16x16.png" />
+    <None Include="Images\MenuImages\Home16x16.jpg" />
+    <Content Include="Images\MenuImages\Layout16x16.png" />
+    <None Include="Images\MenuImages\PageAdd16x16.png" />
+    <None Include="Images\MenuImages\Paste16x16.jpg" />
+    <None Include="Images\MenuImages\ORM16x16.png" />
+    <None Include="Images\MenuImages\PageAddPGS16x16.png" />
+    <None Include="Images\MenuImages\PagePGS16x16.png" />
+    <None Include="Images\MenuImages\LogFile16x16.png" />
+    <None Include="Images\MenuImages\Print16x16.png" />
+    <None Include="Images\MenuImages\PrintPreview16x16.jpg" />
+    <None Include="Images\MenuImages\profile16x16.png" />
+    <None Include="Images\MenuImages\Notification16x16.png" />
+    <None Include="Images\MenuImages\PGS16x16.png" />
+    <None Include="Images\MenuImages\Morphing16x16.png" />
+    <None Include="Images\MenuImages\ModelAdd16x16.jpg" />
+    <Content Include="Images\MenuImages\Properties216x16.jpg" />
+    <None Include="Images\MenuImages\Remove16x16.png" />
+    <None Include="Images\MenuImages\RainCloudRed16x16.png" />
+    <None Include="Images\MenuImages\Redo16x16.jpg" />
+    <None Include="Images\MenuImages\SelectAll.jpg" />
+    <None Include="Images\MenuImages\StarIcon16x16.png" />
+    <None Include="Images\MenuImages\Spyglass16x16.png" />
+    <None Include="Images\MenuImages\StateTransitionDiagram-16x16.png" />
+    <Content Include="Images\MenuImages\Toolbox16x16B&amp;W.jpg" />
+    <None Include="Images\MenuImages\XML16x16.png" />
+    <None Include="Images\Splash\Shutterstock-144487549.jpg" />
+    <None Include="Images\Splash\Shutterstock-87883783.jpg" />
+    <None Include="Images\Splash\Shutterstock-218779708.jpg" />
+    <None Include="Images\Splash\Shutterstock-267251567.jpg" />
+    <None Include="Images\Splash\shutterstock_218779708.jpg" />
+    <None Include="Images\MenuImages\Undo16x16.jpg" />
+    <None Include="Images\MenuImages\Up16x16.png" />
+    <Content Include="Images\Splash\Splash.png" />
+    <Content Include="Images\Splash\Splash.png" />
+    <None Include="Images\Viev\VievLogoMedium.jpg" />
+    <Content Include="ORM.ico" />
+    <Content Include="Shapelibrary\ORMShapes\Acyclic+Intransative.PNG" />
+    <Content Include="Shapelibrary\ORMShapes\acyclic.png" />
+    <Content Include="Shapelibrary\ORMShapes\acyclic_intransitive.png" />
+    <Content Include="Shapelibrary\ORMShapes\Antisymmetric.PNG" />
+    <Content Include="Shapelibrary\ORMShapes\Asymmetric+Intransative.PNG" />
+    <Content Include="Shapelibrary\ORMShapes\Asymmetric.PNG" />
+    <Content Include="Shapelibrary\ORMShapes\asymmetric1.PNG" />
+    <Content Include="Shapelibrary\ORMShapes\asymmetric_intransitive.png" />
+    <None Include="Shapelibrary\ORMShapes\Blank.png" />
+    <Content Include="Shapelibrary\ORMShapes\deontic_acyclic.png" />
+    <Content Include="Shapelibrary\ORMShapes\deontic_acyclic_intransitive.png" />
+    <Content Include="Shapelibrary\ORMShapes\deontic_antisymetric.png" />
+    <Content Include="Shapelibrary\ORMShapes\deontic_antisymmetric.png" />
+    <Content Include="Shapelibrary\ORMShapes\deontic_asymmetric.png" />
+    <Content Include="Shapelibrary\ORMShapes\deontic_asymmetric_intransitive.png" />
+    <Content Include="Shapelibrary\ORMShapes\deontic_equality.png" />
+    <Content Include="Shapelibrary\ORMShapes\deontic_exclusion.png" />
+    <Content Include="Shapelibrary\ORMShapes\deontic_exclusiveOr.png" />
+    <Content Include="Shapelibrary\ORMShapes\deontic_external_preferred_uniqueness.png" />
+    <Content Include="Shapelibrary\ORMShapes\deontic_external_uniqueness.bmp" />
+    <Content Include="Shapelibrary\ORMShapes\deontic_inclusive_or.png" />
+    <Content Include="Shapelibrary\ORMShapes\deontic_intransitive.png" />
+    <Content Include="Shapelibrary\ORMShapes\deontic_irreflexive.png" />
+    <Content Include="Shapelibrary\ORMShapes\deontic_purely_reflexive.png" />
+    <Content Include="Shapelibrary\ORMShapes\deontic_subset_constraint.png" />
+    <Content Include="Shapelibrary\ORMShapes\deontic_symetric_intransative.png" />
+    <Content Include="Shapelibrary\ORMShapes\deontic_symmetric.png" />
+    <Content Include="Shapelibrary\ORMShapes\deontic_symmetric_intransitive.png" />
+    <Content Include="Shapelibrary\ORMShapes\deontic_symmetric_irreflexive.png" />
+    <Content Include="Shapelibrary\ORMShapes\deontic_uniqueness.png" />
+    <Content Include="Shapelibrary\ORMShapes\deontic_value_comparison_greater.png" />
+    <Content Include="Shapelibrary\ORMShapes\deontic_value_comparison_greater_equal.png" />
+    <Content Include="Shapelibrary\ORMShapes\deontic_value_comparrison_less.bmp" />
+    <Content Include="Shapelibrary\ORMShapes\deontic_value_comparrison_less_than.bmp" />
+    <None Include="Shapelibrary\ORMShapes\EntityType.png" />
+    <Content Include="Shapelibrary\ORMShapes\equality.png" />
+    <Content Include="Shapelibrary\ORMShapes\exclusion.png" />
+    <Content Include="Shapelibrary\ORMShapes\exclusiveOr.png" />
+    <Content Include="Shapelibrary\ORMShapes\exlusiveOR.bmp" />
+    <Content Include="Shapelibrary\ORMShapes\externalUniqueness.bmp" />
+    <Content Include="Shapelibrary\ORMShapes\externalUniqueness.png" />
+    <Content Include="Shapelibrary\ORMShapes\frequency_ge.png" />
+    <Content Include="Shapelibrary\ORMShapes\inclusive_or.bmp" />
+    <Content Include="Shapelibrary\ORMShapes\inclusive_or.png" />
+    <Content Include="Shapelibrary\ORMShapes\intransative.png" />
+    <Content Include="Shapelibrary\ORMShapes\intransitive.png" />
+    <Content Include="Shapelibrary\ORMShapes\irreflexive.png" />
+    <Content Include="Shapelibrary\ORMShapes\l.bmp" />
+    <Content Include="Shapelibrary\ORMShapes\m.bmp" />
+    <Content Include="Shapelibrary\ORMShapes\mandatory.png" />
+    <None Include="Shapelibrary\ORMShapes\ModelNote.png" />
+    <None Include="Shapelibrary\ORMShapes\ModelNoteConnector.png" />
+    <Content Include="Shapelibrary\ORMShapes\model_dictionary.png" />
+    <Content Include="Shapelibrary\ORMShapes\model_dictionary_entity_type.png" />
+    <Content Include="Shapelibrary\ORMShapes\model_dictionary_value_type.png" />
+    <Content Include="Shapelibrary\ORMShapes\preferred_uniqueness.png" />
+    <Content Include="Shapelibrary\ORMShapes\preferred_uniqueness_p.png" />
+    <Content Include="Shapelibrary\ORMShapes\purely_reflexive.png" />
+    <Content Include="Shapelibrary\ORMShapes\subset.png" />
+    <None Include="Shapelibrary\ORMShapes\SubtypeConnector.png" />
+    <Content Include="Shapelibrary\ORMShapes\symmetric+intransative.png" />
+    <Content Include="Shapelibrary\ORMShapes\symmetric+irreflixive.png" />
+    <Content Include="Shapelibrary\ORMShapes\symmetric.png" />
+    <Content Include="Shapelibrary\ORMShapes\symmetric_intransitive.png" />
+    <Content Include="Shapelibrary\ORMShapes\symmetric_irreflexive.png" />
+    <Content Include="Shapelibrary\ORMShapes\uniqueness.png" />
+    <Content Include="Shapelibrary\ORMShapes\uniqueness_u.png" />
+    <None Include="Shapelibrary\ORMShapes\ValueType.png" />
+    <Content Include="Shapelibrary\ORMShapes\value_comparison_greater.png" />
+    <Content Include="Shapelibrary\ORMShapes\value_comparison_greater_equal.png" />
+    <Content Include="Shapelibrary\ORMShapes\value_comparrison_less.bmp" />
+    <Content Include="Shapelibrary\ORMShapes\value_comparrison_less_than.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.2.0">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 2.0 %28x86%29</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.0">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.0 %28x86%29</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 3.1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

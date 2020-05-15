@@ -1,0 +1,11 @@
+D:\Viev\02-Marketing\01-Product\01-Products\Boston\Versions\SVN\Boston\ClassesLANGUAGEORMGeneric\FBMGeneric\bin\Debug\Viev.FBM.dll
+D:\Viev\02-Marketing\01-Product\01-Products\Boston\Versions\SVN\Boston\ClassesLANGUAGEORMGeneric\FBMGeneric\bin\Debug\Viev.FBM.pdb
+D:\Viev\02-Marketing\01-Product\01-Products\Boston\Versions\SVN\Boston\ClassesLANGUAGEORMGeneric\FBMGeneric\bin\Debug\Viev.FBM.xml
+D:\Viev\02-Marketing\01-Product\01-Products\Boston\Versions\SVN\Boston\ClassesLANGUAGEORMGeneric\FBMGeneric\bin\Debug\DynamicTypeDescriptor.dll
+D:\Viev\02-Marketing\01-Product\01-Products\Boston\Versions\SVN\Boston\ClassesLANGUAGEORMGeneric\FBMGeneric\bin\Debug\VievLibrary.dll
+D:\Viev\02-Marketing\01-Product\01-Products\Boston\Versions\SVN\Boston\ClassesLANGUAGEORMGeneric\FBMGeneric\bin\Debug\VievLogger.dll
+D:\Viev\02-Marketing\01-Product\01-Products\Boston\Versions\SVN\Boston\ClassesLANGUAGEORMGeneric\FBMGeneric\obj\Debug\Viev.Resources.resources
+D:\Viev\02-Marketing\01-Product\01-Products\Boston\Versions\SVN\Boston\ClassesLANGUAGEORMGeneric\FBMGeneric\obj\Debug\Viev.FBM.vbproj.GenerateResource.Cache
+D:\Viev\02-Marketing\01-Product\01-Products\Boston\Versions\SVN\Boston\ClassesLANGUAGEORMGeneric\FBMGeneric\obj\Debug\Viev.FBM.dll
+D:\Viev\02-Marketing\01-Product\01-Products\Boston\Versions\SVN\Boston\ClassesLANGUAGEORMGeneric\FBMGeneric\obj\Debug\Viev.FBM.xml
+D:\Viev\02-Marketing\01-Product\01-Products\Boston\Versions\SVN\Boston\ClassesLANGUAGEORMGeneric\FBMGeneric\obj\Debug\Viev.FBM.pdb

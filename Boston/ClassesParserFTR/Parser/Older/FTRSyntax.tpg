@@ -1,0 +1,24 @@
+// 
+
+<% @TinyPG Language="vb"%>
+<% @TextHighlighter Generate="true" %>
+
+EOF           -> @"^$";
+[Color(153, 76, 0)] FOLLOWINGREADINGTEXT -> @"[a-z]+$";
+[Color(53, 00, 00)] FRONTREADINGTEXT -> @"(?>[a-z]+)[^\-]";
+[Color(76, 153, 0)]	MODELELEMENTNAME -> @"[A-Z][aA-zZ]+";
+[Color(153, 0, 153)]	PREDICATEPART	-> @"(?>[a-z]+)[^\-][^\s\[a-z]]";
+PREDICATESPACE -> @"[\s]+";
+[Color(153, 76, 0)] PREBOUNDREADINGTEXT -> @"[a-z]+\-";
+[Color(153, 76, 0)] POSTBOUNDREADINGTEXT -> @"\-[a-z]+";
+
+//Statements/Clauses
+FACTREADING	   -> FRONTREADINGTEXT? (MODELELEMENT PREDICATECLAUSE?)*;
+MODELELEMENT    -> PREBOUNDREADINGTEXT? MODELELEMENTNAME POSTBOUNDREADINGTEXT?;
+PREDICATECLAUSE ->  PREDICATEPART PREDICATEPART*;
+
+[Skip] WHITESPACE    -> @"\s+";
+
+Start 		-> FACTREADING
+                 EOF;
+

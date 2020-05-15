@@ -1,0 +1,174 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- saved from url=(0029)http://www.helpandmanual.com/ -->
+<head><script type="text/javascript" src="helpman_topicinit.js"></script>
+<!-- Redirect browser to frame page if page is not in the content frame. -->
+<script type="text/javascript">
+<!--
+if (top.location.search.lastIndexOf("toc=0")<=0) {
+  if (top.frames.length==0) { top.location.href="index.html?the_metamodel_database_tables.htm"; }
+  else { parent.quicksync('a5.2'); }
+}
+//-->
+</script>
+   <title>The MetaModel Database Tables</title>
+   <meta name="generator" content="Help &amp; Manual" />
+   <meta name="keywords" content="" />
+   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+   <meta http-equiv="Content-Style-Type" content="text/css" />
+   <link type="text/css" href="default.css" rel="stylesheet" />
+</head>
+<body style="margin: 0px 0px 0px 0px; background: #FFFFFF;">
+<div id="hmpopupDiv" style="visibility:hidden; position:absolute; z-index:1000; "></div>
+
+
+<table width="100%" border="0" cellspacing="0" cellpadding="5" bgcolor="#649CCC">
+  <tr valign="middle">
+    <td align="left">
+      <p class="p_Heading1"><span class="f_Heading1">The MetaModel Database Tables</span></p>
+
+    </td>
+    <td align="right">
+     <span style="font-size: 9pt">
+     <a href="introduction.htm">Top</a>&nbsp;
+     <a href="backing_up_the_orm_studio_data.htm">Previous</a>&nbsp;
+     <a href="the_metamodelconcept_table.htm">Next</a>
+     </span>
+    </td>
+  </tr>
+</table>
+
+
+<!-- Placeholder for topic body. -->
+<table width="100%" border="0" cellspacing="0" cellpadding="5"><tr valign="top"><td align="left">
+<p>The Boston MetaModel consists of 19 tables that store Models and MetaModels. The following is a list of the Boston MetaModel tables in the database:</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<div style="text-align: left; text-indent: 0px; padding: 0px 0px 0px 0px; margin: 0px 0px 0px 0px;"><table cellspacing="0" cellpadding="3" border="0" style="border: none; border-spacing:0px;">
+<tr style="text-align:left;vertical-align:top;">
+<td valign="top" width="212" style="width:212px;"><p style="border-color: #000000; border-style: solid; border-width: 1px; background: #c0c0c0;">Table Name</p>
+</td>
+<td valign="top" width="1143" style="width:1143px;"><p style="text-align: center; border-color: #000000; border-style: solid; border-width: 1px; background: #c0c0c0;">Description</p>
+</td>
+</tr>
+<tr style="text-align:left;vertical-align:top;">
+<td valign="top" width="212" style="width:212px;"><p>MetaModelConcept</p>
+</td>
+<td valign="top" width="1143" style="width:1143px;"><p>Stores the set of Concepts as utilised in Models in Boston.</p>
+</td>
+</tr>
+<tr style="text-align:left;vertical-align:top;">
+<td valign="top" width="212" style="width:212px;"><p>MetaModelEntityType</p>
+</td>
+<td valign="top" width="1143" style="width:1143px;"><p>Stores the set of Entity Types by Model</p>
+</td>
+</tr>
+<tr style="text-align:left;vertical-align:top;">
+<td valign="top" width="212" style="width:212px;"><p>MetaModelFact</p>
+</td>
+<td valign="top" width="1143" style="width:1143px;"><p>Stores the set of Facts by Model</p>
+</td>
+</tr>
+<tr style="text-align:left;vertical-align:top;">
+<td valign="top" width="212" style="width:212px;"><p>MetaModelFactData</p>
+</td>
+<td valign="top" width="1143" style="width:1143px;"><p>Stores the set of Fact Data by Fact, by Model</p>
+</td>
+</tr>
+<tr style="text-align:left;vertical-align:top;">
+<td valign="top" width="212" style="width:212px;"><p>MetaModelFactType</p>
+</td>
+<td valign="top" width="1143" style="width:1143px;"><p>Stores the set of Fact Types by Model</p>
+</td>
+</tr>
+<tr style="text-align:left;vertical-align:top;">
+<td valign="top" width="212" style="width:212px;"><p>MetaModelFactTypeReading</p>
+</td>
+<td valign="top" width="1143" style="width:1143px;"><p>Stores the set of Fact Type Readings by Fact Type, by Model</p>
+</td>
+</tr>
+<tr style="text-align:left;vertical-align:top;">
+<td valign="top" width="212" style="width:212px;"><p>MetaModelModel</p>
+</td>
+<td valign="top" width="1143" style="width:1143px;"><p>Stores the set of Models in Boston</p>
+</td>
+</tr>
+<tr style="text-align:left;vertical-align:top;">
+<td valign="top" width="212" style="width:212px;"><p>MetaModelModelDictionary</p>
+</td>
+<td valign="top" width="1143" style="width:1143px;"><p>Stores the set of Concepts utilised in a Model</p>
+</td>
+</tr>
+<tr style="text-align:left;vertical-align:top;">
+<td valign="top" width="212" style="width:212px;"><p>MetaModelModelNote</p>
+</td>
+<td valign="top" width="1143" style="width:1143px;"><p>Stores the set of Model Notes by Model</p>
+</td>
+</tr>
+<tr style="text-align:left;vertical-align:top;">
+<td valign="top" width="212" style="width:212px;"><p>MetaModelParentEntityType</p>
+</td>
+<td valign="top" width="1143" style="width:1143px;"><p>Stores the set of Supertypes by Entity Type, by Model</p>
+</td>
+</tr>
+<tr style="text-align:left;vertical-align:top;">
+<td valign="top" width="212" style="width:212px;"><p>MetaModelPredicatePart</p>
+</td>
+<td valign="top" width="1143" style="width:1143px;"><p>Stores the set of Predicate Parts of Fact Type Readings by Model</p>
+</td>
+</tr>
+<tr style="text-align:left;vertical-align:top;">
+<td valign="top" width="212" style="width:212px;"><p>MetaModelRole</p>
+</td>
+<td valign="top" width="1143" style="width:1143px;"><p>Stores the set of Roles by Fact Type, by Model</p>
+</td>
+</tr>
+<tr style="text-align:left;vertical-align:top;">
+<td valign="top" width="212" style="width:212px;"><p>MetaModelRoleConstraint</p>
+</td>
+<td valign="top" width="1143" style="width:1143px;"><p>Stores the set of Role Constraints by Model</p>
+</td>
+</tr>
+<tr style="text-align:left;vertical-align:top;">
+<td valign="top" width="212" style="width:212px;"><p>MetaModelRoleConstraintRole</p>
+</td>
+<td valign="top" width="1143" style="width:1143px;"><p>Stores the set of Roles referenced by a Role Constraint, by Model</p>
+</td>
+</tr>
+<tr style="text-align:left;vertical-align:top;">
+<td valign="top" width="212" style="width:212px;"><p>MetaModelValueType</p>
+</td>
+<td valign="top" width="1143" style="width:1143px;"><p>Stores the set of Value Types by Model</p>
+</td>
+</tr>
+<tr style="text-align:left;vertical-align:top;">
+<td valign="top" width="212" style="width:212px;"><p>MetaModelValueTypeConstraint</p>
+</td>
+<td valign="top" width="1143" style="width:1143px;"><p>Stores the set of Value Constraints for a Value Type, by Model</p>
+</td>
+</tr>
+<tr style="text-align:left;vertical-align:top;">
+<td valign="top" width="212" style="width:212px;"><p>ModelConceptInstance</p>
+</td>
+<td valign="top" width="1143" style="width:1143px;"><p>Stores the Instance data for Concepts by Page, by Model</p>
+</td>
+</tr>
+<tr style="text-align:left;vertical-align:top;">
+<td valign="top" width="212" style="width:212px;"><p>ModelLanguage</p>
+</td>
+<td valign="top" width="1143" style="width:1143px;"><p>Stores the set of Languages supported by Boston</p>
+</td>
+</tr>
+<tr style="text-align:left;vertical-align:top;">
+<td valign="top" width="212" style="width:212px;"><p>ModelPage</p>
+</td>
+<td valign="top" width="1143" style="width:1143px;"><p>Stores the set of Pages by Model</p>
+</td>
+</tr>
+</table>
+</div>
+
+</td></tr></table>
+
+</body>
+</html>

@@ -1,0 +1,9 @@
+CREATE TABLE [ClientServerProject] (
+	[Id] TEXT(40) WITH COMPRESSION,
+	[ProjectName] TEXT(60) WITH COMPRESSION,
+	[CreatedByUserId] TEXT(40) WITH COMPRESSION,
+	CONSTRAINT [PrimaryKey] PRIMARY KEY ([Id])
+);
+ALTER TABLE [ClientServerProject] DENY ZERO LENGTH [Id];
+ALTER TABLE [ClientServerProject] DENY ZERO LENGTH [ProjectName];
+ALTER TABLE [ClientServerProject] DENY ZERO LENGTH [CreatedByUserId];

@@ -1,0 +1,76 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- saved from url=(0029)http://www.helpandmanual.com/ -->
+<head><script type="text/javascript" src="helpman_topicinit.js"></script>
+<!-- Redirect browser to frame page if page is not in the content frame. -->
+<script type="text/javascript">
+<!--
+if (top.location.search.lastIndexOf("toc=0")<=0) {
+  if (top.frames.length==0) { top.location.href="index.html?model_error_126.htm"; }
+  else { parent.quicksync('a3.8.1.5'); }
+}
+//-->
+</script>
+   <title>Model Error 126</title>
+   <meta name="generator" content="Help &amp; Manual" />
+   <meta name="keywords" content="" />
+   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+   <meta http-equiv="Content-Style-Type" content="text/css" />
+   <link type="text/css" href="default.css" rel="stylesheet" />
+</head>
+<body style="margin: 0px 0px 0px 0px; background: #FFFFFF;">
+<div id="hmpopupDiv" style="visibility:hidden; position:absolute; z-index:1000; "></div>
+
+
+<table width="100%" border="0" cellspacing="0" cellpadding="5" bgcolor="#649CCC">
+  <tr valign="middle">
+    <td align="left">
+      <p class="p_Heading1"><span class="f_Heading1">Model Error 126</span></p>
+
+    </td>
+    <td align="right">
+     <span style="font-size: 9pt">
+     <a href="introduction.htm">Top</a>&nbsp;
+     <a href="model_error_115.htm">Previous</a>&nbsp;
+     <a href="model_error_127.htm">Next</a>
+     </span>
+    </td>
+  </tr>
+</table>
+
+
+<!-- Placeholder for topic body. -->
+<table width="100%" border="0" cellspacing="0" cellpadding="5"><tr valign="top"><td align="left">
+<p class="p_Heading1"><span class="f_Heading1">Role Constraint has too few Role Sequences Error</span></p>
+<p>&nbsp;</p>
+<p>The Role Constraint associated with the Model Error has to few Role Sequences / Role Constraint Arguments.</p>
+<p>&nbsp;</p>
+<p>This Model Error captures violations for multiple types of Role Constraints.</p>
+<p>&nbsp;</p>
+<p class="p_Heading2"><span class="f_Heading2">Ring Constraints</span></p>
+<p>&nbsp;</p>
+<p>Each Ring Constraint must have two different Roles of the same Fact Type associated (linked to) the constraint, and where that Fact Type has two Roles played by the same Object Type.</p>
+<p>If the Model Error is for a Ring Constraint, then that Ring Constraint has zero or one Role linked to the Ring Constraint.</p>
+<p>&nbsp;</p>
+<p class="p_Heading2"><span class="f_Heading2">Other External Role Constraints</span></p>
+<p>&nbsp;</p>
+<p>Every External Role Constraint must have at least one associated Role.</p>
+<p>&nbsp;</p>
+<p class="p_Heading1"><span class="f_Heading1">Error Resolution</span></p>
+<p>&nbsp;</p>
+<p>To resolve this error do the following:</p>
+<p>&nbsp;</p>
+<p>1. Make sure that the Role Constraint associated with the Model Error has the appropriate number of associated Roles for the Role Constraint and that each Role Constraint Argument of the Role Constraint has the required number of associated Roles.</p>
+<p>&nbsp;</p>
+<p>See the chapter: <a href="managing_ring_constraints.htm">Managing Ring Constraints</a></p>
+<p>&nbsp;</p>
+<p class="p_Heading1"><span class="f_Heading1">Example</span></p>
+<p>&nbsp;</p>
+<p>The following ORM Diagram shows a Ring Constraint with only one associated Role, and where 2 associated Roles is the required number of associated Roles for a Ring Constraint.</p>
+<p>&nbsp;</p>
+<p><img src="ringconstraintwithtoofewrolesequences.png" width="131" height="198" border="0" alt="RingConstraintWithTooFewRoleSequences"></p>
+
+</td></tr></table>
+
+</body>
+</html>

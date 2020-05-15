@@ -1,0 +1,21 @@
+Steps
+=====
+1. For each of the following files, append the prefix "tFTR"
+
+	Parser.vb		becomes tFTRParser.vb
+	ParseTree.vb		becomes tFTRParseTree.vb
+	Scanner.vb		becomes tFTRScanner.vb
+	TextHighlighter.vb	becomes tFTRTextHighlighter.vb
+
+2. Move the three files (above) to \Boston\Versions\SVN\Boston\ClassesParserFTR\TinyPG
+	(write over existing files)
+
+3. If Boston is open in Visual Studio do the following:
+
+	Click [Yes to All] to the message box reading: "This file has been modified outside the source editor. Do you want to reload it?"
+
+4. Remove the unused variables that appear in the ErrorList of the Project (for completeness)
+
+
+
+

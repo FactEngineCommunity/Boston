@@ -1,0 +1,8 @@
+D:\Viev\02-Marketing\01-Product\01-Products\Boston\Versions\SVN\Boston\ClassesFBMGenericModules\FBMGenericModules\bin\Debug\Viev.FBM.Generic.Modules.dll
+D:\Viev\02-Marketing\01-Product\01-Products\Boston\Versions\SVN\Boston\ClassesFBMGenericModules\FBMGenericModules\bin\Debug\Viev.FBM.Generic.Modules.pdb
+D:\Viev\02-Marketing\01-Product\01-Products\Boston\Versions\SVN\Boston\ClassesFBMGenericModules\FBMGenericModules\bin\Debug\Viev.FBM.Generic.Modules.xml
+D:\Viev\02-Marketing\01-Product\01-Products\Boston\Versions\SVN\Boston\ClassesFBMGenericModules\FBMGenericModules\obj\Debug\Viev.FBM.Generic.Resources.resources
+D:\Viev\02-Marketing\01-Product\01-Products\Boston\Versions\SVN\Boston\ClassesFBMGenericModules\FBMGenericModules\obj\Debug\FBMGenericModules.vbproj.GenerateResource.Cache
+D:\Viev\02-Marketing\01-Product\01-Products\Boston\Versions\SVN\Boston\ClassesFBMGenericModules\FBMGenericModules\obj\Debug\Viev.FBM.Generic.Modules.dll
+D:\Viev\02-Marketing\01-Product\01-Products\Boston\Versions\SVN\Boston\ClassesFBMGenericModules\FBMGenericModules\obj\Debug\Viev.FBM.Generic.Modules.xml
+D:\Viev\02-Marketing\01-Product\01-Products\Boston\Versions\SVN\Boston\ClassesFBMGenericModules\FBMGenericModules\obj\Debug\Viev.FBM.Generic.Modules.pdb

@@ -1,0 +1,7 @@
+CREATE TABLE [ClientServerGroupUser] (
+	[GroupId] TEXT(40) WITH COMPRESSION,
+	[UserId] TEXT(40) WITH COMPRESSION,
+	CONSTRAINT [PrimaryKey] PRIMARY KEY ([GroupId], [UserId])
+);
+ALTER TABLE [ClientServerGroupUser] DENY ZERO LENGTH [GroupId];
+ALTER TABLE [ClientServerGroupUser] DENY ZERO LENGTH [UserId];

@@ -1,0 +1,39 @@
+﻿<?xml version="1.0"?>
+<doc>
+<assembly>
+<name>
+VievFBMInterface
+</name>
+</assembly>
+<members>
+<member name="M:Viev.FBM.Interface.XMLModel.Model.Empty">
+	<summary>
+ Empties the Model
+ </summary>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.Interface.XMLModel.ORMModel.#ctor">
+	<summary>
+ Parameterless Constructor
+ </summary>
+	<remarks></remarks>
+</member><member name="P:Viev.FBM.Interface.My.Resources.Resources.ResourceManager">
+	<summary>
+  Returns the cached ResourceManager instance used by this class.
+</summary>
+</member><member name="P:Viev.FBM.Interface.My.Resources.Resources.Culture">
+	<summary>
+  Overrides the current thread's CurrentUICulture property for all
+  resource lookups using this strongly typed resource class.
+</summary>
+</member><member name="T:Viev.FBM.Interface.My.Resources.Resources">
+	<summary>
+  A strongly-typed resource class, for looking up localized strings, etc.
+</summary>
+</member><member name="F:Viev.FBM.Interface.XMLModel.JoinPath._RolePath">
+	<summary>
+ The set of Roles traversed in order to form the JoinPath.
+ </summary>
+	<remarks></remarks>
+</member>
+</members>
+</doc>

@@ -1,0 +1,134 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- saved from url=(0029)http://www.helpandmanual.com/ -->
+<head><script type="text/javascript" src="helpman_topicinit.js"></script>
+<!-- Redirect browser to frame page if page is not in the content frame. -->
+<script type="text/javascript">
+<!--
+if (top.location.search.lastIndexOf("toc=0")<=0) {
+  if (top.frames.length==0) { top.location.href="index.html?the_metamodelroleconstraint_ta.htm"; }
+  else { parent.quicksync('a5.2.13'); }
+}
+//-->
+</script>
+   <title>The MetaModelRoleConstraint table</title>
+   <meta name="generator" content="Help &amp; Manual" />
+   <meta name="keywords" content="Internal Uniqueness Constraint" />
+   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+   <meta http-equiv="Content-Style-Type" content="text/css" />
+   <link type="text/css" href="default.css" rel="stylesheet" />
+</head>
+<body style="margin: 0px 0px 0px 0px; background: #FFFFFF;">
+<div id="hmpopupDiv" style="visibility:hidden; position:absolute; z-index:1000; "></div>
+
+
+<table width="100%" border="0" cellspacing="0" cellpadding="5" bgcolor="#649CCC">
+  <tr valign="middle">
+    <td align="left">
+      <p class="p_Heading1"><span class="f_Heading1">The MetaModelRoleConstraint table</span></p>
+
+    </td>
+    <td align="right">
+     <span style="font-size: 9pt">
+     <a href="introduction.htm">Top</a>&nbsp;
+     <a href="the_metamodelrole_table.htm">Previous</a>&nbsp;
+     <a href="the_metamodelroleconstraintrol.htm">Next</a>
+     </span>
+    </td>
+  </tr>
+</table>
+
+
+<!-- Placeholder for topic body. -->
+<table width="100%" border="0" cellspacing="0" cellpadding="5"><tr valign="top"><td align="left">
+<p>The MetaModelRoleConstraint table stores details of Role Constraints.</p>
+<p>&nbsp;</p>
+<div style="text-align: left; text-indent: 0px; padding: 0px 0px 0px 0px; margin: 0px 0px 0px 0px;"><table cellspacing="0" cellpadding="3" border="0" style="border: none; border-spacing:0px; border-collapse: collapse;">
+<tr style="text-align:left;vertical-align:top;">
+<td valign="top" width="194" style="width:194px; border: solid 1px #000000;"><p style="text-align: center; border-color: #000000; border-style: solid; border-width: 1px; background: #c0c0c0;">Field</p>
+</td>
+<td valign="top" width="1155" style="width:1155px; border: solid 1px #000000;"><p style="border-color: #000000; border-style: solid; border-width: 1px; background: #c0c0c0;"> Description</p>
+</td>
+</tr>
+<tr style="text-align:left;vertical-align:top;">
+<td valign="top" width="194" style="width:194px; border: solid 1px #000000;"><p>ModelId</p>
+</td>
+<td valign="top" width="1155" style="width:1155px; border: solid 1px #000000;"><p>The unique identifier of the Model to which the Model Element belongs.</p>
+</td>
+</tr>
+<tr style="text-align:left;vertical-align:top;">
+<td valign="top" width="194" style="width:194px; border: solid 1px #000000;"><p>RoleConstraintId</p>
+</td>
+<td valign="top" width="1155" style="width:1155px; border: solid 1px #000000;"><p>The unique identifier of the Role Constraint.</p>
+</td>
+</tr>
+<tr style="text-align:left;vertical-align:top;">
+<td valign="top" width="194" style="width:194px; border: solid 1px #000000;"><p>RoleConstraintName</p>
+</td>
+<td valign="top" width="1155" style="width:1155px; border: solid 1px #000000;"><p>The name of the Role Constraint.</p>
+</td>
+</tr>
+<tr style="text-align:left;vertical-align:top;">
+<td valign="top" width="194" style="width:194px; border: solid 1px #000000;"><p>RoleConstraintType</p>
+</td>
+<td valign="top" width="1155" style="width:1155px; border: solid 1px #000000;"><p>The type of Role Constraint represented by the element.</p>
+</td>
+</tr>
+<tr style="text-align:left;vertical-align:top;">
+<td valign="top" width="194" style="width:194px; border: solid 1px #000000;"><p>RingConstraintType</p>
+</td>
+<td valign="top" width="1155" style="width:1155px; border: solid 1px #000000;"><p>If the RoleConstraintType attribute of the Role Constraint element has a value of ‘RingConstraint’ then this attribute has a value of the type of Ring Constraint.</p>
+</td>
+</tr>
+<tr style="text-align:left;vertical-align:top;">
+<td valign="top" width="194" style="width:194px; border: solid 1px #000000;"><p>LevelNr</p>
+</td>
+<td valign="top" width="1155" style="width:1155px; border: solid 1px #000000;"><p>If the RoleConstraint is an, 'InternalUniquenessConstraint', then set to the displaying 'Level' in the hierarchy of Internal Uniqueness Constraints for the Fact Type to which the Role Constraint applies.</p>
+</td>
+</tr>
+<tr style="text-align:left;vertical-align:top;">
+<td valign="top" width="194" style="width:194px; border: solid 1px #000000;"><p>IsPreferredUniqueness</p>
+</td>
+<td valign="top" width="1155" style="width:1155px; border: solid 1px #000000;"><p>Has a value set to ‘true’ if the Role Constraint represented by the element represents the ‘Preferred Identification Scheme’ for an Entity Type.</p>
+</td>
+</tr>
+<tr style="text-align:left;vertical-align:top;">
+<td valign="top" width="194" style="width:194px; border: solid 1px #000000;"><p>IsDeontic</p>
+</td>
+<td valign="top" width="1155" style="width:1155px; border: solid 1px #000000;"><p>Has a value set to ‘true’ if the Role Constraint is ‘Deontic’, else has a value set to ‘false’.</p>
+</td>
+</tr>
+<tr style="text-align:left;vertical-align:top;">
+<td valign="top" width="194" style="width:194px; border: solid 1px #000000;"><p>MinimumFrequencyCount</p>
+</td>
+<td valign="top" width="1155" style="width:1155px; border: solid 1px #000000;"><p>If the RoleConsrtaintType attribute has a value of ‘FrequencyConstraint’ then this attribute has a value set to the minimum in the range of the Frequency Constraint.</p>
+</td>
+</tr>
+<tr style="text-align:left;vertical-align:top;">
+<td valign="top" width="194" style="width:194px; border: solid 1px #000000;"><p>MaximumFrequencyCount</p>
+</td>
+<td valign="top" width="1155" style="width:1155px; border: solid 1px #000000;"><p>If the RoleConsrtaintType attribute has a value of ‘FrequencyConstraint’ then this attribute has a value set to the maximum in the range of the Frequency Constraint.</p>
+</td>
+</tr>
+<tr style="text-align:left;vertical-align:top;">
+<td valign="top" width="194" style="width:194px; border: solid 1px #000000;"><p>Cardinality</p>
+</td>
+<td valign="top" width="1155" style="width:1155px; border: solid 1px #000000;"><br>
+</td>
+</tr>
+<tr style="text-align:left;vertical-align:top;">
+<td valign="top" width="194" style="width:194px; border: solid 1px #000000;"><p>CardinalityRangeType</p>
+</td>
+<td valign="top" width="1155" style="width:1155px; border: solid 1px #000000;"><br>
+</td>
+</tr>
+</table>
+</div>
+<p>&nbsp;</p>
+<p>See also:</p>
+<p><a href="the_metamodelroleconstraintrol.htm">The MetaModelRoleConstraintRole table</a></p>
+
+</td></tr></table>
+
+</body>
+</html>

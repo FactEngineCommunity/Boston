@@ -1,0 +1,64 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- saved from url=(0029)http://www.helpandmanual.com/ -->
+<head><script type="text/javascript" src="helpman_topicinit.js"></script>
+<!-- Redirect browser to frame page if page is not in the content frame. -->
+<script type="text/javascript">
+<!--
+if (top.location.search.lastIndexOf("toc=0")<=0) {
+  if (top.frames.length==0) { top.location.href="index.html?model_error_113.htm"; }
+  else { parent.quicksync('a3.8.1.3'); }
+}
+//-->
+</script>
+   <title>Model Error 113</title>
+   <meta name="generator" content="Help &amp; Manual" />
+   <meta name="keywords" content="" />
+   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+   <meta http-equiv="Content-Style-Type" content="text/css" />
+   <link type="text/css" href="default.css" rel="stylesheet" />
+</head>
+<body style="margin: 0px 0px 0px 0px; background: #FFFFFF;">
+<div id="hmpopupDiv" style="visibility:hidden; position:absolute; z-index:1000; "></div>
+
+
+<table width="100%" border="0" cellspacing="0" cellpadding="5" bgcolor="#649CCC">
+  <tr valign="middle">
+    <td align="left">
+      <p class="p_Heading1"><span class="f_Heading1">Model Error 113</span></p>
+
+    </td>
+    <td align="right">
+     <span style="font-size: 9pt">
+     <a href="introduction.htm">Top</a>&nbsp;
+     <a href="model_error_106.htm">Previous</a>&nbsp;
+     <a href="model_error_115.htm">Next</a>
+     </span>
+    </td>
+  </tr>
+</table>
+
+
+<!-- Placeholder for topic body. -->
+<table width="100%" border="0" cellspacing="0" cellpadding="5"><tr valign="top"><td align="left">
+<p class="p_Heading1"><span class="f_Heading1">Frequency Constraint Min/Max Error</span></p>
+<p>&nbsp;</p>
+<p>One or more Facts within the a Data Population of the Fact Type associated with the respective Frequency Constraint violates either the Minimum or Maximum allowed Fact count for that Frequency Constraint.</p>
+<p>&nbsp;</p>
+<p class="p_Heading1"><span class="f_Heading1">Error Resolution</span></p>
+<p>&nbsp;</p>
+<p>To resolve this error do <span style="font-weight: bold;">one</span> of the following:</p>
+<p>&nbsp;</p>
+<p>1. Add or Remove Facts within the Fact Table (Data Population) of the Fact Type associated with the Frequency Constraint; <span style="font-weight: bold;">OR</span></p>
+<p>2. Modify the Minimum and/or Maximum value counts of the Frequency Constraint as required.</p>
+<p>&nbsp;</p>
+<p class="p_Heading1"><span class="f_Heading1">Example</span></p>
+<p>&nbsp;</p>
+<p>The following ORM Diagram shows a "Frequency Constraint Min/Max Error" (as indicated by the red Frequency Constraint) where the Frequency Constraint allows no more than 2 instances of a value of Person within the Fact Type, "Person drives VehicleType", but where there are 3 instance of the same Person ("Peter") within the Sample Population for the Fact Type.</p>
+<p>&nbsp;</p>
+<p><img src="frequencyconstraintminmaxviolation.png" width="372" height="224" border="0" alt="FrequencyConstraintMinMaxViolation"></p>
+
+</td></tr></table>
+
+</body>
+</html>

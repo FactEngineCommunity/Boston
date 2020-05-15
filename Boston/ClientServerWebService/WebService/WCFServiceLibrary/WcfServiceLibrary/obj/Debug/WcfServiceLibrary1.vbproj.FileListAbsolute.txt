@@ -1,0 +1,9 @@
+D:\Viev\02-Marketing\01-Product\01-Products\WCF\SubscribePattern\SubscribePatternTest\WebService\WCFServiceLibrary\WcfServiceLibrary1\bin\Debug\WcfServiceLibrary1.dll.config
+D:\Viev\02-Marketing\01-Product\01-Products\WCF\SubscribePattern\SubscribePatternTest\WebService\WCFServiceLibrary\WcfServiceLibrary1\bin\Debug\WcfServiceLibrary1.dll
+D:\Viev\02-Marketing\01-Product\01-Products\WCF\SubscribePattern\SubscribePatternTest\WebService\WCFServiceLibrary\WcfServiceLibrary1\bin\Debug\WcfServiceLibrary1.pdb
+D:\Viev\02-Marketing\01-Product\01-Products\WCF\SubscribePattern\SubscribePatternTest\WebService\WCFServiceLibrary\WcfServiceLibrary1\bin\Debug\WcfServiceLibrary1.xml
+D:\Viev\02-Marketing\01-Product\01-Products\WCF\SubscribePattern\SubscribePatternTest\WebService\WCFServiceLibrary\WcfServiceLibrary1\obj\Debug\WcfServiceLibrary1.Resources.resources
+D:\Viev\02-Marketing\01-Product\01-Products\WCF\SubscribePattern\SubscribePatternTest\WebService\WCFServiceLibrary\WcfServiceLibrary1\obj\Debug\WcfServiceLibrary1.vbproj.GenerateResource.Cache
+D:\Viev\02-Marketing\01-Product\01-Products\WCF\SubscribePattern\SubscribePatternTest\WebService\WCFServiceLibrary\WcfServiceLibrary1\obj\Debug\WcfServiceLibrary1.dll
+D:\Viev\02-Marketing\01-Product\01-Products\WCF\SubscribePattern\SubscribePatternTest\WebService\WCFServiceLibrary\WcfServiceLibrary1\obj\Debug\WcfServiceLibrary1.xml
+D:\Viev\02-Marketing\01-Product\01-Products\WCF\SubscribePattern\SubscribePatternTest\WebService\WCFServiceLibrary\WcfServiceLibrary1\obj\Debug\WcfServiceLibrary1.pdb

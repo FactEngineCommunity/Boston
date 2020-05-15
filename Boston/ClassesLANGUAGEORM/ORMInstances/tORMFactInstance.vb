@@ -1,0 +1,478 @@
+﻿Imports System.Reflection
+Imports System.Xml.Serialization
+Imports MindFusion.Diagramming
+
+Namespace FBM
+
+    <Serializable()> _
+    Public Class FactInstance
+        Inherits FBM.Fact
+
+        <XmlAttribute()> _
+        Public Shadows ConceptType As pcenumConceptType = pcenumConceptType.Fact
+
+        <XmlIgnore()> _
+        Public WithEvents Fact As FBM.Fact 'Pointer to the Fact that this FactInstance relates to. 
+
+        <XmlIgnore()> _
+        Public Shadows FactType As New FBM.FactTypeInstance
+
+        <XmlIgnore()>
+        Public Shadows Data As New List(Of FBM.FactDataInstance)
+
+        <XmlIgnore()>
+        Public FactInstance As FBM.FactInstance 'Used to refer to original object when cloned for convenience.
+        'e.g. If working with a CMML.StartState object (as a clone of a tFactInstance object), this 'FactInstance'
+        '  refers back to the FactInstance from where the clone was made. This is so that any changes made to the CMML.StartState object
+        '  can be reflected back against the original tFactInstance object. The reason that you would do this is because
+        '  CMML.StartState objects (for instance) refer to tFactInstance objects within the corresponding FactTypeInstance on a Page.
+        '  If the user 'moves' a CMML.StartState object on the Page, then the x,y coordinates need to be updated within the FactInstance so that the
+        '  Fact ConceptInstance (Fact on a Page) can be updated in the database when the Page is saved. Otherwise, x,y coordinates cannot be saved back to the database.
+        '  - NB The option to always work with FactInstance objects would have negated the need to use this pattern, however it is more
+        '  convenient from a programming perspective to work with CMML.StartState, CMML.EndState objects than with a genereric FactInstance object,
+        '  which would be confusing over time.
+        '  - See CloneStartState, CloneEndState
+        '  - NB See also the similar functionality within the FBM.FactDataInstance class.
+        '----------------------------------------------------------------------------------------------------------------------------------------
+
+
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Public _X As Integer
+        Public Property X() As Integer
+            Get
+                Return Me._X
+            End Get
+            Set(ByVal value As Integer)
+                Me._X = value
+                If IsSomething(Me.FactInstance) Then
+                    Me.FactInstance._X = value
+                End If
+            End Set
+        End Property
+
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Public _Y As Integer
+        Public Property Y() As Integer
+            Get
+                Return Me._Y
+            End Get
+            Set(ByVal value As Integer)
+                Me._Y = value
+                If IsSomething(Me.FactInstance) Then
+                    Me.FactInstance._Y = value
+                End If
+            End Set
+        End Property
+
+        <NonSerialized()>
+        <XmlIgnore()>
+        Public Shape As New ShapeNode
+
+        <XmlIgnore()> _
+        Public Page As FBM.Page
+
+        Public Sub New()
+        End Sub
+
+        Public Sub New(ByRef arFactTypeInstance As FBM.FactTypeInstance)
+
+            Me.New()
+            Me.Page = arFactTypeInstance.Page
+            Me.FactType = arFactTypeInstance
+
+        End Sub
+
+        Public Sub New(ByRef as_fact_id As String, ByRef arFactTypeInstance As FBM.FactTypeInstance)
+
+            Me.Symbol = Trim(as_fact_id)
+            Me.Id = Me.Symbol
+            Me.Model = arFactTypeInstance.Model
+            Me.Page = arFactTypeInstance.Page
+            Me.FactType = arFactTypeInstance
+
+            '-----------------------------------------------------
+            'Join the FactInstance to the Fact in the Model
+            '-----------------------------------------------------
+            Me.Fact = New FBM.Fact(as_fact_id, arFactTypeInstance.FactType)
+            Me.Fact = Me.FactType.FactType.Fact.Find(AddressOf Me.Fact.EqualsById)
+
+        End Sub
+
+        Public Sub New(ByRef arFact As FBM.Fact, ByRef arFactTypeInstance As FBM.FactTypeInstance)
+
+            Me.Id = arFact.Id
+            Me.Symbol = Trim(arFact.Symbol)
+            Me.Page = arFactTypeInstance.Page
+            Me.FactType = arFactTypeInstance
+            Me.Fact = arFact
+
+        End Sub
+
+        Public Shadows Function Equals(ByVal other As FBM.FactInstance) As Boolean
+
+            Dim lr_data As FBM.FactDataInstance
+            Dim lbFound As Boolean = False
+
+            If Me.FactType.Id = other.FactType.Id Then
+                For Each lr_data In other.Data
+                    If Me.Data.Find(AddressOf lr_data.Equals) Is Nothing Then
+                        lbFound = False
+                        Return False
+                    Else
+                        lbFound = True
+                    End If
+                Next
+                Return lbFound
+            Else
+                Return False
+            End If
+
+        End Function
+
+        Public Shadows Function EqualsByFirstDataMatch(ByVal other As FBM.FactInstance) As Boolean
+
+            Dim lr_data As FBM.FactDataInstance
+            Dim lbFound As Boolean = False
+
+            If Me.FactType.Id = other.FactType.Id Then
+                For Each lr_data In other.Data
+                    If Me.Data.Find(AddressOf lr_data.Equals) Is Nothing Then
+                        lbFound = False
+                    Else
+                        lbFound = True
+                        Return lbFound
+                    End If
+                Next
+                Return lbFound
+            Else
+                Return False
+            End If
+
+        End Function
+
+        Public Overrides Function Clone() As Object
+
+            Dim lrFactInstance As New FBM.FactInstance
+            Dim lrFactDataInstance As FBM.FactDataInstance
+
+            Try
+                With Me                    
+                    lrFactInstance.Model = .Model                    
+                    lrFactInstance.Page = .Page
+                    lrFactInstance.Id = .Id
+                    lrFactInstance.Name = .Name
+                    lrFactInstance.Symbol = .Symbol
+                    lrFactInstance.FactType = Me.Page.FactTypeInstance.Find(AddressOf .FactType.Equals)
+                    lrFactInstance.Fact = lrFactInstance.FactType.FactType.Fact.Find(AddressOf .Fact.EqualsById)
+                    For Each lrFactDataInstance In .Data
+                        lrFactInstance.Data.Add(lrFactDataInstance.Clone(Me.Page, lrFactInstance))
+                    Next
+
+                End With
+
+                Return lrFactInstance
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                lsMessage = "Error: tFactInstance.Clone"
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return Nothing
+            End Try
+
+        End Function
+
+        Public Overloads Function Clone(ByRef arPage As FBM.Page, ByRef arFactTypeInstance As FBM.FactTypeInstance) As Object
+
+            Dim lrFactInstance As New FBM.FactInstance
+            Dim lrFactDataInstance As FBM.FactDataInstance
+
+            Try
+                With Me
+                    lrFactInstance.Model = New FBM.Model
+                    lrFactInstance.Model = arPage.Model                    
+                    lrFactInstance.Page = arPage
+                    lrFactInstance.Id = .Id
+                    lrFactInstance.Name = .Name
+                    lrFactInstance.Symbol = .Symbol
+
+                    lrFactInstance.FactType = arFactTypeInstance
+                    lrFactInstance.Fact = arFactTypeInstance.FactType.Fact.Find(AddressOf .Fact.EqualsById)
+                    For Each lrFactDataInstance In .Data
+                        lrFactInstance.Data.Add(lrFactDataInstance.Clone(arPage, lrFactInstance))
+                    Next
+
+                End With
+
+                Return lrFactInstance
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                lsMessage = "Error: tFactInstance.Clone"
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return Nothing
+            End Try
+
+        End Function
+
+        Public Function CloneConceptInstance() As FBM.ConceptInstance
+
+            Dim lrConceptInstance As New FBM.ConceptInstance(Me.Model, Me.Page, Me.Id, Me.ConceptType)
+
+            Return lrConceptInstance
+
+        End Function
+
+        ''' <summary>
+        ''' Start State Indicator is a circle linking to the first State in a State Transition Diagram.
+        '''   Generally an STD will only have on staring state
+        ''' </summary>
+        ''' <param name="arPage"></param>
+        ''' <returns></returns>
+        Public Function CloneStartStateIndicator(ByRef arPage As FBM.Page, Optional ByRef arState As CMML.State = Nothing) As CMML.StartStateIndicator
+
+            '------------------------------------------------------------------
+            'As in 'Start Status Indicator' within a State Transition Diagram
+            '------------------------------------------------------------------
+
+            Try
+                If Not Me.FactType.Id = pcenumCMMLRelations.CoreValueTypeHasStartCoreElementState.ToString Then
+                    Throw New Exception("Called CloneStartStateIndicator for the wrong type of FactType and Fact.")
+                End If
+
+                Dim lrStartStateIndicator As New CMML.StartStateIndicator
+
+                With Me
+                    lrStartStateIndicator.Model = .Model
+                    lrStartStateIndicator.Page = arPage
+                    lrStartStateIndicator.Name = .Concept.Symbol
+                    lrStartStateIndicator.Fact = Me.Fact
+                    lrStartStateIndicator.FactInstance = Me
+                    lrStartStateIndicator.Concept = .Concept
+                    lrStartStateIndicator.X = .X
+                    lrStartStateIndicator.Y = .Y
+                End With
+
+                lrStartStateIndicator.State = arState
+
+                Return lrStartStateIndicator
+
+            Catch ex As Exception
+
+                Dim lsMessage1 As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+
+            End Try
+
+        End Function
+
+        ''' <summary>
+        ''' End State Indicators are circles linked from the last State in a State Transition Diagram.
+        '''   NB An STD may have more than one End/Finishing State. See also CloneStartStateIndicator.
+        ''' </summary>
+        ''' <param name="arPage"></param>
+        ''' <returns></returns>
+        Public Function CloneEndStateIndicator(ByRef arPage As FBM.Page, Optional ByRef arState As CMML.State = Nothing) As CMML.EndStateIndicator
+
+            '------------------------------------------------------------------
+            'As in 'Start Status Indicator' within a State Transition Diagram
+            '------------------------------------------------------------------
+            Dim lrEndStateIndicator As New CMML.EndStateIndicator
+
+            With Me
+                lrEndStateIndicator.Model = .Model
+                lrEndStateIndicator.Page = arPage
+                lrEndStateIndicator.Name = .Concept.Symbol
+                lrEndStateIndicator.Fact = Me.Fact
+                lrEndStateIndicator.FactInstance = Me
+                lrEndStateIndicator.Concept = .Concept
+                lrEndStateIndicator.X = .X
+                lrEndStateIndicator.Y = .Y
+            End With
+
+            lrEndStateIndicator.State = arState
+
+            Return lrEndStateIndicator
+
+        End Function
+
+        Public Function CloneStateTransition(ByRef arPage As FBM.Page, ByRef arFromState As CMML.State, ByRef arToState As CMML.State, ByVal asEventName As String)
+
+            Dim lrStateTransition As New CMML.StateTransition
+
+            With Me
+                lrStateTransition.Model = .Model
+                lrStateTransition.Page = arPage
+                lrStateTransition.Name = .Concept.Symbol
+                lrStateTransition.Fact = Me.Fact
+                lrStateTransition.FactInstance = Me
+                lrStateTransition.Concept = .Concept
+                lrStateTransition.X = .X
+                lrStateTransition.Y = .Y
+            End With
+
+            lrStateTransition.FromState = arFromState
+            lrStateTransition.ToState = arToState
+            lrStateTransition.EventName = asEventName
+
+            Return lrStateTransition
+
+        End Function
+
+        ''' <summary>
+        ''' Enumerates the Data of the Fact as a key value
+        ''' </summary>
+        ''' <returns>String representing a key of the data within the Fact</returns>
+        ''' <remarks>Used in processing ORMQL statements. e.g. Where DISTINCT keyword is used in a SELECT statement</remarks>
+        Public Overrides Function EnumerateDataAsKey(ByVal aasKeyColumnOrder As List(Of String)) As String
+
+            Dim lsColumnName As String
+            Dim lsKey As String = ""
+
+            For Each lsColumnName In aasKeyColumnOrder
+                lsKey &= Me.GetFactDataInstanceByRoleName(lsColumnName).Data
+            Next
+
+            Return lsKey
+
+        End Function
+
+        Public Overloads Function EnumerateAsBracketedFact() As String
+
+            Dim lrROle As FBM.RoleInstance
+            Dim lrRoleGroup As New List(Of FBM.RoleInstance)
+            Dim lrFactDataInstance As FBM.FactDataInstance
+            Dim lrFactInstance As New FBM.FactInstance
+            Dim lrReferencedFactInstance As New FBM.FactInstance
+            Dim liInd As Integer = 0
+
+            Try
+
+                EnumerateAsBracketedFact = "{"
+
+                For Each lrFactDataInstance In Me.Data
+                    lrRoleGroup.Add(lrFactDataInstance.Role)
+                Next
+
+                lrRoleGroup.Sort(AddressOf FBM.FactTypeInstance.CompareRoleXPositions)
+
+                For Each lrROle In lrRoleGroup
+                    lrFactDataInstance = New FBM.FactDataInstance
+                    lrFactDataInstance.Role = New FBM.RoleInstance
+                    lrFactDataInstance.Role.Id = lrROle.Id
+                    lrFactDataInstance = Me.Data.Find(AddressOf lrFactDataInstance.EqualsByRole)
+                    If lrROle.TypeOfJoin = pcenumRoleJoinType.FactType Then
+                        lrReferencedFactInstance = New FBM.FactInstance(lrFactDataInstance.Data, lrROle.JoinsFactType)
+                        lrFactInstance = lrROle.JoinsFactType.Fact.Find(AddressOf lrReferencedFactInstance.EqualsById)
+                        EnumerateAsBracketedFact &= lrFactInstance.EnumerateAsBracketedFact
+                    Else
+                        EnumerateAsBracketedFact &= lrFactDataInstance.Data
+                    End If
+
+                    liInd += 1
+                    If (liInd > 0) And (liInd < Me.Data.Count) Then
+                        EnumerateAsBracketedFact &= ","
+                    End If
+                Next
+
+                EnumerateAsBracketedFact &= "}"
+
+            Catch ex As Exception
+                Dim lsMessage1 As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return "{}"
+            End Try
+
+        End Function
+
+        Public Function GetFactDataInstanceByRoleName(ByVal asRoleName As String) As FBM.FactDataInstance
+
+            Try
+                Dim lrFactDataInstance As New FBM.FactDataInstance
+
+                Dim larFactDataInstance = From FactDataInstance In Me.Data _
+                                     Where FactDataInstance.Role.Name = asRoleName _
+                                     Distinct Select FactDataInstance
+
+                For Each lrFactDataInstance In larFactDataInstance
+                    Exit For
+                Next
+
+                Return lrFactDataInstance
+
+            Catch ex As Exception
+                Dim lsMessage1 As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return Nothing
+            End Try
+
+        End Function
+
+        Public Shadows Sub Save(Optional ByVal abRapidSave As Boolean = False)
+
+            Dim lrFactDataInstance As FBM.FactDataInstance
+            Dim lrConceptInstance As New FBM.ConceptInstance
+
+            lrConceptInstance.ModelId = Me.FactType.Model.ModelId
+            lrConceptInstance.PageId = Me.Page.PageId
+            lrConceptInstance.Symbol = Me.Fact.Symbol
+            lrConceptInstance.X = Me.X
+            lrConceptInstance.Y = Me.Y
+            lrConceptInstance.ConceptType = pcenumConceptType.Fact
+
+            If abRapidSave Then
+                Call TableConceptInstance.AddConceptInstance(lrConceptInstance)
+            Else
+                If TableConceptInstance.ExistsConceptInstance(lrConceptInstance) Then
+                    Call TableConceptInstance.UpdateConceptInstance(lrConceptInstance)
+                Else
+                    Dim lrConcept As New FBM.Concept(lrConceptInstance.Symbol, True)
+                    lrConcept.Save()
+                    Call TableConceptInstance.AddConceptInstance(lrConceptInstance)
+                End If
+            End If
+
+
+            For Each lrFactDataInstance In Me.Data
+
+                lrConceptInstance = New FBM.ConceptInstance
+                lrConceptInstance.ModelId = Me.FactType.Model.ModelId
+                lrConceptInstance.PageId = Me.Page.PageId
+                lrConceptInstance.Symbol = lrFactDataInstance.Data
+                lrConceptInstance.RoleId = lrFactDataInstance.Role.Id
+                lrConceptInstance.X = lrFactDataInstance.X
+                lrConceptInstance.Y = lrFactDataInstance.Y
+                lrConceptInstance.ConceptType = pcenumConceptType.Value
+
+                'NB Don't use abRapidSave here because more than one Fact can use the same ConceptInstance for its FactData.
+                If TableConceptInstance.ExistsConceptInstance(lrConceptInstance) Then
+                    Call TableConceptInstance.UpdateConceptInstance(lrConceptInstance)
+                Else
+                    Dim lrConcept As New FBM.Concept(lrFactDataInstance.Data)
+                    lrConcept.Save()
+                    Call TableConceptInstance.AddConceptInstance(lrConceptInstance)
+                End If
+            Next
+
+        End Sub
+
+    End Class
+
+End Namespace

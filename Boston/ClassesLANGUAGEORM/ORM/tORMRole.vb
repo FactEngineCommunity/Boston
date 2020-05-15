@@ -1,0 +1,2201 @@
+Imports System.ComponentModel
+Imports System.Xml.Serialization
+Imports System.Runtime.Serialization
+Imports System.Reflection
+Imports System.Security.Permissions
+Imports System.Xml.Schema
+
+Namespace FBM
+    <Serializable()> _
+    Public Class Role
+        Inherits FBM.ModelObject
+        Implements IEquatable(Of FBM.Role)
+        'Implements IXmlSerializable
+        Implements ICloneable
+
+        <XmlIgnore()> _
+        Public FactType As FBM.FactType 'The FactType to which the role belongs
+
+        <XmlIgnore()> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        Public _role_cardinality As Integer = 0 'The maximum number of times that the Entity/ValueType/NestedFactType can be associated with the Role.
+
+        <XmlIgnore()> _
+        Public part_of_key As Boolean = False
+
+        '<CategoryAttribute("Role"), _
+        'DefaultValueAttribute(GetType(Integer), "0"), _
+        'DescriptionAttribute("When populated, determines the number of times an instance plays the Role.")> _
+        <XmlIgnore()> _        
+        Public Property FrequencyConstraint() As Integer
+            Get
+                Return _role_cardinality
+            End Get
+            Set(ByVal Value As Integer)
+                _role_cardinality = Value
+            End Set
+        End Property
+
+        Public Deontic As Boolean = False
+
+        <XmlIgnore()> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        Public _Mandatory As Boolean = False 'True, False
+        <CategoryAttribute("Role"), _
+             DefaultValueAttribute(False), _
+             DescriptionAttribute("True if the Role is a Mandatory Role, else False.")> _
+        Public Property Mandatory() As Boolean
+            Get
+                Return _Mandatory
+            End Get
+            Set(ByVal Value As Boolean)
+                _Mandatory = Value
+            End Set
+        End Property
+
+        <XmlIgnore()> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        Public _Value_Range As String
+        '<CategoryAttribute("Role"), _
+        'DefaultValueAttribute(""), _
+        'DescriptionAttribute("The range of allowable Values for the Role.")> _
+        <XmlIgnore()> _
+        Public Property ValueRange() As String
+            Get
+                Return _Value_Range
+            End Get
+            Set(ByVal Value As String)
+                _Value_Range = Value
+            End Set
+        End Property
+
+        <XmlIgnore()> _
+        Public SequenceNr As Integer 'The position withn the FactType/RoleGroup
+
+        <XmlAttribute()> _
+        Public TypeOfJoin As pcenumRoleJoinType
+
+        <XmlIgnore()> _
+        Public JoinsEntityType As FBM.EntityType
+        <XmlIgnore()> _
+        Public JoinsValueType As FBM.ValueType
+        <XmlIgnore()> _
+        Public JoinsFactType As FBM.FactType
+
+        <XmlIgnore()> _
+        Public WithEvents JoinedORMObject As New FBM.ModelObject 'WithEvents
+
+        <XmlIgnore()> _
+        Public RoleConstraintRole As New List(Of FBM.RoleConstraintRole) 'RoleConstraints are serialized seperately so that the serialiser doesn't go into an infinite loop.
+
+        <XmlIgnore()> _
+        Public Data As New List(Of FBM.FactData) 'As Values ('Concepts'...or just 'Data') are added to a Fact within a FactType, within which this Role exists, this enumerationis populated.
+        'At first, that seems strange, as the RoleData seems to be more a part of a Fact then it ever is by itself (e.g. what is b outside of {a,b,c}).
+        'There is, however, a different perspective, which is that an Entity (e.g. b) is an object in its own right, and is merely associated with a Fact, AND a Role within that Fact/FactType.
+        'This perspective allows LamdaCalculus type searching for Facts, knowing only the Role and the Data (tRoleData has a member, 'Fact').
+
+        <XmlIgnore()> _
+        Public KLFreeVariableLabel As String = "" 'When generating proofs in KL, a letter from pcenumKLFreeVariable gets assigned to each Role in a FactType.
+
+        Public NORMALinksToUnaryFactTypeValueType As Boolean = False
+
+        Public Event MandatoryChanged(ByVal abMandatoryStatus As Boolean)
+        Public Event RoleJoinModified(ByRef arModelObject As FBM.ModelObject)
+        Public Event RoleNameChanged(ByVal asNewRoleName As String)
+        Public Event ValueRangeChanged(ByVal asNewValueRange As String)
+
+        Sub New()
+
+            MyBase.ConceptType = pcenumConceptType.Role
+            Me.Id = System.Guid.NewGuid.ToString()
+
+        End Sub
+
+        Sub New(ByRef arFactType As FBM.FactType, ByVal asRoleId As String, Optional ByVal abUseIdAsName As Boolean = False, Optional ByVal arJoinedModelObject As Object = Nothing)
+
+            Call Me.New()
+            Me.Model = arFactType.Model
+            Me.Id = asRoleId
+            Me._Symbol = asRoleId
+            Me.FactType = arFactType
+
+            If abUseIdAsName Then
+                Me.Name = Me.Id
+            End If
+
+            Me.JoinedORMObject = arJoinedModelObject
+
+            If arJoinedModelObject IsNot Nothing Then
+                Select Case arJoinedModelObject.ConceptType
+                    Case Is = pcenumConceptType.EntityType
+                        Me.TypeOfJoin = pcenumRoleJoinType.EntityType
+                        Me.JoinsEntityType = arJoinedModelObject
+                    Case Is = pcenumConceptType.ValueType
+                        Me.TypeOfJoin = pcenumRoleJoinType.ValueType
+                        Me.JoinsValueType = arJoinedModelObject
+                    Case Is = pcenumConceptType.FactType
+                        Me.TypeOfJoin = pcenumRoleJoinType.FactType
+                        Me.JoinsFactType = arJoinedModelObject
+                End Select
+            End If
+
+        End Sub
+
+        Sub New(ByRef arFactType As FBM.FactType, ByRef arJoinedObject As Object)
+
+            Call Me.New()
+
+            Me.FactType = arFactType
+            Me.Model = arFactType.Model
+
+            Me.JoinedORMObject = arJoinedObject
+
+            If IsSomething(arJoinedObject) Then
+                Select Case arJoinedObject.ConceptType
+                    Case Is = pcenumConceptType.EntityType
+                        Me.TypeOfJoin = pcenumRoleJoinType.EntityType
+                        Me.JoinsEntityType = arJoinedObject
+                    Case Is = pcenumConceptType.ValueType
+                        Me.TypeOfJoin = pcenumRoleJoinType.ValueType
+                        Me.JoinsValueType = arJoinedObject
+                    Case Is = pcenumConceptType.FactType
+                        Me.TypeOfJoin = pcenumRoleJoinType.FactType
+                        Me.JoinsFactType = arJoinedObject
+                End Select
+            End If
+
+            '----------------------------------------------------------
+            'Add the Role to the RoleGroup of the FactType of the Role
+            '----------------------------------------------------------            
+            Me.SequenceNr = Me.FactType.Arity
+
+        End Sub
+
+
+
+        Public Shadows Function Equals(ByVal other As FBM.Role) As Boolean Implements System.IEquatable(Of FBM.Role).Equals
+
+            If Me.Id = other.Id Then
+                Return True
+            Else
+                Return False
+            End If
+
+        End Function
+
+        Public Shadows Function EqualsByJoinedModelObjectId(ByVal other As FBM.Role) As Boolean
+
+            If Trim(Me.JoinedORMObject.Id) = Trim(other.JoinedORMObject.Id) Then
+                Return True
+            Else
+                Return False
+            End If
+
+        End Function
+
+        Public Shadows Function EqualsByName(ByVal other As FBM.Role) As Boolean
+
+            If Trim(Me.Name) = Trim(other.Name) Then
+                Return True
+            Else
+                Return False
+            End If
+
+        End Function
+
+        '''' <summary>
+        ''''Serializes all public, private and public fields except the one 
+        ''''  which are the hidden fields for the eventhandlers
+        '''' </summary>
+        '''' <remarks></remarks>
+        '''' 
+        'Private Sub WriteXML(ByVal writer As XmlWriter) Implements IXmlSerializable.WriteXml
+
+        '    '' Get the list of all events 
+        '    'Dim EvtInfos() As EventInfo = Me.GetType.GetEvents()
+        '    'Dim EvtInfo As EventInfo
+
+        '    '' Get the list of all fields
+        '    'Dim FldInfos() As FieldInfo = Me.GetType.GetFields(BindingFlags.NonPublic Or BindingFlags.Instance Or BindingFlags.Public)
+
+        '    '' Loops in each field and decides wether to serialize it or not
+        '    'Dim FldInfo As FieldInfo
+        '    'MsgBox("hello")
+
+        '    writer.WriteAttributeString("ConceptType", Me.ConceptType.ToString)
+        '    writer.WriteAttributeString("Id", Me.Id)
+        '    writer.WriteAttributeString("Name", Me.Name)
+        '    writer.WriteAttributeString("TypeOfJoin", Me.TypeOfJoin.ToString)
+        '    writer.WriteAttributeString("JoinedObjectId", Me.JoinedORMObject.Id.ToString)
+        '    'Select Case Me.TypeOfJoin
+        '    '    Case Is = pcenumRoleJoinType.EntityType
+        '    '        writer.WriteElementString("JoinedEntityTypeId", Me.JoinsEntityType.Id)
+        '    '    Case Is = pcenumRoleJoinType.ValueType
+        '    '        writer.WriteElementString("JoinedValueTypeId", Me.JoinsValueType.Id)
+        '    '    Case Is = pcenumRoleJoinType.ValueType
+        '    '        writer.WriteElementString("JoinedFactTypeId", Me.JoinsFactType.Id)
+        '    'End Select
+        '    'For Each FldInfo In FldInfos
+        '    '    ' Finds if the field is a eventhandler
+        '    '    Dim Found As Boolean = False
+        '    '    For Each EvtInfo In EvtInfos
+        '    '        If EvtInfo.Name + "Event" = FldInfo.Name Then
+        '    '            Found = True
+        '    '            Exit For
+        '    '        End If
+        '    '    Next
+
+        '    '    ' If field is not an eventhandler serializes it
+        '    '    If Not Found Then
+        '    '        info.AddValue(FldInfo.Name, FldInfo.GetValue(Me))
+        '    '    End If
+
+        '    'Next
+
+        'End Sub
+
+        'Public Sub readxml(ByVal reader As XmlReader) Implements IXmlSerializable.ReadXml
+        '    '       	reader.MoveToContent();
+        '    'Name = reader.GetAttribute("Name");
+        '    'Boolean isEmptyElement = reader.IsEmptyElement; // (1)
+        '    'reader.ReadStartElement();
+        '    'if (!isEmptyElement) // (1)
+        '    '{
+        '    '	Birthday = DateTime.ParseExact(reader.
+        '    '		ReadElementString("Birthday"), "yyyy-MM-dd", null);
+        '    '	reader.ReadEndElement();
+
+        'End Sub
+
+        Public Overrides Function CanSafelyRemoveFromModel() As Boolean
+            Return False
+        End Function
+
+        ''' <summary>
+        ''' Changes the Model of the Role to the target Model.
+        ''' </summary>
+        ''' <param name="arTargetModel">The Model to which the Role will be associated on completion of this method.</param>
+        ''' <remarks></remarks>
+        Public Shadows Sub ChangeModel(ByRef arTargetModel As FBM.Model, ByVal abAddToModel As Boolean)
+
+            Me.Model = arTargetModel
+
+            If abAddToModel Then
+                arTargetModel.AddRole(Me)
+            End If
+
+        End Sub
+
+        'Public Function getschema() As XmlSchema Implements IXmlSerializable.GetSchema
+        '    Return Nothing
+        'End Function
+
+
+        Public Overloads Function Clone(ByRef arModel As FBM.Model, Optional abAddToModel As Boolean = False) As Object
+
+            Dim lrRole As New FBM.Role
+
+            Try
+
+                If arModel.Role.Exists(AddressOf Me.Equals) Then
+                    '---------------------------------------------------------------------------------------------------------------------
+                    'The target Role already exists in the target Model, so return the existing Role (from the target Model)
+                    '  20150127-There seems no logical reason to clone an Role to a target Model if it already exists in the target
+                    '  Model. This method is used when copying/pasting from one Model to a target Model, and (in general) the Role
+                    '  won't exist in the target Model. If it does, then that's the Role that's needed.
+                    '  NB Testing to see if the Signature of the FactType already exists in the target Model is already performed in the
+                    '  Paste proceedure before dropping the FactType onto a target Page/Model. If there is/was any clashes, then the 
+                    '  FactType being copied/pasted will have it's Id/Name/Symbol changed and will not be affected by this test to see
+                    '  if the FactType already exists in the target Model.
+                    '---------------------------------------------------------------------------------------------------------------------
+                    lrRole = arModel.Role.Find(AddressOf Me.Equals)
+                Else
+                    With Me
+                        lrRole.Model = arModel
+                        lrRole.Id = .Id
+                        lrRole.Name = .Name
+                        lrRole.Symbol = .Symbol
+                        lrRole.ConceptType = .ConceptType
+                        lrRole.Deontic = .Deontic
+                        lrRole.TypeOfJoin = .TypeOfJoin
+                        lrRole.SequenceNr = .SequenceNr
+                        lrRole.Mandatory = .Mandatory
+                        lrRole.isDirty = True
+
+                        If abAddToModel Then
+                            arModel.AddRole(lrRole)
+                        End If
+
+                        'lrRole.Data (20150127-Currently set when cloning FactData)
+                        lrRole.FactType = New FBM.FactType
+                        lrRole.FactType.Id = .FactType.Id
+                        If Me.Model.FactType.Exists(AddressOf lrRole.FactType.Equals) Then
+                            lrRole.FactType = Me.Model.FactType.Find(AddressOf lrRole.FactType.Equals)
+                        Else
+                            lrRole.FactType = .FactType.Clone(arModel)
+                        End If
+
+                        lrRole.FrequencyConstraint = .FrequencyConstraint
+                        lrRole.LongDescription = .LongDescription
+                        lrRole.ShortDescription = .ShortDescription
+                        'lrRole.RoleConstraintRole (20150202-Currently set when cloning a RoleConstraint.RoleConstraintRole)
+                        lrRole.ValueRange = .ValueRange
+
+                        Select Case .TypeOfJoin
+                            Case pcenumRoleJoinType.EntityType
+                                If arModel.EntityType.Exists(AddressOf lrRole.JoinedORMObject.Equals) Then
+                                    lrRole.JoinsEntityType = arModel.EntityType.Find(AddressOf lrRole.JoinedORMObject.Equals)
+                                    lrRole.JoinedORMObject = .JoinsEntityType                                    
+                                ElseIf arModel.ModelId = .Model.ModelId Then
+                                    arModel.AddEntityType(lrRole.JoinedORMObject)
+                                    lrRole.JoinsEntityType = .JoinedORMObject
+                                    lrRole.JoinedORMObject = lrRole.JoinsEntityType
+                                Else
+                                    Dim lrEntityType As FBM.EntityType = .JoinedORMObject
+                                    lrEntityType = lrEntityType.Clone(arModel, True, lrEntityType.IsMDAModelElement)
+                                    lrRole.JoinsEntityType = lrEntityType
+                                    lrRole.JoinedORMObject = lrRole.JoinsEntityType
+                                End If                                
+                            Case pcenumRoleJoinType.ValueType                                                                
+                                If arModel.ValueType.Exists(AddressOf lrRole.JoinedORMObject.Equals) Then                                
+                                    lrRole.JoinsValueType = arModel.ValueType.Find(AddressOf lrRole.JoinedORMObject.Equals)
+                                    lrRole.JoinedORMObject = lrRole.JoinsValueType
+                                ElseIf arModel.ModelId = .Model.ModelId Then
+                                    arModel.AddValueType(.JoinedORMObject)
+                                    lrRole.JoinsValueType = .JoinedORMObject
+                                    lrRole.JoinedORMObject = lrRole.JoinsValueType
+                                Else
+                                    'Cloning to a new Model.
+                                    Dim lrValueType As FBM.ValueType = .JoinedORMObject
+                                    lrValueType = lrValueType.Clone(arModel, True, lrValueType.IsMDAModelElement)
+                                    lrRole.JoinsValueType = lrValueType
+                                    lrRole.JoinedORMObject = lrRole.JoinsValueType
+                                End If
+                            Case pcenumRoleJoinType.FactType
+                                If arModel.FactType.Exists(AddressOf .JoinedORMObject.Equals) Then
+                                    lrRole.JoinsFactType = arModel.FactType.Find(AddressOf .JoinedORMObject.Equals)
+                                    lrRole.JoinedORMObject = lrRole.JoinsFactType
+                                ElseIf arModel.ModelId = .Model.ModelId Then
+                                    arModel.AddFactType(.JoinedORMObject)
+                                    lrRole.JoinsFactType = .JoinedORMObject
+                                    lrRole.JoinedORMObject = lrRole.JoinsFactType
+                                Else
+                                    Dim lrFactType As FBM.FactType = lrRole.JoinedORMObject
+                                    lrFactType = lrFactType.Clone(arModel, True, lrFactType.IsMDAModelElement)
+                                    lrRole.JoinsFactType = lrFactType
+                                    lrRole.JoinedORMObject = lrRole.JoinsFactType
+                                End If
+                        End Select
+                    End With
+                End If
+
+                Return lrRole
+            Catch ex As Exception
+                Dim lsMessage1 As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return lrRole
+            End Try
+
+        End Function
+
+        ''' <summary>
+        ''' Clones an instance of the Role
+        ''' </summary>
+        ''' <param name="arPage"></param>
+        ''' <param name="abAddToPage"></param>
+        ''' <param name="abForceReferencingErrorThrowing">True if want to force error throwing when ModelObject referenced (joined) by the Role(Instance) does not exist, else False. _
+        ''' The reason that you would want to suppress throwing of an error is because FactTypes with Roles referencing FactTypes can be recursive, and it is far easier to load _
+        ''' all FactTypeInstances on a Page (using CloneInstance for the FactType/Roles, and then go back and populate the JoinedORMObject for those where Role.JoinedORMObject is Nothing. _
+        ''' This is far easier to implement than a recursive loading of FactTypeInstances.</param>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public Shadows Function CloneInstance(ByRef arPage As FBM.Page, Optional ByVal abAddToPage As Boolean = False, Optional ByVal abForceReferencingErrorThrowing As Boolean = Nothing) As FBM.RoleInstance
+
+            Dim lrEntityTypeInstance As FBM.EntityTypeInstance
+            Dim lrRoleInstance As New FBM.RoleInstance
+            Dim lsMessage As String = ""
+
+            Try
+
+                With Me
+                    lrRoleInstance.Model = arPage.Model
+                    lrRoleInstance.Page = arPage
+                    lrRoleInstance.Role = Me
+
+                    Dim lrFactTypeInstance As New FBM.FactTypeInstance(arPage.Model, arPage, pcenumLanguage.ORMModel, .FactType.Name, True)
+                    lrFactTypeInstance.Id = .FactType.Id
+
+                    lrRoleInstance.Id = .Id
+                    lrRoleInstance.Name = .Name
+                    lrRoleInstance.ConceptType = .ConceptType
+                    lrRoleInstance.FactType = arPage.FactTypeInstance.Find(AddressOf lrFactTypeInstance.Equals)
+                    If lrFactTypeInstance.FactType Is Nothing Then
+                        Throw New ApplicationException("Error: No FactTypeInstance exists for Role with Role.Id: " & lrRoleInstance.Id & ", and for Role.FactType.Id: " & .FactType.Id)
+                    End If
+                    lrRoleInstance.Deontic = .Deontic
+                    lrRoleInstance.TypeOfJoin = .TypeOfJoin
+                    lrRoleInstance.Mandatory = .Mandatory
+                    lrRoleInstance.SequenceNr = .SequenceNr
+
+                    lrRoleInstance.RoleName = New FBM.RoleName(lrRoleInstance, lrRoleInstance.Name)
+
+                    Select Case .TypeOfJoin
+                        Case Is = pcenumRoleJoinType.EntityType
+                            'lrEntityTypeInstance = New FBM.EntityTypeInstance
+                            lrEntityTypeInstance = arPage.EntityTypeInstance.Find(AddressOf .JoinedORMObject.EqualsByName)
+                            'lrRoleInstance.JoinsEntityType = New FBM.EntityTypeInstance
+                            lrRoleInstance.JoinsEntityType = lrEntityTypeInstance
+                            If Not lrRoleInstance.JoinsEntityType Is Nothing Then
+                                'lrRoleInstance.JoinedORMObject = New FBM.EntityTypeInstance
+                                lrRoleInstance.JoinedORMObject = lrEntityTypeInstance 'lrRoleInstance.JoinsEntityType                                
+                            Else
+                                lrRoleInstance.JoinedORMObject = Nothing
+                                lrRoleInstance.JoinsEntityType = .JoinedORMObject.CloneEntityTypeInstance(arPage)
+                                lsMessage = "Error: No EntityTypeInstance found for:"
+                                lsMessage &= vbCrLf & " Role with Role.Id: " & lrRoleInstance.Id & ", and"
+                                lsMessage &= vbCrLf & " for Role.FactType.Id: " & .FactType.Id
+                                lsMessage &= vbCrLf & " for Role.JoinsEntityTypeId: " & Me.JoinedORMObject.Id
+                                lsMessage &= vbCrLf & " for Page.Name: " & arPage.Name
+                                If IsSomething(abForceReferencingErrorThrowing) Then
+                                    If abForceReferencingErrorThrowing Then
+                                        Throw New ApplicationException(lsMessage)
+                                    End If
+                                End If
+                            End If
+                        Case Is = pcenumRoleJoinType.ValueType
+                            lrRoleInstance.JoinsValueType = arPage.ValueTypeInstance.Find(AddressOf .JoinedORMObject.EqualsByName)
+                            If Not lrRoleInstance.JoinsValueType Is Nothing Then
+                                lrRoleInstance.JoinedORMObject = New FBM.ValueTypeInstance
+                                lrRoleInstance.JoinedORMObject = lrRoleInstance.JoinsValueType
+                                'lrRoleInstance.JoinsValueType = .JoinedORMObject.CloneInstance(arPage)
+                            Else
+                                lrRoleInstance.JoinedORMObject = Nothing
+                                lrRoleInstance.JoinsValueType = .JoinedORMObject.CloneInstance(arPage)
+                                lsMessage = "Error: No ValueTypeInstance found for "
+                                lsMessage &= vbCrLf & " Role with Role.Id: " & lrRoleInstance.Id & ", and"
+                                lsMessage &= vbCrLf & " for Role.FactType.Id: " & .FactType.Id
+                                lsMessage &= vbCrLf & " for Role.JoinsValueTypeId: " & Me.JoinedORMObject.Id
+                                lsMessage &= vbCrLf & " for Page.Name: " & arPage.Name
+
+                                If IsSomething(abForceReferencingErrorThrowing) Then
+                                    If abForceReferencingErrorThrowing Then
+                                        Throw New ApplicationException(lsMessage)
+                                    End If
+                                End If
+                            End If
+                        Case Is = pcenumRoleJoinType.FactType
+                            lrRoleInstance.JoinsFactType = arPage.FactTypeInstance.Find(AddressOf .JoinedORMObject.EqualsByName)
+                            If lrRoleInstance.JoinsFactType IsNot Nothing Then
+                                lrRoleInstance.JoinedORMObject = lrRoleInstance.JoinsFactType
+                            Else
+                                lrRoleInstance.JoinedORMObject = Nothing
+                                lrRoleInstance.JoinsFactType = .JoinedORMObject.CloneInstance(arPage, abAddToPage)
+
+                                lsMessage = "Error: No FactTypeInstance found for "
+                                lsMessage &= vbCrLf & " Role with Role.Id: " & lrRoleInstance.Id & ", and"
+                                lsMessage &= vbCrLf & " for Role.FactType.Id: " & .FactType.Id
+                                lsMessage &= vbCrLf & " for Role.JoinsFactTypeId: " & Me.JoinedORMObject.Id
+                                lsMessage &= vbCrLf & " for Page.Name: " & arPage.Name
+                                If IsSomething(abForceReferencingErrorThrowing) Then
+                                    If abForceReferencingErrorThrowing Then
+                                        Throw New ApplicationException(lsMessage)
+                                    End If
+                                End If
+                            End If
+                    End Select
+
+                    If abAddToPage Then
+                        arPage.RoleInstance.AddUnique(lrRoleInstance)
+                    End If
+
+                End With
+
+                Return lrRoleInstance
+
+            Catch ex As Exception
+                lsMessage = "Error: tRole.CloneInstance: " & vbCrLf & vbCrLf
+                lsMessage &= "Role.Id: " & lrRoleInstance.Id
+                lsMessage &= vbCrLf & "Role.FactType.Id: " & Me.FactType.Id
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace) ' & vbCrLf & ex.InnerException.ToString)
+
+                Return Nothing
+            End Try
+
+        End Function
+
+        ''' <summary>
+        ''' Used when adding a new Role to a FactType. If the Role is a RDSForeignKeyRole, then must add the related Column (for the new Role) to the Relation, and the Relation to the Column.
+        ''' PRECONDITION: See FBM.Role.isRDSForeignKeyRole. Role must be the ResponsibleRole of a Column. Relation must have existing Columns (obviously).
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public Function belongsToRelation() As RDS.Relation
+
+            Try
+                Dim larRelation = From Relation In Me.Model.RDS.Relation _
+                                  From OriginColumn In Relation.OriginColumns _
+                                  Where OriginColumn.Role Is Me _
+                                  Select Relation Distinct
+
+                If larRelation.Count > 0 Then
+                    Return larRelation.First
+                Else
+                    Return Nothing 'Don't throw an error because Relation may not have been created yet. This function called when a Column is added to a Table.
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage1 As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return Nothing
+            End Try
+
+        End Function
+
+        Public Function BelongsToTable() As String
+            'Input  - Role_id
+            'Output - The Table_Name to which the Role belongs            
+
+            BelongsToTable = Nothing
+
+            If Me.FactType.HasTotalRoleConstraint Then
+                'Rule 3 and part of 1
+                BelongsToTable = Me.FactType.Name
+                Exit Function
+            ElseIf Me.FactType.HasPartialButMultiRoleConstraint Then
+                'Rule 1
+                BelongsToTable = Me.FactType.Name
+                Exit Function
+            ElseIf Me.FactType.IsUnaryFactType Then
+                If Me.TypeOfJoin = pcenumRoleJoinType.EntityType Then
+                    'Then role joins to entity
+                    BelongsToTable = Me.JoinsEntityType.Name
+                    Exit Function
+                ElseIf Me.TypeOfJoin = pcenumRoleJoinType.FactType Then
+                    BelongsToTable = Me.JoinsFactType.Name
+                End If
+            ElseIf Me.FactType.IsBinaryFactType Then
+                'Rules 2 and 4
+                'For ind = 1 To role_count
+                If Me.TypeOfJoin = pcenumRoleJoinType.EntityType Then
+                    'Then role joins to entity
+                    If Not Me.FactType.Is1To1BinaryFactType Then
+                        If Me.HasInternalUniquenessConstraint Then
+                            BelongsToTable = Me.JoinsEntityType.Name
+                            Exit Function
+                        End If
+                    Else 'is 1:1 binary fact type
+                        If Me.Mandatory = True Then
+                            If Me.FactType.TypeOfBinaryFactType = 1 Then
+                                'Part 1 of Rule 4
+                                BelongsToTable = Me.JoinsEntityType.Name
+                                Exit Function
+                            ElseIf Me.FactType.TypeOfBinaryFactType = 2 Then
+                                'Part 2 of Rule 4
+                                BelongsToTable = "Dummy" 'role_record(role_id).role_name
+                                Exit Function
+                            End If
+                        Else
+                            If Me.FactType.GetOtherRoleOfBinaryFactType(Me.Id).Mandatory = False Then
+                                If Me.FactType.GetOtherRoleOfBinaryFactType(Me.Id).JoinedORMObject.ConceptType = pcenumConceptType.ValueType Then
+                                    BelongsToTable = Me.JoinedORMObject.Name
+                                Else
+                                    BelongsToTable = Me.JoinedORMObject.Name
+                                End If
+                            Else
+                                BelongsToTable = Me.JoinedORMObject.Name
+                            End If
+                        End If
+                    End If
+                ElseIf Me.TypeOfJoin = pcenumRoleJoinType.FactType Then
+                    'Joins nested Fact Object
+
+                    BelongsToTable = Me.JoinsFactType.Name
+                    Exit Function
+                End If
+            End If
+
+        End Function
+
+        Public Function GetAttributeName() As String
+
+            Dim lsAttributeName As String = ""
+            Dim lrFactTypeReading As FBM.FactTypeReading
+            Dim larRole As List(Of FBM.Role)
+            Dim lrModelObject As FBM.ModelObject
+
+            Try
+
+                Select Case Me.TypeOfJoin
+                    Case Is = pcenumRoleJoinType.EntityType
+                        If Me.FactType.Is1To1BinaryFactType Then
+                            lrModelObject = Me.FactType.GetOtherRoleOfBinaryFactType(Me.Id).JoinedORMObject
+                            lsAttributeName = lrModelObject.Name
+
+                            Select Case lrModelObject.ConceptType
+                                Case Is = pcenumConceptType.EntityType
+                                    Dim lrEntityType As FBM.EntityType
+                                    lrEntityType = lrModelObject
+                                    If lrEntityType.HasSimpleReferenceScheme Then
+                                        lsAttributeName &= lrEntityType.ReferenceMode.Replace(".", "")
+                                    End If
+                            End Select
+
+                            larRole = New List(Of FBM.Role)
+                            larRole.Add(Me)
+                            larRole.Add(Me.FactType.GetOtherRoleOfBinaryFactType(Me.Id))
+                            lrFactTypeReading = Me.FactType.FindSuitableFactTypeReadingByRoles(larRole, True)
+                            If lrFactTypeReading IsNot Nothing Then
+                                lsAttributeName = lrFactTypeReading.PredicatePart(1).PreBoundText.Replace("-", "") & lsAttributeName
+                            End If
+
+                        ElseIf Me.FactType.IsBinaryFactType Then
+                            lrModelObject = Me.FactType.GetOtherRoleOfBinaryFactType(Me.Id).JoinedORMObject
+                            lsAttributeName = lrModelObject.Name
+
+                            Select Case lrModelObject.ConceptType
+                                Case Is = pcenumConceptType.EntityType
+                                    Dim lrEntityType As FBM.EntityType
+                                    lrEntityType = lrModelObject
+                                    If lrEntityType.HasSimpleReferenceScheme Then
+                                        lsAttributeName &= lrEntityType.ReferenceMode.Replace(".", "")
+                                    End If
+                            End Select
+
+                            larRole = New List(Of FBM.Role)
+                            larRole.Add(Me)
+                            larRole.Add(Me.FactType.GetOtherRoleOfBinaryFactType(Me.Id))
+                            lrFactTypeReading = Me.FactType.FindSuitableFactTypeReadingByRoles(larRole, True)
+                            If lrFactTypeReading IsNot Nothing Then
+                                lsAttributeName = lrFactTypeReading.PredicatePart(1).PreBoundText.Replace("-", "") & lsAttributeName
+                            Else
+                                larRole = New List(Of FBM.Role)
+                                larRole.Add(Me.FactType.GetOtherRoleOfBinaryFactType(Me.Id))
+                                larRole.Add(Me)                                
+                                lrFactTypeReading = Me.FactType.FindSuitableFactTypeReadingByRoles(larRole, True)
+                                If lrFactTypeReading IsNot Nothing Then
+                                    lsAttributeName = lrFactTypeReading.PredicatePart(1).PreBoundText.Replace("-", "") & lsAttributeName
+                                End If
+                            End If
+                        ElseIf Me.FactType.IsUnaryFactType Then
+                                If Me.FactType.FactTypeReading.Count > 0 Then
+                                    lsAttributeName = Viev.Strings.RemoveWhiteSpace(Viev.Strings.MakeCapCamelCase(Me.FactType.FactTypeReading(0).PredicatePart(0).PredicatePartText))
+                                Else
+                                    lsAttributeName = "ErrorNeedFactTypeReadingForUnaryFactType"
+                                End If
+                        Else
+                                Select Case Me.JoinedORMObject.ConceptType
+                                    Case Is = pcenumConceptType.EntityType
+                                        Dim lrEntityType As FBM.EntityType
+                                        lrEntityType = Me.JoinedORMObject
+                                        If lrEntityType.HasSimpleReferenceScheme Then
+                                            lsAttributeName &= lrEntityType.ReferenceModeValueType.Id
+                                        Else
+                                            lsAttributeName = Me.JoinedORMObject.Name
+                                        End If
+                                    Case Else
+                                        lsAttributeName = Me.JoinedORMObject.Name
+                                End Select
+                        End If
+                    Case Is = pcenumRoleJoinType.FactType
+                        If Me.FactType.Is1To1BinaryFactType Then
+                            lsAttributeName = Me.FactType.GetOtherRoleOfBinaryFactType(Me.Id).JoinedORMObject.Name
+
+                            larRole = New List(Of FBM.Role)
+                            larRole.Add(Me)
+                            larRole.Add(Me.FactType.GetOtherRoleOfBinaryFactType(Me.Id))
+                            lrFactTypeReading = Me.FactType.FindSuitableFactTypeReadingByRoles(larRole, True)
+                            If lrFactTypeReading IsNot Nothing Then
+                                lsAttributeName = lrFactTypeReading.PredicatePart(1).PreBoundText.Replace("-", "") & lsAttributeName
+                            End If
+
+                        ElseIf Me.FactType.IsBinaryFactType Then
+                            lsAttributeName = Me.FactType.GetOtherRoleOfBinaryFactType(Me.Id).JoinedORMObject.Name
+
+                            larRole = New List(Of FBM.Role)
+                            larRole.Add(Me)
+                            larRole.Add(Me.FactType.GetOtherRoleOfBinaryFactType(Me.Id))
+                            lrFactTypeReading = Me.FactType.FindSuitableFactTypeReadingByRoles(larRole, True)
+                            If lrFactTypeReading IsNot Nothing Then
+                                lsAttributeName = lrFactTypeReading.PredicatePart(1).PreBoundText.Replace("-", "") & lsAttributeName
+                            End If
+                        Else
+                            lsAttributeName = Me.JoinedORMObject.Name
+                        End If
+                    Case Is = pcenumRoleJoinType.ValueType
+                        lsAttributeName = Me.JoinedORMObject.Name
+                        'Throw New Exception("Tried to get Attribute Name on Role joined to ValueType")
+                End Select
+
+                Return Viev.Strings.MakeCapCamelCase(Viev.Strings.RemoveWhiteSpace(lsAttributeName))
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return "Error getting Attribute"
+            End Try
+
+
+        End Function
+
+        ''' <summary>
+        ''' PRECONDITIONS: The Role represents only one Column, not many (as when a Role of an ObjectifiedFactType references another ObjectifiedFactType).
+        ''' The Role is within a BinaryFactType or UnaryFactType, and the other Role (if Binary) does not join an ObjectifiedFactType.
+        ''' </summary>
+        ''' <param name="arTable"></param>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public Function GetCorrespondingUnaryOrBinaryFactTypeColumn(ByRef arTable As RDS.Table) As RDS.Column
+
+            Dim lsColumnName As String = "DummyAttribute"
+            Dim lrFactTypeReading As FBM.FactTypeReading
+            Dim larRole As List(Of FBM.Role)
+            Dim lrActiveRole As FBM.Role = Me 'Likely to change (as below is processed).
+            Dim lrModelElement As FBM.ModelObject
+            Dim lbIsMandatory As Boolean = False
+
+            Try
+                'CodeSafe:
+                If Me.FactType.Arity > 2 Then Throw New Exception("Function called for a Role within a FactType that has an Arity > 2.")
+                If Me.FactType.Arity = 2 Then
+                    If Me.FactType.GetOtherRoleOfBinaryFactType(Me.Id).JoinedORMObject.ConceptType = pcenumConceptType.FactType Then
+                        Throw New Exception("Function called for a BinaryFactType where the other Role joins an ObjectifiedFactType.")
+                    End If
+                End If
+                If Me.FactType.HasTotalRoleConstraint Or Me.FactType.HasPartialButMultiRoleConstraint Then
+                    Throw New Exception("Function called for a Role within a FactType that has a TotalRoleConstraint or has a PartialButMultiRoleConstriant.")
+                End If
+
+                Select Case Me.JoinedORMObject.ConceptType
+                    Case Is = pcenumConceptType.EntityType,
+                              pcenumConceptType.FactType
+                        If (Me.FactType.Is1To1BinaryFactType Or Me.FactType.IsBinaryFactType) Then _
+                            'And Not (Me.FactType.HasTotalRoleConstraint Or Me.FactType.HasPartialButMultiRoleConstraint) Then
+
+                            lrActiveRole = Me.FactType.GetOtherRoleOfBinaryFactType(Me.Id)
+                            lrModelElement = lrActiveRole.JoinedORMObject
+
+                            Select Case lrModelElement.ConceptType
+                                Case Is = pcenumConceptType.EntityType
+                                    Dim lrEntityType As FBM.EntityType
+                                    lrEntityType = lrModelElement
+
+                                    If lrEntityType.HasSimpleReferenceScheme Then
+
+                                        If lrEntityType.IsSubtype Then
+                                            Dim lrModelObject As FBM.ModelObject = lrEntityType.GetTopmostSupertype
+                                            If lrModelObject.ConceptType = pcenumConceptType.EntityType Then
+                                                Dim lrTopMostSupertypeEntityType As FBM.EntityType = lrModelObject
+
+                                                lrActiveRole = lrTopMostSupertypeEntityType.ReferenceModeFactType.RoleGroup(1)
+                                                lsColumnName = lrTopMostSupertypeEntityType.ReferenceModeValueType.Id
+                                            Else 'TopmostSupertype is an ObjectifiedFactType
+                                                Throw New NotImplementedException("Called EntityType.GetCorrespondingUnaryOrBinaryFactTypeColumn for Entity Type that has a topmost Supertype that is a FactType. Not yet implmented.")
+                                            End If
+                                        Else
+                                            lrActiveRole = lrEntityType.ReferenceModeFactType.RoleGroup(1)
+                                            lsColumnName = lrEntityType.ReferenceModeValueType.Id
+                                        End If
+
+                                    Else
+                                        lsColumnName = lrEntityType.Id
+                                    End If
+
+                                Case Is = pcenumConceptType.ValueType
+
+                                    lsColumnName = lrModelElement.Id
+                            End Select
+
+
+                            larRole = New List(Of FBM.Role)
+                            larRole.Add(Me)
+                            larRole.Add(lrActiveRole)
+                            lrFactTypeReading = Me.FactType.FindSuitableFactTypeReadingByRoles(larRole, True)
+                            If lrFactTypeReading IsNot Nothing Then
+                                lsColumnName = lrFactTypeReading.PredicatePart(1).PreBoundText.Replace("-", "") & lsColumnName
+                            End If
+
+                        ElseIf Me.FactType.IsUnaryFactType Then
+                            lrActiveRole = Me
+                            If Me.FactType.FactTypeReading.Count > 0 Then
+                                lsColumnName = Viev.Strings.RemoveWhiteSpace(Viev.Strings.MakeCapCamelCase(Me.FactType.FactTypeReading(0).PredicatePart(0).PredicatePartText))
+                            Else
+                                lsColumnName = "ErrorNeedFactTypeReadingForUnaryFactType"
+                            End If
+                        Else
+                            Throw New Exception("Not caterd for. Contact www.viev.com")
+                        End If
+                        'Case Is = pcenumConceptType.FactType
+                        '    'Slightly different processing for a Role within a FactType. 
+                        '    ' ActiveRole is initially me, unless the Role joins to an EntityType with a SimplReferenceScheme
+                        '    lrActiveRole = Me
+
+                        '    Select Case Me.JoinedORMObject.ConceptType
+                        '        Case Is = pcenumConceptType.EntityType
+                        '            Dim lrEntityType As FBM.EntityType
+                        '            lrEntityType = Me.JoinedORMObject
+
+                        '            If lrEntityType.HasSimpleReferenceScheme Then
+                        '                lrActiveRole = lrEntityType.ReferenceModeFactType.RoleGroup(1)
+                        '                lsColumnName = lrEntityType.ReferenceModeValueType.Id
+                        '            Else
+                        '                lsColumnName = lrEntityType.Id
+                        '            End If
+
+                        '        Case Is = pcenumConceptType.ValueType
+
+                        '            lsColumnName = Me.JoinedORMObject.Id
+                        '    End Select
+
+                        '    'ToDo: Need to fix this to get a PreboundText from the relevant LinkFactType.
+                        '    'larRole = New List(Of FBM.Role)
+                        '    'larRole.Add(Me)
+                        '    'larRole.Add(lrActiveRole)
+                        '    'lrFactTypeReading = Me.FactType.FindSuitableFactTypeReadingByRoles(larRole, True)
+                        '    'If lrFactTypeReading IsNot Nothing Then
+                        '    '    lsColumnName = lrFactTypeReading.PredicatePart(1).PreBoundText.Replace("-", "") & lsColumnName
+                        '    'End If
+
+                        '    lsColumnName = Me.JoinedORMObject.Id
+
+                    Case Is = pcenumConceptType.ValueType
+                        lrActiveRole = Me
+                        lsColumnName = Me.JoinedORMObject.Name
+                        Throw New Exception("Tried to get Column for a Role joined to ValueType")
+                End Select
+
+                lsColumnName = Viev.Strings.MakeCapCamelCase(Viev.Strings.RemoveWhiteSpace(lsColumnName))
+                lsColumnName = arTable.createUniqueColumnName(Nothing, lsColumnName, 0)
+
+                If Me.Mandatory Then
+                    lbIsMandatory = True
+                Else
+                    If Me.FactType.HasTotalRoleConstraint Or Me.FactType.HasPartialButMultiRoleConstraint Then
+
+                        Dim larRoleConstraint = From RoleConstraint In Me.FactType.InternalUniquenessConstraint _
+                                                Where RoleConstraint.Role.Contains(Me)
+                                                Select RoleConstraint
+
+                        For Each lrRoleConstraint In larRoleConstraint
+                            lbIsMandatory = True
+                        Next
+                    End If
+                End If
+
+                Return New RDS.Column(arTable, lsColumnName, Me, lrActiveRole, lbIsMandatory)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return Nothing
+            End Try
+
+        End Function
+
+        ''' <summary>
+        ''' PRECONDITIONS: The Role represents only one Column, not many (as when a Role of an ObjectifiedFactType references another ObjectifiedFactType).
+        ''' The Role is within a FactType/ObjectifiedFactType.
+        ''' </summary>
+        ''' <param name="arTable"></param>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public Function GetCorrespondingFactTypeColumn(ByRef arTable As RDS.Table, Optional ByRef arResponsibleRole As FBM.Role = Nothing) As RDS.Column
+
+            Dim lsColumnName As String = "DummyAttribute"
+            'Dim lrFactTypeReading As FBM.FactTypeReading
+            'Dim larRole As List(Of FBM.Role)
+            Dim lrActiveRole As FBM.Role = Me 'Likely to change (as below is processed).
+            Dim lrModelElement As FBM.ModelObject
+            Dim lbIsMandatory As Boolean = False
+
+            Try
+                Dim lrResponsibleRole As FBM.Role
+                If arResponsibleRole Is Nothing Then
+                    lrResponsibleRole = Me
+                Else
+                    lrResponsibleRole = arResponsibleRole
+                End If
+
+                Select Case Me.JoinedORMObject.ConceptType
+                    Case Is = pcenumConceptType.EntityType
+
+                        lrActiveRole = Me
+                        lrModelElement = lrActiveRole.JoinedORMObject
+
+                        Select Case lrModelElement.ConceptType
+                            Case Is = pcenumConceptType.EntityType
+                                Dim lrEntityType As FBM.EntityType
+                                lrEntityType = lrModelElement
+
+                                If lrEntityType.HasSimpleReferenceScheme Then
+                                    If lrEntityType.IsSubtype Then
+                                        Dim lrModelObject As FBM.ModelObject = lrEntityType.GetTopmostSupertype
+                                        Select Case lrModelElement.ConceptType
+                                            Case Is = pcenumConceptType.EntityType
+                                                Dim lrTopmostSupertypeEntityType As FBM.EntityType = lrModelObject
+
+                                                lrActiveRole = lrTopmostSupertypeEntityType.ReferenceModeFactType.RoleGroup(1)
+                                                lsColumnName = lrTopmostSupertypeEntityType.ReferenceModeValueType.Id
+                                            Case Else
+                                                Throw New NotImplementedException("Called EntityType.GetCorrespondingFactTypeColumn for an EntityType that is a Subtype of a FactType as TopmostSupertype. Not yet implemented.")
+                                        End Select
+
+                                    Else
+                                        lrActiveRole = lrEntityType.ReferenceModeFactType.RoleGroup(1)
+                                        lsColumnName = lrEntityType.ReferenceModeValueType.Id
+                                    End If
+                                Else
+                                    lsColumnName = lrEntityType.Id
+                                End If
+
+                            Case Is = pcenumConceptType.ValueType
+
+                                lsColumnName = lrModelElement.Id
+                        End Select
+
+                        'ToDo: Must actually get this information from the corresponding LinkFactType.
+                        'larRole = New List(Of FBM.Role)
+                        'larRole.Add(Me)
+                        'larRole.Add(lrActiveRole)
+                        'lrFactTypeReading = Me.FactType.FindSuitableFactTypeReadingByRoles(larRole, True)
+                        'If lrFactTypeReading IsNot Nothing Then
+                        '    lsColumnName = lrFactTypeReading.PredicatePart(1).PreBoundText.Replace("-", "") & lsColumnName
+                        'End If
+
+                    Case Is = pcenumConceptType.ValueType
+                        lrActiveRole = Me
+                        lsColumnName = Me.JoinedORMObject.Name
+
+                        'ToDo: Must actually get this information from the corresponding LinkFactType.
+                        'larRole = New List(Of FBM.Role)
+                        'larRole.Add(Me)
+                        'larRole.Add(lrActiveRole)
+                        'lrFactTypeReading = Me.FactType.FindSuitableFactTypeReadingByRoles(larRole, True)
+                        'If lrFactTypeReading IsNot Nothing Then
+                        '    lsColumnName = lrFactTypeReading.PredicatePart(1).PreBoundText.Replace("-", "") & lsColumnName
+                        'End If
+                End Select
+
+                lsColumnName = Viev.Strings.MakeCapCamelCase(Viev.Strings.RemoveWhiteSpace(lsColumnName))
+                lsColumnName = arTable.createUniqueColumnName(Nothing, lsColumnName, 0)
+
+                If Me.Mandatory Then
+                    lbIsMandatory = True
+                Else
+                    If Me.FactType.HasTotalRoleConstraint Or Me.FactType.HasPartialButMultiRoleConstraint Then
+
+                        Dim larRoleConstraint = From RoleConstraint In Me.FactType.InternalUniquenessConstraint _
+                                                Where RoleConstraint.Role.Contains(Me)
+                                                Select RoleConstraint
+
+                        For Each lrRoleConstraint In larRoleConstraint
+                            lbIsMandatory = True
+                        Next
+                    End If
+                End If
+
+                Dim lrColumn As RDS.Column = New RDS.Column(arTable, lsColumnName, lrResponsibleRole, lrActiveRole, lbIsMandatory)
+
+                If lrResponsibleRole.isPartOfFactTypesPreferredReferenceScheme Then
+                    lrColumn.ContributesToPrimaryKey = True
+                End If
+
+                Return lrColumn
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return Nothing
+            End Try
+
+        End Function
+
+        ''' <summary>
+        ''' Used in, for instance, Me.getResponsibleColumns() to make sure that upstream Columns for a ReassignedRole are actually for the reassigned Role.
+        ''' </summary>
+        ''' <param name="arTargetRole"></param>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public Function getDownstreamRolePaths(ByRef arTargetRole As FBM.Role, _
+                                               ByRef aarCoveredRoles As List(Of FBM.Role)) As List(Of FBM.Role)
+
+            Try
+                Dim larRolesToReturn As New List(Of FBM.Role)
+
+                If Me.FactType.IsManyTo1BinaryFactType Or Me.FactType.IsBinaryFactType Then
+
+                    Dim lrOtherRole As FBM.Role = Me.FactType.GetOtherRoleOfBinaryFactType(Me.Id)
+
+                    larRolesToReturn.AddUnique(lrOtherRole)
+
+                    Select Case lrOtherRole.JoinedORMObject.ConceptType
+                        Case Is = pcenumConceptType.ValueType
+                            'Nothing to add
+                        Case Is = pcenumConceptType.EntityType
+                            'Nothing to add
+                        Case Is = pcenumConceptType.FactType
+                            For Each lrRole In lrOtherRole.JoinsFactType.RoleGroup
+                                larRolesToReturn.AddUnique(lrRole)
+                                If lrRole Is arTargetRole Then
+                                    Return larRolesToReturn
+                                End If
+
+                                If aarCoveredRoles.Contains(lrRole) Then
+                                    Return larRolesToReturn
+                                Else
+                                    aarCoveredRoles.Add(lrRole)
+                                End If
+                                larRolesToReturn.AddRange(lrRole.getDownstreamRolePaths(arTargetRole, aarCoveredRoles))
+                            Next
+                    End Select
+
+                ElseIf Me.FactType.HasTotalRoleConstraint Or Me.FactType.HasPartialButMultiRoleConstraint Then
+
+                    larRolesToReturn.AddUnique(Me)
+
+                    'For Each lrRole In Me.FactType.RoleGroup
+                    aarCoveredRoles.AddUnique(Me) 'Was lrRole
+
+
+
+                    If Me Is arTargetRole Then 'Was lrRole
+                        Return larRolesToReturn
+                    End If
+
+                    Select Case Me.JoinedORMObject.ConceptType
+                        Case Is = pcenumConceptType.ValueType
+                            'Nothing to add
+                        Case Is = pcenumConceptType.EntityType
+                            'Nothing to add
+                        Case Is = pcenumConceptType.FactType
+
+                            For Each lrDownstreamRole In Me.JoinsFactType.RoleGroup 'Was lrRole
+                                larRolesToReturn.AddUnique(lrDownstreamRole)
+                                If lrDownstreamRole Is arTargetRole Then
+                                    Return larRolesToReturn
+                                End If
+
+                                If aarCoveredRoles.Contains(lrDownstreamRole) Then
+                                    Return larRolesToReturn
+                                Else
+                                    aarCoveredRoles.Add(lrDownstreamRole)
+                                End If
+
+                                larRolesToReturn.AddRange(lrDownstreamRole.getDownstreamRolePaths(arTargetRole, aarCoveredRoles))
+                            Next
+                    End Select
+                    'Next
+
+                End If
+
+                Return larRolesToReturn
+
+            Catch ex As Exception
+                Dim lsMessage1 As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return New List(Of FBM.Role)
+            End Try
+
+        End Function
+
+
+        ''' <summary>
+        ''' Returns a list of the Columns that are ultimately responsible for an ActiveRole, or the ReferenceModeFactType.RoleGroup(0) of the JoinedORMObject (EntityType) of that Role.
+        '''  Most likely will return just one table, but will return all Columns of all Tables that fit the bill.
+        '''   See the TimetableBookings page of the University model.
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Function getResponsibleColumns() As List(Of RDS.Column)
+
+            Try
+                Dim larReturnColumns As New List(Of RDS.Column)
+
+                'Upstream Columns that reference any downstream Roles to this Role.
+                If Me.JoinedORMObject Is Nothing Then Return larReturnColumns
+
+                Select Case Me.JoinedORMObject.ConceptType
+                    Case Is = pcenumConceptType.ValueType
+                        'Upstream Columns that have an ActiveRole that is Me.
+                        Dim larColumn = From Table In Me.Model.RDS.Table
+                                        From Column In Table.Column
+                                        Where Column.ActiveRole Is Me
+                                        Select Column
+
+                        larReturnColumns.AddRange(larColumn.ToList)
+
+                    Case Is = pcenumConceptType.EntityType
+                        Dim larDownstreamActiveRoles As New List(Of FBM.Role)
+                        Dim larCoveredRoles As New List(Of FBM.Role)
+
+                        'Not sure why this is here.
+                        'larCoveredRoles.Add(Me)
+
+                        If Me.JoinsEntityType.HasSimpleReferenceScheme Then
+                            If Me.JoinsEntityType.ReferenceModeFactType IsNot Nothing Then
+                                larCoveredRoles.Add(Me.JoinsEntityType.ReferenceModeFactType.RoleGroup(0))
+                                larCoveredRoles.Add(Me.JoinsEntityType.ReferenceModeFactType.RoleGroup(1))
+                                larDownstreamActiveRoles.Add(Me.JoinsEntityType.ReferenceModeFactType.RoleGroup(1))
+                            End If
+                        ElseIf Me.JoinsEntityType.HasCompoundReferenceMode Then
+
+                            larDownstreamActiveRoles.AddRange(Me.JoinsEntityType.getDownstreamActiveRoles(larCoveredRoles))
+                        Else
+                            'Taken care of in initial collection of upstream Columns (above).
+                        End If
+
+                        Dim larFurtherUpstreamColumns = From Table In Me.Model.RDS.Table _
+                                                        From Column In Table.Column _
+                                                        Where Column.Role Is Me _
+                                                        Or (larDownstreamActiveRoles.Contains(Column.ActiveRole) _
+                                                        And Not larCoveredRoles.Contains(Column.Role)) _
+                                                        Select Column
+
+                        For Each lrColumn In larFurtherUpstreamColumns
+
+                            larCoveredRoles = New List(Of FBM.Role) 'So that getDownstreamRolePaths can't be circular.
+
+                            If lrColumn.Role.getDownstreamRolePaths(Me, larCoveredRoles).Contains(Me) _
+                                Or lrColumn.Role Is Me Then
+                                Call larReturnColumns.AddUnique(lrColumn)
+                            End If
+                        Next
+
+                    Case Is = pcenumConceptType.FactType
+
+                        Dim larDownstreamActiveRoles As New List(Of FBM.Role)
+                        Dim larCoveredRoles As New List(Of FBM.Role)
+
+                        larDownstreamActiveRoles = Me.getDownstreamRoleActiveRoles(larCoveredRoles) 'Returns all Roles joined ObjectifiedFactTypes and their Roles' JoinedORMObjects (recursively).
+
+                        Dim larFurtherUpstreamColumns = From Table In Me.Model.RDS.Table _
+                                                        From Column In Table.Column _
+                                                        Where larDownstreamActiveRoles.Contains(Column.ActiveRole) _
+                                                        And Not larCoveredRoles.Contains(Column.Role)
+                                                        Select Column
+
+                        Call larReturnColumns.AddRange(larFurtherUpstreamColumns.ToList)
+
+                End Select
+
+                Return larReturnColumns
+
+            Catch ex As Exception
+                Dim lsMessage1 As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return New List(Of RDS.Column)
+            End Try
+
+        End Function
+
+        ''' <summary>
+        ''' Returns a list of the Tables that are ultimately responsible for an ActiveRole of a Column. Most likely will return just one table.
+        '''   See the TimetableBookings page of the University model.
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Function getResponsibleTables() As List(Of RDS.Table)
+
+            Dim larTable = From Table In Me.Model.RDS.Table
+                           From Column In Table.Column
+                           Where Me.FactType.RoleGroup.Contains(Column.ActiveRole)
+                           Select Table
+
+            Return larTable.ToList
+
+        End Function
+
+
+        ''' <summary>
+        ''' Returns the list of Attribute Names for a Role that references a Fact Type (recursive).
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public Function getAttributeNames() As List(Of String)
+
+            Dim lasAttributeName As New List(Of String)
+
+            Try
+                If Me.JoinedORMObject.ConceptType = pcenumConceptType.FactType Then
+
+                    Dim lrFactType As FBM.FactType = Me.JoinedORMObject
+
+                    For Each lrRole In lrFactType.RoleGroup
+                        Select Case lrRole.JoinedORMObject.ConceptType
+                            Case Is = pcenumConceptType.ValueType,
+                                      pcenumConceptType.EntityType
+                                lasAttributeName.Add(lrRole.GetAttributeName)
+                            Case Is = pcenumConceptType.FactType
+                                lasAttributeName.AddRange(lrRole.getAttributeNames)
+                        End Select
+                    Next
+
+                Else
+                    Throw New Exception("Tried to get Attribute names (plural) for a Role that does not reference a Fact Type.")
+                End If
+
+                Return lasAttributeName
+
+            Catch ex As Exception
+                Dim lsMessage1 As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return New List(Of String)
+            End Try
+
+        End Function
+
+        ''' <summary>
+        ''' Used, for example, when reassigning a Role to another ModelObject.
+        ''' PRECONDITION: Role is part of the RoleGroup of a FactType with a TotalInternalUniquenessConstraint or a PartialButMultiInternalUniquenessConstraint
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public Function getDownstreamRoleActiveRoles(ByRef aarCoveredRoles As List(Of FBM.Role)) As List(Of FBM.Role)
+
+            Try
+                Dim larRolesToReturn As New List(Of FBM.Role)
+
+                If Me.FactType.HasTotalRoleConstraint Or Me.FactType.HasPartialButMultiRoleConstraint Then
+
+                    Select Case Me.JoinedORMObject.ConceptType
+                        Case Is = pcenumConceptType.ValueType
+                            larRolesToReturn.Add(Me)
+
+                        Case Is = pcenumConceptType.EntityType
+
+                            If Me.JoinsEntityType.HasSimpleReferenceScheme Then
+
+                                aarCoveredRoles.AddUnique(Me.JoinsEntityType.ReferenceModeFactType.RoleGroup(0))
+                                aarCoveredRoles.AddUnique(Me.JoinsEntityType.ReferenceModeFactType.RoleGroup(1))
+
+                                larRolesToReturn.Add(Me.JoinsEntityType.ReferenceModeFactType.RoleGroup(1))
+
+                            ElseIf Me.JoinsEntityType.HasCompoundReferenceMode Then
+
+                                larRolesToReturn.AddRange(Me.JoinsEntityType.getDownstreamActiveRoles(aarCoveredRoles))
+                            Else
+                                larRolesToReturn.AddUnique(Me)
+                            End If
+
+
+                        Case Is = pcenumConceptType.FactType
+
+                            For Each lrRole In Me.JoinsFactType.RoleGroup
+
+                                If aarCoveredRoles.Contains(Me) Then
+                                    Return larRolesToReturn
+                                End If
+
+                                aarCoveredRoles.Add(lrRole)
+                                larRolesToReturn.AddRange(lrRole.getDownstreamRoleActiveRoles(aarCoveredRoles))
+                            Next
+
+                    End Select
+
+                End If
+
+                Return larRolesToReturn
+
+            Catch ex As Exception
+                Dim lsMessage1 As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return New List(Of FBM.Role)
+            End Try
+
+        End Function
+
+        ''' <summary>
+        ''' Returns the list of Attribute Names for a Role that references a Fact Type (recursive).
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public Function getColumns(ByRef arTable As RDS.Table,
+                                   ByRef arResponsibleRole As FBM.Role) As List(Of RDS.Column)
+
+            Dim larColumn As New List(Of RDS.Column)
+            Dim lsColumnName As String = ""
+
+            Try
+
+                Dim lrActiveRole As FBM.Role
+                If Me.JoinedORMObject.ConceptType = pcenumConceptType.FactType Then
+
+                    Dim lrFactType As FBM.FactType = Me.JoinedORMObject
+
+                    Dim larPrimaryKeyRoles As New List(Of FBM.Role)
+
+                    If lrFactType.InternalUniquenessConstraint.Count = 1 Then
+                        larPrimaryKeyRoles = lrFactType.InternalUniquenessConstraint(0).Role
+
+                    ElseIf lrFactType.InternalUniquenessConstraint.Count > 1 Then
+                        'ToDo: Should be the InternalUniquenessConstraint which is a PreferedReferenceScheme for the FactType.
+                        'Use the lowest levelNr at this stage. 
+                        Dim lrFirstInternalUniquenessConstraint As FBM.RoleConstraint
+                        lrFirstInternalUniquenessConstraint = lrFactType.InternalUniquenessConstraint.Find(Function(x) x.LevelNr = 1)
+                    End If
+
+                    For Each lrRole In lrFactType.RoleGroup.FindAll(Function(x) larPrimaryKeyRoles.contains(x))
+                        Select Case lrRole.JoinedORMObject.ConceptType
+                            Case Is = pcenumConceptType.ValueType,
+                                      pcenumConceptType.EntityType
+
+                                lsColumnName = lrRole.JoinedORMObject.Id
+                                lsColumnName = Viev.Strings.MakeCapCamelCase(Viev.Strings.RemoveWhiteSpace(lsColumnName))
+
+                                lrActiveRole = New FBM.Role
+                                lrActiveRole = lrRole
+
+                                Select Case lrRole.JoinedORMObject.ConceptType
+                                    Case Is = pcenumConceptType.EntityType
+
+                                        If lrRole.JoinsEntityType.HasSimpleReferenceScheme Then
+                                            lrActiveRole = lrRole.JoinsEntityType.ReferenceModeFactType.RoleGroup(1)
+                                            lsColumnName = lrActiveRole.JoinedORMObject.Name
+                                        End If
+                                    Case Else
+                                End Select
+
+                                lsColumnName = Viev.Strings.RemoveUnderscores(lsColumnName)
+
+                                Dim lrColumn As RDS.Column = New RDS.Column(arTable, lsColumnName, arResponsibleRole, lrActiveRole, True)
+                                larColumn.Add(lrColumn)
+
+                            Case Is = pcenumConceptType.FactType
+                                'Recursive
+                                larColumn.AddRange(lrRole.getColumns(arTable, arResponsibleRole))
+                        End Select
+                    Next
+
+                Else 'Joins ValueType or EntityType
+                    If Me.FactType.isRDSTable Then
+                        larColumn.Add(Me.GetCorrespondingFactTypeColumn(arTable, arResponsibleRole))
+                    Else
+                        larColumn.Add(Me.GetCorrespondingUnaryOrBinaryFactTypeColumn(arTable))
+                    End If
+                End If
+
+                Return larColumn
+
+            Catch ex As Exception
+                Dim lsMessage1 As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return New List(Of RDS.Column)
+            End Try
+
+        End Function
+
+        ''' <summary>
+        ''' Returns True if the Role 'owns' an InternalUniquenessConstraint, else returns False            
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Function HasInternalUniquenessConstraint() As Boolean
+            '-------------------------------------------------------------------------------
+            'Used when Automatically generating Tables/Entities/Classes
+            'Used predominantly to see which Entity of a binary FactType
+            'owns the uniqueness constraint (Role can't be part of 1:1 binary fact type)
+            '-------------------------------------------------------------------------------
+            
+            HasInternalUniquenessConstraint = False
+
+            Dim larRoleConstraintRole = From RoleConstraint In Me.Model.RoleConstraint
+                                        From RoleConstraintRole In RoleConstraint.RoleConstraintRole _
+                                        Where RoleConstraint.RoleConstraintType = pcenumRoleConstraintType.InternalUniquenessConstraint _
+                                        And RoleConstraintRole.Role.Id = Me.Id _
+                                        Select RoleConstraintRole
+
+            Return larRoleConstraintRole.Count > 0
+
+            'Dim lrRoleConstraintRole As FBM.RoleConstraintRole
+            'For Each lrRoleConstraintRole In Me.RoleConstraintRole
+            '    If lrRoleConstraintRole.RoleConstraint.RoleConstraintType = pcenumRoleConstraintType.InternalUniquenessConstraint Then
+            '        HasInternalUniquenessConstraint = True
+            '        Exit Function
+            '    End If
+            'Next
+
+        End Function
+
+        Function IsAnAttributeRole() As Boolean
+
+            IsAnAttributeRole = False
+
+            Select Case Me.TypeOfJoin
+                Case Is = pcenumRoleJoinType.EntityType
+                    If Me.HasInternalUniquenessConstraint() And Me.FactType.Is1To1BinaryFactType Then
+                        IsAnAttributeRole = True
+                    ElseIf Me.FactType.HasTotalRoleConstraint Then
+                        IsAnAttributeRole = True
+                    End If
+                Case Is = pcenumRoleJoinType.ValueType
+                    'ValueType
+                    If Me.HasInternalUniquenessConstraint() And Me.FactType.Is1To1BinaryFactType Then
+                        IsAnAttributeRole = True
+                    ElseIf Me.FactType.HasTotalRoleConstraint Then
+                        IsAnAttributeRole = True
+                    End If
+                Case Is = pcenumRoleJoinType.FactType
+                    'ObjectifiedFactType        
+                    IsAnAttributeRole = True
+            End Select
+
+        End Function
+
+        ''' <summary>
+        ''' Returns True if the Role represents a PK on the (ERD) Entity, and because the Role is part of the FactType that represents the SimpleReferenceScheme of the associated ModelObject (EntityType, FactType).
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public Function IsERDSimpleReferenceSchemePKRole() As Boolean
+
+            Try
+
+
+                If Me.FactType.IsPreferredReferenceMode _
+                    And Me.RoleConstraintRole.FindAll(Function(x) x.RoleConstraint.IsPreferredIdentifier = False).Count > 0 Then
+                    Return True
+                Else
+                    Return False
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Function
+
+        ''' <summary>
+        ''' Returns True if the Role is part of the PK of an ObjectifiedFactType.
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public Function IsERDPKRoleOfObjectifiedFactType() As Boolean
+
+            If Me.FactType.IsObjectified _
+                And Me.RoleConstraintRole.FindAll(Function(x) x.RoleConstraint.IsPreferredIdentifier = True).Count > 0 Then
+                Return True
+            ElseIf Me.FactType.IsObjectified _
+                And Me.FactType.InternalUniquenessConstraint.Count = 1 Then
+                Return True
+            Else
+                Return False
+            End If
+
+        End Function
+
+        Public Overridable Function IsERDPropertyRole() As Boolean
+
+            IsERDPropertyRole = False
+
+            Select Case Me.TypeOfJoin
+                Case Is = pcenumRoleJoinType.EntityType
+                    If Me.HasInternalUniquenessConstraint() And Me.FactType.Is1To1BinaryFactType Then
+                        'Rule 4
+                        If IsSomething(Me.JoinsEntityType.ReferenceModeFactType) Then
+                            If Me.FactType.Id = Me.JoinsEntityType.ReferenceModeFactType.Id Then
+                                '---------------------------------------------------
+                                'Is Role on ReferenceModeFactType
+                                '---------------------------------------------------
+                                If Me.JoinsEntityType.ReferenceModeRoleConstraint.Role(0).Id = Me.Id Then
+                                    IsERDPropertyRole = False
+                                Else
+                                    IsERDPropertyRole = True
+                                End If
+                            Else
+                                IsERDPropertyRole = True
+                            End If
+                        Else
+                            IsERDPropertyRole = True
+                        End If
+                    ElseIf Me.FactType.HasTotalRoleConstraint Then
+                        'Rule 3 for ERDs but different for PGS
+                        IsERDPropertyRole = True
+                    ElseIf Me.FactType.IsObjectified Then
+                        IsERDPropertyRole = True
+                    ElseIf Me.HasInternalUniquenessConstraint() And Me.FactType.IsBinaryFactType Then
+                        'Rule 2
+                        IsERDPropertyRole = True
+                    ElseIf Me.FactType.Arity = 1 Then
+                        'Is Unary Role, so must be a Property
+                        IsERDPropertyRole = True
+                    End If
+                Case Is = pcenumRoleJoinType.ValueType 'ValueType                    
+                    If Me.FactType.IsObjectified Or Me.FactType.HasPartialButMultiRoleConstraint Then
+                        IsERDPropertyRole = True
+                    Else
+                        IsERDPropertyRole = False
+                    End If
+                Case Is = pcenumRoleJoinType.FactType
+                    'ObjectifiedFactType        
+                    IsERDPropertyRole = True
+            End Select
+
+        End Function
+
+
+        ''' <summary>
+        ''' True if the Role belongs to a FactType that has a Role that is part of a CompoundReferenceScheme for an EntityType
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Function isForFactTypeOfCompoundReferenceScheme() As Boolean
+
+            If Me.JoinedORMObject.ConceptType = pcenumConceptType.EntityType Then
+
+                Dim lrEntityType As FBM.EntityType = Me.JoinedORMObject
+
+                If lrEntityType.HasCompoundReferenceMode Then
+
+                    For Each lrRoleConstraintRole In lrEntityType.ReferenceModeRoleConstraint.RoleConstraintRole
+                        If lrRoleConstraintRole.Role.FactType.Id = Me.FactType.Id Then
+                            Return True
+                        End If
+                    Next
+                Else
+                    Return False
+                End If
+            Else
+                Return False
+            End If
+
+            Return False
+
+        End Function
+
+        ''' <summary>
+        ''' TRUE if the Role is an Active Role (or should be) of a Column, where the Column's ResponsibleRole is in a different FactType that references (eventually) the FactType of this Role.
+        '''   See the TimetableBookings table of the University model.
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Function hasResponsibleColumns() As Boolean
+
+            Return  Me.getResponsibleColumns.Count > 0 
+
+        End Function
+
+        Public Function IsPartOfNestedFactType() As Integer
+            '---------------------------------------------------------------
+            'Returns true if the FactType/RoleGroup to which RoleId belongs
+            'is a Nested_Fact type else returns false
+            '---------------------------------------------------------------
+
+            IsPartOfNestedFactType = False
+
+            If Me.FactType.IsObjectified Then
+                IsPartOfNestedFactType = True
+            End If
+
+        End Function
+
+        Public Function isPartOfFactTypesPreferredReferenceScheme() As Boolean
+
+            Try
+                If Me.FactType.InternalUniquenessConstraint.Count = 0 Then
+                    Return False
+
+                ElseIf (Me.FactType.IsManyTo1BinaryFactType Or Me.FactType.Is1To1BinaryFactType) And _
+                    Not Me.FactType.IsObjectified Then
+
+                    Return False
+
+                ElseIf Me.FactType.isRDSTable _
+                    And Me.FactType.InternalUniquenessConstraint.Count = 1 _
+                    And Me.HasInternalUniquenessConstraint Then
+
+                    Return True
+
+                ElseIf Me.FactType.isRDSTable _
+                    And Me.FactType.getPreferredInternalUniquenessConstraint.Role.Contains(Me) Then
+
+                    Return True
+
+                End If
+
+                Return False
+
+            Catch ex As Exception
+                Dim lsMessage1 As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return False
+            End Try
+
+        End Function
+
+
+        ''' <summary>
+        ''' PRECONDITION: Only use on Roles that are the ResponsibleRole for a Column.
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public Function isRDSForeignKeyRole() As Boolean
+
+            Try
+                If Me.FactType.isRDSTable Then
+                    'ToDo:
+                    Return False
+                Else
+                    If Me.FactType.IsManyTo1BinaryFactType Or Me.FactType.Is1To1BinaryFactType Then
+                        If Me.HasInternalUniquenessConstraint Then
+                            Return True
+                        End If
+                    End If
+                End If
+
+                Return False
+
+            Catch ex As Exception
+                Dim lsMessage1 As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return False
+            End Try
+
+        End Function
+
+
+        'Public Overridable Sub update_from_model() Handles model.ModelUpdated
+
+
+        '    If IsSomething(Me.FactType) Then
+        '        'MsgBox("tRole: Model.ModelUpdated: " & Me.FactType.Name)
+        '    End If
+        '    If IsSomething(Me.JoinedORMObject) Then
+
+        '        Select Case Me.TypeOfJoin
+        '            Case pcenumRoleJoinType.EntityType
+        '                Dim lrEntityType As Object = Me.JoinedORMObject
+        '                If TypeOf (Me.JoinedORMObject) Is tEntityType Then
+        '                    Me.JoinsEntityTypeId = lrEntityType.Id
+        '                End If
+        '            Case pcenumRoleJoinType.ValueType
+        '                Dim lrValueType As Object = Me.JoinedORMObject
+        '                If TypeOf (Me.JoinedORMObject) Is tValueType Then
+        '                    Me.JoinsValueTypeId = lrValueType.Id
+        '                End If
+        '            Case pcenumRoleJoinType.FactType
+        '                Dim lrFactType As Object = Me.JoinedORMObject
+        '                If TypeOf (Me.JoinedORMObject) Is FBM.tFactType Then
+        '                    Me.JoinsNestedFactTypeId = lrFactType.Id
+        '                End If
+        '        End Select
+        '    End If
+
+        'End Sub
+
+        ''' <summary>
+        ''' Reassigns the joined ModelObject of the Role.
+        ''' NB The name of the FactType of the Role must be modified to reflect the new relation.
+        ''' </summary>
+        ''' <param name="arNewJoinedModelObject"></param>
+        ''' <remarks></remarks>
+        Public Sub ReassignJoinedModelObject(ByRef arNewJoinedModelObject As FBM.ModelObject,
+                                             Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
+                                             Optional arConceptInstance As FBM.ConceptInstance = Nothing)
+
+            Try
+                Dim lrOriginallyJoinedModelObject As FBM.ModelObject = Me.JoinedORMObject
+
+                If arNewJoinedModelObject Is Me.JoinedORMObject Then
+                    Exit Sub
+                Else
+                    '==========================================================================
+                    'RDS - NB See below for RDS Processing propper. Must get the responsible Columns before the move.                    
+                    Dim larColumn As List(Of RDS.Column)
+                    larColumn = Me.getResponsibleColumns()
+                    '======================================
+
+                    Me.JoinedORMObject = arNewJoinedModelObject
+
+                    Select Case arNewJoinedModelObject.ConceptType
+                        Case Is = pcenumConceptType.EntityType
+                            Me.TypeOfJoin = pcenumRoleJoinType.EntityType
+                            Me.JoinsEntityType = Me.JoinedORMObject
+                            Me.JoinsValueType = Nothing
+                            Me.JoinsFactType = Nothing                            
+                        Case Is = pcenumConceptType.ValueType
+                            Me.TypeOfJoin = pcenumRoleJoinType.ValueType
+                            Me.JoinsValueType = Me.JoinedORMObject
+                            Me.JoinsEntityType = Nothing
+                            Me.JoinsFactType = Nothing
+                        Case Is = pcenumConceptType.FactType
+                            Me.TypeOfJoin = pcenumRoleJoinType.FactType
+                            Me.JoinsFactType = Me.JoinedORMObject
+                            Me.JoinsEntityType = Nothing
+                            Me.JoinsValueType = Nothing
+                    End Select
+
+                    Me.isDirty = True
+
+                    If Me.FactType.IsObjectified Then
+                        'Modify the JoinedORMObject of the appropriate LinkFactType
+                        Dim larLinkFactTypeRole = From FactType In Me.Model.FactType _
+                                                  Where FactType.IsLinkFactType = True _
+                                                  And FactType.LinkFactTypeRole Is Me _
+                                                  Select FactType.RoleGroup(1)
+
+                        Dim lrLinkFactTypeRole As FBM.Role = larLinkFactTypeRole.First
+
+                        Call lrLinkFactTypeRole.ReassignJoinedModelObject(arNewJoinedModelObject)
+
+                        'Select Case arNewJoinedModelObject.ConceptType
+                        '    Case Is = pcenumConceptType.EntityType
+                        '        lrLinkFactTypeRole.TypeOfJoin = pcenumRoleJoinType.EntityType
+                        '        lrLinkFactTypeRole.JoinsEntityType = lrLinkFactTypeRole.JoinedORMObject
+                        '        lrLinkFactTypeRole.JoinsValueType = Nothing
+                        '        lrLinkFactTypeRole.JoinsFactType = Nothing
+                        '    Case Is = pcenumConceptType.ValueType
+                        '        lrLinkFactTypeRole.TypeOfJoin = pcenumRoleJoinType.ValueType
+                        '        lrLinkFactTypeRole.JoinsValueType = lrLinkFactTypeRole.JoinedORMObject
+                        '        lrLinkFactTypeRole.JoinsEntityType = Nothing
+                        '        lrLinkFactTypeRole.JoinsFactType = Nothing
+                        '    Case Is = pcenumConceptType.FactType
+                        '        lrLinkFactTypeRole.TypeOfJoin = pcenumRoleJoinType.FactType
+                        '        lrLinkFactTypeRole.JoinsFactType = lrLinkFactTypeRole.JoinedORMObject
+                        '        lrLinkFactTypeRole.JoinsEntityType = Nothing
+                        '        lrLinkFactTypeRole.JoinsValueType = Nothing
+                        'End Select
+                    End If
+
+                    If My.Settings.UseClientServer And My.Settings.InitialiseClient And abBroadcastInterfaceEvent Then
+                        Call prDuplexServiceClient.BroadcastToDuplexService(Viev.FBM.Interface.pcenumBroadcastType.RoleReassignJoinedModelObject, Me, Nothing)
+                    End If
+
+                    '==========================================================================
+                    'RDS - NB See Above. Must get the responsible Columns before the move.                    
+
+                    '------------------------------------------------------------
+                    'Relations - Remove existing Relations
+                    If lrOriginallyJoinedModelObject IsNot Nothing Then
+                        Select Case lrOriginallyJoinedModelObject.ConceptType
+                            Case Is = pcenumConceptType.EntityType,
+                                      pcenumConceptType.FactType
+
+                                Dim larOriginTable = From Column In larColumn _
+                                                     Select Column.Table Distinct
+
+                                For Each lrOriginTable In larOriginTable
+                                    Dim larOriginColumn = From Column In lrOriginTable.Column _
+                                                          Where larColumn.Contains(Column) _
+                                                          Select Column Distinct
+
+                                    Dim larRelationToRemove As New List(Of RDS.Relation)
+                                    larRelationToRemove = Me.Model.RDS.getRelationsByOriginTableOriginColumns(lrOriginTable, larOriginColumn.ToList)
+
+                                    For Each lrRelation In larRelationToRemove
+                                        Call Me.Model.RDS.removeRelation(lrRelation)
+                                    Next
+                                Next
+                        End Select
+
+                        'Remove the existing Column/s
+                        For Each lrColumn In larColumn.ToList
+                            Me.Model.RDS.Table.Find(Function(x) x.Name = lrColumn.Table.Name).removeColumn(lrColumn)
+                        Next
+                    End If
+
+                    '=======================================================================================================
+                    'Create the New Columns
+                    Dim larTable = From lrColumn In larColumn _
+                                   Select lrColumn.Table Distinct
+
+                    Dim lrNewColumn As RDS.Column
+                    For Each lrTable In larTable
+
+                        Dim lrResponsibleRole As FBM.Role = larColumn.Find(Function(x) x.Table.Name = lrTable.Name).Role
+
+                        Select Case Me.JoinedORMObject.ConceptType
+                            Case Is = pcenumConceptType.ValueType
+                                If Me.FactType.IsUnaryFactType Then
+                                    Throw New Exception("Can't have a UnaryFactType against a ValueType.")
+
+                                ElseIf Me.FactType.IsManyTo1BinaryFactType Or Me.FactType.Is1To1BinaryFactType Then
+                                    lrNewColumn = lrResponsibleRole.GetCorrespondingUnaryOrBinaryFactTypeColumn(lrTable)
+                                    lrTable.addColumn(lrNewColumn)
+
+                                ElseIf Me.FactType.HasTotalRoleConstraint Or Me.FactType.HasPartialButMultiRoleConstraint Then
+                                    lrNewColumn = Me.GetCorrespondingFactTypeColumn(lrTable)
+                                    lrNewColumn.Role = lrResponsibleRole
+
+                                    If lrResponsibleRole.isPartOfFactTypesPreferredReferenceScheme Then
+                                        lrNewColumn.IsMandatory = True
+                                        lrNewColumn.ContributesToPrimaryKey = True
+                                    End If
+
+                                    Call lrTable.addColumn(lrNewColumn)
+                                Else
+                                    Throw New Exception("Don't know how we got here")
+                                End If
+                            Case Is = pcenumConceptType.EntityType
+
+                                Dim lrEntityType As FBM.EntityType = Me.JoinedORMObject
+
+                                If lrResponsibleRole.FactType.IsUnaryFactType Then
+
+                                    lrNewColumn = lrResponsibleRole.GetCorrespondingUnaryOrBinaryFactTypeColumn(lrTable)
+                                    lrTable.addColumn(lrNewColumn)
+
+                                ElseIf lrResponsibleRole.FactType.IsManyTo1BinaryFactType _
+                                        Or lrResponsibleRole.FactType.Is1To1BinaryFactType Then
+
+                                    If lrResponsibleRole.FactType.RoleGroup.Contains(Me) Then
+                                        Dim lrRoleConstraint = Me.FactType.InternalUniquenessConstraint.Find(Function(x) x.RoleConstraintRole(0).Role.Id = lrResponsibleRole.Id)
+                                        Call Me.Model.generateAttributesForRoleConstraint(lrRoleConstraint)
+
+                                        '20180805-Removed because created new Column on the wrong Table for 1:1 BinaryFactType reassigned Role.
+                                        'lrNewColumn = lrResponsibleRole.GetCorrespondingUnaryOrBinaryFactTypeColumn(lrTable)
+                                    Else
+                                        lrNewColumn = Me.GetCorrespondingFactTypeColumn(lrTable)
+                                        lrNewColumn.Role = lrResponsibleRole
+
+
+                                        lrNewColumn.ContributesToPrimaryKey = lrResponsibleRole.isPartOfFactTypesPreferredReferenceScheme
+
+                                        lrTable.addColumn(lrNewColumn)
+                                    End If
+
+                                ElseIf lrResponsibleRole.FactType.HasTotalRoleConstraint Or lrResponsibleRole.FactType.HasPartialButMultiRoleConstraint Then
+
+                                    If lrEntityType.HasCompoundReferenceMode Then
+                                        Dim larNewColumn As New List(Of RDS.Column)
+
+                                        Call lrEntityType.getCompoundReferenceSchemeColumns(lrTable, lrResponsibleRole, larColumn)
+
+                                        For Each lrColumn In larColumn
+                                            lrTable.addColumn(lrColumn)
+                                        Next
+                                    Else
+                                        lrNewColumn = Me.GetCorrespondingFactTypeColumn(lrTable)
+                                        lrNewColumn.Role = lrResponsibleRole
+
+                                        If Me.isPartOfFactTypesPreferredReferenceScheme Then
+                                            lrNewColumn.IsMandatory = True
+                                            lrNewColumn.ContributesToPrimaryKey = True
+                                        End If
+
+                                        Call lrTable.addColumn(lrNewColumn)
+                                    End If
+
+                                ElseIf lrResponsibleRole.FactType.Is1To1BinaryFactType And lrResponsibleRole Is Me Then
+
+                                    Dim lrRoleConstraint = Me.FactType.InternalUniquenessConstraint.Find(Function(x) x.RoleConstraintRole(0).Role.Id = Me.Id)
+                                    Call Me.Model.generateAttributesForRoleConstraint(lrRoleConstraint)
+
+                                End If
+
+                            Case Is = pcenumConceptType.FactType
+
+                                Dim larNewColumn As New List(Of RDS.Column)
+
+                                larNewColumn = Me.getColumns(lrTable, lrResponsibleRole)
+
+                                For Each lrNewColumn In larNewColumn
+
+                                    lrNewColumn.ContributesToPrimaryKey = lrResponsibleRole.isPartOfFactTypesPreferredReferenceScheme
+                                    lrNewColumn.IsMandatory = lrResponsibleRole.Mandatory Or lrNewColumn.ContributesToPrimaryKey
+
+                                    lrTable.addColumn(lrNewColumn)
+                                Next
+
+                        End Select 'Me.JoinedORMObject.ConceptType
+
+                    Next 'Table
+
+                    '===End-Create new Columns===========================================================================
+
+                    'RDS-Relationships
+                    If Not Me.FactType.IsLinkFactType Then
+                        Call Me.Model.generateRelationForReassignedRole(Me)
+                    End If
+
+                    '------------------------------------------------------------------------
+                    'Rename the FactType of the Role (me) that has been modified.
+                    Dim lsNewName As String = Me.FactType.MakeNameFromFactTypeReadings()
+                    Dim lsOldName As String = Me.FactType.Id
+                    If lsNewName <> lsOldName Then
+                        If Me.FactType.getRolesReferencingNothingCount = 0 Then
+                            Call Me.FactType.setName(lsNewName, True)
+                        End If
+                    End If
+
+                    Me.Model.MakeDirty(False, False)
+
+                    RaiseEvent RoleJoinModified(Me.JoinedORMObject)
+
+                    End If 'Not joined back to what it originally joined to.
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+
+        End Sub
+
+        ''' <summary>
+        ''' Removes the Role from the Model if it is okay to do so.
+        '''   i.e. Will not remove the Role if there is a RoleConstraint attached to the Role.
+        ''' </summary>
+        ''' <remarks></remarks>
+        Public Overrides Function RemoveFromModel(Optional ByVal abForceRemoval As Boolean = False, _
+                                                  Optional ByVal abCheckForErrors As Boolean = True,
+                                                  Optional ByVal abDoDatabaseProcessing As Boolean = True) As Boolean
+
+            Try
+                Me.Model.Role.Remove(Me)
+
+                If abDoDatabaseProcessing Then
+                    Call TableRole.DeleteRole(Me)
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Function
+
+        Public Overrides Sub Save(Optional ByVal abRapidSave As Boolean = False)
+
+            Try
+                If abRapidSave Then
+                    Call TableRole.AddRole(Me)
+
+                ElseIf Me.isDirty Then
+
+                    If TableRole.ExistsRole(Me) Then
+                        Call TableRole.updateRole(Me)
+                    Else
+                        Call TableRole.AddRole(Me)
+                    End If
+
+                    Me.isDirty = False
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+        End Sub
+
+        Public Sub SetMandatory(ByVal abMandatoryStatus As Boolean, ByVal abBroadcastInterfaceEvent As Boolean)
+
+            Try
+                Me._Mandatory = abMandatoryStatus
+
+                Call Me.makeDirty()
+                Call Me.Model.MakeDirty(False, False)
+
+                RaiseEvent MandatoryChanged(abMandatoryStatus)
+
+                If My.Settings.UseClientServer And My.Settings.InitialiseClient And abBroadcastInterfaceEvent Then
+                    Call prDuplexServiceClient.BroadcastToDuplexService(Viev.FBM.Interface.pcenumBroadcastType.ModelUpdateRole, Me, Nothing)
+                End If
+
+                '===============================================================
+                'RDS
+
+                'Relations
+                Dim larOriginRelation = From Relation In Me.Model.RDS.Relation _
+                                        From OriginColumn In Relation.OriginColumns _
+                                        Where OriginColumn.Role.Id = Me.Id _
+                                        Select Relation
+
+                For Each lrRelation As RDS.Relation In larOriginRelation
+                    lrRelation.setOriginMandatory(abMandatoryStatus)
+                Next
+
+                Dim larDestinationRelation = From Relation In Me.Model.RDS.Relation _
+                                        From DestinationColumn In Relation.DestinationColumns _
+                                        Where DestinationColumn.Role.Id = Me.Id _
+                                        Select Relation
+
+                For Each lrRelation As RDS.Relation In larDestinationRelation
+                    lrRelation.setDestinationMandatory(abMandatoryStatus)
+                Next
+
+                If Not Me.HasInternalUniquenessConstraint And Me.FactType.IsManyTo1BinaryFactType Then
+                    Dim larRelation = From Relation In Me.Model.RDS.Relation _
+                                      Where Relation.ResponsibleFactType.Id = Me.FactType.Id _
+                                      Select Relation
+
+                    For Each lrRelation In larRelation
+                        lrRelation.setDestinationMandatory(abMandatoryStatus)
+                    Next
+                End If
+
+                If Me.FactType.Is1To1BinaryFactType Then
+                    Dim larRelation = From Relation In Me.Model.RDS.Relation _
+                                      Where Relation.ResponsibleFactType.Id = Me.FactType.Id _
+                                      And Relation.OriginTable.Name = Me.JoinedORMObject.Id _
+                                      Select Relation
+
+                    For Each lrRelation In larRelation
+                        lrRelation.setOriginMandatory(abMandatoryStatus)
+                    Next
+
+                    larRelation = From Relation In Me.Model.RDS.Relation _
+                                  Where Relation.ResponsibleFactType.Id = Me.FactType.Id _
+                                  And Relation.DestinationTable.Name = Me.JoinedORMObject.Id _
+                                  Select Relation
+
+                    For Each lrRelation In larRelation
+                        lrRelation.setDestinationMandatory(abMandatoryStatus)
+                    Next
+                End If
+
+                'Columns
+                Dim larColumn = From Table In Me.Model.RDS.Table _
+                                From Column In Table.Column _
+                                Where Column.Role.Id = Me.Id _
+                                Select Column
+
+                For Each lrColumn In larColumn
+                    Call lrColumn.setMandatory(abMandatoryStatus)
+                Next
+
+            Catch ex As Exception
+                Dim lsMessage1 As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
+        ''' <summary>
+        ''' Sets the Name of the Role
+        ''' </summary>
+        ''' <param name="asName"></param>
+        ''' <remarks></remarks>
+        Public Overrides Sub setName(ByVal asName As String, Optional ByVal abBroadcastInterfaceEvent As Boolean = True)
+
+            Me.Name = asName
+
+            Call Me.makeDirty()
+            Call Me.Model.MakeDirty(False, False)
+
+            RaiseEvent RoleNameChanged(asName)
+
+            If My.Settings.UseClientServer And My.Settings.InitialiseClient And abBroadcastInterfaceEvent Then
+                Call prDuplexServiceClient.BroadcastToDuplexService(Viev.FBM.Interface.pcenumBroadcastType.ModelUpdateRole, Me, Nothing)
+            End If
+
+        End Sub
+
+        Public Sub SetValueRange(ByVal asNewValueRange As String)
+
+            Me.ValueRange = asNewValueRange
+
+            Call Me.makeDirty()
+            Call Me.Model.MakeDirty(False, True)
+
+            RaiseEvent ValueRangeChanged(asNewValueRange)
+
+        End Sub
+
+        'Private Sub JoinedORMObject_updated() Handles JoinedORMObject.updated
+
+        '    MsgBox("tRole: JoinedORMObject.updated: FactType:" & Me.FactType.Name)
+
+        '    If IsSomething(Me.JoinedORMObject) Then
+        '        Select Case Me.TypeOfJoin
+        '            Case pcenumRoleJoinType.EntityType
+        '                Dim lrEntityType As Object = Me.JoinedORMObject
+        '                If TypeOf (Me.JoinedORMObject) Is tEntityType Then
+        '                    Me.JoinsEntityTypeId = lrEntityType.Id
+        '                End If
+        '            Case pcenumRoleJoinType.ValueType
+        '                Dim lrValueType As Object = Me.JoinedORMObject
+        '                If TypeOf (Me.JoinedORMObject) Is tValueType Then
+        '                    Me.JoinsValueTypeId = lrValueType.Id
+        '                End If
+        '            Case pcenumRoleJoinType.FactType
+        '                Dim lrFactType As Object = Me.JoinedORMObject
+        '                If TypeOf (Me.JoinedORMObject) Is FBM.tFactType Then
+        '                    Me.JoinsNestedFactTypeId = lrFactType.Id
+        '                End If
+        '        End Select
+        '    End If
+
+        'End Sub
+    End Class
+End Namespace

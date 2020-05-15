@@ -1,0 +1,37 @@
+FAMOUS2 Copyright:
+
+As part of its semantic modelling for semantic interoperability research, the European
+Space Agency has given the task of developing the "Fact Based Modelling Unifying
+System" (FAMOUS) methodology to the PNA Group supported by Terence Halpin. The
+FAMOUS-2 specification (including formal models) is the first output from this ESA
+research.
+
+The FAMOUS-2 consortium (including ESA, PNA Group and Terence Halpin) are keen
+that the FAMOUS-2 specification becomes widely used, as many existing information
+modelling standards are far less effective, especially when taking into account the
+information modelling at a “global level” required by Large Systems Developments and
+Operations. Therefore, the FAMOUS-2 consortium decided to release the FAMOUS-2
+specification under a permissive license as specified here below:
+
+The FAMOUS-2 work is subject to copyright by the FAMOUS-2 Consortium. Any part of
+the FAMOUS-2 specification is freely accessible and you are authorized to redistribute it,
+with or without modification, subject to the following three terms:
+
+1. Redistributions of any part of the FAMOUS-2 specification must retain the above
+copyright notice, this list of conditions and the following disclaimer.
+
+2. Redistributions by delivery of actual software (source and binary form) supporting the
+FAMOUS-2 specification must reproduce the above copyright notice, this list of
+conditions and the following disclaimer in the documentation and/or other materials
+provided with the distribution.
+
+3. Neither the name of the copyright holder nor the names of its contributors may be used
+to endorse or promote products derived from the FAMOUS-2 specification without
+specific prior written permission.
+
+FAMOUS2 Disclaimer:
+
+The FAMOUS-2 consortium does not provide any warranty whatsoever, whether
+expressed, implied, or statutory, including, but not limited to, any warranty of
+merchantability or fitness for a particular purpose or any warranty that the contents of the
+item are error-free.

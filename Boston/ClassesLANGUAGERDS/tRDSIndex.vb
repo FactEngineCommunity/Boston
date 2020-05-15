@@ -1,0 +1,226 @@
+﻿Imports System.Xml.Serialization
+Imports System.Reflection
+
+Namespace RDS
+
+    <Serializable()> _
+    Public Class Index
+        Implements IEquatable(Of RDS.Index)
+
+        Public Model As RDS.Model
+
+        <XmlAttribute()> _
+        Public Name As String
+
+        <XmlIgnore()> _
+        <NonSerialized()> _
+        Public Table As RDS.Table
+
+        <XmlAttribute()> _
+        Public ReadOnly Property TableName As String
+            Get
+                Return Me.Table.Name
+            End Get
+        End Property
+
+        <XmlElement()> _
+        Public Column As New List(Of RDS.Column)
+
+        <XmlAttribute()> _
+        Public IsPrimaryKey As Boolean = False
+
+        <XmlAttribute()> _
+        Public NonUnique As Boolean = False
+
+        <XmlAttribute()> _
+        Public Unique As Boolean = False
+
+        <XmlAttribute()> _
+        Public IndexQualifier As String = ""
+
+        <XmlAttribute()> _
+        Public Type As pcenumODBCIndexType
+
+        <XmlAttribute()> _
+        Public AscendingOrDescending As pcenumCMMLIndexDirection 'was pcenumODBCAscendingOrDescending
+
+        <XmlAttribute()> _
+        Public Cardinality As Integer = 0
+
+        <XmlAttribute()> _
+        Public Pages As Integer = 0 'Can be DBNull from ODBC
+
+        <XmlAttribute()> _
+        Public FilterCondition As String 'Can be DBNull from ODBC
+
+        <XmlAttribute()> _
+        Public IgnoresNulls As Boolean = False
+
+        <NonSerialized()> _
+        Public Event ColumnRemoved(ByRef arColumn As RDS.Column)
+        Public Event IsPrimaryKeyChanged(ByVal abIsPrimaryKey As Boolean)
+
+        ''' <summary>
+        ''' Parameterless New
+        ''' </summary>
+        ''' <remarks></remarks>
+        Public Sub New()
+        End Sub
+
+        Public Sub New(ByRef arTable As RDS.Table, ByVal asName As String)
+
+            Me.Model = arTable.Model
+            Me.Table = arTable
+            Me.Name = asName
+
+        End Sub
+
+        Public Sub New(ByRef arTable As RDS.Table,
+                       ByVal asIndexName As String,
+                       ByVal asQualifier As String,
+                       ByVal aiIndexDirection As pcenumODBCAscendingOrDescending,
+                       ByVal abIsPrimaryKey As Boolean,
+                       ByVal abRestrainsToUniqueValues As Boolean,
+                       ByVal abIndexIgnoresNulls As Boolean,
+                       ByVal aarColumn As List(Of RDS.Column),
+                       ByVal abAddToTable As Boolean,
+                       Optional ByVal abAddIndexToColumns As Boolean = False)
+
+            Me.Model = arTable.Model
+            Me.Table = arTable
+            Me.Name = asIndexName
+            Me.IndexQualifier = asQualifier
+            Me.AscendingOrDescending = aiIndexDirection
+            Me.IsPrimaryKey = abIsPrimaryKey
+            Me.Unique = abRestrainsToUniqueValues
+            Me.IgnoresNulls = abIndexIgnoresNulls
+
+            For Each lrColumn In aarColumn
+                Me.Column.Add(lrColumn)
+
+                If abAddIndexToColumns Then
+                    lrColumn.addIndex(Me)
+                End If
+            Next
+
+            If abAddToTable Then
+                arTable.Index.AddUnique(Me)
+            End If
+
+        End Sub
+
+        Public Shadows Function Equals(other As Index) As Boolean Implements IEquatable(Of Index).Equals
+
+            Return Me.Name = other.Name
+
+        End Function
+
+        Public Function EqualsByColumns(other As Index) As Boolean
+
+            If Me.Column.Count = other.Column.Count Then
+
+                For Each lrColumn In Me.Column
+                    If Not other.Column.Contains(lrColumn) Then
+                        Return False
+                    End If
+                Next
+                Return True
+            Else
+                Return False
+            End If
+
+        End Function
+
+        Public Function EqualsByName(ByVal other As RDS.Index) As Boolean
+            Return Me.Name = other.Name
+        End Function
+
+        Public Sub addColumn(ByRef arColumn As RDS.Column)
+
+            Me.Column.Add(arColumn)
+            arColumn.AddIndex(Me)
+
+        End Sub
+
+        Public Sub removeColumn(ByRef arColumn As RDS.Column)
+
+            Try
+                Call Me.Column.Remove(arColumn)
+                Call arColumn.removeIndex(Me)
+
+                Call Me.Model.Model.removeCMMLPropertyFromIndexByRDSIndexColumn(Me, arColumn)
+
+                RaiseEvent ColumnRemoved(arColumn)
+
+            Catch ex As Exception
+                Dim lsMessage1 As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
+        Public Sub setName(ByVal asNewIndexName As String)
+
+            Try
+                Dim lsOriginalName As String = Me.Name
+
+                Me.Name = asNewIndexName
+
+                Call Me.Model.Model.updateCMMLIndexName(lsOriginalName, asNewIndexName)
+
+            Catch ex As Exception
+                Dim lsMessage1 As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
+        Public Sub setIsPrimaryKey(ByVal abIsPrimaryKey As Boolean)
+
+            Try
+                Me.IsPrimaryKey = abIsPrimaryKey
+
+                Call Me.Model.Model.updateCMMLIndexIsPrimaryKey(Me, abIsPrimaryKey)
+
+                RaiseEvent IsPrimaryKeyChanged(abIsPrimaryKey)
+
+            Catch ex As Exception
+                Dim lsMessage1 As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
+        Public Sub setQualifier(ByVal asNewQualifier As String)
+
+            Try
+                Me.IndexQualifier = asNewQualifier
+
+                Call Me.Model.Model.updateCMMLIndexQualifier(Me, asNewQualifier)
+
+            Catch ex As Exception
+                Dim lsMessage1 As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
+    End Class
+
+End Namespace

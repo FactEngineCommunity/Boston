@@ -1,0 +1,513 @@
+﻿Imports System.Reflection
+
+Partial Public Class tBrain
+
+    Private Sub ProcessENTITYTYPEISIDENTIFIEDBYITSStatement()
+
+        Dim lrEntityType As FBM.EntityType
+        Dim lrEntityTypeInstance As FBM.EntityTypeInstance
+
+        Me.VAQL.ENTITYTYPEISIDENTIFIEDBYITSStatement.MODELELEMENTNAME = ""
+        Me.VAQL.ENTITYTYPEISIDENTIFIEDBYITSStatement.REFERENCEMODE = ""
+
+        Call Me.VAQL.GetParseTreeTokens(Me.VAQL.ENTITYTYPEISIDENTIFIEDBYITSStatement, Me.VAQLParsetree)
+
+        Dim lsEntityTypeName As String = Trim(Me.VAQL.ENTITYTYPEISIDENTIFIEDBYITSStatement.MODELELEMENTNAME)
+        Dim lsActualModelElementName As String = ""
+
+        If Me.Model.GetConceptTypeByNameFuzzy(lsEntityTypeName, lsActualModelElementName) = pcenumConceptType.EntityType Then
+            '---------------------------------------------------------
+            'Great! The name identified by the user is an EntityType
+            '---------------------------------------------------------
+            lsEntityTypeName = lsActualModelElementName
+            lrEntityType = Me.Model.GetModelObjectByName(lsEntityTypeName)
+        Else
+            lrEntityType = Me.Model.CreateEntityType(lsEntityTypeName, False)
+
+            lrEntityTypeInstance = Me.Page.DropEntityTypeAtPoint(lrEntityType, New PointF(100, 100))
+
+            'Call lrEntityTypeInstance.RepellFromNeighbouringPageObjects(1, False)
+            'Call lrEntityTypeInstance.Move(lrEntityTypeInstance.X, lrEntityTypeInstance.Y, True)
+        End If
+
+        Dim lsReferenceMode As String = Me.VAQL.ENTITYTYPEISIDENTIFIEDBYITSStatement.REFERENCEMODE
+
+        Dim items As Array
+        items = System.Enum.GetValues(GetType(pcenumReferenceModeEndings))
+        Dim item As pcenumReferenceModeEndings
+        For Each item In items
+            If lsReferenceMode.EndsWith(GetEnumDescription(item)) Then
+                lsReferenceMode = "." & lsReferenceMode
+                Exit For
+            ElseIf lsReferenceMode.EndsWith(GetEnumDescription(item).Trim({"."c})) Then 'See https://msdn.microsoft.com/en-us/library/kxbw3kwc(v=vs.110).aspx
+                lsReferenceMode = "." & lsReferenceMode
+                Exit For
+            End If
+        Next
+
+        Call lrEntityType.SetReferenceMode(lsReferenceMode, False, Nothing, True)
+
+        Call lrEntityType.ReferenceModeValueType.Save()
+        Call lrEntityType.ReferenceModeFactType.Save()
+        For Each lrInternalUniquenessConstraint In lrEntityType.ReferenceModeFactType.InternalUniquenessConstraint
+            Call lrInternalUniquenessConstraint.Save()
+        Next
+        Call lrEntityType.Save()
+
+        Me.send_data("Ok")
+
+    End Sub
+
+    Private Sub ProcessStatementAddEntityType()
+
+        Dim lrEnityTypeInstance As FBM.EntityTypeInstance
+
+        Dim lsOldEntityTypeName As String = ""
+        Dim lsEntityTypeName As String = ""
+
+        Me.Timeout.Stop()
+
+        lsOldEntityTypeName = Me.CurrentQuestion.EntityType(0).Id
+        lsEntityTypeName = Viev.Strings.MakeCapCamelCase(Me.CurrentQuestion.EntityType(0).Id)
+
+        If IsSomething(Me.CurrentQuestion.sentence) Then
+            Me.CurrentQuestion.sentence.Sentence = Me.CurrentQuestion.sentence.Sentence.Replace(lsOldEntityTypeName, lsEntityTypeName)
+            Me.CurrentQuestion.sentence.ResetSentence()
+
+            Call Language.AnalyseSentence(Me.CurrentQuestion.sentence, Me.Model)
+            Call Language.ProcessSentence(Me.CurrentQuestion.sentence)
+            If Me.CurrentQuestion.sentence.AreAllWordsResolved Then
+                Call Language.ResolveSentence(Me.CurrentQuestion.sentence)
+            End If
+
+        End If
+
+        Dim lrEntityType As FBM.EntityType
+
+        lrEntityType = Me.Model.CreateEntityType(lsEntityTypeName, False)
+
+        lrEnityTypeInstance = Me.Page.DropEntityTypeAtPoint(lrEntityType, New PointF(100, 10)) 'VM-20180329-Me.Page.Form.CreateEntityType(lsEntityTypeName, True)
+
+        Call lrEnityTypeInstance.RepellFromNeighbouringPageObjects(1, False)
+        Call lrEnityTypeInstance.Move(lrEnityTypeInstance.X, lrEnityTypeInstance.Y, True)
+
+        If Me.AutoLayoutOn Then
+            Me.Page.Form.AutoLayout()
+        End If
+
+        Me.Timeout.Start()
+
+    End Sub
+
+    Private Function ProcessStatementAddFactType() As Boolean
+
+        Dim lrFactType As FBM.FactType
+        Dim lrResolvedWord As Language.WordResolved
+        Dim lrEntityType As FBM.EntityType
+        Dim lrValueType As FBM.ValueType = Nothing
+        Dim lrJoinedFactType As FBM.FactType = Nothing
+        Dim larModelObject As New List(Of FBM.ModelObject)
+
+        Try
+            ProcessStatementAddFactType = True
+
+            For Each lrResolvedWord In Me.CurrentQuestion.sentence.WordListResolved.FindAll(Function(x) x.Sense = pcenumWordSense.Noun)
+                lrEntityType = New FBM.EntityType(Me.Model, pcenumLanguage.ORMModel, lrResolvedWord.Word, Nothing, True)
+                lrEntityType = Me.Model.EntityType.Find(AddressOf lrEntityType.Equals)
+
+                If lrEntityType Is Nothing Then
+                    lrValueType = New FBM.ValueType(Me.Model, pcenumLanguage.ORMModel, lrResolvedWord.Word, True)
+                    lrValueType = Me.Model.ValueType.Find(AddressOf lrValueType.Equals)
+                    If lrValueType Is Nothing Then
+                        lrJoinedFactType = New FBM.FactType(Me.Model, lrResolvedWord.Word, True)
+                        lrJoinedFactType = Me.Model.FactType.Find(AddressOf lrJoinedFactType.Equals)
+
+                        If lrJoinedFactType.IsObjectified Then
+                            larModelObject.Add(lrJoinedFactType)
+                        Else
+                            Dim lsMessage As String = ""
+                            lsMessage = "The Fact Type, '" & lrJoinedFactType.Name & "', must be objectified before it can be involved in other Fact Types."
+                            lsMessage &= vbCrLf & "Objectify the Fact Type and try again."
+                            Me.OutputBuffer = lsMessage
+                            Me.OutputChannel.BeginInvoke(New SendDataDelegate(AddressOf Me.send_data), Me.OutputBuffer)
+                            Return False
+                            Exit Function
+                        End If
+                    Else
+                        larModelObject.Add(lrValueType)
+                    End If
+                Else
+                    larModelObject.Add(lrEntityType)
+                End If
+            Next
+
+            Dim lrModelObject As FBM.ModelObject
+            Dim lsFactTypeName As String = ""
+
+            For Each lrModelObject In larModelObject
+                lsFactTypeName &= lrModelObject.Name
+            Next
+
+            '==========================================================================
+            'Adding the FactType to the Model is done in the 'DropFactTypeAtPoint' stage, 
+            '  which also broadcasts the event if in Client/Server mode. The below just creates the FactType ready for adding to the Model.
+            lrFactType = Me.Model.CreateFactType(lsFactTypeName, larModelObject, False, False, , , False, )
+
+
+            Dim larRole As New List(Of FBM.Role)
+            Dim lrRole As FBM.Role
+
+            For Each lrRole In lrFactType.RoleGroup
+                larRole.Add(lrRole)
+            Next
+
+            Dim lrFactTypeInstance As FBM.FactTypeInstance
+            Dim loPointF As PointF
+
+            Dim lbAllObjectsOnPage As Boolean = True
+            For Each lrRole In lrFactType.RoleGroup
+                If Not Me.Page.ContainsModelElement(lrRole.JoinedORMObject) Then
+                    lbAllObjectsOnPage = False
+                End If
+            Next
+
+            If lbAllObjectsOnPage Then
+                loPointF = Me.Page.GetMidPointOfModelObjects(lrFactType.GetModelObjects)
+            Else
+                loPointF = New PointF(100, 100)
+            End If
+
+            Dim lrFactTypeReading As New FBM.FactTypeReading(lrFactType, larRole, Me.CurrentQuestion.sentence)
+            lrFactTypeReading.IsPreferred = True
+            Call lrFactType.AddFactTypeReading(lrFactTypeReading, False, True)
+
+            If lrFactType.MakeNameFromFactTypeReadings <> lrFactType.Id Then
+                Call lrFactType.setName(lrFactType.MakeNameFromFactTypeReadings, False)
+            End If
+
+            lrFactTypeInstance = Me.Page.DropFactTypeAtPoint(lrFactType, loPointF, False, False, True)
+
+
+            Call lrFactTypeInstance.RepellFromNeighbouringPageObjects(1, False)
+
+            Dim loPoint As New PointF(100, 100)
+            If lrFactTypeInstance.Arity = 2 Then
+                Dim lrFirstModelObject, lrSecondModelObject As Object
+
+                lrFirstModelObject = lrFactTypeInstance.RoleGroup(0).JoinedORMObject
+                lrSecondModelObject = lrFactTypeInstance.RoleGroup(1).JoinedORMObject
+
+                loPoint.X = (lrFirstModelObject.X + lrSecondModelObject.X) / 2
+                loPoint.Y = (lrFirstModelObject.y + lrSecondModelObject.Y) / 2
+
+                lrFactTypeInstance.Move(loPoint.X, loPoint.Y, True)
+            End If
+
+            If Me.AutoLayoutOn Then
+                Me.Page.Form.AutoLayout()
+            End If
+
+            Call lrFactTypeInstance.RepellFromNeighbouringPageObjects(1, False)
+            Call lrFactTypeInstance.Move(lrFactTypeInstance.X, lrFactTypeInstance.Y, True)
+
+            Me.OutputChannel.Focus()
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Function
+
+    ''' <summary>
+    ''' Used when the ModelElements are already identified
+    '''   e.g. When a Sentence of type 'Person has AT MOST ONE FirstName' is processed, the ModelElements are identified by the VAQL Parser.
+    ''' </summary>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Private Function ProcessStatementAddFactTypePredetermined(ByRef arQuestion As tQuestion) As Boolean
+
+        Dim lrFactType As FBM.FactType
+        Dim lsResolvedModelElementName As String
+        Dim lrModelObject As FBM.ModelObject
+        Dim larModelObject As New List(Of FBM.ModelObject)
+
+        Try
+            ProcessStatementAddFactTypePredetermined = True
+
+            For Each lsResolvedModelElementName In arQuestion.FocalSymbol
+                lrModelObject = Me.Model.GetModelObjectByName(lsResolvedModelElementName)
+                If IsSomething(lrModelObject) Then
+                    larModelObject.Add(lrModelObject)
+                Else
+                    ProcessStatementAddFactTypePredetermined = False
+                    Exit Function
+                End If
+            Next
+
+            Dim lsFactTypeName As String = ""
+
+            For Each lrModelObject In larModelObject
+                lsFactTypeName &= lrModelObject.Name
+            Next
+
+            lrFactType = Me.Model.CreateFactType(lsFactTypeName, larModelObject, False, False, , , False, )
+
+            Dim lrRole As FBM.Role
+            Dim larRole As New List(Of FBM.Role)
+
+            If arQuestion.PlanStep.FactTypeAttributes.Count > 0 Then
+
+                If arQuestion.PlanStep.FactTypeAttributes.Contains(pcenumStepFactTypeAttributes.MandatoryFirstRole) Then
+                    Dim lsModelElementId As String = arQuestion.FocalSymbol(0)
+
+                    lrRole = lrFactType.RoleGroup.Find(Function(x) x.JoinedORMObject.Id = lsModelElementId)
+                    lrRole.SetMandatory(True, True)
+                End If
+
+            End If
+
+            '==========================================================================================
+            'FactTypeReading            
+            larRole.Clear()
+            For Each lrRole In lrFactType.RoleGroup
+                larRole.Add(lrRole)
+            Next
+
+            Dim lrFactTypeReading As New FBM.FactTypeReading(lrFactType, larRole, arQuestion.sentence)
+
+            Call lrFactType.AddFactTypeReading(lrFactTypeReading, True, True)
+
+            If lrFactType.MakeNameFromFactTypeReadings <> lrFactType.Id Then
+                lrFactType.SetName(lrFactType.MakeNameFromFactTypeReadings)
+            End If
+            '===========================================================
+
+            '===========================
+            'RoleConstraint
+            larRole = New List(Of FBM.Role)
+            If arQuestion.PlanStep.FactTypeAttributes.Contains(pcenumStepFactTypeAttributes.ManyToOne) Then
+                Dim lrRoleConstraint As FBM.RoleConstraint
+
+                Dim lsModelElementId As String = arQuestion.FocalSymbol(0)
+
+                lrRole = lrFactType.RoleGroup.Find(Function(x) x.JoinedORMObject.Id = lsModelElementId)
+                larRole.Add(lrRole)
+
+                lrRoleConstraint = Me.Model.CreateRoleConstraint(pcenumRoleConstraintType.InternalUniquenessConstraint, _
+                                                                 larRole, _
+                                                                 "InternalUniquenessConstraint", _
+                                                                 1,
+                                                                 False,
+                                                                 False)
+
+                lrFactType.AddInternalUniquenessConstraint(lrRoleConstraint)
+
+                Me.Model.AddRoleConstraint(lrRoleConstraint, True, True)
+            End If
+            '===========================
+
+            Dim lrFactTypeInstance As FBM.FactTypeInstance
+            Dim loPointF As PointF
+
+            Dim lbAllObjectsOnPage As Boolean = True
+            For Each lrRole In lrFactType.RoleGroup
+                If Not Me.Page.ContainsModelElement(lrRole.JoinedORMObject) Then
+                    lbAllObjectsOnPage = False
+                End If
+            Next
+
+            If lbAllObjectsOnPage Then
+                loPointF = Me.Page.GetMidPointOfModelObjects(lrFactType.GetModelObjects)
+            Else
+                loPointF = New PointF(100, 100)
+            End If
+
+            lrFactTypeInstance = Me.Page.DropFactTypeAtPoint(lrFactType, loPointF, False, False)
+
+            Call lrFactTypeInstance.RepellFromNeighbouringPageObjects(1, False)
+            Call lrFactTypeInstance.Move(lrFactTypeInstance.X, lrFactTypeInstance.Y, True)
+
+            If Me.AutoLayoutOn Then
+                Me.Page.Form.AutoLayout()
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Function
+
+    Private Function ProcessStatementAddFactTypeReading() As Boolean
+
+        Dim larModelObject As New List(Of FBM.ModelObject)
+        Dim lrModelObject As FBM.ModelObject
+        Dim lrFactType As FBM.FactType
+        Dim lrResolvedWord As Language.WordResolved
+        Dim lrRole As FBM.Role
+        Dim larRole As New List(Of FBM.Role)
+
+        Try
+            ProcessStatementAddFactTypeReading = True
+
+            lrFactType = New FBM.FactType(Me.Model, "DummyFactType", True)
+
+            For Each lrResolvedWord In Me.CurrentQuestion.sentence.WordListResolved.FindAll(Function(x) x.Sense = pcenumWordSense.Noun)
+
+                lrModelObject = New FBM.ModelObject(lrResolvedWord.Word, pcenumConceptType.ValueType)
+                lrRole = New FBM.Role(lrFactType, New FBM.ValueType(Me.Model, pcenumLanguage.ORMModel, lrModelObject.Id, True))
+                lrFactType.RoleGroup.Add(lrRole)
+                larModelObject.Add(lrModelObject)
+            Next
+
+            lrFactType = Me.Model.FactType.Find(AddressOf lrFactType.EqualsByModelElements)
+
+            Dim lrFactTypeReading As New FBM.FactTypeReading(lrFactType, larRole, Me.CurrentQuestion.sentence)
+
+            Call lrFactType.AddFactTypeReading(lrFactTypeReading, False, True)
+
+            Dim lrFactTypeInstance As New FBM.FactTypeInstance
+            lrFactTypeInstance = lrFactType.CloneInstance(Me.Page, False)
+            lrFactTypeInstance = Me.Page.FactTypeInstance.Find(AddressOf lrFactTypeInstance.Equals)
+
+            Call lrFactTypeInstance.SetSuitableFactTypeReading()
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Function
+
+    Private Sub ProcessStatementAddValueType()
+
+        Dim lrValueTypeInstance As FBM.ValueTypeInstance
+
+        Dim lsOldValueTypeName As String = ""
+        Dim lsValueTypeName As String = ""
+
+        Me.Timeout.Stop()
+
+        lsOldValueTypeName = Me.CurrentQuestion.ValueType(0).Id
+        lsValueTypeName = Viev.Strings.MakeCapCamelCase(Me.CurrentQuestion.ValueType(0).Id)
+
+        If Me.CurrentQuestion.sentence IsNot Nothing Then
+            Me.CurrentQuestion.sentence.Sentence = Me.CurrentQuestion.sentence.Sentence.Replace(lsOldValueTypeName, lsValueTypeName)
+            Me.CurrentQuestion.sentence.ResetSentence()
+
+            Call Language.AnalyseSentence(Me.CurrentQuestion.sentence, Me.Model)
+            Call Language.ProcessSentence(Me.CurrentQuestion.sentence)
+            If Me.CurrentQuestion.sentence.AreAllWordsResolved Then
+                Call Language.ResolveSentence(Me.CurrentQuestion.sentence)
+            End If
+        End If
+
+        Dim lrValueType As FBM.ValueType
+
+        lrValueType = Me.Model.CreateValueType(lsValueTypeName, False)
+
+        lrValueTypeInstance = Me.Page.DropValueTypeAtPoint(lrValueType, New PointF(100, 100)) 'VM-20181329-Remove this commented-out code, if all okay. Me.Page.Form.CreateValueType(lsValueTypeName, True)
+
+        Call lrValueTypeInstance.RepellFromNeighbouringPageObjects(1, False)
+        Call lrValueTypeInstance.Move(lrValueTypeInstance.X, lrValueTypeInstance.Y, True)
+
+        If Me.AutoLayoutOn Then
+            Me.Page.Form.AutoLayout()
+        End If
+        Me.Timeout.Start()
+
+    End Sub
+
+    Private Sub ProcessVALUETYPEISWRITTENASStatement()
+
+        Me.VAQL.VALUETYPEISWRITTENASStatement.MODELELEMENTNAME = ""
+        Me.VAQL.VALUETYPEISWRITTENASStatement.DATATYPE = New Object
+        Me.VAQL.VALUETYPEISWRITTENASStatement.DATATYPELENGTH = New Object
+        Me.VAQL.VALUETYPEISWRITTENASStatement.DATATYPEPRECISION = New Object
+        Me.VAQL.VALUETYPEISWRITTENASStatement.NUMBER = ""
+
+        Call Me.VAQL.GetParseTreeTokens(Me.VAQL.VALUETYPEISWRITTENASStatement, Me.VAQLParsetree)
+
+        Dim lrValueTypeInstance As FBM.ValueTypeInstance
+        Dim lsValueTypeName As String = ""
+        Dim lsDataTypeName As String = ""
+        Dim liDataType As pcenumORMDataType = pcenumORMDataType.DataTypeNotSet
+
+        lsValueTypeName = Trim(Viev.Strings.MakeCapCamelCase(Me.VAQL.VALUETYPEISWRITTENASStatement.MODELELEMENTNAME))
+
+        Dim liDataTypeLength As Integer = 0
+        Dim liDataTypePrecision As Integer = 0
+
+        If Me.VAQL.VALUETYPEISWRITTENASStatement.DATATYPE.GetType Is GetType(VAQL.ParseNode) Then
+            lsDataTypeName = Me.VAQL.VALUETYPEISWRITTENASStatement.DATATYPE.Nodes(0).Token.Text
+        ElseIf Me.VAQL.VALUETYPEISWRITTENASStatement.DATATYPELENGTH.GetType Is GetType(VAQL.ParseNode) Then
+            lsDataTypeName = Me.VAQL.VALUETYPEISWRITTENASStatement.DATATYPELENGTH.Nodes(0).Token.Text
+            liDataTypeLength = CInt(Me.VAQL.VALUETYPEISWRITTENASStatement.NUMBER)
+        ElseIf Me.VAQL.VALUETYPEISWRITTENASStatement.DATATYPEPRECISION.GetType Is GetType(VAQL.ParseNode) Then
+            lsDataTypeName = Me.VAQL.VALUETYPEISWRITTENASStatement.DATATYPEPRECISION.Nodes(0).Token.Text
+            liDataTypePrecision = CInt(Me.VAQL.VALUETYPEISWRITTENASStatement.NUMBER)
+        End If
+
+        lsDataTypeName = DataTypeAttribute.Get(GetType(pcenumORMDataType), lsDataTypeName)
+        If lsDataTypeName Is Nothing Then
+            Me.send_data("That's not a valid Data Type.")
+            Exit Sub
+        End If
+
+        Try
+            liDataType = DirectCast([Enum].Parse(GetType(pcenumORMDataType), lsDataTypeName), pcenumORMDataType)
+        Catch ex As Exception
+            Me.send_data("That's not a valid Data Type.")
+            Exit Sub
+        End Try
+
+        Dim lsActualModelElementName As String = ""
+
+        If Me.Model.GetConceptTypeByNameFuzzy(lsValueTypeName, lsActualModelElementName) = pcenumConceptType.ValueType Then
+
+            Dim lrValueType As FBM.ValueType
+            Dim liInitialDataType As pcenumORMDataType
+
+            lrValueType = Me.Model.GetModelObjectByName(lsActualModelElementName)
+            liInitialDataType = lrValueType.DataType
+
+            Call lrValueType.SetDataType(liDataType, liDataTypeLength, liDataTypePrecision, True)
+
+            If Me.AutoLayoutOn Then
+                Me.Page.Form.AutoLayout()
+            End If
+
+            Me.send_data("Thank you. I changed the DataType of Value Type, '" & lsActualModelElementName & "' from " & liInitialDataType.ToString & " to " & liDataType.ToString & ".", False)
+        Else
+
+            Me.Timeout.Stop()
+
+            Dim lrValueType As FBM.ValueType
+            lrValueType = Me.Model.CreateValueType(lsValueTypeName, False, liDataType, liDataTypeLength, liDataTypePrecision)
+
+            lrValueTypeInstance = Me.Page.DropValueTypeAtPoint(lrValueType, New PointF(100, 100))
+            Call lrValueTypeInstance.RepellFromNeighbouringPageObjects(1, False)
+            Call lrValueTypeInstance.Move(lrValueTypeInstance.X, lrValueTypeInstance.Y, True)
+
+            If Me.AutoLayoutOn Then
+                Me.Page.Form.AutoLayout()
+            End If
+            Me.Timeout.Start()
+        End If
+
+    End Sub
+
+End Class

@@ -1,0 +1,80 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- saved from url=(0029)http://www.helpandmanual.com/ -->
+<head><script type="text/javascript" src="helpman_topicinit.js"></script>
+<!-- Redirect browser to frame page if page is not in the content frame. -->
+<script type="text/javascript">
+<!--
+if (top.location.search.lastIndexOf("toc=0")<=0) {
+  if (top.frames.length==0) { top.location.href="index.html?using_vaql_virtual_analyst_que.htm"; }
+  else { parent.quicksync('a3.11.3'); }
+}
+//-->
+</script>
+   <title>Using VAQL (Virtual Analyst Query Language)</title>
+   <meta name="generator" content="Help &amp; Manual" />
+   <meta name="keywords" content="" />
+   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+   <meta http-equiv="Content-Style-Type" content="text/css" />
+   <link type="text/css" href="default.css" rel="stylesheet" />
+</head>
+<body style="margin: 0px 0px 0px 0px; background: #FFFFFF;">
+<div id="hmpopupDiv" style="visibility:hidden; position:absolute; z-index:1000; "></div>
+
+
+<table width="100%" border="0" cellspacing="0" cellpadding="5" bgcolor="#649CCC">
+  <tr valign="middle">
+    <td align="left">
+      <p class="p_Heading1"><span class="f_Heading1">Using VAQL (Virtual Analyst Query Language)</span></p>
+
+    </td>
+    <td align="right">
+     <span style="font-size: 9pt">
+     <a href="introduction.htm">Top</a>&nbsp;
+     <a href="creating_subtype_relationships.htm">Previous</a>&nbsp;
+     <a href="using_the_auto_complete_list.htm">Next</a>
+     </span>
+    </td>
+  </tr>
+</table>
+
+
+<!-- Placeholder for topic body. -->
+<table width="100%" border="0" cellspacing="0" cellpadding="5"><tr valign="top"><td align="left">
+<p>The Virtual Analyst includes a Controlled Natural Language (CNL) that called VAQL (Virtual Analyst Query Language). VAQL is a derivative of Data Constellation's open-source CQL (Constellation Query Language) (http://www.dataconstellation.com) available through their Active Facts project (https://github.com/cjheath/activefacts).</p>
+<p>&nbsp;</p>
+<p>CQL is designed so that analysts can create, edit and publish models in a CNL. Viev's VAQL derives from this language, using ALLCAPS for reserved words within the language.</p>
+<p>&nbsp;</p>
+<p>A brief example as introduction to VAQL will frame the nature and intent of the language:</p>
+<p>&nbsp;</p>
+<p>The VAQL statement above defines a Value Type called "FirstName", with a Data Type of 'String Fixed Length', with the maximum length of instances of that Value Type being 100 characters long.</p>
+<p>&nbsp;</p>
+<p> &nbsp; &nbsp; &nbsp; &nbsp;"<span style="color: #339966;">FirstName</span><span style="color: #0000ff;"> IS WRITTEN AS</span> <span style="color: #808080;">StringFixedLength</span>(100)"</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>While the benefits of defining a Value Type using natural language may not be immediately apparent, it is the functionality of the Virtual Analyst toolbox which brings about the unseen benefits.</p>
+<p>&nbsp;</p>
+<p>Using Auto-Completion, Boston's VA augments rapid model definition by displaying the list of options available to complete a VAQL sentence. The Auto-Completion list is displayed under the sentence that you are typing. This allows you to quickly and efficiently complete the sentence. An example of the Auto-Completion functionality is displayed below:</p>
+<p>&nbsp;</p>
+<p style="text-align: center;"><img src="vaqliswrittenasautocomplete.png" width="482" height="256" border="0" alt="VAQLISWRITTENASAutoComplete"></p>
+<p style="text-align: center;"><span style="font-weight: bold;">Auto-Completion in Boston</span></p>
+<p>&nbsp;</p>
+<p>The result of entering the verifiable VAQL statement (above) is either creation of a new Value Type, or modifying of an existing Value Type within the model.</p>
+<p>&nbsp;</p>
+<p>We estimate that using the VA and VAQL is 2 to 3 times faster than using the standard drag-and-drop features to modify a model within Boston.</p>
+<p>&nbsp;</p>
+<p>Creation of new Value Types, or editing the Data Type of an existing Value Type is a simple example. A more complex example, model-wise, but just as easy to type into the VA, is that of creating a new Fact Type with accompanying Entity Type and Value Type all within one sentence:</p>
+<p>&nbsp;</p>
+<p> &nbsp; &nbsp; &nbsp; &nbsp;"<span style="color: #339966;">Person</span> <span style="color: #993300;">has</span> <span style="color: #0000ff;">ONE</span> <span style="color: #339966;">FirstName</span>"</p>
+<p>&nbsp;</p>
+<p>This simple sentence exemplifies the speed and grace by which models can be edited using the VA. Typing "Person has ONE FirstName" into the VA will set the VA in motion to create an Entity Type for 'Person' (if the 'Person' Entity Type doesn't already exist within the model), a Value Type for 'FirstName', a Fact Type with a reading of 'Person has FirstName', a mandatory constraint and a uniqueness constraint...all defined within that simple sentence. The resulting ORM model fragment that is created within Boston is shown below:</p>
+<p>&nbsp;</p>
+<p style="text-align: center;"><img src="modelpersonhasonefirstname.png" width="267" height="113" border="0" alt="ModelPersonHasONEFirstName"></p>
+<p style="text-align: center;"><span class="f_ImageCaption">A model fragment created using VAQL</span></p>
+<p>&nbsp;</p>
+<p>The Value Type, "FirstName", is coloured red because in this example the Data Type of the Value Type has not been set. Using the first VAQL statement first listed above ("FirstName IS WRITTEN AS StringFixedLength(100)") we can quickly and easily define the Data Type and Data Type Length of the Value Type.</p>
+
+</td></tr></table>
+
+</body>
+</html>

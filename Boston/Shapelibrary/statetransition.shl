@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<shapes xmlns="http://mindfusion.org/flowchart">
+  <shape id="State" fill-mode="Winding">
+    <outline>
+      <round-rectangle x="0" y="0" w="100" h="100" r="3" dash-style="Custom" width="-1" />
+    </outline>
+    <decorations />
+  </shape>
+</shapes>

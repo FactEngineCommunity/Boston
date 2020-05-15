@@ -1,0 +1,18 @@
+CREATE TABLE [ClientServerInvitation] (
+	[InvitationType] TEXT(40) WITH COMPRESSION,
+	[DateTime] DATETIME,
+	[InvitingUserId] TEXT(40) WITH COMPRESSION,
+	[InvitedUserId] TEXT(40) WITH COMPRESSION,
+	[InvitedGroupId] TEXT(40) WITH COMPRESSION,
+	[Tag] TEXT(50) WITH COMPRESSION,
+	[Accepted] BIT NOT NULL DEFAULT 0,
+	[Closed] BIT NOT NULL DEFAULT 0,
+	CONSTRAINT [PrimaryKey] PRIMARY KEY ([InvitationType], [DateTime], [InvitingUserId])
+);
+ALTER TABLE [ClientServerInvitation] DENY ZERO LENGTH [InvitationType];
+ALTER TABLE [ClientServerInvitation] DENY ZERO LENGTH [InvitingUserId];
+ALTER TABLE [ClientServerInvitation] ALLOW ZERO LENGTH [InvitedUserId];
+ALTER TABLE [ClientServerInvitation] ALLOW ZERO LENGTH [InvitedGroupId];
+ALTER TABLE [ClientServerInvitation] DENY ZERO LENGTH [Tag];
+ALTER TABLE [ClientServerInvitation] FORMAT [Accepted] SET "Yes/No";
+ALTER TABLE [ClientServerInvitation] FORMAT [Closed] SET "Yes/No";

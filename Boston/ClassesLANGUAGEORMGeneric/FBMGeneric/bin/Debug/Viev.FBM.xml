@@ -1,0 +1,1151 @@
+﻿<?xml version="1.0"?>
+<doc>
+<assembly>
+<name>
+Viev.FBM
+</name>
+</assembly>
+<members>
+<member name="M:Viev.FBM.Concept.Save">
+	<summary>
+ Prototype for the Save function.
+ </summary>
+	<remarks></remarks>
+</member><member name="T:Viev.FBM.PublicConstants.pcenumORMDataType">
+	<summary>
+ See DataTypeAttribute Class (above) for how to get the name of an Enum member from its corresponding 
+   DataType attribute 'name'. Used when converting VAQL DataType tokens to ORMDataType enum.
+ </summary>
+	<remarks></remarks>
+</member><member name="F:Viev.FBM.FactType.RoleGroup">
+	<summary>
+ The list of Roles within the FactType (forming a 'RoleGroup')    
+ </summary>
+	<remarks></remarks>
+</member><member name="F:Viev.FBM.FactType.ObjectifyingEntityType">
+	<summary>
+ The EntityType for the FactType if the FactType is objectified.
+ </summary>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.FactType.EqualsByModelElements(Viev.FBM.FactType)">
+	<summary>
+ Returns True if the FactType's set of Role referenced ModelElements matches the other FactType's set of Role reference ModelElements,
+   else return False.
+ </summary>
+	<param name="other"></param>
+	<returns></returns>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.FactType.CloneFacts">
+	<summary>
+ Creates a cloned list of the Facts in the FactType
+ </summary>
+	<returns></returns>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.FactType.CompareFactTypeNames(Viev.FBM.FactType,Viev.FBM.FactType)">
+	<summary>
+ Used to 'Sort' Enumerated lists Of FBM.FactType
+ </summary>
+	<param name="ao_a"></param>
+	<param name="ao_b"></param>
+	<returns></returns>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.FactType.ExistsFactTypeReadingByRoleSequence(Viev.FBM.FactTypeReading)">
+	<summary>
+ RETURNS TRUE if a Fact Type Reading exists for the Fact Type, and where that Fact Type Reading has the same Roles
+   in the same sequence as the supplied Fact Type Reading;
+ ELSE RETURNS FALSE
+ </summary>
+	<param name="arFactTypeReading">The Fact Type Reading against which a match within the Fact Type will be searched for (by Role/Sequence).</param>
+	<returns>TRUE if a Fact Type Reading exists for the Fact Type, and where that Fact Type Reading has the same Roles
+   in the same sequence as the supplied Fact Type Reading;
+ ELSE RETURNS FALSE
+ </returns>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.FactType.ExistsPredicatePart(Viev.FBM.FactTypeReading,System.String)">
+	<summary>
+ Returns TRUE if a Predicate Part exists for a Fact Type Reading and for the specified Role.
+ </summary>
+	<param name="arFactTypeReading">The Fact Type Reading to be checked.</param>
+	<param name="asRoleId">The Id of the Role within the Fact Type Reading to be checked, to be checked.</param>
+	<returns></returns>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.FactType.CreateRole(Viev.FBM.ModelObject@)">
+	<summary>
+ Adds a Role to a FactType
+ </summary>
+	<param name="aoJoinedObject">The ModelObject to which rhe new Role relates.</param>
+	<returns>FBM.Role</returns>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.FactType.ExistsAvailablePermutation(Viev.FBM.FactTypeReading)">
+	<summary>
+ Returns TRUE if not all of the RoleGroup Role order permutations are used for a FactType with more than on Role referencing the same ModelObject,
+   else returns FALSE.
+ NB Only to be used for FactTypes where more than on Role references the same ModelObject.
+ </summary>
+	<returns></returns>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.FactType.ChangeModel(Viev.FBM.Model@)">
+	<summary>
+ Changes the Model of the FactType to the target Model.
+ </summary>
+	<param name="arTargetModel">The Model to which the FactType will be associated on completion of this method.</param>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.FactType.GetAvailableFTRPermutation(Viev.FBM.FactTypeReading@)">
+	<summary>
+ Finds and returns an available permutation for a FactType with more than one Role referencing the same ModelObject.
+ NB Only to be used for FactTypes with more than one Role referencing the same ModelObject.
+ </summary>
+	<param name="arInitialFactTypeReading">The initial FactTypeReading from which to find a similar FactTypeReading (similar in Role.JoinedORMObject sequence)</param>
+	<returns>returns an available permutation for a FactType with more than one Role referencing the same ModelObject.</returns>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.FactType.GetCountRolesJoiningFactTypes">
+	<summary>
+ Returns a count of the Roles within the RoleGroup of the FactType, where those Roles join a FactType.
+ </summary>
+	<returns></returns>
+	<remarks>Example of use: Sorting FactTypes.</remarks>
+</member><member name="M:Viev.FBM.FactType.GetPredicatePart(Viev.FBM.FactTypeReading,System.Int32,System.String)">
+	<summary>
+	</summary>
+	<param name="arFactTypeReading"></param>
+	<param name="aiSequenceNr"></param>
+	<param name="asRoleId"></param>
+	<returns></returns>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.FactType.GetRoleById(System.String)">
+	<summary>
+ Returns the Role object within the RoleGroup of the FactType, given the RoleId of the Role.
+ </summary>
+	<param name="asRoleId"></param>
+	<returns></returns>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.FactType.GetRoleByJoinedObjectTypeId(System.String,System.Int32)">
+	<summary>
+ RETURNS the first Role that joins a MOdelObject with a matching asJoinedObjectTypeId,
+ OR if a SequenceNr is provided, the nth Role that has a matching asJoinedObjectTypeId
+ ELSE RETURNS Nothing
+ </summary>
+	<param name="aiSequenceNr"></param>
+	<param name="asJoinedObjectTypeId"></param>
+	<returns></returns>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.FactType.GetSignature">
+	<summary>
+ Returns the unique Signature of the FactType
+ </summary>
+	<returns></returns>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.FactType.HasMoreThanOneRoleReferencingTheSameModelObject">
+	<summary>
+ This function is used to determine of more than one Role of the FactType references the same ModelObject.
+ 
+ RETURNS TRUE if more than one Role of the FactType references the same ModelObject
+ ELSE RETURNS FALSE
+ </summary>
+	<returns>TRUE if more than one Role of the FactType references the same ModelObject
+ ELSE RETURNS FALSE</returns>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.FactType.HasPartialButMultiRoleConstraint">
+	<summary>
+ This Function is used to see if a RoleGroup has an internal uniqueness constraint 
+ spanning more than 1 role but not a total_RoleConstraint.
+ 
+ RETURNS TRUE if the FactType has a partial role constraint (but more than unary and less than total)
+ ELSE RETURNS FALSE
+ </summary>
+	<returns></returns>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.FactType.IsDoubleMandatory1To1FactType">
+	<summary>
+ Returns TRUE if the FactType within wich RoleId is present is a 1 to 1 binary FactType
+ and has two mandatory roles else returns FALSE
+ </summary>
+	<returns></returns>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.FactType.GetMandatoryRoleCount">
+	<summary>
+ Returns the Count of MandatoryRoles within the FactType.
+ </summary>
+	<returns></returns>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.FactType.GetTableName">
+	<summary>
+ Returns the TableName that a FactType belongs to when converting an ORMDiagram to a RelationalModel
+ </summary>
+	<returns></returns>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.FactType.RemoveFromModel(System.Boolean,System.Boolean)">
+	<summary>
+ Removes the FactType from the Model if it is possible to do so.
+   i.e. If there are no RoleConstraints that are not InternalUniquenessConstraints attached to Roles of the FactType etc.
+ </summary>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.FactType.RemoveInternalUniquenessConstraints">
+	<summary>
+ Removes the InternalUniquenessConstraints from the FactType.
+ </summary>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.FactType.Objectify">
+	<summary>
+ Objectifies the FactType
+ </summary>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.FactType.RemoveFactTypeReading(Viev.FBM.FactTypeReading)">
+	<summary>
+ Removes a FactTypeReading from the list of FactTypeReadings for the FactType.
+ </summary>
+	<param name="arFactTypeReading"></param>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.FactType.RemoveObjectification">
+	<summary>
+ Removes the Objectification of the FactType
+ </summary>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.FactType.RemoveRole(Viev.FBM.Role@,System.Boolean)">
+	<summary>
+ Removes a Role from the RoleGroup of the FactType
+ </summary>
+	<param name="arRole"></param>
+	<param name="abRemoveFromDatabase"></param>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.FactType.Save">
+	<summary>
+ Prototype for the Save function.
+ </summary>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.FactType.SetFactTypeReading(Viev.FBM.FactTypeReading@)">
+	<summary>
+ Resets an already existing FactTypeReading
+ </summary>
+	<param name="arFactTypeReading"></param>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.FactType.ModifyKey(System.String)">
+	<summary>
+ Calls TableFactType.ModifyKey  i.e. Updates the PrimaryKey of the FactType in the database.
+ Implementation specific.
+ </summary>
+	<param name="asNewName"></param>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.FactType.TransformFactTypeReadingToAvailablePermutation(Viev.FBM.FactTypeReading@)">
+	<summary>
+ Transforms a given FactTypeReading to an available permutation of that FactTypeReading (Role sequence) for a
+   the FactType of that FactTypeReading and where that FactType has more than one Role referencing the same ModelObject.
+ NB Should be called when creating a new FactTypeReading and where the user supplied FactTypeReading (Role sequence) has
+   already been used within the FactType.
+ NB Should only be called for a FactTypeReading.FactType where that FactType has more than one Role referencing the same ModelObject.
+ </summary>
+	<param name="arFactTypeReading"></param>
+	<returns></returns>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.FactType.Update">
+	<summary>
+ For database handling. Implementation specific.
+ </summary>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.Role.Delete">
+	<summary>
+ Deletes the Role from the Database.
+ </summary>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.Role.ChangeModel(Viev.FBM.Model@)">
+	<summary>
+ Changes the Model of the Role to the target Model.
+ </summary>
+	<param name="arTargetModel">The Model to which the Role will be associated on completion of this method.</param>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.Role.ReassignJoinedModelObject(Viev.FBM.ModelObject@)">
+	<summary>
+ Reassigns the joined ModelObject of the Role
+ </summary>
+	<param name="arNewJoinedModelObject"></param>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.Role.RemoveFromModel(System.Boolean,System.Boolean)">
+	<summary>
+ Removes the Role from the Model if it is okay to do so.
+   i.e. Will not remove the Role if there is a RoleConstraint attached to the Role.
+ </summary>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.Role.SetName(System.String)">
+	<summary>
+ Sets the Name of the Role
+ </summary>
+	<param name="asName"></param>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.Fact.EnumerateDataAsKey(System.Collections.Generic.List{System.String})">
+	<summary>
+ Enumerates the Data of the Fact as a key value
+ </summary>
+	<returns>String representing a key of the data within the Fact</returns>
+	<remarks>Used in processing ORMQL statements. e.g. Where DISTINCT keyword is used in a SELECT statement</remarks>
+</member><member name="M:Viev.FBM.Fact.GetReading">
+	<summary>
+ Returns a Reading for the Fact.
+ e.g. "Person has a FirstName"
+ </summary>
+	<returns></returns>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.Fact.Save">
+	<summary>
+ Prototype for the Save function.
+ </summary>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.RoleConstraintArgument.AllRolesAreForTheSameFactType">
+	<summary>
+ RETURNS TRUE if all the Roles of the RoleConstraintRoles of the RoleConstraintArgument are of the same FactType, 
+ ELSE RETURNS FALSE
+ </summary>
+	<returns>RETURNS TRUE if all the Roles of the RoleConstraintRoles of the RoleConstraintArgument are of the same FactType, 
+ ELSE RETURNS FALSE</returns>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.RoleConstraintArgument.ConstructJoinPathForAssociatedRoleConstraintRoles">
+	<summary>
+ Constructs the JoinPath for the RoleConstraintArgument based on the RoleConstraintRoles of the RoleConstraintArgument.
+ </summary>
+	<remarks>
+ PRECONDITIONS:
+ 1. A join path exists for the Roles of the RoleConstraintRoles of the RoleConstraintArgumen.
+     See Me.ExistsJoinPathForRoleConstraintRoles
+     NB It isn't necessary to check this first, but (of course) if there is no JoinPath then this process will fail.
+ POSTCONDITIONS:
+ 1. The JoinPath object for this RoleConstraintArgument is populated.</remarks>
+</member><member name="M:Viev.FBM.RoleConstraintArgument.ExistsJoinPathForRoleConstraintRoles(Viev.FBM.PublicConstants.pcenumJoinPathError@)">
+	<summary>
+ Returns TRUE if there is a JoinPath for all of the Roles associated with the RoleConstraintArgument, else returns FALSE.
+ </summary>
+	<returns></returns>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.RoleConstraintArgument.ProjectArgumentReading">
+	<summary>
+ Projects a Reading of the combined FactTypeReadings for the FactTypes of the JoinPath of the Argument.
+ </summary>
+	<returns></returns>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.RoleConstraintArgument.ProjectArgumentReading(Viev.FBM.ORMVerbailser@,System.Collections.Generic.List{Viev.FBM.ModelObject}@)">
+	<summary>
+ Projects a Reading of the combined FactTypeReadings for the FactTypes of the JoinPath of the Argument,
+   using the given HTMLTextWriter
+ </summary>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.RoleConstraintArgument.Save">
+	<summary>
+ Prototype for the Save function.
+ </summary>
+	<remarks></remarks>
+</member><member name="P:Viev.My.Resources.Resources.ResourceManager">
+	<summary>
+  Returns the cached ResourceManager instance used by this class.
+</summary>
+</member><member name="P:Viev.My.Resources.Resources.Culture">
+	<summary>
+  Overrides the current thread's CurrentUICulture property for all
+  resource lookups using this strongly typed resource class.
+</summary>
+</member><member name="T:Viev.My.Resources.Resources">
+	<summary>
+  A strongly-typed resource class, for looking up localized strings, etc.
+</summary>
+</member><member name="M:Viev.FBM.EntityType.CompareSubtypeConstraintExistance(Viev.FBM.EntityType,Viev.FBM.EntityType)">
+	<summary>
+ Used to sort EntityTypes based on whether they have a SubtypeConstraint or not. Those with not first.
+ </summary>
+	<param name="aoA"></param>
+	<param name="aoB"></param>
+	<returns></returns>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.EntityType.CompareEntityTypeNames(Viev.FBM.EntityType,Viev.FBM.EntityType)">
+	<summary>
+ Used to 'Sort' Enumerated lists Of FBM.tEntityType
+ </summary>
+	<param name="ao_a"></param>
+	<param name="ao_b"></param>
+	<returns></returns>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.EntityType.AddBinaryRelationToValueType(Viev.FBM.ValueType@,Viev.FBM.PublicConstants.pcenumBinaryRelationMultiplicityType)">
+	<summary>
+ Adds a BinaryFactType relation between the EntityType and a ValueType. Adds the ValueType to the Model if it does not already exist.
+ </summary>
+	<param name="arValueType"></param>
+	<param name="aiRelationMultiplicityValue"></param>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.EntityType.EnumerateInstance(System.String)">
+	<summary>
+ If the EntityType has a Compound ReferenceMode returns an enumeration of the Instance/Identity,
+   ELSE returns the supplied Instance
+ </summary>
+	<param name="asInstance"></param>
+	<returns></returns>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.EntityType.ExistsRolesAssociatedWithEntityType">
+	<summary>
+ Returns TRUE if there are any Roles (within FactTypes) that are associated with the EntityType, else returns FALSE
+ </summary>
+	<returns></returns>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.EntityType.GetAdjoinedRoles">
+	<summary>
+ Returns a list of the Roles that join to the EntityType.
+ </summary>
+	<returns></returns>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.EntityType.ExistsSubyTypeForEntityType">
+	<summary>
+ Returns TRUE if there are any Subtypes of the EntityType else returns false.
+ </summary>
+	<returns></returns>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.EntityType.ChangeModel(Viev.FBM.Model@)">
+	<summary>
+ Changes the Model of the EntityType to the target Model.
+ </summary>
+	<param name="arTargetModel">The Model to which the EntityType will be associated on completion of this method.</param>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.EntityType.CreateReferenceMode(System.String,System.String)">
+	<summary>
+ Creates a ReferenceMode where there is none. Sets up ReferenceModeFactType, ReferenceModeValueType, ReferenceModeRoleConstraint, PreferredIdentifierRCId.
+ </summary>
+	<param name="asReferenceMode">The ReferenceMode to be assigned to the EntityType</param>
+	<param name="asValueTypeName">The name for the referenced ValueType if it is already known.</param>
+	<remarks>This method should not be called if any of the following are already set for the EntityType: 
+              ReferenceModeFactType,
+              ReferenceModeValueType,
+              ReferenceModeRoleConstraint,
+              PreferredIdentifierRCId.
+ </remarks>
+</member><member name="M:Viev.FBM.EntityType.GetSignature">
+	<summary>
+ Returns the unique Signature of the EntityType
+ </summary>
+	<returns></returns>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.EntityType.HasCompoundReferenceMode">
+	<summary>
+ Returns True if the EntityType has a Compound Reference Mode, else returns False
+ </summary>
+	<returns></returns>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.EntityType.IsSubtype">
+	<summary>
+ Returns True if the EntityType is a Subtype, else returns False.
+ </summary>
+	<returns></returns>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.EntityType.RemoveDataInstance(System.String)">
+	<summary>
+ Removes a Data Instance from the Entity and all associated Sample Populations (within associated Fact Types).
+ </summary>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.EntityType.RemoveSimpleReferenceScheme(System.Boolean)">
+	<summary>
+ Removes the Simple Reference Scheme from the Entity Type.
+   NB Does not remove the ReferenceModeFactType from the Model. It is possible to remove the Simple Reference Scheme without
+   removing the associated FactType and ValueType. Other functions remove those if necessary.
+   See EntityTypeInstance._EntityType_ReferenceModeChanged (event Raised below).
+ </summary>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.EntityType.RemoveUnwantedDataInstances">
+	<summary>
+ Removes unused DataInstances from the EntityType
+ </summary>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.EntityType.Save">
+	<summary>
+ Prototype for the Save function.
+ </summary>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.EntityType.SetReferenceMode(System.String,System.Boolean,System.String)">
+	<summary>
+	</summary>
+	<param name="asReferenceMode">The ReferenceMode for the EntityType</param>
+	<param name="abSimpleAssignment">True if just setting the ReferenceMode without creating references or changing anything, else False</param>
+	<param name="asValueTypeName">Provided if the name for the ValueType is known and need not be generated.</param>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.EntityType.SetCompoundReferenceSchemeRoleConstraint(Viev.FBM.RoleConstraint@)">
+	<summary>
+ Sets the CompoundReferenceScheme.RoleConstraint for the EntityType.
+ NB Precondition: EntityType has no ReferenceMode (SimpleReferenceScheme), else throws exception.
+ </summary>
+	<param name="arRoleConstraint">The RoleConstraint that defines the CompoundReferenceScheme for the EntityType</param>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.EntityType.SetName(System.String)">
+	<summary>
+ Sets the Name, Symbol and Id of an EntityType.
+ </summary>
+	<param name="asNewName"></param>
+	<remarks>Preconditions: The uniqueness of the new EntityType.Name amoungst EntityTypes, ValueTypes, FactTypes and RoleConstraints has already been verified.</remarks>
+</member><member name="M:Viev.FBM.EntityType.SetIsObjectifyingEntityType(System.Boolean)">
+	<summary>
+ Changes whether or not the EntityType is an Objectifying Entity Type.
+   NB Rare, if ever, this method will be used.
+ </summary>
+	<param name="abIsObjectifyingEntityType"></param>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.EntityType.SetObjectifiedFactType(Viev.FBM.FactType@)">
+	<summary>
+ Changed the FactType objectified by the EntityType
+   NB Rare, if ever, this method will be used.
+ </summary>
+	<param name="arNewObjectifiedFactType"></param>
+	<remarks></remarks>
+</member><member name="F:Viev.FBM.JoinPath.Argument">
+	<summary>
+ The RoleConstraintArgument for which the JoinPath is created.
+ </summary>
+	<remarks></remarks>
+</member><member name="F:Viev.FBM.JoinPath.RolePath">
+	<summary>
+ The set of Roles traversed in order to form the JoinPath.
+ </summary>
+	<remarks></remarks>
+</member><member name="F:Viev.FBM.JoinPath.FactTypePath">
+	<summary>
+ The set of unique FactTypes (1 or more) that are traversed within the JoinPath.
+ </summary>
+	<remarks></remarks>
+</member><member name="P:Viev.FBM.JoinPath.IsComplete">
+	<summary>
+ TRUE if the JoinPath has as many Roles as the Argument of the JoinPath,
+ ELSE FALSE
+ </summary>
+	<value></value>
+	<returns></returns>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.JoinPath.#ctor">
+	<summary>
+ Parameterless New.
+ </summary>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.JoinPath.#ctor(Viev.FBM.RoleConstraintArgument)">
+	<summary>
+ Constructor.
+ </summary>
+	<param name="arRoleConstraintArgument">The RoleConstraintArgument for which the JoinPath is constructed.</param>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.JoinPath.AppendJoinPath(Viev.FBM.JoinPath)">
+	<summary>
+ Appends a JoinPath to the JoinPath.
+ </summary>
+	<param name="arJoinPath"></param>
+	<remarks>Used when stepping between the Roles of a RoleConstraintArgument.</remarks>
+</member><member name="M:Viev.FBM.JoinPath.ConstructFactTypePath">
+	<summary>
+ Constructs the FactTypePath of the JoinPath, given the Roles of the RolePath of the JoinPath.
+ </summary>
+	<remarks></remarks>
+</member><member name="T:Viev.FBM.JoinPath">
+	<summary>
+ A JoinPath is ultimately a sequence of Roles that are transversed from one Role to another Role, or a set of greater than 
+   two Roles.
+   * Each RoleConstraintArgument must have a valid JoinPath between the Roles of the RoleConstraintRoles associated
+     with the RoleConstraintArgument.
+   * Even though a JoinPath may traverse multiple FactTypes, and ultimately the ObjectTypes joined by the Roles of the
+     those FactTypes, it is the set of Roles that are traversed, to get from one Role to another Role, that form the
+     JoinPath.RolePath.
+   * The FactTypePath attribute of this class represents the set of unique FactTypes (1 or more) that are traversed within
+     the JoinPath.
+   * The first and last Roles within the JoinPath are always Roles of the RoleConstraintRoles of the RoleConstraintArgument
+     of the JoinPath. Intermediate Roles are either Roles merely traversed within the JoinPath OR a Role of a
+     RoleConstraintRole of the RoleConstraintArgument where the RoleConstraintArgument has more than two RoleConstraintRoles.
+ </summary>
+	<remarks></remarks>
+</member><member name="F:Viev.FBM.RoleConstraintRole.RoleConstraintArgument">
+	<summary>
+ Populated if the RoleConstraintRole belongs to a RoleConsrtaint with a set of Arguments
+ </summary>
+	<remarks></remarks>
+</member><member name="F:Viev.FBM.RoleConstraintRole.ArgumentSequenceNr">
+	<summary>
+ Poplated if the RoleConstraintRole belongs to a RoleConstraint with a set of Arguments. Is the Sequential poition of the RoleConstaintRole within the Argument to which it belongs. See RoleConstraintRole.RoleConstraintArgument.
+ </summary>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.RoleConstraintRole.Save">
+	<summary>
+ Saves the RoleConstraintRole to the database. Does nothing if the object of this class does not stem from an inherited class where this method if overridden.
+ </summary>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.RoleConstraintRole.Create">
+	<summary>
+ Creates an instance of the RoleConstraintRole in the database. Does nothing if the object of this class does not stem from an inherited class where this method is overridden.
+ </summary>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.RoleConstraintRole.Delete">
+	<summary>
+ Deletes the RoleConstraintRole from the database. Does nothing if the object of this class does not stem from an inherited class where this method is overridden.
+ </summary>
+	<remarks></remarks>
+</member><member name="F:Viev.FBM.DictionaryEntry.Concept">
+	<summary>
+ Me.Symbol cannot be linked to for WithEvents in FactData instances, so need an instance of a Concept from which 'Public WithEvents Concept as FBM.Concept' can be declared in FactData/Instance
+ </summary>
+	<remarks></remarks>
+</member><member name="F:Viev.FBM.DictionaryEntry.ConceptType">
+	<summary>
+ See Me.EqualsByOtherConceptType
+ Only used to check if a DictionaryEntry has other ConceptTypes than the one specified.
+ Used to check if a DictionaryEnty should be removed from the Model.ModelDictionary and the database.         
+ </summary>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.DictionaryEntry.EqualsByOtherConceptType(Viev.FBM.DictionaryEntry)">
+	<summary>
+ Used to see if a DictionaryEntry exists but for a ConceptType other than the provided DictionaryEntry.ConceptType
+ </summary>
+	<param name="other"></param>
+	<returns></returns>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.DictionaryEntry.AddConceptType(Viev.FBM.PublicConstants.pcenumConceptType)">
+	<summary>
+ Adds a ConceptType to a DictionaryEntry.
+   NB A DictionaryEntry may have many ConceptTypes.
+ </summary>
+	<param name="aiConceptType"></param>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.DictionaryEntry.GetConceptType">
+	<summary>
+ Returns the ConceptType of the DictionaryEntry.
+   NB Should only be used in Model.AddModelDictionaryEntry
+ </summary>
+	<returns></returns>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.DictionaryEntry.isGeneralConceptOnly">
+	<summary>
+ Returns TRUE if the DictionaryEntry is only of ConceptType, "GeneralConcept" and no other ConceptType, else returns FALSE
+ </summary>
+	<returns>Returns TRUE if the DictionaryEntry is only of ConceptType, "GeneralConcept" and no other ConceptType, else returns FALSE</returns>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.DictionaryEntry.Save">
+	<summary>
+ Prototype for the Save function.
+ </summary>
+	<remarks></remarks>
+</member><member name="F:Viev.FBM.JoinPathRole.Argument">
+	<summary>
+ The RoleConstraintArgument to which the JoinPathRole belongs.
+ </summary>
+	<remarks></remarks>
+</member><member name="F:Viev.FBM.JoinPathRole.Role">
+	<summary>
+ The Role of the JoinPath (i.e. for this JoinPathRole).
+ </summary>
+	<remarks></remarks>
+</member><member name="F:Viev.FBM.JoinPathRole.SequenceNr">
+	<summary>
+ The SequenceNr of the Role within the set of Roles that form the JoinPath for the RoleConstraintArgument.
+ </summary>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.JoinPathRole.#ctor">
+	<summary>
+ Parameterless New
+ </summary>
+	<remarks></remarks>
+</member><member name="F:Viev.FBM.tSubtypeRelationship.FactType">
+	<summary>
+ The corresponding FactType that represents this SubtypeConstraint.
+ </summary>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.tSubtypeRelationship.Clone(Viev.FBM.Model@,System.Boolean)">
+	<summary>
+	</summary>
+	<param name="arModel">The target Model that the SubtypeRelationship is being cloned to.</param>
+	<param name="abAddToModel">TRUE if all relevant attributes are also cloned to arModel, else FALSE</param>
+	<returns></returns>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.tSubtypeRelationship.Save">
+	<summary>
+ Saves the SubtypeRelationship to the database. Override to implement.
+ </summary>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.tSubtypeRelationship.Create">
+	<summary>
+ Creates an instance of the SubtypeRelationship in the database. Override to implement.
+ </summary>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.tSubtypeRelationship.Delete">
+	<summary>
+ Deletes the SubtypeRelationship from the database. Override to implement.
+ </summary>
+	<remarks></remarks>
+</member><member name="F:Viev.FBM.FactTypeReading._RoleList">
+	<summary>
+ Used only in searching a set of FactTypeReadings for one that has a matching RoleList sequence.
+ </summary>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.FactTypeReading.MatchesByFactTypesRoles">
+	<summary>
+ RETURNS True if the PredicatePart/Role sequence matches that of the FactType's RoleGroup.
+ </summary>
+	<returns></returns>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.FactTypeReading.MatchesRoleConstraintRoleOrder(Viev.FBM.RoleConstraint@)">
+	<summary>
+ Used to check (for Binary FactTypes) whether the FactTypeReading Role order matches that of the supplied RoleConstraint
+ PRECONDITIONS: The FactType for the reading must be a Binary FactType.
+ </summary>
+	<param name="arRoleConstraint"></param>
+	<returns></returns>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.FactTypeReading.GetReadingText(Viev.FBM.ORMVerbailser@,System.Boolean)">
+	<summary>
+ Adds the FactTypeReading text of the FactTypeReading to the Verbaliser.
+ </summary>
+	<param name="arVerbaliser"></param>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.FactTypeReading.GetReadingTextThatOrSome(System.Collections.Generic.List{Viev.FBM.Role},System.Collections.Generic.List{Viev.FBM.ModelObject}@,System.Boolean)">
+	<summary>
+ Returns the ReadingText but with either 'that' or 'some' in front of the ObjectType names.
+ </summary>
+	<param name="aarRole">The set of Roles that determines whether 'that' or 'some' precedes the respective ObjectType's name.</param>
+	<param name="abDropFirstRole">If TRUE, then the first Role/ObjectType.Name is dropped and replaced by 'that'</param>
+	<returns></returns>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.FactTypeReading.GetReadingTextThatOrSome(System.Collections.Generic.List{Viev.FBM.Role},Viev.FBM.ORMVerbailser@,System.Collections.Generic.List{Viev.FBM.ModelObject}@,System.Boolean)">
+	<summary>
+ Returns the ReadingText but with either 'that' or 'some' in front of the ObjectType names.
+ </summary>
+	<param name="aarRole">The set of Roles that determines whether 'that' or 'some' precedes the respective ObjectType's name.</param>
+	<param name="abDropFirstRole">If TRUE, then the first Role/ObjectType.Name is dropped and replaced by 'that'</param>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.FactTypeReading.RemovePredicatePartForRole(Viev.FBM.Role@)">
+	<summary>
+ Removes PredicatePart/s from FactTypeReading for an ObjectType joined to a Role/s of the FactType of the FactTypeReading.
+ When a user removes a Role from a FactType, there is no option but to remove all 
+ PredicateParts (in FactTypeReadings for the FactType) that contain the ObjectType
+ joined by the Role being removed.
+ </summary>
+	<param name="arRole">The Role for which the associated PredicatePart will be removed</param>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.FactTypeReading.Save">
+	<summary>
+ Prototype for the Save function.
+ </summary>
+	<remarks></remarks>
+</member><member name="M:Viev.publicPermutations.publicPermutations.Permutate(System.Int32,System.Collections.Generic.List{System.Object}@,System.Collections.Generic.List{System.Object}@,System.Collections.Generic.List{System.Collections.Generic.List{System.Object}}@)">
+	<summary>
+	</summary>
+	<param name="aaoElements">Elements() is the array to permutate (remember, this will grow shorter as we work, so the ArrayCount parameter cannot be deduced from the length of Elements).</param>
+	<param name="aaoOrder">Order is the temporary array where we store one permutation</param>
+	<param name="aaoOrders">Orders is the Collection where we store all permutations found.</param>
+	<remarks></remarks>
+</member><member name="F:Viev.Validation.ModelValidator.Model">
+	<summary>
+ The Model being validated
+ </summary>
+	<remarks></remarks>
+</member><member name="F:Viev.Validation.ModelValidator.ErrorChecker">
+	<summary>
+ List of ErrorCheker inherited classes/objects.
+ </summary>
+	<remarks></remarks>
+</member><member name="M:Viev.Validation.ModelValidator.AddErrorChecker(Viev.Validation.ErrorChecker@)">
+	<summary>
+ Adds an ErrorChecker object to the list of ErrorChecker objects.
+ </summary>
+	<param name="arErrorChecker"></param>
+	<remarks></remarks>
+</member><member name="M:Viev.Validation.ModelValidator.AddErrorCheckers">
+	<summary>
+ Creates the initial list of ErrorChecker objects
+ </summary>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.ValueType.CompareValueTypeNames(Viev.FBM.ValueType,Viev.FBM.ValueType)">
+	<summary>
+ Used to 'Sort' Enumerated lists of tValueType
+ </summary>
+	<param name="ao_a"></param>
+	<param name="ao_b"></param>
+	<returns></returns>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.ValueType.ChangeModel(Viev.FBM.Model@)">
+	<summary>
+ Changes the Model of the ValueType to the target Model.
+ </summary>
+	<param name="arTargetModel">The Model to which the ValueType will be associated on completion of this method.</param>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.ValueType.ExistsRolesAssociatedWithValueType">
+	<summary>
+ Returns TRUE if there are any Roles (within FactTypes) that are associated with the ValueType, else returns FALSE
+ </summary>
+	<returns>TRUE if there are any Roles (within FactTypes) that are associated with the ValueType, else returns FALSE</returns>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.ValueType.IsIndependant">
+	<summary>
+ Returns True if there are no Roles that reference the ValueType, else returns False
+ </summary>
+	<returns></returns>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.ValueType.IsReferenceMode">
+	<summary>
+ Returns TRUE if is the ReferenceMode of an EntityType, else returns FALSE
+ </summary>
+	<returns></returns>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.ValueType.GetReferenceModeFromName">
+	<summary>
+ Formulates a ReferenceMode (for an EntityType) from the Name of the ValueType.
+   e.g. "Id" from "Person_Id".
+ </summary>
+	<returns></returns>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.ValueType.GetSignature">
+	<summary>
+ Returns the unique Signature of the ValueType
+ </summary>
+	<returns></returns>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.ValueType.Save">
+	<summary>
+ Prototype for the Save function.
+ </summary>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.ModelNote.#ctor">
+	<summary>
+ Parameterless constructor
+ </summary>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.ModelNote.GetSignature">
+	<summary>
+ Returns the unique Signature of the ModelNote
+ </summary>
+	<returns></returns>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.ModelNote.Save">
+	<summary>
+ Prototype for the Save function.
+ </summary>
+	<remarks></remarks>
+</member><member name="F:Viev.FBM.PredicatePart.PredicatePartText">
+	<summary>
+ The full text of the PredicatePart. i.e. Not 'split' into individual words/Symbols.
+ </summary>
+	<remarks></remarks>
+</member><member name="F:Viev.FBM.PredicatePart.PredicatePart">
+	<summary>
+ Is a 'split' of the PredicatePartText. i.e. Is the individual words of the PredicatePartText.
+ </summary>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.PredicatePart.Save">
+	<summary>
+ Prototype for the Save function.
+ </summary>
+	<remarks></remarks>
+</member><member name="F:Viev.Validation.ErrorChecker.Model">
+	<summary>
+ The Model being checked.
+ </summary>
+	<remarks></remarks>
+</member><member name="T:Viev.Validation.ErrorChecker">
+	<summary>
+ Inherited Only
+ Base class for ErrorChecker classes.
+ </summary>
+	<remarks></remarks>
+</member><member name="F:Viev.FBM.FactData.FactType">
+	<summary>
+ The FactType of the Fact to which the RoleData belongs.
+ </summary>
+	<remarks></remarks>
+</member><member name="F:Viev.FBM.FactData.Fact">
+	<summary>
+ The Fact to which the RoleData belongs.
+ </summary>
+	<remarks></remarks>
+</member><member name="F:Viev.FBM.FactData.Role">
+	<summary>
+ The Role to which the 'Concept' (Value) is related within the Fact.
+ </summary>
+	<remarks></remarks>
+</member><member name="P:Viev.FBM.FactData.Data">
+	<summary>
+ The Data stored for the Role for the Fact.
+ </summary>
+	<value></value>
+	<returns></returns>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.FactData.Clone(Viev.FBM.Fact@)">
+	<summary>
+ Returns a Clone of the FactData.
+ </summary>
+	<param name="arFact"></param>
+	<returns></returns>
+	<remarks>Needs to be managed carefully because does not clone the Role</remarks>
+</member><member name="M:Viev.FBM.FactData.Clone(Viev.FBM.Model@,Viev.FBM.Fact@,Viev.FBM.FactType@)">
+	<summary>
+ Clones the RoleData struct. 
+ PRECONDITIONS: The ModelDictionary for the Model must be prepopulated.
+ </summary>
+	<returns></returns>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.FactData.Save">
+	<summary>
+ Prototype for the Save function.
+ </summary>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.FactData.SetData(System.String)">
+	<summary>
+ Sets the Concept.Symbol for the FactData.
+ Preconditions: The ModelDictionary is already loaded for the FactData.Model and the FactData.Concept is already linked to a DictionaryEntry in the ModelDitionary (link to DictionaryEntry.Concept).
+ Postconditions: The FactData.Concept is either updated to a new Symbol or switched to a new DictionaryEntry.Concept.
+ </summary>
+	<param name="value"></param>
+	<remarks>NB Initial setting of the FactData.Concept.Symbol should be done via the Set method of FactData.Data</remarks>
+</member><member name="M:Viev.FBM.Model.#ctor(System.String,System.String,System.String,System.String,Viev.FBM.PublicConstants.pcenumLanguage,System.String)">
+	<summary>
+	</summary>
+	<param name="aiEnterprise_id"></param>
+	<param name="aiSubject_area_id"></param>
+	<param name="aiProject_id"></param>
+	<param name="aiModelId"></param>
+	<param name="aiLanguageId"></param>
+	<param name="as_ORMModel_name"></param>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.Model.AddRoleConstraint(Viev.FBM.RoleConstraint@,System.Boolean)">
+	<summary>
+ Adds a Role Constraint to the list of Role Constraints in the Model.
+   NB Adds a Dictionary Entry for the Role Constraint to the Model's Model Dictionary.
+ </summary>
+	<param name="arRoleConstraint">The Role Constraint to be added to the Model.</param>
+	<remarks>Use this method if it known that the Role Constraint is unique to the model, otherwise use tORMModel.CreateRoleConstraint.</remarks>
+</member><member name="M:Viev.FBM.Model.AreRolesCompatible(Viev.FBM.Role@,Viev.FBM.Role@)">
+	<summary>
+ Checks to see whether two Roles are compatible. i.e. Same JoinedObjectType, or subtype/supertype thereof.
+   * See also Me.AreObjectTypesSupertypesSubtypesOfEachOther
+ </summary>
+	<param name="arFirstRole">The first Role to be checked for compatibility.</param>
+	<param name="arSecondRole">The second Role to be checked for compatibility.</param>
+	<returns></returns>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.Model.AddModelDictionaryEntry(Viev.FBM.DictionaryEntry@,System.Boolean,System.Boolean)">
+	<summary>
+ Adds an FBM.DictionaryEntry to the Model's 'ModelDictionary' (if it does not already exist).
+   Returns the new or existing DictionaryEntry
+ </summary>
+	<param name="arDictionaryEntry">The DictionaryEntry being added to the ModelDictionary.</param>
+	<param name="abAppendRealisations">Defaults to True. If True the Realisations for the DictionaryEntry is appended with the Concept of the DictionaryEntry</param>
+	<remarks>This function can be used to check if a DictionaryEntry already exists in the ModelDictionary. Set abAppendRealisations to False if you don't wish for the Realisations of the DictionaryEntry to be appended with the Concept of the DictionaryEntry.</remarks>
+</member><member name="M:Viev.FBM.Model.CreateEntityType(System.String)">
+	<summary>
+ Creates a new EntityType for the Model (including a ValueType and FactType for the ReferenceMode of the EntityType)
+ </summary>
+	<returns>tEntityType</returns>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.Model.CreateFact(Viev.FBM.FactType@)">
+	<summary>
+ Creates a random fact for the specified FactType.
+ </summary>
+	<param name="arFactType">The FactType for which a random Fact will be created.</param>
+	<returns>A Fact with random FactData.</returns>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.Model.CreateValueType(System.String)">
+	<summary>
+ Creates a ValueType and adds it to the model.
+ </summary>
+	<param name="asValueTypeName"></param>
+	<returns></returns>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.Model.CreateRoleConstraint(Viev.FBM.PublicConstants.pcenumRoleConstraintType,System.Collections.Generic.List{Viev.FBM.Role},System.String,System.Int32,System.Boolean)">
+	<summary>
+ Creates a new Role Constraint for a Model.
+   NB Adds a Dictionary Entry for the Role Constraint in the Model's Model Dictionary.
+ </summary>
+	<param name="aiRoleConstraintType"></param>
+	<param name="aarRole"></param>
+	<returns>A new unique Role Constraint, as created for the Model.</returns>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.Model.DeprecateRealisationsForDictionaryEntry(Viev.FBM.DictionaryEntry@)">
+	<summary>
+ Deprecates the Realisations for a DictionaryEntry in the ModelDictionary
+ </summary>
+	<param name="arDictionaryEntry"></param>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.Model.EmptyModel">
+	<summary>
+ Empties all Model Objects from the Model.
+   NB Does not delete the Model from the database.
+ </summary>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.Model.ReviewModelErrors">
+	<summary>
+ Detects ModelErrors and adds/removes them to/from the Model.ModelError list.
+ </summary>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.Model.Save">
+	<summary>
+ Saves the currently loaded ORM model to the database.
+ This method is a prototype and must be overridden to actually save the model in a database.
+ </summary>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.Model.GetConceptTypeByNameFuzzy(System.String,System.String@)">
+	<summary>
+ Matches a ModelElement.Id/Name even if the case of the letters is incorrect
+ </summary>
+	<param name="asModelElementName">The Id/Name of the ModelElement</param>
+	<param name="asActualModelElementName">The actual Id/Name of the ModelElement, with correct Case</param>
+	<returns>The ConceptType of the ModelElement</returns>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.Model.ExistsJoinPathForRoles(System.Collections.Generic.List{Viev.FBM.Role}@,Viev.FBM.PublicConstants.pcenumJoinPathError@)">
+	<summary>
+ Returns TRUE if there is a JoinPath for all of the Roles associated with the RoleConstraintArgument, else returns FALSE.
+ </summary>
+	<returns></returns>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.Model.IncrementRealisationsForDictionaryEntry(Viev.FBM.DictionaryEntry@)">
+	<summary>
+ Deprecates the Realisations for a DictionaryEntry in the ModelDictionary
+ </summary>
+	<param name="arDictionaryEntry"></param>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.Model.IsEmpty">
+	<summary>
+ Returns True if the Model is Empty (contains no ModelObjects, including ModelNotes), else returns False.
+ </summary>
+	<returns>True if the Model is Empty (contains no ModelObjects, including ModelNotes), else returns False.</returns>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.Model.Load(System.Boolean,System.Boolean,System.ComponentModel.BackgroundWorker@)">
+	<summary>
+ Loads the Model from the database.
+ </summary>
+	<param name="abLoadPages"></param>
+	<param name="abUseThreading"></param>
+	<param name="aoBackgroundWorker">Used for Prgress reporting.</param>
+	<remarks></remarks>
+</member><member name="F:Viev.FBM.ModelObject._parentModelObjectList">
+	<summary>
+ Only used for Entity Types, Fact Types....those ModelObject ConceptTypes that can be Subtypes | Supertypes.
+ </summary>
+	<remarks></remarks>
+</member><member name="F:Viev.FBM.ModelObject.Instance">
+	<summary>
+ Instances of this EntityType as exist as FactData against Roles within FactTypes where those Roles join this EntityType.
+ </summary>
+	<remarks></remarks>
+</member><member name="F:Viev.FBM.ModelObject.m_dctd">
+	<summary>
+ Used for hiding or showing property elements.
+ </summary>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.ModelObject.#ctor">
+	<summary>
+ Parameterless Constructor.
+ </summary>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.ModelObject.GetTopmostSupertype">
+	<summary>
+ If the EntityType is a Subtype, then returns the topmost Supertype in the hierarchy,
+   ELSE returns the EntityType itself.
+ </summary>
+	<returns></returns>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.ModelObject.GetSignature">
+	<summary>
+ Returns the unique Signature of the ModelObject
+ </summary>
+	<returns></returns>
+	<remarks>Overrided in FBM.EntityType, FBM.Valuetype, FBM.FactType, FBM.RoleConstraint, FBM.ModelNote</remarks>
+</member><member name="M:Viev.FBM.ModelObject.GetAdjoinedRoles">
+	<summary>
+ Used for ValueTypes, EntityTypes, Objectified FactTypes. Returns the set of Roles of FactTypes that reference the ModelObject.
+ </summary>
+	<returns></returns>
+	<remarks></remarks>
+</member><member name="F:Viev.FBM.RoleConstraint.CardinalityRangeType">
+	<summary>
+ Only used on FrequencyConstraints.
+ </summary>
+	<remarks></remarks>
+</member><member name="F:Viev.FBM.RoleConstraint.ValueRangeType">
+	<summary>
+ Used in ValueComparisonConstraints
+ </summary>
+	<remarks></remarks>
+</member><member name="F:Viev.FBM.RoleConstraint.Cardinality">
+	<summary>
+ Only used on FrequencyConstraints.
+ Set in relation to the values of MinimumFrequencyCount and MaximumFrequencyCount and CardinalityRangeType
+ Case CardinalityRangeType 
+     Case Is = pcenumCardinalityRangeType.LessThanOREqual
+        Me.Cardinality = MaximumFrequencyCount   
+     Case Is = pcenumCardinalityRangeType.Equal
+        Me.Cardinality = (Either) MaximumFrequencyCount or MinimumFrequencyCount...because they will be the same
+     Case Is = pcenumCardinalityRangeType.GreaterThanOREqual
+        Me.Cardinality = MinimumFrequencyCount
+     Case Is = pcenumCardinalityRangeType.Between
+        Me.Cardinality = 0
+ End Case
+ </summary>
+	<remarks></remarks>
+</member><member name="F:Viev.FBM.RoleConstraint._MinimumFrequencyCount">
+	<summary>
+ Only used on 'FrequencyConstraints'.
+ </summary>
+	<remarks></remarks>
+</member><member name="F:Viev.FBM.RoleConstraint._MaximumFrequencyCount">
+	<summary>
+ Only used on 'FrequencyConstraints'.
+ </summary>
+	<remarks></remarks>
+</member><member name="F:Viev.FBM.RoleConstraint.Argument">
+	<summary>
+ List of Arguments for the RoleConstraint, if the RoleConstraint is of a type that has Arguments.
+ </summary>
+	<remarks></remarks>
+</member><member name="F:Viev.FBM.RoleConstraint.CurrentArgument">
+	<summary>
+ Only used when creating a new Argument dynamically. Once the Argument is created, can be added to Me.Argument.
+ </summary>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.RoleConstraint.#ctor(Viev.FBM.Model,Viev.FBM.PublicConstants.pcenumRoleConstraintType,System.Collections.Generic.List{Viev.FBM.Role}@,System.Int32,Viev.FBM.PublicConstants.pcenumCardinalityRangeType,System.Boolean)">
+	<summary>
+ Constructor used for a FrequencyConstraint type RoleConstraint.
+ </summary>
+	<param name="arModel"></param>
+	<param name="aiRoleConstraintType"></param>
+	<param name="aarRole"></param>
+	<param name="aiCardinality"></param>
+	<param name="aiCardinalityRangeType"></param>
+	<param name="ab_add_to_model"></param>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.RoleConstraint.CompareRoleConstraintNames(Viev.FBM.RoleConstraint,Viev.FBM.RoleConstraint)">
+	<summary>
+ Used to 'Sort' Enumerated lists of tRoleConstraint
+ </summary>
+	<param name="ao_a"></param>
+	<param name="ao_b"></param>
+	<returns></returns>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.RoleConstraint.DoesEachRoleFactTypeOppositeRoleJoinSameModelObject">
+	<summary>
+ Returns True if each Role/FactType (from RoleConstraintRole) is binary, and each opposite Role in that binary FactType joins the same ModelObject, for all RoleConstraintRoles for this RoleConstraint;
+ else returns False.
+ </summary>
+	<returns>True if each Role/FactType (from RoleConstraintRole) is binary, and each opposite Role in that binary FactType joins the same ModelObject, for all RoleConstraintRoles for this RoleConstraint;
+ else returns False.</returns>
+	<remarks>A Role/FactType is the FactType of the Role of a RoleConstraintRole</remarks>
+</member><member name="M:Viev.FBM.RoleConstraint.GetNextArgumentSequenceNr">
+	<summary>
+ Returns the count of Arguments already created for the RoleConstraint plus one.
+ </summary>
+	<returns></returns>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.RoleConstraint.GetSignature">
+	<summary>
+ Returns the unique Signature of the RoleConstraint
+ </summary>
+	<returns></returns>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.RoleConstraint.RemoveArgumentBySequenceNr(System.Int32)">
+	<summary>
+ Removes a RoleConstraintArgument from the RoleConstraint based on the provided SequenceNr
+ </summary>
+	<param name="aiSequenceNr">The SequenceNr of the Argument to be removed.</param>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.RoleConstraint.RemoveFromModel(System.Boolean,System.Boolean)">
+	<summary>
+ Removes the RoleConstraint from the Model.
+ </summary>
+	<remarks></remarks>
+</member><member name="M:Viev.FBM.RoleConstraint.Save">
+	<summary>
+ Prototype for the Save function.
+ </summary>
+	<remarks></remarks>
+</member>
+</members>
+</doc>

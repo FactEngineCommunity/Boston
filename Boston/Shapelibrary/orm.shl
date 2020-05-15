@@ -1,0 +1,134 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<shapes xmlns="http://mindfusion.org/flowchart">
+  <shape id="Entity Type" fill-mode="Winding">
+    <outline>
+      <round-rectangle x="0" y="0" w="96" h="90" r="5" color="#FFFFFFFF" dash-style="Custom" width="-1" />
+    </outline>
+  </shape>
+  <shape id="Value Type" fill-mode="Winding">
+    <outline>
+      <round-rectangle x="0" y="0" w="96" h="90" r="5" color="#FFFFFFFF" dash-style="Custom" width="-1" />
+    </outline>
+    <decorations />
+  </shape>
+  <shape id="Role" fill-mode="Winding">
+    <outline>
+      <line dash-style="Custom" width="-1">
+        <point x="0" y="0" />
+        <point x="100" y="0" />
+      </line>
+      <line dash-style="Custom" width="-1">
+        <point x="100" y="0" />
+        <point x="100" y="84" />
+      </line>
+      <line dash-style="Custom" width="-1">
+        <point x="100" y="84" />
+        <point x="0" y="84" />
+      </line>
+      <line dash-style="Custom" width="-1">
+        <point x="0" y="84" />
+        <point x="0" y="0" />
+      </line>
+    </outline>
+    <decorations />
+  </shape>
+  <shape id="Binary Fact Type" fill-mode="Winding" display-name="Binary Fact Type">
+    <outline>
+      <line dash-style="Custom" width="-1">
+        <point x="0" y="30" />
+        <point x="100" y="30" />
+      </line>
+      <line dash-style="Custom" width="-1">
+        <point x="100" y="30" />
+        <point x="100" y="74" />
+      </line>
+      <line dash-style="Custom" width="-1">
+        <point x="100" y="74" />
+        <point x="0" y="74" />
+      </line>
+      <line dash-style="Custom" width="-1">
+        <point x="0" y="74" />
+        <point x="0" y="30" />
+      </line>
+      <line dash-style="Custom" width="-1">
+        <point x="0" y="30" />
+        <point x="50" y="30" />
+      </line>
+      <line dash-style="Custom" width="-1">
+        <point x="50" y="30" />
+        <point x="50" y="74" />
+      </line>
+      <line dash-style="Custom" width="-1">
+        <point x="0" y="74" />
+        <point x="0" y="30" />
+      </line>
+    </outline>
+    <decorations />
+  </shape>
+  <shape id="Subtype Connector" fill-mode="Winding" display-name="Subtype Connector">
+    <outline>
+      <round-rectangle x="0" y="0" w="95" h="70" r="5" color="#FFFFFFFF" dash-style="Custom" width="-1" />
+    </outline>
+  </shape>
+  <shape id="Ring Constraint" fill-mode="Winding">
+    <outline>
+      <arc x="8" y="9" arc-width="74" arc-height="74" start="-185.8696" sweep="365.8696" color="#FFFFFFFF" dash-style="Custom" width="-1" />
+    </outline>
+    <decorations />
+    <image x="7" y="8" width="82" height="85" src="acyclic.png" />
+  </shape>
+  <shape id="External Uniqueness Constraint" fill-mode="Winding">
+    <outline>
+      <arc x="9" y="9" arc-width="74" arc-height="74" start="-185.8696" sweep="365.8696" color="#FFFFFFFF" dash-style="Custom" width="-1" />
+    </outline>
+    <decorations />
+    <image x="7" y="8" width="82" height="82" src="externalUniqueness.png" />
+  </shape>
+  <shape id="Equality Constraint" fill-mode="Winding">
+    <outline>
+      <arc x="9" y="9" arc-width="74" arc-height="74" start="-185.8696" sweep="365.8696" color="#FFFFFFFF" dash-style="Custom" width="-1" />
+    </outline>
+    <decorations />
+    <image x="12" y="10" width="76" height="76" src="equality.png" />
+  </shape>
+  <shape id="Exclusion Constraint" fill-mode="Winding">
+    <outline>
+      <arc x="8" y="9" arc-width="74" arc-height="74" start="-185.8696" sweep="365.8696" color="#FFFFFFFF" dash-style="Custom" width="-1" />
+    </outline>
+    <decorations />
+    <image x="12" y="14" width="72" height="72" src="exclusion.png" />
+  </shape>
+  <shape id="Inclusive-OR Constraint" fill-mode="Winding">
+    <outline>
+      <arc x="8" y="9" arc-width="74" arc-height="74" start="-185.8696" sweep="365.8696" color="#FFFFFFFF" dash-style="Custom" width="-1" />
+    </outline>
+    <decorations />
+    <image x="7" y="8" width="82" height="85" src="Acyclic.PNG" />
+  </shape>
+  <shape id="Exclusive-OR Constraint" fill-mode="Winding">
+    <outline>
+      <arc x="8" y="9" arc-width="74" arc-height="74" start="-185.8696" sweep="365.8696" color="#FFFFFFFF" dash-style="Custom" width="-1" />
+    </outline>
+    <decorations />
+    <image x="10" y="12" width="73" height="73" src="exclusiveOr.png" />
+  </shape>
+  <shape id="Subset Constraint" fill-mode="Winding">
+    <outline>
+      <arc x="8" y="9" arc-width="74" arc-height="74" start="-185.8696" sweep="365.8696" color="#FFFFFFFF" dash-style="Custom" width="-1" />
+    </outline>
+    <decorations />
+    <image x="9" y="12" width="74" height="74" src="subset.png" />
+  </shape>
+  <shape id="Frequency Constraint" fill-mode="Winding">
+    <outline>
+      <arc x="8" y="9" arc-width="74" arc-height="74" start="-185.8696" sweep="365.8696" color="#FFFFFFFF" dash-style="Custom" width="-1" />
+    </outline>
+    <decorations />
+    <image x="10" y="10" width="74" height="74" src="value_comparison_greater_equal.png" />
+  </shape>
+  <shape id="Model Note" fill-mode="Winding" display-name="Model Note">
+    <outline>
+      <round-rectangle x="0" y="0" w="75" h="100" r="5" color="#FFFFFFFF" dash-style="Custom" width="-1" />
+    </outline>
+  </shape>
+</shapes>

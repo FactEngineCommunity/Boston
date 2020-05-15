@@ -1,0 +1,60 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<!-- saved from url=(0029)http://www.helpandmanual.com/ -->
+<head><script type="text/javascript" src="helpman_topicinit.js"></script>
+<!-- Redirect browser to frame page if page is not in the content frame. -->
+<script type="text/javascript">
+<!--
+if (top.location.search.lastIndexOf("toc=0")<=0) {
+  if (top.frames.length==0) { top.location.href="index.html?importing_to_an_existing_model.htm"; }
+  else { parent.quicksync('a4.2'); }
+}
+//-->
+</script>
+   <title>Importing to an existing Model</title>
+   <meta name="generator" content="Help &amp; Manual" />
+   <meta name="keywords" content="" />
+   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+   <meta http-equiv="Content-Style-Type" content="text/css" />
+   <link type="text/css" href="default.css" rel="stylesheet" />
+</head>
+<body style="margin: 0px 0px 0px 0px; background: #FFFFFF;">
+<div id="hmpopupDiv" style="visibility:hidden; position:absolute; z-index:1000; "></div>
+
+
+<table width="100%" border="0" cellspacing="0" cellpadding="5" bgcolor="#649CCC">
+  <tr valign="middle">
+    <td align="left">
+      <p class="p_Heading1"><span class="f_Heading1">Importing to an existing Model</span></p>
+
+    </td>
+    <td align="right">
+     <span style="font-size: 9pt">
+     <a href="introduction.htm">Top</a>&nbsp;
+     <a href="importing_a_new_model.htm">Previous</a>&nbsp;
+     <a href="explorting_an_orm_model_to_a__.htm">Next</a>
+     </span>
+    </td>
+  </tr>
+</table>
+
+
+<!-- Placeholder for topic body. -->
+<table width="100%" border="0" cellspacing="0" cellpadding="5"><tr valign="top"><td align="left">
+<p>The following steps outline how to import an ORM Model into an existing Model within the Boston database.</p>
+<p>&nbsp;</p>
+<p><span style="font-weight: bold;">NB</span> This is not a 'merge' type procedure. Importing an ORM Model from a .fbm XML file into an existing ORM Model first requires Boston to 'Empty' (or 'purge') the Model Elements from within that Model.</p>
+<p>&nbsp;</p>
+<div style="text-align: left; text-indent: 0px; padding: 0px 0px 0px 0px; margin: 0px 0px 0px 0px;"><table border="0" cellpadding="0" cellspacing="0" style="line-height: normal;"><tr style="vertical-align:baseline" valign="baseline"><td width="15"><span style="font-size: 10pt; font-family: 'Arial'; color: #000000;">1.</span></td><td>Make sure the Model Explorer is open within the Boston workbench;</td></tr></table></div><div style="text-align: left; text-indent: 0px; padding: 0px 0px 0px 0px; margin: 0px 0px 0px 0px;"><table border="0" cellpadding="0" cellspacing="0" style="line-height: normal;"><tr style="vertical-align:baseline" valign="baseline"><td width="15"><span style="font-size: 10pt; font-family: 'Arial'; color: #000000;">2.</span></td><td>Select the Model within the Model Explorer to which you would like to import the new ORM Model from a .fbm XML file;</td></tr></table></div><div style="text-align: left; text-indent: 0px; padding: 0px 0px 0px 0px; margin: 0px 0px 0px 0px;"><table border="0" cellpadding="0" cellspacing="0" style="line-height: normal;"><tr style="vertical-align:baseline" valign="baseline"><td width="15"><span style="font-size: 10pt; font-family: 'Arial'; color: #000000;">3.</span></td><td>Right-click with the mouse on the Model node within the Model Explorer;<br>
+&nbsp;<br>
+A context menu will open with the options that you have to add a new Model to the Model Explorer and the Boston database.<br>
+&nbsp;<br>
+<img src="frmmodelexplorer-modelmenu.png" width="334" height="267" border="0" alt="frmModelExplorer-ModelMenu"><br>
+<span class="f_ImageCaption">&nbsp;</span></td></tr></table></div><div style="text-align: left; text-indent: 0px; padding: 0px 0px 0px 0px; margin: 0px 0px 0px 0px;"><table border="0" cellpadding="0" cellspacing="0" style="line-height: normal;"><tr style="vertical-align:baseline" valign="baseline"><td width="15"><span style="font-size: 10pt; font-family: 'Arial'; color: #000000;">4.</span></td><td>Select the [Import/Export]-&gt;[Import]-&gt;[From .fbm File] menu option</td></tr></table></div><div style="text-align: left; text-indent: 0px; padding: 0px 0px 0px 0px; margin: 0px 0px 0px 0px;"><table border="0" cellpadding="0" cellspacing="0" style="line-height: normal;"><tr style="vertical-align:baseline" valign="baseline"><td width="15"><span style="font-size: 10pt; font-family: 'Arial'; color: #000000;">5.</span></td><td>A "Open File" dialog box will be opened for you to navigate to and open a .fbm file.<br>
+&nbsp;<br>
+<img src="frmopenfiledialog.png" width="625" height="434" border="0" alt="frmOpenFileDialog"><br>
+<span class="f_ImageCaption">&nbsp;</span></td></tr></table></div><div style="text-align: left; text-indent: 0px; padding: 0px 0px 0px 0px; margin: 0px 0px 0px 0px;"><table border="0" cellpadding="0" cellspacing="0" style="line-height: normal;"><tr style="vertical-align:baseline" valign="baseline"><td width="15"><span style="font-size: 10pt; font-family: 'Arial'; color: #000000;">6.</span></td><td>Select the Fact-Based Modeling file that you would like to import into Boston and the Model Explorer, and then select the [Open] button on the Open File dialog;</td></tr></table></div><div style="text-align: left; text-indent: 0px; padding: 0px 0px 0px 0px; margin: 0px 0px 0px 0px;"><table border="0" cellpadding="0" cellspacing="0" style="line-height: normal;"><tr style="vertical-align:baseline" valign="baseline"><td width="15"><span style="font-size: 10pt; font-family: 'Arial'; color: #000000;">7.</span></td><td>The selected Model will first be Emptied (or 'purged') of all existing Model Elements, and the ORM Model within the .fbm XML file will be imported into Boston and Model selected within the Model Explorer.</td></tr></table></div>
+</td></tr></table>
+
+</body>
+</html>
