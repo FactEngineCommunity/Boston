@@ -8018,15 +8018,6 @@ Public Class frmDiagramORM
             lrFactTypeInstance = Me.zrPage.SelectedObject(0)
 
             Using loWaitCursor As New WaitCursor
-
-                If lrFactTypeInstance.FactType.IsObjectified Then
-                    For Each lrFactType In lrFactTypeInstance.FactType.getLinkFactTypes
-                        Call lrFactType.RemoveFromModel(True, , True)
-                    Next
-
-                    Call lrFactTypeInstance.FactType.ObjectifyingEntityType.RemoveFromModel(True, , True)
-                End If
-
                 Call lrFactTypeInstance.FactType.RemoveFromModel(True, , True)
             End Using
 

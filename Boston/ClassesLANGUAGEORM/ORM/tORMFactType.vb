@@ -3036,6 +3036,9 @@ Namespace FBM
                     For Each lrFactType In larLinkFactType.ToArray
                         Call lrFactType.RemoveFromModel()
                     Next
+
+                    'Objectifying EntityType
+                    Call Me.ObjectifyingEntityType.RemoveFromModel(True, , True)
                 End If
 
                 For liInd = 1 To Me.FactTypeReading.Count
@@ -3265,15 +3268,6 @@ Namespace FBM
         Public Sub RemoveObjectification(ByVal abBroadcastInterfaceEvent As Boolean)
 
             Try
-                Dim lrEntityType As FBM.EntityType
-
-                lrEntityType = Me.ObjectifyingEntityType
-
-                If lrEntityType IsNot Nothing Then
-                    lrEntityType.IsObjectifyingEntityType = False
-                End If
-
-
                 Me.IsObjectified = False
                 Me.ObjectifyingEntityType = Nothing
 
@@ -3306,7 +3300,7 @@ Namespace FBM
 
                 RaiseEvent ObjectificationRemoved()
 
-                lrEntityType.RemoveFromModel(True, False, abBroadcastInterfaceEvent)
+                Call Me.ObjectifyingEntityType.RemoveFromModel(True, False, abBroadcastInterfaceEvent)
 
                 If My.Settings.UseClientServer And My.Settings.InitialiseClient And abBroadcastInterfaceEvent Then
                     Call prDuplexServiceClient.BroadcastToDuplexService(Viev.FBM.Interface.pcenumBroadcastType.ModelUpdateFactType, Me, Nothing)
