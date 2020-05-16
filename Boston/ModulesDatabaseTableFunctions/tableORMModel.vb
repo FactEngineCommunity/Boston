@@ -32,6 +32,7 @@ Namespace TableModel
                     lsSQLQuery &= " ,'" & ar_model.Namespace.Id & "'"
                 End If
                 lsSQLQuery &= " ,'" & ar_model.CreatedByUserId & "'"
+                lsSQLQuery &= " ,'" & ar_model.CoreVersionNumber & "'"
                 lsSQLQuery &= ")"
 
                 Call pdbConnection.Execute(lsSQLQuery)
@@ -155,6 +156,8 @@ Namespace TableModel
                     arModel.TargetDatabaseType = Viev.NullVal(lREcordset("TargetDatabaseType").Value, "")
                     arModel.TargetDatabaseConnectionString = Viev.NullVal(lREcordset("TargetDatabaseConnectionString").Value, "")
                     arModel.CreatedByUserId = NullVal(lREcordset("CreatedByUserId").Value, "")
+
+                    arModel.CoreVersionNumber = Trim(lREcordset("CoreVersionNumber").Value)
                 Else
 
                     lsMessage = "No Model returned for ModelId: '" & arModel.ModelId & "'"
@@ -222,6 +225,8 @@ Namespace TableModel
 
                     lrModel.CreatedByUserId = NullVal(lREcordset("CreatedByUserId").Value, "")
 
+                    lrModel.CoreVersionNumber = Trim(lREcordset("CoreVersionNumber").Value)
+
                     GetModels.Add(lrModel)
                     lREcordset.MoveNext()
                 End While
@@ -267,6 +272,7 @@ Namespace TableModel
                 lsSQLQuery &= "       ,TargetDatabaseType = '" & Trim(ar_model.TargetDatabaseType) & "'"
                 lsSQLQuery &= "       ,TargetDatabaseConnectionString = '" & Trim(ar_model.TargetDatabaseConnectionString) & "'"
                 lsSQLQuery &= "       ,CreatedByUserId = '" & NullVal(ar_model.CreatedByUserId, "") & "'"
+                lsSQLQuery &= "       ,CoreVersionNumber = '" & Trim(ar_model.CoreVersionNumber) & "'"
                 lsSQLQuery &= " WHERE ModelId = '" & Trim(ar_model.ModelId) & "'"
 
                 pdbConnection.BeginTrans()

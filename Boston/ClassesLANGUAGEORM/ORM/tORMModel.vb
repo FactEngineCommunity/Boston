@@ -205,9 +205,10 @@ Namespace FBM
         ''' The Relational Data Schema for the Model.
         ''' </summary>
         ''' <remarks></remarks>
-        <XmlIgnore()> _
+        <XmlIgnore()>
         Public RDS As New RDS.Model(Me)
 
+        Public CoreVersionNumber As String 'the version number of the Core Model injected into the Model, or the version number of the Core Model itself if Me is Core.
 
         <XmlIgnore()> _
         Public TargetDatabaseType As String = "" 'e.g. MSAccess, ORACLE, SQL Server, MySQL etc.
