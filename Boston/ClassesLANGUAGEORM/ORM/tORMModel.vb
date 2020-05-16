@@ -3869,8 +3869,8 @@ Namespace FBM
         ''' <param name="abUseThreading"></param>
         ''' <param name="aoBackgroundWorker">Used for Prgress reporting.</param>
         ''' <remarks></remarks>
-        Public Sub Load(Optional ByVal abLoadPages As Boolean = False, _
-                        Optional ByVal abUseThreading As Boolean = True, _
+        Public Sub Load(Optional ByVal abLoadPages As Boolean = False,
+                        Optional ByVal abUseThreading As Boolean = True,
                         Optional ByRef aoBackgroundWorker As System.ComponentModel.BackgroundWorker = Nothing)
 
             '-------------------------------------------------------
@@ -4008,56 +4008,32 @@ Namespace FBM
             Dim lrValidator As New Validation.ModelValidator(Me)
             Call lrValidator.CheckForErrors()
 
-            If Me.HasCoreModel Then
+
+            If Not {"English", "Core"}.Contains(Me.ModelId) Then 'No need to modify the English or Core models
+                If Not Me.HasCoreModel Then
+
+                    Call Me.AddCoreERDPGSAndSTDModelElements(aoBackgroundWorker)
+
+                ElseIf Me.CoreVersionNumber = "1.0" Then
+                    '---------------------------------------------------------------------------------------
+                    'Only contains ERD and PGS Model Elements. Need to add State Transition Model Elements
+                    Me.ContainsLanguage.AddUnique(pcenumLanguage.EntityRelationshipDiagram)
+                    Me.ContainsLanguage.AddUnique(pcenumLanguage.PropertyGraphSchema)
+
+                    Call Me.AddCoreSTDModelElements()
+                    Me.ContainsLanguage.AddUnique(pcenumLanguage.StateTransitionDiagram)
+
+                ElseIf Me.CoreVersionNumber = "2.0" Then
+                    'Nothing to do (at this point), because is the latest version of the Core @ 16/05/2020
+                    Me.ContainsLanguage.AddUnique(pcenumLanguage.EntityRelationshipDiagram)
+                    Me.ContainsLanguage.AddUnique(pcenumLanguage.PropertyGraphSchema)
+                    Me.ContainsLanguage.AddUnique(pcenumLanguage.StateTransitionDiagram)
+                End If
+
+                '==============================================
+                'Either Way, populate the RDS data structure.
                 Call Me.PopulateRDSStructureFromCoreMDAElements()
-                '--------------------------------------------------------------------------
-                '20171110-VM-Need to fix, because obviously having a Core doesn't mean having an ERD Core,
-                '  but use for now.
-                Me.ContainsLanguage.Add(pcenumLanguage.EntityRelationshipDiagram)
-            ElseIf Not {"English", "Core"}.Contains(Me.ModelId) Then
 
-                Dim lfrmFlashCard As New frmFlashCard
-                lfrmFlashCard.ziIntervalMilliseconds = 5600
-                lfrmFlashCard.BackColor = Color.LightGray
-                Dim lsMessage As String = ""
-                lsMessage = "Creating the Relational Data Structure for Entity Relationship Diagrams and Property Graph Schemas."
-                lsMessage &= vbCrLf & vbCrLf
-                lsMessage &= "This is a one-off process and may take a minute."
-                lfrmFlashCard.zsText = lsMessage
-                Dim liDialogResult As DialogResult = lfrmFlashCard.ShowDialog(frmMain)
-
-                '==================================================
-                'RDS - Create a CMML Page and then dispose of it.
-                Dim lrPage As FBM.Page
-                Dim lrCorePage As FBM.Page
-
-                'Now for ERDs/PGSs which have the same basic metamodel
-                lrCorePage = prApplication.CMML.Core.Page.Find(Function(x) x.Name = pcenumCMMLCorePage.CoreEntityRelationshipDiagram.ToString) 'AddressOf lrCorePage.EqualsByName)
-
-                If lrCorePage Is Nothing Then
-                    Throw New Exception("Couldn't find Page, '" & pcenumCMMLCorePage.CoreEntityRelationshipDiagram.ToString & "', in the Core Model.")
-                End If
-
-                lrPage = lrCorePage.Clone(Me, False, True, False) 'Clone the Page's Model Element for the EntityRelationshipDiagram into the core metamodel.
-
-                'Now for StateTransitionDiagrams
-                lrCorePage = prApplication.CMML.Core.Page.Find(Function(x) x.Name = pcenumCMMLCorePage.CoreStateTransitionDiagram.ToString) 'AddressOf lrCorePage.EqualsByName)
-
-                If lrCorePage Is Nothing Then
-                    Throw New Exception("Couldn't find Page, '" & pcenumCMMLCorePage.CoreStateTransitionDiagram.ToString & "', in the Core Model.")
-                End If
-
-                lrPage = lrCorePage.Clone(Me, False, True, False) 'Clone the Page's Model Element for the EntityRelationshipDiagram into the core metamodel.
-                '==================================================
-
-                Call Me.createEntityRelationshipArtifacts(aoBackgroundWorker)
-
-
-                lfrmFlashCard = New frmFlashCard
-                lfrmFlashCard.ziIntervalMilliseconds = 3000
-                lfrmFlashCard.BackColor = Color.LightGray
-                lfrmFlashCard.zsText = "Your model is ready for Entity Relationship Diagrams and Property Graph Schemas."
-                liDialogResult = lfrmFlashCard.ShowDialog(frmMain)
             End If
 
             Me.Loaded = True
@@ -4067,6 +4043,100 @@ Namespace FBM
 
             Richmond.WriteToStatusBar(".")
 
+        End Sub
+
+        Public Sub AddCoreERDPGSAndSTDModelElements(Optional ByRef aoBackgroundWorker As System.ComponentModel.BackgroundWorker = Nothing)
+
+            Dim lfrmFlashCard As New frmFlashCard
+            lfrmFlashCard.ziIntervalMilliseconds = 5600
+            lfrmFlashCard.BackColor = Color.LightGray
+            Dim lsMessage As String = ""
+            lsMessage = "Creating the Relational Data Structure for Entity Relationship Diagrams and Property Graph Schemas."
+            lsMessage &= vbCrLf & vbCrLf
+            lsMessage &= "This is a one-off process and may take a minute."
+            lfrmFlashCard.zsText = lsMessage
+            Dim liDialogResult As DialogResult = lfrmFlashCard.ShowDialog(frmMain)
+
+            '==================================================
+            'RDS - Create a CMML Page and then dispose of it.
+            Dim lrPage As FBM.Page
+            Dim lrCorePage As FBM.Page
+
+            'Now for ERDs/PGSs which have the same basic metamodel
+            lrCorePage = prApplication.CMML.Core.Page.Find(Function(x) x.Name = pcenumCMMLCorePage.CoreEntityRelationshipDiagram.ToString) 'AddressOf lrCorePage.EqualsByName)
+
+            If lrCorePage Is Nothing Then
+                Throw New Exception("Couldn't find Page, '" & pcenumCMMLCorePage.CoreEntityRelationshipDiagram.ToString & "', in the Core Model.")
+            End If
+
+            lrPage = lrCorePage.Clone(Me, False, True, False) 'Clone the Page's Model Element for the EntityRelationshipDiagram into the core metamodel.
+
+            'Now for StateTransitionDiagrams
+            lrCorePage = prApplication.CMML.Core.Page.Find(Function(x) x.Name = pcenumCMMLCorePage.CoreStateTransitionDiagram.ToString) 'AddressOf lrCorePage.EqualsByName)
+
+            If lrCorePage Is Nothing Then
+                Throw New Exception("Couldn't find Page, '" & pcenumCMMLCorePage.CoreStateTransitionDiagram.ToString & "', in the Core Model.")
+            End If
+
+            lrPage = lrCorePage.Clone(Me, False, True, False) 'Clone the Page's Model Element for the EntityRelationshipDiagram into the core metamodel.
+            '==================================================
+
+            '----------------------------------------------------------------------------------------
+            'Populate the Facts/FactData within the ERD/PGS Model Element metamodel Model Elements.
+            Call Me.createEntityRelationshipArtifacts(aoBackgroundWorker)
+
+            Me.ContainsLanguage.AddUnique(pcenumLanguage.EntityRelationshipDiagram)
+            Me.ContainsLanguage.AddUnique(pcenumLanguage.PropertyGraphSchema)
+            Me.ContainsLanguage.AddUnique(pcenumLanguage.StateTransitionDiagram)
+
+
+            lfrmFlashCard = New frmFlashCard
+            lfrmFlashCard.ziIntervalMilliseconds = 3000
+            lfrmFlashCard.BackColor = Color.LightGray
+            lfrmFlashCard.zsText = "Your model is ready for Entity Relationship Diagrams and Property Graph Schemas."
+            liDialogResult = lfrmFlashCard.ShowDialog(frmMain)
+
+        End Sub
+
+        ''' <summary>
+        ''' Injects v2.0 of the Core into the Model.
+        ''' IMPORTANT: Assumes that V1.0  (ERD/PGS) model elements already in the Model.
+        ''' </summary>
+        ''' <param name="aoBackgroundWorker"></param>
+        Public Sub AddCoreSTDModelElements(Optional ByRef aoBackgroundWorker As System.ComponentModel.BackgroundWorker = Nothing)
+
+            Dim lfrmFlashCard As New frmFlashCard
+            lfrmFlashCard.ziIntervalMilliseconds = 5600
+            lfrmFlashCard.BackColor = Color.LightGray
+            Dim lsMessage As String = ""
+            lsMessage = "Creating the Relational Data Structure for State Transition Diagrams."
+            lsMessage &= vbCrLf & vbCrLf
+            lsMessage &= "This is a one-off process and may take a minute."
+            lfrmFlashCard.zsText = lsMessage
+            Dim liDialogResult As DialogResult = lfrmFlashCard.ShowDialog(frmMain)
+
+            '==================================================
+            'RDS - Create a CMML Page and then dispose of it.
+            Dim lrPage As FBM.Page
+            Dim lrCorePage As FBM.Page
+
+            'Now for StateTransitionDiagrams
+            lrCorePage = prApplication.CMML.Core.Page.Find(Function(x) x.Name = pcenumCMMLCorePage.CoreStateTransitionDiagram.ToString) 'AddressOf lrCorePage.EqualsByName)
+
+            If lrCorePage Is Nothing Then
+                Throw New Exception("Couldn't find Page, '" & pcenumCMMLCorePage.CoreStateTransitionDiagram.ToString & "', in the Core Model.")
+            End If
+
+            lrPage = lrCorePage.Clone(Me, False, True, False) 'Clone the Page's Model Element for the EntityRelationshipDiagram into the core metamodel.
+            '==================================================
+
+            Call Me.createEntityRelationshipArtifacts(aoBackgroundWorker)
+
+            lfrmFlashCard = New frmFlashCard
+            lfrmFlashCard.ziIntervalMilliseconds = 3000
+            lfrmFlashCard.BackColor = Color.LightGray
+            lfrmFlashCard.zsText = "Your model is ready for State Transition Diagrams."
+            liDialogResult = lfrmFlashCard.ShowDialog(frmMain)
 
         End Sub
 

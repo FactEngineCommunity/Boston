@@ -208,8 +208,8 @@ Namespace FBM
         End Sub
 
         ''' <summary>
-        ''' Creates the Entity Relationship Diagram artifacts within the (existing) (Meta)Model.
-        ''' Preconditions: The 'Core' set of ModelObjects have been injected within the Model from the Model called, 'Core'.
+        ''' Creates the Entity Relationship Diagram fact/data artifacts within the (existing) ERD (Meta)Model.
+        ''' Preconditions: The 'Core' set of ERD/PGS ModelObjects have been injected within the Model from the Model called, 'Core'.
         ''' </summary>
         Public Sub createEntityRelationshipArtifacts(Optional ByRef aoBackgroundWorker As System.ComponentModel.BackgroundWorker = Nothing)
             '--------------------------------------------------------------------------------------------------------------------------
