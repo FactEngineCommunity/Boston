@@ -4023,6 +4023,10 @@ Namespace FBM
                     Call Me.AddCoreSTDModelElements()
                     Me.ContainsLanguage.AddUnique(pcenumLanguage.StateTransitionDiagram)
 
+                    Me.CoreVersionNumber = "2.0"
+
+                    Call Me.Save()
+
                 ElseIf Me.CoreVersionNumber = "2.0" Then
                     'Nothing to do (at this point), because is the latest version of the Core @ 16/05/2020
                     Me.ContainsLanguage.AddUnique(pcenumLanguage.EntityRelationshipDiagram)

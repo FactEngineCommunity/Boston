@@ -1129,7 +1129,7 @@ Public Class frmToolboxORMVerbalisation
 
         lrVerbaliser.VerbaliseQuantifier("For each ")
         lrVerbaliser.VerbaliseModelObject(lrModelObject)
-        lrVerbaliser.VerbaliseQuantifier(", at most one of the following holds:")
+        lrVerbaliser.VerbaliseQuantifier(", at exactly one of the following holds:")
         lrVerbaliser.HTW.WriteBreak()
 
         For Each lrRoleConstraintRole In arRoleConstraint.RoleConstraintRole
