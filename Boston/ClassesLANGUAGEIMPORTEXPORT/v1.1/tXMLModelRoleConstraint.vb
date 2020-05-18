@@ -1,12 +1,12 @@
 ﻿Imports System.Xml.Serialization
 
-Namespace XMLModelv11
-    <Serializable()> _
+Namespace XMLModel11
+    <Serializable()>
     Public Class RoleConstraint
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _Id As String
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property Id() As String
             Get
                 Return Me._Id
@@ -16,9 +16,9 @@ Namespace XMLModelv11
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _Name As String
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property Name() As String
             Get
                 Return Me._Name
@@ -28,9 +28,9 @@ Namespace XMLModelv11
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _RoleConstraintType As String
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property RoleConstraintType() As String
             Get
                 Return Me._RoleConstraintType
@@ -40,9 +40,9 @@ Namespace XMLModelv11
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _RingConstraintType As String
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property RingConstraintType() As String
             Get
                 Return Me._RingConstraintType
@@ -64,9 +64,9 @@ Namespace XMLModelv11
         '    End Set
         'End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _IsPreferredUniqueness As Boolean
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property IsPreferredUniqueness() As Boolean
             Get
                 Return Me._IsPreferredUniqueness
@@ -76,9 +76,9 @@ Namespace XMLModelv11
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _IsDeontic As Boolean
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property IsDeontic() As Boolean
             Get
                 Return Me._IsDeontic
@@ -88,9 +88,9 @@ Namespace XMLModelv11
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _MinimumFrequencyCount As Integer
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property MinimumFrequencyCount() As Integer
             Get
                 Return Me._MinimumFrequencyCount
@@ -100,9 +100,9 @@ Namespace XMLModelv11
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _MaximumFrequencyCount As Integer
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property MaximumFrequencyCount() As Integer
             Get
                 Return Me._MaximumFrequencyCount
@@ -112,9 +112,9 @@ Namespace XMLModelv11
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _Cardinality As Integer
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property Cardinality() As Integer
             Get
                 Return Me._Cardinality
@@ -124,9 +124,9 @@ Namespace XMLModelv11
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _CardinalityRangeType As String
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property CardinalityRangeType() As String
             Get
                 Return Me._CardinalityRangeType
@@ -136,13 +136,13 @@ Namespace XMLModelv11
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
-        Private _RoleConstraintRoles As New List(Of XMLModel.RoleConstraintRole)
-        Public Property RoleConstraintRoles() As List(Of XMLModel.RoleConstraintRole)
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Private _RoleConstraintRoles As New List(Of XMLModel11.RoleConstraintRole)
+        Public Property RoleConstraintRoles() As List(Of XMLModel11.RoleConstraintRole)
             Get
                 Return Me._RoleConstraintRoles
             End Get
-            Set(ByVal value As List(Of XMLModel.RoleConstraintRole))
+            Set(ByVal value As List(Of XMLModel11.RoleConstraintRole))
                 Me._RoleConstraintRoles = value
             End Set
         End Property

@@ -148,24 +148,24 @@ Namespace XMLModel14
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
-        Private _RoleConstraintRoles As New List(Of XMLModel.RoleConstraintRole)
-        Public Property RoleConstraintRoles() As List(Of XMLModel.RoleConstraintRole)
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Private _RoleConstraintRoles As New List(Of XMLModel14.RoleConstraintRole)
+        Public Property RoleConstraintRoles() As List(Of XMLModel14.RoleConstraintRole)
             Get
                 Return Me._RoleConstraintRoles
             End Get
-            Set(ByVal value As List(Of XMLModel.RoleConstraintRole))
+            Set(ByVal value As List(Of XMLModel14.RoleConstraintRole))
                 Me._RoleConstraintRoles = value
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
-        Private _Argument As New List(Of XMLModel.RoleConstraintArgument)
-        Public Property Argument As List(Of XMLModel.RoleConstraintArgument)
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Private _Argument As New List(Of XMLModel14.RoleConstraintArgument)
+        Public Property Argument As List(Of XMLModel14.RoleConstraintArgument)
             Get
                 Return Me._Argument
             End Get
-            Set(value As List(Of XMLModel.RoleConstraintArgument))
+            Set(value As List(Of XMLModel14.RoleConstraintArgument))
                 Me._Argument = value
             End Set
         End Property

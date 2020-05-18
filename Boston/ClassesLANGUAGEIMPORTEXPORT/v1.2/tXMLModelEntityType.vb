@@ -100,12 +100,12 @@ Namespace XMLModel12
             End Set
         End Property
 
-        Private _SubtypeRelationships As New List(Of XMLModel.SubtypeRelationship)
-        Public Property SubtypeRelationships() As List(Of XMLModel.SubtypeRelationship)
+        Private _SubtypeRelationships As New List(Of XMLModel12.SubtypeRelationship)
+        Public Property SubtypeRelationships() As List(Of XMLModel12.SubtypeRelationship)
             Get
                 Return Me._SubtypeRelationships
             End Get
-            Set(ByVal value As List(Of XMLModel.SubtypeRelationship))
+            Set(ByVal value As List(Of XMLModel12.SubtypeRelationship))
                 Me._SubtypeRelationships = value
             End Set
         End Property
@@ -136,13 +136,39 @@ Namespace XMLModel12
 
         <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
         Private _ShortDescription As String = ""
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property ShortDescription() As String
             Get
                 Return Me._ShortDescription
             End Get
             Set(ByVal value As String)
                 Me._ShortDescription = value
+            End Set
+        End Property
+
+
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Private _IsIndependent As Boolean
+        <XmlAttribute()>
+        Public Property IsIndependent As Boolean
+            Get
+                Return Me._IsIndependent
+            End Get
+            Set(ByVal value As Boolean)
+                Me._IsIndependent = value
+            End Set
+        End Property
+
+
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Private _IsAbsorbed As Boolean
+        <XmlAttribute()>
+        Public Property IsAbsorbed As Boolean
+            Get
+                Return Me._IsAbsorbed
+            End Get
+            Set(ByVal value As Boolean)
+                Me._IsAbsorbed = value
             End Set
         End Property
 

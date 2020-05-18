@@ -10,11 +10,11 @@ Namespace XMLModel14
         <XmlAttribute()> _
         Public Name As String = ""
 
-        Public ValueTypes As New List(Of XMLModel.ValueType)
-        Public EntityTypes As New List(Of XMLModel.EntityType)
-        Public FactTypes As New List(Of XMLModel.FactType)
-        Public RoleConstraints As New List(Of XMLModel.RoleConstraint)
-        Public ModelNotes As New List(Of XMLModel.ModelNote)
+        Public ValueTypes As New List(Of XMLModel14.ValueType)
+        Public EntityTypes As New List(Of XMLModel14.EntityType)
+        Public FactTypes As New List(Of XMLModel14.FactType)
+        Public RoleConstraints As New List(Of XMLModel14.RoleConstraint)
+        Public ModelNotes As New List(Of XMLModel14.ModelNote)
 
         ''' <summary>
         ''' Parameterless Constructor

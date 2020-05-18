@@ -1,12 +1,12 @@
 ﻿Imports System.Xml.Serialization
 
-Namespace XMLModel
-    <Serializable()> _
+Namespace XMLModel16
+    <Serializable()>
     Public Class RoleConstraint
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _Id As String
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property Id() As String
             Get
                 Return Me._Id
@@ -16,9 +16,9 @@ Namespace XMLModel
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _GUID As String
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property GUID As String
             Get
                 Return Me._GUID
@@ -28,9 +28,9 @@ Namespace XMLModel
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _Name As String
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property Name() As String
             Get
                 Return Me._Name
@@ -40,9 +40,9 @@ Namespace XMLModel
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _RoleConstraintType As String
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property RoleConstraintType() As String
             Get
                 Return Me._RoleConstraintType
@@ -52,9 +52,9 @@ Namespace XMLModel
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _RingConstraintType As String
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property RingConstraintType() As String
             Get
                 Return Me._RingConstraintType
@@ -76,9 +76,9 @@ Namespace XMLModel
         '    End Set
         'End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _IsPreferredUniqueness As Boolean
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property IsPreferredUniqueness() As Boolean
             Get
                 Return Me._IsPreferredUniqueness
@@ -88,9 +88,9 @@ Namespace XMLModel
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _IsDeontic As Boolean
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property IsDeontic() As Boolean
             Get
                 Return Me._IsDeontic
@@ -100,9 +100,9 @@ Namespace XMLModel
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _IsMDAModelElement As Boolean
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property IsMDAModelElement As Boolean
             Get
                 Return Me._IsMDAModelElement
@@ -112,9 +112,9 @@ Namespace XMLModel
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _MinimumFrequencyCount As Integer
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property MinimumFrequencyCount() As Integer
             Get
                 Return Me._MinimumFrequencyCount
@@ -124,9 +124,9 @@ Namespace XMLModel
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _MaximumFrequencyCount As Integer
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property MaximumFrequencyCount() As Integer
             Get
                 Return Me._MaximumFrequencyCount
@@ -136,9 +136,9 @@ Namespace XMLModel
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _Cardinality As Integer
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property Cardinality() As Integer
             Get
                 Return Me._Cardinality
@@ -148,9 +148,9 @@ Namespace XMLModel
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _CardinalityRangeType As String
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property CardinalityRangeType() As String
             Get
                 Return Me._CardinalityRangeType
@@ -160,32 +160,32 @@ Namespace XMLModel
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
-        Private _RoleConstraintRoles As New List(Of XMLModel.RoleConstraintRole)
-        Public Property RoleConstraintRoles() As List(Of XMLModel.RoleConstraintRole)
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Private _RoleConstraintRoles As New List(Of XMLModel16.RoleConstraintRole)
+        Public Property RoleConstraintRoles() As List(Of XMLModel16.RoleConstraintRole)
             Get
                 Return Me._RoleConstraintRoles
             End Get
-            Set(ByVal value As List(Of XMLModel.RoleConstraintRole))
+            Set(ByVal value As List(Of XMLModel16.RoleConstraintRole))
                 Me._RoleConstraintRoles = value
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
-        Private _Argument As New List(Of XMLModel.RoleConstraintArgument)
-        Public Property Argument As List(Of XMLModel.RoleConstraintArgument)
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Private _Argument As New List(Of XMLModel16.RoleConstraintArgument)
+        Public Property Argument As List(Of XMLModel16.RoleConstraintArgument)
             Get
                 Return Me._Argument
             End Get
-            Set(value As List(Of XMLModel.RoleConstraintArgument))
+            Set(value As List(Of XMLModel16.RoleConstraintArgument))
                 Me._Argument = value
             End Set
         End Property
 
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _LongDescription As String = ""
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property LongDescription() As String
             Get
                 Return Me._LongDescription
@@ -195,9 +195,9 @@ Namespace XMLModel
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _ShortDescription As String = ""
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property ShortDescription() As String
             Get
                 Return Me._ShortDescription

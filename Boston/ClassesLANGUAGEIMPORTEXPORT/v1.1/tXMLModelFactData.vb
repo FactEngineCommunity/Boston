@@ -1,12 +1,12 @@
 ﻿Imports System.Xml.Serialization
 
-Namespace XMLModelv11
-    <Serializable()> _
+Namespace XMLModel11
+    <Serializable()>
     Public Class FactData
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _RoleId As String
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property RoleId() As String
             Get
                 Return Me._RoleId
@@ -16,7 +16,7 @@ Namespace XMLModelv11
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _Data As String
         Public Property Data() As String
             Get

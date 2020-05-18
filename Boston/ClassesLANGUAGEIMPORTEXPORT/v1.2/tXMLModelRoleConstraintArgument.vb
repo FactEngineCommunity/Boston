@@ -28,24 +28,24 @@ Namespace XMLModel12
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
-        Private _Role As New List(Of XMLModel.RoleReference)
-        Public Property Role As List(Of XMLModel.RoleReference)
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Private _Role As New List(Of XMLModel12.RoleReference)
+        Public Property Role As List(Of XMLModel12.RoleReference)
             Get
                 Return Me._Role
             End Get
-            Set(value As List(Of XMLModel.RoleReference))
+            Set(value As List(Of XMLModel12.RoleReference))
                 Me._Role = value
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
-        Private _JoinPath As New XMLModel.JoinPath
-        Public Property JoinPath As XMLModel.JoinPath
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Private _JoinPath As New XMLModel12.JoinPath
+        Public Property JoinPath As XMLModel12.JoinPath
             Get
                 Return Me._JoinPath
             End Get
-            Set(value As XMLModel.JoinPath)
+            Set(value As XMLModel12.JoinPath)
                 Me._JoinPath = value
             End Set
         End Property

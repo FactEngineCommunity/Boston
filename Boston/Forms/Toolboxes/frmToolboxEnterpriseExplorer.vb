@@ -2282,8 +2282,8 @@ Public Class frmToolboxEnterpriseExplorer
                         objStreamReader.Close()
                         lrModel = lrXMLModel.MapToFBMModel
                     Case Is = "1"
-                        lrSerializer = New XmlSerializer(GetType(XMLModelv1.Model))
-                        Dim lrXMLModel As New XMLModelv1.Model
+                        lrSerializer = New XmlSerializer(GetType(XMLModel1.Model))
+                        Dim lrXMLModel As New XMLModel1.Model
                         lrXMLModel = lrSerializer.Deserialize(objStreamReader)
                         objStreamReader.Close()
                         lrModel = lrXMLModel.MapToFBMModel
@@ -2492,14 +2492,14 @@ Public Class frmToolboxEnterpriseExplorer
                         objStreamReader.Close()
                         lrModel = lrXMLModel.MapToFBMModel
                     Case Is = "1"
-                        lrSerializer = New XmlSerializer(GetType(XMLModelv1.Model))
-                        Dim lrXMLModel As New XMLModelv1.Model
+                        lrSerializer = New XmlSerializer(GetType(XMLModel1.Model))
+                        Dim lrXMLModel As New XMLModel1.Model
                         lrXMLModel = lrSerializer.Deserialize(objStreamReader)
                         objStreamReader.Close()
                         lrModel = lrXMLModel.MapToFBMModel
                     Case Is = "1.1"
-                        lrSerializer = New XmlSerializer(GetType(XMLModelv11.Model))
-                        Dim lrXMLModel As New XMLModelv11.Model
+                        lrSerializer = New XmlSerializer(GetType(XMLModel11.Model))
+                        Dim lrXMLModel As New XMLModel11.Model
                         lrXMLModel = lrSerializer.Deserialize(objStreamReader)
                         objStreamReader.Close()
                         lrModel = lrXMLModel.MapToFBMModel

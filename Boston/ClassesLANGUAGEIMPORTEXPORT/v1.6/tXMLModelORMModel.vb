@@ -1,20 +1,20 @@
 ﻿Imports System.Xml.Serialization
 
-Namespace XMLModel
-    <Serializable()> _
+Namespace XMLModel16
+    <Serializable()>
     Public Class ORMModel
 
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public ModelId As String = ""
 
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Name As String = ""
 
-        Public ValueTypes As New List(Of XMLModel.ValueType)
-        Public EntityTypes As New List(Of XMLModel.EntityType)
-        Public FactTypes As New List(Of XMLModel.FactType)
-        Public RoleConstraints As New List(Of XMLModel.RoleConstraint)
-        Public ModelNotes As New List(Of XMLModel.ModelNote)
+        Public ValueTypes As New List(Of XMLModel16.ValueType)
+        Public EntityTypes As New List(Of XMLModel16.EntityType)
+        Public FactTypes As New List(Of XMLModel16.FactType)
+        Public RoleConstraints As New List(Of XMLModel16.RoleConstraint)
+        Public ModelNotes As New List(Of XMLModel16.ModelNote)
 
         ''' <summary>
         ''' Parameterless Constructor

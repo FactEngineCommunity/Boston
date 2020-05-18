@@ -88,12 +88,12 @@ Namespace XMLModelv081
             End Set
         End Property
 
-        Private _SubtypeRelationships As New List(Of XMLModel.SubtypeRelationship)
-        Public Property SubtypeRelationships() As List(Of XMLModel.SubtypeRelationship)
+        Private _SubtypeRelationships As New List(Of XMLModelv081.SubtypeRelationship)
+        Public Property SubtypeRelationships() As List(Of XMLModelv081.SubtypeRelationship)
             Get
                 Return Me._SubtypeRelationships
             End Get
-            Set(ByVal value As List(Of XMLModel.SubtypeRelationship))
+            Set(ByVal value As List(Of XMLModelv081.SubtypeRelationship))
                 Me._SubtypeRelationships = value
             End Set
         End Property

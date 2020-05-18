@@ -40,13 +40,13 @@ Namespace XMLModel13
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
-        Private _PredicateParts As New List(Of XMLModel.PredicatePart)
-        Public Property PredicateParts() As List(Of XMLModel.PredicatePart)
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Private _PredicateParts As New List(Of XMLModel13.PredicatePart)
+        Public Property PredicateParts() As List(Of XMLModel13.PredicatePart)
             Get
                 Return Me._PredicateParts
             End Get
-            Set(ByVal value As List(Of XMLModel.PredicatePart))
+            Set(ByVal value As List(Of XMLModel13.PredicatePart))
                 Me._PredicateParts = value
             End Set
         End Property

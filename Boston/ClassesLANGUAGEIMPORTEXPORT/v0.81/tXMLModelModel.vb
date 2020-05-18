@@ -8,7 +8,7 @@ Namespace XMLModelv081
         <XmlAttribute()> _
         Public XSDVersionNr As Single = 0.81
         Public ORMModel As New XMLModelv081.ORMModel
-        Public ORMDiagram As New List(Of XMLModel.Page)
+        Public ORMDiagram As New List(Of XMLModelv081.Page)
 
         ''' <summary>
         ''' Maps an instance of FBM.Model to this class.
@@ -70,11 +70,11 @@ Namespace XMLModelv081
                 End If
 
                 Dim lrSubtypeRelationship As FBM.tSubtypeRelationship
-                Dim lrXMLSubtypeRelationship As XMLModel.SubtypeRelationship
+                Dim lrXMLSubtypeRelationship As XMLModelv081.SubtypeRelationship
 
                 For Each lrSubtypeRelationship In lrEntityType.SubtypeRelationship
 
-                    lrXMLSubtypeRelationship = New XMLModel.SubtypeRelationship
+                    lrXMLSubtypeRelationship = New XMLModelv081.SubtypeRelationship
                     lrXMLSubtypeRelationship.ParentEntityTypeId = lrSubtypeRelationship.parentEntityType.Id
                     lrXMLSubtypeRelationship.SubtypingFactTypeId = lrSubtypeRelationship.FactType.Id
 
@@ -250,7 +250,7 @@ Namespace XMLModelv081
 
             For Each lrPage In arFBMModel.Page
 
-                Dim lrExportPage As New XMLModel.Page
+                Dim lrExportPage As New XMLModelv081.Page
 
                 lrExportPage.Id = lrPage.PageId
                 lrExportPage.Name = lrPage.Name
@@ -633,7 +633,7 @@ Namespace XMLModelv081
         Public Sub MapToFBMPages(ByRef arModel As FBM.Model)
 
             Dim lrPage As FBM.Page
-            Dim lrXMLPage As XMLModel.Page
+            Dim lrXMLPage As XMLModelv081.Page
             Dim lrConceptInstance As FBM.ConceptInstance
 
             For Each lrXMLPage In Me.ORMDiagram

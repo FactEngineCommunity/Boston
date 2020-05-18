@@ -1,13 +1,13 @@
 ﻿Imports System.Xml.Serialization
 
-Namespace XMLModel
-    <Serializable()> _
+Namespace XMLModel16
+    <Serializable()>
     Public Class FactType
-        Implements IEquatable(Of XMLModel.FactType)
+        Implements IEquatable(Of XMLModel16.FactType)
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _Id As String
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property Id() As String
             Get
                 Return Me._Id
@@ -17,9 +17,9 @@ Namespace XMLModel
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _GUID As String
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property GUID As String
             Get
                 Return Me._GUID
@@ -29,9 +29,9 @@ Namespace XMLModel
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _Name As String
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property Name() As String
             Get
                 Return Me._Name
@@ -41,9 +41,9 @@ Namespace XMLModel
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _ObjectifyingEntityTypeId As String = ""
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property ObjectifyingEntityTypeId() As String
             Get
                 Return Me._ObjectifyingEntityTypeId
@@ -53,42 +53,42 @@ Namespace XMLModel
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
-        Private _RoleGroup As New List(Of XMLModel.Role)
-        Public Property RoleGroup() As List(Of XMLModel.Role)
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Private _RoleGroup As New List(Of XMLModel16.Role)
+        Public Property RoleGroup() As List(Of XMLModel16.Role)
             Get
                 Return Me._RoleGroup
             End Get
-            Set(ByVal value As List(Of XMLModel.Role))
+            Set(ByVal value As List(Of XMLModel16.Role))
                 Me._RoleGroup = value
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
-        Private _Facts As New List(Of XMLModel.Fact)
-        Public Property Facts() As List(Of XMLModel.Fact)
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Private _Facts As New List(Of XMLModel16.Fact)
+        Public Property Facts() As List(Of XMLModel16.Fact)
             Get
                 Return Me._Facts
             End Get
-            Set(ByVal value As List(Of XMLModel.Fact))
+            Set(ByVal value As List(Of XMLModel16.Fact))
                 Me._Facts = value
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
-        Private _FactTypeReadings As New List(Of XMLModel.FactTypeReading)
-        Public Property FactTypeReadings() As List(Of XMLModel.FactTypeReading)
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Private _FactTypeReadings As New List(Of XMLModel16.FactTypeReading)
+        Public Property FactTypeReadings() As List(Of XMLModel16.FactTypeReading)
             Get
                 Return Me._FactTypeReadings
             End Get
-            Set(ByVal value As List(Of XMLModel.FactTypeReading))
+            Set(ByVal value As List(Of XMLModel16.FactTypeReading))
                 Me._FactTypeReadings = value
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _IsLinkFactType As Boolean
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property IsLinkFactType As Boolean
             Get
                 Return Me._IsLinkFactType
@@ -98,9 +98,9 @@ Namespace XMLModel
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _LinkFactTypeRoleId As String
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property LinkFactTypeRoleId As String
             Get
                 Return Me._LinkFactTypeRoleId
@@ -110,9 +110,9 @@ Namespace XMLModel
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _IsMDAModelElement As Boolean
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property IsMDAModelElement As Boolean
             Get
                 Return Me._IsMDAModelElement
@@ -122,9 +122,9 @@ Namespace XMLModel
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _IsSubtypeRelationshipFactType As Boolean
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property IsSubtypeRelationshipFactType() As Boolean
             Get
                 Return Me._IsSubtypeRelationshipFactType
@@ -134,9 +134,9 @@ Namespace XMLModel
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _IsObjectified As Boolean
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property IsObjectified() As Boolean
             Get
                 Return Me._IsObjectified
@@ -146,9 +146,9 @@ Namespace XMLModel
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _IsPreferredReferenceSchemeFT As Boolean
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property IsPreferredReferenceSchemeFT() As Boolean
             Get
                 Return Me._IsPreferredReferenceSchemeFT
@@ -158,9 +158,9 @@ Namespace XMLModel
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _IsDerived As Boolean
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property IsDerived As Boolean
             Get
                 Return Me._IsDerived
@@ -170,9 +170,9 @@ Namespace XMLModel
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _IsStored As Boolean
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property IsStored As Boolean
             Get
                 Return Me._IsStored
@@ -182,9 +182,9 @@ Namespace XMLModel
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _DerivationText As String
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property DerivationText As String
             Get
                 Return Me._DerivationText
@@ -195,9 +195,9 @@ Namespace XMLModel
         End Property
 
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _LongDescription As String = ""
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property LongDescription() As String
             Get
                 Return Me._LongDescription
@@ -207,9 +207,9 @@ Namespace XMLModel
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _ShortDescription As String = ""
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property ShortDescription() As String
             Get
                 Return Me._ShortDescription
@@ -219,9 +219,9 @@ Namespace XMLModel
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _IsIndependent As Boolean
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property IsIndependent As Boolean
             Get
                 Return Me._IsIndependent

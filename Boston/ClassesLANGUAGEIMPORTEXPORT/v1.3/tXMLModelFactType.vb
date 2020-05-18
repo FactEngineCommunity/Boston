@@ -53,35 +53,35 @@ Namespace XMLModel13
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
-        Private _RoleGroup As New List(Of XMLModel.Role)
-        Public Property RoleGroup() As List(Of XMLModel.Role)
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Private _RoleGroup As New List(Of XMLModel13.Role)
+        Public Property RoleGroup() As List(Of XMLModel13.Role)
             Get
                 Return Me._RoleGroup
             End Get
-            Set(ByVal value As List(Of XMLModel.Role))
+            Set(ByVal value As List(Of XMLModel13.Role))
                 Me._RoleGroup = value
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
-        Private _Facts As New List(Of XMLModel.Fact)
-        Public Property Facts() As List(Of XMLModel.Fact)
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Private _Facts As New List(Of XMLModel13.Fact)
+        Public Property Facts() As List(Of XMLModel13.Fact)
             Get
                 Return Me._Facts
             End Get
-            Set(ByVal value As List(Of XMLModel.Fact))
+            Set(ByVal value As List(Of XMLModel13.Fact))
                 Me._Facts = value
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
-        Private _FactTypeReadings As New List(Of XMLModel.FactTypeReading)
-        Public Property FactTypeReadings() As List(Of XMLModel.FactTypeReading)
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Private _FactTypeReadings As New List(Of XMLModel13.FactTypeReading)
+        Public Property FactTypeReadings() As List(Of XMLModel13.FactTypeReading)
             Get
                 Return Me._FactTypeReadings
             End Get
-            Set(ByVal value As List(Of XMLModel.FactTypeReading))
+            Set(ByVal value As List(Of XMLModel13.FactTypeReading))
                 Me._FactTypeReadings = value
             End Set
         End Property

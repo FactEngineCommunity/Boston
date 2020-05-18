@@ -1,12 +1,12 @@
 ﻿Imports System.Xml.Serialization
 
-Namespace XMLModel
-    <Serializable()> _
+Namespace XMLModel16
+    <Serializable()>
     Public Class RoleConstraintRole
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _RoleId As String
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property RoleId() As String
             Get
                 Return Me._RoleId
@@ -16,9 +16,9 @@ Namespace XMLModel
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _SequenceNr As Integer
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property SequenceNr() As Integer
             Get
                 Return Me._SequenceNr
@@ -28,9 +28,9 @@ Namespace XMLModel
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _IsEntry As Boolean
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property IsEntry() As Boolean
             Get
                 Return Me._IsEntry
@@ -40,9 +40,9 @@ Namespace XMLModel
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _IsExit As Boolean
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property IsExit() As Boolean
             Get
                 Return Me._IsExit
@@ -52,9 +52,9 @@ Namespace XMLModel
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _ArgumentId As String = ""
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property ArgumentId As String
             Get
                 Return Me._ArgumentId
@@ -64,9 +64,9 @@ Namespace XMLModel
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _ArgumentSequenceNr As Integer = 0
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property ArgumentSequenceNr As Integer
             Get
                 Return Me._ArgumentSequenceNr

@@ -16,13 +16,13 @@ Namespace XMLModel14
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
-        Private _Data As New List(Of XMLModel.FactData)
-        Public Property Data() As List(Of XMLModel.FactData)
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Private _Data As New List(Of XMLModel14.FactData)
+        Public Property Data() As List(Of XMLModel14.FactData)
             Get
                 Return Me._Data
             End Get
-            Set(ByVal value As List(Of XMLModel.FactData))
+            Set(ByVal value As List(Of XMLModel14.FactData))
                 Me._Data = value
             End Set
         End Property

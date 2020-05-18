@@ -8,13 +8,13 @@ Namespace XMLModel13
         ''' The set of Roles traversed in order to form the JoinPath.
         ''' </summary>
         ''' <remarks></remarks>
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
-        Private _RolePath As New List(Of XMLModel.RoleReference)
-        Public Property RolePath As List(Of XMLModel.RoleReference)
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Private _RolePath As New List(Of XMLModel13.RoleReference)
+        Public Property RolePath As List(Of XMLModel13.RoleReference)
             Get
                 Return Me._RolePath
             End Get
-            Set(value As List(Of XMLModel.RoleReference))
+            Set(value As List(Of XMLModel13.RoleReference))
                 Me._RolePath = value
             End Set
         End Property

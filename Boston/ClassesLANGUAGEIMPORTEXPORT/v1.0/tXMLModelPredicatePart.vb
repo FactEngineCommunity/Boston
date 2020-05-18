@@ -1,12 +1,12 @@
 ﻿Imports System.Xml.Serialization
 
-Namespace XMLModelv1
-    <Serializable()> _
+Namespace XMLModel1
+    <Serializable()>
     Public Class PredicatePart
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _SequenceNr As Integer
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property SequenceNr() As Integer
             Get
                 Return Me._SequenceNr
@@ -16,9 +16,9 @@ Namespace XMLModelv1
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _ObjectType1Id As String
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property ObjectType1Id() As String
             Get
                 Return Me._ObjectType1Id
@@ -28,9 +28,9 @@ Namespace XMLModelv1
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _ObjectType2Id As String
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property ObjectType2Id() As String
             Get
                 Return Me._ObjectType2Id
@@ -40,7 +40,7 @@ Namespace XMLModelv1
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _PredicatePartText As String
         Public Property PredicatePartText() As String
             Get

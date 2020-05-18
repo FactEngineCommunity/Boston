@@ -13,8 +13,8 @@ Namespace XMLModel15
 
         <XmlAttribute()> _
         Public XSDVersionNr As Double = 1.5
-        Public ORMModel As New XMLModel.ORMModel
-        Public ORMDiagram As New List(Of XMLModel.Page)
+        Public ORMModel As New XMLModel15.ORMModel
+        Public ORMDiagram As New List(Of XMLModel15.Page)
 
         ''' <summary>
         ''' Maps an instance of FBM.Model to this class.
@@ -24,7 +24,7 @@ Namespace XMLModel15
         Public Sub MapFromFBMModel(ByVal arFBMModel As FBM.Model)
 
             Try
-                Me.ORMModel = New XMLModel.ORMModel
+                Me.ORMModel = New XMLModel15.ORMModel
                 Me.ORMModel.ModelId = arFBMModel.ModelId
                 Me.ORMModel.Name = arFBMModel.Name
 
@@ -32,10 +32,10 @@ Namespace XMLModel15
                 'Process the ValueTypes
                 '========================
                 Dim lrValueType As FBM.ValueType
-                Dim lrXMLValueType As XMLModel.ValueType
+                Dim lrXMLValueType As XMLModel15.ValueType
                 For Each lrValueType In arFBMModel.ValueType
 
-                    lrXMLValueType = New XMLModel.ValueType
+                    lrXMLValueType = New XMLModel15.ValueType
                     lrXMLValueType.Id = lrValueType.Id
                     lrXMLValueType.Name = lrValueType.Name
                     lrXMLValueType.DataType = lrValueType.DataType
@@ -60,11 +60,11 @@ Namespace XMLModel15
                 'Process the EntityTypes
                 '========================
                 Dim lrEntityType As FBM.EntityType
-                Dim lrXMLEntityType As XMLModel.EntityType
+                Dim lrXMLEntityType As XMLModel15.EntityType
 
                 For Each lrEntityType In arFBMModel.EntityType
 
-                    lrXMLEntityType = New XMLModel.EntityType
+                    lrXMLEntityType = New XMLModel15.EntityType
 
                     lrXMLEntityType.Id = lrEntityType.Id
                     lrXMLEntityType.GUID = lrEntityType.GUID
@@ -89,11 +89,11 @@ Namespace XMLModel15
                     End If
 
                     Dim lrSubtypeRelationship As FBM.tSubtypeRelationship
-                    Dim lrXMLSubtypeRelationship As XMLModel.SubtypeRelationship
+                    Dim lrXMLSubtypeRelationship As XMLModel15.SubtypeRelationship
 
                     For Each lrSubtypeRelationship In lrEntityType.SubtypeRelationship
 
-                        lrXMLSubtypeRelationship = New XMLModel.SubtypeRelationship
+                        lrXMLSubtypeRelationship = New XMLModel15.SubtypeRelationship
                         lrXMLSubtypeRelationship.ParentEntityTypeId = lrSubtypeRelationship.parentEntityType.Id
                         lrXMLSubtypeRelationship.SubtypingFactTypeId = lrSubtypeRelationship.FactType.Id
 
@@ -108,11 +108,11 @@ Namespace XMLModel15
                 'Process the FactTypes
                 '=======================
                 Dim lrFactType As FBM.FactType
-                Dim lrXMLFactType As XMLModel.FactType
+                Dim lrXMLFactType As XMLModel15.FactType
 
                 For Each lrFactType In arFBMModel.FactType
 
-                    lrXMLFactType = New XMLModel.FactType
+                    lrXMLFactType = New XMLModel15.FactType
 
                     lrXMLFactType.Id = lrFactType.Id
                     lrXMLFactType.GUID = lrFactType.GUID
@@ -137,10 +137,10 @@ Namespace XMLModel15
                     'Map the Roles
                     '---------------
                     Dim lrRole As FBM.Role
-                    Dim lrXMLRole As XMLModel.Role
+                    Dim lrXMLRole As XMLModel15.Role
                     For Each lrRole In lrFactType.RoleGroup
 
-                        lrXMLRole = New XMLModel.Role
+                        lrXMLRole = New XMLModel15.Role
 
                         lrXMLRole.Id = lrRole.Id
                         lrXMLRole.Name = lrRole.Name
@@ -158,13 +158,13 @@ Namespace XMLModel15
                     'Map the Facts
                     '---------------
                     Dim lrFact As FBM.Fact
-                    Dim lrXMLFact As XMLModel.Fact
+                    Dim lrXMLFact As XMLModel15.Fact
                     Dim lrFactData As FBM.FactData
-                    Dim lrXMLFactData As XMLModel.FactData
+                    Dim lrXMLFactData As XMLModel15.FactData
 
                     For Each lrFact In lrFactType.Fact
 
-                        lrXMLFact = New XMLModel.Fact
+                        lrXMLFact = New XMLModel15.Fact
 
                         lrXMLFact.Id = lrFact.Id
 
@@ -172,7 +172,7 @@ Namespace XMLModel15
                         'Map the FactData
                         '------------------
                         For Each lrFactData In lrFact.Data
-                            lrXMLFactData = New XMLModel.FactData
+                            lrXMLFactData = New XMLModel15.FactData
 
                             lrXMLFactData.RoleId = lrFactData.Role.Id
                             lrXMLFactData.Data = lrFactData.Data
@@ -187,13 +187,13 @@ Namespace XMLModel15
                     'Map FactTypeReadings
                     '----------------------
                     Dim lrFactTypeReading As FBM.FactTypeReading
-                    Dim lrXMLFactTypeReading As XMLModel.FactTypeReading
+                    Dim lrXMLFactTypeReading As XMLModel15.FactTypeReading
                     Dim lrPredicatePart As FBM.PredicatePart
-                    Dim lrXMLPredicatePart As XMLModel.PredicatePart
+                    Dim lrXMLPredicatePart As XMLModel15.PredicatePart
 
                     For Each lrFactTypeReading In lrFactType.FactTypeReading
 
-                        lrXMLFactTypeReading = New XMLModel.FactTypeReading
+                        lrXMLFactTypeReading = New XMLModel15.FactTypeReading
 
                         lrXMLFactTypeReading.Id = lrFactTypeReading.Id
                         lrXMLFactTypeReading.FrontReadingText = lrFactTypeReading.FrontText
@@ -201,7 +201,7 @@ Namespace XMLModel15
 
                         For Each lrPredicatePart In lrFactTypeReading.PredicatePart
 
-                            lrXMLPredicatePart = New XMLModel.PredicatePart
+                            lrXMLPredicatePart = New XMLModel15.PredicatePart
 
                             lrXMLPredicatePart.SequenceNr = lrPredicatePart.SequenceNr
                             lrXMLPredicatePart.Role_Id = lrPredicatePart.RoleId
@@ -227,15 +227,15 @@ Namespace XMLModel15
                 'Map the RoleConstraints
                 '=========================
                 Dim lrRoleConstraint As FBM.RoleConstraint
-                Dim lrXMLRoleConstraint As XMLModel.RoleConstraint
+                Dim lrXMLRoleConstraint As XMLModel15.RoleConstraint
                 Dim lrRoleConstraintRole As FBM.RoleConstraintRole
                 Dim lrRoleConstraintArgument As FBM.RoleConstraintArgument
-                Dim lrXMLRoleConstraintRole As XMLModel.RoleConstraintRole
-                Dim lrXMLRoleConstraintArgument As XMLModel.RoleConstraintArgument
+                Dim lrXMLRoleConstraintRole As XMLModel15.RoleConstraintRole
+                Dim lrXMLRoleConstraintArgument As XMLModel15.RoleConstraintArgument
 
                 For Each lrRoleConstraint In arFBMModel.RoleConstraint
 
-                    lrXMLRoleConstraint = New XMLModel.RoleConstraint
+                    lrXMLRoleConstraint = New XMLModel15.RoleConstraint
 
                     lrXMLRoleConstraint.Id = lrRoleConstraint.Id
                     lrXMLRoleConstraint.GUID = lrRoleConstraint.GUID
@@ -254,7 +254,7 @@ Namespace XMLModel15
 
                     For Each lrRoleConstraintRole In lrRoleConstraint.RoleConstraintRole
 
-                        lrXMLRoleConstraintRole = New XMLModel.RoleConstraintRole
+                        lrXMLRoleConstraintRole = New XMLModel15.RoleConstraintRole
 
                         lrXMLRoleConstraintRole.RoleId = lrRoleConstraintRole.Role.Id
                         lrXMLRoleConstraintRole.SequenceNr = lrRoleConstraintRole.SequenceNr
@@ -267,22 +267,22 @@ Namespace XMLModel15
                     '----------------------------------------
                     'Construct the RoleConstraintArguments.
                     '----------------------------------------
-                    Dim lrXMLRoleReference As XMLModel.RoleReference
+                    Dim lrXMLRoleReference As XMLModel15.RoleReference
                     Dim lrRole As FBM.Role
                     For Each lrRoleConstraintArgument In lrRoleConstraint.Argument
-                        lrXMLRoleConstraintArgument = New XMLModel.RoleConstraintArgument
+                        lrXMLRoleConstraintArgument = New XMLModel15.RoleConstraintArgument
                         lrXMLRoleConstraintArgument.SequenceNr = lrRoleConstraintArgument.SequenceNr
 
                         For Each lrRoleConstraintRole In lrRoleConstraintArgument.RoleConstraintRole
-                            lrXMLRoleReference = New XMLModel.RoleReference
+                            lrXMLRoleReference = New XMLModel15.RoleReference
                             lrXMLRoleReference.RoleId = lrRoleConstraintRole.Role.Id
                             lrXMLRoleConstraintArgument.Role.Add(lrXMLRoleReference)
                         Next
 
-                        lrXMLRoleConstraintArgument.JoinPath = New XMLModel.JoinPath
+                        lrXMLRoleConstraintArgument.JoinPath = New XMLModel15.JoinPath
                         lrXMLRoleConstraintArgument.JoinPath.JoinPathError = lrRoleConstraintArgument.JoinPath.JoinPathError
                         For Each lrRole In lrRoleConstraintArgument.JoinPath.RolePath
-                            lrXMLRoleReference = New XMLModel.RoleReference
+                            lrXMLRoleReference = New XMLModel15.RoleReference
                             lrXMLRoleReference.RoleId = lrRole.Id
                             lrXMLRoleConstraintArgument.JoinPath.RolePath.Add(lrXMLRoleReference)
                         Next
@@ -297,11 +297,11 @@ Namespace XMLModel15
                 'Map ModelNotes
                 '================
                 Dim lrModelNote As FBM.ModelNote
-                Dim lrXMLModelNote As XMLModel.ModelNote
+                Dim lrXMLModelNote As XMLModel15.ModelNote
 
                 For Each lrModelNote In arFBMModel.ModelNote
 
-                    lrXMLModelNote = New XMLModel.ModelNote
+                    lrXMLModelNote = New XMLModel15.ModelNote
 
                     lrXMLModelNote.Id = lrModelNote.Id
                     lrXMLModelNote.Note = lrModelNote.LongDescription
@@ -317,7 +317,7 @@ Namespace XMLModel15
 
                 For Each lrPage In arFBMModel.Page
 
-                    Dim lrExportPage As New XMLModel.Page
+                    Dim lrExportPage As New XMLModel15.Page
 
                     lrExportPage.Id = lrPage.PageId
                     lrExportPage.Name = lrPage.Name
@@ -501,7 +501,7 @@ Namespace XMLModel15
                 '==============================
                 'Map the ValueTypes
                 '==============================
-                Dim lrXMLValueType As XMLModel.ValueType
+                Dim lrXMLValueType As XMLModel15.ValueType
                 Dim lrValueType As FBM.ValueType
                 Dim lsValueTypeConstraintValue As String
 
@@ -535,7 +535,7 @@ Namespace XMLModel15
                 '==============================
                 'Map the EntityTypes
                 '==============================
-                Dim lrXMLEntityType As XMLModel.EntityType
+                Dim lrXMLEntityType As XMLModel15.EntityType
                 Dim lrEntityType As FBM.EntityType
 
                 For Each lrXMLEntityType In Me.ORMModel.EntityTypes
@@ -575,7 +575,7 @@ Namespace XMLModel15
                 '==============================
                 'Map the FactTypes
                 '==============================
-                Dim lrXMLFactType As XMLModel.FactType
+                Dim lrXMLFactType As XMLModel15.FactType
                 Dim lrFactType As FBM.FactType
 
                 For Each lrXMLFactType In Me.ORMModel.FactTypes
@@ -659,7 +659,7 @@ Namespace XMLModel15
                 '==============================
                 'Map the RoleConstraints
                 '==============================
-                Dim lrXMLRoleConstraint As XMLModel.RoleConstraint
+                Dim lrXMLRoleConstraint As XMLModel15.RoleConstraint
                 Dim lrRoleConstraint As FBM.RoleConstraint
 
                 For Each lrXMLRoleConstraint In Me.ORMModel.RoleConstraints
@@ -712,7 +712,7 @@ Namespace XMLModel15
                     '  SequenceNr on a RoleConstraintRole is many things, but
                     '  relates particularly to DataIn, DataOut integrity matching.
                     '----------------------------------------------------------
-                    Dim lrXMLRoleConstraintRole As XMLModel.RoleConstraintRole
+                    Dim lrXMLRoleConstraintRole As XMLModel15.RoleConstraintRole
                     Dim lrRoleConstraintRole As FBM.RoleConstraintRole
                     Dim lrRole As New FBM.Role
 
@@ -752,9 +752,9 @@ Namespace XMLModel15
                     End If
 
                     Dim lrRoleConstraintArgument As FBM.RoleConstraintArgument
-                    Dim lrXMLRoleConstraintArgument As XMLModel.RoleConstraintArgument
+                    Dim lrXMLRoleConstraintArgument As XMLModel15.RoleConstraintArgument
                     Dim lrJoinPath As FBM.JoinPath
-                    Dim lrXMLRoleReference As XMLModel.RoleReference
+                    Dim lrXMLRoleReference As XMLModel15.RoleReference
 
                     For Each lrXMLRoleConstraintArgument In lrXMLRoleConstraint.Argument
                         lrRoleConstraintArgument = New FBM.RoleConstraintArgument(lrRoleConstraint, _
@@ -801,7 +801,7 @@ Namespace XMLModel15
                 '==============================
                 'Map the ModelNotes
                 '==============================
-                Dim lrXMLModelNote As XMLModel.ModelNote
+                Dim lrXMLModelNote As XMLModel15.ModelNote
                 Dim lrModelNote As FBM.ModelNote
 
                 For Each lrXMLModelNote In Me.ORMModel.ModelNotes
@@ -868,7 +868,7 @@ Namespace XMLModel15
         Public Sub MapToFBMPages(ByRef arModel As FBM.Model)
 
             Dim lrPage As FBM.Page
-            Dim lrXMLPage As XMLModel.Page
+            Dim lrXMLPage As XMLModel15.Page
             Dim lrConceptInstance As FBM.ConceptInstance
 
             Try
@@ -1151,9 +1151,9 @@ Namespace XMLModel15
 
             Try
 
-                Dim lrXMLFact As XMLModel.Fact
-                Dim lrXMLFactData As XMLModel.FactData
-                Dim lrXMLFactType As New XMLModel.FactType
+                Dim lrXMLFact As XMLModel15.Fact
+                Dim lrXMLFactData As XMLModel15.FactData
+                Dim lrXMLFactType As New XMLModel15.FactType
 
                 lrXMLFactType.Id = arFactType.Id
                 lrXMLFactType = Me.ORMModel.FactTypes.Find(AddressOf lrXMLFactType.Equals)
@@ -1230,9 +1230,9 @@ Namespace XMLModel15
         Public Sub GetFactTypeDetails(ByRef arFactType As FBM.FactType)
 
             Dim lsMessage As String = ""
-            Dim lrXMLRole As XMLModel.Role
+            Dim lrXMLRole As XMLModel15.Role
             Dim lrRole As FBM.Role
-            Dim lrXMLFactType As New XMLModel.FactType
+            Dim lrXMLFactType As New XMLModel15.FactType
 
             lrXMLFactType.Id = arFactType.Id
             lrXMLFactType.GUID = arFactType.GUID
@@ -1336,8 +1336,8 @@ Namespace XMLModel15
 
         Public Function GetFactTypeReadingsForFactType(ByRef arFactType As FBM.FactType) As List(Of FBM.FactTypeReading)
 
-            Dim lrXMLFactType As XMLModel.FactType
-            Dim lrXMLFactTypeReading As XMLModel.FactTypeReading
+            Dim lrXMLFactType As XMLModel15.FactType
+            Dim lrXMLFactTypeReading As XMLModel15.FactTypeReading
             Dim lrFactTypeReading As FBM.FactTypeReading
             Dim lsMessage As String = ""
 
@@ -1348,13 +1348,13 @@ Namespace XMLModel15
 
             Try
 
-                lrXMLFactType = New XMLModel.FactType
+                lrXMLFactType = New XMLModel15.FactType
                 lrXMLFactType.Id = arFactType.Id
                 lrXMLFactType = Me.ORMModel.FactTypes.Find(AddressOf lrXMLFactType.Equals)
 
                 Dim liSequenceNr As Integer = 0
                 Dim lrPredicatePart As FBM.PredicatePart
-                Dim lrXMLPredicatePart As XMLModel.PredicatePart
+                Dim lrXMLPredicatePart As XMLModel15.PredicatePart
 
                 For Each lrXMLFactTypeReading In lrXMLFactType.FactTypeReadings
 

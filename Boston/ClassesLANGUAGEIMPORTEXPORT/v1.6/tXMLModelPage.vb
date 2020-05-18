@@ -1,20 +1,20 @@
 ﻿Imports System.Xml.Serialization
 Imports System.Runtime.Serialization.Formatters.Binary
 
-Namespace XMLModel
-    <Serializable()> _
+Namespace XMLModel16
+    <Serializable()>
     Public Class Page
 
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Id As String
 
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Name As String = ""
 
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Language As pcenumLanguage
 
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public IsCoreModelPage As Boolean = False
 
         '----------------------------------------------

@@ -1,12 +1,12 @@
 ﻿Imports System.Xml.Serialization
 
-Namespace XMLModelv11
+Namespace XMLModel11
 
-    <Serializable()> _
+    <Serializable()>
     Partial Public Class ValueType
 
         Private _Id As String
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property Id() As String
             Get
                 Return Me._Id
@@ -17,7 +17,7 @@ Namespace XMLModelv11
         End Property
 
         Private _Name As String
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property Name() As String
             Get
                 Return Me._Name
@@ -28,7 +28,7 @@ Namespace XMLModelv11
         End Property
 
         Private _DataType As pcenumORMDataType
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property DataType() As pcenumORMDataType
             Get
                 Return Me._DataType
@@ -39,7 +39,7 @@ Namespace XMLModelv11
         End Property
 
         Private _DataTypePrecision As Integer
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property DataTypePrecision() As Integer
             Get
                 Return Me._DataTypePrecision
@@ -50,7 +50,7 @@ Namespace XMLModelv11
         End Property
 
         Private _DataTypeLength As Integer
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property DataTypeLength() As Integer
             Get
                 Return Me._DataTypeLength

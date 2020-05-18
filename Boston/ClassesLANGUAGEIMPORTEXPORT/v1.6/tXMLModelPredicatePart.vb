@@ -1,12 +1,12 @@
 ﻿Imports System.Xml.Serialization
 
-Namespace XMLModel
-    <Serializable()> _
+Namespace XMLModel16
+    <Serializable()>
     Public Class PredicatePart
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _SequenceNr As Integer
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property SequenceNr() As Integer
             Get
                 Return Me._SequenceNr
@@ -16,9 +16,9 @@ Namespace XMLModel
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _RoleId As String = ""
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property Role_Id As String
             Get
                 Return Me._RoleId
@@ -28,9 +28,9 @@ Namespace XMLModel
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _PreboundReadingText As String = ""
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property PreboundReadingText As String
             Get
                 Return Me._PreboundReadingText
@@ -40,9 +40,9 @@ Namespace XMLModel
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _PostboundReadingText As String = ""
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property PostboundReadingText As String
             Get
                 Return Me._PostboundReadingText
@@ -52,7 +52,7 @@ Namespace XMLModel
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _PredicatePartText As String
         Public Property PredicatePartText() As String
             Get

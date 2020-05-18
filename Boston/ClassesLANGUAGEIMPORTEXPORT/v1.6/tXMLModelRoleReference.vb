@@ -1,12 +1,12 @@
 ﻿Imports System.Xml.Serialization
 
-Namespace XMLModel
+Namespace XMLModel16
 
-    <Serializable()> _
+    <Serializable()>
     Partial Public Class RoleReference
 
         Private _RoleId As String
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property RoleId() As String
             Get
                 Return Me._RoleId

@@ -1,13 +1,13 @@
 ﻿Imports System.Xml.Serialization
 
-Namespace XMLModelv11
+Namespace XMLModel11
 
-    <Serializable()> _
+    <Serializable()>
     Public Class EntityType
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _Id As String
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property Id() As String
             Get
                 Return Me._Id
@@ -17,9 +17,9 @@ Namespace XMLModelv11
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _Name As String
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property Name() As String
             Get
                 Return Me._Name
@@ -29,7 +29,7 @@ Namespace XMLModelv11
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _Instance As New List(Of String)
         Public Property Instance() As List(Of String)
             Get
@@ -40,9 +40,9 @@ Namespace XMLModelv11
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _ReferenceModeValueTypeId As String
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property ReferenceModeValueTypeId() As String
             Get
                 Return Me._ReferenceModeValueTypeId
@@ -52,9 +52,9 @@ Namespace XMLModelv11
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _ReferenceSchemeRoleConstraintId As String = ""
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property ReferenceSchemeRoleConstraintId() As String
             Get
                 Return Me._ReferenceSchemeRoleConstraintId
@@ -64,9 +64,9 @@ Namespace XMLModelv11
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _IsObjectifyingEntityType As Boolean
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property IsObjectifyingEntityType() As Boolean
             Get
                 Return Me._IsObjectifyingEntityType
@@ -76,9 +76,9 @@ Namespace XMLModelv11
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _ReferenceMode As String
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property ReferenceMode() As String
             Get
                 Return Me._ReferenceMode
@@ -88,12 +88,12 @@ Namespace XMLModelv11
             End Set
         End Property
 
-        Private _SubtypeRelationships As New List(Of XMLModel.SubtypeRelationship)
-        Public Property SubtypeRelationships() As List(Of XMLModel.SubtypeRelationship)
+        Private _SubtypeRelationships As New List(Of XMLModel11.SubtypeRelationship)
+        Public Property SubtypeRelationships() As List(Of XMLModel11.SubtypeRelationship)
             Get
                 Return Me._SubtypeRelationships
             End Get
-            Set(ByVal value As List(Of XMLModel.SubtypeRelationship))
+            Set(ByVal value As List(Of XMLModel11.SubtypeRelationship))
                 Me._SubtypeRelationships = value
             End Set
         End Property

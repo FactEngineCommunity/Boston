@@ -1,12 +1,12 @@
 ﻿Imports System.Xml.Serialization
 
-Namespace XMLModelv11
-    <Serializable()> _
+Namespace XMLModel11
+    <Serializable()>
     Public Class ModelNote
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _Id As String
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property Id() As String
             Get
                 Return Me._Id
@@ -16,9 +16,9 @@ Namespace XMLModelv11
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _JoinedObjectTypeId As String
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property JoinedObjectTypeId() As String
             Get
                 Return Me._JoinedObjectTypeId
@@ -28,9 +28,9 @@ Namespace XMLModelv11
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _Note As String
-        <XmlElement()> _
+        <XmlElement()>
         Public Property Note() As String
             Get
                 Return Me._Note
