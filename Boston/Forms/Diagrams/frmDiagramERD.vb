@@ -1551,78 +1551,108 @@ Public Class frmDiagramERD
 
     Private Sub DiagramView_DragDrop(ByVal sender As Object, ByVal e As System.Windows.Forms.DragEventArgs) Handles DiagramView.DragDrop
 
-        If e.Data.GetDataPresent(tShapeNodeDragItem.DraggedItemObjectType) Then
+        Dim lsMessage As String
 
-            '------------------------------------------------------------------------------------------------------------------------------------
-            'Make sure the current page points to the Diagram on this form. The reason is that the user may be viewing the Page as an ORM Model
-            '------------------------------------------------------------------------------------------------------------------------------------
-            Me.zrPage.Diagram = Me.Diagram
+        Try
+            If e.Data.GetDataPresent(tShapeNodeDragItem.DraggedItemObjectType) Then
 
-            Dim loDraggedNode As tShapeNodeDragItem = e.Data.GetData(tShapeNodeDragItem.DraggedItemObjectType)
+                '------------------------------------------------------------------------------------------------------------------------------------
+                'Make sure the current page points to the Diagram on this form. The reason is that the user may be viewing the Page as an ORM Model
+                '------------------------------------------------------------------------------------------------------------------------------------
+                Me.zrPage.Diagram = Me.Diagram
 
-            Dim loPoint As Point = Me.DiagramView.PointToClient(New Point(e.X, e.Y))
-            Dim loPointF As PointF = Me.DiagramView.ClientToDoc(New Point(loPoint.X, loPoint.Y))
+                Dim loDraggedNode As tShapeNodeDragItem = e.Data.GetData(tShapeNodeDragItem.DraggedItemObjectType)
 
-            If loDraggedNode.Index >= 0 Then
+                Dim loPoint As Point = Me.DiagramView.PointToClient(New Point(e.X, e.Y))
+                Dim loPointF As PointF = Me.DiagramView.ClientToDoc(New Point(loPoint.X, loPoint.Y))
 
-                Dim lrToolboxForm As frmToolbox
-                lrToolboxForm = prApplication.GetToolboxForm(frmToolbox.Name)
+                If loDraggedNode.Index >= 0 Then
 
-                If loDraggedNode.Index < lrToolboxForm.ShapeListBox.ShapeCount Then
+                    Dim lrToolboxForm As frmToolbox
+                    lrToolboxForm = prApplication.GetToolboxForm(frmToolbox.Name)
 
-                    Select Case lrToolboxForm.ShapeListBox.Shapes(loDraggedNode.Index).Id
-                        Case Is = "Entity"
-                            '---------------------------------------------------------------
-                            'Establish a new EntityType and Entity for the dropped object.
-                            '---------------------------------------------------------------    
+                    If loDraggedNode.Index < lrToolboxForm.ShapeListBox.ShapeCount Then
 
-                            Dim lrEntityType As New FBM.EntityType(Me.zrPage.Model, pcenumLanguage.ORMModel)
-                            lrEntityType = Me.zrPage.Model.CreateEntityType
+                        Select Case lrToolboxForm.ShapeListBox.Shapes(loDraggedNode.Index).Id
+                            Case Is = "Entity"
+                                '---------------------------------------------------------------
+                                'Establish a new EntityType and Entity for the dropped object.
+                                '---------------------------------------------------------------    
 
-                            Dim lsEntityName As String = Me.zrPage.Model.CreateUniqueEntityName(lrEntityType.Name)
-                            Dim lrEntity As New ERD.Entity(Me.zrPage, lsEntityName)
-                            '=========================================================================================
+                                Dim lrEntityType As New FBM.EntityType(Me.zrPage.Model, pcenumLanguage.ORMModel)
+                                lrEntityType = Me.zrPage.Model.CreateEntityType
 
-                            Call Me.zrPage.DropEntityAtPoint(lrEntity, loPointF)
+                                Dim lsEntityName As String = Me.zrPage.Model.CreateUniqueEntityName(lrEntityType.Name)
+                                Dim lrEntity As New ERD.Entity(Me.zrPage, lsEntityName)
+                                '=========================================================================================
 
-                            Me.zrPage.ERDiagram.Entity.Add(lrEntity)
-                            '=========================================================================================
-                    End Select
+                                Call Me.zrPage.DropEntityAtPoint(lrEntity, loPointF)
+
+                                Me.zrPage.ERDiagram.Entity.Add(lrEntity)
+                                '=========================================================================================
+                        End Select
+                    End If
+                ElseIf loDraggedNode.Tag.GetType Is GetType(RDS.Table) Then
+
+                    Dim lrTable As RDS.Table
+                    lrTable = loDraggedNode.Tag
+
+                    '------------------
+                    'Load the Entity.
+                    '==================================================================================================================
+                    Dim lsSQLQuery As String = ""
+                    Dim lrRecordset As ORMQL.Recordset
+                    Dim lrFactInstance As FBM.FactInstance
+
+                    Dim lrEntity As ERD.Entity
+
+                    If Me.zrPage.ERDiagram.Entity.Find(Function(x) x.Name = lrTable.Name) IsNot Nothing Then
+                        lsMessage = "This page already has the Entity, '" & lrTable.Name & "', loaded on it. Please choose another Entity to drop on the page."
+                        MsgBox(lsMessage)
+                        Exit Sub
+                    End If
+
+
+                    lsSQLQuery = "SELECT *"
+                    lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreElementHasElementType.ToString
+                    lsSQLQuery &= " WHERE Element = '" & lrTable.Name & "'"
+
+                    lrRecordset = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                    If lrRecordset.EOF Then
+                        lsMessage = "The Entity, '" & lrTable.Name & "', does not seem to have any Attributes at this stage. Make sure that the corresponding Model Element in your Object-Role Model at least has a Primary Reference Scheme."
+                        lsMessage &= vbCrLf & vbCrLf & "Entities in Entity-Relationship Diagrams in Boston have their Attributes created by the relative relations of the corresponding Model Element in your Object-Role Model."
+
+                        If Me.zrPage.Model.GetModelObjectByName(lrTable.Name).ConceptType = pcenumConceptType.EntityType Then
+                            lsMessage &= vbCrLf & vbCrLf & "i.e. Make sure the Entity Type, '" & lrTable.Name & "', at least has a Primary Reference Scheme in your Object-Role Model."
+                        End If
+                        MsgBox(lsMessage)
+                        Exit Sub
+                    Else
+                        lsSQLQuery = "ADD FACT '" & lrRecordset.CurrentFact.Id & "'"
+                        lsSQLQuery &= " TO " & pcenumCMMLRelations.CoreElementHasElementType.ToString
+                        lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
+
+                        lrFactInstance = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                        lrEntity = lrFactInstance.GetFactDataInstanceByRoleName(pcenumCMML.Element.ToString).CloneEntity(Me.zrPage)
+                        '===================================================================================================================
+                        lrEntity.RDSTable = lrTable 'IMPORTANT: Leave this at this point in the code. Otherwise (somehow) lrEntity ends up with no TableShape.
+                        Call Me.zrPage.DropExistingEntityAtPoint(lrEntity, loPointF)
+
+                        Call Me.zrPage.loadRelationsForEntity(lrEntity)
+
+                    End If
                 End If
-            ElseIf loDraggedNode.Tag.GetType Is GetType(RDS.Table) Then
-
-                Dim lrTable As RDS.Table
-                lrTable = loDraggedNode.Tag
-
-                '------------------
-                'Load the Entity.
-                '==================================================================================================================
-                Dim lsSQLQuery As String = ""
-                Dim lrRecordset As ORMQL.Recordset
-                Dim lrFactInstance As FBM.FactInstance
-
-                Dim lrEntity As ERD.Entity
-
-                lsSQLQuery = "SELECT *"
-                lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreElementHasElementType.ToString
-                lsSQLQuery &= " WHERE Element = '" & lrTable.Name & "'"
-
-                lrRecordset = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-                lsSQLQuery = "ADD FACT '" & lrRecordset.CurrentFact.Id & "'"
-                lsSQLQuery &= " TO " & pcenumCMMLRelations.CoreElementHasElementType.ToString
-                lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
-
-                lrFactInstance = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-                lrEntity = lrFactInstance.GetFactDataInstanceByRoleName(pcenumCMML.Element.ToString).CloneEntity(Me.zrPage)
-                '===================================================================================================================
-                lrEntity.RDSTable = lrTable 'IMPORTANT: Leave this at this point in the code. Otherwise (somehow) lrEntity ends up with no TableShape.
-                Call Me.zrPage.DropExistingEntityAtPoint(lrEntity, loPointF)
-
-                Call Me.zrPage.loadRelationsForEntity(lrEntity)
             End If
-        End If
+
+        Catch ex As Exception
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 

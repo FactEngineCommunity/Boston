@@ -467,7 +467,7 @@ Namespace FBM
 
                 '======================================================================================
                 'RDS
-                If Not arEntityType.IsMDAModelElement Then
+                If Not arEntityType.IsMDAModelElement And Not arEntityType.IsObjectifyingEntityType Then
                     Dim lrTable As New RDS.Table(Me.RDS, arEntityType.Id, arEntityType)
                     Me.RDS.Table.AddUnique(lrTable)
                 End If

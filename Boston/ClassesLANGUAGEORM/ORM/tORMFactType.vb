@@ -3164,8 +3164,9 @@ Namespace FBM
         Public Sub Objectify()
 
             Try
-                Me.ObjectifyingEntityType = Me.Model.CreateEntityType
+                Me.ObjectifyingEntityType = Me.Model.CreateEntityType(Nothing, False)
                 Me.ObjectifyingEntityType.IsObjectifyingEntityType = True
+                Me.Model.AddEntityType(Me.ObjectifyingEntityType, True, True, Nothing)
 
                 Call Me.CreateLinkFactTypes(True)
 
@@ -3269,7 +3270,6 @@ Namespace FBM
 
             Try
                 Me.IsObjectified = False
-                Me.ObjectifyingEntityType = Nothing
 
                 Dim larFactType As New List(Of FBM.FactType)
 
@@ -3301,6 +3301,8 @@ Namespace FBM
                 RaiseEvent ObjectificationRemoved()
 
                 Call Me.ObjectifyingEntityType.RemoveFromModel(True, False, abBroadcastInterfaceEvent)
+
+                Me.ObjectifyingEntityType = Nothing
 
                 If My.Settings.UseClientServer And My.Settings.InitialiseClient And abBroadcastInterfaceEvent Then
                     Call prDuplexServiceClient.BroadcastToDuplexService(Viev.FBM.Interface.pcenumBroadcastType.ModelUpdateFactType, Me, Nothing)

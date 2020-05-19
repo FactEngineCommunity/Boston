@@ -110,7 +110,11 @@ Public Module tableDatabaseUpgrade
                 lrDatabaesUpgrade.FromVersionNr = lrRecordset("FromVersion").Value
                 lrDatabaesUpgrade.ToVersionNr = lrRecordset("ToVersion").Value
                 lrDatabaesUpgrade.SuccessfulImplementation = False
-                Call lrDatabaesUpgrade.Save()
+
+                If Not tableDatabaseUpgrade.ExistsDatabaseUpgradeInRichmond(lrDatabaesUpgrade.FromVersionNr, lrDatabaesUpgrade.ToVersionNr) Then
+                    Call lrDatabaesUpgrade.Save()
+                End If
+
                 lrRecordset.MoveNext()
             End While
 

@@ -20,6 +20,7 @@ Public Class frmToolboxEnterpriseExplorer
 
     Private WithEvents zrToolTip As New ToolTip
 
+
     Private zbSetupFormComplete As Boolean = False
     Private zoCurrentNode As TreeNode = Nothing
 
@@ -531,9 +532,6 @@ Public Class frmToolboxEnterpriseExplorer
                 Dim lsMessage As String = "New Page added to the Model."
                 Me.zrToolTip.IsBalloon = True
                 Me.zrToolTip.ToolTipIcon = ToolTipIcon.None
-                Me.zrToolTip.BackColor = Color.SteelBlue
-                Me.zrToolTip.ForeColor = Color.White
-                Me.zrToolTip.OwnerDraw = True
                 Me.zrToolTip.Show(lsMessage, Me, loNode.Bounds.X, loNode.Bounds.Y + loNode.Bounds.Height, 4000)
             End If
 
@@ -1376,13 +1374,9 @@ Public Class frmToolboxEnterpriseExplorer
 
             If abToolTipNewPage Then
 
-                'Me.zrToolTip.IsBalloon = True
                 Dim lsMessage As String = "New Page added to the Model."
                 Me.zrToolTip.IsBalloon = True
                 Me.zrToolTip.ToolTipIcon = ToolTipIcon.None
-                Me.zrToolTip.BackColor = Color.SteelBlue
-                Me.zrToolTip.ForeColor = Color.White
-                Me.zrToolTip.OwnerDraw = True
                 Me.zrToolTip.Show(lsMessage, Me, loNode.Bounds.X, loNode.Bounds.Y + loNode.Bounds.Height, 4000)
             End If
 
@@ -1473,7 +1467,6 @@ Public Class frmToolboxEnterpriseExplorer
 
             lrModel = Me.AddNewModel(lrNewTreeNode)
 
-
             '==================================================
             'RDS - Create a CMML Page and then dispose of it.            
             'Inject the Core ERD metamodel into the model
@@ -1519,12 +1512,10 @@ Public Class frmToolboxEnterpriseExplorer
             Call Me.AddPageToModel(lrNewTreeNode)
 
             Dim lsMessage As String = "New Model and Page added."
+
             Me.zrToolTip.IsBalloon = True
             Me.zrToolTip.ToolTipIcon = ToolTipIcon.None
-            Me.zrToolTip.BackColor = Color.SteelBlue
-            Me.zrToolTip.ForeColor = Color.White
-            Me.zrToolTip.OwnerDraw = True
-            Me.zrToolTip.Show(lsMessage, Me, lrNewTreeNode.Bounds.X, lrNewTreeNode.Bounds.Y + lrNewTreeNode.Bounds.Height, 4000)
+            Me.zrToolTip.Show(lsMessage, Me, lrNewTreeNode.Bounds.X, lrNewTreeNode.Bounds.Y + +lrNewTreeNode.Bounds.Height, 4000)
 
             Call Me.TreeView.Nodes(0).Expand()
 
@@ -2529,6 +2520,12 @@ Public Class frmToolboxEnterpriseExplorer
                         objStreamReader.Close()
                         lrModel = lrXMLModel.MapToFBMModel
                     Case Is = "1.6"
+                        lrSerializer = New XmlSerializer(GetType(XMLModel16.Model))
+                        Dim lrXMLModel As New XMLModel16.Model
+                        lrXMLModel = lrSerializer.Deserialize(objStreamReader)
+                        objStreamReader.Close()
+                        lrModel = lrXMLModel.MapToFBMModel
+                    Case Is = "1.7"
                         lrSerializer = New XmlSerializer(GetType(XMLModel.Model))
                         Dim lrXMLModel As New XMLModel.Model
                         lrXMLModel = lrSerializer.Deserialize(objStreamReader)
@@ -2577,9 +2574,9 @@ Public Class frmToolboxEnterpriseExplorer
 
                 '================================================================================================================
                 'RDS
-                If lrModel.HasCoreModel Then
+                If (lrModel.ModelId <> "Core") And lrModel.HasCoreModel Then
                     Call lrModel.PopulateRDSStructureFromCoreMDAElements()
-                Else
+                ElseIf (lrModel.ModelId <> "Core") Then
                     Call lrModel.Save(True)
                     '==================================================
                     'RDS - Create a CMML Page and then dispose of it.
@@ -2737,15 +2734,6 @@ Public Class frmToolboxEnterpriseExplorer
         lrPage = lrEnterpriseView.Tag
 
         Call frmMain.loadORMModelPage(lrPage, Me.TreeView.SelectedNode)
-
-    End Sub
-
-    Private Sub toolTip1_Draw(ByVal sender As System.Object, ByVal e As DrawToolTipEventArgs) Handles zrToolTip.Draw
-
-        'e.Graphics.FillRectangle(SystemBrushes.ControlDark, e.Bounds)
-        e.DrawBackground()
-        e.DrawBorder()
-        e.DrawText()
 
     End Sub
 
@@ -3832,4 +3820,25 @@ Public Class frmToolboxEnterpriseExplorer
         Cursor.Current = Cursors.Default
 
     End Sub
+
+    Private Sub zrToolTip_Draw(sender As Object, e As DrawToolTipEventArgs) Handles zrToolTip.Draw
+
+        'e.DrawText()
+
+        Dim b As System.Drawing.Drawing2D.LinearGradientBrush = New System.Drawing.Drawing2D.LinearGradientBrush(e.Bounds, Color.GreenYellow, Color.MintCream, 45.0F)
+
+        e.Graphics.FillRectangle(b, e.Bounds)
+
+        e.Graphics.DrawRectangle(New Pen(Brushes.Red, 1), New Rectangle(e.Bounds.X, e.Bounds.Y, e.Bounds.Width - 100, e.Bounds.Height - 100))
+        e.Graphics.FillRectangle(SystemBrushes.Info, e.Bounds)
+
+        'e.DrawBackground()
+        'e.DrawBorder()
+
+        Dim f As Font = New Font("Arial", 12)
+        e.Graphics.DrawString(e.ToolTipText, f, Brushes.Black, New PointF(1, 1))
+
+    End Sub
+
+
 End Class

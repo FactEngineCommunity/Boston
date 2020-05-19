@@ -7823,14 +7823,23 @@ Public Class frmDiagramORM
     Private Sub RemoveallInternalUniquenessConstraintsToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles RemoveallInternalUniquenessConstraintsToolStripMenuItem.Click
 
         Dim lrFactTypeInstance As FBM.FactTypeInstance
-
+        Dim lsMessage As String = ""
 
         '------------------------------------------------------
         'Get the FactType for the InternalUniquenessConstraint
         '------------------------------------------------------                    
         lrFactTypeInstance = Me.zrPage.SelectedObject(0)
 
-        Call lrFactTypeInstance.FactType.RemoveInternalUniquenessConstraints(True)
+        If lrFactTypeInstance.FactType.IsObjectified Then
+            lsMessage = "Remove the objectification of this Fact Type before removing all of the Internal Uniqueness Constraints of the Fact Type."
+            lsMessage &= vbCrLf & vbCrLf
+            lsMessage &= "A Fact Type cannot be objectified if it has no Internal Uniqueness Constraints."
+            MsgBox(lsMessage)
+        Else
+            Call lrFactTypeInstance.FactType.RemoveInternalUniquenessConstraints(True)
+        End If
+
+
 
     End Sub
 
