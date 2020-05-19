@@ -28,43 +28,6 @@ Public Class frmDatabaseUpgrade
 
     End Sub
 
-    ''' <summary>
-    ''' Used when the Upgrade requires Boston to run code in Boston.
-    ''' </summary>
-    ''' <param name="asUpgradeCodeName"></param>
-    ''' <returns></returns>
-    ''' <remarks></remarks>
-    Function ExecuteUpgradeCode(ByVal asUpgradeCodeName As String) As Boolean
-
-        ExecuteUpgradeCode = True
-
-        Select Case Trim(asUpgradeCodeName)
-            '----------------------------------
-            'Put calls to code execution here
-            '----------------------------------
-            Case Is = "SetInitialFactTypeReadingTypedPredicateIds"
-                Call DatabaseUpgradeFunctions.SetInitialFactTypeReadingTypedPredicateIds()
-            Case Is = "UpgradePredicatePartRoleIds"
-                Call DatabaseUpgradeFunctions.UpgradePredicatePartRoleIds()
-            Case Is = "InsertNewPredicatePartRecordsForRoleIds"
-                Call DatabaseUpgradeFunctions.InsertNewPredicatePartRecordsForRoleIds()
-            Case Is = "AddValueTypeGUIDs"
-                Call DatabaseUpgradeFunctions.AddValueTypeGUIDs()
-            Case Is = "AddFactTypeGUIDs"
-                Call DatabaseUpgradeFunctions.AddFactTypeGUIDs()
-            Case Is = "AddRoleConstraintGUIDs"
-                Call DatabaseUpgradeFunctions.AddRoleConstraintGUIDs()
-            Case Is = "ReplaceCoreModel"
-                Call DatabaseUpgradeFunctions.ReplaceCoreModel()
-            Case Is = "ReplaceUniversityModel"
-                Call DatabaseUpgradeFunctions.ReplaceUniversityModel()
-            Case Else
-                MsgBox("Error: ExecuteUpgradeCode: Ability to process code '" & asUpgradeCodeName & "' does not exist. Please contact your vendor with this error message.")
-                ExecuteUpgradeCode = False
-        End Select
-
-    End Function
-
     Sub LoadDatabaseUpgradeHistory()
 
         Dim lsListItem As String
@@ -117,7 +80,7 @@ Public Class frmDatabaseUpgrade
     ''' <param name="asToVersionNr">The database VersionNr that the installation datbase will be upgraded to.</param>
     ''' <returns></returns>
     ''' <remarks></remarks>
-    Function PerformNextRequiredDatabaseUpgrade(ByVal aiUpgradeId As String, ByVal asFromVersionNr As String, ByVal asToVersionNr As String) As Boolean
+    Public Function PerformNextRequiredDatabaseUpgrade(ByVal aiUpgradeId As String, ByVal asFromVersionNr As String, ByVal asToVersionNr As String) As Boolean
 
         Dim lsUpgradeSQL As String
         Dim lsMessage As String
@@ -131,8 +94,6 @@ Public Class frmDatabaseUpgrade
         Dim transaction As OleDb.OleDbTransaction = Nothing
 
         Try
-
-            Me.Cursor = Cursors.WaitCursor
 
             lrRecordset.ActiveConnection = pdbDatabaseUpgradeConnection
             lrRecordset.CursorType = pcOpenStatic
@@ -253,7 +214,7 @@ Public Class frmDatabaseUpgrade
                             '  hard-coded, and may as well be referenced from right here.
                             '-------------------------------------------------------------
                             Call transaction.Commit()
-                            If Not Me.ExecuteUpgradeCode(lrDatabaseUpgradeSQL.CodeToExecute) Then
+                            If Not Database.Database.ExecuteUpgradeCode(lrDatabaseUpgradeSQL.CodeToExecute) Then
                                 GoTo error_handler
                             End If
                             transaction = pdb_OLEDB_connection.BeginTransaction()
@@ -309,12 +270,10 @@ Public Class frmDatabaseUpgrade
 
         End Try
 
-
 error_handler:
-
+        Cursor = Cursors.Default
         'pdbConnection.Rollback()
         Call transaction.Rollback()
-        Me.Cursor = Cursors.Default
 
         lsErrorMessage = Err.Number & ", " & Err.Source & ", " & Err.Description
         lsMessage &= "Error Message: " & lsErrorMessage

@@ -158,7 +158,7 @@ Public Module tableDatabaseUpgrade
 
 
 
-    Sub GetNextRequiredUpgrade(ByRef ar_upgrade As DatabaseUpgrade.Upgrade)
+    Public Function GetNextRequiredUpgrade(ByRef ar_upgrade As DatabaseUpgrade.Upgrade, Optional ByVal abSilent As Boolean = False) As DatabaseUpgrade.Upgrade
 
         Dim lsSQLQuery As String = ""
         Dim lrRecordset As New ADODB.Recordset
@@ -185,11 +185,14 @@ Public Module tableDatabaseUpgrade
             ar_upgrade.ToVersionNr = Trim(lrRecordset("ToVersion").Value)
             ar_upgrade.SuccessfulImplementation = lrRecordset("SuccessfulImplementation").Value
             lrRecordset.Close()
+
+            Return ar_upgrade
         Else
-            MsgBox("Error: GetNextRequiredUpgrade: no record returned")
+            If Not abSilent Then MsgBox("Error: GetNextRequiredUpgrade: no record returned")
+            Return Nothing
         End If
 
-    End Sub
+    End Function
 
     Function GetRequiredUpgradeCount() As Integer
 

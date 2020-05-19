@@ -1,6 +1,8 @@
-﻿Namespace Database
+﻿Imports System.Reflection
 
-    Public Module publicDatabase
+Namespace Database
+
+    Public Module Database
 
         Public Function MakeStringSafe(ByVal asString As String) As String
 
@@ -22,7 +24,245 @@
 
         End Function
 
+        ''' <summary>
+        ''' RETURNS TRUE if SuccessfulImplementation
+        '''  ELSE FALSE if NOT SuccessfulImplementation
+        '''             OR No RequiredUpgrade exists
+        ''' </summary>
+        ''' <param name="aiUpgradeId">The UpgradeId of the DatabaseUpgrade to be performed</param>
+        ''' <param name="asFromVersionNr">The database VersionNr from which the Upgrade will be performed
+        ''' Must be the current VersionNr of the Boston installation database.</param>
+        ''' <param name="asToVersionNr">The database VersionNr that the installation datbase will be upgraded to.</param>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public Function PerformNextRequiredDatabaseUpgrade(ByVal aiUpgradeId As String, ByVal asFromVersionNr As String, ByVal asToVersionNr As String) As Boolean
+
+            Dim lsUpgradeSQL As String
+            Dim lsMessage As String
+            Dim lsStallMessage As String = ""
+            Dim lsErrorMessage As String
+            Dim lrDatabaseUpgradeSQL As DatabaseUpgrade.UpgradeSQL
+            Dim lsSQLQuery As String
+            Dim lrRecordset As New ADODB.Recordset
+
+            Dim transaction As OleDb.OleDbTransaction = Nothing
+
+            Try
+
+                lrRecordset.ActiveConnection = pdbDatabaseUpgradeConnection
+                lrRecordset.CursorType = pcOpenStatic
+
+                '-----------------------------------------------------------------
+                'Get the set of SQLStatements that need to be performed.
+                '-----------------------------------------------------------------
+                lsSQLQuery = "SELECT *"
+                lsSQLQuery &= "  FROM UpgradeSQL"
+                lsSQLQuery &= " WHERE UpgradeId = " & aiUpgradeId
+                lsSQLQuery &= " ORDER BY SequenceNr"
+
+                lrRecordset.Open(lsSQLQuery)
+
+                If Not lrRecordset.EOF Then
+                    'pdbConnection.BeginTrans()
+
+                    transaction = pdb_OLEDB_connection.BeginTransaction()
+
+                    While Not lrRecordset.EOF
+
+                        lsStallMessage = ""
+                        '---------------------------------------------------
+                        'Step through the set of required SQL statements
+                        '  that need to be executed to perform the upgrade
+                        '---------------------------------------------------
+                        lrDatabaseUpgradeSQL = New DatabaseUpgrade.UpgradeSQL
+                        lrDatabaseUpgradeSQL.UpgradeType = lrRecordset("UpgradeType").Value
+                        lrDatabaseUpgradeSQL.TableName = Trim(Viev.NullVal(lrRecordset("TableName").Value, ""))
+                        lrDatabaseUpgradeSQL.FieldName = Trim(Viev.NullVal(lrRecordset("FieldName").Value, ""))
+                        lrDatabaseUpgradeSQL.OrdinalPosition = Viev.NullVal(lrRecordset("OrdinalPosition").Value, 0)
+                        lsUpgradeSQL = Trim(Viev.NullVal(lrRecordset("SQLString").Value, ""))
+                        lrDatabaseUpgradeSQL.CodeToExecute = Trim(Viev.NullVal(lrRecordset("CodeToExecute").Value, ""))
+
+                        lsMessage = lrRecordset("SequenceNr").Value
+                        lsMessage &= vbCrLf
+                        lsMessage &= lrDatabaseUpgradeSQL.UpgradeType
+                        lsMessage &= vbCrLf
+                        lsMessage &= lrDatabaseUpgradeSQL.TableName
+                        lsMessage &= vbCrLf
+                        lsMessage &= lrDatabaseUpgradeSQL.FieldName
+                        lsMessage &= vbCrLf
+                        lsMessage &= lrDatabaseUpgradeSQL.OrdinalPosition
+                        lsMessage &= vbCrLf
+                        lsMessage &= lsUpgradeSQL
+
+
+                        Select Case lrDatabaseUpgradeSQL.UpgradeType
+                            Case Is = 1 'STRAIGHT SQL STATEMENT
+
+                                Dim lsUpgradeSQLCommands() = lsUpgradeSQL.Split(";")
+
+                                For Each lsCommand In lsUpgradeSQLCommands
+                                    If Trim(lsCommand) <> "" Then
+                                        Try
+                                            'Call pdbConnection.Execute(lsCommand)
+                                            Dim command As New OleDb.OleDbCommand(lsCommand)
+                                            command.Connection = pdb_OLEDB_connection
+                                            command.Transaction = transaction
+                                            Call command.ExecuteNonQuery()
+                                        Catch ex As Exception
+                                            Dim lsMessage1 As String
+                                            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                                            lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                                            lsMessage1 &= vbCrLf & lsCommand
+                                            lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                                            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+
+                                            GoTo error_handler
+                                        End Try
+                                    End If
+                                Next
+
+                            'pdbConnection.Execute(lsUpgradeSQL)
+
+                            Case Is = 2 'SQL ADD COLUMN WITH ORDINAL POSITION OF FIELD
+                                pdbConnection.Execute(lsUpgradeSQL)
+
+                                lsStallMessage = lsStallMessage & vbCrLf & "Stall: Successfully executed SQL"
+                                lsStallMessage = lsStallMessage & vbCrLf & "Stall: Successfully refreshed TableDef"
+                                lsStallMessage = lsStallMessage & vbCrLf & "Stall: Attempting to set OrdinalPosition: " & lrDatabaseUpgradeSQL.OrdinalPosition
+
+                            '----------------------------------------------------------------------------------------------
+                            'VM-20160518-Drop this code. ADO.Net does not support TableDefs. This was old DAO code, which
+                            '  is no longer supported. There is no way to change the ordinal position of a field in a table with ADO.Net
+                            'pdbConnection.TableDefs(Trim(lrDatabaseUpgradeSQL.TableName)).Fields(Trim(lrDatabaseUpgradeSQL.FieldName)).OrdinalPosition = lrDatabaseUpgradeSQL.OrdinalPosition
+                            'lsStallMessage = lsStallMessage & vbCrLf & "Stall: Successfully changed ordinal position"
+                            'lsStallMessage = lsStallMessage & vbCrLf & "Stall: Successfully refreshed TableDefs"
+
+                            Case Is = 3 'SQL CREATE TABLE
+                                pdbConnection.Execute(lsUpgradeSQL)
+
+                            Case Is = 4 'SQL UPDATE INTRODUCING NEW CONSTRAINT
+                                pdbConnection.Execute(lsUpgradeSQL)
+
+                            Case Is = 5 'TABLE NAME CHANGE
+                                pdbConnection.Execute(lsUpgradeSQL)
+                            '----------------------------------------------------------------------------------------------
+                            'VM-20171013-Drop this code. ADO.Net does not support TableDefs. This was old DAO code, which
+                            '  is no longer supported. There is no way to change the ordinal position of a field in a table with ADO.Net
+                            'pdbConnection.TableDefs(lsUpgradeSQL).name = Trim(lrDatabaseUpgradeSQL.TableName)
+
+                            Case Is = 6 'ALTER TABLE DROP COLUMN
+                                pdbConnection.Execute(lsUpgradeSQL)
+
+                            Case Is = 7 'EXECUTE CODE WITHIN Boston
+                                '-------------------------------------------------------------
+                                'Because it is known in advance and on release which code
+                                '  must be executed to fulfill a release...then it must be
+                                '  hard-coded, and may as well be referenced from right here.
+                                '-------------------------------------------------------------
+                                Call transaction.Commit()
+                                If Not Database.ExecuteUpgradeCode(lrDatabaseUpgradeSQL.CodeToExecute) Then
+                                    GoTo error_handler
+                                End If
+                                transaction = pdb_OLEDB_connection.BeginTransaction()
+                        End Select
+
+                        lrRecordset.MoveNext()
+                    End While
+                    'pdbConnection.CommitTrans() '(dbForceOSFlush)
+                    Call transaction.Commit()
+
+
+                    PerformNextRequiredDatabaseUpgrade = True
+                    lrRecordset.Close()
+
+                Else
+                    MsgBox("Error: PerformNextRequiredDatabaseUpgrade: No set of SQLStatements returned for UpgradeId: " & aiUpgradeId)
+                    PerformNextRequiredDatabaseUpgrade = False
+                End If
+
+                Return True
+
+            Catch ex As Exception
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                PerformNextRequiredDatabaseUpgrade = False
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf
+                lsMessage &= "The following step in the upgrade failed:"
+                'lsMessage &= vbCrLf & vbCrLf
+                'lsMessage &= "Upgrade Type: " & lrDatabaseUpgradeSQL.UpgradeType
+                lsMessage &= vbCrLf & vbCrLf
+                lsMessage &= "Sequence#: " & lrRecordset("SequenceNr").Value
+                lsMessage &= vbCrLf & vbCrLf
+                lsMessage &= "Stall Message/s: " & lsStallMessage
+                lsMessage &= vbCrLf & vbCrLf
+                lsMessage &= "SQL: " & lrRecordset("SQLString").Value
+                lsMessage &= vbCrLf & vbCrLf
+
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                pdbConnection.RollbackTrans()
+
+            End Try
+
+error_handler:
+
+            'pdbConnection.Rollback()
+            Call transaction.Rollback()
+
+            lsErrorMessage = Err.Number & ", " & Err.Source & ", " & Err.Description
+            lsMessage &= "Error Message: " & lsErrorMessage
+            MsgBox(lsMessage)
+
+            PerformNextRequiredDatabaseUpgrade = False
+
+        End Function
+
+        ''' <summary>
+        ''' Used when the Upgrade requires Boston to run code in Boston.
+        ''' </summary>
+        ''' <param name="asUpgradeCodeName"></param>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Function ExecuteUpgradeCode(ByVal asUpgradeCodeName As String) As Boolean
+
+            ExecuteUpgradeCode = True
+
+            Select Case Trim(asUpgradeCodeName)
+            '----------------------------------
+            'Put calls to code execution here
+            '----------------------------------
+                Case Is = "SetInitialFactTypeReadingTypedPredicateIds"
+                    Call DatabaseUpgradeFunctions.SetInitialFactTypeReadingTypedPredicateIds()
+                Case Is = "UpgradePredicatePartRoleIds"
+                    Call DatabaseUpgradeFunctions.UpgradePredicatePartRoleIds()
+                Case Is = "InsertNewPredicatePartRecordsForRoleIds"
+                    Call DatabaseUpgradeFunctions.InsertNewPredicatePartRecordsForRoleIds()
+                Case Is = "AddValueTypeGUIDs"
+                    Call DatabaseUpgradeFunctions.AddValueTypeGUIDs()
+                Case Is = "AddFactTypeGUIDs"
+                    Call DatabaseUpgradeFunctions.AddFactTypeGUIDs()
+                Case Is = "AddRoleConstraintGUIDs"
+                    Call DatabaseUpgradeFunctions.AddRoleConstraintGUIDs()
+                Case Is = "ReplaceCoreModel"
+                    Call DatabaseUpgradeFunctions.ReplaceCoreModel()
+                Case Is = "ReplaceUniversityModel"
+                    Call DatabaseUpgradeFunctions.ReplaceUniversityModel()
+                Case Else
+                    MsgBox("Error: ExecuteUpgradeCode: Ability to process code '" & asUpgradeCodeName & "' does not exist. Please contact your vendor with this error message.")
+                    ExecuteUpgradeCode = False
+            End Select
+
+        End Function
 
     End Module
 
 End Namespace
+
+
+
+

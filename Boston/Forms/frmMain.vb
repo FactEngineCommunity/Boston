@@ -2772,21 +2772,25 @@ Public Class frmMain
             '----------------------------------------------------------
             'Database is not of the version expected by the application
             '----------------------------------------------------------
-            lsMessage = "Boston has detected that a 'Boston Database Version' upgrade is required. "
-            lsMessage = lsMessage & vbCrLf & vbCrLf
-            lsMessage = lsMessage & "Your current Boston Database Version is: " & TableReferenceFieldValue.GetReferenceFieldValue(1, 1).ToString & " (from database)"
-            lsMessage = lsMessage & vbCrLf
-            lsMessage = lsMessage & "The required Boston Database Version is: " & prApplication.DatabaseVersionNr
-            lsMessage = lsMessage & vbCrLf & vbCrLf
-            lsMessage = lsMessage & "Press [OK] to continue with the upgrade."
-            lsMessage = lsMessage & vbCrLf & vbCrLf
-            lsMessage = lsMessage & "Note: This message appears because you have recently installed an upgrade to Boston, or because there is an outstanding Boston database upgrade that is requried for the successful operation of Boston."
-            lsMessage = lsMessage & vbCrLf & vbCrLf
-            lsMessage = lsMessage & "Database Connection String = '" & My.Settings.DatabaseConnectionString & "'"
-            lsMessage = lsMessage & vbCrLf & vbCrLf
-            lsMessage = lsMessage & "Database Version Number (from database): " & TableReferenceFieldValue.GetReferenceFieldValue(1, 1)
+            If Not My.Settings.SilentDatabaseUpgrade Then
 
-            Call MsgBox(lsMessage, vbExclamation)
+                lsMessage = "Boston has detected that a 'Boston Database Version' upgrade is required. "
+                lsMessage = lsMessage & vbCrLf & vbCrLf
+                lsMessage = lsMessage & "Your current Boston Database Version is: " & TableReferenceFieldValue.GetReferenceFieldValue(1, 1).ToString & " (from database)"
+                lsMessage = lsMessage & vbCrLf
+                lsMessage = lsMessage & "The required Boston Database Version is: " & prApplication.DatabaseVersionNr
+                lsMessage = lsMessage & vbCrLf & vbCrLf
+                lsMessage = lsMessage & "Press [OK] to continue with the upgrade."
+                lsMessage = lsMessage & vbCrLf & vbCrLf
+                lsMessage = lsMessage & "Note: This message appears because you have recently installed an upgrade to Boston, or because there is an outstanding Boston database upgrade that is requried for the successful operation of Boston."
+                lsMessage = lsMessage & vbCrLf & vbCrLf
+                lsMessage = lsMessage & "Database Connection String = '" & My.Settings.DatabaseConnectionString & "'"
+                lsMessage = lsMessage & vbCrLf & vbCrLf
+                lsMessage = lsMessage & "Database Version Number (from database): " & TableReferenceFieldValue.GetReferenceFieldValue(1, 1)
+
+                Call MsgBox(lsMessage, vbExclamation)
+            End If
+
 
             '---------------------------------------------------------------------------------------------------------------------------
             'Check to see if the rostersdatabaseupgrade.vdb file has been posted to the <AppPath./rostersdatbase/rostersdatabaseupgrade/
@@ -2821,10 +2825,27 @@ Public Class frmMain
                 '  in the Richmond database.
                 '----------------------------------------------------------
                 If GetRequiredUpgradeCount() > 0 Then
-                    '-------------------------------------------------------------------
-                    'Now, with the user, perform the actual Upgrade
-                    '-------------------------------------------------------------------
-                    frmDatabaseUpgrade.ShowDialog()
+
+                    If My.Settings.SilentDatabaseUpgrade Then
+                        Dim lrDatabaseUpgrade As New DatabaseUpgrade.Upgrade
+                        While tableDatabaseUpgrade.GetNextRequiredUpgrade(lrDatabaseUpgrade, True) IsNot Nothing
+
+                            If Database.Database.PerformNextRequiredDatabaseUpgrade(lrDatabaseUpgrade.UpgradeId, lrDatabaseUpgrade.FromVersionNr, lrDatabaseUpgrade.ToVersionNr) Then
+                                '------------------------------------------------
+                                'Update the Boston DatabaseVersionNr
+                                '------------------------------------------------
+                                Call Richmond.UpdateDatabaseVersion(lrDatabaseUpgrade.ToVersionNr)
+                                Call tableDatabaseUpgrade.MarkUpgradeAsSuccessfulImplementation(lrDatabaseUpgrade.UpgradeId)
+                            End If
+
+                        End While
+                    Else
+                            '-------------------------------------------------------------------
+                            'Now, with the user, perform the actual Upgrade
+                            '-------------------------------------------------------------------
+                            frmDatabaseUpgrade.ShowDialog()
+                    End If
+
                     '----------------------------------------------------------
                     'Check to see if the user upgraded the database
                     '----------------------------------------------------------

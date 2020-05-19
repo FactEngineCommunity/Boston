@@ -128,5 +128,8 @@
     <Setting Name="StateTransitionShapeLibrary" Type="System.String" Scope="User">
       <Value Profile="(Default)">.\shapelibrary\statetransition.shl</Value>
     </Setting>
+    <Setting Name="SilentDatabaseUpgrade" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

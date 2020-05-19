@@ -557,6 +557,18 @@ Namespace My
                 Me("StateTransitionShapeLibrary") = value
             End Set
         End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("True")>  _
+        Public Property SilentDatabaseUpgrade() As Boolean
+            Get
+                Return CType(Me("SilentDatabaseUpgrade"),Boolean)
+            End Get
+            Set
+                Me("SilentDatabaseUpgrade") = value
+            End Set
+        End Property
     End Class
 End Namespace
 
