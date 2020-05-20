@@ -22,8 +22,8 @@ Namespace TableRoleConstraint
                 lsSQLQuery &= " ,'" & Trim(arRoleConstraint.Model.ModelId) & "'"
                 lsSQLQuery &= " ,'" & Trim(arRoleConstraint.Id) & "'"
                 lsSQLQuery &= " ,'" & Trim(arRoleConstraint.Name) & "'"
-                lsSQLQuery &= " ," & arRoleConstraint.RoleConstraintType
-                lsSQLQuery &= " ," & arRoleConstraint.RingConstraintType
+                lsSQLQuery &= " ,'" & arRoleConstraint.RoleConstraintType.ToString & "'"
+                lsSQLQuery &= " ,'" & arRoleConstraint.RingConstraintType.ToString & "'"
                 lsSQLQuery &= " ," & arRoleConstraint.LevelNr
                 lsSQLQuery &= " ," & arRoleConstraint.IsPreferredIdentifier
                 lsSQLQuery &= " ," & arRoleConstraint.IsDeontic

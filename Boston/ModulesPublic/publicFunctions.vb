@@ -62,6 +62,7 @@ Namespace Richmond
                 lsConnectionString = lsDBLocation
 
                 If My.Settings.DatabaseType = pcenumDatabaseType.MSJet.ToString Then
+
                     Dim lrSQLConnectionStringBuilder As New System.Data.Common.DbConnectionStringBuilder(True)
                     lrSQLConnectionStringBuilder.ConnectionString = lsConnectionString
 

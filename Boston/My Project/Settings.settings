@@ -69,10 +69,10 @@
       <Value Profile="(Default)">.\shapelibrary\entityrelationshipdiagram.shl</Value>
     </Setting>
     <Setting Name="DisplayCoreMetaModel" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
+      <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="SuperuserMode" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
+      <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="DisplayLanguageModel" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>

@@ -2827,9 +2827,16 @@ Public Class frmMain
                 If GetRequiredUpgradeCount() > 0 Then
 
                     If My.Settings.SilentDatabaseUpgrade Then
+
+                        Dim lfrmFlashCard As New frmFlashCard
+                        lfrmFlashCard.ziIntervalMilliseconds = 2600
+                        lfrmFlashCard.BackColor = Color.LightGray
+                        lsMessage = "Upgrading the database. This won't take too long."
+                        lfrmFlashCard.zsText = lsMessage
+                        Dim liDialogResult As DialogResult = lfrmFlashCard.ShowDialog(Me)
+
                         Dim lrDatabaseUpgrade As New DatabaseUpgrade.Upgrade
                         While tableDatabaseUpgrade.GetNextRequiredUpgrade(lrDatabaseUpgrade, True) IsNot Nothing
-
                             If Database.Database.PerformNextRequiredDatabaseUpgrade(lrDatabaseUpgrade.UpgradeId, lrDatabaseUpgrade.FromVersionNr, lrDatabaseUpgrade.ToVersionNr) Then
                                 '------------------------------------------------
                                 'Update the Boston DatabaseVersionNr
@@ -2837,18 +2844,23 @@ Public Class frmMain
                                 Call Richmond.UpdateDatabaseVersion(lrDatabaseUpgrade.ToVersionNr)
                                 Call tableDatabaseUpgrade.MarkUpgradeAsSuccessfulImplementation(lrDatabaseUpgrade.UpgradeId)
                             End If
-
                         End While
+
+                        lfrmFlashCard.ziIntervalMilliseconds = 5600
+                        lfrmFlashCard.BackColor = Color.LightGray
+                        lsMessage = "Successfully upgraded to database version: " & TableReferenceFieldValue.GetReferenceFieldValue(1, 1)
+                        lfrmFlashCard.zsText = lsMessage
+                        liDialogResult = lfrmFlashCard.ShowDialog(Me)
                     Else
-                            '-------------------------------------------------------------------
-                            'Now, with the user, perform the actual Upgrade
-                            '-------------------------------------------------------------------
-                            frmDatabaseUpgrade.ShowDialog()
+                        '------------------------------------------------
+                        'Now, with the user, perform the actual Upgrade
+                        '------------------------------------------------
+                        frmDatabaseUpgrade.ShowDialog()
                     End If
 
-                    '----------------------------------------------------------
+                    '------------------------------------------------
                     'Check to see if the user upgraded the database
-                    '----------------------------------------------------------
+                    '------------------------------------------------
                     Dim lsDatabaseVersionNumber As String = ""
                     lsDatabaseVersionNumber = TableReferenceFieldValue.GetReferenceFieldValue(1, 1)
                     If CDbl(prApplication.DatabaseVersionNr) = lsDatabaseVersionNumber Then

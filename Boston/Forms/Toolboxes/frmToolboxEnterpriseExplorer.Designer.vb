@@ -300,7 +300,7 @@ Partial Class frmToolboxEnterpriseExplorer
         '
         Me.ContextMenuStrip_ORMModel.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.AddPageToolStripMenuItem1, Me.ToolStripMenuItemPastePage, Me.ToolStripMenuItemLanguage, Me.ToolStripSeparator1, Me.EmptyModelToolStripMenuItem, Me.DeleteModelToolStripMenuItem, Me.RenameToolStripMenuItem, Me.ToolStripSeparator3, Me.ViewModelDictionaryToolStripMenuItem, Me.ViewGlossaryToolStripMenuItem, Me.ToolStripMenuItemModelConfiguration, Me.GenerateDocumentationToolStripMenuItem, Me.ToolStripSeparator5, Me.ImportExportToolStripMenuItem})
         Me.ContextMenuStrip_ORMModel.Name = "ContextMenuStrip_ORMModel"
-        Me.ContextMenuStrip_ORMModel.Size = New System.Drawing.Size(208, 264)
+        Me.ContextMenuStrip_ORMModel.Size = New System.Drawing.Size(208, 286)
         '
         'AddPageToolStripMenuItem1
         '
@@ -360,11 +360,12 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.StateTransitionDiagramToolStripMenuItem.Name = "StateTransitionDiagramToolStripMenuItem"
         Me.StateTransitionDiagramToolStripMenuItem.Size = New System.Drawing.Size(220, 22)
         Me.StateTransitionDiagramToolStripMenuItem.Text = "&State Transition Diagram"
+        Me.StateTransitionDiagramToolStripMenuItem.Visible = False
         '
         'AddSTDPageToolStripMenuItem
         '
         Me.AddSTDPageToolStripMenuItem.Name = "AddSTDPageToolStripMenuItem"
-        Me.AddSTDPageToolStripMenuItem.Size = New System.Drawing.Size(148, 22)
+        Me.AddSTDPageToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
         Me.AddSTDPageToolStripMenuItem.Text = "&Add STD Page"
         '
         'ToolStripSeparator1
