@@ -101,6 +101,7 @@ Namespace TableJoinPathRole
 
                     If lrRole Is Nothing Then
                         lsMessage = "Couldn't find Role in Model for JoinPath"
+                        lREcordset.Close()
                         Throw New Exception(lsMessage)
                     End If
 

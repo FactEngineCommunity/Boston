@@ -271,7 +271,6 @@ Namespace TableEntityType
 
             Dim lsMessage As String = ""
             Dim lrEntityType As FBM.EntityType
-            Dim lr_parentEntityType As New FBM.EntityType
             Dim lb_at_least_one_entity_type_found As Boolean = False 'Safeguard. Usually we don't require this type of simplistic Boolean, however
             'the two sets of SQL make it easier to manage this way. Leave here for this function.
             Dim lsSQLQuery As String = ""

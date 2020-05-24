@@ -1428,7 +1428,7 @@ Namespace FBM
                                                 Optional ByVal abCheckForErrors As Boolean = False) As FBM.DictionaryEntry
 
             Try
-                Dim lrDictionaryEntry As New FBM.DictionaryEntry
+                Dim lrDictionaryEntry As FBM.DictionaryEntry
 
                 If Me.ModelDictionary.Exists(AddressOf arDictionaryEntry.Equals) Then
                     '-------------------------------------------------------------------------------------------------------
@@ -3414,26 +3414,47 @@ Namespace FBM
             Try
                 If Me.ExistsModelElement(asModelObjectName) Then
 
-                    lrValueType = New FBM.ValueType(Me, pcenumLanguage.ORMModel, asModelObjectName, True)
-                    lrEntityType = New FBM.EntityType(Me, pcenumLanguage.ORMModel, asModelObjectName, Nothing, True)
-                    lrFactType = New FBM.FactType(Me, asModelObjectName, True)
-                    lrRoleConstraint = New FBM.RoleConstraint(Me, asModelObjectName, True)
+                    Dim lrDictionaryEntry As FBM.DictionaryEntry
+                    lrDictionaryEntry = Me.ModelDictionary.Find(Function(x) x.Symbol = asModelObjectName)
 
-                    If Me.ValueType.Exists(AddressOf lrValueType.Equals) Then
-                        Return Me.ValueType.Find(AddressOf lrValueType.Equals)
-                    ElseIf Me.EntityType.Exists(AddressOf lrEntityType.Equals) Then
-                        Return Me.EntityType.Find(AddressOf lrEntityType.Equals)
-                    ElseIf Me.FactType.Exists(AddressOf lrFactType.Equals) Then
-                        Return Me.FactType.Find(AddressOf lrFactType.Equals)
-                    ElseIf Me.RoleConstraint.Exists(AddressOf lrRoleConstraint.Equals) Then
-                        Return Me.RoleConstraint.Find(AddressOf lrRoleConstraint.Equals)
+                    If lrDictionaryEntry IsNot Nothing Then
+                        If lrDictionaryEntry.isValueType Then
+                            Return Me.ValueType.Find(Function(x) x.Id = asModelObjectName)
+                        ElseIf lrDictionaryEntry.isEntityType Then
+                            Return Me.EntityType.Find(Function(x) x.Id = asModelObjectName)
+                        ElseIf lrDictionaryEntry.isFactType Then
+                            Return Me.FactType.Find(Function(x) x.Id = asModelObjectName)
+                        ElseIf lrDictionaryEntry.isRoleConstraint Then
+                            Return Me.RoleConstraint.Find(Function(x) x.Id = asModelObjectName)
+                        Else
+                            Dim lsMessage As String = ""
+                            lsMessage = "Model Element doesn't actually exist in the Model. Only in the ModelDictionary: '" & asModelObjectName & "'"
+                            lsMessage.AppendString(vbCrLf & vbCrLf & "Boston will now remove the ModelElement from the ModelDictionary.")
+                            Throw New Exception(lsMessage)
+                        End If
                     Else
-                        Dim lsMessage As String = ""
-                        lsMessage = "Model Element doesn't actually exist in the Model. Only in the ModelDictionary: '" & asModelObjectName & "'"
-                        lsMessage.AppendString(vbCrLf & vbCrLf & "Boston will now remove the ModelElement from the ModelDictionary.")
-                        Throw New Exception(lsMessage)
-                        Me.ModelDictionary.Remove(New FBM.DictionaryEntry(Me, asModelObjectName, pcenumConceptType.Actor))
+                        lrValueType = New FBM.ValueType(Me, pcenumLanguage.ORMModel, asModelObjectName, True)
+                        lrEntityType = New FBM.EntityType(Me, pcenumLanguage.ORMModel, asModelObjectName, Nothing, True)
+                        lrFactType = New FBM.FactType(Me, asModelObjectName, True)
+                        lrRoleConstraint = New FBM.RoleConstraint(Me, asModelObjectName, True)
+
+                        If Me.ValueType.Exists(AddressOf lrValueType.Equals) Then
+                            Return Me.ValueType.Find(AddressOf lrValueType.Equals)
+                        ElseIf Me.EntityType.Exists(AddressOf lrEntityType.Equals) Then
+                            Return Me.EntityType.Find(AddressOf lrEntityType.Equals)
+                        ElseIf Me.FactType.Exists(AddressOf lrFactType.Equals) Then
+                            Return Me.FactType.Find(AddressOf lrFactType.Equals)
+                        ElseIf Me.RoleConstraint.Exists(AddressOf lrRoleConstraint.Equals) Then
+                            Return Me.RoleConstraint.Find(AddressOf lrRoleConstraint.Equals)
+                        Else
+                            Dim lsMessage As String = ""
+                            lsMessage = "Model Element doesn't actually exist in the Model. Only in the ModelDictionary: '" & asModelObjectName & "'"
+                            lsMessage.AppendString(vbCrLf & vbCrLf & "Boston will now remove the ModelElement from the ModelDictionary.")
+                            Throw New Exception(lsMessage)
+                            Me.ModelDictionary.Remove(New FBM.DictionaryEntry(Me, asModelObjectName, pcenumConceptType.Actor))
+                        End If
                     End If
+
                 Else
                     '-------------------------------------------------
                     'The ModelObject does not exist within the Model

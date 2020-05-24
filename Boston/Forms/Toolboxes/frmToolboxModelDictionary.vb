@@ -358,7 +358,7 @@ Public Class frmToolboxModelDictionary
     Private Sub TreeView1_AfterSelect(ByVal sender As Object, ByVal e As System.Windows.Forms.TreeViewEventArgs) Handles TreeView1.AfterSelect
 
         Try
-            Dim lrDictionaryEntry As New FBM.DictionaryEntry
+            Dim lrDictionaryEntry As FBM.DictionaryEntry
 
             Dim lrORMToolboxVerbalisation As frmToolboxORMVerbalisation
             lrORMToolboxVerbalisation = prApplication.GetToolboxForm(frmToolboxORMVerbalisation.Name)

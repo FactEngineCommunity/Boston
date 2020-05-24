@@ -145,6 +145,8 @@ Namespace FBM
             Me.ConceptType = aiConceptType
 
             Select Case aiConceptType
+                Case Is = pcenumConceptType.GeneralConcept
+                    Me.isGeneralConcept = True
                 Case Is = pcenumConceptType.EntityType
                     Me.isEntityType = True
                 Case Is = pcenumConceptType.ValueType
@@ -159,12 +161,9 @@ Namespace FBM
                     Me.isValue = True
                 Case Is = pcenumConceptType.ModelNote
                     Me.isModelNote = True
-                Case Is = pcenumConceptType.GeneralConcept
-                    Me.isGeneralConcept = True
             End Select
 
-            Me.Concept = New FBM.Concept(asSymbol)
-            Me.Concept.isDirty = abMakeConceptDirty
+            Me.Concept = New FBM.Concept(asSymbol, abMakeConceptDirty)
 
             Me.ShortDescription = asShortDescription
             Me.LongDescription = asLongDescription

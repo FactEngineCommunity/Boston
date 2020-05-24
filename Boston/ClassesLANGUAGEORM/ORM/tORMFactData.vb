@@ -38,8 +38,8 @@ Namespace FBM
         ''' The Role to which the 'Concept' (Value) is related within the Fact.
         ''' </summary>
         ''' <remarks></remarks>
-        <XmlIgnore()> _
-        Public Role As New FBM.Role
+        <XmlIgnore()>
+        Public Role As FBM.Role 'New
 
         ''' <summary>
         ''' The Data stored for the Role for the Fact.

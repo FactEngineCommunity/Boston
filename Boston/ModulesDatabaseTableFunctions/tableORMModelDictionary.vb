@@ -213,26 +213,36 @@ Namespace TableModelDictionary
                 If Not lREcordset.EOF Then
                     While Not lREcordset.EOF
 
-                        If lREcordset("IsEntityType").Value = True Then
-                            liConceptType = pcenumConceptType.EntityType
-                        ElseIf lREcordset("IsValueType").Value = True Then
-                            liConceptType = pcenumConceptType.ValueType
-                        ElseIf lREcordset("IsFactType").Value = True Then
-                            liConceptType = pcenumConceptType.FactType
-                        ElseIf lREcordset("IsFact").Value = True Then
-                            liConceptType = pcenumConceptType.Fact
-                        ElseIf lREcordset("IsValue").Value = True Then
-                            liConceptType = pcenumConceptType.Value
-                        ElseIf lREcordset("IsRoleConstraint").Value = True Then
-                            liConceptType = pcenumConceptType.RoleConstraint
-                        ElseIf lREcordset("IsModelNote").Value = True Then
-                            liConceptType = pcenumConceptType.ModelNote
-                        ElseIf lREcordset("IsGeneralConcept").Value = True Then
-                            liConceptType = pcenumConceptType.GeneralConcept
-                        End If
+                        'If lREcordset("IsEntityType").Value = True Then
+                        '    liConceptType = pcenumConceptType.EntityType
+                        'ElseIf lREcordset("IsValueType").Value = True Then
+                        '    liConceptType = pcenumConceptType.ValueType
+                        'ElseIf lREcordset("IsFactType").Value = True Then
+                        '    liConceptType = pcenumConceptType.FactType
+                        'ElseIf lREcordset("IsFact").Value = True Then
+                        '    liConceptType = pcenumConceptType.Fact
+                        'ElseIf lREcordset("IsValue").Value = True Then
+                        '    liConceptType = pcenumConceptType.Value
+                        'ElseIf lREcordset("IsRoleConstraint").Value = True Then
+                        '    liConceptType = pcenumConceptType.RoleConstraint
+                        'ElseIf lREcordset("IsModelNote").Value = True Then
+                        '    liConceptType = pcenumConceptType.ModelNote
+                        'ElseIf lREcordset("IsGeneralConcept").Value = True Then
+                        '    liConceptType = pcenumConceptType.GeneralConcept
+                        'End If
                         'CType([Enum].Parse(GetType(pcenumRoleConstraintType), lREcordset("RoleConstraintType").Value), pcenumRoleConstraintType)
 
-                        lrDictionaryEntry = New FBM.DictionaryEntry(ar_model, Trim(lREcordset("Symbol").Value), liConceptType, , , False)
+                        lrDictionaryEntry = New FBM.DictionaryEntry(ar_model, Trim(lREcordset("Symbol").Value), pcenumConceptType.GeneralConcept, , , False)
+
+                        lrDictionaryEntry.isEntityType = lREcordset("IsEntityType").Value
+                        lrDictionaryEntry.isValueType = lREcordset("IsValueType").Value
+                        lrDictionaryEntry.isFactType = lREcordset("IsFactType").Value
+                        lrDictionaryEntry.isFact = lREcordset("IsFact").Value
+                        lrDictionaryEntry.isValue = lREcordset("IsValue").Value
+                        lrDictionaryEntry.isRoleConstraint = lREcordset("IsRoleConstraint").Value
+                        lrDictionaryEntry.isModelNote = lREcordset("IsModelNote").Value
+                        lrDictionaryEntry.isFact = lREcordset("IsFact").Value
+                        lrDictionaryEntry.isGeneralConcept = lREcordset("IsGeneralConcept").Value
 
                         lrDictionaryEntry.ShortDescription = Trim(Viev.NullVal(lREcordset("ShortDescription").Value, ""))
                         lrDictionaryEntry.LongDescription = Trim(Viev.NullVal(lREcordset("LongDescription").Value, ""))
@@ -242,7 +252,7 @@ Namespace TableModelDictionary
                         '  such that KL Theorems can be written.
                         '--------------------------------------------------------------------------
                         If Not {pcenumConceptType.Value, pcenumConceptType.Fact}.Contains(lrDictionaryEntry.ConceptType) Then
-                            Call lrDictionaryEntry.GenerateKLIdentityLetter(GetDictionaryEntriesByModel, 1)
+                            'Call lrDictionaryEntry.GenerateKLIdentityLetter(GetDictionaryEntriesByModel, 1)
                         End If
 
                         lrDictionaryEntry.isDirty = False

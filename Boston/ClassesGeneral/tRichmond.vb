@@ -415,6 +415,7 @@ Public Class tRichmondApplication
 
                             If abAbortApplication Then Call Application.Exit()
 
+
                         End If
 
                 End Select

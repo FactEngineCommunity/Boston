@@ -93,11 +93,11 @@ Namespace TableFact
 
         Public Sub GetFactsForFactType(ByRef arFactType As FBM.FactType) 'As List(Of FBM.Fact)
 
-            Dim lrDictionaryEntry As New FBM.DictionaryEntry
+            Dim lrDictionaryEntry As FBM.DictionaryEntry
             Dim ls_Symbol_list As String = ""
             Dim ls_tuple_field_name As String = ""
             Dim ls_FactSymbol As String = Nothing 'The unique identifier for a Tuple (like an ORACLE 'RowId')
-            Dim lrFact As New FBM.Fact
+            Dim lrFact As FBM.Fact
             Dim liInd As Integer = 0
             Dim lrRole As FBM.Role
             Dim lsSQLQuery As String = ""

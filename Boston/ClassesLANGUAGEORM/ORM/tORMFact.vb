@@ -396,23 +396,24 @@ Namespace FBM
 
         Public Function GetFactDataByRoleId(ByVal asRoleId As String) As FBM.FactData
 
-            Dim lrFactData As New FBM.FactData
+            Dim lrFactData As FBM.FactData = Nothing
             Dim larFactData() As FBM.FactData
             Dim liInd As Integer = 0
             Dim lbFoundFactData As Boolean = False
 
             Try
-                larFactData = Me.Data.ToArray
+                'larFactData = Me.Data.ToArray
+                lrFactData = Me.Data.Find(Function(x) x.Role.Id = asRoleId) ' ToArray
 
-                For liInd = 1 To larFactData.Count
-                    If larFactData(liInd - 1).Role.Id = asRoleId Then
-                        lrFactData = larFactData(liInd - 1)
-                        lbFoundFactData = True
-                        Exit For
-                    End If
-                Next
+                'For liInd = 1 To larFactData.Count
+                '    If larFactData(liInd - 1).Role.Id = asRoleId Then
+                '        lrFactData = larFactData(liInd - 1)
+                '        lbFoundFactData = True
+                '        Exit For
+                '    End If
+                'Next
 
-                If Not lbFoundFactData Then
+                If lrFactData Is Nothing Then 'Not lbFoundFactData Then
                     Throw New Exception("Function called for Fact with no matching Role.")
                 End If
 

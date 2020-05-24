@@ -24,11 +24,11 @@ Namespace FBM
             End Set
         End Property
 
-        <XmlIgnore()> _
-        <Browsable(False), _
-        [ReadOnly](True), _
-        BindableAttribute(False)> _
-        Public WithEvents Concept As New FBM.Concept   'The Concept that is related to the ModelObject within the Model/ModelDictionary
+        <XmlIgnore()>
+        <Browsable(False),
+        [ReadOnly](True),
+        BindableAttribute(False)>
+        Public WithEvents Concept As FBM.Concept  'New 'The Concept that is related to the ModelObject within the Model/ModelDictionary
 
 
         <XmlAttribute()> _
