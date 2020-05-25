@@ -278,7 +278,6 @@ Namespace FBM
         Sub New()
 
             Me.ConceptType = pcenumConceptType.EntityType
-            Me.EntityType = New FBM.EntityType
 
             'Call Me.SetPropertyAttributes()
 

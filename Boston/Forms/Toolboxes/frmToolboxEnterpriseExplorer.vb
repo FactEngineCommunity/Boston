@@ -930,7 +930,7 @@ Public Class frmToolboxEnterpriseExplorer
                                     Me.Cursor = Cursors.WaitCursor
                                     Richmond.WriteToStatusBar("Loading Model")
                                     Me.CircularProgressBar.Top = Me.Height / 3 - (Me.CircularProgressBar.Height / 2)
-                                    Me.CircularProgressBar.Left = (Me.TreeView.Left + Me.TreeView.Width) - (Me.CircularProgressBar.Width + 30)
+                                    Me.CircularProgressBar.Left = Me.Panel1.Width - (Me.CircularProgressBar.Width + 30)
                                     Me.CircularProgressBar.BringToFront()
                                     Me.CircularProgressBar.Value = 0
                                     Me.CircularProgressBar.Value = 1
@@ -1620,6 +1620,7 @@ Public Class frmToolboxEnterpriseExplorer
     Private Sub TextBox1_GotFocus(ByVal sender As Object, ByVal e As System.EventArgs) Handles TextBox1.GotFocus
 
         Me.LabelHelpTips.Text = "V (Down Key) to scroll through recently searched items in the Enterprise Viewer"
+
 
     End Sub
 
@@ -2968,6 +2969,7 @@ Public Class frmToolboxEnterpriseExplorer
     Private Sub frmToolboxEnterpriseExplorer_SizeChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.SizeChanged
 
         'Me.CircularProgressBar.Location = New Point(CInt((2 / 4) * Me.Width), Me.CircularProgressBar.Location.Y)
+        Me.TreeView.Left = 3
 
     End Sub
 
@@ -3840,5 +3842,8 @@ Public Class frmToolboxEnterpriseExplorer
 
     End Sub
 
+    Private Sub frmToolboxEnterpriseExplorer_ResizeEnd(sender As Object, e As EventArgs) Handles Me.ResizeEnd
 
+        Me.TreeView.Left = 3
+    End Sub
 End Class

@@ -27,6 +27,8 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.components = New System.ComponentModel.Container()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmToolboxEnterpriseExplorer))
         Me.GroupBox_main = New System.Windows.Forms.GroupBox()
+        Me.TreeView = New System.Windows.Forms.TreeView()
+        Me.ImageList = New System.Windows.Forms.ImageList(Me.components)
         Me.ButtonNewModel = New System.Windows.Forms.Button()
         Me.ComboBoxNamespace = New System.Windows.Forms.ComboBox()
         Me.LabelPromptNamespace = New System.Windows.Forms.Label()
@@ -35,8 +37,6 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.LabelHelpTips = New System.Windows.Forms.Label()
         Me.Button1 = New System.Windows.Forms.Button()
         Me.TextBox1 = New System.Windows.Forms.TextBox()
-        Me.TreeView = New System.Windows.Forms.TreeView()
-        Me.ImageList = New System.Windows.Forms.ImageList(Me.components)
         Me.CircularProgressBar = New CircularProgressBar.CircularProgressBar()
         Me.Timer_FormSetup = New System.Windows.Forms.Timer(Me.components)
         Me.ContextMenuStrip_Page = New System.Windows.Forms.ContextMenuStrip(Me.components)
@@ -82,10 +82,12 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.BackgroundWorkerModelLoader = New System.ComponentModel.BackgroundWorker()
         Me.SaveFileDialog = New System.Windows.Forms.SaveFileDialog()
         Me.ToolTip = New System.Windows.Forms.ToolTip(Me.components)
+        Me.Panel1 = New System.Windows.Forms.Panel()
         Me.GroupBox_main.SuspendLayout()
         Me.ContextMenuStrip_Page.SuspendLayout()
         Me.ContextMenuStrip_ORMModel.SuspendLayout()
         Me.ContextMenuStrip_ORMModels.SuspendLayout()
+        Me.Panel1.SuspendLayout()
         Me.SuspendLayout()
         '
         'GroupBox_main
@@ -102,13 +104,38 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.GroupBox_main.Controls.Add(Me.LabelHelpTips)
         Me.GroupBox_main.Controls.Add(Me.Button1)
         Me.GroupBox_main.Controls.Add(Me.TextBox1)
-        Me.GroupBox_main.Controls.Add(Me.TreeView)
-        Me.GroupBox_main.Controls.Add(Me.CircularProgressBar)
         Me.GroupBox_main.Location = New System.Drawing.Point(12, 12)
         Me.GroupBox_main.Name = "GroupBox_main"
         Me.GroupBox_main.Size = New System.Drawing.Size(383, 588)
         Me.GroupBox_main.TabIndex = 0
         Me.GroupBox_main.TabStop = False
+        '
+        'TreeView
+        '
+        Me.TreeView.AllowDrop = True
+        Me.TreeView.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.TreeView.ForeColor = System.Drawing.Color.FromArgb(CType(CType(5, Byte), Integer), CType(CType(5, Byte), Integer), CType(CType(5, Byte), Integer))
+        Me.TreeView.HideSelection = False
+        Me.TreeView.ImageIndex = 0
+        Me.TreeView.ImageList = Me.ImageList
+        Me.TreeView.LabelEdit = True
+        Me.TreeView.Location = New System.Drawing.Point(0, 0)
+        Me.TreeView.MinimumSize = New System.Drawing.Size(190, 4)
+        Me.TreeView.Name = "TreeView"
+        Me.TreeView.SelectedImageKey = "blank.ico"
+        Me.TreeView.Size = New System.Drawing.Size(380, 482)
+        Me.TreeView.TabIndex = 0
+        '
+        'ImageList
+        '
+        Me.ImageList.ImageStream = CType(resources.GetObject("ImageList.ImageStream"), System.Windows.Forms.ImageListStreamer)
+        Me.ImageList.TransparentColor = System.Drawing.Color.Transparent
+        Me.ImageList.Images.SetKeyName(0, "orm_icon.ico")
+        Me.ImageList.Images.SetKeyName(1, "database-16x16.png")
+        Me.ImageList.Images.SetKeyName(2, "Page16x16.png")
+        Me.ImageList.Images.SetKeyName(3, "PagePGS16x16.png")
+        Me.ImageList.Images.SetKeyName(4, "ERD-16-16.png")
+        Me.ImageList.Images.SetKeyName(5, "StateTransitionDiagram-16x16.png")
         '
         'ButtonNewModel
         '
@@ -188,34 +215,6 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.TextBox1.Size = New System.Drawing.Size(289, 20)
         Me.TextBox1.TabIndex = 1
         '
-        'TreeView
-        '
-        Me.TreeView.AllowDrop = True
-        Me.TreeView.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-            Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.TreeView.ForeColor = System.Drawing.Color.FromArgb(CType(CType(5, Byte), Integer), CType(CType(5, Byte), Integer), CType(CType(5, Byte), Integer))
-        Me.TreeView.HideSelection = False
-        Me.TreeView.ImageIndex = 0
-        Me.TreeView.ImageList = Me.ImageList
-        Me.TreeView.LabelEdit = True
-        Me.TreeView.Location = New System.Drawing.Point(3, 49)
-        Me.TreeView.Name = "TreeView"
-        Me.TreeView.SelectedImageKey = "blank.ico"
-        Me.TreeView.Size = New System.Drawing.Size(380, 493)
-        Me.TreeView.TabIndex = 0
-        '
-        'ImageList
-        '
-        Me.ImageList.ImageStream = CType(resources.GetObject("ImageList.ImageStream"), System.Windows.Forms.ImageListStreamer)
-        Me.ImageList.TransparentColor = System.Drawing.Color.Transparent
-        Me.ImageList.Images.SetKeyName(0, "orm_icon.ico")
-        Me.ImageList.Images.SetKeyName(1, "database-16x16.png")
-        Me.ImageList.Images.SetKeyName(2, "Page16x16.png")
-        Me.ImageList.Images.SetKeyName(3, "PagePGS16x16.png")
-        Me.ImageList.Images.SetKeyName(4, "ERD-16-16.png")
-        Me.ImageList.Images.SetKeyName(5, "StateTransitionDiagram-16x16.png")
-        '
         'CircularProgressBar
         '
         Me.CircularProgressBar.AnimationFunction = Nothing
@@ -226,7 +225,7 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.CircularProgressBar.InnerColor = System.Drawing.Color.FromArgb(CType(CType(224, Byte), Integer), CType(CType(224, Byte), Integer), CType(CType(224, Byte), Integer))
         Me.CircularProgressBar.InnerMargin = 2
         Me.CircularProgressBar.InnerWidth = -1
-        Me.CircularProgressBar.Location = New System.Drawing.Point(263, 274)
+        Me.CircularProgressBar.Location = New System.Drawing.Point(49, 74)
         Me.CircularProgressBar.MarqueeAnimationSpeed = 1000
         Me.CircularProgressBar.Name = "CircularProgressBar"
         Me.CircularProgressBar.OuterColor = System.Drawing.Color.LightGray
@@ -238,7 +237,7 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.CircularProgressBar.Size = New System.Drawing.Size(87, 87)
         Me.CircularProgressBar.StartAngle = 270
         Me.CircularProgressBar.SubscriptColor = System.Drawing.Color.FromArgb(CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer))
-        Me.CircularProgressBar.SubscriptMargin = New System.Windows.Forms.Padding(2, -35, 0, 0)
+        Me.CircularProgressBar.SubscriptMargin = New System.Windows.Forms.Padding(-4, -35, 0, 0)
         Me.CircularProgressBar.SubscriptText = "Loading"
         Me.CircularProgressBar.SuperscriptColor = System.Drawing.Color.FromArgb(CType(CType(166, Byte), Integer), CType(CType(166, Byte), Integer), CType(CType(166, Byte), Integer))
         Me.CircularProgressBar.SuperscriptMargin = New System.Windows.Forms.Padding(15, 30, 0, 0)
@@ -300,7 +299,7 @@ Partial Class frmToolboxEnterpriseExplorer
         '
         Me.ContextMenuStrip_ORMModel.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.AddPageToolStripMenuItem1, Me.ToolStripMenuItemPastePage, Me.ToolStripMenuItemLanguage, Me.ToolStripSeparator1, Me.EmptyModelToolStripMenuItem, Me.DeleteModelToolStripMenuItem, Me.RenameToolStripMenuItem, Me.ToolStripSeparator3, Me.ViewModelDictionaryToolStripMenuItem, Me.ViewGlossaryToolStripMenuItem, Me.ToolStripMenuItemModelConfiguration, Me.GenerateDocumentationToolStripMenuItem, Me.ToolStripSeparator5, Me.ImportExportToolStripMenuItem})
         Me.ContextMenuStrip_ORMModel.Name = "ContextMenuStrip_ORMModel"
-        Me.ContextMenuStrip_ORMModel.Size = New System.Drawing.Size(208, 286)
+        Me.ContextMenuStrip_ORMModel.Size = New System.Drawing.Size(208, 264)
         '
         'AddPageToolStripMenuItem1
         '
@@ -365,7 +364,7 @@ Partial Class frmToolboxEnterpriseExplorer
         'AddSTDPageToolStripMenuItem
         '
         Me.AddSTDPageToolStripMenuItem.Name = "AddSTDPageToolStripMenuItem"
-        Me.AddSTDPageToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
+        Me.AddSTDPageToolStripMenuItem.Size = New System.Drawing.Size(148, 22)
         Me.AddSTDPageToolStripMenuItem.Text = "&Add STD Page"
         '
         'ToolStripSeparator1
@@ -509,12 +508,25 @@ Partial Class frmToolboxEnterpriseExplorer
         '
         Me.BackgroundWorkerModelLoader.WorkerReportsProgress = True
         '
+        'Panel1
+        '
+        Me.Panel1.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.Panel1.Controls.Add(Me.TreeView)
+        Me.Panel1.Controls.Add(Me.CircularProgressBar)
+        Me.Panel1.Location = New System.Drawing.Point(12, 62)
+        Me.Panel1.Name = "Panel1"
+        Me.Panel1.Size = New System.Drawing.Size(380, 482)
+        Me.Panel1.TabIndex = 11
+        '
         'frmToolboxEnterpriseExplorer
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.BackColor = System.Drawing.Color.Gainsboro
         Me.ClientSize = New System.Drawing.Size(407, 612)
+        Me.Controls.Add(Me.Panel1)
         Me.Controls.Add(Me.GroupBox_main)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.Name = "frmToolboxEnterpriseExplorer"
@@ -525,6 +537,7 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.ContextMenuStrip_Page.ResumeLayout(False)
         Me.ContextMenuStrip_ORMModel.ResumeLayout(False)
         Me.ContextMenuStrip_ORMModels.ResumeLayout(False)
+        Me.Panel1.ResumeLayout(False)
         Me.ResumeLayout(False)
 
     End Sub
@@ -584,4 +597,5 @@ Partial Class frmToolboxEnterpriseExplorer
     Friend WithEvents ToolStripMenuItem2 As ToolStripMenuItem
     Friend WithEvents ButtonNewModel As Button
     Friend WithEvents ToolTip As ToolTip
+    Friend WithEvents Panel1 As Panel
 End Class

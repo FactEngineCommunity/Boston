@@ -194,7 +194,7 @@ Namespace FBM
             'NB Arguments are by Ref, because need to point to actual objects on a Page.
             '-----------------------------------------------------------------------------
             Dim lsMessage As String = ""
-
+            Dim lsFactId As String
             Try
                 Me.ConceptType = pcenumConceptType.RoleData
                 Me.Model = arPage.Model
@@ -210,11 +210,12 @@ Namespace FBM
                 ' by seting Me.FactData (at instance level) to the Role.Data at the Model level.
                 '---------------------------------------------------------------------------------
                 Dim lrRole As FBM.Role = arRoleInstance.Role
-                Dim lrFactData As New FBM.FactData(lrRole, arConcept, arFactInstance.Fact)
-
-                lrFactData = lrRole.Data.Find(AddressOf lrFactData.Equals)
-                Me.FactData = lrFactData
-                If lrFactData Is Nothing Then
+                'Dim lrFactData As New FBM.FactData(lrRole, arConcept, arFactInstance.Fact)
+                'lrFactData = lrRole.Data.Find(AddressOf lrFactData.Equals)
+                'Me.FactData = lrFactData
+                lsFactId = arFactInstance.Id
+                Me.FactData = lrRole.Data.Find(Function(x) x.Role.Id = lrRole.Id And x.Fact.Id = lsFactId)
+                If Me.FactData Is Nothing Then
                     lsMessage = "Error: Cannot find Role.Data (at Model level) to link FactDataInstance.FactData to: "
                     lsMessage &= vbCrLf & vbCrLf & "Expecting to find:"
                     lsMessage &= vbCrLf & "Role.Id: " & lrRole.Id

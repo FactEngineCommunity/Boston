@@ -12,8 +12,8 @@ Namespace FBM
         Implements ICloneable
         Implements FBM.iPageObject
 
-        <XmlIgnore()> _
-        Private WithEvents _ValueType As New FBM.ValueType 'The ValueType for which the ValueTypeIstance acts as View/Proxy.
+        <XmlIgnore()>
+        Private WithEvents _ValueType As FBM.ValueType 'The ValueType for which the ValueTypeIstance acts as View/Proxy.
         <XmlIgnore()> _
         <Browsable(False)> _
         Public Property ValueType() As FBM.ValueType
@@ -241,7 +241,6 @@ Namespace FBM
                 loDroppedNode.ShadowOffsetX = 1
                 loDroppedNode.ShadowOffsetY = 1
                 loDroppedNode.ShadowColor = Color.LightGray
-                loDroppedNode.Tag = New FBM.ValueTypeInstance
                 loDroppedNode.Tag = Me
                 loDroppedNode.Pen.Width = 0.5
                 If Me.IsReferenceModeForFactTypeOnPage And (Not abForceDisplay) Then
