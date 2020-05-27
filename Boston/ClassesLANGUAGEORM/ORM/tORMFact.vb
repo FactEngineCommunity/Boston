@@ -204,8 +204,7 @@ Namespace FBM
                     lrFactInstance.Fact = Me
                     lrFactInstance.Id = .Id
 
-                    Dim lrFactTypeInstance As New FBM.FactTypeInstance(arPage.Model, arPage, pcenumLanguage.ORMModel, .FactType.Id, .FactType.Name)
-                    lrFactInstance.FactType = arPage.FactTypeInstance.Find(AddressOf lrFactTypeInstance.Equals)
+                    lrFactInstance.FactType = arPage.FactTypeInstance.Find(Function(x) x.Id = .FactType.Id)
 
                     For Each lrFactData In .Data
                         lrFactInstance.Data.Add(lrFactData.CloneInstance(arPage, lrFactInstance))

@@ -315,6 +315,7 @@ Namespace FBM
             Dim lrFactData As New FBM.FactData
 
             Try
+                lrFactData.Concept = New FBM.Concept
                 With Me
                     'Concept - See lrFactData.Data below
                     lrFactData.Model = arModel
@@ -356,8 +357,7 @@ Namespace FBM
         Public Shadows Function CloneInstance(ByRef arPage As FBM.Page, Optional ByRef arFactInstance As FBM.FactInstance = Nothing) As FBM.FactDataInstance
 
             Dim lrFactDataInstance As New FBM.FactDataInstance
-            Dim lrFactTypeInstance As New FBM.FactTypeInstance
-            Dim lrFactInstance As New FBM.FactInstance
+            Dim lrFactTypeInstance As FBM.FactTypeInstance
 
             Try
                 With Me
@@ -369,20 +369,11 @@ Namespace FBM
 
                     Select Case Me.Role.TypeOfJoin
                         Case Is = pcenumRoleJoinType.EntityType
-                            Dim lrEntityTypeInstance As New FBM.EntityTypeInstance
-                            lrEntityTypeInstance.Id = .Role.JoinsEntityType.Id
-                            lrEntityTypeInstance = arPage.EntityTypeInstance.Find(AddressOf lrEntityTypeInstance.Equals)
-                            lrFactDataInstance.JoinedObjectType = lrEntityTypeInstance
+                            lrFactDataInstance.JoinedObjectType = arPage.EntityTypeInstance.Find(Function(x) x.Id = .Role.JoinsEntityType.Id)
                         Case Is = pcenumRoleJoinType.ValueType
-                            Dim lrValueTypeInstance As New FBM.ValueTypeInstance
-                            lrValueTypeInstance.Id = .Role.JoinsValueType.Id
-                            lrValueTypeInstance = arPage.ValueTypeInstance.Find(AddressOf lrValueTypeInstance.Equals)
-                            lrFactDataInstance.JoinedObjectType = lrValueTypeInstance
+                            lrFactDataInstance.JoinedObjectType = arPage.ValueTypeInstance.Find(Function(x) x.Id = .Role.JoinsValueType.Id)
                         Case Is = pcenumRoleJoinType.FactType
-                            lrFactTypeInstance = New FBM.FactTypeInstance
-                            lrFactTypeInstance.Id = .Role.JoinsFactType.Id
-                            lrFactTypeInstance = arPage.FactTypeInstance.Find(AddressOf lrFactTypeInstance.Equals)
-                            lrFactDataInstance.JoinedObjectType = lrFactTypeInstance
+                            lrFactDataInstance.JoinedObjectType = arPage.FactTypeInstance.Find(Function(x) x.Id = .Role.JoinsFactType.Id)
                     End Select
 
                     lrFactDataInstance.Concept = .Concept
@@ -390,15 +381,12 @@ Namespace FBM
                     '----------------------------------------
                     'Find the RoleInstance for the FactData
                     '----------------------------------------
-                    Dim lrRoleInstance As New FBM.RoleInstance(Me.Model, arPage, Me.Role)
-                    lrFactDataInstance.Role = arPage.RoleInstance.Find(AddressOf lrRoleInstance.Equals)
+                    lrFactDataInstance.Role = arPage.RoleInstance.Find(Function(x) x.Id = Me.Role.Id)
 
                     '--------------------------------------------
                     'Find the FactTypeInstance for the FactData
                     '--------------------------------------------
-                    lrFactTypeInstance = New FBM.FactTypeInstance
-                    lrFactTypeInstance.Id = .Role.FactType.Id
-                    lrFactTypeInstance = arPage.FactTypeInstance.Find(AddressOf lrFactTypeInstance.Equals)
+                    lrFactTypeInstance = arPage.FactTypeInstance.Find(Function(x) x.Id = .Role.FactType.Id)
 
                     If IsSomething(arFactInstance) Then
                         lrFactDataInstance.Fact = arFactInstance
@@ -406,11 +394,7 @@ Namespace FBM
                         '--------------------------------
                         'Find the Fact for the FactData
                         '--------------------------------
-                        lrFactInstance.Id = .Fact.Id
-                        lrFactInstance.Symbol = .Fact.Symbol
-                        lrFactInstance = lrFactTypeInstance.Fact.Find(AddressOf lrFactInstance.EqualsById)
-
-                        lrFactDataInstance.Fact = lrFactInstance
+                        lrFactDataInstance.Fact = lrFactTypeInstance.Fact.Find(Function(x) x.Id = .Fact.Id)
                     End If
 
                 End With

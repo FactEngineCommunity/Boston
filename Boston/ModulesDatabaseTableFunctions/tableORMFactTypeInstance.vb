@@ -429,15 +429,12 @@ Namespace TableFactTypeInstance
 
                 If Not lREcordset.EOF Then
                     While Not lREcordset.EOF
-                        lrFactTypeInstance = New FBM.FactTypeInstance
-                        lrFactTypeInstance.Id = Trim(lREcordset("FactTypeId").Value)
-
-                        lrFactTypeInstance = TableFactTypeInstance.GetFactTypeInstanceByPage(lrFactTypeInstance.Id, arPage)
+                        lrFactTypeInstance = TableFactTypeInstance.GetFactTypeInstanceByPage(Trim(lREcordset("FactTypeId").Value), arPage)
 
                         '-----------------------------------------------------------------------------------
                         'CodeSafe: Only add the FactTypeInstance to the Page if it was successfully loaded
                         '-----------------------------------------------------------------------------------
-                        If IsSomething(lrFactTypeInstance) Then
+                        If lrFactTypeInstance IsNot Nothing Then
                             GetFactTypeInstancesByPage.Add(lrFactTypeInstance)
                             'prApplication.ThrowErrorMessage("Successfully loaded (Page:'" & lrFactTypeInstance.Page.Name & "' AND FactTypeInstance.Id:'" & lrFactTypeInstance.Id & "')", pcenumErrorType.Information)
                         End If

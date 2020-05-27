@@ -373,6 +373,8 @@ Namespace FBM
 
             Me.Symbol = Me.Id
 
+            Me.Concept = New FBM.Concept(Me.Symbol)
+
         End Sub
 
         Public Sub New(ByRef arModel As FBM.Model, ByVal asFactTypeName As String, ByVal as_FactTypeId As String)
