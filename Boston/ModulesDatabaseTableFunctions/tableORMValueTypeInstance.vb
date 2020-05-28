@@ -80,7 +80,7 @@ Namespace TableValueTypeInstance
                         lrValueTypeInstance.Page = lrPage
                         lrValueTypeInstance.Id = lREcordset("ValueTypeId").Value
                         lrValueTypeInstance.ValueType.Id = lrValueTypeInstance.Id
-                        lrValueTypeInstance.ValueType = lrPage.Model.ValueType.Find(AddressOf lrValueTypeInstance.ValueType.Equals)
+                        lrValueTypeInstance.ValueType = lrPage.Model.ValueType.Find(Function(x) x.Id = lrValueTypeInstance.Id)
 
                         '-------------------------------------------------------------------------------------------
                         'CodeSafe: Remove the ValueTypeInstance if it references a ValueType that no longer exists

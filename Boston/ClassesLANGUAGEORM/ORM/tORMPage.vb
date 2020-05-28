@@ -1736,7 +1736,6 @@ Namespace FBM
             Dim liInd As Integer = 0
 
             Try
-
                 Me.Loading = True
                 '------------------------------------
                 'Get ValueTypes
@@ -1783,12 +1782,12 @@ Namespace FBM
                 '====================================================================================================================
                 'Sometimes if a Role within an ObjectifiedFactType references another ObjectifiedFactType the SQL sort order
                 ' within TableFactTypeInstance.GetFactTypeInstancesByPage doesn't work. So make sure that all Roles have a JoinedORMObject.
-                Dim latType = {GetType(FBM.ValueTypeInstance), _
-                               GetType(FBM.EntityTypeInstance), _
+                Dim latType = {GetType(FBM.ValueTypeInstance),
+                               GetType(FBM.EntityTypeInstance),
                                GetType(FBM.FactTypeInstance)}
 
-                Dim larRoleInstance = From FactTypeInstance In Me.FactTypeInstance _
-                                      From RoleInstance In FactTypeInstance.RoleGroup _
+                Dim larRoleInstance = From FactTypeInstance In Me.FactTypeInstance
+                                      From RoleInstance In FactTypeInstance.RoleGroup
                                       Where RoleInstance.JoinedORMObject Is Nothing
                                       Select RoleInstance
                 'removed Or Not latType.Contains(RoleInstance.JoinedORMObject.GetType)

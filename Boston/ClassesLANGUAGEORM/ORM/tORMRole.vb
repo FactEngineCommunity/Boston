@@ -450,10 +450,8 @@ Namespace FBM
                             lrEntityTypeInstance = arPage.EntityTypeInstance.Find(AddressOf .JoinedORMObject.EqualsByName)
                             'lrRoleInstance.JoinsEntityType = New FBM.EntityTypeInstance
                             lrRoleInstance.JoinsEntityType = lrEntityTypeInstance
-                            If Not lrRoleInstance.JoinsEntityType Is Nothing Then
-                                'lrRoleInstance.JoinedORMObject = New FBM.EntityTypeInstance
-                                lrRoleInstance.JoinedORMObject = lrEntityTypeInstance 'lrRoleInstance.JoinsEntityType                                
-                            Else
+                            lrRoleInstance.JoinedORMObject = lrEntityTypeInstance
+                            If lrRoleInstance.JoinsEntityType Is Nothing Then
                                 lrRoleInstance.JoinedORMObject = Nothing
                                 lrRoleInstance.JoinsEntityType = .JoinedORMObject.CloneEntityTypeInstance(arPage)
                                 lsMessage = "Error: No EntityTypeInstance found for:"
@@ -469,11 +467,8 @@ Namespace FBM
                             End If
                         Case Is = pcenumRoleJoinType.ValueType
                             lrRoleInstance.JoinsValueType = arPage.ValueTypeInstance.Find(AddressOf .JoinedORMObject.EqualsByName)
-                            If Not lrRoleInstance.JoinsValueType Is Nothing Then
-                                lrRoleInstance.JoinedORMObject = New FBM.ValueTypeInstance
-                                lrRoleInstance.JoinedORMObject = lrRoleInstance.JoinsValueType
-                                'lrRoleInstance.JoinsValueType = .JoinedORMObject.CloneInstance(arPage)
-                            Else
+                            lrRoleInstance.JoinedORMObject = lrRoleInstance.JoinsValueType
+                            If lrRoleInstance.JoinsValueType Is Nothing Then
                                 lrRoleInstance.JoinedORMObject = Nothing
                                 lrRoleInstance.JoinsValueType = .JoinedORMObject.CloneInstance(arPage)
                                 lsMessage = "Error: No ValueTypeInstance found for "
@@ -490,9 +485,8 @@ Namespace FBM
                             End If
                         Case Is = pcenumRoleJoinType.FactType
                             lrRoleInstance.JoinsFactType = arPage.FactTypeInstance.Find(AddressOf .JoinedORMObject.EqualsByName)
-                            If lrRoleInstance.JoinsFactType IsNot Nothing Then
-                                lrRoleInstance.JoinedORMObject = lrRoleInstance.JoinsFactType
-                            Else
+                            lrRoleInstance.JoinedORMObject = lrRoleInstance.JoinsFactType
+                            If lrRoleInstance.JoinsFactType Is Nothing Then
                                 lrRoleInstance.JoinedORMObject = Nothing
                                 lrRoleInstance.JoinsFactType = .JoinedORMObject.CloneInstance(arPage, abAddToPage)
 
