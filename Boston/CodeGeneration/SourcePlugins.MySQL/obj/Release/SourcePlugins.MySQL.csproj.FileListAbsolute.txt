@@ -1,0 +1,10 @@
+D:\Viev\02-Marketing\01-Product\01-Products\Metadrone\source\bin\Release\SourcePlugins.MySQL.dll
+D:\Viev\02-Marketing\01-Product\01-Products\Metadrone\source\bin\Release\SourcePlugins.MySQL.pdb
+D:\Viev\02-Marketing\01-Product\01-Products\Metadrone\source\SourcePlugins.MySQL\obj\Release\SourcePlugins.MySQL.Logo.resources
+D:\Viev\02-Marketing\01-Product\01-Products\Metadrone\source\SourcePlugins.MySQL\obj\Release\SourcePlugins.MySQL.Manage.resources
+D:\Viev\02-Marketing\01-Product\01-Products\Metadrone\source\SourcePlugins.MySQL\obj\Release\SourcePlugins.MySQL.Properties.Resources.resources
+D:\Viev\02-Marketing\01-Product\01-Products\Metadrone\source\SourcePlugins.MySQL\obj\Release\SourcePlugins.MySQL.csproj.GenerateResource.cache
+D:\Viev\02-Marketing\01-Product\01-Products\Metadrone\source\SourcePlugins.MySQL\obj\Release\SourcePlugins.MySQL.csproj.CopyComplete
+D:\Viev\02-Marketing\01-Product\01-Products\Metadrone\source\SourcePlugins.MySQL\obj\Release\SourcePlugins.MySQL.dll
+D:\Viev\02-Marketing\01-Product\01-Products\Metadrone\source\SourcePlugins.MySQL\obj\Release\SourcePlugins.MySQL.pdb
+D:\Viev\02-Marketing\01-Product\01-Products\Metadrone\source\SourcePlugins.MySQL\obj\Release\SourcePlugins.MySQL.csprojAssemblyReference.cache

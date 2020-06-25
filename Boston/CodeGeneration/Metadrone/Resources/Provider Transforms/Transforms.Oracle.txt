@@ -1,0 +1,182 @@
+﻿//Set table property values
+set table.lastpos = table.listpos = table.listcount
+
+//Set column property values
+set column.lastpos = column.listpos = column.listcount
+set column.sqltype = column.datatype
+set column.vbtype = ""
+set column.cstype = ""
+set column.vbdefval = ""
+set column.csdefval = ""
+
+if column.datatype = "char" and column.length = 1
+	set column.vbtype = "Boolean"
+	set column.cstype = "bool"
+	set column.vbdefval = "False"
+	set column.csdefval = "false"
+	
+elseif column.datatype = "Int" or column.datatype = "Integer"
+	set column.vbtype = "Integer"
+	set column.cstype = "int"
+	set column.vbdefval = 0
+	set column.csdefval = 0
+	
+elseif column.datatype = "smallint"
+	set column.vbtype = "Int16"
+	set column.cstype = "int"
+	set column.vbdefval = 0
+	set column.csdefval = 0
+	
+elseif column.datatype = "long"
+	set column.vbtype = "Long"
+	set column.cstype = "long"
+	set column.vbdefval = 0
+	set column.csdefval = 0
+	
+elseif column.datatype = "varchar" or column.datatype = "varchar2"
+	set column.vbtype = "String"
+	set column.cstype = "string"
+	set column.vbdefval = "Nothing"
+	set column.csdefval = "null"
+	
+elseif column.datatype = "nvarchar" or column.datatype = "nvarchar2"
+	set column.vbtype = "String"
+	set column.cstype = "string"
+	set column.vbdefval = "Nothing"
+	set column.csdefval = "null"
+	
+elseif column.datatype = "char" or column.datatype = "nchar"
+	set column.vbtype = "String"
+	set column.cstype = "string"
+	set column.vbdefval = "Nothing"
+	set column.csdefval = "null"
+	
+elseif column.datatype = "decimal" or column.datatype = "number" or column.datatype = "numeric"
+	set column.vbtype = "Decimal"
+	set column.cstype = "decimal"
+	set column.vbdefval = 0
+	set column.csdefval = 0
+	
+elseif column.datatype = "float" or column.datatype = "double precision"
+	set column.vbtype = "Double"
+	set column.cstype = "double"
+	set column.vbdefval = 0
+	set column.csdefval = 0
+	
+elseif column.datatype = "real"
+	set column.vbtype = "Single"
+	set column.cstype = "float"
+	set column.vbdefval = 0
+	set column.csdefval = 0
+		
+elseif column.datatype = "date"
+	set column.vbtype = "DateTime"
+	set column.cstype = "DateTime"
+	set column.vbdefval = "System.DateTime.Now"
+	set column.csdefval = "System.DateTime.Now"
+	
+elseif column.datatype = "blob"
+	set column.vbtype = "Byte()"
+	set column.cstype = "byte[]"
+	set column.vbdefval = "Nothing"
+	set column.csdefval = "null"
+	
+else
+	set column.vbtype = column.datatype
+	set column.cstype = column.datatype
+	set column.vbdefval = "Nothing"
+	set column.csdefval = "null"
+	
+end
+
+
+
+
+//Set parameter property values
+set routine.lastpos = routine.listpos = routine.listcount
+set param.lastpos = column.listpos = column.listcount
+set param.sqltype = param.datatype
+set param.vbtype = ""
+set param.cstype = ""
+set param.vbdefval = ""
+set param.csdefval = ""
+
+if param.datatype = "char" and param.length = 1
+	set param.vbtype = "Boolean"
+	set param.cstype = "bool"
+	set param.vbdefval = "False"
+	set param.csdefval = "false"
+	
+elseif param.datatype = "Int" or param.datatype = "Integer"
+	set param.vbtype = "Integer"
+	set param.cstype = "int"
+	set param.vbdefval = 0
+	set param.csdefval = 0
+	
+elseif param.datatype = "smallint"
+	set param.vbtype = "Int16"
+	set param.cstype = "int"
+	set param.vbdefval = 0
+	set param.csdefval = 0
+	
+elseif param.datatype = "long"
+	set param.vbtype = "Long"
+	set param.cstype = "long"
+	set param.vbdefval = 0
+	set param.csdefval = 0
+	
+elseif param.datatype = "varchar" or param.datatype = "varchar2"
+	set param.vbtype = "String"
+	set param.cstype = "string"
+	set param.vbdefval = "Nothing"
+	set param.csdefval = "null"
+	
+elseif param.datatype = "nvarchar" or param.datatype = "nvarchar2"
+	set param.vbtype = "String"
+	set param.cstype = "string"
+	set param.vbdefval = "Nothing"
+	set param.csdefval = "null"
+	
+elseif param.datatype = "char" or param.datatype = "nchar"
+	set param.vbtype = "String"
+	set param.cstype = "string"
+	set param.vbdefval = "Nothing"
+	set param.csdefval = "null"
+	
+elseif param.datatype = "decimal" or param.datatype = "number" or param.datatype = "numeric"
+	set param.vbtype = "Decimal"
+	set param.cstype = "decimal"
+	set param.vbdefval = 0
+	set param.csdefval = 0
+	
+elseif param.datatype = "float" or param.datatype = "double precision"
+	set param.vbtype = "Double"
+	set param.cstype = "double"
+	set param.vbdefval = 0
+	set param.csdefval = 0
+	
+elseif param.datatype = "real"
+	set param.vbtype = "Single"
+	set param.cstype = "float"
+	set param.vbdefval = 0
+	set param.csdefval = 0
+		
+elseif param.datatype = "date"
+	set param.vbtype = "DateTime"
+	set param.cstype = "DateTime"
+	set param.vbdefval = "System.DateTime.Now"
+	set param.csdefval = "System.DateTime.Now"
+	
+elseif param.datatype = "blob"
+	set param.vbtype = "Byte()"
+	set param.cstype = "byte[]"
+	set param.vbdefval = "Nothing"
+	set param.csdefval = "null"
+	
+else
+	set param.vbtype = param.datatype
+	set param.cstype = param.datatype
+	set param.vbdefval = "Nothing"
+	set param.csdefval = "null"
+	
+end

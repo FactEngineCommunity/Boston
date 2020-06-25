@@ -1,0 +1,112 @@
+﻿<?xml version="1.0"?>
+
+<SyntaxDefinition name = "MetadroneMain" extensions = ".mdm">
+
+  <Environment>
+    <Default color = "Black" bgcolor = "White"/>
+    <Selection color = "White" bgcolor = "Blue"/>
+    <VRuler color = "Gray"/>
+  </Environment>
+
+  <Digits name ="Digits" bold ="false" italic ="false" color ="Blue"/>
+
+  <RuleSets>
+
+    <RuleSet ignorecase = "true">
+      <Delimiters>&amp;&lt;&gt;~!%^*()-+=|\#/{}[]:;"' ,	.?</Delimiters>
+
+      <Span name = "LINECOMMENT" bold = "false" italic = "true" color = "Green" bgcolor = "White" stopateol = "true">
+        <Begin>//</Begin>
+      </Span>
+
+      <Span name = "LINEPREPROC" bold = "false" italic = "true" color = "Teal" bgcolor = "White" stopateol = "true">
+        <Begin>#</Begin>
+      </Span>
+
+      <Span name = "STRING" bold = "false" italic = "false" color = "Red" bgcolor = "White" stopateol = "true">
+        <Begin>"</Begin>
+        <End>"</End>
+      </Span>
+
+      <KeyWords name = "Keywords" bold="true" italic="false" color="Blue" bgcolor = "White">
+        <Key word = "set" />
+        <Key word = "true" />
+        <Key word = "false" />
+        <Key word = "and" />
+        <Key word = "or" />
+        <Key word = "not" />
+
+        <Key word = "for" />
+        <Key word = "in" />
+        <Key word = "if" />
+        <Key word = "else" />
+        <Key word = "elseif" />
+        <Key word = "end" />
+        <Key word = "call" />
+        <Key word = "exit" />
+        <Key word = "when" />
+      </KeyWords>
+
+      <KeyWords name = "sysfunctions" bold="true" italic="false" color="Magenta" bgcolor = "White">
+        <Key word = "cout" />
+        <Key word = "coutln" />
+        <Key word = "clcon" />
+        <Key word = "makedir" />
+        <Key word = "filecopy" />
+        <Key word = "command" />
+        <Key word = "runvb" />
+        <Key word = "runcs" />
+        <Key word = "runscript" />
+        <Key word = "cnum" />
+        <Key word = "sin" />
+        <Key word = "cos" />
+        <Key word = "tan" />
+        <Key word = "sqrt" />
+      </KeyWords>
+
+      <KeyWords name = "Punctuation" bold = "true" italic = "false" color = "Blue" bgcolor = "White">
+        <Key word = "(" />
+        <Key word = ")" />
+        <Key word = "?" />
+        <Key word = "," />
+        <Key word = "." />
+        <Key word = ";" />
+        <Key word = "[" />
+        <Key word = "]" />
+        <Key word = "{" />
+        <Key word = "}" />
+        <Key word = "+" />
+        <Key word = "-" />
+        <Key word = "/" />
+        <Key word = "%" />
+        <Key word = "*" />
+        <Key word = "&lt;" />
+        <Key word = "&gt;" />
+        <Key word = "^" />
+        <Key word = "=" />
+        <Key word = "~" />
+        <Key word = "!" />
+        <Key word = "|" />
+        <Key word = "&amp;" />
+      </KeyWords>
+
+      <KeyWords name = "Objects" bold="true" italic="false" color="OliveDrab" bgcolor = "White">
+        <Key word = "table" />
+        <Key word = "view" />
+        <Key word = "column" />
+        <Key word = "pkcolumn" />
+        <Key word = "fkcolumn" />
+        <Key word = "idcolumn" />
+        <Key word = "file" />
+        <Key word = "procedure" />
+        <Key word = "function" />
+        <Key word = "param" />
+        <Key word = "inparam" />
+        <Key word = "outparam" />
+        <Key word = "inoutparam" />
+      </KeyWords>
+    </RuleSet>
+
+  </RuleSets>
+
+</SyntaxDefinition>

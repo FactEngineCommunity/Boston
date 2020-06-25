@@ -1,0 +1,7 @@
+﻿PostgreSQL source provider plugin for Metadrone.
+
+ADO.NET data provider download: http://www.postgresql.org/
+
+Related assemblies:
+  Mono.Security.dll
+  Npgsql.dll

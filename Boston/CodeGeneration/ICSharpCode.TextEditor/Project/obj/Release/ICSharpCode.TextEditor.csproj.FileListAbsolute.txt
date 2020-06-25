@@ -1,0 +1,3 @@
+D:\Viev\02-Marketing\01-Product\01-Products\Metadrone\source\ICSharpCode.TextEditor\bin\Release\ICSharpCode.TextEditor.dll
+D:\Viev\02-Marketing\01-Product\01-Products\Metadrone\source\ICSharpCode.TextEditor\Project\obj\Release\ICSharpCode.TextEditor.dll
+D:\Viev\02-Marketing\01-Product\01-Products\Metadrone\source\ICSharpCode.TextEditor\Project\obj\Release\ICSharpCode.TextEditor.csprojAssemblyReference.cache

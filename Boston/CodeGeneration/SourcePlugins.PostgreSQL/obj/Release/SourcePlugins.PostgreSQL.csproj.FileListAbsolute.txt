@@ -1,0 +1,10 @@
+D:\Viev\02-Marketing\01-Product\01-Products\Metadrone\source\bin\Release\SourcePlugins.PostgreSQL.dll
+D:\Viev\02-Marketing\01-Product\01-Products\Metadrone\source\bin\Release\SourcePlugins.PostgreSQL.pdb
+D:\Viev\02-Marketing\01-Product\01-Products\Metadrone\source\SourcePlugins.PostgreSQL\obj\Release\SourcePlugins.PostgreSQL.Logo.resources
+D:\Viev\02-Marketing\01-Product\01-Products\Metadrone\source\SourcePlugins.PostgreSQL\obj\Release\SourcePlugins.PostgreSQL.Manage.resources
+D:\Viev\02-Marketing\01-Product\01-Products\Metadrone\source\SourcePlugins.PostgreSQL\obj\Release\SourcePlugins.PostgreSQL.Properties.Resources.resources
+D:\Viev\02-Marketing\01-Product\01-Products\Metadrone\source\SourcePlugins.PostgreSQL\obj\Release\SourcePlugins.PostgreSQL.csproj.GenerateResource.cache
+D:\Viev\02-Marketing\01-Product\01-Products\Metadrone\source\SourcePlugins.PostgreSQL\obj\Release\SourcePlugins.PostgreSQL.csproj.CopyComplete
+D:\Viev\02-Marketing\01-Product\01-Products\Metadrone\source\SourcePlugins.PostgreSQL\obj\Release\SourcePlugins.PostgreSQL.dll
+D:\Viev\02-Marketing\01-Product\01-Products\Metadrone\source\SourcePlugins.PostgreSQL\obj\Release\SourcePlugins.PostgreSQL.pdb
+D:\Viev\02-Marketing\01-Product\01-Products\Metadrone\source\SourcePlugins.PostgreSQL\obj\Release\SourcePlugins.PostgreSQL.csprojAssemblyReference.cache

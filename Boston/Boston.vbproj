@@ -598,6 +598,338 @@
     <Compile Include="ClassesParserVA\TinyPG\tVAQLTextHighlighter.vb" />
     <Compile Include="ClassesParserVA\tVAQLProcessor.vb" />
     <Compile Include="ClassesPluginServices\PluginServices.vb" />
+    <Compile Include="CodeGeneration\Metadrone\ApplicationEvents.vb" />
+    <Compile Include="CodeGeneration\Metadrone\ConsoleExec.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Globals.vb" />
+    <Compile Include="CodeGeneration\Metadrone\My Project\Application.Designer.vb" />
+    <Compile Include="CodeGeneration\Metadrone\My Project\AssemblyInfo.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Parsing\Bin.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Parsing\CodeCompletion\Analyser.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Parsing\CodeCompletion\Source.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Parsing\CodeCompletion\Template.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Parsing\CodeCompletion\Variable.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Parsing\CodeCompletion\Variables.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Parsing\Main.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Parsing\Meta\Database\Column.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Parsing\Meta\Database\Database.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Parsing\Meta\Database\Parameter.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Parsing\Meta\Database\Routine.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Parsing\Meta\Database\Schema.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Parsing\Meta\Database\Table.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Parsing\Meta\IEntity.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Parsing\Meta\IEntityConnection.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Parsing\Output.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Parsing\PackageBuilder.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Parsing\SourceBuilder.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Parsing\Source\ConnectionFactory.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Parsing\Source\Source.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Parsing\SuperBuilder.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Parsing\Syntax\Compilation\Compilation.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Parsing\Syntax\Compilation\SourceTransforms.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Parsing\Syntax\Compilation\SyntaxNode.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Parsing\Syntax\Compilation\SyntaxToken.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Parsing\Syntax\Connections.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Parsing\Syntax\Constants.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Parsing\Syntax\Execution\ExceptionClasses.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Parsing\Syntax\Execution\Exec_Base.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Parsing\Syntax\Execution\Exec_BigFor.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Parsing\Syntax\Execution\Exec_Call.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Parsing\Syntax\Execution\Exec_Expr.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Parsing\Syntax\Execution\Exec_Expr_Test.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Parsing\Syntax\Execution\Exec_For.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Parsing\Syntax\Execution\Exec_Header.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Parsing\Syntax\Execution\Exec_If.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Parsing\Syntax\Execution\Exec_Set.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Parsing\Syntax\Execution\Exec_Sys.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Parsing\Syntax\Execution\Exec_Template.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Parsing\Syntax\Execution\PreProcessor.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Parsing\Syntax\Expressions\CodeDom.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Parsing\Syntax\Expressions\EvalTokens.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Parsing\Syntax\Expressions\Strings.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Parsing\Syntax\Main.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Parsing\Syntax\Variable.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Parsing\Syntax\Variables.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Parsing\Template.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Persistence\1.0 Angry Army\CodeDOM_CS.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Persistence\1.0 Angry Army\CodeDOM_VB.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Persistence\1.0 Angry Army\Folder.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Persistence\1.0 Angry Army\IEditorItem.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Persistence\1.0 Angry Army\IMDPersistenceItem.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Persistence\1.0 Angry Army\Main.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Persistence\1.0 Angry Army\MDObj.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Persistence\1.0 Angry Army\MDPackage.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Persistence\1.0 Angry Army\MDPackageTag.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Persistence\1.0 Angry Army\MDProject.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Persistence\1.0 Angry Army\Profile.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Persistence\1.0 Angry Army\Properties.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Persistence\1.0 Angry Army\Source.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Persistence\1.0 Angry Army\Template.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Persistence\Beta 0.10\Directives.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Persistence\Beta 0.10\Folder.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Persistence\Beta 0.10\IEditorItem.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Persistence\Beta 0.10\IMDPersistenceItem.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Persistence\Beta 0.10\MDObj.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Persistence\Beta 0.10\MDPackage.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Persistence\Beta 0.10\MDPackageTag.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Persistence\Beta 0.10\MDProject.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Persistence\Beta 0.10\Profile.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Persistence\Beta 0.10\Properties.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Persistence\Beta 0.10\Source.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Persistence\Beta 0.10\Template.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Persistence\Beta 0.11\CodeDOM_CS.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Persistence\Beta 0.11\CodeDOM_VB.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Persistence\Beta 0.11\Directives.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Persistence\Beta 0.11\Folder.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Persistence\Beta 0.11\IEditorItem.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Persistence\Beta 0.11\IMDPersistenceItem.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Persistence\Beta 0.11\MDObj.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Persistence\Beta 0.11\MDPackage.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Persistence\Beta 0.11\MDPackageTag.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Persistence\Beta 0.11\MDProject.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Persistence\Beta 0.11\Profile.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Persistence\Beta 0.11\Properties.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Persistence\Beta 0.11\Source.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Persistence\Beta 0.11\Template.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Persistence\CodeDOM_CS.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Persistence\CodeDOM_VB.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Persistence\Folder.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Persistence\IEditorItem.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Persistence\IMDPersistenceItem.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Persistence\Main.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Persistence\MDObj.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Persistence\MDPackage.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Persistence\MDPackageTag.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Persistence\MDProject.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Persistence\Profile.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Persistence\ProjectManager.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Persistence\Properties.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Persistence\Settings\Settings.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Persistence\Source.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Persistence\Template.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Plugin Interface\IPluginDescription.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Plugin Interface\Sources\Connections\Access.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Plugin Interface\Sources\Connections\Excel.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Plugin Interface\Sources\Connections\NullConnection.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Plugin Interface\Sources\Connections\ODBC.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Plugin Interface\Sources\Connections\OleDb.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Plugin Interface\Sources\Connections\Oracle.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Plugin Interface\Sources\Connections\SQLServer.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Plugin Interface\Sources\IConnection.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Plugin Interface\Sources\IManageSource.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Plugin Interface\Sources\ISourceDescription.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Plugin Interface\Sources\SchemaRow.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Plugin Interface\Sources\System\Descriptions.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Plugin Interface\Sources\System\Loader.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Tools\Conv.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Tools\ListSorter.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Tools\ThreadedControlUpdates.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Tools\Tools.vb" />
+    <Compile Include="CodeGeneration\Metadrone\UI\About.Designer.vb">
+      <DependentUpon>About.vb</DependentUpon>
+    </Compile>
+    <Compile Include="CodeGeneration\Metadrone\UI\About.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CodeGeneration\Metadrone\UI\Controls\Code Completion\ImageListBox.vb">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="CodeGeneration\Metadrone\UI\Controls\Code Completion\SyntaxPopup.Designer.vb">
+      <DependentUpon>SyntaxPopup.vb</DependentUpon>
+    </Compile>
+    <Compile Include="CodeGeneration\Metadrone\UI\Controls\Code Completion\SyntaxPopup.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CodeGeneration\Metadrone\UI\Controls\Code Completion\SyntaxPopupList.vb" />
+    <Compile Include="CodeGeneration\Metadrone\UI\Controls\Code Completion\SyntaxPopupListItem.vb" />
+    <Compile Include="CodeGeneration\Metadrone\UI\Controls\Code Editing\CodeEditor.Designer.vb">
+      <DependentUpon>CodeEditor.vb</DependentUpon>
+    </Compile>
+    <Compile Include="CodeGeneration\Metadrone\UI\Controls\Code Editing\CodeEditor.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="CodeGeneration\Metadrone\UI\Controls\Code Editing\CodeEditor_ext_keypress.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="CodeGeneration\Metadrone\UI\Controls\Code Editing\CodeEditor_PopupHandling.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="CodeGeneration\Metadrone\UI\Controls\Code Editing\SQLEditor.Designer.vb">
+      <DependentUpon>SQLEditor.vb</DependentUpon>
+    </Compile>
+    <Compile Include="CodeGeneration\Metadrone\UI\Controls\Code Editing\SQLEditor.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="CodeGeneration\Metadrone\UI\Controls\Code Editing\TransformationsEditor.Designer.vb">
+      <DependentUpon>TransformationsEditor.vb</DependentUpon>
+    </Compile>
+    <Compile Include="CodeGeneration\Metadrone\UI\Controls\Code Editing\TransformationsEditor.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="CodeGeneration\Metadrone\UI\Controls\Code Editing\txtBox.Designer.vb">
+      <DependentUpon>txtBox.vb</DependentUpon>
+    </Compile>
+    <Compile Include="CodeGeneration\Metadrone\UI\Controls\Code Editing\txtBox.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="CodeGeneration\Metadrone\UI\Controls\CustTabControl.vb">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="CodeGeneration\Metadrone\UI\Controls\Explorer.Designer.vb">
+      <DependentUpon>Explorer.vb</DependentUpon>
+    </Compile>
+    <Compile Include="CodeGeneration\Metadrone\UI\Controls\Explorer.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="CodeGeneration\Metadrone\UI\Controls\Explorer_CutCopyPaste.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="CodeGeneration\Metadrone\UI\Controls\Explorer_NodeManagement.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="CodeGeneration\Metadrone\UI\Controls\Explorer_Persistence.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="CodeGeneration\Metadrone\UI\Controls\LinkButton.Designer.vb">
+      <DependentUpon>LinkButton.vb</DependentUpon>
+    </Compile>
+    <Compile Include="CodeGeneration\Metadrone\UI\Controls\LinkButton.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="CodeGeneration\Metadrone\UI\Controls\Project Properties\ManageProjectProperties.Designer.vb">
+      <DependentUpon>ManageProjectProperties.vb</DependentUpon>
+    </Compile>
+    <Compile Include="CodeGeneration\Metadrone\UI\Controls\Project Properties\ManageProjectProperties.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="CodeGeneration\Metadrone\UI\Controls\Project Properties\ManageProjectSuperMain.Designer.vb">
+      <DependentUpon>ManageProjectSuperMain.vb</DependentUpon>
+    </Compile>
+    <Compile Include="CodeGeneration\Metadrone\UI\Controls\Project Properties\ManageProjectSuperMain.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="CodeGeneration\Metadrone\UI\Controls\Search\SearchBox.Designer.vb">
+      <DependentUpon>SearchBox.vb</DependentUpon>
+    </Compile>
+    <Compile Include="CodeGeneration\Metadrone\UI\Controls\Search\SearchBox.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="CodeGeneration\Metadrone\UI\Controls\Sources\ManageDataSource.Designer.vb">
+      <DependentUpon>ManageDataSource.vb</DependentUpon>
+    </Compile>
+    <Compile Include="CodeGeneration\Metadrone\UI\Controls\Sources\ManageDataSource.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="CodeGeneration\Metadrone\UI\Controls\Sources\ManageDBAccess.Designer.vb">
+      <DependentUpon>ManageDBAccess.vb</DependentUpon>
+    </Compile>
+    <Compile Include="CodeGeneration\Metadrone\UI\Controls\Sources\ManageDBAccess.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="CodeGeneration\Metadrone\UI\Controls\Sources\ManageDBExcel.Designer.vb">
+      <DependentUpon>ManageDBExcel.vb</DependentUpon>
+    </Compile>
+    <Compile Include="CodeGeneration\Metadrone\UI\Controls\Sources\ManageDBExcel.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="CodeGeneration\Metadrone\UI\Controls\Sources\ManageDBODBC.Designer.vb">
+      <DependentUpon>ManageDBODBC.vb</DependentUpon>
+    </Compile>
+    <Compile Include="CodeGeneration\Metadrone\UI\Controls\Sources\ManageDBODBC.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="CodeGeneration\Metadrone\UI\Controls\Sources\ManageDBOLEDB.Designer.vb">
+      <DependentUpon>ManageDBOLEDB.vb</DependentUpon>
+    </Compile>
+    <Compile Include="CodeGeneration\Metadrone\UI\Controls\Sources\ManageDBOLEDB.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="CodeGeneration\Metadrone\UI\Controls\Sources\ManageDBOracle.Designer.vb">
+      <DependentUpon>ManageDBOracle.vb</DependentUpon>
+    </Compile>
+    <Compile Include="CodeGeneration\Metadrone\UI\Controls\Sources\ManageDBOracle.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="CodeGeneration\Metadrone\UI\Controls\Sources\ManageDBSQLServer.Designer.vb">
+      <DependentUpon>ManageDBSQLServer.vb</DependentUpon>
+    </Compile>
+    <Compile Include="CodeGeneration\Metadrone\UI\Controls\Sources\ManageDBSQLServer.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="CodeGeneration\Metadrone\UI\Controls\Sources\QueryResults.Designer.vb">
+      <DependentUpon>QueryResults.vb</DependentUpon>
+    </Compile>
+    <Compile Include="CodeGeneration\Metadrone\UI\Controls\Sources\QueryResults.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="CodeGeneration\Metadrone\UI\Controls\StartPage.Designer.vb">
+      <DependentUpon>StartPage.vb</DependentUpon>
+    </Compile>
+    <Compile Include="CodeGeneration\Metadrone\UI\Controls\StartPage.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="CodeGeneration\Metadrone\UI\Controls\StartPageRecent.Designer.vb">
+      <DependentUpon>StartPageRecent.vb</DependentUpon>
+    </Compile>
+    <Compile Include="CodeGeneration\Metadrone\UI\Controls\StartPageRecent.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="CodeGeneration\Metadrone\UI\Controls\ThemedColours.vb" />
+    <Compile Include="CodeGeneration\Metadrone\UI\MainForm.Designer.vb">
+      <DependentUpon>MainForm.vb</DependentUpon>
+    </Compile>
+    <Compile Include="CodeGeneration\Metadrone\UI\MainForm.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CodeGeneration\Metadrone\UI\MainForm_Parsing.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CodeGeneration\Metadrone\UI\MainForm_Search.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CodeGeneration\Metadrone\UI\MainForm_StartPageEvents.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CodeGeneration\Metadrone\UI\MainForm_Startup.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CodeGeneration\Metadrone\UI\MainForm_TabControl.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CodeGeneration\Metadrone\UI\MainForm_TemplateManagement.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CodeGeneration\Metadrone\UI\NewItem.Designer.vb">
+      <DependentUpon>NewItem.vb</DependentUpon>
+    </Compile>
+    <Compile Include="CodeGeneration\Metadrone\UI\NewItem.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CodeGeneration\Metadrone\UI\PreviewOutput.Designer.vb">
+      <DependentUpon>PreviewOutput.vb</DependentUpon>
+    </Compile>
+    <Compile Include="CodeGeneration\Metadrone\UI\PreviewOutput.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CodeGeneration\Metadrone\UI\PreviewOutputInit.Designer.vb">
+      <DependentUpon>PreviewOutputInit.vb</DependentUpon>
+    </Compile>
+    <Compile Include="CodeGeneration\Metadrone\UI\PreviewOutputInit.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CodeGeneration\Metadrone\UI\SaveChanges.Designer.vb">
+      <DependentUpon>SaveChanges.vb</DependentUpon>
+    </Compile>
+    <Compile Include="CodeGeneration\Metadrone\UI\SaveChanges.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CodeGeneration\Tests\Tests\My Project\Application.Designer.vb" />
+    <Compile Include="CodeGeneration\Tests\Tests\My Project\AssemblyInfo.vb" />
+    <Compile Include="CodeGeneration\Tests\Tests\My Project\Resources.Designer.vb" />
+    <Compile Include="CodeGeneration\Tests\Tests\My Project\Settings.Designer.vb" />
+    <Compile Include="CodeGeneration\Tests\Tests\TestEvaluations.vb" />
+    <Compile Include="CodeGeneration\Tests\Tests\TestOutput.vb" />
+    <Compile Include="CodeGeneration\Tests\Tests\TestOutputPaths.vb" />
+    <Compile Include="CodeGeneration\Tests\Tests\TestTransforms.vb" />
     <Compile Include="Forms\CRUD\ClientServer\frmCRUDEditRole.Designer.vb">
       <DependentUpon>frmCRUDEditRole.vb</DependentUpon>
     </Compile>
@@ -1256,6 +1588,137 @@
     <EmbeddedResource Include="ClassesGeneral\UserInviter.resx">
       <DependentUpon>UserInviter.vb</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="CodeGeneration\Metadrone\obj\Release\Metadrone.Resources.resources" />
+    <EmbeddedResource Include="CodeGeneration\Metadrone\obj\Release\Metadrone.UI.About.resources" />
+    <EmbeddedResource Include="CodeGeneration\Metadrone\obj\Release\Metadrone.UI.CodeEditor.resources" />
+    <EmbeddedResource Include="CodeGeneration\Metadrone\obj\Release\Metadrone.UI.Explorer.resources" />
+    <EmbeddedResource Include="CodeGeneration\Metadrone\obj\Release\Metadrone.UI.LinkButton.resources" />
+    <EmbeddedResource Include="CodeGeneration\Metadrone\obj\Release\Metadrone.UI.MainForm.resources" />
+    <EmbeddedResource Include="CodeGeneration\Metadrone\obj\Release\Metadrone.UI.ManageDBAccess.resources" />
+    <EmbeddedResource Include="CodeGeneration\Metadrone\obj\Release\Metadrone.UI.ManageDBExcel.resources" />
+    <EmbeddedResource Include="CodeGeneration\Metadrone\obj\Release\Metadrone.UI.ManageDBODBC.resources" />
+    <EmbeddedResource Include="CodeGeneration\Metadrone\obj\Release\Metadrone.UI.ManageDBOLEDB.resources" />
+    <EmbeddedResource Include="CodeGeneration\Metadrone\obj\Release\Metadrone.UI.ManageDBOracle.resources" />
+    <EmbeddedResource Include="CodeGeneration\Metadrone\obj\Release\Metadrone.UI.ManageDBSQLServer.resources" />
+    <EmbeddedResource Include="CodeGeneration\Metadrone\obj\Release\Metadrone.UI.ManageProjectProperties.resources" />
+    <EmbeddedResource Include="CodeGeneration\Metadrone\obj\Release\Metadrone.UI.ManageProjectSuperMain.resources" />
+    <EmbeddedResource Include="CodeGeneration\Metadrone\obj\Release\Metadrone.UI.ManageSource.resources" />
+    <EmbeddedResource Include="CodeGeneration\Metadrone\obj\Release\Metadrone.UI.NewItem.resources" />
+    <EmbeddedResource Include="CodeGeneration\Metadrone\obj\Release\Metadrone.UI.PreviewOutput.resources" />
+    <EmbeddedResource Include="CodeGeneration\Metadrone\obj\Release\Metadrone.UI.PreviewOutputInit.resources" />
+    <EmbeddedResource Include="CodeGeneration\Metadrone\obj\Release\Metadrone.UI.QueryResults.resources" />
+    <EmbeddedResource Include="CodeGeneration\Metadrone\obj\Release\Metadrone.UI.SaveChanges.resources" />
+    <EmbeddedResource Include="CodeGeneration\Metadrone\obj\Release\Metadrone.UI.SearchBox.resources" />
+    <EmbeddedResource Include="CodeGeneration\Metadrone\obj\Release\Metadrone.UI.SQLEditor.resources" />
+    <EmbeddedResource Include="CodeGeneration\Metadrone\obj\Release\Metadrone.UI.StartPage.resources" />
+    <EmbeddedResource Include="CodeGeneration\Metadrone\obj\Release\Metadrone.UI.StartPageRecent.resources" />
+    <EmbeddedResource Include="CodeGeneration\Metadrone\obj\Release\Metadrone.UI.SyntaxPopup.resources" />
+    <EmbeddedResource Include="CodeGeneration\Metadrone\obj\Release\Metadrone.UI.TransformationsEditor.resources" />
+    <EmbeddedResource Include="CodeGeneration\Metadrone\obj\Release\Metadrone.UI.txtBox.resources" />
+    <EmbeddedResource Include="CodeGeneration\Metadrone\UI\About.resx">
+      <DependentUpon>About.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CodeGeneration\Metadrone\UI\Controls\Code Completion\SyntaxPopup.resx">
+      <DependentUpon>SyntaxPopup.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CodeGeneration\Metadrone\UI\Controls\Code Editing\CodeEditor.resx">
+      <DependentUpon>CodeEditor.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CodeGeneration\Metadrone\UI\Controls\Code Editing\SQLEditor.resx">
+      <DependentUpon>SQLEditor.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CodeGeneration\Metadrone\UI\Controls\Code Editing\TransformationsEditor.resx">
+      <DependentUpon>TransformationsEditor.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CodeGeneration\Metadrone\UI\Controls\Code Editing\txtBox.resx">
+      <DependentUpon>txtBox.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CodeGeneration\Metadrone\UI\Controls\Explorer.resx">
+      <DependentUpon>Explorer.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CodeGeneration\Metadrone\UI\Controls\LinkButton.resx">
+      <DependentUpon>LinkButton.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CodeGeneration\Metadrone\UI\Controls\Project Properties\ManageProjectProperties.resx">
+      <DependentUpon>ManageProjectProperties.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CodeGeneration\Metadrone\UI\Controls\Project Properties\ManageProjectSuperMain.resx">
+      <DependentUpon>ManageProjectSuperMain.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CodeGeneration\Metadrone\UI\Controls\Search\SearchBox.resx">
+      <DependentUpon>SearchBox.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CodeGeneration\Metadrone\UI\Controls\Sources\ManageDataSource.resx">
+      <DependentUpon>ManageDataSource.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CodeGeneration\Metadrone\UI\Controls\Sources\ManageDBAccess.resx">
+      <DependentUpon>ManageDBAccess.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CodeGeneration\Metadrone\UI\Controls\Sources\ManageDBExcel.resx">
+      <DependentUpon>ManageDBExcel.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CodeGeneration\Metadrone\UI\Controls\Sources\ManageDBODBC.resx">
+      <DependentUpon>ManageDBODBC.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CodeGeneration\Metadrone\UI\Controls\Sources\ManageDBOLEDB.resx">
+      <DependentUpon>ManageDBOLEDB.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CodeGeneration\Metadrone\UI\Controls\Sources\ManageDBOracle.resx">
+      <DependentUpon>ManageDBOracle.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CodeGeneration\Metadrone\UI\Controls\Sources\ManageDBSQLServer.resx">
+      <DependentUpon>ManageDBSQLServer.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CodeGeneration\Metadrone\UI\Controls\Sources\QueryResults.resx">
+      <DependentUpon>QueryResults.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CodeGeneration\Metadrone\UI\Controls\StartPage.resx">
+      <DependentUpon>StartPage.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CodeGeneration\Metadrone\UI\Controls\StartPageRecent.resx">
+      <DependentUpon>StartPageRecent.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CodeGeneration\Metadrone\UI\MainForm.resx">
+      <DependentUpon>MainForm.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CodeGeneration\Metadrone\UI\NewItem.resx">
+      <DependentUpon>NewItem.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CodeGeneration\Metadrone\UI\PreviewOutput.resx">
+      <DependentUpon>PreviewOutput.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CodeGeneration\Metadrone\UI\PreviewOutputInit.resx">
+      <DependentUpon>PreviewOutputInit.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CodeGeneration\Metadrone\UI\SaveChanges.resx">
+      <DependentUpon>SaveChanges.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CodeGeneration\SourcePlugins.Firebird\Logo.resx" />
+    <EmbeddedResource Include="CodeGeneration\SourcePlugins.Firebird\Manage.resx" />
+    <EmbeddedResource Include="CodeGeneration\SourcePlugins.Firebird\obj\Release\SourcePlugins.Firebird.Logo.resources" />
+    <EmbeddedResource Include="CodeGeneration\SourcePlugins.Firebird\obj\Release\SourcePlugins.Firebird.Manage.resources" />
+    <EmbeddedResource Include="CodeGeneration\SourcePlugins.Firebird\obj\Release\SourcePlugins.Firebird.Properties.Resources.resources" />
+    <EmbeddedResource Include="CodeGeneration\SourcePlugins.Firebird\Properties\Resources.resx" />
+    <EmbeddedResource Include="CodeGeneration\SourcePlugins.MySQL\Logo.resx" />
+    <EmbeddedResource Include="CodeGeneration\SourcePlugins.MySQL\Manage.resx" />
+    <EmbeddedResource Include="CodeGeneration\SourcePlugins.MySQL\obj\Release\SourcePlugins.MySQL.Logo.resources" />
+    <EmbeddedResource Include="CodeGeneration\SourcePlugins.MySQL\obj\Release\SourcePlugins.MySQL.Manage.resources" />
+    <EmbeddedResource Include="CodeGeneration\SourcePlugins.MySQL\obj\Release\SourcePlugins.MySQL.Properties.Resources.resources" />
+    <EmbeddedResource Include="CodeGeneration\SourcePlugins.MySQL\Properties\Resources.resx" />
+    <EmbeddedResource Include="CodeGeneration\SourcePlugins.PostgreSQL\Logo.resx" />
+    <EmbeddedResource Include="CodeGeneration\SourcePlugins.PostgreSQL\Manage.resx" />
+    <EmbeddedResource Include="CodeGeneration\SourcePlugins.PostgreSQL\obj\Release\SourcePlugins.PostgreSQL.Logo.resources" />
+    <EmbeddedResource Include="CodeGeneration\SourcePlugins.PostgreSQL\obj\Release\SourcePlugins.PostgreSQL.Manage.resources" />
+    <EmbeddedResource Include="CodeGeneration\SourcePlugins.PostgreSQL\obj\Release\SourcePlugins.PostgreSQL.Properties.Resources.resources" />
+    <EmbeddedResource Include="CodeGeneration\SourcePlugins.PostgreSQL\Properties\Resources.resx" />
+    <EmbeddedResource Include="CodeGeneration\SourcePlugins.SQLite\Logo.resx" />
+    <EmbeddedResource Include="CodeGeneration\SourcePlugins.SQLite\Manage.resx" />
+    <EmbeddedResource Include="CodeGeneration\SourcePlugins.SQLite\obj\Release\SourcePlugins.SQLite.Logo.resources" />
+    <EmbeddedResource Include="CodeGeneration\SourcePlugins.SQLite\obj\Release\SourcePlugins.SQLite.Manage.resources" />
+    <EmbeddedResource Include="CodeGeneration\SourcePlugins.SQLite\obj\Release\SourcePlugins.SQLite.Properties.Resources.resources" />
+    <EmbeddedResource Include="CodeGeneration\SourcePlugins.SQLite\Properties\Resources.resx" />
+    <EmbeddedResource Include="CodeGeneration\Tests\Tests\My Project\Resources.resx" />
+    <EmbeddedResource Include="CodeGeneration\Tests\Tests\obj\Release\Tests.Resources.resources" />
     <EmbeddedResource Include="Forms\CRUD\ClientServer\frmCRUDEditRole.resx">
       <DependentUpon>frmCRUDEditRole.vb</DependentUpon>
     </EmbeddedResource>
@@ -1516,6 +1979,90 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="CodeGeneration\bin\Release\Metadrone.exe.config" />
+    <None Include="CodeGeneration\bin\Release\Metadrone.settings" />
+    <None Include="CodeGeneration\ICSharpCode.TextEditor\Project\obj\Release\DesignTimeResolveAssemblyReferencesInput.cache" />
+    <None Include="CodeGeneration\ICSharpCode.TextEditor\Project\obj\Release\ICSharpCode.TextEditor.csprojAssemblyReference.cache" />
+    <None Include="CodeGeneration\ICSharpCode.TextEditor\Project\Resources\ASPX.xshd" />
+    <None Include="CodeGeneration\ICSharpCode.TextEditor\Project\Resources\BAT-Mode.xshd" />
+    <None Include="CodeGeneration\ICSharpCode.TextEditor\Project\Resources\Boo.xshd" />
+    <None Include="CodeGeneration\ICSharpCode.TextEditor\Project\Resources\Coco-Mode.xshd" />
+    <None Include="CodeGeneration\ICSharpCode.TextEditor\Project\Resources\CPP-Mode.xshd" />
+    <None Include="CodeGeneration\ICSharpCode.TextEditor\Project\Resources\CSharp-Mode.xshd" />
+    <None Include="CodeGeneration\ICSharpCode.TextEditor\Project\Resources\HTML-Mode.xshd" />
+    <None Include="CodeGeneration\ICSharpCode.TextEditor\Project\Resources\ICSharpCode.TextEditor.snk" />
+    <None Include="CodeGeneration\ICSharpCode.TextEditor\Project\Resources\Java-Mode.xshd" />
+    <None Include="CodeGeneration\ICSharpCode.TextEditor\Project\Resources\JavaScript-Mode.xshd" />
+    <None Include="CodeGeneration\ICSharpCode.TextEditor\Project\Resources\Metadrone-Main.xshd" />
+    <None Include="CodeGeneration\ICSharpCode.TextEditor\Project\Resources\Metadrone-SuperMain.xshd" />
+    <None Include="CodeGeneration\ICSharpCode.TextEditor\Project\Resources\Metadrone-Template.xshd" />
+    <None Include="CodeGeneration\ICSharpCode.TextEditor\Project\Resources\Metadrone-Transformations.xshd" />
+    <None Include="CodeGeneration\ICSharpCode.TextEditor\Project\Resources\Mode.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="CodeGeneration\ICSharpCode.TextEditor\Project\Resources\Patch-Mode.xshd" />
+    <None Include="CodeGeneration\ICSharpCode.TextEditor\Project\Resources\PHP-Mode.xshd" />
+    <None Include="CodeGeneration\ICSharpCode.TextEditor\Project\Resources\SQL-Mode.xshd" />
+    <None Include="CodeGeneration\ICSharpCode.TextEditor\Project\Resources\Tex-Mode.xshd" />
+    <None Include="CodeGeneration\ICSharpCode.TextEditor\Project\Resources\VBNET-Mode.xshd" />
+    <None Include="CodeGeneration\ICSharpCode.TextEditor\Project\Resources\XML-Mode.xshd" />
+    <None Include="CodeGeneration\Metadrone\app.config" />
+    <None Include="CodeGeneration\Metadrone\My Project\app.manifest" />
+    <None Include="CodeGeneration\Metadrone\obj\Release\DesignTimeResolveAssemblyReferences.cache" />
+    <None Include="CodeGeneration\Metadrone\obj\Release\DesignTimeResolveAssemblyReferencesInput.cache" />
+    <None Include="CodeGeneration\Metadrone\obj\Release\Metadrone.vbproj.CopyComplete" />
+    <None Include="CodeGeneration\Metadrone\obj\Release\Metadrone.vbproj.GenerateResource.cache" />
+    <None Include="CodeGeneration\Metadrone\obj\Release\Metadrone.vbprojAssemblyReference.cache" />
+    <None Include="CodeGeneration\Metadrone\Resources\img\About.psd" />
+    <None Include="CodeGeneration\Metadrone\Resources\img\celltile.psd" />
+    <None Include="CodeGeneration\Metadrone\Resources\img\CloseDownl16x16.pdn" />
+    <None Include="CodeGeneration\Metadrone\Resources\img\Closehil16x16.pdn" />
+    <None Include="CodeGeneration\Metadrone\Resources\img\DialogLeft.psd" />
+    <None Include="CodeGeneration\Metadrone\Resources\img\DialogTop.psd" />
+    <None Include="CodeGeneration\Metadrone\Resources\img\DialogTop52x32.psd" />
+    <None Include="CodeGeneration\Metadrone\Resources\img\fncmeta16x16.pdn" />
+    <None Include="CodeGeneration\Metadrone\Resources\img\SearchBox.pdn" />
+    <None Include="CodeGeneration\Metadrone\Resources\img\SearchBoxNoFocus.pdn" />
+    <None Include="CodeGeneration\Metadrone\Resources\img\Splash.psd" />
+    <None Include="CodeGeneration\Metadrone\Resources\img\supermain16x16.pdn" />
+    <None Include="CodeGeneration\Metadrone\Resources\img\tblmeta16x16.pdn" />
+    <None Include="CodeGeneration\Metadrone\Resources\Metadrone.snk" />
+    <None Include="CodeGeneration\packages\MSTest.TestAdapter.1.2.0\.signature.p7s" />
+    <None Include="CodeGeneration\packages\MSTest.TestAdapter.1.2.0\build\net45\MSTest.TestAdapter.props" />
+    <None Include="CodeGeneration\packages\MSTest.TestAdapter.1.2.0\build\net45\MSTest.TestAdapter.targets" />
+    <None Include="CodeGeneration\packages\MSTest.TestAdapter.1.2.0\build\netcoreapp1.0\MSTest.TestAdapter.props" />
+    <None Include="CodeGeneration\packages\MSTest.TestAdapter.1.2.0\build\uap10.0\MSTest.TestAdapter.props" />
+    <None Include="CodeGeneration\packages\MSTest.TestAdapter.1.2.0\build\uap10.0\MSTest.TestAdapter.targets" />
+    <None Include="CodeGeneration\packages\MSTest.TestAdapter.1.2.0\MSTest.TestAdapter.1.2.0.nupkg" />
+    <None Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\.signature.p7s" />
+    <None Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\MSTest.TestFramework.1.2.0.nupkg" />
+    <None Include="CodeGeneration\SourcePlugins.Firebird\obj\Release\DesignTimeResolveAssemblyReferencesInput.cache" />
+    <None Include="CodeGeneration\SourcePlugins.Firebird\obj\Release\SourcePlugins.Firebird.csproj.CopyComplete" />
+    <None Include="CodeGeneration\SourcePlugins.Firebird\obj\Release\SourcePlugins.Firebird.csproj.GenerateResource.cache" />
+    <None Include="CodeGeneration\SourcePlugins.Firebird\obj\Release\SourcePlugins.Firebird.csprojAssemblyReference.cache" />
+    <None Include="CodeGeneration\SourcePlugins.Firebird\Resources\img\tblmeta16x16.pdn" />
+    <None Include="CodeGeneration\SourcePlugins.MySQL\obj\Release\DesignTimeResolveAssemblyReferencesInput.cache" />
+    <None Include="CodeGeneration\SourcePlugins.MySQL\obj\Release\SourcePlugins.MySQL.csproj.CopyComplete" />
+    <None Include="CodeGeneration\SourcePlugins.MySQL\obj\Release\SourcePlugins.MySQL.csproj.GenerateResource.cache" />
+    <None Include="CodeGeneration\SourcePlugins.MySQL\obj\Release\SourcePlugins.MySQL.csprojAssemblyReference.cache" />
+    <None Include="CodeGeneration\SourcePlugins.MySQL\Resources\img\tblmeta16x16.pdn" />
+    <None Include="CodeGeneration\SourcePlugins.PostgreSQL\obj\Release\DesignTimeResolveAssemblyReferencesInput.cache" />
+    <None Include="CodeGeneration\SourcePlugins.PostgreSQL\obj\Release\SourcePlugins.PostgreSQL.csproj.CopyComplete" />
+    <None Include="CodeGeneration\SourcePlugins.PostgreSQL\obj\Release\SourcePlugins.PostgreSQL.csproj.GenerateResource.cache" />
+    <None Include="CodeGeneration\SourcePlugins.PostgreSQL\obj\Release\SourcePlugins.PostgreSQL.csprojAssemblyReference.cache" />
+    <None Include="CodeGeneration\SourcePlugins.PostgreSQL\Resources\img\tblmeta16x16.pdn" />
+    <None Include="CodeGeneration\SourcePlugins.SQLite\obj\Release\DesignTimeResolveAssemblyReferencesInput.cache" />
+    <None Include="CodeGeneration\SourcePlugins.SQLite\obj\Release\SourcePlugins.SQLite.csproj.CopyComplete" />
+    <None Include="CodeGeneration\SourcePlugins.SQLite\obj\Release\SourcePlugins.SQLite.csproj.GenerateResource.cache" />
+    <None Include="CodeGeneration\SourcePlugins.SQLite\obj\Release\SourcePlugins.SQLite.csprojAssemblyReference.cache" />
+    <None Include="CodeGeneration\SourcePlugins.SQLite\Resources\img\tblmeta16x16.pdn" />
+    <None Include="CodeGeneration\Tests\Tests\bin\Release\Metadrone.exe.config" />
+    <None Include="CodeGeneration\Tests\Tests\My Project\Settings.settings" />
+    <None Include="CodeGeneration\Tests\Tests\obj\Release\DesignTimeResolveAssemblyReferencesInput.cache" />
+    <None Include="CodeGeneration\Tests\Tests\obj\Release\Tests.vbproj.CopyComplete" />
+    <None Include="CodeGeneration\Tests\Tests\obj\Release\Tests.vbproj.GenerateResource.cache" />
+    <None Include="CodeGeneration\Tests\Tests\obj\Release\Tests.vbprojAssemblyReference.cache" />
+    <None Include="CodeGeneration\Tests\Tests\packages.config" />
     <None Include="My Project\app.manifest">
       <SubType>Designer</SubType>
     </None>
@@ -1795,6 +2342,583 @@
     <Content Include="ClassesFBMInterfaceHost\ReadMe.txt" />
     <Content Include="ClassesParserVA\VAQLProcessorReflection\ReadMe.txt" />
     <None Include="Images\Icons\SubtypeConnectorSmallCursor.ico" />
+    <Content Include="CodeGeneration\bin\Release\FirebirdSql.Data.FirebirdClient.dll" />
+    <Content Include="CodeGeneration\bin\Release\ICSharpCode.TextEditor.dll" />
+    <Content Include="CodeGeneration\bin\Release\Metadrone.exe" />
+    <Content Include="CodeGeneration\bin\Release\Microsoft.SqlServer.ConnectionInfo.dll" />
+    <Content Include="CodeGeneration\bin\Release\Microsoft.SqlServer.Dmf.dll" />
+    <Content Include="CodeGeneration\bin\Release\Microsoft.SqlServer.Management.Sdk.Sfc.dll" />
+    <Content Include="CodeGeneration\bin\Release\Microsoft.SqlServer.ServiceBrokerEnum.dll" />
+    <Content Include="CodeGeneration\bin\Release\Microsoft.SqlServer.Smo.dll" />
+    <Content Include="CodeGeneration\bin\Release\Microsoft.SqlServer.SqlClrProvider.dll" />
+    <Content Include="CodeGeneration\bin\Release\Microsoft.SqlServer.SqlEnum.dll" />
+    <Content Include="CodeGeneration\bin\Release\Mono.Security.dll" />
+    <Content Include="CodeGeneration\bin\Release\mysql.data.dll" />
+    <Content Include="CodeGeneration\bin\Release\Npgsql.dll" />
+    <Content Include="CodeGeneration\bin\Release\SourcePlugins.Firebird.dll" />
+    <Content Include="CodeGeneration\bin\Release\SourcePlugins.Firebird.pdb" />
+    <Content Include="CodeGeneration\bin\Release\SourcePlugins.MySQL.dll" />
+    <Content Include="CodeGeneration\bin\Release\SourcePlugins.MySQL.pdb" />
+    <Content Include="CodeGeneration\bin\Release\SourcePlugins.PostgreSQL.dll" />
+    <Content Include="CodeGeneration\bin\Release\SourcePlugins.PostgreSQL.pdb" />
+    <Content Include="CodeGeneration\bin\Release\SourcePlugins.SQLite.dll" />
+    <Content Include="CodeGeneration\bin\Release\SourcePlugins.SQLite.pdb" />
+    <Content Include="CodeGeneration\bin\Release\System.Data.SQLite.dll" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\bin\Release\ICSharpCode.TextEditor.dll" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Configuration\AssemblyInfo.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\ICSharpCode.TextEditor.csproj" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\obj\Release\ICSharpCode.TextEditor.csproj.FileListAbsolute.txt" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\obj\Release\ICSharpCode.TextEditor.dll" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Resources\RightArrow.cur" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Resources\SyntaxModes.xml" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Resources\TextEditorControl.bmp" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Actions\BookmarkActions.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Actions\CaretActions.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Actions\ClipBoardActions.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Actions\FoldActions.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Actions\FormatActions.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Actions\HomeEndActions.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Actions\IEditAction.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Actions\MiscActions.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Actions\SelectionActions.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\AbstractSegment.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\BookmarkManager\Bookmark.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\BookmarkManager\BookmarkEventHandler.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\BookmarkManager\BookmarkManager.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\BookmarkManager\BookmarkManagerMemento.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\DefaultDocument.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\DefaultTextEditorProperties.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\DocumentEventArgs.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\DocumentFactory.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\FoldingStrategy\FoldingManager.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\FoldingStrategy\FoldMarker.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\FoldingStrategy\IFoldingStrategy.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\FoldingStrategy\IndentFoldingStrategy.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\FormattingStrategy\DefaultFormattingStrategy.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\FormattingStrategy\IFormattingStrategy.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\HighlightingStrategy\DefaultHighlightingStrategy.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\HighlightingStrategy\FontContainer.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\HighlightingStrategy\HighlightBackground.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\HighlightingStrategy\HighlightColor.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\HighlightingStrategy\HighlightInfo.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\HighlightingStrategy\HighlightingColorNotFoundException.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\HighlightingStrategy\HighlightingDefinitionInvalidException.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\HighlightingStrategy\HighlightingDefinitionParser.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\HighlightingStrategy\HighlightingManager.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\HighlightingStrategy\HighlightingStrategyFactory.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\HighlightingStrategy\HighlightRuleSet.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\HighlightingStrategy\IHighlightingStrategy.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\HighlightingStrategy\NextMarker.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\HighlightingStrategy\PrevMarker.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\HighlightingStrategy\Span.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\HighlightingStrategy\SpanStack.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\HighlightingStrategy\SyntaxModes\FileSyntaxModeProvider.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\HighlightingStrategy\SyntaxModes\ISyntaxModeFileProvider.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\HighlightingStrategy\SyntaxModes\ResourceSyntaxModeProvider.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\HighlightingStrategy\SyntaxModes\SyntaxMode.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\HighlightingStrategy\TextWord.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\IDocument.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\ISegment.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\ITextEditorProperties.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\LineManager\DeferredEventList.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\LineManager\LineManager.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\LineManager\LineManagerEventArgs.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\LineManager\LineSegment.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\LineManager\LineSegmentTree.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\MarkerStrategy\MarkerStrategy.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\MarkerStrategy\TextMarker.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\Selection\ColumnRange.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\Selection\DefaultSelection.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\Selection\ISelection.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\Selection\SelectionManager.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\TextAnchor.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\TextBufferStrategy\GapTextBufferStrategy.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\TextBufferStrategy\ITextBufferStrategy.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\TextBufferStrategy\StringTextBufferStrategy.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\TextLocation.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\TextUtilities.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Gui\AbstractMargin.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Gui\BracketHighlighter.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Gui\BrushRegistry.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Gui\Caret.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Gui\CompletionWindow\AbstractCompletionWindow.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Gui\CompletionWindow\CodeCompletionListView.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Gui\CompletionWindow\CodeCompletionWindow.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Gui\CompletionWindow\DeclarationViewWindow.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Gui\CompletionWindow\ICompletionData.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Gui\CompletionWindow\ICompletionDataProvider.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Gui\DrawableLine.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Gui\FoldMargin.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Gui\GutterMargin.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Gui\HRuler.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Gui\IconBarMargin.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Gui\Ime.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Gui\InsightWindow\IInsightDataProvider.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Gui\InsightWindow\InsightWindow.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Gui\TextArea.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Gui\TextAreaClipboardHandler.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Gui\TextAreaControl.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Gui\TextAreaDragDropHandler.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Gui\TextAreaMouseHandler.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Gui\TextAreaUpdate.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Gui\TextEditorControl.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Gui\TextEditorControlBase.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Gui\TextView.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Gui\ToolTipRequestEventArgs.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Undo\IUndoableOperation.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Undo\UndoableDelete.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Undo\UndoableInsert.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Undo\UndoableReplace.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Undo\UndoQueue.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Undo\UndoStack.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Util\AugmentableRedBlackTree.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Util\CheckedList.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Util\FileReader.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Util\LoggingService.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Util\LookupTable.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Util\MouseWheelHandler.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Util\RedBlackTreeIterator.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Util\RtfWriter.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Util\TextUtility.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Util\TipPainter.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Util\TipPainterTools.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Util\TipSection.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Util\TipSpacer.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Util\TipSplitter.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Util\TipText.cs" />
+    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Util\WeakCollection.cs" />
+    <Content Include="CodeGeneration\Metadrone\Metadrone.vbproj" />
+    <Content Include="CodeGeneration\Metadrone\My Project\Application.myapp" />
+    <Content Include="CodeGeneration\Metadrone\obj\Release\Metadrone.exe" />
+    <Content Include="CodeGeneration\Metadrone\obj\Release\Metadrone.vbproj.FileListAbsolute.txt" />
+    <Content Include="CodeGeneration\Metadrone\obj\Release\TempPE\My Project.Resources.Designer.vb.dll" />
+    <Content Include="CodeGeneration\Metadrone\Resources\ICSharpCode.AvalonEdit.dll" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\1rightarrow16x16.ico" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\1rightarrow16x16.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\About.jpg" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\Access16x16.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\Access2K16x16.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\Access32x32.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\add.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\application_view_list16x16.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\arrow_down.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\arrow_refresh.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\BarTile.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\button_ok16x16.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\celltile.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\Close16x16.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\CloseDownl16x16.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\Closehil16x16.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\codecom icons\dirvar16x16.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\codecom icons\forcol16x16.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\codecom icons\forfil16x16.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\codecom icons\fortbl16x16.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\codecom icons\forvw16x16.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\codecom icons\func16x16.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\codecom icons\InOutParam16x16.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\codecom icons\InParam16x16.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\codecom icons\OutParam16x16.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\codecom icons\Param16x16.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\codecom icons\source16x16.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\codecom icons\stored_proc16x16.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\codecom icons\sys16x16.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\codecom icons\templvar16x16.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\codecom icons\tool16x16.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\connection16x16.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\control_play16x16.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\Copy16x16.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\cross16x16.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\CS16x16.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\CS32x32.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\CurrentDocument16x16.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\CurrentDocument28x16.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\cut16x16.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\DataSource16x16.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\DataSource32x32.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\DataSourceDimmed16x16.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\DialogLeft.jpg" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\DialogTop.jpg" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\DialogTop52x32.jpg" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\Excel16x16.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\Excel2K16x16.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\Excel32x32.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\filenew16x16.ico" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\filenew16x16.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\filesave16x16.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\fncmeta16x16.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\FolderClosed16x16.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\FolderClosedDimmed16x16.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\FolderOpen16x16.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\FolderOpenDimmed16x16.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\get16x16.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\help16x16.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\house16x16.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\Leaf16x16.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\Leaf32x32.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\LittleDownArrow.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\Loader3.gif" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\MainToolbarBG.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\messagebox_info16x16.ico" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\messagebox_info32x32.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\metadrone.ico" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\Metadrone32x32.ico" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\music16x16.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\music32x32.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\musicDimmed16x16.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\musicvar16x16.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\ODBC16x16.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\ODBC32x32.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\OLEDB16x16.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\OLEDB32x32.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\open16x16.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\Oracle16x16.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\Oracle32x32.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\Package16x16.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\Package28x16.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\Package32x32.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\PackageDimmed16x16.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\paste16x16.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\pencil.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\pencil16x16.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\Preview.ico" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\Preview16x16.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\Preview32x32.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\Project16x16.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\Project28x16.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\Project32x32.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\ProjFolderClosed16x16.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\ProjFolderClosedDimmed16x16.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\ProjFolderOpen16x16.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\ProjFolderOpenDimmed16x16.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\Properties16x16.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\PropertiesDimmed16x16.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\Question16x16.ico" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\Question32x32.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\SaveAllPreviews16x16.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\SavePreview16x16.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\SearchBoxEnd.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\SearchBoxEndNoFocus.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\SearchBoxMiddle.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\SearchBoxMiddleNoFocus.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\SearchBoxStart.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\SearchBoxStartNoFocus.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\sep.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\sep2.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\settings16x16.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\sitemap16x16.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\Splash.jpg" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\SQLServer16x16.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\SQLServer32x32.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\supermain16x16.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\support32x32.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\tab_breakoff16x16.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\tab_close16x16.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\tab_duplicate16x16.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\tblmeta16x16.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\Template16x16.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\Template32x32.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\TemplateBypassed16x16.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\TemplateDimmed16x16.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\TemplateLibrary16x16.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\TemplateParam16x16.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\TemplateVar16x16.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\terminal16x16.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\transform16x16.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\Tutes32x32.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\VB16x16.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\VB32x32.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\viewmag16x16.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\viewmag32x32.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\Warning16x16.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\Warning32x32.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\img\world.png" />
+    <Content Include="CodeGeneration\Metadrone\Resources\Licence Details\LicenceDetails.ICSharpCodeTextEditor.txt" />
+    <Content Include="CodeGeneration\Metadrone\Resources\Licence Details\LicenceDetails.Metadrone.txt" />
+    <Content Include="CodeGeneration\Metadrone\Resources\Licence Details\ProductDetails.ICSharpCodeTextEditor.txt" />
+    <Content Include="CodeGeneration\Metadrone\Resources\Licence Details\ProductDetails.Metadrone.txt" />
+    <Content Include="CodeGeneration\Metadrone\Resources\Microsoft.SqlServer.ConnectionInfo.dll" />
+    <Content Include="CodeGeneration\Metadrone\Resources\Microsoft.SqlServer.Dmf.dll" />
+    <Content Include="CodeGeneration\Metadrone\Resources\Microsoft.SqlServer.Management.Sdk.Sfc.dll" />
+    <Content Include="CodeGeneration\Metadrone\Resources\Microsoft.SqlServer.ServiceBrokerEnum.dll" />
+    <Content Include="CodeGeneration\Metadrone\Resources\Microsoft.SqlServer.Smo.dll" />
+    <Content Include="CodeGeneration\Metadrone\Resources\Microsoft.SqlServer.SqlClrProvider.dll" />
+    <Content Include="CodeGeneration\Metadrone\Resources\Microsoft.SqlServer.SqlEnum.dll" />
+    <Content Include="CodeGeneration\Metadrone\Resources\Provider Queries\Queries.Access.TableQuery.sql" />
+    <Content Include="CodeGeneration\Metadrone\Resources\Provider Queries\Queries.Oracle.ColumnQuery.sql" />
+    <Content Include="CodeGeneration\Metadrone\Resources\Provider Queries\Queries.Oracle.RoutineSchemaQuery.sql" />
+    <Content Include="CodeGeneration\Metadrone\Resources\Provider Queries\Queries.Oracle.SchemaQuery.sql" />
+    <Content Include="CodeGeneration\Metadrone\Resources\Provider Queries\Queries.Oracle.TableQuery.sql" />
+    <Content Include="CodeGeneration\Metadrone\Resources\Provider Queries\Queries.SQLServer.ColumnQuery.sql" />
+    <Content Include="CodeGeneration\Metadrone\Resources\Provider Queries\Queries.SQLServer.RoutineSchemaQuery.sql" />
+    <Content Include="CodeGeneration\Metadrone\Resources\Provider Queries\Queries.SQLServer.SchemaQuery.sql" />
+    <Content Include="CodeGeneration\Metadrone\Resources\Provider Queries\Queries.SQLServer.TableQuery.sql" />
+    <Content Include="CodeGeneration\Metadrone\Resources\Provider Transforms\Transforms.Access.txt" />
+    <Content Include="CodeGeneration\Metadrone\Resources\Provider Transforms\Transforms.Oracle.txt" />
+    <Content Include="CodeGeneration\Metadrone\Resources\Provider Transforms\Transforms.SQLServer.txt" />
+    <Content Include="CodeGeneration\Metadrone\Resources\SciLexer.dll" />
+    <Content Include="CodeGeneration\Metadrone\Resources\ScintillaNet.dll" />
+    <Content Include="CodeGeneration\Metadrone\Resources\System.Data.OracleClient.dll" />
+    <Content Include="CodeGeneration\Metadrone\Resources\zip-v1.9-Reduced\Ionic.Zip.Reduced.dll" />
+    <Content Include="CodeGeneration\Metadrone\Resources\zip-v1.9-Reduced\Readme.txt" />
+    <Content Include="CodeGeneration\packages\MSTest.TestAdapter.1.2.0\build\netcoreapp1.0\Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.dll" />
+    <Content Include="CodeGeneration\packages\MSTest.TestAdapter.1.2.0\build\uap10.0\Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.dll" />
+    <Content Include="CodeGeneration\packages\MSTest.TestAdapter.1.2.0\build\_common\cs\Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.resources.dll" />
+    <Content Include="CodeGeneration\packages\MSTest.TestAdapter.1.2.0\build\_common\cs\Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.resources.dll" />
+    <Content Include="CodeGeneration\packages\MSTest.TestAdapter.1.2.0\build\_common\cs\Microsoft.VisualStudio.TestPlatform.TestFramework.resources.dll" />
+    <Content Include="CodeGeneration\packages\MSTest.TestAdapter.1.2.0\build\_common\de\Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.resources.dll" />
+    <Content Include="CodeGeneration\packages\MSTest.TestAdapter.1.2.0\build\_common\de\Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.resources.dll" />
+    <Content Include="CodeGeneration\packages\MSTest.TestAdapter.1.2.0\build\_common\de\Microsoft.VisualStudio.TestPlatform.TestFramework.resources.dll" />
+    <Content Include="CodeGeneration\packages\MSTest.TestAdapter.1.2.0\build\_common\es\Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.resources.dll" />
+    <Content Include="CodeGeneration\packages\MSTest.TestAdapter.1.2.0\build\_common\es\Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.resources.dll" />
+    <Content Include="CodeGeneration\packages\MSTest.TestAdapter.1.2.0\build\_common\es\Microsoft.VisualStudio.TestPlatform.TestFramework.resources.dll" />
+    <Content Include="CodeGeneration\packages\MSTest.TestAdapter.1.2.0\build\_common\fr\Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.resources.dll" />
+    <Content Include="CodeGeneration\packages\MSTest.TestAdapter.1.2.0\build\_common\fr\Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.resources.dll" />
+    <Content Include="CodeGeneration\packages\MSTest.TestAdapter.1.2.0\build\_common\fr\Microsoft.VisualStudio.TestPlatform.TestFramework.resources.dll" />
+    <Content Include="CodeGeneration\packages\MSTest.TestAdapter.1.2.0\build\_common\it\Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.resources.dll" />
+    <Content Include="CodeGeneration\packages\MSTest.TestAdapter.1.2.0\build\_common\it\Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.resources.dll" />
+    <Content Include="CodeGeneration\packages\MSTest.TestAdapter.1.2.0\build\_common\it\Microsoft.VisualStudio.TestPlatform.TestFramework.resources.dll" />
+    <Content Include="CodeGeneration\packages\MSTest.TestAdapter.1.2.0\build\_common\ja\Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.resources.dll" />
+    <Content Include="CodeGeneration\packages\MSTest.TestAdapter.1.2.0\build\_common\ja\Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.resources.dll" />
+    <Content Include="CodeGeneration\packages\MSTest.TestAdapter.1.2.0\build\_common\ja\Microsoft.VisualStudio.TestPlatform.TestFramework.resources.dll" />
+    <Content Include="CodeGeneration\packages\MSTest.TestAdapter.1.2.0\build\_common\ko\Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.resources.dll" />
+    <Content Include="CodeGeneration\packages\MSTest.TestAdapter.1.2.0\build\_common\ko\Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.resources.dll" />
+    <Content Include="CodeGeneration\packages\MSTest.TestAdapter.1.2.0\build\_common\ko\Microsoft.VisualStudio.TestPlatform.TestFramework.resources.dll" />
+    <Content Include="CodeGeneration\packages\MSTest.TestAdapter.1.2.0\build\_common\Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.dll" />
+    <Content Include="CodeGeneration\packages\MSTest.TestAdapter.1.2.0\build\_common\Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.dll" />
+    <Content Include="CodeGeneration\packages\MSTest.TestAdapter.1.2.0\build\_common\Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.Interface.dll" />
+    <Content Include="CodeGeneration\packages\MSTest.TestAdapter.1.2.0\build\_common\Microsoft.VisualStudio.TestPlatform.TestFramework.dll" />
+    <Content Include="CodeGeneration\packages\MSTest.TestAdapter.1.2.0\build\_common\pl\Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.resources.dll" />
+    <Content Include="CodeGeneration\packages\MSTest.TestAdapter.1.2.0\build\_common\pl\Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.resources.dll" />
+    <Content Include="CodeGeneration\packages\MSTest.TestAdapter.1.2.0\build\_common\pl\Microsoft.VisualStudio.TestPlatform.TestFramework.resources.dll" />
+    <Content Include="CodeGeneration\packages\MSTest.TestAdapter.1.2.0\build\_common\pt\Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.resources.dll" />
+    <Content Include="CodeGeneration\packages\MSTest.TestAdapter.1.2.0\build\_common\pt\Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.resources.dll" />
+    <Content Include="CodeGeneration\packages\MSTest.TestAdapter.1.2.0\build\_common\pt\Microsoft.VisualStudio.TestPlatform.TestFramework.resources.dll" />
+    <Content Include="CodeGeneration\packages\MSTest.TestAdapter.1.2.0\build\_common\ru\Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.resources.dll" />
+    <Content Include="CodeGeneration\packages\MSTest.TestAdapter.1.2.0\build\_common\ru\Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.resources.dll" />
+    <Content Include="CodeGeneration\packages\MSTest.TestAdapter.1.2.0\build\_common\ru\Microsoft.VisualStudio.TestPlatform.TestFramework.resources.dll" />
+    <Content Include="CodeGeneration\packages\MSTest.TestAdapter.1.2.0\build\_common\tr\Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.resources.dll" />
+    <Content Include="CodeGeneration\packages\MSTest.TestAdapter.1.2.0\build\_common\tr\Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.resources.dll" />
+    <Content Include="CodeGeneration\packages\MSTest.TestAdapter.1.2.0\build\_common\tr\Microsoft.VisualStudio.TestPlatform.TestFramework.resources.dll" />
+    <Content Include="CodeGeneration\packages\MSTest.TestAdapter.1.2.0\build\_common\zh-Hans\Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.resources.dll" />
+    <Content Include="CodeGeneration\packages\MSTest.TestAdapter.1.2.0\build\_common\zh-Hans\Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.resources.dll" />
+    <Content Include="CodeGeneration\packages\MSTest.TestAdapter.1.2.0\build\_common\zh-Hans\Microsoft.VisualStudio.TestPlatform.TestFramework.resources.dll" />
+    <Content Include="CodeGeneration\packages\MSTest.TestAdapter.1.2.0\build\_common\zh-Hant\Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.resources.dll" />
+    <Content Include="CodeGeneration\packages\MSTest.TestAdapter.1.2.0\build\_common\zh-Hant\Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.resources.dll" />
+    <Content Include="CodeGeneration\packages\MSTest.TestAdapter.1.2.0\build\_common\zh-Hant\Microsoft.VisualStudio.TestPlatform.TestFramework.resources.dll" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\net45\cs\Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.xml" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\net45\cs\Microsoft.VisualStudio.TestPlatform.TestFramework.xml" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\net45\de\Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.xml" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\net45\de\Microsoft.VisualStudio.TestPlatform.TestFramework.xml" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\net45\es\Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.xml" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\net45\es\Microsoft.VisualStudio.TestPlatform.TestFramework.xml" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\net45\fr\Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.xml" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\net45\fr\Microsoft.VisualStudio.TestPlatform.TestFramework.xml" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\net45\it\Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.xml" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\net45\it\Microsoft.VisualStudio.TestPlatform.TestFramework.xml" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\net45\ja\Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.xml" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\net45\ja\Microsoft.VisualStudio.TestPlatform.TestFramework.xml" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\net45\ko\Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.xml" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\net45\ko\Microsoft.VisualStudio.TestPlatform.TestFramework.xml" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\net45\Microsoft.VisualStudio.TestPlatform.TestFramework.dll" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\net45\Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.dll" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\net45\Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.XML" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\net45\Microsoft.VisualStudio.TestPlatform.TestFramework.XML" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\net45\pl\Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.xml" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\net45\pl\Microsoft.VisualStudio.TestPlatform.TestFramework.xml" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\net45\pt\Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.xml" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\net45\pt\Microsoft.VisualStudio.TestPlatform.TestFramework.xml" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\net45\ru\Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.xml" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\net45\ru\Microsoft.VisualStudio.TestPlatform.TestFramework.xml" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\net45\tr\Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.xml" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\net45\tr\Microsoft.VisualStudio.TestPlatform.TestFramework.xml" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\net45\zh-Hans\Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.xml" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\net45\zh-Hans\Microsoft.VisualStudio.TestPlatform.TestFramework.xml" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\net45\zh-Hant\Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.xml" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\net45\zh-Hant\Microsoft.VisualStudio.TestPlatform.TestFramework.xml" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\netstandard1.0\cs\Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.xml" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\netstandard1.0\cs\Microsoft.VisualStudio.TestPlatform.TestFramework.xml" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\netstandard1.0\de\Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.xml" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\netstandard1.0\de\Microsoft.VisualStudio.TestPlatform.TestFramework.xml" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\netstandard1.0\es\Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.xml" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\netstandard1.0\es\Microsoft.VisualStudio.TestPlatform.TestFramework.xml" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\netstandard1.0\fr\Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.xml" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\netstandard1.0\fr\Microsoft.VisualStudio.TestPlatform.TestFramework.xml" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\netstandard1.0\it\Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.xml" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\netstandard1.0\it\Microsoft.VisualStudio.TestPlatform.TestFramework.xml" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\netstandard1.0\ja\Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.xml" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\netstandard1.0\ja\Microsoft.VisualStudio.TestPlatform.TestFramework.xml" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\netstandard1.0\ko\Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.xml" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\netstandard1.0\ko\Microsoft.VisualStudio.TestPlatform.TestFramework.xml" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\netstandard1.0\Microsoft.VisualStudio.TestPlatform.TestFramework.dll" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\netstandard1.0\Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.dll" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\netstandard1.0\Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.XML" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\netstandard1.0\Microsoft.VisualStudio.TestPlatform.TestFramework.XML" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\netstandard1.0\pl\Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.xml" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\netstandard1.0\pl\Microsoft.VisualStudio.TestPlatform.TestFramework.xml" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\netstandard1.0\pt\Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.xml" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\netstandard1.0\pt\Microsoft.VisualStudio.TestPlatform.TestFramework.xml" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\netstandard1.0\ru\Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.xml" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\netstandard1.0\ru\Microsoft.VisualStudio.TestPlatform.TestFramework.xml" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\netstandard1.0\tr\Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.xml" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\netstandard1.0\tr\Microsoft.VisualStudio.TestPlatform.TestFramework.xml" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\netstandard1.0\zh-Hans\Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.xml" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\netstandard1.0\zh-Hans\Microsoft.VisualStudio.TestPlatform.TestFramework.xml" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\netstandard1.0\zh-Hant\Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.xml" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\netstandard1.0\zh-Hant\Microsoft.VisualStudio.TestPlatform.TestFramework.xml" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\uap10.0\cs\Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.xml" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\uap10.0\cs\Microsoft.VisualStudio.TestPlatform.TestFramework.xml" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\uap10.0\de\Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.xml" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\uap10.0\de\Microsoft.VisualStudio.TestPlatform.TestFramework.xml" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\uap10.0\es\Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.xml" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\uap10.0\es\Microsoft.VisualStudio.TestPlatform.TestFramework.xml" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\uap10.0\fr\Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.xml" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\uap10.0\fr\Microsoft.VisualStudio.TestPlatform.TestFramework.xml" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\uap10.0\it\Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.xml" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\uap10.0\it\Microsoft.VisualStudio.TestPlatform.TestFramework.xml" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\uap10.0\ja\Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.xml" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\uap10.0\ja\Microsoft.VisualStudio.TestPlatform.TestFramework.xml" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\uap10.0\ko\Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.xml" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\uap10.0\ko\Microsoft.VisualStudio.TestPlatform.TestFramework.xml" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\uap10.0\Microsoft.VisualStudio.TestPlatform.TestFramework.dll" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\uap10.0\Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.dll" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\uap10.0\Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.XML" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\uap10.0\Microsoft.VisualStudio.TestPlatform.TestFramework.XML" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\uap10.0\pl\Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.xml" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\uap10.0\pl\Microsoft.VisualStudio.TestPlatform.TestFramework.xml" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\uap10.0\pt\Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.xml" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\uap10.0\pt\Microsoft.VisualStudio.TestPlatform.TestFramework.xml" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\uap10.0\ru\Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.xml" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\uap10.0\ru\Microsoft.VisualStudio.TestPlatform.TestFramework.xml" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\uap10.0\tr\Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.xml" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\uap10.0\tr\Microsoft.VisualStudio.TestPlatform.TestFramework.xml" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\uap10.0\zh-Hans\Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.xml" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\uap10.0\zh-Hans\Microsoft.VisualStudio.TestPlatform.TestFramework.xml" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\uap10.0\zh-Hant\Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.xml" />
+    <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\uap10.0\zh-Hant\Microsoft.VisualStudio.TestPlatform.TestFramework.xml" />
+    <Content Include="CodeGeneration\SourcePlugins.Firebird\Connection.cs" />
+    <Content Include="CodeGeneration\SourcePlugins.Firebird\Description.cs" />
+    <Content Include="CodeGeneration\SourcePlugins.Firebird\Logo.cs" />
+    <Content Include="CodeGeneration\SourcePlugins.Firebird\Logo.Designer.cs" />
+    <Content Include="CodeGeneration\SourcePlugins.Firebird\Manage.cs" />
+    <Content Include="CodeGeneration\SourcePlugins.Firebird\Manage.Designer.cs" />
+    <Content Include="CodeGeneration\SourcePlugins.Firebird\obj\Release\SourcePlugins.Firebird.csproj.FileListAbsolute.txt" />
+    <Content Include="CodeGeneration\SourcePlugins.Firebird\obj\Release\SourcePlugins.Firebird.dll" />
+    <Content Include="CodeGeneration\SourcePlugins.Firebird\obj\Release\SourcePlugins.Firebird.pdb" />
+    <Content Include="CodeGeneration\SourcePlugins.Firebird\Properties\AssemblyInfo.cs" />
+    <Content Include="CodeGeneration\SourcePlugins.Firebird\Properties\Resources.Designer.cs" />
+    <Content Include="CodeGeneration\SourcePlugins.Firebird\ReadResource.cs" />
+    <Content Include="CodeGeneration\SourcePlugins.Firebird\Resources\Assemblies\FirebirdSql.Data.FirebirdClient.dll" />
+    <Content Include="CodeGeneration\SourcePlugins.Firebird\Resources\img\connection16x16.png" />
+    <Content Include="CodeGeneration\SourcePlugins.Firebird\Resources\img\Firebird16x16.png" />
+    <Content Include="CodeGeneration\SourcePlugins.Firebird\Resources\img\Firebird32x32.png" />
+    <Content Include="CodeGeneration\SourcePlugins.Firebird\Resources\img\transform16x16.png" />
+    <Content Include="CodeGeneration\SourcePlugins.Firebird\Resources\Licence.txt" />
+    <Content Include="CodeGeneration\SourcePlugins.Firebird\Resources\ProductInformation.txt" />
+    <Content Include="CodeGeneration\SourcePlugins.Firebird\Resources\Queries\Queries.ColumnQuery.sql" />
+    <Content Include="CodeGeneration\SourcePlugins.Firebird\Resources\Queries\Queries.SchemaQuery.sql" />
+    <Content Include="CodeGeneration\SourcePlugins.Firebird\Resources\Queries\Queries.TableQuery.sql" />
+    <Content Include="CodeGeneration\SourcePlugins.Firebird\Resources\Transforms\Transforms.txt" />
+    <Content Include="CodeGeneration\SourcePlugins.Firebird\SourcePlugins.Firebird.csproj" />
+    <Content Include="CodeGeneration\SourcePlugins.MetadroneExeBuild\Metadrone.exe" />
+    <Content Include="CodeGeneration\SourcePlugins.MySQL\Connection.cs" />
+    <Content Include="CodeGeneration\SourcePlugins.MySQL\Description.cs" />
+    <Content Include="CodeGeneration\SourcePlugins.MySQL\Logo.cs" />
+    <Content Include="CodeGeneration\SourcePlugins.MySQL\Logo.Designer.cs" />
+    <Content Include="CodeGeneration\SourcePlugins.MySQL\Manage.cs" />
+    <Content Include="CodeGeneration\SourcePlugins.MySQL\Manage.Designer.cs" />
+    <Content Include="CodeGeneration\SourcePlugins.MySQL\obj\Release\SourcePlugins.MySQL.csproj.FileListAbsolute.txt" />
+    <Content Include="CodeGeneration\SourcePlugins.MySQL\obj\Release\SourcePlugins.MySQL.dll" />
+    <Content Include="CodeGeneration\SourcePlugins.MySQL\obj\Release\SourcePlugins.MySQL.pdb" />
+    <Content Include="CodeGeneration\SourcePlugins.MySQL\Properties\AssemblyInfo.cs" />
+    <Content Include="CodeGeneration\SourcePlugins.MySQL\Properties\Resources.Designer.cs" />
+    <Content Include="CodeGeneration\SourcePlugins.MySQL\ReadResource.cs" />
+    <Content Include="CodeGeneration\SourcePlugins.MySQL\Resources\Assemblies\mysql.data.dll" />
+    <Content Include="CodeGeneration\SourcePlugins.MySQL\Resources\img\connection16x16.png" />
+    <Content Include="CodeGeneration\SourcePlugins.MySQL\Resources\img\fncmeta16x16.png" />
+    <Content Include="CodeGeneration\SourcePlugins.MySQL\Resources\img\MySQL16x16.png" />
+    <Content Include="CodeGeneration\SourcePlugins.MySQL\Resources\img\MySQL32x32.png" />
+    <Content Include="CodeGeneration\SourcePlugins.MySQL\Resources\img\transform16x16.png" />
+    <Content Include="CodeGeneration\SourcePlugins.MySQL\Resources\Licence.txt" />
+    <Content Include="CodeGeneration\SourcePlugins.MySQL\Resources\ProductInformation.txt" />
+    <Content Include="CodeGeneration\SourcePlugins.MySQL\Resources\Queries\Queries.ColumnQuery.sql" />
+    <Content Include="CodeGeneration\SourcePlugins.MySQL\Resources\Queries\Queries.RoutineSchemaQuery.sql" />
+    <Content Include="CodeGeneration\SourcePlugins.MySQL\Resources\Queries\Queries.SchemaQuery.sql" />
+    <Content Include="CodeGeneration\SourcePlugins.MySQL\Resources\Queries\Queries.TableQuery.sql" />
+    <Content Include="CodeGeneration\SourcePlugins.MySQL\Resources\Transforms\Transforms.txt" />
+    <Content Include="CodeGeneration\SourcePlugins.MySQL\SourcePlugins.MySQL.csproj" />
+    <Content Include="CodeGeneration\SourcePlugins.PostgreSQL\Connection.cs" />
+    <Content Include="CodeGeneration\SourcePlugins.PostgreSQL\Description.cs" />
+    <Content Include="CodeGeneration\SourcePlugins.PostgreSQL\Logo.cs" />
+    <Content Include="CodeGeneration\SourcePlugins.PostgreSQL\Logo.Designer.cs" />
+    <Content Include="CodeGeneration\SourcePlugins.PostgreSQL\Manage.cs" />
+    <Content Include="CodeGeneration\SourcePlugins.PostgreSQL\Manage.Designer.cs" />
+    <Content Include="CodeGeneration\SourcePlugins.PostgreSQL\obj\Release\SourcePlugins.PostgreSQL.csproj.FileListAbsolute.txt" />
+    <Content Include="CodeGeneration\SourcePlugins.PostgreSQL\obj\Release\SourcePlugins.PostgreSQL.dll" />
+    <Content Include="CodeGeneration\SourcePlugins.PostgreSQL\obj\Release\SourcePlugins.PostgreSQL.pdb" />
+    <Content Include="CodeGeneration\SourcePlugins.PostgreSQL\Properties\AssemblyInfo.cs" />
+    <Content Include="CodeGeneration\SourcePlugins.PostgreSQL\Properties\Resources.Designer.cs" />
+    <Content Include="CodeGeneration\SourcePlugins.PostgreSQL\ReadResource.cs" />
+    <Content Include="CodeGeneration\SourcePlugins.PostgreSQL\Resources\Assemblies\Mono.Security.dll" />
+    <Content Include="CodeGeneration\SourcePlugins.PostgreSQL\Resources\Assemblies\Npgsql.dll" />
+    <Content Include="CodeGeneration\SourcePlugins.PostgreSQL\Resources\img\connection16x16.png" />
+    <Content Include="CodeGeneration\SourcePlugins.PostgreSQL\Resources\img\fncmeta16x16.png" />
+    <Content Include="CodeGeneration\SourcePlugins.PostgreSQL\Resources\img\PostgreSQL16x16.png" />
+    <Content Include="CodeGeneration\SourcePlugins.PostgreSQL\Resources\img\PostgreSQL32x32.png" />
+    <Content Include="CodeGeneration\SourcePlugins.PostgreSQL\Resources\img\transform16x16.png" />
+    <Content Include="CodeGeneration\SourcePlugins.PostgreSQL\Resources\Licence.txt" />
+    <Content Include="CodeGeneration\SourcePlugins.PostgreSQL\Resources\ProductInformation.txt" />
+    <Content Include="CodeGeneration\SourcePlugins.PostgreSQL\Resources\Queries\Queries.ColumnQuery.sql" />
+    <Content Include="CodeGeneration\SourcePlugins.PostgreSQL\Resources\Queries\Queries.RoutineSchemaQuery.sql" />
+    <Content Include="CodeGeneration\SourcePlugins.PostgreSQL\Resources\Queries\Queries.SchemaQuery.sql" />
+    <Content Include="CodeGeneration\SourcePlugins.PostgreSQL\Resources\Queries\Queries.TableQuery.sql" />
+    <Content Include="CodeGeneration\SourcePlugins.PostgreSQL\Resources\Transforms\Transforms.txt" />
+    <Content Include="CodeGeneration\SourcePlugins.PostgreSQL\SourcePlugins.PostgreSQL.csproj" />
+    <Content Include="CodeGeneration\SourcePlugins.SQLite\Connection.cs" />
+    <Content Include="CodeGeneration\SourcePlugins.SQLite\Description.cs" />
+    <Content Include="CodeGeneration\SourcePlugins.SQLite\ListSorter.cs" />
+    <Content Include="CodeGeneration\SourcePlugins.SQLite\Logo.cs" />
+    <Content Include="CodeGeneration\SourcePlugins.SQLite\Logo.Designer.cs" />
+    <Content Include="CodeGeneration\SourcePlugins.SQLite\Manage.cs" />
+    <Content Include="CodeGeneration\SourcePlugins.SQLite\Manage.Designer.cs" />
+    <Content Include="CodeGeneration\SourcePlugins.SQLite\obj\Release\SourcePlugins.SQLite.csproj.FileListAbsolute.txt" />
+    <Content Include="CodeGeneration\SourcePlugins.SQLite\obj\Release\SourcePlugins.SQLite.dll" />
+    <Content Include="CodeGeneration\SourcePlugins.SQLite\obj\Release\SourcePlugins.SQLite.pdb" />
+    <Content Include="CodeGeneration\SourcePlugins.SQLite\Properties\AssemblyInfo.cs" />
+    <Content Include="CodeGeneration\SourcePlugins.SQLite\Properties\Resources.Designer.cs" />
+    <Content Include="CodeGeneration\SourcePlugins.SQLite\ReadResource.cs" />
+    <Content Include="CodeGeneration\SourcePlugins.SQLite\Resources\Assemblies\System.Data.SQLite.dll" />
+    <Content Include="CodeGeneration\SourcePlugins.SQLite\Resources\img\connection16x16.png" />
+    <Content Include="CodeGeneration\SourcePlugins.SQLite\Resources\img\SQLite16x16.png" />
+    <Content Include="CodeGeneration\SourcePlugins.SQLite\Resources\img\SQLite32x32.png" />
+    <Content Include="CodeGeneration\SourcePlugins.SQLite\Resources\img\transform16x16.png" />
+    <Content Include="CodeGeneration\SourcePlugins.SQLite\Resources\Licence.txt" />
+    <Content Include="CodeGeneration\SourcePlugins.SQLite\Resources\ProductInformation.txt" />
+    <Content Include="CodeGeneration\SourcePlugins.SQLite\Resources\Queries\Queries.ColumnQuery.sql" />
+    <Content Include="CodeGeneration\SourcePlugins.SQLite\Resources\Queries\Queries.TableQuery.sql" />
+    <Content Include="CodeGeneration\SourcePlugins.SQLite\Resources\Transforms\Transforms.txt" />
+    <Content Include="CodeGeneration\SourcePlugins.SQLite\SourcePlugins.SQLite.csproj" />
+    <Content Include="CodeGeneration\Tests\Tests\bin\Release\ICSharpCode.TextEditor.dll" />
+    <Content Include="CodeGeneration\Tests\Tests\bin\Release\Metadrone.exe" />
+    <Content Include="CodeGeneration\Tests\Tests\bin\Release\Microsoft.SqlServer.ConnectionInfo.dll" />
+    <Content Include="CodeGeneration\Tests\Tests\bin\Release\Microsoft.SqlServer.Dmf.dll" />
+    <Content Include="CodeGeneration\Tests\Tests\bin\Release\Microsoft.SqlServer.Management.Sdk.Sfc.dll" />
+    <Content Include="CodeGeneration\Tests\Tests\bin\Release\Microsoft.SqlServer.ServiceBrokerEnum.dll" />
+    <Content Include="CodeGeneration\Tests\Tests\bin\Release\Microsoft.SqlServer.Smo.dll" />
+    <Content Include="CodeGeneration\Tests\Tests\bin\Release\Microsoft.SqlServer.SqlClrProvider.dll" />
+    <Content Include="CodeGeneration\Tests\Tests\bin\Release\Microsoft.SqlServer.SqlEnum.dll" />
+    <Content Include="CodeGeneration\Tests\Tests\bin\Release\Microsoft.VisualStudio.TestPlatform.TestFramework.dll" />
+    <Content Include="CodeGeneration\Tests\Tests\bin\Release\Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.dll" />
+    <Content Include="CodeGeneration\Tests\Tests\bin\Release\Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.xml" />
+    <Content Include="CodeGeneration\Tests\Tests\bin\Release\Microsoft.VisualStudio.TestPlatform.TestFramework.xml" />
+    <Content Include="CodeGeneration\Tests\Tests\bin\Release\Tests.dll" />
+    <Content Include="CodeGeneration\Tests\Tests\bin\Release\Tests.pdb" />
+    <Content Include="CodeGeneration\Tests\Tests\bin\Release\Tests.xml" />
+    <Content Include="CodeGeneration\Tests\Tests\My Project\Application.myapp" />
+    <Content Include="CodeGeneration\Tests\Tests\obj\Release\Tests.dll" />
+    <Content Include="CodeGeneration\Tests\Tests\obj\Release\Tests.pdb" />
+    <Content Include="CodeGeneration\Tests\Tests\obj\Release\Tests.vbproj.FileListAbsolute.txt" />
+    <Content Include="CodeGeneration\Tests\Tests\obj\Release\Tests.xml" />
+    <Content Include="CodeGeneration\Tests\Tests\Tests.vbproj" />
     <Content Include="Images\MenuImages\Camera16x16.jpg" />
     <None Include="Images\MenuImages\delete16x16.png" />
     <None Include="Images\MenuImages\deleteround16x16.png" />
@@ -1963,7 +3087,15 @@
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="CodeGeneration\bin\Debug\" />
+    <Folder Include="CodeGeneration\ICSharpCode.TextEditor\Project\obj\Release\TempPE\" />
+    <Folder Include="CodeGeneration\SourcePlugins.Firebird\obj\Release\TempPE\" />
+    <Folder Include="CodeGeneration\SourcePlugins.MySQL\obj\Release\TempPE\" />
+    <Folder Include="CodeGeneration\SourcePlugins.PostgreSQL\obj\Release\TempPE\" />
+    <Folder Include="CodeGeneration\SourcePlugins.SQLite\obj\Release\TempPE\" />
+    <Folder Include="CodeGeneration\Tests\Tests\obj\Release\TempPE\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

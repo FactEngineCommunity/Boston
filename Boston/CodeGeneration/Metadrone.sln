@@ -1,0 +1,96 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27428.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Plugins", "Plugins", "{17A15092-100F-46FE-8B7A-7223C2EBF283}"
+EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "Metadrone", "Metadrone\Metadrone.vbproj", "{F750BDB0-4F52-442A-B9B0-1EB4E74367E4}"
+	ProjectSection(ProjectDependencies) = postProject
+		{C31F674F-44BF-4E61-B5D6-438EB44C1176} = {C31F674F-44BF-4E61-B5D6-438EB44C1176}
+		{75D5C179-7802-4781-AADC-47F2600E9F2E} = {75D5C179-7802-4781-AADC-47F2600E9F2E}
+		{3D49C0E8-4B17-4A24-A971-2642D4725685} = {3D49C0E8-4B17-4A24-A971-2642D4725685}
+		{142518FB-C082-4BE7-88F5-67B4FADCA407} = {142518FB-C082-4BE7-88F5-67B4FADCA407}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ICSharpCode.TextEditor", "ICSharpCode.TextEditor\Project\ICSharpCode.TextEditor.csproj", "{2D18BE89-D210-49EB-A9DD-2246FBB3DF6D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SourcePlugins.MySQL", "SourcePlugins.MySQL\SourcePlugins.MySQL.csproj", "{75D5C179-7802-4781-AADC-47F2600E9F2E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SourcePlugins.Firebird", "SourcePlugins.Firebird\SourcePlugins.Firebird.csproj", "{3D49C0E8-4B17-4A24-A971-2642D4725685}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SourcePlugins.PostgreSQL", "SourcePlugins.PostgreSQL\SourcePlugins.PostgreSQL.csproj", "{142518FB-C082-4BE7-88F5-67B4FADCA407}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SourcePlugins.SQLite", "SourcePlugins.SQLite\SourcePlugins.SQLite.csproj", "{C31F674F-44BF-4E61-B5D6-438EB44C1176}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{EBCCB68C-E99D-4C17-9FE8-ACEBEE7DF1DD}"
+EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "Tests", "Tests\Tests\Tests.vbproj", "{0B1C327A-5216-4998-9A90-B7FF17C3DE9C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		AllPlugins|Any CPU = AllPlugins|Any CPU
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F750BDB0-4F52-442A-B9B0-1EB4E74367E4}.AllPlugins|Any CPU.ActiveCfg = Release|Any CPU
+		{F750BDB0-4F52-442A-B9B0-1EB4E74367E4}.AllPlugins|Any CPU.Build.0 = Release|Any CPU
+		{F750BDB0-4F52-442A-B9B0-1EB4E74367E4}.Debug|Any CPU.ActiveCfg = Release|Any CPU
+		{F750BDB0-4F52-442A-B9B0-1EB4E74367E4}.Debug|Any CPU.Build.0 = Release|Any CPU
+		{F750BDB0-4F52-442A-B9B0-1EB4E74367E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F750BDB0-4F52-442A-B9B0-1EB4E74367E4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2D18BE89-D210-49EB-A9DD-2246FBB3DF6D}.AllPlugins|Any CPU.ActiveCfg = Release|Any CPU
+		{2D18BE89-D210-49EB-A9DD-2246FBB3DF6D}.AllPlugins|Any CPU.Build.0 = Release|Any CPU
+		{2D18BE89-D210-49EB-A9DD-2246FBB3DF6D}.Debug|Any CPU.ActiveCfg = Release|Any CPU
+		{2D18BE89-D210-49EB-A9DD-2246FBB3DF6D}.Debug|Any CPU.Build.0 = Release|Any CPU
+		{2D18BE89-D210-49EB-A9DD-2246FBB3DF6D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2D18BE89-D210-49EB-A9DD-2246FBB3DF6D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{75D5C179-7802-4781-AADC-47F2600E9F2E}.AllPlugins|Any CPU.ActiveCfg = Release|Any CPU
+		{75D5C179-7802-4781-AADC-47F2600E9F2E}.AllPlugins|Any CPU.Build.0 = Release|Any CPU
+		{75D5C179-7802-4781-AADC-47F2600E9F2E}.Debug|Any CPU.ActiveCfg = Release|Any CPU
+		{75D5C179-7802-4781-AADC-47F2600E9F2E}.Debug|Any CPU.Build.0 = Release|Any CPU
+		{75D5C179-7802-4781-AADC-47F2600E9F2E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{75D5C179-7802-4781-AADC-47F2600E9F2E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3D49C0E8-4B17-4A24-A971-2642D4725685}.AllPlugins|Any CPU.ActiveCfg = Release|Any CPU
+		{3D49C0E8-4B17-4A24-A971-2642D4725685}.AllPlugins|Any CPU.Build.0 = Release|Any CPU
+		{3D49C0E8-4B17-4A24-A971-2642D4725685}.Debug|Any CPU.ActiveCfg = Release|Any CPU
+		{3D49C0E8-4B17-4A24-A971-2642D4725685}.Debug|Any CPU.Build.0 = Release|Any CPU
+		{3D49C0E8-4B17-4A24-A971-2642D4725685}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3D49C0E8-4B17-4A24-A971-2642D4725685}.Release|Any CPU.Build.0 = Release|Any CPU
+		{142518FB-C082-4BE7-88F5-67B4FADCA407}.AllPlugins|Any CPU.ActiveCfg = Release|Any CPU
+		{142518FB-C082-4BE7-88F5-67B4FADCA407}.AllPlugins|Any CPU.Build.0 = Release|Any CPU
+		{142518FB-C082-4BE7-88F5-67B4FADCA407}.Debug|Any CPU.ActiveCfg = Release|Any CPU
+		{142518FB-C082-4BE7-88F5-67B4FADCA407}.Debug|Any CPU.Build.0 = Release|Any CPU
+		{142518FB-C082-4BE7-88F5-67B4FADCA407}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{142518FB-C082-4BE7-88F5-67B4FADCA407}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C31F674F-44BF-4E61-B5D6-438EB44C1176}.AllPlugins|Any CPU.ActiveCfg = Release|Any CPU
+		{C31F674F-44BF-4E61-B5D6-438EB44C1176}.AllPlugins|Any CPU.Build.0 = Release|Any CPU
+		{C31F674F-44BF-4E61-B5D6-438EB44C1176}.Debug|Any CPU.ActiveCfg = Release|Any CPU
+		{C31F674F-44BF-4E61-B5D6-438EB44C1176}.Debug|Any CPU.Build.0 = Release|Any CPU
+		{C31F674F-44BF-4E61-B5D6-438EB44C1176}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C31F674F-44BF-4E61-B5D6-438EB44C1176}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0B1C327A-5216-4998-9A90-B7FF17C3DE9C}.AllPlugins|Any CPU.ActiveCfg = Release|Any CPU
+		{0B1C327A-5216-4998-9A90-B7FF17C3DE9C}.AllPlugins|Any CPU.Build.0 = Release|Any CPU
+		{0B1C327A-5216-4998-9A90-B7FF17C3DE9C}.Debug|Any CPU.ActiveCfg = Release|Any CPU
+		{0B1C327A-5216-4998-9A90-B7FF17C3DE9C}.Debug|Any CPU.Build.0 = Release|Any CPU
+		{0B1C327A-5216-4998-9A90-B7FF17C3DE9C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0B1C327A-5216-4998-9A90-B7FF17C3DE9C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{75D5C179-7802-4781-AADC-47F2600E9F2E} = {17A15092-100F-46FE-8B7A-7223C2EBF283}
+		{3D49C0E8-4B17-4A24-A971-2642D4725685} = {17A15092-100F-46FE-8B7A-7223C2EBF283}
+		{142518FB-C082-4BE7-88F5-67B4FADCA407} = {17A15092-100F-46FE-8B7A-7223C2EBF283}
+		{C31F674F-44BF-4E61-B5D6-438EB44C1176} = {17A15092-100F-46FE-8B7A-7223C2EBF283}
+		{0B1C327A-5216-4998-9A90-B7FF17C3DE9C} = {EBCCB68C-E99D-4C17-9FE8-ACEBEE7DF1DD}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {FC852369-29D7-4F5A-9287-545C05FD0FF4}
+	EndGlobalSection
+	GlobalSection(TestCaseManagementSettings) = postSolution
+		CategoryFile = Metadrone.vsmdi
+	EndGlobalSection
+EndGlobal

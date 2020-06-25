@@ -1467,6 +1467,11 @@ Public Class frmToolboxEnterpriseExplorer
 
             lrModel = Me.AddNewModel(lrNewTreeNode)
 
+            '---------------------------------------------------------------------
+            'Abort if a Model is not created.
+            'e.g. The Student version only allows 3 Modelsin the Model Explorer.
+            If lrModel Is Nothing Then Exit Sub
+
             '==================================================
             'RDS - Create a CMML Page and then dispose of it.            
             'Inject the Core ERD metamodel into the model

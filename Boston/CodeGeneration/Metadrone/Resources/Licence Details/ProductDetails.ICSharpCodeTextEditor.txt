@@ -1,0 +1,7 @@
+﻿ICSharpCode.TextEditor
+
+ICSharpCode.TextEditor is the text editor component for the SharpDevelop project. SharpDevelop is a free open source IDE.
+
+Sharpdevelop web site: http://www.icsharpcode.net/OpenSource/SD/Default.aspx
+
+Although Metadrone is not a derivative work of ICSharpCode.TextEditor, this component has been altered for use with this product. Its modified source code is available: http://code.google.com/p/metadrone/source

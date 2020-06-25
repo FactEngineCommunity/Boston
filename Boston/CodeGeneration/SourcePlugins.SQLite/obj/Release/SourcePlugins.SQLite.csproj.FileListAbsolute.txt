@@ -1,0 +1,10 @@
+D:\Viev\02-Marketing\01-Product\01-Products\Metadrone\source\bin\Release\SourcePlugins.SQLite.dll
+D:\Viev\02-Marketing\01-Product\01-Products\Metadrone\source\bin\Release\SourcePlugins.SQLite.pdb
+D:\Viev\02-Marketing\01-Product\01-Products\Metadrone\source\SourcePlugins.SQLite\obj\Release\SourcePlugins.SQLite.Logo.resources
+D:\Viev\02-Marketing\01-Product\01-Products\Metadrone\source\SourcePlugins.SQLite\obj\Release\SourcePlugins.SQLite.Manage.resources
+D:\Viev\02-Marketing\01-Product\01-Products\Metadrone\source\SourcePlugins.SQLite\obj\Release\SourcePlugins.SQLite.Properties.Resources.resources
+D:\Viev\02-Marketing\01-Product\01-Products\Metadrone\source\SourcePlugins.SQLite\obj\Release\SourcePlugins.SQLite.csproj.GenerateResource.cache
+D:\Viev\02-Marketing\01-Product\01-Products\Metadrone\source\SourcePlugins.SQLite\obj\Release\SourcePlugins.SQLite.csproj.CopyComplete
+D:\Viev\02-Marketing\01-Product\01-Products\Metadrone\source\SourcePlugins.SQLite\obj\Release\SourcePlugins.SQLite.dll
+D:\Viev\02-Marketing\01-Product\01-Products\Metadrone\source\SourcePlugins.SQLite\obj\Release\SourcePlugins.SQLite.pdb
+D:\Viev\02-Marketing\01-Product\01-Products\Metadrone\source\SourcePlugins.SQLite\obj\Release\SourcePlugins.SQLite.csprojAssemblyReference.cache

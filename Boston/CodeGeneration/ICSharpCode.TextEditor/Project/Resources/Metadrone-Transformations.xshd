@@ -1,0 +1,78 @@
+﻿<?xml version="1.0"?>
+
+<SyntaxDefinition name = "MetadroneTransformations" extensions = ".mdr">
+
+  <Environment>
+    <Default color = "Black" bgcolor = "White"/>
+    <Selection color = "White" bgcolor = "Blue"/>
+    <VRuler color = "Gray"/>
+  </Environment>
+
+  <Digits name ="Digits" bold ="false" italic ="false" color ="Blue"/>
+
+  <RuleSets>
+
+    <RuleSet ignorecase = "true">
+      <Delimiters>&amp;&lt;&gt;~!%^*()-+=|\#/{}[]:;"' ,	.?</Delimiters>
+
+      <Span name = "LINECOMMENT" bold = "false" italic = "true" color = "Green" bgcolor = "White" stopateol = "true">
+        <Begin>//</Begin>
+      </Span>
+
+      <Span name = "BLOCKCOMMENT" bold = "false" italic = "true" color = "Green" bgcolor = "White" stopateol = "false">
+        <Begin>/*</Begin>
+        <End>*/</End>
+      </Span>
+
+      <Span name = "STRING" bold = "false" italic = "false" color = "Red" bgcolor = "White" stopateol = "true">
+        <Begin>"</Begin>
+        <End>"</End>
+      </Span>
+
+      <KeyWords name = "Keywords" bold="true" italic="false" color="Blue" bgcolor = "White">
+        <Key word = "if" />
+        <Key word = "else" />
+        <Key word = "elseif" />
+        <Key word = "end" />
+        <Key word = "set" />
+        <Key word = "true" />
+        <Key word = "false" />
+        <Key word = "and" />
+        <Key word = "or" />
+      </KeyWords>
+
+      <KeyWords name = "Objects" bold="true" italic="false" color="OliveDrab" bgcolor = "White">
+        <Key word = "table" />
+        <Key word = "routine" />
+        <Key word = "column" />
+        <Key word = "param" />
+      </KeyWords>
+
+      <KeyWords name = "Punctuation" bold = "true" italic = "false" color = "Blue" bgcolor = "White">
+        <Key word = "?" />
+        <Key word = "," />
+        <Key word = "." />
+        <Key word = ";" />
+        <Key word = "[" />
+        <Key word = "]" />
+        <Key word = "{" />
+        <Key word = "}" />
+        <Key word = "+" />
+        <Key word = "-" />
+        <Key word = "/" />
+        <Key word = "%" />
+        <Key word = "*" />
+        <Key word = "&lt;" />
+        <Key word = "&gt;" />
+        <Key word = "^" />
+        <Key word = "=" />
+        <Key word = "~" />
+        <Key word = "!" />
+        <Key word = "|" />
+        <Key word = "&amp;" />
+      </KeyWords>
+    </RuleSet>
+
+  </RuleSets>
+
+</SyntaxDefinition>

@@ -1,0 +1,6 @@
+﻿SQLite source provider plugin for Metadrone.
+
+ADO.NET data provider download: http://sqlite.phxsoftware.com/
+
+Related assemblies:
+  System.Data.SQLite.dll

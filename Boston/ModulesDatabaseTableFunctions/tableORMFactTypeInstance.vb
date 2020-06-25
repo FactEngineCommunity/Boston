@@ -266,59 +266,34 @@ Namespace TableFactTypeInstance
                                 End If
 
                                 '-----------------------------------------------------------------------------------------------
-                                '20200528-VM-Remove if all okay. Redundant with lrRole.CloneInstance(arPage, True) above
-                                'Select Case lrRoleInstance.TypeOfJoin
-                                '    Case Is = pcenumRoleJoinType.EntityType
-
-                                '        If lrRoleInstance.JoinedORMObject Is Nothing Then
-                                '            lsMessage = "Cannot find EntityTypeInstance to join RoleInstance to, for:"
-                                '            lsMessage &= vbCrLf & "FactType.Id: " & lrFactTypeInstance.FactType.Id
-                                '            lsMessage &= vbCrLf & "FactType.Name: " & lrFactTypeInstance.FactType.Name
-                                '            lsMessage &= vbCrLf & " Role.Id: " & lrRoleInstance.Id
-                                '            lsMessage &= vbCrLf & " Page.Id: " & arPage.PageId
-                                '            lsMessage &= vbCrLf & " Page.Name: " & arPage.Name
-                                '            lsMessage &= vbCrLf & " Cloned Role->RoleInstance.JoinedORMObject/Id: <Nothing>"
-                                '            If IsSomething(lrRole.JoinedORMObject) Then
-                                '                lsMessage &= vbCrLf & " RoleInstance.Role.JoinedORMObject/Id: " & lrRole.JoinedORMObject.Id
-                                '            End If
-                                '            Throw New Exception(lsMessage)
-                                '        End If
-
-                                '        lrRoleInstance.JoinedORMObject = arPage.EntityTypeInstance.Find(Function(x) x.Id = lrRoleInstance.JoinsEntityType.Id)
-
-                                '    Case Is = pcenumRoleJoinType.ValueType
-
-                                '        If lrRoleInstance.JoinedORMObject Is Nothing Then
-                                '            lsMessage = "Cannot find ValueType for"
-                                '            lsMessage &= vbCrLf & "FactType.Id: " & lrFactTypeInstance.FactType.Id
-                                '            lsMessage &= vbCrLf & "FactType.Name: " & lrFactTypeInstance.FactType.Name
-                                '            lsMessage &= vbCrLf & " Role.Id: " & lrRoleInstance.Id
-                                '            lsMessage &= vbCrLf & " Page.Id: " & arPage.PageId
-                                '            lsMessage &= vbCrLf & " Page.Name: " & arPage.Name
-                                '            lsMessage &= vbCrLf & " ValueTypeId: (looking for) '" & lrRole.JoinedORMObject.Id & "'"
-                                '            If arPage.Model.GetModelObjectByName(lrRole.JoinedORMObject.Id) IsNot Nothing Then
-                                '                Call arPage.DropValueTypeAtPoint(lrRole.JoinedORMObject, New PointF(50, 50), True)
-                                '            Else
-                                '                Throw New Exception(lsMessage)
-                                '            End If
-                                '        End If
-
-                                '        lrRoleInstance.JoinedORMObject = arPage.ValueTypeInstance.Find(Function(x) x.Id = lrRoleInstance.JoinsValueType.Id)
-                                '    Case Is = pcenumRoleJoinType.FactType
-                                '        Dim lrNestedFactTypeInstance As New FBM.FactTypeInstance
-                                '        lrNestedFactTypeInstance.Id = lrRoleInstance.Role.JoinsFactType.Id
-                                '        '---------------------------------------------------------------------------------------------------
-                                '        'See Below. Do not throw exception here because the FactTypeInstance may not have been loaded yet.
-                                '        '---------------------------------------------------------------------------------------------------
-                                '        If lrRoleInstance.JoinedORMObject Is Nothing Then
-                                '            lrRoleInstance.JoinedORMObject = TableFactTypeInstance.GetFactTypeInstanceByPage(lrNestedFactTypeInstance.Id, arPage)
-
-                                '            'Load facts from the database, because cloning the RoleInstance above loads the FactTypeInstance, but not the Factsf
-                                '            lrRoleInstance.JoinsFactType.GetFactInstancesFromDatabase()
-                                '        End If
-                                'End Select
-
-
+                                'CodeSafe; Make sure the RoleInstance is connected to something.
+                                If lrRoleInstance.JoinedORMObject Is Nothing Then
+                                    Select Case lrRoleInstance.TypeOfJoin
+                                        Case Is = pcenumRoleJoinType.EntityType
+                                            lrRoleInstance.JoinedORMObject = arPage.EntityTypeInstance.Find(Function(x) x.Id = lrRoleInstance.JoinsEntityType.Id)
+                                        Case Is = pcenumRoleJoinType.ValueType
+                                            lsMessage = "Cannot find ValueType for"
+                                            lsMessage &= vbCrLf & "FactType.Id: " & lrFactTypeInstance.FactType.Id
+                                            lsMessage &= vbCrLf & "FactType.Name: " & lrFactTypeInstance.FactType.Name
+                                            lsMessage &= vbCrLf & " Role.Id: " & lrRoleInstance.Id
+                                            lsMessage &= vbCrLf & " Page.Id: " & arPage.PageId
+                                            lsMessage &= vbCrLf & " Page.Name: " & arPage.Name
+                                            lsMessage &= vbCrLf & " ValueTypeId: (looking for) '" & lrRole.JoinedORMObject.Id & "'"
+                                            If arPage.Model.GetModelObjectByName(lrRole.JoinedORMObject.Id) IsNot Nothing Then
+                                                Call arPage.DropValueTypeAtPoint(lrRole.JoinedORMObject, New PointF(50, 50), True)
+                                            Else
+                                                Throw New Exception(lsMessage)
+                                            End If
+                                            lrRoleInstance.JoinedORMObject = arPage.ValueTypeInstance.Find(Function(x) x.Id = lrRoleInstance.JoinsValueType.Id)
+                                        Case Is = pcenumRoleJoinType.FactType
+                                            '---------------------------------------------------------------------------------------------------
+                                            'See Below. Do not throw exception here because the FactTypeInstance may not have been loaded yet.
+                                            '---------------------------------------------------------------------------------------------------
+                                            lrRoleInstance.JoinedORMObject = TableFactTypeInstance.GetFactTypeInstanceByPage(lrRoleInstance.Role.JoinsFactType.Id, arPage)
+                                            'Load facts from the database, because cloning the RoleInstance above loads the FactTypeInstance, but not the Factsf
+                                            lrRoleInstance.JoinsFactType.GetFactInstancesFromDatabase()
+                                    End Select
+                                End If
 
                                 '-----------------------------------------
                                 'Setup the RoleName for the RoleInstance
@@ -464,7 +439,7 @@ Namespace TableFactTypeInstance
                     '  for a Role may not have been loaded at the time the Role
                     '  was loaded, so the 'find' function will have returned 'Nothing'
                     '--------------------------------------------------------------                                        
-                    For Each lrFactTypeInstance In GetFactTypeInstancesByPage.FindAll(Function(x) x.RoleGroup.FindAll(Function(y) y.JoinedORMObject.ConceptType = pcenumConceptType.FactType And y.JoinedORMObject Is Nothing).Count > 0).ToArray
+                    For Each lrFactTypeInstance In GetFactTypeInstancesByPage.FindAll(Function(x) x.RoleGroup.FindAll(Function(y) y.TypeOfJoin = pcenumRoleJoinType.FactType And y.JoinedORMObject Is Nothing).Count > 0).ToArray
                         For Each lrRoleInstance In lrFactTypeInstance.RoleGroup.FindAll(Function(p) p.TypeOfJoin = pcenumRoleJoinType.FactType And p.JoinedORMObject Is Nothing)
                             lrRoleInstance.JoinedORMObject = Nothing
                             lrRoleInstance.JoinedORMObject = arPage.FactTypeInstance.Find(Function(x) x.Id = lrRoleInstance.Role.JoinsFactType.Id)

@@ -1,0 +1,34 @@
+﻿<?xml version="1.0"?>
+
+<SyntaxDefinition name = "MetadroneSuperMain" extensions = ".mds">
+
+  <Environment>
+    <Default color = "Black" bgcolor = "White"/>
+    <Selection color = "White" bgcolor = "Blue"/>
+    <VRuler color = "Gray"/>
+  </Environment>
+
+  <Digits name ="Digits" bold ="false" italic ="false" color ="Blue"/>
+
+  <RuleSets>
+
+    <RuleSet ignorecase = "true">
+      <Delimiters>&amp;&lt;&gt;~!%^*()-+=|\#/{}[]:;"' ,	.?</Delimiters>
+
+      <Span name = "LINECOMMENT" bold = "false" italic = "true" color = "Green" bgcolor = "White" stopateol = "true">
+        <Begin>//</Begin>
+      </Span>
+
+      <Span name = "STRING" bold = "false" italic = "false" color = "Red" bgcolor = "White" stopateol = "true">
+        <Begin>"</Begin>
+        <End>"</End>
+      </Span>
+
+      <KeyWords name = "Keywords" bold="true" italic="false" color="Blue" bgcolor = "White">
+        <Key word = "call" />
+      </KeyWords>
+    </RuleSet>
+
+  </RuleSets>
+
+</SyntaxDefinition>
