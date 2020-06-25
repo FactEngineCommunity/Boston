@@ -75,7 +75,7 @@
             '
             'pnlTop
             '
-            Me.pnlTop.BackgroundImage = Global.Metadrone.My.Resources.Resources.DialogTop
+            Me.pnlTop.BackgroundImage = Global.Boston.My.Resources.CodeGeneration.DialogTop
             Me.pnlTop.Controls.Add(Me.tlpHeader)
             Me.pnlTop.Controls.Add(Me.pnlLine)
             Me.pnlTop.Controls.Add(Me.Label1)

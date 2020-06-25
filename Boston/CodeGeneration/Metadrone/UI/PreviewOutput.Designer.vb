@@ -104,7 +104,7 @@
             '
             'Panel4
             '
-            Me.Panel4.BackgroundImage = Global.Metadrone.My.Resources.Resources.BarTile
+            Me.Panel4.BackgroundImage = Global.Boston.My.Resources.CodeGeneration.BarTile
             Me.Panel4.Controls.Add(Me.lblPaths)
             Me.Panel4.Dock = System.Windows.Forms.DockStyle.Top
             Me.Panel4.Location = New System.Drawing.Point(0, 0)
@@ -135,7 +135,7 @@
             '
             'Panel2
             '
-            Me.Panel2.BackgroundImage = Global.Metadrone.My.Resources.Resources.BarTile
+            Me.Panel2.BackgroundImage = Global.Boston.My.Resources.CodeGeneration.BarTile
             Me.Panel2.Controls.Add(Me.lblOut)
             Me.Panel2.Dock = System.Windows.Forms.DockStyle.Top
             Me.Panel2.Location = New System.Drawing.Point(0, 0)
@@ -227,7 +227,7 @@
             '
             'Panel3
             '
-            Me.Panel3.BackgroundImage = Global.Metadrone.My.Resources.Resources.BarTile
+            Me.Panel3.BackgroundImage = Global.Boston.My.Resources.CodeGeneration.BarTile
             Me.Panel3.Controls.Add(Me.Label2)
             Me.Panel3.Dock = System.Windows.Forms.DockStyle.Top
             Me.Panel3.Location = New System.Drawing.Point(0, 0)

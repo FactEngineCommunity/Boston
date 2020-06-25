@@ -255,11 +255,11 @@ Namespace UI
 
             'Draw the close box
             If Me.HiLightCloseTabIndex = index Then
-                graph.DrawImage(My.Resources.Closehil16x16, rect.Right - 11, 4, rect.Height - 2, rect.Height - 2)
+                graph.DrawImage(My.Resources.CodeGeneration.Closehil16x16, rect.Right - 11, 4, rect.Height - 2, rect.Height - 2)
             ElseIf Me.HiDownCloseTabIndex = index Then
-                graph.DrawImage(My.Resources.CloseDownl16x16, rect.Right - 11, 4, rect.Height - 2, rect.Height - 2)
+                graph.DrawImage(My.Resources.CodeGeneration.CloseDownl16x16, rect.Right - 11, 4, rect.Height - 2, rect.Height - 2)
             Else
-                graph.DrawImage(My.Resources.Close16x16, rect.Right - 11, 4, rect.Height - 2, rect.Height - 2)
+                graph.DrawImage(My.Resources.CodeGeneration.Close16x16, rect.Right - 11, 4, rect.Height - 2, rect.Height - 2)
             End If
 
         End Sub

@@ -404,7 +404,7 @@
             '
             'Panel4
             '
-            Me.Panel4.BackgroundImage = Global.Metadrone.My.Resources.Resources.DialogLeft
+            'Me.Panel4.BackgroundImage = Global.Metadrone.My.Resources.Resources.DialogLeft
             Me.Panel4.Dock = System.Windows.Forms.DockStyle.Left
             Me.Panel4.Location = New System.Drawing.Point(0, 0)
             Me.Panel4.Name = "Panel4"
@@ -413,7 +413,7 @@
             '
             'Panel2
             '
-            Me.Panel2.BackgroundImage = Global.Metadrone.My.Resources.Resources.DialogLeft
+            'Me.Panel2.BackgroundImage = Global.Metadrone.My.Resources.Resources.DialogLeft
             Me.Panel2.Controls.Add(Me.picPackage)
             Me.Panel2.Controls.Add(Me.rbPackage)
             Me.Panel2.Controls.Add(Me.rbTemplate)

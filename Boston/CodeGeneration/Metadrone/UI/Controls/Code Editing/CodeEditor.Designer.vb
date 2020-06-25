@@ -35,7 +35,7 @@
             '
             'tsMain
             '
-            Me.tsMain.BackgroundImage = Global.Metadrone.My.Resources.Resources.MainToolbarBG
+            'Me.tsMain.BackgroundImage = Global.Metadrone.My.Resources.Resources.MainToolbarBG
             Me.tsMain.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden
             Me.tsMain.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.btnPreview, Me.lblDescription})
             Me.tsMain.Location = New System.Drawing.Point(0, 0)

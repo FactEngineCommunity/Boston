@@ -113,6 +113,10 @@
     <Reference Include="Gios.Word">
       <HintPath>..\Dependencies\Gios.Word.dll</HintPath>
     </Reference>
+    <Reference Include="ICSharpCode.TextEditor, Version=0.0.0.0, Culture=neutral, PublicKeyToken=4d61825e8dd49f1a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Dependencies\ICSharpCode.TextEditor.dll</HintPath>
+    </Reference>
     <Reference Include="LinFu.Common, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Dependencies\LinFu.Common.dll</HintPath>
@@ -128,6 +132,34 @@
     <Reference Include="LinFu.Reflection, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Dependencies\LinFu.Reflection.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.SqlServer.ConnectionInfo, Version=10.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Dependencies\Microsoft.SqlServer.ConnectionInfo.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.SqlServer.Dmf, Version=10.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Dependencies\Microsoft.SqlServer.Dmf.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.SqlServer.Management.Sdk.Sfc, Version=10.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Dependencies\Microsoft.SqlServer.Management.Sdk.Sfc.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.SqlServer.ServiceBrokerEnum, Version=10.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Dependencies\Microsoft.SqlServer.ServiceBrokerEnum.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.SqlServer.Smo, Version=10.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Dependencies\Microsoft.SqlServer.Smo.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.SqlServer.SqlClrProvider, Version=10.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Dependencies\Microsoft.SqlServer.SqlClrProvider.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.SqlServer.SqlEnum, Version=10.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Dependencies\Microsoft.SqlServer.SqlEnum.dll</HintPath>
     </Reference>
     <Reference Include="MindFusion.Common, Version=1.2.3214.16975, Culture=neutral, PublicKeyToken=7fed53ada5b92263, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -189,9 +221,11 @@
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
     <Reference Include="System.Data" />
+    <Reference Include="System.Data.OracleClient, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL" />
     <Reference Include="System.Deployment" />
     <Reference Include="System.Design" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.EnterpriseServices" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.Web" />
     <Reference Include="System.Windows.Forms" />
@@ -601,8 +635,6 @@
     <Compile Include="CodeGeneration\Metadrone\ApplicationEvents.vb" />
     <Compile Include="CodeGeneration\Metadrone\ConsoleExec.vb" />
     <Compile Include="CodeGeneration\Metadrone\Globals.vb" />
-    <Compile Include="CodeGeneration\Metadrone\My Project\Application.Designer.vb" />
-    <Compile Include="CodeGeneration\Metadrone\My Project\AssemblyInfo.vb" />
     <Compile Include="CodeGeneration\Metadrone\Parsing\Bin.vb" />
     <Compile Include="CodeGeneration\Metadrone\Parsing\CodeCompletion\Analyser.vb" />
     <Compile Include="CodeGeneration\Metadrone\Parsing\CodeCompletion\Source.vb" />
@@ -922,14 +954,6 @@
     <Compile Include="CodeGeneration\Metadrone\UI\SaveChanges.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="CodeGeneration\Tests\Tests\My Project\Application.Designer.vb" />
-    <Compile Include="CodeGeneration\Tests\Tests\My Project\AssemblyInfo.vb" />
-    <Compile Include="CodeGeneration\Tests\Tests\My Project\Resources.Designer.vb" />
-    <Compile Include="CodeGeneration\Tests\Tests\My Project\Settings.Designer.vb" />
-    <Compile Include="CodeGeneration\Tests\Tests\TestEvaluations.vb" />
-    <Compile Include="CodeGeneration\Tests\Tests\TestOutput.vb" />
-    <Compile Include="CodeGeneration\Tests\Tests\TestOutputPaths.vb" />
-    <Compile Include="CodeGeneration\Tests\Tests\TestTransforms.vb" />
     <Compile Include="Forms\CRUD\ClientServer\frmCRUDEditRole.Designer.vb">
       <DependentUpon>frmCRUDEditRole.vb</DependentUpon>
     </Compile>
@@ -1549,6 +1573,11 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>BarkerERImages.resx</DependentUpon>
     </Compile>
+    <Compile Include="Resources\CodeGeneration.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>CodeGeneration.resx</DependentUpon>
+    </Compile>
     <Compile Include="Resources\Viev.Designer.vb">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -1693,32 +1722,6 @@
     <EmbeddedResource Include="CodeGeneration\Metadrone\UI\SaveChanges.resx">
       <DependentUpon>SaveChanges.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="CodeGeneration\SourcePlugins.Firebird\Logo.resx" />
-    <EmbeddedResource Include="CodeGeneration\SourcePlugins.Firebird\Manage.resx" />
-    <EmbeddedResource Include="CodeGeneration\SourcePlugins.Firebird\obj\Release\SourcePlugins.Firebird.Logo.resources" />
-    <EmbeddedResource Include="CodeGeneration\SourcePlugins.Firebird\obj\Release\SourcePlugins.Firebird.Manage.resources" />
-    <EmbeddedResource Include="CodeGeneration\SourcePlugins.Firebird\obj\Release\SourcePlugins.Firebird.Properties.Resources.resources" />
-    <EmbeddedResource Include="CodeGeneration\SourcePlugins.Firebird\Properties\Resources.resx" />
-    <EmbeddedResource Include="CodeGeneration\SourcePlugins.MySQL\Logo.resx" />
-    <EmbeddedResource Include="CodeGeneration\SourcePlugins.MySQL\Manage.resx" />
-    <EmbeddedResource Include="CodeGeneration\SourcePlugins.MySQL\obj\Release\SourcePlugins.MySQL.Logo.resources" />
-    <EmbeddedResource Include="CodeGeneration\SourcePlugins.MySQL\obj\Release\SourcePlugins.MySQL.Manage.resources" />
-    <EmbeddedResource Include="CodeGeneration\SourcePlugins.MySQL\obj\Release\SourcePlugins.MySQL.Properties.Resources.resources" />
-    <EmbeddedResource Include="CodeGeneration\SourcePlugins.MySQL\Properties\Resources.resx" />
-    <EmbeddedResource Include="CodeGeneration\SourcePlugins.PostgreSQL\Logo.resx" />
-    <EmbeddedResource Include="CodeGeneration\SourcePlugins.PostgreSQL\Manage.resx" />
-    <EmbeddedResource Include="CodeGeneration\SourcePlugins.PostgreSQL\obj\Release\SourcePlugins.PostgreSQL.Logo.resources" />
-    <EmbeddedResource Include="CodeGeneration\SourcePlugins.PostgreSQL\obj\Release\SourcePlugins.PostgreSQL.Manage.resources" />
-    <EmbeddedResource Include="CodeGeneration\SourcePlugins.PostgreSQL\obj\Release\SourcePlugins.PostgreSQL.Properties.Resources.resources" />
-    <EmbeddedResource Include="CodeGeneration\SourcePlugins.PostgreSQL\Properties\Resources.resx" />
-    <EmbeddedResource Include="CodeGeneration\SourcePlugins.SQLite\Logo.resx" />
-    <EmbeddedResource Include="CodeGeneration\SourcePlugins.SQLite\Manage.resx" />
-    <EmbeddedResource Include="CodeGeneration\SourcePlugins.SQLite\obj\Release\SourcePlugins.SQLite.Logo.resources" />
-    <EmbeddedResource Include="CodeGeneration\SourcePlugins.SQLite\obj\Release\SourcePlugins.SQLite.Manage.resources" />
-    <EmbeddedResource Include="CodeGeneration\SourcePlugins.SQLite\obj\Release\SourcePlugins.SQLite.Properties.Resources.resources" />
-    <EmbeddedResource Include="CodeGeneration\SourcePlugins.SQLite\Properties\Resources.resx" />
-    <EmbeddedResource Include="CodeGeneration\Tests\Tests\My Project\Resources.resx" />
-    <EmbeddedResource Include="CodeGeneration\Tests\Tests\obj\Release\Tests.Resources.resources" />
     <EmbeddedResource Include="Forms\CRUD\ClientServer\frmCRUDEditRole.resx">
       <DependentUpon>frmCRUDEditRole.vb</DependentUpon>
     </EmbeddedResource>
@@ -1964,6 +1967,11 @@
       <LastGenOutput>BarkerERImages.Designer.vb</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="Resources\CodeGeneration.resx">
+      <CustomToolNamespace>My.Resources</CustomToolNamespace>
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>CodeGeneration.Designer.vb</LastGenOutput>
+    </EmbeddedResource>
     <EmbeddedResource Include="Resources\Viev.resx">
       <CustomToolNamespace>My.Resources</CustomToolNamespace>
       <Generator>ResXFileCodeGenerator</Generator>
@@ -1981,31 +1989,6 @@
     <None Include="app.config" />
     <None Include="CodeGeneration\bin\Release\Metadrone.exe.config" />
     <None Include="CodeGeneration\bin\Release\Metadrone.settings" />
-    <None Include="CodeGeneration\ICSharpCode.TextEditor\Project\obj\Release\DesignTimeResolveAssemblyReferencesInput.cache" />
-    <None Include="CodeGeneration\ICSharpCode.TextEditor\Project\obj\Release\ICSharpCode.TextEditor.csprojAssemblyReference.cache" />
-    <None Include="CodeGeneration\ICSharpCode.TextEditor\Project\Resources\ASPX.xshd" />
-    <None Include="CodeGeneration\ICSharpCode.TextEditor\Project\Resources\BAT-Mode.xshd" />
-    <None Include="CodeGeneration\ICSharpCode.TextEditor\Project\Resources\Boo.xshd" />
-    <None Include="CodeGeneration\ICSharpCode.TextEditor\Project\Resources\Coco-Mode.xshd" />
-    <None Include="CodeGeneration\ICSharpCode.TextEditor\Project\Resources\CPP-Mode.xshd" />
-    <None Include="CodeGeneration\ICSharpCode.TextEditor\Project\Resources\CSharp-Mode.xshd" />
-    <None Include="CodeGeneration\ICSharpCode.TextEditor\Project\Resources\HTML-Mode.xshd" />
-    <None Include="CodeGeneration\ICSharpCode.TextEditor\Project\Resources\ICSharpCode.TextEditor.snk" />
-    <None Include="CodeGeneration\ICSharpCode.TextEditor\Project\Resources\Java-Mode.xshd" />
-    <None Include="CodeGeneration\ICSharpCode.TextEditor\Project\Resources\JavaScript-Mode.xshd" />
-    <None Include="CodeGeneration\ICSharpCode.TextEditor\Project\Resources\Metadrone-Main.xshd" />
-    <None Include="CodeGeneration\ICSharpCode.TextEditor\Project\Resources\Metadrone-SuperMain.xshd" />
-    <None Include="CodeGeneration\ICSharpCode.TextEditor\Project\Resources\Metadrone-Template.xshd" />
-    <None Include="CodeGeneration\ICSharpCode.TextEditor\Project\Resources\Metadrone-Transformations.xshd" />
-    <None Include="CodeGeneration\ICSharpCode.TextEditor\Project\Resources\Mode.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="CodeGeneration\ICSharpCode.TextEditor\Project\Resources\Patch-Mode.xshd" />
-    <None Include="CodeGeneration\ICSharpCode.TextEditor\Project\Resources\PHP-Mode.xshd" />
-    <None Include="CodeGeneration\ICSharpCode.TextEditor\Project\Resources\SQL-Mode.xshd" />
-    <None Include="CodeGeneration\ICSharpCode.TextEditor\Project\Resources\Tex-Mode.xshd" />
-    <None Include="CodeGeneration\ICSharpCode.TextEditor\Project\Resources\VBNET-Mode.xshd" />
-    <None Include="CodeGeneration\ICSharpCode.TextEditor\Project\Resources\XML-Mode.xshd" />
     <None Include="CodeGeneration\Metadrone\app.config" />
     <None Include="CodeGeneration\Metadrone\My Project\app.manifest" />
     <None Include="CodeGeneration\Metadrone\obj\Release\DesignTimeResolveAssemblyReferences.cache" />
@@ -2036,33 +2019,6 @@
     <None Include="CodeGeneration\packages\MSTest.TestAdapter.1.2.0\MSTest.TestAdapter.1.2.0.nupkg" />
     <None Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\.signature.p7s" />
     <None Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\MSTest.TestFramework.1.2.0.nupkg" />
-    <None Include="CodeGeneration\SourcePlugins.Firebird\obj\Release\DesignTimeResolveAssemblyReferencesInput.cache" />
-    <None Include="CodeGeneration\SourcePlugins.Firebird\obj\Release\SourcePlugins.Firebird.csproj.CopyComplete" />
-    <None Include="CodeGeneration\SourcePlugins.Firebird\obj\Release\SourcePlugins.Firebird.csproj.GenerateResource.cache" />
-    <None Include="CodeGeneration\SourcePlugins.Firebird\obj\Release\SourcePlugins.Firebird.csprojAssemblyReference.cache" />
-    <None Include="CodeGeneration\SourcePlugins.Firebird\Resources\img\tblmeta16x16.pdn" />
-    <None Include="CodeGeneration\SourcePlugins.MySQL\obj\Release\DesignTimeResolveAssemblyReferencesInput.cache" />
-    <None Include="CodeGeneration\SourcePlugins.MySQL\obj\Release\SourcePlugins.MySQL.csproj.CopyComplete" />
-    <None Include="CodeGeneration\SourcePlugins.MySQL\obj\Release\SourcePlugins.MySQL.csproj.GenerateResource.cache" />
-    <None Include="CodeGeneration\SourcePlugins.MySQL\obj\Release\SourcePlugins.MySQL.csprojAssemblyReference.cache" />
-    <None Include="CodeGeneration\SourcePlugins.MySQL\Resources\img\tblmeta16x16.pdn" />
-    <None Include="CodeGeneration\SourcePlugins.PostgreSQL\obj\Release\DesignTimeResolveAssemblyReferencesInput.cache" />
-    <None Include="CodeGeneration\SourcePlugins.PostgreSQL\obj\Release\SourcePlugins.PostgreSQL.csproj.CopyComplete" />
-    <None Include="CodeGeneration\SourcePlugins.PostgreSQL\obj\Release\SourcePlugins.PostgreSQL.csproj.GenerateResource.cache" />
-    <None Include="CodeGeneration\SourcePlugins.PostgreSQL\obj\Release\SourcePlugins.PostgreSQL.csprojAssemblyReference.cache" />
-    <None Include="CodeGeneration\SourcePlugins.PostgreSQL\Resources\img\tblmeta16x16.pdn" />
-    <None Include="CodeGeneration\SourcePlugins.SQLite\obj\Release\DesignTimeResolveAssemblyReferencesInput.cache" />
-    <None Include="CodeGeneration\SourcePlugins.SQLite\obj\Release\SourcePlugins.SQLite.csproj.CopyComplete" />
-    <None Include="CodeGeneration\SourcePlugins.SQLite\obj\Release\SourcePlugins.SQLite.csproj.GenerateResource.cache" />
-    <None Include="CodeGeneration\SourcePlugins.SQLite\obj\Release\SourcePlugins.SQLite.csprojAssemblyReference.cache" />
-    <None Include="CodeGeneration\SourcePlugins.SQLite\Resources\img\tblmeta16x16.pdn" />
-    <None Include="CodeGeneration\Tests\Tests\bin\Release\Metadrone.exe.config" />
-    <None Include="CodeGeneration\Tests\Tests\My Project\Settings.settings" />
-    <None Include="CodeGeneration\Tests\Tests\obj\Release\DesignTimeResolveAssemblyReferencesInput.cache" />
-    <None Include="CodeGeneration\Tests\Tests\obj\Release\Tests.vbproj.CopyComplete" />
-    <None Include="CodeGeneration\Tests\Tests\obj\Release\Tests.vbproj.GenerateResource.cache" />
-    <None Include="CodeGeneration\Tests\Tests\obj\Release\Tests.vbprojAssemblyReference.cache" />
-    <None Include="CodeGeneration\Tests\Tests\packages.config" />
     <None Include="My Project\app.manifest">
       <SubType>Designer</SubType>
     </None>
@@ -2364,131 +2320,7 @@
     <Content Include="CodeGeneration\bin\Release\SourcePlugins.SQLite.dll" />
     <Content Include="CodeGeneration\bin\Release\SourcePlugins.SQLite.pdb" />
     <Content Include="CodeGeneration\bin\Release\System.Data.SQLite.dll" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\bin\Release\ICSharpCode.TextEditor.dll" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Configuration\AssemblyInfo.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\ICSharpCode.TextEditor.csproj" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\obj\Release\ICSharpCode.TextEditor.csproj.FileListAbsolute.txt" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\obj\Release\ICSharpCode.TextEditor.dll" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Resources\RightArrow.cur" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Resources\SyntaxModes.xml" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Resources\TextEditorControl.bmp" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Actions\BookmarkActions.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Actions\CaretActions.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Actions\ClipBoardActions.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Actions\FoldActions.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Actions\FormatActions.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Actions\HomeEndActions.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Actions\IEditAction.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Actions\MiscActions.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Actions\SelectionActions.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\AbstractSegment.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\BookmarkManager\Bookmark.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\BookmarkManager\BookmarkEventHandler.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\BookmarkManager\BookmarkManager.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\BookmarkManager\BookmarkManagerMemento.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\DefaultDocument.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\DefaultTextEditorProperties.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\DocumentEventArgs.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\DocumentFactory.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\FoldingStrategy\FoldingManager.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\FoldingStrategy\FoldMarker.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\FoldingStrategy\IFoldingStrategy.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\FoldingStrategy\IndentFoldingStrategy.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\FormattingStrategy\DefaultFormattingStrategy.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\FormattingStrategy\IFormattingStrategy.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\HighlightingStrategy\DefaultHighlightingStrategy.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\HighlightingStrategy\FontContainer.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\HighlightingStrategy\HighlightBackground.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\HighlightingStrategy\HighlightColor.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\HighlightingStrategy\HighlightInfo.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\HighlightingStrategy\HighlightingColorNotFoundException.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\HighlightingStrategy\HighlightingDefinitionInvalidException.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\HighlightingStrategy\HighlightingDefinitionParser.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\HighlightingStrategy\HighlightingManager.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\HighlightingStrategy\HighlightingStrategyFactory.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\HighlightingStrategy\HighlightRuleSet.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\HighlightingStrategy\IHighlightingStrategy.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\HighlightingStrategy\NextMarker.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\HighlightingStrategy\PrevMarker.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\HighlightingStrategy\Span.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\HighlightingStrategy\SpanStack.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\HighlightingStrategy\SyntaxModes\FileSyntaxModeProvider.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\HighlightingStrategy\SyntaxModes\ISyntaxModeFileProvider.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\HighlightingStrategy\SyntaxModes\ResourceSyntaxModeProvider.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\HighlightingStrategy\SyntaxModes\SyntaxMode.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\HighlightingStrategy\TextWord.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\IDocument.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\ISegment.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\ITextEditorProperties.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\LineManager\DeferredEventList.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\LineManager\LineManager.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\LineManager\LineManagerEventArgs.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\LineManager\LineSegment.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\LineManager\LineSegmentTree.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\MarkerStrategy\MarkerStrategy.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\MarkerStrategy\TextMarker.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\Selection\ColumnRange.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\Selection\DefaultSelection.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\Selection\ISelection.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\Selection\SelectionManager.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\TextAnchor.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\TextBufferStrategy\GapTextBufferStrategy.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\TextBufferStrategy\ITextBufferStrategy.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\TextBufferStrategy\StringTextBufferStrategy.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\TextLocation.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Document\TextUtilities.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Gui\AbstractMargin.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Gui\BracketHighlighter.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Gui\BrushRegistry.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Gui\Caret.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Gui\CompletionWindow\AbstractCompletionWindow.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Gui\CompletionWindow\CodeCompletionListView.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Gui\CompletionWindow\CodeCompletionWindow.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Gui\CompletionWindow\DeclarationViewWindow.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Gui\CompletionWindow\ICompletionData.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Gui\CompletionWindow\ICompletionDataProvider.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Gui\DrawableLine.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Gui\FoldMargin.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Gui\GutterMargin.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Gui\HRuler.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Gui\IconBarMargin.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Gui\Ime.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Gui\InsightWindow\IInsightDataProvider.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Gui\InsightWindow\InsightWindow.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Gui\TextArea.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Gui\TextAreaClipboardHandler.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Gui\TextAreaControl.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Gui\TextAreaDragDropHandler.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Gui\TextAreaMouseHandler.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Gui\TextAreaUpdate.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Gui\TextEditorControl.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Gui\TextEditorControlBase.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Gui\TextView.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Gui\ToolTipRequestEventArgs.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Undo\IUndoableOperation.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Undo\UndoableDelete.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Undo\UndoableInsert.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Undo\UndoableReplace.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Undo\UndoQueue.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Undo\UndoStack.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Util\AugmentableRedBlackTree.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Util\CheckedList.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Util\FileReader.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Util\LoggingService.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Util\LookupTable.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Util\MouseWheelHandler.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Util\RedBlackTreeIterator.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Util\RtfWriter.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Util\TextUtility.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Util\TipPainter.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Util\TipPainterTools.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Util\TipSection.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Util\TipSpacer.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Util\TipSplitter.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Util\TipText.cs" />
-    <Content Include="CodeGeneration\ICSharpCode.TextEditor\Project\Src\Util\WeakCollection.cs" />
     <Content Include="CodeGeneration\Metadrone\Metadrone.vbproj" />
-    <Content Include="CodeGeneration\Metadrone\My Project\Application.myapp" />
     <Content Include="CodeGeneration\Metadrone\obj\Release\Metadrone.exe" />
     <Content Include="CodeGeneration\Metadrone\obj\Release\Metadrone.vbproj.FileListAbsolute.txt" />
     <Content Include="CodeGeneration\Metadrone\obj\Release\TempPE\My Project.Resources.Designer.vb.dll" />
@@ -2795,130 +2627,6 @@
     <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\uap10.0\zh-Hans\Microsoft.VisualStudio.TestPlatform.TestFramework.xml" />
     <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\uap10.0\zh-Hant\Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.xml" />
     <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\uap10.0\zh-Hant\Microsoft.VisualStudio.TestPlatform.TestFramework.xml" />
-    <Content Include="CodeGeneration\SourcePlugins.Firebird\Connection.cs" />
-    <Content Include="CodeGeneration\SourcePlugins.Firebird\Description.cs" />
-    <Content Include="CodeGeneration\SourcePlugins.Firebird\Logo.cs" />
-    <Content Include="CodeGeneration\SourcePlugins.Firebird\Logo.Designer.cs" />
-    <Content Include="CodeGeneration\SourcePlugins.Firebird\Manage.cs" />
-    <Content Include="CodeGeneration\SourcePlugins.Firebird\Manage.Designer.cs" />
-    <Content Include="CodeGeneration\SourcePlugins.Firebird\obj\Release\SourcePlugins.Firebird.csproj.FileListAbsolute.txt" />
-    <Content Include="CodeGeneration\SourcePlugins.Firebird\obj\Release\SourcePlugins.Firebird.dll" />
-    <Content Include="CodeGeneration\SourcePlugins.Firebird\obj\Release\SourcePlugins.Firebird.pdb" />
-    <Content Include="CodeGeneration\SourcePlugins.Firebird\Properties\AssemblyInfo.cs" />
-    <Content Include="CodeGeneration\SourcePlugins.Firebird\Properties\Resources.Designer.cs" />
-    <Content Include="CodeGeneration\SourcePlugins.Firebird\ReadResource.cs" />
-    <Content Include="CodeGeneration\SourcePlugins.Firebird\Resources\Assemblies\FirebirdSql.Data.FirebirdClient.dll" />
-    <Content Include="CodeGeneration\SourcePlugins.Firebird\Resources\img\connection16x16.png" />
-    <Content Include="CodeGeneration\SourcePlugins.Firebird\Resources\img\Firebird16x16.png" />
-    <Content Include="CodeGeneration\SourcePlugins.Firebird\Resources\img\Firebird32x32.png" />
-    <Content Include="CodeGeneration\SourcePlugins.Firebird\Resources\img\transform16x16.png" />
-    <Content Include="CodeGeneration\SourcePlugins.Firebird\Resources\Licence.txt" />
-    <Content Include="CodeGeneration\SourcePlugins.Firebird\Resources\ProductInformation.txt" />
-    <Content Include="CodeGeneration\SourcePlugins.Firebird\Resources\Queries\Queries.ColumnQuery.sql" />
-    <Content Include="CodeGeneration\SourcePlugins.Firebird\Resources\Queries\Queries.SchemaQuery.sql" />
-    <Content Include="CodeGeneration\SourcePlugins.Firebird\Resources\Queries\Queries.TableQuery.sql" />
-    <Content Include="CodeGeneration\SourcePlugins.Firebird\Resources\Transforms\Transforms.txt" />
-    <Content Include="CodeGeneration\SourcePlugins.Firebird\SourcePlugins.Firebird.csproj" />
-    <Content Include="CodeGeneration\SourcePlugins.MetadroneExeBuild\Metadrone.exe" />
-    <Content Include="CodeGeneration\SourcePlugins.MySQL\Connection.cs" />
-    <Content Include="CodeGeneration\SourcePlugins.MySQL\Description.cs" />
-    <Content Include="CodeGeneration\SourcePlugins.MySQL\Logo.cs" />
-    <Content Include="CodeGeneration\SourcePlugins.MySQL\Logo.Designer.cs" />
-    <Content Include="CodeGeneration\SourcePlugins.MySQL\Manage.cs" />
-    <Content Include="CodeGeneration\SourcePlugins.MySQL\Manage.Designer.cs" />
-    <Content Include="CodeGeneration\SourcePlugins.MySQL\obj\Release\SourcePlugins.MySQL.csproj.FileListAbsolute.txt" />
-    <Content Include="CodeGeneration\SourcePlugins.MySQL\obj\Release\SourcePlugins.MySQL.dll" />
-    <Content Include="CodeGeneration\SourcePlugins.MySQL\obj\Release\SourcePlugins.MySQL.pdb" />
-    <Content Include="CodeGeneration\SourcePlugins.MySQL\Properties\AssemblyInfo.cs" />
-    <Content Include="CodeGeneration\SourcePlugins.MySQL\Properties\Resources.Designer.cs" />
-    <Content Include="CodeGeneration\SourcePlugins.MySQL\ReadResource.cs" />
-    <Content Include="CodeGeneration\SourcePlugins.MySQL\Resources\Assemblies\mysql.data.dll" />
-    <Content Include="CodeGeneration\SourcePlugins.MySQL\Resources\img\connection16x16.png" />
-    <Content Include="CodeGeneration\SourcePlugins.MySQL\Resources\img\fncmeta16x16.png" />
-    <Content Include="CodeGeneration\SourcePlugins.MySQL\Resources\img\MySQL16x16.png" />
-    <Content Include="CodeGeneration\SourcePlugins.MySQL\Resources\img\MySQL32x32.png" />
-    <Content Include="CodeGeneration\SourcePlugins.MySQL\Resources\img\transform16x16.png" />
-    <Content Include="CodeGeneration\SourcePlugins.MySQL\Resources\Licence.txt" />
-    <Content Include="CodeGeneration\SourcePlugins.MySQL\Resources\ProductInformation.txt" />
-    <Content Include="CodeGeneration\SourcePlugins.MySQL\Resources\Queries\Queries.ColumnQuery.sql" />
-    <Content Include="CodeGeneration\SourcePlugins.MySQL\Resources\Queries\Queries.RoutineSchemaQuery.sql" />
-    <Content Include="CodeGeneration\SourcePlugins.MySQL\Resources\Queries\Queries.SchemaQuery.sql" />
-    <Content Include="CodeGeneration\SourcePlugins.MySQL\Resources\Queries\Queries.TableQuery.sql" />
-    <Content Include="CodeGeneration\SourcePlugins.MySQL\Resources\Transforms\Transforms.txt" />
-    <Content Include="CodeGeneration\SourcePlugins.MySQL\SourcePlugins.MySQL.csproj" />
-    <Content Include="CodeGeneration\SourcePlugins.PostgreSQL\Connection.cs" />
-    <Content Include="CodeGeneration\SourcePlugins.PostgreSQL\Description.cs" />
-    <Content Include="CodeGeneration\SourcePlugins.PostgreSQL\Logo.cs" />
-    <Content Include="CodeGeneration\SourcePlugins.PostgreSQL\Logo.Designer.cs" />
-    <Content Include="CodeGeneration\SourcePlugins.PostgreSQL\Manage.cs" />
-    <Content Include="CodeGeneration\SourcePlugins.PostgreSQL\Manage.Designer.cs" />
-    <Content Include="CodeGeneration\SourcePlugins.PostgreSQL\obj\Release\SourcePlugins.PostgreSQL.csproj.FileListAbsolute.txt" />
-    <Content Include="CodeGeneration\SourcePlugins.PostgreSQL\obj\Release\SourcePlugins.PostgreSQL.dll" />
-    <Content Include="CodeGeneration\SourcePlugins.PostgreSQL\obj\Release\SourcePlugins.PostgreSQL.pdb" />
-    <Content Include="CodeGeneration\SourcePlugins.PostgreSQL\Properties\AssemblyInfo.cs" />
-    <Content Include="CodeGeneration\SourcePlugins.PostgreSQL\Properties\Resources.Designer.cs" />
-    <Content Include="CodeGeneration\SourcePlugins.PostgreSQL\ReadResource.cs" />
-    <Content Include="CodeGeneration\SourcePlugins.PostgreSQL\Resources\Assemblies\Mono.Security.dll" />
-    <Content Include="CodeGeneration\SourcePlugins.PostgreSQL\Resources\Assemblies\Npgsql.dll" />
-    <Content Include="CodeGeneration\SourcePlugins.PostgreSQL\Resources\img\connection16x16.png" />
-    <Content Include="CodeGeneration\SourcePlugins.PostgreSQL\Resources\img\fncmeta16x16.png" />
-    <Content Include="CodeGeneration\SourcePlugins.PostgreSQL\Resources\img\PostgreSQL16x16.png" />
-    <Content Include="CodeGeneration\SourcePlugins.PostgreSQL\Resources\img\PostgreSQL32x32.png" />
-    <Content Include="CodeGeneration\SourcePlugins.PostgreSQL\Resources\img\transform16x16.png" />
-    <Content Include="CodeGeneration\SourcePlugins.PostgreSQL\Resources\Licence.txt" />
-    <Content Include="CodeGeneration\SourcePlugins.PostgreSQL\Resources\ProductInformation.txt" />
-    <Content Include="CodeGeneration\SourcePlugins.PostgreSQL\Resources\Queries\Queries.ColumnQuery.sql" />
-    <Content Include="CodeGeneration\SourcePlugins.PostgreSQL\Resources\Queries\Queries.RoutineSchemaQuery.sql" />
-    <Content Include="CodeGeneration\SourcePlugins.PostgreSQL\Resources\Queries\Queries.SchemaQuery.sql" />
-    <Content Include="CodeGeneration\SourcePlugins.PostgreSQL\Resources\Queries\Queries.TableQuery.sql" />
-    <Content Include="CodeGeneration\SourcePlugins.PostgreSQL\Resources\Transforms\Transforms.txt" />
-    <Content Include="CodeGeneration\SourcePlugins.PostgreSQL\SourcePlugins.PostgreSQL.csproj" />
-    <Content Include="CodeGeneration\SourcePlugins.SQLite\Connection.cs" />
-    <Content Include="CodeGeneration\SourcePlugins.SQLite\Description.cs" />
-    <Content Include="CodeGeneration\SourcePlugins.SQLite\ListSorter.cs" />
-    <Content Include="CodeGeneration\SourcePlugins.SQLite\Logo.cs" />
-    <Content Include="CodeGeneration\SourcePlugins.SQLite\Logo.Designer.cs" />
-    <Content Include="CodeGeneration\SourcePlugins.SQLite\Manage.cs" />
-    <Content Include="CodeGeneration\SourcePlugins.SQLite\Manage.Designer.cs" />
-    <Content Include="CodeGeneration\SourcePlugins.SQLite\obj\Release\SourcePlugins.SQLite.csproj.FileListAbsolute.txt" />
-    <Content Include="CodeGeneration\SourcePlugins.SQLite\obj\Release\SourcePlugins.SQLite.dll" />
-    <Content Include="CodeGeneration\SourcePlugins.SQLite\obj\Release\SourcePlugins.SQLite.pdb" />
-    <Content Include="CodeGeneration\SourcePlugins.SQLite\Properties\AssemblyInfo.cs" />
-    <Content Include="CodeGeneration\SourcePlugins.SQLite\Properties\Resources.Designer.cs" />
-    <Content Include="CodeGeneration\SourcePlugins.SQLite\ReadResource.cs" />
-    <Content Include="CodeGeneration\SourcePlugins.SQLite\Resources\Assemblies\System.Data.SQLite.dll" />
-    <Content Include="CodeGeneration\SourcePlugins.SQLite\Resources\img\connection16x16.png" />
-    <Content Include="CodeGeneration\SourcePlugins.SQLite\Resources\img\SQLite16x16.png" />
-    <Content Include="CodeGeneration\SourcePlugins.SQLite\Resources\img\SQLite32x32.png" />
-    <Content Include="CodeGeneration\SourcePlugins.SQLite\Resources\img\transform16x16.png" />
-    <Content Include="CodeGeneration\SourcePlugins.SQLite\Resources\Licence.txt" />
-    <Content Include="CodeGeneration\SourcePlugins.SQLite\Resources\ProductInformation.txt" />
-    <Content Include="CodeGeneration\SourcePlugins.SQLite\Resources\Queries\Queries.ColumnQuery.sql" />
-    <Content Include="CodeGeneration\SourcePlugins.SQLite\Resources\Queries\Queries.TableQuery.sql" />
-    <Content Include="CodeGeneration\SourcePlugins.SQLite\Resources\Transforms\Transforms.txt" />
-    <Content Include="CodeGeneration\SourcePlugins.SQLite\SourcePlugins.SQLite.csproj" />
-    <Content Include="CodeGeneration\Tests\Tests\bin\Release\ICSharpCode.TextEditor.dll" />
-    <Content Include="CodeGeneration\Tests\Tests\bin\Release\Metadrone.exe" />
-    <Content Include="CodeGeneration\Tests\Tests\bin\Release\Microsoft.SqlServer.ConnectionInfo.dll" />
-    <Content Include="CodeGeneration\Tests\Tests\bin\Release\Microsoft.SqlServer.Dmf.dll" />
-    <Content Include="CodeGeneration\Tests\Tests\bin\Release\Microsoft.SqlServer.Management.Sdk.Sfc.dll" />
-    <Content Include="CodeGeneration\Tests\Tests\bin\Release\Microsoft.SqlServer.ServiceBrokerEnum.dll" />
-    <Content Include="CodeGeneration\Tests\Tests\bin\Release\Microsoft.SqlServer.Smo.dll" />
-    <Content Include="CodeGeneration\Tests\Tests\bin\Release\Microsoft.SqlServer.SqlClrProvider.dll" />
-    <Content Include="CodeGeneration\Tests\Tests\bin\Release\Microsoft.SqlServer.SqlEnum.dll" />
-    <Content Include="CodeGeneration\Tests\Tests\bin\Release\Microsoft.VisualStudio.TestPlatform.TestFramework.dll" />
-    <Content Include="CodeGeneration\Tests\Tests\bin\Release\Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.dll" />
-    <Content Include="CodeGeneration\Tests\Tests\bin\Release\Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.xml" />
-    <Content Include="CodeGeneration\Tests\Tests\bin\Release\Microsoft.VisualStudio.TestPlatform.TestFramework.xml" />
-    <Content Include="CodeGeneration\Tests\Tests\bin\Release\Tests.dll" />
-    <Content Include="CodeGeneration\Tests\Tests\bin\Release\Tests.pdb" />
-    <Content Include="CodeGeneration\Tests\Tests\bin\Release\Tests.xml" />
-    <Content Include="CodeGeneration\Tests\Tests\My Project\Application.myapp" />
-    <Content Include="CodeGeneration\Tests\Tests\obj\Release\Tests.dll" />
-    <Content Include="CodeGeneration\Tests\Tests\obj\Release\Tests.pdb" />
-    <Content Include="CodeGeneration\Tests\Tests\obj\Release\Tests.vbproj.FileListAbsolute.txt" />
-    <Content Include="CodeGeneration\Tests\Tests\obj\Release\Tests.xml" />
-    <Content Include="CodeGeneration\Tests\Tests\Tests.vbproj" />
     <Content Include="Images\MenuImages\Camera16x16.jpg" />
     <None Include="Images\MenuImages\delete16x16.png" />
     <None Include="Images\MenuImages\deleteround16x16.png" />
@@ -3089,12 +2797,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="CodeGeneration\bin\Debug\" />
-    <Folder Include="CodeGeneration\ICSharpCode.TextEditor\Project\obj\Release\TempPE\" />
-    <Folder Include="CodeGeneration\SourcePlugins.Firebird\obj\Release\TempPE\" />
-    <Folder Include="CodeGeneration\SourcePlugins.MySQL\obj\Release\TempPE\" />
-    <Folder Include="CodeGeneration\SourcePlugins.PostgreSQL\obj\Release\TempPE\" />
-    <Folder Include="CodeGeneration\SourcePlugins.SQLite\obj\Release\TempPE\" />
-    <Folder Include="CodeGeneration\Tests\Tests\obj\Release\TempPE\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

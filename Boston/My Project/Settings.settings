@@ -93,7 +93,7 @@
       <Value Profile="(Default)">english.aiml</Value>
     </Setting>
     <Setting Name="FirstRun" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
+      <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="AllowModelConfiguration" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
