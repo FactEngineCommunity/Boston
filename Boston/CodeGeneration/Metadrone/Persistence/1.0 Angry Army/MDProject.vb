@@ -141,6 +141,9 @@
             Copy.RoutineSchemaQuery = source.RoutineSchemaQuery
             Copy.Transformations = source.Transformations
 
+            Copy.BostonModelId = source.BostonModelId
+            Copy.ModelName = source.ModelName
+
             Copy.EditorGUID = source.EditorGUID
 
             Return Copy

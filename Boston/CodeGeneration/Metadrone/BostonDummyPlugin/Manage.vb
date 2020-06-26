@@ -7,6 +7,8 @@ Imports System.Linq
 Imports System.Text
 Imports System.Windows.Forms
 Imports Boston.PluginInterface.Sources
+Imports System.Reflection
+Imports Boston.FBM
 
 Namespace SourcePlugins.Boston
     Partial Public Class Manage
@@ -54,7 +56,17 @@ Namespace SourcePlugins.Boston
             'Me.txtTransformations.TextChanged += New Metadrone.UI.TransformationsEditor.TextChangedEventHandler(AddressOf Me.txtTransformations_TextChanged)
         End Sub
 
-        Public Sub Setup()
+        Public Sub Setup() Implements IManageSource.Setup
+
+            'Boston specific Setup
+            If prApplication.WorkingModel Is Nothing Then
+                Me.LabelWorkingModel.Text = "You must be working from a selected model in the Model Explorer."
+            Else
+                Me.LabelWorkingModel.Text = prApplication.WorkingModel.Name
+                Me.LabelModelName.Text = prApplication.WorkingModel.Name
+                Call Me.LoadERDModelDictionary()
+            End If
+
             If Me.SchemaQuery.Length = 0 Then
                 'Me.SchemaQuery = New Connection("", "").GetQuery(Connection.QueryEnum.SchemaQuery)
             End If
@@ -62,8 +74,6 @@ Namespace SourcePlugins.Boston
             If Me.RoutineSchemaQuery.Length = 0 Then
                 'Me.RoutineSchemaQuery = New Connection("", "").GetQuery(Connection.QueryEnum.RoutineSchemaQuery)
             End If
-
-            Me.splitMain.Panel2Collapsed = True
 
         End Sub
 
@@ -181,12 +191,64 @@ Namespace SourcePlugins.Boston
             End Set
         End Property
 
+        Public _BostonModel As FBM.Model
+        Public Property BostonModel As Model Implements IManageSource.BostonModel
+            Get
+                Return Me._BostonModel
+            End Get
+            Set(value As Model)
+                Me._BostonModel = value
+            End Set
+        End Property
+
         Private Sub Manage_Load(ByVal sender As Object, ByVal e As EventArgs)
             'Me.rbMeta_CheckedChanged(sender, e)
         End Sub
 
         Private Sub SavePress()
             RaiseEvent Save()
+        End Sub
+
+        Private Sub LoadERDModelDictionary()
+
+            Try
+                Dim loNode As New TreeNode
+
+                loNode = Me.TreeView1.Nodes.Add("Entity", "Entity", 0, 0)
+                loNode.Tag = New tEnterpriseEnterpriseView(pcenumMenuType.pageERD, Nothing)
+
+                If prApplication.WorkingModel Is Nothing Then
+                    Exit Sub
+                End If
+
+                Dim lrEntity As RDS.Table
+
+                prApplication.WorkingModel.RDS.Table.Sort(AddressOf RDS.Table.CompareName)
+
+                Dim loColumnNode As New TreeNode
+                For Each lrEntity In prApplication.WorkingModel.RDS.Table
+                    'loNode = New TreeNode
+                    loNode = Me.TreeView1.Nodes("Entity").Nodes.Add("Entity" & lrEntity.Name, lrEntity.Name, 0, 0)
+                    loNode.Tag = lrEntity
+
+                    For Each lrAttribute In lrEntity.Column
+                        loColumnNode = loNode.Nodes.Add("Attribute" & lrAttribute.Name, lrAttribute.Name, 14, 14)
+                        loColumnNode.Tag = lrAttribute
+                    Next
+
+                Next
+
+                Me.TreeView1.Nodes("Entity").Expand()
+
+            Catch ex As Exception
+                Dim lsMessage1 As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
         End Sub
 
         'Private Sub txtSchemaQuery_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs)
@@ -246,13 +308,13 @@ Namespace SourcePlugins.Boston
         '    End If
         'End Sub
 
-        Private Sub BuildConnectionString()
-            If Me.chkPort.Checked Then
-                Me.txtConnectionString.Text = "Server=" & Me.txtServer.Text & ";Port=" + Me.txtPort.Text & ";Database=" + Me.txtDatabase.Text & ";Uid=" + Me.txtUsername.Text & ";Pwd=" + Me.txtPassword.Text
-            Else
-                Me.txtConnectionString.Text = "Server=" & Me.txtServer.Text & ";Database=" + Me.txtDatabase.Text & ";Uid=" + Me.txtUsername.Text & ";Pwd=" + Me.txtPassword.Text
-            End If
-        End Sub
+        'Private Sub BuildConnectionString()
+        '    If Me.chkPort.Checked Then
+        '        Me.txtConnectionString.Text = "Server=" & Me.txtServer.Text & ";Port=" + Me.txtPort.Text & ";Database=" + Me.txtDatabase.Text & ";Uid=" + Me.txtUsername.Text & ";Pwd=" + Me.txtPassword.Text
+        '    Else
+        '        Me.txtConnectionString.Text = "Server=" & Me.txtServer.Text & ";Database=" + Me.txtDatabase.Text & ";Uid=" + Me.txtUsername.Text & ";Pwd=" + Me.txtPassword.Text
+        '    End If
+        'End Sub
 
         'Private Sub txtConnParts_TextChanged(ByVal sender As Object, ByVal e As EventArgs)
         '    Me.BuildConnectionString()
@@ -331,113 +393,51 @@ Namespace SourcePlugins.Boston
         '    Me.Cursor = Cursors.[Default]
         'End Sub
 
-        Private Sub IManageSource_Setup() Implements IManageSource.Setup
-            'Throw New NotImplementedException()
-        End Sub
-
 #Region "Form Initialisation"
         Private Sub InitializeComponent()
+            Me.components = New System.ComponentModel.Container()
             Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Manage))
-            Me.tcMain = New System.Windows.Forms.TabControl()
+            Me.TabPage2 = New System.Windows.Forms.TabPage()
             Me.TabPage1 = New System.Windows.Forms.TabPage()
-            Me.txtPort = New System.Windows.Forms.TextBox()
-            Me.chkPort = New System.Windows.Forms.CheckBox()
             Me.Panel2 = New System.Windows.Forms.Panel()
             Me.lblTitle = New System.Windows.Forms.Label()
-            Me.btnTest = New System.Windows.Forms.Button()
-            Me.lblServer = New System.Windows.Forms.Label()
-            Me.txtConnectionString = New System.Windows.Forms.TextBox()
-            Me.txtServer = New System.Windows.Forms.TextBox()
-            Me.lblConnectionString = New System.Windows.Forms.Label()
-            Me.lblDatabase = New System.Windows.Forms.Label()
-            Me.txtPassword = New System.Windows.Forms.TextBox()
-            Me.txtDatabase = New System.Windows.Forms.TextBox()
-            Me.lblPassword = New System.Windows.Forms.Label()
-            Me.lblUsername = New System.Windows.Forms.Label()
-            Me.txtUsername = New System.Windows.Forms.TextBox()
-            Me.TabPage2 = New System.Windows.Forms.TabPage()
-            Me.splitMain = New System.Windows.Forms.SplitContainer()
-            Me.splitQuery = New System.Windows.Forms.SplitContainer()
-            Me.Panel3 = New System.Windows.Forms.Panel()
-            Me.lblSchemaQuery = New System.Windows.Forms.Label()
-            Me.lnkPreviewSchema = New System.Windows.Forms.LinkLabel()
-            Me.splitTableColumn = New System.Windows.Forms.SplitContainer()
-            Me.lblTableSchemaQuery = New System.Windows.Forms.Label()
-            Me.lblColumnSchemaQuery = New System.Windows.Forms.Label()
+            Me.LabelPromptWorkingModel = New System.Windows.Forms.Label()
+            Me.LabelWorkingModel = New System.Windows.Forms.Label()
+            Me.tcMain = New System.Windows.Forms.TabControl()
             Me.Panel1 = New System.Windows.Forms.Panel()
-            Me.grpApproach = New System.Windows.Forms.GroupBox()
-            Me.rbApproachSingle = New System.Windows.Forms.RadioButton()
-            Me.rbApproachTableColumn = New System.Windows.Forms.RadioButton()
-            Me.grpColumnSchema = New System.Windows.Forms.GroupBox()
-            Me.txtTableName = New System.Windows.Forms.TextBox()
-            Me.Label3 = New System.Windows.Forms.Label()
-            Me.grpTableSchema = New System.Windows.Forms.GroupBox()
-            Me.rbTableDefault = New System.Windows.Forms.RadioButton()
-            Me.rbTableQuery = New System.Windows.Forms.RadioButton()
-            Me.TabPage3 = New System.Windows.Forms.TabPage()
-            Me.splitRoutine = New System.Windows.Forms.SplitContainer()
-            Me.Panel5 = New System.Windows.Forms.Panel()
-            Me.Label2 = New System.Windows.Forms.Label()
-            Me.lnkPreviewRoutineSchema = New System.Windows.Forms.LinkLabel()
-            Me.TabPage4 = New System.Windows.Forms.TabPage()
-            Me.tcMain.SuspendLayout()
-            Me.TabPage1.SuspendLayout()
+            Me.GroupBox_Main = New System.Windows.Forms.GroupBox()
+            Me.CheckBoxShowModelDictionary = New System.Windows.Forms.CheckBox()
+            Me.CheckBoxShowCoreModelElements = New System.Windows.Forms.CheckBox()
+            Me.LabelModelName = New System.Windows.Forms.Label()
+            Me.LabelPrompt = New System.Windows.Forms.Label()
+            Me.TreeView1 = New System.Windows.Forms.TreeView()
+            Me.ImageList = New System.Windows.Forms.ImageList(Me.components)
             Me.TabPage2.SuspendLayout()
-            CType(Me.splitMain, System.ComponentModel.ISupportInitialize).BeginInit()
-            Me.splitMain.Panel1.SuspendLayout()
-            Me.splitMain.SuspendLayout()
-            CType(Me.splitQuery, System.ComponentModel.ISupportInitialize).BeginInit()
-            Me.splitQuery.Panel1.SuspendLayout()
-            Me.splitQuery.Panel2.SuspendLayout()
-            Me.splitQuery.SuspendLayout()
-            Me.Panel3.SuspendLayout()
-            CType(Me.splitTableColumn, System.ComponentModel.ISupportInitialize).BeginInit()
-            Me.splitTableColumn.Panel1.SuspendLayout()
-            Me.splitTableColumn.Panel2.SuspendLayout()
-            Me.splitTableColumn.SuspendLayout()
+            Me.TabPage1.SuspendLayout()
+            Me.tcMain.SuspendLayout()
             Me.Panel1.SuspendLayout()
-            Me.grpApproach.SuspendLayout()
-            Me.grpColumnSchema.SuspendLayout()
-            Me.grpTableSchema.SuspendLayout()
-            Me.TabPage3.SuspendLayout()
-            CType(Me.splitRoutine, System.ComponentModel.ISupportInitialize).BeginInit()
-            Me.splitRoutine.Panel1.SuspendLayout()
-            Me.splitRoutine.SuspendLayout()
-            Me.Panel5.SuspendLayout()
+            Me.GroupBox_Main.SuspendLayout()
             Me.SuspendLayout()
             '
-            'tcMain
+            'TabPage2
             '
-            Me.tcMain.Alignment = System.Windows.Forms.TabAlignment.Bottom
-            Me.tcMain.Controls.Add(Me.TabPage1)
-            Me.tcMain.Controls.Add(Me.TabPage2)
-            Me.tcMain.Controls.Add(Me.TabPage3)
-            Me.tcMain.Controls.Add(Me.TabPage4)
-            Me.tcMain.Dock = System.Windows.Forms.DockStyle.Fill
-            Me.tcMain.Location = New System.Drawing.Point(0, 0)
-            Me.tcMain.Name = "tcMain"
-            Me.tcMain.SelectedIndex = 0
-            Me.tcMain.Size = New System.Drawing.Size(777, 579)
-            Me.tcMain.TabIndex = 2
+            Me.TabPage2.Controls.Add(Me.Panel1)
+            Me.TabPage2.ImageIndex = 1
+            Me.TabPage2.Location = New System.Drawing.Point(4, 4)
+            Me.TabPage2.Margin = New System.Windows.Forms.Padding(0)
+            Me.TabPage2.Name = "TabPage2"
+            Me.TabPage2.Size = New System.Drawing.Size(769, 553)
+            Me.TabPage2.TabIndex = 1
+            Me.TabPage2.Text = "Tables/Columns"
+            Me.TabPage2.UseVisualStyleBackColor = True
             '
             'TabPage1
             '
             Me.TabPage1.BackColor = System.Drawing.Color.Transparent
-            Me.TabPage1.Controls.Add(Me.txtPort)
-            Me.TabPage1.Controls.Add(Me.chkPort)
             Me.TabPage1.Controls.Add(Me.Panel2)
             Me.TabPage1.Controls.Add(Me.lblTitle)
-            Me.TabPage1.Controls.Add(Me.btnTest)
-            Me.TabPage1.Controls.Add(Me.lblServer)
-            Me.TabPage1.Controls.Add(Me.txtConnectionString)
-            Me.TabPage1.Controls.Add(Me.txtServer)
-            Me.TabPage1.Controls.Add(Me.lblConnectionString)
-            Me.TabPage1.Controls.Add(Me.lblDatabase)
-            Me.TabPage1.Controls.Add(Me.txtPassword)
-            Me.TabPage1.Controls.Add(Me.txtDatabase)
-            Me.TabPage1.Controls.Add(Me.lblPassword)
-            Me.TabPage1.Controls.Add(Me.lblUsername)
-            Me.TabPage1.Controls.Add(Me.txtUsername)
+            Me.TabPage1.Controls.Add(Me.LabelPromptWorkingModel)
+            Me.TabPage1.Controls.Add(Me.LabelWorkingModel)
             Me.TabPage1.ImageIndex = 0
             Me.TabPage1.Location = New System.Drawing.Point(4, 4)
             Me.TabPage1.Name = "TabPage1"
@@ -446,25 +446,6 @@ Namespace SourcePlugins.Boston
             Me.TabPage1.TabIndex = 0
             Me.TabPage1.Text = "Connection"
             Me.TabPage1.UseVisualStyleBackColor = True
-            '
-            'txtPort
-            '
-            Me.txtPort.Enabled = False
-            Me.txtPort.Location = New System.Drawing.Point(171, 79)
-            Me.txtPort.Name = "txtPort"
-            Me.txtPort.Size = New System.Drawing.Size(75, 20)
-            Me.txtPort.TabIndex = 3
-            Me.txtPort.Text = "3306"
-            '
-            'chkPort
-            '
-            Me.chkPort.AutoSize = True
-            Me.chkPort.Location = New System.Drawing.Point(79, 81)
-            Me.chkPort.Name = "chkPort"
-            Me.chkPort.Size = New System.Drawing.Size(86, 17)
-            Me.chkPort.TabIndex = 2
-            Me.chkPort.Text = "Specify Port:"
-            Me.chkPort.UseVisualStyleBackColor = True
             '
             'Panel2
             '
@@ -488,397 +469,142 @@ Namespace SourcePlugins.Boston
             Me.lblTitle.TabIndex = 0
             Me.lblTitle.Text = "Boston Model - Direct Access"
             '
-            'btnTest
+            'LabelPromptWorkingModel
             '
-            Me.btnTest.Location = New System.Drawing.Point(20, 258)
-            Me.btnTest.Name = "btnTest"
-            Me.btnTest.Size = New System.Drawing.Size(103, 23)
-            Me.btnTest.TabIndex = 12
-            Me.btnTest.Text = "Test Connection"
-            Me.btnTest.UseVisualStyleBackColor = True
+            Me.LabelPromptWorkingModel.AutoSize = True
+            Me.LabelPromptWorkingModel.Location = New System.Drawing.Point(17, 58)
+            Me.LabelPromptWorkingModel.Name = "LabelPromptWorkingModel"
+            Me.LabelPromptWorkingModel.Size = New System.Drawing.Size(82, 13)
+            Me.LabelPromptWorkingModel.TabIndex = 0
+            Me.LabelPromptWorkingModel.Text = "Working Model:"
             '
-            'lblServer
+            'LabelWorkingModel
             '
-            Me.lblServer.AutoSize = True
-            Me.lblServer.Location = New System.Drawing.Point(17, 58)
-            Me.lblServer.Name = "lblServer"
-            Me.lblServer.Size = New System.Drawing.Size(41, 13)
-            Me.lblServer.TabIndex = 0
-            Me.lblServer.Text = "Server:"
+            Me.LabelWorkingModel.AutoSize = True
+            Me.LabelWorkingModel.Location = New System.Drawing.Point(105, 58)
+            Me.LabelWorkingModel.Name = "LabelWorkingModel"
+            Me.LabelWorkingModel.Size = New System.Drawing.Size(86, 13)
+            Me.LabelWorkingModel.TabIndex = 4
+            Me.LabelWorkingModel.Text = "lblWorkingModel"
             '
-            'txtConnectionString
+            'tcMain
             '
-            Me.txtConnectionString.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-            Me.txtConnectionString.Location = New System.Drawing.Point(20, 223)
-            Me.txtConnectionString.Name = "txtConnectionString"
-            Me.txtConnectionString.Size = New System.Drawing.Size(735, 20)
-            Me.txtConnectionString.TabIndex = 11
-            '
-            'txtServer
-            '
-            Me.txtServer.Location = New System.Drawing.Point(79, 55)
-            Me.txtServer.Name = "txtServer"
-            Me.txtServer.Size = New System.Drawing.Size(317, 20)
-            Me.txtServer.TabIndex = 1
-            '
-            'lblConnectionString
-            '
-            Me.lblConnectionString.AutoSize = True
-            Me.lblConnectionString.Location = New System.Drawing.Point(17, 207)
-            Me.lblConnectionString.Name = "lblConnectionString"
-            Me.lblConnectionString.Size = New System.Drawing.Size(94, 13)
-            Me.lblConnectionString.TabIndex = 10
-            Me.lblConnectionString.Text = "Connection String:"
-            '
-            'lblDatabase
-            '
-            Me.lblDatabase.AutoSize = True
-            Me.lblDatabase.Location = New System.Drawing.Point(17, 108)
-            Me.lblDatabase.Name = "lblDatabase"
-            Me.lblDatabase.Size = New System.Drawing.Size(56, 13)
-            Me.lblDatabase.TabIndex = 4
-            Me.lblDatabase.Text = "Database:"
-            '
-            'txtPassword
-            '
-            Me.txtPassword.Location = New System.Drawing.Point(79, 157)
-            Me.txtPassword.Name = "txtPassword"
-            Me.txtPassword.Size = New System.Drawing.Size(317, 20)
-            Me.txtPassword.TabIndex = 9
-            '
-            'txtDatabase
-            '
-            Me.txtDatabase.Location = New System.Drawing.Point(79, 105)
-            Me.txtDatabase.Name = "txtDatabase"
-            Me.txtDatabase.Size = New System.Drawing.Size(317, 20)
-            Me.txtDatabase.TabIndex = 5
-            '
-            'lblPassword
-            '
-            Me.lblPassword.AutoSize = True
-            Me.lblPassword.Location = New System.Drawing.Point(17, 160)
-            Me.lblPassword.Name = "lblPassword"
-            Me.lblPassword.Size = New System.Drawing.Size(56, 13)
-            Me.lblPassword.TabIndex = 8
-            Me.lblPassword.Text = "Password:"
-            '
-            'lblUsername
-            '
-            Me.lblUsername.AutoSize = True
-            Me.lblUsername.Location = New System.Drawing.Point(17, 134)
-            Me.lblUsername.Name = "lblUsername"
-            Me.lblUsername.Size = New System.Drawing.Size(58, 13)
-            Me.lblUsername.TabIndex = 6
-            Me.lblUsername.Text = "Username:"
-            '
-            'txtUsername
-            '
-            Me.txtUsername.Location = New System.Drawing.Point(79, 131)
-            Me.txtUsername.Name = "txtUsername"
-            Me.txtUsername.Size = New System.Drawing.Size(317, 20)
-            Me.txtUsername.TabIndex = 7
-            '
-            'TabPage2
-            '
-            Me.TabPage2.Controls.Add(Me.splitMain)
-            Me.TabPage2.Controls.Add(Me.Panel1)
-            Me.TabPage2.ImageIndex = 1
-            Me.TabPage2.Location = New System.Drawing.Point(4, 4)
-            Me.TabPage2.Margin = New System.Windows.Forms.Padding(0)
-            Me.TabPage2.Name = "TabPage2"
-            Me.TabPage2.Size = New System.Drawing.Size(769, 553)
-            Me.TabPage2.TabIndex = 1
-            Me.TabPage2.Text = "Tables/Views Meta Data"
-            Me.TabPage2.UseVisualStyleBackColor = True
-            '
-            'splitMain
-            '
-            Me.splitMain.Dock = System.Windows.Forms.DockStyle.Fill
-            Me.splitMain.Location = New System.Drawing.Point(199, 0)
-            Me.splitMain.Name = "splitMain"
-            Me.splitMain.Orientation = System.Windows.Forms.Orientation.Horizontal
-            '
-            'splitMain.Panel1
-            '
-            Me.splitMain.Panel1.Controls.Add(Me.splitQuery)
-            Me.splitMain.Panel2Collapsed = True
-            Me.splitMain.Size = New System.Drawing.Size(570, 553)
-            Me.splitMain.TabIndex = 1
-            '
-            'splitQuery
-            '
-            Me.splitQuery.Dock = System.Windows.Forms.DockStyle.Fill
-            Me.splitQuery.Location = New System.Drawing.Point(0, 0)
-            Me.splitQuery.Name = "splitQuery"
-            Me.splitQuery.Orientation = System.Windows.Forms.Orientation.Horizontal
-            '
-            'splitQuery.Panel1
-            '
-            Me.splitQuery.Panel1.Controls.Add(Me.Panel3)
-            '
-            'splitQuery.Panel2
-            '
-            Me.splitQuery.Panel2.Controls.Add(Me.splitTableColumn)
-            Me.splitQuery.Size = New System.Drawing.Size(570, 553)
-            Me.splitQuery.SplitterDistance = 272
-            Me.splitQuery.TabIndex = 1
-            '
-            'Panel3
-            '
-            Me.Panel3.BackColor = System.Drawing.Color.White
-            Me.Panel3.Controls.Add(Me.lblSchemaQuery)
-            Me.Panel3.Controls.Add(Me.lnkPreviewSchema)
-            Me.Panel3.Dock = System.Windows.Forms.DockStyle.Top
-            Me.Panel3.Location = New System.Drawing.Point(0, 0)
-            Me.Panel3.Name = "Panel3"
-            Me.Panel3.Size = New System.Drawing.Size(570, 24)
-            Me.Panel3.TabIndex = 2
-            '
-            'lblSchemaQuery
-            '
-            Me.lblSchemaQuery.BackColor = System.Drawing.Color.Transparent
-            Me.lblSchemaQuery.Dock = System.Windows.Forms.DockStyle.Fill
-            Me.lblSchemaQuery.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-            Me.lblSchemaQuery.Location = New System.Drawing.Point(0, 0)
-            Me.lblSchemaQuery.Name = "lblSchemaQuery"
-            Me.lblSchemaQuery.Size = New System.Drawing.Size(506, 24)
-            Me.lblSchemaQuery.TabIndex = 2
-            Me.lblSchemaQuery.Text = "Schema Query"
-            Me.lblSchemaQuery.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
-            '
-            'lnkPreviewSchema
-            '
-            Me.lnkPreviewSchema.BackColor = System.Drawing.Color.Transparent
-            Me.lnkPreviewSchema.Dock = System.Windows.Forms.DockStyle.Right
-            Me.lnkPreviewSchema.Image = CType(resources.GetObject("lnkPreviewSchema.Image"), System.Drawing.Image)
-            Me.lnkPreviewSchema.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
-            Me.lnkPreviewSchema.Location = New System.Drawing.Point(506, 0)
-            Me.lnkPreviewSchema.Name = "lnkPreviewSchema"
-            Me.lnkPreviewSchema.Size = New System.Drawing.Size(64, 24)
-            Me.lnkPreviewSchema.TabIndex = 4
-            Me.lnkPreviewSchema.TabStop = True
-            Me.lnkPreviewSchema.Text = "Preview"
-            Me.lnkPreviewSchema.TextAlign = System.Drawing.ContentAlignment.MiddleRight
-            '
-            'splitTableColumn
-            '
-            Me.splitTableColumn.Dock = System.Windows.Forms.DockStyle.Fill
-            Me.splitTableColumn.Location = New System.Drawing.Point(0, 0)
-            Me.splitTableColumn.Name = "splitTableColumn"
-            Me.splitTableColumn.Orientation = System.Windows.Forms.Orientation.Horizontal
-            '
-            'splitTableColumn.Panel1
-            '
-            Me.splitTableColumn.Panel1.Controls.Add(Me.lblTableSchemaQuery)
-            '
-            'splitTableColumn.Panel2
-            '
-            Me.splitTableColumn.Panel2.Controls.Add(Me.lblColumnSchemaQuery)
-            Me.splitTableColumn.Size = New System.Drawing.Size(570, 277)
-            Me.splitTableColumn.SplitterDistance = 135
-            Me.splitTableColumn.TabIndex = 1
-            '
-            'lblTableSchemaQuery
-            '
-            Me.lblTableSchemaQuery.BackColor = System.Drawing.Color.White
-            Me.lblTableSchemaQuery.Dock = System.Windows.Forms.DockStyle.Top
-            Me.lblTableSchemaQuery.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-            Me.lblTableSchemaQuery.Location = New System.Drawing.Point(0, 0)
-            Me.lblTableSchemaQuery.Name = "lblTableSchemaQuery"
-            Me.lblTableSchemaQuery.Size = New System.Drawing.Size(570, 24)
-            Me.lblTableSchemaQuery.TabIndex = 0
-            Me.lblTableSchemaQuery.Text = "Table Schema Query"
-            Me.lblTableSchemaQuery.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
-            '
-            'lblColumnSchemaQuery
-            '
-            Me.lblColumnSchemaQuery.BackColor = System.Drawing.Color.White
-            Me.lblColumnSchemaQuery.Dock = System.Windows.Forms.DockStyle.Top
-            Me.lblColumnSchemaQuery.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-            Me.lblColumnSchemaQuery.Location = New System.Drawing.Point(0, 0)
-            Me.lblColumnSchemaQuery.Name = "lblColumnSchemaQuery"
-            Me.lblColumnSchemaQuery.Size = New System.Drawing.Size(570, 24)
-            Me.lblColumnSchemaQuery.TabIndex = 0
-            Me.lblColumnSchemaQuery.Text = "Column Schema Query"
-            Me.lblColumnSchemaQuery.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+            Me.tcMain.Alignment = System.Windows.Forms.TabAlignment.Bottom
+            Me.tcMain.Controls.Add(Me.TabPage1)
+            Me.tcMain.Controls.Add(Me.TabPage2)
+            Me.tcMain.Dock = System.Windows.Forms.DockStyle.Fill
+            Me.tcMain.Location = New System.Drawing.Point(0, 0)
+            Me.tcMain.Name = "tcMain"
+            Me.tcMain.SelectedIndex = 0
+            Me.tcMain.Size = New System.Drawing.Size(777, 579)
+            Me.tcMain.TabIndex = 2
             '
             'Panel1
             '
-            Me.Panel1.Controls.Add(Me.grpApproach)
-            Me.Panel1.Controls.Add(Me.grpColumnSchema)
-            Me.Panel1.Controls.Add(Me.grpTableSchema)
-            Me.Panel1.Dock = System.Windows.Forms.DockStyle.Left
+            Me.Panel1.Controls.Add(Me.GroupBox_Main)
+            Me.Panel1.Dock = System.Windows.Forms.DockStyle.Fill
             Me.Panel1.Location = New System.Drawing.Point(0, 0)
             Me.Panel1.Name = "Panel1"
-            Me.Panel1.Size = New System.Drawing.Size(199, 553)
+            Me.Panel1.Size = New System.Drawing.Size(769, 553)
             Me.Panel1.TabIndex = 0
             '
-            'grpApproach
+            'GroupBox_Main
             '
-            Me.grpApproach.Controls.Add(Me.rbApproachSingle)
-            Me.grpApproach.Controls.Add(Me.rbApproachTableColumn)
-            Me.grpApproach.Location = New System.Drawing.Point(4, 3)
-            Me.grpApproach.Name = "grpApproach"
-            Me.grpApproach.Size = New System.Drawing.Size(188, 87)
-            Me.grpApproach.TabIndex = 0
-            Me.grpApproach.TabStop = False
-            Me.grpApproach.Text = "Approach"
+            Me.GroupBox_Main.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
+            Me.GroupBox_Main.Controls.Add(Me.CheckBoxShowModelDictionary)
+            Me.GroupBox_Main.Controls.Add(Me.CheckBoxShowCoreModelElements)
+            Me.GroupBox_Main.Controls.Add(Me.LabelModelName)
+            Me.GroupBox_Main.Controls.Add(Me.LabelPrompt)
+            Me.GroupBox_Main.Controls.Add(Me.TreeView1)
+            Me.GroupBox_Main.Dock = System.Windows.Forms.DockStyle.Fill
+            Me.GroupBox_Main.ForeColor = System.Drawing.Color.Black
+            Me.GroupBox_Main.Location = New System.Drawing.Point(0, 0)
+            Me.GroupBox_Main.Name = "GroupBox_Main"
+            Me.GroupBox_Main.Size = New System.Drawing.Size(769, 553)
+            Me.GroupBox_Main.TabIndex = 1
+            Me.GroupBox_Main.TabStop = False
+            Me.GroupBox_Main.Text = "Model Dictionary:"
             '
-            'rbApproachSingle
+            'CheckBoxShowModelDictionary
             '
-            Me.rbApproachSingle.AutoSize = True
-            Me.rbApproachSingle.Checked = True
-            Me.rbApproachSingle.Location = New System.Drawing.Point(21, 21)
-            Me.rbApproachSingle.Name = "rbApproachSingle"
-            Me.rbApproachSingle.Size = New System.Drawing.Size(99, 17)
-            Me.rbApproachSingle.TabIndex = 0
-            Me.rbApproachSingle.TabStop = True
-            Me.rbApproachSingle.Text = "Single result set"
-            Me.rbApproachSingle.UseVisualStyleBackColor = True
+            Me.CheckBoxShowModelDictionary.AutoSize = True
+            Me.CheckBoxShowModelDictionary.Location = New System.Drawing.Point(183, 26)
+            Me.CheckBoxShowModelDictionary.Name = "CheckBoxShowModelDictionary"
+            Me.CheckBoxShowModelDictionary.Size = New System.Drawing.Size(135, 17)
+            Me.CheckBoxShowModelDictionary.TabIndex = 5
+            Me.CheckBoxShowModelDictionary.Text = "Show Model Dictionary"
+            Me.CheckBoxShowModelDictionary.UseVisualStyleBackColor = True
+            Me.CheckBoxShowModelDictionary.Visible = False
             '
-            'rbApproachTableColumn
+            'CheckBoxShowCoreModelElements
             '
-            Me.rbApproachTableColumn.AutoSize = True
-            Me.rbApproachTableColumn.Location = New System.Drawing.Point(21, 44)
-            Me.rbApproachTableColumn.Name = "rbApproachTableColumn"
-            Me.rbApproachTableColumn.Size = New System.Drawing.Size(132, 17)
-            Me.rbApproachTableColumn.TabIndex = 1
-            Me.rbApproachTableColumn.Text = "Table/Column retrieval"
-            Me.rbApproachTableColumn.UseVisualStyleBackColor = True
+            Me.CheckBoxShowCoreModelElements.AutoSize = True
+            Me.CheckBoxShowCoreModelElements.Location = New System.Drawing.Point(183, 9)
+            Me.CheckBoxShowCoreModelElements.Name = "CheckBoxShowCoreModelElements"
+            Me.CheckBoxShowCoreModelElements.Size = New System.Drawing.Size(156, 17)
+            Me.CheckBoxShowCoreModelElements.TabIndex = 4
+            Me.CheckBoxShowCoreModelElements.Text = "Show Core Model Elements"
+            Me.CheckBoxShowCoreModelElements.UseVisualStyleBackColor = True
+            Me.CheckBoxShowCoreModelElements.Visible = False
             '
-            'grpColumnSchema
+            'LabelModelName
             '
-            Me.grpColumnSchema.Controls.Add(Me.txtTableName)
-            Me.grpColumnSchema.Controls.Add(Me.Label3)
-            Me.grpColumnSchema.Location = New System.Drawing.Point(4, 189)
-            Me.grpColumnSchema.Name = "grpColumnSchema"
-            Me.grpColumnSchema.Size = New System.Drawing.Size(188, 87)
-            Me.grpColumnSchema.TabIndex = 2
-            Me.grpColumnSchema.TabStop = False
-            Me.grpColumnSchema.Text = "Column Schema Retrieval Method"
+            Me.LabelModelName.AutoSize = True
+            Me.LabelModelName.Location = New System.Drawing.Point(53, 25)
+            Me.LabelModelName.Name = "LabelModelName"
+            Me.LabelModelName.Size = New System.Drawing.Size(102, 13)
+            Me.LabelModelName.TabIndex = 3
+            Me.LabelModelName.Text = "<LabelModelName>"
             '
-            'txtTableName
+            'LabelPrompt
             '
-            Me.txtTableName.Location = New System.Drawing.Point(21, 42)
-            Me.txtTableName.Name = "txtTableName"
-            Me.txtTableName.Size = New System.Drawing.Size(161, 20)
-            Me.txtTableName.TabIndex = 3
+            Me.LabelPrompt.AutoSize = True
+            Me.LabelPrompt.Location = New System.Drawing.Point(17, 25)
+            Me.LabelPrompt.Name = "LabelPrompt"
+            Me.LabelPrompt.Size = New System.Drawing.Size(39, 13)
+            Me.LabelPrompt.TabIndex = 2
+            Me.LabelPrompt.Text = "Model:"
             '
-            'Label3
+            'TreeView1
             '
-            Me.Label3.AutoSize = True
-            Me.Label3.Location = New System.Drawing.Point(18, 26)
-            Me.Label3.Name = "Label3"
-            Me.Label3.Size = New System.Drawing.Size(127, 13)
-            Me.Label3.TabIndex = 2
-            Me.Label3.Text = "Table name place-holder:"
+            Me.TreeView1.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Me.TreeView1.ImageIndex = 0
+            Me.TreeView1.ImageList = Me.ImageList
+            Me.TreeView1.Location = New System.Drawing.Point(3, 49)
+            Me.TreeView1.Name = "TreeView1"
+            Me.TreeView1.SelectedImageIndex = 0
+            Me.TreeView1.Size = New System.Drawing.Size(760, 498)
+            Me.TreeView1.TabIndex = 1
             '
-            'grpTableSchema
+            'ImageList
             '
-            Me.grpTableSchema.Controls.Add(Me.rbTableDefault)
-            Me.grpTableSchema.Controls.Add(Me.rbTableQuery)
-            Me.grpTableSchema.Location = New System.Drawing.Point(4, 96)
-            Me.grpTableSchema.Name = "grpTableSchema"
-            Me.grpTableSchema.Size = New System.Drawing.Size(188, 87)
-            Me.grpTableSchema.TabIndex = 1
-            Me.grpTableSchema.TabStop = False
-            Me.grpTableSchema.Text = "Table Schema Retrieval Method"
-            '
-            'rbTableDefault
-            '
-            Me.rbTableDefault.AutoSize = True
-            Me.rbTableDefault.Checked = True
-            Me.rbTableDefault.Location = New System.Drawing.Point(21, 21)
-            Me.rbTableDefault.Name = "rbTableDefault"
-            Me.rbTableDefault.Size = New System.Drawing.Size(62, 17)
-            Me.rbTableDefault.TabIndex = 0
-            Me.rbTableDefault.TabStop = True
-            Me.rbTableDefault.Text = "Generic"
-            Me.rbTableDefault.UseVisualStyleBackColor = True
-            '
-            'rbTableQuery
-            '
-            Me.rbTableQuery.AutoSize = True
-            Me.rbTableQuery.Location = New System.Drawing.Point(21, 44)
-            Me.rbTableQuery.Name = "rbTableQuery"
-            Me.rbTableQuery.Size = New System.Drawing.Size(53, 17)
-            Me.rbTableQuery.TabIndex = 1
-            Me.rbTableQuery.Text = "Query"
-            Me.rbTableQuery.UseVisualStyleBackColor = True
-            '
-            'TabPage3
-            '
-            Me.TabPage3.Controls.Add(Me.splitRoutine)
-            Me.TabPage3.ImageIndex = 2
-            Me.TabPage3.Location = New System.Drawing.Point(4, 4)
-            Me.TabPage3.Name = "TabPage3"
-            Me.TabPage3.Size = New System.Drawing.Size(769, 553)
-            Me.TabPage3.TabIndex = 2
-            Me.TabPage3.Text = "Routines Meta Data"
-            Me.TabPage3.UseVisualStyleBackColor = True
-            '
-            'splitRoutine
-            '
-            Me.splitRoutine.Dock = System.Windows.Forms.DockStyle.Fill
-            Me.splitRoutine.Location = New System.Drawing.Point(0, 0)
-            Me.splitRoutine.Name = "splitRoutine"
-            Me.splitRoutine.Orientation = System.Windows.Forms.Orientation.Horizontal
-            '
-            'splitRoutine.Panel1
-            '
-            Me.splitRoutine.Panel1.Controls.Add(Me.Panel5)
-            Me.splitRoutine.Panel2Collapsed = True
-            Me.splitRoutine.Size = New System.Drawing.Size(769, 553)
-            Me.splitRoutine.SplitterDistance = 315
-            Me.splitRoutine.TabIndex = 2
-            '
-            'Panel5
-            '
-            Me.Panel5.BackColor = System.Drawing.Color.White
-            Me.Panel5.Controls.Add(Me.Label2)
-            Me.Panel5.Controls.Add(Me.lnkPreviewRoutineSchema)
-            Me.Panel5.Dock = System.Windows.Forms.DockStyle.Top
-            Me.Panel5.Location = New System.Drawing.Point(0, 0)
-            Me.Panel5.Name = "Panel5"
-            Me.Panel5.Size = New System.Drawing.Size(769, 24)
-            Me.Panel5.TabIndex = 1
-            '
-            'Label2
-            '
-            Me.Label2.BackColor = System.Drawing.Color.Transparent
-            Me.Label2.Dock = System.Windows.Forms.DockStyle.Fill
-            Me.Label2.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-            Me.Label2.Location = New System.Drawing.Point(0, 0)
-            Me.Label2.Name = "Label2"
-            Me.Label2.Size = New System.Drawing.Size(705, 24)
-            Me.Label2.TabIndex = 0
-            Me.Label2.Text = "Routine/Parameter Schema Query"
-            Me.Label2.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
-            '
-            'lnkPreviewRoutineSchema
-            '
-            Me.lnkPreviewRoutineSchema.BackColor = System.Drawing.Color.Transparent
-            Me.lnkPreviewRoutineSchema.Dock = System.Windows.Forms.DockStyle.Right
-            Me.lnkPreviewRoutineSchema.Image = CType(resources.GetObject("lnkPreviewRoutineSchema.Image"), System.Drawing.Image)
-            Me.lnkPreviewRoutineSchema.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
-            Me.lnkPreviewRoutineSchema.Location = New System.Drawing.Point(705, 0)
-            Me.lnkPreviewRoutineSchema.Name = "lnkPreviewRoutineSchema"
-            Me.lnkPreviewRoutineSchema.Size = New System.Drawing.Size(64, 24)
-            Me.lnkPreviewRoutineSchema.TabIndex = 1
-            Me.lnkPreviewRoutineSchema.TabStop = True
-            Me.lnkPreviewRoutineSchema.Text = "Preview"
-            Me.lnkPreviewRoutineSchema.TextAlign = System.Drawing.ContentAlignment.MiddleRight
-            '
-            'TabPage4
-            '
-            Me.TabPage4.ImageIndex = 3
-            Me.TabPage4.Location = New System.Drawing.Point(4, 4)
-            Me.TabPage4.Name = "TabPage4"
-            Me.TabPage4.Size = New System.Drawing.Size(769, 553)
-            Me.TabPage4.TabIndex = 3
-            Me.TabPage4.Text = "Transformations"
-            Me.TabPage4.UseVisualStyleBackColor = True
+            Me.ImageList.ImageStream = CType(resources.GetObject("ImageList.ImageStream"), System.Windows.Forms.ImageListStreamer)
+            Me.ImageList.TransparentColor = System.Drawing.Color.Transparent
+            Me.ImageList.Images.SetKeyName(0, "model_dictionary_entity_type")
+            Me.ImageList.Images.SetKeyName(1, "model_dictionary_value_type")
+            Me.ImageList.Images.SetKeyName(2, "model_dictionary_FactType")
+            Me.ImageList.Images.SetKeyName(3, "ObjectifiedFactType")
+            Me.ImageList.Images.SetKeyName(4, "ExclusionConstraint")
+            Me.ImageList.Images.SetKeyName(5, "EqualityConstraint")
+            Me.ImageList.Images.SetKeyName(6, "SubsetConstraint")
+            Me.ImageList.Images.SetKeyName(7, "InclusiveOrConstraint")
+            Me.ImageList.Images.SetKeyName(8, "ExclusiveOrConstraint")
+            Me.ImageList.Images.SetKeyName(9, "FrequencyConstraint")
+            Me.ImageList.Images.SetKeyName(10, "RingConstraint")
+            Me.ImageList.Images.SetKeyName(11, "ExternalUniquenessConstraint")
+            Me.ImageList.Images.SetKeyName(12, "ERD-16-16.png")
+            Me.ImageList.Images.SetKeyName(13, "ERDEntity16x16.png")
+            Me.ImageList.Images.SetKeyName(14, "Attribute.png")
+            Me.ImageList.Images.SetKeyName(15, "EntityTypeDerived")
+            Me.ImageList.Images.SetKeyName(16, "FactTypeUnary")
+            Me.ImageList.Images.SetKeyName(17, "SubtypeRelationship")
+            Me.ImageList.Images.SetKeyName(18, "FactTypeDerived")
+            Me.ImageList.Images.SetKeyName(19, "FactTypeUnaryDerived")
+            Me.ImageList.Images.SetKeyName(20, "PreferredExternalUniqueness")
+            Me.ImageList.Images.SetKeyName(21, "PGSNode.png")
+            Me.ImageList.Images.SetKeyName(22, "PGSRelation.png")
             '
             'Manage
             '
@@ -887,80 +613,33 @@ Namespace SourcePlugins.Boston
             Me.Controls.Add(Me.tcMain)
             Me.Name = "Manage"
             Me.Size = New System.Drawing.Size(777, 579)
-            Me.tcMain.ResumeLayout(False)
+            Me.TabPage2.ResumeLayout(False)
             Me.TabPage1.ResumeLayout(False)
             Me.TabPage1.PerformLayout()
-            Me.TabPage2.ResumeLayout(False)
-            Me.splitMain.Panel1.ResumeLayout(False)
-            CType(Me.splitMain, System.ComponentModel.ISupportInitialize).EndInit()
-            Me.splitMain.ResumeLayout(False)
-            Me.splitQuery.Panel1.ResumeLayout(False)
-            Me.splitQuery.Panel2.ResumeLayout(False)
-            CType(Me.splitQuery, System.ComponentModel.ISupportInitialize).EndInit()
-            Me.splitQuery.ResumeLayout(False)
-            Me.Panel3.ResumeLayout(False)
-            Me.splitTableColumn.Panel1.ResumeLayout(False)
-            Me.splitTableColumn.Panel2.ResumeLayout(False)
-            CType(Me.splitTableColumn, System.ComponentModel.ISupportInitialize).EndInit()
-            Me.splitTableColumn.ResumeLayout(False)
+            Me.tcMain.ResumeLayout(False)
             Me.Panel1.ResumeLayout(False)
-            Me.grpApproach.ResumeLayout(False)
-            Me.grpApproach.PerformLayout()
-            Me.grpColumnSchema.ResumeLayout(False)
-            Me.grpColumnSchema.PerformLayout()
-            Me.grpTableSchema.ResumeLayout(False)
-            Me.grpTableSchema.PerformLayout()
-            Me.TabPage3.ResumeLayout(False)
-            Me.splitRoutine.Panel1.ResumeLayout(False)
-            CType(Me.splitRoutine, System.ComponentModel.ISupportInitialize).EndInit()
-            Me.splitRoutine.ResumeLayout(False)
-            Me.Panel5.ResumeLayout(False)
+            Me.GroupBox_Main.ResumeLayout(False)
+            Me.GroupBox_Main.PerformLayout()
             Me.ResumeLayout(False)
 
         End Sub
 
-        Friend WithEvents tcMain As TabControl
-        Friend WithEvents TabPage1 As TabPage
-        Friend WithEvents txtPort As TextBox
-        Friend WithEvents chkPort As CheckBox
-        Friend WithEvents Panel2 As Panel
-        Friend WithEvents lblTitle As Label
-        Friend WithEvents btnTest As Button
-        Friend WithEvents lblServer As Label
-        Friend WithEvents txtConnectionString As TextBox
-        Friend WithEvents txtServer As TextBox
-        Friend WithEvents lblConnectionString As Label
-        Friend WithEvents lblDatabase As Label
-        Friend WithEvents txtPassword As TextBox
-        Friend WithEvents txtDatabase As TextBox
-        Friend WithEvents lblPassword As Label
-        Friend WithEvents lblUsername As Label
-        Friend WithEvents txtUsername As TextBox
         Friend WithEvents TabPage2 As TabPage
-        Friend WithEvents splitMain As SplitContainer
-        Friend WithEvents splitQuery As SplitContainer
-        Friend WithEvents Panel3 As Panel
-        Friend WithEvents lblSchemaQuery As Label
-        Friend WithEvents lnkPreviewSchema As LinkLabel
-        Friend WithEvents splitTableColumn As SplitContainer
-        Friend WithEvents lblTableSchemaQuery As Label
-        Friend WithEvents lblColumnSchemaQuery As Label
+        Friend WithEvents TabPage1 As TabPage
+        Friend WithEvents lblTitle As Label
+        Friend WithEvents LabelPromptWorkingModel As Label
+        Friend WithEvents LabelWorkingModel As Label
+        Friend WithEvents tcMain As TabControl
         Friend WithEvents Panel1 As Panel
-        Friend WithEvents grpApproach As GroupBox
-        Friend WithEvents rbApproachSingle As RadioButton
-        Friend WithEvents rbApproachTableColumn As RadioButton
-        Friend WithEvents grpColumnSchema As GroupBox
-        Friend WithEvents txtTableName As TextBox
-        Friend WithEvents Label3 As Label
-        Friend WithEvents grpTableSchema As GroupBox
-        Friend WithEvents rbTableDefault As RadioButton
-        Friend WithEvents rbTableQuery As RadioButton
-        Friend WithEvents TabPage3 As TabPage
-        Friend WithEvents splitRoutine As SplitContainer
-        Friend WithEvents Panel5 As Panel
-        Friend WithEvents Label2 As Label
-        Friend WithEvents lnkPreviewRoutineSchema As LinkLabel
-        Friend WithEvents TabPage4 As TabPage
+        Friend WithEvents Panel2 As Panel
+        Friend WithEvents GroupBox_Main As GroupBox
+        Friend WithEvents CheckBoxShowModelDictionary As CheckBox
+        Friend WithEvents CheckBoxShowCoreModelElements As CheckBox
+        Friend WithEvents LabelModelName As Label
+        Friend WithEvents LabelPrompt As Label
+        Friend WithEvents TreeView1 As TreeView
+        Friend WithEvents ImageList As ImageList
+        Private components As IContainer
 
 #End Region
 

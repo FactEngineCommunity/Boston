@@ -140,6 +140,16 @@ Namespace UI
 
 #End Region
 
+        Public _BostonModel As FBM.Model
+        Public Property BostonModel As FBM.Model Implements PluginInterface.Sources.IManageSource.BostonModel
+            Get
+                Return Me._BostonModel
+            End Get
+            Set(value As FBM.Model)
+                Me._BostonModel = value
+            End Set
+        End Property
+
         Private Sub BuildConnectionString()
             If Me.Access2K Then
                 Me.txtConnectionString.Text = "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" & Me.txtFile.Text & ";"

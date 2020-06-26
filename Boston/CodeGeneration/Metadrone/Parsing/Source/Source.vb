@@ -9,6 +9,11 @@ Namespace Parser.Source
         Public Name As String = Nothing
         Public Provider As String = PluginInterface.Sources.Descriptions.SQLSERVER.ProviderName
 
+        'Boston specific attributes.
+        Public BostonModelId As String = Nothing 'The Id of the Boston Model referenced in the database, if the provider is "BostonModel"
+        Public ModelName As String = Nothing 'The Id of the Boston Model referenced in the database, if the provider is "BostonModel"
+        Public Model As FBM.Model 'The Model linked by this Source.
+
         Public ConnectionString As String = Nothing
         Public SchemaQuery As String = Nothing
         Public TableSchemaQuery As String = Nothing

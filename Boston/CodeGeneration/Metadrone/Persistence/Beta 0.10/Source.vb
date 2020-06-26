@@ -10,6 +10,10 @@
         Public Name As String
         Public Provider As String = PluginInterface.Sources.Descriptions.SQLSERVER.ProviderName
 
+        'Boston specific attributes.
+        Public BostonModelId As String 'The Id of the Boston Model referenced in the database, if the provider is "BostonModel"
+        Public ModelName As String 'The Id of the Boston Model referenced in the database, if the provider is "BostonModel"
+
         Public ConnectionString As String
         Public SchemaQuery As String
         Public TableSchemaQuery As String
@@ -44,6 +48,9 @@
             Copy.RoutineSchemaQuery = Me.RoutineSchemaQuery
             Copy.Transformations = Me.Transformations
 
+            Copy.BostonModelId = Me.BostonModelId
+            Copy.ModelName = Me.ModelName
+
             Copy.GUID = Me.GUID
 
             Return Copy
@@ -68,6 +75,9 @@
             src.TableNamePlaceHolder = Me.TableNamePlaceHolder
             src.RoutineSchemaQuery = Me.RoutineSchemaQuery
             src.Transformations = Me.Transformations
+
+            src.BostonModelId = Me.BostonModelId
+            src.ModelName = Me.ModelName
 
             Return src
         End Function

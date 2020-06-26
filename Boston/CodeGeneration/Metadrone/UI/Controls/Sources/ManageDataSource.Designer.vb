@@ -1,11 +1,11 @@
 ﻿Namespace UI
 
-    <Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
+    <Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()>
     Partial Friend Class ManageSource
         Inherits System.Windows.Forms.UserControl
 
         'UserControl overrides dispose to clean up the component list.
-        <System.Diagnostics.DebuggerNonUserCode()> _
+        <System.Diagnostics.DebuggerNonUserCode()>
         Protected Overrides Sub Dispose(ByVal disposing As Boolean)
             Try
                 If disposing AndAlso components IsNot Nothing Then
@@ -22,7 +22,7 @@
         'NOTE: The following procedure is required by the Windows Form Designer
         'It can be modified using the Windows Form Designer.  
         'Do not modify it using the code editor.
-        <System.Diagnostics.DebuggerStepThrough()> _
+        <System.Diagnostics.DebuggerStepThrough()>
         Private Sub InitializeComponent()
             Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(ManageSource))
             Me.pnlProviders = New System.Windows.Forms.Panel()
@@ -50,8 +50,6 @@
             Me.pnlMessage = New System.Windows.Forms.Panel()
             Me.lnkMessage = New System.Windows.Forms.LinkLabel()
             Me.picMessage = New System.Windows.Forms.PictureBox()
-            Me.RadioButtonBostonModel = New System.Windows.Forms.RadioButton()
-            Me.PictureBox1 = New System.Windows.Forms.PictureBox()
             Me.pnlProviders.SuspendLayout()
             CType(Me.picExcel, System.ComponentModel.ISupportInitialize).BeginInit()
             CType(Me.picOracle, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -63,15 +61,12 @@
             Me.pnlLeft.SuspendLayout()
             Me.pnlMessage.SuspendLayout()
             CType(Me.picMessage, System.ComponentModel.ISupportInitialize).BeginInit()
-            CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).BeginInit()
             Me.SuspendLayout()
             '
             'pnlProviders
             '
             Me.pnlProviders.AutoScroll = True
             Me.pnlProviders.BackColor = System.Drawing.Color.Transparent
-            Me.pnlProviders.Controls.Add(Me.PictureBox1)
-            Me.pnlProviders.Controls.Add(Me.RadioButtonBostonModel)
             Me.pnlProviders.Controls.Add(Me.picExcel)
             Me.pnlProviders.Controls.Add(Me.rbExcel)
             Me.pnlProviders.Controls.Add(Me.picOracle)
@@ -381,24 +376,6 @@
             Me.picMessage.TabIndex = 0
             Me.picMessage.TabStop = False
             '
-            'RadioButtonBostonModel
-            '
-            Me.RadioButtonBostonModel.Location = New System.Drawing.Point(51, 268)
-            Me.RadioButtonBostonModel.Name = "RadioButtonBostonModel"
-            Me.RadioButtonBostonModel.Size = New System.Drawing.Size(108, 17)
-            Me.RadioButtonBostonModel.TabIndex = 39
-            Me.RadioButtonBostonModel.Text = "Boston Model"
-            Me.RadioButtonBostonModel.UseVisualStyleBackColor = True
-            '
-            'PictureBox1
-            '
-            Me.PictureBox1.Image = Global.Boston.My.Resources.MenuImagesMain.ORMStudio32x32
-            Me.PictureBox1.Location = New System.Drawing.Point(13, 261)
-            Me.PictureBox1.Name = "PictureBox1"
-            Me.PictureBox1.Size = New System.Drawing.Size(32, 32)
-            Me.PictureBox1.TabIndex = 40
-            Me.PictureBox1.TabStop = False
-            '
             'ManageSource
             '
             Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -419,7 +396,6 @@
             Me.pnlLeft.ResumeLayout(False)
             Me.pnlMessage.ResumeLayout(False)
             CType(Me.picMessage, System.ComponentModel.ISupportInitialize).EndInit()
-            CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).EndInit()
             Me.ResumeLayout(False)
 
         End Sub
@@ -448,8 +424,6 @@
         Friend WithEvents lnkMessage As System.Windows.Forms.LinkLabel
         Friend WithEvents pnlMessage As System.Windows.Forms.Panel
         Friend WithEvents picMessage As System.Windows.Forms.PictureBox
-        Friend WithEvents PictureBox1 As PictureBox
-        Friend WithEvents RadioButtonBostonModel As RadioButton
     End Class
 
 End Namespace

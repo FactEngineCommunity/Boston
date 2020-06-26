@@ -1,6 +1,7 @@
 D:\Viev\02-Marketing\01-Product\01-Products\Boston\Versions\Boston\SourcePlugins.Firebird\bin\Debug\SourcePlugins.Firebird.dll
 D:\Viev\02-Marketing\01-Product\01-Products\Boston\Versions\Boston\SourcePlugins.Firebird\bin\Debug\SourcePlugins.Firebird.pdb
 D:\Viev\02-Marketing\01-Product\01-Products\Boston\Versions\Boston\SourcePlugins.Firebird\bin\Debug\Boston.exe
+D:\Viev\02-Marketing\01-Product\01-Products\Boston\Versions\Boston\SourcePlugins.Firebird\bin\Debug\FirebirdSql.Data.FirebirdClient.dll
 D:\Viev\02-Marketing\01-Product\01-Products\Boston\Versions\Boston\SourcePlugins.Firebird\bin\Debug\AIMLbot.dll
 D:\Viev\02-Marketing\01-Product\01-Products\Boston\Versions\Boston\SourcePlugins.Firebird\bin\Debug\MindFusion.Diagramming.dll
 D:\Viev\02-Marketing\01-Product\01-Products\Boston\Versions\Boston\SourcePlugins.Firebird\bin\Debug\WordNetClasses.dll
@@ -59,10 +60,9 @@ D:\Viev\02-Marketing\01-Product\01-Products\Boston\Versions\Boston\SourcePlugins
 D:\Viev\02-Marketing\01-Product\01-Products\Boston\Versions\Boston\SourcePlugins.Firebird\bin\Debug\NotificationBar.xml
 D:\Viev\02-Marketing\01-Product\01-Products\Boston\Versions\Boston\SourcePlugins.Firebird\bin\Debug\WinFormAnimation.xml
 D:\Viev\02-Marketing\01-Product\01-Products\Boston\Versions\Boston\SourcePlugins.Firebird\obj\Debug\SourcePlugins.Firebird.csprojAssemblyReference.cache
+D:\Viev\02-Marketing\01-Product\01-Products\Boston\Versions\Boston\SourcePlugins.Firebird\obj\Debug\SourcePlugins.Firebird.Logo.resources
+D:\Viev\02-Marketing\01-Product\01-Products\Boston\Versions\Boston\SourcePlugins.Firebird\obj\Debug\SourcePlugins.Firebird.Manage.resources
+D:\Viev\02-Marketing\01-Product\01-Products\Boston\Versions\Boston\SourcePlugins.Firebird\obj\Debug\SourcePlugins.Firebird.csproj.GenerateResource.cache
 D:\Viev\02-Marketing\01-Product\01-Products\Boston\Versions\Boston\SourcePlugins.Firebird\obj\Debug\SourcePlugins.Firebird.csproj.CopyComplete
 D:\Viev\02-Marketing\01-Product\01-Products\Boston\Versions\Boston\SourcePlugins.Firebird\obj\Debug\SourcePlugins.Firebird.dll
 D:\Viev\02-Marketing\01-Product\01-Products\Boston\Versions\Boston\SourcePlugins.Firebird\obj\Debug\SourcePlugins.Firebird.pdb
-D:\Viev\02-Marketing\01-Product\01-Products\Boston\Versions\Boston\SourcePlugins.Firebird\bin\Debug\FirebirdSql.Data.FirebirdClient.dll
-D:\Viev\02-Marketing\01-Product\01-Products\Boston\Versions\Boston\SourcePlugins.Firebird\obj\Debug\SourcePlugins.Firebird.Manage.resources
-D:\Viev\02-Marketing\01-Product\01-Products\Boston\Versions\Boston\SourcePlugins.Firebird\obj\Debug\SourcePlugins.Firebird.csproj.GenerateResource.cache
-D:\Viev\02-Marketing\01-Product\01-Products\Boston\Versions\Boston\SourcePlugins.Firebird\obj\Debug\SourcePlugins.Firebird.Logo.resources

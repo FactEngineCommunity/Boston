@@ -26,6 +26,15 @@
 
 
 #Region "Properties"
+        Public _BostonModel As FBM.Model
+        Public Property BostonModel As FBM.Model Implements PluginInterface.Sources.IManageSource.BostonModel
+            Get
+                Return Me._BostonModel
+            End Get
+            Set(value As FBM.Model)
+                Me._BostonModel = value
+            End Set
+        End Property
 
         Public Property ConnectionString() As String Implements PluginInterface.Sources.IManageSource.ConnectionString
             Get

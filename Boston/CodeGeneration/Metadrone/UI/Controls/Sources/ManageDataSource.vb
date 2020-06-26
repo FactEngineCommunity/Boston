@@ -105,7 +105,7 @@ Namespace UI
                 Me.ctlODBC.RoutineSchemaQuery = Source.RoutineSchemaQuery
                 Me.ctlODBC.Transformations = Source.Transformations
 
-            ElseIf Source.Provider.Equals(PluginInterface.Sources.Descriptions.ACCESS.ProviderName, StringComparison.CurrentCultureIgnoreCase) Or _
+            ElseIf Source.Provider.Equals(PluginInterface.Sources.Descriptions.ACCESS.ProviderName, StringComparison.CurrentCultureIgnoreCase) Or
                    Source.Provider.Equals(PluginInterface.Sources.Descriptions.ACCESS2K.ProviderName, StringComparison.CurrentCultureIgnoreCase) Then
                 Me.rbAccess.Checked = True
                 Me.ctlAccess.Access2K = (Source.Provider = PluginInterface.Sources.Descriptions.ACCESS2K.ProviderName)
@@ -117,7 +117,7 @@ Namespace UI
                 Me.ctlAccess.RoutineSchemaQuery = Source.RoutineSchemaQuery
                 Me.ctlAccess.Transformations = Source.Transformations
 
-            ElseIf Source.Provider.Equals(PluginInterface.Sources.Descriptions.EXCEL.ProviderName, StringComparison.CurrentCultureIgnoreCase) Or _
+            ElseIf Source.Provider.Equals(PluginInterface.Sources.Descriptions.EXCEL.ProviderName, StringComparison.CurrentCultureIgnoreCase) Or
                    Source.Provider.Equals(PluginInterface.Sources.Descriptions.EXCEL2K.ProviderName, StringComparison.CurrentCultureIgnoreCase) Then
                 Me.rbExcel.Checked = True
                 Me.ctlExcel.Excel2K = (Source.Provider.Equals(PluginInterface.Sources.Descriptions.EXCEL2K.ProviderName, StringComparison.CurrentCultureIgnoreCase))
@@ -175,6 +175,8 @@ Namespace UI
             End If
 
             Call Me.ShowManager()
+
+            MsgBox(Source.BostonModelId)
 
             Me.SysIgnoreEvent = False
 
@@ -272,7 +274,7 @@ Namespace UI
                                 If CType(ctl, UserControl).Tag Is Nothing Then Continue For
                                 If Not TypeOf ctl Is PluginInterface.Sources.IManageSource Then Continue For
 
-                                If CType(ctl, UserControl).Tag.ToString.Equals(pi.SourceDescription.ProviderName, _
+                                If CType(ctl, UserControl).Tag.ToString.Equals(pi.SourceDescription.ProviderName,
                                                                                StringComparison.CurrentCultureIgnoreCase) Then
                                     'Now set
                                     With CType(Me.Tag, Persistence.Source)
@@ -349,8 +351,7 @@ Namespace UI
                                                                                                     rbAccess.CheckedChanged,
                                                                                                     rbExcel.CheckedChanged,
                                                                                                     rbOLEDB.CheckedChanged,
-                                                                                                    rbODBC.CheckedChanged,
-                                                                                                    RadioButtonBostonModel.CheckedChanged
+                                                                                                    rbODBC.CheckedChanged
             If Me.SysIgnoreEvent Then Exit Sub
 
             Me.SysIgnoreEvent = True

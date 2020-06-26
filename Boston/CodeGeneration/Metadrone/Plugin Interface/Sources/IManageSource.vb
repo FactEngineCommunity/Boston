@@ -18,6 +18,8 @@
         Property RoutineSchemaQuery() As String
         Property Transformations() As String
 
+        Property BostonModel As FBM.Model
+
     End Interface
 
 End Namespace

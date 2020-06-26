@@ -5,6 +5,28 @@
 
     Friend Class DescriptionImplementations
 
+        Public Class Boston
+            Implements ISourceDescription
+
+            Public ReadOnly Property Description() As String Implements ISourceDescription.Description
+                Get
+                    Return "Boston"
+                End Get
+            End Property
+
+            Public ReadOnly Property LogoImage() As System.Drawing.Image Implements ISourceDescription.LogoImage
+                Get
+                    Return Nothing
+                End Get
+            End Property
+
+            Public ReadOnly Property ProviderName() As String Implements ISourceDescription.ProviderName
+                Get
+                    Return "BostonModel"
+                End Get
+            End Property
+        End Class
+
         Public Class SQLServer
             Implements ISourceDescription
 
@@ -196,6 +218,7 @@
         Public Shared ACCESS2K As New DescriptionImplementations.Access2K()
         Public Shared EXCEL As New DescriptionImplementations.Excel()
         Public Shared EXCEL2K As New DescriptionImplementations.Excel2k()
+        Public Shared Boston As New DescriptionImplementations.Boston
 
     End Class
 

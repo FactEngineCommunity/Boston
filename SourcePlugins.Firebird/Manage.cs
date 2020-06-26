@@ -75,6 +75,12 @@ namespace SourcePlugins.Firebird
 
         #region "Properties"
 
+        public Boston.FBM.Model _BostonModel;
+        public Boston.FBM.Model BostonModel
+        {
+            get { return this._BostonModel; }
+            set { this._BostonModel = value; }
+        }
         public string ConnectionString
         {
             get { return this.txtConnectionString.Text; }
