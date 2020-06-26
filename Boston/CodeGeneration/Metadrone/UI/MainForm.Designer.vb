@@ -1,11 +1,11 @@
 ﻿Namespace UI
 
-    <Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
+    <Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()>
     Partial Friend Class MainForm
-        Inherits System.Windows.Forms.Form
+        Inherits WeifenLuo.WinFormsUI.Docking.DockContent
 
         'Form overrides dispose to clean up the component list.
-        <System.Diagnostics.DebuggerNonUserCode()> _
+        <System.Diagnostics.DebuggerNonUserCode()>
         Protected Overrides Sub Dispose(ByVal disposing As Boolean)
             Try
                 If disposing AndAlso components IsNot Nothing Then
@@ -22,7 +22,7 @@
         'NOTE: The following procedure is required by the Windows Form Designer
         'It can be modified using the Windows Form Designer.  
         'Do not modify it using the code editor.
-        <System.Diagnostics.DebuggerStepThrough()> _
+        <System.Diagnostics.DebuggerStepThrough()>
         Private Sub InitializeComponent()
             Me.components = New System.ComponentModel.Container()
             Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(MainForm))
@@ -520,7 +520,7 @@
             Me.MinimumSize = New System.Drawing.Size(450, 400)
             Me.Name = "MainForm"
             Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
-            Me.Text = "Metadrone"
+            Me.Text = "Generator"
             Me.WindowState = System.Windows.Forms.FormWindowState.Maximized
             Me.tsMain.ResumeLayout(False)
             Me.tsMain.PerformLayout()

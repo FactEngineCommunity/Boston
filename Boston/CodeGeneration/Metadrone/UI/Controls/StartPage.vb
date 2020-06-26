@@ -9,8 +9,6 @@
         Public Event OpenRecent(ByVal path As String)
 
         Private Sub StartPage_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
-            'Init descriptions
-            Me.lblBuild.Text = Globals.ASSEMBLY_VERSION_METADRONE
         End Sub
 
         Public Sub OpenRecentProject(ByVal path As String)

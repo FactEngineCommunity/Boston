@@ -3851,4 +3851,10 @@ Public Class frmToolboxEnterpriseExplorer
 
         Me.TreeView.Left = 3
     End Sub
+
+    Private Sub CodeGenerationToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles CodeGenerationToolStripMenuItem.Click
+
+        Call frmMain.loadCodeGenerator()
+
+    End Sub
 End Class

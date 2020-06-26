@@ -1,5 +1,4 @@
 ﻿Namespace UI
-
     Friend Class MainForm
 
         Private Const IMG_METADRONE As Integer = 0
@@ -10,7 +9,6 @@
         Private Const IMG_SOURCE As Integer = 5
         Private Const IMG_PROPERTIES As Integer = 6
         Private Const IMG_TEMPLATE_LIBRARY As Integer = 7
-
 
         Private Sub MainForm_Shown(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Shown
             Me.Cursor = Cursors.WaitCursor
@@ -55,7 +53,7 @@
         Private Sub MainForm_FormClosing(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
             'Me.txtTemplate.HidePopup()
             If Not Me.buildCompleted Then
-                If MessageBox.Show("Do you want to cancel building?", "Stil Building", MessageBoxButtons.YesNo, _
+                If MessageBox.Show("Do you want to cancel building?", "Stil Building", MessageBoxButtons.YesNo,
                                    MessageBoxIcon.Question, MessageBoxDefaultButton.Button1) = System.Windows.Forms.DialogResult.Yes Then
                     Me.main.CancelBuild()
                     While Not Me.buildCompleted
@@ -78,6 +76,8 @@
 
         Private Sub MainForm_FormClosed(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosedEventArgs) Handles Me.FormClosed
             Call Me.settings.Save()
+
+            frmMain.zfrmCodeGenerator = Nothing
         End Sub
 
         Private Sub MainForm_SizeChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.SizeChanged

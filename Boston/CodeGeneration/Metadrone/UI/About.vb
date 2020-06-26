@@ -31,8 +31,8 @@ Namespace UI
                 Me.grdPlugins.Rows(i).Selected = False
             Next
             Me.grdComponents.Rows(0).Selected = True
-            Me.txtDetails.Text = Globals.ReadResource("Metadrone.ProductDetails.Metadrone.txt")
-            Me.txtLicence.Text = Globals.ReadResource("Metadrone.LicenceDetails.Metadrone.txt")
+            Me.txtDetails.Text = Globals.ReadResource("Boston.ProductDetails.Metadrone.txt")
+            Me.txtLicence.Text = Globals.ReadResource("Boston.LicenceDetails.Metadrone.txt")
             Dim rtxt As New RichTextBox()
             rtxt.Text = Globals.VersionHistory().ToString
             rtxt.ReadOnly = True
@@ -61,14 +61,14 @@ Namespace UI
             If Me.grdComponents.SelectedRows.Count = 0 Then Me.grdComponents.Rows(0).Selected = True
             If Me.grdComponents.SelectedRows(0).Cells(0).Value.Equals(Globals.ASSEMBLY_NAME_METADRONE) And _
                Me.grdComponents.SelectedRows(0).Cells(1).Value.Equals(Application.ProductVersion) Then
-                Me.txtDetails.Text = Globals.ReadResource("Metadrone.ProductDetails.Metadrone.txt")
-                Me.txtLicence.Text = Globals.ReadResource("Metadrone.LicenceDetails.Metadrone.txt")
+                Me.txtDetails.Text = Globals.ReadResource("Boston.ProductDetails.Metadrone.txt")
+                Me.txtLicence.Text = Globals.ReadResource("Boston.LicenceDetails.Metadrone.txt")
                 Me.tcInfo.TabPages.Add(Me.versionPage)
 
             ElseIf Me.grdComponents.SelectedRows(0).Cells(0).Value.Equals(Globals.ASSEMBLY_NAME_ICSHARPCODE) And _
                    Me.grdComponents.SelectedRows(0).Cells(1).Value.Equals(Globals.ASSEMBLY_VERSION_ICSHARPCODE) Then
-                Me.txtDetails.Text = Globals.ReadResource("Metadrone.ProductDetails.ICSharpCodeTextEditor.txt")
-                Me.txtLicence.Text = Globals.ReadResource("Metadrone.LicenceDetails.ICSharpCodeTextEditor.txt")
+                Me.txtDetails.Text = Globals.ReadResource("Boston.ProductDetails.ICSharpCodeTextEditor.txt")
+                Me.txtLicence.Text = Globals.ReadResource("Boston.LicenceDetails.ICSharpCodeTextEditor.txt")
                 Me.tcInfo.TabPages.Remove(Me.versionPage)
 
             End If

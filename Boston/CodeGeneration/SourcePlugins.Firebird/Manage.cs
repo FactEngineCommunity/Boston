@@ -9,7 +9,7 @@ using System.Windows.Forms;
 
 namespace SourcePlugins.Firebird
 {
-    public partial class Manage : UserControl, Boston.PluginInterface.Sources.IManageSource
+    public partial class Manage : UserControl, Boston.PluginInterface.Sources.IManageSource 
     {
 
         public event Boston.PluginInterface.Sources.IManageSource.ValueChangedEventHandler ValueChanged;

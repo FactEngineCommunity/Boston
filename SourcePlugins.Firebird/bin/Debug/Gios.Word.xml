@@ -1,0 +1,495 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Gios.Word</name>
+    </assembly>
+    <members>
+        <member name="T:Gios.Word.WordArea">
+            <summary>
+            the abstract class of an area of the document. Could be a Table Cell or the Document itself.
+            </summary>
+        </member>
+        <member name="M:Gios.Word.WordArea.SetFont(System.Drawing.Font)">
+            <summary>
+            Sets the Font for the next writing.
+            </summary>
+            <param name="Font"></param>
+        </member>
+        <member name="M:Gios.Word.WordArea.SetForegroundColor(System.Drawing.Color)">
+            <summary>
+            Sets the color for the next writing.
+            </summary>
+            <param name="Color"></param>
+        </member>
+        <member name="M:Gios.Word.WordArea.SetFontBackgroundColor(System.Drawing.Color)">
+            <summary>
+            Sets the color for the next writing.
+            </summary>
+            <param name="Color"></param>
+        </member>
+        <member name="M:Gios.Word.WordArea.SetFontBackgroundColor">
+            <summary>
+            Resets the font background color
+            </summary>
+        </member>
+        <member name="M:Gios.Word.WordArea.WriteControlWord(System.String)">
+            <summary>
+            Expert users only. Insert a control word into the Document. (see RTF specifcations)
+            
+            For example:
+            myDocument.WriteControlWord("animtext3");
+            Starts sparkling text writing.
+            </summary>
+            <param name="ControlWord"></param>
+        </member>
+        <member name="M:Gios.Word.WordArea.WriteRtf(System.String)">
+            <summary>
+            Expert users only. Writes RTF code directly into the Document.
+            This can be useful for implementing further RTF capabilities.
+            </summary>
+            <param name="RtfText"></param>
+        </member>
+        <member name="M:Gios.Word.WordArea.WriteLine(System.String)">
+            <summary>
+            Writes a text line.
+            </summary>
+            <param name="text"></param>
+        </member>
+        <member name="M:Gios.Word.WordArea.WriteTabSpace">
+            <summary>
+            Writes a TAB (Tabulation) Space
+            </summary>
+        </member>
+        <member name="M:Gios.Word.WordArea.SetParagraph(System.Int32)">
+            <summary>
+            Sets the line Indent
+            </summary>
+            <param name="Indent"></param>
+        </member>
+        <member name="M:Gios.Word.WordArea.SetParagraph(System.Int32,System.Int32)">
+            <summary>
+            Sets the line Indent
+            </summary>
+            <param name="Indent"></param>
+            <param name="FirstIndent"></param>
+        </member>
+        <member name="M:Gios.Word.WordArea.SetParagraph">
+            <summary>
+            Resets the line indent
+            </summary>
+        </member>
+        <member name="M:Gios.Word.WordArea.WriteLine">
+            <summary>
+            Writes a new line.
+            </summary>
+        </member>
+        <member name="M:Gios.Word.WordArea.Write(System.String)">
+            <summary>
+            Writes a string
+            </summary>
+            <param name="text"></param>
+        </member>
+        <member name="M:Gios.Word.WordArea.PutImage(System.String,System.Int32)">
+            <summary>
+            Puts a jpeg image into the current position.
+            </summary>
+            <param name="JpegFile">the color RGB jpeg file.</param>
+            <param name="DPI">target picture resolution</param>
+        </member>
+        <member name="M:Gios.Word.WordArea.SetTextAlign(Gios.Word.WordTextAlign)">
+            <summary>
+            Sets the horizontal alignment of the text.
+            </summary>
+            <param name="WordTextAlignment"></param>
+        </member>
+        <member name="M:Gios.Word.WordArea.RenderToStream(System.IO.Stream)">
+            <summary>
+            
+            </summary>
+            <param name="ms"></param>
+        </member>
+        <member name="T:Gios.Word.WordCell">
+            <summary>
+            cell of a WordTable
+            </summary>
+        </member>
+        <member name="M:Gios.Word.WordCell.SetCellPadding(System.Int32)">
+            <summary>
+            Sets the padding of the cell.
+            </summary>
+            <param name="Padding"></param>
+        </member>
+        <member name="M:Gios.Word.WordCell.SetBackgroundColor(System.Drawing.Color)">
+            <summary>
+            Sets the background color of the cell.
+            </summary>
+            <param name="BackgroundColor"></param>
+        </member>
+        <member name="M:Gios.Word.WordCell.SetContentAlignment(System.Drawing.ContentAlignment)">
+            <summary>
+            Sets the content alignment of this cell.
+            </summary>
+            <param name="ContentAlignment"></param>
+        </member>
+        <member name="M:Gios.Word.WordCell.SetBorders(System.Drawing.Color,System.Int32,System.Boolean,System.Boolean,System.Boolean,System.Boolean)">
+            <summary>
+            Sets each border of the cell.
+            </summary>
+            <param name="BorderColor"></param>
+            <param name="BorderWidth"></param>
+            <param name="top"></param>
+            <param name="bottom"></param>
+            <param name="left"></param>
+            <param name="right"></param>
+        </member>
+        <member name="P:Gios.Word.WordCell.ColSpan">
+            <summary>
+            Gets or sets the column span of the cell.
+            </summary>
+        </member>
+        <member name="P:Gios.Word.WordCell.RowSpan">
+            <summary>
+            Gets or sets the row span of the cell.
+            </summary>
+        </member>
+        <member name="T:Gios.Word.WordCellRange">
+            <summary>
+            a range of cell of the WordTable.
+            </summary>
+        </member>
+        <member name="M:Gios.Word.WordCellRange.SetCellPadding(System.Int32)">
+            <summary>
+            Sets this padding to each cell of the cellrange.
+            </summary>
+            <param name="CellPadding"></param>
+        </member>
+        <member name="M:Gios.Word.WordCellRange.SetBackgroundColor(System.Drawing.Color)">
+            <summary>
+            Sets this background color to each cell of the cellrange. 
+            </summary>
+            <param name="BackgroundColor"></param>
+        </member>
+        <member name="M:Gios.Word.WordCellRange.SetBackgroundColor(System.Drawing.Color,System.Drawing.Color)">
+            <summary>
+            Sets those background colors to each cell of the cellrange.
+            </summary>
+            <param name="BackgroundColor"></param>
+            <param name="AlternateBackgroundColor"></param>
+        </member>
+        <member name="M:Gios.Word.WordCellRange.SetForegroundColor(System.Drawing.Color)">
+            <summary>
+            Sets this foreground color to each cell of the cellrange.
+            </summary>
+            <param name="Color"></param>
+        </member>
+        <member name="M:Gios.Word.WordCellRange.SetColors(System.Drawing.Color,System.Drawing.Color,System.Drawing.Color)">
+            <summary>
+            Sets those colors to each cell of the cellrange.
+            </summary>
+            <param name="ForegroundColor"></param>
+            <param name="BackgroundColor"></param>
+            <param name="AlternateBackgroundColor"></param>
+        </member>
+        <member name="M:Gios.Word.WordCellRange.SetColors(System.Drawing.Color,System.Drawing.Color)">
+            <summary>
+            Sets those colors to each cell of the cellrange.
+            </summary>
+            <param name="ForegroundColor"></param>
+            <param name="BackgroundColor"></param>
+        </member>
+        <member name="M:Gios.Word.WordCellRange.SetContentAlignment(System.Drawing.ContentAlignment)">
+            <summary>
+            Sets this content alignment to each cell of the cellrange.
+            </summary>
+            <param name="ContentAlignment"></param>
+        </member>
+        <member name="M:Gios.Word.WordCellRange.SetFont(System.Drawing.Font)">
+            <summary>
+            Sets this font to each cell of the cellrange.
+            </summary>
+            <param name="Font"></param>
+        </member>
+        <member name="M:Gios.Word.WordCellRange.SetBorders(System.Drawing.Color,System.Int32,System.Boolean,System.Boolean,System.Boolean,System.Boolean)">
+            <summary>
+            Sets this border to the sub-table area defined by the cellrange
+            </summary>
+            <param name="BorderColor"></param>
+            <param name="BorderWidth"></param>
+            <param name="top"></param>
+            <param name="bottom"></param>
+            <param name="left"></param>
+            <param name="right"></param>
+        </member>
+        <member name="M:Gios.Word.WordCellRange.MergeCells">
+            <summary>
+            Merges together every cell of this cellrange. (using row and column spanning)
+            </summary>
+        </member>
+        <member name="P:Gios.Word.WordCellRange.Cells">
+            <summary>
+            the entire collection of cells.
+            </summary>
+        </member>
+        <member name="T:Gios.Word.WordColumn">
+            <summary>
+            a Column of the WordTable
+            </summary>
+        </member>
+        <member name="M:Gios.Word.WordColumn.SetWidth(System.Int32)">
+            <summary>
+            sets the Relative Width of the Column. For example: if the relative widths of a 3 columns
+            table are 10,10,30; the columns will respectivelly sized as 20%,20%,60% of the table size.
+            </summary>
+            <param name="RelativeWidth"></param>
+        </member>
+        <member name="P:Gios.Word.WordColumn.Index">
+            <summary>
+            Gets the index of the column.
+            </summary>
+        </member>
+        <member name="T:Gios.Word.WordDocument">
+            <summary>
+            The target Word Document.
+            </summary>
+        </member>
+        <member name="M:Gios.Word.WordDocument.#ctor(Gios.Word.WordDocumentFormat)">
+            <summary>
+            Creates a new word document specifing the format of the pages.
+            </summary>
+            <param name="WordDocumentFormat"></param>
+        </member>
+        <member name="M:Gios.Word.WordDocument.NewPage">
+            <summary>
+            Writes a page interruption (new page)
+            </summary>
+        </member>
+        <member name="M:Gios.Word.WordDocument.NewTable(System.Drawing.Font,System.Drawing.Color,System.Int32,System.Int32,System.Int32)">
+            <summary>
+            Creates a new WordTable.
+            </summary>
+            <param name="DefaultFont"></param>
+            <param name="DefaultForegroundColor"></param>
+            <param name="rows"></param>
+            <param name="columns"></param>
+            <param name="padding"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Gios.Word.WordDocument.SetPageNumbering(System.Int32)">
+            <summary>
+            Sets the document's page numbering. It can be called only once.
+            </summary>
+            <param name="StartPageNumber"></param>
+        </member>
+        <member name="M:Gios.Word.WordDocument.HeaderStart">
+            <summary>
+            Set the starting tag of the header of the document
+            </summary>
+        </member>
+        <member name="M:Gios.Word.WordDocument.HeaderEnd">
+            <summary>
+            Set the ending tag of the header of the document
+            </summary>
+        </member>
+        <member name="M:Gios.Word.WordDocument.FooterStart">
+            <summary>
+            Set the starting tag of the footer of the document
+            </summary>
+        </member>
+        <member name="M:Gios.Word.WordDocument.FooterEnd">
+            <summary>
+            Set the ending tag of the footer of the document
+            </summary>
+        </member>
+        <member name="M:Gios.Word.WordDocument.SaveToStream(System.IO.Stream)">
+            <summary>
+            Outputs the Complete WORD Document to a Generic Stream as a Rich Text Format (RTF)
+            </summary>
+            <param name="Stream">
+            The Generic Stream to Output the Pdf Document
+            </param>
+        </member>
+        <member name="M:Gios.Word.WordDocument.SaveToFile(System.String)">
+            <summary>
+            Outputs the complete WORD Document to a file as a Rich Text Format (RTF)
+            </summary>
+            <param name="file"></param>
+        </member>
+        <member name="T:Gios.Word.WordDocumentFormat">
+            <summary>
+            Summary description for WordDocumentFormat.
+            </summary>
+        </member>
+        <member name="M:Gios.Word.WordDocumentFormat.InCentimeters(System.Double,System.Double,System.Double,System.Double,System.Double,System.Double)">
+            <summary>
+            creates a centimeters custom sized paper.
+            </summary>
+            <param name="Width"></param>
+            <param name="Height"></param>
+            <param name="LeftMargin"></param>
+            <param name="RightMargin"></param>
+            <param name="TopMargin"></param>
+            <param name="BottomMargin"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Gios.Word.WordDocumentFormat.InInches(System.Double,System.Double,System.Double,System.Double,System.Double,System.Double)">
+            <summary>
+            creates a inches custom sized paper.
+            </summary>
+            <param name="Width"></param>
+            <param name="Height"></param>
+            <param name="LeftMargin"></param>
+            <param name="RightMargin"></param>
+            <param name="TopMargin"></param>
+            <param name="BottomMargin"></param>
+            <returns></returns>
+        </member>
+        <member name="P:Gios.Word.WordDocumentFormat.A4">
+            <summary>
+            gets the Classic A4 Letter.
+            </summary>
+        </member>
+        <member name="P:Gios.Word.WordDocumentFormat.A4_Horizontal">
+            <summary>
+            gets the Classic A4 Letter (Horizontal)
+            </summary>
+        </member>
+        <member name="P:Gios.Word.WordDocumentFormat.Letter_8_5x11">
+            <summary>
+            gets the 8.5x11 American Letter.
+            </summary>
+        </member>
+        <member name="P:Gios.Word.WordDocumentFormat.Letter_8_5x11_Horizontal">
+            <summary>
+            gets the 8.5x11 American Letter. (Horizontal)
+            </summary>
+        </member>
+        <member name="T:Gios.Word.WordRow">
+            <summary>
+            row of a WordTable
+            </summary>
+        </member>
+        <member name="M:Gios.Word.WordRow.SetRowHeight(System.Int32)">
+            <summary>
+            Sets the row height in twips.
+            </summary>
+            <param name="Height"></param>
+        </member>
+        <member name="P:Gios.Word.WordRow.Index">
+            <summary>
+            Gets the index of the row.
+            </summary>
+        </member>
+        <member name="P:Gios.Word.WordRow.Item(System.Int32)">
+            <summary>
+            Gets a cell specifying the column.
+            </summary>
+        </member>
+        <member name="T:Gios.Word.WordTable">
+            <summary>
+            the Word Document Table.
+            </summary>
+        </member>
+        <member name="M:Gios.Word.WordTable.SetColumnsWidth(System.Int32[])">
+            <summary>
+            sets the widths of the Columns.
+            </summary>
+            <param name="ColumnsWidthArray"></param>
+        </member>
+        <member name="M:Gios.Word.WordTable.Cell(System.Int32,System.Int32)">
+            <summary>
+            Return a specific cell of the WordTable
+            </summary>
+            <param name="row"></param>
+            <param name="column"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Gios.Word.WordTable.CellRange(System.Int32,System.Int32,System.Int32,System.Int32)">
+            <summary>
+            Return a cell range of the WordTable.
+            </summary>
+            <param name="startRow"></param>
+            <param name="startColumn"></param>
+            <param name="endRow"></param>
+            <param name="endColumn"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Gios.Word.WordTable.Import(System.Data.DataTable,System.Int32,System.Int32)">
+            <summary>
+            Imports text from a datatable.
+            </summary>
+            <param name="dt">The Source Datatable</param>
+            <param name="WordTableStartRow">the starting row of the Pdf Table that will import datas.</param>
+            <param name="WordTableStartColumn">the starting column of the Pdf Table that will import datas.</param>
+        </member>
+        <member name="M:Gios.Word.WordTable.Import(System.Data.DataTable)">
+            <summary>
+            Imports text from a datatable.
+            </summary>
+            <param name="dt">The Source Datatable</param>
+        </member>
+        <member name="M:Gios.Word.WordTable.Import(System.Data.DataTable,System.Int32,System.Int32,System.Int32,System.Int32)">
+            <summary>
+            Imports text from a datatable.
+            </summary>
+            <param name="dt">The Source Datatable</param>
+            <param name="WordTableStartRow">the starting row of the Pdf Table that will import datas.</param>
+            <param name="WordTableStartColumn">the starting column of the Pdf Table that will import datas.</param>
+            <param name="DataTableStartRow">the starting row of the DataTable that will export datas.</param>
+            <param name="DataTableEndRow">the ending row of the DataTable that will export datas.</param>
+        </member>
+        <member name="M:Gios.Word.WordTable.SaveToDocument(System.Int32,System.Int32)">
+            <summary>
+            Save the table to the document in the current position.
+            </summary>
+            <param name="Width"></param>
+            <param name="PosX"></param>
+        </member>
+        <member name="M:Gios.Word.WordTable.SetRowHeight(System.Int32)">
+            <summary>
+            Sets this Height to each Row of the Table.
+            </summary>
+            <param name="Height"></param>
+        </member>
+        <member name="M:Gios.Word.WordTable.RenderToStream(System.IO.Stream)">
+            <summary>
+            
+            </summary>
+            <param name="ms"></param>
+        </member>
+        <member name="P:Gios.Word.WordTable.Columns">
+            <summary>
+            The Columns Array of the WordTable
+            </summary>
+        </member>
+        <member name="P:Gios.Word.WordTable.Rows">
+            <summary>
+            The Rows Array of the WordTable
+            </summary>
+        </member>
+        <member name="T:Gios.Word.WordTextAlign">
+            <summary>
+            the different kinds of text alignment.
+            </summary>
+        </member>
+        <member name="F:Gios.Word.WordTextAlign.Left">
+            <summary>
+            left aligned text.
+            </summary>
+        </member>
+        <member name="F:Gios.Word.WordTextAlign.Center">
+            <summary>
+            center aligned text.
+            </summary>
+        </member>
+        <member name="F:Gios.Word.WordTextAlign.Right">
+            <summary>
+            right aligned text.
+            </summary>
+        </member>
+        <member name="F:Gios.Word.WordTextAlign.Justified">
+            <summary>
+            jusified text.
+            </summary>
+        </member>
+    </members>
+</doc>

@@ -25,7 +25,7 @@
         Private Sub LoadPlugins()
             If Globals.SourcePlugins.Plugins.Count > 0 Then Exit Sub
 
-            Dim di As New IO.DirectoryInfo(My.Application.Info.DirectoryPath)
+            Dim di As New IO.DirectoryInfo(My.Application.Info.DirectoryPath & "\codegenerationplugins")
             Dim aryFi As IO.FileInfo() = di.GetFiles("*plugins*.dll")
             For Each fi As IO.FileInfo In aryFi
                 Me.lblStatus.Text = "Scanning for plugins: '" & fi.FullName & "'. "
@@ -37,9 +37,11 @@
 
                 Catch ex As Exception
                     'Ignore exception
-
+                    MsgBox(ex.InnerException.Message)
                 End Try
             Next
+
+            Call Globals.SourcePlugins.loadBostonCodeGenerationPlugin() 'DummyPlugin that references a Boston Model in memory rather than a database
 
             Me.lblStatus.Text = ""
             Me.Refresh()

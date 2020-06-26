@@ -118,20 +118,14 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="Grid" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>Images\MenuImages\Grid.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="Home16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>Images\MenuImages\Home16x16.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="Group16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Images\MenuImages\Group16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="Layout16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>Images\MenuImages\Layout16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="ORMStudio32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Images\Icons\BostonIconFiles\ORMStudio32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="Camera16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>Images\MenuImages\Camera16x16.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="ModelAdd16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Images\MenuImages\ModelAdd16x16.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="StateTransitionDiagram-16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Images\MenuImages\StateTransitionDiagram-16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -139,16 +133,31 @@
   <data name="ORM16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Images\MenuImages\ORM16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="Database16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>Images\MenuImages\Database16x16.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="dictionary16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Images\MenuImages\dictionary16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Camera16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Images\MenuImages\Camera16x16.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Home16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Images\MenuImages\Home16x16.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="profile16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Images\MenuImages\profile16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="ModelAdd16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>Images\MenuImages\ModelAdd16x16.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="Grid" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Images\MenuImages\Grid.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ORMStudio32x321" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Images\Icons\BostonIconFiles\ORMStudio32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Database16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Images\MenuImages\Database16x16.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Layout16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Images\MenuImages\Layout16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ORMStudio32x322" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Images\Icons\BostonIconFiles\ORMStudio32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>

@@ -31,16 +31,16 @@ Namespace PluginInterface.Sources
 
         Friend Function GetQuery(ByVal Query As QueryEnum) As String
             Select Case Query
-                Case QueryEnum.SchemaQuery : Return Globals.ReadResource("Metadrone.Queries.SQLServer.SchemaQuery.sql")
-                Case QueryEnum.TableQuery : Return Globals.ReadResource("Metadrone.Queries.SQLServer.TableQuery.sql")
-                Case QueryEnum.ColumnQuery : Return Globals.ReadResource("Metadrone.Queries.SQLServer.ColumnQuery.sql")
-                Case QueryEnum.RoutineSchemaQuery : Return Globals.ReadResource("Metadrone.Queries.SQLServer.RoutineSchemaQuery.sql")
+                Case QueryEnum.SchemaQuery : Return Globals.ReadResource("Boston.Queries.SQLServer.SchemaQuery.sql")
+                Case QueryEnum.TableQuery : Return Globals.ReadResource("Boston.Queries.SQLServer.TableQuery.sql")
+                Case QueryEnum.ColumnQuery : Return Globals.ReadResource("Boston.Queries.SQLServer.ColumnQuery.sql")
+                Case QueryEnum.RoutineSchemaQuery : Return Globals.ReadResource("Boston.Queries.SQLServer.RoutineSchemaQuery.sql")
             End Select
             Return Nothing
         End Function
 
         Friend Function GetTransforms() As String
-            Return Globals.ReadResource("Metadrone.Transforms.SQLServer.txt")
+            Return Globals.ReadResource("Boston.Transforms.SQLServer.txt")
         End Function
 
         Public Property Name() As String Implements IConnection.Name

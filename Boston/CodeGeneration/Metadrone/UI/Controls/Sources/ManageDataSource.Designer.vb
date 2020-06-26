@@ -25,31 +25,33 @@
         <System.Diagnostics.DebuggerStepThrough()> _
         Private Sub InitializeComponent()
             Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(ManageSource))
-            Me.pnlProviders = New System.Windows.Forms.Panel
-            Me.picExcel = New System.Windows.Forms.PictureBox
-            Me.rbExcel = New System.Windows.Forms.RadioButton
-            Me.picOracle = New System.Windows.Forms.PictureBox
-            Me.rbOracle = New System.Windows.Forms.RadioButton
-            Me.picODBC = New System.Windows.Forms.PictureBox
-            Me.rbODBC = New System.Windows.Forms.RadioButton
-            Me.picOLEDB = New System.Windows.Forms.PictureBox
-            Me.rbOLEDB = New System.Windows.Forms.RadioButton
-            Me.picAccess = New System.Windows.Forms.PictureBox
-            Me.rbAccess = New System.Windows.Forms.RadioButton
-            Me.Label1 = New System.Windows.Forms.Label
-            Me.picSQLServer = New System.Windows.Forms.PictureBox
-            Me.rbSQLServer = New System.Windows.Forms.RadioButton
-            Me.pnlManagers = New System.Windows.Forms.Panel
-            Me.ctlSQLServer = New Boston.UI.ManageDBSQLServer
-            Me.ctlExcel = New Boston.UI.ManageDBExcel
-            Me.ctlAccess = New Boston.UI.ManageDBAccess
-            Me.ctlOracle = New Boston.UI.ManageDBOracle
-            Me.ctlOLEDB = New Boston.UI.ManageDBOLEDB
-            Me.ctlODBC = New Boston.UI.ManageDBODBC
-            Me.pnlLeft = New System.Windows.Forms.Panel
-            Me.pnlMessage = New System.Windows.Forms.Panel
-            Me.lnkMessage = New System.Windows.Forms.LinkLabel
-            Me.picMessage = New System.Windows.Forms.PictureBox
+            Me.pnlProviders = New System.Windows.Forms.Panel()
+            Me.picExcel = New System.Windows.Forms.PictureBox()
+            Me.rbExcel = New System.Windows.Forms.RadioButton()
+            Me.picOracle = New System.Windows.Forms.PictureBox()
+            Me.rbOracle = New System.Windows.Forms.RadioButton()
+            Me.picODBC = New System.Windows.Forms.PictureBox()
+            Me.rbODBC = New System.Windows.Forms.RadioButton()
+            Me.picOLEDB = New System.Windows.Forms.PictureBox()
+            Me.rbOLEDB = New System.Windows.Forms.RadioButton()
+            Me.picAccess = New System.Windows.Forms.PictureBox()
+            Me.rbAccess = New System.Windows.Forms.RadioButton()
+            Me.Label1 = New System.Windows.Forms.Label()
+            Me.picSQLServer = New System.Windows.Forms.PictureBox()
+            Me.rbSQLServer = New System.Windows.Forms.RadioButton()
+            Me.pnlManagers = New System.Windows.Forms.Panel()
+            Me.ctlSQLServer = New Boston.UI.ManageDBSQLServer()
+            Me.ctlExcel = New Boston.UI.ManageDBExcel()
+            Me.ctlAccess = New Boston.UI.ManageDBAccess()
+            Me.ctlOracle = New Boston.UI.ManageDBOracle()
+            Me.ctlOLEDB = New Boston.UI.ManageDBOLEDB()
+            Me.ctlODBC = New Boston.UI.ManageDBODBC()
+            Me.pnlLeft = New System.Windows.Forms.Panel()
+            Me.pnlMessage = New System.Windows.Forms.Panel()
+            Me.lnkMessage = New System.Windows.Forms.LinkLabel()
+            Me.picMessage = New System.Windows.Forms.PictureBox()
+            Me.RadioButtonBostonModel = New System.Windows.Forms.RadioButton()
+            Me.PictureBox1 = New System.Windows.Forms.PictureBox()
             Me.pnlProviders.SuspendLayout()
             CType(Me.picExcel, System.ComponentModel.ISupportInitialize).BeginInit()
             CType(Me.picOracle, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -61,12 +63,15 @@
             Me.pnlLeft.SuspendLayout()
             Me.pnlMessage.SuspendLayout()
             CType(Me.picMessage, System.ComponentModel.ISupportInitialize).BeginInit()
+            CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).BeginInit()
             Me.SuspendLayout()
             '
             'pnlProviders
             '
             Me.pnlProviders.AutoScroll = True
             Me.pnlProviders.BackColor = System.Drawing.Color.Transparent
+            Me.pnlProviders.Controls.Add(Me.PictureBox1)
+            Me.pnlProviders.Controls.Add(Me.RadioButtonBostonModel)
             Me.pnlProviders.Controls.Add(Me.picExcel)
             Me.pnlProviders.Controls.Add(Me.rbExcel)
             Me.pnlProviders.Controls.Add(Me.picOracle)
@@ -244,8 +249,8 @@
             '
             Me.ctlExcel.ColumnSchemaGeneric = False
             Me.ctlExcel.ColumnSchemaQuery = Nothing
-            Me.ctlExcel.ConnectionString = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=;Extended Properties=""Excel 12.0 Xm" & _
-                "l;HDR=Yes"";"
+            Me.ctlExcel.ConnectionString = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=;Extended Properties=""Excel 12.0 Xm" &
+    "l;HDR=Yes"";"
             Me.ctlExcel.Excel2K = False
             Me.ctlExcel.Location = New System.Drawing.Point(315, 114)
             Me.ctlExcel.Name = "ctlExcel"
@@ -283,8 +288,8 @@
             '
             Me.ctlOracle.ColumnSchemaGeneric = False
             Me.ctlOracle.ColumnSchemaQuery = ""
-            Me.ctlOracle.ConnectionString = "Data Source=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=)(PORT=1521))" & _
-                ")(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=)));User Id=;Password=;"
+            Me.ctlOracle.ConnectionString = "Data Source=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=)(PORT=1521))" &
+    ")(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=)));User Id=;Password=;"
             Me.ctlOracle.Location = New System.Drawing.Point(315, 3)
             Me.ctlOracle.Name = "ctlOracle"
             Me.ctlOracle.RoutineSchemaQuery = ""
@@ -376,6 +381,24 @@
             Me.picMessage.TabIndex = 0
             Me.picMessage.TabStop = False
             '
+            'RadioButtonBostonModel
+            '
+            Me.RadioButtonBostonModel.Location = New System.Drawing.Point(51, 268)
+            Me.RadioButtonBostonModel.Name = "RadioButtonBostonModel"
+            Me.RadioButtonBostonModel.Size = New System.Drawing.Size(108, 17)
+            Me.RadioButtonBostonModel.TabIndex = 39
+            Me.RadioButtonBostonModel.Text = "Boston Model"
+            Me.RadioButtonBostonModel.UseVisualStyleBackColor = True
+            '
+            'PictureBox1
+            '
+            Me.PictureBox1.Image = Global.Boston.My.Resources.MenuImagesMain.ORMStudio32x32
+            Me.PictureBox1.Location = New System.Drawing.Point(13, 261)
+            Me.PictureBox1.Name = "PictureBox1"
+            Me.PictureBox1.Size = New System.Drawing.Size(32, 32)
+            Me.PictureBox1.TabIndex = 40
+            Me.PictureBox1.TabStop = False
+            '
             'ManageSource
             '
             Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -396,6 +419,7 @@
             Me.pnlLeft.ResumeLayout(False)
             Me.pnlMessage.ResumeLayout(False)
             CType(Me.picMessage, System.ComponentModel.ISupportInitialize).EndInit()
+            CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).EndInit()
             Me.ResumeLayout(False)
 
         End Sub
@@ -424,7 +448,8 @@
         Friend WithEvents lnkMessage As System.Windows.Forms.LinkLabel
         Friend WithEvents pnlMessage As System.Windows.Forms.Panel
         Friend WithEvents picMessage As System.Windows.Forms.PictureBox
-
+        Friend WithEvents PictureBox1 As PictureBox
+        Friend WithEvents RadioButtonBostonModel As RadioButton
     End Class
 
 End Namespace

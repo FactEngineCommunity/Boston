@@ -344,12 +344,13 @@ Namespace UI
             End Select
         End Sub
 
-        Private Sub rbS_CheckedChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles rbSQLServer.CheckedChanged, _
-                                                                                                    rbOracle.CheckedChanged, _
-                                                                                                    rbAccess.CheckedChanged, _
-                                                                                                    rbExcel.CheckedChanged, _
-                                                                                                    rbOLEDB.CheckedChanged, _
-                                                                                                    rbODBC.CheckedChanged
+        Private Sub rbS_CheckedChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles rbSQLServer.CheckedChanged,
+                                                                                                    rbOracle.CheckedChanged,
+                                                                                                    rbAccess.CheckedChanged,
+                                                                                                    rbExcel.CheckedChanged,
+                                                                                                    rbOLEDB.CheckedChanged,
+                                                                                                    rbODBC.CheckedChanged,
+                                                                                                    RadioButtonBostonModel.CheckedChanged
             If Me.SysIgnoreEvent Then Exit Sub
 
             Me.SysIgnoreEvent = True
@@ -358,6 +359,7 @@ Namespace UI
             RaiseEvent ValueChanged(CType(sender, RadioButton).Checked)
 
             Me.SysIgnoreEvent = False
+
         End Sub
 
         Private Sub ctl_Save() Handles ctlSQLServer.Save, _

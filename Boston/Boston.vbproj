@@ -633,6 +633,21 @@
     <Compile Include="ClassesParserVA\tVAQLProcessor.vb" />
     <Compile Include="ClassesPluginServices\PluginServices.vb" />
     <Compile Include="CodeGeneration\Metadrone\ApplicationEvents.vb" />
+    <Compile Include="CodeGeneration\Metadrone\BostonDummyPlugin\Connection.vb" />
+    <Compile Include="CodeGeneration\Metadrone\BostonDummyPlugin\Description.vb" />
+    <Compile Include="CodeGeneration\Metadrone\BostonDummyPlugin\Manage.Designer.vb">
+      <DependentUpon>Manage.vb</DependentUpon>
+    </Compile>
+    <Compile Include="CodeGeneration\Metadrone\BostonDummyPlugin\Manage.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="CodeGeneration\Metadrone\BostonDummyPlugin\Logo.Designer.vb">
+      <DependentUpon>Logo.vb</DependentUpon>
+    </Compile>
+    <Compile Include="CodeGeneration\Metadrone\BostonDummyPlugin\Logo.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="CodeGeneration\Metadrone\BostonDummyPlugin\SourceDescription.vb" />
     <Compile Include="CodeGeneration\Metadrone\ConsoleExec.vb" />
     <Compile Include="CodeGeneration\Metadrone\Globals.vb" />
     <Compile Include="CodeGeneration\Metadrone\Parsing\Bin.vb" />
@@ -1617,6 +1632,12 @@
     <EmbeddedResource Include="ClassesGeneral\UserInviter.resx">
       <DependentUpon>UserInviter.vb</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="CodeGeneration\Metadrone\BostonDummyPlugin\Logo.resx">
+      <DependentUpon>Logo.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CodeGeneration\Metadrone\BostonDummyPlugin\Manage.resx">
+      <DependentUpon>Manage.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="CodeGeneration\Metadrone\obj\Release\Metadrone.Resources.resources" />
     <EmbeddedResource Include="CodeGeneration\Metadrone\obj\Release\Metadrone.UI.About.resources" />
     <EmbeddedResource Include="CodeGeneration\Metadrone\obj\Release\Metadrone.UI.CodeEditor.resources" />
@@ -1971,6 +1992,7 @@
       <CustomToolNamespace>My.Resources</CustomToolNamespace>
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>CodeGeneration.Designer.vb</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Resources\Viev.resx">
       <CustomToolNamespace>My.Resources</CustomToolNamespace>
@@ -2475,18 +2497,18 @@
     <Content Include="CodeGeneration\Metadrone\Resources\Microsoft.SqlServer.Smo.dll" />
     <Content Include="CodeGeneration\Metadrone\Resources\Microsoft.SqlServer.SqlClrProvider.dll" />
     <Content Include="CodeGeneration\Metadrone\Resources\Microsoft.SqlServer.SqlEnum.dll" />
-    <Content Include="CodeGeneration\Metadrone\Resources\Provider Queries\Queries.Access.TableQuery.sql" />
-    <Content Include="CodeGeneration\Metadrone\Resources\Provider Queries\Queries.Oracle.ColumnQuery.sql" />
-    <Content Include="CodeGeneration\Metadrone\Resources\Provider Queries\Queries.Oracle.RoutineSchemaQuery.sql" />
-    <Content Include="CodeGeneration\Metadrone\Resources\Provider Queries\Queries.Oracle.SchemaQuery.sql" />
-    <Content Include="CodeGeneration\Metadrone\Resources\Provider Queries\Queries.Oracle.TableQuery.sql" />
-    <Content Include="CodeGeneration\Metadrone\Resources\Provider Queries\Queries.SQLServer.ColumnQuery.sql" />
-    <Content Include="CodeGeneration\Metadrone\Resources\Provider Queries\Queries.SQLServer.RoutineSchemaQuery.sql" />
-    <Content Include="CodeGeneration\Metadrone\Resources\Provider Queries\Queries.SQLServer.SchemaQuery.sql" />
-    <Content Include="CodeGeneration\Metadrone\Resources\Provider Queries\Queries.SQLServer.TableQuery.sql" />
-    <Content Include="CodeGeneration\Metadrone\Resources\Provider Transforms\Transforms.Access.txt" />
-    <Content Include="CodeGeneration\Metadrone\Resources\Provider Transforms\Transforms.Oracle.txt" />
-    <Content Include="CodeGeneration\Metadrone\Resources\Provider Transforms\Transforms.SQLServer.txt" />
+    <EmbeddedResource Include="CodeGeneration\Metadrone\Resources\Provider Queries\Queries.Access.TableQuery.sql" />
+    <EmbeddedResource Include="CodeGeneration\Metadrone\Resources\Provider Queries\Queries.Oracle.ColumnQuery.sql" />
+    <EmbeddedResource Include="CodeGeneration\Metadrone\Resources\Provider Queries\Queries.Oracle.RoutineSchemaQuery.sql" />
+    <EmbeddedResource Include="CodeGeneration\Metadrone\Resources\Provider Queries\Queries.Oracle.SchemaQuery.sql" />
+    <EmbeddedResource Include="CodeGeneration\Metadrone\Resources\Provider Queries\Queries.Oracle.TableQuery.sql" />
+    <EmbeddedResource Include="CodeGeneration\Metadrone\Resources\Provider Queries\Queries.SQLServer.ColumnQuery.sql" />
+    <EmbeddedResource Include="CodeGeneration\Metadrone\Resources\Provider Queries\Queries.SQLServer.RoutineSchemaQuery.sql" />
+    <EmbeddedResource Include="CodeGeneration\Metadrone\Resources\Provider Queries\Queries.SQLServer.SchemaQuery.sql" />
+    <EmbeddedResource Include="CodeGeneration\Metadrone\Resources\Provider Queries\Queries.SQLServer.TableQuery.sql" />
+    <EmbeddedResource Include="CodeGeneration\Metadrone\Resources\Provider Transforms\Transforms.Access.txt" />
+    <EmbeddedResource Include="CodeGeneration\Metadrone\Resources\Provider Transforms\Transforms.Oracle.txt" />
+    <EmbeddedResource Include="CodeGeneration\Metadrone\Resources\Provider Transforms\Transforms.SQLServer.txt" />
     <Content Include="CodeGeneration\Metadrone\Resources\SciLexer.dll" />
     <Content Include="CodeGeneration\Metadrone\Resources\ScintillaNet.dll" />
     <Content Include="CodeGeneration\Metadrone\Resources\System.Data.OracleClient.dll" />
@@ -2627,6 +2649,7 @@
     <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\uap10.0\zh-Hans\Microsoft.VisualStudio.TestPlatform.TestFramework.xml" />
     <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\uap10.0\zh-Hant\Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.xml" />
     <Content Include="CodeGeneration\packages\MSTest.TestFramework.1.2.0\lib\uap10.0\zh-Hant\Microsoft.VisualStudio.TestPlatform.TestFramework.xml" />
+    <None Include="Images\Icons\BostonIconFiles\ORMStudio32x32.png" />
     <Content Include="Images\MenuImages\Camera16x16.jpg" />
     <None Include="Images\MenuImages\delete16x16.png" />
     <None Include="Images\MenuImages\deleteround16x16.png" />

@@ -37,6 +37,7 @@ Public Class frmMain
     Public zfrm_PGS_diagram_view As frmDiagramPGS = Nothing
     Public zfrmStateTransitionDiagramView As frmStateTransitionDiagram = Nothing
     Public zfrmNotifications As frmNotifications = Nothing
+    Friend zfrmCodeGenerator As UI.MainForm = Nothing
 
     'ClientServer
     'NB See method InitialiseClient
@@ -1443,7 +1444,7 @@ Public Class frmMain
 
             prApplication.ThrowErrorMessage("Showing the ORM Diagram Form", pcenumErrorType.Information)
 
-            child.Show(DockPanel)            
+            child.Show(DockPanel)
 
             '---------------------------------------------------------------
             'Reference the Form back from the Page.
@@ -1512,6 +1513,15 @@ Public Class frmMain
         End Try
 
     End Function
+
+    Public Sub loadCodeGenerator()
+
+        If zfrmCodeGenerator Is Nothing Then
+            zfrmCodeGenerator = UI.MainForm
+            Call zfrmCodeGenerator.Show(DockPanel)
+        End If
+
+    End Sub
 
     ''' <summary>
     ''' Loads the Glossary form within the main DockPanel

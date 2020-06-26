@@ -24,13 +24,13 @@
 
         Friend Function GetQuery(ByVal Query As QueryEnum) As String
             Select Case Query
-                Case QueryEnum.TableQuery : Return Globals.ReadResource("Metadrone.Queries.Access.TableQuery.sql")
+                Case QueryEnum.TableQuery : Return Globals.ReadResource("Boston.Queries.Access.TableQuery.sql")
             End Select
             Return Nothing
         End Function
 
         Friend Function GetTransforms() As String
-            Return Globals.ReadResource("Metadrone.Transforms.Access.txt")
+            Return Globals.ReadResource("Boston.Transforms.Access.txt")
         End Function
 
         Public Property Name() As String Implements IConnection.Name
