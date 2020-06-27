@@ -66,6 +66,8 @@
             'pnlProviders
             '
             Me.pnlProviders.AutoScroll = True
+            Me.pnlProviders.AutoSize = True
+            Me.pnlProviders.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
             Me.pnlProviders.BackColor = System.Drawing.Color.Transparent
             Me.pnlProviders.Controls.Add(Me.picExcel)
             Me.pnlProviders.Controls.Add(Me.rbExcel)
@@ -83,7 +85,7 @@
             Me.pnlProviders.Dock = System.Windows.Forms.DockStyle.Fill
             Me.pnlProviders.Location = New System.Drawing.Point(0, 0)
             Me.pnlProviders.Name = "pnlProviders"
-            Me.pnlProviders.Size = New System.Drawing.Size(200, 536)
+            Me.pnlProviders.Size = New System.Drawing.Size(220, 536)
             Me.pnlProviders.TabIndex = 0
             '
             'picExcel
@@ -184,7 +186,7 @@
             Me.Label1.Location = New System.Drawing.Point(0, 0)
             Me.Label1.Name = "Label1"
             Me.Label1.Padding = New System.Windows.Forms.Padding(6, 6, 0, 0)
-            Me.Label1.Size = New System.Drawing.Size(200, 30)
+            Me.Label1.Size = New System.Drawing.Size(220, 30)
             Me.Label1.TabIndex = 0
             Me.Label1.Text = "Provider"
             '
@@ -218,13 +220,14 @@
             Me.pnlManagers.Controls.Add(Me.ctlOLEDB)
             Me.pnlManagers.Controls.Add(Me.ctlODBC)
             Me.pnlManagers.Dock = System.Windows.Forms.DockStyle.Fill
-            Me.pnlManagers.Location = New System.Drawing.Point(200, 0)
+            Me.pnlManagers.Location = New System.Drawing.Point(220, 0)
             Me.pnlManagers.Name = "pnlManagers"
-            Me.pnlManagers.Size = New System.Drawing.Size(633, 558)
+            Me.pnlManagers.Size = New System.Drawing.Size(613, 558)
             Me.pnlManagers.TabIndex = 1
             '
             'ctlSQLServer
             '
+            Me.ctlSQLServer.BostonModel = Nothing
             Me.ctlSQLServer.ColumnSchemaGeneric = False
             Me.ctlSQLServer.ColumnSchemaQuery = ""
             Me.ctlSQLServer.ConnectionString = "Data Source=;Initial Catalog=;Integrated Security=True;"
@@ -242,6 +245,7 @@
             '
             'ctlExcel
             '
+            Me.ctlExcel.BostonModel = Nothing
             Me.ctlExcel.ColumnSchemaGeneric = False
             Me.ctlExcel.ColumnSchemaQuery = Nothing
             Me.ctlExcel.ConnectionString = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=;Extended Properties=""Excel 12.0 Xm" &
@@ -263,6 +267,7 @@
             'ctlAccess
             '
             Me.ctlAccess.Access2K = False
+            Me.ctlAccess.BostonModel = Nothing
             Me.ctlAccess.ColumnSchemaGeneric = False
             Me.ctlAccess.ColumnSchemaQuery = Nothing
             Me.ctlAccess.ConnectionString = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=;Persist Security Info=True;"
@@ -271,7 +276,7 @@
             Me.ctlAccess.RoutineSchemaQuery = Nothing
             Me.ctlAccess.SchemaQuery = Nothing
             Me.ctlAccess.SingleResultApproach = False
-            Me.ctlAccess.Size = New System.Drawing.Size(290, 100)
+            Me.ctlAccess.Size = New System.Drawing.Size(290, 95)
             Me.ctlAccess.TabIndex = 2
             Me.ctlAccess.TableName = Nothing
             Me.ctlAccess.TableSchemaGeneric = False
@@ -281,6 +286,7 @@
             '
             'ctlOracle
             '
+            Me.ctlOracle.BostonModel = Nothing
             Me.ctlOracle.ColumnSchemaGeneric = False
             Me.ctlOracle.ColumnSchemaQuery = ""
             Me.ctlOracle.ConnectionString = "Data Source=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=)(PORT=1521))" &
@@ -299,6 +305,7 @@
             '
             'ctlOLEDB
             '
+            Me.ctlOLEDB.BostonModel = Nothing
             Me.ctlOLEDB.ColumnSchemaGeneric = True
             Me.ctlOLEDB.ColumnSchemaQuery = ""
             Me.ctlOLEDB.ConnectionString = ""
@@ -316,6 +323,7 @@
             '
             'ctlODBC
             '
+            Me.ctlODBC.BostonModel = Nothing
             Me.ctlODBC.ColumnSchemaGeneric = False
             Me.ctlODBC.ColumnSchemaQuery = ""
             Me.ctlODBC.ConnectionString = ""
@@ -339,7 +347,7 @@
             Me.pnlLeft.Dock = System.Windows.Forms.DockStyle.Left
             Me.pnlLeft.Location = New System.Drawing.Point(0, 0)
             Me.pnlLeft.Name = "pnlLeft"
-            Me.pnlLeft.Size = New System.Drawing.Size(200, 558)
+            Me.pnlLeft.Size = New System.Drawing.Size(220, 558)
             Me.pnlLeft.TabIndex = 0
             '
             'pnlMessage
@@ -350,7 +358,7 @@
             Me.pnlMessage.Dock = System.Windows.Forms.DockStyle.Bottom
             Me.pnlMessage.Location = New System.Drawing.Point(0, 536)
             Me.pnlMessage.Name = "pnlMessage"
-            Me.pnlMessage.Size = New System.Drawing.Size(200, 22)
+            Me.pnlMessage.Size = New System.Drawing.Size(220, 22)
             Me.pnlMessage.TabIndex = 1
             Me.pnlMessage.Visible = False
             '
@@ -360,7 +368,7 @@
             Me.lnkMessage.Dock = System.Windows.Forms.DockStyle.Fill
             Me.lnkMessage.Location = New System.Drawing.Point(21, 0)
             Me.lnkMessage.Name = "lnkMessage"
-            Me.lnkMessage.Size = New System.Drawing.Size(179, 22)
+            Me.lnkMessage.Size = New System.Drawing.Size(199, 22)
             Me.lnkMessage.TabIndex = 1
             Me.lnkMessage.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
             '
@@ -394,6 +402,7 @@
             CType(Me.picSQLServer, System.ComponentModel.ISupportInitialize).EndInit()
             Me.pnlManagers.ResumeLayout(False)
             Me.pnlLeft.ResumeLayout(False)
+            Me.pnlLeft.PerformLayout()
             Me.pnlMessage.ResumeLayout(False)
             CType(Me.picMessage, System.ComponentModel.ISupportInitialize).EndInit()
             Me.ResumeLayout(False)

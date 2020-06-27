@@ -64,7 +64,12 @@ Namespace SourcePlugins.Boston
             Else
                 Me.LabelWorkingModel.Text = prApplication.WorkingModel.Name
                 Me.LabelModelName.Text = prApplication.WorkingModel.Name
+
                 Call Me.LoadERDModelDictionary()
+            End If
+
+            If Me.BostonModel IsNot Nothing Then
+                Me.Label1.Text = Me.BostonModel.Name
             End If
 
             If Me.SchemaQuery.Length = 0 Then
@@ -74,6 +79,14 @@ Namespace SourcePlugins.Boston
             If Me.RoutineSchemaQuery.Length = 0 Then
                 'Me.RoutineSchemaQuery = New Connection("", "").GetQuery(Connection.QueryEnum.RoutineSchemaQuery)
             End If
+
+            'Trying to resolve problem where if two Project Sources open at the same time, one Project Source Panel for a Plugin won't show.
+            Me.Dock = DockStyle.Fill
+            Me.Parent.Parent.Visible = True
+            Me.Parent.Visible = True
+            Me.tcMain.Visible = True
+            Me.Panel1.Visible = True
+            Me.Panel2.Visible = True
 
         End Sub
 
@@ -398,12 +411,6 @@ Namespace SourcePlugins.Boston
             Me.components = New System.ComponentModel.Container()
             Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Manage))
             Me.TabPage2 = New System.Windows.Forms.TabPage()
-            Me.TabPage1 = New System.Windows.Forms.TabPage()
-            Me.Panel2 = New System.Windows.Forms.Panel()
-            Me.lblTitle = New System.Windows.Forms.Label()
-            Me.LabelPromptWorkingModel = New System.Windows.Forms.Label()
-            Me.LabelWorkingModel = New System.Windows.Forms.Label()
-            Me.tcMain = New System.Windows.Forms.TabControl()
             Me.Panel1 = New System.Windows.Forms.Panel()
             Me.GroupBox_Main = New System.Windows.Forms.GroupBox()
             Me.CheckBoxShowModelDictionary = New System.Windows.Forms.CheckBox()
@@ -412,11 +419,18 @@ Namespace SourcePlugins.Boston
             Me.LabelPrompt = New System.Windows.Forms.Label()
             Me.TreeView1 = New System.Windows.Forms.TreeView()
             Me.ImageList = New System.Windows.Forms.ImageList(Me.components)
+            Me.TabPage1 = New System.Windows.Forms.TabPage()
+            Me.Panel2 = New System.Windows.Forms.Panel()
+            Me.lblTitle = New System.Windows.Forms.Label()
+            Me.LabelPromptWorkingModel = New System.Windows.Forms.Label()
+            Me.LabelWorkingModel = New System.Windows.Forms.Label()
+            Me.tcMain = New System.Windows.Forms.TabControl()
+            Me.Label1 = New System.Windows.Forms.Label()
             Me.TabPage2.SuspendLayout()
-            Me.TabPage1.SuspendLayout()
-            Me.tcMain.SuspendLayout()
             Me.Panel1.SuspendLayout()
             Me.GroupBox_Main.SuspendLayout()
+            Me.TabPage1.SuspendLayout()
+            Me.tcMain.SuspendLayout()
             Me.SuspendLayout()
             '
             'TabPage2
@@ -430,74 +444,6 @@ Namespace SourcePlugins.Boston
             Me.TabPage2.TabIndex = 1
             Me.TabPage2.Text = "Tables/Columns"
             Me.TabPage2.UseVisualStyleBackColor = True
-            '
-            'TabPage1
-            '
-            Me.TabPage1.BackColor = System.Drawing.Color.Transparent
-            Me.TabPage1.Controls.Add(Me.Panel2)
-            Me.TabPage1.Controls.Add(Me.lblTitle)
-            Me.TabPage1.Controls.Add(Me.LabelPromptWorkingModel)
-            Me.TabPage1.Controls.Add(Me.LabelWorkingModel)
-            Me.TabPage1.ImageIndex = 0
-            Me.TabPage1.Location = New System.Drawing.Point(4, 4)
-            Me.TabPage1.Name = "TabPage1"
-            Me.TabPage1.Padding = New System.Windows.Forms.Padding(3)
-            Me.TabPage1.Size = New System.Drawing.Size(769, 553)
-            Me.TabPage1.TabIndex = 0
-            Me.TabPage1.Text = "Connection"
-            Me.TabPage1.UseVisualStyleBackColor = True
-            '
-            'Panel2
-            '
-            Me.Panel2.BackColor = System.Drawing.Color.Silver
-            Me.Panel2.Dock = System.Windows.Forms.DockStyle.Top
-            Me.Panel2.Location = New System.Drawing.Point(3, 33)
-            Me.Panel2.Name = "Panel2"
-            Me.Panel2.Size = New System.Drawing.Size(763, 1)
-            Me.Panel2.TabIndex = 0
-            '
-            'lblTitle
-            '
-            Me.lblTitle.BackColor = System.Drawing.Color.White
-            Me.lblTitle.Dock = System.Windows.Forms.DockStyle.Top
-            Me.lblTitle.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-            Me.lblTitle.ForeColor = System.Drawing.Color.DimGray
-            Me.lblTitle.Location = New System.Drawing.Point(3, 3)
-            Me.lblTitle.Name = "lblTitle"
-            Me.lblTitle.Padding = New System.Windows.Forms.Padding(6, 6, 0, 0)
-            Me.lblTitle.Size = New System.Drawing.Size(763, 30)
-            Me.lblTitle.TabIndex = 0
-            Me.lblTitle.Text = "Boston Model - Direct Access"
-            '
-            'LabelPromptWorkingModel
-            '
-            Me.LabelPromptWorkingModel.AutoSize = True
-            Me.LabelPromptWorkingModel.Location = New System.Drawing.Point(17, 58)
-            Me.LabelPromptWorkingModel.Name = "LabelPromptWorkingModel"
-            Me.LabelPromptWorkingModel.Size = New System.Drawing.Size(82, 13)
-            Me.LabelPromptWorkingModel.TabIndex = 0
-            Me.LabelPromptWorkingModel.Text = "Working Model:"
-            '
-            'LabelWorkingModel
-            '
-            Me.LabelWorkingModel.AutoSize = True
-            Me.LabelWorkingModel.Location = New System.Drawing.Point(105, 58)
-            Me.LabelWorkingModel.Name = "LabelWorkingModel"
-            Me.LabelWorkingModel.Size = New System.Drawing.Size(86, 13)
-            Me.LabelWorkingModel.TabIndex = 4
-            Me.LabelWorkingModel.Text = "lblWorkingModel"
-            '
-            'tcMain
-            '
-            Me.tcMain.Alignment = System.Windows.Forms.TabAlignment.Bottom
-            Me.tcMain.Controls.Add(Me.TabPage1)
-            Me.tcMain.Controls.Add(Me.TabPage2)
-            Me.tcMain.Dock = System.Windows.Forms.DockStyle.Fill
-            Me.tcMain.Location = New System.Drawing.Point(0, 0)
-            Me.tcMain.Name = "tcMain"
-            Me.tcMain.SelectedIndex = 0
-            Me.tcMain.Size = New System.Drawing.Size(777, 579)
-            Me.tcMain.TabIndex = 2
             '
             'Panel1
             '
@@ -606,6 +552,84 @@ Namespace SourcePlugins.Boston
             Me.ImageList.Images.SetKeyName(21, "PGSNode.png")
             Me.ImageList.Images.SetKeyName(22, "PGSRelation.png")
             '
+            'TabPage1
+            '
+            Me.TabPage1.BackColor = System.Drawing.Color.Transparent
+            Me.TabPage1.Controls.Add(Me.Label1)
+            Me.TabPage1.Controls.Add(Me.Panel2)
+            Me.TabPage1.Controls.Add(Me.lblTitle)
+            Me.TabPage1.Controls.Add(Me.LabelPromptWorkingModel)
+            Me.TabPage1.Controls.Add(Me.LabelWorkingModel)
+            Me.TabPage1.ImageIndex = 0
+            Me.TabPage1.Location = New System.Drawing.Point(4, 4)
+            Me.TabPage1.Name = "TabPage1"
+            Me.TabPage1.Padding = New System.Windows.Forms.Padding(3)
+            Me.TabPage1.Size = New System.Drawing.Size(769, 553)
+            Me.TabPage1.TabIndex = 0
+            Me.TabPage1.Text = "Connection"
+            Me.TabPage1.UseVisualStyleBackColor = True
+            '
+            'Panel2
+            '
+            Me.Panel2.BackColor = System.Drawing.Color.Silver
+            Me.Panel2.Dock = System.Windows.Forms.DockStyle.Top
+            Me.Panel2.Location = New System.Drawing.Point(3, 33)
+            Me.Panel2.Name = "Panel2"
+            Me.Panel2.Size = New System.Drawing.Size(763, 1)
+            Me.Panel2.TabIndex = 0
+            '
+            'lblTitle
+            '
+            Me.lblTitle.BackColor = System.Drawing.Color.White
+            Me.lblTitle.Dock = System.Windows.Forms.DockStyle.Top
+            Me.lblTitle.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+            Me.lblTitle.ForeColor = System.Drawing.Color.DimGray
+            Me.lblTitle.Location = New System.Drawing.Point(3, 3)
+            Me.lblTitle.Name = "lblTitle"
+            Me.lblTitle.Padding = New System.Windows.Forms.Padding(6, 6, 0, 0)
+            Me.lblTitle.Size = New System.Drawing.Size(763, 30)
+            Me.lblTitle.TabIndex = 0
+            Me.lblTitle.Text = "Boston Model - Direct Access"
+            '
+            'LabelPromptWorkingModel
+            '
+            Me.LabelPromptWorkingModel.AutoSize = True
+            Me.LabelPromptWorkingModel.Location = New System.Drawing.Point(17, 58)
+            Me.LabelPromptWorkingModel.Name = "LabelPromptWorkingModel"
+            Me.LabelPromptWorkingModel.Size = New System.Drawing.Size(82, 13)
+            Me.LabelPromptWorkingModel.TabIndex = 0
+            Me.LabelPromptWorkingModel.Text = "Working Model:"
+            '
+            'LabelWorkingModel
+            '
+            Me.LabelWorkingModel.AutoSize = True
+            Me.LabelWorkingModel.Location = New System.Drawing.Point(105, 58)
+            Me.LabelWorkingModel.Name = "LabelWorkingModel"
+            Me.LabelWorkingModel.Size = New System.Drawing.Size(86, 13)
+            Me.LabelWorkingModel.TabIndex = 4
+            Me.LabelWorkingModel.Text = "lblWorkingModel"
+            '
+            'tcMain
+            '
+            Me.tcMain.Alignment = System.Windows.Forms.TabAlignment.Bottom
+            Me.tcMain.Controls.Add(Me.TabPage1)
+            Me.tcMain.Controls.Add(Me.TabPage2)
+            Me.tcMain.Dock = System.Windows.Forms.DockStyle.Fill
+            Me.tcMain.Location = New System.Drawing.Point(0, 0)
+            Me.tcMain.Name = "tcMain"
+            Me.tcMain.SelectedIndex = 0
+            Me.tcMain.Size = New System.Drawing.Size(777, 579)
+            Me.tcMain.TabIndex = 2
+            '
+            'Label1
+            '
+            Me.Label1.AutoSize = True
+            Me.Label1.Location = New System.Drawing.Point(68, 102)
+            Me.Label1.Name = "Label1"
+            Me.Label1.Size = New System.Drawing.Size(39, 13)
+            Me.Label1.TabIndex = 5
+            Me.Label1.Text = "Label1"
+            '
             'Manage
             '
             Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -614,12 +638,12 @@ Namespace SourcePlugins.Boston
             Me.Name = "Manage"
             Me.Size = New System.Drawing.Size(777, 579)
             Me.TabPage2.ResumeLayout(False)
-            Me.TabPage1.ResumeLayout(False)
-            Me.TabPage1.PerformLayout()
-            Me.tcMain.ResumeLayout(False)
             Me.Panel1.ResumeLayout(False)
             Me.GroupBox_Main.ResumeLayout(False)
             Me.GroupBox_Main.PerformLayout()
+            Me.TabPage1.ResumeLayout(False)
+            Me.TabPage1.PerformLayout()
+            Me.tcMain.ResumeLayout(False)
             Me.ResumeLayout(False)
 
         End Sub
@@ -640,6 +664,7 @@ Namespace SourcePlugins.Boston
         Friend WithEvents TreeView1 As TreeView
         Friend WithEvents ImageList As ImageList
         Private components As IContainer
+        Friend WithEvents Label1 As Label
 
 #End Region
 

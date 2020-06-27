@@ -169,14 +169,13 @@ Namespace UI
                             .TableName = Source.TableNamePlaceHolder
                             .RoutineSchemaQuery = Source.RoutineSchemaQuery
                             .Transformations = Source.Transformations
+                            .BostonModel = prApplication.getBostonApplicationModelById(Source.BostonModelId)
                         End With
                     End If
                 Next
             End If
 
             Call Me.ShowManager()
-
-            MsgBox(Source.BostonModelId)
 
             Me.SysIgnoreEvent = False
 
@@ -286,6 +285,9 @@ Namespace UI
                                         .TableNamePlaceHolder = CType(ctl, PluginInterface.Sources.IManageSource).TableName
                                         .RoutineSchemaQuery = CType(ctl, PluginInterface.Sources.IManageSource).RoutineSchemaQuery
                                         .Transformations = CType(ctl, PluginInterface.Sources.IManageSource).Transformations
+                                        If CType(ctl, PluginInterface.Sources.IManageSource).BostonModel IsNot Nothing Then
+                                            .BostonModelId = CType(ctl, PluginInterface.Sources.IManageSource).BostonModel.ModelId
+                                        End If
                                     End With
                                 End If
                             Next

@@ -5573,6 +5573,12 @@ Walks the ParseTree and finds the tokens as per the Properties/Fields of the ao_
  </summary>
  <remarks></remarks>
 </member>
+<member name="M:Boston.tRichmondApplication.getBostonApplicationModelById(System.String)">
+ <summary>
+ Gets a Model from the list of Models loaded into the application (in this class), else returns Nothing
+ </summary>
+ <returns></returns>
+</member>
 <member name="T:Boston.tUserAction">
  <summary>
  Used for the Undo/Redo Logs

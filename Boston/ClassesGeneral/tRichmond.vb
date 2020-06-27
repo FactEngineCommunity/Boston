@@ -314,6 +314,15 @@ Public Class tRichmondApplication
 
     End Sub
 
+    ''' <summary>
+    ''' Gets a Model from the list of Models loaded into the application (in this class), else returns Nothing
+    ''' </summary>
+    ''' <returns></returns>
+    Public Function getBostonApplicationModelById(ByVal asModelId As String) As FBM.Model
+        Return Me.Models.Find(Function(x) x.ModelId = asModelId)
+    End Function
+
+
     Public Function GetToolboxForm(ByVal asFormName As String) As WeifenLuo.WinFormsUI.Docking.DockContent
 
         Dim lrForm As WeifenLuo.WinFormsUI.Docking.DockContent
