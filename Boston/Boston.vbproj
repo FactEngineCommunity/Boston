@@ -2342,6 +2342,7 @@
     <Content Include="CodeGeneration\bin\Release\SourcePlugins.SQLite.dll" />
     <Content Include="CodeGeneration\bin\Release\SourcePlugins.SQLite.pdb" />
     <Content Include="CodeGeneration\bin\Release\System.Data.SQLite.dll" />
+    <EmbeddedResource Include="CodeGeneration\Metadrone\BostonDummyPlugin\Resources\Transforms\BostonDummyPlugin.Transforms.txt" />
     <Content Include="CodeGeneration\Metadrone\Metadrone.vbproj" />
     <Content Include="CodeGeneration\Metadrone\obj\Release\Metadrone.exe" />
     <Content Include="CodeGeneration\Metadrone\obj\Release\Metadrone.vbproj.FileListAbsolute.txt" />

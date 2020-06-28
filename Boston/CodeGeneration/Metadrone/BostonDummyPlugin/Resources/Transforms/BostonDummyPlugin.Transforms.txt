@@ -1,0 +1,53 @@
+﻿//Set table property values
+set table.lastpos = table.listpos = table.listcount
+
+//Set column property values
+set column.lastpos = column.listpos = column.listcount
+set column.vbtype = ""
+set column.cstype = ""
+set column.vbdefval = ""
+set column.csdefval = ""
+	
+if column.datatype = "Boolean"
+	set column.vbtype = "Boolean"
+	set column.cstype = "bool"
+	set column.vbdefval = "False"
+	set column.csdefval = "false"
+	
+elseif column.datatype = "Integer"
+	set column.vbtype = "Integer"
+	set column.cstype = "int"
+	set column.vbdefval = 0
+	set column.csdefval = 0
+	
+elseif column.datatype = "WChar"
+	set column.vbtype = "String"
+	set column.cstype = "string"
+	set column.vbdefval = "Nothing"
+	set column.csdefval = "null"
+	
+elseif column.datatype = "Currency"
+	set column.vbtype = "Decimal"
+	set column.cstype = "decimal"
+	set column.vbdefval = 0
+	set column.csdefval = 0
+	
+elseif column.datatype = "Date"
+	set column.vbtype = "DateTime"
+	set column.cstype = "DateTime"
+	set column.vbdefval = "System.DateTime.Now"
+	set column.csdefval = "System.DateTime.Now"
+	
+elseif column.datatype = "Binary"
+	set column.vbtype = "Byte()"
+	set column.cstype = "byte[]"
+	set column.vbdefval = "Nothing"
+	set column.csdefval = "null"
+	
+else
+	set column.vbtype = column.datatype
+	set column.cstype = column.datatype
+	set column.vbdefval = "Nothing"
+	set column.csdefval = "null"
+	
+end

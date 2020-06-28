@@ -4,6 +4,20 @@ Namespace SourcePlugins.Boston
     Public Class Connection
         Implements PluginInterface.Sources.IConnection
 
+        Private mName As String = ""
+        Private ConnStr As String = ""
+        Private mTransforms As String = ""
+
+        Public Sub New()
+            Me.mTransforms = Me.GetTransforms()
+        End Sub
+
+        Public Sub New(ByVal Name As String, ByVal ConnectionString As String)
+            MyBase.New()
+            Me.mName = Name
+            Me.ConnStr = ConnectionString
+        End Sub
+
         Public Property Name As String Implements IConnection.Name
             Get
                 Throw New NotImplementedException()
@@ -69,16 +83,16 @@ Namespace SourcePlugins.Boston
 
         Public Property Transformations As String Implements IConnection.Transformations
             Get
-                Throw New NotImplementedException()
+                Return Me.mTransforms
             End Get
             Set(value As String)
-                Throw New NotImplementedException()
+                Me.mTransforms = value
             End Set
         End Property
 
         Public ReadOnly Property IgnoreTableNames As List(Of String) Implements IConnection.IgnoreTableNames
             Get
-                Throw New NotImplementedException()
+                Return New List(Of String)
             End Get
         End Property
 
@@ -102,6 +116,10 @@ Namespace SourcePlugins.Boston
             Throw New NotImplementedException()
         End Function
 
+        Public Function GetTransforms() As String
+            Return Globals.ReadResource("Boston.BostonDummyPlugin.Transforms.txt")
+        End Function
+
         Public Function GetRoutineSchema() As List(Of SchemaRow) Implements IConnection.GetRoutineSchema
             Throw New NotImplementedException()
         End Function
@@ -110,8 +128,28 @@ Namespace SourcePlugins.Boston
             Throw New NotImplementedException()
         End Function
 
-        Public Function CreateCopy(Name As String, Connectionstring As String, SchemaQuery As String, TableSchemaQuery As String, ColumnSchemaQuery As String, TableNamePlaceHolder As String, RoutineSchemaQuery As String, Transformations As String, IgnoreTableNames As List(Of String)) As IConnection Implements IConnection.CreateCopy
-            Throw New NotImplementedException()
+        Public Function CreateCopy(ByVal Name As String,
+                                   ByVal Connectionstring As String,
+                                   ByVal SchemaQuery As String,
+                                   ByVal TableSchemaQuery As String,
+                                   ByVal ColumnSchemaQuery As String,
+                                   ByVal TableNamePlaceHolder As String,
+                                   ByVal RoutineSchemaQuery As String,
+                                   ByVal Transformations As String,
+                                   ByVal IgnoreTableNames As List(Of String)) As IConnection Implements IConnection.CreateCopy
+            Dim copy As Connection = New Connection(Name, Connectionstring)
+            copy.SchemaQuery = SchemaQuery
+            copy.TableSchemaQuery = TableSchemaQuery
+            copy.ColumnSchemaQuery = ColumnSchemaQuery
+            copy.TableNamePlaceHolder = TableNamePlaceHolder
+            copy.RoutineSchemaQuery = RoutineSchemaQuery
+            copy.Transformations = Transformations
+
+            For Each tbl As String In IgnoreTableNames
+                copy.IgnoreTableNames.Add(tbl)
+            Next
+
+            Return copy
         End Function
 
     End Class

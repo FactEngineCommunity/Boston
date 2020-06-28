@@ -53,11 +53,14 @@ Namespace SourcePlugins.Boston
             'AddHandler Me.rbApproachTableColumn.CheckedChanged, New System.EventHandler(AddressOf Me.rbMeta_CheckedChanged)
             'AddHandler Me.rbTableDefault.CheckedChanged, New System.EventHandler(AddressOf Me.rbMeta_CheckedChanged)
             'AddHandler Me.rbTableQuery.CheckedChanged, New System.EventHandler(AddressOf Me.rbMeta_CheckedChanged)
-            'Me.txtTransformations.SavePress += New Metadrone.UI.TransformationsEditor.SavePressEventHandler(AddressOf Me.SavePress)
-            'Me.txtTransformations.TextChanged += New Metadrone.UI.TransformationsEditor.TextChangedEventHandler(AddressOf Me.txtTransformations_TextChanged)
+            AddHandler Me.txtTransformations.SavePress, New UI.TransformationsEditor.SavePressEventHandler(AddressOf Me.SavePress) 'Boston.UI.TransformationsEditor.SavePressEventHandler
+            AddHandler Me.txtTransformations.TextChanged, New UI.TransformationsEditor.TextChangedEventHandler(AddressOf Me.txtTransformations_TextChanged) 'Metadrone.UI.TransformationsEditor.TextChangedEventHandler
+
         End Sub
 
         Public Sub Setup() Implements IManageSource.Setup
+
+            'NB See ManageDataSources.Initialise for initial setting of properties
 
             'Boston specific Setup
             If prApplication.WorkingModel Is Nothing Then
@@ -106,6 +109,10 @@ Namespace SourcePlugins.Boston
             Me.Panel1.Visible = True
             Me.Panel2.Visible = True
 
+        End Sub
+
+        Private Sub txtTransformations_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs)
+            RaiseEvent ValueChanged(Me.txtTransformations.Text)
         End Sub
 
         Private Sub ComboBoxModel_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ComboBoxModel.SelectedIndexChanged
@@ -212,11 +219,10 @@ Namespace SourcePlugins.Boston
 
         Public Property Transformations As String Implements IManageSource.Transformations
             Get
-                Return "Boston Model direct query. No need for a Schema Query here." 'Return Me.txtTransformations.Text
+                Return Me.txtTransformations.Text
             End Get
             Set(ByVal value As String)
-                'Nothing to do here
-                'Me.txtTransformations.Text = value
+                Me.txtTransformations.Text = value
             End Set
         End Property
 
@@ -445,18 +451,21 @@ Namespace SourcePlugins.Boston
             Me.TreeView1 = New System.Windows.Forms.TreeView()
             Me.ImageList = New System.Windows.Forms.ImageList(Me.components)
             Me.TabPage1 = New System.Windows.Forms.TabPage()
+            Me.ComboBoxModel = New System.Windows.Forms.ComboBox()
             Me.Label1 = New System.Windows.Forms.Label()
             Me.Panel2 = New System.Windows.Forms.Panel()
             Me.lblTitle = New System.Windows.Forms.Label()
             Me.LabelPromptWorkingModel = New System.Windows.Forms.Label()
             Me.LabelWorkingModel = New System.Windows.Forms.Label()
             Me.tcMain = New System.Windows.Forms.TabControl()
-            Me.ComboBoxModel = New System.Windows.Forms.ComboBox()
+            Me.TabPage3 = New System.Windows.Forms.TabPage()
+            Me.txtTransformations = New UI.TransformationsEditor()
             Me.TabPage2.SuspendLayout()
             Me.Panel1.SuspendLayout()
             Me.GroupBox_Main.SuspendLayout()
             Me.TabPage1.SuspendLayout()
             Me.tcMain.SuspendLayout()
+            Me.TabPage3.SuspendLayout()
             Me.SuspendLayout()
             '
             'TabPage2
@@ -596,6 +605,14 @@ Namespace SourcePlugins.Boston
             Me.TabPage1.Text = "Connection"
             Me.TabPage1.UseVisualStyleBackColor = True
             '
+            'ComboBoxModel
+            '
+            Me.ComboBoxModel.FormattingEnabled = True
+            Me.ComboBoxModel.Location = New System.Drawing.Point(108, 87)
+            Me.ComboBoxModel.Name = "ComboBoxModel"
+            Me.ComboBoxModel.Size = New System.Drawing.Size(210, 21)
+            Me.ComboBoxModel.TabIndex = 6
+            '
             'Label1
             '
             Me.Label1.AutoSize = True
@@ -650,6 +667,7 @@ Namespace SourcePlugins.Boston
             Me.tcMain.Alignment = System.Windows.Forms.TabAlignment.Bottom
             Me.tcMain.Controls.Add(Me.TabPage1)
             Me.tcMain.Controls.Add(Me.TabPage2)
+            Me.tcMain.Controls.Add(Me.TabPage3)
             Me.tcMain.Dock = System.Windows.Forms.DockStyle.Fill
             Me.tcMain.Location = New System.Drawing.Point(0, 0)
             Me.tcMain.Name = "tcMain"
@@ -657,13 +675,29 @@ Namespace SourcePlugins.Boston
             Me.tcMain.Size = New System.Drawing.Size(777, 579)
             Me.tcMain.TabIndex = 2
             '
-            'ComboBoxModel
+            'TabPage3
             '
-            Me.ComboBoxModel.FormattingEnabled = True
-            Me.ComboBoxModel.Location = New System.Drawing.Point(108, 87)
-            Me.ComboBoxModel.Name = "ComboBoxModel"
-            Me.ComboBoxModel.Size = New System.Drawing.Size(210, 21)
-            Me.ComboBoxModel.TabIndex = 6
+            Me.TabPage3.Controls.Add(Me.txtTransformations)
+            Me.TabPage3.Location = New System.Drawing.Point(4, 4)
+            Me.TabPage3.Name = "TabPage3"
+            Me.TabPage3.Size = New System.Drawing.Size(769, 553)
+            Me.TabPage3.TabIndex = 2
+            Me.TabPage3.Text = "Transformations"
+            Me.TabPage3.UseVisualStyleBackColor = True
+            '
+            'txtTransformations
+            '
+            Me.txtTransformations.BackColor = System.Drawing.SystemColors.Window
+            Me.txtTransformations.Dock = System.Windows.Forms.DockStyle.Fill
+            Me.txtTransformations.ForeColor = System.Drawing.SystemColors.WindowText
+            Me.txtTransformations.Location = New System.Drawing.Point(0, 0)
+            Me.txtTransformations.Name = "txtTransformations"
+            Me.txtTransformations.ReadOnly = False
+            Me.txtTransformations.SelectedText = ""
+            Me.txtTransformations.SelectionLength = 0
+            Me.txtTransformations.SelectionStart = 0
+            Me.txtTransformations.Size = New System.Drawing.Size(769, 553)
+            Me.txtTransformations.TabIndex = 2
             '
             'Manage
             '
@@ -679,6 +713,7 @@ Namespace SourcePlugins.Boston
             Me.TabPage1.ResumeLayout(False)
             Me.TabPage1.PerformLayout()
             Me.tcMain.ResumeLayout(False)
+            Me.TabPage3.ResumeLayout(False)
             Me.ResumeLayout(False)
 
         End Sub
@@ -701,6 +736,8 @@ Namespace SourcePlugins.Boston
         Private components As IContainer
         Friend WithEvents Label1 As Label
         Friend WithEvents ComboBoxModel As ComboBox
+        Friend WithEvents TabPage3 As TabPage
+        Friend WithEvents txtTransformations As UI.TransformationsEditor
 
 #End Region
 
