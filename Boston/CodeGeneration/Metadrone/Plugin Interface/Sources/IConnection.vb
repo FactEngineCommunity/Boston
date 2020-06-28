@@ -14,6 +14,8 @@
 
         ReadOnly Property IgnoreTableNames() As List(Of String)
 
+        Property BostonModel As FBM.Model
+
         Sub TestConnection()
         Function TestQuery(ByVal Query As String) As DataTable
         Function GetSchema() As List(Of SchemaRow)

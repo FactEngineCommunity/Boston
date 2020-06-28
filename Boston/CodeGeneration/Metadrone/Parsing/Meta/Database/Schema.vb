@@ -23,7 +23,6 @@ Namespace Parser.Meta.Database
 
         Private Transforms As Syntax.SourceTransforms = Nothing
 
-
         Public Sub New(ByVal Source As Parser.Source.Source)
             'Set up connection
             Me.Connection = ConnectionFactory.EvaluateProvider(Source)

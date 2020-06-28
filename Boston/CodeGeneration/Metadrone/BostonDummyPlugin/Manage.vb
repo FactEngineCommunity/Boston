@@ -226,15 +226,6 @@ Namespace SourcePlugins.Boston
             End Set
         End Property
 
-        Private Property IManageSource_Transformations As String
-            Get
-                Throw New NotImplementedException()
-            End Get
-            Set(value As String)
-                Throw New NotImplementedException()
-            End Set
-        End Property
-
         Public _BostonModel As FBM.Model
         Public Property BostonModel As Model Implements IManageSource.BostonModel
             Get

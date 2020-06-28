@@ -22,6 +22,16 @@
             End Set
         End Property
 
+        Public _BostonModel As FBM.Model
+        Public Property BostonModel As FBM.Model Implements IConnection.BostonModel
+            Get
+                Return Me._BostonModel
+            End Get
+            Set(value As FBM.Model)
+                Me._BostonModel = value
+            End Set
+        End Property
+
         Public Property ConnectionString() As String Implements IConnection.ConnectionString
             Get
                 Return Me.ConnStr
