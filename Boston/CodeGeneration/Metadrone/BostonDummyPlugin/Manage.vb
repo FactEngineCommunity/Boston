@@ -15,11 +15,12 @@ Namespace SourcePlugins.Boston
         Inherits UserControl
         Implements PluginInterface.Sources.IManageSource
 
-        Public Event ValueChanged As PluginInterface.Sources.IManageSource.ValueChangedEventHandler
+        'Public Event ValueChanged As PluginInterface.Sources.IManageSource.ValueChangedEventHandler
         Public Delegate Sub ValueChangedEventHandler(ByVal value As Object)
-        Public Event Save As PluginInterface.Sources.IManageSource.SaveEventHandler
-        Private Event IManageSource_ValueChanged(value As Object) Implements IManageSource.ValueChanged
-        Private Event IManageSource_Save() Implements IManageSource.Save
+        'Public Event Save As PluginInterface.Sources.IManageSource.SaveEventHandler
+        Public Shadows Event ValueChanged(ByVal value As Object) Implements IManageSource.ValueChanged
+        Public Event Save() Implements PluginInterface.Sources.IManageSource.Save
+        'Private Event Save() Implements IManageSource.Save
 
         Public Delegate Sub SaveEventHandler()
 
@@ -68,6 +69,23 @@ Namespace SourcePlugins.Boston
                 Call Me.LoadERDModelDictionary()
             End If
 
+            '---------------------------------------------------------------------------------
+            'Load the set of Models loaded into the Boston application (prApplication.Models
+            If Me.ComboBoxModel.Items.Count = 0 Then
+                Dim loComboBoxItem As New tComboboxItem("0", "<No Model Selected>", Nothing)
+                Dim loWorkingComboboxItem As tComboboxItem = Nothing
+                Me.ComboBoxModel.Items.Add(loComboBoxItem)
+                For Each lrModel In prApplication.Models
+                    loComboBoxItem = New tComboboxItem(lrModel.ModelId, lrModel.Name, lrModel)
+                    Me.ComboBoxModel.Items.Add(loComboBoxItem)
+                    If Me.BostonModel IsNot Nothing Then
+                        If Me.BostonModel.ModelId = lrModel.ModelId Then loWorkingComboboxItem = loComboBoxItem
+                    End If
+                Next
+                loComboBoxItem = New tComboboxItem(Me.BostonModel.ModelId, Me.BostonModel.Name, Me.BostonModel)
+                Me.ComboBoxModel.SelectedIndex = Me.ComboBoxModel.Items.IndexOf(loWorkingComboboxItem)
+            End If
+
             If Me.BostonModel IsNot Nothing Then
                 Me.Label1.Text = Me.BostonModel.Name
             End If
@@ -88,6 +106,13 @@ Namespace SourcePlugins.Boston
             Me.Panel1.Visible = True
             Me.Panel2.Visible = True
 
+        End Sub
+
+        Private Sub ComboBoxModel_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ComboBoxModel.SelectedIndexChanged
+
+            Me.BostonModel = Me.ComboBoxModel.SelectedItem.Tag
+
+            RaiseEvent ValueChanged(Me.ComboBoxModel.SelectedItem.ItemData)
         End Sub
 
         Private Sub TestConn()
@@ -420,12 +445,13 @@ Namespace SourcePlugins.Boston
             Me.TreeView1 = New System.Windows.Forms.TreeView()
             Me.ImageList = New System.Windows.Forms.ImageList(Me.components)
             Me.TabPage1 = New System.Windows.Forms.TabPage()
+            Me.Label1 = New System.Windows.Forms.Label()
             Me.Panel2 = New System.Windows.Forms.Panel()
             Me.lblTitle = New System.Windows.Forms.Label()
             Me.LabelPromptWorkingModel = New System.Windows.Forms.Label()
             Me.LabelWorkingModel = New System.Windows.Forms.Label()
             Me.tcMain = New System.Windows.Forms.TabControl()
-            Me.Label1 = New System.Windows.Forms.Label()
+            Me.ComboBoxModel = New System.Windows.Forms.ComboBox()
             Me.TabPage2.SuspendLayout()
             Me.Panel1.SuspendLayout()
             Me.GroupBox_Main.SuspendLayout()
@@ -555,6 +581,7 @@ Namespace SourcePlugins.Boston
             'TabPage1
             '
             Me.TabPage1.BackColor = System.Drawing.Color.Transparent
+            Me.TabPage1.Controls.Add(Me.ComboBoxModel)
             Me.TabPage1.Controls.Add(Me.Label1)
             Me.TabPage1.Controls.Add(Me.Panel2)
             Me.TabPage1.Controls.Add(Me.lblTitle)
@@ -568,6 +595,15 @@ Namespace SourcePlugins.Boston
             Me.TabPage1.TabIndex = 0
             Me.TabPage1.Text = "Connection"
             Me.TabPage1.UseVisualStyleBackColor = True
+            '
+            'Label1
+            '
+            Me.Label1.AutoSize = True
+            Me.Label1.Location = New System.Drawing.Point(71, 128)
+            Me.Label1.Name = "Label1"
+            Me.Label1.Size = New System.Drawing.Size(39, 13)
+            Me.Label1.TabIndex = 5
+            Me.Label1.Text = "Label1"
             '
             'Panel2
             '
@@ -621,14 +657,13 @@ Namespace SourcePlugins.Boston
             Me.tcMain.Size = New System.Drawing.Size(777, 579)
             Me.tcMain.TabIndex = 2
             '
-            'Label1
+            'ComboBoxModel
             '
-            Me.Label1.AutoSize = True
-            Me.Label1.Location = New System.Drawing.Point(68, 102)
-            Me.Label1.Name = "Label1"
-            Me.Label1.Size = New System.Drawing.Size(39, 13)
-            Me.Label1.TabIndex = 5
-            Me.Label1.Text = "Label1"
+            Me.ComboBoxModel.FormattingEnabled = True
+            Me.ComboBoxModel.Location = New System.Drawing.Point(108, 87)
+            Me.ComboBoxModel.Name = "ComboBoxModel"
+            Me.ComboBoxModel.Size = New System.Drawing.Size(210, 21)
+            Me.ComboBoxModel.TabIndex = 6
             '
             'Manage
             '
@@ -665,6 +700,7 @@ Namespace SourcePlugins.Boston
         Friend WithEvents ImageList As ImageList
         Private components As IContainer
         Friend WithEvents Label1 As Label
+        Friend WithEvents ComboBoxModel As ComboBox
 
 #End Region
 

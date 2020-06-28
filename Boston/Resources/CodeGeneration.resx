@@ -1,0 +1,535 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="About" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\About.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="About2" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\About.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Access16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\Access16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Access2K16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\Access2K16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Access32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\Access32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="add" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\add.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="application_view_list16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\application_view_list16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="arrow_down" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\arrow_down.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="arrow_refresh" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\arrow_refresh.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="BarTile" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\BarTile.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="button_ok16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\button_ok16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="celltile" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\celltile.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Close16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\Close16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="CloseDownl16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\CloseDownl16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Closehil16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\Closehil16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="connection16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\connection16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="control_play16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\control_play16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Copy16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\Copy16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="cross16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\cross16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="CS16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\CS16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="CS32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\CS32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="CurrentDocument16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\CurrentDocument16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="CurrentDocument28x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\CurrentDocument28x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="cut16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\cut16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="DataSource16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\DataSource16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="DataSource32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\DataSource32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="DataSourceDimmed16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\DataSourceDimmed16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="DialogLeft" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\DialogLeft.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="DialogTop" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\DialogTop.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="DialogTop52x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\DialogTop52x32.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Excel16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\Excel16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Excel2K16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\Excel2K16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Excel32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\Excel32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="filenew16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\filenew16x16.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="filenew16x161" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\filenew16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="filesave16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\filesave16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="fncmeta16x161" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\fncmeta16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="FolderClosed16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\FolderClosed16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="FolderClosedDimmed16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\FolderClosedDimmed16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="FolderOpen16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\FolderOpen16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="FolderOpenDimmed16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\FolderOpenDimmed16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="get16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\get16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="help16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\help16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="house16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\house16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Leaf16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\Leaf16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Leaf32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\Leaf32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="LittleDownArrow" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\LittleDownArrow.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Loader3" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\Loader3.gif;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="MainToolbarBG" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\MainToolbarBG.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="messagebox_info16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\messagebox_info16x16.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="messagebox_info32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\messagebox_info32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="metadrone" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\metadrone.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Metadrone32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\Metadrone32x32.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="music16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\music16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="music32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\music32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="musicDimmed16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\musicDimmed16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="musicvar16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\musicvar16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ODBC16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\ODBC16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ODBC32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\ODBC32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="OLEDB16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\OLEDB16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="OLEDB32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\OLEDB32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="open16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\open16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Oracle16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\Oracle16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Oracle32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\Oracle32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Package16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\Package16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Package28x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\Package28x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Package32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\Package32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="PackageDimmed16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\PackageDimmed16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="paste16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\paste16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="pencil" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\pencil.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="pencil16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\pencil16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Preview" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\Preview.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Preview16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\Preview16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Preview32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\Preview32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Project16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\Project16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Project28x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\Project28x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Project32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\Project32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ProjFolderClosed16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\ProjFolderClosed16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ProjFolderClosedDimmed16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\ProjFolderClosedDimmed16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ProjFolderOpen16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\ProjFolderOpen16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ProjFolderOpenDimmed16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\ProjFolderOpenDimmed16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Properties16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\Properties16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="PropertiesDimmed16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\PropertiesDimmed16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Question16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\Question16x16.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Question32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\Question32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="SaveAllPreviews16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\SaveAllPreviews16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="SavePreview16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\SavePreview16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="SearchBoxEnd" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\SearchBoxEnd.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="SearchBoxEndNoFocus" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\SearchBoxEndNoFocus.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="SearchBoxMiddle" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\SearchBoxMiddle.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="SearchBoxMiddleNoFocus" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\SearchBoxMiddleNoFocus.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="SearchBoxStart" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\SearchBoxStart.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="SearchBoxStartNoFocus" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\SearchBoxStartNoFocus.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="sep" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\sep.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="sep2" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\sep2.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="settings16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\settings16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="sitemap16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\sitemap16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Splash" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\Splash.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="SQLServer16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\SQLServer16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="SQLServer32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\SQLServer32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="supermain16x161" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\supermain16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="support32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\support32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="tab_breakoff16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\tab_breakoff16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="tab_close16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\tab_close16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="tab_duplicate16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\tab_duplicate16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="tblmeta16x161" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\tblmeta16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Template16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\Template16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Template32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\Template32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="TemplateBypassed16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\TemplateBypassed16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="TemplateDimmed16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\TemplateDimmed16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="TemplateDimmed16x161" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\TemplateDimmed16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="TemplateLibrary16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\TemplateLibrary16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="TemplateLibrary16x161" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\TemplateLibrary16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="TemplateParam16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\TemplateParam16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="TemplateParam16x161" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\TemplateParam16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="TemplateVar16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\TemplateVar16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="TemplateVar16x161" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\TemplateVar16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="terminal16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\terminal16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="terminal16x161" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\terminal16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="transform16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\transform16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="transform16x161" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\transform16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Tutes32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\Tutes32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Tutes32x321" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\Tutes32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="VB16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\VB16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="VB16x161" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\VB16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="VB32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\VB32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="VB32x321" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\VB32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="viewmag16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\viewmag16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="viewmag16x161" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\viewmag16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="viewmag32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\viewmag32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="viewmag32x321" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\viewmag32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Warning16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\Warning16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Warning16x161" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\Warning16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Warning32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\Warning32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Warning32x321" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\Warning32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="world" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\world.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="world1" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\world.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="_1rightarrow16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\CodeGeneration\Metadrone\Resources\img\1rightarrow16x16.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+</root>

@@ -376,11 +376,11 @@ Namespace UI
             RaiseEvent Save()
         End Sub
 
-        Private Sub ctl_ValueChanged(ByVal value As Object) Handles ctlSQLServer.ValueChanged, _
-                                                                    ctlOracle.ValueChanged, _
-                                                                    ctlAccess.ValueChanged, _
-                                                                    ctlExcel.ValueChanged, _
-                                                                    ctlOLEDB.ValueChanged, _
+        Private Sub ctl_ValueChanged(ByVal value As Object) Handles ctlSQLServer.ValueChanged,
+                                                                    ctlOracle.ValueChanged,
+                                                                    ctlAccess.ValueChanged,
+                                                                    ctlExcel.ValueChanged,
+                                                                    ctlOLEDB.ValueChanged,
                                                                     ctlODBC.ValueChanged
             If Me.SysIgnoreEvent Then Exit Sub
 
