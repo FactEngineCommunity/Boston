@@ -49,7 +49,14 @@ namespace SourcePlugins.Firebird
 			this.ConnStr = ConnectionString;
 		}
 
-		internal string GetQuery(QueryEnum Query)
+        public Boston.FBM.Model _BostonModel;
+        public Boston.FBM.Model BostonModel
+        {
+            get{return this._BostonModel;}
+            set{this._BostonModel = value;}
+        }
+
+        internal string GetQuery(QueryEnum Query)
 		{
 			switch (Query) {
 				case QueryEnum.SchemaQuery:

@@ -29,6 +29,16 @@ Namespace PluginInterface.Sources
             Me.ConnStr = ConnectionString
         End Sub
 
+        Public _BostonModel As FBM.Model
+        Public Property BostonModel As FBM.Model Implements IConnection.BostonModel
+            Get
+                Return Me._BostonModel
+            End Get
+            Set(value As FBM.Model)
+                Me._BostonModel = value
+            End Set
+        End Property
+
         Friend Function GetQuery(ByVal Query As QueryEnum) As String
             Select Case Query
                 Case QueryEnum.SchemaQuery : Return Globals.ReadResource("Boston.Queries.SQLServer.SchemaQuery.sql")

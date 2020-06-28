@@ -1,6 +1,10 @@
-﻿Imports Boston.PluginInterface.Sources
+﻿Imports Boston.FBM
+Imports Boston.PluginInterface.Sources
 
 Namespace SourcePlugins.Boston
+    ''' <summary>
+    ''' See Loader.vb for how the Plugin is created
+    ''' </summary>
     Public Class Connection
         Implements PluginInterface.Sources.IConnection
 
@@ -20,16 +24,26 @@ Namespace SourcePlugins.Boston
 
         Public Property Name As String Implements IConnection.Name
             Get
-                Throw New NotImplementedException()
+                Return Me.mName
             End Get
             Set(value As String)
-                Throw New NotImplementedException()
+                Me.mName = value
+            End Set
+        End Property
+
+        Public _BostonModel As FBM.Model
+        Public Property BostonModel As Model Implements IConnection.BostonModel
+            Get
+                Return Me._BostonModel
+            End Get
+            Set(value As Model)
+                Me._BostonModel = value
             End Set
         End Property
 
         Public Property ConnectionString As String Implements IConnection.ConnectionString
             Get
-                Throw New NotImplementedException()
+                Return Nothing 'Throw New NotImplementedException()
             End Get
             Set(value As String)
                 Throw New NotImplementedException()
@@ -38,10 +52,9 @@ Namespace SourcePlugins.Boston
 
         Public Property SchemaQuery As String Implements IConnection.SchemaQuery
             Get
-                Throw New NotImplementedException()
+                Return Nothing
             End Get
             Set(value As String)
-                Throw New NotImplementedException()
             End Set
         End Property
 
@@ -50,7 +63,7 @@ Namespace SourcePlugins.Boston
                 Throw New NotImplementedException()
             End Get
             Set(value As String)
-                Throw New NotImplementedException()
+                ' Throw New NotImplementedException()
             End Set
         End Property
 
@@ -59,7 +72,7 @@ Namespace SourcePlugins.Boston
                 Throw New NotImplementedException()
             End Get
             Set(value As String)
-                Throw New NotImplementedException()
+                'Throw New NotImplementedException()
             End Set
         End Property
 
@@ -68,7 +81,7 @@ Namespace SourcePlugins.Boston
                 Throw New NotImplementedException()
             End Get
             Set(value As String)
-                Throw New NotImplementedException()
+                'Throw New NotImplementedException()
             End Set
         End Property
 
@@ -77,7 +90,7 @@ Namespace SourcePlugins.Boston
                 Throw New NotImplementedException()
             End Get
             Set(value As String)
-                Throw New NotImplementedException()
+                'Throw New NotImplementedException()
             End Set
         End Property
 
@@ -109,11 +122,48 @@ Namespace SourcePlugins.Boston
         End Function
 
         Public Function GetSchema() As List(Of SchemaRow) Implements IConnection.GetSchema
-            Throw New NotImplementedException()
+
+            Dim larSchema As New List(Of SchemaRow)
+
+            If Me.BostonModel Is Nothing Then Return larSchema
+
+            Dim sr As SchemaRow
+
+            For Each lrTable In Me.BostonModel.RDS.Table
+                For Each lrColumn In lrTable.Column
+                    sr = New SchemaRow()
+                    sr.Name = lrTable.Name
+                    sr.Type = "TABLE"
+                    sr.Column_Name = lrColumn.Name
+                    sr.Data_Type = lrColumn.getMetamodelDataType.ToString
+                    sr.Ordinal_Position = lrColumn.OrdinalPosition
+                    sr.Length = lrColumn.getMetamodelDataTypeLength
+                    sr.Precision = lrColumn.getMetamodelDataTypePrecision
+                    sr.Scale = 0
+                    sr.Nullable = Not lrColumn.IsMandatory
+                    sr.IsIdentity = False
+                    sr.IsTable = True
+                    sr.IsView = False
+                    sr.IsPrimaryKey = lrColumn.ContributesToPrimaryKey
+                    sr.IsForeignKey = False
+                    larSchema.Add(sr)
+                Next
+            Next
+
+            Return larSchema
+
         End Function
 
         Public Function GetTables() As List(Of String) Implements IConnection.GetTables
-            Throw New NotImplementedException()
+
+            Dim lasTableName As New List(Of String)
+
+            For Each lrTable In Me.BostonModel.RDS.Table
+                lasTableName.Add(lrTable.Name)
+            Next
+
+            Return lasTableName
+
         End Function
 
         Public Function GetTransforms() As String
@@ -126,6 +176,25 @@ Namespace SourcePlugins.Boston
 
         Public Function GetRoutineColumnSchema(RoutineName As String, RoutineType As String, IsProcedure As Boolean, ParamList As List(Of String)) As List(Of SchemaRow) Implements IConnection.GetRoutineColumnSchema
             Throw New NotImplementedException()
+        End Function
+
+        Private Function SetColumnAttributes(ByVal Table_Name As String, ByVal Table_Type As String, ByVal dr As DataRow) As SchemaRow
+            Dim sr As SchemaRow = New SchemaRow()
+            sr.Name = Table_Name.Trim()
+            sr.Type = Table_Type.Trim()
+            sr.Column_Name = dr("COLUMN_NAME").ToString().Trim()
+            sr.Data_Type = dr("DATA_TYPE").ToString().Trim()
+            sr.Ordinal_Position = Convert.ToInt64(dr("ORDINAL_POSITION"))
+            sr.Length = Convert.ToInt64((If(Object.ReferenceEquals(dr("CHARACTER_MAXIMUM_LENGTH"), DBNull.Value), -1, dr("CHARACTER_MAXIMUM_LENGTH"))))
+            sr.Precision = Convert.ToInt64((If(Object.ReferenceEquals(dr("NUMERIC_PRECISION"), DBNull.Value), -1, dr("NUMERIC_PRECISION"))))
+            sr.Scale = Convert.ToInt64((If(Object.ReferenceEquals(dr("NUMERIC_SCALE"), DBNull.Value), -1, dr("NUMERIC_SCALE"))))
+            sr.Nullable = Convert.ToBoolean((If(dr("IS_NULLABLE").ToString().Trim().Equals("YES", StringComparison.OrdinalIgnoreCase), True, False)))
+            sr.IsIdentity = Convert.ToBoolean((If(dr("IS_IDENTITY").ToString().Trim().Equals("1"), True, False)))
+            sr.IsTable = sr.Type.Equals("BASE TABLE", StringComparison.OrdinalIgnoreCase)
+            sr.IsView = sr.Type.Equals("VIEW", StringComparison.OrdinalIgnoreCase)
+            sr.IsPrimaryKey = dr("CONSTRAINT_TYPE").ToString().Trim().Equals("PRIMARY KEY", StringComparison.OrdinalIgnoreCase)
+            sr.IsForeignKey = dr("CONSTRAINT_TYPE").ToString().Trim().Equals("FOREIGN KEY", StringComparison.OrdinalIgnoreCase)
+            Return sr
         End Function
 
         Public Function CreateCopy(ByVal Name As String,
@@ -144,6 +213,7 @@ Namespace SourcePlugins.Boston
             copy.TableNamePlaceHolder = TableNamePlaceHolder
             copy.RoutineSchemaQuery = RoutineSchemaQuery
             copy.Transformations = Transformations
+            copy.BostonModel = BostonModel
 
             For Each tbl As String In IgnoreTableNames
                 copy.IgnoreTableNames.Add(tbl)

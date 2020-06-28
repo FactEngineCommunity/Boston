@@ -85,11 +85,13 @@ Namespace SourcePlugins.Boston
                         If Me.BostonModel.ModelId = lrModel.ModelId Then loWorkingComboboxItem = loComboBoxItem
                     End If
                 Next
-                loComboBoxItem = New tComboboxItem(Me.BostonModel.ModelId, Me.BostonModel.Name, Me.BostonModel)
-                Me.ComboBoxModel.SelectedIndex = Me.ComboBoxModel.Items.IndexOf(loWorkingComboboxItem)
+                If Me.BostonModel IsNot Nothing Then
+                    loComboBoxItem = New tComboboxItem(Me.BostonModel.ModelId, Me.BostonModel.Name, Me.BostonModel)
+                    Me.ComboBoxModel.SelectedIndex = Me.ComboBoxModel.Items.IndexOf(loWorkingComboboxItem)
+                End If
             End If
 
-            If Me.BostonModel IsNot Nothing Then
+                If Me.BostonModel IsNot Nothing Then
                 Me.Label1.Text = Me.BostonModel.Name
             End If
 
@@ -223,15 +225,6 @@ Namespace SourcePlugins.Boston
             End Get
             Set(ByVal value As String)
                 Me.txtTransformations.Text = value
-            End Set
-        End Property
-
-        Private Property IManageSource_Transformations As String
-            Get
-                Throw New NotImplementedException()
-            End Get
-            Set(value As String)
-                Throw New NotImplementedException()
             End Set
         End Property
 
