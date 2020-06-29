@@ -120,6 +120,7 @@ Namespace SourcePlugins.Boston
         Private Sub ComboBoxModel_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ComboBoxModel.SelectedIndexChanged
 
             Me.BostonModel = Me.ComboBoxModel.SelectedItem.Tag
+            Call Me.LoadERDModelDictionary()
 
             RaiseEvent ValueChanged(Me.ComboBoxModel.SelectedItem.ItemData)
         End Sub
@@ -249,6 +250,7 @@ Namespace SourcePlugins.Boston
         Private Sub LoadERDModelDictionary()
 
             Try
+                Me.TreeView1.Nodes.Clear()
                 Dim loNode As New TreeNode
 
                 loNode = Me.TreeView1.Nodes.Add("Entity", "Entity", 0, 0)

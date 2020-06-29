@@ -290,6 +290,7 @@ Namespace UI
                                         If CType(ctl, PluginInterface.Sources.IManageSource).BostonModel IsNot Nothing Then
                                             .BostonModelId = CType(ctl, PluginInterface.Sources.IManageSource).BostonModel.ModelId
                                         End If
+                                        pi.Connection.BostonModel = prApplication.getBostonApplicationModelById(.BostonModelId)
                                     End With
                                 End If
                             Next

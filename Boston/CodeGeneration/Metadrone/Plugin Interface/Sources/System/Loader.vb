@@ -7,9 +7,13 @@
             Public AssemblyVersion As String = Nothing
             Public Path As String = Nothing
             Public Connection As IConnection = Nothing
-            Public Manager As IManageSource = Nothing
+            Public WithEvents Manager As IManageSource = Nothing
             Public SourceDescription As ISourceDescription = Nothing
             Public PluginDescription As IPluginDescription = Nothing
+
+            Private Sub Manager_ValueChanged(value As Object) Handles Manager.ValueChanged
+
+            End Sub
         End Class
 
         Public Plugins As New List(Of Plugin)

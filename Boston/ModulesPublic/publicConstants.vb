@@ -248,6 +248,10 @@ Public Module publicConstants
         <Description(".nr")> DotLowercaseNr
         <Description(".Title")> DotUppercaseTitle
         <Description(".title")> DotLowercaseTitle
+        <Description(".Date")> UppercaseDate
+        <Description(".date")> DotLowercaseDate
+        <Description(".Time")> DotUppercaseTime
+        <Description(".time")> DotLowercaseTime
     End Enum
 
     <Serializable()> _

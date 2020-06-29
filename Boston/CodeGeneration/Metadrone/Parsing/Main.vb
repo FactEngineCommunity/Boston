@@ -264,6 +264,7 @@ Namespace Parser
             If Me.sourceParser.CompiledSources.Count = 0 Then
                 'If not pre-compiled get sources to compile
                 For Each src In Me.mdProject.Sources
+
                     If Me.StopBuildRequest Then Exit For
 
                     If Me.frmMain IsNot Nothing Then

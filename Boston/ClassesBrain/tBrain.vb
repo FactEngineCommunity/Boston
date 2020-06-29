@@ -2389,13 +2389,13 @@ Public Class tBrain
                         Dim lasSymbol As New List(Of String)
                         lasSymbol.Add(lsModelObjectName)
 
-                        lrQuestion = New tQuestion("Would you like me to create an Entity Type for '" & lsModelObjectName & "'?", _
-                                                         pcenumQuestionType.CreateEntityType, _
-                                                         True, _
-                                                         lasSymbol, _
-                                                         Nothing, _
-                                                         Nothing, _
-                                                         lrPlan, _
+                        lrQuestion = New tQuestion("Would you like me to create an Entity Type for '" & lsModelObjectName & "'? (Answer 'No' for Value Type)",
+                                                         pcenumQuestionType.CreateEntityType,
+                                                         True,
+                                                         lasSymbol,
+                                                         Nothing,
+                                                         Nothing,
+                                                         lrPlan,
                                                          lrStep)
                     End If
 

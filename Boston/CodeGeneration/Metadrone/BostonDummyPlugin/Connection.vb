@@ -127,6 +127,10 @@ Namespace SourcePlugins.Boston
 
             If Me.BostonModel Is Nothing Then Return larSchema
 
+            If Not Me.BostonModel.Loaded Then
+                Call Me.BostonModel.Load()
+            End If
+
             Dim sr As SchemaRow
 
             For Each lrTable In Me.BostonModel.RDS.Table
