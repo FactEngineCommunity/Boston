@@ -293,12 +293,18 @@ Namespace RDS
 
         Public Function hasNonPrimaryKeyColumnsAboveIt() As Boolean
 
-            Dim liNonPrimaryKeyCount = Aggregate Column In Me.Table.Column _
+            Dim liNonPrimaryKeyCount = Aggregate Column In Me.Table.Column
                                        Where Column.ContributesToPrimaryKey = False _
-                                       And Column.OrdinalPosition < Me.OrdinalPosition _
+                                       And Column.OrdinalPosition < Me.OrdinalPosition
                                        Into Count()
 
             Return liNonPrimaryKeyCount > 0
+
+        End Function
+
+        Public Function isForeignKey() As Boolean
+
+            Return Me.Relation.Count > 0
 
         End Function
 

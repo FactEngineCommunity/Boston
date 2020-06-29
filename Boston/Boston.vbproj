@@ -2695,6 +2695,7 @@
     <None Include="Images\MenuImages\PGS16x16.png" />
     <None Include="Images\MenuImages\Morphing16x16.png" />
     <None Include="Images\MenuImages\ModelAdd16x16.jpg" />
+    <None Include="Images\MenuImages\Project16x16.png" />
     <Content Include="Images\MenuImages\Properties216x16.jpg" />
     <None Include="Images\MenuImages\Remove16x16.png" />
     <None Include="Images\MenuImages\RainCloudRed16x16.png" />

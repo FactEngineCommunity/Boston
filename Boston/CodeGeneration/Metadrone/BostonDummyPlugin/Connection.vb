@@ -145,7 +145,7 @@ Namespace SourcePlugins.Boston
                     SR.IsTable = True
                     SR.IsView = False
                     SR.IsPrimaryKey = lrColumn.ContributesToPrimaryKey
-                    SR.IsForeignKey = False
+                    sr.IsForeignKey = lrColumn.isForeignKey
                     larSchema.Add(SR)
                 Next
             Next
