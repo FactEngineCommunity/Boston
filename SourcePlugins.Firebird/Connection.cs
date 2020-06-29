@@ -9,6 +9,7 @@ using System.Linq;
 using System.Xml.Linq;
 using FirebirdSql.Data;
 using Boston.PluginInterface.Sources;
+
 namespace SourcePlugins.Firebird
 {
 
@@ -29,6 +30,7 @@ namespace SourcePlugins.Firebird
         private string mTableSchemaQuery;
         private string mColumnSchemaQuery;
 		private string mTableNamePlaceHolder;
+        private Boston.FBM.Model mBostonModel;
 
         private string mTransforms;
 
@@ -48,12 +50,11 @@ namespace SourcePlugins.Firebird
 			this.mName = Name;
 			this.ConnStr = ConnectionString;
 		}
-
-        public Boston.FBM.Model _BostonModel;
+        
         public Boston.FBM.Model BostonModel
         {
-            get{return this._BostonModel;}
-            set{this._BostonModel = value;}
+            get{return this.mBostonModel;}
+            set{this.mBostonModel = value;}
         }
 
         internal string GetQuery(QueryEnum Query)

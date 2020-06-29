@@ -16,6 +16,7 @@ Namespace Parser.Syntax
         Public Const VARIABLE_ATTRIBUTE_ISPRIMARYKEY As String = "isprimarykey"
         Public Const VARIABLE_ATTRIBUTE_ISFOREIGNKEY As String = "isforeignkey"
         Public Const VARIABLE_ATTRIBUTE_NULLABLE As String = "nullable"
+        Public Const VARIABLE_ATTRIBUTE_ALLOWZEROLENGTH As String = "allowzerolength"
         Public Const VARIABLE_ATTRIBUTE_LENGTH As String = "length"
         Public Const VARIABLE_ATTRIBUTE_PRECISION As String = "precision"
         Public Const VARIABLE_ATTRIBUTE_SCALE As String = "scale"
@@ -205,6 +206,7 @@ Namespace Parser.Syntax
         Friend Shared DOCO_VARIABLE_ATTRIBUTE_ISFOREIGNKEY As String = "If is a foreign key column."
         Friend Shared DOCO_VARIABLE_ATTRIBUTE_NULLABLE As String = "If is nullable field."
         Friend Shared DOCO_VARIABLE_ATTRIBUTE_DEFAULTVALUE As String = "Default value for field."
+        Friend Shared DOCO_VARIABLE_ATTRIBUTE_ALLOWZEROLENGTH As String = "Field allows zero length."
         Friend Shared DOCO_VARIABLE_ATTRIBUTE_LENGTH As String = "Length of field."
         Friend Shared DOCO_VARIABLE_ATTRIBUTE_PRECISION As String = "Precision of field."
         Friend Shared DOCO_VARIABLE_ATTRIBUTE_SCALE As String = "Scale of field."
@@ -319,6 +321,7 @@ Namespace Parser.Syntax
             If StrEq(value, VARIABLE_ATTRIBUTE_ISPRIMARYKEY) Then Return True
             If StrEq(value, VARIABLE_ATTRIBUTE_ISFOREIGNKEY) Then Return True
             If StrEq(value, VARIABLE_ATTRIBUTE_NULLABLE) Then Return True
+            If StrEq(value, VARIABLE_ATTRIBUTE_ALLOWZEROLENGTH) Then Return True
             If StrEq(value, VARIABLE_ATTRIBUTE_LENGTH) Then Return True
             If StrEq(value, VARIABLE_ATTRIBUTE_PRECISION) Then Return True
             If StrEq(value, VARIABLE_ATTRIBUTE_SCALE) Then Return True

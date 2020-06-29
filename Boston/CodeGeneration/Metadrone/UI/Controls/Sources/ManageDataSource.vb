@@ -154,7 +154,6 @@ Namespace UI
                 'Set up manager control
                 For Each ctl In Me.pnlManagers.Controls
                     If CType(ctl, UserControl).Tag Is Nothing Then Continue For
-                    MsgBox(ctl.GetType.ToString)
                     If Not TypeOf ctl Is PluginInterface.Sources.IManageSource Then Continue For
 
                     If Source.Provider.Equals(CType(ctl, UserControl).Tag.ToString, StringComparison.CurrentCultureIgnoreCase) Then

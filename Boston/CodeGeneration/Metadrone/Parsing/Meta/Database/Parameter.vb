@@ -42,6 +42,15 @@ Namespace Parser.Meta.Database
             Return parm
         End Function
 
+        Public Property AllowZeroLength() As Boolean
+            Get
+                Return Me.SchemaRowVal.AllowZeroLength
+            End Get
+            Set(ByVal value As Boolean)
+                Me.SchemaRowVal.AllowZeroLength = value
+            End Set
+        End Property
+
         Public Property Value() As Object
             Get
                 Return Me.mValue
@@ -149,6 +158,10 @@ Namespace Parser.Meta.Database
                 'set in/out mode
                 Me.IsInOutMode = Conv.ToBoolean(value)
 
+            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_ALLOWZEROLENGTH) Then
+                'set allowZeroLength
+                Me.AllowZeroLength = Conv.ToBoolean(value)
+
             ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_LENGTH) Then
                 'set length
                 Me.Length = Conv.ToInteger(value)
@@ -217,6 +230,11 @@ Namespace Parser.Meta.Database
                 'return in/out mode
                 Call Me.CheckParamsForPropertyCall(AttribName, Params)
                 Return Me.IsInOutMode
+
+            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_ALLOWZEROLENGTH) Then
+                'return allowZeroLength
+                Call Me.CheckParamsForPropertyCall(AttribName, Params)
+                Return Me.AllowZeroLength
 
             ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_LENGTH) Then
                 'return length

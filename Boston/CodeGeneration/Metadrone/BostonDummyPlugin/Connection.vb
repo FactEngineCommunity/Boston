@@ -133,20 +133,20 @@ Namespace SourcePlugins.Boston
                 For Each lrColumn In lrTable.Column
                     sr = New SchemaRow()
                     sr.Name = lrTable.Name
-                    sr.Type = "TABLE"
-                    sr.Column_Name = lrColumn.Name
-                    sr.Data_Type = lrColumn.getMetamodelDataType.ToString
-                    sr.Ordinal_Position = lrColumn.OrdinalPosition
-                    sr.Length = lrColumn.getMetamodelDataTypeLength
-                    sr.Precision = lrColumn.getMetamodelDataTypePrecision
-                    sr.Scale = 0
-                    sr.Nullable = Not lrColumn.IsMandatory
-                    sr.IsIdentity = False
-                    sr.IsTable = True
-                    sr.IsView = False
-                    sr.IsPrimaryKey = lrColumn.ContributesToPrimaryKey
-                    sr.IsForeignKey = False
-                    larSchema.Add(sr)
+                    SR.Type = "TABLE"
+                    SR.Column_Name = lrColumn.Name
+                    SR.Data_Type = lrColumn.getMetamodelDataType.ToString
+                    SR.Ordinal_Position = lrColumn.OrdinalPosition
+                    SR.Length = lrColumn.getMetamodelDataTypeLength
+                    SR.Precision = lrColumn.getMetamodelDataTypePrecision
+                    SR.Scale = 0
+                    SR.Nullable = Not lrColumn.IsMandatory
+                    SR.IsIdentity = False
+                    SR.IsTable = True
+                    SR.IsView = False
+                    SR.IsPrimaryKey = lrColumn.ContributesToPrimaryKey
+                    sr.IsForeignKey = lrColumn.isForeignKey
+                    larSchema.Add(SR)
                 Next
             Next
 

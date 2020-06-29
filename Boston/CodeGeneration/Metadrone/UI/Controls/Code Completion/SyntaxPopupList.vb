@@ -328,6 +328,7 @@ Namespace UI
                             Me.AddListItem(VARIABLE_ATTRIBUTE_LISTCOUNT, DOCO_VARIABLE_ATTRIBUTE_LISTCOUNT, Nothing, SyntaxPopupListItem.Icons.PROPERTY)
                             Me.AddListItem(VARIABLE_ATTRIBUTE_LISTPOS, DOCO_VARIABLE_ATTRIBUTE_LISTPOS, Nothing, SyntaxPopupListItem.Icons.PROPERTY)
 
+                            Me.AddListItem(VARIABLE_ATTRIBUTE_ALLOWZEROLENGTH, DOCO_VARIABLE_ATTRIBUTE_ALLOWZEROLENGTH, Nothing, SyntaxPopupListItem.Icons.PROPERTY)
                             Me.AddListItem(VARIABLE_ATTRIBUTE_DATATYPE, DOCO_VARIABLE_ATTRIBUTE_DATATYPE, Nothing, SyntaxPopupListItem.Icons.PROPERTY)
                             Me.AddListItem(VARIABLE_ATTRIBUTE_LENGTH, DOCO_VARIABLE_ATTRIBUTE_LENGTH, Nothing, SyntaxPopupListItem.Icons.PROPERTY)
                             Me.AddListItem(VARIABLE_ATTRIBUTE_PRECISION, DOCO_VARIABLE_ATTRIBUTE_PRECISION, Nothing, SyntaxPopupListItem.Icons.PROPERTY)
@@ -366,6 +367,7 @@ Namespace UI
                             Me.AddListItem(VARIABLE_ATTRIBUTE_LISTCOUNT, DOCO_VARIABLE_ATTRIBUTE_LISTCOUNT, Nothing, SyntaxPopupListItem.Icons.PROPERTY)
                             Me.AddListItem(VARIABLE_ATTRIBUTE_LISTPOS, DOCO_VARIABLE_ATTRIBUTE_LISTPOS, Nothing, SyntaxPopupListItem.Icons.PROPERTY)
 
+                            Me.AddListItem(VARIABLE_ATTRIBUTE_ALLOWZEROLENGTH, DOCO_VARIABLE_ATTRIBUTE_ALLOWZEROLENGTH, Nothing, SyntaxPopupListItem.Icons.PROPERTY)
                             Me.AddListItem(VARIABLE_ATTRIBUTE_DATATYPE, DOCO_VARIABLE_ATTRIBUTE_DATATYPE, Nothing, SyntaxPopupListItem.Icons.PROPERTY)
                             Me.AddListItem(VARIABLE_ATTRIBUTE_LENGTH, DOCO_VARIABLE_ATTRIBUTE_LENGTH, Nothing, SyntaxPopupListItem.Icons.PROPERTY)
                             Me.AddListItem(VARIABLE_ATTRIBUTE_PRECISION, DOCO_VARIABLE_ATTRIBUTE_PRECISION, Nothing, SyntaxPopupListItem.Icons.PROPERTY)

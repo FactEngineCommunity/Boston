@@ -27,6 +27,9 @@
         Private IsOutMode_Field As Boolean
         Private IsInOutMode_Field As Boolean
 
+        'Added for Boston. Not in original Metadrone code.
+        Private AllowZeroLengthField As Boolean
+
 
         Public Function GetCopy() As SchemaRow
             Dim schema As New SchemaRow()
@@ -52,11 +55,23 @@
                 .IsInMode = Me.IsInMode
                 .IsOutMode = Me.IsOutMode
                 .IsInOutMode = Me.IsInOutMode
+
+                'Test for Boston
+                .AllowZeroLength = Me.AllowZeroLength
             End With
             Return schema
         End Function
 
 #Region "Properties"
+
+        Public Property AllowZeroLength() As Boolean
+            Get
+                Return Me.AllowZeroLengthField
+            End Get
+            Set(ByVal value As Boolean)
+                Me.AllowZeroLengthField = value
+            End Set
+        End Property
 
         Public Property Name() As String
             Get

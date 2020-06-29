@@ -42,6 +42,15 @@ Namespace Parser.Meta.Database
             Return col
         End Function
 
+        Public Property AllowZeroLength() As Boolean
+            Get
+                Return Me.SchemaRowVal.AllowZeroLength
+            End Get
+            Set(ByVal value As Boolean)
+                Me.SchemaRowVal.AllowZeroLength = value
+            End Set
+        End Property
+
         Public Property Value() As Object
             Get
                 Return Me.mValue
@@ -149,6 +158,10 @@ Namespace Parser.Meta.Database
                 'set nullable
                 Me.Nullable = Conv.ToBoolean(value)
 
+            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_ALLOWZEROLENGTH) Then
+                'set allowZeroLength
+                Me.AllowZeroLength = Conv.ToBoolean(value)
+
             ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_LENGTH) Then
                 'set length
                 Me.Length = Conv.ToInteger(value)
@@ -192,6 +205,13 @@ Namespace Parser.Meta.Database
                 'return value
                 Call Me.CheckParamsForPropertyCall(VARIABLE_ATTRIBUTE_VALUE, Params)
                 Return Me.ReplaceAllList.ApplyReplaces(Me.Value)
+            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_DATATYPE) And LookTransformsIfNotFound Then
+                Call Me.CheckParamsForPropertyCall(AttribName, Params)
+                Try
+                    Return Me.Transforms.GetAttributeValue(Me, Me.Owner, AttribName)
+                Catch ex As Exception
+                    Return Me.DataType
+                End Try
 
             ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_DATATYPE) Then
                 'return provider datatype
@@ -217,6 +237,11 @@ Namespace Parser.Meta.Database
                 'return nullable
                 Call Me.CheckParamsForPropertyCall(AttribName, Params)
                 Return Me.Nullable
+
+            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_ALLOWZEROLENGTH) Then
+                'return allowZeroLength
+                Call Me.CheckParamsForPropertyCall(AttribName, Params)
+                Return Me.AllowZeroLength
 
             ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_LENGTH) Then
                 'return length
