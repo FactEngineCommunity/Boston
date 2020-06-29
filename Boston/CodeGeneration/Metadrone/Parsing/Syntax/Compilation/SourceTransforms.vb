@@ -370,7 +370,8 @@ Namespace Parser.Syntax
                                 upper = node.IfBranch.ElseNodeIndex
 
                             Else 'Up to the end
-                                upper = node.Nodes.Count - 1
+                                'Bug found: Will not process the last elseif when "-1" is left in below. Bug in original Metadrone code.
+                                upper = node.Nodes.Count '- 1
 
                             End If
                             'process block
@@ -378,6 +379,7 @@ Namespace Parser.Syntax
                             For j As Integer = lower To upper
                                 Call Me.Process(source, sourceOwner, node.Nodes(j))
                             Next
+
                             Exit Sub
 
                         End If

@@ -192,6 +192,13 @@ Namespace Parser.Meta.Database
                 'return value
                 Call Me.CheckParamsForPropertyCall(VARIABLE_ATTRIBUTE_VALUE, Params)
                 Return Me.ReplaceAllList.ApplyReplaces(Me.Value)
+            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_DATATYPE) And LookTransformsIfNotFound Then
+                Call Me.CheckParamsForPropertyCall(AttribName, Params)
+                Try
+                    Return Me.Transforms.GetAttributeValue(Me, Me.Owner, AttribName)
+                Catch ex As Exception
+                    Return Me.DataType
+                End Try
 
             ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_DATATYPE) Then
                 'return provider datatype
