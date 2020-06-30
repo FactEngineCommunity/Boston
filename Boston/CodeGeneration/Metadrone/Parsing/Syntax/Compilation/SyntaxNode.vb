@@ -228,6 +228,9 @@ Namespace Parser.Syntax
                     ElseIf StrEq(tokObject, OBJECT_VIEW) Then
                         Me.ForEntity = ExecForEntities.OBJECT_VIEW
 
+                    ElseIf StrEq(tokObject, OBJECT_RELATION) Then 'Boston specific. Not part of original Metadrone.
+                        Me.ForEntity = ExecForEntities.OBJECT_RELATION
+
                     ElseIf StrEq(tokObject, OBJECT_COLUMN) Then
                         Me.ForEntity = ExecForEntities.OBJECT_COLUMN
 
@@ -447,6 +450,7 @@ Namespace Parser.Syntax
             OBJECT_INPARAMETER = 11
             OBJECT_OUTPARAMETER = 12
             OBJECT_INOUTPARAMETER = 13
+            OBJECT_RELATION = 14 'Boston specific. Not part of original Metadrone. Used for RDS.Relations as Objects.
         End Enum
 
         Public Function GetCopy() As SyntaxNode

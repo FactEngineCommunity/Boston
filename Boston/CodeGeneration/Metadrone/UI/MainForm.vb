@@ -67,6 +67,8 @@
                 End If
             End If
 
+            Globals.SourcePlugins.Plugins.Clear()
+
             If Me.IsDirty Then
                 If Me.SaveChanges() = System.Windows.Forms.DialogResult.Cancel Then
                     e.Cancel = True

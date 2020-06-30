@@ -4,7 +4,6 @@ Imports Boston.Parser.Syntax.Strings
 Namespace Parser.Syntax
 
     Friend Class Variable
-
         Public Enum Types
             [Null] = 0
             [Primitive] = 1

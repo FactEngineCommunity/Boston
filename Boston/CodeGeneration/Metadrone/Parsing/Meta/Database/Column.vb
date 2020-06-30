@@ -17,6 +17,10 @@ Namespace Parser.Meta.Database
 
         Private ReplaceAllList As New ReplaceAllList()
 
+        Friend Relations As New List(Of IEntity)
+
+        Private FilteredRelations As New List(Of IEntity) 'Boston specific. For stepping through Relations for the Column.
+
         Private Transforms As Syntax.SourceTransforms = Nothing
 
         Friend ListCount As Int64 = -1
@@ -30,6 +34,11 @@ Namespace Parser.Meta.Database
             Me.Owner = Owner
             Me.Connection = Connection
             Me.Transforms = Transforms
+
+            For Each lrRelation In SchemaRow.Relation
+                Me.Relations.Add(New Relation(lrRelation.Id))
+            Next
+
         End Sub
 
         Public Function GetCopy() As IEntity Implements IEntity.GetCopy
@@ -42,6 +51,24 @@ Namespace Parser.Meta.Database
             Return col
         End Function
 
+        ''' <summary>
+        ''' Boston specific. Not originally part of Metadrone.
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property Relation() As List(Of RDS.Relation)
+            Get
+                Return Me.SchemaRowVal.Relation
+            End Get
+            Set(ByVal value As List(Of RDS.Relation))
+                Me.SchemaRowVal.Relation = value
+            End Set
+        End Property
+
+
+        ''' <summary>
+        ''' Boston specific. Not originally part of Metadrone.
+        ''' </summary>
+        ''' <returns></returns>
         Public Property AllowZeroLength() As Boolean
             Get
                 Return Me.SchemaRowVal.AllowZeroLength
@@ -158,6 +185,10 @@ Namespace Parser.Meta.Database
                 'set nullable
                 Me.Nullable = Conv.ToBoolean(value)
 
+            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_RELATION) Then
+                'set Relation
+                Me.Relation = CType(value, List(Of RDS.Relation))
+
             ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_ALLOWZEROLENGTH) Then
                 'set allowZeroLength
                 Me.AllowZeroLength = Conv.ToBoolean(value)
@@ -238,7 +269,12 @@ Namespace Parser.Meta.Database
                 Call Me.CheckParamsForPropertyCall(AttribName, Params)
                 Return Me.Nullable
 
-            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_ALLOWZEROLENGTH) Then
+            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_RELATION) Then 'Boston specific. Not part of original Metadrone.
+                'return relation
+                Call Me.CheckParamsForPropertyCall(AttribName, Params)
+                Return Me.Relation
+
+            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_ALLOWZEROLENGTH) Then 'Boston specific. Not part of original Metadrone.
                 'return allowZeroLength
                 Call Me.CheckParamsForPropertyCall(AttribName, Params)
                 Return Me.AllowZeroLength
@@ -344,10 +380,27 @@ Namespace Parser.Meta.Database
 
         Public Sub InitEntities() Implements IEntity.InitEntities
 
+            Dim liInd As Integer = 0
+
+            For Each lrRelation In Me.Relation
+
+                With CType(Me.Relations(liInd), Relation)
+                    Me.FilteredRelations.Add(.GetCopy)
+                End With
+                liInd += 1
+            Next
+
         End Sub
 
         Public Function GetEntities(ByVal Entity As Syntax.SyntaxNode.ExecForEntities) As List(Of IEntity) Implements IEntity.GetEntities
-            Return New List(Of IEntity)
+
+            Select Case Entity
+                Case Syntax.SyntaxNode.ExecForEntities.OBJECT_RELATION
+                    Return Me.FilteredRelations
+                Case Else
+                    Return New List(Of IEntity)
+            End Select
+
         End Function
 
     End Class

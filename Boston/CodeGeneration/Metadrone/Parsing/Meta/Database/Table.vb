@@ -20,6 +20,8 @@ Namespace Parser.Meta.Database
         Private UseOnlyList As New List(Of String)
         Private IgnoreList As New List(Of String)
 
+        Friend Relations As New List(Of IEntity) 'Boston specific I think.
+
         Friend Columns As New List(Of IEntity)
 
         Private FilteredColumns As New List(Of IEntity)

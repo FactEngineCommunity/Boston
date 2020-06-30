@@ -29,12 +29,12 @@
 
         'Added for Boston. Not in original Metadrone code.
         Private AllowZeroLengthField As Boolean
-
+        Private RelationField As New List(Of RDS.Relation)  'the Relation to which the Column belongs if this SchemaRow record is for a Column
 
         Public Function GetCopy() As SchemaRow
             Dim schema As New SchemaRow()
             With schema
-                .Name = Me.Name
+                .Name = Me.Name  'Table Name
                 .Type = Me.Type
                 .Column_Name = Me.Column_Name
                 .Data_Type = Me.Data_Type
@@ -56,13 +56,27 @@
                 .IsOutMode = Me.IsOutMode
                 .IsInOutMode = Me.IsInOutMode
 
-                'Test for Boston
+                'Boston specific. Not part of the original MetaDrone
                 .AllowZeroLength = Me.AllowZeroLength
+                .Relation = Me.Relation
             End With
             Return schema
         End Function
 
 #Region "Properties"
+        ''' <summary>
+        ''' If the SchemaRow is for a Column and that Column is part of a Relation, the RDS.Relation associated with the Column
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property Relation() As List(Of RDS.Relation)
+            Get
+                Return Me.RelationField
+            End Get
+            Set(ByVal value As List(Of RDS.Relation))
+                Me.RelationField = value
+            End Set
+        End Property
+
 
         Public Property AllowZeroLength() As Boolean
             Get

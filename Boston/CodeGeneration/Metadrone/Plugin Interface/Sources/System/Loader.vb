@@ -26,6 +26,9 @@
             Next
         End Sub
 
+        ''' <summary>
+        ''' Loads the BostonDummyPlugin
+        ''' </summary>
         Public Sub loadBostonCodeGenerationPlugin()
 
             'Load the Boston Dummy Plugin

@@ -150,6 +150,10 @@ Namespace SourcePlugins.Boston
                     SR.IsView = False
                     SR.IsPrimaryKey = lrColumn.ContributesToPrimaryKey
                     sr.IsForeignKey = lrColumn.isForeignKey
+
+                    'Boston specific fields
+                    sr.Relation = lrColumn.Relation
+                    'sr.AllowZeroLength 'Not yet implemented in lrColumn in Boston. Need to add AllowZeroLength to ValueType, which then becomes a RDS.Column
                     larSchema.Add(SR)
                 Next
             Next

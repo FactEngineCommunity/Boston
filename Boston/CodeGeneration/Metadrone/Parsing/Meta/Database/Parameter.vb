@@ -42,7 +42,16 @@ Namespace Parser.Meta.Database
             Return parm
         End Function
 
-        Public Property AllowZeroLength() As Boolean
+        Public Property Relation As List(Of RDS.Relation) 'Boston specific. Not part of original Metadrone.
+            Get
+                Return Me.SchemaRowVal.Relation
+            End Get
+            Set(value As List(Of RDS.Relation))
+                Me.SchemaRowVal.Relation = value
+            End Set
+        End Property
+
+        Public Property AllowZeroLength() As Boolean 'Boston specific. Not part of original Metadrone.
             Get
                 Return Me.SchemaRowVal.AllowZeroLength
             End Get
@@ -158,7 +167,11 @@ Namespace Parser.Meta.Database
                 'set in/out mode
                 Me.IsInOutMode = Conv.ToBoolean(value)
 
-            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_ALLOWZEROLENGTH) Then
+            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_RELATION) Then 'Boston specific. Not part of original Metadrone.
+                'set Relation
+                Me.Relation = CType(value, List(Of RDS.Relation))
+
+            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_ALLOWZEROLENGTH) Then 'Boston specific. Not part of original Metadrone.
                 'set allowZeroLength
                 Me.AllowZeroLength = Conv.ToBoolean(value)
 
@@ -231,7 +244,12 @@ Namespace Parser.Meta.Database
                 Call Me.CheckParamsForPropertyCall(AttribName, Params)
                 Return Me.IsInOutMode
 
-            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_ALLOWZEROLENGTH) Then
+            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_RELATION) Then 'Boston specific. Not part of original Metadrone.
+                'return Relation
+                Call Me.CheckParamsForPropertyCall(AttribName, Params)
+                Return Me.Relation
+
+            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_ALLOWZEROLENGTH) Then 'Boston specific. Not part of original Metadrone.
                 'return allowZeroLength
                 Call Me.CheckParamsForPropertyCall(AttribName, Params)
                 Return Me.AllowZeroLength

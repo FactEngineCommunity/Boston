@@ -11,12 +11,14 @@ Namespace Parser.Syntax
         Public Shared TAG_END As String = "!>>"
 
         Public Const VARIABLE_ATTRIBUTE_VALUE As String = "value"
+        Public Const VARIABLE_ATTRIBUTE_ID As String = "id" 'Boston specific. Not part of orginal Metadrone.
         Public Const VARIABLE_ATTRIBUTE_DATATYPE As String = "datatype"
         Public Const VARIABLE_ATTRIBUTE_ISIDENTITY As String = "isidentity"
         Public Const VARIABLE_ATTRIBUTE_ISPRIMARYKEY As String = "isprimarykey"
         Public Const VARIABLE_ATTRIBUTE_ISFOREIGNKEY As String = "isforeignkey"
         Public Const VARIABLE_ATTRIBUTE_NULLABLE As String = "nullable"
-        Public Const VARIABLE_ATTRIBUTE_ALLOWZEROLENGTH As String = "allowzerolength"
+        Public Const VARIABLE_ATTRIBUTE_RELATION As String = "relation" 'Boston specific. Not part of original Metadrone.
+        Public Const VARIABLE_ATTRIBUTE_ALLOWZEROLENGTH As String = "allowzerolength" 'Boston specific. Not part of original Metadrone.
         Public Const VARIABLE_ATTRIBUTE_LENGTH As String = "length"
         Public Const VARIABLE_ATTRIBUTE_PRECISION As String = "precision"
         Public Const VARIABLE_ATTRIBUTE_SCALE As String = "scale"
@@ -99,6 +101,7 @@ Namespace Parser.Syntax
 
         Public Const OBJECT_TABLE As String = "table"
         Public Const OBJECT_VIEW As String = "view"
+        Public Const OBJECT_RELATION As String = "relation" 'Boston specific. Not part of original Metadrone. Used to get RDS.Relations
         Public Const OBJECT_COLUMN As String = "column"
         Public Const OBJECT_PKCOLUMN As String = "pkcolumn"
         Public Const OBJECT_FKCOLUMN As String = "fkcolumn"
@@ -189,6 +192,7 @@ Namespace Parser.Syntax
         Friend Shared DOCO_OBJECT_PROCEDURE As String = "Loop through stored procedures in database connection."
         Friend Shared DOCO_OBJECT_FUNCTION As String = "Loop through functions in database connection."
         Friend Shared DOCO_OBJECT_FILE As String = "Loop through files in directory."
+        Friend Shared DOCO_OBJECT_RELATION As String = "Loop through Relations specific to the Table/Column."
         Friend Shared DOCO_OBJECT_COLUMN As String = "Loop through columns in the parent loop's current table/routine iteration."
         Friend Shared DOCO_OBJECT_PKCOLUMN As String = "Loop through primary key columns in the parent loop's current table/routine iteration."
         Friend Shared DOCO_OBJECT_FKCOLUMN As String = "Loop through foreign key columns in the parent loop's current table/routine iteration."
@@ -206,7 +210,8 @@ Namespace Parser.Syntax
         Friend Shared DOCO_VARIABLE_ATTRIBUTE_ISFOREIGNKEY As String = "If is a foreign key column."
         Friend Shared DOCO_VARIABLE_ATTRIBUTE_NULLABLE As String = "If is nullable field."
         Friend Shared DOCO_VARIABLE_ATTRIBUTE_DEFAULTVALUE As String = "Default value for field."
-        Friend Shared DOCO_VARIABLE_ATTRIBUTE_ALLOWZEROLENGTH As String = "Field allows zero length."
+        Friend Shared DOCO_VARIABLE_ATTRIBUTE_RELATION As String = "Set of Relations relating to the Column." 'Boston specific. Not part of original Metadrone.
+        Friend Shared DOCO_VARIABLE_ATTRIBUTE_ALLOWZEROLENGTH As String = "Field allows zero length." 'Boston specific. Not part of original Metadrone.
         Friend Shared DOCO_VARIABLE_ATTRIBUTE_LENGTH As String = "Length of field."
         Friend Shared DOCO_VARIABLE_ATTRIBUTE_PRECISION As String = "Precision of field."
         Friend Shared DOCO_VARIABLE_ATTRIBUTE_SCALE As String = "Scale of field."
@@ -321,7 +326,8 @@ Namespace Parser.Syntax
             If StrEq(value, VARIABLE_ATTRIBUTE_ISPRIMARYKEY) Then Return True
             If StrEq(value, VARIABLE_ATTRIBUTE_ISFOREIGNKEY) Then Return True
             If StrEq(value, VARIABLE_ATTRIBUTE_NULLABLE) Then Return True
-            If StrEq(value, VARIABLE_ATTRIBUTE_ALLOWZEROLENGTH) Then Return True
+            If StrEq(value, VARIABLE_ATTRIBUTE_RELATION) Then Return True 'Boston specific. Not part of original Metadrone.
+            If StrEq(value, VARIABLE_ATTRIBUTE_ALLOWZEROLENGTH) Then Return True 'Boston specific. Not part of original Metadrone.
             If StrEq(value, VARIABLE_ATTRIBUTE_LENGTH) Then Return True
             If StrEq(value, VARIABLE_ATTRIBUTE_PRECISION) Then Return True
             If StrEq(value, VARIABLE_ATTRIBUTE_SCALE) Then Return True
