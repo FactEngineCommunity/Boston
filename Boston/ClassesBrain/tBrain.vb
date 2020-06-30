@@ -588,9 +588,12 @@ Public Class tBrain
             '-----------------------------------------------------
             'The user wants the Brain to abort it's CurrentPlan
             '-----------------------------------------------------
-            Me.CurrentPlan.Status = pcenumPlanStatus.AbortedByUser
-            Me.send_data("Okay")
+            If Me.CurrentPlan IsNot Nothing Then
+                Me.CurrentPlan.Status = pcenumPlanStatus.AbortedByUser
+                Me.send_data("Okay")
+            End If
         End If
+
 
         If Me.check_Core_commands(Me.InputBuffer) Then
             Me.send_data("Okay")
@@ -1841,13 +1844,13 @@ Public Class tBrain
             If liInd = 1 Then
                 lasSymbol.Add(Trim(lsModelElementName))
                 'NB Brain can answer its own questions, so if the EntityType already exists, the following creates no problem.
-                lrQuestion = New tQuestion("Would you like me to create an Entity Type for '" & lasSymbol(0) & "'?", _
-                                                 pcenumQuestionType.CreateEntityType, _
-                                                 True, _
-                                                 lasSymbol, _
-                                                 lrSentence, _
-                                                 Nothing, _
-                                                 lrPlan, _
+                lrQuestion = New tQuestion("Would you like me to create an Entity Type for '" & lasSymbol(0) & "'? (Answer 'No' and I'll ask you if you want a Value Type)",
+                                                 pcenumQuestionType.CreateEntityType,
+                                                 True,
+                                                 lasSymbol,
+                                                 lrSentence,
+                                                 Nothing,
+                                                 lrPlan,
                                                  lrFirstStep)
 
                 Dim lrEntityType As New FBM.EntityType(Me.Model, pcenumLanguage.ORMModel, lsModelElementName, Nothing, True)
@@ -2078,13 +2081,13 @@ Public Class tBrain
                     Dim lasSymbol As New List(Of String)
                     lasSymbol.Add(lsModelObjectName)
 
-                    lrQuestion = New tQuestion("Would you like me to create an Entity Type for '" & lsModelObjectName & "'?", _
-                                                     pcenumQuestionType.CreateEntityType, _
-                                                     True, _
-                                                     lasSymbol, _
-                                                     Nothing, _
-                                                     Nothing, _
-                                                     lrPlan, _
+                    lrQuestion = New tQuestion("Would you like me to create an Entity Type for '" & lsModelObjectName & "'? (Answer 'No' and I'll ask you if you want a Value Type)",
+                                                     pcenumQuestionType.CreateEntityType,
+                                                     True,
+                                                     lasSymbol,
+                                                     Nothing,
+                                                     Nothing,
+                                                     lrPlan,
                                                      lrStep)
                 End If
 
@@ -2389,7 +2392,7 @@ Public Class tBrain
                         Dim lasSymbol As New List(Of String)
                         lasSymbol.Add(lsModelObjectName)
 
-                        lrQuestion = New tQuestion("Would you like me to create an Entity Type for '" & lsModelObjectName & "'? (Answer 'No' for Value Type)",
+                        lrQuestion = New tQuestion("Would you like me to create an Entity Type for '" & lsModelObjectName & "'? (Answer 'No' and I'll ask you if you want a Value Type)",
                                                          pcenumQuestionType.CreateEntityType,
                                                          True,
                                                          lasSymbol,
@@ -2806,13 +2809,13 @@ Public Class tBrain
         If Me.Model.EntityType.Exists(AddressOf lrEntityType.Equals) Then
         Else
             lasSymbol.Add(Me.CurrentSentence.WordListResolved(0).Word)
-            lrQuestion = New tQuestion("Would you like me to create an Entity Type for '" & Me.CurrentSentence.WordListResolved(0).Word & "'?", _
-                                       pcenumQuestionType.CreateEntityType, _
-                                       True, _
-                                       lasSymbol, _
-                                       Me.CurrentSentence, _
-                                       Nothing, _
-                                       Me.CurrentPlan, _
+            lrQuestion = New tQuestion("Would you like me to create an Entity Type for '" & Me.CurrentSentence.WordListResolved(0).Word & "'? (Answer 'No' and I'll ask you if you want a Value Type)",
+                                       pcenumQuestionType.CreateEntityType,
+                                       True,
+                                       lasSymbol,
+                                       Me.CurrentSentence,
+                                       Nothing,
+                                       Me.CurrentPlan,
                                        lrFirstStep)
 
             If Me.QuestionHasBeenRaised(lrQuestion) Then
@@ -2829,13 +2832,13 @@ Public Class tBrain
         Else
             lasSymbol = New List(Of String)
             lasSymbol.Add(Me.CurrentSentence.WordListResolved(3).Word)
-            lrQuestion = New tQuestion("Would you like me to create an Entity Type for '" & Me.CurrentSentence.WordListResolved(3).Word & "'?", _
-                                       pcenumQuestionType.CreateEntityType, _
-                                       True, _
-                                       lasSymbol, _
-                                       Me.CurrentSentence, _
-                                       Nothing, _
-                                       Me.CurrentPlan, _
+            lrQuestion = New tQuestion("Would you like me to create an Entity Type for '" & Me.CurrentSentence.WordListResolved(3).Word & "'? (Answer 'No' and I'll ask you if you want a Value Type)",
+                                       pcenumQuestionType.CreateEntityType,
+                                       True,
+                                       lasSymbol,
+                                       Me.CurrentSentence,
+                                       Nothing,
+                                       Me.CurrentPlan,
                                        lrSecondStep)
 
             If Me.QuestionHasBeenRaised(lrQuestion) Then
@@ -2939,13 +2942,13 @@ Public Class tBrain
                     lrStep = New Brain.Step(pcenumActionType.CreateEntityType, True, pcenumActionType.CreateValueType)
                     lrPlan.AddStep(lrStep)
 
-                    lrQuestion = New tQuestion("Would you like me to create an Entity Type for '" & lrResolvedWord.Word & "'?", _
-                                                     pcenumQuestionType.CreateEntityType, _
-                                                     True, _
-                                                     lasSymbol, _
-                                                     Me.Sentence(0), _
-                                                     Nothing, _
-                                                     lrPlan, _
+                    lrQuestion = New tQuestion("Would you like me to create an Entity Type for '" & lrResolvedWord.Word & "'? (Answer 'No' and I'll ask you if you want a Value Type)",
+                                                     pcenumQuestionType.CreateEntityType,
+                                                     True,
+                                                     lasSymbol,
+                                                     Me.Sentence(0),
+                                                     Nothing,
+                                                     lrPlan,
                                                      lrStep)
 
                     If Me.QuestionHasBeenRaised(lrQuestion) Then
@@ -3022,13 +3025,13 @@ Public Class tBrain
         Dim lrStep As New Brain.Step(pcenumActionType.CreateEntityType, True, pcenumActionType.None)
         lrPlan.AddStep(lrStep)
 
-        lrQuestion = New tQuestion("Would you like me to create an Entity Type for '" & arEntityType.Name & "'?", _
-                                         pcenumQuestionType.CreateEntityType, _
-                                         True, _
-                                         lasSymbol, _
-                                         arSentence, _
-                                         Nothing, _
-                                         lrPlan, _
+        lrQuestion = New tQuestion("Would you like me to create an Entity Type for '" & arEntityType.Name & "'? (Answer 'No' and I'll ask you if you want a Value Type)",
+                                         pcenumQuestionType.CreateEntityType,
+                                         True,
+                                         lasSymbol,
+                                         arSentence,
+                                         Nothing,
+                                         lrPlan,
                                          lrStep)
 
         lrQuestion.EntityType.Add(arEntityType)
@@ -3107,12 +3110,33 @@ Public Class tBrain
 
     Private Sub ProcessCurrentSentence()
 
+        Dim lsMessage As String = ""
+
         If Me.ConfirmActions Then
             Me.OutputBuffer = "Processing Current Sentence"
             Me.OutputChannel.BeginInvoke(New SendDataDelegate(AddressOf Me.send_data), Me.OutputBuffer)
         End If
 
         Me.Timeout.Stop()
+
+        '-----------------------------------------------
+        'Encourage the user to use CapCamelCase words.
+        If Me.CurrentSentence.Sentence.All(Function(c) Char.IsLower(c) Or c = " ") And
+           Me.CurrentSentence.WordList.Count > 1 Then
+
+            '---------------------------------------------------
+            'Find an example Model Element in the sentence. I.e. If there is a word in the sentence that is an Entity/Value/ObjectifiedFact Type then return the first one found.
+            Dim lrModelElementWord As String = "Company"
+            For Each lrModelElementWord In Me.CurrentSentence.WordList
+                If Me.Model.GetModelObjectByName(Viev.Strings.MakeCapCamelCase(lrModelElementWord)) IsNot Nothing Then
+                    Viev.Strings.MakeCapCamelCase(lrModelElementWord)
+                    Exit For
+                End If
+            Next
+            lsMessage = "It is better to use a capital first letter for Entity Types, Value Types and Objectified Fact Types (e.g. '" & Viev.Strings.MakeCapCamelCase(lrModelElementWord) & "')"
+            Me.send_data(lsMessage)
+        End If
+
 
         Call Language.ProcessSentence(Me.CurrentSentence)
 

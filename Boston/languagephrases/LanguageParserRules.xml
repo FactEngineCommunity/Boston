@@ -330,7 +330,7 @@
 				<LPTSWS LanguagePhraseId="107" Token="*" SequenceNr="5" WordSense="Noun"/>
 			</TokenSequence>
 		</LanguagePhrase>
-		<LanguagePhrase PhraseId="108" PhraseType="Resolved" ResolvesToLanguagePhraseId="" Example="">
+		<LanguagePhrase PhraseId="108" PhraseType="Resolved" ResolvesToLanguagePhraseId="" Example="Person starts work at Time">
 			<TokenSequence>
 				<LPTSWS LanguagePhraseId="108" Token="*" SequenceNr="1" WordSense="Noun"/>
 				<LPTSWS LanguagePhraseId="108" Token="*" SequenceNr="2" WordSense="Verb"/>

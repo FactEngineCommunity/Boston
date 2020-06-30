@@ -302,6 +302,10 @@ Namespace RDS
 
         End Function
 
+        ''' <summary>
+        ''' The Column is part of a Relation mapping the Column's Table to another Table, and may be one of many Columns in the associated Relation.
+        ''' </summary>
+        ''' <returns></returns>
         Public Function isForeignKey() As Boolean
 
             Return Me.Relation.Count > 0
