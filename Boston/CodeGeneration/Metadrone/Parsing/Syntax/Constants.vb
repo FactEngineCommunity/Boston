@@ -12,6 +12,7 @@ Namespace Parser.Syntax
 
         Public Const VARIABLE_ATTRIBUTE_VALUE As String = "value"
         Public Const VARIABLE_ATTRIBUTE_ID As String = "id" 'Boston specific. Not part of orginal Metadrone.
+        Public Const VARIABLE_ATTRIBUTE_REFERENCEDTABLENAME As String = "referencedtablename" 'Boston specific. Not part of orginal Metadrone.
         Public Const VARIABLE_ATTRIBUTE_DATATYPE As String = "datatype"
         Public Const VARIABLE_ATTRIBUTE_ISIDENTITY As String = "isidentity"
         Public Const VARIABLE_ATTRIBUTE_ISPRIMARYKEY As String = "isprimarykey"
@@ -204,6 +205,7 @@ Namespace Parser.Syntax
 
 
         Friend Shared DOCO_VARIABLE_ATTRIBUTE_ID As String = "Id of variable." 'Boston specific. Not part of original Metadrone
+        Friend Shared DOCO_VARIABLE_ATTRIBUTE_REFERENCEDTABLENAME As String = "The name of the Table referenced by the Relation, of variable." 'Boston specific. Not part of original Metadrone
         Friend Shared DOCO_VARIABLE_ATTRIBUTE_VALUE As String = "Value of variable."
         Friend Shared DOCO_VARIABLE_ATTRIBUTE_DATATYPE As String = "Provider's type definition of variable."
         Friend Shared DOCO_VARIABLE_ATTRIBUTE_ISIDENTITY As String = "If is an identity column."
@@ -322,7 +324,8 @@ Namespace Parser.Syntax
         Friend Shared Function IsSystemAttribute(ByVal value As String) As Boolean
             If String.IsNullOrEmpty(value) Then Return False
 
-            If StrEq(value, VARIABLE_ATTRIBUTE_ID) Then Return True
+            If StrEq(value, VARIABLE_ATTRIBUTE_ID) Then Return True 'Boston specific. Not part of original Metadrone.
+            If StrEq(value, VARIABLE_ATTRIBUTE_REFERENCEDTABLENAME) Then Return True 'Boston specific. Not part of original Metadrone.
             If StrEq(value, VARIABLE_ATTRIBUTE_VALUE) Then Return True
             If StrEq(value, VARIABLE_ATTRIBUTE_DATATYPE) Then Return True
             If StrEq(value, VARIABLE_ATTRIBUTE_ISIDENTITY) Then Return True

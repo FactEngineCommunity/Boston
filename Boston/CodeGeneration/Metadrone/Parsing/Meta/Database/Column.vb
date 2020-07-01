@@ -36,7 +36,16 @@ Namespace Parser.Meta.Database
             Me.Transforms = Transforms
 
             For Each lrRelation In SchemaRow.Relation
-                Me.Relations.Add(New Relation(lrRelation.Id))
+                Dim lsReferencedTableName As String = ""
+
+                Me.Relations.Add(New Relation(lrRelation.Id, lrRelation.DestinationTable.Name))
+                'If lrRelation.OriginTable.Name = Me.Value Then
+                '    Me.Relations.Add(New Relation(lrRelation.Id, lrRelation.DestinationColumns(0).Table.Name))
+                'Else
+                '    lsReferencedTableName = lrRelation.OriginTable.Name 'lsReferencedTableName = lrRelation.OriginTable.Name
+                '    Me.Relations.Add(New Relation(lrRelation.Id, lsReferencedTableName))
+                'End If
+
             Next
 
         End Sub
@@ -214,16 +223,16 @@ Namespace Parser.Meta.Database
                 Me.ListPos = Conv.ToInteger(value)
 
             ElseIf StrEq(AttribName, VARIABLE_METHOD_REPLACE) Then
-                Throw New Exception("""" & VARIABLE_METHOD_REPLACE & """ is a method and cannot be a target of an assignment.")
+                Throw New Exception("""" & VARIABLE_METHOD_REPLACE & """ Is a method And cannot be a target Of an assignment.")
 
             ElseIf StrIdxOf(AttribName, FUNC_IGNORE) = 0 Then
-                Throw New Exception("""" & FUNC_IGNORE & """ is a method and cannot be a target of an assignment.")
+                Throw New Exception("""" & FUNC_IGNORE & """ Is a method And cannot be a target Of an assignment.")
 
             ElseIf StrIdxOf(AttribName, FUNC_USEONLY) = 0 Then
-                Throw New Exception("""" & FUNC_USEONLY & """ is a method and cannot be a target of an assignment.")
+                Throw New Exception("""" & FUNC_USEONLY & """ Is a method And cannot be a target Of an assignment.")
 
             Else
-                Throw New Exception("Syntax error.")
+                Throw New Exception("Syntax Error.")
 
             End If
         End Sub
@@ -307,9 +316,9 @@ Namespace Parser.Meta.Database
             ElseIf StrIdxOf(AttribName, VARIABLE_METHOD_REPLACE) = 0 Then
                 'employ replace method
                 Select Case Params.Count
-                    Case 0 : Throw New Exception("Expecting argument OldVal in '" & VARIABLE_METHOD_REPLACE & "'.")
+                    Case 0 : Throw New Exception("Expecting argument OldVal In '" & VARIABLE_METHOD_REPLACE & "'.")
                     Case 1 : Throw New Exception("Expecting argument NewVal in '" & VARIABLE_METHOD_REPLACE & "'.")
-                    Case Is > 2 : Throw New Exception("Too many arguments in '" & VARIABLE_METHOD_REPLACE & "'.")
+                Case Is > 2 : Throw New Exception("Too many arguments in '" & VARIABLE_METHOD_REPLACE & "'.")
                 End Select
                 If PackageBuilder.PreProc.IgnoreCase Then
                     Return ReplaceInsensitive(Me.ReplaceAllList.ApplyReplaces(Me.Value).ToString, Params(0).ToString, Params(1).ToString)
