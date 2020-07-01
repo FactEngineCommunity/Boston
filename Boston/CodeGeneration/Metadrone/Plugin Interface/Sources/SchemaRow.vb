@@ -28,6 +28,7 @@
         Private IsInOutMode_Field As Boolean
 
         'Added for Boston. Not in original Metadrone code.
+        Private ColumnIdField As String
         Private AllowZeroLengthField As Boolean
         Private RelationField As New List(Of RDS.Relation)  'the Relation to which the Column belongs if this SchemaRow record is for a Column
 
@@ -57,6 +58,7 @@
                 .IsInOutMode = Me.IsInOutMode
 
                 'Boston specific. Not part of the original MetaDrone
+                .ColumnId = Me.ColumnId
                 .AllowZeroLength = Me.AllowZeroLength
                 .Relation = Me.Relation
             End With
@@ -77,7 +79,19 @@
             End Set
         End Property
 
+        Public Property ColumnId() As String
+            Get
+                Return Me.ColumnIdField
+            End Get
+            Set(ByVal value As String)
+                Me.ColumnIdField = value
+            End Set
+        End Property
 
+        ''' <summary>
+        ''' Boston specific. From DataType of ValueType
+        ''' </summary>
+        ''' <returns></returns>
         Public Property AllowZeroLength() As Boolean
             Get
                 Return Me.AllowZeroLengthField

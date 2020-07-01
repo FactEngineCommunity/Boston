@@ -320,9 +320,10 @@ Namespace UI
 
                             Me.AddListItem(VARIABLE_METHOD_INDEXOFCOL, DOCO_VARIABLE_METHOD_INDEXOFCOL, VARIABLE_METHOD_INDEXOFCOL & "(""colname"")", SyntaxPopupListItem.Icons.METHOD)
 
-                        Case Parser.CodeCompletion.Variable.Types.Relation
+                        Case Parser.CodeCompletion.Variable.Types.Relation 'Boston specific. Not part of original Metadrone.
                             Me.AddListItem(VARIABLE_ATTRIBUTE_ID, DOCO_VARIABLE_ATTRIBUTE_ID, Nothing, SyntaxPopupListItem.Icons.PROPERTY)
                             Me.AddListItem(VARIABLE_ATTRIBUTE_REFERENCEDTABLENAME, DOCO_VARIABLE_ATTRIBUTE_REFERENCEDTABLENAME, Nothing, SyntaxPopupListItem.Icons.PROPERTY)
+                            Me.AddListItem(VARIABLE_ATTRIBUTE_REFERENCEDCOLUMNNAME, DOCO_VARIABLE_ATTRIBUTE_REFERENCEDCOLUMNNAME, Nothing, SyntaxPopupListItem.Icons.PROPERTY)
 
                         Case Parser.CodeCompletion.Variable.Types.TemplateParameter,
                              Parser.CodeCompletion.Variable.Types.Column,

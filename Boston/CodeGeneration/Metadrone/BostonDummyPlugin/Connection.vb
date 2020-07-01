@@ -152,7 +152,13 @@ Namespace SourcePlugins.Boston
                     sr.IsForeignKey = lrColumn.isForeignKey
 
                     'Boston specific fields
+                    sr.ColumnId = lrColumn.Id
                     sr.Relation = lrColumn.Relation
+                    For Each lrRelation In sr.Relation.ToArray
+                        If lrRelation.DestinationTable.Name = lrTable.Name Then
+                            sr.Relation.Remove(lrRelation)
+                        End If
+                    Next
                     'sr.AllowZeroLength 'Not yet implemented in lrColumn in Boston. Need to add AllowZeroLength to ValueType, which then becomes a RDS.Column
                     larSchema.Add(SR)
                 Next

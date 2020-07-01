@@ -42,8 +42,12 @@ Namespace Parser.Meta.Database
 
         End Sub
 
-        Public Sub New(ByVal Schema As List(Of SchemaRow), ByVal Owner As IEntityConnection, ByVal Connection As IConnection, _
-                       ByVal Transforms As Syntax.SourceTransforms, ByRef SchemaRowIdx As Integer)
+        Public Sub New(ByVal Schema As List(Of SchemaRow),
+                       ByVal Owner As IEntityConnection,
+                       ByVal Connection As IConnection,
+                       ByVal Transforms As Syntax.SourceTransforms,
+                       ByRef SchemaRowIdx As Integer)
+
             Me.Transforms = Transforms
 
             'Set table value and add first column

@@ -26,8 +26,10 @@ Namespace Parser.Meta.Database
         Friend ListCount As Int64 = -1
         Friend ListPos As Int64 = -1
 
-        Public Sub New(ByVal Value As Object, ByVal SchemaRow As SchemaRow, _
-                       ByVal Owner As IEntity, ByVal Connection As IConnection, _
+        Public Sub New(ByVal Value As Object,
+                       ByVal SchemaRow As SchemaRow,
+                       ByVal Owner As IEntity,
+                       ByVal Connection As IConnection,
                        ByVal Transforms As Syntax.SourceTransforms)
             Me.Value = Value
             Me.SchemaRowVal = SchemaRow
@@ -38,14 +40,18 @@ Namespace Parser.Meta.Database
             For Each lrRelation In SchemaRow.Relation
                 Dim lsReferencedTableName As String = ""
 
-                Me.Relations.Add(New Relation(lrRelation.Id, lrRelation.DestinationTable.Name))
-                'If lrRelation.OriginTable.Name = Me.Value Then
-                '    Me.Relations.Add(New Relation(lrRelation.Id, lrRelation.DestinationColumns(0).Table.Name))
-                'Else
-                '    lsReferencedTableName = lrRelation.OriginTable.Name 'lsReferencedTableName = lrRelation.OriginTable.Name
-                '    Me.Relations.Add(New Relation(lrRelation.Id, lsReferencedTableName))
-                'End If
+                Dim lsDestinationColumnName As String = ""
+                If lrRelation.DestinationColumns.Count = 1 Then
+                    lsDestinationColumnName = lrRelation.DestinationColumns(0).Name
+                Else
+                    Dim lrOriginColumn As RDS.Column = lrRelation.OriginColumns.Find(Function(x) x.Id = SchemaRow.ColumnId)
+                    Dim lrDestinationColumn As RDS.Column = lrRelation.DestinationColumns.Find(Function(x) x.ActiveRole.Id = lrOriginColumn.ActiveRole.Id)
+                    lsDestinationColumnName = lrDestinationColumn.Name
+                End If
 
+                Me.Relations.Add(New Relation(lrRelation.Id,
+                                              lrRelation.DestinationTable.Name,
+                                              lsDestinationColumnName))
             Next
 
         End Sub

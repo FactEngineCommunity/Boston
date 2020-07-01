@@ -1405,6 +1405,7 @@ Namespace FBM
                 lrRelation.DestinationColumns = larDestinationColumn
 
                 Dim larOriginColumn As New List(Of RDS.Column)
+                '20200701-VM-Remove the following if all seems okay. Found commented out on this date.
                 'For Each lrColumn In larDestinationColumn
                 '    If lrOriginTable.Column.Find(Function(x) x.ActiveRole.Id = lrColumn.ActiveRole.Id) Is Nothing Then
                 '        'For when a Column in a ManyToManyFactType wasn't previously joined to a EntityType with a ReferenceScheme

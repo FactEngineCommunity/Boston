@@ -19,15 +19,18 @@ Namespace Parser.Meta.Database
         Private mValue As Object = Nothing
         Private mId As String
         Private mReferencedTableName As String
+        Private mReferencedColumnName As String
         Private ReplaceAllList As New ReplaceAllList()
 
         Public Sub New()
         End Sub
 
         Public Sub New(ByVal asId As String,
-                       ByVal asReferencedTableName As String)
+                       ByVal asReferencedTableName As String,
+                       ByVal asReferencedColumnName As String)
             Me.mId = asId
             Me.mReferencedTableName = asReferencedTableName
+            Me.mReferencedColumnName = asReferencedColumnName
         End Sub
 
         Public Sub SetAttributeValue(AttribName As String, value As Object) Implements IEntity.SetAttributeValue
@@ -60,6 +63,10 @@ Namespace Parser.Meta.Database
             ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_REFERENCEDTABLENAME) And LookTransformsIfNotFound Then
                 Call Me.CheckParamsForPropertyCall(AttribName, Params)
                 Return Me.ReferencedTableName
+
+            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_REFERENCEDCOLUMNNAME) And LookTransformsIfNotFound Then
+                Call Me.CheckParamsForPropertyCall(AttribName, Params)
+                Return Me.ReferencedColumnName
 
                 'ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_ISIDENTITY) Then
                 '    'return isidentity
@@ -204,6 +211,7 @@ Namespace Parser.Meta.Database
             With Me
                 rel.Id = .Id
                 rel.ReferencedTableName = .ReferencedTableName
+                rel.ReferencedColumnName = .mReferencedColumnName
             End With
             'col.ListCount = Me.ListCount
             'col.ListPos = Me.ListPos
@@ -235,6 +243,15 @@ Namespace Parser.Meta.Database
             End Get
             Set(ByVal value As String)
                 Me.mReferencedTableName = value
+            End Set
+        End Property
+
+        Public Property ReferencedColumnName() As String
+            Get
+                Return Me.mReferencedColumnName
+            End Get
+            Set(ByVal value As String)
+                Me.mReferencedColumnName = value
             End Set
         End Property
 

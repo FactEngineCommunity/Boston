@@ -283,7 +283,7 @@ Namespace FBM
 
                 For Each lrRole In Me.FactType.RoleGroup
                     lrFactData = New FBM.FactData
-                    lrFactData.Role.Id = lrRole.Id
+                    lrFactData.Role = lrRole
                     lrFactData = Me.Data.Find(AddressOf lrFactData.EqualsByRole)
                     Select Case lrRole.TypeOfJoin
                         Case Is = pcenumRoleJoinType.EntityType
