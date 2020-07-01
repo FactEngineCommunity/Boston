@@ -197,6 +197,9 @@ Namespace Parser.CodeCompletion
 
                     'Now we can add the var
                     Select Case ExecNode.ForEntity
+                        Case SyntaxNode.ExecForEntities.OBJECT_RELATION 'Boston specific. Not part of original metadrone.
+                            Call Me.AddVar(AsMain, New Variable(ExecNode.Tokens(2).Text, Variable.Types.Relation, Me.varScopeDepth, sourceTag))
+
                         Case SyntaxNode.ExecForEntities.OBJECT_TABLE
                             Call Me.AddVar(AsMain, New Variable(ExecNode.Tokens(2).Text, Variable.Types.Table, Me.varScopeDepth, sourceTag))
 

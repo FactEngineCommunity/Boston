@@ -102,6 +102,7 @@
       <KeyWords name = "Objects" bold="true" italic="false" color="OliveDrab" bgcolor = "#DEDEEE">
         <Key word = "table" />
         <Key word = "view" />
+        <Key word = "relation" />
         <Key word = "column" />
         <Key word = "pkcolumn" />
         <Key word = "fkcolumn" />

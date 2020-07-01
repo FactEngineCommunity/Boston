@@ -192,7 +192,7 @@ Namespace Parser.Syntax
         Friend Shared DOCO_OBJECT_PROCEDURE As String = "Loop through stored procedures in database connection."
         Friend Shared DOCO_OBJECT_FUNCTION As String = "Loop through functions in database connection."
         Friend Shared DOCO_OBJECT_FILE As String = "Loop through files in directory."
-        Friend Shared DOCO_OBJECT_RELATION As String = "Loop through Relations specific to the Table/Column."
+        Friend Shared DOCO_OBJECT_RELATION As String = "Loop through Relations specific to the Table/Column." 'Boston specific. Not in original Metadrone.
         Friend Shared DOCO_OBJECT_COLUMN As String = "Loop through columns in the parent loop's current table/routine iteration."
         Friend Shared DOCO_OBJECT_PKCOLUMN As String = "Loop through primary key columns in the parent loop's current table/routine iteration."
         Friend Shared DOCO_OBJECT_FKCOLUMN As String = "Loop through foreign key columns in the parent loop's current table/routine iteration."
@@ -203,6 +203,7 @@ Namespace Parser.Syntax
         Friend Shared DOCO_OBJECT_INOUTPARAMETER As String = "Loop through input/output parameters in the parent loop's current routine iteration."
 
 
+        Friend Shared DOCO_VARIABLE_ATTRIBUTE_ID As String = "Id of variable." 'Boston specific. Not part of original Metadrone
         Friend Shared DOCO_VARIABLE_ATTRIBUTE_VALUE As String = "Value of variable."
         Friend Shared DOCO_VARIABLE_ATTRIBUTE_DATATYPE As String = "Provider's type definition of variable."
         Friend Shared DOCO_VARIABLE_ATTRIBUTE_ISIDENTITY As String = "If is an identity column."
@@ -296,6 +297,7 @@ Namespace Parser.Syntax
             If StrEq(value, RESERVED_PREPROC_SAFEBEGIN) Then Return True
             If StrEq(value, RESERVED_PREPROC_SAFEEND) Then Return True
 
+            If StrEq(value, OBJECT_RELATION) Then Return True 'Boston specific. Not part of the original Metadrone.
             If StrEq(value, OBJECT_TABLE) Then Return True
             If StrEq(value, OBJECT_VIEW) Then Return True
             If StrEq(value, OBJECT_COLUMN) Then Return True
@@ -320,6 +322,7 @@ Namespace Parser.Syntax
         Friend Shared Function IsSystemAttribute(ByVal value As String) As Boolean
             If String.IsNullOrEmpty(value) Then Return False
 
+            If StrEq(value, VARIABLE_ATTRIBUTE_ID) Then Return True
             If StrEq(value, VARIABLE_ATTRIBUTE_VALUE) Then Return True
             If StrEq(value, VARIABLE_ATTRIBUTE_DATATYPE) Then Return True
             If StrEq(value, VARIABLE_ATTRIBUTE_ISIDENTITY) Then Return True

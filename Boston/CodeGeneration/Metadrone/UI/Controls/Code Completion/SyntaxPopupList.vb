@@ -320,6 +320,9 @@ Namespace UI
 
                             Me.AddListItem(VARIABLE_METHOD_INDEXOFCOL, DOCO_VARIABLE_METHOD_INDEXOFCOL, VARIABLE_METHOD_INDEXOFCOL & "(""colname"")", SyntaxPopupListItem.Icons.METHOD)
 
+                        Case Parser.CodeCompletion.Variable.Types.Relation
+                            Me.AddListItem(VARIABLE_ATTRIBUTE_ID, DOCO_VARIABLE_ATTRIBUTE_ID, Nothing, SyntaxPopupListItem.Icons.PROPERTY)
+
                         Case Parser.CodeCompletion.Variable.Types.TemplateParameter,
                              Parser.CodeCompletion.Variable.Types.Column,
                              Parser.CodeCompletion.Variable.Types.PKColumn,
