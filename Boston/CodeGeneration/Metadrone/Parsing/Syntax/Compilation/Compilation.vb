@@ -326,7 +326,6 @@ Namespace Parser.Syntax
 
 
 #Region "Build nodes"
-
         Private Function BuildNodes(ByVal tags As List(Of TagVal)) As List(Of SyntaxNode)
             Dim SyntaxNodes As New List(Of SyntaxNode)
             Dim lineNumber As Integer = 1

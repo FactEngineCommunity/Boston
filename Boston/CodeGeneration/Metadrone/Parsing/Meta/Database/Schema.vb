@@ -96,6 +96,13 @@ Namespace Parser.Meta.Database
                 If idx = currIdx Then idx += 1
             End While
 
+            '20200702-VM-Added the following to sort the Tables by the number of foreign keys.
+            'Init the Table
+            For Each tbl In Me.Tables
+                Call tbl.InitEntities()
+            Next
+            Me.Tables.Sort(Function(x, y) x.GetAttributeValue("fkcolumncount", Nothing, False, False) < y.GetAttributeValue("fkcolumncount", Nothing, False, False))
+
             'Set listcount
             For Each tbl In Me.Tables
                 CType(tbl, Table).ListCount = Me.Tables.Count
@@ -187,6 +194,7 @@ Namespace Parser.Meta.Database
                     End If
                 End With
             Next
+
             For i As Integer = 0 To Me.FilteredTables.Count - 1
                 CType(Me.FilteredTables(i), Table).ListPos = i + 1
                 CType(Me.FilteredTables(i), Table).ListCount = Me.FilteredTables.Count
