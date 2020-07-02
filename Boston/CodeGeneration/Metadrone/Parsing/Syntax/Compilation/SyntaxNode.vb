@@ -182,7 +182,9 @@ Namespace Parser.Syntax
                 If Me.AsMain Then Throw New Exception("Statement only valid in templates. Line: " & Me.LineNumber.ToString)
 
                 If Not Me.NotStrict Then
-                    If Me.Tokens.Count > 1 Then Throw New Exception("Syntax error. Line: " & Me.LineNumber.ToString)
+                    If Me.Tokens.Count > 1 Then
+                        Throw New Exception("Syntax error. Line: " & Me.LineNumber.ToString)
+                    End If
                 End If
 
                 Me.Action = ExecActions.ACTION_HEADER
@@ -295,7 +297,9 @@ Namespace Parser.Syntax
                 Me.Action = ExecActions.ACTION_END
 
                 If Not Me.NotStrict Then
-                    If Me.Tokens.Count > 1 Then Throw New Exception("Syntax error. Line: " & Me.LineNumber.ToString)
+                    If Me.Tokens.Count > 1 Then
+                        Throw New Exception("Syntax error. Line: " & Me.LineNumber.ToString)
+                    End If
                 End If
 
             ElseIf StrEq(tok, ACTION_SET) Then

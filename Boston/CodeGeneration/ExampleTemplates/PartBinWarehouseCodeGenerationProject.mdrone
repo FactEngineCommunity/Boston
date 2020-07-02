@@ -31,7 +31,7 @@
 	set column.datatype = "Date"
 	
 elseif column.datatype = "TextFixedLength"
-	set column.datatype = "StringFixedLength"			
+	set column.datatype = "Text"			
 	
 end
 </Transformations>
@@ -80,28 +80,26 @@ call Template
 end!&gt;&gt;
 
 &lt;&lt;!for table tbl in MainConn!&gt;&gt;
-&lt;&lt;!for column col in tbl!&gt;&gt;
-  &lt;&lt;!tbl!&gt;&gt; - &lt;&lt;!col!&gt;&gt; : &lt;&lt;!col.datatype!&gt;&gt;  
-  &lt;&lt;!for relation rel in col!&gt;&gt;
-  &lt;&lt;!rel.referencedtablename + " " + rel.referencedcolumnname!&gt;&gt;
+&lt;&lt;!"CREATE TABLE [" + tbl + "] ("!&gt;&gt;
+  &lt;&lt;!for column col in tbl!&gt;&gt;
+         &lt;&lt;!col.value + " " +  col.datatype!&gt;&gt;&lt;&lt;!if col.length &gt; 0!&gt;&gt;&lt;&lt;!"(" + col.length + ")"!&gt;&gt;&lt;&lt;!end!&gt;&gt;         
   &lt;&lt;!end!&gt;&gt;
-&lt;&lt;!end!&gt;&gt;
+&lt;&lt;!");"!&gt;&gt;
 &lt;&lt;!set reftab = ""!&gt;&gt;
 &lt;&lt;!set reftab2 = ""!&gt;&gt;
 &lt;&lt;!for relation rel2 in tbl!&gt;&gt;
-  &lt;&lt;!set reftab = rel2.referencedtablename!&gt;&gt;  
-  &lt;&lt;!set string = ""!&gt;&gt;
-  &lt;&lt;!if reftab2 &lt;&gt; reftab!&gt;&gt;
-    &lt;&lt;!for relation rel3 in tbl!&gt;&gt;
-       &lt;&lt;!if rel3.referencedtablename = reftab!&gt;&gt;
-         &lt;&lt;!set string = string + rel3.referencedcolumnname + ", "!&gt;&gt;
-         &lt;&lt;!set reftab2 = "covered"!&gt;&gt;
-       &lt;&lt;!end!&gt;&gt;
-     &lt;&lt;!end!&gt;&gt;
-     &lt;&lt;!rel2.referencedtablename + "(" + string + ")"!&gt;&gt;
-   &lt;&lt;!end!&gt;&gt;   
-   &lt;&lt;!set reftab2 = reftab!&gt;&gt;
-&lt;&lt;!end!&gt;&gt;
+&lt;&lt;!set reftab = rel2.referencedtablename!&gt;&gt;  
+&lt;&lt;!set string = ""!&gt;&gt;
+ &lt;&lt;!if reftab2 &lt;&gt; reftab!&gt;&gt;
+&lt;&lt;!"ALTER TABLE [" + tbl + "]"!&gt;&gt;    
+    &lt;&lt;!  "ADD CONSTRAINT [" + rel2.referencedtablename + "_FK]"!&gt;&gt;
+        &lt;&lt;!"    FOREIGN KEY ("!&gt;&gt;&lt;&lt;!for relation rel3 in tbl!&gt;&gt;&lt;&lt;!if rel3.referencedtablename = reftab!&gt;&gt;&lt;&lt;!set string = string + rel3.referencedcolumnname + ", "!&gt;&gt;&lt;&lt;!set reftab2 = "covered"!&gt;&gt;&lt;&lt;!end!&gt;&gt;
+    &lt;&lt;!end!&gt;&gt;
+    &lt;&lt;!string + ") REFERENCES"!&gt;&gt;
+       &lt;&lt;!"[" + rel2.referencedtablename + "] (" + string + ");"!&gt;&gt;
+     &lt;&lt;!end!&gt;&gt;   
+     &lt;&lt;!set reftab2 = reftab!&gt;&gt;
+  &lt;&lt;!end!&gt;&gt;
 
 &lt;&lt;!end!&gt;&gt;
 </Text>

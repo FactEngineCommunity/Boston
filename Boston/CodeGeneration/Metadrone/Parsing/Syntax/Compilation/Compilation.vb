@@ -351,6 +351,14 @@ Namespace Parser.Syntax
                         While sr.Peek > -1
                             lineIncs += 1
                             Dim lines() As String = sr.ReadLine.Split(RESERVED_SEPERATOR.ToCharArray)
+                            '20200702-VM-Added the for loop below to cater for a case when the string is something like ");",
+                            '  which would otherwise throw a syntax error because of the split on RESERVED_SEPARATOR (which is ";") above.
+                            For i As Integer = 0 To lines.Count - 1
+                                If lines(i) = Chr(34) And i = lines.Count - 1 And lines.Count > 1 Then
+                                    lines(i - 1) &= ";" & Chr(34)
+                                    ReDim Preserve lines(i - 1)
+                                End If
+                            Next
                             For i As Integer = 0 To lines.Count - 1
                                 If lines(i).Trim.Length = 0 And i < lines.Count - 1 Then
                                     Throw New Exception("Statement expected. Line: " & lineNumber & ".")
@@ -396,7 +404,7 @@ Namespace Parser.Syntax
                         Dim lineIncs As Integer = 0 'Track readlines if more than one (last readline won't check for eol)
                         While sr.Peek > -1
                             lineIncs += 1
-                            Dim lines() As String = sr.ReadLine.Split(RESERVED_SEPERATOR.ToCharArray)
+                            Dim lines() As String = sr.ReadLine.Split(RESERVED_SEPERATOR.ToCharArray) '{sr.ReadLine.ToString}
                             For i As Integer = 0 To lines.Count - 1
                                 If lines(i).Trim.Length = 0 And i < lines.Count - 1 Then
                                     Throw New Exception("Statement expected. Line: " & lineNumber & ".")

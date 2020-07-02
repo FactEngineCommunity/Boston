@@ -300,7 +300,7 @@ Namespace UI
                     End If
 
                     'Get last statement (if; any; seperated)
-                    Dim lines() As String = line.ToString.Split(RESERVED_SEPERATOR.ToCharArray)
+                    Dim lines() As String = line.ToString.Split(RESERVED_SEPERATOR.ToCharArray) '{line.ToString}
                     If lines.Count > 1 Then line = New System.Text.StringBuilder(lines(lines.Count - 1))
 
                     'Compile as a syntax node

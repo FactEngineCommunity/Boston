@@ -135,7 +135,9 @@ Namespace Parser.Syntax
                 End While
 
                 'Must enclose string literals
-                If inStr Then Throw New Exception("Syntax error. Line: " & LineNumber.ToString & ".")
+                If inStr Then
+                    Throw New Exception("Syntax error. Line: " & LineNumber.ToString & ".")
+                End If
 
                 'Add remaining dangler
                 If sb.Length > 0 Then toks.Add(New SyntaxToken(sb.ToString, LineNumber, SyntaxToken.ElementTypes.NotSet))
