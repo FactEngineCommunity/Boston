@@ -76,18 +76,26 @@ Namespace Parser.Meta.Database
                         Dim lsReferencedTableName As String = ""
 
                         Dim lsDestinationColumnName As String = ""
+
+                        Dim liInd As Integer = SchemaRowIdx
+                        Dim lsOriginColumnName As String = ""
+
                         If lrRelation.DestinationColumns.Count = 1 Then
+                            lsOriginColumnName = lrRelation.OriginColumns(0).Name
                             lsDestinationColumnName = lrRelation.DestinationColumns(0).Name
                         Else
-                            Dim liInd As Integer = SchemaRowIdx
                             Dim lrOriginColumn As RDS.Column = lrRelation.OriginColumns.Find(Function(x) x.Id = Schema(liInd).ColumnId)
+                            lsOriginColumnName = lrOriginColumn.Name
                             Dim lrDestinationColumn As RDS.Column = lrRelation.DestinationColumns.Find(Function(x) x.ActiveRole.Id = lrOriginColumn.ActiveRole.Id)
                             lsDestinationColumnName = lrDestinationColumn.Name
                         End If
 
                         Me.Relations.Add(New Relation(lrRelation.Id,
+                                                      lrRelation.OriginTable.Name,
+                                                      lsOriginColumnName,
                                                       lrRelation.DestinationTable.Name,
-                                                      lsDestinationColumnName))
+                                                      lsDestinationColumnName,
+                                                      lrRelation.OriginColumns.Count))
                     Next
 
                 Else
@@ -106,17 +114,17 @@ Namespace Parser.Meta.Database
         End Sub
 
         Public Function GetCopy() As IEntity Implements IEntity.GetCopy
-            'Dim Table As New Table()
-            'Table.Value = Me.Value
-            'Table.Owner = Me.Owner
-            'Table.ConnStr = Me.ConnStr
-            'Table.Transforms = Me.Transforms
+            Dim Table As New Table()
+            Table.Value = Me.Value
+            Table.Owner = Me.Owner
+            Table.ConnStr = Me.ConnStr
+            Table.Transforms = Me.Transforms
             'For Each col In Me.Columns
             '    Table.Columns.Add(CType(col, Column).GetCopy)
             'Next
-            'For Each r In Me.ReplaceAllList.List
-            '    Table.ReplaceAllList.Add(r.OldVal, r.NewVal)
-            'Next
+            For Each r In Me.ReplaceAllList.List
+                Table.ReplaceAllList.Add(r.OldVal, r.NewVal)
+            Next
             'For Each s In Me.UseOnlyList
             '    Table.UseOnlyList.Add(s)
             'Next
@@ -126,10 +134,10 @@ Namespace Parser.Meta.Database
             'Table.InitEntities()
             'Table.ListCount = Me.ListCount
             'Table.ListPos = Me.ListPos
-            'Return Table
+            Return Table '20200703-VM-Was commented out
 
             'This not really used (just yet)
-            Return New Table()
+            'Return New Table() '20200703-VM-Was not commented out
         End Function
 
         Private Sub AddCol(ByVal SchemaRow As SchemaRow, ByVal Connection As IConnection)

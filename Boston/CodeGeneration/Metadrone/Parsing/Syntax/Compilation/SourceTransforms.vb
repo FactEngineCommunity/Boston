@@ -239,7 +239,11 @@ Namespace Parser.Syntax
                     'Column - get attrib from the source (if source is a column), otherwise return empty
                     If TypeOf source Is Parser.Meta.Database.Column Then
                         'Column - get attrib from source
-                        val = source.GetAttributeValue(exprRight, New List(Of Object), False, False)
+                        If exprRight = "value" Then '20200703-VM-Added check for "value" below such that column.values can be changed in a transform.
+                            val = source.GetAttributeValue("value", Nothing, Nothing, False)
+                        Else
+                            val = source.GetAttributeValue(exprRight, New List(Of Object), False, False)
+                        End If
                     Else
                         val = ""
                     End If
@@ -419,28 +423,46 @@ Namespace Parser.Syntax
         Public Function GetAttributeValue(ByVal source As Boston.Parser.Meta.Database.Table, ByVal AttribName As String) As Object
             Call Me.Process(source, source)
             Dim attrib As Attrib = Me.GetAttrib(SyntaxToken.TransformTargets.Table, AttribName)
-            If attrib Is Nothing Then Throw New Exception("Attribute not defined: '" & AttribName & "'. ")
+            If attrib Is Nothing Then
+                Throw New Exception("Attribute not defined: '" & AttribName & "'. ")
+            End If
             Return attrib.AttribVal
         End Function
 
         Public Function GetAttributeValue(ByVal source As Boston.Parser.Meta.Database.Routine, ByVal AttribName As String) As Object
             Call Me.Process(source, source)
             Dim attrib As Attrib = Me.GetAttrib(SyntaxToken.TransformTargets.Routine, AttribName)
-            If attrib Is Nothing Then Throw New Exception("Attribute not defined: '" & AttribName & "'. ")
+            If attrib Is Nothing Then
+                Throw New Exception("Attribute not defined: '" & AttribName & "'. ")
+            End If
             Return attrib.AttribVal
         End Function
 
-        Public Function GetAttributeValue(ByVal source As Boston.Parser.Meta.Database.Column, ByVal sourceOwner As IEntity, ByVal AttribName As String) As Object
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <param name="source"></param>
+        ''' <param name="sourceOwner"></param>
+        ''' <param name="AttribName"></param>
+        ''' <returns></returns>
+        Public Function GetAttributeValue(ByVal source As Boston.Parser.Meta.Database.Column,
+                                          ByVal sourceOwner As IEntity,
+                                          ByVal AttribName As String
+                                          ) As Object
             Call Me.Process(source, sourceOwner)
             Dim attrib As Attrib = Me.GetAttrib(SyntaxToken.TransformTargets.Column, AttribName)
-            If attrib Is Nothing Then Throw New Exception("Attribute not defined: '" & AttribName & "'. ")
+            If attrib Is Nothing Then
+                Throw New Exception("Attribute not defined: '" & AttribName & "'. ")
+            End If
             Return attrib.AttribVal
         End Function
 
         Public Function GetAttributeValue(ByVal source As Boston.Parser.Meta.Database.Parameter, ByVal sourceOwner As IEntity, ByVal AttribName As String) As Object
             Call Me.Process(source, sourceOwner)
             Dim attrib As Attrib = Me.GetAttrib(SyntaxToken.TransformTargets.Param, AttribName)
-            If attrib Is Nothing Then Throw New Exception("Attribute not defined: '" & AttribName & "'. ")
+            If attrib Is Nothing Then
+                Throw New Exception("Attribute not defined: '" & AttribName & "'. ")
+            End If
             Return attrib.AttribVal
         End Function
 

@@ -11,7 +11,9 @@ Namespace Parser.Syntax
         Public Shared TAG_END As String = "!>>"
 
         Public Const VARIABLE_ATTRIBUTE_VALUE As String = "value"
-        Public Const VARIABLE_ATTRIBUTE_ID As String = "id" 'Boston specific. Not part of orginal Metadrone.
+        Public Const VARIABLE_ATTRIBUTE_ID As String = "id" 'Boston specific. Not part of orginal Metadrone.        
+        Public Const VARIABLE_ATTRIBUTE_REFERENCINGTABLENAME As String = "referencingtablename" 'Boston specific. Not part of orginal Metadrone.
+        Public Const VARIABLE_ATTRIBUTE_REFERENCINGCOLUMNNAME As String = "referencingcolumnname" 'Boston specific. Not part of orginal Metadrone.
         Public Const VARIABLE_ATTRIBUTE_REFERENCEDTABLENAME As String = "referencedtablename" 'Boston specific. Not part of orginal Metadrone.
         Public Const VARIABLE_ATTRIBUTE_REFERENCEDCOLUMNNAME As String = "referencedcolumnname" 'Boston specific. Not part of orginal Metadrone.
         Public Const VARIABLE_ATTRIBUTE_DATATYPE As String = "datatype"
@@ -205,7 +207,9 @@ Namespace Parser.Syntax
         Friend Shared DOCO_OBJECT_INOUTPARAMETER As String = "Loop through input/output parameters in the parent loop's current routine iteration."
 
 
-        Friend Shared DOCO_VARIABLE_ATTRIBUTE_ID As String = "Id of variable." 'Boston specific. Not part of original Metadrone
+        Friend Shared DOCO_VARIABLE_ATTRIBUTE_ID As String = "Id of variable." 'Boston specific. Not part of original Metadrone        
+        Friend Shared DOCO_VARIABLE_ATTRIBUTE_REFERENCINGTABLENAME As String = "The name of the Table to which the Relation belongs, of variable." 'Boston specific. Not part of original Metadrone
+        Friend Shared DOCO_VARIABLE_ATTRIBUTE_REFERENCINGCOLUMNNAME As String = "The name of the Column referencing another Table/Column by the Relation, of variable." 'Boston specific. Not part of original Metadrone
         Friend Shared DOCO_VARIABLE_ATTRIBUTE_REFERENCEDTABLENAME As String = "The name of the Table referenced by the Relation, of variable." 'Boston specific. Not part of original Metadrone
         Friend Shared DOCO_VARIABLE_ATTRIBUTE_REFERENCEDCOLUMNNAME As String = "The name of the Column referenced by the Relation, of variable." 'Boston specific. Not part of original Metadrone
         Friend Shared DOCO_VARIABLE_ATTRIBUTE_VALUE As String = "Value of variable."
@@ -326,7 +330,9 @@ Namespace Parser.Syntax
         Friend Shared Function IsSystemAttribute(ByVal value As String) As Boolean
             If String.IsNullOrEmpty(value) Then Return False
 
-            If StrEq(value, VARIABLE_ATTRIBUTE_ID) Then Return True 'Boston specific. Not part of original Metadrone.
+            If StrEq(value, VARIABLE_ATTRIBUTE_ID) Then Return True 'Boston specific. Not part of original Metadrone.            
+            If StrEq(value, VARIABLE_ATTRIBUTE_REFERENCINGTABLENAME) Then Return True 'Boston specific. Not part of original Metadrone.
+            If StrEq(value, VARIABLE_ATTRIBUTE_REFERENCINGCOLUMNNAME) Then Return True 'Boston specific. Not part of original Metadrone.
             If StrEq(value, VARIABLE_ATTRIBUTE_REFERENCEDTABLENAME) Then Return True 'Boston specific. Not part of original Metadrone.
             If StrEq(value, VARIABLE_ATTRIBUTE_REFERENCEDCOLUMNNAME) Then Return True 'Boston specific. Not part of original Metadrone.
             If StrEq(value, VARIABLE_ATTRIBUTE_VALUE) Then Return True

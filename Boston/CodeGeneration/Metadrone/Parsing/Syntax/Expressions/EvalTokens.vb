@@ -397,7 +397,7 @@ Namespace Parser.Syntax
             End Select
 
             'Evaluate variable
-            Return Me.GetVar(Me.Tokens(TokenIdxStart).Text, TokenIdxStart, Nothing)
+            Return Me.GetVar(Me.Tokens(TokenIdxStart).Text, TokenIdxStart, New List(Of Object)) '20200703-VM-Was Nothing for Params
         End Function
 
         Private Function GetVar(ByVal funcName As String, ByVal tokenIdx As Integer, ByVal params As List(Of Object)) As List(Of Object)

@@ -7,7 +7,7 @@
       <string>56df1cc2-b7c0-4feb-8fdc-2b3780d39a46</string>
       <string>b4c88052-5243-4f89-b8b7-27de2875d8c1</string>
     </OpenEditorGUIDs>
-    <SelectedEditorGUID>56df1cc2-b7c0-4feb-8fdc-2b3780d39a46</SelectedEditorGUID>
+    <SelectedEditorGUID>2a6f72f1-7153-4fff-9b60-a106520641bb</SelectedEditorGUID>
   </Profile>
   <Properties>
     <EditorGUID>8ee3448f-d73e-405a-9ba8-f19cc47ba8ab</EditorGUID>
@@ -20,21 +20,30 @@
     <Source>
       <Name>Source</Name>
       <Provider>BostonModel</Provider>
-      <BostonModelId>d5e6c134-00a1-45e4-933b-00926a8b3c62</BostonModelId>
+      <BostonModelId>20c218b6-5994-41b9-b812-ac11d52866b1</BostonModelId>
       <ConnectionString>None Required</ConnectionString>
       <SchemaQuery>Boston Model direct query. No need for a Schema Query here at all</SchemaQuery>
       <TableSchemaQuery>Boston Model direct query. No need for a Schema Query here at all</TableSchemaQuery>
       <ColumnSchemaQuery>Boston Model direct query. No need for a Schema Query here at all.</ColumnSchemaQuery>
       <TableNamePlaceHolder>Boston Model direct query. No need for a Schema Query here.</TableNamePlaceHolder>
       <RoutineSchemaQuery>Boston Model direct query. No need for a Schema Query here.</RoutineSchemaQuery>
-      <Transformations>if column.datatype = "TemporalDate"
-	set column.datatype = "Date"
+      <Transformations>if column.value = "Date"
+    set column.value = "[Date]"
+else
+    set column.value = column.value
+end if
+
+if column.datatype = "TemporalDate"
+	set column.datatype = "DateTime"
 	
 elseif column.datatype = "TextFixedLength"
 	set column.datatype = "Text"			
 	
 end
-</Transformations>
+
+if param.value = "Date"
+   set param.value = "[Date]"
+end</Transformations>
       <EditorGUID>2a6f72f1-7153-4fff-9b60-a106520641bb</EditorGUID>
     </Source>
   </Sources>
@@ -85,32 +94,25 @@ end!&gt;&gt;
   &lt;&lt;!for column col in tbl!&gt;&gt;
          &lt;&lt;!col.value + " " +  col.datatype!&gt;&gt;&lt;&lt;!if col.length &gt; 0!&gt;&gt;&lt;&lt;!"(" + col.length + ")"!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!if liInd &lt; tbl.columncount or tbl.idcolumncount &gt; 0!&gt;&gt;&lt;&lt;!","!&gt;&gt;&lt;&lt;!end!&gt;&gt;
          &lt;&lt;!set liInd = liInd + 1!&gt;&gt;
-  &lt;&lt;!end!&gt;&gt;
-&lt;&lt;!if tbl.idcolumncount &gt; 0!&gt;&gt;
-&lt;&lt;!set indexString = ""!&gt;&gt;
-&lt;&lt;!set liInd = 1!&gt;&gt;
-&lt;&lt;!"PKColumnCount" + tbl.pkcolumncount + " " + liInd!&gt;&gt;
-&lt;&lt;!for idcolumn index in tbl!&gt;&gt;
-&lt;&lt;!if index.isprimarykey!&gt;&gt;
-&lt;&lt;!set indexString = indexString &amp; "[" + index + "]"!&gt;&gt;&lt;&lt;!if liInd &lt; tbl.pkcolumncount!&gt;&gt;&lt;&lt;!set indexString = indexString + ","!&gt;&gt;&lt;&lt;!end!&gt;&gt;
-&lt;&lt;!set liInd = liInd + 1!&gt;&gt;
+  &lt;&lt;!end!&gt;&gt;&lt;&lt;!if tbl.idcolumncount &gt; 0!&gt;&gt;&lt;&lt;!set indexString = ""!&gt;&gt;&lt;&lt;!set liInd = 1!&gt;&gt;
+&lt;&lt;!for idcolumn index in tbl!&gt;&gt;&lt;&lt;!if index.isprimarykey!&gt;&gt;&lt;&lt;!set indexString = indexString &amp; "[" + index + "]"!&gt;&gt;&lt;&lt;!if liInd &lt; tbl.pkcolumncount!&gt;&gt;&lt;&lt;!set indexString = indexString + ","!&gt;&gt;&lt;&lt;!end!&gt;&gt;
+&lt;&lt;!set liInd = liInd + 1!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!if indexString &lt;&gt; ""!&gt;&gt;&lt;&lt;!"CONSTRAINT [PrimaryKey] PRIMARY KEY (" + indexString + ")"!&gt;&gt;&lt;&lt;!end!&gt;&gt;
 &lt;&lt;!end!&gt;&gt;
-&lt;&lt;!end!&gt;&gt;
-&lt;&lt;!if indexString &lt;&gt; ""!&gt;&gt;&lt;&lt;!"CONSTRAINT [PrimaryKey] PRIMARY KEY (" + indexString + ")"!&gt;&gt;&lt;&lt;!end!&gt;&gt;
-&lt;&lt;!end!&gt;&gt;  
 &lt;&lt;!");"!&gt;&gt;
 &lt;&lt;!set reftab = ""!&gt;&gt;
 &lt;&lt;!set reftab2 = ""!&gt;&gt;
 &lt;&lt;!for relation rel2 in tbl!&gt;&gt;
 &lt;&lt;!set reftab = rel2.referencedtablename!&gt;&gt;
 &lt;&lt;!set string = ""!&gt;&gt;
+&lt;&lt;!set referencingString = ""!&gt;&gt;
 &lt;&lt;!set liInd = 1!&gt;&gt;
  &lt;&lt;!if reftab2 &lt;&gt; reftab!&gt;&gt;
+ 
 &lt;&lt;!"ALTER TABLE [" + tbl + "]"!&gt;&gt;    
     &lt;&lt;!  "ADD CONSTRAINT [" + rel2.referencedtablename + "_FK]"!&gt;&gt;
-        &lt;&lt;!"    FOREIGN KEY ("!&gt;&gt;&lt;&lt;!for relation rel3 in tbl!&gt;&gt;&lt;&lt;!if rel3.referencedtablename = reftab!&gt;&gt;&lt;&lt;!set string = string + rel3.referencedcolumnname!&gt;&gt;&lt;&lt;!if liInd &lt; tbl.fkcolumncount!&gt;&gt;&lt;&lt;!set string = string + ","!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!set reftab2 = "covered"!&gt;&gt;&lt;&lt;!end!&gt;&gt;
+        &lt;&lt;!"    FOREIGN KEY ("!&gt;&gt;&lt;&lt;!for relation rel3 in tbl!&gt;&gt;&lt;&lt;!if rel3.referencedtablename = reftab!&gt;&gt;&lt;&lt;!set referencingString = referencingString + rel3.referencingcolumnname!&gt;&gt;&lt;&lt;!set string = string + rel3.referencedcolumnname!&gt;&gt;&lt;&lt;!if liInd &lt; rel3.columncount!&gt;&gt;&lt;&lt;!set referencingString = referencingString + ","!&gt;&gt;&lt;&lt;!set string = string + ","!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!set reftab2 = "covered"!&gt;&gt;&lt;&lt;!set liInd = liInd + 1!&gt;&gt;&lt;&lt;!end!&gt;&gt;
     &lt;&lt;!end!&gt;&gt;
-    &lt;&lt;!string + ") REFERENCES"!&gt;&gt;
+    &lt;&lt;!referencingString + ") REFERENCES"!&gt;&gt;
        &lt;&lt;!"[" + rel2.referencedtablename + "] (" + string + ");"!&gt;&gt;
      &lt;&lt;!end!&gt;&gt;   
      &lt;&lt;!set reftab2 = reftab!&gt;&gt;

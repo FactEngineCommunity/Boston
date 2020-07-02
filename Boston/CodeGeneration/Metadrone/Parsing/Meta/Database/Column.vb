@@ -40,18 +40,22 @@ Namespace Parser.Meta.Database
             For Each lrRelation In SchemaRow.Relation
                 Dim lsReferencedTableName As String = ""
 
+                Dim lrOriginColumn As RDS.Column = lrRelation.OriginColumns.Find(Function(x) x.Id = SchemaRow.ColumnId)
+
                 Dim lsDestinationColumnName As String = ""
                 If lrRelation.DestinationColumns.Count = 1 Then
                     lsDestinationColumnName = lrRelation.DestinationColumns(0).Name
                 Else
-                    Dim lrOriginColumn As RDS.Column = lrRelation.OriginColumns.Find(Function(x) x.Id = SchemaRow.ColumnId)
                     Dim lrDestinationColumn As RDS.Column = lrRelation.DestinationColumns.Find(Function(x) x.ActiveRole.Id = lrOriginColumn.ActiveRole.Id)
                     lsDestinationColumnName = lrDestinationColumn.Name
                 End If
 
                 Me.Relations.Add(New Relation(lrRelation.Id,
+                                              Me.Owner.GetAttributeValue("Value", Nothing, False, False),
+                                              Me.Value,
                                               lrRelation.DestinationTable.Name,
-                                              lsDestinationColumnName))
+                                              lsDestinationColumnName,
+                                              lrRelation.OriginColumns.Count))
             Next
 
         End Sub
@@ -243,139 +247,158 @@ Namespace Parser.Meta.Database
             End If
         End Sub
 
-        Public Function GetAttributeValue(ByVal AttribName As String, ByVal Params As List(Of Object), _
+        Public Function GetAttributeValue(ByVal AttribName As String, ByVal Params As List(Of Object),
                                           ByVal LookTransformsIfNotFound As Boolean, ByRef ExitBlock As Boolean) As Object Implements IEntity.GetAttributeValue
-            If Params Is Nothing Then Params = New List(Of Object)
+
             If AttribName Is Nothing Then AttribName = ""
+
             If AttribName.Length = 0 Or StrEq(AttribName, VARIABLE_ATTRIBUTE_VALUE) Then
                 'return value
-                Call Me.CheckParamsForPropertyCall(VARIABLE_ATTRIBUTE_VALUE, Params)
-                Return Me.ReplaceAllList.ApplyReplaces(Me.Value)
-            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_DATATYPE) And LookTransformsIfNotFound Then
-                Call Me.CheckParamsForPropertyCall(AttribName, Params)
-                Try
-                    Return Me.Transforms.GetAttributeValue(Me, Me.Owner, AttribName)
-                Catch ex As Exception
+                If Params IsNot Nothing Then Call Me.CheckParamsForPropertyCall(VARIABLE_ATTRIBUTE_VALUE, Params)
+                Dim loReturnObject As Object
+                'Return Me.ReplaceAllList.ApplyReplaces(Me.Value)  Was. Return if things go pear shape.
+
+                If Params Is Nothing Then
+                    Return Me.mValue
+                Else
+                    If AttribName = "" Then 'Fixes bug where if a Transform such as column.value = "Date" then column.value = "[Date]" modifies the standard transform function.
+                        Return Me.mValue
+                    Else
+                        loReturnObject = Me.Transforms.GetAttributeValue(Me, Me.Owner, AttribName)
+                    End If
+
+                    Return loReturnObject
+                End If
+
+            End If
+
+            If Params Is Nothing Then Params = New List(Of Object)
+
+            If StrEq(AttribName, VARIABLE_ATTRIBUTE_DATATYPE) And LookTransformsIfNotFound Then
+                    Call Me.CheckParamsForPropertyCall(AttribName, Params)
+                    Try
+                        Return Me.Transforms.GetAttributeValue(Me, Me.Owner, AttribName)
+                    Catch ex As Exception
+                        Return Me.DataType
+                    End Try
+
+                ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_DATATYPE) Then
+                    'return provider datatype
+                    Call Me.CheckParamsForPropertyCall(AttribName, Params)
                     Return Me.DataType
-                End Try
 
-            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_DATATYPE) Then
-                'return provider datatype
-                Call Me.CheckParamsForPropertyCall(AttribName, Params)
-                Return Me.DataType
+                ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_ISIDENTITY) Then
+                    'return isidentity
+                    Call Me.CheckParamsForPropertyCall(AttribName, Params)
+                    Return Me.IsIdentity
 
-            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_ISIDENTITY) Then
-                'return isidentity
-                Call Me.CheckParamsForPropertyCall(AttribName, Params)
-                Return Me.IsIdentity
+                ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_ISPRIMARYKEY) Then
+                    'return isprimarykey
+                    Call Me.CheckParamsForPropertyCall(AttribName, Params)
+                    Return Me.IsPrimaryKey
 
-            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_ISPRIMARYKEY) Then
-                'return isprimarykey
-                Call Me.CheckParamsForPropertyCall(AttribName, Params)
-                Return Me.IsPrimaryKey
+                ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_ISFOREIGNKEY) Then
+                    'return isforeignkey
+                    Call Me.CheckParamsForPropertyCall(AttribName, Params)
+                    Return Me.IsForeignKey
 
-            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_ISFOREIGNKEY) Then
-                'return isforeignkey
-                Call Me.CheckParamsForPropertyCall(AttribName, Params)
-                Return Me.IsForeignKey
+                ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_NULLABLE) Then
+                    'return nullable
+                    Call Me.CheckParamsForPropertyCall(AttribName, Params)
+                    Return Me.Nullable
 
-            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_NULLABLE) Then
-                'return nullable
-                Call Me.CheckParamsForPropertyCall(AttribName, Params)
-                Return Me.Nullable
+                ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_RELATION) Then 'Boston specific. Not part of original Metadrone.
+                    'return relation
+                    Call Me.CheckParamsForPropertyCall(AttribName, Params)
+                    Return Me.Relation
 
-            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_RELATION) Then 'Boston specific. Not part of original Metadrone.
-                'return relation
-                Call Me.CheckParamsForPropertyCall(AttribName, Params)
-                Return Me.Relation
+                ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_ALLOWZEROLENGTH) Then 'Boston specific. Not part of original Metadrone.
+                    'return allowZeroLength
+                    Call Me.CheckParamsForPropertyCall(AttribName, Params)
+                    Return Me.AllowZeroLength
 
-            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_ALLOWZEROLENGTH) Then 'Boston specific. Not part of original Metadrone.
-                'return allowZeroLength
-                Call Me.CheckParamsForPropertyCall(AttribName, Params)
-                Return Me.AllowZeroLength
+                ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_LENGTH) Then
+                    'return length
+                    Call Me.CheckParamsForPropertyCall(AttribName, Params)
+                    Return Me.Length
 
-            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_LENGTH) Then
-                'return length
-                Call Me.CheckParamsForPropertyCall(AttribName, Params)
-                Return Me.Length
+                ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_PRECISION) Then
+                    'return precision
+                    Call Me.CheckParamsForPropertyCall(AttribName, Params)
+                    Return Me.Precision
 
-            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_PRECISION) Then
-                'return precision
-                Call Me.CheckParamsForPropertyCall(AttribName, Params)
-                Return Me.Precision
+                ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_SCALE) Then
+                    'return scale
+                    Call Me.CheckParamsForPropertyCall(AttribName, Params)
+                    Return Me.Scale
 
-            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_SCALE) Then
-                'return scale
-                Call Me.CheckParamsForPropertyCall(AttribName, Params)
-                Return Me.Scale
+                ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_LISTCOUNT) Then
+                    'return listcount
+                    Call Me.CheckParamsForPropertyCall(AttribName, Params)
+                    Return Me.ListCount
 
-            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_LISTCOUNT) Then
-                'return listcount
-                Call Me.CheckParamsForPropertyCall(AttribName, Params)
-                Return Me.ListCount
+                ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_LISTPOS) Then
+                    'return listpos
+                    Call Me.CheckParamsForPropertyCall(AttribName, Params)
+                    Return Me.ListPos
 
-            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_LISTPOS) Then
-                'return listpos
-                Call Me.CheckParamsForPropertyCall(AttribName, Params)
-                Return Me.ListPos
+                ElseIf StrIdxOf(AttribName, VARIABLE_METHOD_REPLACE) = 0 Then
+                    'employ replace method
+                    Select Case Params.Count
+                        Case 0 : Throw New Exception("Expecting argument OldVal In '" & VARIABLE_METHOD_REPLACE & "'.")
+                        Case 1 : Throw New Exception("Expecting argument NewVal in '" & VARIABLE_METHOD_REPLACE & "'.")
+                        Case Is > 2 : Throw New Exception("Too many arguments in '" & VARIABLE_METHOD_REPLACE & "'.")
+                    End Select
+                    If PackageBuilder.PreProc.IgnoreCase Then
+                        Return ReplaceInsensitive(Me.ReplaceAllList.ApplyReplaces(Me.Value).ToString, Params(0).ToString, Params(1).ToString)
+                    Else
+                        Return Me.ReplaceAllList.ApplyReplaces(Me.Value).ToString.Replace(Params(0).ToString, Params(1).ToString)
+                    End If
 
-            ElseIf StrIdxOf(AttribName, VARIABLE_METHOD_REPLACE) = 0 Then
-                'employ replace method
-                Select Case Params.Count
-                    Case 0 : Throw New Exception("Expecting argument OldVal In '" & VARIABLE_METHOD_REPLACE & "'.")
-                    Case 1 : Throw New Exception("Expecting argument NewVal in '" & VARIABLE_METHOD_REPLACE & "'.")
-                Case Is > 2 : Throw New Exception("Too many arguments in '" & VARIABLE_METHOD_REPLACE & "'.")
-                End Select
-                If PackageBuilder.PreProc.IgnoreCase Then
-                    Return ReplaceInsensitive(Me.ReplaceAllList.ApplyReplaces(Me.Value).ToString, Params(0).ToString, Params(1).ToString)
+                ElseIf StrIdxOf(AttribName, FUNC_REPLACEALL) = 0 Then
+                    'add replace all value
+                    Select Case Params.Count
+                        Case 0 : Throw New Exception("Expecting argument OldVal in '" & FUNC_REPLACEALL & "'.")
+                        Case 1 : Throw New Exception("Expecting argument NewVal in '" & FUNC_REPLACEALL & "'.")
+                        Case Is > 2 : Throw New Exception("Too many arguments in '" & FUNC_REPLACEALL & "'.")
+                    End Select
+                    Me.ReplaceAllList.Add(Params(0).ToString, Params(1).ToString)
+                    Return Nothing
+
+                ElseIf StrIdxOf(AttribName, FUNC_IGNORE) = 0 Then
+                    'add ignore
+                    Select Case Params.Count
+                        Case 0 : Throw New Exception("Expecting argument IgnoreValue in '" & FUNC_IGNORE & "'.")
+                        Case Is > 1 : Throw New Exception("Too many arguments in '" & FUNC_IGNORE & "'.")
+                    End Select
+                    If TypeOf Me.Owner Is Table Then
+                        CType(Me.Owner, Table).ApplyIgnore(Params(0).ToString)
+                    ElseIf TypeOf Me.Owner Is Routine Then
+                        CType(Me.Owner, Routine).ApplyColumnIgnore(Params(0).ToString)
+                    Else
+                        Throw New Exception("Invalid attribute: " & AttribName & ". ")
+                    End If
+                    ExitBlock = True
+                    Return Nothing
+
+                ElseIf StrIdxOf(AttribName, FUNC_USEONLY) = 0 Then
+                    'add use only
+                    Select Case Params.Count
+                        Case 0 : Throw New Exception("Expecting argument UseOnlyValue in '" & FUNC_USEONLY & "'.")
+                        Case Is > 1 : Throw New Exception("Too many arguments in '" & FUNC_USEONLY & "'.")
+                    End Select
+                    If TypeOf Me.Owner Is Table Then
+                        CType(Me.Owner, Table).ApplyUseOnly(Params(0).ToString)
+                    ElseIf TypeOf Me.Owner Is Routine Then
+                        CType(Me.Owner, Routine).ApplyColumnUseOnly(Params(0).ToString)
+                    Else
+                        Throw New Exception("Invalid attribute: " & AttribName & ". ")
+                    End If
+                    ExitBlock = True
+                    Return Nothing
+
                 Else
-                    Return Me.ReplaceAllList.ApplyReplaces(Me.Value).ToString.Replace(Params(0).ToString, Params(1).ToString)
-                End If
-
-            ElseIf StrIdxOf(AttribName, FUNC_REPLACEALL) = 0 Then
-                'add replace all value
-                Select Case Params.Count
-                    Case 0 : Throw New Exception("Expecting argument OldVal in '" & FUNC_REPLACEALL & "'.")
-                    Case 1 : Throw New Exception("Expecting argument NewVal in '" & FUNC_REPLACEALL & "'.")
-                    Case Is > 2 : Throw New Exception("Too many arguments in '" & FUNC_REPLACEALL & "'.")
-                End Select
-                Me.ReplaceAllList.Add(Params(0).ToString, Params(1).ToString)
-                Return Nothing
-
-            ElseIf StrIdxOf(AttribName, FUNC_IGNORE) = 0 Then
-                'add ignore
-                Select Case Params.Count
-                    Case 0 : Throw New Exception("Expecting argument IgnoreValue in '" & FUNC_IGNORE & "'.")
-                    Case Is > 1 : Throw New Exception("Too many arguments in '" & FUNC_IGNORE & "'.")
-                End Select
-                If TypeOf Me.Owner Is Table Then
-                    CType(Me.Owner, Table).ApplyIgnore(Params(0).ToString)
-                ElseIf TypeOf Me.Owner Is Routine Then
-                    CType(Me.Owner, Routine).ApplyColumnIgnore(Params(0).ToString)
-                Else
-                    Throw New Exception("Invalid attribute: " & AttribName & ". ")
-                End If
-                ExitBlock = True
-                Return Nothing
-
-            ElseIf StrIdxOf(AttribName, FUNC_USEONLY) = 0 Then
-                'add use only
-                Select Case Params.Count
-                    Case 0 : Throw New Exception("Expecting argument UseOnlyValue in '" & FUNC_USEONLY & "'.")
-                    Case Is > 1 : Throw New Exception("Too many arguments in '" & FUNC_USEONLY & "'.")
-                End Select
-                If TypeOf Me.Owner Is Table Then
-                    CType(Me.Owner, Table).ApplyUseOnly(Params(0).ToString)
-                ElseIf TypeOf Me.Owner Is Routine Then
-                    CType(Me.Owner, Routine).ApplyColumnUseOnly(Params(0).ToString)
-                Else
-                    Throw New Exception("Invalid attribute: " & AttribName & ". ")
-                End If
-                ExitBlock = True
-                Return Nothing
-
-            Else
-                If LookTransformsIfNotFound Then
+                    If LookTransformsIfNotFound Then
                     Return Me.Transforms.GetAttributeValue(Me, Me.Owner, AttribName)
                 Else
                     'This will avoid stack overflow when called from SourceTransforms

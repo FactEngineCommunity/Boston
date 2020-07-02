@@ -322,6 +322,9 @@ Namespace UI
 
                         Case Parser.CodeCompletion.Variable.Types.Relation 'Boston specific. Not part of original Metadrone.
                             Me.AddListItem(VARIABLE_ATTRIBUTE_ID, DOCO_VARIABLE_ATTRIBUTE_ID, Nothing, SyntaxPopupListItem.Icons.PROPERTY)
+                            Me.AddListItem(VARIABLE_ATTRIBUTE_COLUMNCOUNT, DOCO_VARIABLE_ATTRIBUTE_COLUMNCOUNT, Nothing, SyntaxPopupListItem.Icons.PROPERTY)
+                            Me.AddListItem(VARIABLE_ATTRIBUTE_REFERENCINGTABLENAME, DOCO_VARIABLE_ATTRIBUTE_REFERENCINGTABLENAME, Nothing, SyntaxPopupListItem.Icons.PROPERTY)
+                            Me.AddListItem(VARIABLE_ATTRIBUTE_REFERENCINGCOLUMNNAME, DOCO_VARIABLE_ATTRIBUTE_REFERENCINGCOLUMNNAME, Nothing, SyntaxPopupListItem.Icons.PROPERTY)
                             Me.AddListItem(VARIABLE_ATTRIBUTE_REFERENCEDTABLENAME, DOCO_VARIABLE_ATTRIBUTE_REFERENCEDTABLENAME, Nothing, SyntaxPopupListItem.Icons.PROPERTY)
                             Me.AddListItem(VARIABLE_ATTRIBUTE_REFERENCEDCOLUMNNAME, DOCO_VARIABLE_ATTRIBUTE_REFERENCEDCOLUMNNAME, Nothing, SyntaxPopupListItem.Icons.PROPERTY)
 

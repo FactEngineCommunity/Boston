@@ -18,19 +18,28 @@ Namespace Parser.Meta.Database
 
         Private mValue As Object = Nothing
         Private mId As String
+        Private mReferencingTableName As String
+        Private mReferencingColumnName As String
         Private mReferencedTableName As String
         Private mReferencedColumnName As String
+        Private mColumnCount As Integer = 0
         Private ReplaceAllList As New ReplaceAllList()
 
         Public Sub New()
         End Sub
 
         Public Sub New(ByVal asId As String,
+                       ByVal asReferencingTableName As String,
+                       ByVal asReferencingColumnName As String,
                        ByVal asReferencedTableName As String,
-                       ByVal asReferencedColumnName As String)
+                       ByVal asReferencedColumnName As String,
+                       ByVal aiColumnCount As Integer)
             Me.mId = asId
+            Me.mReferencingTableName = asReferencingTableName
+            Me.mReferencingColumnName = asReferencingColumnName
             Me.mReferencedTableName = asReferencedTableName
             Me.mReferencedColumnName = asReferencedColumnName
+            Me.mColumnCount = aiColumnCount
         End Sub
 
         Public Sub SetAttributeValue(AttribName As String, value As Object) Implements IEntity.SetAttributeValue
@@ -60,6 +69,14 @@ Namespace Parser.Meta.Database
                 Call Me.CheckParamsForPropertyCall(AttribName, Params)
                 Return Me.Id
 
+            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_REFERENCINGTABLENAME) And LookTransformsIfNotFound Then
+                Call Me.CheckParamsForPropertyCall(AttribName, Params)
+                Return Me.ReferencingTableName
+
+            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_REFERENCINGCOLUMNNAME) And LookTransformsIfNotFound Then
+                Call Me.CheckParamsForPropertyCall(AttribName, Params)
+                Return Me.ReferencingColumnName
+
             ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_REFERENCEDTABLENAME) And LookTransformsIfNotFound Then
                 Call Me.CheckParamsForPropertyCall(AttribName, Params)
                 Return Me.ReferencedTableName
@@ -67,6 +84,10 @@ Namespace Parser.Meta.Database
             ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_REFERENCEDCOLUMNNAME) And LookTransformsIfNotFound Then
                 Call Me.CheckParamsForPropertyCall(AttribName, Params)
                 Return Me.ReferencedColumnName
+
+            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_COLUMNCOUNT) And LookTransformsIfNotFound Then
+                Call Me.CheckParamsForPropertyCall(AttribName, Params)
+                Return Me.ColumnCount
 
                 'ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_ISIDENTITY) Then
                 '    'return isidentity
@@ -201,8 +222,11 @@ Namespace Parser.Meta.Database
 
         Public Function GetEntities(Entity As Syntax.SyntaxNode.ExecForEntities) As List(Of IEntity) Implements IEntity.GetEntities
 
+            Me.mReferencingTableName = Me.mReferencingTableName
+            Me.mReferencingColumnName = Me.mReferencingColumnName
             Me.mReferencedTableName = Me.mReferencedTableName
             Me.mReferencedColumnName = Me.mReferencedColumnName
+            Me.mColumnCount = mColumnCount
             Return New List(Of IEntity)
         End Function
 
@@ -212,8 +236,11 @@ Namespace Parser.Meta.Database
 
             With Me
                 rel.Id = .Id
+                rel.ReferencingTableName = .ReferencingTableName
+                rel.ReferencingColumnName = .mReferencingColumnName
                 rel.ReferencedTableName = .ReferencedTableName
                 rel.ReferencedColumnName = .mReferencedColumnName
+                rel.ColumnCount = .mColumnCount
             End With
             'col.ListCount = Me.ListCount
             'col.ListPos = Me.ListPos
@@ -236,6 +263,33 @@ Namespace Parser.Meta.Database
             End Get
             Set(ByVal value As String)
                 Me.mId = value
+            End Set
+        End Property
+
+        Public Property ColumnCount() As Integer
+            Get
+                Return Me.mColumnCount
+            End Get
+            Set(ByVal value As Integer)
+                Me.mColumnCount = value
+            End Set
+        End Property
+
+        Public Property ReferencingTableName() As String
+            Get
+                Return Me.mReferencingTableName
+            End Get
+            Set(ByVal value As String)
+                Me.mReferencingTableName = value
+            End Set
+        End Property
+
+        Public Property ReferencingColumnName() As String
+            Get
+                Return Me.mReferencingColumnName
+            End Get
+            Set(ByVal value As String)
+                Me.mReferencingColumnName = value
             End Set
         End Property
 
