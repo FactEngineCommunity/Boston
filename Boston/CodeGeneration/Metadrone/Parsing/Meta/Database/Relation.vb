@@ -201,6 +201,8 @@ Namespace Parser.Meta.Database
 
         Public Function GetEntities(Entity As Syntax.SyntaxNode.ExecForEntities) As List(Of IEntity) Implements IEntity.GetEntities
 
+            Me.mReferencedTableName = Me.mReferencedTableName
+            Me.mReferencedColumnName = Me.mReferencedColumnName
             Return New List(Of IEntity)
         End Function
 

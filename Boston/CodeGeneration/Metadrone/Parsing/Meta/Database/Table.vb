@@ -22,6 +22,8 @@ Namespace Parser.Meta.Database
 
         Friend Relations As New List(Of IEntity) 'Boston specific I think.
 
+        Private FilteredRelations As New List(Of IEntity) 'Boston specific. For stepping through Relations for the Column.
+
         Friend Columns As New List(Of IEntity)
 
         Private FilteredColumns As New List(Of IEntity)
@@ -46,15 +48,18 @@ Namespace Parser.Meta.Database
                        ByVal Owner As IEntityConnection,
                        ByVal Connection As IConnection,
                        ByVal Transforms As Syntax.SourceTransforms,
-                       ByRef SchemaRowIdx As Integer)
+                       ByRef SchemaRowIdx As Integer
+                       ) 'SchemaRowIdx was ByRef
+
+            '20200702-VM-'SchemaRowIdx was ByRef
 
             Me.Transforms = Transforms
 
             'Set table value and add first column
             Me.Value = Schema(SchemaRowIdx).Name
             Me.SchemaRowVal = Schema(SchemaRowIdx)
-            Me.AddCol(Schema(SchemaRowIdx), Connection)
-            SchemaRowIdx += 1
+            'Me.AddCol(Schema(SchemaRowIdx), Connection)
+            'SchemaRowIdx += 1
 
             Me.Owner = Owner
             Me.ConnStr = Owner.GetConnectionString
@@ -63,12 +68,35 @@ Namespace Parser.Meta.Database
             While SchemaRowIdx < Schema.Count
                 If Schema(SchemaRowIdx).Name.Equals(Me.Value.ToString) Then
                     Me.AddCol(Schema(SchemaRowIdx), Connection)
+
+                    'Add Relations            
+                    'Dim larRelation As List(Of RDS.Relation)
+                    'larRelation = Schema(SchemaRowIdx).Relation.Select(Function(x) x.Relation)
+                    For Each lrRelation In Schema(SchemaRowIdx).Relation 'larRelation
+                        Dim lsReferencedTableName As String = ""
+
+                        Dim lsDestinationColumnName As String = ""
+                        If lrRelation.DestinationColumns.Count = 1 Then
+                            lsDestinationColumnName = lrRelation.DestinationColumns(0).Name
+                        Else
+                            Dim liInd As Integer = SchemaRowIdx
+                            Dim lrOriginColumn As RDS.Column = lrRelation.OriginColumns.Find(Function(x) x.Id = Schema(liInd).ColumnId)
+                            Dim lrDestinationColumn As RDS.Column = lrRelation.DestinationColumns.Find(Function(x) x.ActiveRole.Id = lrOriginColumn.ActiveRole.Id)
+                            lsDestinationColumnName = lrDestinationColumn.Name
+                        End If
+
+                        Me.Relations.Add(New Relation(lrRelation.Id,
+                                                      lrRelation.DestinationTable.Name,
+                                                      lsDestinationColumnName))
+                    Next
+
                 Else
                     'Passed table
                     Exit While
                 End If
 
                 SchemaRowIdx += 1
+
             End While
 
             'Set listcount
@@ -112,6 +140,19 @@ Namespace Parser.Meta.Database
             Me.Columns.Add(Column)
         End Sub
 
+        ''' <summary>
+        ''' Boston specific. Not originally part of Metadrone.
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property Relation() As List(Of RDS.Relation)
+            Get
+                Return Me.SchemaRowVal.Relation
+            End Get
+            Set(ByVal value As List(Of RDS.Relation))
+                Me.SchemaRowVal.Relation = value
+            End Set
+        End Property
+
         Public Property Value() As Object
             Get
                 Return Me.mValue
@@ -151,6 +192,10 @@ Namespace Parser.Meta.Database
             If AttribName.Length = 0 Or StrEq(AttribName, VARIABLE_ATTRIBUTE_VALUE) Then
                 'set value
                 Me.Value = value
+
+            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_RELATION) Then
+                'set Relation
+                Me.Relation = CType(value, List(Of RDS.Relation))
 
             ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_LISTCOUNT) Then
                 'set listcount
@@ -202,6 +247,11 @@ Namespace Parser.Meta.Database
                 'return value
                 Call Me.CheckParamsForPropertyCall(VARIABLE_ATTRIBUTE_VALUE, Params)
                 Return Me.ReplaceAllList.ApplyReplaces(Me.Value)
+
+            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_RELATION) Then 'Boston specific. Not part of original Metadrone.
+                'return relation
+                Call Me.CheckParamsForPropertyCall(AttribName, Params)
+                Return Me.Relation
 
             ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_LISTCOUNT) Then
                 'return listcount
@@ -336,6 +386,7 @@ Namespace Parser.Meta.Database
                     UseIdx.Add(i)
                 End If
             Next
+
             'Remove any from ignore list
             For i As Integer = 0 To Me.IgnoreList.Count - 1
                 Dim removed As Boolean = True
@@ -364,6 +415,17 @@ Namespace Parser.Meta.Database
             Me.FilteredIDColumns = New List(Of IEntity)
             Me.FilteredPKColumns = New List(Of IEntity)
             Me.FilteredFKColumns = New List(Of IEntity)
+            Me.FilteredRelations = New List(Of IEntity)
+
+            Dim liInd As Integer = 0
+
+            For Each lrRelation In Me.Relations
+
+                With CType(Me.Relations(liInd), Relation)
+                    Me.FilteredRelations.Add(.GetCopy)
+                End With
+                liInd += 1
+            Next
 
             For i As Integer = 0 To UseIdx.Count - 1
                 With CType(Me.Columns(UseIdx(i)), Column)
@@ -402,6 +464,9 @@ Namespace Parser.Meta.Database
             Select Case Entity
                 Case Syntax.SyntaxNode.ExecForEntities.OBJECT_COLUMN
                     Return Me.FilteredColumns
+
+                Case Syntax.SyntaxNode.ExecForEntities.OBJECT_RELATION 'Boston specific. Not part of original Metadrone.
+                    Return Me.FilteredRelations
 
                 Case Syntax.SyntaxNode.ExecForEntities.OBJECT_IDCOLUMN
                     Return Me.FilteredIDColumns

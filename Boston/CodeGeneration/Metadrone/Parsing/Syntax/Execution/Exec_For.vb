@@ -42,7 +42,7 @@ Namespace Parser.Syntax
                     'Table/view loop
                     Return Me.Process_TableOrView()
 
-                Case SyntaxNode.ExecForEntities.OBJECT_RELATION, SyntaxNode.ExecForEntities.OBJECT_RELATION
+                Case SyntaxNode.ExecForEntities.OBJECT_RELATION, SyntaxNode.ExecForEntities.OBJECT_RELATION 'Boston specific. Not part of original Metadrone.
                     'Relation loop
                     Return Me.Process_Relation()
 
