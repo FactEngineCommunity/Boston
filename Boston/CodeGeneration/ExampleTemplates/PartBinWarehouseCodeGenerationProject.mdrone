@@ -19,31 +19,376 @@
   <Sources>
     <Source>
       <Name>Source</Name>
-      <Provider>BostonModel</Provider>
+      <Provider>SQLServer</Provider>
       <BostonModelId>20c218b6-5994-41b9-b812-ac11d52866b1</BostonModelId>
-      <ConnectionString>None Required</ConnectionString>
-      <SchemaQuery>Boston Model direct query. No need for a Schema Query here at all</SchemaQuery>
-      <TableSchemaQuery>Boston Model direct query. No need for a Schema Query here at all</TableSchemaQuery>
-      <ColumnSchemaQuery>Boston Model direct query. No need for a Schema Query here at all.</ColumnSchemaQuery>
-      <TableNamePlaceHolder>Boston Model direct query. No need for a Schema Query here.</TableNamePlaceHolder>
-      <RoutineSchemaQuery>Boston Model direct query. No need for a Schema Query here.</RoutineSchemaQuery>
-      <Transformations>if column.value = "Date"
-    set column.value = "[Date]"
-else
-    set column.value = column.value
-end if
+      <ConnectionString>Data Source=;Initial Catalog=;Integrated Security=True;</ConnectionString>
+      <SchemaQuery>SELECT DISTINCT 
+    INFORMATION_SCHEMA.TABLES.TABLE_NAME                AS TABLE_NAME,
+    INFORMATION_SCHEMA.TABLES.TABLE_TYPE                AS TABLE_TYPE,
+    INFORMATION_SCHEMA.COLUMNS.COLUMN_NAME              AS COLUMN_NAME, 
+    INFORMATION_SCHEMA.COLUMNS.DATA_TYPE                AS DATA_TYPE, 
+    INFORMATION_SCHEMA.COLUMNS.ORDINAL_POSITION         AS ORDINAL_POSITION, 
+    INFORMATION_SCHEMA.COLUMNS.CHARACTER_MAXIMUM_LENGTH AS CHARACTER_MAXIMUM_LENGTH, 
+    INFORMATION_SCHEMA.COLUMNS.NUMERIC_PRECISION        AS NUMERIC_PRECISION, 
+    INFORMATION_SCHEMA.COLUMNS.NUMERIC_SCALE            AS NUMERIC_SCALE, 
+    INFORMATION_SCHEMA.COLUMNS.IS_NULLABLE              AS IS_NULLABLE, 
+    ISNULL(ColumnProperty(Object_ID(QuoteName(KEY_COLUMN_USAGE.TABLE_SCHEMA) + '.' + QuoteName(KEY_COLUMN_USAGE.TABLE_NAME)), 
+                                              KEY_COLUMN_USAGE.COLUMN_NAME, 'IsIdentity'), 0) 
+                                                        AS IS_IDENTITY, 
+    (SELECT TOP 1 INFORMATION_SCHEMA.TABLE_CONSTRAINTS.CONSTRAINT_TYPE 
+     FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS 
+     INNER JOIN INFORMATION_SCHEMA.CONSTRAINT_COLUMN_USAGE ON INFORMATION_SCHEMA.CONSTRAINT_COLUMN_USAGE.TABLE_NAME = INFORMATION_SCHEMA.TABLE_CONSTRAINTS.TABLE_NAME 
+     AND INFORMATION_SCHEMA.CONSTRAINT_COLUMN_USAGE.CONSTRAINT_NAME = INFORMATION_SCHEMA.TABLE_CONSTRAINTS.CONSTRAINT_NAME 
+     WHERE INFORMATION_SCHEMA.TABLE_CONSTRAINTS.TABLE_NAME = INFORMATION_SCHEMA.COLUMNS.TABLE_NAME 
+     AND INFORMATION_SCHEMA.CONSTRAINT_COLUMN_USAGE.COLUMN_NAME = INFORMATION_SCHEMA.COLUMNS.COLUMN_NAME) 
+                                                        AS CONSTRAINT_TYPE 
+FROM 
+    INFORMATION_SCHEMA.TABLES 
+LEFT JOIN 
+    INFORMATION_SCHEMA.COLUMNS ON INFORMATION_SCHEMA.COLUMNS.TABLE_NAME = INFORMATION_SCHEMA.TABLES.TABLE_NAME 
+LEFT JOIN 
+    INFORMATION_SCHEMA.KEY_COLUMN_USAGE ON INFORMATION_SCHEMA.KEY_COLUMN_USAGE.TABLE_NAME = INFORMATION_SCHEMA.COLUMNS.TABLE_NAME 
+    AND 
+    INFORMATION_SCHEMA.KEY_COLUMN_USAGE.COLUMN_NAME = INFORMATION_SCHEMA.COLUMNS.COLUMN_NAME 
+WHERE 
+    INFORMATION_SCHEMA.TABLES.TABLE_NAME &lt;&gt; 'sysdiagrams' 
+AND 
+    INFORMATION_SCHEMA.TABLES.TABLE_NAME &lt;&gt; 'sysmessages' 
+AND 
+    INFORMATION_SCHEMA.TABLES.TABLE_NAME &lt;&gt; 'sysobjects' 
+ORDER BY 
+    INFORMATION_SCHEMA.TABLES.TABLE_NAME, 
+    INFORMATION_SCHEMA.COLUMNS.ORDINAL_POSITION
+</SchemaQuery>
+      <TableSchemaQuery />
+      <ColumnSchemaQuery />
+      <TableNamePlaceHolder />
+      <RoutineSchemaQuery>SELECT
+	INFORMATION_SCHEMA.ROUTINES.ROUTINE_NAME				AS ROUTINE_NAME,
+	INFORMATION_SCHEMA.ROUTINES.ROUTINE_TYPE				AS ROUTINE_TYPE,
+	INFORMATION_SCHEMA.PARAMETERS.PARAMETER_NAME			AS PARAMETER_NAME,
+	INFORMATION_SCHEMA.PARAMETERS.PARAMETER_MODE			AS PARAMETER_MODE,
+	INFORMATION_SCHEMA.PARAMETERS.DATA_TYPE					AS DATA_TYPE,
+	INFORMATION_SCHEMA.PARAMETERS.ORDINAL_POSITION			AS ORDINAL_POSITION,
+	INFORMATION_SCHEMA.PARAMETERS.CHARACTER_MAXIMUM_LENGTH	AS CHARACTER_MAXIMUM_LENGTH,
+	INFORMATION_SCHEMA.PARAMETERS.NUMERIC_PRECISION			AS NUMERIC_PRECISION,
+	INFORMATION_SCHEMA.PARAMETERS.NUMERIC_SCALE				AS NUMERIC_SCALE
+FROM
+	INFORMATION_SCHEMA.ROUTINES 
+LEFT JOIN
+	INFORMATION_SCHEMA.PARAMETERS ON INFORMATION_SCHEMA.PARAMETERS.SPECIFIC_NAME = INFORMATION_SCHEMA.ROUTINES.SPECIFIC_NAME
+WHERE
+    ObjectProperty (Object_Id (INFORMATION_SCHEMA.ROUTINES.ROUTINE_NAME), 'IsMSShipped') = 0 AND
+    (SELECT
+		major_id 
+	 FROM
+		SYS.EXTENDED_PROPERTIES
+	 WHERE
+		major_id = object_id(INFORMATION_SCHEMA.ROUTINES.ROUTINE_NAME)
+	 AND
+		minor_id = 0
+	 AND
+		class = 1
+	AND
+		name = N'microsoft_database_tools_support'
+    ) IS NULL
+ORDER BY
+	INFORMATION_SCHEMA.ROUTINES.SPECIFIC_NAME,
+	INFORMATION_SCHEMA.PARAMETERS.ORDINAL_POSITION
+</RoutineSchemaQuery>
+      <Transformations>//Set table property values
+set table.lastpos = table.listpos = table.listcount
 
-if column.datatype = "TemporalDate"
-	set column.datatype = "DateTime"
+//Set column property values
+set column.lastpos = column.listpos = column.listcount
+set column.sqltype = column.datatype
+set column.sqltypefullspec = column.datatype
+set column.vbtype = ""
+set column.cstype = ""
+set column.vbdefval = ""
+set column.csdefval = ""
+
+if column.datatype = "bit"
+	set column.vbtype = "Boolean"
+	set column.cstype = "bool"
+	set column.vbdefval = "False"
+	set column.csdefval = "false"
 	
-elseif column.datatype = "TextFixedLength"
-	set column.datatype = "Text"			
+elseif column.datatype = "int" or column.datatype = "int identity"
+	set column.vbtype = "Integer"
+	set column.cstype = "int"
+	set column.vbdefval = 0
+	set column.csdefval = 0
+	
+elseif column.datatype = "bigint" or column.datatype = "bigint identity"
+	set column.vbtype = "Int64"
+	set column.cstype = "int"
+	set column.vbdefval = 0
+	set column.csdefval = 0
+	
+elseif column.datatype = "smallint" or column.datatype = "smallint identity"
+	set column.vbtype = "Int16"
+	set column.cstype = "int"
+	set column.vbdefval = 0
+	set column.csdefval = 0
+	
+elseif column.datatype = "tinyint"
+	set column.vbtype = "Byte"
+	set column.cstype = "byte"
+	set column.vbdefval = "Nothing"
+	set column.csdefval = "null"
+	
+elseif column.datatype = "varchar"
+	set column.vbtype = "String"
+	set column.cstype = "string"
+	set column.vbdefval = "Nothing"
+	set column.csdefval = "null"
+	if column.length = -1
+		set column.sqltypefullspec = column.datatype + "(max)"
+	else
+		set column.sqltypefullspec = column.datatype + "(" + column.length + ")"
+	end
+	
+elseif column.datatype = "nvarchar"
+	set column.vbtype = "String"
+	set column.cstype = "string"
+	set column.vbdefval = "Nothing"
+	set column.csdefval = "null"
+	if column.length = -1
+		set column.sqltypefullspec = column.datatype + "(max)"
+	else
+		set column.sqltypefullspec = column.datatype + "(" + column.length + ")"
+	end
+	
+elseif column.datatype = "text" or column.datatype = "ntext" or column.datatype = "xml" or column.datatype = "sysname"
+	set column.vbtype = "String"
+	set column.cstype = "string"
+	set column.vbdefval = "Nothing"
+	set column.csdefval = "null"
+	
+elseif column.datatype = "char" or column.datatype = "nchar"
+	set column.vbtype = "String"
+	set column.cstype = "string"
+	set column.vbdefval = "Nothing"
+	set column.csdefval = "null"
+	set column.sqltypefullspec = column.datatype + "(" + column.length + ")"
+	
+elseif column.datatype = "decimal" or column.datatype = "numeric"
+	set column.vbtype = "Decimal"
+	set column.cstype = "decimal"
+	set column.vbdefval = 0
+	set column.csdefval = 0
+	set column.sqltypefullspec = column.datatype + "(" + column.precision + "," + column.scale + ")"
+	
+elseif column.datatype = "float"
+	set column.vbtype = "Double"
+	set column.cstype = "double"
+	set column.vbdefval = 0
+	set column.csdefval = 0
+	
+elseif column.datatype = "real"
+	set column.vbtype = "Single"
+	set column.cstype = "float"
+	set column.vbdefval = 0
+	set column.csdefval = 0
+	
+elseif column.datatype = "money" or column.datatype = "smallmoney"
+	set column.vbtype = "Decimal"
+	set column.cstype = "decimal"
+	set column.vbdefval = 0
+	set column.csdefval = 0
+	
+elseif column.datatype = "datetime" or column.datatype = "smalldatetime" or column.datatype = "timestamp"
+	set column.vbtype = "DateTime"
+	set column.cstype = "DateTime"
+	set column.vbdefval = "System.DateTime.Now"
+	set column.csdefval = "System.DateTime.Now"
+	
+elseif column.datatype = "binary" or column.datatype = "image"
+	set column.vbtype = "Byte()"
+	set column.cstype = "byte[]"
+	set column.vbdefval = "Nothing"
+	set column.csdefval = "null"
+	set column.sqltypefullspec = column.datatype + "(" + column.length + ")"
+	
+elseif column.datatype = "varbinary"
+	set column.vbtype = "Byte()"
+	set column.cstype = "byte[]"
+	set column.vbdefval = "Nothing"
+	set column.csdefval = "null"
+	if column.length = -1
+		set column.sqltypefullspec = column.datatype + "(max)"
+	else
+		set column.sqltypefullspec = column.datatype + "(" + column.length + ")"
+	end
+	
+elseif column.datatype = "sql_variant"
+	set column.vbtype = "Object"
+	set column.cstype = "object"
+	set column.vbdefval = "Nothing"
+	set column.csdefval = "null"
+	
+elseif column.datatype = "uniqueidentifier"
+	set column.vbtype = "Guid"
+	set column.cstype = "Guid"
+	set column.vbdefval = "Nothing"
+	set column.csdefval = "null"
+	
+else
+	set column.vbtype = column.datatype
+	set column.cstype = column.datatype
+	set column.vbdefval = "Nothing"
+	set column.csdefval = "null"
 	
 end
 
-if param.value = "Date"
-   set param.value = "[Date]"
-end</Transformations>
+
+
+
+//Set parameter property values
+set routine.lastpos = routine.listpos = routine.listcount
+set param.lastpos = column.listpos = column.listcount
+set param.sqltype = param.datatype
+set param.sqltypefullspec = param.datatype
+set param.vbtype = ""
+set param.cstype = ""
+set param.vbdefval = ""
+set param.csdefval = ""
+
+if param.datatype = "bit"
+	set param.vbtype = "Boolean"
+	set param.cstype = "bool"
+	set param.vbdefval = "False"
+	set param.csdefval = "false"
+	
+elseif param.datatype = "int" or param.datatype = "int identity"
+	set param.vbtype = "Integer"
+	set param.cstype = "int"
+	set param.vbdefval = 0
+	set param.csdefval = 0
+	
+elseif param.datatype = "bigint" or param.datatype = "bigint identity"
+	set param.vbtype = "Int64"
+	set param.cstype = "int"
+	set param.vbdefval = 0
+	set param.csdefval = 0
+	
+elseif param.datatype = "smallint" or param.datatype = "smallint identity"
+	set param.vbtype = "Int16"
+	set param.cstype = "int"
+	set param.vbdefval = 0
+	set param.csdefval = 0
+	
+elseif param.datatype = "tinyint"
+	set param.vbtype = "Byte"
+	set param.cstype = "byte"
+	set param.vbdefval = "Nothing"
+	set param.csdefval = "null"
+	
+elseif param.datatype = "varchar"
+	set param.vbtype = "String"
+	set param.cstype = "string"
+	set param.vbdefval = "Nothing"
+	set param.csdefval = "null"
+	if param.length = -1
+		set param.sqltypefullspec = param.datatype + "(max)"
+	else
+		set param.sqltypefullspec = param.datatype + "(" + param.length + ")"
+	end
+	
+elseif param.datatype = "nvarchar"
+	set param.vbtype = "String"
+	set param.cstype = "string"
+	set param.vbdefval = "Nothing"
+	set param.csdefval = "null"
+	if param.length = -1
+		set param.sqltypefullspec = param.datatype + "(max)"
+	else
+		set param.sqltypefullspec = param.datatype + "(" + param.length + ")"
+	end
+	
+elseif param.datatype = "text" or param.datatype = "ntext" or param.datatype = "xml" or param.datatype = "sysname"
+	set param.vbtype = "String"
+	set param.cstype = "string"
+	set param.vbdefval = "Nothing"
+	set param.csdefval = "null"
+	
+elseif param.datatype = "char" or param.datatype = "nchar"
+	set param.vbtype = "String"
+	set param.cstype = "string"
+	set param.vbdefval = "Nothing"
+	set param.csdefval = "null"
+	set param.sqltypefullspec = param.datatype + "(" + param.length + ")"
+	
+elseif param.datatype = "decimal" or param.datatype = "numeric"
+	set param.vbtype = "Decimal"
+	set param.cstype = "decimal"
+	set param.vbdefval = 0
+	set param.csdefval = 0
+	set param.sqltypefullspec = param.datatype + "(" + param.precision + "," + param.scale + ")"
+	
+elseif param.datatype = "float"
+	set param.vbtype = "Double"
+	set param.cstype = "double"
+	set param.vbdefval = 0
+	set param.csdefval = 0
+	
+elseif param.datatype = "real"
+	set param.vbtype = "Single"
+	set param.cstype = "float"
+	set param.vbdefval = 0
+	set param.csdefval = 0
+	
+elseif param.datatype = "money" or param.datatype = "smallmoney"
+	set param.vbtype = "Decimal"
+	set param.cstype = "decimal"
+	set param.vbdefval = 0
+	set param.csdefval = 0
+	
+elseif param.datatype = "datetime" or param.datatype = "smalldatetime" or param.datatype = "timestamp"
+	set param.vbtype = "DateTime"
+	set param.cstype = "DateTime"
+	set param.vbdefval = "System.DateTime.Now"
+	set param.csdefval = "System.DateTime.Now"
+	
+elseif param.datatype = "binary" or param.datatype = "image"
+	set param.vbtype = "Byte()"
+	set param.cstype = "byte[]"
+	set param.vbdefval = "Nothing"
+	set param.csdefval = "null"
+	set param.sqltypefullspec = param.datatype + "(" + param.length + ")"
+	
+elseif param.datatype = "varbinary"
+	set param.vbtype = "Byte()"
+	set param.cstype = "byte[]"
+	set param.vbdefval = "Nothing"
+	set param.csdefval = "null"
+	if param.length = -1
+		set param.sqltypefullspec = param.datatype + "(max)"
+	else
+		set param.sqltypefullspec = param.datatype + "(" + param.length + ")"
+	end
+	
+elseif param.datatype = "sql_variant"
+	set param.vbtype = "Object"
+	set param.cstype = "object"
+	set param.vbdefval = "Nothing"
+	set param.csdefval = "null"
+	
+elseif param.datatype = "uniqueidentifier"
+	set param.vbtype = "Guid"
+	set param.cstype = "Guid"
+	set param.vbdefval = "Nothing"
+	set param.csdefval = "null"
+	
+else
+	set param.vbtype = param.datatype
+	set param.cstype = param.datatype
+	set param.vbdefval = "Nothing"
+	set param.csdefval = "null"
+	
+end
+</Transformations>
       <EditorGUID>2a6f72f1-7153-4fff-9b60-a106520641bb</EditorGUID>
     </Source>
   </Sources>

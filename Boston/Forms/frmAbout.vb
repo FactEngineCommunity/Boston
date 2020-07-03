@@ -18,7 +18,7 @@ Public Class frmAbout
 
         label_versioning.Text = ls_message
 
-        ls_message = "Written by Viev Pty Ltd. Copyright 2017. All rights reserved."
+        ls_message = "Written by Viev Pty Ltd and Victor Morgante. Copyright 2017-2020. All rights reserved."
 
         label_details.Text = ls_message
 
