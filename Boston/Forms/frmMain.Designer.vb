@@ -145,6 +145,7 @@ Partial Class frmMain
         Me.HelpProvider = New System.Windows.Forms.HelpProvider()
         Me.NotifyIcon = New System.Windows.Forms.NotifyIcon(Me.components)
         Me.TimerNotifications = New System.Windows.Forms.Timer(Me.components)
+        Me.CodeGeneratorToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.MenuStrip_main.SuspendLayout()
         Me.ToolStrip_main.SuspendLayout()
         Me.StatusBar_main.SuspendLayout()
@@ -307,7 +308,7 @@ Partial Class frmMain
         '
         'ToolStripMenuItemView
         '
-        Me.ToolStripMenuItemView.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MenuItem_ShowEnterpriseTreeView, Me.ToolStripSeparator8, Me.ToolStripMenuItem11, Me.ToolboxesToolStripMenuItem, Me.StatusBarToolStripMenuItem, Me.ToolStripSeparator1, Me.ToolStripMenuItemDiagramSpy})
+        Me.ToolStripMenuItemView.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MenuItem_ShowEnterpriseTreeView, Me.CodeGeneratorToolStripMenuItem, Me.ToolStripSeparator8, Me.ToolStripMenuItem11, Me.ToolboxesToolStripMenuItem, Me.StatusBarToolStripMenuItem, Me.ToolStripSeparator1, Me.ToolStripMenuItemDiagramSpy})
         Me.ToolStripMenuItemView.Name = "ToolStripMenuItemView"
         Me.ToolStripMenuItemView.Size = New System.Drawing.Size(44, 20)
         Me.ToolStripMenuItemView.Text = "&View"
@@ -315,19 +316,19 @@ Partial Class frmMain
         'MenuItem_ShowEnterpriseTreeView
         '
         Me.MenuItem_ShowEnterpriseTreeView.Name = "MenuItem_ShowEnterpriseTreeView"
-        Me.MenuItem_ShowEnterpriseTreeView.Size = New System.Drawing.Size(154, 22)
+        Me.MenuItem_ShowEnterpriseTreeView.Size = New System.Drawing.Size(180, 22)
         Me.MenuItem_ShowEnterpriseTreeView.Text = "&Model Explorer"
         '
         'ToolStripSeparator8
         '
         Me.ToolStripSeparator8.Name = "ToolStripSeparator8"
-        Me.ToolStripSeparator8.Size = New System.Drawing.Size(151, 6)
+        Me.ToolStripSeparator8.Size = New System.Drawing.Size(177, 6)
         '
         'ToolStripMenuItem11
         '
         Me.ToolStripMenuItem11.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.StandardToolStripMenuItem})
         Me.ToolStripMenuItem11.Name = "ToolStripMenuItem11"
-        Me.ToolStripMenuItem11.Size = New System.Drawing.Size(154, 22)
+        Me.ToolStripMenuItem11.Size = New System.Drawing.Size(180, 22)
         Me.ToolStripMenuItem11.Text = "Toolbars"
         '
         'StandardToolStripMenuItem
@@ -340,7 +341,7 @@ Partial Class frmMain
         '
         Me.ToolboxesToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItemToolbox, Me.ToolStripMenuItemDiagramOverview, Me.ToolStripMenuItemKLTheoremWriter, Me.TestToolStripMenuItem})
         Me.ToolboxesToolStripMenuItem.Name = "ToolboxesToolStripMenuItem"
-        Me.ToolboxesToolStripMenuItem.Size = New System.Drawing.Size(154, 22)
+        Me.ToolboxesToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
         Me.ToolboxesToolStripMenuItem.Text = "Tool&boxes"
         '
         'ToolStripMenuItemToolbox
@@ -373,18 +374,18 @@ Partial Class frmMain
         'StatusBarToolStripMenuItem
         '
         Me.StatusBarToolStripMenuItem.Name = "StatusBarToolStripMenuItem"
-        Me.StatusBarToolStripMenuItem.Size = New System.Drawing.Size(154, 22)
+        Me.StatusBarToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
         Me.StatusBarToolStripMenuItem.Text = "&Status Bar"
         '
         'ToolStripSeparator1
         '
         Me.ToolStripSeparator1.Name = "ToolStripSeparator1"
-        Me.ToolStripSeparator1.Size = New System.Drawing.Size(151, 6)
+        Me.ToolStripSeparator1.Size = New System.Drawing.Size(177, 6)
         '
         'ToolStripMenuItemDiagramSpy
         '
         Me.ToolStripMenuItemDiagramSpy.Name = "ToolStripMenuItemDiagramSpy"
-        Me.ToolStripMenuItemDiagramSpy.Size = New System.Drawing.Size(154, 22)
+        Me.ToolStripMenuItemDiagramSpy.Size = New System.Drawing.Size(180, 22)
         Me.ToolStripMenuItemDiagramSpy.Text = "&Diagram Spy"
         '
         'ToolStripMenuItemBoston
@@ -860,6 +861,13 @@ Partial Class frmMain
         '
         Me.TimerNotifications.Interval = 5000
         '
+        'CodeGeneratorToolStripMenuItem
+        '
+        Me.CodeGeneratorToolStripMenuItem.Image = Global.Boston.My.Resources.MenuImagesMain.Project16x16
+        Me.CodeGeneratorToolStripMenuItem.Name = "CodeGeneratorToolStripMenuItem"
+        Me.CodeGeneratorToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
+        Me.CodeGeneratorToolStripMenuItem.Text = "&Code Generator"
+        '
         'frmMain
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -994,4 +1002,5 @@ Partial Class frmMain
     Friend WithEvents ToolStripSeparator5 As ToolStripSeparator
     Friend WithEvents ToolStripButtonNewModel As ToolStripButton
     Friend WithEvents ToolStripButton1 As ToolStripButton
+    Friend WithEvents CodeGeneratorToolStripMenuItem As ToolStripMenuItem
 End Class

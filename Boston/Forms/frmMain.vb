@@ -3818,4 +3818,10 @@ Public Class frmMain
 
     End Sub
 
+    Private Sub CodeGeneratorToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles CodeGeneratorToolStripMenuItem.Click
+
+        Call Me.loadCodeGenerator()
+
+    End Sub
+
 End Class
