@@ -1,0 +1,202 @@
+<?xml version="1.0"?>
+<MDProject xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="www.metadrone.com.angry.army.1.0">
+  <Name>PartBinWarehouse</Name>
+  <Profile>
+    <OpenEditorGUIDs>
+      <string>2a6f72f1-7153-4fff-9b60-a106520641bb</string>
+      <string>56df1cc2-b7c0-4feb-8fdc-2b3780d39a46</string>
+      <string>b4c88052-5243-4f89-b8b7-27de2875d8c1</string>
+    </OpenEditorGUIDs>
+    <SelectedEditorGUID>56df1cc2-b7c0-4feb-8fdc-2b3780d39a46</SelectedEditorGUID>
+  </Profile>
+  <Properties>
+    <EditorGUID>8ee3448f-d73e-405a-9ba8-f19cc47ba8ab</EditorGUID>
+    <BeginTag>&lt;&lt;!</BeginTag>
+    <EndTag>!&gt;&gt;</EndTag>
+    <SuperMain>call Package</SuperMain>
+  </Properties>
+  <Folders />
+  <Sources>
+    <Source>
+      <Name>Source</Name>
+      <Provider>BostonModel</Provider>
+      <BostonModelId>aa8f9065-6c94-45d7-ae50-b4c3e1ffd332</BostonModelId>
+      <ConnectionString>None Required</ConnectionString>
+      <SchemaQuery>Boston Model direct query. No need for a Schema Query here at all</SchemaQuery>
+      <TableSchemaQuery>Boston Model direct query. No need for a Schema Query here at all</TableSchemaQuery>
+      <ColumnSchemaQuery>Boston Model direct query. No need for a Schema Query here at all.</ColumnSchemaQuery>
+      <TableNamePlaceHolder>Boston Model direct query. No need for a Schema Query here.</TableNamePlaceHolder>
+      <RoutineSchemaQuery>Boston Model direct query. No need for a Schema Query here.</RoutineSchemaQuery>
+      <Transformations>if column.value = "Date"
+    set column.value = "[Date]"
+else
+    set column.value = column.value
+end if
+
+if column.datatype = "Boolean"
+	set column.datatype = "BIT"
+	
+elseif column.datatype = "LogicalTrueFalse"
+	set column.datatype = "BIT"
+	
+elseif column.datatype = "LogicalYesNo"
+	set column.datatype = "BIT"
+	
+elseif column.datatype = "NumericAutoCounter"
+	set column.datatype = "AUTOINCREMENT"
+
+elseif column.datatype = "NumericDecimal"
+	set column.datatype = "NUMBER"
+	
+elseif column.datatype = "NumericFloatCustomPrecision"
+	set column.datatype = "NUMBER"
+	
+elseif column.datatype = "NumericFloatDoublePrecision"
+	set column.datatype = "NUMBER"
+	
+elseif column.datatype = "NumericFloatSinglePrecision"
+	set column.datatype = "NUMBER"
+	
+elseif column.datatype = "NumericMoney"
+	set column.datatype = "NUMBER"
+	
+elseif column.datatype = "NumericSignedBigInteger"
+	set column.datatype = "NUMBER"
+	
+elseif column.datatype = "NumericSignedInteger"
+	set column.datatype = "NUMBER"
+	
+elseif column.datatype = "NumericSignedSmallInteger"
+	set column.datatype = "NUMBER"
+	
+elseif column.datatype = "NumericUnsignedBigInteger"
+	set column.datatype = "NUMBER"
+	
+elseif column.datatype = "NumericUnsignedInteger"
+	set column.datatype = "NUMBER"
+	
+elseif column.datatype = "NumericUnsignedSmallInteger"
+	set column.datatype = "NUMBER"
+	
+elseif column.datatype = "NumericUnsignedTinyInteger"
+	set column.datatype = "NUMBER"
+	
+elseif column.datatype = "OtherObjectID"
+	set column.datatype = "NUMBER"
+	
+elseif column.datatype = "OtherRowID"
+	set column.datatype = "NUMBER"
+	
+elseif column.datatype = "RawDataFixedLength"
+	set column.datatype = "IMAGE"
+	
+elseif column.datatype = "RawDataLargeLength"
+	set column.datatype = "IMAGE"
+	
+elseif column.datatype = "RawDataOLEObject"
+	set column.datatype = "IMAGE"
+	
+elseif column.datatype = "RawDataPicture"
+	set column.datatype = "IMAGE"
+	
+elseif column.datatype = "RawDataVariableLength"
+	set column.datatype = "IMAGE"
+	
+elseif column.datatype = "TemporalAutoTimestamp"
+	set column.datatype = "DATETIME"
+	
+elseif column.datatype = "TemporalDate"
+	set column.datatype = "DATETIME"
+	
+elseif column.datatype = "TemporalDateTime"
+	set column.datatype = "DATETIME"
+	
+elseif column.datatype = "TemporalTime"
+	set column.datatype = "DATETIME"
+	
+elseif column.datatype = "TextFixedLength"
+	set column.datatype = "TEXT"
+	
+elseif column.datatype = "TextLargeLength"
+	set column.datatype = "TEXT"
+	
+elseif column.datatype = "TextVariableLength"
+	set column.datatype = "TEXT"
+	
+end if</Transformations>
+      <EditorGUID>2a6f72f1-7153-4fff-9b60-a106520641bb</EditorGUID>
+    </Source>
+  </Sources>
+  <Packages>
+    <MDPackage>
+      <TagVal>
+        <GUID>94517ac7-98b3-4b25-8200-6ff6ffd9e60e</GUID>
+      </TagVal>
+      <Name>Package</Name>
+      <Main>
+        <EditorGUID>b4c88052-5243-4f89-b8b7-27de2875d8c1</EditorGUID>
+        <OwnerGUID>94517ac7-98b3-4b25-8200-6ff6ffd9e60e</OwnerGUID>
+        <Text>//**** Preprocessors ******
+#ignorecase on  // case sensitivity of string comparisons
+#safebegin = "" // begin of safe zone
+#safeend = ""   // end of safe zone
+
+//**** Define globals ******
+set MainConn = sources.Source
+set BasePath = ""
+
+call Template
+
+// Perform any file operations
+//makedir("create\directory")
+//filecopy("source file","dest file")
+
+// or any command line operations
+//command("file name","arguments")
+//command("rename ","source.file dest.file")
+</Text>
+      </Main>
+      <Folders />
+      <Templates>
+        <Template>
+          <Name>Template</Name>
+          <EditorGUID>56df1cc2-b7c0-4feb-8fdc-2b3780d39a46</EditorGUID>
+          <OwnerGUID>94517ac7-98b3-4b25-8200-6ff6ffd9e60e</OwnerGUID>
+          <Text>&lt;&lt;!header; is Template()
+    // for table tbl in MainConn
+    // return BasePath + "Tables\" + tbl + ".txt"
+    return BasePath + "destination.txt"
+end!&gt;&gt;
+
+&lt;&lt;!for table tbl in MainConn!&gt;&gt;
+&lt;&lt;!"CREATE TABLE [" + tbl + "] ("!&gt;&gt;
+  &lt;&lt;!set liInd = 1!&gt;&gt;
+  &lt;&lt;!for column col in tbl!&gt;&gt;&lt;&lt;!col.value + " "!&gt;&gt;&lt;&lt;!if col.datatype = "AUTOINCREMENT" and col.isforeignkey!&gt;&gt;&lt;&lt;!"NUMBER"!&gt;&gt;&lt;&lt;!else!&gt;&gt;&lt;&lt;!col.datatype!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!if col.length &gt; 0!&gt;&gt;&lt;&lt;!"(" + col.length + ")"!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!if liInd &lt; tbl.columncount or tbl.idcolumncount &gt; 0!&gt;&gt;&lt;&lt;!","!&gt;&gt;
+  
+  &lt;&lt;!end!&gt;&gt;
+         &lt;&lt;!set liInd = liInd + 1!&gt;&gt;
+  &lt;&lt;!end!&gt;&gt;&lt;&lt;!if tbl.idcolumncount &gt; 0!&gt;&gt;&lt;&lt;!set indexString = ""!&gt;&gt;&lt;&lt;!set liInd = 1!&gt;&gt;
+&lt;&lt;!for idcolumn index in tbl!&gt;&gt;&lt;&lt;!if index.isprimarykey!&gt;&gt;&lt;&lt;!set indexString = indexString &amp; "[" + index + "]"!&gt;&gt;&lt;&lt;!if liInd &lt; tbl.pkcolumncount!&gt;&gt;&lt;&lt;!set indexString = indexString + ","!&gt;&gt;&lt;&lt;!end!&gt;&gt;
+&lt;&lt;!set liInd = liInd + 1!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!if indexString &lt;&gt; ""!&gt;&gt;&lt;&lt;!"CONSTRAINT [PrimaryKey] PRIMARY KEY (" + indexString + ")"!&gt;&gt;&lt;&lt;!end!&gt;&gt;
+&lt;&lt;!end!&gt;&gt;
+&lt;&lt;!");"!&gt;&gt;
+&lt;&lt;!set reftab = ""!&gt;&gt;
+&lt;&lt;!set reftab2 = ""!&gt;&gt;
+&lt;&lt;!set refIndex = ""!&gt;&gt;
+  &lt;&lt;!for relation rel in tbl!&gt;&gt;&lt;&lt;!set reftab = rel.referencedtablename!&gt;&gt;&lt;&lt;!set string = ""!&gt;&gt;&lt;&lt;!set referencingString = ""!&gt;&gt;&lt;&lt;!set liIndA = 1!&gt;&gt;&lt;&lt;!if reftab2 &lt;&gt; reftab!&gt;&gt;
+&lt;&lt;!"ALTER TABLE [" + tbl + "]"!&gt;&gt;    
+      &lt;&lt;!  "ADD CONSTRAINT [" + tbl.value + rel.referencedtablename + "_FK]"!&gt;&gt;
+      &lt;&lt;!"    FOREIGN KEY ("!&gt;&gt;&lt;&lt;!for table tbl2 in MainConn!&gt;&gt;&lt;&lt;!if tbl2.value = rel.referencedtablename and refIndex = ""!&gt;&gt;&lt;&lt;!set liIndA = 1!&gt;&gt;&lt;&lt;!for idcolumn index2 in tbl2!&gt;&gt;&lt;&lt;!if index2.isprimarykey!&gt;&gt;&lt;&lt;!set string = string + index2.value!&gt;&gt;&lt;&lt;!for relation rel3 in tbl!&gt;&gt;&lt;&lt;!if rel3.referencedcolumnname = index2.value!&gt;&gt;&lt;&lt;!set referencingString = referencingString + rel3.referencingcolumnname!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!if liIndA &lt; rel.columncount!&gt;&gt;&lt;&lt;!set string = string + ","!&gt;&gt;&lt;&lt;!set referencingString = referencingString + ","!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!set liIndA = liIndA + 1!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!set refIndex = "Covered"!&gt;&gt;&lt;&lt;!set reftab2 = reftab!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!set refIndex = ""!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!referencingString + ") REFERENCES "!&gt;&gt;&lt;&lt;!"[" + rel.referencedtablename + "] (" + string + ");"!&gt;&gt;                  
+    &lt;&lt;!end!&gt;&gt;  
+    &lt;&lt;!set reftab2 = reftab!&gt;&gt;             
+  &lt;&lt;!end!&gt;&gt;
+&lt;&lt;!end!&gt;&gt;
+</Text>
+        </Template>
+      </Templates>
+      <VBCode />
+      <CSCode />
+    </MDPackage>
+  </Packages>
+  <Bin />
+</MDProject>

@@ -468,7 +468,7 @@ Namespace SourcePlugins.Boston
             Me.TabPage2.Location = New System.Drawing.Point(4, 4)
             Me.TabPage2.Margin = New System.Windows.Forms.Padding(0)
             Me.TabPage2.Name = "TabPage2"
-            Me.TabPage2.Size = New System.Drawing.Size(1158, 858)
+            Me.TabPage2.Size = New System.Drawing.Size(769, 553)
             Me.TabPage2.TabIndex = 1
             Me.TabPage2.Text = "Tables/Columns"
             Me.TabPage2.UseVisualStyleBackColor = True
@@ -478,9 +478,8 @@ Namespace SourcePlugins.Boston
             Me.Panel1.Controls.Add(Me.GroupBox_Main)
             Me.Panel1.Dock = System.Windows.Forms.DockStyle.Fill
             Me.Panel1.Location = New System.Drawing.Point(0, 0)
-            Me.Panel1.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
             Me.Panel1.Name = "Panel1"
-            Me.Panel1.Size = New System.Drawing.Size(1158, 858)
+            Me.Panel1.Size = New System.Drawing.Size(769, 553)
             Me.Panel1.TabIndex = 0
             '
             'GroupBox_Main
@@ -494,10 +493,8 @@ Namespace SourcePlugins.Boston
             Me.GroupBox_Main.Dock = System.Windows.Forms.DockStyle.Fill
             Me.GroupBox_Main.ForeColor = System.Drawing.Color.Black
             Me.GroupBox_Main.Location = New System.Drawing.Point(0, 0)
-            Me.GroupBox_Main.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
             Me.GroupBox_Main.Name = "GroupBox_Main"
-            Me.GroupBox_Main.Padding = New System.Windows.Forms.Padding(4, 5, 4, 5)
-            Me.GroupBox_Main.Size = New System.Drawing.Size(1158, 858)
+            Me.GroupBox_Main.Size = New System.Drawing.Size(769, 553)
             Me.GroupBox_Main.TabIndex = 1
             Me.GroupBox_Main.TabStop = False
             Me.GroupBox_Main.Text = "Model Dictionary:"
@@ -505,10 +502,9 @@ Namespace SourcePlugins.Boston
             'CheckBoxShowModelDictionary
             '
             Me.CheckBoxShowModelDictionary.AutoSize = True
-            Me.CheckBoxShowModelDictionary.Location = New System.Drawing.Point(274, 40)
-            Me.CheckBoxShowModelDictionary.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+            Me.CheckBoxShowModelDictionary.Location = New System.Drawing.Point(183, 26)
             Me.CheckBoxShowModelDictionary.Name = "CheckBoxShowModelDictionary"
-            Me.CheckBoxShowModelDictionary.Size = New System.Drawing.Size(196, 24)
+            Me.CheckBoxShowModelDictionary.Size = New System.Drawing.Size(135, 17)
             Me.CheckBoxShowModelDictionary.TabIndex = 5
             Me.CheckBoxShowModelDictionary.Text = "Show Model Dictionary"
             Me.CheckBoxShowModelDictionary.UseVisualStyleBackColor = True
@@ -517,10 +513,9 @@ Namespace SourcePlugins.Boston
             'CheckBoxShowCoreModelElements
             '
             Me.CheckBoxShowCoreModelElements.AutoSize = True
-            Me.CheckBoxShowCoreModelElements.Location = New System.Drawing.Point(274, 14)
-            Me.CheckBoxShowCoreModelElements.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+            Me.CheckBoxShowCoreModelElements.Location = New System.Drawing.Point(183, 9)
             Me.CheckBoxShowCoreModelElements.Name = "CheckBoxShowCoreModelElements"
-            Me.CheckBoxShowCoreModelElements.Size = New System.Drawing.Size(231, 24)
+            Me.CheckBoxShowCoreModelElements.Size = New System.Drawing.Size(156, 17)
             Me.CheckBoxShowCoreModelElements.TabIndex = 4
             Me.CheckBoxShowCoreModelElements.Text = "Show Core Model Elements"
             Me.CheckBoxShowCoreModelElements.UseVisualStyleBackColor = True
@@ -529,20 +524,18 @@ Namespace SourcePlugins.Boston
             'LabelModelName
             '
             Me.LabelModelName.AutoSize = True
-            Me.LabelModelName.Location = New System.Drawing.Point(80, 38)
-            Me.LabelModelName.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
+            Me.LabelModelName.Location = New System.Drawing.Point(53, 25)
             Me.LabelModelName.Name = "LabelModelName"
-            Me.LabelModelName.Size = New System.Drawing.Size(151, 20)
+            Me.LabelModelName.Size = New System.Drawing.Size(102, 13)
             Me.LabelModelName.TabIndex = 3
             Me.LabelModelName.Text = "<LabelModelName>"
             '
             'LabelPrompt
             '
             Me.LabelPrompt.AutoSize = True
-            Me.LabelPrompt.Location = New System.Drawing.Point(26, 38)
-            Me.LabelPrompt.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
+            Me.LabelPrompt.Location = New System.Drawing.Point(17, 25)
             Me.LabelPrompt.Name = "LabelPrompt"
-            Me.LabelPrompt.Size = New System.Drawing.Size(56, 20)
+            Me.LabelPrompt.Size = New System.Drawing.Size(39, 13)
             Me.LabelPrompt.TabIndex = 2
             Me.LabelPrompt.Text = "Model:"
             '
@@ -553,11 +546,10 @@ Namespace SourcePlugins.Boston
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
             Me.TreeView1.ImageIndex = 0
             Me.TreeView1.ImageList = Me.ImageList
-            Me.TreeView1.Location = New System.Drawing.Point(4, 75)
-            Me.TreeView1.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+            Me.TreeView1.Location = New System.Drawing.Point(3, 49)
             Me.TreeView1.Name = "TreeView1"
             Me.TreeView1.SelectedImageIndex = 0
-            Me.TreeView1.Size = New System.Drawing.Size(1142, 771)
+            Me.TreeView1.Size = New System.Drawing.Size(760, 498)
             Me.TreeView1.TabIndex = 1
             '
             'ImageList
@@ -598,30 +590,28 @@ Namespace SourcePlugins.Boston
             Me.TabPage1.Controls.Add(Me.LabelPromptWorkingModel)
             Me.TabPage1.ImageIndex = 0
             Me.TabPage1.Location = New System.Drawing.Point(4, 4)
-            Me.TabPage1.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
             Me.TabPage1.Name = "TabPage1"
-            Me.TabPage1.Padding = New System.Windows.Forms.Padding(4, 5, 4, 5)
-            Me.TabPage1.Size = New System.Drawing.Size(1158, 858)
+            Me.TabPage1.Padding = New System.Windows.Forms.Padding(3, 3, 3, 3)
+            Me.TabPage1.Size = New System.Drawing.Size(769, 553)
             Me.TabPage1.TabIndex = 0
             Me.TabPage1.Text = "Connection"
             Me.TabPage1.UseVisualStyleBackColor = True
             '
             'ComboBoxModel
             '
+            Me.ComboBoxModel.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
             Me.ComboBoxModel.FormattingEnabled = True
-            Me.ComboBoxModel.Location = New System.Drawing.Point(152, 86)
-            Me.ComboBoxModel.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+            Me.ComboBoxModel.Location = New System.Drawing.Point(101, 56)
             Me.ComboBoxModel.Name = "ComboBoxModel"
-            Me.ComboBoxModel.Size = New System.Drawing.Size(720, 28)
+            Me.ComboBoxModel.Size = New System.Drawing.Size(481, 21)
             Me.ComboBoxModel.TabIndex = 6
             '
             'Label1
             '
             Me.Label1.AutoSize = True
-            Me.Label1.Location = New System.Drawing.Point(26, 139)
-            Me.Label1.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
+            Me.Label1.Location = New System.Drawing.Point(17, 90)
             Me.Label1.Name = "Label1"
-            Me.Label1.Size = New System.Drawing.Size(57, 20)
+            Me.Label1.Size = New System.Drawing.Size(39, 13)
             Me.Label1.TabIndex = 5
             Me.Label1.Text = "Label1"
             '
@@ -629,10 +619,9 @@ Namespace SourcePlugins.Boston
             '
             Me.Panel2.BackColor = System.Drawing.Color.Silver
             Me.Panel2.Dock = System.Windows.Forms.DockStyle.Top
-            Me.Panel2.Location = New System.Drawing.Point(4, 51)
-            Me.Panel2.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+            Me.Panel2.Location = New System.Drawing.Point(3, 33)
             Me.Panel2.Name = "Panel2"
-            Me.Panel2.Size = New System.Drawing.Size(1150, 2)
+            Me.Panel2.Size = New System.Drawing.Size(763, 1)
             Me.Panel2.TabIndex = 0
             '
             'lblTitle
@@ -641,21 +630,19 @@ Namespace SourcePlugins.Boston
             Me.lblTitle.Dock = System.Windows.Forms.DockStyle.Top
             Me.lblTitle.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
             Me.lblTitle.ForeColor = System.Drawing.Color.DimGray
-            Me.lblTitle.Location = New System.Drawing.Point(4, 5)
-            Me.lblTitle.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
+            Me.lblTitle.Location = New System.Drawing.Point(3, 3)
             Me.lblTitle.Name = "lblTitle"
-            Me.lblTitle.Padding = New System.Windows.Forms.Padding(9, 9, 0, 0)
-            Me.lblTitle.Size = New System.Drawing.Size(1150, 46)
+            Me.lblTitle.Padding = New System.Windows.Forms.Padding(6, 6, 0, 0)
+            Me.lblTitle.Size = New System.Drawing.Size(763, 30)
             Me.lblTitle.TabIndex = 0
             Me.lblTitle.Text = "Boston Model - Direct Access"
             '
             'LabelPromptWorkingModel
             '
             Me.LabelPromptWorkingModel.AutoSize = True
-            Me.LabelPromptWorkingModel.Location = New System.Drawing.Point(26, 89)
-            Me.LabelPromptWorkingModel.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
+            Me.LabelPromptWorkingModel.Location = New System.Drawing.Point(17, 58)
             Me.LabelPromptWorkingModel.Name = "LabelPromptWorkingModel"
-            Me.LabelPromptWorkingModel.Size = New System.Drawing.Size(118, 20)
+            Me.LabelPromptWorkingModel.Size = New System.Drawing.Size(82, 13)
             Me.LabelPromptWorkingModel.TabIndex = 0
             Me.LabelPromptWorkingModel.Text = "Working Model:"
             '
@@ -667,19 +654,17 @@ Namespace SourcePlugins.Boston
             Me.tcMain.Controls.Add(Me.TabPage3)
             Me.tcMain.Dock = System.Windows.Forms.DockStyle.Fill
             Me.tcMain.Location = New System.Drawing.Point(0, 0)
-            Me.tcMain.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
             Me.tcMain.Name = "tcMain"
             Me.tcMain.SelectedIndex = 0
-            Me.tcMain.Size = New System.Drawing.Size(1166, 891)
+            Me.tcMain.Size = New System.Drawing.Size(777, 579)
             Me.tcMain.TabIndex = 2
             '
             'TabPage3
             '
             Me.TabPage3.Controls.Add(Me.txtTransformations)
             Me.TabPage3.Location = New System.Drawing.Point(4, 4)
-            Me.TabPage3.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
             Me.TabPage3.Name = "TabPage3"
-            Me.TabPage3.Size = New System.Drawing.Size(1158, 858)
+            Me.TabPage3.Size = New System.Drawing.Size(769, 553)
             Me.TabPage3.TabIndex = 2
             Me.TabPage3.Text = "Transformations"
             Me.TabPage3.UseVisualStyleBackColor = True
@@ -690,23 +675,22 @@ Namespace SourcePlugins.Boston
             Me.txtTransformations.Dock = System.Windows.Forms.DockStyle.Fill
             Me.txtTransformations.ForeColor = System.Drawing.SystemColors.WindowText
             Me.txtTransformations.Location = New System.Drawing.Point(0, 0)
-            Me.txtTransformations.Margin = New System.Windows.Forms.Padding(6, 8, 6, 8)
+            Me.txtTransformations.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
             Me.txtTransformations.Name = "txtTransformations"
             Me.txtTransformations.ReadOnly = False
             Me.txtTransformations.SelectedText = ""
             Me.txtTransformations.SelectionLength = 0
             Me.txtTransformations.SelectionStart = 0
-            Me.txtTransformations.Size = New System.Drawing.Size(1158, 858)
+            Me.txtTransformations.Size = New System.Drawing.Size(769, 553)
             Me.txtTransformations.TabIndex = 2
             '
             'Manage
             '
-            Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
+            Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
             Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
             Me.Controls.Add(Me.tcMain)
-            Me.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
             Me.Name = "Manage"
-            Me.Size = New System.Drawing.Size(1166, 891)
+            Me.Size = New System.Drawing.Size(777, 579)
             Me.TabPage2.ResumeLayout(False)
             Me.Panel1.ResumeLayout(False)
             Me.GroupBox_Main.ResumeLayout(False)

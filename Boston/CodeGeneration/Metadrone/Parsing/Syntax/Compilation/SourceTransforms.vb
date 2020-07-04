@@ -354,51 +354,53 @@ Namespace Parser.Syntax
                     End If
 
                 ElseIf node.IfBranch.ElseIfNodeIndexes.Count > 0 Then
+
+
                     'Asses elseif conditions
                     For i As Integer = 0 To node.IfBranch.ElseIfNodeIndexes.Count - 1
-                        toks = Me.PrepareExpression(source, sourceOwner, node.Nodes(node.IfBranch.ElseIfNodeIndexes(i)).Tokens, _
-                                                    1, node.Nodes(node.IfBranch.ElseIfNodeIndexes(i)).Tokens.Count - 1, _
-                                                    node.Nodes(node.IfBranch.ElseIfNodeIndexes(i)).LineNumber)
+                            toks = Me.PrepareExpression(source, sourceOwner, node.Nodes(node.IfBranch.ElseIfNodeIndexes(i)).Tokens,
+                                                        1, node.Nodes(node.IfBranch.ElseIfNodeIndexes(i)).Tokens.Count - 1,
+                                                        node.Nodes(node.IfBranch.ElseIfNodeIndexes(i)).LineNumber)
 
-                        If CBool(Exec_Expr.EvalExpression(toks, 0, toks.Count - 1, Nothing, 0)) Then
-                            'Determine which nodes to process
-                            lower = node.IfBranch.ElseIfNodeIndexes(i)
-                            upper = node.Nodes.Count - 1
+                            If CBool(Exec_Expr.EvalExpression(toks, 0, toks.Count - 1, Nothing, 0)) Then
+                                'Determine which nodes to process
+                                lower = node.IfBranch.ElseIfNodeIndexes(i)
+                                upper = node.Nodes.Count - 1
 
-                            If i < node.IfBranch.ElseIfNodeIndexes.Count - 1 Then
-                                'Up to the next elseif
-                                upper = node.IfBranch.ElseIfNodeIndexes.Item(i + 1)
+                                If i < node.IfBranch.ElseIfNodeIndexes.Count - 1 Then
+                                    'Up to the next elseif
+                                    upper = node.IfBranch.ElseIfNodeIndexes.Item(i + 1)
 
-                            ElseIf node.IfBranch.ElseNodeIndex > -1 Then
-                                'Up to the else
-                                upper = node.IfBranch.ElseNodeIndex
+                                ElseIf node.IfBranch.ElseNodeIndex > -1 Then
+                                    'Up to the else
+                                    upper = node.IfBranch.ElseNodeIndex
 
-                            Else 'Up to the end
-                                'Bug found: Will not process the last elseif when "-1" is left in below. Bug in original Metadrone code.
-                                upper = node.Nodes.Count '- 1
+                                Else 'Up to the end
+                                    'Bug found: Will not process the last elseif when "-1" is left in below. Bug in original Metadrone code.
+                                    upper = node.Nodes.Count '- 1
+
+                                End If
+                                'process block
+                                lower += 1 : upper -= 1
+                                For j As Integer = lower To upper
+                                    Call Me.Process(source, sourceOwner, node.Nodes(j))
+                                Next
+
+                                Exit Sub
 
                             End If
-                            'process block
-                            lower += 1 : upper -= 1
-                            For j As Integer = lower To upper
-                                Call Me.Process(source, sourceOwner, node.Nodes(j))
-                            Next
+                        Next
 
-                            Exit Sub
-
+                        'None of the elseif conditions were met, go to else
+                        If node.IfBranch.ElseNodeIndex > -1 Then
+                            'Nodes to process are from else to end
+                            lower = node.IfBranch.ElseNodeIndex + 1
+                            upper = node.Nodes.Count - 1
                         End If
-                    Next
 
-                    'None of the elseif conditions were met, go to else
-                    If node.IfBranch.ElseNodeIndex > -1 Then
-                        'Nodes to process are from else to end
+                    ElseIf node.IfBranch.ElseNodeIndex > -1 Then
+                        'Do else
                         lower = node.IfBranch.ElseNodeIndex + 1
-                        upper = node.Nodes.Count - 1
-                    End If
-
-                ElseIf node.IfBranch.ElseNodeIndex > -1 Then
-                    'Do else
-                    lower = node.IfBranch.ElseNodeIndex + 1
                     upper = node.Nodes.Count - 1
 
                 End If
@@ -409,7 +411,11 @@ Namespace Parser.Syntax
                 Next
 
             Else
-                Throw New Exception("Syntax error at line " & node.LineNumber & " of transformations '" & Me.GetName & "'.")
+                Throw New Exception("Syntax error at line " _
+                                    & node.LineNumber & " of transformations '" & Me.GetName & "'." _
+                                    & " Source Owner:" & sourceOwner.GetAttributeValue("value", Nothing, False, False) _
+                                    & " Source:" & source.GetAttributeValue("value", Nothing, False, False)
+                                    )
 
             End If
         End Sub

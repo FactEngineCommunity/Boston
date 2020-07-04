@@ -148,7 +148,8 @@ Namespace SourcePlugins.Boston
                     sr.IsIdentity = lrColumn.ContributesToPrimaryKey
                     sr.IsTable = True
                     SR.IsView = False
-                    SR.IsPrimaryKey = lrColumn.ContributesToPrimaryKey
+                    sr.IsPrimaryKey = lrColumn.ContributesToPrimaryKey
+
                     sr.IsForeignKey = lrColumn.isForeignKey
 
                     'Boston specific fields
