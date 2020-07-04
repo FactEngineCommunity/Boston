@@ -194,6 +194,8 @@ Public Class frmToolboxEnterpriseExplorer
 
                     Call Me.AddModelToModelExplorer(lrModel, True)
                     liModelCount += 1
+
+                    prApplication.Models.AddUnique(lrModel)
                 End If
             Next
 
@@ -340,7 +342,13 @@ Public Class frmToolboxEnterpriseExplorer
             prApplication.ORMQL = New ORMQL.Processor
 
             prPageNodes.Clear()
-            prApplication.Models.Clear()
+            Dim lasExcludedModels = {"Core", "English"}
+            For Each lrModel In prApplication.Models.ToArray
+                If Not lasExcludedModels.Contains(lrModel.ModelId) Then
+                    prApplication.Models.Remove(lrModel)
+                End If
+            Next
+
             prApplication.ActivePages.Clear()
 
             Call frmMain.ShowHideMenuOptions()
@@ -529,7 +537,7 @@ Public Class frmToolboxEnterpriseExplorer
             If abToolTipNewPage Then
 
                 'Me.zrToolTip.IsBalloon = True
-                Dim lsMessage As String = "New Page added to the Model."
+                Dim lsMessage As String = "New Page added To the Model."
                 Me.zrToolTip.IsBalloon = True
                 Me.zrToolTip.ToolTipIcon = ToolTipIcon.None
                 Me.zrToolTip.Show(lsMessage, Me, loNode.Bounds.X, loNode.Bounds.Y + loNode.Bounds.Height, 4000)
@@ -1592,7 +1600,7 @@ Public Class frmToolboxEnterpriseExplorer
                                                        prApplication.WorkingModel, _
                                                        prApplication.WorkingModel.ModelId)
 
-            prApplication.Models.AddUnique(lrModel)
+            Call prApplication.addModel(lrModel)
 
             lrModel.TreeNode = loNode
 

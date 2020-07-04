@@ -1903,7 +1903,7 @@ Public Class frmMain
                 '---------------------------------------
                 'Enterprise TreeView is already loaded
                 '---------------------------------------                
-                zfrmModelExplorer = Nothing
+                Me.zfrmModelExplorer = Nothing
             End If
         End If
 
@@ -3820,7 +3820,13 @@ Public Class frmMain
 
     Private Sub CodeGeneratorToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles CodeGeneratorToolStripMenuItem.Click
 
-        Call Me.loadCodeGenerator()
+        If Me.zfrmModelExplorer Is Nothing Then
+            Call Me.LoadEnterpriseTreeViewer()
+            Call Me.loadCodeGenerator()
+        Else
+            Call Me.loadCodeGenerator()
+        End If
+
 
     End Sub
 

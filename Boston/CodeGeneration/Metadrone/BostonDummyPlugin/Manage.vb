@@ -15,6 +15,8 @@ Namespace SourcePlugins.Boston
         Inherits UserControl
         Implements PluginInterface.Sources.IManageSource
 
+        Private WithEvents ApplicationLink As tRichmondApplication = prApplication
+
         'Public Event ValueChanged As PluginInterface.Sources.IManageSource.ValueChangedEventHandler
         Public Delegate Sub ValueChangedEventHandler(ByVal value As Object)
         'Public Event Save As PluginInterface.Sources.IManageSource.SaveEventHandler
@@ -69,7 +71,8 @@ Namespace SourcePlugins.Boston
                 Dim loComboBoxItem As New tComboboxItem("0", "<No Model Selected>", Nothing)
                 Dim loWorkingComboboxItem As tComboboxItem = Nothing
                 Me.ComboBoxModel.Items.Add(loComboBoxItem)
-                For Each lrModel In prApplication.Models
+                Dim lasExcludedModelIds = {"Core", "English"}
+                For Each lrModel In prApplication.Models.FindAll(Function(x) Not lasExcludedModelIds.Contains(x.ModelId))
                     loComboBoxItem = New tComboboxItem(lrModel.ModelId, lrModel.Name, lrModel)
                     Me.ComboBoxModel.Items.Add(loComboBoxItem)
                     If Me.BostonModel IsNot Nothing Then
@@ -700,6 +703,13 @@ Namespace SourcePlugins.Boston
             Me.tcMain.ResumeLayout(False)
             Me.TabPage3.ResumeLayout(False)
             Me.ResumeLayout(False)
+
+        End Sub
+
+        Private Sub ApplicationLink_ModelAdded(ByRef arModel As Model) Handles ApplicationLink.ModelAdded
+
+            Dim loComboBoxItem = New tComboboxItem(arModel.ModelId, arModel.Name, arModel)
+            Me.ComboBoxModel.Items.Add(loComboBoxItem)
 
         End Sub
 

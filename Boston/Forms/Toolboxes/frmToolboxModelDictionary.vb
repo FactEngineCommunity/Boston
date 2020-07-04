@@ -61,7 +61,6 @@ Public Class frmToolboxModelDictionary
     Public Sub LoadToolboxModelDictionary(ByVal ailanguage As pcenumLanguage, Optional ByVal abForceReload As Boolean = False)
 
         Try
-
             If IsSomething(Me.zrLoadedModel) And Not abForceReload Then
                 If (Me.zrLoadedModel Is Me.zrORMModel) And (prApplication.WorkingPage.Language = Me.ziLoadedLanguage) Then
                     Exit Sub

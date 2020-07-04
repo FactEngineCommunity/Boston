@@ -60,6 +60,8 @@ Public Class tRichmondApplication
     Public UndoLog As New List(Of tUserAction)
     Public RedoLog As New List(Of tUserAction)
 
+    Public Event ModelAdded(ByRef arModel As FBM.Model)
+
     Public Sub New()
 
         Try
@@ -85,6 +87,14 @@ Public Class tRichmondApplication
             lsMessage &= vbCrLf & vbCrLf & ex.Message
             MsgBox(lsMessage)
         End Try
+
+    End Sub
+
+    Public Sub addModel(ByRef arModel As FBM.Model)
+
+        Me.Models.AddUnique(arModel)
+
+        RaiseEvent ModelAdded(arModel)
 
     End Sub
 
