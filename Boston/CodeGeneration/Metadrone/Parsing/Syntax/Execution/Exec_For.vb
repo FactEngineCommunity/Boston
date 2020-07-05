@@ -42,6 +42,10 @@ Namespace Parser.Syntax
                     'Table/view loop
                     Return Me.Process_TableOrView()
 
+                Case SyntaxNode.ExecForEntities.OBJECT_RELATIONS, SyntaxNode.ExecForEntities.OBJECT_RELATIONS 'Boston specific. Not part of original Metadrone.
+                    'Relation loop
+                    Return Me.Process_Relation()
+
                 Case SyntaxNode.ExecForEntities.OBJECT_RELATION, SyntaxNode.ExecForEntities.OBJECT_RELATION 'Boston specific. Not part of original Metadrone.
                     'Relation loop
                     Return Me.Process_Relation()
@@ -202,6 +206,7 @@ Namespace Parser.Syntax
             Dim ExitIndex As Integer = -1
             Dim CurrentLoopIdx As Integer = 0
             Dim CurrentBlockIdx As Integer = 0
+
             Do
                 'Repeat if had to exit
 

@@ -76,7 +76,7 @@ Namespace Parser.Meta.Database
             While idx < Schema.Count
                 'Build table/view
                 Dim currIdx As Integer = idx
-                Dim Table As New Table(Schema, Me, Me.Connection, Me.Transforms, idx)
+                Dim Table As New Table(Schema, Me, Me.Connection, Me.Transforms, idx, Me)
 
                 'Add to table collection, if not in ignore list
                 Dim Ignore As Boolean = False
@@ -96,12 +96,24 @@ Namespace Parser.Meta.Database
                 If idx = currIdx Then idx += 1
             End While
 
+            Me.FilteredTables = Me.Tables
+
             '20200702-VM-Added the following to sort the Tables by the number of foreign keys.
             'Init the Table
             For Each tbl In Me.Tables
                 Call tbl.InitEntities()
             Next
             Me.Tables.Sort(Function(x, y) x.GetAttributeValue("fkcolumncount", Nothing, False, False) < y.GetAttributeValue("fkcolumncount", Nothing, False, False))
+
+            For liInd = 0 To Me.Tables.Count - 1
+                CType(Me.Tables(liInd), Table).ListPos = liInd
+            Next
+
+            '20200705-VM-Below is not working.
+            Call Me.sortTablesByRelations()
+
+
+            Me.FilteredTables = Me.Tables
 
             'Set listcount
             For Each tbl In Me.Tables
@@ -323,6 +335,52 @@ Namespace Parser.Meta.Database
 
         Public Sub RunScriptFile(ByVal ScriptFile As String) Implements IEntityConnection.RunScriptFile
             Call Me.Connection.RunScriptFile(ScriptFile)
+        End Sub
+
+        ''' <summary>
+        ''' Puts the tables in an order that they can be output to a SQL table creation file in an order such that the Foreign Key constraint creation commands do not fail.
+        ''' E.g. If a table is not created before a Foreign Key reference is made to that Table, then the SQL script will fail.
+        ''' </summary>
+        Public Sub sortTablesByRelations()
+
+            Dim larTable() As IEntity = Me.Tables.ToArray
+            Dim lrTable As Parser.Meta.Database.Table
+            Dim liInd, liInd2 As Integer
+
+            Try
+                For liInd = 0 To larTable.Count - 1
+
+                    lrTable = CType(Me.Tables(liInd), Table)
+
+                    liInd2 = liInd
+                    Dim lbTripped As Boolean = False
+                    While lrTable.hasHigherReferencedTable
+
+                        Dim lrTempTable As Table = CType(Me.Tables(liInd2), Table) 'Create a temporary Table
+
+                        'Swap the Table with the next Table in the list of tables in Me.Tables
+                        Me.Tables(liInd2) = Me.Tables(liInd2 + 1)
+                        CType(Me.Tables(liInd2), Table).ListPos = liInd2
+
+                        Me.Tables(liInd2 + 1) = lrTempTable
+                        CType(Me.Tables(liInd2 + 1), Table).ListPos = liInd2 + 1
+
+                        liInd2 += 1
+                        lbTripped = True
+                    End While
+                    If lbTripped Then
+                        If liInd = 0 Then
+                            liInd = 0
+                        Else
+                            liInd -= 1
+                        End If
+                    End If
+                Next
+
+            Catch ex As Exception
+
+            End Try
+
         End Sub
 
     End Class

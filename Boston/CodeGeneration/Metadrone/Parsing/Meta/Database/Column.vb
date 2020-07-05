@@ -204,6 +204,12 @@ Namespace Parser.Meta.Database
                 'set nullable
                 Me.Nullable = Conv.ToBoolean(value)
 
+            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_RELATIONS) Then
+                'set Relation
+                For Each lrIEntityRelation In value
+                    Me.Relations.Add(CType(lrIEntityRelation, Relation))
+                Next
+
             ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_RELATION) Then
                 'set Relation
                 Me.Relation = CType(value, List(Of RDS.Relation))
@@ -275,39 +281,44 @@ Namespace Parser.Meta.Database
             If Params Is Nothing Then Params = New List(Of Object)
 
             If StrEq(AttribName, VARIABLE_ATTRIBUTE_DATATYPE) And LookTransformsIfNotFound Then
-                    Call Me.CheckParamsForPropertyCall(AttribName, Params)
-                    Try
-                        Return Me.Transforms.GetAttributeValue(Me, Me.Owner, AttribName)
-                    Catch ex As Exception
-                        Return Me.DataType
-                    End Try
-
-                ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_DATATYPE) Then
-                    'return provider datatype
-                    Call Me.CheckParamsForPropertyCall(AttribName, Params)
+                Call Me.CheckParamsForPropertyCall(AttribName, Params)
+                Try
+                    Return Me.Transforms.GetAttributeValue(Me, Me.Owner, AttribName)
+                Catch ex As Exception
                     Return Me.DataType
+                End Try
 
-                ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_ISIDENTITY) Then
-                    'return isidentity
-                    Call Me.CheckParamsForPropertyCall(AttribName, Params)
-                    Return Me.IsIdentity
+            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_DATATYPE) Then
+                'return provider datatype
+                Call Me.CheckParamsForPropertyCall(AttribName, Params)
+                Return Me.DataType
 
-                ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_ISPRIMARYKEY) Then
-                    'return isprimarykey
-                    Call Me.CheckParamsForPropertyCall(AttribName, Params)
-                    Return Me.IsPrimaryKey
+            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_ISIDENTITY) Then
+                'return isidentity
+                Call Me.CheckParamsForPropertyCall(AttribName, Params)
+                Return Me.IsIdentity
 
-                ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_ISFOREIGNKEY) Then
-                    'return isforeignkey
-                    Call Me.CheckParamsForPropertyCall(AttribName, Params)
-                    Return Me.IsForeignKey
+            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_ISPRIMARYKEY) Then
+                'return isprimarykey
+                Call Me.CheckParamsForPropertyCall(AttribName, Params)
+                Return Me.IsPrimaryKey
 
-                ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_NULLABLE) Then
-                    'return nullable
-                    Call Me.CheckParamsForPropertyCall(AttribName, Params)
-                    Return Me.Nullable
+            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_ISFOREIGNKEY) Then
+                'return isforeignkey
+                Call Me.CheckParamsForPropertyCall(AttribName, Params)
+                Return Me.IsForeignKey
 
-                ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_RELATION) Then 'Boston specific. Not part of original Metadrone.
+            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_NULLABLE) Then
+                'return nullable
+                Call Me.CheckParamsForPropertyCall(AttribName, Params)
+                Return Me.Nullable
+
+            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_RELATIONS) Then 'Boston specific. Not part of original Metadrone.
+                'return relation
+                Call Me.CheckParamsForPropertyCall(AttribName, Params)
+                Return Me.Relations
+
+            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_RELATION) Then 'Boston specific. Not part of original Metadrone.
                     'return relation
                     Call Me.CheckParamsForPropertyCall(AttribName, Params)
                     Return Me.Relation

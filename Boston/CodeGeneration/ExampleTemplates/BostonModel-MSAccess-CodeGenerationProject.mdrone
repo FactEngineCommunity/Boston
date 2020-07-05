@@ -169,6 +169,10 @@ call Template
 end!&gt;&gt;
 
 &lt;&lt;!for table tbl in MainConn!&gt;&gt;
+  &lt;&lt;!tbl!&gt;&gt;
+&lt;&lt;!end!&gt;&gt;
+
+&lt;&lt;!for table tbl in MainConn!&gt;&gt;
 &lt;&lt;!"CREATE TABLE [" + tbl + "] ("!&gt;&gt;
   &lt;&lt;!set liInd = 1!&gt;&gt;
   &lt;&lt;!for column col in tbl!&gt;&gt;&lt;&lt;!col.value + " "!&gt;&gt;&lt;&lt;!if col.datatype = "AUTOINCREMENT" and col.isforeignkey!&gt;&gt;&lt;&lt;!"NUMBER"!&gt;&gt;&lt;&lt;!else!&gt;&gt;&lt;&lt;!col.datatype!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!if col.length &gt; 0!&gt;&gt;&lt;&lt;!"(" + col.length + ")"!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!if liInd &lt; tbl.columncount or tbl.idcolumncount &gt; 0!&gt;&gt;&lt;&lt;!","!&gt;&gt;
@@ -186,7 +190,7 @@ end!&gt;&gt;
   &lt;&lt;!for relation rel in tbl!&gt;&gt;&lt;&lt;!set reftab = rel.referencedtablename!&gt;&gt;&lt;&lt;!set string = ""!&gt;&gt;&lt;&lt;!set referencingString = ""!&gt;&gt;&lt;&lt;!set liIndA = 1!&gt;&gt;&lt;&lt;!if reftab2 &lt;&gt; reftab!&gt;&gt;
 &lt;&lt;!"ALTER TABLE [" + tbl + "]"!&gt;&gt;    
       &lt;&lt;!  "ADD CONSTRAINT [" + tbl.value + rel.referencedtablename + "_FK]"!&gt;&gt;
-      &lt;&lt;!"    FOREIGN KEY ("!&gt;&gt;&lt;&lt;!for table tbl2 in MainConn!&gt;&gt;&lt;&lt;!if tbl2.value = rel.referencedtablename and refIndex = ""!&gt;&gt;&lt;&lt;!set liIndA = 1!&gt;&gt;&lt;&lt;!for idcolumn index2 in tbl2!&gt;&gt;&lt;&lt;!if index2.isprimarykey!&gt;&gt;&lt;&lt;!set string = string + index2.value!&gt;&gt;&lt;&lt;!for relation rel3 in tbl!&gt;&gt;&lt;&lt;!if rel3.referencedcolumnname = index2.value!&gt;&gt;&lt;&lt;!set referencingString = referencingString + rel3.referencingcolumnname!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!if liIndA &lt; rel.columncount!&gt;&gt;&lt;&lt;!set string = string + ","!&gt;&gt;&lt;&lt;!set referencingString = referencingString + ","!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!set liIndA = liIndA + 1!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!set refIndex = "Covered"!&gt;&gt;&lt;&lt;!set reftab2 = reftab!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!set refIndex = ""!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!referencingString + ") REFERENCES "!&gt;&gt;&lt;&lt;!"[" + rel.referencedtablename + "] (" + string + ");"!&gt;&gt;                  
+      &lt;&lt;!"    FOREIGN KEY ("!&gt;&gt;&lt;&lt;!for table tbl2 in MainConn!&gt;&gt;&lt;&lt;!if tbl2.value = rel.referencedtablename and refIndex = ""!&gt;&gt;&lt;&lt;!set liIndA = 1!&gt;&gt;&lt;&lt;!for idcolumn index2 in tbl2!&gt;&gt;&lt;&lt;!if index2.isprimarykey!&gt;&gt;&lt;&lt;!set string = string + index2.value!&gt;&gt;&lt;&lt;!for relations rel3 in tbl!&gt;&gt;&lt;&lt;!if rel3.referencedcolumnname = index2.value!&gt;&gt;&lt;&lt;!set referencingString = referencingString + rel3.referencingcolumnname!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!if liIndA &lt; rel.columncount!&gt;&gt;&lt;&lt;!set string = string + ","!&gt;&gt;&lt;&lt;!set referencingString = referencingString + ","!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!set liIndA = liIndA + 1!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!set refIndex = "Covered"!&gt;&gt;&lt;&lt;!set reftab2 = reftab!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!set refIndex = ""!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!referencingString + ") REFERENCES "!&gt;&gt;&lt;&lt;!"[" + rel.referencedtablename + "] (" + string + ");"!&gt;&gt;                  
     &lt;&lt;!end!&gt;&gt;  
     &lt;&lt;!set reftab2 = reftab!&gt;&gt;             
   &lt;&lt;!end!&gt;&gt;

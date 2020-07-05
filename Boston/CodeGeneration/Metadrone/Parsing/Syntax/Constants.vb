@@ -21,6 +21,7 @@ Namespace Parser.Syntax
         Public Const VARIABLE_ATTRIBUTE_ISPRIMARYKEY As String = "isprimarykey"
         Public Const VARIABLE_ATTRIBUTE_ISFOREIGNKEY As String = "isforeignkey"
         Public Const VARIABLE_ATTRIBUTE_NULLABLE As String = "nullable"
+        Public Const VARIABLE_ATTRIBUTE_RELATIONS As String = "relations" 'Boston specific. Not part of original Metadrone.
         Public Const VARIABLE_ATTRIBUTE_RELATION As String = "relation" 'Boston specific. Not part of original Metadrone.
         Public Const VARIABLE_ATTRIBUTE_ALLOWZEROLENGTH As String = "allowzerolength" 'Boston specific. Not part of original Metadrone.
         Public Const VARIABLE_ATTRIBUTE_LENGTH As String = "length"
@@ -105,7 +106,8 @@ Namespace Parser.Syntax
 
         Public Const OBJECT_TABLE As String = "table"
         Public Const OBJECT_VIEW As String = "view"
-        Public Const OBJECT_RELATION As String = "relation" 'Boston specific. Not part of original Metadrone. Used to get RDS.Relations
+        Public Const OBJECT_RELATIONS As String = "relations" 'Boston specific. Not part of original Metadrone. Used to get all Colum Relations for a Table
+        Public Const OBJECT_RELATION As String = "relation" 'Boston specific. Not part of original Metadrone. Used to get individual RDS.Relations for a Table
         Public Const OBJECT_COLUMN As String = "column"
         Public Const OBJECT_PKCOLUMN As String = "pkcolumn"
         Public Const OBJECT_FKCOLUMN As String = "fkcolumn"

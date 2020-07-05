@@ -123,53 +123,70 @@ Namespace SourcePlugins.Boston
 
         Public Function GetSchema() As List(Of SchemaRow) Implements IConnection.GetSchema
 
-            Dim larSchema As New List(Of SchemaRow)
+            Dim larSchemaRow As New List(Of SchemaRow)
+            Dim sr As SchemaRow
 
-            If Me.BostonModel Is Nothing Then Return larSchema
+            If Me.BostonModel Is Nothing Then Return larSchemaRow
 
             If Not Me.BostonModel.Loaded Then
                 Call Me.BostonModel.Load()
             End If
 
-            Dim sr As SchemaRow
+            Try
+                'NB Tables sorted in Schema.vb in the LoadSchema method
+                For Each lrTable In Me.BostonModel.RDS.Table
+                    For Each lrColumn In lrTable.Column
+                        sr = New SchemaRow()
+                        sr.Name = lrTable.Name
+                        sr.Type = "TABLE"
+                        sr.Column_Name = lrColumn.Name
+                        sr.Data_Type = lrColumn.getMetamodelDataType.ToString
+                        sr.Ordinal_Position = lrColumn.OrdinalPosition
+                        sr.Length = lrColumn.getMetamodelDataTypeLength
+                        sr.Precision = lrColumn.getMetamodelDataTypePrecision
+                        sr.Scale = 0
+                        sr.Nullable = Not lrColumn.IsMandatory
+                        sr.IsIdentity = lrColumn.ContributesToPrimaryKey
+                        sr.IsTable = True
+                        sr.IsView = False
+                        sr.IsPrimaryKey = lrColumn.ContributesToPrimaryKey
 
-            For Each lrTable In Me.BostonModel.RDS.Table
-                For Each lrColumn In lrTable.Column
-                    sr = New SchemaRow()
-                    sr.Name = lrTable.Name
-                    SR.Type = "TABLE"
-                    SR.Column_Name = lrColumn.Name
-                    SR.Data_Type = lrColumn.getMetamodelDataType.ToString
-                    SR.Ordinal_Position = lrColumn.OrdinalPosition
-                    SR.Length = lrColumn.getMetamodelDataTypeLength
-                    SR.Precision = lrColumn.getMetamodelDataTypePrecision
-                    SR.Scale = 0
-                    SR.Nullable = Not lrColumn.IsMandatory
-                    sr.IsIdentity = lrColumn.ContributesToPrimaryKey
-                    sr.IsTable = True
-                    SR.IsView = False
-                    sr.IsPrimaryKey = lrColumn.ContributesToPrimaryKey
+                        sr.IsForeignKey = lrColumn.isForeignKey
 
-                    sr.IsForeignKey = lrColumn.isForeignKey
+                        'Boston specific fields
+                        sr.ColumnId = lrColumn.Id
+                        For Each lrRelation In lrColumn.Relation
+                            sr.Relation.AddUnique(lrRelation)
+                        Next
 
-                    'Boston specific fields
-                    sr.ColumnId = lrColumn.Id
-                    sr.Relation = lrColumn.Relation
-                    For Each lrRelation In sr.Relation.ToArray
-                        If lrRelation.DestinationTable.Name = lrTable.Name Then
-                            sr.Relation.Remove(lrRelation)
-                        End If
+                        'Remove Relations that point to the Table.Column being loaded. Only want Relations that are referenced 'from' the Table.Column
+                        For Each lrRelation In sr.Relation.ToArray
+                            If lrRelation.DestinationTable.Name = lrTable.Name Then
+                                sr.Relation.Remove(lrRelation)
+                            End If
+                        Next
+
+                        'sr.AllowZeroLength 'Not yet implemented in lrColumn in Boston. Need to add AllowZeroLength to ValueType, which then becomes a RDS.Column
+                        larSchemaRow.Add(sr)
                     Next
-                    'sr.AllowZeroLength 'Not yet implemented in lrColumn in Boston. Need to add AllowZeroLength to ValueType, which then becomes a RDS.Column
-                    larSchema.Add(SR)
                 Next
-            Next
 
-            Return larSchema
+
+            Catch ex As Exception
+                Return larSchemaRow
+            End Try
+
+            Return larSchemaRow
 
         End Function
 
+        ''' <summary>
+        ''' NB Tables sorted in Schema.vb in the LoadSchema method
+        ''' </summary>
+        ''' <returns></returns>
         Public Function GetTables() As List(Of String) Implements IConnection.GetTables
+
+            'NB Tables sorted in Schema.vb in the LoadSchema method
 
             Dim lasTableName As New List(Of String)
 

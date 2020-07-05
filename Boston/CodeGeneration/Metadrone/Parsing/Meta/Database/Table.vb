@@ -10,6 +10,7 @@ Namespace Parser.Meta.Database
     Friend Class Table
         Implements IEntity
 
+        Public Schema As Parser.Meta.Database.Schema
         Private mValue As Object = Nothing
         Private SchemaRowVal As SchemaRow = Nothing
         Private Owner As IEntityConnection = Nothing
@@ -44,20 +45,24 @@ Namespace Parser.Meta.Database
 
         End Sub
 
-        Public Sub New(ByVal Schema As List(Of SchemaRow),
+        Public Sub New(ByVal aarSchemaRow As List(Of SchemaRow),
                        ByVal Owner As IEntityConnection,
                        ByVal Connection As IConnection,
                        ByVal Transforms As Syntax.SourceTransforms,
-                       ByRef SchemaRowIdx As Integer
+                       ByRef SchemaRowIdx As Integer,
+                       ByRef arSchema As Parser.Meta.Database.Schema
                        ) 'SchemaRowIdx was ByRef
 
             '20200702-VM-'SchemaRowIdx was ByRef
 
+            Me.Schema = arSchema
             Me.Transforms = Transforms
 
             'Set table value and add first column
-            Me.Value = Schema(SchemaRowIdx).Name
-            Me.SchemaRowVal = Schema(SchemaRowIdx)
+            Me.Value = aarSchemaRow(SchemaRowIdx).Name
+            Me.SchemaRowVal = aarSchemaRow(SchemaRowIdx)
+
+            '20200705-VM-Remove if all seems okay. Moved to below, so that the Relations are loaded.
             'Me.AddCol(Schema(SchemaRowIdx), Connection)
             'SchemaRowIdx += 1
 
@@ -65,14 +70,14 @@ Namespace Parser.Meta.Database
             Me.ConnStr = Owner.GetConnectionString
 
             'Add columns
-            While SchemaRowIdx < Schema.Count
-                If Schema(SchemaRowIdx).Name.Equals(Me.Value.ToString) Then
-                    Me.AddCol(Schema(SchemaRowIdx), Connection)
+            While SchemaRowIdx < aarSchemaRow.Count
+                If aarSchemaRow(SchemaRowIdx).Name.Equals(Me.Value.ToString) Then
+                    Me.AddCol(aarSchemaRow(SchemaRowIdx), Connection)
 
                     'Add Relations            
                     'Dim larRelation As List(Of RDS.Relation)
                     'larRelation = Schema(SchemaRowIdx).Relation.Select(Function(x) x.Relation)
-                    For Each lrRelation In Schema(SchemaRowIdx).Relation 'larRelation
+                    For Each lrRelation In aarSchemaRow(SchemaRowIdx).Relation 'larRelation
                         Dim lsReferencedTableName As String = ""
 
                         Dim lsDestinationColumnName As String = ""
@@ -84,10 +89,14 @@ Namespace Parser.Meta.Database
                             lsOriginColumnName = lrRelation.OriginColumns(0).Name
                             lsDestinationColumnName = lrRelation.DestinationColumns(0).Name
                         Else
-                            Dim lrOriginColumn As RDS.Column = lrRelation.OriginColumns.Find(Function(x) x.Id = Schema(liInd).ColumnId)
+                            Dim lrOriginColumn As RDS.Column = lrRelation.OriginColumns.Find(Function(x) x.Id = aarSchemaRow(liInd).ColumnId)
                             lsOriginColumnName = lrOriginColumn.Name
                             Dim lrDestinationColumn As RDS.Column = lrRelation.DestinationColumns.Find(Function(x) x.ActiveRole.Id = lrOriginColumn.ActiveRole.Id)
                             lsDestinationColumnName = lrDestinationColumn.Name
+                        End If
+
+                        If Me.Relation.Find(Function(x) x.Id = lrRelation.Id) Is Nothing Then
+                            Me.Relation.AddUnique(lrRelation)
                         End If
 
                         Me.Relations.Add(New Relation(lrRelation.Id,
@@ -201,6 +210,12 @@ Namespace Parser.Meta.Database
                 'set value
                 Me.Value = value
 
+            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_RELATIONS) Then
+                'set Relations
+                For Each lrIEntityRelation In value
+                    Me.Relations.Add(CType(lrIEntityRelation, Relation))
+                Next
+
             ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_RELATION) Then
                 'set Relation
                 Me.Relation = CType(value, List(Of RDS.Relation))
@@ -247,6 +262,40 @@ Namespace Parser.Meta.Database
             End If
         End Sub
 
+        ''' <summary>
+        ''' 20200705-VM
+        ''' Used in sorting of Tables by Tables referenced by other Tables, as in when for creating output SQL in the propper Table order
+        '''   such that Foreign Key reference constraints are created in the correct order.
+        ''' NB Relies on the ListPos property of the Table being correct.
+        ''' </summary>
+        ''' <returns></returns>
+        Public Function hasHigherReferencedTable() As Boolean
+
+            Dim larEntity As New List(Of IEntity)
+            Dim liInd As Integer
+            Try
+                larEntity = Me.Schema.GetEntities(Syntax.SyntaxNode.ExecForEntities.OBJECT_TABLE)
+
+                If Me.ListPos = larEntity.Count - 1 Then Return False
+
+
+                For liInd = Me.ListPos To larEntity.Count - 2
+                    For Each lrRelation In Me.Relation
+                        Dim lrComparisonTable As Table = CType(larEntity(liInd + 1), Table)
+                        If lrRelation.DestinationTable.Name = lrComparisonTable.Value Then
+                            Return True
+                        End If
+                    Next
+                Next
+
+            Catch ex As Exception
+                Return False
+            End Try
+
+            Return False
+
+        End Function
+
         Public Function GetAttributeValue(ByVal AttribName As String, ByVal Params As List(Of Object), _
                                           ByVal LookTransformsIfNotFound As Boolean, ByRef ExitBlock As Boolean) As Object Implements IEntity.GetAttributeValue
             If Params Is Nothing Then Params = New List(Of Object)
@@ -255,6 +304,11 @@ Namespace Parser.Meta.Database
                 'return value
                 Call Me.CheckParamsForPropertyCall(VARIABLE_ATTRIBUTE_VALUE, Params)
                 Return Me.ReplaceAllList.ApplyReplaces(Me.Value)
+
+            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_RELATIONS) Then 'Boston specific. Not part of original Metadrone.
+                'return relation
+                Call Me.CheckParamsForPropertyCall(AttribName, Params)
+                Return Me.Relations
 
             ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_RELATION) Then 'Boston specific. Not part of original Metadrone.
                 'return relation
@@ -429,8 +483,13 @@ Namespace Parser.Meta.Database
 
             For Each lrRelation In Me.Relations
 
-                With CType(Me.Relations(liInd), Relation)
-                    Me.FilteredRelations.Add(.GetCopy)
+                Dim lrEntityRelation = CType(Me.Relations(liInd), Relation)
+                With lrEntityRelation
+                    Dim lsReferencedTableName = lrEntityRelation.GetAttributeValue("referencedtablename", Nothing, True, False)
+                    If Me.FilteredRelations.Find(Function(x) x.GetAttributeValue("referencedtablename", Nothing, True, False) =
+                                                     lsReferencedTableName) Is Nothing Then
+                        Me.FilteredRelations.Add(.GetCopy)
+                    End If
                 End With
                 liInd += 1
             Next
@@ -472,6 +531,10 @@ Namespace Parser.Meta.Database
             Select Case Entity
                 Case Syntax.SyntaxNode.ExecForEntities.OBJECT_COLUMN
                     Return Me.FilteredColumns
+
+                Case Syntax.SyntaxNode.ExecForEntities.OBJECT_RELATIONS 'Boston specific. Not part of original Metadrone.
+                    Return Me.Relations
+
 
                 Case Syntax.SyntaxNode.ExecForEntities.OBJECT_RELATION 'Boston specific. Not part of original Metadrone.
                     Return Me.FilteredRelations
