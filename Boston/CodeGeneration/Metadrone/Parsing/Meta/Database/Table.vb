@@ -21,9 +21,11 @@ Namespace Parser.Meta.Database
         Private UseOnlyList As New List(Of String)
         Private IgnoreList As New List(Of String)
 
+        Friend Indexes As New List(Of IEntity) 'Boston specific.
         Friend Relations As New List(Of IEntity) 'Boston specific I think.
 
-        Private FilteredRelations As New List(Of IEntity) 'Boston specific. For stepping through Relations for the Column.
+        Private FilteredRelations As New List(Of IEntity) 'Boston specific. For stepping through Relations for the Table.
+        Private FilteredIndexes As New List(Of IEntity) 'Boston specific. For stepping through Indexes for the Table. Can be List(Of Index) containing Columns
 
         Friend Columns As New List(Of IEntity)
 
@@ -75,9 +77,7 @@ Namespace Parser.Meta.Database
                     Me.AddCol(aarSchemaRow(SchemaRowIdx), Connection)
 
                     'Add Relations            
-                    'Dim larRelation As List(Of RDS.Relation)
-                    'larRelation = Schema(SchemaRowIdx).Relation.Select(Function(x) x.Relation)
-                    For Each lrRelation In aarSchemaRow(SchemaRowIdx).Relation 'larRelation
+                    For Each lrRelation In aarSchemaRow(SchemaRowIdx).Relation
                         Dim lsReferencedTableName As String = ""
 
                         Dim lsDestinationColumnName As String = ""
@@ -107,6 +107,14 @@ Namespace Parser.Meta.Database
                                                       lrRelation.OriginColumns.Count))
                     Next
 
+                    '============================
+                    'Indexes
+                    For Each lrIndex In aarSchemaRow(SchemaRowIdx).Index
+                        Dim lrEntityIndex = New Index(lrIndex.Name,
+                                                      lrIndex.Column)
+                        Me.Indexes.Add(lrEntityIndex)
+                    Next
+
                 Else
                     'Passed table
                     Exit While
@@ -123,6 +131,10 @@ Namespace Parser.Meta.Database
         End Sub
 
         Public Function GetCopy() As IEntity Implements IEntity.GetCopy
+
+            '20200705-VM-Aparently not used yet. As per the bottom of this method.
+            'This not really used (just yet)
+
             Dim Table As New Table()
             Table.Value = Me.Value
             Table.Owner = Me.Owner
@@ -158,7 +170,20 @@ Namespace Parser.Meta.Database
         End Sub
 
         ''' <summary>
-        ''' Boston specific. Not originally part of Metadrone.
+        ''' Boston specific. Not originally part of Metadrone. The set of Indexes associated with the Table.
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property Index() As List(Of RDS.Index)
+            Get
+                Return Me.SchemaRowVal.Index
+            End Get
+            Set(ByVal value As List(Of RDS.Index))
+                Me.SchemaRowVal.Index = value
+            End Set
+        End Property
+
+        ''' <summary>
+        ''' Boston specific. Not originally part of Metadrone. The set of Relations associated with the Table.
         ''' </summary>
         ''' <returns></returns>
         Public Property Relation() As List(Of RDS.Relation)
@@ -205,20 +230,26 @@ Namespace Parser.Meta.Database
         End Function
 
         Public Sub SetAttributeValue(ByVal AttribName As String, ByVal value As Object) Implements IEntity.SetAttributeValue
+
             If AttribName Is Nothing Then AttribName = ""
+
             If AttribName.Length = 0 Or StrEq(AttribName, VARIABLE_ATTRIBUTE_VALUE) Then
                 'set value
                 Me.Value = value
 
-            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_RELATIONS) Then
+            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_RELATIONS) Then 'The set of Relations stemming from the Table. Not at the Column level, but the Table level.
                 'set Relations
                 For Each lrIEntityRelation In value
                     Me.Relations.Add(CType(lrIEntityRelation, Relation))
                 Next
 
-            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_RELATION) Then
+            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_RELATION) Then 'The set of Relations stemming from the Table at the Column level.
                 'set Relation
                 Me.Relation = CType(value, List(Of RDS.Relation))
+
+            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_INDEX) Then 'The set of Indexes for the Table.
+                'set Relation
+                Me.Index = CType(value, List(Of RDS.Index))
 
             ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_LISTCOUNT) Then
                 'set listcount
@@ -260,6 +291,7 @@ Namespace Parser.Meta.Database
                 Throw New Exception("Invalid attribute: " & AttribName & ". ")
 
             End If
+
         End Sub
 
         ''' <summary>
@@ -296,10 +328,13 @@ Namespace Parser.Meta.Database
 
         End Function
 
-        Public Function GetAttributeValue(ByVal AttribName As String, ByVal Params As List(Of Object), _
+        Public Function GetAttributeValue(ByVal AttribName As String, ByVal Params As List(Of Object),
                                           ByVal LookTransformsIfNotFound As Boolean, ByRef ExitBlock As Boolean) As Object Implements IEntity.GetAttributeValue
+
             If Params Is Nothing Then Params = New List(Of Object)
+
             If AttribName Is Nothing Then AttribName = ""
+
             If AttribName.Length = 0 Or StrEq(AttribName, VARIABLE_ATTRIBUTE_VALUE) Then
                 'return value
                 Call Me.CheckParamsForPropertyCall(VARIABLE_ATTRIBUTE_VALUE, Params)
@@ -314,6 +349,11 @@ Namespace Parser.Meta.Database
                 'return relation
                 Call Me.CheckParamsForPropertyCall(AttribName, Params)
                 Return Me.Relation
+
+            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_INDEX) Then 'Boston specific. Not part of original Metadrone.
+                'return relation
+                Call Me.CheckParamsForPropertyCall(AttribName, Params)
+                Return Me.Index
 
             ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_LISTCOUNT) Then
                 'return listcount
@@ -403,6 +443,7 @@ Namespace Parser.Meta.Database
                 End If
 
             End If
+
         End Function
 
         Private Sub CheckParamsForPropertyCall(ByVal AttribName As String, ByVal Params As List(Of Object))
@@ -478,9 +519,9 @@ Namespace Parser.Meta.Database
             Me.FilteredPKColumns = New List(Of IEntity)
             Me.FilteredFKColumns = New List(Of IEntity)
             Me.FilteredRelations = New List(Of IEntity)
+            Me.FilteredIndexes = New List(Of IEntity)
 
             Dim liInd As Integer = 0
-
             For Each lrRelation In Me.Relations
 
                 Dim lrEntityRelation = CType(Me.Relations(liInd), Relation)
@@ -490,6 +531,16 @@ Namespace Parser.Meta.Database
                                                      lsReferencedTableName) Is Nothing Then
                         Me.FilteredRelations.Add(.GetCopy)
                     End If
+                End With
+                liInd += 1
+            Next
+
+            liInd = 0
+            For Each lrIndex In Me.Indexes
+
+                Dim lrEntityIndex = CType(Me.Indexes(liInd), Index)
+                With lrEntityIndex
+                    Me.FilteredIndexes.Add(.GetCopy)
                 End With
                 liInd += 1
             Next
@@ -527,17 +578,21 @@ Namespace Parser.Meta.Database
         End Sub
 
         Public Function GetEntities(ByVal Entity As Syntax.SyntaxNode.ExecForEntities) As List(Of IEntity) Implements IEntity.GetEntities
+
             'Check predicate against type of entity, and return appropriate collection
             Select Case Entity
+
                 Case Syntax.SyntaxNode.ExecForEntities.OBJECT_COLUMN
                     Return Me.FilteredColumns
 
                 Case Syntax.SyntaxNode.ExecForEntities.OBJECT_RELATIONS 'Boston specific. Not part of original Metadrone.
                     Return Me.Relations
 
-
                 Case Syntax.SyntaxNode.ExecForEntities.OBJECT_RELATION 'Boston specific. Not part of original Metadrone.
                     Return Me.FilteredRelations
+
+                Case Syntax.SyntaxNode.ExecForEntities.OBJECT_INDEX 'Boston specific. Not part of original Metadrone.
+                    Return Me.FilteredIndexes
 
                 Case Syntax.SyntaxNode.ExecForEntities.OBJECT_IDCOLUMN
                     Return Me.FilteredIDColumns

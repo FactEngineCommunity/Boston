@@ -159,6 +159,10 @@ Namespace SourcePlugins.Boston
                             sr.Relation.AddUnique(lrRelation)
                         Next
 
+                        For Each lrIndex In lrTable.Index
+                            sr.Index.AddUnique(lrIndex)
+                        Next
+
                         'Remove Relations that point to the Table.Column being loaded. Only want Relations that are referenced 'from' the Table.Column
                         For Each lrRelation In sr.Relation.ToArray
                             If lrRelation.DestinationTable.Name = lrTable.Name Then

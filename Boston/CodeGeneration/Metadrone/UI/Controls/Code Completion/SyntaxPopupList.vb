@@ -94,6 +94,7 @@ Namespace UI
                     Me.AddListItem(OBJECT_PROCEDURE, DOCO_OBJECT_PROCEDURE, Nothing, SyntaxPopupListItem.Icons.OBJECT_PROC)
                     Me.AddListItem(OBJECT_FUNCTION, DOCO_OBJECT_FUNCTION, Nothing, SyntaxPopupListItem.Icons.OBJECT_FUNC)
                     Me.AddListItem(OBJECT_FILE, DOCO_OBJECT_FILE, Nothing, SyntaxPopupListItem.Icons.OBJECT_FILE)
+                    Me.AddListItem(OBJECT_INDEX, DOCO_OBJECT_INDEX, Nothing, SyntaxPopupListItem.Icons.OBJECT_COLUMN) 'ToDo: Copy OBJECT_COLUMN icon. Boston Specific. Not part of original Meadrone. Used for RDS.Relations
                     Me.AddListItem(OBJECT_RELATION, DOCO_OBJECT_RELATION, Nothing, SyntaxPopupListItem.Icons.OBJECT_COLUMN) 'ToDo: Copy OBJECT_COLUMN icon. Boston Specific. Not part of original Meadrone. Used for RDS.Relations
                     Me.AddListItem(OBJECT_COLUMN, DOCO_OBJECT_COLUMN, Nothing, SyntaxPopupListItem.Icons.OBJECT_COLUMN)
                     Me.AddListItem(OBJECT_IDCOLUMN, DOCO_OBJECT_IDCOLUMN, Nothing, SyntaxPopupListItem.Icons.OBJECT_COLUMN)
@@ -327,6 +328,10 @@ Namespace UI
                             Me.AddListItem(VARIABLE_ATTRIBUTE_REFERENCINGCOLUMNNAME, DOCO_VARIABLE_ATTRIBUTE_REFERENCINGCOLUMNNAME, Nothing, SyntaxPopupListItem.Icons.PROPERTY)
                             Me.AddListItem(VARIABLE_ATTRIBUTE_REFERENCEDTABLENAME, DOCO_VARIABLE_ATTRIBUTE_REFERENCEDTABLENAME, Nothing, SyntaxPopupListItem.Icons.PROPERTY)
                             Me.AddListItem(VARIABLE_ATTRIBUTE_REFERENCEDCOLUMNNAME, DOCO_VARIABLE_ATTRIBUTE_REFERENCEDCOLUMNNAME, Nothing, SyntaxPopupListItem.Icons.PROPERTY)
+
+                        Case Parser.CodeCompletion.Variable.Types.Index 'Boston specific. Not part of original Metadrone.
+                            Me.AddListItem(VARIABLE_ATTRIBUTE_ID, DOCO_VARIABLE_ATTRIBUTE_ID, Nothing, SyntaxPopupListItem.Icons.PROPERTY)
+                            Me.AddListItem(VARIABLE_ATTRIBUTE_COLUMNCOUNT, DOCO_VARIABLE_ATTRIBUTE_COLUMNCOUNT, Nothing, SyntaxPopupListItem.Icons.PROPERTY)
 
                         Case Parser.CodeCompletion.Variable.Types.TemplateParameter,
                              Parser.CodeCompletion.Variable.Types.Column,

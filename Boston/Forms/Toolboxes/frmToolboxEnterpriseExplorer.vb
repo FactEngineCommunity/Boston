@@ -949,7 +949,7 @@ Public Class frmToolboxEnterpriseExplorer
                                         pdb_OLEDB_connection.Close() 'keep this here (Close/Open database). Because Access doesn't refresh quick enough from the Save Broadcast above.
                                         Richmond.OpenDatabase() 'keep this here (Close/Open database). Because Access doesn't refresh quick enough from the Save Broadcast above.
                                     End If
-                                    Call lrModel.Load(True, False, Me.BackgroundWorkerModelLoader)
+                                    Call lrModel.Load(True, True, Me.BackgroundWorkerModelLoader)
                                     Me.CircularProgressBar.Value = 0
                                     Me.CircularProgressBar.Text = "0%"
                                     Me.CircularProgressBar.Invalidate()
@@ -982,7 +982,7 @@ Public Class frmToolboxEnterpriseExplorer
                             frmMain.ToolStripButtonNew.Enabled = False
 
                             lrPage = loObject.tag
-                            If lrPage.Loaded Or lrPage.Loading Then
+                            If lrPage.Loaded Or lrPage.Loading Or lrPage.Model.PagesLoading Then
                                 '---------------------------------------------------------
                                 'The Page is already loaded or is loading so do nothing.
                                 '---------------------------------------------------------

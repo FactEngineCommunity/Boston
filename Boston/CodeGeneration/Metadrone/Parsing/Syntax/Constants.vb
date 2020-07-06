@@ -23,12 +23,14 @@ Namespace Parser.Syntax
         Public Const VARIABLE_ATTRIBUTE_NULLABLE As String = "nullable"
         Public Const VARIABLE_ATTRIBUTE_RELATIONS As String = "relations" 'Boston specific. Not part of original Metadrone.
         Public Const VARIABLE_ATTRIBUTE_RELATION As String = "relation" 'Boston specific. Not part of original Metadrone.
+        Public Const VARIABLE_ATTRIBUTE_INDEX As String = "index" 'Boston specific. Not part of original Metadrone.
         Public Const VARIABLE_ATTRIBUTE_ALLOWZEROLENGTH As String = "allowzerolength" 'Boston specific. Not part of original Metadrone.
         Public Const VARIABLE_ATTRIBUTE_LENGTH As String = "length"
         Public Const VARIABLE_ATTRIBUTE_PRECISION As String = "precision"
         Public Const VARIABLE_ATTRIBUTE_SCALE As String = "scale"
         Public Const VARIABLE_ATTRIBUTE_LISTCOUNT As String = "listcount"
         Public Const VARIABLE_ATTRIBUTE_LISTPOS As String = "listpos"
+        Public Const VARIABLE_ATTRIBUTE_COLUMN As String = "column" 'At this stage, used for the set of Columns in an Index.
         Public Const VARIABLE_ATTRIBUTE_COLUMNCOUNT As String = "columncount"
         Public Const VARIABLE_ATTRIBUTE_PKCOLUMNCOUNT As String = "pkcolumncount"
         Public Const VARIABLE_ATTRIBUTE_FKCOLUMNCOUNT As String = "fkcolumncount"
@@ -108,6 +110,7 @@ Namespace Parser.Syntax
         Public Const OBJECT_VIEW As String = "view"
         Public Const OBJECT_RELATIONS As String = "relations" 'Boston specific. Not part of original Metadrone. Used to get all Colum Relations for a Table
         Public Const OBJECT_RELATION As String = "relation" 'Boston specific. Not part of original Metadrone. Used to get individual RDS.Relations for a Table
+        Public Const OBJECT_INDEX As String = "index" 'Boston specific. Not part of original Metadrone. Used to get individual Indexes for a Table
         Public Const OBJECT_COLUMN As String = "column"
         Public Const OBJECT_PKCOLUMN As String = "pkcolumn"
         Public Const OBJECT_FKCOLUMN As String = "fkcolumn"
@@ -199,6 +202,7 @@ Namespace Parser.Syntax
         Friend Shared DOCO_OBJECT_FUNCTION As String = "Loop through functions in database connection."
         Friend Shared DOCO_OBJECT_FILE As String = "Loop through files in directory."
         Friend Shared DOCO_OBJECT_RELATION As String = "Loop through Relations specific to the Table/Column." 'Boston specific. Not in original Metadrone.
+        Friend Shared DOCO_OBJECT_INDEX As String = "Loop through Indexes specific to the Table." 'Boston specific. Not in original Metadrone.
         Friend Shared DOCO_OBJECT_COLUMN As String = "Loop through columns in the parent loop's current table/routine iteration."
         Friend Shared DOCO_OBJECT_PKCOLUMN As String = "Loop through primary key columns in the parent loop's current table/routine iteration."
         Friend Shared DOCO_OBJECT_FKCOLUMN As String = "Loop through foreign key columns in the parent loop's current table/routine iteration."
@@ -221,11 +225,14 @@ Namespace Parser.Syntax
         Friend Shared DOCO_VARIABLE_ATTRIBUTE_ISFOREIGNKEY As String = "If is a foreign key column."
         Friend Shared DOCO_VARIABLE_ATTRIBUTE_NULLABLE As String = "If is nullable field."
         Friend Shared DOCO_VARIABLE_ATTRIBUTE_DEFAULTVALUE As String = "Default value for field."
+        Friend Shared DOCO_VARIABLE_ATTRIBUTE_RELATIONS As String = "Set of Relations relating to the Table." 'Boston specific. Not part of original Metadrone.
         Friend Shared DOCO_VARIABLE_ATTRIBUTE_RELATION As String = "Set of Relations relating to the Column." 'Boston specific. Not part of original Metadrone.
+        Friend Shared DOCO_VARIABLE_ATTRIBUTE_INDEX As String = "Set of Relations relating to the Column." 'Boston specific. Not part of original Metadrone.
         Friend Shared DOCO_VARIABLE_ATTRIBUTE_ALLOWZEROLENGTH As String = "Field allows zero length." 'Boston specific. Not part of original Metadrone.
         Friend Shared DOCO_VARIABLE_ATTRIBUTE_LENGTH As String = "Length of field."
         Friend Shared DOCO_VARIABLE_ATTRIBUTE_PRECISION As String = "Precision of field."
         Friend Shared DOCO_VARIABLE_ATTRIBUTE_SCALE As String = "Scale of field."
+        Friend Shared DOCO_VARIABLE_ATTRIBUTE_COLUMN As String = "Set of Columns relating to an Index." 'At this stage, just for Indexes.  'Boston specific. Not part of original Metadrone.
         Friend Shared DOCO_VARIABLE_ATTRIBUTE_COLUMNCOUNT As String = "Number of columns in collection this variable refers to."
         Friend Shared DOCO_VARIABLE_ATTRIBUTE_PKCOLUMNCOUNT As String = "Number of primary key columns in collection this variable refers to."
         Friend Shared DOCO_VARIABLE_ATTRIBUTE_FKCOLUMNCOUNT As String = "Number of foreign key columns in collection this variable refers to."
@@ -308,6 +315,7 @@ Namespace Parser.Syntax
             If StrEq(value, RESERVED_PREPROC_SAFEEND) Then Return True
 
             If StrEq(value, OBJECT_RELATION) Then Return True 'Boston specific. Not part of the original Metadrone.
+            If StrEq(value, OBJECT_INDEX) Then Return True 'Boston specific. Not part of the original Metadrone.
             If StrEq(value, OBJECT_TABLE) Then Return True
             If StrEq(value, OBJECT_VIEW) Then Return True
             If StrEq(value, OBJECT_COLUMN) Then Return True
@@ -343,13 +351,16 @@ Namespace Parser.Syntax
             If StrEq(value, VARIABLE_ATTRIBUTE_ISPRIMARYKEY) Then Return True
             If StrEq(value, VARIABLE_ATTRIBUTE_ISFOREIGNKEY) Then Return True
             If StrEq(value, VARIABLE_ATTRIBUTE_NULLABLE) Then Return True
+            If StrEq(value, VARIABLE_ATTRIBUTE_RELATIONS) Then Return True 'Boston specific. Not part of original Metadrone.
             If StrEq(value, VARIABLE_ATTRIBUTE_RELATION) Then Return True 'Boston specific. Not part of original Metadrone.
+            If StrEq(value, VARIABLE_ATTRIBUTE_INDEX) Then Return True 'Boston specific. Not part of original Metadrone.
             If StrEq(value, VARIABLE_ATTRIBUTE_ALLOWZEROLENGTH) Then Return True 'Boston specific. Not part of original Metadrone.
             If StrEq(value, VARIABLE_ATTRIBUTE_LENGTH) Then Return True
             If StrEq(value, VARIABLE_ATTRIBUTE_PRECISION) Then Return True
             If StrEq(value, VARIABLE_ATTRIBUTE_SCALE) Then Return True
             If StrEq(value, VARIABLE_ATTRIBUTE_LISTCOUNT) Then Return True
             If StrEq(value, VARIABLE_ATTRIBUTE_LISTPOS) Then Return True
+            If StrEq(value, VARIABLE_ATTRIBUTE_COLUMN) Then Return True 'Boston specific. Not part of original Metadrone. Used just for Indexes at this stage.
             If StrEq(value, VARIABLE_ATTRIBUTE_COLUMNCOUNT) Then Return True
             If StrEq(value, VARIABLE_ATTRIBUTE_PKCOLUMNCOUNT) Then Return True
             If StrEq(value, VARIABLE_ATTRIBUTE_FKCOLUMNCOUNT) Then Return True
@@ -368,7 +379,9 @@ Namespace Parser.Syntax
 
         Friend Shared Function ContainsOperator(ByVal value As String) As Boolean
             For i As Integer = 0 To RESERVED_OPERATORS.Count - 1
-                If value.IndexOfAny(RESERVED_OPERATORS(i).ToCharArray) > -1 Then Return True
+                If value.IndexOfAny(RESERVED_OPERATORS(i).ToCharArray) > -1 Then
+                    Return True
+                End If
             Next
         End Function
 

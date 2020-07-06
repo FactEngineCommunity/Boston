@@ -30,7 +30,8 @@
         'Added for Boston. Not in original Metadrone code.
         Private ColumnIdField As String
         Private AllowZeroLengthField As Boolean
-        Private RelationField As New List(Of RDS.Relation)  'the Relation to which the Column belongs if this SchemaRow record is for a Column
+        Private RelationField As New List(Of RDS.Relation)  'Boston specific. The Relation to which the Column belongs if this SchemaRow record is for a Column
+        Private IndexField As New List(Of RDS.Index)  'Boston specific. The Relation to which the Column belongs if this SchemaRow record is for a Column
 
         Public Function GetCopy() As SchemaRow
             Dim schema As New SchemaRow()
@@ -66,6 +67,20 @@
         End Function
 
 #Region "Properties"
+
+        ''' <summary>
+        ''' If the SchemaRow is for a Table/Column, the RDS.Index associated with the Table
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property Index() As List(Of RDS.Index)
+            Get
+                Return Me.IndexField
+            End Get
+            Set(ByVal value As List(Of RDS.Index))
+                Me.IndexField = value
+            End Set
+        End Property
+
         ''' <summary>
         ''' If the SchemaRow is for a Column and that Column is part of a Relation, the RDS.Relation associated with the Column
         ''' </summary>

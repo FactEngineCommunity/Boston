@@ -660,6 +660,7 @@
     <Compile Include="CodeGeneration\Metadrone\Parsing\Meta\Database\Column.vb" />
     <Compile Include="CodeGeneration\Metadrone\Parsing\Meta\Database\Database.vb" />
     <Compile Include="CodeGeneration\Metadrone\Parsing\Meta\Database\Parameter.vb" />
+    <Compile Include="CodeGeneration\Metadrone\Parsing\Meta\Database\Index.vb" />
     <Compile Include="CodeGeneration\Metadrone\Parsing\Meta\Database\Relation.vb" />
     <Compile Include="CodeGeneration\Metadrone\Parsing\Meta\Database\Routine.vb" />
     <Compile Include="CodeGeneration\Metadrone\Parsing\Meta\Database\Schema.vb" />

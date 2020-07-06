@@ -19,6 +19,7 @@
             InOutParameter = 15
             TemplateParameter = 16
             Relation = 17 'Boston specific. Not part of original Metadrone.
+            Index = 18 'Boston specific. Not part of original Metadrone.
         End Enum
 
         Public Name As String = ""

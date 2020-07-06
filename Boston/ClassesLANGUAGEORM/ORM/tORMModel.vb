@@ -2336,6 +2336,11 @@ Namespace FBM
 
         End Sub
 
+        Public Function PagesLoading() As Boolean
+
+            Return Me.Page.Find(Function(x) x.Loaded = False) IsNot Nothing
+        End Function
+
         Public Sub RemoveDictionaryEntry(ByRef arDictionaryEntry As FBM.DictionaryEntry,
                                          ByVal abDoDatabaseProcessing As Boolean)
 
