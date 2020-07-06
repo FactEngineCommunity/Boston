@@ -20,6 +20,7 @@ Namespace Parser.Meta.Database
 
         Private mValue As Object = Nothing
         Private mId As String
+        Private mIsPrimaryKey As Boolean = False
 
         Friend Columns As New List(Of IEntity)
 
@@ -35,11 +36,12 @@ Namespace Parser.Meta.Database
         End Sub
 
         Public Sub New(ByVal asId As String,
-                       ByRef aarColumn As List(Of RDS.Column))
+                       ByRef aarColumn As List(Of RDS.Column),
+                       ByVal abIsPrimaryKey As Boolean)
 
             Me.mId = asId
             Me.ColumnField = aarColumn
-
+            Me.IsPrimaryKey = abIsPrimaryKey
             Me.mColumnCount = Me.ColumnField.Count
 
         End Sub
@@ -109,6 +111,10 @@ Namespace Parser.Meta.Database
                 Call Me.CheckParamsForPropertyCall(AttribName, Params)
                 Return Me.Id
 
+            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_ISPRIMARYKEY) And LookTransformsIfNotFound Then
+                Call Me.CheckParamsForPropertyCall(AttribName, Params)
+                Return Me.IsPrimaryKey
+
             ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_COLUMN) And LookTransformsIfNotFound Then
                 Call Me.CheckParamsForPropertyCall(AttribName, Params)
                 Return Me.Column
@@ -151,6 +157,7 @@ Namespace Parser.Meta.Database
 
             With Me
                 lrIndex.Id = .Id
+                lrIndex.IsPrimaryKey = .IsPrimaryKey
                 lrIndex.ColumnField = .ColumnField
                 lrIndex.Column = .Column
                 lrIndex.ColumnCount = .mColumnCount
@@ -175,6 +182,15 @@ Namespace Parser.Meta.Database
             End Get
             Set(ByVal value As String)
                 Me.mId = value
+            End Set
+        End Property
+
+        Public Property IsPrimaryKey() As Boolean
+            Get
+                Return Me.mIsPrimaryKey
+            End Get
+            Set(ByVal value As Boolean)
+                Me.mIsPrimaryKey = value
             End Set
         End Property
 

@@ -221,7 +221,7 @@ Namespace Parser.Syntax
         Friend Shared DOCO_VARIABLE_ATTRIBUTE_VALUE As String = "Value of variable."
         Friend Shared DOCO_VARIABLE_ATTRIBUTE_DATATYPE As String = "Provider's type definition of variable."
         Friend Shared DOCO_VARIABLE_ATTRIBUTE_ISIDENTITY As String = "If is an identity column."
-        Friend Shared DOCO_VARIABLE_ATTRIBUTE_ISPRIMARYKEY As String = "If is a primary key column."
+        Friend Shared DOCO_VARIABLE_ATTRIBUTE_ISPRIMARYKEY As String = "If is a primary key column/index."
         Friend Shared DOCO_VARIABLE_ATTRIBUTE_ISFOREIGNKEY As String = "If is a foreign key column."
         Friend Shared DOCO_VARIABLE_ATTRIBUTE_NULLABLE As String = "If is nullable field."
         Friend Shared DOCO_VARIABLE_ATTRIBUTE_DEFAULTVALUE As String = "Default value for field."
