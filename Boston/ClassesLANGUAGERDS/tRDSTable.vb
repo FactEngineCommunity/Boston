@@ -251,6 +251,202 @@ Namespace RDS
 
         End Function
 
+        Public Sub getCMMLColumns()
+
+            Dim lsSQLQuery As String
+            Dim lrORMRecordset2, lrORMRecordset3 As ORMQL.Recordset
+            Dim lsColumnName As String
+            Dim lrResponsibleRole, lrActiveRole As FBM.Role
+            Dim lrColumn As RDS.Column
+
+            '==========================================================================================================
+            'Columns
+            lsSQLQuery = " SELECT *"
+            lsSQLQuery &= "  FROM " & pcenumCMMLRelations.CoreERDAttribute.ToString
+            lsSQLQuery &= " WHERE ModelObject = '" & Me.Name & "'"
+
+            lrORMRecordset2 = Me.Model.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+
+            While Not lrORMRecordset2.EOF
+
+                'Column Name
+                lsSQLQuery = "SELECT *"
+                lsSQLQuery &= " FROM CorePropertyHasPropertyName" '(Property, PropertyName)
+                lsSQLQuery &= " WHERE Property = '" & lrORMRecordset2("Attribute").Data & "'"
+
+                lrORMRecordset3 = Me.Model.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                lsColumnName = lrORMRecordset3("PropertyName").Data
+
+                'Responsible Role
+                lsSQLQuery = "SELECT *"
+                lsSQLQuery &= " FROM " & pcenumCMMLRelations.CorePropertyIsForRole.ToString
+                lsSQLQuery &= " WHERE Property = '" & lrORMRecordset2("Attribute").Data & "'"
+
+                lrORMRecordset3 = Me.Model.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                lrResponsibleRole = Me.Model.Model.Role.Find(Function(x) x.Id = lrORMRecordset3("Role").Data)
+
+                'Active Role
+                lsSQLQuery = "SELECT *"
+                lsSQLQuery &= " FROM " & pcenumCMMLRelations.CorePropertyHasActiveRole.ToString
+                lsSQLQuery &= " WHERE Property = '" & lrORMRecordset2("Attribute").Data & "'"
+
+                lrORMRecordset3 = Me.Model.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                lrActiveRole = Me.Model.Model.Role.Find(Function(x) x.Id = lrORMRecordset3("Role").Data)
+
+                'New Column
+                lrColumn = New RDS.Column(Me, lsColumnName, lrResponsibleRole, lrActiveRole)
+                lrColumn.Id = lrORMRecordset2("Attribute").Data
+
+                'IsMandatory
+                lsSQLQuery = "SELECT *"
+                lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreIsMandatory.ToString
+                lsSQLQuery &= " WHERE IsMandatory = '" & lrColumn.Id & "'"
+
+                lrORMRecordset3 = Me.Model.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                lrColumn.IsMandatory = Not lrORMRecordset3.EOF
+
+                'Fact Type
+                lsSQLQuery = "SELECT *"
+                lsSQLQuery &= " FROM " & pcenumCMMLRelations.CorePropertyIsForFactType.ToString
+                lsSQLQuery &= " WHERE Property = '" & lrColumn.Id & "'"
+
+                lrORMRecordset3 = Me.Model.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                lrColumn.FactType = Me.Model.Model.FactType.Find(Function(x) x.Id = lrORMRecordset3("FactType").Data)
+
+                'Ordinal Position
+                lsSQLQuery = "SELECT *"
+                lsSQLQuery &= " FROM " & pcenumCMMLRelations.CorePropertyHasOrdinalPosition.ToString
+                lsSQLQuery &= " WHERE Property = '" & lrColumn.Id & "'"
+
+                lrORMRecordset3 = Me.Model.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                lrColumn.OrdinalPosition = lrORMRecordset3("Position").Data
+
+                Me.Column.Add(lrColumn)
+
+                lrORMRecordset2.MoveNext()
+
+            End While
+            '==========================================================================================================
+
+            '===========================
+            'Indexes
+            Call Me.getCMMLIndexes()
+
+        End Sub
+
+        Public Sub getCMMLIndexes()
+
+            Dim lrIndex As RDS.Index
+            Dim lrColumn As RDS.Column
+            Dim lsSQLQuery As String = ""
+            Dim lrRecordset As ORMQL.Recordset
+            Dim lrRecordset1 As ORMQL.Recordset
+
+            Try
+                '-------------------------------------------------
+                'Must create a Primary Identifier for the Entity
+                '-------------------------------------------------
+                lsSQLQuery = "SELECT *"
+                lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreIndexIsForEntity.ToString
+                lsSQLQuery &= " WHERE Entity = '" & Me.Name & "'"
+
+                lrRecordset = Me.Model.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                While Not lrRecordset.EOF
+
+                    lrIndex = New RDS.Index(Me, lrRecordset("Index").Data)
+
+                    'Columns 
+                    lsSQLQuery = "SELECT *"
+                    lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreIndexMakesUseOfProperty.ToString '(Index, Property)
+                    lsSQLQuery &= " WHERE Index = '" & lrIndex.Name & "'"
+
+                    lrRecordset1 = Me.Model.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                    While Not lrRecordset1.EOF
+
+                        lrColumn = New RDS.Column
+                        lrColumn = Me.Column.Find(Function(x) x.Id = lrRecordset1("Property").Data)
+
+                        'Code Safe. If Column doesn't exist, need to remove it from the Index.
+                        If lrColumn Is Nothing Then
+                            lrColumn = New RDS.Column(Me, "Dummy", Nothing, Nothing)
+                            lrColumn.Id = lrRecordset1("Property").Data
+                            lrIndex.removeColumn(lrColumn)
+                        Else
+                            lrColumn.Index.Add(lrIndex)
+
+                            lrIndex.Column.Add(lrColumn)
+                        End If
+
+                        lrRecordset1.MoveNext()
+                    End While
+
+                    'Restrains to Unique Values
+                    lsSQLQuery = "SELECT *"
+                    lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreIndexRestrainsToUniqueValues.ToString
+                    lsSQLQuery &= " WHERE Index = '" & lrIndex.Name & "'"
+
+                    lrRecordset1 = Me.Model.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                    lrIndex.Unique = Not lrRecordset1.EOF
+
+
+                    'Is PrimaryKey
+                    lsSQLQuery = "SELECT * "
+                    lsSQLQuery &= "FROM " & pcenumCMMLRelations.CoreIndexIsPrimaryKey.ToString
+                    lsSQLQuery &= " WHERE Index = '" & lrIndex.Name & "'"
+
+                    lrRecordset1 = Me.Model.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                    lrIndex.IsPrimaryKey = Not lrRecordset1.EOF
+                    For Each lrColumn In lrIndex.Column
+                        lrColumn.ContributesToPrimaryKey = Not lrRecordset1.EOF
+                    Next
+
+                    'Ignore Nulls
+                    lsSQLQuery = "SELECT *"
+                    lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreIndexIgnoresNulls.ToString
+                    lsSQLQuery &= " WHERE Index = '" & lrIndex.Name & "'"
+
+                    lrRecordset1 = Me.Model.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                    lrIndex.IgnoresNulls = Not lrRecordset1.EOF
+
+                    'Direction
+                    lsSQLQuery = "SELECT *"
+                    lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreIndexHasDirection.ToString '(Index, IndexDirection)
+                    lsSQLQuery &= " WHERE Index = '" & lrIndex.Name & "'"
+
+                    lrRecordset1 = Me.Model.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                    lrIndex.AscendingOrDescending.GetByDescription(lrRecordset1("IndexDirection").Data)
+
+                    'Qualifier
+                    lsSQLQuery = "SELECT *"
+                    lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreIndexHasQualifier.ToString '(Index, Qualifier)
+                    lsSQLQuery &= " WHERE Index = '" & lrIndex.Name & "'"
+
+                    lrRecordset1 = Me.Model.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                    lrIndex.IndexQualifier = lrRecordset1("Qualifier").Data
+
+                    '==========================
+                    'Add the Index to the RDS
+                    Me.Model.Model.RDS.Index.Add(lrIndex)
+
+                    Me.Index.AddUnique(lrIndex)
+
+                    lrRecordset.MoveNext()
+                End While 'Indexes in the Model for the arTable.
+
+            Catch ex As Exception
+                Dim lsMessage1 As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
         Public Function getFirstNonPrimaryKeyColumnOrdinalPosition() As Integer
 
             Try

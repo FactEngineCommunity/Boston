@@ -46,8 +46,11 @@ Namespace FBM
         <NonSerialized()> _
         Public TreeNode As TreeNode
 
-        <XmlIgnore()> _
+        <XmlIgnore()>
         Public Loaded As Boolean = False 'Used to stop reloading every time the User selects a Model in the navigation tree.
+
+        <XmlIgnore()>
+        Public RDSLoading As Boolean = False 'Used to stop loading of Pages when the RDS has not finished loading under threading.
 
         <XmlIgnore()> _
         Public LoadedFromXMLFile As Boolean = False
@@ -4062,7 +4065,10 @@ Namespace FBM
 
                 '==============================================
                 'Either Way, populate the RDS data structure.
-                Call Me.PopulateRDSStructureFromCoreMDAElements()
+                Dim loRDSThread As System.Threading.Thread
+                loRDSThread = New System.Threading.Thread(AddressOf Me.PopulateRDSStructureFromCoreMDAElements)
+                loRDSThread.Start()
+                'Call Me.PopulateRDSStructureFromCoreMDAElements()
 
             End If
 

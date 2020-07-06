@@ -2774,13 +2774,13 @@ Public Class frmToolboxEnterpriseExplorer
             lrPage = lrEnterpriseView.Tag 'prApplication.WorkingPage 
             'lrPage = lrEnterpriseView.Tag
 
-            If lrPage.Loading Then
+            If lrPage.Loading Or ((lrPage.Language <> pcenumLanguage.ORMModel) And lrPage.Model.RDSLoading) Then
                 Richmond.WriteToStatusBar("Waiting for background loading of the Page", True)
                 frmMain.Cursor = Cursors.WaitCursor
                 frmMain.Refresh()
             End If
 
-            Do While lrPage.Loading
+            Do While lrPage.Loading Or ((lrPage.Language <> pcenumLanguage.ORMModel) And lrPage.Model.RDSLoading)
                 '---------------------------------------------
                 'Wait for threads to finish loading the Page
                 '---------------------------------------------

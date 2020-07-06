@@ -1587,6 +1587,7 @@ Namespace FBM
         Public Sub PopulateRDSStructureFromCoreMDAElements()
 
             Try
+                Me.RDSLoading = True
                 Dim lsSQLQuery As String = ""
                 Dim lrTable As RDS.Table
                 Dim lrColumn As RDS.Column
@@ -1704,8 +1705,10 @@ Namespace FBM
                 End While 'Stepping through Tables
 
                 '==========================================================================================================
-                'Relations
+                'Relations                
                 Call Me.populateRDSRelationsFromCoreMDAElements()
+
+                Me.RDSLoading = False
 
             Catch ex As Exception
                 Dim lsMessage1 As String
