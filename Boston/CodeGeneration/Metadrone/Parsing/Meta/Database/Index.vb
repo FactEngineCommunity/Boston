@@ -6,7 +6,6 @@ Imports Boston.Parser.Source
 Imports Boston.Tools
 Imports Boston.PluginInterface.Sources
 
-
 Namespace Parser.Meta.Database
 
     ''' <summary>
@@ -16,11 +15,13 @@ Namespace Parser.Meta.Database
     Friend Class Index
         Implements IEntity
 
+        Private mOwner As IEntity = Nothing 'The Table to which the Index belongs
+
         Private SchemaRowVal As SchemaRow = Nothing
 
         Private mValue As Object = Nothing
         Private mId As String
-        Private mIsPrimaryKey As Boolean = False
+        Private mIsPrimaryKey As Boolean
 
         Friend Columns As New List(Of IEntity)
 
@@ -32,17 +33,26 @@ Namespace Parser.Meta.Database
 
         Private ColumnField As New List(Of RDS.Column)
 
+        Private Connection As IConnection = Nothing
+        Private Transforms As Syntax.SourceTransforms = Nothing
+
         Public Sub New()
         End Sub
 
         Public Sub New(ByVal asId As String,
                        ByRef aarColumn As List(Of RDS.Column),
+                       ByRef arOwner As Table,
+                       ByVal Connection As IConnection,
+                       ByVal Transforms As Syntax.SourceTransforms,
                        ByVal abIsPrimaryKey As Boolean)
 
+            Me.mOwner = arOwner
             Me.mId = asId
+            Me.mIsPrimaryKey = abIsPrimaryKey
             Me.ColumnField = aarColumn
-            Me.IsPrimaryKey = abIsPrimaryKey
             Me.mColumnCount = Me.ColumnField.Count
+            Me.Transforms = Transforms
+            Me.Connection = Connection
 
         End Sub
 
@@ -57,7 +67,7 @@ Namespace Parser.Meta.Database
             ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_COLUMN) Then 'The set of Columns for the Index.
                 'set Columns
                 For Each lrIEntityIndex In value
-                    Me.Columns.Add(CType(lrIEntityIndex, Index))
+                    Me.Columns.Add(CType(lrIEntityIndex, Column))
                 Next
             Else
                 Throw New Exception("Invalid attribute for Index: '" & AttribName & "'. ")
@@ -72,9 +82,15 @@ Namespace Parser.Meta.Database
 
             Dim liInd As Integer = 0
 
-            For Each lrRDSIndex In Me.ColumnField
+            For Each lrRDSColumn In Me.ColumnField
                 Dim lrEntityColumn As Column
-                lrEntityColumn = New Column(lrRDSIndex.Name, Me.SchemaRowVal, Me, Nothing, Nothing)
+
+                Dim lrSchemaRowVal As SchemaRow
+                Dim larTableColumns As List(Of IEntity) = Me.Owner.GetEntities(SyntaxNode.ExecForEntities.OBJECT_COLUMN)
+                Dim lrTableColumn As IEntity = larTableColumns.Find(Function(x) x.GetAttributeValue("value", Nothing, True, False) = lrRDSColumn.Name)
+                lrSchemaRowVal = lrTableColumn.GetAttributeValue("schemarowval", Nothing, True, False)
+
+                lrEntityColumn = New Column(lrRDSColumn.Name, lrSchemaRowVal, Me, Me.Connection, Me.Transforms)
                 Me.Columns.Add(lrEntityColumn)
             Next
 
@@ -102,10 +118,9 @@ Namespace Parser.Meta.Database
 
             If AttribName Is Nothing Then AttribName = ""
 
-            If AttribName.Length = 0 Or StrEq(AttribName, VARIABLE_ATTRIBUTE_VALUE) Then
+            If AttribName.Length = 0 Or StrEq(AttribName, VARIABLE_ATTRIBUTE_OWNER) Then 'Boston specific.
                 'return value
-                Call Me.CheckParamsForPropertyCall(VARIABLE_ATTRIBUTE_VALUE, Params)
-                Return Me.ReplaceAllList.ApplyReplaces(Me.Value)
+                Return Me.Owner
 
             ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_ID) And LookTransformsIfNotFound Then
                 Call Me.CheckParamsForPropertyCall(AttribName, Params)
@@ -153,7 +168,7 @@ Namespace Parser.Meta.Database
 
         Public Function GetCopy() As IEntity Implements IEntity.GetCopy
 
-            Dim lrIndex As New Index()
+            Dim lrIndex As New Index("Dummy", New List(Of RDS.Column), Nothing, Nothing, Me.Transforms, False)
 
             With Me
                 lrIndex.Id = .Id
@@ -161,6 +176,7 @@ Namespace Parser.Meta.Database
                 lrIndex.ColumnField = .ColumnField
                 lrIndex.Column = .Column
                 lrIndex.ColumnCount = .mColumnCount
+                lrIndex.Owner = .Owner
             End With
 
             Return lrIndex
@@ -215,6 +231,16 @@ Namespace Parser.Meta.Database
                 Me.ColumnField = value
             End Set
         End Property
+
+        Public Property Owner As IEntity
+            Get
+                Return Me.mOwner
+            End Get
+            Set(value As IEntity)
+                Me.mOwner = value
+            End Set
+        End Property
+
 
 
     End Class

@@ -110,8 +110,12 @@ Namespace Parser.Meta.Database
                     '============================
                     'Indexes
                     For Each lrIndex In aarSchemaRow(SchemaRowIdx).Index
+
                         Dim lrEntityIndex = New Index(lrIndex.Name,
                                                       lrIndex.Column,
+                                                      Me,
+                                                      Nothing,
+                                                      Me.Transforms,
                                                       lrIndex.IsPrimaryKey)
 
                         If Me.Indexes.Find(Function(x) x.GetAttributeValue("id", Nothing, True, False) = lrIndex.Name) Is Nothing Then

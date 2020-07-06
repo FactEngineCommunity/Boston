@@ -900,28 +900,33 @@ Namespace FBM
 
                                     Next 'RoleConstraintRole
 
-                                    Dim lsQualifier As String
-                                    If lrFactType.InternalUniquenessConstraint.Count = 1 Then
-                                        lsQualifier = lrTable.generateUniqueQualifier("PK")
-                                    Else
-                                        lsQualifier = lrTable.generateUniqueQualifier("UC")
-                                    End If
+                                Dim lsQualifier As String
+                                Dim lbIsPrimaryKey As Boolean = False
+                                If lrFactType.InternalUniquenessConstraint.Count = 1 Then
+                                    lsQualifier = lrTable.generateUniqueQualifier("PK")
+                                    lrFactType.InternalUniquenessConstraint(0).SetIsPreferredIdentifier(True)
+                                    lbIsPrimaryKey = True
+                                Else
+                                    lsQualifier = lrTable.generateUniqueQualifier("UC")
+                                End If
 
-                                    Dim lsIndexName As String = lrTable.Name & "_" & Trim(lsQualifier)
 
-                                    'Add the new Index
-                                    Dim lrIndex As New RDS.Index(lrTable,
+                                Dim lsIndexName As String = lrTable.Name & "_" & Trim(lsQualifier)
+
+
+                                'Add the new Index
+                                Dim lrIndex As New RDS.Index(lrTable,
                                                              lsIndexName,
                                                              lsQualifier,
                                                              pcenumODBCAscendingOrDescending.Ascending,
-                                                             True,
+                                                             lbIsPrimaryKey,
                                                              True,
                                                              False,
                                                              larIndexColumn,
                                                              False,
                                                              True)
 
-                                    Call lrTable.addIndex(lrIndex)
+                                Call lrTable.addIndex(lrIndex)
 
                                 ElseIf arRoleConstraint.RoleConstraintRole.Count = 1 _
                                 And arRoleConstraint.RoleConstraintRole(0).Role.FactType.IsBinaryFactType _
@@ -3933,6 +3938,8 @@ Namespace FBM
                 Me.ValueType = TableValueType.GetValueTypesByModel(Me)
             End If
 
+            If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(1)
+
             '------------------------------------
             'Get EntityTypes
             '------------------------------------
@@ -3947,6 +3954,8 @@ Namespace FBM
                 '--------------------------------------------------            
                 Me.EntityType = TableEntityType.getEntityTypesByModel(Me)
             End If
+
+            If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(2)
 
             '------------------------------------
             'Get FactTypes
@@ -3964,6 +3973,8 @@ Namespace FBM
             End If
 
             Call TableSubtypeRelationship.GetSubtypeRelationshipsByModel(Me)
+
+            If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(3)
 
             '---------------------------------------------------
             'Get RoleConstraints 
@@ -3985,6 +3996,8 @@ Namespace FBM
                 Call lrEntityType.SetReferenceModeObjects()
             Next
 
+            If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(4)
+
             '-----------------------------------
             'Load the ModelNotes for the Model
             '-----------------------------------
@@ -3995,6 +4008,8 @@ Namespace FBM
                 '-----------------------------------------------
                 Me.ModelNote = TableModelNote.getModelNotesByModel(Me)
             End If
+
+            If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(5)
 
             '------------------------------------
             'Load the Pages for the Model

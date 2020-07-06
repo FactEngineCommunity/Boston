@@ -572,7 +572,13 @@ Namespace FBM
 
                                 If lrIndex Is Nothing Then
                                     'No existing Index for the previous version of the RoleConstraint (i.e. Minus the new RoleConstraintRole)
-                                    Dim lsQualifier As String = lrTable.generateUniqueQualifier("UC")
+                                    Dim lsQualifier As String
+                                    If arRoleConstraintRole.RoleConstraint.IsPreferredIdentifier Then
+                                        lsQualifier = lrTable.generateUniqueQualifier("PK")
+                                    Else
+                                        lsQualifier = lrTable.generateUniqueQualifier("UC")
+                                    End If
+
                                     Dim lsIndexName As String = lrTable.Name & "_" & Trim(lsQualifier)
 
                                     'Add the new Index

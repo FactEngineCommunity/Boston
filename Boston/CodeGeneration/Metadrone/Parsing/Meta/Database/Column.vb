@@ -293,6 +293,10 @@ Namespace Parser.Meta.Database
                 Call Me.CheckParamsForPropertyCall(AttribName, Params)
                 Return Me.DataType
 
+            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_SCHEMAROWVAL) Then
+                'return SchemaRowVal              
+                Return Me.SchemaRowVal
+
             ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_ISIDENTITY) Then
                 'return isidentity
                 Call Me.CheckParamsForPropertyCall(AttribName, Params)

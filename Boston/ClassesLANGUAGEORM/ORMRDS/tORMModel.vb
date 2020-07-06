@@ -827,9 +827,11 @@ Namespace FBM
                             Throw New Exception("No Columns found for Table covered by Role Constraint, '" & lrRoleConstraint.Id & "'")
                         End If
 
+                        Dim lbIsPrimaryKey As Boolean = False
                         If larColumn(0).ContributesToPrimaryKey Then
                             lsIndexName = larColumn(0).Table.Name & "_PK"
                             lsQualifier = "PK"
+                            lbIsPrimaryKey = True
                         Else
                             lsQualifier = larColumn(0).Table.generateUniqueQualifier("UC")
                             lsIndexName = larColumn(0).Table.Name & "_" & Trim(lsQualifier)
@@ -839,7 +841,7 @@ Namespace FBM
                                                      lsIndexName,
                                                      lsQualifier,
                                                      pcenumCMMLIndexDirection.ASC,
-                                                     True,
+                                                     lbIsPrimaryKey,
                                                      True,
                                                      True,
                                                      larColumn,
@@ -852,7 +854,7 @@ Namespace FBM
                                                 larColumn(0).Table.Name,
                                                 lsQualifier,
                                                 pcenumCMMLIndexDirection.ASC,
-                                                True,
+                                                lbIsPrimaryKey,
                                                 True,
                                                 True,
                                                 larColumn)
