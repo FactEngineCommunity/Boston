@@ -3972,6 +3972,8 @@ Namespace FBM
                 TableFactType.GetFactTypesByModel(Me, True)
             End If
 
+            If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(3)
+
             Call TableSubtypeRelationship.GetSubtypeRelationshipsByModel(Me)
 
             If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(3)
@@ -3987,6 +3989,8 @@ Namespace FBM
                 '-----------------------------------------------
                 Me.RoleConstraint = TableRoleConstraint.GetRoleConstraintsByModel(Me)
             End If
+
+            If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(4)
 
             '-----------------------------------------------------------------------------
             'Set the ReferenceMode ObjectTypes for each of the EntityTypes in the Model
@@ -4016,7 +4020,6 @@ Namespace FBM
             '------------------------------------
             Richmond.WriteToStatusBar("Loading the Pages")
             prApplication.ThrowErrorMessage("Loading Pages", pcenumErrorType.Information)
-
 
             If abLoadPages Then
                 If abUseThreading Then

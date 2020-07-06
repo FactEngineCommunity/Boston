@@ -115,8 +115,12 @@ Namespace Parser.Meta.Database
                                                       lrIndex.Column,
                                                       Me,
                                                       Nothing,
+<<<<<<< HEAD
                                                       Me.Transforms,
                                                       lrIndex.IsPrimaryKey)
+=======
+                                                      Me.Transforms)
+>>>>>>> b25ace31232fcbaa93f9b73528729ff615362ecf
 
                         If Me.Indexes.Find(Function(x) x.GetAttributeValue("id", Nothing, True, False) = lrIndex.Name) Is Nothing Then
                             Me.Indexes.Add(lrEntityIndex)
@@ -546,9 +550,7 @@ Namespace Parser.Meta.Database
             Next
 
             liInd = 0
-
             For Each lrIndex In Me.Indexes
-
                 Dim lrEntityIndex = CType(Me.Indexes(liInd), Index)
                 With lrEntityIndex
                     Me.FilteredIndexes.Add(.GetCopy)

@@ -18,6 +18,10 @@ Namespace Parser.Syntax
         Public Const VARIABLE_ATTRIBUTE_REFERENCEDTABLENAME As String = "referencedtablename" 'Boston specific. Not part of orginal Metadrone.
         Public Const VARIABLE_ATTRIBUTE_REFERENCEDCOLUMNNAME As String = "referencedcolumnname" 'Boston specific. Not part of orginal Metadrone.
         Public Const VARIABLE_ATTRIBUTE_SCHEMAROWVAL As String = "schemarowval" 'Boston specific. Used to load Columns for Indexes.
+<<<<<<< HEAD
+=======
+        Public Const VARIABLE_ATTRIBUTE_OWNER As String = "owner" 'Boston specific. Used to load Columns for Indexes.
+>>>>>>> b25ace31232fcbaa93f9b73528729ff615362ecf
         Public Const VARIABLE_ATTRIBUTE_DATATYPE As String = "datatype"
         Public Const VARIABLE_ATTRIBUTE_ISIDENTITY As String = "isidentity"
         Public Const VARIABLE_ATTRIBUTE_ISPRIMARYKEY As String = "isprimarykey"

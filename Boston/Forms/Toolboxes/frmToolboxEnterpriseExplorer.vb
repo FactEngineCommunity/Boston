@@ -3862,7 +3862,10 @@ Public Class frmToolboxEnterpriseExplorer
 
     Private Sub CodeGenerationToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles CodeGenerationToolStripMenuItem.Click
 
-        Call frmMain.loadCodeGenerator()
+        With New WaitCursor
+            Call frmMain.loadCodeGenerator()
+        End With
+
 
     End Sub
 End Class

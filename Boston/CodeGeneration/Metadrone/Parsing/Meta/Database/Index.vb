@@ -43,8 +43,12 @@ Namespace Parser.Meta.Database
                        ByRef aarColumn As List(Of RDS.Column),
                        ByRef arOwner As Table,
                        ByVal Connection As IConnection,
+<<<<<<< HEAD
                        ByVal Transforms As Syntax.SourceTransforms,
                        ByVal abIsPrimaryKey As Boolean)
+=======
+                       ByVal Transforms As Syntax.SourceTransforms)
+>>>>>>> b25ace31232fcbaa93f9b73528729ff615362ecf
 
             Me.mOwner = arOwner
             Me.mId = asId
@@ -168,7 +172,11 @@ Namespace Parser.Meta.Database
 
         Public Function GetCopy() As IEntity Implements IEntity.GetCopy
 
+<<<<<<< HEAD
             Dim lrIndex As New Index("Dummy", New List(Of RDS.Column), Nothing, Nothing, Me.Transforms, False)
+=======
+            Dim lrIndex As New Index("Dummy", New List(Of RDS.Column), Nothing, Nothing, Me.Transforms)
+>>>>>>> b25ace31232fcbaa93f9b73528729ff615362ecf
 
             With Me
                 lrIndex.Id = .Id
