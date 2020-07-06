@@ -112,7 +112,11 @@ Namespace Parser.Meta.Database
                     For Each lrIndex In aarSchemaRow(SchemaRowIdx).Index
                         Dim lrEntityIndex = New Index(lrIndex.Name,
                                                       lrIndex.Column)
-                        Me.Indexes.Add(lrEntityIndex)
+
+                        If Me.Indexes.Find(Function(x) x.GetAttributeValue("id", Nothing, True, False) = lrIndex.Name) Is Nothing Then
+                            Me.Indexes.Add(lrEntityIndex)
+                        End If
+
                     Next
 
                 Else
@@ -123,6 +127,7 @@ Namespace Parser.Meta.Database
                 SchemaRowIdx += 1
 
             End While
+
 
             'Set listcount
             For Each col In Me.Columns
@@ -536,6 +541,7 @@ Namespace Parser.Meta.Database
             Next
 
             liInd = 0
+
             For Each lrIndex In Me.Indexes
 
                 Dim lrEntityIndex = CType(Me.Indexes(liInd), Index)
