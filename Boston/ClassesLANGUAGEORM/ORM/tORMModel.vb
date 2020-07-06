@@ -3933,6 +3933,8 @@ Namespace FBM
                 Me.ValueType = TableValueType.GetValueTypesByModel(Me)
             End If
 
+            If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(1)
+
             '------------------------------------
             'Get EntityTypes
             '------------------------------------
@@ -3947,6 +3949,8 @@ Namespace FBM
                 '--------------------------------------------------            
                 Me.EntityType = TableEntityType.getEntityTypesByModel(Me)
             End If
+
+            If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(2)
 
             '------------------------------------
             'Get FactTypes
@@ -3963,6 +3967,8 @@ Namespace FBM
                 TableFactType.GetFactTypesByModel(Me, True)
             End If
 
+            If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(3)
+
             Call TableSubtypeRelationship.GetSubtypeRelationshipsByModel(Me)
 
             '---------------------------------------------------
@@ -3976,6 +3982,8 @@ Namespace FBM
                 '-----------------------------------------------
                 Me.RoleConstraint = TableRoleConstraint.GetRoleConstraintsByModel(Me)
             End If
+
+            If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(4)
 
             '-----------------------------------------------------------------------------
             'Set the ReferenceMode ObjectTypes for each of the EntityTypes in the Model
@@ -3996,12 +4004,13 @@ Namespace FBM
                 Me.ModelNote = TableModelNote.getModelNotesByModel(Me)
             End If
 
+            If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(5)
+
             '------------------------------------
             'Load the Pages for the Model
             '------------------------------------
             Richmond.WriteToStatusBar("Loading the Pages")
             prApplication.ThrowErrorMessage("Loading Pages", pcenumErrorType.Information)
-
 
             If abLoadPages Then
                 If abUseThreading Then

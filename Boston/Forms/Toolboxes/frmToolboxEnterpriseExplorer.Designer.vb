@@ -248,17 +248,17 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.CircularProgressBar.ProgressColor = System.Drawing.Color.SteelBlue
         Me.CircularProgressBar.ProgressWidth = 6
         Me.CircularProgressBar.SecondaryFont = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.CircularProgressBar.Size = New System.Drawing.Size(130, 134)
+        Me.CircularProgressBar.Size = New System.Drawing.Size(80, 80)
         Me.CircularProgressBar.StartAngle = 270
         Me.CircularProgressBar.SubscriptColor = System.Drawing.Color.FromArgb(CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer))
         Me.CircularProgressBar.SubscriptMargin = New System.Windows.Forms.Padding(-4, -35, 0, 0)
-        Me.CircularProgressBar.SubscriptText = "Loading"
+        Me.CircularProgressBar.SubscriptText = ""
         Me.CircularProgressBar.SuperscriptColor = System.Drawing.Color.FromArgb(CType(CType(166, Byte), Integer), CType(CType(166, Byte), Integer), CType(CType(166, Byte), Integer))
         Me.CircularProgressBar.SuperscriptMargin = New System.Windows.Forms.Padding(15, 30, 0, 0)
         Me.CircularProgressBar.SuperscriptText = ""
         Me.CircularProgressBar.TabIndex = 5
-        Me.CircularProgressBar.Text = "0"
-        Me.CircularProgressBar.TextMargin = New System.Windows.Forms.Padding(2, 5, 0, 0)
+        Me.CircularProgressBar.Text = "0%"
+        Me.CircularProgressBar.TextMargin = New System.Windows.Forms.Padding(0, 1, 0, 0)
         Me.CircularProgressBar.Value = 68
         '
         'Timer_FormSetup
@@ -508,25 +508,25 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.ContextMenuStrip_ORMModels.ImageScalingSize = New System.Drawing.Size(24, 24)
         Me.ContextMenuStrip_ORMModels.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItemAddModel, Me.ToolStripSeparator2, Me.ToolStripMenuItem1})
         Me.ContextMenuStrip_ORMModels.Name = "ContextMenuStrip_ORMModels"
-        Me.ContextMenuStrip_ORMModels.Size = New System.Drawing.Size(249, 107)
+        Me.ContextMenuStrip_ORMModels.Size = New System.Drawing.Size(221, 74)
         '
         'ToolStripMenuItemAddModel
         '
         Me.ToolStripMenuItemAddModel.Image = Global.Boston.My.Resources.MenuImages.DatabaseAdd16x16
         Me.ToolStripMenuItemAddModel.Name = "ToolStripMenuItemAddModel"
-        Me.ToolStripMenuItemAddModel.Size = New System.Drawing.Size(248, 32)
+        Me.ToolStripMenuItemAddModel.Size = New System.Drawing.Size(220, 32)
         Me.ToolStripMenuItemAddModel.Text = "&Add Model"
         '
         'ToolStripSeparator2
         '
         Me.ToolStripSeparator2.Name = "ToolStripSeparator2"
-        Me.ToolStripSeparator2.Size = New System.Drawing.Size(245, 6)
+        Me.ToolStripSeparator2.Size = New System.Drawing.Size(217, 6)
         '
         'ToolStripMenuItem1
         '
         Me.ToolStripMenuItem1.Image = Global.Boston.My.Resources.Resources.XML16x16
         Me.ToolStripMenuItem1.Name = "ToolStripMenuItem1"
-        Me.ToolStripMenuItem1.Size = New System.Drawing.Size(248, 32)
+        Me.ToolStripMenuItem1.Size = New System.Drawing.Size(220, 32)
         Me.ToolStripMenuItem1.Text = "&Import .fbm File"
         '
         'HelpProvider
