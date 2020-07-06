@@ -37,6 +37,8 @@ Namespace Parser.Meta.Database
             Me.Connection = Connection
             Me.Transforms = Transforms
 
+            If SchemaRow Is Nothing Then Exit Sub 'Not used for columns on Indexes
+
             For Each lrRelation In SchemaRow.Relation
                 Dim lsReferencedTableName As String = ""
 
@@ -61,6 +63,7 @@ Namespace Parser.Meta.Database
         End Sub
 
         Public Function GetCopy() As IEntity Implements IEntity.GetCopy
+
             Dim col As New Column(Me.mValue, Me.SchemaRowVal.GetCopy, Me.Owner, Me.Connection, Me.Transforms)
             For Each r In Me.ReplaceAllList.List
                 col.ReplaceAllList.Add(r.OldVal, r.NewVal)
@@ -68,6 +71,7 @@ Namespace Parser.Meta.Database
             col.ListCount = Me.ListCount
             col.ListPos = Me.ListPos
             Return col
+
         End Function
 
         ''' <summary>
@@ -287,6 +291,14 @@ Namespace Parser.Meta.Database
                 Catch ex As Exception
                     Return Me.DataType
                 End Try
+
+            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_SCHEMAROWVAL) Then
+                'return listpos               
+                Return Me.SchemaRowVal
+
+            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_OWNER) Then
+                'return listpos               
+                Return Me.Owner
 
             ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_DATATYPE) Then
                 'return provider datatype
