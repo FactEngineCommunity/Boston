@@ -236,11 +236,7 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.CircularProgressBar.ProgressColor = System.Drawing.Color.SteelBlue
         Me.CircularProgressBar.ProgressWidth = 6
         Me.CircularProgressBar.SecondaryFont = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-<<<<<<< HEAD
         Me.CircularProgressBar.Size = New System.Drawing.Size(55, 55)
-=======
-        Me.CircularProgressBar.Size = New System.Drawing.Size(80, 80)
->>>>>>> b25ace31232fcbaa93f9b73528729ff615362ecf
         Me.CircularProgressBar.StartAngle = 270
         Me.CircularProgressBar.SubscriptColor = System.Drawing.Color.FromArgb(CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer))
         Me.CircularProgressBar.SubscriptMargin = New System.Windows.Forms.Padding(-4, -35, 0, 0)
@@ -500,41 +496,25 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.ContextMenuStrip_ORMModels.ImageScalingSize = New System.Drawing.Size(24, 24)
         Me.ContextMenuStrip_ORMModels.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItemAddModel, Me.ToolStripSeparator2, Me.ToolStripMenuItem1})
         Me.ContextMenuStrip_ORMModels.Name = "ContextMenuStrip_ORMModels"
-<<<<<<< HEAD
         Me.ContextMenuStrip_ORMModels.Size = New System.Drawing.Size(168, 70)
-=======
-        Me.ContextMenuStrip_ORMModels.Size = New System.Drawing.Size(221, 74)
->>>>>>> b25ace31232fcbaa93f9b73528729ff615362ecf
         '
         'ToolStripMenuItemAddModel
         '
         Me.ToolStripMenuItemAddModel.Image = Global.Boston.My.Resources.MenuImages.DatabaseAdd16x16
         Me.ToolStripMenuItemAddModel.Name = "ToolStripMenuItemAddModel"
-<<<<<<< HEAD
         Me.ToolStripMenuItemAddModel.Size = New System.Drawing.Size(167, 30)
-=======
-        Me.ToolStripMenuItemAddModel.Size = New System.Drawing.Size(220, 32)
->>>>>>> b25ace31232fcbaa93f9b73528729ff615362ecf
         Me.ToolStripMenuItemAddModel.Text = "&Add Model"
         '
         'ToolStripSeparator2
         '
         Me.ToolStripSeparator2.Name = "ToolStripSeparator2"
-<<<<<<< HEAD
         Me.ToolStripSeparator2.Size = New System.Drawing.Size(164, 6)
-=======
-        Me.ToolStripSeparator2.Size = New System.Drawing.Size(217, 6)
->>>>>>> b25ace31232fcbaa93f9b73528729ff615362ecf
         '
         'ToolStripMenuItem1
         '
         Me.ToolStripMenuItem1.Image = Global.Boston.My.Resources.Resources.XML16x16
         Me.ToolStripMenuItem1.Name = "ToolStripMenuItem1"
-<<<<<<< HEAD
         Me.ToolStripMenuItem1.Size = New System.Drawing.Size(167, 30)
-=======
-        Me.ToolStripMenuItem1.Size = New System.Drawing.Size(220, 32)
->>>>>>> b25ace31232fcbaa93f9b73528729ff615362ecf
         Me.ToolStripMenuItem1.Text = "&Import .fbm File"
         '
         'HelpProvider
