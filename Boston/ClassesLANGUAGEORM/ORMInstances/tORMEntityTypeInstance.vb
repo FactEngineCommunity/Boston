@@ -1374,7 +1374,7 @@ Namespace FBM
 
             Try
 
-                Me.ReferenceModeFactType.FactTable.RemoveFromPage(abBroadcastInterfaceEvent)
+                If Me.ReferenceModeFactType.FactTable IsNot Nothing Then Me.ReferenceModeFactType.FactTable.RemoveFromPage(abBroadcastInterfaceEvent)
                 Me.ReferenceModeFactType.FactTypeName.RemoveFromPage(abBroadcastInterfaceEvent)
 
                 Me.ReferenceModeFactType.RemoveFromPage(abBroadcastInterfaceEvent)

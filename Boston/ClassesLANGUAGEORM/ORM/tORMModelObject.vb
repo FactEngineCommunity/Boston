@@ -156,8 +156,9 @@ Namespace FBM
         <NonSerialized()> _
         Public PreboundReadingText As String = ""
 
-        <XmlElement()> _
-        <NonSerialized()> _
+
+        '<NonSerialized()> _
+        <XmlElement()>
         Public SubtypeRelationship As New List(Of FBM.tSubtypeRelationship)
 
         ''' <summary>
