@@ -12,6 +12,7 @@ Imports SolidBrush = MindFusion.Drawing.SolidBrush
 Imports TextureBrush = MindFusion.Drawing.TextureBrush
 Imports System.IO
 Imports System.Threading
+Imports System.ComponentModel
 
 Public Class frmDiagramORM
 
@@ -138,11 +139,11 @@ Public Class frmDiagramORM
             Dim lsNewInstance = lsNewValue
             Dim lsOldInstance = lrFactDataInstance.Data
 
-            Dim liUsingOldFactDataCount = Aggregate FactType In Me.zrPage.Model.FactType _
-                                From Fact In FactType.Fact _
-                                From FactData In Fact.Data _
+            Dim liUsingOldFactDataCount = Aggregate FactType In Me.zrPage.Model.FactType
+                                From Fact In FactType.Fact
+                                From FactData In Fact.Data
                                 Where FactData.Data = lsOldInstance _
-                                And Not (FactData Is lrFactDataInstance.FactData) _
+                                And Not (FactData Is lrFactDataInstance.FactData)
                                 Into Count()
 
             lrDictionaryEntry = Me.zrPage.Model.ModelDictionary.Find(AddressOf lrDictionaryEntry.Equals)
@@ -448,9 +449,9 @@ Public Class frmDiagramORM
         Dim loPoint As New PointF(0, 0)
         Dim lrFactType As FBM.FactType
 
-        Dim larFactType = (From Role In Me.zrPage.Model.Role _
-                          Where Role.JoinedORMObject.Id = aoModelObject.Id _
-                          Select Role.FactType).Distinct
+        Dim larFactType = (From Role In Me.zrPage.Model.Role
+                           Where Role.JoinedORMObject.Id = aoModelObject.Id
+                           Select Role.FactType).Distinct
 
         loPoint.X = CInt(Math.Floor((300 - 10 + 1) * Rnd())) + 10
         loPoint.Y = CInt(Math.Floor((300 - 10 + 1) * Rnd())) + 10
@@ -902,11 +903,11 @@ Public Class frmDiagramORM
                                     lrRoleConstraintInstance = Me.zrPage.DropRoleConstraintAtPoint(lrRoleConstraint, loPt)
                                     Me.zrPage.Save()
 
-                                Case Is = pcenumRoleConstraintType.RingConstraint, _
-                                          pcenumRoleConstraintType.EqualityConstraint, _
-                                          pcenumRoleConstraintType.ExternalUniquenessConstraint, _
-                                          pcenumRoleConstraintType.ExclusiveORConstraint, _
-                                          pcenumRoleConstraintType.ExclusionConstraint, _
+                                Case Is = pcenumRoleConstraintType.RingConstraint,
+                                          pcenumRoleConstraintType.EqualityConstraint,
+                                          pcenumRoleConstraintType.ExternalUniquenessConstraint,
+                                          pcenumRoleConstraintType.ExclusiveORConstraint,
+                                          pcenumRoleConstraintType.ExclusionConstraint,
                                           pcenumRoleConstraintType.SubsetConstraint
                                     lrRoleConstraintInstance = Me.zrPage.DropRoleConstraintAtPoint(lrRoleConstraint, loPt, True)
                                     Me.zrPage.Save()
@@ -960,11 +961,11 @@ Public Class frmDiagramORM
                         Case Is = "Binary Fact Type"
                             Dim lsFactTypeName As String = ""
                             lsFactTypeName = Me.zrPage.Model.CreateUniqueFactTypeName("NewFactType", 0)
-                            lrFactType = Me.zrPage.Model.CreateFactType(lsFactTypeName, _
-                                                                        Nothing, _
-                                                                        False, _
-                                                                        True, _
-                                                                        False, _
+                            lrFactType = Me.zrPage.Model.CreateFactType(lsFactTypeName,
+                                                                        Nothing,
+                                                                        False,
+                                                                        True,
+                                                                        False,
                                                                         Nothing,
                                                                         False)
 
@@ -973,9 +974,9 @@ Public Class frmDiagramORM
                             lrFactType.CreateRole(Nothing)
                             Dim lrFactTypeInstance As FBM.FactTypeInstance
                             loDropPtF = New Point(loPt.X - 15, loPt.Y - 5)
-                            lrFactTypeInstance = Me.zrPage.DropFactTypeAtPoint(lrFactType, _
-                                                                               loDropPtF, _
-                                                                               False, _
+                            lrFactTypeInstance = Me.zrPage.DropFactTypeAtPoint(lrFactType,
+                                                                               loDropPtF,
+                                                                               False,
                                                                                False)
                             'Me.zrPage.Save() - 20190929-VM-Caused errors because called removeRolesThatReferenceNothing, removing the FactType just dropped.
                         Case Is = "Subtype Connector"
@@ -1416,9 +1417,9 @@ Public Class frmDiagramORM
                                     Dim lrDraggedOverModelObject As FBM.ModelObject
                                     lrDraggedOverModelObject = loNode.Tag
                                     Select Case lrDraggedOverModelObject.ConceptType
-                                        Case Is = pcenumConceptType.EntityType, _
-                                                  pcenumConceptType.ValueType, _
-                                                  pcenumConceptType.FactType, _
+                                        Case Is = pcenumConceptType.EntityType,
+                                                  pcenumConceptType.ValueType,
+                                                  pcenumConceptType.FactType,
                                                   pcenumConceptType.FactTypeReading
                                             e.Effect = DragDropEffects.None
                                         Case Is = pcenumConceptType.Role
@@ -1542,7 +1543,7 @@ Public Class frmDiagramORM
         SaveFileDialog.Filter = "SVG files|*.svg"
         If SaveFileDialog.ShowDialog() = DialogResult.OK Then
 
-            Dim svgExp As MindFusion.Diagramming.Export.SvgExporter = _
+            Dim svgExp As MindFusion.Diagramming.Export.SvgExporter =
              New MindFusion.Diagramming.Export.SvgExporter()
             svgExp.Export(DiagramView.Diagram, SaveFileDialog.FileName)
         End If
@@ -1905,7 +1906,7 @@ Public Class frmDiagramORM
                     lrModelNoteInstance.ModelNote.JoinedObjectType.Id = lrTargetModelObject.Id
             End Select
 
-            If (lrTargetModelObject Is Nothing) And _
+            If (lrTargetModelObject Is Nothing) And
              Not (TypeOf e.Link.Destination Is DummyNode) Then
                 Me.Diagram.Links.Remove(e.Link)
                 Exit Sub
@@ -1998,9 +1999,9 @@ Public Class frmDiagramORM
                                         MsgBox("You can only create links from a Ring Constraint to the Roles of a Fact Type.")
                                         Me.Diagram.Links.Remove(e.Link)
                                     End If
-                                Case Is = pcenumRoleConstraintType.EqualityConstraint, _
-                                          pcenumRoleConstraintType.ExclusionConstraint, _
-                                          pcenumRoleConstraintType.InclusiveORConstraint, _
+                                Case Is = pcenumRoleConstraintType.EqualityConstraint,
+                                          pcenumRoleConstraintType.ExclusionConstraint,
+                                          pcenumRoleConstraintType.InclusiveORConstraint,
                                           pcenumRoleConstraintType.ExclusiveORConstraint
 
                                     Dim lrRoleInstance As FBM.RoleInstance = lrTargetModelObject
@@ -2010,8 +2011,8 @@ Public Class frmDiagramORM
 
                                     '------------------------------------
                                     Me.Diagram.Links.Remove(e.Link)
-                                    lrRoleConstraintRole = lrRoleConstraintInstance.RoleConstraint.CreateRoleConstraintRole(lrRole, _
-                                                                                                                            lrRoleConstraintInstance.CurrentArgument, _
+                                    lrRoleConstraintRole = lrRoleConstraintInstance.RoleConstraint.CreateRoleConstraintRole(lrRole,
+                                                                                                                            lrRoleConstraintInstance.CurrentArgument,
                                                                                                                             lrSubtypeConstraintInstance)
 
                                     'lrRoleConstraintRole = New FBM.RoleConstraintRole(lrRole, lrRoleConstraint)
@@ -2148,12 +2149,12 @@ Public Class frmDiagramORM
                     Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
                     lrRoleConstraintInstance = lrModelObject
                     Select Case lrRoleConstraintInstance.RoleConstraintType
-                        Case Is = pcenumRoleConstraintType.RingConstraint, _
-                                  pcenumRoleConstraintType.EqualityConstraint, _
-                                  pcenumRoleConstraintType.ExternalUniquenessConstraint, _
-                                  pcenumRoleConstraintType.ExclusionConstraint, _
-                                  pcenumRoleConstraintType.ExclusiveORConstraint, _
-                                  pcenumRoleConstraintType.InclusiveORConstraint, _
+                        Case Is = pcenumRoleConstraintType.RingConstraint,
+                                  pcenumRoleConstraintType.EqualityConstraint,
+                                  pcenumRoleConstraintType.ExternalUniquenessConstraint,
+                                  pcenumRoleConstraintType.ExclusionConstraint,
+                                  pcenumRoleConstraintType.ExclusiveORConstraint,
+                                  pcenumRoleConstraintType.InclusiveORConstraint,
                                   pcenumRoleConstraintType.SubsetConstraint
                             e.Link.Tag = lrModelObject
                             e.Link.BaseShape = ArrowHead.None
@@ -2363,8 +2364,8 @@ Public Class frmDiagramORM
 
                             lrRoleConstraintRole = lrRoleConstraintInstance.RoleConstraint.CreateRoleConstraintRole(lrRoleInstance.Role)
                             lrRoleConstraintInstance.CurrentArgument.AddRoleConstraintRole(lrRoleConstraintRole)
-                            lrRoleInstance.Shape.Text = lrRoleConstraintInstance.CurrentArgument.SequenceNr.ToString & _
-                                                        "." & _
+                            lrRoleInstance.Shape.Text = lrRoleConstraintInstance.CurrentArgument.SequenceNr.ToString &
+                                                        "." &
                                                         lrRoleConstraintRole.ArgumentSequenceNr.ToString
 
                         ElseIf Me.zrPage.Model.ExistsJoinPathForRoles(larRole, liJoinPathError, lrRoleConstraintInstance.RoleConstraint) Then
@@ -2373,8 +2374,8 @@ Public Class frmDiagramORM
 
                                 lrRoleConstraintRole = lrRoleConstraintInstance.RoleConstraint.CreateRoleConstraintRole(lrRoleInstance.Role, lrRoleConstraintInstance.CurrentArgument)
                                 lrRoleConstraintInstance.CurrentArgument.AddRoleConstraintRole(lrRoleConstraintRole)
-                                lrRoleInstance.Shape.Text = lrRoleConstraintInstance.CurrentArgument.SequenceNr.ToString & _
-                                                            "." & _
+                                lrRoleInstance.Shape.Text = lrRoleConstraintInstance.CurrentArgument.SequenceNr.ToString &
+                                                            "." &
                                                             lrRoleConstraintRole.ArgumentSequenceNr.ToString
 
                                 If lrRoleConstraintInstance.CurrentArgument.RoleConstraintRole.Count = 2 Then
@@ -2397,15 +2398,15 @@ Public Class frmDiagramORM
 
                                 lrRoleConstraintRole = lrRoleConstraintInstance.RoleConstraint.CreateRoleConstraintRole(lrRoleInstance.Role)
                                 lrRoleConstraintInstance.CurrentArgument.AddRoleConstraintRole(lrRoleConstraintRole)
-                                lrRoleInstance.Shape.Text = lrRoleConstraintInstance.CurrentArgument.SequenceNr.ToString & _
-                                                            "." & _
+                                lrRoleInstance.Shape.Text = lrRoleConstraintInstance.CurrentArgument.SequenceNr.ToString &
+                                                            "." &
                                                             lrRoleConstraintRole.ArgumentSequenceNr.ToString
 
                             Else
                                 lrRoleConstraintRole = lrRoleConstraintInstance.RoleConstraint.CreateRoleConstraintRole(lrRoleInstance.Role)
                                 lrRoleConstraintInstance.CurrentArgument.AddRoleConstraintRole(lrRoleConstraintRole)
-                                lrRoleInstance.Shape.Text = lrRoleConstraintInstance.CurrentArgument.SequenceNr.ToString & _
-                                                            "." & _
+                                lrRoleInstance.Shape.Text = lrRoleConstraintInstance.CurrentArgument.SequenceNr.ToString &
+                                                            "." &
                                                             lrRoleConstraintRole.ArgumentSequenceNr.ToString
                             End If
                         Else
@@ -2419,8 +2420,8 @@ Public Class frmDiagramORM
 
                                 lrRoleConstraintRole = lrRoleConstraintInstance.RoleConstraint.CreateRoleConstraintRole(lrRoleInstance.Role)
                                 lrRoleConstraintInstance.CurrentArgument.AddRoleConstraintRole(lrRoleConstraintRole, True)
-                                lrRoleInstance.Shape.Text = lrRoleConstraintInstance.CurrentArgument.SequenceNr.ToString & _
-                                                            "." & _
+                                lrRoleInstance.Shape.Text = lrRoleConstraintInstance.CurrentArgument.SequenceNr.ToString &
+                                                            "." &
                                                             lrRoleConstraintRole.ArgumentSequenceNr.ToString
                             End If
                         End If
@@ -2621,7 +2622,7 @@ Public Class frmDiagramORM
                         Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
                         lrRoleConstraintInstance = Me.GetRoleConstraintCurrentlyCreatingArgument
                         lrRoleConstraintInstance.RoleConstraint.AddArgument(lrRoleConstraintInstance.CurrentArgument, True)
-                        lrRoleConstraintInstance.CurrentArgument = New FBM.RoleConstraintArgument(lrRoleConstraintInstance.RoleConstraint, _
+                        lrRoleConstraintInstance.CurrentArgument = New FBM.RoleConstraintArgument(lrRoleConstraintInstance.RoleConstraint,
                                                                                                   lrRoleConstraintInstance.RoleConstraint.Argument.Count + 1)
                     End If
                 Case Is = pcenumConceptType.RoleConstraint
@@ -2648,7 +2649,7 @@ Public Class frmDiagramORM
                         '--------------------------------------------------------------------------
                         lrRoleConstraintInstance.RoleConstraint.AddArgument(lrRoleConstraintInstance.CurrentArgument, True)
                         lrRoleConstraintInstance.CurrentArgument = Nothing
-                    End If                    
+                    End If
                 Case Is = pcenumConceptType.EntityType
                     Dim lrEntityTypeInstance As FBM.EntityTypeInstance
                     lrEntityTypeInstance = lrModelObject
@@ -3160,7 +3161,7 @@ Public Class frmDiagramORM
                     Call Me.CreateExternalUniquenessConstraint(larRoleInstance, lo_point)
                 End If
             Case Is = Keys.S 'Subtype
-                If ((Me.zrPage.SelectedObject.Count = 2) And Me.zrPage.are_all_SelectedObjects_entity_types) Or _
+                If ((Me.zrPage.SelectedObject.Count = 2) And Me.zrPage.are_all_SelectedObjects_entity_types) Or
                    ((Me.zrPage.SelectedObject.Count = 2) And Me.zrPage.areSelectedObjectsEntityTypeAndFactType) Then
 
                     Dim lrEntityType_1 As New FBM.EntityTypeInstance
@@ -3249,10 +3250,10 @@ Public Class frmDiagramORM
 
     End Function
 
-    Public Function CreateValueType(Optional ByVal as_value_type_name As String = Nothing, _
-                                    Optional ByVal ab_use_value_type_name_as_id As Boolean = False, _
-                                    Optional ByVal aiDataType As pcenumORMDataType = pcenumORMDataType.DataTypeNotSet, _
-                                    Optional ByVal aiLength As Integer = Nothing, _
+    Public Function CreateValueType(Optional ByVal as_value_type_name As String = Nothing,
+                                    Optional ByVal ab_use_value_type_name_as_id As Boolean = False,
+                                    Optional ByVal aiDataType As pcenumORMDataType = pcenumORMDataType.DataTypeNotSet,
+                                    Optional ByVal aiLength As Integer = Nothing,
                                     Optional ByVal aiPrecision As Integer = Nothing) As FBM.ValueTypeInstance
 
         Dim lo_ValueTypeInstance As FBM.ValueTypeInstance
@@ -3606,8 +3607,8 @@ Public Class frmDiagramORM
 
                             Case Is = pcenumConceptType.RoleConstraint
                                 Select Case loNode.Tag.RoleConstraintType
-                                    Case Is = pcenumRoleConstraintType.RingConstraint, _
-                                              pcenumRoleConstraintType.ExclusionConstraint, _
+                                    Case Is = pcenumRoleConstraintType.RingConstraint,
+                                              pcenumRoleConstraintType.ExclusionConstraint,
                                               pcenumRoleConstraintType.ExternalUniquenessConstraint
 
                                         '----------------------------
@@ -3650,16 +3651,16 @@ Public Class frmDiagramORM
                             Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
                             lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute})
                             Select Case lrValueTypeInstance.DataType
-                                Case Is = pcenumORMDataType.NumericFloatCustomPrecision, _
-                                          pcenumORMDataType.NumericDecimal, _
+                                Case Is = pcenumORMDataType.NumericFloatCustomPrecision,
+                                          pcenumORMDataType.NumericDecimal,
                                           pcenumORMDataType.NumericMoney
                                     Call lrValueTypeInstance.SetPropertyAttributes(Me, "DataTypePrecision", True)
                                     Call lrValueTypeInstance.SetPropertyAttributes(Me, "DataTypeLength", False)
-                                Case Is = pcenumORMDataType.RawDataFixedLength, _
-                                          pcenumORMDataType.RawDataLargeLength, _
-                                          pcenumORMDataType.RawDataVariableLength, _
-                                          pcenumORMDataType.TextFixedLength, _
-                                          pcenumORMDataType.TextLargeLength, _
+                                Case Is = pcenumORMDataType.RawDataFixedLength,
+                                          pcenumORMDataType.RawDataLargeLength,
+                                          pcenumORMDataType.RawDataVariableLength,
+                                          pcenumORMDataType.TextFixedLength,
+                                          pcenumORMDataType.TextLargeLength,
                                           pcenumORMDataType.TextVariableLength
                                     Call lrValueTypeInstance.SetPropertyAttributes(Me, "DataTypeLength", True)
                                     Call lrValueTypeInstance.SetPropertyAttributes(Me, "DataTypePrecision", False)
@@ -3681,16 +3682,16 @@ Public Class frmDiagramORM
                             If lrEntityTypeInstance.EntityType.HasSimpleReferenceScheme Then
                                 Call lrEntityTypeInstance.SetPropertyAttributes(Me, "DataType", True)
                                 Select Case lrEntityTypeInstance.DataType
-                                    Case Is = pcenumORMDataType.NumericFloatCustomPrecision, _
-                                              pcenumORMDataType.NumericDecimal, _
+                                    Case Is = pcenumORMDataType.NumericFloatCustomPrecision,
+                                              pcenumORMDataType.NumericDecimal,
                                               pcenumORMDataType.NumericMoney
                                         Call lrEntityTypeInstance.SetPropertyAttributes(Me, "DataTypePrecision", True)
                                         Call lrEntityTypeInstance.SetPropertyAttributes(Me, "DataTypeLength", False)
-                                    Case Is = pcenumORMDataType.RawDataFixedLength, _
-                                              pcenumORMDataType.RawDataLargeLength, _
-                                              pcenumORMDataType.RawDataVariableLength, _
-                                              pcenumORMDataType.TextFixedLength, _
-                                              pcenumORMDataType.TextLargeLength, _
+                                    Case Is = pcenumORMDataType.RawDataFixedLength,
+                                              pcenumORMDataType.RawDataLargeLength,
+                                              pcenumORMDataType.RawDataVariableLength,
+                                              pcenumORMDataType.TextFixedLength,
+                                              pcenumORMDataType.TextLargeLength,
                                               pcenumORMDataType.TextVariableLength
                                         Call lrEntityTypeInstance.SetPropertyAttributes(Me, "DataTypeLength", True)
                                         Call lrEntityTypeInstance.SetPropertyAttributes(Me, "DataTypePrecision", False)
@@ -3712,16 +3713,16 @@ Public Class frmDiagramORM
                             If lrEntityTypeName.EntityTypeInstance.EntityType.HasSimpleReferenceScheme Then
                                 Call lrEntityTypeName.EntityTypeInstance.SetPropertyAttributes(Me, "DataType", True)
                                 Select Case lrEntityTypeName.EntityTypeInstance.DataType
-                                    Case Is = pcenumORMDataType.NumericFloatCustomPrecision, _
-                                              pcenumORMDataType.NumericDecimal, _
+                                    Case Is = pcenumORMDataType.NumericFloatCustomPrecision,
+                                              pcenumORMDataType.NumericDecimal,
                                               pcenumORMDataType.NumericMoney
                                         Call lrEntityTypeName.EntityTypeInstance.SetPropertyAttributes(Me, "DataTypePrecision", True)
                                         Call lrEntityTypeName.EntityTypeInstance.SetPropertyAttributes(Me, "DataTypeLength", False)
-                                    Case Is = pcenumORMDataType.RawDataFixedLength, _
-                                              pcenumORMDataType.RawDataLargeLength, _
-                                              pcenumORMDataType.RawDataVariableLength, _
-                                              pcenumORMDataType.TextFixedLength, _
-                                              pcenumORMDataType.TextLargeLength, _
+                                    Case Is = pcenumORMDataType.RawDataFixedLength,
+                                              pcenumORMDataType.RawDataLargeLength,
+                                              pcenumORMDataType.RawDataVariableLength,
+                                              pcenumORMDataType.TextFixedLength,
+                                              pcenumORMDataType.TextLargeLength,
                                               pcenumORMDataType.TextVariableLength
                                         Call lrEntityTypeName.EntityTypeInstance.SetPropertyAttributes(Me, "DataTypeLength", True)
                                         Call lrEntityTypeName.EntityTypeInstance.SetPropertyAttributes(Me, "DataTypePrecision", False)
@@ -4161,7 +4162,7 @@ Public Class frmDiagramORM
             'Do specific Object/ConceptType processing
             ' Adding to Page.SelectedObject
             '---------------------------------------------
-            Dim laiValidConceptTypes() As pcenumConceptType = {pcenumConceptType.Role, _
+            Dim laiValidConceptTypes() As pcenumConceptType = {pcenumConceptType.Role,
                                                                pcenumConceptType.FactType}
             If Not laiValidConceptTypes.Contains(e.Node.Tag.ConceptType) Then
                 Call Me.zrPage.Model.RemoveRolesThatReferenceNothing(True)
@@ -4268,11 +4269,11 @@ Public Class frmDiagramORM
                             Me.DiagramView.ContextMenuStrip = Me.ContextMenuStrip_FrequencyConstraint
                         Case Is = pcenumRoleConstraintType.RingConstraint
                             Me.DiagramView.ContextMenuStrip = ContextMenuStrip_RingConstraint
-                        Case Is = pcenumRoleConstraintType.ExclusionConstraint, _
-                                  pcenumRoleConstraintType.ExternalUniquenessConstraint, _
-                                  pcenumRoleConstraintType.EqualityConstraint, _
-                                  pcenumRoleConstraintType.SubsetConstraint, _
-                                  pcenumRoleConstraintType.ExclusiveORConstraint, _
+                        Case Is = pcenumRoleConstraintType.ExclusionConstraint,
+                                  pcenumRoleConstraintType.ExternalUniquenessConstraint,
+                                  pcenumRoleConstraintType.EqualityConstraint,
+                                  pcenumRoleConstraintType.SubsetConstraint,
+                                  pcenumRoleConstraintType.ExclusiveORConstraint,
                                   pcenumRoleConstraintType.InclusiveORConstraint
                             Me.DiagramView.ContextMenuStrip = ContextMenuStrip_ExternalRoleConstraint
                     End Select
@@ -4890,9 +4891,9 @@ Public Class frmDiagramORM
 
 
         Try
-            lrRoleConstraint = Me.zrPage.Model.CreateRoleConstraint(pcenumRoleConstraintType.ExclusionConstraint, _
-                                                                    aarRole, _
-                                                                    lsRoleConstraintName, _
+            lrRoleConstraint = Me.zrPage.Model.CreateRoleConstraint(pcenumRoleConstraintType.ExclusionConstraint,
+                                                                    aarRole,
+                                                                    lsRoleConstraintName,
                                                                     0)
 
             Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
@@ -4959,9 +4960,9 @@ Public Class frmDiagramORM
             '---------------------------
             'Create the RoleConstraint
             '---------------------------
-            lrRoleConstraint = Me.zrPage.Model.CreateRoleConstraint(pcenumRoleConstraintType.ExternalUniquenessConstraint, _
-                                                                    larRole, _
-                                                                    "ExternalUniquenessConstraint", _
+            lrRoleConstraint = Me.zrPage.Model.CreateRoleConstraint(pcenumRoleConstraintType.ExternalUniquenessConstraint,
+                                                                    larRole,
+                                                                    "ExternalUniquenessConstraint",
                                                                     0)
 
             Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
@@ -4997,9 +4998,9 @@ Public Class frmDiagramORM
             '--------------------------------
             'Create the RoleConstraint
             '--------------------------------
-            lrRoleConstraint = Me.zrPage.Model.CreateRoleConstraint(pcenumRoleConstraintType.EqualityConstraint, _
-                                                                    larRole, _
-                                                                    "EqualityConstraint", _
+            lrRoleConstraint = Me.zrPage.Model.CreateRoleConstraint(pcenumRoleConstraintType.EqualityConstraint,
+                                                                    larRole,
+                                                                    "EqualityConstraint",
                                                                     0)
 
             Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
@@ -5029,9 +5030,9 @@ Public Class frmDiagramORM
 
             larRole.Add(arRoleInstance.Role)
 
-            lrRoleConstraint = Me.zrPage.Model.CreateRoleConstraint(pcenumRoleConstraintType.FrequencyConstraint, _
-                                                                    larRole, _
-                                                                    "FrequencyConstraint", _
+            lrRoleConstraint = Me.zrPage.Model.CreateRoleConstraint(pcenumRoleConstraintType.FrequencyConstraint,
+                                                                    larRole,
+                                                                    "FrequencyConstraint",
                                                                     0)
 
             lrRoleConstraintInstance = lrRoleConstraint.CloneInstance(Me.zrPage, True)
@@ -5098,9 +5099,9 @@ Public Class frmDiagramORM
             '---------------------------
             'Create the RoleConstraint
             '---------------------------
-            lrRoleConstraint = Me.zrPage.Model.CreateRoleConstraint(pcenumRoleConstraintType.InclusiveORConstraint, _
-                                                                    larRole, _
-                                                                    "InclusiveOrConstraint", _
+            lrRoleConstraint = Me.zrPage.Model.CreateRoleConstraint(pcenumRoleConstraintType.InclusiveORConstraint,
+                                                                    larRole,
+                                                                    "InclusiveOrConstraint",
                                                                     0)
 
             Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
@@ -5134,9 +5135,9 @@ Public Class frmDiagramORM
             '---------------------------
             'Create the RoleConstraint
             '---------------------------
-            lrRoleConstraint = Me.zrPage.Model.CreateRoleConstraint(pcenumRoleConstraintType.ExclusiveORConstraint, _
-                                                                    larRole, _
-                                                                    "ExclusiveOrConstraint", _
+            lrRoleConstraint = Me.zrPage.Model.CreateRoleConstraint(pcenumRoleConstraintType.ExclusiveORConstraint,
+                                                                    larRole,
+                                                                    "ExclusiveOrConstraint",
                                                                     0)
 
             Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
@@ -5328,10 +5329,10 @@ Public Class frmDiagramORM
         loNode = e.Node
         lrModelObject = loNode.tag
         Select Case lrModelObject.ConceptType
-            Case Is = pcenumConceptType.Role, _
-                      pcenumConceptType.RoleConstraint, _
-                      pcenumConceptType.EntityType, _
-                      pcenumConceptType.FactType, _
+            Case Is = pcenumConceptType.Role,
+                      pcenumConceptType.RoleConstraint,
+                      pcenumConceptType.EntityType,
+                      pcenumConceptType.FactType,
                       pcenumConceptType.FactTypeReading
                 e.Cancel = True
         End Select
@@ -5522,7 +5523,7 @@ Public Class frmDiagramORM
 
         Try
             Select Case arModelObject.ConceptType
-                Case Is = pcenumConceptType.EntityType, _
+                Case Is = pcenumConceptType.EntityType,
                           pcenumConceptType.ValueType
                     '------------------------------------------------
                     'All okay
@@ -5706,16 +5707,16 @@ Public Class frmDiagramORM
                 If lrEntityTypeInstance.EntityType.HasSimpleReferenceScheme Then
                     Call lrEntityTypeInstance.SetPropertyAttributes(Me, "DataType", True)
                     Select Case lrEntityTypeInstance.DataType
-                        Case Is = pcenumORMDataType.NumericFloatCustomPrecision, _
-                                  pcenumORMDataType.NumericDecimal, _
+                        Case Is = pcenumORMDataType.NumericFloatCustomPrecision,
+                                  pcenumORMDataType.NumericDecimal,
                                   pcenumORMDataType.NumericMoney
                             Call lrEntityTypeInstance.SetPropertyAttributes(Me, "DataTypePrecision", True)
                             Call lrEntityTypeInstance.SetPropertyAttributes(Me, "DataTypeLength", False)
-                        Case Is = pcenumORMDataType.RawDataFixedLength, _
-                                  pcenumORMDataType.RawDataLargeLength, _
-                                  pcenumORMDataType.RawDataVariableLength, _
-                                  pcenumORMDataType.TextFixedLength, _
-                                  pcenumORMDataType.TextLargeLength, _
+                        Case Is = pcenumORMDataType.RawDataFixedLength,
+                                  pcenumORMDataType.RawDataLargeLength,
+                                  pcenumORMDataType.RawDataVariableLength,
+                                  pcenumORMDataType.TextFixedLength,
+                                  pcenumORMDataType.TextLargeLength,
                                   pcenumORMDataType.TextVariableLength
                             Call lrEntityTypeInstance.SetPropertyAttributes(Me, "DataTypeLength", True)
                             Call lrEntityTypeInstance.SetPropertyAttributes(Me, "DataTypePrecision", False)
@@ -5867,12 +5868,12 @@ Public Class frmDiagramORM
                                 Select Case Diagram.Nodes(liInd - 1).Tag.RoleConstraintType
                                     Case Is = pcenumRoleConstraintType.InternalUniquenessConstraint
                                         Diagram.Nodes(liInd - 1).Pen.Color = Color.White
-                                    Case Is = pcenumRoleConstraintType.EqualityConstraint, _
-                                                pcenumRoleConstraintType.ExclusionConstraint, _
-                                                pcenumRoleConstraintType.ExclusiveORConstraint, _
-                                                pcenumRoleConstraintType.ExternalUniquenessConstraint, _
-                                                pcenumRoleConstraintType.InclusiveORConstraint, _
-                                                pcenumRoleConstraintType.RingConstraint, _
+                                    Case Is = pcenumRoleConstraintType.EqualityConstraint,
+                                                pcenumRoleConstraintType.ExclusionConstraint,
+                                                pcenumRoleConstraintType.ExclusiveORConstraint,
+                                                pcenumRoleConstraintType.ExternalUniquenessConstraint,
+                                                pcenumRoleConstraintType.InclusiveORConstraint,
+                                                pcenumRoleConstraintType.RingConstraint,
                                                 pcenumRoleConstraintType.SubsetConstraint
                                         Diagram.Nodes(liInd - 1).Pen.Color = Color.White
                                         Me.Diagram.Invalidate()
@@ -6405,7 +6406,7 @@ Public Class frmDiagramORM
                     'Get the list of (Model level) Roles for which to 
                     '  assign the InternalUniquenessConstraint
                     '--------------------------------------------------
-                    Dim larRole As New List(Of FBM.Role)                    
+                    Dim larRole As New List(Of FBM.Role)
 
                     For Each lrRoleInstance In Me.zrPage.SelectedObject
                         larRole.Add(lrRoleInstance.Role)
@@ -6707,14 +6708,14 @@ Public Class frmDiagramORM
                         If lrJoinedFactType.Fact.Count = 0 Then
                             lsMessage = "The Fact Type, '" & lrJoinedFactType.Id & "', must have at least one Sample Population before adding a Fact to this Fact Type."
                             MsgBox(lsMessage)
-                        End If                        
+                        End If
                     Next 'Role
 
                 End If
 
             End If
 
-        Catch ex As Exception            
+        Catch ex As Exception
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
@@ -7051,8 +7052,8 @@ Public Class frmDiagramORM
             Dim lrPage As New FBM.Page(lrEnterpriseView.Tag.Model)
             lrPage = lrEnterpriseView.Tag
 
-            Dim larEntityTypeInstance = From EntityTypeInstance In lrPage.EntityTypeInstance _
-                                        Where EntityTypeInstance.Id = lrEntityTypeInstance.Id _
+            Dim larEntityTypeInstance = From EntityTypeInstance In lrPage.EntityTypeInstance
+                                        Where EntityTypeInstance.Id = lrEntityTypeInstance.Id
                                         Select EntityTypeInstance
 
             For Each lrEntityTypeInstance In larEntityTypeInstance
@@ -7061,11 +7062,11 @@ Public Class frmDiagramORM
 
             'Me.MorphTimer.Enabled = True
             'Me.MorphStepTimer.Enabled = True
-            Me.MorphVector(0) = New tMorphVector(Me.MorphVector(0).StartPoint.X, _
-                                                 Me.MorphVector(0).StartPoint.Y, _
-                                                 lrEntityTypeInstance.X, _
-                                                 lrEntityTypeInstance.Y, _
-                                                 40, _
+            Me.MorphVector(0) = New tMorphVector(Me.MorphVector(0).StartPoint.X,
+                                                 Me.MorphVector(0).StartPoint.Y,
+                                                 lrEntityTypeInstance.X,
+                                                 lrEntityTypeInstance.Y,
+                                                 40,
                                                  Me.MorphVector(0).Shape)
 
             Me.MorphVector(0).StartSize = New Rectangle(0, 0, Me.MorphVector(0).Shape.Bounds.Width, Me.MorphVector(0).Shape.Bounds.Height)
@@ -7130,14 +7131,14 @@ Public Class frmDiagramORM
             '------------------------------------------------------------------
             Dim lr_page As New FBM.Page(lrEnterpriseView.Tag.Model)
             lr_page = lrEnterpriseView.Tag
-            Dim lrValueTypeInstanceList = From ValueTypeInstance In lr_page.ValueTypeInstance _
-                                           Where ValueTypeInstance.Id = lrValueTypeInstance.Id _
-                                           Select New FBM.ValueTypeInstance(lr_page.Model, _
-                                                                    lr_page, _
-                                                                    pcenumLanguage.ORMModel, _
-                                                                    lrValueTypeInstance.Name, _
-                                                                    True, _
-                                                                    ValueTypeInstance.X, _
+            Dim lrValueTypeInstanceList = From ValueTypeInstance In lr_page.ValueTypeInstance
+                                          Where ValueTypeInstance.Id = lrValueTypeInstance.Id
+                                          Select New FBM.ValueTypeInstance(lr_page.Model,
+                                                                    lr_page,
+                                                                    pcenumLanguage.ORMModel,
+                                                                    lrValueTypeInstance.Name,
+                                                                    True,
+                                                                    ValueTypeInstance.X,
                                                                     ValueTypeInstance.Y)
 
             For Each lrValueTypeInstance In lrValueTypeInstanceList
@@ -7146,11 +7147,11 @@ Public Class frmDiagramORM
 
             'Me.MorphTimer.Enabled = True
             'Me.MorphStepTimer.Enabled = True
-            Me.MorphVector(0) = New tMorphVector(Me.MorphVector(0).StartPoint.X, _
-                                                 Me.MorphVector(0).StartPoint.Y, _
-                                                 lrValueTypeInstance.X, _
-                                                 lrValueTypeInstance.Y, _
-                                                 40, _
+            Me.MorphVector(0) = New tMorphVector(Me.MorphVector(0).StartPoint.X,
+                                                 Me.MorphVector(0).StartPoint.Y,
+                                                 lrValueTypeInstance.X,
+                                                 lrValueTypeInstance.Y,
+                                                 40,
                                                  Me.MorphVector(0).Shape)
             Me.MorphVector(0).EnterpriseTreeView = lrEnterpriseView
             Me.MorphStepTimer.Tag = lrEnterpriseView.TreeNode
@@ -7204,13 +7205,13 @@ Public Class frmDiagramORM
                     Me.MorphVector(0).TargetZoomFactor = lrPage.DiagramView.ZoomFactor
                 End If
 
-                Dim larFactDataInstance = From FactTypeInstance In lrPage.FactTypeInstance _
-                                   From FactInstance In FactTypeInstance.Fact _
-                                   From FactDataInstance In FactInstance.Data _
-                                   Where FactTypeInstance.Name = pcenumCMMLRelations.CoreElementHasElementType.ToString _
+                Dim larFactDataInstance = From FactTypeInstance In lrPage.FactTypeInstance
+                                          From FactInstance In FactTypeInstance.Fact
+                                          From FactDataInstance In FactInstance.Data
+                                          Where FactTypeInstance.Name = pcenumCMMLRelations.CoreElementHasElementType.ToString _
                                    And FactDataInstance.Role.Name = pcenumCMML.Element.ToString _
-                                   And FactDataInstance.Concept.Symbol = lrPageObject.Name _
-                                   Select New FBM.FactDataInstance(lrPage, FactInstance, FactDataInstance.Role, FactDataInstance.Concept, FactDataInstance.X, FactDataInstance.Y)
+                                   And FactDataInstance.Concept.Symbol = lrPageObject.Name
+                                          Select New FBM.FactDataInstance(lrPage, FactInstance, FactDataInstance.Role, FactDataInstance.Concept, FactDataInstance.X, FactDataInstance.Y)
 
                 Dim lrFactDataInstance As New FBM.FactDataInstance
                 For Each lrFactDataInstance In larFactDataInstance
@@ -7305,14 +7306,14 @@ Public Class frmDiagramORM
             '------------------------------------------------------------------
             Dim lr_page As New FBM.Page(lrEnterpriseView.Tag.Model)
             lr_page = lrEnterpriseView.Tag
-            Dim lrFactTypeInstanceList = From FactTypeInstance In lr_page.FactTypeInstance _
-                                           Where FactTypeInstance.Id = lrFactTypeInstance.Id _
-                                           Select New FBM.FactTypeInstance(lr_page.Model, _
-                                                                    lr_page, _
-                                                                    pcenumLanguage.ORMModel, _
-                                                                    lrFactTypeInstance.Name, _
-                                                                    True, _
-                                                                    FactTypeInstance.X, _
+            Dim lrFactTypeInstanceList = From FactTypeInstance In lr_page.FactTypeInstance
+                                         Where FactTypeInstance.Id = lrFactTypeInstance.Id
+                                         Select New FBM.FactTypeInstance(lr_page.Model,
+                                                                    lr_page,
+                                                                    pcenumLanguage.ORMModel,
+                                                                    lrFactTypeInstance.Name,
+                                                                    True,
+                                                                    FactTypeInstance.X,
                                                                     FactTypeInstance.Y)
 
             For Each lrFactTypeInstance In lrFactTypeInstanceList
@@ -7321,11 +7322,11 @@ Public Class frmDiagramORM
 
             Me.MorphTimer.Enabled = True
             Me.MorphStepTimer.Enabled = True
-            Me.MorphVector(0) = New tMorphVector(Me.MorphVector(0).StartPoint.X, _
-                                                 Me.MorphVector(0).StartPoint.Y, _
-                                                 lrFactTypeInstance.X, _
-                                                 lrFactTypeInstance.Y, _
-                                                 40, _
+            Me.MorphVector(0) = New tMorphVector(Me.MorphVector(0).StartPoint.X,
+                                                 Me.MorphVector(0).StartPoint.Y,
+                                                 lrFactTypeInstance.X,
+                                                 lrFactTypeInstance.Y,
+                                                 40,
                                                  Me.MorphVector(0).Shape)
             Me.MorphVector(0).EnterpriseTreeView = lrEnterpriseView
             Me.MorphStepTimer.Tag = lrEnterpriseView.TreeNode
@@ -7379,13 +7380,13 @@ Public Class frmDiagramORM
                     Me.MorphVector(0).TargetZoomFactor = lrPage.DiagramView.ZoomFactor
                 End If
 
-                Dim larFactDataInstance = From FactTypeInstance In lrPage.FactTypeInstance _
-                                   From FactInstance In FactTypeInstance.Fact _
-                                   From FactDataInstance In FactInstance.Data _
-                                   Where FactTypeInstance.Name = pcenumCMMLRelations.CoreElementHasElementType.ToString _
+                Dim larFactDataInstance = From FactTypeInstance In lrPage.FactTypeInstance
+                                          From FactInstance In FactTypeInstance.Fact
+                                          From FactDataInstance In FactInstance.Data
+                                          Where FactTypeInstance.Name = pcenumCMMLRelations.CoreElementHasElementType.ToString _
                                    And FactDataInstance.Role.Name = pcenumCMML.Element.ToString _
-                                   And FactDataInstance.Concept.Symbol = lrPageObject.Name _
-                                   Select New FBM.FactDataInstance(lrPage, FactInstance, FactDataInstance.Role, FactDataInstance.Concept, FactDataInstance.X, FactDataInstance.Y)
+                                   And FactDataInstance.Concept.Symbol = lrPageObject.Name
+                                          Select New FBM.FactDataInstance(lrPage, FactInstance, FactDataInstance.Role, FactDataInstance.Concept, FactDataInstance.X, FactDataInstance.Y)
 
                 Dim lrFactDataInstance As New FBM.FactDataInstance
                 For Each lrFactDataInstance In larFactDataInstance
@@ -7480,10 +7481,10 @@ Public Class frmDiagramORM
                 lrMorphVector.Shape.Move(lrPoint.X, lrPoint.Y)
 
                 lrRectangle = lrMorphVector.getNextMorphVectorRectangle
-                lrMorphVector.Shape.Resize(lrRectangle.Width, lrRectangle.Height)                
+                lrMorphVector.Shape.Resize(lrRectangle.Width, lrRectangle.Height)
 
                 If lrMorphVector.VectorStep > lrMorphVector.VectorSteps / 2 Then
-                    Select lrMorphVector.TargetShape
+                    Select Case lrMorphVector.TargetShape
                         Case Is = pcenumTargetMorphShape.Circle
                             lrMorphVector.Shape.Shape = Shapes.Ellipse
                             lrMorphVector.Shape.Image = My.Resources.ORMShapes.Blank
@@ -7495,7 +7496,7 @@ Public Class frmDiagramORM
 
             Me.HiddenDiagramView.ZoomFactor = Me.MorphVector(0).InitialZoomFactor + ((Me.MorphVector(0).VectorStep / Me.MorphVector(0).VectorSteps) * (Me.MorphVector(0).TargetZoomFactor - Me.MorphVector(0).InitialZoomFactor))
 
-            Me.HiddenDiagram.Invalidate()            
+            Me.HiddenDiagram.Invalidate()
 
             If Me.MorphVector(0).VectorStep > Me.MorphVector(0).VectorSteps Then
                 Me.MorphStepTimer.Stop()
@@ -7592,11 +7593,11 @@ Public Class frmDiagramORM
                 '  is now added for those hidden Pages.
                 '----------------------------------------------------------
                 Dim lrEnterpriseView As tEnterpriseEnterpriseView
-                lrEnterpriseView = New tEnterpriseEnterpriseView(pcenumMenuType.pageORMModel, _
-                                                           lr_page, _
-                                                           lr_model.ModelId, _
-                                                           pcenumLanguage.ORMModel, _
-                                                           Nothing, _
+                lrEnterpriseView = New tEnterpriseEnterpriseView(pcenumMenuType.pageORMModel,
+                                                           lr_page,
+                                                           lr_model.ModelId,
+                                                           pcenumLanguage.ORMModel,
+                                                           Nothing,
                                                            lr_page.PageId)
                 lrEnterpriseView = prPageNodes.Find(AddressOf lrEnterpriseView.Equals)
                 If IsSomething(lrEnterpriseView) Then
@@ -7707,7 +7708,7 @@ Public Class frmDiagramORM
         '--------------------------------------------------------------
         'Clear the list of diagrams that may relate to the FactType
         '--------------------------------------------------------------
-        Me.ORMFromFactTypeToolStripMenuItem.DropDownItems.Clear()        
+        Me.ORMFromFactTypeToolStripMenuItem.DropDownItems.Clear()
         Me.ERDiagramFromFactTypeToolStripMenuItem.DropDownItems.Clear()
         Me.PGSDiagramToolStripMenuItem.DropDownItems.Clear()
 
@@ -9502,11 +9503,11 @@ Public Class frmDiagramORM
                 '  is now added for those hidden Pages.
                 '----------------------------------------------------------
                 Dim lrEnterpriseView As tEnterpriseEnterpriseView
-                lrEnterpriseView = New tEnterpriseEnterpriseView(pcenumMenuType.pageORMModel, _
-                                                           lrPage, _
-                                                           lrModel.ModelId, _
-                                                           pcenumLanguage.ORMModel, _
-                                                           Nothing, _
+                lrEnterpriseView = New tEnterpriseEnterpriseView(pcenumMenuType.pageORMModel,
+                                                           lrPage,
+                                                           lrModel.ModelId,
+                                                           pcenumLanguage.ORMModel,
+                                                           Nothing,
                                                            lrPage.PageId)
 
                 lrEnterpriseView = prPageNodes.Find(AddressOf lrEnterpriseView.Equals)
@@ -9802,11 +9803,11 @@ Public Class frmDiagramORM
                 Select Case lrRoleConstraint.RoleConstraintType
                     Case Is = pcenumRoleConstraintType.InternalUniquenessConstraint
                         lrRoleConstraintInstance = Me.zrPage.DropRoleConstraintAtPoint(lrRoleConstraint, loPt)
-                    Case Is = pcenumRoleConstraintType.RingConstraint, _
-                              pcenumRoleConstraintType.EqualityConstraint, _
-                              pcenumRoleConstraintType.ExternalUniquenessConstraint, _
-                              pcenumRoleConstraintType.ExclusiveORConstraint, _
-                              pcenumRoleConstraintType.ExclusionConstraint, _
+                    Case Is = pcenumRoleConstraintType.RingConstraint,
+                              pcenumRoleConstraintType.EqualityConstraint,
+                              pcenumRoleConstraintType.ExternalUniquenessConstraint,
+                              pcenumRoleConstraintType.ExclusiveORConstraint,
+                              pcenumRoleConstraintType.ExclusionConstraint,
                               pcenumRoleConstraintType.SubsetConstraint
                         lrRoleConstraintInstance = Me.zrPage.DropRoleConstraintAtPoint(lrRoleConstraint, loPt)
                     Case Is = pcenumRoleConstraintType.FrequencyConstraint
@@ -10216,7 +10217,7 @@ Public Class frmDiagramORM
             lrSubtypeRelationshipInstance = Me.zrPage.SelectedObject(0)
 
             If lrSubtypeRelationshipInstance.FactType.Shape IsNot Nothing Then
-                lrSubtypeRelationshipInstance.FactType.Hide()            
+                lrSubtypeRelationshipInstance.FactType.Hide()
             End If
 
         Catch ex As Exception
@@ -10495,7 +10496,7 @@ Public Class frmDiagramORM
             If lrRoleConstraintRoleInstance Is Nothing Then Exit Sub 'CodeSafe
 
             Dim lrUncoveredRole As FBM.Role
-            Dim lrRoleConstraint As FBM.RoleConstraint = lrRoleConstraintRoleInstance.RoleConstraint.RoleConstraint            
+            Dim lrRoleConstraint As FBM.RoleConstraint = lrRoleConstraintRoleInstance.RoleConstraint.RoleConstraint
             Dim lrFactType As FBM.FactType = lrRoleConstraint.Role(0).FactType
 
             lrUncoveredRole = lrFactType.getRoleNotCoveredByInternalUniquenessConstraint(lrRoleConstraint)
@@ -10589,5 +10590,43 @@ Public Class frmDiagramORM
 
     Private Sub DiagramView_CreateEditControl(sender As Object, e As InPlaceEditEventArgs) Handles DiagramView.CreateEditControl
 
+    End Sub
+
+    Private Sub ContextMenuStrip_Diagram_Opening(sender As Object, e As CancelEventArgs) Handles ContextMenuStrip_Diagram.Opening
+
+        Dim lrPage As New FBM.Page
+        Dim loForm As Form
+
+        loForm = frmMain.DockPanel.ActiveDocument
+
+        If frmMain.PageDataExistsInClipboard(lrPage) Then
+            '------------------------------------
+            'Page data exists in the clipboard.
+            '------------------------------------
+            If loForm.Name = frmMain.zrORMModel_view.Name Then
+                '------------------------------------------------------------------------
+                'Current form is an ORM Diagram form, so can at least paste to the Page
+                '  if it isn't the same page the data was copied from
+                '------------------------------------------------------------------------
+                Dim loORMDiagramForm As frmDiagramORM
+                loORMDiagramForm = loForm
+                If IsSomething(loORMDiagramForm.zrPage) Then
+                    If lrPage.CopiedPageId <> loORMDiagramForm.zrPage.PageId Then
+                        Me.ToolStripMenuItemPaste.Enabled = True
+                    Else
+                        Me.ToolStripMenuItemPaste.Enabled = False
+                    End If
+                End If
+            End If
+        Else
+            Me.ToolStripMenuItemPaste.Enabled = False
+        End If
+
+    End Sub
+
+    Private Sub ToolStripMenuItemPaste_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItemPaste.Click
+        Call frmMain.PasteToCurrentPageFromClipboard()
+
+        Me.ToolStripMenuItemPaste.Enabled = False
     End Sub
 End Class

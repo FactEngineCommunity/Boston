@@ -286,6 +286,8 @@ Partial Class frmDiagramORM
         Me.Diagram2 = New MindFusion.Diagramming.Diagram()
         Me.ContextMenuStripModelNote = New System.Windows.Forms.ContextMenuStrip(Me.components)
         Me.ToolStripMenuItemModelNoteRemoveFromPageAndModel = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripMenuItemPaste = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripSeparator34 = New System.Windows.Forms.ToolStripSeparator()
         Me.ContextMenuStrip_Diagram.SuspendLayout()
         Me.ContextMenuStrip_shape_list.SuspendLayout()
         Me.ContextMenuStrip_Role.SuspendLayout()
@@ -522,9 +524,9 @@ Partial Class frmDiagramORM
         '
         'ContextMenuStrip_Diagram
         '
-        Me.ContextMenuStrip_Diagram.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ViewToolStripMenuItem1, Me.ShowHideToolStripMenuItem, Me.ToolStripSeparator3, Me.ToolStripMenuItemConvert, Me.ToolStripSeparator19Convert, Me.AutoLayoutToolStripMenuItem, Me.mnuOption_CopyImageToClipboard})
+        Me.ContextMenuStrip_Diagram.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ViewToolStripMenuItem1, Me.ShowHideToolStripMenuItem, Me.ToolStripSeparator3, Me.ToolStripMenuItemConvert, Me.ToolStripSeparator19Convert, Me.ToolStripMenuItemPaste, Me.ToolStripSeparator34, Me.AutoLayoutToolStripMenuItem, Me.mnuOption_CopyImageToClipboard})
         Me.ContextMenuStrip_Diagram.Name = "ContextMenuStrip_Diagram"
-        Me.ContextMenuStrip_Diagram.Size = New System.Drawing.Size(208, 126)
+        Me.ContextMenuStrip_Diagram.Size = New System.Drawing.Size(208, 176)
         '
         'ViewToolStripMenuItem1
         '
@@ -2024,13 +2026,25 @@ Partial Class frmDiagramORM
         '
         Me.ContextMenuStripModelNote.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItemModelNoteRemoveFromPageAndModel})
         Me.ContextMenuStripModelNote.Name = "ContextMenuStripModelNote"
-        Me.ContextMenuStripModelNote.Size = New System.Drawing.Size(226, 48)
+        Me.ContextMenuStripModelNote.Size = New System.Drawing.Size(226, 26)
         '
         'ToolStripMenuItemModelNoteRemoveFromPageAndModel
         '
         Me.ToolStripMenuItemModelNoteRemoveFromPageAndModel.Name = "ToolStripMenuItemModelNoteRemoveFromPageAndModel"
         Me.ToolStripMenuItemModelNoteRemoveFromPageAndModel.Size = New System.Drawing.Size(225, 22)
         Me.ToolStripMenuItemModelNoteRemoveFromPageAndModel.Text = "&Remove from Page && Model"
+        '
+        'ToolStripMenuItemPaste
+        '
+        Me.ToolStripMenuItemPaste.Enabled = False
+        Me.ToolStripMenuItemPaste.Name = "ToolStripMenuItemPaste"
+        Me.ToolStripMenuItemPaste.Size = New System.Drawing.Size(207, 22)
+        Me.ToolStripMenuItemPaste.Text = "&Paste"
+        '
+        'ToolStripSeparator34
+        '
+        Me.ToolStripSeparator34.Name = "ToolStripSeparator34"
+        Me.ToolStripSeparator34.Size = New System.Drawing.Size(204, 6)
         '
         'frmDiagramORM
         '
@@ -2334,4 +2348,6 @@ Partial Class frmDiagramORM
     Friend WithEvents Diagram2 As MindFusion.Diagramming.Diagram
     Friend WithEvents ContextMenuStripModelNote As ContextMenuStrip
     Friend WithEvents ToolStripMenuItemModelNoteRemoveFromPageAndModel As ToolStripMenuItem
+    Friend WithEvents ToolStripMenuItemPaste As ToolStripMenuItem
+    Friend WithEvents ToolStripSeparator34 As ToolStripSeparator
 End Class
