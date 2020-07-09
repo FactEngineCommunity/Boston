@@ -7926,13 +7926,15 @@ Public Class frmDiagramORM
         Dim lrEntityTypeInstance As FBM.EntityTypeInstance
 
         Try
-            lrEntityTypeInstance = Me.zrPage.SelectedObject(0)
+            With New WaitCursor
+                lrEntityTypeInstance = Me.zrPage.SelectedObject(0)
 
-            Me.zrPage.SelectedObject.Remove(lrEntityTypeInstance)
+                Me.zrPage.SelectedObject.Remove(lrEntityTypeInstance)
 
-            If lrEntityTypeInstance Is Nothing Then Exit Sub
+                If lrEntityTypeInstance Is Nothing Then Exit Sub
 
-            Call lrEntityTypeInstance.EntityType.RemoveFromModel(False, True, True)
+                Call lrEntityTypeInstance.EntityType.RemoveFromModel(False, True, True)
+            End With
 
         Catch ex As Exception
             Dim lsMessage As String
@@ -10629,4 +10631,11 @@ Public Class frmDiagramORM
 
         Me.ToolStripMenuItemPaste.Enabled = False
     End Sub
+
+    Private Sub CopyToolStripMenuItem1_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItemCopy.Click
+
+        Call frmMain.CopySelectedObjectsToClipboard()
+
+    End Sub
+
 End Class

@@ -264,7 +264,7 @@ Partial Class frmMain
         '
         Me.CopyToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.Copy16x16
         Me.CopyToolStripMenuItem.Name = "CopyToolStripMenuItem"
-        Me.CopyToolStripMenuItem.Size = New System.Drawing.Size(229, 30)
+        Me.CopyToolStripMenuItem.Size = New System.Drawing.Size(221, 22)
         Me.CopyToolStripMenuItem.Text = "&Copy"
         '
         'PasteToolStripMenuItem
@@ -272,7 +272,7 @@ Partial Class frmMain
         Me.PasteToolStripMenuItem.Enabled = False
         Me.PasteToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.Paste16x16
         Me.PasteToolStripMenuItem.Name = "PasteToolStripMenuItem"
-        Me.PasteToolStripMenuItem.Size = New System.Drawing.Size(229, 30)
+        Me.PasteToolStripMenuItem.Size = New System.Drawing.Size(221, 22)
         Me.PasteToolStripMenuItem.Text = "&Paste"
         '
         'ToolStripMenuItemUndo
@@ -281,7 +281,7 @@ Partial Class frmMain
         Me.ToolStripMenuItemUndo.Image = Global.Boston.My.Resources.Resources.Undo16x16
         Me.ToolStripMenuItemUndo.Name = "ToolStripMenuItemUndo"
         Me.ToolStripMenuItemUndo.ShortcutKeys = CType((System.Windows.Forms.Keys.Control Or System.Windows.Forms.Keys.Z), System.Windows.Forms.Keys)
-        Me.ToolStripMenuItemUndo.Size = New System.Drawing.Size(229, 30)
+        Me.ToolStripMenuItemUndo.Size = New System.Drawing.Size(221, 22)
         Me.ToolStripMenuItemUndo.Text = "&Undo"
         '
         'ToolStripMenuItemRedo
@@ -290,21 +290,21 @@ Partial Class frmMain
         Me.ToolStripMenuItemRedo.Image = Global.Boston.My.Resources.Resources.Redo16x16
         Me.ToolStripMenuItemRedo.Name = "ToolStripMenuItemRedo"
         Me.ToolStripMenuItemRedo.ShortcutKeys = CType((System.Windows.Forms.Keys.Control Or System.Windows.Forms.Keys.Y), System.Windows.Forms.Keys)
-        Me.ToolStripMenuItemRedo.Size = New System.Drawing.Size(229, 30)
+        Me.ToolStripMenuItemRedo.Size = New System.Drawing.Size(221, 22)
         Me.ToolStripMenuItemRedo.Text = "&Redo"
         '
         'SelectAllToolStripMenuItem
         '
         Me.SelectAllToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.SelectAll
         Me.SelectAllToolStripMenuItem.Name = "SelectAllToolStripMenuItem"
-        Me.SelectAllToolStripMenuItem.Size = New System.Drawing.Size(229, 30)
+        Me.SelectAllToolStripMenuItem.Size = New System.Drawing.Size(221, 22)
         Me.SelectAllToolStripMenuItem.Text = "Select &All"
         '
         'CopyAsImageToClipboardToolStripMenuItem
         '
         Me.CopyAsImageToClipboardToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.Camera16x16
         Me.CopyAsImageToClipboardToolStripMenuItem.Name = "CopyAsImageToClipboardToolStripMenuItem"
-        Me.CopyAsImageToClipboardToolStripMenuItem.Size = New System.Drawing.Size(229, 30)
+        Me.CopyAsImageToClipboardToolStripMenuItem.Size = New System.Drawing.Size(221, 22)
         Me.CopyAsImageToClipboardToolStripMenuItem.Text = "Copy as &Image to Clipboard"
         '
         'ToolStripMenuItemView
@@ -667,22 +667,22 @@ Partial Class frmMain
         'ToolStrip_main
         '
         Me.ToolStrip_main.AutoSize = False
-        Me.ToolStrip_main.ImageScalingSize = New System.Drawing.Size(24, 24)
         Me.ToolStrip_main.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButton1, Me.ToolStripButton_Save, Me.ToolStripSeparator4, Me.ToolStripButtonNewModel, Me.ToolStripButtonNew, Me.ToolStripButtonPrint, Me.ToolStripButtonCopy, Me.ToolStripButtonPaste, Me.toolStripSeparator12, Me.ToolStripLabelPrompt_zoom, Me.ToolStripComboBox_zoom, Me.toolStripSeparator, Me.ToolStripButtonHelp, Me.ToolStripSeparator3, Me.ToolStripButtonProfile, Me.ToolStripButtonNotifications})
         Me.ToolStrip_main.Location = New System.Drawing.Point(0, 24)
         Me.ToolStrip_main.Name = "ToolStrip_main"
         Me.ToolStrip_main.Padding = New System.Windows.Forms.Padding(0, 0, 2, 0)
-        Me.ToolStrip_main.Size = New System.Drawing.Size(1066, 32)
+        Me.ToolStrip_main.Size = New System.Drawing.Size(1066, 22)
         Me.ToolStrip_main.TabIndex = 9
         Me.ToolStrip_main.Text = "ToolStrip1"
         '
         'ToolStripButton1
         '
+        Me.ToolStripButton1.AutoSize = False
         Me.ToolStripButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
         Me.ToolStripButton1.Image = Global.Boston.My.Resources.MenuImagesMain.Home16x16
         Me.ToolStripButton1.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ToolStripButton1.Name = "ToolStripButton1"
-        Me.ToolStripButton1.Size = New System.Drawing.Size(28, 28)
+        Me.ToolStripButton1.Size = New System.Drawing.Size(28, 29)
         Me.ToolStripButton1.Text = "ToolStripButton1"
         '
         'ToolStripButton_Save
@@ -692,13 +692,13 @@ Partial Class frmMain
         Me.ToolStripButton_Save.Image = CType(resources.GetObject("ToolStripButton_Save.Image"), System.Drawing.Image)
         Me.ToolStripButton_Save.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ToolStripButton_Save.Name = "ToolStripButton_Save"
-        Me.ToolStripButton_Save.Size = New System.Drawing.Size(28, 28)
+        Me.ToolStripButton_Save.Size = New System.Drawing.Size(23, 19)
         Me.ToolStripButton_Save.Text = "Save"
         '
         'ToolStripSeparator4
         '
         Me.ToolStripSeparator4.Name = "ToolStripSeparator4"
-        Me.ToolStripSeparator4.Size = New System.Drawing.Size(6, 31)
+        Me.ToolStripSeparator4.Size = New System.Drawing.Size(6, 22)
         '
         'ToolStripButtonNewModel
         '
@@ -706,7 +706,7 @@ Partial Class frmMain
         Me.ToolStripButtonNewModel.Image = Global.Boston.My.Resources.MenuImagesMain.ModelAdd16x16
         Me.ToolStripButtonNewModel.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ToolStripButtonNewModel.Name = "ToolStripButtonNewModel"
-        Me.ToolStripButtonNewModel.Size = New System.Drawing.Size(28, 28)
+        Me.ToolStripButtonNewModel.Size = New System.Drawing.Size(23, 19)
         Me.ToolStripButtonNewModel.Text = "New &Model"
         '
         'ToolStripButtonNew
@@ -716,7 +716,7 @@ Partial Class frmMain
         Me.ToolStripButtonNew.Image = CType(resources.GetObject("ToolStripButtonNew.Image"), System.Drawing.Image)
         Me.ToolStripButtonNew.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ToolStripButtonNew.Name = "ToolStripButtonNew"
-        Me.ToolStripButtonNew.Size = New System.Drawing.Size(28, 28)
+        Me.ToolStripButtonNew.Size = New System.Drawing.Size(23, 19)
         Me.ToolStripButtonNew.Text = "&New Page for Model"
         '
         'ToolStripButtonPrint
@@ -726,7 +726,7 @@ Partial Class frmMain
         Me.ToolStripButtonPrint.Image = CType(resources.GetObject("ToolStripButtonPrint.Image"), System.Drawing.Image)
         Me.ToolStripButtonPrint.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ToolStripButtonPrint.Name = "ToolStripButtonPrint"
-        Me.ToolStripButtonPrint.Size = New System.Drawing.Size(28, 28)
+        Me.ToolStripButtonPrint.Size = New System.Drawing.Size(23, 19)
         Me.ToolStripButtonPrint.Text = "&Print"
         '
         'ToolStripButtonCopy
@@ -736,7 +736,7 @@ Partial Class frmMain
         Me.ToolStripButtonCopy.Image = CType(resources.GetObject("ToolStripButtonCopy.Image"), System.Drawing.Image)
         Me.ToolStripButtonCopy.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ToolStripButtonCopy.Name = "ToolStripButtonCopy"
-        Me.ToolStripButtonCopy.Size = New System.Drawing.Size(28, 28)
+        Me.ToolStripButtonCopy.Size = New System.Drawing.Size(23, 19)
         Me.ToolStripButtonCopy.Text = "&Copy"
         '
         'ToolStripButtonPaste
@@ -746,18 +746,18 @@ Partial Class frmMain
         Me.ToolStripButtonPaste.Image = CType(resources.GetObject("ToolStripButtonPaste.Image"), System.Drawing.Image)
         Me.ToolStripButtonPaste.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ToolStripButtonPaste.Name = "ToolStripButtonPaste"
-        Me.ToolStripButtonPaste.Size = New System.Drawing.Size(28, 28)
+        Me.ToolStripButtonPaste.Size = New System.Drawing.Size(23, 19)
         Me.ToolStripButtonPaste.Text = "&Paste"
         '
         'toolStripSeparator12
         '
         Me.toolStripSeparator12.Name = "toolStripSeparator12"
-        Me.toolStripSeparator12.Size = New System.Drawing.Size(6, 31)
+        Me.toolStripSeparator12.Size = New System.Drawing.Size(6, 22)
         '
         'ToolStripLabelPrompt_zoom
         '
         Me.ToolStripLabelPrompt_zoom.Name = "ToolStripLabelPrompt_zoom"
-        Me.ToolStripLabelPrompt_zoom.Size = New System.Drawing.Size(45, 28)
+        Me.ToolStripLabelPrompt_zoom.Size = New System.Drawing.Size(45, 19)
         Me.ToolStripLabelPrompt_zoom.Text = "Zoom :"
         '
         'ToolStripComboBox_zoom
@@ -765,12 +765,12 @@ Partial Class frmMain
         Me.ToolStripComboBox_zoom.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.ToolStripComboBox_zoom.DropDownWidth = 75
         Me.ToolStripComboBox_zoom.Name = "ToolStripComboBox_zoom"
-        Me.ToolStripComboBox_zoom.Size = New System.Drawing.Size(75, 31)
+        Me.ToolStripComboBox_zoom.Size = New System.Drawing.Size(75, 22)
         '
         'toolStripSeparator
         '
         Me.toolStripSeparator.Name = "toolStripSeparator"
-        Me.toolStripSeparator.Size = New System.Drawing.Size(6, 31)
+        Me.toolStripSeparator.Size = New System.Drawing.Size(6, 22)
         '
         'ToolStripButtonHelp
         '
@@ -778,13 +778,13 @@ Partial Class frmMain
         Me.ToolStripButtonHelp.Image = CType(resources.GetObject("ToolStripButtonHelp.Image"), System.Drawing.Image)
         Me.ToolStripButtonHelp.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ToolStripButtonHelp.Name = "ToolStripButtonHelp"
-        Me.ToolStripButtonHelp.Size = New System.Drawing.Size(28, 28)
+        Me.ToolStripButtonHelp.Size = New System.Drawing.Size(23, 19)
         Me.ToolStripButtonHelp.Text = "He&lp"
         '
         'ToolStripSeparator3
         '
         Me.ToolStripSeparator3.Name = "ToolStripSeparator3"
-        Me.ToolStripSeparator3.Size = New System.Drawing.Size(6, 31)
+        Me.ToolStripSeparator3.Size = New System.Drawing.Size(6, 22)
         '
         'ToolStripButtonProfile
         '
@@ -793,7 +793,7 @@ Partial Class frmMain
         Me.ToolStripButtonProfile.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
         Me.ToolStripButtonProfile.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ToolStripButtonProfile.Name = "ToolStripButtonProfile"
-        Me.ToolStripButtonProfile.Size = New System.Drawing.Size(28, 28)
+        Me.ToolStripButtonProfile.Size = New System.Drawing.Size(23, 19)
         Me.ToolStripButtonProfile.Text = "ToolStripButton1"
         Me.ToolStripButtonProfile.Visible = False
         '
@@ -802,7 +802,7 @@ Partial Class frmMain
         Me.ToolStripButtonNotifications.Image = Global.Boston.My.Resources.Resources.Notification16x16
         Me.ToolStripButtonNotifications.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ToolStripButtonNotifications.Name = "ToolStripButtonNotifications"
-        Me.ToolStripButtonNotifications.Size = New System.Drawing.Size(152, 28)
+        Me.ToolStripButtonNotifications.Size = New System.Drawing.Size(144, 19)
         Me.ToolStripButtonNotifications.Text = "You have notifications"
         Me.ToolStripButtonNotifications.Visible = False
         '
@@ -857,9 +857,9 @@ Partial Class frmMain
         'DockPanel
         '
         Me.DockPanel.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.DockPanel.Location = New System.Drawing.Point(0, 56)
+        Me.DockPanel.Location = New System.Drawing.Point(0, 46)
         Me.DockPanel.Name = "DockPanel"
-        Me.DockPanel.Size = New System.Drawing.Size(1066, 487)
+        Me.DockPanel.Size = New System.Drawing.Size(1066, 497)
         Me.DockPanel.TabIndex = 24
         '
         'HelpProvider
