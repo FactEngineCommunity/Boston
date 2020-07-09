@@ -532,29 +532,38 @@ Namespace Parser.Meta.Database
             Me.FilteredIndexes = New List(Of IEntity)
 
             Dim liInd As Integer = 0
-            For Each lrRelation In Me.Relations
+            Try
+                For Each lrRelation In Me.Relations
 
-                Dim lrEntityRelation = CType(Me.Relations(liInd), Relation)
-                With lrEntityRelation
-                    Dim lsReferencedTableName = lrEntityRelation.GetAttributeValue("referencedtablename", Nothing, True, False)
-                    If Me.FilteredRelations.Find(Function(x) x.GetAttributeValue("referencedtablename", Nothing, True, False) =
+                    Dim lrEntityRelation = CType(Me.Relations(liInd), Relation)
+                    With lrEntityRelation
+                        Dim lsReferencedTableName = lrEntityRelation.GetAttributeValue("referencedtablename", Nothing, True, False)
+                        If Me.FilteredRelations.Find(Function(x) x.GetAttributeValue("referencedtablename", Nothing, True, False) =
                                                      lsReferencedTableName) Is Nothing Then
-                        Me.FilteredRelations.Add(.GetCopy)
-                    End If
-                End With
-                liInd += 1
-            Next
+                            Me.FilteredRelations.Add(.GetCopy)
+                        End If
+                    End With
+                    liInd += 1
+                Next
 
-            liInd = 0
+            Catch ex As Exception
+                Throw New Exception("Error initialising Relations for Table.")
+            End Try
 
-            For Each lrIndex In Me.Indexes
+            Try
 
-                Dim lrEntityIndex = CType(Me.Indexes(liInd), Index)
-                With lrEntityIndex
-                    Me.FilteredIndexes.Add(.GetCopy)
-                End With
-                liInd += 1
-            Next
+                liInd = 0
+                For Each lrIndex In Me.Indexes
+
+                    Dim lrEntityIndex = CType(Me.Indexes(liInd), Index)
+                    With lrEntityIndex
+                        Me.FilteredIndexes.Add(.GetCopy)
+                    End With
+                    liInd += 1
+                Next
+            Catch ex As Exception
+                Throw New Exception("Error initialising Indexes for Table.")
+            End Try
 
             For i As Integer = 0 To UseIdx.Count - 1
                 With CType(Me.Columns(UseIdx(i)), Column)

@@ -40,24 +40,36 @@ Namespace Parser.Meta.Database
             If SchemaRow Is Nothing Then Exit Sub 'Not used for columns on Indexes
 
             For Each lrRelation In SchemaRow.Relation
-                Dim lsReferencedTableName As String = ""
 
-                Dim lrOriginColumn As RDS.Column = lrRelation.OriginColumns.Find(Function(x) x.Id = SchemaRow.ColumnId)
+                Try
 
-                Dim lsDestinationColumnName As String = ""
-                If lrRelation.DestinationColumns.Count = 1 Then
-                    lsDestinationColumnName = lrRelation.DestinationColumns(0).Name
-                Else
-                    Dim lrDestinationColumn As RDS.Column = lrRelation.DestinationColumns.Find(Function(x) x.ActiveRole.Id = lrOriginColumn.ActiveRole.Id)
-                    lsDestinationColumnName = lrDestinationColumn.Name
-                End If
+                    For Each lrDestinationColumn In lrRelation.DestinationColumns
 
-                Me.Relations.Add(New Relation(lrRelation.Id,
-                                              Me.Owner.GetAttributeValue("Value", Nothing, False, False),
-                                              Me.Value,
-                                              lrRelation.DestinationTable.Name,
-                                              lsDestinationColumnName,
-                                              lrRelation.OriginColumns.Count))
+                        Dim lsReferencedTableName As String = ""
+
+                        Dim lrOriginColumn As RDS.Column = lrRelation.OriginColumns.Find(Function(x) x.Id = lrDestinationColumn.Id) ' SchemaRow.ColumnId)
+
+                        If lrOriginColumn Is Nothing Then Continue For
+
+                        Dim lsDestinationColumnName As String = ""
+                        If lrRelation.DestinationColumns.Count = 1 Then
+                            lsDestinationColumnName = lrRelation.DestinationColumns(0).Name
+                        Else
+                            'Dim lrDestinationColumn As RDS.Column = lrRelation.DestinationColumns.Find(Function(x) x.ActiveRole.Id = lrOriginColumn.ActiveRole.Id)
+                            lsDestinationColumnName = lrDestinationColumn.Name
+                        End If
+
+                        Me.Relations.Add(New Relation(lrRelation.Id,
+                                                      Me.Owner.GetAttributeValue("Value", Nothing, False, False),
+                                                      Me.Value,
+                                                      lrRelation.DestinationTable.Name,
+                                                      lsDestinationColumnName,
+                                                      lrRelation.OriginColumns.Count))
+
+                    Next
+                Catch ex As Exception
+                    Throw New Exception("Error setting Relation in Column.New")
+                End Try
             Next
 
         End Sub

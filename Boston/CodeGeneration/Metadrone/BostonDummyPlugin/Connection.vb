@@ -174,8 +174,6 @@ Namespace SourcePlugins.Boston
                         larSchemaRow.Add(sr)
                     Next
                 Next
-
-
             Catch ex As Exception
                 Return larSchemaRow
             End Try

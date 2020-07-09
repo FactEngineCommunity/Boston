@@ -204,11 +204,18 @@ Namespace Parser.Syntax
 
                     Case "+" ' Determine if concat string or addition on numerics
                         If lexpr.Count <> 1 Or rexpr.Count <> 1 Then Throw New Exception("Syntax error.")
-                        If TypeOf lexpr(0) Is String Or TypeOf rexpr(0) Is String Then
-                            ret.Add(lexpr(0).ToString & rexpr(0).ToString)
-                        Else
+
+                        If IsNumeric(lexpr(0)) And IsNumeric(rexpr(0)) Then
                             ret.Add(CDbl(lexpr(0)) + CDbl(rexpr(0)))
+                        Else
+                            ret.Add(lexpr(0).ToString & rexpr(0).ToString)
                         End If
+
+                        'If TypeOf lexpr(0) Is String Or TypeOf rexpr(0) Is String Then
+                        '    ret.Add(lexpr(0).ToString & rexpr(0).ToString)
+                        'Else
+                        '    ret.Add(CDbl(lexpr(0)) + CDbl(rexpr(0)))
+                        'End If
 
                     Case "&" ' Concat string
                         If lexpr.Count <> 1 Or rexpr.Count <> 1 Then Throw New Exception("Syntax error.")

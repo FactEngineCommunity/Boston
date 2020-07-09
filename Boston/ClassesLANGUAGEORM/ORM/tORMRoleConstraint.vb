@@ -2022,20 +2022,30 @@ Namespace FBM
 
                 '=================================================================================================
                 'RDS Processing
+
                 For Each lrRoleConstraintRole In Me.RoleConstraintRole
                     'Columns/Attributes/Properties will be set to ContributesToPrimaryKey = True
                     '  This needs to change to False.
-                    Dim larColumn = From Table In Me.Model.RDS.Table _
-                                    From Column In Table.Column _
-                                    Where Column.Role.Id = lrRoleConstraintRole.Role.FactType.GetOtherRoleOfBinaryFactType(lrRoleConstraintRole.Role.Id).Id _
+                    Dim larColumn As Object
+                    If Me.RoleConstraintRole(0).Role.FactType.Arity = 2 Then
+                        larColumn = From Table In Me.Model.RDS.Table
+                                    From Column In Table.Column
+                                    Where Column.Role.Id = lrRoleConstraintRole.Role.FactType.GetOtherRoleOfBinaryFactType(lrRoleConstraintRole.Role.Id).Id
                                     Select Column
+                    Else
+                        larColumn = From Table In Me.Model.RDS.Table
+                                    From Column In Table.Column
+                                    Where Column.Role.Id = lrRoleConstraintRole.Role.Id
+                                    Select Column
+                    End If
 
                     For Each lrColumn In larColumn
-                        lrColumn.setContributesToPrimaryKey(abIsPreferredIdentifier)
-                        larColumnsAffected.Add(lrColumn)
+                            lrColumn.setContributesToPrimaryKey(abIsPreferredIdentifier)
+                            larColumnsAffected.Add(lrColumn)
+                        Next
+
                     Next
 
-                Next
 
                 If larColumnsAffected.Count > 0 Then
 
