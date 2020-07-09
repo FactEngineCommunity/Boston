@@ -62,6 +62,7 @@ Public Class frmToolboxModelDictionary
 
         Try
             If IsSomething(Me.zrLoadedModel) And Not abForceReload Then
+                If prApplication.WorkingPage Is Nothing Then Exit Sub
                 If (Me.zrLoadedModel Is Me.zrORMModel) And (prApplication.WorkingPage.Language = Me.ziLoadedLanguage) Then
                     Exit Sub
                 End If

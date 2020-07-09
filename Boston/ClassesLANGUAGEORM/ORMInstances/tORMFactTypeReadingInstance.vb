@@ -83,6 +83,7 @@ Namespace FBM
                 Dim G As Graphics
 
                 'CodeSafe
+                If Me.FactType Is Nothing Then Exit Sub
                 If Me.FactType.Shape Is Nothing Then Exit Sub
                 If Me.Page.Form Is Nothing Then Exit Sub
 

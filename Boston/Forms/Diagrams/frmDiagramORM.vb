@@ -8879,6 +8879,8 @@ Public Class frmDiagramORM
 
                 lrFactTypeInstance = lrTableNode.Tag.FactTypeInstance
 
+                If lrFactTypeInstance Is Nothing Then Throw New Exception("No Fact Type Instance found for the Table.")
+
                 Dim lrFactImportForm As New frmCRUDImportFact
 
                 lrFactImportForm.zrFactTypeInstance = lrFactTypeInstance

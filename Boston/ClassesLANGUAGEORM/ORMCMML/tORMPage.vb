@@ -620,7 +620,7 @@ Namespace FBM
                             lrORMRecordset2 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
                             lsSQLQuery = "ADD FACT '" & lrORMRecordset2.CurrentFact.Id & "'"
-                            lsSQLQuery &= " TO " & pcenumCMMLRelations.CorePropertyHasPropertyName.ToString
+                            lsSQLQuery &= " TO " & pcenumCMMLRelations.CorePropertyIsForFactType.ToString 'CorePropertyHasPropertyName.ToString
                             lsSQLQuery &= " ON PAGE '" & lrPage.Name & "'"
 
                             Call Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)

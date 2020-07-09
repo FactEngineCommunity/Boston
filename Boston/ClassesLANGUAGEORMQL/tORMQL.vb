@@ -888,7 +888,9 @@ Namespace ORMQL
             lrFact = lrFactType.Fact.Find(AddressOf lrFact.EqualsById)
 
             If lrFact Is Nothing Then
-                Me.Parsetree.Errors.Add(New TinyPG.ParseError("Error: tModel.ProcessORMQLStatement: Can't find Fact with Id: '" & lrAddFactStatement.VALUE & "' within the Model level FactType.Id :" & lrAddFactStatement.USERTABLENAME, 100, Nothing))
+                Dim lrNode As New TinyPG.ParseNode()
+                lrNode.Token = New TinyPG.Token(0, 0)
+                Me.Parsetree.Errors.Add(New TinyPG.ParseError("Error: tModel.ProcessORMQLStatement: Can't find Fact with Id: '" & lrAddFactStatement.VALUE & "' within the Model level FactType.Id :" & lrAddFactStatement.USERTABLENAME, 100, lrNode))
                 Return Me.Parsetree.Errors
                 Exit Function
             End If
