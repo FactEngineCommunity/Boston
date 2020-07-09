@@ -7927,6 +7927,8 @@ Public Class frmDiagramORM
         Try
             lrEntityTypeInstance = Me.zrPage.SelectedObject(0)
 
+            Me.zrPage.SelectedObject.Remove(lrEntityTypeInstance)
+
             If lrEntityTypeInstance Is Nothing Then Exit Sub
 
             Call lrEntityTypeInstance.EntityType.RemoveFromModel(False, True, True)

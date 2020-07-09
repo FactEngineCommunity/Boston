@@ -1286,29 +1286,31 @@ Namespace FBM
                 If liFactTypeInstanceCount = 0 Then
                     'EntityTypeInstances have 3 shapes
 
-                    Me.Page.Diagram.Nodes.Remove(Me.Shape)
-                    Me.Page.Diagram.Nodes.Remove(Me.EntityTypeNameShape)
-                    Me.Page.Diagram.Nodes.Remove(Me.ReferenceModeShape)
-                    Me.Page.EntityTypeInstance.Remove(Me)
-                    Call TableEntityTypeInstance.delete_entity_type_instance(Me)
+                    If Me.Shape IsNot Nothing Then
+                        Me.Page.Diagram.Nodes.Remove(Me.Shape)
+                        Me.Page.Diagram.Nodes.Remove(Me.EntityTypeNameShape)
+                        Me.Page.Diagram.Nodes.Remove(Me.ReferenceModeShape)
+                        Me.Page.EntityTypeInstance.Remove(Me)
+                        Call TableEntityTypeInstance.delete_entity_type_instance(Me)
 
-                    If Me.HasSimpleReferenceScheme _
+                        If Me.HasSimpleReferenceScheme _
                         And Me.ReferenceModeFactType IsNot Nothing _
                         And abBroadcastInterfaceEvent Then
 
-                        Call TableFactTypeInstance.DeleteFactTypeInstance(Me.ReferenceModeFactType)
-                        Call TableValueTypeInstance.DeleteValueTypeInstance(Me.ReferenceModeValueType)
-                        Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
-                        For Each lrRoleConstraintInstance In Me.ReferenceModeFactType.InternalUniquenessConstraint
-                            TableRoleConstraintInstance.DeleteRoleConstraintInstance(lrRoleConstraintInstance)
-                        Next
-                        Call TableFactTableInstance.DeleteFactTableInstance(Me.ReferenceModeFactType.FactTable)
-                        Call TableFactTypeName.DeleteFactTypeNameInstance(Me.ReferenceModeFactType.FactTypeName)
-                        Me.ReferenceModeFactType.RemoveFromPage(abBroadcastInterfaceEvent)
-                        Me.ReferenceModeValueType.RemoveFromPage(abBroadcastInterfaceEvent)
+                            Call TableFactTypeInstance.DeleteFactTypeInstance(Me.ReferenceModeFactType)
+                            Call TableValueTypeInstance.DeleteValueTypeInstance(Me.ReferenceModeValueType)
+                            Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
+                            For Each lrRoleConstraintInstance In Me.ReferenceModeFactType.InternalUniquenessConstraint
+                                TableRoleConstraintInstance.DeleteRoleConstraintInstance(lrRoleConstraintInstance)
+                            Next
+                            Call TableFactTableInstance.DeleteFactTableInstance(Me.ReferenceModeFactType.FactTable)
+                            Call TableFactTypeName.DeleteFactTypeNameInstance(Me.ReferenceModeFactType.FactTypeName)
+                            Me.ReferenceModeFactType.RemoveFromPage(abBroadcastInterfaceEvent)
+                            Me.ReferenceModeValueType.RemoveFromPage(abBroadcastInterfaceEvent)
+                        End If
                     End If
                 Else
-                    lsMessage = "You cannot remove the Entity Type, '" & Trim(Me.Name) & "' until all Fact Types with Roles assigned to the Entity Type have been removed from the Page."
+                        lsMessage = "You cannot remove the Entity Type, '" & Trim(Me.Name) & "' until all Fact Types with Roles assigned to the Entity Type have been removed from the Page."
                     Throw New Exception(lsMessage)
                 End If
 
@@ -1389,9 +1391,12 @@ Namespace FBM
                     Me.ReferenceModeShape.Resize(1, 1)
                 End If
 
+                Me.ExpandReferenceMode = False
+
+                If Me.Page.Diagram Is Nothing Then Exit Sub
                 Me.Page.Diagram.Invalidate()
 
-                Me.ExpandReferenceMode = False
+
 
             Catch ex As Exception
                 Dim lsMessage As String

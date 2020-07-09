@@ -2064,7 +2064,7 @@ Namespace FBM
         Public Sub RemoveEntityTypeInstance(ByRef arEntityTypeInstance As FBM.EntityTypeInstance, ByVal abBroadcastInterfaceEvent As Boolean)
 
             Try
-                If Me.Diagram IsNot Nothing Then
+                If Me.Diagram IsNot Nothing And arEntityTypeInstance.Shape IsNot Nothing Then
                     Me.Diagram.Nodes.Remove(arEntityTypeInstance.EntityTypeNameShape)
                     Me.Diagram.Nodes.Remove(arEntityTypeInstance.ReferenceModeShape)
                     Me.Diagram.Nodes.Remove(arEntityTypeInstance.Shape)
@@ -2120,7 +2120,9 @@ Namespace FBM
                 'Do database processing if necessary.
                 If abBroadcastInterfaceEvent Then
                     Call TableFactTypeInstance.DeleteFactTypeInstance(arFactTypeInstance)
-                    Call TableFactTableInstance.DeleteFactTableInstance(arFactTypeInstance.FactTable)
+                    If arFactTypeInstance.FactTable IsNot Nothing Then
+                        Call TableFactTableInstance.DeleteFactTableInstance(arFactTypeInstance.FactTable)
+                    End If
                 End If
 
                 If My.Settings.UseClientServer And My.Settings.InitialiseClient And abBroadcastInterfaceEvent Then
@@ -2219,8 +2221,10 @@ Namespace FBM
 
                 For Each lrRoleConstraintRoleInstance In arRoleConstraintInstance.RoleConstraintRole
                     If lrRoleConstraintRoleInstance.Role IsNot Nothing Then
-                        lrRoleConstraintRoleInstance.Role.Shape.Text = ""
-                        lrRoleConstraintRoleInstance.Role.Shape.Brush = New MindFusion.Drawing.SolidBrush(Color.White)
+                        If lrRoleConstraintRoleInstance.Role.Shape IsNot Nothing Then
+                            lrRoleConstraintRoleInstance.Role.Shape.Text = ""
+                            lrRoleConstraintRoleInstance.Role.Shape.Brush = New MindFusion.Drawing.SolidBrush(Color.White)
+                        End If
                     End If
                 Next
 

@@ -1381,8 +1381,10 @@ Namespace FBM
                         Me.Page.Diagram.Nodes.Remove(lrRoleConstraintRoleInstance.Shape)
                     End If
                     If lrRoleConstraintRoleInstance.Role IsNot Nothing Then
-                        lrRoleConstraintRoleInstance.Role.Shape.Text = ""
-                        lrRoleConstraintRoleInstance.Role.Shape.Brush = New MindFusion.Drawing.SolidBrush(Color.White)
+                        If lrRoleConstraintRoleInstance.Role.Shape IsNot Nothing Then
+                            lrRoleConstraintRoleInstance.Role.Shape.Text = ""
+                            lrRoleConstraintRoleInstance.Role.Shape.Brush = New MindFusion.Drawing.SolidBrush(Color.White)
+                        End If
                     End If
                 Next
 

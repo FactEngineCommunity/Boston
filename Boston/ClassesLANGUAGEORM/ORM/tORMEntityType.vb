@@ -47,9 +47,11 @@ Namespace FBM
         <XmlIgnore()> _
         Public PrimativeType As String = ""
 
-        <XmlIgnore()> _
+        <XmlIgnore()>
         Public _ReferenceModeFactType As FBM.FactType = Nothing
-        <XmlIgnore()> _
+
+
+        <XmlIgnore()>
         Public Property ReferenceModeFactType() As FBM.FactType
             Get
                 Return Me._ReferenceModeFactType
@@ -62,7 +64,7 @@ Namespace FBM
                     'CodeSafe: ReferenceModeFactType is functionally dependand on Me.ReferenceMode
                     '-------------------------------------------------------------------------------
                     If (Trim(Me.ReferenceMode) = "") And (value IsNot Nothing) Then
-                        Throw New Exception("Tried to set ReferenceModeFactType for EntityType.Id: " & _
+                        Throw New Exception("Tried to set ReferenceModeFactType for EntityType.Id: " &
                                             Me.Id & ", where there is no ReferenceMode set for the EntityType")
                     End If
                 Catch ex As Exception
@@ -864,9 +866,17 @@ Namespace FBM
                 arTargetModel.AddEntityType(Me)
             End If
 
+            If Me.ReferenceModeValueType IsNot Nothing Then
+                Me.ReferenceModeValueType.ChangeModel(arTargetModel)
+            End If
+
             If Me.ReferenceModeFactType IsNot Nothing Then
                 Me.ReferenceModeFactType.ChangeModel(arTargetModel, abAddToModel)
             End If
+
+            'If Me.ReferenceModeRoleConstraint IsNot Nothing Then
+            '            Me.ReferenceModeRoleConstraint.ChangeModel(arTargetModel)
+            'End If
 
         End Sub
 

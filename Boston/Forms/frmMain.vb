@@ -2400,7 +2400,6 @@ Public Class frmMain
                     Exit Sub
                 End If
 
-
                 If lrPage.CopiedModelId <> prApplication.WorkingModel.ModelId Then
                     '--------------------------------------------------------
                     'Must merge the Page/ModelObjects into the target Model
