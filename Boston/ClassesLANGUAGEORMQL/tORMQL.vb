@@ -48,6 +48,147 @@ Namespace ORMQL
         End Property
     End Class
 
+    Public Class InsertStatement
+
+        Private _USERTABLENAME As String = Nothing
+        Public Property USERTABLENAME As String
+            Get
+                Return Me._USERTABLENAME
+            End Get
+            Set(value As String)
+                Me._USERTABLENAME = value
+            End Set
+        End Property
+
+        Private _COLUMNNAMESTR As New List(Of String)
+        Public Property COLUMNNAMESTR As List(Of String)
+            Get
+                Return Me._COLUMNNAMESTR
+            End Get
+            Set(value As List(Of String))
+                Me._COLUMNNAMESTR = value
+            End Set
+        End Property
+
+        Private _PAGENAME As String = Nothing
+        Public Property PAGENAME As String
+            Get
+                Return Me._PAGENAME
+            End Get
+            Set(value As String)
+                Me._PAGENAME = value
+            End Set
+        End Property
+
+        Private _MODELID As String = Nothing
+        Public Property MODELID As String
+            Get
+                Return Me._MODELID
+            End Get
+            Set(value As String)
+                Me._MODELID = value
+            End Set
+        End Property
+
+        Private _VALUE As New List(Of String)
+        Public Property VALUE As List(Of String)
+            Get
+                Return Me._VALUE
+            End Get
+            Set(value As List(Of String))
+                Me._VALUE = value
+            End Set
+        End Property
+
+    End Class
+
+    Public Class SelectStatement
+
+        Private _COLUMNLIST As New List(Of Object) 'Stores the ParseNode containing the list of Columns to be returned.
+        Public Property COLUMNLIST As List(Of Object)
+            Get
+                Return Me._COLUMNLIST
+            End Get
+            Set(value As List(Of Object))
+                Me._COLUMNLIST = value
+            End Set
+        End Property
+
+        Private _COLUMNNAMESTR As New List(Of String) 'Stores the list of Columns to be Returned, OR EmptyList for *, or Count(*)
+        Public Property COLUMNNAMESTR As List(Of String)
+            Get
+                Return Me._COLUMNNAMESTR
+            End Get
+            Set(value As List(Of String))
+                Me._COLUMNNAMESTR = value
+            End Set
+        End Property
+
+        Private _KEYWDDISTINCT As Object = Nothing 'SELECT can be 'DISTINCT".
+        Public Property KEYWDDISTINCT As Object
+            Get
+                Return Me._KEYWDDISTINCT
+            End Get
+            Set(value As Object)
+                Me._KEYWDDISTINCT = value
+            End Set
+        End Property
+
+        Private _USERTABLENAME As String 'Stores the table being searched on
+        Public Property USERTABLENAME As String
+            Get
+                Return Me._USERTABLENAME
+            End Get
+            Set(value As String)
+                Me._USERTABLENAME = value
+            End Set
+        End Property
+
+        Private _PAGENAME As String = Nothing 'Stores the Page being searched, if the search is for a table on a Page.
+        Public Property PAGENAME As String
+            Get
+                Return Me._PAGENAME
+            End Get
+            Set(value As String)
+                Me._PAGENAME = value
+            End Set
+        End Property
+
+        Private _MODELID As String 'Stores the Model being searched on
+        Public Property MODELID As String
+            Get
+                Return Me._MODELID
+            End Get
+            Set(value As String)
+                Me._MODELID = value
+            End Set
+        End Property
+
+        Private _WHERESTMT As Object = Nothing 'Stores a list of Where clauses
+        Public Property WHERESTMT As Object
+            Get
+                Return Me._WHERESTMT
+            End Get
+            Set(value As Object)
+                Me._WHERESTMT = value
+            End Set
+        End Property
+
+    End Class
+
+
+    Public Class WhereClauseTree
+        Private _COMPARISON As New List(Of Object)
+        Public Property COMPARISON As List(Of Object)
+            Get
+                Return Me._COMPARISON
+            End Get
+            Set(value As List(Of Object))
+                Me._COMPARISON = value
+            End Set
+        End Property
+
+    End Class
     Public Class Processor
 
         Private Model As FBM.Model
@@ -62,10 +203,10 @@ Namespace ORMQL
 
         Private Parser As New TinyPG.Parser(New TinyPG.Scanner) 'Used to parse Text input into the Brain; especially for ORMQL.
         Private Parsetree As New TinyPG.ParseTree 'Used with the Parser, is populated during the parsing of text input into the Brain; especially ORMQL
-        Public SelectStatement As New Object
-        Public WhereClauseTree As New Object
-        Public InsertStatement As New Object
-        Public DeleteStatement As New Object
+        Public SelectStatement As New SelectStatement
+        Public WhereClauseTree As New WhereClauseTree
+        Public InsertStatement As New InsertStatement
+        Public DeleteStatement As New DeleteStatement
         Public DeleteFactStatement As New Object
         Public CreateFactTypeStatement As New Object
         Public AddFactStatement As New Object
@@ -77,46 +218,47 @@ Namespace ORMQL
 
             Try
                 Richmond.WriteToStatusBar("Creating Dynamic Classes", True)
-                '================================================
-                'Create the DynamicObject for Select Statements
-                '================================================
-                Dim lrORMQLSelectStatement As New DynamicClassLibrary.Factory.tClass
-                lrORMQLSelectStatement.add_attribute(New DynamicClassLibrary.Factory.tAttribute("COLUMNLIST", GetType(List(Of Object)))) 'Stores the ParseNode containing the list of Columns to be returned.
-                lrORMQLSelectStatement.add_attribute(New DynamicClassLibrary.Factory.tAttribute("COLUMNNAMESTR", GetType(List(Of String)))) 'Stores the list of Columns to be Returned, OR EmptyList for *, or Count(*)
-                lrORMQLSelectStatement.add_attribute(New DynamicClassLibrary.Factory.tAttribute("KEYWDDISTINCT", GetType(Object))) 'Stores the list of Columns to be Returned, OR EmptyList for *, or Count(*)
-                lrORMQLSelectStatement.add_attribute(New DynamicClassLibrary.Factory.tAttribute("USERTABLENAME", GetType(List(Of String)))) 'Stores the table being searched on
-                lrORMQLSelectStatement.add_attribute(New DynamicClassLibrary.Factory.tAttribute("PAGENAME", GetType(List(Of String)))) 'Stores the Page being searched, if the search is for a table on a Page.
-                lrORMQLSelectStatement.add_attribute(New DynamicClassLibrary.Factory.tAttribute("MODELID", GetType(List(Of String)))) 'Stores the Model being searched on
-                lrORMQLSelectStatement.add_attribute(New DynamicClassLibrary.Factory.tAttribute("WHERESTMT", GetType(Object))) 'Stores a list of Where clauses
 
-                Me.SelectStatement = lrORMQLSelectStatement.clone
+                ''================================================
+                ''Create the DynamicObject for Select Statements
+                ''================================================
+                'Dim lrORMQLSelectStatement As New DynamicClassLibrary.Factory.tClass
+                'lrORMQLSelectStatement.add_attribute(New DynamicClassLibrary.Factory.tAttribute("COLUMNLIST", GetType(List(Of Object)))) 'Stores the ParseNode containing the list of Columns to be returned.
+                'lrORMQLSelectStatement.add_attribute(New DynamicClassLibrary.Factory.tAttribute("COLUMNNAMESTR", GetType(List(Of String)))) 'Stores the list of Columns to be Returned, OR EmptyList for *, or Count(*)
+                'lrORMQLSelectStatement.add_attribute(New DynamicClassLibrary.Factory.tAttribute("KEYWDDISTINCT", GetType(Object))) 'Stores the list of Columns to be Returned, OR EmptyList for *, or Count(*)
+                'lrORMQLSelectStatement.add_attribute(New DynamicClassLibrary.Factory.tAttribute("USERTABLENAME", GetType(List(Of String)))) 'Stores the table being searched on
+                'lrORMQLSelectStatement.add_attribute(New DynamicClassLibrary.Factory.tAttribute("PAGENAME", GetType(List(Of String)))) 'Stores the Page being searched, if the search is for a table on a Page.
+                'lrORMQLSelectStatement.add_attribute(New DynamicClassLibrary.Factory.tAttribute("MODELID", GetType(List(Of String)))) 'Stores the Model being searched on
+                'lrORMQLSelectStatement.add_attribute(New DynamicClassLibrary.Factory.tAttribute("WHERESTMT", GetType(Object))) 'Stores a list of Where clauses
+
+                'Me.SelectStatement = lrORMQLSelectStatement.clone
 
                 '================================================
                 'Create the DynamicObject for Where Clauses
                 '================================================
-                Dim lrWhereClauseTree As New DynamicClassLibrary.Factory.tClass
-                lrWhereClauseTree.add_attribute(New DynamicClassLibrary.Factory.tAttribute("COMPARISON", GetType(List(Of Object))))
+                'Dim lrWhereClauseTree As New DynamicClassLibrary.Factory.tClass
+                'lrWhereClauseTree.add_attribute(New DynamicClassLibrary.Factory.tAttribute("COMPARISON", GetType(List(Of Object))))
 
-                Me.WhereClauseTree = lrWhereClauseTree.clone
+                'Me.WhereClauseTree = lrWhereClauseTree.clone
 
-                '==========================================================
-                Dim lrORMQLInsertStatement As New DynamicClassLibrary.Factory.tClass
-                lrORMQLInsertStatement.add_attribute(New DynamicClassLibrary.Factory.tAttribute("USERTABLENAME", GetType(List(Of String))))
-                lrORMQLInsertStatement.add_attribute(New DynamicClassLibrary.Factory.tAttribute("COLUMNNAMESTR", GetType(List(Of String))))
-                lrORMQLInsertStatement.add_attribute(New DynamicClassLibrary.Factory.tAttribute("PAGENAME", GetType(List(Of String))))
-                lrORMQLInsertStatement.add_attribute(New DynamicClassLibrary.Factory.tAttribute("MODELID", GetType(List(Of String))))
-                lrORMQLInsertStatement.add_attribute(New DynamicClassLibrary.Factory.tAttribute("VALUE", GetType(List(Of String))))
+                ''==========================================================
+                'Dim lrORMQLInsertStatement As New DynamicClassLibrary.Factory.tClass
+                'lrORMQLInsertStatement.add_attribute(New DynamicClassLibrary.Factory.tAttribute("USERTABLENAME", GetType(List(Of String))))
+                'lrORMQLInsertStatement.add_attribute(New DynamicClassLibrary.Factory.tAttribute("COLUMNNAMESTR", GetType(List(Of String))))
+                'lrORMQLInsertStatement.add_attribute(New DynamicClassLibrary.Factory.tAttribute("PAGENAME", GetType(List(Of String))))
+                'lrORMQLInsertStatement.add_attribute(New DynamicClassLibrary.Factory.tAttribute("MODELID", GetType(List(Of String))))
+                'lrORMQLInsertStatement.add_attribute(New DynamicClassLibrary.Factory.tAttribute("VALUE", GetType(List(Of String))))
 
-                Me.InsertStatement = lrORMQLInsertStatement.clone
+                'Me.InsertStatement = lrORMQLInsertStatement.clone
 
-                '==========================================================
-                Dim lrORMQLDeleteStatement As New DynamicClassLibrary.Factory.tClass
-                lrORMQLDeleteStatement.add_attribute(New DynamicClassLibrary.Factory.tAttribute("USERTABLENAME", GetType(List(Of String))))
-                lrORMQLDeleteStatement.add_attribute(New DynamicClassLibrary.Factory.tAttribute("PAGENAME", GetType(List(Of String))))
-                lrORMQLDeleteStatement.add_attribute(New DynamicClassLibrary.Factory.tAttribute("WHERECLAUSECOLUMNNAMESTR", GetType(List(Of String))))
-                lrORMQLDeleteStatement.add_attribute(New DynamicClassLibrary.Factory.tAttribute("VALUE", GetType(List(Of String))))
+                ''==========================================================
+                'Dim lrORMQLDeleteStatement As New DynamicClassLibrary.Factory.tClass
+                'lrORMQLDeleteStatement.add_attribute(New DynamicClassLibrary.Factory.tAttribute("USERTABLENAME", GetType(List(Of String))))
+                'lrORMQLDeleteStatement.add_attribute(New DynamicClassLibrary.Factory.tAttribute("PAGENAME", GetType(List(Of String))))
+                'lrORMQLDeleteStatement.add_attribute(New DynamicClassLibrary.Factory.tAttribute("WHERECLAUSECOLUMNNAMESTR", GetType(List(Of String))))
+                'lrORMQLDeleteStatement.add_attribute(New DynamicClassLibrary.Factory.tAttribute("VALUE", GetType(List(Of String))))
 
-                Me.DeleteStatement = lrORMQLDeleteStatement.clone
+                'Me.DeleteStatement = lrORMQLDeleteStatement.clone
 
                 '==========================================================
                 Dim lrORMQLDeleteFactStatement As New DynamicClassLibrary.Factory.tClass
@@ -313,15 +455,21 @@ Namespace ORMQL
 
                         '==================================
                         'piInstance.SetValue(ao_object, aoParseTreeNode.Token.Text)
-                    ElseIf lrType Is GetType(List(Of String)) Then
-                        'ao_object.GetAttributeMember(aoParseTreeNode.Token.Type.ToString).Add(aoParseTreeNode)
-                        piInstance.SetValue(ao_object, aoParseTreeNode.Token.Text)
+                        'ElseIf lrType Is GetType(List(Of String)) Then
+                        '    'ao_object.GetAttributeMember(aoParseTreeNode.Token.Type.ToString).Add(aoParseTreeNode)
+                        '    piInstance.SetValue(ao_object, aoParseTreeNode.Token.Text)
                     ElseIf lrType Is GetType(List(Of Object)) Then
+
+                        Dim instance As Object = Activator.CreateInstance(ao_object.GetType.GetProperty(aoParseTreeNode.Token.Type.ToString).PropertyType)
+                        Dim list As IList = CType(instance, IList)
+                        list.Add(aoParseTreeNode)
+                        ao_object.GetType.GetProperty(aoParseTreeNode.Token.Type.ToString).SetValue(ao_object, list, Nothing)
+
                         'ao_object.GetAttributeMember(aoParseTreeNode.Token.Type.ToString).Add(aoParseTreeNode)
-                        piInstance.SetValue(ao_object, aoParseTreeNode.Token.Text)
+                        'piInstance.SetValue(ao_object, aoParseTreeNode.Token.Text)
                     ElseIf lrType Is GetType(Object) Then
                         'ao_object.SetAttributeMember(aoParseTreeNode.Token.Type.ToString, aoParseTreeNode)
-                        piInstance.SetValue(ao_object, aoParseTreeNode.Token.Text)
+                        piInstance.SetValue(ao_object, aoParseTreeNode)
                     End If
                 End If
 
@@ -439,31 +587,49 @@ Namespace ORMQL
                 Dim lsSelectType As String = ""
                 Dim lrPage As FBM.Page
 
-                '-------------------------
-                'Create the DynamicObject
-                '-------------------------
-                Dim lrSelectStatement As New Object
-                lrSelectStatement = prApplication.ORMQL.SelectStatement
+                '=============================================================
+                Dim lrselectStatement As New ORMQL.SelectStatement
+                'lrselectStatement = prApplication.ORMQL.selectStatement
 
-                lrSelectStatement.COLUMNLIST.CLear()
-                lrSelectStatement.KEYWDDISTINCT = New Object
-                lrSelectStatement.COLUMNNAMESTR.Clear()
-                lrSelectStatement.MODELID.Clear()
-                lrSelectStatement.USERTABLENAME.Clear()
-                lrSelectStatement.PAGENAME.Clear()
-                lrSelectStatement.WHERESTMT = New Object
+                lrselectStatement.COLUMNLIST = New List(Of Object)
+                lrselectStatement.KEYWDDISTINCT = New Object
+                lrselectStatement.COLUMNNAMESTR = New List(Of String)
+                lrselectStatement.MODELID = Nothing
+                lrselectStatement.USERTABLENAME = Nothing
+                lrselectStatement.PAGENAME = Nothing
+                lrselectStatement.WHERESTMT = New Object
 
                 '----------------------------------
                 'Get the Tokens from the ParseTree
                 '----------------------------------
+                Call Me.GetParseTreeTokensReflection(lrselectStatement, Me.Parsetree.Nodes(0))
+                '======================================================================
 
-                Call Me.GetParseTreeTokens(lrSelectStatement, Me.Parsetree.Nodes(0))
+                ''-------------------------
+                ''Create the DynamicObject
+                ''-------------------------
+                'Dim lrSelectStatement As New Object
+                'lrSelectStatement = prApplication.ORMQL.SelectStatement
+
+                'lrSelectStatement.COLUMNLIST.CLear()
+                'lrSelectStatement.KEYWDDISTINCT = New Object
+                'lrSelectStatement.COLUMNNAMESTR.Clear()
+                'lrSelectStatement.MODELID.Clear()
+                'lrSelectStatement.USERTABLENAME.Clear()
+                'lrSelectStatement.PAGENAME.Clear()
+                'lrSelectStatement.WHERESTMT = New Object
+
+                ''----------------------------------
+                ''Get the Tokens from the ParseTree
+                ''----------------------------------
+
+                'Call Me.GetParseTreeTokens(lrSelectStatement, Me.Parsetree.Nodes(0))
 
                 '-------------------------------------------------------------
                 'Check if the Select query is targeted at a particular Model
                 '-------------------------------------------------------------
-                If lrSelectStatement.MODELID.count > 0 Then
-                    If (String.Compare(lrSelectStatement.MODELID(0), Me.Model.ModelId)) = 0 Then
+                If lrselectStatement.MODELID IsNot Nothing Then
+                    If (String.Compare(lrselectStatement.MODELID, Me.Model.ModelId)) = 0 Then
                         '-------------------------------------------------------------
                         'User has elected to search the current model, so do nothing
                         '-------------------------------------------------------------
@@ -471,7 +637,7 @@ Namespace ORMQL
                         '-----------------------------------------
                         'Send the query to the appropriate Model
                         '-----------------------------------------
-                        Dim lsModelId As String = lrSelectStatement.MODELID(0)
+                        Dim lsModelId As String = lrselectStatement.MODELID
                         Dim lrModel As FBM.Model '(pcenumLanguage.ORMModel, "", lsModelId)
                         lrModel = prApplication.Models.Find(Function(x) x.ModelId = lsModelId) 'AddressOf lrModel.Equals)
 
@@ -499,22 +665,22 @@ Namespace ORMQL
                 '---------------------------------------------------------
                 'Find the FactType that the SELECT statement is for.
                 '---------------------------------------------------------
-                If lrSelectStatement.PAGENAME.Count = 0 Then
+                If lrselectStatement.PAGENAME Is Nothing Then
                     'lrFactType = New FBM.FactType(Me.Model, lrSelectStatement.USERTABLENAME(0).ToString, False)
                     '20200504-VM-Faster as below. Remove above and comment below if all okay after a period of time
-                    lrFactType = Me.Model.FactType.Find(Function(x) x.Id = lrSelectStatement.USERTABLENAME(0)) 'AddressOf lrFactType.EqualsByName)
+                    lrFactType = Me.Model.FactType.Find(Function(x) x.Id = lrselectStatement.USERTABLENAME) 'AddressOf lrFactType.EqualsByName)
                 Else
-                    lrPage = Me.Model.Page.Find(Function(x) x.Name = lrSelectStatement.PAGENAME(0))
+                    lrPage = Me.Model.Page.Find(Function(x) x.Name = lrselectStatement.PAGENAME)
                     'lrFactType = New FBM.FactTypeInstance(Me.Model, lrPage, pcenumLanguage.ORMModel, lrSelectStatement.USERTABLENAME(0).ToString, True)
                     '20200504-VM-Faster as below. Remove above and comment below if all okay after a period of time
-                    lrFactType = lrPage.FactTypeInstance.Find(Function(x) x.Id = lrSelectStatement.USERTABLENAME(0)) 'AddressOf lrFactType.EqualsByName)
+                    lrFactType = lrPage.FactTypeInstance.Find(Function(x) x.Id = lrselectStatement.USERTABLENAME) 'AddressOf lrFactType.EqualsByName)
                 End If
 
                 If lrFactType Is Nothing Then
                     Dim lsInterimMessage As String
-                    lsInterimMessage = "Cannot find Fact Type Instance, '" & lrSelectStatement.USERTABLENAME(0).ToString
-                    If lrSelectStatement.PAGENAME.Count > 0 Then
-                        lsInterimMessage &= "', on Page, '" & lrSelectStatement.PAGENAME(0) & "'."
+                    lsInterimMessage = "Cannot find Fact Type Instance, '" & lrselectStatement.USERTABLENAME
+                    If lrselectStatement.PAGENAME IsNot Nothing Then
+                        lsInterimMessage &= "', on Page, '" & lrselectStatement.PAGENAME & "'."
                     End If
                     Throw New Exception(lsInterimMessage)
                 End If
@@ -525,17 +691,30 @@ Namespace ORMQL
 
                 If lrFactType Is Nothing Then
                     'Throw New ApplicationException("Error: tModel.ProcessORMQLStatement: Can't find FactType with Name: " & lrSelectStatement.USERTABLENAME(0).ToString)
-                    Dim lr_error As New TinyPG.ParseError("Error: Can't find FactType with Name: " & lrSelectStatement.USERTABLENAME(0), 101, Nothing)
+                    Dim lr_error As New TinyPG.ParseError("Error: Can't find FactType with Name: " & lrselectStatement.USERTABLENAME, 101, Nothing)
                     Me.Parsetree.Errors.Add(lr_error)
                     Return Me.Parsetree.Errors
                     Exit Function
                 End If
 
-                '-------------------------
-                'Create the DynamicObject
-                '-------------------------
-                Dim lrWhereClauseTree As Object = prApplication.ORMQL.WhereClauseTree
+                ''-------------------------
+                ''Create the DynamicObject
+                ''-------------------------
+                'Dim lrWhereClauseTree As Object = prApplication.ORMQL.WhereClauseTree
+                'lrWhereClauseTree.COMPARISON.Clear()
+
+                '=============================================================
+                Dim lrWhereClauseTree As ORMQL.WhereClauseTree
+                lrWhereClauseTree = prApplication.ORMQL.WhereClauseTree
+
                 lrWhereClauseTree.COMPARISON.Clear()
+
+                '----------------------------------
+                'Get the Tokens from the ParseTree
+                '----------------------------------
+                Call Me.GetParseTreeTokensReflection(lrWhereClauseTree, Me.Parsetree.Nodes(0))
+                '======================================================================
+
 
                 '=============================================
                 'Process the Where Clause (if there is one)
@@ -566,7 +745,7 @@ Namespace ORMQL
                     '-------------------------------------
                     'The ORMQL Statement has a WHERESTMT
                     '-------------------------------------
-                    Call Me.GetParseTreeTokens(lrWhereClauseTree, lrSelectStatement.WHERESTMT) 'Me.parsetree.Nodes(0))
+                    Call Me.GetParseTreeTokensReflection(lrWhereClauseTree, lrselectStatement.WHERESTMT) 'Me.parsetree.Nodes(0))
 
                     '-----------------------------------------------------------------------------
                     'Create a FactPredicate. Used for Lambda search on the FactType.Fact
@@ -845,19 +1024,35 @@ Namespace ORMQL
                 '-------------------------
                 'Create the DynamicObject
                 '-------------------------
-                Dim lrInsertStatement As New Object
-                lrInsertStatement = prApplication.ORMQL.InsertStatement
+                'Dim lrInsertStatement As New Object
+                'lrInsertStatement = prApplication.ORMQL.InsertStatement
 
-                lrInsertStatement.USERTABLENAME.Clear()
-                lrInsertStatement.COLUMNNAMESTR.Clear()
-                lrInsertStatement.PAGENAME.Clear()
-                lrInsertStatement.MODELID.Clear()
-                lrInsertStatement.VALUE.Clear()
+                'lrInsertStatement.USERTABLENAME.Clear()
+                'lrInsertStatement.COLUMNNAMESTR.Clear()
+                'lrInsertStatement.PAGENAME.Clear()
+                'lrInsertStatement.MODELID.Clear()
+                'lrInsertStatement.VALUE.Clear()
+
+                ''----------------------------------
+                ''Get the Tokens from the ParseTree
+                ''----------------------------------
+                'Call Me.GetParseTreeTokens(lrInsertStatement, Me.Parsetree.Nodes(0))
+
+                '=============================================================
+                Dim lrinsertStatement As New ORMQL.InsertStatement
+                'lrinsertStatement = prApplication.ORMQL.insertStatement
+
+                lrinsertStatement.USERTABLENAME = Nothing
+                lrinsertStatement.PAGENAME = Nothing
+                lrinsertStatement.MODELID = Nothing
+                lrinsertStatement.COLUMNNAMESTR = New List(Of String)
+                lrinsertStatement.VALUE = New List(Of String)
 
                 '----------------------------------
                 'Get the Tokens from the ParseTree
                 '----------------------------------
-                Call Me.GetParseTreeTokens(lrInsertStatement, Me.Parsetree.Nodes(0))
+                Call Me.GetParseTreeTokensReflection(lrinsertStatement, Me.Parsetree.Nodes(0))
+                '======================================================================
 
                 If Me.Parsetree.Errors.Count > 0 Then
                     Return Me.Parsetree.Errors
@@ -867,13 +1062,13 @@ Namespace ORMQL
                 '-------------------------------------------------------------
                 'Check if the Select query is targeted at a particular Model
                 '-------------------------------------------------------------
-                If lrInsertStatement.MODELID.count > 0 Then
-                    If (String.Compare(lrInsertStatement.MODELID(0), Me.Model.ModelId)) = 0 Then
+                If lrinsertStatement.MODELID IsNot Nothing Then
+                    If (String.Compare(lrinsertStatement.MODELID, Me.Model.ModelId)) = 0 Then
                         '-------------------------------------------------------------
                         'User has elected to search the current model, so do nothing
                         '-------------------------------------------------------------
                     Else
-                        Dim lsModelId As String = lrInsertStatement.MODELID(0)
+                        Dim lsModelId As String = lrinsertStatement.MODELID
                         Dim lrModel As FBM.Model '(pcenumLanguage.ORMModel, "", lsModelId)
 
                         lrModel = prApplication.Models.Find(Function(x) x.ModelId = lsModelId) 'AddressOf lrModel.Equals)
@@ -894,10 +1089,10 @@ Namespace ORMQL
                 'Find the FactType that the INSERT INTO statement is for.
                 '---------------------------------------------------------
                 'lrFactType = New FBM.FactType(Me.Model, lrInsertStatement.USERTABLENAME(0).ToString, False)
-                lrFactType = Me.Model.FactType.Find(Function(x) x.Id = lrInsertStatement.USERTABLENAME(0).ToString) 'AddressOf lrFactType.EqualsByName)
+                lrFactType = Me.Model.FactType.Find(Function(x) x.Id = lrinsertStatement.USERTABLENAME) 'AddressOf lrFactType.EqualsByName)
 
                 If lrFactType Is Nothing Then
-                    Me.Parsetree.Errors.Add(New TinyPG.ParseError("Error: tModel.ProcessORMQLStatement: Can't find FactType with Name: " & lrInsertStatement.USERTABLENAME(0).ToString, 100, Nothing))
+                    Me.Parsetree.Errors.Add(New TinyPG.ParseError("Error: tModel.ProcessORMQLStatement: Can't find FactType with Name: " & lrinsertStatement.USERTABLENAME, 100, Nothing))
                     Return Me.Parsetree.Errors
                     Exit Function
                 End If
@@ -934,12 +1129,12 @@ Namespace ORMQL
                 '---------------------------------------------------
                 'Check to see if the Fact is to be added to a Page
                 '---------------------------------------------------
-                If lrInsertStatement.PAGENAME.Count > 0 Then
+                If lrinsertStatement.PAGENAME IsNot Nothing Then
                     '--------------
                     'Get the Page
                     '--------------
                     Dim lrPage As FBM.Page
-                    lrPage = Me.Model.Page.Find(Function(x) x.Name = lrInsertStatement.PAGENAME(0))
+                    lrPage = Me.Model.Page.Find(Function(x) x.Name = lrinsertStatement.PAGENAME)
 
                     If IsSomething(lrPage) Then
                         '-----------------------------------------------------------
@@ -969,7 +1164,7 @@ Namespace ORMQL
                         End If
 
                     Else
-                        Throw New Exception("No Page found in the Model for :" & lrInsertStatement.PAGENAME(0))
+                        Throw New Exception("No Page found in the Model for :" & lrinsertStatement.PAGENAME(0))
                     End If
                 Else
                     Return lrFact
