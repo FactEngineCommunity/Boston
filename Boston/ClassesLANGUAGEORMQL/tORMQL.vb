@@ -331,9 +331,8 @@ Namespace ORMQL
                         'Send the query to the appropriate Model
                         '-----------------------------------------
                         Dim lsModelId As String = lrSelectStatement.MODELID(0)
-                        Dim lrModel As New FBM.Model(pcenumLanguage.ORMModel, "", lsModelId)
-
-                        lrModel = prApplication.Models.Find(AddressOf lrModel.Equals)
+                        Dim lrModel As FBM.Model '(pcenumLanguage.ORMModel, "", lsModelId)
+                        lrModel = prApplication.Models.Find(Function(x) x.ModelId = lsModelId) 'AddressOf lrModel.Equals)
 
                         If IsSomething(lrModel) Then
                             Dim lrReturnObject As New Object
@@ -734,9 +733,9 @@ Namespace ORMQL
                         '-------------------------------------------------------------
                     Else
                         Dim lsModelId As String = lrInsertStatement.MODELID(0)
-                        Dim lrModel As New FBM.Model(pcenumLanguage.ORMModel, "", lsModelId)
+                        Dim lrModel As FBM.Model '(pcenumLanguage.ORMModel, "", lsModelId)
 
-                        lrModel = prApplication.Models.Find(AddressOf lrModel.Equals)
+                        lrModel = prApplication.Models.Find(function (x) x.ModelId = lsModelId) 'AddressOf lrModel.Equals)
 
                         If IsSomething(lrModel) Then
                             Dim lrReturnObject As New Object
@@ -753,8 +752,8 @@ Namespace ORMQL
                 '---------------------------------------------------------
                 'Find the FactType that the INSERT INTO statement is for.
                 '---------------------------------------------------------
-                lrFactType = New FBM.FactType(Me.Model, lrInsertStatement.USERTABLENAME(0).ToString, False)
-                lrFactType = Me.Model.FactType.Find(AddressOf lrFactType.EqualsByName)
+                'lrFactType = New FBM.FactType(Me.Model, lrInsertStatement.USERTABLENAME(0).ToString, False)
+                lrFactType = Me.Model.FactType.Find(Function(x) x.Id = lrInsertStatement.USERTABLENAME(0).ToString) 'AddressOf lrFactType.EqualsByName)
 
                 If lrFactType Is Nothing Then
                     Me.Parsetree.Errors.Add(New TinyPG.ParseError("Error: tModel.ProcessORMQLStatement: Can't find FactType with Name: " & lrInsertStatement.USERTABLENAME(0).ToString, 100, Nothing))
@@ -770,10 +769,10 @@ Namespace ORMQL
                 Dim lrFactData As FBM.FactData
                 Dim lrModelDictionaryEntry As New FBM.DictionaryEntry
 
+                Dim lrRole As FBM.Role
                 For Each lsColumnName In lrInsertStatement.COLUMNNAMESTR
-                    Dim lrRole As New FBM.Role
-                    lrRole.Name = lsColumnName
-                    lrRole = lrFactType.RoleGroup.Find(AddressOf lrRole.EqualsByName)
+                    'lrRole.Name = lsColumnName
+                    lrRole = lrFactType.RoleGroup.Find(Function(x) x.Name = lsColumnName) 'AddressOf lrRole.EqualsByName)
                     Dim lrConcept As FBM.Concept = New FBM.Concept(Trim(lrInsertStatement.VALUE(liInd).ToString))
 
                     '----------------------------------------------------------------------------------------
@@ -805,8 +804,8 @@ Namespace ORMQL
                         '-----------------------------------------------------------
                         'Find the FactTypeInstance to add the new FactInstance to.
                         '-----------------------------------------------------------
-                        Dim lrFactTypeInstance As FBM.FactTypeInstance = lrFactType.CloneInstance(lrPage, False)
-                        lrFactTypeInstance = lrPage.FactTypeInstance.Find(AddressOf lrFactTypeInstance.Equals)
+                        Dim lrFactTypeInstance As FBM.FactTypeInstance '= lrFactType.CloneInstance(lrPage, False)
+                        lrFactTypeInstance = lrPage.FactTypeInstance.Find(Function(x) x.Id = lrFactType.Id) 'AddressOf lrFactTypeInstance.Equals)
 
                         If IsSomething(lrFactTypeInstance) Then
                             Dim lrFactInstance As FBM.FactInstance
@@ -871,8 +870,8 @@ Namespace ORMQL
             '---------------------------------------------------------
             'Find the FactType that the ADD FACT statement is for.
             '---------------------------------------------------------
-            lrFactType = New FBM.FactType(lrAddFactStatement.USERTABLENAME, True)
-            lrFactType = Me.Model.FactType.Find(AddressOf lrFactType.EqualsByName)
+            'lrFactType = New FBM.FactType(lrAddFactStatement.USERTABLENAME, True)
+            lrFactType = Me.Model.FactType.Find(Function(x) x.Id = lrAddFactStatement.USERTABLENAME) 'AddressOf lrFactType.EqualsByName)
 
             If lrFactType Is Nothing Then
                 Me.Parsetree.Errors.Add(New TinyPG.ParseError("Error: tModel.ProcessORMQLStatement: Can't find FactType with Name: '" & lrAddFactStatement.USERTABLENAME(0).ToString & "' within the Model.", 100, Nothing))
@@ -883,9 +882,8 @@ Namespace ORMQL
             '-----------------
             'Create the Fact
             '-----------------
-            lrFact = New FBM.Fact(lrAddFactStatement.VALUE, lrFactType)
-
-            lrFact = lrFactType.Fact.Find(AddressOf lrFact.EqualsById)
+            'lrFact = New FBM.Fact(lrAddFactStatement.VALUE, lrFactType)
+            lrFact = lrFactType.Fact.Find(Function(x) x.Id = lrAddFactStatement.VALUE) 'AddressOf lrFact.EqualsById)
 
             If lrFact Is Nothing Then
                 Dim lrNode As New TinyPG.ParseNode()
@@ -902,8 +900,8 @@ Namespace ORMQL
                 lrPage = Me.Model.Page.Find(Function(x) x.Name = lrAddFactStatement.PAGENAME)
 
                 If IsSomething(lrPage) Then
-                    Dim lrFactTypeInstance As FBM.FactTypeInstance = lrFactType.CloneInstance(lrPage, False)
-                    lrFactTypeInstance = lrPage.FactTypeInstance.Find(AddressOf lrFactTypeInstance.Equals)
+                    Dim lrFactTypeInstance As FBM.FactTypeInstance '= lrFactType.CloneInstance(lrPage, False)
+                    lrFactTypeInstance = lrPage.FactTypeInstance.Find(Function(x) x.Id = lrFactType.Id) 'AddressOf lrFactTypeInstance.Equals)
                     If IsSomething(lrFactTypeInstance) Then
                         lrFactInstance = lrFactTypeInstance.AddFact(lrFact, False)
                         Return lrFactInstance
@@ -1032,9 +1030,8 @@ Namespace ORMQL
             '---------------------------------------------------------
             'Find the FactType that the DELETESTMT statement is for.
             '---------------------------------------------------------
-            lrFactType = New FBM.FactType(Me.Model, lr_object.USERTABLENAME(0).ToString, True)
-
-            lrFactType = Me.Model.FactType.Find(AddressOf lrFactType.EqualsByName)
+            'lrFactType = New FBM.FactType(Me.Model, lr_object.USERTABLENAME(0).ToString, True)
+            lrFactType = Me.Model.FactType.Find(Function(x) x.Id = lr_object.USERTABLENAME(0).ToString) 'AddressOf lrFactType.EqualsByName)
 
             If lrFactType Is Nothing Then
                 Throw New ApplicationException("Error: tModel.ProcessORMQLStatement: Can't find FactType with Name: " & lr_object.USERTABLENAME(0).ToString)
@@ -1045,10 +1042,10 @@ Namespace ORMQL
             lrFact = New FBM.Fact(lrFactType)
             Dim liInd As Integer = 0
 
+            Dim lrRole As New FBM.Role
             For Each lsColumnName In lr_object.WHERECLAUSECOLUMNNAMESTR
-                Dim lrRole As New FBM.Role
-                lrRole.Name = lsColumnName
-                lrRole = lrFactType.RoleGroup.Find(AddressOf lrRole.EqualsByName)
+                'lrRole.Name = lsColumnName
+                lrRole = lrFactType.RoleGroup.Find(Function(x) x.Name = lsColumnName) 'AddressOf lrRole.EqualsByName)
                 lrFact.Data.Add(New FBM.FactData(lrRole, New FBM.Concept(Trim(lr_object.VALUE(liInd).ToString))))
                 liInd += 1
             Next
@@ -1066,8 +1063,8 @@ Namespace ORMQL
                     '-----------------------------------------------------------
                     'Find the FactTypeInstance to add the new FactInstance to.
                     '-----------------------------------------------------------
-                    Dim lrFactTypeInstance As FBM.FactTypeInstance = lrFactType.CloneInstance(lrPage, False)
-                    lrFactTypeInstance = lrPage.FactTypeInstance.Find(AddressOf lrFactTypeInstance.Equals)
+                    Dim lrFactTypeInstance As FBM.FactTypeInstance '= lrFactType.CloneInstance(lrPage, False)
+                    lrFactTypeInstance = lrPage.FactTypeInstance.Find(Function(x) x.Id = lrFactType.Id) 'AddressOf lrFactTypeInstance.Equals)
 
                     If IsSomething(lrFactTypeInstance) Then
                         Dim lrFactInstance As FBM.FactInstance
@@ -1128,9 +1125,8 @@ Namespace ORMQL
             '---------------------------------------------------------
             'Find the FactType that the DELETESTMT statement is for.
             '---------------------------------------------------------
-            lrFactType = New FBM.FactType(Me.Model, lr_object.USERTABLENAME(0).ToString, True)
-
-            lrFactType = Me.Model.FactType.Find(AddressOf lrFactType.EqualsByName)
+            'lrFactType = New FBM.FactType(Me.Model, lr_object.USERTABLENAME(0).ToString, True)
+            lrFactType = Me.Model.FactType.Find(Function(x) x.Id = lr_object.USERTABLENAME(0).ToString) 'AddressOf lrFactType.EqualsByName)
 
             If lrFactType Is Nothing Then
                 Throw New ApplicationException("Error: tModel.ProcessORMQLStatement: Can't find FactType with Name: " & lr_object.USERTABLENAME(0).ToString)
@@ -1138,9 +1134,8 @@ Namespace ORMQL
                 Exit Function
             End If
 
-            lrFact = New FBM.Fact(lr_object.VALUE, lrFactType)
-
-            lrFact = lrFactType.Fact.Find(AddressOf lrFact.EqualsById)
+            'lrFact = New FBM.Fact(lr_object.VALUE, lrFactType)
+            lrFact = lrFactType.Fact.Find(Function(x) x.Id = lr_object.VALUE) 'AddressOf lrFact.EqualsById)
 
             If lrFact Is Nothing Then
                 Throw New ApplicationException("Can't find Fact.Id: " & lr_object.VALUE & " in FactType.Name: " & lrFactType.Name)
@@ -1162,13 +1157,13 @@ Namespace ORMQL
                     '-----------------------------------------------------------
                     'Find the FactTypeInstance to delete the FactInstance from.
                     '-----------------------------------------------------------
-                    Dim lrFactTypeInstance As FBM.FactTypeInstance = lrFactType.CloneInstance(lrPage, False)
-                    lrFactTypeInstance = lrPage.FactTypeInstance.Find(AddressOf lrFactTypeInstance.Equals)
+                    Dim lrFactTypeInstance As FBM.FactTypeInstance '= lrFactType.CloneInstance(lrPage, False)
+                    lrFactTypeInstance = lrPage.FactTypeInstance.Find(Function(x) x.Id = lrFactType.Id) 'AddressOf lrFactTypeInstance.Equals)
 
                     If IsSomething(lrFactTypeInstance) Then
                         Dim lrFactInstance As FBM.FactInstance
-                        lrFactInstance = lrFact.CloneInstance(lrPage)
-                        lrFactInstance = lrFactTypeInstance.Fact.Find(AddressOf lrFactInstance.EqualsById)
+                        'lrFactInstance = lrFact.CloneInstance(lrPage)
+                        lrFactInstance = lrFactTypeInstance.Fact.Find(Function(x) x.Id - lrFact.Id) 'AddressOf lrFactInstance.EqualsById)
                         lrFactTypeInstance.RemoveFact(lrFactInstance)
                         lrFactType.RemoveFactByData(lrFact, False)
                         Call lrFactTypeInstance.FactTable.ResortFactTable()
@@ -1220,9 +1215,8 @@ Namespace ORMQL
             '---------------------------------------------------------
             'Find the FactType that the INSERT INTO statement is for.
             '---------------------------------------------------------
-            lrFactType = New FBM.FactType(lr_object.USERTABLENAME(0).ToString)
-
-            lrFactType = Me.Model.FactType.Find(AddressOf lrFactType.EqualsByName)
+            'lrFactType = New FBM.FactType(lr_object.USERTABLENAME(0).ToString)
+            lrFactType = Me.Model.FactType.Find(Function(x) x.Id = lr_object.USERTABLENAME(0).ToString) 'AddressOf lrFactType.EqualsByName)
 
             If lrFactType Is Nothing Then
                 Throw New ApplicationException("Error: tModel.ProcessORMQLStatement: Can't find FactType with Name: " & lr_object.USERTABLENAME(0).ToString)

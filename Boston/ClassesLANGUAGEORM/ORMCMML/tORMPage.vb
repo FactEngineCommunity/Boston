@@ -1568,7 +1568,7 @@ Namespace FBM
 
         End Sub
 
-        Public Sub DropExistingEntityAtPoint(ByRef arEntityInstance As ERD.Entity, ByVal aoPointF As PointF)
+        Public Sub DropExistingEntityAtPoint(ByRef arEntityInstance As ERD.Entity, ByVal aoPointF As PointF, Optional ByVal abSavePage As Boolean = True)
 
             Try
                 Dim lsSQLQuery As String = ""
@@ -1729,7 +1729,9 @@ Namespace FBM
                 arEntityInstance.TableShape.ResizeToFitText(False)
 
                 Call Me.MakeDirty()
-                Call Me.Save()
+                If abSavePage Then
+                    Call Me.Save()
+                End If
 
             Catch ex As Exception
                 Dim lsMessage As String
@@ -1955,7 +1957,7 @@ Namespace FBM
         ''' </summary>
         ''' <param name="arEntity"></param>
         ''' <remarks></remarks>
-        Public Sub loadRelationsForEntity(ByRef arEntity As ERD.Entity)
+        Public Sub loadRelationsForEntity(ByRef arEntity As ERD.Entity, Optional abSavePage As Boolean = True)
 
             Dim lsSQLQuery As String = ""
             Dim lrRecordset As ORMQL.Recordset
@@ -2201,7 +2203,6 @@ Namespace FBM
                         Dim lrLink As New ERD.Link(arEntity.Page, lrFactInstance, lrOrigingEREntity, lrDestinationgEREntity, Nothing, Nothing, lrRelation)
                         lrLink.DisplayAndAssociate()
 
-
                         '==========================================================================================================================
                         '==========================================================================================================================
                         'Dim loOriginTableNode As ERD.TableNode = lrOrigingEREntity.TableShape
@@ -2340,10 +2341,12 @@ Namespace FBM
                     lrRecordset.MoveNext()
                 End While
 
-                Call Me.MakeDirty()
-                Call Me.Save()
-
             Next 'From/To arEntity
+
+            Call Me.MakeDirty()
+            If abSavePage Then
+                Call Me.Save()
+            End If
 
         End Sub
 

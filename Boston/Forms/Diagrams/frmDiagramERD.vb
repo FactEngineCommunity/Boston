@@ -1612,7 +1612,6 @@ Public Class frmDiagramERD
                         Exit Sub
                     End If
 
-
                     lsSQLQuery = "SELECT *"
                     lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreElementHasElementType.ToString
                     lsSQLQuery &= " WHERE Element = '" & lrTable.Name & "'"
@@ -1637,10 +1636,13 @@ Public Class frmDiagramERD
 
                         lrEntity = lrFactInstance.GetFactDataInstanceByRoleName(pcenumCMML.Element.ToString).CloneEntity(Me.zrPage)
                         '===================================================================================================================
-                        lrEntity.RDSTable = lrTable 'IMPORTANT: Leave this at this point in the code. Otherwise (somehow) lrEntity ends up with no TableShape.
-                        Call Me.zrPage.DropExistingEntityAtPoint(lrEntity, loPointF)
+                        With New WaitCursor
+                            lrEntity.RDSTable = lrTable 'IMPORTANT: Leave this at this point in the code. Otherwise (somehow) lrEntity ends up with no TableShape.
 
-                        Call Me.zrPage.loadRelationsForEntity(lrEntity)
+                            Call Me.zrPage.DropExistingEntityAtPoint(lrEntity, loPointF, False)
+                            Call Me.zrPage.loadRelationsForEntity(lrEntity, False)
+                            Call Me.zrPage.Save(False, False)
+                        End With
 
                     End If
                 End If

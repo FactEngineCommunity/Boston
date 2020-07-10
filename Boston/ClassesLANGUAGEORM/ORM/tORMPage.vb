@@ -2296,7 +2296,7 @@ Namespace FBM
         ''' </summary>
         ''' <param name="abRapidSave">True if Page is new to the database, else False</param>
         ''' <remarks></remarks>
-        Public Overloads Sub Save(Optional ByVal abRapidSave As Boolean = False)
+        Public Overloads Sub Save(Optional ByVal abRapidSave As Boolean = False, Optional ByVal abSaveModel As Boolean = True)
 
             Dim lrEntityTypeInstance As FBM.EntityTypeInstance
             Dim lrValueTypeInstance As FBM.ValueTypeInstance
@@ -2317,7 +2317,7 @@ Namespace FBM
                 '----------------------------------------
                 'Save the underlying Model (of the Page)
                 '----------------------------------------
-                If Me.Model.IsDirty Then
+                If Me.Model.IsDirty And abSaveModel Then
                     Call Me.Model.Save()
                 End If
 
