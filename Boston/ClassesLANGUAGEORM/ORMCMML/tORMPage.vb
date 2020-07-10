@@ -2583,7 +2583,6 @@ Namespace FBM
             '-------------------------------------
             Dim lsSQLQuery As String = ""
 
-
             lsSQLQuery = "DELETE FROM " & pcenumCMMLRelations.CorePropertyHasPropertyName.ToString
             lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
             lsSQLQuery &= " WHERE Property = '" & arAttribute.Id & "'"

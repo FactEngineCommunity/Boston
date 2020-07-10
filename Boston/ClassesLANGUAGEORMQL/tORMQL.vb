@@ -22,6 +22,8 @@ Namespace ORMQL
         Public SelectStatement As New Object
         Public WhereClauseTree As New Object
         Public InsertStatement As New Object
+        Public DeleteStatement As New Object
+        Public DeleteFactStatement As New Object
         Public CreateFactTypeStatement As New Object
         Public AddFactStatement As New Object
         Public UpdateStatement As New Object
@@ -63,6 +65,23 @@ Namespace ORMQL
                 lrORMQLInsertStatement.add_attribute(New DynamicClassLibrary.Factory.tAttribute("VALUE", GetType(List(Of String))))
 
                 Me.InsertStatement = lrORMQLInsertStatement.clone
+
+                '==========================================================
+                Dim lrORMQLDeleteStatement As New DynamicClassLibrary.Factory.tClass
+                lrORMQLDeleteStatement.add_attribute(New DynamicClassLibrary.Factory.tAttribute("USERTABLENAME", GetType(List(Of String))))
+                lrORMQLDeleteStatement.add_attribute(New DynamicClassLibrary.Factory.tAttribute("PAGENAME", GetType(List(Of String))))
+                lrORMQLDeleteStatement.add_attribute(New DynamicClassLibrary.Factory.tAttribute("WHERECLAUSECOLUMNNAMESTR", GetType(List(Of String))))
+                lrORMQLDeleteStatement.add_attribute(New DynamicClassLibrary.Factory.tAttribute("VALUE", GetType(List(Of String))))
+
+                Me.DeleteStatement = lrORMQLDeleteStatement.clone
+
+                '==========================================================
+                Dim lrORMQLDeleteFactStatement As New DynamicClassLibrary.Factory.tClass
+                lrORMQLDeleteFactStatement.add_attribute(New DynamicClassLibrary.Factory.tAttribute("VALUE", GetType(List(Of String))))
+                lrORMQLDeleteFactStatement.add_attribute(New DynamicClassLibrary.Factory.tAttribute("USERTABLENAME", GetType(List(Of String))))
+                lrORMQLDeleteFactStatement.add_attribute(New DynamicClassLibrary.Factory.tAttribute("PAGENAME", GetType(List(Of String))))
+
+                Me.DeleteFactStatement = lrORMQLDeleteFactStatement.clone
 
                 '================================================
                 'Create the DynamicObject for Select Statements
@@ -998,25 +1017,40 @@ Namespace ORMQL
             Dim lrFactType As FBM.FactType
             Dim lsColumnName As String = ""
 
-            '-------------------------------------------
-            'Create the DynamicClass within the Factory
-            '-------------------------------------------
-            Dim lrClass As New DynamicClassLibrary.Factory.tClass
-            lrClass.add_attribute(New DynamicClassLibrary.Factory.tAttribute("USERTABLENAME", GetType(List(Of String))))
-            lrClass.add_attribute(New DynamicClassLibrary.Factory.tAttribute("PAGENAME", GetType(List(Of String))))
-            lrClass.add_attribute(New DynamicClassLibrary.Factory.tAttribute("WHERECLAUSECOLUMNNAMESTR", GetType(List(Of String))))
-            lrClass.add_attribute(New DynamicClassLibrary.Factory.tAttribute("VALUE", GetType(List(Of String))))
+            ''-------------------------------------------
+            ''Create the DynamicClass within the Factory
+            ''-------------------------------------------
+            'Dim lrClass As New DynamicClassLibrary.Factory.tClass
+            'lrClass.add_attribute(New DynamicClassLibrary.Factory.tAttribute("USERTABLENAME", GetType(List(Of String))))
+            'lrClass.add_attribute(New DynamicClassLibrary.Factory.tAttribute("PAGENAME", GetType(List(Of String))))
+            'lrClass.add_attribute(New DynamicClassLibrary.Factory.tAttribute("WHERECLAUSECOLUMNNAMESTR", GetType(List(Of String))))
+            'lrClass.add_attribute(New DynamicClassLibrary.Factory.tAttribute("VALUE", GetType(List(Of String))))
 
-            '-------------------------
-            'Create the DynamicObject
-            '-------------------------
-            Dim lr_object As New Object
-            lr_object = lrClass.clone
+            ''-------------------------
+            ''Create the DynamicObject
+            ''-------------------------
+            'Dim lr_object As New Object
+            'lr_object = lrClass.clone
 
             '----------------------------------
             'Get the Tokens from the ParseTree
             '----------------------------------
-            Call Me.GetParseTreeTokens(lr_object, Me.Parsetree.Nodes(0))
+            'Call Me.GetParseTreeTokens(lr_object, Me.Parsetree.Nodes(0))
+
+            '=============================================================
+            Dim lrDeleteStatement As New Object
+            lrDeleteStatement = prApplication.ORMQL.DeleteStatement
+
+            lrDeleteStatement.USERTABLENAME.Clear()
+            lrDeleteStatement.PAGENAME.Clear()
+            lrDeleteStatement.WHERECLAUSECOLUMNNAMESTR.Clear()
+            lrDeleteStatement.VALUE.Clear()
+
+            '----------------------------------
+            'Get the Tokens from the ParseTree
+            '----------------------------------
+            Call Me.GetParseTreeTokens(lrDeleteStatement, Me.Parsetree.Nodes(0))
+            '======================================================================
 
             If Me.Parsetree.Errors.Count > 0 Then
                 Dim lr_error As TinyPG.ParseError
@@ -1031,10 +1065,10 @@ Namespace ORMQL
             'Find the FactType that the DELETESTMT statement is for.
             '---------------------------------------------------------
             'lrFactType = New FBM.FactType(Me.Model, lr_object.USERTABLENAME(0).ToString, True)
-            lrFactType = Me.Model.FactType.Find(Function(x) x.Id = lr_object.USERTABLENAME(0).ToString) 'AddressOf lrFactType.EqualsByName)
+            lrFactType = Me.Model.FactType.Find(Function(x) x.Id = lrDeleteStatement.USERTABLENAME(0).ToString) 'AddressOf lrFactType.EqualsByName)
 
             If lrFactType Is Nothing Then
-                Throw New ApplicationException("Error: tModel.ProcessORMQLStatement: Can't find FactType with Name: " & lr_object.USERTABLENAME(0).ToString)
+                Throw New ApplicationException("Error: tModel.ProcessORMQLStatement: Can't find FactType with Name: " & lrDeleteStatement.USERTABLENAME(0).ToString)
                 Return False
                 Exit Function
             End If
@@ -1043,40 +1077,47 @@ Namespace ORMQL
             Dim liInd As Integer = 0
 
             Dim lrRole As New FBM.Role
-            For Each lsColumnName In lr_object.WHERECLAUSECOLUMNNAMESTR
+            For Each lsColumnName In lrDeleteStatement.WHERECLAUSECOLUMNNAMESTR
                 'lrRole.Name = lsColumnName
                 lrRole = lrFactType.RoleGroup.Find(Function(x) x.Name = lsColumnName) 'AddressOf lrRole.EqualsByName)
-                lrFact.Data.Add(New FBM.FactData(lrRole, New FBM.Concept(Trim(lr_object.VALUE(liInd).ToString))))
+                lrFact.Data.Add(New FBM.FactData(lrRole, New FBM.Concept(Trim(lrDeleteStatement.VALUE(liInd).ToString))))
                 liInd += 1
             Next
 
             '--------------------------------------------------------------------------
             'Check to see if the Delete Statmenent elects to remove Facts from a Page
             '--------------------------------------------------------------------------
-            If lr_object.PAGENAME.Count > 0 Then
+            If lrDeleteStatement.PAGENAME.Count > 0 Then
                 '--------------
                 'Get the Page
                 '--------------
-                Dim lrPage As FBM.Page = Me.Model.Page.Find(Function(x) x.Name = lr_object.PAGENAME(0))
+                Dim lrPage As FBM.Page = Me.Model.Page.Find(Function(x) x.Name = lrDeleteStatement.PAGENAME(0))
 
                 If IsSomething(lrPage) Then
-                    '-----------------------------------------------------------
-                    'Find the FactTypeInstance to add the new FactInstance to.
-                    '-----------------------------------------------------------
+                    '---------------------------
+                    'Find the FactTypeInstance 
+                    '---------------------------
                     Dim lrFactTypeInstance As FBM.FactTypeInstance '= lrFactType.CloneInstance(lrPage, False)
                     lrFactTypeInstance = lrPage.FactTypeInstance.Find(Function(x) x.Id = lrFactType.Id) 'AddressOf lrFactTypeInstance.Equals)
 
                     If IsSomething(lrFactTypeInstance) Then
                         Dim lrFactInstance As FBM.FactInstance
                         lrFactInstance = lrFact.CloneInstance(lrPage)
-                        lrFactInstance = lrFactTypeInstance.Fact.Find(AddressOf lrFactInstance.EqualsByFirstDataMatch)
-                        Do While IsSomething(lrFactInstance)
-                            lrFactTypeInstance.RemoveFact(lrFactInstance)                            
-                            lrFactInstance = lrFact.CloneInstance(lrPage)
-                            lrFactInstance = lrFactTypeInstance.Fact.Find(AddressOf lrFactInstance.EqualsByFirstDataMatch)
-                        Loop 'Remove all Facts on the Page that match the WHERE clause.
-                        Call lrFactTypeInstance.FactTable.ResortFactTable()
+                        '20200710-VM-Was the following. Remove if all okay.
+                        'lrFactInstance = lrFactTypeInstance.Fact.Find(AddressOf lrFactInstance.EqualsByFirstDataMatch)
+                        'Do While lrFactInstance IsNot Nothing
+                        '    lrFactTypeInstance.RemoveFact(lrFactInstance)
+                        '    lrFactInstance = lrFact.CloneInstance(lrPage)
+                        '    lrFactInstance = lrFactTypeInstance.Fact.Find(AddressOf lrFactInstance.EqualsByFirstDataMatch)
+                        'Loop 'Remove all Facts on the Page that match the WHERE clause.
 
+                        Dim larFactInstance As List(Of FBM.FactInstance) = lrFactTypeInstance.Fact.FindAll(AddressOf lrFactInstance.EqualsByFirstDataMatch)
+
+                        For Each lrFactInstance In larFactInstance
+                            lrFactTypeInstance.RemoveFact(lrFactInstance)
+                        Next 'Remove all Facts on the Page that match the WHERE clause.
+
+                        If lrPage.Language = pcenumLanguage.ORMModel Then Call lrFactTypeInstance.FactTable.ResortFactTable()
                     End If
                 End If
             Else
@@ -1095,23 +1136,37 @@ Namespace ORMQL
             '-------------------------------------------
             'Create the DynamicClass within the Factory
             '-------------------------------------------
-            Dim lrClass As New DynamicClassLibrary.Factory.tClass
-            lrClass.add_attribute(New DynamicClassLibrary.Factory.tAttribute("VALUE", GetType(String)))
-            lrClass.add_attribute(New DynamicClassLibrary.Factory.tAttribute("USERTABLENAME", GetType(List(Of String))))
-            lrClass.add_attribute(New DynamicClassLibrary.Factory.tAttribute("PAGENAME", GetType(List(Of String))))
+            'Dim lrClass As New DynamicClassLibrary.Factory.tClass
+            'lrClass.add_attribute(New DynamicClassLibrary.Factory.tAttribute("VALUE", GetType(String)))
+            'lrClass.add_attribute(New DynamicClassLibrary.Factory.tAttribute("USERTABLENAME", GetType(List(Of String))))
+            'lrClass.add_attribute(New DynamicClassLibrary.Factory.tAttribute("PAGENAME", GetType(List(Of String))))
 
             '-------------------------
             'Create the DynamicObject
             '-------------------------
-            Dim lr_object As New Object
-            lr_object = lrClass.clone
+            'Dim lr_object As New Object
+            'lr_object = lrClass.clone
 
-            lr_object.VALUE = ""
+            'lr_object.VALUE = ""
 
             '----------------------------------
             'Get the Tokens from the ParseTree
             '----------------------------------
-            Call Me.GetParseTreeTokens(lr_object, Me.Parsetree.Nodes(0))
+            'Call Me.GetParseTreeTokens(lr_object, Me.Parsetree.Nodes(0))
+
+            '=============================================================
+            Dim lrDeleteFactStatement As New Object
+            lrDeleteFactStatement = prApplication.ORMQL.DeleteStatement
+
+            lrDeleteFactStatement.VALUE.Clear()
+            lrDeleteFactStatement.USERTABLENAME.Clear()
+            lrDeleteFactStatement.PAGENAME.Clear()
+
+            '----------------------------------
+            'Get the Tokens from the ParseTree
+            '----------------------------------
+            Call Me.GetParseTreeTokens(lrDeleteFactStatement, Me.Parsetree.Nodes(0))
+            '======================================================================
 
             If Me.Parsetree.Errors.Count > 0 Then
                 Dim lr_error As TinyPG.ParseError
@@ -1126,19 +1181,19 @@ Namespace ORMQL
             'Find the FactType that the DELETESTMT statement is for.
             '---------------------------------------------------------
             'lrFactType = New FBM.FactType(Me.Model, lr_object.USERTABLENAME(0).ToString, True)
-            lrFactType = Me.Model.FactType.Find(Function(x) x.Id = lr_object.USERTABLENAME(0).ToString) 'AddressOf lrFactType.EqualsByName)
+            lrFactType = Me.Model.FactType.Find(Function(x) x.Id = lrDeleteFactStatement.USERTABLENAME(0).ToString) 'AddressOf lrFactType.EqualsByName)
 
             If lrFactType Is Nothing Then
-                Throw New ApplicationException("Error: tModel.ProcessORMQLStatement: Can't find FactType with Name: " & lr_object.USERTABLENAME(0).ToString)
+                Throw New ApplicationException("Error: tModel.ProcessORMQLStatement: Can't find FactType with Name: " & lrDeleteFactStatement.USERTABLENAME(0).ToString)
                 Return False
                 Exit Function
             End If
 
             'lrFact = New FBM.Fact(lr_object.VALUE, lrFactType)
-            lrFact = lrFactType.Fact.Find(Function(x) x.Id = lr_object.VALUE) 'AddressOf lrFact.EqualsById)
+            lrFact = lrFactType.Fact.Find(Function(x) x.Id = lrDeleteFactStatement.VALUE) 'AddressOf lrFact.EqualsById)
 
             If lrFact Is Nothing Then
-                Throw New ApplicationException("Can't find Fact.Id: " & lr_object.VALUE & " in FactType.Name: " & lrFactType.Name)
+                Throw New ApplicationException("Can't find Fact.Id: " & lrDeleteFactStatement.VALUE & " in FactType.Name: " & lrFactType.Name)
                 Return False
                 Exit Function
             End If
@@ -1146,12 +1201,12 @@ Namespace ORMQL
             '--------------------------------------------------------------------------
             'Check to see if the Delete Statmenent elects to remove Facts from a Page
             '--------------------------------------------------------------------------
-            If lr_object.PAGENAME.Count > 0 Then
+            If lrDeleteFactStatement.PAGENAME.Count > 0 Then
                 '--------------
                 'Get the Page
                 '--------------
                 Dim lrPage As FBM.Page
-                lrPage = Me.Model.Page.Find(Function(x) x.Name = lr_object.PAGENAME(0))
+                lrPage = Me.Model.Page.Find(Function(x) x.Name = lrDeleteFactStatement.PAGENAME(0))
 
                 If IsSomething(lrPage) Then
                     '-----------------------------------------------------------
