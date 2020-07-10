@@ -20,7 +20,7 @@ Namespace Parser.Meta.Database
         Private SchemaRowVal As SchemaRow = Nothing
 
         Private mValue As Object = Nothing
-        Private mId As String
+        Private mName As String
         Private mIsPrimaryKey As Boolean
 
         Friend Columns As New List(Of IEntity)
@@ -39,7 +39,7 @@ Namespace Parser.Meta.Database
         Public Sub New()
         End Sub
 
-        Public Sub New(ByVal asId As String,
+        Public Sub New(ByVal asName As String,
                        ByRef aarColumn As List(Of RDS.Column),
                        ByRef arOwner As Table,
                        ByVal Connection As IConnection,
@@ -47,7 +47,7 @@ Namespace Parser.Meta.Database
                        ByVal abIsPrimaryKey As Boolean)
 
             Me.mOwner = arOwner
-            Me.mId = asId
+            Me.mName = asName
             Me.mIsPrimaryKey = abIsPrimaryKey
             Me.ColumnField = aarColumn
             Me.mColumnCount = Me.ColumnField.Count
@@ -122,9 +122,9 @@ Namespace Parser.Meta.Database
                 'return value
                 Return Me.Owner
 
-            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_ID) And LookTransformsIfNotFound Then
+            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_NAME) And LookTransformsIfNotFound Then
                 Call Me.CheckParamsForPropertyCall(AttribName, Params)
-                Return Me.Id
+                Return Me.Name
 
             ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_ISPRIMARYKEY) And LookTransformsIfNotFound Then
                 Call Me.CheckParamsForPropertyCall(AttribName, Params)
@@ -171,7 +171,7 @@ Namespace Parser.Meta.Database
             Dim lrIndex As New Index("Dummy", New List(Of RDS.Column), Nothing, Nothing, Me.Transforms, False)
 
             With Me
-                lrIndex.Id = .Id
+                lrIndex.Name = .Name
                 lrIndex.IsPrimaryKey = .IsPrimaryKey
                 lrIndex.ColumnField = .ColumnField
                 lrIndex.Column = .Column
@@ -192,12 +192,12 @@ Namespace Parser.Meta.Database
             End Set
         End Property
 
-        Public Property Id() As String
+        Public Property Name() As String
             Get
-                Return Me.mId
+                Return Me.mName
             End Get
             Set(ByVal value As String)
-                Me.mId = value
+                Me.mName = value
             End Set
         End Property
 

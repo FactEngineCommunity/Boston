@@ -1,13 +1,13 @@
 <?xml version="1.0"?>
 <MDProject xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="www.metadrone.com.angry.army.1.0">
-  <Name>PartBinWarehouse</Name>
+  <Name>ExampleBostonModelToMSAccessSQLProject</Name>
   <Profile>
     <OpenEditorGUIDs>
       <string>2a6f72f1-7153-4fff-9b60-a106520641bb</string>
       <string>56df1cc2-b7c0-4feb-8fdc-2b3780d39a46</string>
       <string>b4c88052-5243-4f89-b8b7-27de2875d8c1</string>
     </OpenEditorGUIDs>
-    <SelectedEditorGUID>56df1cc2-b7c0-4feb-8fdc-2b3780d39a46</SelectedEditorGUID>
+    <SelectedEditorGUID>2a6f72f1-7153-4fff-9b60-a106520641bb</SelectedEditorGUID>
   </Profile>
   <Properties>
     <EditorGUID>8ee3448f-d73e-405a-9ba8-f19cc47ba8ab</EditorGUID>
@@ -34,7 +34,7 @@ else
 end if
 
 if column.datatype = "Boolean"
-	set column.datatype = "BIT"
+	set column.datatype = "BIT"	
 	
 elseif column.datatype = "LogicalTrueFalse"
 	set column.datatype = "BIT"
@@ -43,7 +43,7 @@ elseif column.datatype = "LogicalYesNo"
 	set column.datatype = "BIT"
 	
 elseif column.datatype = "NumericAutoCounter"
-	set column.datatype = "AUTOINCREMENT"
+	set column.datatype = "NUMBER"
 
 elseif column.datatype = "NumericDecimal"
 	set column.datatype = "NUMBER"
@@ -54,7 +54,7 @@ elseif column.datatype = "NumericFloatCustomPrecision"
 elseif column.datatype = "NumericFloatDoublePrecision"
 	set column.datatype = "NUMBER"
 	
-elseif column.datatype = "NumericFloatSinglePrecision"
+elseif column.datatype = "NumericFloatSinglePrecistion"
 	set column.datatype = "NUMBER"
 	
 elseif column.datatype = "NumericMoney"
@@ -123,7 +123,7 @@ elseif column.datatype = "TextLargeLength"
 elseif column.datatype = "TextVariableLength"
 	set column.datatype = "TEXT"
 	
-end if</Transformations>
+end</Transformations>
       <EditorGUID>2a6f72f1-7153-4fff-9b60-a106520641bb</EditorGUID>
     </Source>
   </Sources>
@@ -169,28 +169,25 @@ call Template
 end!&gt;&gt;
 
 &lt;&lt;!for table tbl in MainConn!&gt;&gt;
-  &lt;&lt;!tbl!&gt;&gt;
-&lt;&lt;!end!&gt;&gt;
-
-&lt;&lt;!for table tbl in MainConn!&gt;&gt;
 &lt;&lt;!"CREATE TABLE [" + tbl + "] ("!&gt;&gt;
   &lt;&lt;!set liInd = 1!&gt;&gt;
-  &lt;&lt;!for column col in tbl!&gt;&gt;&lt;&lt;!col.value + " "!&gt;&gt;&lt;&lt;!if col.datatype = "AUTOINCREMENT" and col.isforeignkey!&gt;&gt;&lt;&lt;!"NUMBER"!&gt;&gt;&lt;&lt;!else!&gt;&gt;&lt;&lt;!col.datatype!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!if col.length &gt; 0!&gt;&gt;&lt;&lt;!"(" + col.length + ")"!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!if liInd &lt; tbl.columncount or tbl.idcolumncount &gt; 0!&gt;&gt;&lt;&lt;!","!&gt;&gt;
+  &lt;&lt;!for column col in tbl!&gt;&gt;&lt;&lt;!col.value + " "!&gt;&gt;&lt;&lt;!col.datatype!&gt;&gt;&lt;&lt;!if col.length &gt; 0!&gt;&gt;&lt;&lt;!"(" + col.length + ")"!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!if liInd &lt; tbl.columncount or tbl.idcolumncount &gt; 0!&gt;&gt;&lt;&lt;!","!&gt;&gt;
   
   &lt;&lt;!end!&gt;&gt;
          &lt;&lt;!set liInd = liInd + 1!&gt;&gt;
-  &lt;&lt;!end!&gt;&gt;&lt;&lt;!if tbl.idcolumncount &gt; 0!&gt;&gt;&lt;&lt;!set indexString = ""!&gt;&gt;&lt;&lt;!set liInd = 1!&gt;&gt;
-&lt;&lt;!for idcolumn index in tbl!&gt;&gt;&lt;&lt;!if index.isprimarykey!&gt;&gt;&lt;&lt;!set indexString = indexString &amp; "[" + index + "]"!&gt;&gt;&lt;&lt;!if liInd &lt; tbl.pkcolumncount!&gt;&gt;&lt;&lt;!set indexString = indexString + ","!&gt;&gt;&lt;&lt;!end!&gt;&gt;
-&lt;&lt;!set liInd = liInd + 1!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!if indexString &lt;&gt; ""!&gt;&gt;&lt;&lt;!"CONSTRAINT [PrimaryKey] PRIMARY KEY (" + indexString + ")"!&gt;&gt;&lt;&lt;!end!&gt;&gt;
+  &lt;&lt;!end!&gt;&gt;&lt;&lt;!if tbl.idcolumncount &gt; 0!&gt;&gt;&lt;&lt;!set indxString = ""!&gt;&gt;&lt;&lt;!set liInd = 1!&gt;&gt;
+&lt;&lt;!for idcolumn indx in tbl!&gt;&gt;&lt;&lt;!if indx.isprimarykey!&gt;&gt;&lt;&lt;!set indxString = indxString &amp; "[" + indx + "]"!&gt;&gt;&lt;&lt;!if liInd &lt; tbl.pkcolumncount!&gt;&gt;&lt;&lt;!set indxString = indxString + ","!&gt;&gt;&lt;&lt;!end!&gt;&gt;
+&lt;&lt;!set liInd = liInd + 1!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!if indxString &lt;&gt; ""!&gt;&gt;&lt;&lt;!"CONSTRAINT [PrimaryKey] PRIMARY KEY (" + indxString + ")"!&gt;&gt;&lt;&lt;!end!&gt;&gt;
+&lt;&lt;!for index idx in tbl!&gt;&gt;&lt;&lt;!set licol = 1!&gt;&gt;&lt;&lt;!if not idx.isprimarykey!&gt;&gt;&lt;&lt;!"       ,CONSTRAINT " + idx.name + " UNIQUE ("!&gt;&gt;&lt;&lt;!for column col in idx!&gt;&gt;&lt;&lt;!col.value!&gt;&gt;&lt;&lt;!if licol &lt; idx.columncount!&gt;&gt;&lt;&lt;!","!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!set licol = licol + 1!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!")"!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!end!&gt;&gt;
 &lt;&lt;!end!&gt;&gt;
 &lt;&lt;!");"!&gt;&gt;
 &lt;&lt;!set reftab = ""!&gt;&gt;
 &lt;&lt;!set reftab2 = ""!&gt;&gt;
-&lt;&lt;!set refIndex = ""!&gt;&gt;
+&lt;&lt;!set refIndx = ""!&gt;&gt;
   &lt;&lt;!for relation rel in tbl!&gt;&gt;&lt;&lt;!set reftab = rel.referencedtablename!&gt;&gt;&lt;&lt;!set string = ""!&gt;&gt;&lt;&lt;!set referencingString = ""!&gt;&gt;&lt;&lt;!set liIndA = 1!&gt;&gt;&lt;&lt;!if reftab2 &lt;&gt; reftab!&gt;&gt;
 &lt;&lt;!"ALTER TABLE [" + tbl + "]"!&gt;&gt;    
       &lt;&lt;!  "ADD CONSTRAINT [" + tbl.value + rel.referencedtablename + "_FK]"!&gt;&gt;
-      &lt;&lt;!"    FOREIGN KEY ("!&gt;&gt;&lt;&lt;!for table tbl2 in MainConn!&gt;&gt;&lt;&lt;!if tbl2.value = rel.referencedtablename and refIndex = ""!&gt;&gt;&lt;&lt;!set liIndA = 1!&gt;&gt;&lt;&lt;!for idcolumn index2 in tbl2!&gt;&gt;&lt;&lt;!if index2.isprimarykey!&gt;&gt;&lt;&lt;!set string = string + index2.value!&gt;&gt;&lt;&lt;!for relations rel3 in tbl!&gt;&gt;&lt;&lt;!if rel3.referencedcolumnname = index2.value!&gt;&gt;&lt;&lt;!set referencingString = referencingString + rel3.referencingcolumnname!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!if liIndA &lt; rel.columncount!&gt;&gt;&lt;&lt;!set string = string + ","!&gt;&gt;&lt;&lt;!set referencingString = referencingString + ","!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!set liIndA = liIndA + 1!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!set refIndex = "Covered"!&gt;&gt;&lt;&lt;!set reftab2 = reftab!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!set refIndex = ""!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!referencingString + ") REFERENCES "!&gt;&gt;&lt;&lt;!"[" + rel.referencedtablename + "] (" + string + ");"!&gt;&gt;                  
+      &lt;&lt;!"    FOREIGN KEY ("!&gt;&gt;&lt;&lt;!for table tbl2 in MainConn!&gt;&gt;&lt;&lt;!if tbl2.value = rel.referencedtablename and refIndx = ""!&gt;&gt;&lt;&lt;!set liIndA = 1!&gt;&gt;&lt;&lt;!for idcolumn indx2 in tbl2!&gt;&gt;&lt;&lt;!if indx2.isprimarykey!&gt;&gt;&lt;&lt;!set string = string + indx2.value!&gt;&gt;&lt;&lt;!for relations rel3 in tbl!&gt;&gt;&lt;&lt;!if rel3.referencedcolumnname = indx2.value!&gt;&gt;&lt;&lt;!set referencingString = referencingString + rel3.referencingcolumnname!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!if liIndA &lt; rel.columncount!&gt;&gt;&lt;&lt;!set string = string + ","!&gt;&gt;&lt;&lt;!set referencingString = referencingString + ","!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!set liIndA = liIndA + 1!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!set refIndx = "Covered"!&gt;&gt;&lt;&lt;!set reftab2 = reftab!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!set refIndx = ""!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!referencingString + ") REFERENCES "!&gt;&gt;&lt;&lt;!"[" + rel.referencedtablename + "] (" + string + ");"!&gt;&gt;                  
     &lt;&lt;!end!&gt;&gt;  
     &lt;&lt;!set reftab2 = reftab!&gt;&gt;             
   &lt;&lt;!end!&gt;&gt;

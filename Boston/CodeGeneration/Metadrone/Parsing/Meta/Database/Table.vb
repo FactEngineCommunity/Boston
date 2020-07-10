@@ -118,7 +118,7 @@ Namespace Parser.Meta.Database
                                                       Me.Transforms,
                                                       lrIndex.IsPrimaryKey)
 
-                        If Me.Indexes.Find(Function(x) x.GetAttributeValue("id", Nothing, True, False) = lrIndex.Name) Is Nothing Then
+                        If Me.Indexes.Find(Function(x) x.GetAttributeValue("name", Nothing, True, False) = lrIndex.Name) Is Nothing Then
                             Me.Indexes.Add(lrEntityIndex)
                         End If
 
