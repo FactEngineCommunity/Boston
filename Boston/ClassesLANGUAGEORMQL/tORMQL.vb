@@ -5,6 +5,49 @@ Imports <xmlns:ns="http://www.w3.org/2001/XMLSchema">
 
 Namespace ORMQL
 
+    Public Class DeleteStatement
+
+        Dim _USERTABLENAME As String
+        Public Property USERTABLENAME As String
+            Get
+                Return Me._USERTABLENAME
+            End Get
+            Set(value As String)
+                Me._USERTABLENAME = value
+            End Set
+        End Property
+
+        Dim _PAGENAME As String
+        Public Property PAGENAME As String
+            Get
+                Return Me._PAGENAME
+            End Get
+            Set(value As String)
+                Me._PAGENAME = value
+            End Set
+        End Property
+
+        Dim _WHERECLAUSECOLUMNNAMESTR As New List(Of String)
+        Public Property WHERECLAUSECOLUMNNAMESTR As List(Of String)
+            Get
+                Return Me._WHERECLAUSECOLUMNNAMESTR
+            End Get
+            Set(value As List(Of String))
+                Me._WHERECLAUSECOLUMNNAMESTR = value
+            End Set
+        End Property
+
+        Dim _VALUE As New List(Of String)
+        Public Property VALUE As List(Of String)
+            Get
+                Return Me._VALUE
+            End Get
+            Set(value As List(Of String))
+                Me._VALUE = value
+            End Set
+        End Property
+    End Class
+
     Public Class Processor
 
         Private Model As FBM.Model
@@ -205,6 +248,85 @@ Namespace ORMQL
 
                 For Each loParseTreeNode In aoParseTreeNode.Nodes.ToArray
                     Call GetParseTreeTokens(ao_object, loParseTreeNode)
+                Next
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
+        Public Sub GetParseTreeTokensReflection(ByRef ao_object As Object, ByRef aoParseTreeNode As TinyPG.ParseNode)
+
+            '-------------------------------
+            'NB IMPORTANT: The TokenTypes in the ParseTree must be the same as established in aoObject (as hardcoded here in Richmond).
+            'i.e. Richmond (the software) and the Parser (to the outside word) are linked.
+            'If the Tokens in the Parser do not match the HardCoded tokens then Richmond will not be able to retrieve the tokens
+            ' from the ParseText input from the user.
+            'This isn't the falt of the user, this is a fault of using the ParserGenerator (TinyPG in Richmond's case) to set-up the Tokens.
+            'i.e. The person setting up the Parser in TinyPG need be aware that 'Tokens' in TinyPG (when defining the ORMQL) need be the same
+            ' as the Tokens in Richmond and as Richmond expects.
+            'i.e. Establishing a Parser in TinyPG is actually a form of 'coding' (hard-coding), and where Richmond ostensibly has 2 parsers,
+            '  VB.Net and TinyPG.
+            '---------------------
+            'Parameters
+            'ao_object is of runtime generated type DynamicCollection.Entity
+            '----------------------------------------------------------------------
+
+            Dim loPropertyInfo() As System.Reflection.PropertyInfo = ao_object.GetType().GetProperties
+            Dim loProperty As PropertyInfo
+            Dim lr_bag As New Stack
+            Dim loParseTreeNode As TinyPG.ParseNode
+            Dim lrType As Type
+            Try
+                '--------------------------------------
+                'Retrieve the list of required Tokens
+                '--------------------------------------
+                For Each loProperty In loPropertyInfo
+                    lr_bag.Push(loProperty.Name)
+                Next
+
+                loParseTreeNode = aoParseTreeNode
+
+                Dim lasListOfString As New List(Of String)
+
+                If lr_bag.Contains(aoParseTreeNode.Token.Type.ToString) Then
+                    'lrType = ao_object.GetAttributeMember(aoParseTreeNode.Token.Type.ToString).GetType
+                    lrType = ao_object.GetType.GetProperty(aoParseTreeNode.Token.Type.ToString).PropertyType
+                    Dim piInstance As PropertyInfo = ao_object.GetType.GetProperty(aoParseTreeNode.Token.Type.ToString)
+
+                    If lrType Is GetType(String) Then
+                        'ao_object.SetAttributeMember(aoParseTreeNode.Token.Type.ToString, aoParseTreeNode.Token.Text)
+                        piInstance.SetValue(ao_object, aoParseTreeNode.Token.Text)
+
+                    ElseIf lrType Is lasListOfString.GetType Then
+                        'ao_object.GetAttributeMember(aoParseTreeNode.Token.Type.ToString).Add(aoParseTreeNode.Token.Text)
+
+                        Dim instance As Object = Activator.CreateInstance(ao_object.GetType.GetProperty(aoParseTreeNode.Token.Type.ToString).PropertyType)
+                        Dim list As IList = CType(instance, IList)
+                        list.Add(aoParseTreeNode.Token.Text)
+                        ao_object.GetType.GetProperty(aoParseTreeNode.Token.Type.ToString).SetValue(ao_object, list, Nothing)
+
+                        '==================================
+                        'piInstance.SetValue(ao_object, aoParseTreeNode.Token.Text)
+                    ElseIf lrType Is GetType(List(Of String)) Then
+                        'ao_object.GetAttributeMember(aoParseTreeNode.Token.Type.ToString).Add(aoParseTreeNode)
+                        piInstance.SetValue(ao_object, aoParseTreeNode.Token.Text)
+                    ElseIf lrType Is GetType(List(Of Object)) Then
+                        'ao_object.GetAttributeMember(aoParseTreeNode.Token.Type.ToString).Add(aoParseTreeNode)
+                        piInstance.SetValue(ao_object, aoParseTreeNode.Token.Text)
+                    ElseIf lrType Is GetType(Object) Then
+                        'ao_object.SetAttributeMember(aoParseTreeNode.Token.Type.ToString, aoParseTreeNode)
+                        piInstance.SetValue(ao_object, aoParseTreeNode.Token.Text)
+                    End If
+                End If
+
+                For Each loParseTreeNode In aoParseTreeNode.Nodes.ToArray
+                    Call GetParseTreeTokensReflection(ao_object, loParseTreeNode)
                 Next
 
             Catch ex As Exception
@@ -466,9 +588,9 @@ Namespace ORMQL
                         lrSerializer.Serialize(lrWriter, lrCustomClass)
                         lrWriter.Close()
 
-                        Dim lasColumnName As XElement = <Comparison><%= From p In xml.<ParseNode>.<Nodes>.<ParseNode>.<Token> _
-                                                                        Where p.@Type = "WHERECLAUSECOLUMNNAMESTR" _
-                                                                        Select p.<Text>.Value _
+                        Dim lasColumnName As XElement = <Comparison><%= From p In xml.<ParseNode>.<Nodes>.<ParseNode>.<Token>
+                                                                        Where p.@Type = "WHERECLAUSECOLUMNNAMESTR"
+                                                                        Select p.<Text>.Value
                                                                     %>
                                                         </Comparison>
 
@@ -478,9 +600,9 @@ Namespace ORMQL
                         Dim lsDataValue As String = ""
 
 
-                        Dim lrDataValue As XElement = <Comparison><%= From p In xml.<ParseNode>.<Nodes>.<ParseNode>.<Nodes>.<ParseNode>.<Token> _
-                                                                      Where p.@Type = "VALUE" _
-                                                                      Select p.<Text>.Value _
+                        Dim lrDataValue As XElement = <Comparison><%= From p In xml.<ParseNode>.<Nodes>.<ParseNode>.<Nodes>.<ParseNode>.<Token>
+                                                                      Where p.@Type = "VALUE"
+                                                                      Select p.<Text>.Value
                                                                   %>
                                                       </Comparison>
 
@@ -559,8 +681,8 @@ Namespace ORMQL
                     serializer.Serialize(writer, customClass)
                     writer.Close()
 
-                    Dim lasSelectType As XElement = <Comparison><%= From p In xml.<ParseNode>.<Nodes>.<ParseNode>.<Nodes>.<ParseNode>.<Token> _
-                                                                    Select p.@Type _
+                    Dim lasSelectType As XElement = <Comparison><%= From p In xml.<ParseNode>.<Nodes>.<ParseNode>.<Nodes>.<ParseNode>.<Token>
+                                                                    Select p.@Type
                                                                 %>
                                                     </Comparison>
 
@@ -754,7 +876,7 @@ Namespace ORMQL
                         Dim lsModelId As String = lrInsertStatement.MODELID(0)
                         Dim lrModel As FBM.Model '(pcenumLanguage.ORMModel, "", lsModelId)
 
-                        lrModel = prApplication.Models.Find(function (x) x.ModelId = lsModelId) 'AddressOf lrModel.Equals)
+                        lrModel = prApplication.Models.Find(Function(x) x.ModelId = lsModelId) 'AddressOf lrModel.Equals)
 
                         If IsSomething(lrModel) Then
                             Dim lrReturnObject As New Object
@@ -1038,18 +1160,18 @@ Namespace ORMQL
             'Call Me.GetParseTreeTokens(lr_object, Me.Parsetree.Nodes(0))
 
             '=============================================================
-            Dim lrDeleteStatement As New Object
-            lrDeleteStatement = prApplication.ORMQL.DeleteStatement
+            Dim lrDeleteStatement As New ORMQL.DeleteStatement
+            'lrDeleteStatement = prApplication.ORMQL.DeleteStatement
 
-            lrDeleteStatement.USERTABLENAME.Clear()
-            lrDeleteStatement.PAGENAME.Clear()
+            lrDeleteStatement.USERTABLENAME = Nothing
+            lrDeleteStatement.PAGENAME = Nothing
             lrDeleteStatement.WHERECLAUSECOLUMNNAMESTR.Clear()
             lrDeleteStatement.VALUE.Clear()
 
             '----------------------------------
             'Get the Tokens from the ParseTree
             '----------------------------------
-            Call Me.GetParseTreeTokens(lrDeleteStatement, Me.Parsetree.Nodes(0))
+            Call Me.GetParseTreeTokensReflection(lrDeleteStatement, Me.Parsetree.Nodes(0))
             '======================================================================
 
             If Me.Parsetree.Errors.Count > 0 Then
@@ -1065,7 +1187,7 @@ Namespace ORMQL
             'Find the FactType that the DELETESTMT statement is for.
             '---------------------------------------------------------
             'lrFactType = New FBM.FactType(Me.Model, lr_object.USERTABLENAME(0).ToString, True)
-            lrFactType = Me.Model.FactType.Find(Function(x) x.Id = lrDeleteStatement.USERTABLENAME(0).ToString) 'AddressOf lrFactType.EqualsByName)
+            lrFactType = Me.Model.FactType.Find(Function(x) x.Id = lrDeleteStatement.USERTABLENAME) 'AddressOf lrFactType.EqualsByName)
 
             If lrFactType Is Nothing Then
                 Throw New ApplicationException("Error: tModel.ProcessORMQLStatement: Can't find FactType with Name: " & lrDeleteStatement.USERTABLENAME(0).ToString)
@@ -1087,11 +1209,11 @@ Namespace ORMQL
             '--------------------------------------------------------------------------
             'Check to see if the Delete Statmenent elects to remove Facts from a Page
             '--------------------------------------------------------------------------
-            If lrDeleteStatement.PAGENAME.Count > 0 Then
+            If lrDeleteStatement.PAGENAME IsNot Nothing Then
                 '--------------
                 'Get the Page
                 '--------------
-                Dim lrPage As FBM.Page = Me.Model.Page.Find(Function(x) x.Name = lrDeleteStatement.PAGENAME(0))
+                Dim lrPage As FBM.Page = Me.Model.Page.Find(Function(x) x.Name = lrDeleteStatement.PAGENAME)
 
                 If IsSomething(lrPage) Then
                     '---------------------------
