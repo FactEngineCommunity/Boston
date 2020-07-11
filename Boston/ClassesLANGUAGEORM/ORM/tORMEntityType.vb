@@ -730,7 +730,34 @@ Namespace FBM
 
         End Sub
 
+        ''' <summary>
+        ''' PRECONDITION: FactType must have a corresponding RDS Table. Used to save typing.
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public Overrides Function getCorrespondingRDSTable() As RDS.Table
 
+            Try
+                Dim lrTable As RDS.Table = Me.Model.RDS.Table.Find(Function(x) x.Name = Me.Id)
+
+                If lrTable Is Nothing Then
+                    Throw New Exception("There is no corresponding table for FactType: '" & Me.Id & "'")
+                Else
+                    Return lrTable
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage1 As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return Nothing
+            End Try
+
+        End Function
         Public Function GetCountRolesAssociatedWithEntityType() As Integer
 
 

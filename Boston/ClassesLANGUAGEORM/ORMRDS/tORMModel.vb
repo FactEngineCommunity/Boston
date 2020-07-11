@@ -1710,6 +1710,12 @@ Namespace FBM
                     'Indexes
                     Call Me.loadIndexesForTable(lrTable)
 
+                    '================================
+                    'CodeSafe
+                    For Each lrColumn In lrTable.Column
+                        lrColumn.ContributesToPrimaryKey = lrColumn.isPartOfPrimaryKey
+                    Next
+
                     lrORMRecordset.MoveNext()
 
                 End While 'Stepping through Tables

@@ -487,9 +487,11 @@ Namespace FBM
         ''' <returns></returns>
         ''' <remarks></remarks>
         Public Overridable Function getBaseModelObject() As FBM.ModelObject
+            Return New FBM.ModelObject
+        End Function
 
-            Return Me
-
+        Public Overridable Function getCorrespondingRDSTable() As RDS.Table
+            Return New RDS.Table
         End Function
 
         ''' <summary>

@@ -312,6 +312,17 @@ Namespace RDS
 
         End Function
 
+        ''' <summary>
+        ''' Used to check if the Column is part of the PK Index for the Table. Especially when adding a new Unique Index to a Table,
+        '''   such that the ERD.Attribute.PartOfPrimaryKey is not set to False.
+        ''' </summary>
+        ''' <returns></returns>
+        Public Function isPartOfPrimaryKey() As Boolean
+
+            Return Me.Model.Index.Find(Function(x) x.IsPrimaryKey And (x.Column.Find(Function(y) y.Id = Me.Id) IsNot Nothing)) IsNot Nothing
+
+        End Function
+
         Public Sub moveToOrdinalPosition(ByVal aiOrdinalPosition As Integer)
 
             Try

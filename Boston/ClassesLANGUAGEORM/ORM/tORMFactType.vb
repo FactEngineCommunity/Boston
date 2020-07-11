@@ -2236,7 +2236,7 @@ Namespace FBM
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Function getCorrespondingRDSTable() As RDS.Table
+        Public Overrides Function getCorrespondingRDSTable() As RDS.Table
 
             Try
                 Dim lrTable As RDS.Table = Me.Model.RDS.Table.Find(Function(x) x.Name = Me.Id)
