@@ -444,9 +444,7 @@ Namespace FBM
                 'The EntityType already exists in the list of EntityTypes for the Model.
                 '-------------------------------------------------------------------------
             Else
-                lrDictionaryEntry.isEntityType = True
-                lrDictionaryEntry.Realisations.AddUnique(pcenumConceptType.EntityType)
-
+                lrDictionaryEntry.AddConceptType(pcenumConceptType.EntityType)
 
                 Me.EntityType.Add(arEntityType)
                 If abMakeModelDirty Then
@@ -570,7 +568,7 @@ Namespace FBM
                 'The DictionaryEntry already exists in the ModelDictionary
                 '-----------------------------------------------------------
                 lrDictionaryEntry = Me.ModelDictionary.Find(AddressOf lrDictionaryEntry.Equals)
-                lrDictionaryEntry.Realisations.AddUnique(pcenumConceptType.ModelNote)
+                lrDictionaryEntry.AddConceptType(pcenumConceptType.ModelNote)
             Else
                 lrDictionaryEntry = Me.AddModelDictionaryEntry(lrDictionaryEntry)
                 Me.MakeDirty()
@@ -623,8 +621,9 @@ Namespace FBM
                     'The RoleConstraint already exists in the list of RoleConstraints for the Model.
                     '-------------------------------------------------------------------------
                 Else
-                    lrDictionaryEntry.isRoleConstraint = True
-                    lrDictionaryEntry.Realisations.AddUnique(pcenumConceptType.RoleConstraint)
+                    lrDictionaryEntry.AddConceptType(pcenumConceptType.RoleConstraint)
+                    'lrDictionaryEntry.isRoleConstraint = True
+                    'lrDictionaryEntry.Realisations.AddUnique(pcenumConceptType.RoleConstraint)
 
                     Me.RoleConstraint.Add(arRoleConstraint)
 
@@ -1141,8 +1140,9 @@ Namespace FBM
                     'The ValueType already exists in the list of ValueTypes for the Model.
                     '-------------------------------------------------------------------------
                 Else
-                    lrDictionaryEntry.isValueType = True
-                    lrDictionaryEntry.Realisations.AddUnique(pcenumConceptType.ValueType)
+                    lrDictionaryEntry.AddConceptType(pcenumConceptType.ValueType)
+                    'lrDictionaryEntry.isValueType = True
+                    'lrDictionaryEntry.Realisations.AddUnique(pcenumConceptType.ValueType)
 
                     Me.ValueType.Add(arValueType)
 
@@ -1323,8 +1323,9 @@ Namespace FBM
                 'The FactType already exists in the list of FactTypes for the Model.
                 '-------------------------------------------------------------------------
             Else
-                lrDictionaryEntry.isFactType = True
-                lrDictionaryEntry.Realisations.AddUnique(pcenumConceptType.FactType)
+                lrDictionaryEntry.AddConceptType(pcenumConceptType.FactType)
+                'lrDictionaryEntry.isFactType = True
+                'lrDictionaryEntry.Realisations.AddUnique(pcenumConceptType.FactType)
 
                 Me.FactType.Add(arFactType)
 
@@ -1448,9 +1449,9 @@ Namespace FBM
                     If abAppendRealisations Then
                         'CodeSafe - Only allow multiple Value realisations.
                         If arDictionaryEntry.ConceptType = pcenumConceptType.Value Then
-                            lrDictionaryEntry.Realisations.Add(arDictionaryEntry.ConceptType)
+                            lrDictionaryEntry.AddRealisation(arDictionaryEntry.ConceptType)
                         Else
-                            lrDictionaryEntry.Realisations.AddUnique(arDictionaryEntry.ConceptType)
+                            lrDictionaryEntry.AddRealisation(arDictionaryEntry.ConceptType, True)
                         End If
 
                     End If
@@ -1462,9 +1463,9 @@ Namespace FBM
                     If abAppendRealisations Then
                         'CodeSafe - Only allow multiple Value realisations.
                         If arDictionaryEntry.ConceptType = pcenumConceptType.Value Then
-                            lrDictionaryEntry.Realisations.Add(arDictionaryEntry.ConceptType)
+                            lrDictionaryEntry.AddRealisation(arDictionaryEntry.ConceptType)
                         Else
-                            lrDictionaryEntry.Realisations.AddUnique(arDictionaryEntry.ConceptType)
+                            lrDictionaryEntry.AddRealisation(arDictionaryEntry.ConceptType, True)
                         End If
                     End If
                     arDictionaryEntry.isDirty = True
@@ -3043,7 +3044,7 @@ Namespace FBM
             '---------------------------------------------------
             'Save the DictionaryEntries in the ModelDictionary
             '---------------------------------------------------
-            For Each lrModelDictionaryEntry In Me.ModelDictionary.ToArray
+            For Each lrModelDictionaryEntry In Me.ModelDictionary.FindAll(Function(x) x.isDirty).ToArray
                 '---------------------------------------------------------
                 'CodeSafe: Only save DictionaryEntries with Realisations
                 '---------------------------------------------------------
@@ -3830,7 +3831,7 @@ Namespace FBM
 
             lrDictionarEntry = Me.ModelDictionary.Find(AddressOf arDictionaryEntry.Equals)
 
-            lrDictionarEntry.Realisations.Add(arDictionaryEntry.ConceptType)
+            lrDictionarEntry.AddRealisation(arDictionaryEntry.ConceptType)
 
         End Sub
 

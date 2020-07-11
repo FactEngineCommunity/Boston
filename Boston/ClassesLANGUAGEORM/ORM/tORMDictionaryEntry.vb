@@ -395,9 +395,21 @@ Namespace FBM
                     Me.isValue = True
             End Select
 
+            Me.Realisations.AddUnique(aiConceptType)
             Me.isDirty = True
 
         End Sub
+
+        Public Sub AddRealisation(ByVal aiConceptType As pcenumConceptType, Optional ByVal abUnique As Boolean = False)
+
+            If abUnique Then
+                Me.Realisations.AddUnique(aiConceptType)
+            Else
+                Me.Realisations.Add(aiConceptType)
+            End If
+
+        End Sub
+
 
         Public Function GenerateKLIdentityLetter(ByRef aarModelDictionary As List(Of FBM.DictionaryEntry), ByVal aiStartingPosition As Integer, Optional ByVal asKLIdentityLetter As String = "")
 
