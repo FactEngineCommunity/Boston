@@ -1833,50 +1833,52 @@ Public Class frmDiagramORM
 
             Select Case lrOriginModelObject.ConceptType
                 Case Is = pcenumConceptType.Role
-                    Dim lrRoleInstance As New FBM.RoleInstance
-                    lrRoleInstance = lrModelObject
 
-                    '------------------------------------------------------------------------------------------------------
-                    'Remove the link either way, because if lrTargetModelObject is something, then RoleInstance.ResetLink
-                    '  will recreate the link, and lrRoleInstance may not be the only RoleInstance in the Model that
-                    '  will have RoleInstance.ResetLink method called.
-                    '------------------------------------------------------------------------------------------------------
-                    Me.Diagram.Links.Remove(e.Link)
-
-                    If lrRoleInstance.FactType.IsLinkFactType Then
-                        MsgBox("You cannot directly reassign the Role of a Link Fact Type.")
-                        Exit Sub
-                    End If
-
-                    If lrTargetModelObject Is Nothing Then
+                    With New WaitCursor
+                        Dim lrRoleInstance As New FBM.RoleInstance
                         lrRoleInstance = lrModelObject
-                        lrRoleInstance.Link.Pen.Color = Color.Black
 
-                        Exit Sub
-                    Else
-                        Select Case lrTargetModelObject.ConceptType
-                            Case Is = pcenumConceptType.ValueType
-                                Dim lrValueTypeInstance As FBM.ValueTypeInstance = lrTargetModelObject
-                                lrRoleInstance.Role.ReassignJoinedModelObject(lrValueTypeInstance.ValueType, True)
-                            Case Is = pcenumConceptType.EntityType
-                                Dim lrEntityTypeInstance As FBM.EntityTypeInstance = lrTargetModelObject
-                                lrRoleInstance.Role.ReassignJoinedModelObject(lrEntityTypeInstance.EntityType, True)
-                            Case Is = pcenumConceptType.EntityTypeName
-                                Dim lrEntityTypeNameInstance As FBM.EntityTypeName = lrTargetModelObject
-                                lrRoleInstance.Role.ReassignJoinedModelObject(lrEntityTypeNameInstance.EntityTypeInstance.EntityType, True)
-                            Case Is = pcenumConceptType.FactType
-                                Dim lrFactTypeInstance As FBM.FactTypeInstance = lrTargetModelObject
-                                lrRoleInstance.Role.ReassignJoinedModelObject(lrFactTypeInstance.FactType, True)
-                        End Select
-                    End If
+                        '------------------------------------------------------------------------------------------------------
+                        'Remove the link either way, because if lrTargetModelObject is something, then RoleInstance.ResetLink
+                        '  will recreate the link, and lrRoleInstance may not be the only RoleInstance in the Model that
+                        '  will have RoleInstance.ResetLink method called.
+                        '------------------------------------------------------------------------------------------------------
+                        Me.Diagram.Links.Remove(e.Link)
 
-                    If lrRoleInstance.FactType.RoleGroup.FindAll(Function(x) x.JoinedORMObject IsNot Nothing).Count = lrRoleInstance.FactType.Arity Then
-                        Call lrRoleInstance.FactType.SortRoleGroup()
-                    End If
+                        If lrRoleInstance.FactType.IsLinkFactType Then
+                            MsgBox("You cannot directly reassign the Role of a Link Fact Type.")
+                            Exit Sub
+                        End If
 
-                    Me.Diagram.AllowUnanchoredLinks = False
-                    Me.Diagram.AllowUnconnectedLinks = False
+                        If lrTargetModelObject Is Nothing Then
+                            lrRoleInstance = lrModelObject
+                            lrRoleInstance.Link.Pen.Color = Color.Black
 
+                            Exit Sub
+                        Else
+                            Select Case lrTargetModelObject.ConceptType
+                                Case Is = pcenumConceptType.ValueType
+                                    Dim lrValueTypeInstance As FBM.ValueTypeInstance = lrTargetModelObject
+                                    lrRoleInstance.Role.ReassignJoinedModelObject(lrValueTypeInstance.ValueType, True)
+                                Case Is = pcenumConceptType.EntityType
+                                    Dim lrEntityTypeInstance As FBM.EntityTypeInstance = lrTargetModelObject
+                                    lrRoleInstance.Role.ReassignJoinedModelObject(lrEntityTypeInstance.EntityType, True)
+                                Case Is = pcenumConceptType.EntityTypeName
+                                    Dim lrEntityTypeNameInstance As FBM.EntityTypeName = lrTargetModelObject
+                                    lrRoleInstance.Role.ReassignJoinedModelObject(lrEntityTypeNameInstance.EntityTypeInstance.EntityType, True)
+                                Case Is = pcenumConceptType.FactType
+                                    Dim lrFactTypeInstance As FBM.FactTypeInstance = lrTargetModelObject
+                                    lrRoleInstance.Role.ReassignJoinedModelObject(lrFactTypeInstance.FactType, True)
+                            End Select
+                        End If
+
+                        If lrRoleInstance.FactType.RoleGroup.FindAll(Function(x) x.JoinedORMObject IsNot Nothing).Count = lrRoleInstance.FactType.Arity Then
+                            Call lrRoleInstance.FactType.SortRoleGroup()
+                        End If
+
+                        Me.Diagram.AllowUnanchoredLinks = False
+                        Me.Diagram.AllowUnconnectedLinks = False
+                    End With
                 Case Is = pcenumConceptType.ModelNote
                     Dim lrModelNoteInstance As FBM.ModelNoteInstance
                     lrModelNoteInstance = lrOriginModelObject

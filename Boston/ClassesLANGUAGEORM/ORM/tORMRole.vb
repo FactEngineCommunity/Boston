@@ -1190,15 +1190,21 @@ Namespace FBM
                         Dim larDownstreamActiveRoles As New List(Of FBM.Role)
                         Dim larCoveredRoles As New List(Of FBM.Role)
 
-                        larDownstreamActiveRoles = Me.getDownstreamRoleActiveRoles(larCoveredRoles) 'Returns all Roles joined ObjectifiedFactTypes and their Roles' JoinedORMObjects (recursively).
+                        Dim lrTable As RDS.Table = Me.JoinsFactType.getCorrespondingRDSTable
 
-                        Dim larFurtherUpstreamColumns = From Table In Me.Model.RDS.Table _
-                                                        From Column In Table.Column _
-                                                        Where larDownstreamActiveRoles.Contains(Column.ActiveRole) _
-                                                        And Not larCoveredRoles.Contains(Column.Role)
-                                                        Select Column
+                        larReturnColumns.Add(lrTable.Column.Find(Function(x) x.Role Is Me))
 
-                        Call larReturnColumns.AddRange(larFurtherUpstreamColumns.ToList)
+                        'larDownstreamActiveRoles = Me.getDownstreamRoleActiveRoles(larCoveredRoles) 'Returns all Roles joined ObjectifiedFactTypes and their Roles' JoinedORMObjects (recursively).
+
+                        'Dim larFurtherUpstreamColumns = From Table In Me.Model.RDS.Table _
+                        '                                From Column In Table.Column _
+                        '                                Where larDownstreamActiveRoles.Contains(Column.ActiveRole) _
+                        '                                And Not larCoveredRoles.Contains(Column.Role)
+                        '                                Select Column
+
+                        'Call larReturnColumns.AddRange(larFurtherUpstreamColumns.ToList)
+
+
 
                 End Select
 

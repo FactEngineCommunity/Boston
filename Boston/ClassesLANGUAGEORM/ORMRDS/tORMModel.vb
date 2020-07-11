@@ -1307,8 +1307,16 @@ Namespace FBM
                                         larOriginColumn.Add(lrOriginTable.Column.Find(Function(x) x.Role.Id = lrRole.FactType.LinkFactTypeRole.Id _
                                                                                           And x.ActiveRole.Id = lrColumn.ActiveRole.Id))
                                     Else
+                                        If lrOriginTable.Column.Find(Function(x) x.Role.Id = lrRole.Id _
+                                                                     And x.ActiveRole.Id = lrColumn.ActiveRole.Id) Is Nothing Then
+                                            '=====================================================
+                                            'The Column doesn't exist in the Table yet.
+                                            Dim lrNewColumn = New RDS.Column(lrOriginTable, lrColumn.ActiveRole.JoinedORMObject.Id, lrRole, lrColumn.ActiveRole, lrRole.Mandatory)
+                                            lrOriginTable.addColumn(lrNewColumn)
+                                        End If
                                         larOriginColumn.Add(lrOriginTable.Column.Find(Function(x) x.Role.Id = lrRole.Id _
-                                                                                          And x.ActiveRole.Id = lrColumn.ActiveRole.Id))
+                                                                                      And x.ActiveRole.Id = lrColumn.ActiveRole.Id))
+
                                     End If
                                 Next
                             Case Is = pcenumConceptType.FactType
