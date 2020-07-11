@@ -2008,7 +2008,14 @@ Namespace FBM
 
         End Sub
 
-        Public Sub SetIsPreferredIdentifier(ByVal abIsPreferredIdentifier As Boolean)
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <param name="abIsPreferredIdentifier"></param>
+        ''' <param name="abDoRDSProcessing">When creating the first Uniqueness Constraint for a Ternary/greater Fact Type, we want to set the RC.IsPreferredIndentifier to True, 
+        ''' but not create the Index, because that is done further in Model.AddRoleConstraint, so abort at RDS processing here.</param>
+        Public Sub SetIsPreferredIdentifier(ByVal abIsPreferredIdentifier As Boolean,
+                                            Optional ByVal abDoRDSProcessing As Boolean = True)
 
             Try
                 Me.IsPreferredIdentifier = abIsPreferredIdentifier
@@ -2020,9 +2027,9 @@ Namespace FBM
 
                 Dim larColumnsAffected As New List(Of RDS.Column)
 
+                If Not abDoRDSProcessing Then Exit Sub
                 '=================================================================================================
                 'RDS Processing
-
                 For Each lrRoleConstraintRole In Me.RoleConstraintRole
                     'Columns/Attributes/Properties will be set to ContributesToPrimaryKey = True
                     '  This needs to change to False.
@@ -2040,11 +2047,11 @@ Namespace FBM
                     End If
 
                     For Each lrColumn In larColumn
-                            lrColumn.setContributesToPrimaryKey(abIsPreferredIdentifier)
-                            larColumnsAffected.Add(lrColumn)
-                        Next
 
+                        lrColumn.setContributesToPrimaryKey(abIsPreferredIdentifier)
+                        larColumnsAffected.Add(lrColumn)
                     Next
+                Next
 
 
                 If larColumnsAffected.Count > 0 Then
@@ -2064,7 +2071,7 @@ Namespace FBM
                         If abIsPreferredIdentifier = True Then
                             '------------------------------
                             'Add the new PrimaryKey Index
-                            Dim lrPrimaryKeyIndex As New RDS.Index(lrTable, _
+                            Dim lrPrimaryKeyIndex As New RDS.Index(lrTable,
                                                                    lrTable.Name & "_PK",
                                                                    "PK",
                                                                    pcenumODBCAscendingOrDescending.Ascending,

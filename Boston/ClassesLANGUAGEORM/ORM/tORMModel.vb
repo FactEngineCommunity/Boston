@@ -904,7 +904,7 @@ Namespace FBM
                                 Dim lbIsPrimaryKey As Boolean = False
                                 If lrFactType.InternalUniquenessConstraint.Count = 1 Then
                                     lsQualifier = lrTable.generateUniqueQualifier("PK")
-                                    lrFactType.InternalUniquenessConstraint(0).SetIsPreferredIdentifier(True)
+                                    lrFactType.InternalUniquenessConstraint(0).SetIsPreferredIdentifier(True, False)
                                     lbIsPrimaryKey = True
                                 Else
                                     lsQualifier = lrTable.generateUniqueQualifier("UC")
