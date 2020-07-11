@@ -176,7 +176,6 @@ Namespace ORMQL
 
     End Class
 
-
     Public Class WhereClauseTree
         Private _COMPARISON As New List(Of Object)
         Public Property COMPARISON As List(Of Object)
@@ -185,6 +184,74 @@ Namespace ORMQL
             End Get
             Set(value As List(Of Object))
                 Me._COMPARISON = value
+            End Set
+        End Property
+
+    End Class
+
+    Public Class AddFactStatement
+
+        Private _USERTABLENAME As String
+        Public Property USERTABLENAME As String
+            Get
+                Return Me._USERTABLENAME
+            End Get
+            Set(value As String)
+                Me._USERTABLENAME = value
+            End Set
+        End Property
+
+        Private _VALUE As String
+        Public Property VALUE As String
+            Get
+                Return Me._VALUE
+            End Get
+            Set(value As String)
+                Me._VALUE = value
+            End Set
+        End Property
+
+        Private _PAGENAME As String
+        Public Property PAGENAME As String
+            Get
+                Return Me._PAGENAME
+            End Get
+            Set(value As String)
+                Me._PAGENAME = value
+            End Set
+        End Property
+
+    End Class
+
+    Public Class UpdateStatement
+
+        Private _USERTABLENAME As String
+        Public Property USERTABLENAME As String
+            Get
+                Return Me._USERTABLENAME
+            End Get
+            Set(value As String)
+                Me._USERTABLENAME = value
+            End Set
+        End Property
+
+        Private _COLUMNNAMESTR As New List(Of String)
+        Public Property COLUMNNAMESTR As List(Of String)
+            Get
+                Return Me._COLUMNNAMESTR
+            End Get
+            Set(value As List(Of String))
+                Me._COLUMNNAMESTR = value
+            End Set
+        End Property
+
+        Private _VALUE As New List(Of String)
+        Public Property VALUE As List(Of String)
+            Get
+                Return Me._VALUE
+            End Get
+            Set(value As List(Of String))
+                Me._VALUE = value
             End Set
         End Property
 
@@ -209,8 +276,8 @@ Namespace ORMQL
         Public DeleteStatement As New DeleteStatement
         Public DeleteFactStatement As New Object
         Public CreateFactTypeStatement As New Object
-        Public AddFactStatement As New Object
-        Public UpdateStatement As New Object
+        Public AddFactStatement As New AddFactStatement
+        Public UpdateStatement As New UpdateStatement
         Public RemoveInstanceStatement As New Object
         Public RenameInstanceStatement As New Object
 
@@ -281,22 +348,22 @@ Namespace ORMQL
                 '-----------------------------------------------
                 'Create the DynamicClass for ADDFACT Statemnts
                 '-----------------------------------------------
-                Dim lrClass As New DynamicClassLibrary.Factory.tClass
-                lrClass.add_attribute(New DynamicClassLibrary.Factory.tAttribute("USERTABLENAME", GetType(String)))
-                lrClass.add_attribute(New DynamicClassLibrary.Factory.tAttribute("VALUE", GetType(String)))
-                lrClass.add_attribute(New DynamicClassLibrary.Factory.tAttribute("PAGENAME", GetType(String)))
+                'Dim lrClass As New DynamicClassLibrary.Factory.tClass
+                'lrClass.add_attribute(New DynamicClassLibrary.Factory.tAttribute("USERTABLENAME", GetType(String)))
+                'lrClass.add_attribute(New DynamicClassLibrary.Factory.tAttribute("VALUE", GetType(String)))
+                'lrClass.add_attribute(New DynamicClassLibrary.Factory.tAttribute("PAGENAME", GetType(String)))
 
-                Me.AddFactStatement = lrClass.clone
+                'Me.AddFactStatement = lrClass.clone
 
                 '-----------------------------------------------
                 'Create the DynamicClass for UPDATE Statemnts
                 '-----------------------------------------------
-                Dim lrORMQLUpdateStatement As New DynamicClassLibrary.Factory.tClass
-                lrORMQLUpdateStatement.add_attribute(New DynamicClassLibrary.Factory.tAttribute("USERTABLENAME", GetType(String)))
-                lrORMQLUpdateStatement.add_attribute(New DynamicClassLibrary.Factory.tAttribute("COLUMNNAMESTR", GetType(List(Of String))))
-                lrORMQLUpdateStatement.add_attribute(New DynamicClassLibrary.Factory.tAttribute("VALUE", GetType(List(Of String))))
+                'Dim lrORMQLUpdateStatement As New DynamicClassLibrary.Factory.tClass
+                'lrORMQLUpdateStatement.add_attribute(New DynamicClassLibrary.Factory.tAttribute("USERTABLENAME", GetType(String)))
+                'lrORMQLUpdateStatement.add_attribute(New DynamicClassLibrary.Factory.tAttribute("COLUMNNAMESTR", GetType(List(Of String))))
+                'lrORMQLUpdateStatement.add_attribute(New DynamicClassLibrary.Factory.tAttribute("VALUE", GetType(List(Of String))))
 
-                Me.UpdateStatement = lrORMQLUpdateStatement.clone
+                'Me.UpdateStatement = lrORMQLUpdateStatement.clone
 
                 'REMOVE INSTANCE
                 Dim lrORMQLRemoveInstanceStatement As New DynamicClassLibrary.Factory.tClass
@@ -448,8 +515,9 @@ Namespace ORMQL
                     ElseIf lrType Is lasListOfString.GetType Then
                         'ao_object.GetAttributeMember(aoParseTreeNode.Token.Type.ToString).Add(aoParseTreeNode.Token.Text)
 
-                        Dim instance As Object = Activator.CreateInstance(ao_object.GetType.GetProperty(aoParseTreeNode.Token.Type.ToString).PropertyType)
-                        Dim list As IList = CType(instance, IList)
+                        Dim liInstance As Object = ao_object.GetType.GetProperty(aoParseTreeNode.Token.Type.ToString).GetValue(ao_object)
+                        'Dim instance As Object = Activator.CreateInstance(ao_object.GetType.GetProperty(aoParseTreeNode.Token.Type.ToString).PropertyType)
+                        Dim list As IList = CType(liInstance, IList)
                         list.Add(aoParseTreeNode.Token.Text)
                         ao_object.GetType.GetProperty(aoParseTreeNode.Token.Type.ToString).SetValue(ao_object, list, Nothing)
 
@@ -460,8 +528,9 @@ Namespace ORMQL
                         '    piInstance.SetValue(ao_object, aoParseTreeNode.Token.Text)
                     ElseIf lrType Is GetType(List(Of Object)) Then
 
-                        Dim instance As Object = Activator.CreateInstance(ao_object.GetType.GetProperty(aoParseTreeNode.Token.Type.ToString).PropertyType)
-                        Dim list As IList = CType(instance, IList)
+                        Dim liInstance As Object = ao_object.GetType.GetProperty(aoParseTreeNode.Token.Type.ToString).GetValue(ao_object)
+                        'Dim instance As Object = Activator.CreateInstance(ao_object.GetType.GetProperty(aoParseTreeNode.Token.Type.ToString).PropertyType)
+                        Dim list As IList = CType(liInstance, IList)
                         list.Add(aoParseTreeNode)
                         ao_object.GetType.GetProperty(aoParseTreeNode.Token.Type.ToString).SetValue(ao_object, list, Nothing)
 
@@ -588,8 +657,8 @@ Namespace ORMQL
                 Dim lrPage As FBM.Page
 
                 '=============================================================
-                Dim lrselectStatement As New ORMQL.SelectStatement
-                'lrselectStatement = prApplication.ORMQL.selectStatement
+                Dim lrselectStatement As ORMQL.SelectStatement
+                lrselectStatement = prApplication.ORMQL.SelectStatement
 
                 lrselectStatement.COLUMNLIST = New List(Of Object)
                 lrselectStatement.KEYWDDISTINCT = New Object
@@ -969,17 +1038,31 @@ Namespace ORMQL
                 '-------------------------
                 'Create the DynamicObject
                 '-------------------------
-                Dim lrUpdateStatement As New Object
-                lrUpdateStatement = prApplication.ORMQL.UpdateStatement
+                'Dim lrUpdateStatement As New Object
+                'lrUpdateStatement = prApplication.ORMQL.UpdateStatement
 
-                lrUpdateStatement.USERTABLENAME = ""
-                lrUpdateStatement.COLUMNNAMESTR = New List(Of String)
-                lrUpdateStatement.VALUE = New List(Of String)
+                'lrUpdateStatement.USERTABLENAME = ""
+                'lrUpdateStatement.COLUMNNAMESTR = New List(Of String)
+                'lrUpdateStatement.VALUE = New List(Of String)
+
+                ''----------------------------------
+                ''Get the Tokens from the ParseTree
+                ''----------------------------------
+                'Call Me.GetParseTreeTokens(lrUpdateStatement, Me.Parsetree.Nodes(0))
+
+                '=============================================================
+                Dim lrupdateStatement As New ORMQL.UpdateStatement
+                lrupdateStatement = prApplication.ORMQL.UpdateStatement
+
+                lrupdateStatement.USERTABLENAME = Nothing
+                lrupdateStatement.COLUMNNAMESTR.Clear()
+                lrupdateStatement.VALUE.Clear()
 
                 '----------------------------------
                 'Get the Tokens from the ParseTree
                 '----------------------------------
-                Call Me.GetParseTreeTokens(lrUpdateStatement, Me.Parsetree.Nodes(0))
+                Call Me.GetParseTreeTokensReflection(lrupdateStatement, Me.Parsetree.Nodes(0))
+                '======================================================================
 
                 Dim lrFactType As FBM.FactType
                 Dim lrFact As FBM.Fact
@@ -1190,17 +1273,31 @@ Namespace ORMQL
             Dim lrFactType As FBM.FactType
             Dim lsColumnName As String = ""
 
-            Dim lrAddFactStatement As New Object
+            'Dim lrAddFactStatement As New Object
+            'lrAddFactStatement = prApplication.ORMQL.AddFactStatement
+
+            'lrAddFactStatement.USERTABLENAME = ""
+            'lrAddFactStatement.VALUE = ""
+            'lrAddFactStatement.PAGENAME = ""
+
+            ''----------------------------------
+            ''Get the Tokens from the ParseTree
+            ''----------------------------------
+            'Call Me.GetParseTreeTokens(lrAddFactStatement, Me.Parsetree.Nodes(0))
+
+            '=============================================================
+            Dim lrAddFactStatement As ORMQL.AddFactStatement
             lrAddFactStatement = prApplication.ORMQL.AddFactStatement
 
-            lrAddFactStatement.USERTABLENAME = ""
-            lrAddFactStatement.VALUE = ""
-            lrAddFactStatement.PAGENAME = ""
+            lrAddFactStatement.USERTABLENAME = Nothing
+            lrAddFactStatement.VALUE = Nothing
+            lrAddFactStatement.PAGENAME = Nothing
 
             '----------------------------------
             'Get the Tokens from the ParseTree
             '----------------------------------
-            Call Me.GetParseTreeTokens(lrAddFactStatement, Me.Parsetree.Nodes(0))
+            Call Me.GetParseTreeTokensReflection(lrAddFactStatement, Me.Parsetree.Nodes(0))
+            '======================================================================
 
             '========================================
             '---------------------------------------------------------
@@ -1210,7 +1307,7 @@ Namespace ORMQL
             lrFactType = Me.Model.FactType.Find(Function(x) x.Id = lrAddFactStatement.USERTABLENAME) 'AddressOf lrFactType.EqualsByName)
 
             If lrFactType Is Nothing Then
-                Me.Parsetree.Errors.Add(New TinyPG.ParseError("Error: tModel.ProcessORMQLStatement: Can't find FactType with Name: '" & lrAddFactStatement.USERTABLENAME(0).ToString & "' within the Model.", 100, Nothing))
+                Me.Parsetree.Errors.Add(New TinyPG.ParseError("Error: tModel.ProcessORMQLStatement: Can't find FactType with Name: '" & lrAddFactStatement.USERTABLENAME & "' within the Model.", 100, Nothing))
                 Return Me.Parsetree.Errors
                 Exit Function
             End If
@@ -1231,7 +1328,7 @@ Namespace ORMQL
 
             Dim lrFactInstance As FBM.FactInstance
 
-            If lrAddFactStatement.PAGENAME IsNot "" Then
+            If lrAddFactStatement.PAGENAME IsNot Nothing Then
                 Dim lrPage As FBM.Page
                 lrPage = Me.Model.Page.Find(Function(x) x.Name = lrAddFactStatement.PAGENAME)
 
@@ -1246,85 +1343,12 @@ Namespace ORMQL
                         Return Me.Parsetree.Errors
                     End If
                 Else
-                    Me.Parsetree.Errors.Add(New TinyPG.ParseError("Error: tModel.ProcessORMQLStatement: Can't find Page with Name: '" & lrAddFactStatement.PageID(0).ToString & "'.", 100, Nothing))
+                    Me.Parsetree.Errors.Add(New TinyPG.ParseError("Error: tModel.ProcessORMQLStatement: Can't find Page with Name: '" & lrAddFactStatement.PAGENAME & "'.", 100, Nothing))
                     Return Me.Parsetree.Errors
                 End If
             Else
                 Return lrFact
             End If
-
-            '=======================================
-            '20161026-VM-Delete the below. Esp if all is working.
-            '=======================================
-
-            ''---------------------------------------------------------
-            ''Find the FactType that the ADD FACT statement is for.
-            ''---------------------------------------------------------
-            'lrFactType = New FBM.FactType(lrAddFactStatement.USERTABLENAME(0).ToString)
-            'lrFactType = Me.Model.FactType.Find(AddressOf lrFactType.EqualsByName)
-
-            'If lrFactType Is Nothing Then
-            '    Me.Parsetree.Errors.Add(New TinyPG.ParseError("Error: tModel.ProcessORMQLStatement: Can't find FactType with Name: '" & lrAddFactStatement.USERTABLENAME(0).ToString & "' within the Model.", 100, Nothing))
-            '    Return Me.Parsetree.Errors
-            '    Exit Function
-            'End If
-
-            ''-----------------
-            ''Create the Fact
-            ''-----------------
-            'lrFact = New FBM.Fact(lrFactType)
-            'Dim liInd As Integer = 0
-
-            'For Each lsColumnName In lrAddFactStatement.COLUMNNAME
-            '    Dim lrRole As New FBM.Role
-            '    lrRole.Name = lsColumnName
-            '    lrRole = lrFactType.RoleGroup.Find(AddressOf lrRole.EqualsByName)
-            '    Dim lrConcept As FBM.Concept = New FBM.Concept(Trim(lrAddFactStatement.VALUE(liInd).ToString))
-            '    Dim lrModelDictionaryEntry As New FBM.DictionaryEntry(Me.Model, lrConcept.Symbol, pcenumConceptType.Value)
-            '    '----------------------------------------------
-            '    'Add the (new) Concept to the ModelDictionary
-            '    '----------------------------------------------
-            '    Call Me.Model.AddModelDictionaryEntry(lrModelDictionaryEntry)
-            '    lrFact.Data.Add(New FBM.FactData(lrRole, lrConcept))
-            '    liInd += 1
-            'Next
-
-            ''------------------------------------------------------
-            ''Find the Fact within the Model. If the Fact does not
-            ''  already exist within the Model then abort.
-            ''------------------------------------------------------
-            'lrFact = lrFactType.Fact.Find(AddressOf lrFact.Equals)
-
-            'If IsSomething(lrFact) Then
-            '    '----------------------------------------------
-            '    'That's great, the Fact already exists within
-            '    '  the Model/FactType
-            '    '----------------------------------------------
-            'Else
-            '    '----------------------------------------------
-            '    'Abort, because the Fact does not exist within
-            '    '  the Model/FactType
-            '    '----------------------------------------------
-            '    Me.Parsetree.Errors.Add(New TinyPG.ParseError("Error: tModel.ProcessORMQLStatement: Can't find Fact within Fact Type, '" & lrAddFactStatement.USERTABLENAME(0).ToString & "' with values {x,y,z}", 100, Nothing))
-            '    Return Me.Parsetree.Errors
-            '    Exit Function
-            'End If
-
-            'Dim lrPage As New FBM.Page(Me.Model, lrAddFactStatement.PageID(0), lrAddFactStatement.PageID(0), pcenumLanguage.ORMModel)
-            'lrPage = Me.Model.Page.Find(AddressOf lrPage.EqualsByName)
-            'If IsSomething(lrPage) Then
-            '    Dim lrFactTypeInstance As FBM.FactTypeInstance = lrFactType.CloneInstance(lrPage)
-            '    lrFactTypeInstance = lrPage.FactTypeInstance.Find(AddressOf lrFactTypeInstance.Equals)
-            '    If IsSomething(lrFactTypeInstance) Then
-            '        lrFactTypeInstance.AddFact(lrFact)
-            '        Call lrFactTypeInstance.RefreshShape()
-            '    End If
-            'Else
-            '    Me.Parsetree.Errors.Add(New TinyPG.ParseError("Error: tModel.ProcessORMQLStatement: Can't find Page with Name: '" & lrAddFactStatement.PageID(0).ToString & "'.", 100, Nothing))
-            '    Return Me.Parsetree.Errors
-            'End If
-
-            'Return lrFact
 
         End Function
 
@@ -1356,7 +1380,7 @@ Namespace ORMQL
 
             '=============================================================
             Dim lrDeleteStatement As New ORMQL.DeleteStatement
-            'lrDeleteStatement = prApplication.ORMQL.DeleteStatement
+            lrDeleteStatement = prApplication.ORMQL.DeleteStatement
 
             lrDeleteStatement.USERTABLENAME = Nothing
             lrDeleteStatement.PAGENAME = Nothing
