@@ -1241,6 +1241,7 @@ Namespace FBM
 
                 lsMessage = "Error: FBM.EntityType.SetReferenceModeObjects"
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
+                lsMessage &= vbCrLf & vbCrLf & "EntityType.Id: " & Me.Id
                 lsMessage &= vbCrLf & vbCrLf & "Page.Id: " & Me.Page.PageId
                 lsMessage &= vbCrLf & "Page.Name: " & Me.Page.Name
                 lsMessage &= vbCrLf & "PreferredIdentifierRCId: " & Me.PreferredIdentifierRCId

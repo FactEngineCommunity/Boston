@@ -176,6 +176,7 @@ Public Class frmDiagramERD
             'Set the Caption/Title of the Page to the PageName
             '---------------------------------------------------
             Me.zrPage = arPage
+            Me.Tag = arPage
             Me.TabText = arPage.Name
 
             '-------------------------------------------------------------------------

@@ -229,29 +229,6 @@ Namespace TableFactType
                     arFactType.StoreFactCoordinates = CBool(lREcordset("StoreFactCoordinates").Value)
                     arFactType.isDirty = False
 
-                    If Viev.NullVal(lREcordset("ObjectifyingEntityTypeId").Value, "") = "" Then
-                        arFactType.ObjectifyingEntityType = Nothing
-                    Else
-                        Dim lsEntityTypeId As String = ""
-                        lsEntityTypeId = lREcordset("ObjectifyingEntityTypeId").Value
-                        arFactType.ObjectifyingEntityType = arFactType.Model.EntityType.Find(Function(x) x.Id = lsEntityTypeId)
-                        arFactType.ObjectifyingEntityType.IsObjectifyingEntityType = True
-                        arFactType.ObjectifyingEntityType.ObjectifiedFactType = New FBM.FactType
-                        arFactType.ObjectifyingEntityType.ObjectifiedFactType = arFactType
-
-                        If IsSomething(arFactType.ObjectifyingEntityType) Then
-                            '---------------------------------------------
-                            'Okay, have found the ObjectifyingEntityType
-                            '---------------------------------------------
-                        Else
-                            lsMessage = "No EntityType found in the Model for Objectifying Entity Type of the FactType"
-                            lsMessage &= vbCrLf & "ModelId: " & arFactType.Model.ModelId
-                            lsMessage &= vbCrLf & "FactTypeId: " & arFactType.Id
-                            lsMessage &= vbCrLf & "Looking for EntityTypeId: " & lsEntityTypeId
-                            Throw New Exception(lsMessage)
-                        End If
-                    End If
-
                     '------------------------------------------------------------
                     'Get the Roles within the RoleGroup for the FactType as well
                     '------------------------------------------------------------
@@ -269,6 +246,33 @@ Namespace TableFactType
                     arFactType.GetFactsFromDatabase()
                     'Dim loFactThread As New System.Threading.Thread(AddressOf arFactType.GetFactsFromDatabase)
                     'loFactThread.Start()
+
+                    '---------------------------------------------
+                    'ObjectifyingEntityType
+                    '---------------------------------------------
+                    If Viev.NullVal(lREcordset("ObjectifyingEntityTypeId").Value, "") = "" Then
+                        arFactType.ObjectifyingEntityType = Nothing
+                    Else
+                        Dim lsEntityTypeId As String = ""
+                        lsEntityTypeId = lREcordset("ObjectifyingEntityTypeId").Value
+                        arFactType.ObjectifyingEntityType = arFactType.Model.EntityType.Find(Function(x) x.Id = lsEntityTypeId)
+                        If arFactType.ObjectifyingEntityType IsNot Nothing Then
+                            '---------------------------------------------
+                            'Okay, have found the ObjectifyingEntityType
+                            '---------------------------------------------
+                            arFactType.ObjectifyingEntityType.IsObjectifyingEntityType = True
+                            arFactType.ObjectifyingEntityType.ObjectifiedFactType = New FBM.FactType
+                            arFactType.ObjectifyingEntityType.ObjectifiedFactType = arFactType
+                        Else
+                            lsMessage = "No EntityType found in the Model for Objectifying Entity Type of the FactType"
+                            lsMessage &= vbCrLf & "ModelId: " & arFactType.Model.ModelId
+                            lsMessage &= vbCrLf & "FactTypeId: " & arFactType.Id
+                            lsMessage &= vbCrLf & "Looking for EntityTypeId: " & lsEntityTypeId
+
+                            lREcordset.Close()
+                            Throw New Exception(lsMessage)
+                        End If
+                    End If
 
 
                 Else
@@ -290,6 +294,10 @@ Namespace TableFactType
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
                 prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
+                If abAddFactTypeToModel Then
+                    arFactType.Model.AddModelDictionaryEntry(New FBM.DictionaryEntry(arFactType.Model, arFactType.Id, pcenumConceptType.FactType))
+                    arFactType.Model.AddFactType(arFactType, False, False)
+                End If
             End Try
 
         End Sub

@@ -5,6 +5,41 @@ Imports <xmlns:ns="http://www.w3.org/2001/XMLSchema">
 
 Namespace ORMQL
 
+
+    Public Class AddFactStatement
+
+        Private _USERTABLENAME As String
+        Public Property USERTABLENAME As String
+            Get
+                Return Me._USERTABLENAME
+            End Get
+            Set(value As String)
+                Me._USERTABLENAME = value
+            End Set
+        End Property
+
+        Private _VALUE As String
+        Public Property VALUE As String
+            Get
+                Return Me._VALUE
+            End Get
+            Set(value As String)
+                Me._VALUE = value
+            End Set
+        End Property
+
+        Private _PAGENAME As String
+        Public Property PAGENAME As String
+            Get
+                Return Me._PAGENAME
+            End Get
+            Set(value As String)
+                Me._PAGENAME = value
+            End Set
+        End Property
+
+    End Class
+
     Public Class DeleteStatement
 
         Dim _USERTABLENAME As String
@@ -43,6 +78,39 @@ Namespace ORMQL
                 Return Me._VALUE
             End Get
             Set(value As List(Of String))
+                Me._VALUE = value
+            End Set
+        End Property
+    End Class
+
+    Public Class DeleteFactStatement
+
+        Dim _USERTABLENAME As String
+        Public Property USERTABLENAME As String
+            Get
+                Return Me._USERTABLENAME
+            End Get
+            Set(value As String)
+                Me._USERTABLENAME = value
+            End Set
+        End Property
+
+        Dim _PAGENAME As String
+        Public Property PAGENAME As String
+            Get
+                Return Me._PAGENAME
+            End Get
+            Set(value As String)
+                Me._PAGENAME = value
+            End Set
+        End Property
+
+        Dim _VALUE As String
+        Public Property VALUE As String
+            Get
+                Return Me._VALUE
+            End Get
+            Set(value As String)
                 Me._VALUE = value
             End Set
         End Property
@@ -91,6 +159,54 @@ Namespace ORMQL
         End Property
 
         Private _VALUE As New List(Of String)
+        Public Property VALUE As List(Of String)
+            Get
+                Return Me._VALUE
+            End Get
+            Set(value As List(Of String))
+                Me._VALUE = value
+            End Set
+        End Property
+
+    End Class
+
+    Public Class RemoveInstanceStatement
+
+        Dim _MODELELEMENTNAME As String
+        Public Property MODELELEMENTNAME As String
+            Get
+                Return Me._MODELELEMENTNAME
+            End Get
+            Set(value As String)
+                Me._MODELELEMENTNAME = value
+            End Set
+        End Property
+
+        Dim _VALUE As String
+        Public Property VALUE As String
+            Get
+                Return Me._VALUE
+            End Get
+            Set(value As String)
+                Me._VALUE = value
+            End Set
+        End Property
+
+    End Class
+
+    Public Class RenameInstanceStatement
+
+        Dim _MODELELEMENTNAME As String
+        Public Property MODELELEMENTNAME As String
+            Get
+                Return Me._MODELELEMENTNAME
+            End Get
+            Set(value As String)
+                Me._MODELELEMENTNAME = value
+            End Set
+        End Property
+
+        Dim _VALUE As List(Of String)
         Public Property VALUE As List(Of String)
             Get
                 Return Me._VALUE
@@ -189,40 +305,6 @@ Namespace ORMQL
 
     End Class
 
-    Public Class AddFactStatement
-
-        Private _USERTABLENAME As String
-        Public Property USERTABLENAME As String
-            Get
-                Return Me._USERTABLENAME
-            End Get
-            Set(value As String)
-                Me._USERTABLENAME = value
-            End Set
-        End Property
-
-        Private _VALUE As String
-        Public Property VALUE As String
-            Get
-                Return Me._VALUE
-            End Get
-            Set(value As String)
-                Me._VALUE = value
-            End Set
-        End Property
-
-        Private _PAGENAME As String
-        Public Property PAGENAME As String
-            Get
-                Return Me._PAGENAME
-            End Get
-            Set(value As String)
-                Me._PAGENAME = value
-            End Set
-        End Property
-
-    End Class
-
     Public Class UpdateStatement
 
         Private _USERTABLENAME As String
@@ -274,12 +356,12 @@ Namespace ORMQL
         Public WhereClauseTree As New WhereClauseTree
         Public InsertStatement As New InsertStatement
         Public DeleteStatement As New DeleteStatement
-        Public DeleteFactStatement As New Object
+        Public DeleteFactStatement As New DeleteFactStatement
         Public CreateFactTypeStatement As New Object
         Public AddFactStatement As New AddFactStatement
         Public UpdateStatement As New UpdateStatement
-        Public RemoveInstanceStatement As New Object
-        Public RenameInstanceStatement As New Object
+        Public RemoveInstanceStatement As New RemoveInstanceStatement
+        Public RenameInstanceStatement As New RenameInstanceStatement
 
         Public Sub New()
 
@@ -328,12 +410,12 @@ Namespace ORMQL
                 'Me.DeleteStatement = lrORMQLDeleteStatement.clone
 
                 '==========================================================
-                Dim lrORMQLDeleteFactStatement As New DynamicClassLibrary.Factory.tClass
-                lrORMQLDeleteFactStatement.add_attribute(New DynamicClassLibrary.Factory.tAttribute("VALUE", GetType(List(Of String))))
-                lrORMQLDeleteFactStatement.add_attribute(New DynamicClassLibrary.Factory.tAttribute("USERTABLENAME", GetType(List(Of String))))
-                lrORMQLDeleteFactStatement.add_attribute(New DynamicClassLibrary.Factory.tAttribute("PAGENAME", GetType(List(Of String))))
+                'Dim lrORMQLDeleteFactStatement As New DynamicClassLibrary.Factory.tClass
+                'lrORMQLDeleteFactStatement.add_attribute(New DynamicClassLibrary.Factory.tAttribute("VALUE", GetType(List(Of String))))
+                'lrORMQLDeleteFactStatement.add_attribute(New DynamicClassLibrary.Factory.tAttribute("USERTABLENAME", GetType(List(Of String))))
+                'lrORMQLDeleteFactStatement.add_attribute(New DynamicClassLibrary.Factory.tAttribute("PAGENAME", GetType(List(Of String))))
 
-                Me.DeleteFactStatement = lrORMQLDeleteFactStatement.clone
+                'Me.DeleteFactStatement = lrORMQLDeleteFactStatement.clone
 
                 '================================================
                 'Create the DynamicObject for Select Statements
@@ -366,18 +448,18 @@ Namespace ORMQL
                 'Me.UpdateStatement = lrORMQLUpdateStatement.clone
 
                 'REMOVE INSTANCE
-                Dim lrORMQLRemoveInstanceStatement As New DynamicClassLibrary.Factory.tClass
-                lrORMQLRemoveInstanceStatement.add_attribute(New DynamicClassLibrary.Factory.tAttribute("MODELELEMENTNAME", GetType(String)))
-                lrORMQLRemoveInstanceStatement.add_attribute(New DynamicClassLibrary.Factory.tAttribute("VALUE", GetType(String)))
+                'Dim lrORMQLRemoveInstanceStatement As New DynamicClassLibrary.Factory.tClass
+                'lrORMQLRemoveInstanceStatement.add_attribute(New DynamicClassLibrary.Factory.tAttribute("MODELELEMENTNAME", GetType(String)))
+                'lrORMQLRemoveInstanceStatement.add_attribute(New DynamicClassLibrary.Factory.tAttribute("VALUE", GetType(String)))
 
-                Me.RemoveInstanceStatement = lrORMQLRemoveInstanceStatement.clone
+                'Me.RemoveInstanceStatement = lrORMQLRemoveInstanceStatement.clone
 
                 'RENAME INSTANCE
-                Dim lrORMQLRenameInstanceStatement As New DynamicClassLibrary.Factory.tClass
-                lrORMQLRenameInstanceStatement.add_attribute(New DynamicClassLibrary.Factory.tAttribute("MODELELEMENTNAME", GetType(String)))
-                lrORMQLRenameInstanceStatement.add_attribute(New DynamicClassLibrary.Factory.tAttribute("VALUE", GetType(List(Of String))))
+                'Dim lrORMQLRenameInstanceStatement As New DynamicClassLibrary.Factory.tClass
+                'lrORMQLRenameInstanceStatement.add_attribute(New DynamicClassLibrary.Factory.tAttribute("MODELELEMENTNAME", GetType(String)))
+                'lrORMQLRenameInstanceStatement.add_attribute(New DynamicClassLibrary.Factory.tAttribute("VALUE", GetType(List(Of String))))
 
-                Me.RenameInstanceStatement = lrORMQLRenameInstanceStatement.clone
+                'Me.RenameInstanceStatement = lrORMQLRenameInstanceStatement.clone
 
 
                 Richmond.WriteToStatusBar("Dynamic Classes Created", True)
@@ -562,23 +644,36 @@ Namespace ORMQL
                 '-------------------------------------------
                 'Create the DynamicClass within the Factory
                 '-------------------------------------------
-                Dim lrClass As New DynamicClassLibrary.Factory.tClass
-                lrClass.add_attribute(New DynamicClassLibrary.Factory.tAttribute("MODELELEMENTNAME", GetType(String)))
-                lrClass.add_attribute(New DynamicClassLibrary.Factory.tAttribute("VALUE", GetType(String)))
+                'Dim lrClass As New DynamicClassLibrary.Factory.tClass
+                'lrClass.add_attribute(New DynamicClassLibrary.Factory.tAttribute("MODELELEMENTNAME", GetType(String)))
+                'lrClass.add_attribute(New DynamicClassLibrary.Factory.tAttribute("VALUE", GetType(String)))
 
-                '-------------------------
-                'Set the DynamicObject
-                '-------------------------
-                Dim lrRemoveInstanceStatement As New Object
+                ''-------------------------
+                ''Set the DynamicObject
+                ''-------------------------
+                'Dim lrRemoveInstanceStatement As New Object
+                'lrRemoveInstanceStatement = prApplication.ORMQL.RemoveInstanceStatement
+
+                'lrRemoveInstanceStatement.MODELELEMENTNAME = ""
+                'lrRemoveInstanceStatement.VALUE = ""
+
+                ''----------------------------------
+                ''Get the Tokens from the ParseTree
+                ''----------------------------------
+                'Call Me.GetParseTreeTokens(lrRemoveInstanceStatement, Me.Parsetree.Nodes(0))
+
+                '=============================================================
+                Dim lrRemoveInstanceStatement As New ORMQL.RemoveInstanceStatement
                 lrRemoveInstanceStatement = prApplication.ORMQL.RemoveInstanceStatement
 
-                lrRemoveInstanceStatement.MODELELEMENTNAME = ""
-                lrRemoveInstanceStatement.VALUE = ""
+                lrRemoveInstanceStatement.MODELELEMENTNAME = Nothing
+                lrRemoveInstanceStatement.VALUE = Nothing
 
                 '----------------------------------
                 'Get the Tokens from the ParseTree
                 '----------------------------------
-                Call Me.GetParseTreeTokens(lrRemoveInstanceStatement, Me.Parsetree.Nodes(0))
+                Call Me.GetParseTreeTokensReflection(lrRemoveInstanceStatement, Me.Parsetree.Nodes(0))
+                '======================================================================
 
                 Dim lrModelElement As FBM.ModelObject = Me.Model.GetModelObjectByName(lrRemoveInstanceStatement.MODELELEMENTNAME)
 
@@ -605,16 +700,29 @@ Namespace ORMQL
                 '-------------------------
                 'Set the DynamicObject
                 '-------------------------
-                Dim lrRenameInstanceStatement As New Object
+                'Dim lrRenameInstanceStatement As New Object
+                'lrRenameInstanceStatement = prApplication.ORMQL.RenameInstanceStatement
+
+                'lrRenameInstanceStatement.MODELELEMENTNAME = ""
+                'lrRenameInstanceStatement.VALUE = New List(Of String)
+
+                ''----------------------------------
+                ''Get the Tokens from the ParseTree
+                ''----------------------------------
+                'Call Me.GetParseTreeTokens(lrRenameInstanceStatement, Me.Parsetree.Nodes(0))
+
+                '=============================================================
+                Dim lrRenameInstanceStatement As New ORMQL.RenameInstanceStatement
                 lrRenameInstanceStatement = prApplication.ORMQL.RenameInstanceStatement
 
-                lrRenameInstanceStatement.MODELELEMENTNAME = ""
+                lrRenameInstanceStatement.MODELELEMENTNAME = Nothing
                 lrRenameInstanceStatement.VALUE = New List(Of String)
 
                 '----------------------------------
                 'Get the Tokens from the ParseTree
                 '----------------------------------
-                Call Me.GetParseTreeTokens(lrRenameInstanceStatement, Me.Parsetree.Nodes(0))
+                Call Me.GetParseTreeTokensReflection(lrRenameInstanceStatement, Me.Parsetree.Nodes(0))
+                '======================================================================
 
                 Dim lrModelElement As FBM.ModelObject = Me.Model.GetModelObjectByName(lrRenameInstanceStatement.MODELELEMENTNAME)
 
@@ -788,7 +896,7 @@ Namespace ORMQL
                 '=============================================
                 'Process the Where Clause (if there is one)
                 '=============================================
-                If lrSelectStatement.WHERESTMT.GetType Is GetType(Object) Then
+                If lrselectStatement.WHERESTMT.GetType Is GetType(Object) Then
                     '----------------------
                     'No WHERECLAUSE found
                     '  Retrieve all the Facts from the FactType
@@ -882,7 +990,7 @@ Namespace ORMQL
                 '=============================================================
                 'If KEYWDDISTINCT then return only the distinct set of Facts
                 '=============================================================
-                If lrSelectStatement.KEYWDDISTINCT.GetType Is GetType(Object) Then
+                If lrselectStatement.KEYWDDISTINCT.GetType Is GetType(Object) Then
                     '----------------------
                     'No DISTINCT required
                     '----------------------
@@ -897,7 +1005,7 @@ Namespace ORMQL
                         '-----------------------------------
                         'Create the key for the Dictionary
                         '-----------------------------------
-                        lsKey = lrFact.EnumerateDataAsKey(lrSelectStatement.COLUMNNAMESTR)
+                        lsKey = lrFact.EnumerateDataAsKey(lrselectStatement.COLUMNNAMESTR)
 
                         If larReturnDictionarySet.ContainsKey(lsKey) Then
                             lrFactList.Remove(lrFact)
@@ -917,7 +1025,7 @@ Namespace ORMQL
                 'Get the type of SELECT type for each column. Can be either, Attribute, Count(*), or *
                 '-------------------------------------------------------------------------------------------
                 Dim lrColumn As New Object
-                For Each lrColumn In lrSelectStatement.COLUMNLIST
+                For Each lrColumn In lrselectStatement.COLUMNLIST
 
                     Dim customClass As TinyPG.ParseNode = lrColumn
                     'MsgBox(Richmond.IsSerializable(customClass).ToString)
@@ -951,21 +1059,21 @@ Namespace ORMQL
 
                             lrFactList = New List(Of FBM.Fact)
                             lrFactList.Add(lrFact)
-                            lrSelectStatement.COLUMNNAMESTR.Add("Count")
+                            lrselectStatement.COLUMNNAMESTR.Add("Count")
                             Exit For
                         Case Is = "STAR"
                             If lrFactList.Count > 0 Then
-                                lrSelectStatement.COLUMNNAMESTR.Clear()
+                                lrselectStatement.COLUMNNAMESTR.Clear()
                                 If lrFactList(0).GetType Is GetType(FBM.Fact) Then
                                     For Each lrRoleData In lrFactList(0).Data
-                                        lrSelectStatement.COLUMNNAMESTR.Add(lrRoleData.Role.Name)
+                                        lrselectStatement.COLUMNNAMESTR.Add(lrRoleData.Role.Name)
                                     Next
                                 Else
                                     Dim lrFactInstance As New FBM.FactInstance
                                     Dim lrFactDataInstance As FBM.FactDataInstance
                                     lrFactInstance = lrFactList(0)
                                     For Each lrFactDataInstance In lrFactInstance.Data
-                                        lrSelectStatement.COLUMNNAMESTR.Add(lrFactDataInstance.Role.Name)
+                                        lrselectStatement.COLUMNNAMESTR.Add(lrFactDataInstance.Role.Name)
                                     Next
                                 End If
                             End If
@@ -1015,7 +1123,7 @@ Namespace ORMQL
                 Dim lrORMQlREcordset As New ORMQL.Recordset
 
                 lrORMQlREcordset.Facts = lrFactList
-                lrORMQlREcordset.Columns = lrSelectStatement.COLUMNNAMESTR
+                lrORMQlREcordset.Columns = lrselectStatement.COLUMNNAMESTR
 
                 Return lrORMQlREcordset
 
@@ -1067,16 +1175,16 @@ Namespace ORMQL
                 Dim lrFactType As FBM.FactType
                 Dim lrFact As FBM.Fact
 
-                lrFactType = Me.Model.FactType.Find(Function(x) x.Id = lrUpdateStatement.USERTABLENAME)
+                lrFactType = Me.Model.FactType.Find(Function(x) x.Id = lrupdateStatement.USERTABLENAME)
 
                 'Where Clause
-                lrFact = lrFactType.Fact.Find(Function(x) x.Data.Find(Function(y) y.Role.Name = lrUpdateStatement.COLUMNNAMESTR(1)).Data = lrUpdateStatement.VALUE(1))
+                lrFact = lrFactType.Fact.Find(Function(x) x.Data.Find(Function(y) y.Role.Name = lrupdateStatement.COLUMNNAMESTR(1)).Data = lrupdateStatement.VALUE(1))
 
                 'Update Data
                 If lrFact IsNot Nothing Then
                     Dim lrFactData As FBM.FactData
-                    lrFactData = lrFact.Data.Find(Function(x) x.Role.Name = lrUpdateStatement.COLUMNNAMESTR(0))
-                    lrFactData.Data = lrUpdateStatement.VALUE(0)
+                    lrFactData = lrFact.Data.Find(Function(x) x.Role.Name = lrupdateStatement.COLUMNNAMESTR(0))
+                    lrFactData.Data = lrupdateStatement.VALUE(0)
                     lrFactData.isDirty = True
                 End If
 
@@ -1189,10 +1297,10 @@ Namespace ORMQL
                 Dim lrModelDictionaryEntry As New FBM.DictionaryEntry
 
                 Dim lrRole As FBM.Role
-                For Each lsColumnName In lrInsertStatement.COLUMNNAMESTR
+                For Each lsColumnName In lrinsertStatement.COLUMNNAMESTR
                     'lrRole.Name = lsColumnName
                     lrRole = lrFactType.RoleGroup.Find(Function(x) x.Name = lsColumnName) 'AddressOf lrRole.EqualsByName)
-                    Dim lrConcept As FBM.Concept = New FBM.Concept(Trim(lrInsertStatement.VALUE(liInd).ToString))
+                    Dim lrConcept As FBM.Concept = New FBM.Concept(Trim(lrinsertStatement.VALUE(liInd).ToString))
 
                     '----------------------------------------------------------------------------------------
                     'Link the FactData.Concept to the corresponding ModelDictionary.DictionaryEntry.Concept
@@ -1497,7 +1605,7 @@ Namespace ORMQL
 
             '=============================================================
             Dim lrDeleteFactStatement As New Object
-            lrDeleteFactStatement = prApplication.ORMQL.DeleteStatement
+            lrDeleteFactStatement = prApplication.ORMQL.DeleteFactStatement
 
             lrDeleteFactStatement.VALUE.Clear()
             lrDeleteFactStatement.USERTABLENAME.Clear()
