@@ -1790,7 +1790,7 @@ Namespace FBM
 
                         Dim larDownstreamRole As New List(Of FBM.Role)
                         larDownstreamRole = (From Role In lrColumn.Role.getDownstreamRolePaths(Nothing, larCoveredRoles).FindAll(Function(x) x.JoinedORMObject Is Me)
-                                            Select Role Distinct).ToList
+                                             Select Role Distinct).ToList
 
                         If larDownstreamRole.Count = 1 Then
                                 'Great, this is simple

@@ -1295,7 +1295,8 @@ Namespace FBM
             Try
                 Dim larRolesToReturn As New List(Of FBM.Role)
 
-                If Me.FactType.HasTotalRoleConstraint Or Me.FactType.HasPartialButMultiRoleConstraint Then
+                If Me.FactType.HasTotalRoleConstraint Or Me.FactType.HasPartialButMultiRoleConstraint _
+                    Or Me.JoinedORMObject.ConceptType = pcenumConceptType.FactType Then
 
                     Select Case Me.JoinedORMObject.ConceptType
                         Case Is = pcenumConceptType.ValueType
@@ -1329,6 +1330,34 @@ Namespace FBM
                                 aarCoveredRoles.Add(lrRole)
                                 larRolesToReturn.AddRange(lrRole.getDownstreamRoleActiveRoles(aarCoveredRoles))
                             Next
+
+                    End Select
+
+                ElseIf Me.FactType.IsManyTo1BinaryFactType And Me.HasInternalUniquenessConstraint Then
+
+                    Dim lrJoinedModelObject = Me.FactType.GetOtherRoleOfBinaryFactType(Me.Id)
+
+                    Select Case lrJoinedModelObject.JoinedORMObject.ConceptType
+                        Case Is = pcenumConceptType.FactType
+                            larRolesToReturn.AddRange(Me.FactType.GetOtherRoleOfBinaryFactType(Me.Id).getDownstreamRoleActiveRoles(aarCoveredRoles))
+                        Case Is = pcenumConceptType.ValueType
+                            larRolesToReturn.Add(Me)
+
+                        Case Is = pcenumConceptType.EntityType
+
+                            If Me.JoinsEntityType.HasSimpleReferenceScheme Then
+
+                                aarCoveredRoles.AddUnique(Me.JoinsEntityType.ReferenceModeFactType.RoleGroup(0))
+                                aarCoveredRoles.AddUnique(Me.JoinsEntityType.ReferenceModeFactType.RoleGroup(1))
+
+                                larRolesToReturn.Add(Me.JoinsEntityType.ReferenceModeFactType.RoleGroup(1))
+
+                            ElseIf Me.JoinsEntityType.HasCompoundReferenceMode Then
+
+                                larRolesToReturn.AddRange(Me.JoinsEntityType.getDownstreamActiveRoles(aarCoveredRoles))
+                            Else
+                                larRolesToReturn.AddUnique(Me)
+                            End If
 
                     End Select
 
@@ -1769,7 +1798,7 @@ Namespace FBM
                 'Get the originally joined ModelObject
                 Dim lrOriginallyJoinedModelObject As FBM.ModelObject = Me.JoinedORMObject
                 Dim lrOriginallyJoinedTable = lrOriginallyJoinedModelObject.getCorrespondingRDSTable
-                Dim lrOriginalColumn = lrOriginallyJoinedTable.Column.Find(Function(x) x.Role Is Me)
+                Dim larOriginalColumn = lrOriginallyJoinedTable.Column.FindAll(Function(x) x.Role Is Me)
 
                 If arNewJoinedModelObject Is Me.JoinedORMObject Then
                     Exit Sub
@@ -1790,17 +1819,23 @@ Namespace FBM
                         '---------------------------------------------------------
                         Dim lrNewTable = arNewJoinedModelObject.getCorrespondingRDSTable
 
+                        Dim larCoveredRoles As New List(Of FBM.Role)
+                        Dim larDownstreamActiveRoles = Me.getDownstreamRoleActiveRoles(larCoveredRoles) 'Returns all Roles joined ObjectifiedFactTypes and their Roles' JoinedORMObjects (recursively).
+
                         'Create the new Column in the newly joined Table
-                        Dim lrNewColumn As New RDS.Column(lrNewTable,
-                                                          lrOriginalColumn.Name,
+                        For Each lrActiveRole In larDownstreamActiveRoles
+                            'Dim lrOriginalColumn = larOriginalColumn.Find(Function(x) x.ActiveRole Is lrActiveRole)
+                            Dim lrNewColumn As New RDS.Column(lrNewTable,
+                                                          lrActiveRole.JoinedORMObject.Id,
                                                           Me,
-                                                          lrOriginalColumn.ActiveRole,
+                                                          lrActiveRole,
                                                           Me.Mandatory)
-                        lrNewTable.addColumn(lrNewColumn)
+                            lrNewTable.addColumn(lrNewColumn)
+                        Next
 
                         'Remove the Original Relation
-                        If lrOriginalColumn.Relation.Count > 0 Then
-                            Call Me.Model.RDS.removeRelation(lrOriginalColumn.Relation(0))
+                        If larOriginalColumn(0).Relation.Count > 0 Then
+                            Call Me.Model.RDS.removeRelation(larOriginalColumn(0).Relation(0))
                         End If
 
                         'Reassign the Role
@@ -1831,7 +1866,9 @@ Namespace FBM
                         Call Me.Model.generateRelationForReassignedRole(Me)
 
                         'Remove the orginal Column from the Originally Joined Table
-                        Call lrOriginallyJoinedTable.removeColumn(lrOriginalColumn)
+                        For Each lrColumn In larOriginalColumn
+                            Call lrOriginallyJoinedTable.removeColumn(lrColumn)
+                        Next
 
                     Else
                         '==========================================================================
