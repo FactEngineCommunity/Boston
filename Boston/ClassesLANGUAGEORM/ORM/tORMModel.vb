@@ -716,8 +716,8 @@ Namespace FBM
                                          And lrRole.FactType.InternalUniquenessConstraint.Count = 2 _
                                          And Not lrRole.FactType.IsPreferredReferenceMode Then
 
-                                        Dim larRelation = From Relation In Me.RDS.Relation _
-                                                          Where Relation.ResponsibleFactType.Id = lrRole.FactType.Id _
+                                        Dim larRelation = From Relation In Me.RDS.Relation
+                                                          Where Relation.ResponsibleFactType.Id = lrRole.FactType.Id
                                                           Select Relation
 
                                         If larRelation.Count = 0 Then
@@ -745,9 +745,41 @@ Namespace FBM
 
                                 End If
 
+                            ElseIf arRoleConstraint.Role(0).FactType.IsManyTo1BinaryFactType And arRoleConstraint.Role(0).HasInternalUniquenessConstraint Then
+
+                                Dim lrRoleConstraintRole As FBM.Role = arRoleConstraint.RoleConstraintRole(0).Role
+
+
+                                lsTableName = lrRoleConstraintRole.JoinedORMObject.Id
+                                lrTable = Me.RDS.getTableByName(lsTableName)
+
+                                If lrTable Is Nothing Then
+                                    'CodeSafe: Table not created yet, but should already exist.
+                                    lrTable = New RDS.Table(Me.RDS, lsTableName, lrRoleConstraintRole.JoinedORMObject)
+                                    Me.RDS.addTable(lrTable)
+                                End If
+
+                                Dim larCoveredRoles As New List(Of FBM.Role)
+                                Dim larDownstreamActiveRoles = lrRoleConstraintRole.getDownstreamRoleActiveRoles(larCoveredRoles) 'Returns all Roles joined ObjectifiedFactTypes and their Roles' JoinedORMObjects (recursively).
+
+                                'Create the new Column/s in the newly joined Table
+                                For Each lrActiveRole In larDownstreamActiveRoles
+                                    Dim lrNewColumn As New RDS.Column(lrTable,
+                                                                      lrActiveRole.JoinedORMObject.Id,
+                                                                      lrRoleConstraintRole,
+                                                                      lrActiveRole,
+                                                                      lrRoleConstraintRole.Mandatory)
+                                    lrTable.addColumn(lrNewColumn)
+                                Next
+
+                                'Relation
+                                Call Me.generateRelationForManyTo1BinaryFactType(lrRoleConstraintRole)
+
                             ElseIf (arRoleConstraint.RoleConstraintRole.Count <> 1) _
                                 Or (arRoleConstraint.RoleConstraintRole.Count = 1 And arRoleConstraint.RoleConstraintRole(0).Role.FactType.IsObjectified) Then 'And (arRoleConstraint.RoleConstraintRole(0).Role.JoinedORMObject.ConceptType <> pcenumConceptType.ValueType)
+
                                 'Make Columns for the FactType of the RoleConstraint (InternalUniquenessConstraint)
+
                                 Dim lrFactType As FBM.FactType = arRoleConstraint.RoleConstraintRole(0).Role.FactType
 
                                 lsTableName = lrFactType.Name
@@ -779,7 +811,6 @@ Namespace FBM
                                 ElseIf lrFactType.JoinedFactTypes.Count = 0 Then
                                     lrTable.setIsPGSRelation(True)
                                 End If
-
 
                                 'Must have a column for all of the Roles of the FactType
                                 For Each lrRole In lrFactType.RoleGroup

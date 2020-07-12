@@ -430,46 +430,58 @@ Namespace FBM
             Dim lrFactDataInstance As FBM.FactDataInstance
             Dim lrConceptInstance As New FBM.ConceptInstance
 
-            lrConceptInstance.ModelId = Me.FactType.Model.ModelId
-            lrConceptInstance.PageId = Me.Page.PageId
-            lrConceptInstance.Symbol = Me.Fact.Symbol
-            lrConceptInstance.X = Me.X
-            lrConceptInstance.Y = Me.Y
-            lrConceptInstance.ConceptType = pcenumConceptType.Fact
-
-            If abRapidSave Then
-                Call TableConceptInstance.AddConceptInstance(lrConceptInstance)
-            Else
-                If TableConceptInstance.ExistsConceptInstance(lrConceptInstance) Then
-                    Call TableConceptInstance.UpdateConceptInstance(lrConceptInstance)
-                Else
-                    Dim lrConcept As New FBM.Concept(lrConceptInstance.Symbol, True)
-                    lrConcept.Save()
-                    Call TableConceptInstance.AddConceptInstance(lrConceptInstance)
-                End If
-            End If
-
-
-            For Each lrFactDataInstance In Me.Data
-
-                lrConceptInstance = New FBM.ConceptInstance
+            Try
                 lrConceptInstance.ModelId = Me.FactType.Model.ModelId
                 lrConceptInstance.PageId = Me.Page.PageId
-                lrConceptInstance.Symbol = lrFactDataInstance.Data
-                lrConceptInstance.RoleId = lrFactDataInstance.Role.Id
-                lrConceptInstance.X = lrFactDataInstance.X
-                lrConceptInstance.Y = lrFactDataInstance.Y
-                lrConceptInstance.ConceptType = pcenumConceptType.Value
+                lrConceptInstance.Symbol = Me.Fact.Symbol
+                lrConceptInstance.X = Me.X
+                lrConceptInstance.Y = Me.Y
+                lrConceptInstance.ConceptType = pcenumConceptType.Fact
 
-                'NB Don't use abRapidSave here because more than one Fact can use the same ConceptInstance for its FactData.
-                If TableConceptInstance.ExistsConceptInstance(lrConceptInstance) Then
-                    Call TableConceptInstance.UpdateConceptInstance(lrConceptInstance)
-                Else
-                    Dim lrConcept As New FBM.Concept(lrFactDataInstance.Data)
-                    lrConcept.Save()
+                If abRapidSave Then
                     Call TableConceptInstance.AddConceptInstance(lrConceptInstance)
-                End If
-            Next
+
+                ElseIf Me.isDirty Then
+
+                    If TableConceptInstance.ExistsConceptInstance(lrConceptInstance) Then
+                        Call TableConceptInstance.UpdateConceptInstance(lrConceptInstance)
+                    Else
+                        Dim lrConcept As New FBM.Concept(lrConceptInstance.Symbol, True)
+                        lrConcept.Save()
+                        Call TableConceptInstance.AddConceptInstance(lrConceptInstance)
+                    End If
+
+                    For Each lrFactDataInstance In Me.Data
+
+                        lrConceptInstance = New FBM.ConceptInstance
+                        lrConceptInstance.ModelId = Me.FactType.Model.ModelId
+                        lrConceptInstance.PageId = Me.Page.PageId
+                        lrConceptInstance.Symbol = lrFactDataInstance.Data
+                        lrConceptInstance.RoleId = lrFactDataInstance.Role.Id
+                        lrConceptInstance.X = lrFactDataInstance.X
+                        lrConceptInstance.Y = lrFactDataInstance.Y
+                        lrConceptInstance.ConceptType = pcenumConceptType.Value
+
+                        'NB Don't use abRapidSave here because more than one Fact can use the same ConceptInstance for its FactData.
+                        If TableConceptInstance.ExistsConceptInstance(lrConceptInstance) Then
+                            Call TableConceptInstance.UpdateConceptInstance(lrConceptInstance)
+                        Else
+                            Dim lrConcept As New FBM.Concept(lrFactDataInstance.Data)
+                            lrConcept.Save()
+                            Call TableConceptInstance.AddConceptInstance(lrConceptInstance)
+                        End If
+                    Next
+
+                    Me.isDirty = False
+
+                End If 'IsDirty
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                lsMessage = "Error: GetFactsForFactTypeInstance:"
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
         End Sub
 

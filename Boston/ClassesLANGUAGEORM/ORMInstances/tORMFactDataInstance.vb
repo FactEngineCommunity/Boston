@@ -108,26 +108,26 @@ Namespace FBM
                     Me.Concept = lrNewDictionaryEntry.Concept
                     Me.Symbol = lrNewDictionaryEntry.Symbol
 
-                    lsDebugMessage = "FactDataInstance.Data.Set"
-                    If IsSomething(Me.FactType) Then
-                        lsDebugMessage &= vbCrLf & "FactType.Id: " & Me.FactType.Id
-                    Else
-                        lsDebugMessage &= vbCrLf & "FactType.Id: Nothing"
-                    End If
-                    If IsSomething(Me.Fact) Then
-                        lsDebugMessage &= vbCrLf & "Fact.Symbol: " & Me.Fact.Symbol
-                    Else
-                        lsDebugMessage &= vbCrLf & "Fact.Symbol: Nothing"
-                    End If
-                    If Me.Role IsNot Nothing Then
-                        lsDebugMessage &= vbCrLf & "Role.Id: " & Me.Role.Id
-                    Else
-                        lsDebugMessage &= vbCrLf & "Role.Id: Nothing"
-                    End If
+                    'lsDebugMessage = "FactDataInstance.Data.Set"
+                    'If IsSomething(Me.FactType) Then
+                    '    lsDebugMessage &= vbCrLf & "FactType.Id: " & Me.FactType.Id
+                    'Else
+                    '    lsDebugMessage &= vbCrLf & "FactType.Id: Nothing"
+                    'End If
+                    'If IsSomething(Me.Fact) Then
+                    '    lsDebugMessage &= vbCrLf & "Fact.Symbol: " & Me.Fact.Symbol
+                    'Else
+                    '    lsDebugMessage &= vbCrLf & "Fact.Symbol: Nothing"
+                    'End If
+                    'If Me.Role IsNot Nothing Then
+                    '    lsDebugMessage &= vbCrLf & "Role.Id: " & Me.Role.Id
+                    'Else
+                    '    lsDebugMessage &= vbCrLf & "Role.Id: Nothing"
+                    'End If
 
-                    lsDebugMessage &= vbCrLf & "Original Data/Concept.Symbol: " & Me.Data
-                    lsDebugMessage &= vbCrLf & "New Data/Concept.Symbol: '" & lrNewDictionaryEntry.Symbol & "' already exists in the ModelDictionary"
-                    Call prApplication.ThrowErrorMessage(lsDebugMessage, pcenumErrorType.Information)
+                    'lsDebugMessage &= vbCrLf & "Original Data/Concept.Symbol: " & Me.Data
+                    'lsDebugMessage &= vbCrLf & "New Data/Concept.Symbol: '" & lrNewDictionaryEntry.Symbol & "' already exists in the ModelDictionary"
+                    'Call prApplication.ThrowErrorMessage(lsDebugMessage, pcenumErrorType.Information)
 
                 Else
                     '-------------------------------------------------------
@@ -139,8 +139,10 @@ Namespace FBM
                     Me.Concept = lrDictionaryEntry.Concept
                     Me.Symbol = value
 
-                    lsDebugMessage = "Setting FactData.Concept.Symbol to new Concep/DictionaryEntry: " & value
-                    Call prApplication.ThrowErrorMessage(lsDebugMessage, pcenumErrorType.Information)
+                    Me.isDirty = True
+
+                    'lsDebugMessage = "Setting FactData.Concept.Symbol to new Concep/DictionaryEntry: " & value
+                    'Call prApplication.ThrowErrorMessage(lsDebugMessage, pcenumErrorType.Information)
                 End If
             End Set
         End Property
@@ -780,6 +782,7 @@ Namespace FBM
             Me.FactData.Id = asNewName
             Me.FactData.Name = asNewName
             Me.FactData.Data = asNewName
+            Me.FactData.isDirty = True
 
         End Sub
 
@@ -885,6 +888,7 @@ Namespace FBM
 
             Me.Symbol = asData
             Me.Concept = arConcept
+            Me.isDirty = True
 
         End Sub
 

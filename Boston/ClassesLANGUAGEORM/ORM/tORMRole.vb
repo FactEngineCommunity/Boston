@@ -1822,7 +1822,7 @@ Namespace FBM
                         Dim larCoveredRoles As New List(Of FBM.Role)
                         Dim larDownstreamActiveRoles = Me.getDownstreamRoleActiveRoles(larCoveredRoles) 'Returns all Roles joined ObjectifiedFactTypes and their Roles' JoinedORMObjects (recursively).
 
-                        'Create the new Column in the newly joined Table
+                        'Create the new Column/s in the newly joined Table
                         For Each lrActiveRole In larDownstreamActiveRoles
                             'Dim lrOriginalColumn = larOriginalColumn.Find(Function(x) x.ActiveRole Is lrActiveRole)
                             Dim lrNewColumn As New RDS.Column(lrNewTable,

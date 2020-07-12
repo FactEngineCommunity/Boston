@@ -87,6 +87,7 @@
                             'Add the FactDataInstance to the Role
                             '-------------------------------------
                             lrRoleInstance.Data.Add(lrFactDataInstance)
+
                             '-------------------------------------
                             'Add the FactDataInstance to the Fact
                             '-------------------------------------
@@ -102,14 +103,21 @@
 
                             lRecordset.MoveNext()
                         Else
-                            lrFact = arFactTypeInstance.FactType.Fact.Find(Function(x) x.Id = lsFactId)
-                            lrFactInstance = lrFact.CloneInstance(arFactTypeInstance.Page, True)
-                            For Each lrFactDataInstance In lrFactInstance.Data
-                                arFactTypeInstance.Page.ValueInstance.Add(lrFactDataInstance)
-                                lrFactDataInstance.Role.Data.AddUnique(lrFactDataInstance)
-                            Next
-                            lrFactInstance.Save()
-                            Exit For
+                            Try
+                                lrFact = arFactTypeInstance.FactType.Fact.Find(Function(x) x.Id = lsFactId)
+                                lrFactInstance = lrFact.CloneInstance(arFactTypeInstance.Page, True)
+                                For Each lrFactDataInstance In lrFactInstance.Data
+                                    arFactTypeInstance.Page.ValueInstance.Add(lrFactDataInstance)
+                                    lrFactDataInstance.Role.Data.AddUnique(lrFactDataInstance)
+                                Next
+                                lrFactInstance.Save()
+                            Catch ex As Exception
+                                Dim lsMessage As String
+                                lsMessage = "Error: GetFactsForFactTypeInstance:"
+                                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                                lsMessage &= vbCrLf & vbCrLf & "PageId: " & arFactTypeInstance.Page.PageId & vbCrLf & ", FactTypeId: " & arFactTypeInstance.Id & vbCrLf & ", FactId:" & lsFactId
+                                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                            End Try
                         End If
                     Next liInd
                     'GetFactsForFactTypeInstance.Add(lrFactInstance)

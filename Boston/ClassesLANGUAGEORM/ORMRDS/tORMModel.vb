@@ -1295,7 +1295,7 @@ Namespace FBM
                         '--------------------------------------------------------------------------
                         'Get the Origin/Destination Columns
                         Dim larDestinationColumn As New List(Of RDS.Column)
-                        larDestinationColumn = lrDestinationTable.Column.FindAll(Function(x) x.ContributesToPrimaryKey = True)
+                        'larDestinationColumn = lrDestinationTable.Column.FindAll(Function(x) x.ContributesToPrimaryKey = True)
                         lrRelation.DestinationColumns = larDestinationColumn
 
                         Dim larOriginColumn As New List(Of RDS.Column)
@@ -1320,7 +1320,7 @@ Namespace FBM
                                     End If
                                 Next
                             Case Is = pcenumConceptType.FactType
-                                For Each lrColumn In larDestinationColumn
+                                For Each lrColumn In lrDestinationTable.Column
                                     larOriginColumn.Add(lrOriginTable.Column.Find(Function(x) x.ActiveRole.Id = lrColumn.ActiveRole.Id _
                                                                                       And Not x.Role.FactType.IsPreferredReferenceMode))
                                 Next

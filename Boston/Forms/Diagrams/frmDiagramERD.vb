@@ -2118,7 +2118,6 @@ Public Class frmDiagramERD
                         lrOriginAttribute.Cell.Brush = New MindFusion.Drawing.SolidBrush(Color.LightSteelBlue)
                     Next
                 End If
-
             Next
 
             For Each lrDestinationColumn In lrERDLink.Relation.RDSRelation.DestinationColumns

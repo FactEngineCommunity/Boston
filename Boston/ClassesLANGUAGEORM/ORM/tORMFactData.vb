@@ -382,6 +382,10 @@ Namespace FBM
                     'Find the RoleInstance for the FactData
                     '----------------------------------------
                     lrFactDataInstance.Role = arPage.RoleInstance.Find(Function(x) x.Id = Me.Role.Id)
+                    'CodeSafe: Add the Clone and add the RoleInstance to the Page if it does not exist
+                    If lrFactDataInstance.Role.Data.FindAll(Function(x) x.Role Is Nothing).Count > 0 Then
+                        lrFactDataInstance.Role = Me.Role.CloneInstance(arPage, True)
+                    End If
 
                     '--------------------------------------------
                     'Find the FactTypeInstance for the FactData
