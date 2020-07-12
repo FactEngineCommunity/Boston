@@ -225,6 +225,19 @@ Namespace RDS
 
             Me.Relation.Remove(arRelation)
 
+            Dim lsRelationId = arRelation.Id
+
+            'Remove the Relation from the associated Columns
+            Dim larColumn = From Table In Me.Table
+                            From Column In Table.Column
+                            From Relation In Column.Relation
+                            Where Relation.Id = lsRelationId
+                            Select Column
+
+            For Each lrColumn In larColumn.ToArray
+                Call lrColumn.Relation.Remove(arRelation)
+            Next
+
             Call Me.Model.removeCMMLRelation(arRelation)
 
             RaiseEvent RelationRemoved(arRelation)

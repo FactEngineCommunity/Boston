@@ -1835,7 +1835,8 @@ Namespace FBM
 
                         'Remove the Original Relation
                         If larOriginalColumn(0).Relation.Count > 0 Then
-                            Call Me.Model.RDS.removeRelation(larOriginalColumn(0).Relation(0))
+                            Dim lrRelation = larOriginalColumn(0).Relation(0)
+                            Call Me.Model.RDS.removeRelation(lrRelation)
                         End If
 
                         'Reassign the Role
