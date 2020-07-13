@@ -4180,6 +4180,7 @@ Public Class frmDiagramORM
                     Case Is = pcenumConceptType.FactType
                         'Not done here, because when a Role is selected, the FactType of the Role is selected also.
                         '  This is so that when a Role is moved, the FactType(Instance) moves also.
+                        Call e.Node.Tag.AdjustBorderHeight()
                     Case Is = pcenumConceptType.FactTable
                         Me.zrPage.SelectedObject.Add(e.Node.Tag)
                     Case Is = pcenumConceptType.EntityTypeName

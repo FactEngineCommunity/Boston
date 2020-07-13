@@ -745,7 +745,9 @@ Namespace FBM
 
                                 End If
 
-                            ElseIf arRoleConstraint.Role(0).FactType.IsManyTo1BinaryFactType And arRoleConstraint.Role(0).HasInternalUniquenessConstraint Then
+                            ElseIf arRoleConstraint.Role(0).FactType.IsManyTo1BinaryFactType And
+                                   arRoleConstraint.Role(0).HasInternalUniquenessConstraint And
+                                   Not arRoleConstraint.Role(0).FactType.IsLinkFactType Then
 
                                 Dim lrRoleConstraintRole As FBM.Role = arRoleConstraint.RoleConstraintRole(0).Role
 
@@ -2717,7 +2719,7 @@ Namespace FBM
 
                             lrTable = Me.RDS.getTableByName(arRoleConstraint.RoleConstraintRole(0).Role.FactType.Id)
 
-                            If lrFactType.isRDSTable Or (lrTable IsNot Nothing) Then
+                            If (lrFactType.isRDSTable Or (lrTable IsNot Nothing)) And lrFactType.InternalUniquenessConstraint.Count = 0 Then
                                 'Remove the Table from the RDSModel/Database                                
 
                                 '--------------------------------------------------------------------
@@ -2759,8 +2761,6 @@ Namespace FBM
                                 Next
 
                                 'Relations: Already removed within FactType.RemoveInternalUniquenessConstraint.
-
-
                             End If
 
 
