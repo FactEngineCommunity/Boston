@@ -33,17 +33,9 @@
             RaiseEvent OpenProject()
         End Sub
 
-        Private Sub lnkAbout_LinkClicked(ByVal sender As System.Object, ByVal e As System.Windows.Forms.LinkLabelLinkClickedEventArgs) Handles lnkAbout.LinkClicked
+        Private Sub lnkAbout_LinkClicked(ByVal sender As System.Object, ByVal e As System.Windows.Forms.LinkLabelLinkClickedEventArgs)
             Dim frm As New About()
             frm.ShowDialog(Me)
-        End Sub
-
-        Private Sub lnkAbout_MouseEnter(ByVal sender As Object, ByVal e As System.EventArgs) Handles lnkAbout.MouseEnter
-            Me.lnkAbout.LinkColor = Color.Black
-        End Sub
-
-        Private Sub lnkAbout_MouseLeave(ByVal sender As Object, ByVal e As System.EventArgs) Handles lnkAbout.MouseLeave
-            Me.lnkAbout.LinkColor = Color.FromArgb(85, 85, 85)
         End Sub
 
     End Class

@@ -3819,13 +3819,17 @@ Public Class frmMain
 
     Private Sub CodeGeneratorToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles CodeGeneratorToolStripMenuItem.Click
 
-        If Me.zfrmModelExplorer Is Nothing Then
-            Call Me.LoadEnterpriseTreeViewer()
-            Call Me.loadCodeGenerator()
+        If prApplication.SoftwareCategory = pcenumSoftwareCategory.Student Then
+            Dim lsMessage = "Please upgrade to Boston Professional for code generation."
+            MsgBox(lsMessage)
         Else
-            Call Me.loadCodeGenerator()
+            If Me.zfrmModelExplorer Is Nothing Then
+                Call Me.LoadEnterpriseTreeViewer()
+                Call Me.loadCodeGenerator()
+            Else
+                Call Me.loadCodeGenerator()
+            End If
         End If
-
 
     End Sub
 

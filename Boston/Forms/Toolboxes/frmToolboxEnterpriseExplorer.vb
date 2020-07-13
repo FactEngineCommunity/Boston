@@ -3862,9 +3862,14 @@ Public Class frmToolboxEnterpriseExplorer
 
     Private Sub CodeGenerationToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles CodeGenerationToolStripMenuItem.Click
 
-        With New WaitCursor
-            Call frmMain.loadCodeGenerator()
-        End With
+        If prApplication.SoftwareCategory = pcenumSoftwareCategory.Student Then
+            Dim lsMessage = "Please upgrade to Boston Professional for code generation."
+            MsgBox(lsMessage)
+        Else
+            With New WaitCursor
+                Call frmMain.loadCodeGenerator()
+            End With
+        End If
 
 
     End Sub
