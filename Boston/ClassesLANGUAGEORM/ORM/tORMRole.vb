@@ -2096,9 +2096,9 @@ Namespace FBM
 
                     End If 'Whether a Role in a ManyToOne Binary FactType or is a Role in a Ternary/Greater FactType.
 
-
-
                     RaiseEvent RoleJoinModified(Me.JoinedORMObject)
+
+                    Call Me.Model.Save()
 
                 End If 'Not joined back to what it originally joined to.
 

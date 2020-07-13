@@ -2787,9 +2787,11 @@ Public Class frmDiagramORM
                 e.Handled = True
             Case Is = Keys.M
                 Call frmMain.LoadToolboxModelDictionary()
+                Call Me.DiagramView.Focus()
             Case Is = Keys.T
                 Call frmMain.LoadToolbox()
                 Call Me.SetToolbox()
+                Call Me.DiagramView.Focus()
             Case Is = Keys.Right 'Right Arrow
                 If Me.zrPage.SelectedObject.Count > 0 Then
                     Dim loObject As Object
@@ -2835,12 +2837,15 @@ Public Class frmDiagramORM
                 lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
                 lrPropertyGridForm.PropertyGrid.HiddenAttributes = Nothing
                 If IsSomething(lrPropertyGridForm) Then
-                    If Me.Diagram.Selection.Items.Count > 0 Then
+                    If Me.Diagram.Selection.Items.Count = 1 Then
                         lrPropertyGridForm.PropertyGrid.SelectedObject = Me.Diagram.Selection.Items(Me.Diagram.Selection.Items.Count - 1).Tag
+                        Me.Diagram.Selection.Items(Me.Diagram.Selection.Items.Count - 1).Tag.Shape.Selected = True
                     Else
-                        'lrPropertyGridForm.PropertyGrid.SelectedObject = Me.Diagram.Selection.Items(0).Tag
+                        Call Me.DiagramView.Focus()
                     End If
                 End If
+
+
             Case Is = Keys.R
                 '-----------------------------------------------------------
                 'The User has elected to add a Role to the Model.

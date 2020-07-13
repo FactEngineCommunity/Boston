@@ -2685,4 +2685,30 @@ Public Class frmDiagramERD
         lr_image.Save(asFileLocation, System.Drawing.Imaging.ImageFormat.Jpeg)
 
     End Sub
+
+    Private Sub DiagramView_KeyDown(sender As Object, e As KeyEventArgs) Handles DiagramView.KeyDown
+
+        Select Case e.KeyCode
+            Case Is = Keys.P
+                Call frmMain.LoadToolboxPropertyWindow(Me.DockPanel.ActivePane)
+
+                Dim lrPropertyGridForm As frmToolboxProperties
+                lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
+                lrPropertyGridForm.PropertyGrid.HiddenAttributes = Nothing
+                If IsSomething(lrPropertyGridForm) Then
+                    If Me.Diagram.Selection.Items.Count > 0 Then
+                        lrPropertyGridForm.PropertyGrid.SelectedObject = Me.Diagram.Selection.Items(Me.Diagram.Selection.Items.Count - 1).Tag
+                    Else
+                        'lrPropertyGridForm.PropertyGrid.SelectedObject = Me.Diagram.Selection.Items(0).Tag
+                    End If
+                End If
+            Case Is = Keys.M
+                Call frmMain.LoadToolboxModelDictionary()
+            Case Is = Keys.T
+                Call frmMain.LoadToolbox()
+                Call Me.SetToolbox()
+        End Select
+
+        Call Me.DiagramView.Focus()
+    End Sub
 End Class
