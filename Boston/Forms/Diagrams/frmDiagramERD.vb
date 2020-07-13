@@ -2107,6 +2107,9 @@ Public Class frmDiagramERD
             'Highlight the Attributes of the Relation
             Dim lrAttribute As ERD.Attribute
             For Each lrOriginColumn In lrERDLink.Relation.RDSRelation.OriginColumns
+                'CodeSafe: Remove Attributes with no columns
+                Me.zrPage.ERDiagram.Attribute.RemoveAll(Function(x) x.Column Is Nothing)
+
                 lrAttribute = Me.zrPage.ERDiagram.Attribute.Find(Function(x) x.Column.Id = lrOriginColumn.Id)
                 lrAttribute.Cell.TextColor = Color.White
                 lrAttribute.Cell.Brush = New MindFusion.Drawing.SolidBrush(Color.LightGray)

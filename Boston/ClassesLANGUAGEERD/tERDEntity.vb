@@ -290,6 +290,9 @@ Namespace ERD
 
                 Me.TableShape.RowCount = Me.Attribute.Count
 
+                'CodeSafe: Remove Attributes where Column is Nothing
+                Me.Attribute.RemoveAll(Function(x) x.Column Is Nothing)
+
                 For Each lrERAttribute In Me.Attribute                    
                     lrERAttribute.Cell = Me.TableShape.Item(0, lrERAttribute.Column.OrdinalPosition - 1)
                     Me.TableShape.Item(0, lrERAttribute.Column.OrdinalPosition - 1).Tag = lrERAttribute
