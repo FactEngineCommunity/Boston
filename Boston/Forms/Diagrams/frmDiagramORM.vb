@@ -2835,7 +2835,8 @@ Public Class frmDiagramORM
 
                 Dim lrPropertyGridForm As frmToolboxProperties
                 lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
-                lrPropertyGridForm.PropertyGrid.HiddenAttributes = Nothing
+                Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
+                lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute})
                 If IsSomething(lrPropertyGridForm) Then
                     If Me.Diagram.Selection.Items.Count = 1 Then
                         lrPropertyGridForm.PropertyGrid.SelectedObject = Me.Diagram.Selection.Items(Me.Diagram.Selection.Items.Count - 1).Tag
