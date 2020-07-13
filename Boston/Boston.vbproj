@@ -322,6 +322,9 @@
     <Compile Include="ClassesClientServer\tRole.vb" />
     <Compile Include="ClassesClientServer\tUser.vb" />
     <Compile Include="ClassesFBMInterfaceHost\tFBMInterfaceHost.vb" />
+    <Compile Include="ClassesGeneral\BostonTreeView.vb">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="ClassesGeneral\classVievToopTip.vb" />
     <Compile Include="ClassesGeneral\FlexibleListBox.Designer.vb">
       <DependentUpon>FlexibleListBox.vb</DependentUpon>

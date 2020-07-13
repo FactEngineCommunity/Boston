@@ -739,6 +739,15 @@ Namespace FBM
 
         End Function
 
+        Public Sub AddFactInstance(ByRef arFactInstance As FBM.FactInstance)
+
+            Me.Fact.Add(arFactInstance)
+            Me.Page.FactInstance.Add(arFactInstance)
+
+            Me.isDirty = True
+            Me.Page.IsDirty = True
+        End Sub
+
 
         Public Shadows Function AddRole(ByRef arRole As FBM.Role, ByRef aoJoinedObject As Object) As FBM.RoleInstance
 

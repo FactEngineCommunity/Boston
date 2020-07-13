@@ -3292,19 +3292,19 @@ Namespace FBM
                     lrFactType.RemoveFromModel(False, True, abBroadcastInterfaceEvent)
                 Next
 
-                '------------------------------------------------------------------------------------------------------------
-                'Save the FactType because there's a need to remove the ObjectifyingEntityType reference from the FactType.
-                '------------------------------------------------------------------------------------------------------------
-                If abBroadcastInterfaceEvent Then 'Because if not, is the receiving Client and the sending Client has already performed the database actions.
-                    Me.makeDirty()
-                    Me.Save()
-                End If
-
                 RaiseEvent ObjectificationRemoved()
 
                 Call Me.ObjectifyingEntityType.RemoveFromModel(True, False, abBroadcastInterfaceEvent)
-
                 Me.ObjectifyingEntityType = Nothing
+
+                '------------------------------------------------------------------------------------------------------------
+                'Save the FactType because there's a need to remove the ObjectifyingEntityType reference from the FactType.
+                '------------------------------------------------------------------------------------------------------------
+                'If abBroadcastInterfaceEvent Then 'Because if not, is the receiving Client and the sending Client has already performed the database actions.
+                Me.makeDirty()
+                Me.Save()
+                'End If
+
 
                 If My.Settings.UseClientServer And My.Settings.InitialiseClient And abBroadcastInterfaceEvent Then
                     Call prDuplexServiceClient.BroadcastToDuplexService(Viev.FBM.Interface.pcenumBroadcastType.ModelUpdateFactType, Me, Nothing)

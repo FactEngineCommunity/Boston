@@ -1642,6 +1642,7 @@ Public Class frmDiagramERD
 
                             Call Me.zrPage.DropExistingEntityAtPoint(lrEntity, loPointF, False)
                             Call Me.zrPage.loadRelationsForEntity(lrEntity, False)
+                            Call lrEntity.Move(loPointF.X, loPointF.Y, True)
                             Call Me.zrPage.Save(False, False)
                         End With
 

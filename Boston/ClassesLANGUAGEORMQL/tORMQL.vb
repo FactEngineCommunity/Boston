@@ -1185,7 +1185,10 @@ Namespace ORMQL
                     Dim lrFactData As FBM.FactData
                     lrFactData = lrFact.Data.Find(Function(x) x.Role.Name = lrupdateStatement.COLUMNNAMESTR(0))
                     lrFactData.Data = lrupdateStatement.VALUE(0)
+                    lrFact.isDirty = True
                     lrFactData.isDirty = True
+                    lrFactType.isDirty = True
+                    Me.Model.IsDirty = True
                 End If
 
                 Return True
@@ -1342,7 +1345,7 @@ Namespace ORMQL
                             '--------------------------------------------------
                             'Add the new FactInstance to the FactTypeInstance
                             '--------------------------------------------------
-                            lrFactTypeInstance.Fact.Add(lrFactInstance)
+                            lrFactTypeInstance.AddFactInstance(lrFactInstance)
 
                             lrFactTypeInstance.FactTable.ResortFactTable()
 

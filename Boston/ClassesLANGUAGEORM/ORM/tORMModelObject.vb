@@ -501,6 +501,7 @@ Namespace FBM
         ''' <remarks></remarks>
         Public Sub makeDirty()
 
+            Me.Model.IsDirty = True
             Me.isDirty = True
 
         End Sub

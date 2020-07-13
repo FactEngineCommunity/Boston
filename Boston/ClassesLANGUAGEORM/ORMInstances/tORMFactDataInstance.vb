@@ -674,9 +674,14 @@ Namespace FBM
 
             Me.Concept = arConcept
             Me.Symbol = Me.Concept.Symbol
+            Me.isDirty = True
+            Me.Fact.isDirty = True
+            Me.Fact.FactType.isDirty = True
 
             If Me.Page Is Nothing Then
                 Exit Sub
+            Else
+                Me.Page.IsDirty = True
             End If
 
             If IsSomething(Me.Page.Diagram) Then
@@ -723,6 +728,10 @@ Namespace FBM
 
                 Me.Id = Me.FactData.Id
                 Me.Name = Me.FactData.Name
+
+                Me.Fact.isDirty = True
+                Me.Fact.FactType.isDirty = True
+                Me.isDirty = True
 
                 If Me.Page Is Nothing Then
                     Exit Sub

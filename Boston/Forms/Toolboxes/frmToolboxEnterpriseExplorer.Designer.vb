@@ -35,7 +35,7 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.LabelHelpTips = New System.Windows.Forms.Label()
         Me.Button1 = New System.Windows.Forms.Button()
         Me.TextBox1 = New System.Windows.Forms.TextBox()
-        Me.TreeView = New System.Windows.Forms.TreeView()
+        Me.TreeView = New BostonTreeView 'System.Windows.Forms.TreeView()
         Me.ImageList = New System.Windows.Forms.ImageList(Me.components)
         Me.CircularProgressBar = New CircularProgressBar.CircularProgressBar()
         Me.Timer_FormSetup = New System.Windows.Forms.Timer(Me.components)

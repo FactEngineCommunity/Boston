@@ -429,6 +429,10 @@ Namespace ERD
             Me.FactDataInstance.X = aiNewX
             Me.FactDataInstance.Y = aiNewY
 
+            Me.FactDataInstance.Fact.FactType.isDirty = True
+            Me.FactDataInstance.Fact.isDirty = True
+            Me.FactDataInstance.isDirty = True
+
         End Sub
 
         Private Sub RDSTable_ColumnAdded(ByRef arColumn As RDS.Column) Handles RDSTable.ColumnAdded
