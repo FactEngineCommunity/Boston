@@ -6,41 +6,171 @@ Namespace FBM
 
         Public WithEvents RDSModel As New RDS.Model
 
-        Public Sub loadPGSNode(ByRef asTable As RDS.Table)
+        Public Sub displayPGSRelationNodeLink(ByRef arOriginatingNode As PGS.Node, ByVal asRelationId As String)
 
-            If Not Me.Language = pcenumLanguage.PropertyGraphSchema Then Exit Sub
+            Dim lsSQLQuery As String
+            Dim lrRecordset, lrRecordset1 As ORMQL.Recordset
+            Dim lrFactInstance As New FBM.FactInstance
 
-            '------------------
-            'Load the Node.
-            '==================================================================================================================
-            Dim lsSQLQuery As String = ""
-            Dim lrRecordset As ORMQL.Recordset
-            Dim lrFactInstance As FBM.FactInstance
+            Try
+                Dim lsRelationId = asRelationId
 
-            Dim lrNode As PGS.Node
+                lsSQLQuery = "SELECT *"
+                lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreRelationIsForEntity.ToString
+                lsSQLQuery &= " WHERE Entity = '" & arOriginatingNode.Name & "'"
 
-            lsSQLQuery = "SELECT *"
-            lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreElementHasElementType.ToString
-            lsSQLQuery &= " WHERE Element = '" & asTable.Name & "'"
+                lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
-            lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                If lrRecordset.Facts.Count > 2 Then
+                    'Ignore for now. Won't happen that much. Most relations of this type are binary.
+                    'For ORM/PGS binary-manyToMany relations, the ORM relationship is actually a PGS relation, rather than a PGS Node.
+                    'For ORM FactTypes that have 3 or more Roles, within the PGS diagram, the FT is a Node.
+                    'NB See DiagramView.MouseDown for how the Predicates are shown for the Link of a Binary PGSRelationNode-come-Relation.
+                    '  Must get the Predicates from the ResponsibleFactType rather than the actual Relations which are likely on/from the LinkFactTypes.
+                Else
+                    Dim liInd As Integer = 1
+                    Dim lrNode1 As PGS.Node = Nothing
+                    Dim lrNode2 As PGS.Node = Nothing
 
-            lsSQLQuery = "ADD FACT '" & lrRecordset.CurrentFact.Id & "'"
-            lsSQLQuery &= " TO " & pcenumCMMLRelations.CoreElementHasElementType.ToString
-            lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
+                    While Not lrRecordset.EOF
+                        lsSQLQuery = "SELECT *"
+                        lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreRelationHasDestinationEntity.ToString
+                        lsSQLQuery &= " WHERE Relation = '" & lrRecordset("Relation").Data & "'"
 
-            lrFactInstance = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                        lrRecordset1 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
-            lrNode = lrFactInstance.GetFactDataInstanceByRoleName(pcenumCMML.Element.ToString).ClonePGSNode(Me)
-            '===================================================================================================================
-            lrNode.RDSTable = asTable 'IMPORTANT: Leave this at this point in the code.
-            Dim loPointF As New PointF(0, 0)
-            Call Me.DropExistingPGSNodeAtPoint(lrNode, loPointF)
+                        If liInd = 1 Then
+                            lrNode2 = Me.ERDiagram.Entity.Find(Function(x) x.Name = lrRecordset1("Entity").Data)
+                        Else
+                            lrNode1 = Me.ERDiagram.Entity.Find(Function(x) x.Name = lrRecordset1("Entity").Data)
+                        End If
 
-            Call Me.loadRelationsForPGSNode(lrNode)
-            Call Me.loadPropertyRelationsForPGSNode(lrNode)
+                        liInd += 1
+                        lrRecordset.MoveNext()
+                    End While
+
+                    Dim lrRelation As New ERD.Relation(Me.Model,
+                                                                Me,
+                                                                asRelationId,
+                                                                lrNode1,
+                                                                pcenumCMMLMultiplicity.One,
+                                                                False,
+                                                                False,
+                                                                lrNode2,
+                                                                pcenumCMMLMultiplicity.One,
+                                                                False,
+                                                                arOriginatingNode.RDSTable)
+
+                    lrRelation.IsPGSRelationNode = True
+                    Dim lrOriginatingNode = arOriginatingNode
+                    lrRelation.ActualPGSNode = Me.ERDiagram.Entity.Find(Function(x) x.Id = lrOriginatingNode.Id)
+                    lrRelation.ActualPGSNode.PGSRelation = lrRelation
+
+                    'NB Even though the RDSRelation is stored against the Link (below), the Predicates for the Link come from the ResponsibleFactType.
+                    '  because the relation is actually a PGSRelationNode.
+                    Dim lrRDSRelation As RDS.Relation = Me.Model.RDS.Relation.Find(Function(x) x.Id = lsRelationId)
+                    lrRelation.RelationFactType = lrRDSRelation.ResponsibleFactType
+
+                    If lrRDSRelation.ResponsibleFactType.FactTypeReading.Count = 1 Then
+                        Dim lrFactTypeReading = lrRDSRelation.ResponsibleFactType.FactTypeReading(0)
+                        If Not lrFactTypeReading.PredicatePart(0).Role.JoinedORMObject.Id = lrNode1.Name Then
+                            'Swap the Origin and Desination nodes, for directed Graphs. i.e. The single FactTypeReading determines the direction.
+                            Dim lrTempNode = lrNode1
+                            lrNode1 = lrRelation.DestinationEntity
+                            lrNode2 = lrTempNode
+                        End If
+                    End If
+
+                    Dim lrLink As PGS.Link
+
+                    lrLink = New PGS.Link(Me, lrFactInstance, lrNode1, lrNode2, Nothing, Nothing, lrRelation)
+                    lrLink.RDSRelation = lrRDSRelation
+
+                    lrLink.DisplayAndAssociate()
+
+                    lrLink.Link.Text = lrRelation.ActualPGSNode.Id
+                    lrLink.Relation.Link = lrLink
+                    Me.ERDiagram.Relation.AddUnique(lrRelation)
+
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage1 As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
         End Sub
+
+
+        Public Function loadPGSNode(ByRef asTable As RDS.Table, Optional abDisplayAndAssociate As Boolean = True) As PGS.Node
+
+            Try
+                If Not Me.Language = pcenumLanguage.PropertyGraphSchema Then Throw New Exception("Only call this function for PGS Pages.")
+
+                '------------------
+                'Load the Node.
+                '==================================================================================================================
+                Dim lsSQLQuery As String = ""
+                Dim lrRecordset As ORMQL.Recordset
+                Dim lrFactInstance As FBM.FactInstance
+
+                Dim lrNode As PGS.Node
+
+                lsSQLQuery = "SELECT *"
+                lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreElementHasElementType.ToString
+                lsSQLQuery &= " WHERE Element = '" & asTable.Name & "'"
+
+                lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                lsSQLQuery = "ADD FACT '" & lrRecordset.CurrentFact.Id & "'"
+                lsSQLQuery &= " TO " & pcenumCMMLRelations.CoreElementHasElementType.ToString
+                lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
+
+                lrFactInstance = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                lrNode = lrFactInstance.GetFactDataInstanceByRoleName(pcenumCMML.Element.ToString).ClonePGSNode(Me)
+                '===================================================================================================================
+                lrNode.RDSTable = asTable 'IMPORTANT: Leave this at this point in the code.
+
+
+                lsSQLQuery = "SELECT COUNT(*)"
+                lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreIsPGSRelation.ToString
+                'lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
+                lsSQLQuery &= " WHERE IsPGSRelation = '" & lrNode.Name & "'"
+
+                Dim lrRecordsetIsPGSRelation As ORMQL.Recordset
+                lrRecordsetIsPGSRelation = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                If CInt(lrRecordsetIsPGSRelation("Count").Data) > 0 Then
+                    lrNode.NodeType = pcenumPGSEntityType.Relationship
+                End If
+
+                Me.ERDiagram.Entity.AddUnique(lrNode)
+
+                Dim loPointF As New PointF(0, 0)
+                If abDisplayAndAssociate Then Call Me.DropExistingPGSNodeAtPoint(lrNode, loPointF)
+
+                If abDisplayAndAssociate Then Call Me.loadRelationsForPGSNode(lrNode)
+                If abDisplayAndAssociate Then Call Me.loadPropertyRelationsForPGSNode(lrNode)
+
+                Return lrNode
+
+            Catch ex As Exception
+                Dim lsMessage1 As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return New PGS.Node
+            End Try
+
+        End Function
 
         Private Sub RDSModel_RelationAdded(ByRef arRelation As RDS.Relation) Handles RDSModel.RelationAdded
 
@@ -119,7 +249,10 @@ Namespace FBM
                     Next
 
                     If lbAllFound Then
-                        Call Me.loadPGSNode(lrRelation.OriginTable)
+                        Dim lrNode = Me.loadPGSNode(lrRelation.OriginTable, False)
+                        If lrNode.NodeType = pcenumPGSEntityType.Relationship Then
+                            Call Me.displayPGSRelationNodeLink(lrNode, lrRelation.Id)
+                        End If
                     End If
                 End If
 
