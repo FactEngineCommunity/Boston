@@ -26,7 +26,7 @@ Public Class tRichmondApplication
 
     Public Language As Language.LanguageGeneric
 
-    Public WorkingModel As FBM.Model = Nothing
+    Public WithEvents WorkingModel As FBM.Model = Nothing
     Public WorkingPage As FBM.Page = Nothing
     Public WorkingValueType As FBM.ValueType = Nothing
     Public WorkingProject As ClientServer.Project = Nothing
@@ -460,4 +460,8 @@ Public Class tRichmondApplication
 
     End Sub
 
+    Private Sub WorkingModel_MadeDirty(abGlobalBroadcast As Boolean) Handles WorkingModel.MadeDirty
+
+        frmMain.ToolStripButton_Save.Enabled = True
+    End Sub
 End Class

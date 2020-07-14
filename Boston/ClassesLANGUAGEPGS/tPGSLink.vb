@@ -103,12 +103,7 @@ Namespace PGS
                 lrPGSLink.Tag = Me
                 Me.Link = lrPGSLink
 
-                If Me.RDSRelation IsNot Nothing Then
-                    If Me.Relation.IsPGSRelationNode Then
-                        Me.Link.BaseShape = ArrowHead.PointerArrow
-                        Me.Link.BaseShapeSize = Me.Link.HeadShapeSize
-                    End If
-                End If
+                Call Me.setHeadShapes
 
                 Me.Page.Diagram.Links.Add(lrPGSLink)
 
@@ -211,6 +206,53 @@ Namespace PGS
 
         End Sub
 
+        ''' <summary>
+        ''' Puts the arrows on the Link depending on various scenarios.
+        ''' </summary>
+        Public Sub setHeadShapes()
+
+            Me.Link.BaseShapeSize = Me.Link.HeadShapeSize
+
+            If Me.RDSRelation IsNot Nothing Then
+
+                If Me.RDSRelation.ResponsibleFactType.IsObjectified Or Me.RDSRelation.ResponsibleFactType.IsLinkFactType Then
+                    'Set both head shapes to None to start with
+                    Me.Link.HeadShape = ArrowHead.None
+                    Me.Link.BaseShape = ArrowHead.None
+
+                    Dim lrFactType = Me.RDSRelation.ResponsibleFactType.LinkFactTypeRole.FactType
+
+                    If lrFactType.FactTypeReading.Count = 1 Then
+                        Dim lrFactTypeReading = lrFactType.FactTypeReading(0)
+
+                        Dim lrOriginModelObject = Me.Model.GetModelObjectByName(lrFactTypeReading.PredicatePart(0).Role.JoinedORMObject.Id)
+                        Dim lrDestinationModelObject = Me.Model.GetModelObjectByName(lrFactTypeReading.PredicatePart(1).Role.JoinedORMObject.Id)
+
+                        Dim lrOriginNode = Me.Page.ERDiagram.Entity.Find(Function(x) x.Name = lrOriginModelObject.Id)
+                        Dim lrDesinationNode = Me.Page.ERDiagram.Entity.Find(Function(x) x.Name = lrDestinationModelObject.Id)
+
+                        If Me.OriginModelElement.Name = lrOriginNode.Name Then
+                            Me.Link.BaseShape = ArrowHead.None
+                            Me.Link.HeadShape = ArrowHead.PointerArrow
+                        Else
+                            Me.Link.BaseShape = ArrowHead.PointerArrow
+                            Me.Link.HeadShape = ArrowHead.None
+                        End If
+                    Else
+                        Me.Link.BaseShape = ArrowHead.PointerArrow
+                        Me.Link.HeadShape = ArrowHead.PointerArrow
+                    End If
+
+                ElseIf Me.Relation.IsPGSRelationNode Then
+                    If Me.RDSRelation.ResponsibleFactType.FactTypeReading.Count > 1 Then
+                        Me.Link.BaseShape = ArrowHead.PointerArrow
+                        Me.Link.BaseShapeSize = Me.Link.HeadShapeSize
+                    End If
+                End If
+            End If
+
+        End Sub
+
         Public Sub setPredicate()
 
             Try
@@ -221,36 +263,90 @@ Namespace PGS
                     Dim lsDestinationPredicate As String = ""
 
                     Dim larRole As New List(Of FBM.Role)
-                    Dim lrFactTypeReading As FBM.FactTypeReading
+                    Dim lrFactType As FBM.FactType
 
-                    larRole.Add(Me.RDSRelation.ResponsibleFactType.RoleGroup(0)) 'NB Is opposite to the way you would think, because ER Diagrams read predicates at the opposite end of the Relation
-                    larRole.Add(Me.RDSRelation.ResponsibleFactType.RoleGroup(1))
-
-                    lrFactTypeReading = Me.RDSRelation.ResponsibleFactType.FindSuitableFactTypeReadingByRoles(larRole, True)
-
-                    If lrFactTypeReading IsNot Nothing Then
-                        lsDestinationPredicate = lrFactTypeReading.PredicatePart(0).PredicatePartText & " " & lrFactTypeReading.PredicatePart(1).PreBoundText
+                    If Me.RDSRelation.ResponsibleFactType.IsObjectified Or Me.RDSRelation.ResponsibleFactType.IsLinkFactType Then
+                        lrFactType = Me.RDSRelation.ResponsibleFactType.LinkFactTypeRole.FactType
                     Else
-                        lsDestinationPredicate = "unknown predicate"
+                        lrFactType = Me.RDSRelation.ResponsibleFactType
                     End If
 
-                    larRole.Clear()
-                    larRole.Add(Me.RDSRelation.ResponsibleFactType.RoleGroup(1)) 'NB Is opposite to the way you would think, because ER Diagrams read predicates at the opposite end of the Relation
-                    larRole.Add(Me.RDSRelation.ResponsibleFactType.RoleGroup(0))
+                    Dim lsPredicate As String = Nothing
+                    If lrFactType.FactTypeReading.Count = 1 Then
+                        Dim lrFactTypeReading = lrFactType.FactTypeReading(0)
 
-                    lrFactTypeReading = Me.RDSRelation.ResponsibleFactType.FindSuitableFactTypeReadingByRoles(larRole, True)
-
-                    If lrFactTypeReading IsNot Nothing Then
-                        lsOriginPredicate = lrFactTypeReading.PredicatePart(0).PredicatePartText & " " & lrFactTypeReading.PredicatePart(1).PreBoundText
+                        lsPredicate = lrFactTypeReading.PredicatePart(0).PredicatePartText
                     Else
-                        lsOriginPredicate = "unknown predicate"
+                        '20200714-VM-Not yet implemented.
                     End If
 
-                    If Me.Link.Origin.Bounds.X < Me.Link.Destination.Bounds.X Then
-                        Me.Link.Text = lsOriginPredicate & " / " & lsDestinationPredicate
-                    Else
-                        Me.Link.Text = lsDestinationPredicate & " / " & lsOriginPredicate
-                    End If
+                    Dim lrRDSTable = Me.Page.ERDiagram.Entity.Find(Function(x) x.Name = lrFactType.Id).getCorrespondingRDSTable
+
+                    For Each lrColumn In lrRDSTable.Column
+                        '============================================================
+                        'If lrColumn.ContributesToPrimaryKey And lrRDSTable.Column.Count > 1 Then
+                        '    'Don't show the Column
+                        'Else
+                        If lrColumn.Relation.FindAll(Function(x) x.OriginTable.Name = lrColumn.Table.Name).Count > 0 Then
+                            'ForeignKey. Don't show the Column
+                        Else
+                            lsPredicate &= " {" & lrColumn.Name
+                            If lrRDSTable.Column.Count > 1 Then lsPredicate &= ",..."
+                            lsPredicate &= "}"
+                            Exit For
+                        End If
+                        '============================================================
+                    Next
+
+                    Me.Link.Text = lsPredicate
+
+
+                    'larRole.Add(Me.RDSRelation.ResponsibleFactType.RoleGroup(0)) 'NB Is opposite to the way you would think, because ER Diagrams read predicates at the opposite end of the Relation
+                    'larRole.Add(Me.RDSRelation.ResponsibleFactType.RoleGroup(1))
+
+                    'lrFactTypeReading = Me.RDSRelation.ResponsibleFactType.FindSuitableFactTypeReadingByRoles(larRole, True)
+
+                    'If lrFactTypeReading IsNot Nothing Then
+                    '    lsDestinationPredicate = lrFactTypeReading.PredicatePart(0).PredicatePartText & " " & lrFactTypeReading.PredicatePart(1).PreBoundText
+                    'Else
+                    '    lsDestinationPredicate = "unknown predicate"
+                    'End If
+
+                    'larRole.Clear()
+                    'larRole.Add(Me.RDSRelation.ResponsibleFactType.RoleGroup(1)) 'NB Is opposite to the way you would think, because ER Diagrams read predicates at the opposite end of the Relation
+                    'larRole.Add(Me.RDSRelation.ResponsibleFactType.RoleGroup(0))
+
+                    'lrFactTypeReading = Me.RDSRelation.ResponsibleFactType.FindSuitableFactTypeReadingByRoles(larRole, True)
+
+                    'If lrFactTypeReading IsNot Nothing Then
+                    '    lsOriginPredicate = lrFactTypeReading.PredicatePart(0).PredicatePartText & " " & lrFactTypeReading.PredicatePart(1).PreBoundText
+                    'Else
+                    '    lsOriginPredicate = "unknown predicate"
+                    'End If
+
+                    'Dim lasUnknownPredicate = {"unknown predicate"}
+
+                    'If Me.Link.Origin.Bounds.X < Me.Link.Destination.Bounds.X Then
+                    '    If lasUnknownPredicate.Contains(lsOriginPredicate) And lasUnknownPredicate.Contains(lsDestinationPredicate) Then
+                    '        Me.Link.Text = "<create an ORM Fact Type Reading>"
+                    '    ElseIf lasUnknownPredicate.Contains(lsOriginPredicate) Then
+                    '        Me.Link.Text = lsDestinationPredicate
+                    '    ElseIf lasUnknownPredicate.Contains(lsDestinationPredicate) Then
+                    '        Me.Link.Text = lsOriginPredicate
+                    '    Else
+                    '        Me.Link.Text = lsOriginPredicate & " / " & lsDestinationPredicate
+                    '    End If
+                    'Else
+                    '    If lasUnknownPredicate.Contains(lsOriginPredicate) And lasUnknownPredicate.Contains(lsDestinationPredicate) Then
+                    '        Me.Link.Text = "<create an ORM Fact Type Reading>"
+                    '    ElseIf lasUnknownPredicate.Contains(lsDestinationPredicate) Then
+                    '        Me.Link.Text = lsOriginPredicate
+                    '    ElseIf lasUnknownPredicate.Contains(lsOriginPredicate) Then
+                    '        Me.Link.Text = lsDestinationPredicate
+                    '    Else
+                    '        Me.Link.Text = lsDestinationPredicate & " / " & lsOriginPredicate
+                    '    End If
+                    'End If
                 Else
                     Me.Link.Text = Me.RDSRelation.DestinationPredicate
                 End If

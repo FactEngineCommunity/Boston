@@ -167,6 +167,9 @@ Namespace PGS
 
         End Sub
 
+        Public Overrides Function getCorrespondingRDSTable() As RDS.Table
+            Return Me.RDSTable
+        End Function
 
         Public Sub MouseDown() Implements FBM.iPageObject.MouseDown
 

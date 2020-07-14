@@ -306,7 +306,7 @@ Public Class frmDiagramPGS
 
                 lsSQLQuery = "SELECT COUNT(*)"
                 lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreIsPGSRelation.ToString
-                lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
+                'lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
                 lsSQLQuery &= " WHERE IsPGSRelation = '" & lrPGSNode.Name & "'"
 
                 Dim lrRecordsetIsPGSRelation As ORMQL.Recordset
@@ -983,7 +983,7 @@ Public Class frmDiagramPGS
 
         End If
 
-
+        Call Me.resetNodeAndLinkColors()
 
     End Sub
 
@@ -1020,9 +1020,10 @@ Public Class frmDiagramPGS
                 For Each lrColumn In lrRDSTable.Column
 
                     '============================================================
-                    If lrColumn.ContributesToPrimaryKey And lrRDSTable.Column.Count > 1 Then
-                        'Don't show the Column
-                    ElseIf lrColumn.Relation.FindAll(Function(x) x.OriginTable.Name = lrColumn.Table.Name).Count > 0 Then
+                    'If lrColumn.ContributesToPrimaryKey And lrRDSTable.Column.Count > 1 Then
+                    '    'Don't show the Column
+                    'Else
+                    If lrColumn.Relation.FindAll(Function(x) x.OriginTable.Name = lrColumn.Table.Name).Count > 0 Then
                         'ForeignKey. Don't show the Column
                     Else
                         Me.PropertyTableNode.RowCount += 1
@@ -1924,7 +1925,7 @@ Public Class frmDiagramPGS
             Dim lrPGSLink As PGS.Link = lrLink.Tag
             Call lrPGSLink.setPredicate()
 
-
+            Call lrPGSLink.setHeadShapes()
             '--------------------------------
             'Disambiguate overlapping links
             '--------------------------------
