@@ -6,6 +6,42 @@ Namespace FBM
 
         Public WithEvents RDSModel As New RDS.Model
 
+        Public Sub loadPGSNode(ByRef asTable As RDS.Table)
+
+            If Not Me.Language = pcenumLanguage.PropertyGraphSchema Then Exit Sub
+
+            '------------------
+            'Load the Node.
+            '==================================================================================================================
+            Dim lsSQLQuery As String = ""
+            Dim lrRecordset As ORMQL.Recordset
+            Dim lrFactInstance As FBM.FactInstance
+
+            Dim lrNode As PGS.Node
+
+            lsSQLQuery = "SELECT *"
+            lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreElementHasElementType.ToString
+            lsSQLQuery &= " WHERE Element = '" & asTable.Name & "'"
+
+            lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+            lsSQLQuery = "ADD FACT '" & lrRecordset.CurrentFact.Id & "'"
+            lsSQLQuery &= " TO " & pcenumCMMLRelations.CoreElementHasElementType.ToString
+            lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
+
+            lrFactInstance = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+            lrNode = lrFactInstance.GetFactDataInstanceByRoleName(pcenumCMML.Element.ToString).ClonePGSNode(Me)
+            '===================================================================================================================
+            lrNode.RDSTable = asTable 'IMPORTANT: Leave this at this point in the code.
+            Dim loPointF As New PointF(0, 0)
+            Call Me.DropExistingPGSNodeAtPoint(lrNode, loPointF)
+
+            Call Me.loadRelationsForPGSNode(lrNode)
+            Call Me.loadPropertyRelationsForPGSNode(lrNode)
+
+        End Sub
+
         Private Sub RDSModel_RelationAdded(ByRef arRelation As RDS.Relation) Handles RDSModel.RelationAdded
 
             Try
@@ -27,18 +63,20 @@ Namespace FBM
                 lrOriginEntity = Me.ERDiagram.Entity.Find(Function(x) x.Name = lrRelation.OriginTable.Name)
                 lrDestinationEntity = Me.ERDiagram.Entity.Find(Function(x) x.Name = lrRelation.DestinationTable.Name)
 
+
+
                 If (lrOriginEntity IsNot Nothing) And (lrDestinationEntity IsNot Nothing) Then
                     'For when the Page is displayed
 
                     Dim lrERDRelation As New ERD.Relation(Me.Model,
                                                           Me,
                                                           arRelation.Id,
-                                                          lrOriginEntity, _
-                                                          arRelation.OriginMultiplicity, _
-                                                          arRelation.RelationOriginIsMandatory, _
-                                                          arRelation.ContributesToPrimaryKey, _
-                                                          lrDestinationEntity, _
-                                                          arRelation.DestinationMultiplicity, _
+                                                          lrOriginEntity,
+                                                          arRelation.OriginMultiplicity,
+                                                          arRelation.RelationOriginIsMandatory,
+                                                          arRelation.ContributesToPrimaryKey,
+                                                          lrDestinationEntity,
+                                                          arRelation.DestinationMultiplicity,
                                                           arRelation.RelationDestinationIsMandatory)
 
                     lrERDRelation.OriginPredicate = arRelation.OriginPredicate
@@ -55,7 +93,7 @@ Namespace FBM
 
                                 Dim lrLink As ERD.Link
                                 lrLink = New ERD.Link(Me, New FBM.FactInstance, lrOriginEntity, lrDestinationEntity, Nothing, Nothing, lrERDRelation)
-                                lrLink.DisplayAndAssociate()                                
+                                lrLink.DisplayAndAssociate()
                                 lrERDRelation.Link = lrLink
 
                             Case Is = pcenumLanguage.PropertyGraphSchema
@@ -69,7 +107,20 @@ Namespace FBM
                         End Select
 
                     End If
+                ElseIf lrOriginEntity Is Nothing And Not lrRelation.ResponsibleFactType.IsLinkFactType And Me.Language = pcenumLanguage.PropertyGraphSchema Then
 
+                    Dim larDestinationModelObjects = lrRelation.ResponsibleFactType.getDesinationModelObjects
+
+                    Dim lbAllFound As Boolean = True
+                    For Each lrModelObject In larDestinationModelObjects
+                        If Me.ERDiagram.Entity.Find(Function(x) x.Name = lrModelObject.Id) Is Nothing Then
+                            lbAllFound = False
+                        End If
+                    Next
+
+                    If lbAllFound Then
+                        Call Me.loadPGSNode(lrRelation.OriginTable)
+                    End If
                 End If
 
             Catch ex As Exception

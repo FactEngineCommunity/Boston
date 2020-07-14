@@ -2283,6 +2283,26 @@ Namespace FBM
         End Function
 
         ''' <summary>
+        ''' Returns the set of Destination Model Objects on LinkFactTypes associated with the FactType.
+        '''   Used to add the FactType's corresponding Table to a Page when all the ModelObjects are on the Page.
+        '''   Used predominantly for PGS Pages, when both joined nodes of a binaryFactType are on the Page, such that the corresponding Relation/Edge link 
+        '''   can be added to the Page.
+        ''' </summary>
+        ''' <returns></returns>
+        Public Function getDesinationModelObjects() As List(Of FBM.ModelObject)
+
+            Dim larModelObject As New List(Of FBM.ModelObject)
+            For Each lrRole In Me.RoleGroup
+                If lrRole.HasInternalUniquenessConstraint Or Me.Arity = 2 Then
+                    larModelObject.Add(lrRole.JoinedORMObject)
+                End If
+            Next
+
+            Return larModelObject
+
+        End Function
+
+        ''' <summary>
         ''' Returns the CQL for the EntityType
         ''' </summary>
         ''' <returns></returns>
@@ -3202,9 +3222,9 @@ Namespace FBM
 
                     For Each lrRole In Me.RoleGroup
 
-                        Dim larLinkFactTypeRole = From FactType In Me.Model.FactType _
+                        Dim larLinkFactTypeRole = From FactType In Me.Model.FactType
                                                   Where FactType.IsLinkFactType = True _
-                                                  And FactType.LinkFactTypeRole Is lrRole _
+                                                  And FactType.LinkFactTypeRole Is lrRole
                                                   Select FactType.RoleGroup(0)
 
                         For Each lrLinkFactTypeRole In larLinkFactTypeRole
@@ -3213,8 +3233,14 @@ Namespace FBM
                     Next
 
                 Else
+                    Dim lrTable As RDS.Table = Me.Model.RDS.Table.Find(Function(x) x.Name = Me.Id)
+
                     '  Move Relations that reference this FactType to their respective LinkFactType
+                    'NB Do this before setting IsPGSRelation, such that the single Relation is created.
                     Call Me.Model.moveRelationsOfFactTypeToRespectiveLinkFactTypes(Me)
+
+                    lrTable.setIsPGSRelation(True)
+
                 End If
 
                 Call Me.Model.MakeDirty(True, False)

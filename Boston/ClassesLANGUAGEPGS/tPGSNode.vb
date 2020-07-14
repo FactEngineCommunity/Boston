@@ -325,7 +325,7 @@ Namespace PGS
             Try
                 lsSQLQuery = "SELECT *"
                 lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreRelationIsForEntity.ToString
-                lsSQLQuery &= " ON PAGE '" & Me.Page.Name & "'"
+                'lsSQLQuery &= " ON PAGE '" & Me.Page.Name & "'"
                 lsSQLQuery &= " WHERE Entity = '" & Me.RDSTable.Name & "'"
 
                 lrRecordset1 = Me.Page.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)

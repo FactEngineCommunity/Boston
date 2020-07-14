@@ -419,20 +419,30 @@ Public Class frmDiagramPGS
                             Dim lrRDSRelation As RDS.Relation = Me.zrPage.Model.RDS.Relation.Find(Function(x) x.Id = lrRecordset("Relation").Data)
                             lrRelation.RelationFactType = lrRDSRelation.ResponsibleFactType
 
+                            If lrRDSRelation.ResponsibleFactType.FactTypeReading.Count = 1 Then
+                                Dim lrFactTypeReading = lrRDSRelation.ResponsibleFactType.FactTypeReading(0)
+                                If Not lrFactTypeReading.PredicatePart(0).Role.JoinedORMObject.Id = lrNode1.Name Then
+                                    'Swap the Origin and Desination nodes, for directed Graphs. i.e. The single FactTypeReading determines the direction.
+                                    Dim lrTempNode = lrNode1
+                                    lrNode1 = lrRelation.DestinationEntity
+                                    lrNode2 = lrTempNode
+                                End If
+                            End If
+
                             Dim lrLink As PGS.Link
+
                             lrLink = New PGS.Link(Me.zrPage, lrFactInstance, lrNode1, lrNode2, Nothing, Nothing, lrRelation)
                             lrLink.RDSRelation = lrRDSRelation
+
                             lrLink.DisplayAndAssociate()
+
                             lrLink.Link.Text = lrRelation.ActualPGSNode.Id
-
                             lrLink.Relation.Link = lrLink
-
                             Me.zrPage.ERDiagram.Relation.Add(lrRelation)
-
                             larLoadedRelationNodes.Add(lrRelation.ActualPGSNode)
 
+                            End If
                         End If
-                    End If
                 Else 'Is Not a PGSRelation
 
                     '-----------------------------
