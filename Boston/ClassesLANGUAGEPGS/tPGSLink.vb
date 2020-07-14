@@ -21,7 +21,7 @@ Namespace PGS
 
         Public WithEvents Relation As ERD.Relation
 
-        Public RDSRelation As RDS.Relation
+        Public WithEvents RDSRelation As RDS.Relation
 
         Public SentData As New List(Of String)
 
@@ -350,6 +350,27 @@ Namespace PGS
                 Else
                     Me.Link.Text = Me.RDSRelation.DestinationPredicate
                 End If
+
+            Catch ex As Exception
+                Dim lsMessage1 As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
+        Private Sub RDSRelation_RemovedFromModel() Handles RDSRelation.RemovedFromModel
+
+            Try
+                Me.Page.Diagram.Links.Remove(Me.Link)
+
+                Dim lrDiagramingLink As MindFusion.Diagramming.DiagramLink = Me.Link
+
+                lrDiagramingLink.Dispose()
+                Me.Page.Diagram.Invalidate()
 
             Catch ex As Exception
                 Dim lsMessage1 As String

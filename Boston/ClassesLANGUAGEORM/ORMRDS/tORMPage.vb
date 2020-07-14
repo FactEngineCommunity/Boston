@@ -6,15 +6,15 @@ Namespace FBM
 
         Public WithEvents RDSModel As New RDS.Model
 
-        Public Sub displayPGSRelationNodeLink(ByRef arOriginatingNode As PGS.Node, ByVal asRelationId As String)
+        Public Sub displayPGSRelationNodeLink(ByRef arOriginatingNode As PGS.Node, ByRef arRelation As RDS.Relation)
 
             Dim lsSQLQuery As String
             Dim lrRecordset, lrRecordset1 As ORMQL.Recordset
             Dim lrFactInstance As New FBM.FactInstance
 
-            Try
-                Dim lsRelationId = asRelationId
+            Dim lrRelation = arRelation
 
+            Try
                 lsSQLQuery = "SELECT *"
                 lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreRelationIsForEntity.ToString
                 lsSQLQuery &= " WHERE Entity = '" & arOriginatingNode.Name & "'"
@@ -49,9 +49,14 @@ Namespace FBM
                         lrRecordset.MoveNext()
                     End While
 
-                    Dim lrRelation As New ERD.Relation(Me.Model,
+                    If lrNode1 Is Nothing Then
+                        lrNode1 = Me.ERDiagram.Entity.Find(Function(x) x.Name = lrRelation.ResponsibleFactType.RoleGroup(0).JoinedORMObject.Id)
+                        lrNode2 = Me.ERDiagram.Entity.Find(Function(x) x.Name = lrRelation.ResponsibleFactType.RoleGroup(1).JoinedORMObject.Id)
+                    End If
+
+                    Dim lrERDRelation As New ERD.Relation(Me.Model,
                                                                 Me,
-                                                                asRelationId,
+                                                                lrRelation.Id,
                                                                 lrNode1,
                                                                 pcenumCMMLMultiplicity.One,
                                                                 False,
@@ -61,36 +66,36 @@ Namespace FBM
                                                                 False,
                                                                 arOriginatingNode.RDSTable)
 
-                    lrRelation.IsPGSRelationNode = True
+                    lrERDRelation.IsPGSRelationNode = True
                     Dim lrOriginatingNode = arOriginatingNode
-                    lrRelation.ActualPGSNode = Me.ERDiagram.Entity.Find(Function(x) x.Id = lrOriginatingNode.Id)
-                    lrRelation.ActualPGSNode.PGSRelation = lrRelation
+                    lrERDRelation.ActualPGSNode = Me.ERDiagram.Entity.Find(Function(x) x.Id = lrOriginatingNode.Id)
+                    lrERDRelation.ActualPGSNode.PGSRelation = lrERDRelation
 
                     'NB Even though the RDSRelation is stored against the Link (below), the Predicates for the Link come from the ResponsibleFactType.
-                    '  because the relation is actually a PGSRelationNode.
-                    Dim lrRDSRelation As RDS.Relation = Me.Model.RDS.Relation.Find(Function(x) x.Id = lsRelationId)
-                    lrRelation.RelationFactType = lrRDSRelation.ResponsibleFactType
+                    '  because the relation is actually a PGSRelationNode.                    
+                    lrERDRelation.RelationFactType = lrRelation.ResponsibleFactType
 
-                    If lrRDSRelation.ResponsibleFactType.FactTypeReading.Count = 1 Then
-                        Dim lrFactTypeReading = lrRDSRelation.ResponsibleFactType.FactTypeReading(0)
+                    If lrRelation.ResponsibleFactType.FactTypeReading.Count = 1 Then
+                        Dim lrFactTypeReading = lrRelation.ResponsibleFactType.FactTypeReading(0)
                         If Not lrFactTypeReading.PredicatePart(0).Role.JoinedORMObject.Id = lrNode1.Name Then
                             'Swap the Origin and Desination nodes, for directed Graphs. i.e. The single FactTypeReading determines the direction.
                             Dim lrTempNode = lrNode1
-                            lrNode1 = lrRelation.DestinationEntity
+                            lrNode1 = lrERDRelation.DestinationEntity
                             lrNode2 = lrTempNode
                         End If
                     End If
 
                     Dim lrLink As PGS.Link
 
-                    lrLink = New PGS.Link(Me, lrFactInstance, lrNode1, lrNode2, Nothing, Nothing, lrRelation)
-                    lrLink.RDSRelation = lrRDSRelation
+                    lrLink = New PGS.Link(Me, lrFactInstance, lrNode1, lrNode2, Nothing, Nothing, lrERDRelation)
+                    lrLink.RDSRelation = lrRelation
 
                     lrLink.DisplayAndAssociate()
 
-                    lrLink.Link.Text = lrRelation.ActualPGSNode.Id
+                    lrLink.Link.Text = lrERDRelation.ActualPGSNode.Id
                     lrLink.Relation.Link = lrLink
-                    Me.ERDiagram.Relation.AddUnique(lrRelation)
+                    lrERDRelation.Link = lrLink
+                    If Me.ERDiagram.Relation.FindAll(Function(x) x.Id = lrERDRelation.Id).Count = 0 Then ERDiagram.Relation.AddUnique(lrERDRelation)
 
                 End If
 
@@ -251,7 +256,7 @@ Namespace FBM
                     If lbAllFound Then
                         Dim lrNode = Me.loadPGSNode(lrRelation.OriginTable, False)
                         If lrNode.NodeType = pcenumPGSEntityType.Relationship Then
-                            Call Me.displayPGSRelationNodeLink(lrNode, lrRelation.Id)
+                            Call Me.displayPGSRelationNodeLink(lrNode, lrRelation)
                         End If
                     End If
                 End If

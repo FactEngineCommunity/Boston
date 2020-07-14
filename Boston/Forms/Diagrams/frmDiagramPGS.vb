@@ -363,7 +363,8 @@ Public Class frmDiagramPGS
                     'For binary-manyToMany relations, the ORM relationship is actually a PGS relation, rather than a PGS Node.
                     If Not larLoadedRelationNodes.Contains(lrOriginatingNode) Then
 
-                        Call Me.zrPage.displayPGSRelationNodeLink(lrOriginatingNode, lsRelationId)
+                        Dim lrRDSRelation = Me.zrPage.Model.RDS.Relation.Find(Function(x) x.Id = lsRelationId)
+                        Call Me.zrPage.displayPGSRelationNodeLink(lrOriginatingNode, lrRDSRelation)
 
                         larLoadedRelationNodes.Add(lrOriginatingNode)
 

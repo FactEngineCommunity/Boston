@@ -226,6 +226,12 @@ Namespace RDS
 
         End Sub
 
+        Public Sub triggerRemovedFromModel()
+
+            RaiseEvent RemovedFromModel()
+
+        End Sub
+
         Private Sub ResponsibleFactType_RemovedFromModel(abBroadcastInterfaceEvent As Boolean) Handles ResponsibleFactType.RemovedFromModel
 
             Me.Model.Relation.Remove(Me)

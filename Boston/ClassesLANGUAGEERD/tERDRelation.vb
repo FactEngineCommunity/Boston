@@ -3,8 +3,9 @@
 Namespace ERD
 
 
-    <Serializable()> _
+    <Serializable()>
     Public Class Relation
+        Implements IEquatable(Of ERD.Relation)
 
         Public ConceptType As pcenumConceptType = pcenumConceptType.Relation
 
@@ -86,6 +87,10 @@ Namespace ERD
 
         End Sub
 
+        Public Shadows Function Equals(other As Relation) As Boolean Implements IEquatable(Of Relation).Equals
+            If Me.Id = other.Id Then Return True
+        End Function
+
         Private Sub RelationFactType_FactTypeReadingAdded(ByRef arFactTypeReading As FBM.FactTypeReading) Handles RelationFactType.FactTypeReadingAdded
 
         End Sub
@@ -139,8 +144,14 @@ Namespace ERD
 
         Private Sub RDSRelation_RemovedFromModel() Handles RDSRelation.RemovedFromModel
 
+            If Me.Link Is Nothing Then Exit Sub
             Me.Page.Diagram.Links.Remove(Me.Link.Link)
             Me.Page.ERDiagram.Relation.Remove(Me)
+
+            Dim lrDiagramingLink As MindFusion.Diagramming.DiagramLink = Me.Link.Link
+            lrDiagramingLink.Dispose()
+
+            Me.Page.Diagram.Invalidate()
 
         End Sub
 
@@ -164,6 +175,7 @@ Namespace ERD
                 Me.Page.ERDiagram.Relation.Remove(Me)
 
                 Me.Page.Diagram.Invalidate()
+
 
             Catch ex As Exception
                 Dim lsMessage1 As String
