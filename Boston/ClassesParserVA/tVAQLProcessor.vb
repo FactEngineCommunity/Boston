@@ -10,6 +10,7 @@ Namespace VAQL
         Private Parsetree As New VAQL.ParseTree 'Used with the Parser, is populated during the parsing of text input into the Brain; especially ORMQL
 
         Public ISACONCEPTStatement As New Object
+        Public ISANENTITYTYPEStatement As New Object
         Public ATMOSTONEStatement As New Object
         Public PREDICATEPARTClause As New Object
         Public VALUETYPEISWRITTENASStatement As New Object
@@ -38,6 +39,15 @@ Namespace VAQL
             lrIsAConceptStatement.add_attribute(New DynamicClassLibrary.Factory.tAttribute("MODELELEMENTNAME", GetType(String)))
 
             Me.ISACONCEPTStatement = lrIsAConceptStatement.clone
+
+            '====================================================================
+            'Create the DynamicObject for IsAnEntityType Texts/Satements
+            '====================================================================
+            Dim lrIsAnEntityTypeStatement As New DynamicClassLibrary.Factory.tClass
+            lrIsAnEntityTypeStatement.add_attribute(New DynamicClassLibrary.Factory.tAttribute("MODELELEMENTNAME", GetType(String)))
+            lrIsAnEntityTypeStatement.add_attribute(New DynamicClassLibrary.Factory.tAttribute("KEYWDISANENTITYTYPE", GetType(String)))
+
+            Me.ISANENTITYTYPEStatement = lrIsAnEntityTypeStatement.clone
 
             '====================================================================
             'Create the DynamicObject for FACTTYPEREADING Texts/Satements
@@ -237,28 +247,31 @@ Namespace VAQL
                         aoTokenType = TokenType.ENTITYTYPEISIDENTIFIEDBYITSCLAUSE
                         aoParseTree = Me.Parsetree
 
-                    ElseIf Me.ParseTreeContainsTokenType(Me.Parsetree, TokenType.MODELELEMENTLEADINGSTMT) And _
-                           Me.ParseTreeContainsTokenType(Me.Parsetree, TokenType.FACTTYPECLAUSE) And _
-                           Not Me.ParseTreeContainsTokenType(Me.Parsetree, TokenType.KEYWDATMOSTONE) And _
+                    ElseIf Me.ParseTreeContainsTokenType(Me.Parsetree, TokenType.MODELELEMENTLEADINGSTMT) And
+                           Me.ParseTreeContainsTokenType(Me.Parsetree, TokenType.FACTTYPECLAUSE) And
+                           Not Me.ParseTreeContainsTokenType(Me.Parsetree, TokenType.KEYWDATMOSTONE) And
                            Not Me.ParseTreeContainsTokenType(Me.Parsetree, TokenType.KEYWDONE) Then
                         aoTokenType = TokenType.FACTTYPECLAUSE
                         aoParseTree = Me.Parsetree
 
-                    ElseIf Me.ParseTreeContainsTokenType(Me.Parsetree, TokenType.MODELELEMENTLEADINGSTMT) And _
+                    ElseIf Me.ParseTreeContainsTokenType(Me.Parsetree, TokenType.MODELELEMENTLEADINGSTMT) And
                            Me.ParseTreeContainsTokenType(Me.Parsetree, TokenType.KEYWDATMOSTONE) Then
                         aoTokenType = TokenType.KEYWDATMOSTONE
                         aoParseTree = Me.Parsetree
-                    ElseIf Me.ParseTreeContainsTokenType(Me.Parsetree, TokenType.MODELELEMENTLEADINGSTMT) And _
+                    ElseIf Me.ParseTreeContainsTokenType(Me.Parsetree, TokenType.MODELELEMENTLEADINGSTMT) And
                            Me.ParseTreeContainsTokenType(Me.Parsetree, TokenType.KEYWDONE) Then
                         aoTokenType = TokenType.KEYWDONE
                         aoParseTree = Me.Parsetree
-                    ElseIf Me.ParseTreeContainsTokenType(Me.Parsetree, TokenType.MODELELEMENTLEADINGSTMT) And _
-                           (Me.ParseTreeContainsTokenType(Me.Parsetree, TokenType.BINARYPREDICATECLAUSE) Or _
+                    ElseIf Me.ParseTreeContainsTokenType(Me.Parsetree, TokenType.MODELELEMENTLEADINGSTMT) And
+                           (Me.ParseTreeContainsTokenType(Me.Parsetree, TokenType.BINARYPREDICATECLAUSE) Or
                            Me.ParseTreeContainsTokenType(Me.Parsetree, TokenType.UNARYPREDICATECLAUSE)) Then
                         aoTokenType = TokenType.FACTTYPECLAUSE
                         aoParseTree = Me.Parsetree
                     ElseIf Me.ParseTreeContainsTokenType(Me.Parsetree, TokenType.KEYWDISACONCEPT) Then
                         aoTokenType = TokenType.KEYWDISACONCEPT
+                        aoParseTree = Me.Parsetree
+                    ElseIf Me.ParseTreeContainsTokenType(Me.Parsetree, TokenType.KEYWDISANENTITYTYPE) Then
+                        aoTokenType = TokenType.KEYWDISANENTITYTYPE
                         aoParseTree = Me.Parsetree
                     End If
 

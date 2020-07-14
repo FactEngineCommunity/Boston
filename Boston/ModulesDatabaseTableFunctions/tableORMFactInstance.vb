@@ -64,53 +64,30 @@
                     '-----------------------------------
                     For liInd = 1 To arFactTypeInstance.Arity
 
-                        If lRecordset("Symbol").Value = lsFactId Then
-                            Try
+                        If Not lRecordset.EOF Then
+                            If lRecordset("Symbol").Value = lsFactId Then
+                                Try
 
-                                lrRoleInstance = arFactTypeInstance.RoleGroup.Find(Function(x) x.Id = lRecordset("RoleId").Value) ' AddressOf lrRoleInstance.Equals)
-                                If lrRoleInstance Is Nothing Then
-                                    Throw New ApplicationException("Error: FetFactsForFactTypeInstance: Could not find RoleInstance for RoleId: " & lRecordset("RoleId").Value & ", for FactType: " & arFactTypeInstance.Name)
-                                End If
+                                    lrRoleInstance = arFactTypeInstance.RoleGroup.Find(Function(x) x.Id = lRecordset("RoleId").Value) ' AddressOf lrRoleInstance.Equals)
+                                    If lrRoleInstance Is Nothing Then
+                                        Throw New ApplicationException("Error: FetFactsForFactTypeInstance: Could not find RoleInstance for RoleId: " & lRecordset("RoleId").Value & ", for FactType: " & arFactTypeInstance.Name)
+                                    End If
 
-                                '-------------------------------
-                                'Create a Concept for the Data
-                                '-------------------------------
-                                Dim lrConcept As New FBM.Concept(lRecordset("ValueSymbol").Value)
+                                    '-------------------------------
+                                    'Create a Concept for the Data
+                                    '-------------------------------
+                                    Dim lrConcept As New FBM.Concept(lRecordset("ValueSymbol").Value)
 
-                                '----------------------------
-                                'Create the FactDataInstance
-                                '----------------------------
-                                lrFactDataInstance = New FBM.FactDataInstance(arFactTypeInstance.Page, lrFactInstance, lrRoleInstance, lrConcept)
-                                lrFactDataInstance.X = lRecordset("fdci.x").Value
-                                lrFactDataInstance.Y = lRecordset("fdci.y").Value
+                                    '----------------------------
+                                    'Create the FactDataInstance
+                                    '----------------------------
+                                    lrFactDataInstance = New FBM.FactDataInstance(arFactTypeInstance.Page, lrFactInstance, lrRoleInstance, lrConcept)
+                                    lrFactDataInstance.X = lRecordset("fdci.x").Value
+                                    lrFactDataInstance.Y = lRecordset("fdci.y").Value
 
-                                '-------------------------------------
-                                'Add the FactDataInstance to the Role
-                                '-------------------------------------
-                                lrRoleInstance.Data.Add(lrFactDataInstance)
-
-                                '-------------------------------------
-                                'Add the FactDataInstance to the Fact
-                                '-------------------------------------
-                                lrFactInstance.Data.Add(lrFactDataInstance)
-                                '-------------------------------------
-                                'Add the FactDataInstance to the Page
-                                '  Most useful in XML Export
-                                '-------------------------------------
-                                'SyncLock arFactTypeInstance.Page.ValueInstance
-                                arFactTypeInstance.Page.ValueInstance.Add(lrFactDataInstance)
-                                'End SyncLock
-
-                                lRecordset.MoveNext()
-                            Catch ex As Exception
-                                'Probaly a EOF Error on lRecordset.MoveNext
-                                'Get the FactInstance from the Database
-                                lrFactInstance = arFactTypeInstance.FactType.Fact.Find(Function(x) x.Id = lsFactId).CloneInstance(arFactTypeInstance.Page)
-                                For Each lrFactDataInstance In lrFactInstance.Data
                                     '-------------------------------------
                                     'Add the FactDataInstance to the Role
                                     '-------------------------------------
-                                    lrRoleInstance = arFactTypeInstance.RoleGroup.Find(Function(x) x.Id = lrFactDataInstance.Role.Id)
                                     lrRoleInstance.Data.Add(lrFactDataInstance)
 
                                     '-------------------------------------
@@ -123,31 +100,55 @@
                                     '-------------------------------------
                                     'SyncLock arFactTypeInstance.Page.ValueInstance
                                     arFactTypeInstance.Page.ValueInstance.Add(lrFactDataInstance)
+                                    'End SyncLock
 
+                                    If Not lRecordset.EOF Then lRecordset.MoveNext()
+                                Catch ex As Exception
+                                    'Probaly a EOF Error on lRecordset.MoveNext
+                                    'Get the FactInstance from the Database
+                                    lrFactInstance = arFactTypeInstance.FactType.Fact.Find(Function(x) x.Id = lsFactId).CloneInstance(arFactTypeInstance.Page)
+                                    For Each lrFactDataInstance In lrFactInstance.Data
+                                        '-------------------------------------
+                                        'Add the FactDataInstance to the Role
+                                        '-------------------------------------
+                                        lrRoleInstance = arFactTypeInstance.RoleGroup.Find(Function(x) x.Id = lrFactDataInstance.Role.Id)
+                                        lrRoleInstance.Data.Add(lrFactDataInstance)
+
+                                        '-------------------------------------
+                                        'Add the FactDataInstance to the Fact
+                                        '-------------------------------------
+                                        lrFactInstance.Data.Add(lrFactDataInstance)
+                                        '-------------------------------------
+                                        'Add the FactDataInstance to the Page
+                                        '  Most useful in XML Export
+                                        '-------------------------------------
+                                        'SyncLock arFactTypeInstance.Page.ValueInstance
+                                        arFactTypeInstance.Page.ValueInstance.Add(lrFactDataInstance)
+                                    Next
                                     Dim lsMessage = "Not all Fact Data was found on the Page for:"
                                     lsMessage &= vbCrLf & vbCrLf
                                     lsMessage &= "Page: " & arFactTypeInstance.Page.Name
                                     lsMessage &= "Fact Type: " & arFactTypeInstance.Id
                                     lsMessage &= "Fact :" & lsFactId
                                     MsgBox(lsMessage)
-                                Next
-                            End Try
-                        Else
-                            Try
-                                lrFact = arFactTypeInstance.FactType.Fact.Find(Function(x) x.Id = lsFactId)
-                                lrFactInstance = lrFact.CloneInstance(arFactTypeInstance.Page, True)
-                                For Each lrFactDataInstance In lrFactInstance.Data
-                                    arFactTypeInstance.Page.ValueInstance.Add(lrFactDataInstance)
-                                    lrFactDataInstance.Role.Data.AddUnique(lrFactDataInstance)
-                                Next
-                                lrFactInstance.Save()
-                            Catch ex As Exception
-                                Dim lsMessage As String
-                                lsMessage = "Error: GetFactsForFactTypeInstance:"
-                                lsMessage &= vbCrLf & vbCrLf & ex.Message
-                                lsMessage &= vbCrLf & vbCrLf & "PageId: " & arFactTypeInstance.Page.PageId & vbCrLf & ", FactTypeId: " & arFactTypeInstance.Id & vbCrLf & ", FactId:" & lsFactId
-                                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
-                            End Try
+                                End Try
+                            Else
+                                Try
+                                    lrFact = arFactTypeInstance.FactType.Fact.Find(Function(x) x.Id = lsFactId)
+                                    lrFactInstance = lrFact.CloneInstance(arFactTypeInstance.Page, True)
+                                    For Each lrFactDataInstance In lrFactInstance.Data
+                                        arFactTypeInstance.Page.ValueInstance.Add(lrFactDataInstance)
+                                        lrFactDataInstance.Role.Data.AddUnique(lrFactDataInstance)
+                                    Next
+                                    lrFactInstance.Save()
+                                Catch ex As Exception
+                                    Dim lsMessage As String
+                                    lsMessage = "Error: GetFactsForFactTypeInstance:"
+                                    lsMessage &= vbCrLf & vbCrLf & ex.Message
+                                    lsMessage &= vbCrLf & vbCrLf & "PageId: " & arFactTypeInstance.Page.PageId & vbCrLf & ", FactTypeId: " & arFactTypeInstance.Id & vbCrLf & ", FactId:" & lsFactId
+                                    prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                                End Try
+                            End If
                         End If
                     Next liInd
                     'GetFactsForFactTypeInstance.Add(lrFactInstance)

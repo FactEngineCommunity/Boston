@@ -247,6 +247,9 @@ Namespace VAQL
                 Case TokenType.ISACONCEPTCLAUSE
                     Value = EvalISACONCEPTCLAUSE(tree, paramlist)
                     Exit Select
+                Case TokenType.ISANENTITYTYPECLAUSE
+                    Value = EvalISANENTITYTYPECLAUSE(tree, paramlist)
+                    Exit Select
                 Case TokenType.MODELELEMENT
                     Value = EvalMODELELEMENT(tree, paramlist)
                     Exit Select
@@ -320,6 +323,10 @@ Namespace VAQL
         End Function
 
         Protected Overridable Function EvalISACONCEPTCLAUSE(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalISANENTITYTYPECLAUSE(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
             Throw New NotImplementedException()
         End Function
 

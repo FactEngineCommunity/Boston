@@ -4,6 +4,9 @@ Partial Public Class tBrain
 
     Private Sub ProcessENTITYTYPEISIDENTIFIEDBYITSStatement()
 
+        Me.Model = prApplication.WorkingModel
+
+
         Dim lrEntityType As FBM.EntityType
         Dim lrEntityTypeInstance As FBM.EntityTypeInstance
 
@@ -60,6 +63,8 @@ Partial Public Class tBrain
 
     Private Sub ProcessStatementAddEntityType()
 
+        Me.Model = prApplication.WorkingModel
+
         Dim lrEnityTypeInstance As FBM.EntityTypeInstance
 
         Dim lsOldEntityTypeName As String = ""
@@ -109,6 +114,8 @@ Partial Public Class tBrain
         Dim larModelObject As New List(Of FBM.ModelObject)
 
         Try
+            Me.Model = prApplication.WorkingModel
+
             ProcessStatementAddFactType = True
 
             For Each lrResolvedWord In Me.CurrentQuestion.sentence.WordListResolved.FindAll(Function(x) x.Sense = pcenumWordSense.Noun)
@@ -237,6 +244,8 @@ Partial Public Class tBrain
         Dim larModelObject As New List(Of FBM.ModelObject)
 
         Try
+            Me.Model = prApplication.WorkingModel
+
             ProcessStatementAddFactTypePredetermined = True
 
             For Each lsResolvedModelElementName In arQuestion.FocalSymbol
@@ -283,7 +292,7 @@ Partial Public Class tBrain
             Call lrFactType.AddFactTypeReading(lrFactTypeReading, True, True)
 
             If lrFactType.MakeNameFromFactTypeReadings <> lrFactType.Id Then
-                lrFactType.SetName(lrFactType.MakeNameFromFactTypeReadings)
+                lrFactType.setName(lrFactType.MakeNameFromFactTypeReadings)
             End If
             '===========================================================
 
@@ -298,9 +307,9 @@ Partial Public Class tBrain
                 lrRole = lrFactType.RoleGroup.Find(Function(x) x.JoinedORMObject.Id = lsModelElementId)
                 larRole.Add(lrRole)
 
-                lrRoleConstraint = Me.Model.CreateRoleConstraint(pcenumRoleConstraintType.InternalUniquenessConstraint, _
-                                                                 larRole, _
-                                                                 "InternalUniquenessConstraint", _
+                lrRoleConstraint = Me.Model.CreateRoleConstraint(pcenumRoleConstraintType.InternalUniquenessConstraint,
+                                                                 larRole,
+                                                                 "InternalUniquenessConstraint",
                                                                  1,
                                                                  False,
                                                                  False)
@@ -357,6 +366,8 @@ Partial Public Class tBrain
         Dim larRole As New List(Of FBM.Role)
 
         Try
+            Me.Model = prApplication.WorkingModel
+
             ProcessStatementAddFactTypeReading = True
 
             lrFactType = New FBM.FactType(Me.Model, "DummyFactType", True)
@@ -401,6 +412,8 @@ Partial Public Class tBrain
 
         Me.Timeout.Stop()
 
+        Me.Model = prApplication.WorkingModel
+
         lsOldValueTypeName = Me.CurrentQuestion.ValueType(0).Id
         lsValueTypeName = Viev.Strings.MakeCapCamelCase(Me.CurrentQuestion.ValueType(0).Id)
 
@@ -431,7 +444,39 @@ Partial Public Class tBrain
 
     End Sub
 
+    Private Sub ProcessISANENTITYTYPECLAUSE()
+
+        Me.Model = prApplication.WorkingModel
+
+        Me.VAQL.ISANENTITYTYPEStatement.KEYWDISANENTITYTYPE = ""
+        Me.VAQL.ISANENTITYTYPEStatement.MODELELEMENTNAME = ""
+
+        Call Me.VAQL.GetParseTreeTokens(Me.VAQL.ISANENTITYTYPEStatement, Me.VAQLParsetree)
+
+        Me.Timeout.Stop()
+
+        Dim lsEntityTypeName = Viev.Strings.MakeCapCamelCase(Me.VAQL.ISANENTITYTYPEStatement.MODELELEMENTNAME)
+
+        Dim lrEntityType = Me.Model.CreateEntityType(lsEntityTypeName, False)
+
+        Dim lrEnityTypeInstance = Me.Page.DropEntityTypeAtPoint(lrEntityType, New PointF(100, 10)) 'VM-20180329-Me.Page.Form.CreateEntityType(lsEntityTypeName, True)
+
+        Call lrEnityTypeInstance.RepellFromNeighbouringPageObjects(1, False)
+        Call lrEnityTypeInstance.Move(lrEnityTypeInstance.X, lrEnityTypeInstance.Y, True)
+
+        If Me.AutoLayoutOn Then
+            Me.Page.Form.AutoLayout()
+        End If
+
+        Me.send_data("Ok")
+
+        Me.Timeout.Start()
+
+    End Sub
+
     Private Sub ProcessVALUETYPEISWRITTENASStatement()
+
+        Me.Model = prApplication.WorkingModel
 
         Me.VAQL.VALUETYPEISWRITTENASStatement.MODELELEMENTNAME = ""
         Me.VAQL.VALUETYPEISWRITTENASStatement.DATATYPE = New Object

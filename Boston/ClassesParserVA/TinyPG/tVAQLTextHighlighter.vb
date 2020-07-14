@@ -88,8 +88,8 @@ Namespace VAQL
                 Return GetScrollPos(Textbox.Handle.ToInt32(), SB_HORZ)
             End Get
             Set(ByVal value As Integer)
-                SetScrollPos(Textbox.Handle, SB_HORZ, value, True)
-                PostMessageA(Textbox.Handle, WM_HSCROLL, SB_THUMBPOSITION + 65536 * value, 0)
+                SetScrollPos(DirectCast(Textbox.Handle, IntPtr), SB_HORZ, value, True)
+                PostMessageA(DirectCast(Textbox.Handle, IntPtr), WM_HSCROLL, SB_THUMBPOSITION + 65536 * value, 0)
             End Set
         End Property
 
@@ -98,8 +98,8 @@ Namespace VAQL
                 Return GetScrollPos(Textbox.Handle.ToInt32(), SB_VERT)
             End Get
             Set(ByVal value As Integer)
-                SetScrollPos(Textbox.Handle, SB_VERT, value, True)
-                PostMessageA(Textbox.Handle, WM_VSCROLL, SB_THUMBPOSITION + 65536 * value, 0)
+                SetScrollPos(DirectCast(Textbox.Handle, IntPtr), SB_VERT, value, True)
+                PostMessageA(DirectCast(Textbox.Handle, IntPtr), WM_VSCROLL, SB_THUMBPOSITION + 65536 * value, 0)
             End Set
         End Property
 
@@ -142,7 +142,7 @@ Namespace VAQL
                 Dim nextItem As UndoItem = ua
                 Dim i As Integer = 0
                 While i < 6
-                    Dim prevItem As UndoItem = UndoList(UndoList.Count - 2 - i)
+    Dim prevItem As UndoItem = UndoList(UndoList.Count - 2 - i)
                     canRemove = canRemove And (Math.Abs(prevItem.Text.Length - nextItem.Text.Length) <= 1 AndAlso Math.Abs(prevItem.Position - nextItem.Position) <= 1)
                     nextItem = prevItem
                     System.Math.Max(System.Threading.Interlocked.Increment(i), i - 1)
@@ -154,103 +154,103 @@ Namespace VAQL
             UndoIndex = UndoList.Count
         End Sub
 
-        Public Sub ClearUndo()
-            UndoList = New List(Of UndoItem)()
-            UndoIndex = 0
-        End Sub
+    Public Sub ClearUndo()
+        UndoList = New List(Of UndoItem)()
+        UndoIndex = 0
+    End Sub
 
-        Public Sub Undo()
-            If Not CanUndo Then
-                Return
-            End If
+    Public Sub Undo()
+        If Not CanUndo Then
+            Return
+        End If
 
-            System.Math.Max(System.Threading.Interlocked.Decrement(UndoIndex), UndoIndex + 1)
-            If UndoIndex < 1 Then
-                UndoIndex = 1
-            End If
+        System.Math.Max(System.Threading.Interlocked.Decrement(UndoIndex), UndoIndex + 1)
+        If UndoIndex < 1 Then
+            UndoIndex = 1
+        End If
 
-            ' implement undo action here
-            Dim ua As UndoItem = UndoList(UndoIndex - 1)
-            RestoreState(ua)
-        End Sub
+        ' implement undo action here
+        Dim ua As UndoItem = UndoList(UndoIndex - 1)
+        RestoreState(ua)
+    End Sub
 
-        Public Sub Redo()
-            If Not CanRedo Then
-                Return
-            End If
+    Public Sub Redo()
+        If Not CanRedo Then
+            Return
+        End If
 
-            System.Math.Max(System.Threading.Interlocked.Increment(UndoIndex), UndoIndex - 1)
-            If UndoIndex > UndoList.Count Then
-                UndoIndex = UndoList.Count
-            End If
+        System.Math.Max(System.Threading.Interlocked.Increment(UndoIndex), UndoIndex - 1)
+        If UndoIndex > UndoList.Count Then
+            UndoIndex = UndoList.Count
+        End If
 
-            Dim ua As UndoItem = UndoList(UndoIndex - 1)
-            RestoreState(ua)
+        Dim ua As UndoItem = UndoList(UndoIndex - 1)
+        RestoreState(ua)
 
-        End Sub
+    End Sub
 
-        Private Sub RestoreState(ByVal item As UndoItem)
-            Lock()
-            ' restore state
-            Textbox.Rtf = item.Text
-            Textbox.[Select](item.Position, 0)
-            HScrollPos = item.ScrollPosition.X
-            VScrollPos = item.ScrollPosition.Y
+    Private Sub RestoreState(ByVal item As UndoItem)
+        Lock()
+        ' restore state
+        Textbox.Rtf = item.Text
+        Textbox.[Select](item.Position, 0)
+        HScrollPos = item.ScrollPosition.X
+        VScrollPos = item.ScrollPosition.Y
 
-            Unlock()
-        End Sub
+        Unlock()
+    End Sub
 
-        Public ReadOnly Property CanUndo() As Boolean
-            Get
-                Return UndoIndex > 0
-            End Get
-        End Property
+    Public ReadOnly Property CanUndo() As Boolean
+        Get
+            Return UndoIndex > 0
+        End Get
+    End Property
 
-        Public ReadOnly Property CanRedo() As Boolean
-            Get
-                Return UndoIndex < UndoList.Count
-            End Get
-        End Property
+    Public ReadOnly Property CanRedo() As Boolean
+        Get
+            Return UndoIndex < UndoList.Count
+        End Get
+    End Property
 
-        Public Sub New(ByVal textbox As RichTextBox, ByVal scanner As Scanner, ByVal parser As Parser)
-            Me.Textbox = textbox
-            Me.Scanner = scanner
-            Me.Parser = parser
+    Public Sub New(ByVal textbox As RichTextBox, ByVal scanner As Scanner, ByVal parser As Parser)
+        Me.Textbox = textbox
+        Me.Scanner = scanner
+        Me.Parser = parser
 
-            ClearUndo()
+        ClearUndo()
 
-            AddHandler Textbox.TextChanged, AddressOf Textbox_TextChanged
-            AddHandler textbox.KeyUp, AddressOf textbox_KeyDown
-            AddHandler Textbox.SelectionChanged, AddressOf Textbox_SelectionChanged
-            AddHandler Textbox.Disposed, AddressOf Textbox_Disposed
+        AddHandler Textbox.TextChanged, AddressOf Textbox_TextChanged
+        AddHandler textbox.KeyUp, AddressOf textbox_KeyDown
+        AddHandler Textbox.SelectionChanged, AddressOf Textbox_SelectionChanged
+        AddHandler Textbox.Disposed, AddressOf Textbox_Disposed
 
-            Tree = New ParseTree()
-            currentContext = Tree
+        Tree = New ParseTree()
+        currentContext = Tree
 
-            threadAutoHighlight = New Thread(AddressOf AutoHighlightStart)
-            threadAutoHighlight.Start()
-        End Sub
+        threadAutoHighlight = New Thread(AddressOf AutoHighlightStart)
+        threadAutoHighlight.Start()
+    End Sub
 
 
-        Public Sub Lock()
-            ' Stop redrawing:  
-            SendMessage(Textbox.Handle, WM_SETREDRAW, 0, IntPtr.Zero)
-            ' Stop sending of events:  
-            stateLocked = SendMessage(Textbox.Handle, EM_GETEVENTMASK, 0, IntPtr.Zero)
-            ' change colors and stuff in the RichTextBox  
-        End Sub
+    Public Sub Lock()
+        ' Stop redrawing:  
+        SendMessage(Textbox.Handle, WM_SETREDRAW, 0, IntPtr.Zero)
+        ' Stop sending of events:  
+        stateLocked = SendMessage(Textbox.Handle, EM_GETEVENTMASK, 0, IntPtr.Zero)
+        ' change colors and stuff in the RichTextBox  
+    End Sub
 
-        Public Sub Unlock()
-            ' turn on events  
-            SendMessage(Textbox.Handle, EM_SETEVENTMASK, 0, stateLocked)
-            ' turn on redrawing  
-            SendMessage(Textbox.Handle, WM_SETREDRAW, 1, IntPtr.Zero)
+    Public Sub Unlock()
+        ' turn on events  
+        SendMessage(Textbox.Handle, EM_SETEVENTMASK, 0, stateLocked)
+        ' turn on redrawing  
+        SendMessage(Textbox.Handle, WM_SETREDRAW, 1, IntPtr.Zero)
 
-            stateLocked = IntPtr.Zero
-            Textbox.Invalidate()
-        End Sub
+        stateLocked = IntPtr.Zero
+        Textbox.Invalidate()
+    End Sub
 
-        Sub textbox_KeyDown(ByVal sender As Object, ByVal e As KeyEventArgs)
+    Sub textbox_KeyDown(ByVal sender As Object, ByVal e As KeyEventArgs)
 
             '=============================
             If e.KeyCode = Keys.Space Then
@@ -259,56 +259,56 @@ Namespace VAQL
             End If
             '=============================
 
-            ' undo/redo
-            If e.KeyValue = 89 AndAlso e.Control Then
-                Redo()
-                ' CTRL-Y
-            End If
-            If e.KeyValue = 90 AndAlso e.Control Then
-                Undo()
-                ' CTRL-Z
-            End If
+        ' undo/redo
+        If e.KeyValue = 89 AndAlso e.Control Then
+            Redo()
+            ' CTRL-Y
+        End If
+        If e.KeyValue = 90 AndAlso e.Control Then
+            Undo()
+            ' CTRL-Z
+        End If
 
-            RaiseEvent KeyDown(sender, e)
+        RaiseEvent KeyDown(sender, e)
 
-        End Sub
+    End Sub
 
-        Sub Textbox_TextChanged(ByVal sender As Object, ByVal e As EventArgs)
-            If stateLocked <> IntPtr.Zero Then
-                Return
-            End If
-        End Sub
+    Sub Textbox_TextChanged(ByVal sender As Object, ByVal e As EventArgs)
+        If stateLocked <> IntPtr.Zero Then
+            Return
+        End If
+    End Sub
 
-        Sub Textbox_SelectionChanged(ByVal sender As Object, ByVal e As EventArgs)
-            If stateLocked <> IntPtr.Zero Then
-                Return
-            End If
+    Sub Textbox_SelectionChanged(ByVal sender As Object, ByVal e As EventArgs)
+        If stateLocked <> IntPtr.Zero Then
+            Return
+        End If
 
-            Dim newContext As ParseNode = GetCurrentContext()
+        Dim newContext As ParseNode = GetCurrentContext()
 
-            If currentContext Is Nothing Then
-                currentContext = newContext
-            End If
-            If newContext Is Nothing Then
-                Return
-            End If
+        If currentContext Is Nothing Then
+            currentContext = newContext
+        End If
+        If newContext Is Nothing Then
+            Return
+        End If
 
-            If newContext.Token.Type <> currentContext.Token.Type Then
-                RaiseEvent SwitchContext(Me, New ContextSwitchEventArgs(currentContext, newContext))
-                'SwitchContext.Invoke(Me, New ContextSwitchEventArgs(currentContext, newContext))
-                currentContext = newContext
-            End If
+        If newContext.Token.Type <> currentContext.Token.Type Then
+            RaiseEvent SwitchContext(Me, New ContextSwitchEventArgs(currentContext, newContext))
+            'SwitchContext.Invoke(Me, New ContextSwitchEventArgs(currentContext, newContext))
+            currentContext = newContext
+        End If
 
-        End Sub
+    End Sub
 
-        ''' <summary>
-        ''' this handy function returns the section in which the user is editing currently
-        ''' </summary>
-        ''' <returns></returns>
-        Public Function GetCurrentContext() As ParseNode
-            Dim node As ParseNode = FindNode(Tree, Textbox.SelectionStart)
-            Return node
-        End Function
+    ''' <summary>
+    ''' this handy function returns the section in which the user is editing currently
+    ''' </summary>
+    ''' <returns></returns>
+    Public Function GetCurrentContext() As ParseNode
+        Dim node As ParseNode = FindNode(Tree, Textbox.SelectionStart)
+        Return node
+    End Function
 
         Public Function FindNode(ByVal node As ParseNode, ByVal posstart As Integer) As ParseNode
 
@@ -317,8 +317,8 @@ Namespace VAQL
             End If
 
             If node.Nodes.Count > 0 Then
-                If node.Nodes.Count > 1 And _
-                       node.Nodes(node.Nodes.Count - 1).Token.Type = TokenType._UNDETERMINED_ Then
+                If node.Nodes.Count > 1 And
+                   node.Nodes(node.Nodes.Count - 1).Token.Type = TokenType._UNDETERMINED_ Then
                     Return FindNode(node.Nodes(node.Nodes.Count - 2), 0)
                 ElseIf node.Nodes(node.Nodes.Count - 1).Nodes.Count > 0 Then
                     Return FindNode(node.Nodes(node.Nodes.Count - 1), 0)
@@ -331,11 +331,11 @@ Namespace VAQL
 
         End Function
 
-    ''' <summary>
-    ''' use HighlighText to start the text highlight process from the caller's thread.
-    ''' this method is not used internally. 
-    ''' </summary>
-    Public Sub HighlightText()
+        ''' <summary>
+        ''' use HighlighText to start the text highlight process from the caller's thread.
+        ''' this method is not used internally. 
+        ''' </summary>
+        Public Sub HighlightText()
         SyncLock treelock
             textChanged = True
             currentText = Trim(Textbox.Text)
@@ -617,20 +617,23 @@ Namespace VAQL
                     Case TokenType.KEYWDISACONCEPT:
                         sb.Append("{{\cf44 ")
                         Exit Select
-                    Case TokenType.KEYWDISIDENTIFIEDBYITS:
+                    Case TokenType.KEYWDISANENTITYTYPE:
                         sb.Append("{{\cf45 ")
                         Exit Select
-                    Case TokenType.KEYWDISWRITTENAS:
+                    Case TokenType.KEYWDISIDENTIFIEDBYITS:
                         sb.Append("{{\cf46 ")
                         Exit Select
-                    Case TokenType.KEYWDNL:
+                    Case TokenType.KEYWDISWRITTENAS:
                         sb.Append("{{\cf47 ")
                         Exit Select
-                    Case TokenType.KEYWDONE:
+                    Case TokenType.KEYWDNL:
                         sb.Append("{{\cf48 ")
                         Exit Select
-                    Case TokenType.KEYWDREADING:
+                    Case TokenType.KEYWDONE:
                         sb.Append("{{\cf49 ")
+                        Exit Select
+                    Case TokenType.KEYWDREADING:
+                        sb.Append("{{\cf50 ")
                         Exit Select
 
             Case Else
@@ -641,7 +644,7 @@ Namespace VAQL
 
     ' define the color palette to be used here
     Private Sub AddRtfHeader(ByVal sb As StringBuilder)
-        sb.Insert(0, "{\rtf1\ansi\deff0{\fonttbl{\f0\fnil\fcharset0 Tahoma;}}{\colortbl;\red0\green191\blue255;\red0\green191\blue255;\red153\green0\blue0;\red76\green153\blue0;\red153\green76\blue0;\red153\green76\blue0;\red153\green0\blue153;\red76\green153\blue0;\red153\green76\blue0;\red153\green0\blue0;\red0\green0\blue255;\red153\green0\blue153;\red153\green0\blue0;\red0\green0\blue255;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue102;\red0\green0\blue255;\red0\green0\blue255;}\viewkind4\uc1\pard\lang1033\f0\fs20")
+        sb.Insert(0, "{\rtf1\ansi\deff0{\fonttbl{\f0\fnil\fcharset0 Tahoma;}}{\colortbl;\red0\green191\blue255;\red0\green191\blue255;\red153\green0\blue0;\red76\green153\blue0;\red153\green76\blue0;\red153\green76\blue0;\red153\green0\blue153;\red76\green153\blue0;\red153\green76\blue0;\red153\green0\blue0;\red0\green0\blue255;\red153\green0\blue153;\red153\green0\blue0;\red0\green0\blue255;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue102;\red0\green0\blue255;\red0\green0\blue255;}\viewkind4\uc1\pard\lang1033\f0\fs20")
     End Sub
 
     Private Sub AddRtfEnd(ByVal sb As StringBuilder)

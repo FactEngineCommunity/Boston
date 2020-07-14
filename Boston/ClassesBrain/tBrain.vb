@@ -1772,6 +1772,9 @@ Public Class tBrain
         ProcessVAQLStatement = False
 
         Select Case aoTokenType
+            Case Is = Boston.VAQL.TokenType.KEYWDISANENTITYTYPE
+                Call Me.ProcessISANENTITYTYPECLAUSE()
+                Return True
             Case Is = Boston.VAQL.TokenType.VALUETYPEISWRITTENASCLAUSE
                 Call Me.ProcessVALUETYPEISWRITTENASStatement()
                 Return True
