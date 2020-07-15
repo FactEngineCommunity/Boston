@@ -8,7 +8,7 @@
       <string>b4c88052-5243-4f89-b8b7-27de2875d8c1</string>
       <string>06d7bba0-a99f-4636-a8be-4071374e5894</string>
     </OpenEditorGUIDs>
-    <SelectedEditorGUID>06d7bba0-a99f-4636-a8be-4071374e5894</SelectedEditorGUID>
+    <SelectedEditorGUID>2a6f72f1-7153-4fff-9b60-a106520641bb</SelectedEditorGUID>
   </Profile>
   <Properties>
     <EditorGUID>8ee3448f-d73e-405a-9ba8-f19cc47ba8ab</EditorGUID>
@@ -44,7 +44,7 @@ elseif column.datatype = "LogicalYesNo"
 	set column.datatype = "BIT"
 	
 elseif column.datatype = "NumericAutoCounter"
-	set column.datatype = "AUTOINCREMENT"
+	set column.datatype = "INTEGER"
 
 elseif column.datatype = "NumericDecimal"
 	set column.datatype = "NUMBER"
@@ -77,7 +77,7 @@ elseif column.datatype = "NumericUnsignedInteger"
 	set column.datatype = "NUMBER"
 	
 elseif column.datatype = "NumericUnsignedSmallInteger"
-	set column.datatype = "NUMBER"
+	set column.datatype = "INTEGER"
 	
 elseif column.datatype = "NumericUnsignedTinyInteger"
 	set column.datatype = "NUMBER"
@@ -173,15 +173,15 @@ end!&gt;&gt;
 
 &lt;&lt;!for table tbl in MainConn!&gt;&gt;
 &lt;&lt;!if not tbl.ispgsrelation!&gt;&gt;
-&lt;&lt;!"CREATE TABLE [" + tbl + "] ("!&gt;&gt;
+&lt;&lt;!"CREATE TABLE " + tbl + " ("!&gt;&gt;
   &lt;&lt;!set liInd = 1!&gt;&gt;
   &lt;&lt;!for column col in tbl!&gt;&gt;&lt;&lt;!col.value + " "!&gt;&gt;&lt;&lt;!col.datatype!&gt;&gt;&lt;&lt;!if col.length &gt; 0!&gt;&gt;&lt;&lt;!"(" + col.length + ")"!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!if liInd &lt; tbl.columncount or tbl.idcolumncount &gt; 0!&gt;&gt;&lt;&lt;!","!&gt;&gt;
   
   &lt;&lt;!end!&gt;&gt;
          &lt;&lt;!set liInd = liInd + 1!&gt;&gt;
   &lt;&lt;!end!&gt;&gt;&lt;&lt;!if tbl.idcolumncount &gt; 0!&gt;&gt;&lt;&lt;!set indxString = ""!&gt;&gt;&lt;&lt;!set liInd = 1!&gt;&gt;
-&lt;&lt;!for idcolumn indx in tbl!&gt;&gt;&lt;&lt;!if indx.isprimarykey!&gt;&gt;&lt;&lt;!set indxString = indxString &amp; "[" + indx + "]"!&gt;&gt;&lt;&lt;!if liInd &lt; tbl.pkcolumncount!&gt;&gt;&lt;&lt;!set indxString = indxString + ","!&gt;&gt;&lt;&lt;!end!&gt;&gt;
-&lt;&lt;!set liInd = liInd + 1!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!if indxString &lt;&gt; ""!&gt;&gt;&lt;&lt;!"CONSTRAINT [PrimaryKey] PRIMARY KEY (" + indxString + ")"!&gt;&gt;&lt;&lt;!end!&gt;&gt;
+&lt;&lt;!for idcolumn indx in tbl!&gt;&gt;&lt;&lt;!if indx.isprimarykey!&gt;&gt;&lt;&lt;!set indxString = indxString &amp; "" + indx + ""!&gt;&gt;&lt;&lt;!if liInd &lt; tbl.pkcolumncount!&gt;&gt;&lt;&lt;!set indxString = indxString + ","!&gt;&gt;&lt;&lt;!end!&gt;&gt;
+&lt;&lt;!set liInd = liInd + 1!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!if indxString &lt;&gt; ""!&gt;&gt;&lt;&lt;!"CONSTRAINT " + tbl + "PrimaryKey PRIMARY KEY (" + indxString + ")"!&gt;&gt;&lt;&lt;!end!&gt;&gt;
 &lt;&lt;!for index idx in tbl!&gt;&gt;&lt;&lt;!set licol = 1!&gt;&gt;&lt;&lt;!if not idx.isprimarykey!&gt;&gt;&lt;&lt;!"       ,CONSTRAINT " + idx.name + " UNIQUE ("!&gt;&gt;&lt;&lt;!for column col in idx!&gt;&gt;&lt;&lt;!col.value!&gt;&gt;&lt;&lt;!if licol &lt; idx.columncount!&gt;&gt;&lt;&lt;!","!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!set licol = licol + 1!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!")"!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!end!&gt;&gt;
 &lt;&lt;!end!&gt;&gt;
 &lt;&lt;!");"!&gt;&gt;
@@ -189,13 +189,23 @@ end!&gt;&gt;
 &lt;&lt;!set reftab2 = ""!&gt;&gt;
 &lt;&lt;!set refIndx = ""!&gt;&gt;
   &lt;&lt;!for relation rel in tbl!&gt;&gt;&lt;&lt;!set reftab = rel.referencedtablename!&gt;&gt;&lt;&lt;!set string = ""!&gt;&gt;&lt;&lt;!set referencingString = ""!&gt;&gt;&lt;&lt;!set liIndA = 1!&gt;&gt;&lt;&lt;!if reftab2 &lt;&gt; reftab!&gt;&gt;
-&lt;&lt;!"ALTER TABLE [" + tbl + "]"!&gt;&gt;    
-      &lt;&lt;!  "ADD CONSTRAINT [" + tbl.value + rel.referencedtablename + "_FK]"!&gt;&gt;
-      &lt;&lt;!"    FOREIGN KEY ("!&gt;&gt;&lt;&lt;!for table tbl2 in MainConn!&gt;&gt;&lt;&lt;!if tbl2.value = rel.referencedtablename and refIndx = ""!&gt;&gt;&lt;&lt;!set liIndA = 1!&gt;&gt;&lt;&lt;!for idcolumn indx2 in tbl2!&gt;&gt;&lt;&lt;!if indx2.isprimarykey!&gt;&gt;&lt;&lt;!set string = string + indx2.value!&gt;&gt;&lt;&lt;!for relations rel3 in tbl!&gt;&gt;&lt;&lt;!if rel3.referencedcolumnname = indx2.value!&gt;&gt;&lt;&lt;!set referencingString = referencingString + rel3.referencingcolumnname!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!if liIndA &lt; rel.columncount!&gt;&gt;&lt;&lt;!set string = string + ","!&gt;&gt;&lt;&lt;!set referencingString = referencingString + ","!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!set liIndA = liIndA + 1!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!set refIndx = "Covered"!&gt;&gt;&lt;&lt;!set reftab2 = reftab!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!set refIndx = ""!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!referencingString + ") REFERENCES "!&gt;&gt;&lt;&lt;!"[" + rel.referencedtablename + "] (" + string + ");"!&gt;&gt;                  
+&lt;&lt;!"ALTER TABLE " + tbl!&gt;&gt;    
+      &lt;&lt;!  "ADD CONSTRAINT " + tbl.value + rel.referencedtablename + "_FK"!&gt;&gt;
+      &lt;&lt;!"    FOREIGN KEY ("!&gt;&gt;&lt;&lt;!for table tbl2 in MainConn!&gt;&gt;&lt;&lt;!if tbl2.value = rel.referencedtablename and refIndx = ""!&gt;&gt;&lt;&lt;!set liIndA = 1!&gt;&gt;&lt;&lt;!for idcolumn indx2 in tbl2!&gt;&gt;&lt;&lt;!if indx2.isprimarykey!&gt;&gt;&lt;&lt;!set string = string + indx2.value!&gt;&gt;&lt;&lt;!for relations rel3 in tbl!&gt;&gt;&lt;&lt;!if rel3.referencedcolumnname = indx2.value!&gt;&gt;&lt;&lt;!set referencingString = referencingString + rel3.referencingcolumnname!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!if liIndA &lt; rel.columncount!&gt;&gt;&lt;&lt;!set string = string + ","!&gt;&gt;&lt;&lt;!set referencingString = referencingString + ","!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!set liIndA = liIndA + 1!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!set refIndx = "Covered"!&gt;&gt;&lt;&lt;!set reftab2 = reftab!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!set refIndx = ""!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!referencingString + ") REFERENCES "!&gt;&gt;&lt;&lt;!rel.referencedtablename + " (" + string + ");"!&gt;&gt;                  
     &lt;&lt;!end!&gt;&gt;  
     &lt;&lt;!set reftab2 = reftab!&gt;&gt;             
   &lt;&lt;!end!&gt;&gt;
   &lt;&lt;!end!&gt;&gt;
+&lt;&lt;!end!&gt;&gt;
+
+
+&lt;&lt;!for table tbl in MainConn!&gt;&gt;
+&lt;&lt;!if tbl.ispgsrelation!&gt;&gt;
+&lt;&lt;!"CREATE TABLE " + tbl.PGSEdgeName!&gt;&gt;&lt;&lt;!if tbl.columncount &gt; 2!&gt;&gt;&lt;&lt;!" ("!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!set cind = 1!&gt;&gt;&lt;&lt;!set liInd = 1!&gt;&gt;
+&lt;&lt;!for column col in tbl!&gt;&gt;&lt;&lt;!if cind &gt; 2!&gt;&gt;&lt;&lt;!col.value + " " + col.datatype!&gt;&gt;
+&lt;&lt;!if col.length &gt; 0!&gt;&gt;&lt;&lt;!"(" + col.length + ")"!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!if liInd &lt; tbl.columncount!&gt;&gt;&lt;&lt;!","!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!end!&gt;&gt;
+&lt;&lt;!set liInd = liInd + 1!&gt;&gt;&lt;&lt;!set cind = cind + 1!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!if tbl.columncount &gt; 2!&gt;&gt;&lt;&lt;!")"!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!" AS EDGE;"!&gt;&gt;
+&lt;&lt;!end!&gt;&gt;
 &lt;&lt;!end!&gt;&gt;</Text>
         </Template>
         <Template>

@@ -155,9 +155,9 @@ Namespace RDS
         Public Function getOutgoingRelations() As List(Of RDS.Relation)
 
             Try
-                Dim larOutgoingRelation = From Relation In Me.Model.Model.RDS.Relation _
-                                          From Column In Relation.OriginColumns _
-                                          Where Column.Table.Name = Me.Name _
+                Dim larOutgoingRelation = From Relation In Me.Model.Model.RDS.Relation
+                                          From Column In Relation.OriginColumns
+                                          Where Column.Table.Name = Me.Name
                                           Select Relation Distinct
 
                 Return larOutgoingRelation.ToList
@@ -171,6 +171,34 @@ Namespace RDS
                 prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
 
                 Return New List(Of RDS.Relation)
+            End Try
+
+        End Function
+
+        Public Function getPGSEdgeName() As String
+
+            Try
+                If Not Me.FBMModelElement.ConceptType = pcenumConceptType.FactType Then Return "" 'Throw New Exception("Table does not represent a Fact Type.")
+
+                Dim lrFactType = CType(Me.FBMModelElement, FBM.FactType)
+
+                'If Me.isPGSRelation Then Throw New Exception("Table is not a Property Graph Schema Relation/Edge, for Fact Type: '" & lrFactType.Id & "'")
+
+                If lrFactType.FactTypeReading.Count = 0 Then Throw New Exception("Fact Type, '" & lrFactType.Id & "', has no Fact Type Reading.")
+
+                Dim lrFactTypeReading = lrFactType.FactTypeReading(0)
+
+                Return Viev.Strings.MakeLowerCapCamelCase(lrFactTypeReading.PredicatePart(0).PredicatePartText)
+
+            Catch ex As Exception
+                Dim lsMessage1 As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return "ErrorGettingEdgeNameForTable"
             End Try
 
         End Function

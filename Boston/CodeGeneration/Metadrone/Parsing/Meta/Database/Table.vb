@@ -28,6 +28,7 @@ Namespace Parser.Meta.Database
         Private FilteredIndexes As New List(Of IEntity) 'Boston specific. For stepping through Indexes for the Table. Can be List(Of Index) containing Columns
 
         Private mIsPGSRelation As Boolean = False 'Boston specific. True if the Table represents a Property Graph Schema Relation.
+        Private mPGSEdgeName As String = ""
 
         Friend Columns As New List(Of IEntity)
 
@@ -79,6 +80,7 @@ Namespace Parser.Meta.Database
                     Me.AddCol(aarSchemaRow(SchemaRowIdx), Connection)
 
                     Me.mIsPGSRelation = aarSchemaRow(SchemaRowIdx).IsPGSRelation
+                    Me.mPGSEdgeName = aarSchemaRow(SchemaRowIdx).PGSEdgeName
 
                     'Add Relations            
                     For Each lrRelation In aarSchemaRow(SchemaRowIdx).Relation
@@ -251,6 +253,10 @@ Namespace Parser.Meta.Database
                 'set value
                 Me.Value = value
 
+            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_PGSEDGENAME) Then
+                'set value
+                Me.mPGSEdgeName = value
+
             ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_ISPGSRELATION) Then
                 'set value
                 Me.mIsPGSRelation = value
@@ -357,6 +363,11 @@ Namespace Parser.Meta.Database
                 'return value
                 Call Me.CheckParamsForPropertyCall(VARIABLE_ATTRIBUTE_VALUE, Params)
                 Return Me.ReplaceAllList.ApplyReplaces(Me.Value)
+
+            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_PGSEDGENAME) Then 'Boston specific. Not part of original Metadrone.
+                'return mPGSEdgeName
+                Call Me.CheckParamsForPropertyCall(AttribName, Params)
+                Return Me.mPGSEdgeName
 
             ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_ISPGSRELATION) Then 'Boston specific. Not part of original Metadrone.
                 'return mIsPGSRelation

@@ -156,6 +156,9 @@ Namespace SourcePlugins.Boston
                         'Boston specific fields
                         sr.ColumnId = lrColumn.Id
                         sr.IsPGSRelation = lrTable.isPGSRelation
+                        If lrTable.isPGSRelation Then
+                            sr.PGSEdgeName = lrTable.getPGSEdgeName
+                        End If
                         For Each lrRelation In lrColumn.Relation
                             sr.Relation.AddUnique(lrRelation)
                         Next

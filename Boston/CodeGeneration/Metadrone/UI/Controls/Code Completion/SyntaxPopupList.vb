@@ -279,6 +279,7 @@ Namespace UI
                             Me.AddListItem(VARIABLE_ATTRIBUTE_LISTPOS, DOCO_VARIABLE_ATTRIBUTE_LISTPOS, Nothing, SyntaxPopupListItem.Icons.PROPERTY)
 
                             Me.AddListItem(VARIABLE_ATTRIBUTE_ISPGSRELATION, DOCO_VARIABLE_ATTRIBUTE_ISPGSRELATION, Nothing, SyntaxPopupListItem.Icons.PROPERTY)
+                            Me.AddListItem(VARIABLE_ATTRIBUTE_PGSEDGENAME, DOCO_VARIABLE_ATTRIBUTE_PGSEDGENAME, Nothing, SyntaxPopupListItem.Icons.PROPERTY)
                             Me.AddListItem(VARIABLE_ATTRIBUTE_COLUMNCOUNT, DOCO_VARIABLE_ATTRIBUTE_COLUMNCOUNT, Nothing, SyntaxPopupListItem.Icons.PROPERTY)
                             Me.AddListItem(VARIABLE_ATTRIBUTE_PKCOLUMNCOUNT, DOCO_VARIABLE_ATTRIBUTE_PKCOLUMNCOUNT, Nothing, SyntaxPopupListItem.Icons.PROPERTY)
                             Me.AddListItem(VARIABLE_ATTRIBUTE_FKCOLUMNCOUNT, DOCO_VARIABLE_ATTRIBUTE_FKCOLUMNCOUNT, Nothing, SyntaxPopupListItem.Icons.PROPERTY)

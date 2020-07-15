@@ -31,6 +31,7 @@
         Private ColumnIdField As String
         Private AllowZeroLengthField As Boolean
         Private IsPGSRelationField As Boolean
+        Private PGSEdgeNameField As String
         Private RelationField As New List(Of RDS.Relation)  'Boston specific. The Relation to which the Column belongs if this SchemaRow record is for a Column
         Private IndexField As New List(Of RDS.Index)  'Boston specific. The Relation to which the Column belongs if this SchemaRow record is for a Column
 
@@ -101,6 +102,19 @@
             End Get
             Set(ByVal value As String)
                 Me.ColumnIdField = value
+            End Set
+        End Property
+
+        ''' <summary>
+        ''' Boston specific. From DataType of ValueType
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property PGSEdgeName() As String
+            Get
+                Return Me.PGSEdgeNameField
+            End Get
+            Set(ByVal value As String)
+                Me.PGSEdgeNameField = value
             End Set
         End Property
 
