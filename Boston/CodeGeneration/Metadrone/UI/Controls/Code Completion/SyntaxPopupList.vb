@@ -272,9 +272,56 @@ Namespace UI
                     End Select
 
                     Select Case var.Type
-                        Case Parser.CodeCompletion.Variable.Types.TemplateParameter,
-                             Parser.CodeCompletion.Variable.Types.Table,
-                             Parser.CodeCompletion.Variable.Types.View,
+                        Case Parser.CodeCompletion.Variable.Types.Table 'Boston specific. Special for Table for IsPGSRelation
+
+                            Me.AddListItem(VARIABLE_ATTRIBUTE_VALUE, DOCO_VARIABLE_ATTRIBUTE_VALUE, Nothing, SyntaxPopupListItem.Icons.PROPERTY)
+                            Me.AddListItem(VARIABLE_ATTRIBUTE_LISTCOUNT, DOCO_VARIABLE_ATTRIBUTE_LISTCOUNT, Nothing, SyntaxPopupListItem.Icons.PROPERTY)
+                            Me.AddListItem(VARIABLE_ATTRIBUTE_LISTPOS, DOCO_VARIABLE_ATTRIBUTE_LISTPOS, Nothing, SyntaxPopupListItem.Icons.PROPERTY)
+
+                            Me.AddListItem(VARIABLE_ATTRIBUTE_ISPGSRELATION, DOCO_VARIABLE_ATTRIBUTE_ISPGSRELATION, Nothing, SyntaxPopupListItem.Icons.PROPERTY)
+                            Me.AddListItem(VARIABLE_ATTRIBUTE_COLUMNCOUNT, DOCO_VARIABLE_ATTRIBUTE_COLUMNCOUNT, Nothing, SyntaxPopupListItem.Icons.PROPERTY)
+                            Me.AddListItem(VARIABLE_ATTRIBUTE_PKCOLUMNCOUNT, DOCO_VARIABLE_ATTRIBUTE_PKCOLUMNCOUNT, Nothing, SyntaxPopupListItem.Icons.PROPERTY)
+                            Me.AddListItem(VARIABLE_ATTRIBUTE_FKCOLUMNCOUNT, DOCO_VARIABLE_ATTRIBUTE_FKCOLUMNCOUNT, Nothing, SyntaxPopupListItem.Icons.PROPERTY)
+                            Me.AddListItem(VARIABLE_ATTRIBUTE_IDCOLUMNCOUNT, DOCO_VARIABLE_ATTRIBUTE_IDCOLUMNCOUNT, Nothing, SyntaxPopupListItem.Icons.PROPERTY)
+
+                            Select Case var.Type
+                                Case Parser.CodeCompletion.Variable.Types.Procedure, Parser.CodeCompletion.Variable.Types.Function
+                                    Me.AddListItem(VARIABLE_ATTRIBUTE_PARAMCOUNT, DOCO_VARIABLE_ATTRIBUTE_PARAMCOUNT, Nothing, SyntaxPopupListItem.Icons.PROPERTY)
+                                    Me.AddListItem(VARIABLE_ATTRIBUTE_INPARAMCOUNT, DOCO_VARIABLE_ATTRIBUTE_INPARAMCOUNT, Nothing, SyntaxPopupListItem.Icons.PROPERTY)
+                                    Me.AddListItem(VARIABLE_ATTRIBUTE_OUTPARAMCOUNT, DOCO_VARIABLE_ATTRIBUTE_OUTPARAMCOUNT, Nothing, SyntaxPopupListItem.Icons.PROPERTY)
+                                    Me.AddListItem(VARIABLE_ATTRIBUTE_INOUTPARAMCOUNT, DOCO_VARIABLE_ATTRIBUTE_INOUTPARAMCOUNT, Nothing, SyntaxPopupListItem.Icons.PROPERTY)
+                            End Select
+
+                            'Add transforms from the source involved
+                            For Each src In analysis.Sources
+                                If StrEq(src.Name, var.SourceTag) Then
+                                    src.Transforms = New Parser.Syntax.SourceTransforms(src.Name, src.Transformations)
+                                    src.Transforms.Build()
+
+                                    For Each n In src.Transforms.TransformInstructions.Nodes
+                                        Select Case var.Type
+                                            Case Parser.CodeCompletion.Variable.Types.Table, Parser.CodeCompletion.Variable.Types.View
+                                                If StrEq(n.SetSubj, Parser.Syntax.SyntaxToken.TransformTargets.Table.ToString) And Not _
+                                                   Parser.Syntax.Constants.IsSystemAttribute(n.SetSubjAttrib) Then
+                                                    Me.AddListItem(n.SetSubjAttrib, "User defined transformation", Nothing, SyntaxPopupListItem.Icons.TRANSFORMATION)
+                                                End If
+                                            Case Parser.CodeCompletion.Variable.Types.Procedure, Parser.CodeCompletion.Variable.Types.Function
+                                                If StrEq(n.SetSubj, Parser.Syntax.SyntaxToken.TransformTargets.Routine.ToString) And Not _
+                                                   Parser.Syntax.Constants.IsSystemAttribute(n.SetSubjAttrib) Then
+                                                    Me.AddListItem(n.SetSubjAttrib, "User defined transformation", Nothing, SyntaxPopupListItem.Icons.TRANSFORMATION)
+                                                End If
+                                        End Select
+                                    Next
+
+                                    Exit For
+                                End If
+                            Next
+
+                            Me.AddListItem(VARIABLE_METHOD_INDEXOFCOL, DOCO_VARIABLE_METHOD_INDEXOFCOL, VARIABLE_METHOD_INDEXOFCOL & "(""colname"")", SyntaxPopupListItem.Icons.METHOD)
+
+
+                        Case Parser.CodeCompletion.Variable.Types.TemplateParameter, 'Parser.CodeCompletion.Variable.Types.Table,
+                            Parser.CodeCompletion.Variable.Types.View,
                              Parser.CodeCompletion.Variable.Types.Procedure,
                              Parser.CodeCompletion.Variable.Types.Function
                             Me.AddListItem(VARIABLE_ATTRIBUTE_VALUE, DOCO_VARIABLE_ATTRIBUTE_VALUE, Nothing, SyntaxPopupListItem.Icons.PROPERTY)

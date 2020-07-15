@@ -271,16 +271,23 @@ Namespace PGS
                         lrFactType = Me.RDSRelation.ResponsibleFactType
                     End If
 
+                    Dim lrFactTypeReading As FBM.FactTypeReading = Nothing
                     Dim lsPredicate As String = Nothing
+
                     If lrFactType.FactTypeReading.Count = 1 Then
-                        Dim lrFactTypeReading = lrFactType.FactTypeReading(0)
+                        lrFactTypeReading = lrFactType.FactTypeReading(0)
 
                         lsPredicate = lrFactTypeReading.PredicatePart(0).PredicatePartText
                     Else
                         '20200714-VM-Not yet implemented.
                     End If
 
-                    Dim lrRDSTable = Me.Page.ERDiagram.Entity.Find(Function(x) x.Name = lrFactType.Id).getCorrespondingRDSTable
+                    Dim lrRDSTable As RDS.Table
+                    If Me.Page.ERDiagram.Entity.Find(Function(x) x.Name = lrFactType.Id) Is Nothing Then
+                        lrRDSTable = lrFactTypeReading.FactType.getCorrespondingRDSTable
+                    Else
+                        lrRDSTable = Me.Page.ERDiagram.Entity.Find(Function(x) x.Name = lrFactType.Id).getCorrespondingRDSTable
+                    End If
 
                     For Each lrColumn In lrRDSTable.Column
                         '============================================================

@@ -295,6 +295,9 @@ Namespace ERD
             End If
 
         End Sub
+        Public Sub setPredicate()
+            'Not used for ERDLink at this stage.
+        End Sub
 
     End Class
 End Namespace

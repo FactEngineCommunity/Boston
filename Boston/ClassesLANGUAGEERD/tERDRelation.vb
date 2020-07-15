@@ -98,6 +98,8 @@ Namespace ERD
 
         Private Sub RelationFactType_FactTypeReadingModified(ByRef arFactTypeReading As FBM.FactTypeReading) Handles RelationFactType.FactTypeReadingModified
 
+            Call Me.Link.setPredicate
+
         End Sub
 
         Private Sub RDSRelation_DestinationMandatoryChanged(abDestinationIsMandatory As Boolean) Handles RDSRelation.DestinationMandatoryChanged

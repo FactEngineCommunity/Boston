@@ -155,6 +155,7 @@ Namespace SourcePlugins.Boston
 
                         'Boston specific fields
                         sr.ColumnId = lrColumn.Id
+                        sr.IsPGSRelation = lrTable.isPGSRelation
                         For Each lrRelation In lrColumn.Relation
                             sr.Relation.AddUnique(lrRelation)
                         Next

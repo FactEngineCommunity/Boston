@@ -490,7 +490,7 @@ Namespace FBM
             Return New FBM.ModelObject
         End Function
 
-        Public Overridable Function getCorrespondingRDSTable() As RDS.Table
+        Public Overridable Function getCorrespondingRDSTable(Optional ByVal arModelObject As FBM.ModelObject = Nothing) As RDS.Table
             Return New RDS.Table
         End Function
 

@@ -30,6 +30,7 @@
         'Added for Boston. Not in original Metadrone code.
         Private ColumnIdField As String
         Private AllowZeroLengthField As Boolean
+        Private IsPGSRelationField As Boolean
         Private RelationField As New List(Of RDS.Relation)  'Boston specific. The Relation to which the Column belongs if this SchemaRow record is for a Column
         Private IndexField As New List(Of RDS.Index)  'Boston specific. The Relation to which the Column belongs if this SchemaRow record is for a Column
 
@@ -100,6 +101,19 @@
             End Get
             Set(ByVal value As String)
                 Me.ColumnIdField = value
+            End Set
+        End Property
+
+        ''' <summary>
+        ''' Boston specific. From DataType of ValueType
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property IsPGSRelation() As Boolean
+            Get
+                Return Me.IsPGSRelationField
+            End Get
+            Set(ByVal value As Boolean)
+                Me.IsPGSRelationField = value
             End Set
         End Property
 

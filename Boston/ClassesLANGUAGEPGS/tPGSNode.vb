@@ -167,7 +167,7 @@ Namespace PGS
 
         End Sub
 
-        Public Overrides Function getCorrespondingRDSTable() As RDS.Table
+        Public Overrides Function getCorrespondingRDSTable(Optional ByVal arModelObject As FBM.ModelObject = Nothing) As RDS.Table
             Return Me.RDSTable
         End Function
 
