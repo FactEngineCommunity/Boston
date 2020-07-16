@@ -2486,6 +2486,8 @@ Public Class frmToolboxEnterpriseExplorer
 
                 xml = XDocument.Load(Me.DialogOpenFile.FileName)
 
+                Richmond.WriteToStatusBar("Loading model.", True)
+
                 lsXSDVersionNr = xml.<Model>.@XSDVersionNr
                 '=====================================================================================================
                 Dim lrSerializer As XmlSerializer = Nothing
@@ -2586,6 +2588,11 @@ Public Class frmToolboxEnterpriseExplorer
                 '-----------------------------------------
                 Call Me.AddModelToModelExplorer(lrModel, False)
 
+                Richmond.WriteToStatusBar("Saving model.", True)
+                Dim lfrmFlashCard As New frmFlashCard
+                lfrmFlashCard.ziIntervalMilliseconds = 3500
+                lfrmFlashCard.zsText = "Saving model."
+                lfrmFlashCard.Show()
                 Call lrModel.Save(True)
 
                 '================================================================================================================
@@ -2618,6 +2625,12 @@ Public Class frmToolboxEnterpriseExplorer
 
                     Call lrModel.createEntityRelationshipArtifacts()
                     Call lrModel.PopulateRDSStructureFromCoreMDAElements()
+
+                    lfrmFlashCard = New frmFlashCard
+                    lfrmFlashCard.ziIntervalMilliseconds = 3500
+                    lfrmFlashCard.zsText = "Saving model."
+                    lfrmFlashCard.Show(Me)
+                    Richmond.WriteToStatusBar("Saving model.", True)
                     Call lrModel.Save()
                 End If
 

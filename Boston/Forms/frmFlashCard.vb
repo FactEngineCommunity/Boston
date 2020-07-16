@@ -33,7 +33,8 @@
 
     Private Sub Timer_Tick(sender As Object, e As EventArgs) Handles Timer.Tick
 
-        Me.Hide()
+        Me.MdiParent = frmMain
+        'Me.Hide()
         Me.Close()
 
     End Sub
