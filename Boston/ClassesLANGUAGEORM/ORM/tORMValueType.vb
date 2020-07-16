@@ -65,13 +65,13 @@ Namespace FBM
         End Property
 
         Private _DataTypePrecision As Integer
-        <CategoryAttribute("Value Type"), _
-        Browsable(False), _
-        [ReadOnly](False), _
-        BindableAttribute(True), _
-        DefaultValueAttribute(""), _
-        DesignOnly(False), _
-        DescriptionAttribute("The 'Data Type Precision' of the Data Type.")> _
+        <CategoryAttribute("Value Type"),
+        Browsable(False),
+        [ReadOnly](False),
+        BindableAttribute(True),
+        DefaultValueAttribute(""),
+        DesignOnly(False),
+        DescriptionAttribute("The 'Data Type Precision' of the Data Type.")>
         Public Property DataTypePrecision() As Integer
             Get
                 Return Me._DataTypePrecision
@@ -164,16 +164,16 @@ Namespace FBM
         Private _IsIndependent As Boolean = True
         <XmlAttribute()> _
         <CategoryAttribute("Model Object"), _
-        DefaultValueAttribute(False), _
-        DescriptionAttribute("True if the Model Object is independent.")> _
+        DefaultValueAttribute(False),
+        DescriptionAttribute("True if the Model Object is independent.")>
         Public Property IsIndependent As Boolean Implements iFBMIndependence.IsIndependent
             Get
                 If Me.Model Is Nothing Then
                     Return Me._IsIndependent
                 End If
 
-                Dim laoRole = From Role In Me.Model.Role _
-                              Where Role.JoinedORMObject Is Me
+                Dim laoRole = From Role In Me.Model.Role
+                              Where Role.JoinedORMObject.Id = Me.Id
                               Select Role
 
                 Return laoRole.Count = 0
@@ -569,6 +569,9 @@ Namespace FBM
                     Me.AddValueConstraint(asNewValueConstraint)
                 End If
 
+                Me.isDirty = True
+                Me.Model.MakeDirty(False, False)
+
                 '=============================================================================================================================================================
                 '20180401-VM-Can probably reimplement the below with more sophisticated code. Take code from populating a cell in a FactTable when VT has a ValueConstraint.
                 '20170126-VM-Commented out the below.
@@ -745,7 +748,7 @@ Namespace FBM
             End If
 
             Me.isDirty = True
-            Call Me.Model.MakeDirty(False, True)
+            Me.Model.Save()
 
         End Sub
 

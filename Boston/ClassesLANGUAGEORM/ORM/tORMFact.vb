@@ -13,8 +13,16 @@ Namespace FBM
         <XmlIgnore()> _
         Public FactType As FBM.FactType
 
-
-        Public WithEvents Data As New List(Of FBM.FactData)
+        Private _Data As New List(Of FBM.FactData)
+        Public Property Data As List(Of FBM.FactData)
+            Get
+                Return Me._Data
+            End Get
+            Set(value As List(Of FBM.FactData))
+                Me._Data = value
+                If Me.Model.Loaded Then Call Me.makeDirty()
+            End Set
+        End Property
 
         <XmlIgnore()> _
         Public DictionarySet As New Dictionary(Of String, String)
@@ -383,14 +391,13 @@ Namespace FBM
 
         End Function
 
-        Public Shadows Sub makeDirty()
-
-            Me.isDirty = True
+        Public Overridable Shadows Sub makeDirty()
+            MyBase.makeDirty()
+            Me.FactType.isDirty = True
 
             For Each lrFactData In Me.Data
                 lrFactData.isDirty = True
             Next
-
         End Sub
 
         Public Function GetFactDataByRoleId(ByVal asRoleId As String) As FBM.FactData

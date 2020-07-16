@@ -669,6 +669,8 @@ Namespace FBM
             '---------------------------------------
             Try
                 Dim lrConceptInstance As New FBM.ConceptInstance(Me.Model, Me.Page, Me.ValueType.Id, pcenumConceptType.ValueType)
+                lrConceptInstance.X = Me.X
+                lrConceptInstance.Y = Me.Y
                 Call TableConceptInstance.UpdateConceptInstanceByModelPageConceptTypeRoleId(lrConceptInstance, Me.Id)
 
                 Me.Id = Me.ValueType.Id
@@ -687,7 +689,7 @@ Namespace FBM
                     Me.Shape.SetRect(loRectangle, False)
                 End If
 
-                Me.Page.MakeDirty()
+                'Me.Page.MakeDirty()
 
             Catch ex As Exception
                 Dim lsMessage As String
@@ -780,16 +782,16 @@ Namespace FBM
                     Select Case aoChangedPropertyItem.ChangedItem.PropertyDescriptor.Name
                         Case Is = "DataType"
                             Select Case Me.DataType
-                                Case Is = pcenumORMDataType.NumericFloatCustomPrecision, _
-                                          pcenumORMDataType.NumericDecimal, _
+                                Case Is = pcenumORMDataType.NumericFloatCustomPrecision,
+                                          pcenumORMDataType.NumericDecimal,
                                           pcenumORMDataType.NumericMoney
                                     Call Me.SetPropertyAttributes(Me, "DataTypePrecision", True)
                                     Call Me.SetPropertyAttributes(Me, "DataTypeLength", False)
-                                Case Is = pcenumORMDataType.RawDataFixedLength, _
-                                          pcenumORMDataType.RawDataLargeLength, _
-                                          pcenumORMDataType.RawDataVariableLength, _
-                                          pcenumORMDataType.TextFixedLength, _
-                                          pcenumORMDataType.TextLargeLength, _
+                                Case Is = pcenumORMDataType.RawDataFixedLength,
+                                          pcenumORMDataType.RawDataLargeLength,
+                                          pcenumORMDataType.RawDataVariableLength,
+                                          pcenumORMDataType.TextFixedLength,
+                                          pcenumORMDataType.TextLargeLength,
                                           pcenumORMDataType.TextVariableLength
                                     Call Me.SetPropertyAttributes(Me, "DataTypeLength", True)
                                     Call Me.SetPropertyAttributes(Me, "DataTypePrecision", False)
@@ -797,29 +799,36 @@ Namespace FBM
                                     Call Me.SetPropertyAttributes(Me, "DataTypePrecision", False)
                                     Call Me.SetPropertyAttributes(Me, "DataTypeLength", False)
                             End Select
-                            Call Me.ValueType.SetDataType(Me.DataType)
-                            Call Me.Page.Form.EnableSaveButton()
+                            With New WaitCursor
+                                Call Me.ValueType.SetDataType(Me.DataType)
+                            End With
                         Case Is = "DataTypePrecision"
-                            Call Me.ValueType.SetDataTypePrecision(Me.DataTypePrecision)
-                            Call Me.Page.Form.EnableSaveButton()
+                            With New WaitCursor
+                                Call Me.ValueType.SetDataTypePrecision(Me.DataTypePrecision)
+                            End With
                         Case Is = "DataTypeLength"
-                            Call Me.ValueType.SetDataTypeLength(Me.DataTypeLength)
-                            Call Me.Page.Form.EnableSaveButton()
+                            With New WaitCursor
+                                Call Me.ValueType.SetDataTypeLength(Me.DataTypeLength)
+                            End With
                         Case Is = "IsIndependent"
-                            Call Me.ValueType.SetIsIndependent(Me.IsIndependent, True)
-                            Call Me.Page.Form.EnableSaveButton()
+                            If Me.ValueType.IsIndependent = False Then MsgBox("There are Roles joined to this Value Type, so it cannot be independent.")
+                            With New WaitCursor
+                                Call Me.ValueType.SetIsIndependent(Me.IsIndependent, True)
+                            End With
                         Case Is = "ShortDescription"
-                            Call Me.ValueType.SetShortDescription(Me.ShortDescription)
-                            Me.Model.ModelDictionary.Find(Function(x) x.Concept.Symbol = Me.Id).ShortDescription = Me.ShortDescription
+                            With New WaitCursor
+                                Call Me.ValueType.SetShortDescription(Me.ShortDescription)
+                                Me.Model.ModelDictionary.Find(Function(x) x.Concept.Symbol = Me.Id).ShortDescription = Me.ShortDescription
+                            End With
                         Case Is = "LongDescription"
-                            Call Me.ValueType.SetLongDescription(Me.LongDescription)
-                            Me.Model.ModelDictionary.Find(Function(x) x.Concept.Symbol = Me.Id).LongDescription = Me.LongDescription
-                            'Case Is = "ValueConstraintValue"   ...was this
+                            With New WaitCursor
+                                Call Me.ValueType.SetLongDescription(Me.LongDescription)
+                                Me.Model.ModelDictionary.Find(Function(x) x.Concept.Symbol = Me.Id).LongDescription = Me.LongDescription
+                            End With
                         Case Is = "Value"
-
-                            Call Me.ValueType.ModifyValueConstraint(aoChangedPropertyItem.OldValue, aoChangedPropertyItem.ChangedItem.Value.ToString)
-
-                            Me.Page.IsDirty = True
+                            With New WaitCursor
+                                Call Me.ValueType.ModifyValueConstraint(aoChangedPropertyItem.OldValue, aoChangedPropertyItem.ChangedItem.Value.ToString)
+                            End With
                         Case Is = "Name"
                             If Me.ValueType.Name = Me.Name Then
                                 '------------------------------------------------------------
@@ -850,9 +859,11 @@ Namespace FBM
                                     MsgBox("The name of an Value Type can only contain the characters [a-zA-Z0-9].")
                                     Me.Name = Me.ValueType.Name
                                 Else
-                                    Me.ValueType.SetName(Me.Name)
-                                    Me.Id = Me.Name
-                                    Me.Symbol = Me.Name
+                                    With New WaitCursor
+                                        Me.ValueType.SetName(Me.Name)
+                                        Me.Id = Me.Name
+                                        Me.Symbol = Me.Name
+                                    End With
                                 End If
 
                                 If IsSomething(Me.Shape) Then

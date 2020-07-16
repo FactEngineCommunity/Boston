@@ -1389,7 +1389,7 @@ Namespace FBM
             '--------------------------------------------
             'Save any Facts within the FactTypeInstance
             '--------------------------------------------
-            For Each lrFactInstance In Me.Fact
+            For Each lrFactInstance In Me.Fact.FindAll(Function(x) x.isDirty)
                 Try
                     lrFactInstance.Save(abRapidSave)
                 Catch arErr As Exception
@@ -1400,6 +1400,8 @@ Namespace FBM
                     prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, arErr.StackTrace)
                 End Try
             Next
+
+            Me.isDirty = False
 
         End Sub
 

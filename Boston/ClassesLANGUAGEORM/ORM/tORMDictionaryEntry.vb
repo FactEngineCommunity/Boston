@@ -117,8 +117,18 @@ Namespace FBM
         <XmlAttribute()> _
         Public isModelNote As Boolean = False
 
-        <XmlIgnore()> _
-        Public isDirty As Boolean = False
+        <XmlIgnore()>
+        Private _isDirty As Boolean = False
+
+        <XmlIgnore()>
+        Public Property isDirty As Boolean
+            Get
+                Return Me._isDirty
+            End Get
+            Set(value As Boolean)
+                Me._isDirty = value
+            End Set
+        End Property
 
         Public Sub New()
             '-------------
@@ -170,7 +180,7 @@ Namespace FBM
 
             '--------------------------------------------------------
             'NB Me.isDirty = False by default for DictionaryEntries
-            Me.isDirty = abMakeDictionaryEntryDirty
+            If Me.Model.Loaded And Me.Model.Page.FindAll(Function(x) x.Loaded = False) IsNot Nothing Then Me.isDirty = abMakeDictionaryEntryDirty
 
         End Sub
 
@@ -396,7 +406,7 @@ Namespace FBM
             End Select
 
             Me.Realisations.AddUnique(aiConceptType)
-            Me.isDirty = True
+            If Me.Model.Loaded And Me.Model.Page.FindAll(Function(x) x.Loaded = False) IsNot Nothing Then Me.isDirty = True
 
         End Sub
 

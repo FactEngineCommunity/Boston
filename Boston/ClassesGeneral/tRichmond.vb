@@ -464,4 +464,8 @@ Public Class tRichmondApplication
 
         frmMain.ToolStripButton_Save.Enabled = True
     End Sub
+
+    Private Sub WorkingModel_Saved() Handles WorkingModel.Saved
+        frmMain.ToolStripButton_Save.Enabled = False
+    End Sub
 End Class

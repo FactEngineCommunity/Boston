@@ -139,7 +139,7 @@ Namespace FBM
                     Me.Concept = lrDictionaryEntry.Concept
                     Me.Symbol = value
 
-                    Me.isDirty = True
+                    If Me.Model.Loaded And Me.Page.Loaded Then Call Me.makeDirty()
 
                     'lsDebugMessage = "Setting FactData.Concept.Symbol to new Concep/DictionaryEntry: " & value
                     'Call prApplication.ThrowErrorMessage(lsDebugMessage, pcenumErrorType.Information)
@@ -733,13 +733,8 @@ Namespace FBM
                 Me.Fact.FactType.isDirty = True
                 Me.isDirty = True
 
-                If Me.Page Is Nothing Then
-                    Exit Sub
-                Else
-                    Me.Page.MakeDirty()
-                End If
-
-                Me.makeDirty()
+                'NB Me.Page.MakeDirty() is not required here because the above modifies the Symbol.
+                'NB Me.makeDirty() is not required here because the above modifies the Symbol.
 
                 'Call TableConceptInstance.ModifySymbol(lrConceptInstance, Me.FactData.Concept.Symbol)
 
@@ -893,6 +888,10 @@ Namespace FBM
 
         End Sub
 
+        Public Overrides Sub makeDirty()
+            Me.Fact.FactType.isDirty = True
+            Me.Fact.isDirty = True
+        End Sub
         Public Shadows Sub setData(ByVal asData As String, Optional ByRef arConcept As FBM.Concept = Nothing)
 
             Me.Symbol = asData

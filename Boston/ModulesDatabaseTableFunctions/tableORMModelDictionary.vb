@@ -255,8 +255,6 @@ Namespace TableModelDictionary
                             'Call lrDictionaryEntry.GenerateKLIdentityLetter(GetDictionaryEntriesByModel, 1)
                         End If
 
-                        lrDictionaryEntry.isDirty = False
-
                         GetDictionaryEntriesByModel.Add(lrDictionaryEntry)
                         lREcordset.MoveNext()
                     End While

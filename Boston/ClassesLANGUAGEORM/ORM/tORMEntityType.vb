@@ -1917,8 +1917,7 @@ Namespace FBM
             Dim lsMessage As String = ""
 
             Try
-                Dim lrDictionaryEntry As New FBM.DictionaryEntry(Me.Model, Me.Id, pcenumConceptType.EntityType, Me.ShortDescription, Me.LongDescription)
-                lrDictionaryEntry = Me.Model.ModelDictionary.Find(AddressOf lrDictionaryEntry.Equals)
+                Dim lrDictionaryEntry = Me.Model.ModelDictionary.Find(Function(x) x.Symbol = Me.Id)
 
                 '--------------------------------------------------------------------------------
                 'CodeSafe: If there is no dictionary entry for the EntityType, then create one.

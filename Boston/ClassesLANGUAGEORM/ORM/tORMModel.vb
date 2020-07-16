@@ -262,8 +262,10 @@ Namespace FBM
         Public Event ModelUpdated()
         <NonSerialized()> _
         Public Event ModelErrorsUpdated()
-        <NonSerialized()> _
+        <NonSerialized()>
         Public Event RDSColumnAdded(ByRef arColumn As RDS.Column)
+        <NonSerialized()>
+        Public Event Saved()
 
         '--------------------------
         'Parameterless Constructor
@@ -1501,7 +1503,7 @@ Namespace FBM
                             lrDictionaryEntry.AddRealisation(arDictionaryEntry.ConceptType, True)
                         End If
                     End If
-                    arDictionaryEntry.isDirty = True
+                    If Me.Loaded And Me.Page.FindAll(Function(x) x.Loaded = False) IsNot Nothing Then arDictionaryEntry.isDirty = True
                     Me.ModelDictionary.Add(arDictionaryEntry)
                     If abMakeModelDirty Then
                         Me.MakeDirty(False, abCheckForErrors)
@@ -3020,7 +3022,7 @@ Namespace FBM
                 '-------------------------------------------------
                 ' Save the set of Value Types within the ORM Model
                 '-------------------------------------------------
-                For Each lrValueType In Me.ValueType
+                For Each lrValueType In Me.ValueType.FindAll(Function(x) x.isDirty)
                     Call lrValueType.Save(abRapidSave)
                 Next
 
@@ -3790,9 +3792,7 @@ Namespace FBM
             Try
                 ExistsModelElement = False
 
-                Dim lrDictionaryEntry As New FBM.DictionaryEntry(Me, Trim(asModelElementName), pcenumConceptType.ValueType)
-
-                lrDictionaryEntry = Me.ModelDictionary.Find(AddressOf lrDictionaryEntry.EqualsBySymbol)
+                Dim lrDictionaryEntry = Me.ModelDictionary.Find(Function(x) x.Symbol = Trim(asModelElementName))
 
                 If IsSomething(lrDictionaryEntry) Then
                     If lrDictionaryEntry.isValueType Or _

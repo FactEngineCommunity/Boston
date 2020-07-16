@@ -109,7 +109,7 @@ Namespace FBM
                         ''lrNewDictionaryEntry.AddConceptType(pcenumConceptType.Value)
 
                         ''RaiseEvent ConceptSwitched(Me.Concept)
-                        Me.makeDirty()
+                        If Me.Model.Loaded Then Call Me.makeDirty()
                         Call Me.SwitchConcept(lrNewDictionaryEntry.Concept, pcenumConceptType.Value)
 
                         'lsDebugMessage = "FactData.Data.Set"
@@ -441,6 +441,12 @@ Namespace FBM
                 Return Me.ModelError.Count > 0
             End Get
         End Property
+
+        Public Overrides Sub makeDirty()
+            MyBase.makeDirty()
+            Me.Fact.FactType.isDirty = True
+            Me.Fact.isDirty = True
+        End Sub
 
         Public Overrides Function RemoveFromModel(Optional ByVal abForceRemoval As Boolean = False, _
                                                   Optional ByVal abCheckForErrors As Boolean = True,

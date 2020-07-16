@@ -2358,7 +2358,7 @@ Namespace FBM
                 '------------------------------------
                 'Save the FactTypeInstance objects
                 '------------------------------------
-                For Each lrFactTypeInstance In Me.FactTypeInstance
+                For Each lrFactTypeInstance In Me.FactTypeInstance.FindAll(Function(x) x.isDirty)
                     lrFactTypeInstance.Save(abRapidSave)
                     lrFactTypeInstance.FactTable.Save(abRapidSave)
                 Next
@@ -2367,7 +2367,7 @@ Namespace FBM
                 'Save the RoleName objects (if any)
                 '------------------------------------
                 Dim lrRoleInstance As FBM.RoleInstance
-                For Each lrFactTypeInstance In Me.FactTypeInstance
+                For Each lrFactTypeInstance In Me.FactTypeInstance.FindAll(Function(x) x.isDirty)
                     For Each lrRoleInstance In lrFactTypeInstance.RoleGroup
                         If IsSomething(lrRoleInstance.RoleName) Then
                             If lrRoleInstance.Name <> "" Then
