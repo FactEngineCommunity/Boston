@@ -4011,7 +4011,7 @@ Public Class frmDiagramORM
         '-------------------------------------------------------
         'Check to see if the user was clicking over a ShapeNode
         '-------------------------------------------------------
-        lo_point = Diagram.PixelToUnit(e.Location)
+        lo_point = Me.DiagramView.ClientToDoc(e.Location)
 
         For Each lrRoleInstance In Me.zrPage.RoleInstance
             lrRoleInstance.Shape.Brush = New MindFusion.Drawing.SolidBrush(Color.White)

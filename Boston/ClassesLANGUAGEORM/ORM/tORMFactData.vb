@@ -320,17 +320,19 @@ Namespace FBM
                     'Concept - See lrFactData.Data below
                     lrFactData.Model = arModel
                     lrFactData.ConceptType = .ConceptType
+                    If IsSomething(arFactType) Then
+                        lrFactData.FactType = arFactType
+                    End If
+
+                    If IsSomething(arFact) Then
+                        lrFactData.Fact = arFact
+                    End If
+
                     lrFactData.Data = .Data 'NB Sets the 'Concept' attribute
 
                     Dim lrDictionaryEntry As New FBM.DictionaryEntry(arModel, lrFactData.Data, pcenumConceptType.Value)
                     Call arModel.AddModelDictionaryEntry(lrDictionaryEntry)
 
-                    If IsSomething(arFact) Then
-                        lrFactData.Fact = arFact
-                    End If
-                    If IsSomething(arFactType) Then
-                        lrFactData.FactType = arFactType
-                    End If
                     lrFactData.Role = arFactType.RoleGroup.Find(AddressOf .Role.Equals)
                     lrFactData.Symbol = .Symbol
                 End With

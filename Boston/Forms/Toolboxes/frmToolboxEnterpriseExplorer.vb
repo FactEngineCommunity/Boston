@@ -2616,6 +2616,8 @@ Public Class frmToolboxEnterpriseExplorer
                     '==================================================
 
                     Call lrModel.createEntityRelationshipArtifacts()
+                    Call lrModel.PopulateRDSStructureFromCoreMDAElements()
+                    Call lrModel.Save()
                 End If
 
                 frmMain.Cursor = Cursors.Default

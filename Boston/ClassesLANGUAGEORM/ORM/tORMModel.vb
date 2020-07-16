@@ -3069,7 +3069,7 @@ Namespace FBM
 
         End Sub
 
-        Public Sub SaveModelDictionary(Optional ByRef abRapidSave As Boolean = False)
+        Public Sub SaveModelDictionary(Optional ByVal abRapidSave As Boolean = False)
 
             Dim lrConcept As New FBM.Concept
             Dim lrModelDictionaryEntry As FBM.DictionaryEntry
@@ -3077,14 +3077,14 @@ Namespace FBM
             '---------------------------------------------------
             'Save the DictionaryEntries in the ModelDictionary
             '---------------------------------------------------
-            For Each lrModelDictionaryEntry In Me.ModelDictionary.FindAll(Function(x) x.isDirty).ToArray
+            For Each lrModelDictionaryEntry In Me.ModelDictionary.FindAll(Function(x) x.isDirty Or abRapidSave).ToArray
                 '---------------------------------------------------------
                 'CodeSafe: Only save DictionaryEntries with Realisations
                 '---------------------------------------------------------
                 If (lrModelDictionaryEntry.Realisations.Count >= 1) Or lrModelDictionaryEntry.isGeneralConcept Then
                     lrConcept = New FBM.Concept(lrModelDictionaryEntry.Symbol, True)
-                    lrConcept.Save()
-                    Call lrModelDictionaryEntry.Save()
+                    lrConcept.Save(abRapidSave)
+                    Call lrModelDictionaryEntry.Save(abRapidSave)
                 Else
                     '---------------------------------------------------------------------
                     'Remove unnused DictionaryEntries from the ModelDictionary/database.
