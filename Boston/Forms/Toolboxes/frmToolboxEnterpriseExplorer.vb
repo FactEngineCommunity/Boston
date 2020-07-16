@@ -2586,12 +2586,13 @@ Public Class frmToolboxEnterpriseExplorer
                 '-----------------------------------------
                 Call Me.AddModelToModelExplorer(lrModel, False)
 
+                Call lrModel.Save(True)
+
                 '================================================================================================================
                 'RDS
                 If (lrModel.ModelId <> "Core") And lrModel.HasCoreModel Then
                     Call lrModel.PopulateRDSStructureFromCoreMDAElements()
                 ElseIf (lrModel.ModelId <> "Core") Then
-                    Call lrModel.Save(True)
                     '==================================================
                     'RDS - Create a CMML Page and then dispose of it.
                     Dim lrPage As FBM.Page '(lrModel)

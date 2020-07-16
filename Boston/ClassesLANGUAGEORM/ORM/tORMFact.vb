@@ -211,7 +211,6 @@ Namespace FBM
                     lrFactInstance.Page = arPage
                     lrFactInstance.Fact = Me
                     lrFactInstance.Id = .Id
-
                     lrFactInstance.FactType = arPage.FactTypeInstance.Find(Function(x) x.Id = .FactType.Id)
 
                     For Each lrFactData In .Data

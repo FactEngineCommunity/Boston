@@ -576,8 +576,8 @@ Namespace XMLModel
                     '------------------------------------------------
                     'Link to the Concept within the ModelDictionary
                     '------------------------------------------------
-                    Dim lrDictionaryEntry As New FBM.DictionaryEntry(lrModel, lrEntityType.Name, pcenumConceptType.EntityType, , , True)
-                    lrDictionaryEntry = lrModel.AddModelDictionaryEntry(lrDictionaryEntry, , False)
+                    Dim lrDictionaryEntry As New FBM.DictionaryEntry(lrModel, lrEntityType.Name, pcenumConceptType.EntityType, , , True, True)
+                    lrDictionaryEntry = lrModel.AddModelDictionaryEntry(lrDictionaryEntry, , True)
 
                     lrEntityType.Concept = lrDictionaryEntry.Concept
 
@@ -998,7 +998,12 @@ Namespace XMLModel
                                 'The Fact is included on the Page
                                 '----------------------------------
                                 lrFactInstance = lrFact.CloneInstance(lrPage)
+                                lrFactInstance.isDirty = True
+                                For Each lrFactDataInstance In lrFactInstance.Data
+                                    lrFactDataInstance.isDirty = True
+                                Next
                                 lrFactTypeInstance.Fact.Add(lrFactInstance)
+                                lrFactTypeInstance.isDirty = True
 
                                 For Each lrFactDataInstance In lrFactInstance.Data
 
@@ -1177,7 +1182,8 @@ Namespace XMLModel
                 For Each lrXMLFact In lrXMLFactType.Facts
 
                     lrFact = New FBM.Fact(lrXMLFact.Id, arFactType)
-
+                    lrFact.FactType.isDirty = True
+                    lrFact.isDirty = True
                     lrDictionaryEntry = New FBM.DictionaryEntry(arFactType.Model, _
                                                                 lrFact.Id, _
                                                                 pcenumConceptType.Fact, _
@@ -1207,6 +1213,7 @@ Namespace XMLModel
                         Dim lrConcept As FBM.Concept = lrDictionaryEntry.Concept
 
                         Dim lrFactData As New FBM.FactData(lrRole, lrConcept, lrFact)
+                        lrFactData.isDirty = True
                         lrFactData.Model = arFactType.Model
                         '-----------------------------
                         'Add the FactData to the Fact

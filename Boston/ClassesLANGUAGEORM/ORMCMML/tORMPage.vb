@@ -464,9 +464,9 @@ Namespace FBM
 
                 aoBackgroundWorker.ReportProgress(40)
 
-                '================================================================
-                'Double check that Entities are on the Page for each Attributes
-                '================================================================
+                '===============================================================
+                'Double check that Entities are on the Page for each Attribute
+                '===============================================================
                 Dim lsPropertyInstanceId As String
                 Dim lrEntity As New ERD.Entity(lrPage, "")
                 Dim lrAttribute As New ERD.Attribute("DummyId", lrEntity)

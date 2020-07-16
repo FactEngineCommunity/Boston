@@ -55,7 +55,10 @@ Namespace ERD
         Public _PartOfPrimaryKey As Boolean = False
         Public Overridable Property PartOfPrimaryKey() As Boolean
             Get
-                Return Me._PartOfPrimaryKey
+                Dim lbIsPartOfPrimaryKey = (From Index In Me.Column.Index
+                                            Where Index.IsPrimaryKey
+                                            Select Index).Count > 0
+                Return lbIsPartOfPrimaryKey
             End Get
             Set(ByVal value As Boolean)
                 Me._PartOfPrimaryKey = value

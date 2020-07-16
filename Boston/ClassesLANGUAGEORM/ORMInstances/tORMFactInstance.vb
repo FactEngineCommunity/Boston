@@ -457,6 +457,27 @@ Namespace FBM
                 If abRapidSave Then
                     Call TableConceptInstance.AddConceptInstance(lrConceptInstance)
 
+
+                    For Each lrFactDataInstance In Me.Data
+
+                        lrConceptInstance = New FBM.ConceptInstance
+                        lrConceptInstance.ModelId = Me.FactType.Model.ModelId
+                        lrConceptInstance.PageId = Me.Page.PageId
+                        lrConceptInstance.Symbol = lrFactDataInstance.Data
+                        lrConceptInstance.RoleId = lrFactDataInstance.Role.Id
+                        lrConceptInstance.X = lrFactDataInstance.X
+                        lrConceptInstance.Y = lrFactDataInstance.Y
+                        lrConceptInstance.ConceptType = pcenumConceptType.Value
+
+                        'NB Don't use abRapidSave here because more than one Fact can use the same ConceptInstance for its FactData.
+                        If TableConceptInstance.ExistsConceptInstance(lrConceptInstance) Then
+                            Call TableConceptInstance.UpdateConceptInstance(lrConceptInstance)
+                        Else
+                            Dim lrConcept As New FBM.Concept(lrFactDataInstance.Data)
+                            lrConcept.Save()
+                            Call TableConceptInstance.AddConceptInstance(lrConceptInstance)
+                        End If
+                    Next
                 ElseIf Me.isDirty Then
 
                     If TableConceptInstance.ExistsConceptInstance(lrConceptInstance) Then
