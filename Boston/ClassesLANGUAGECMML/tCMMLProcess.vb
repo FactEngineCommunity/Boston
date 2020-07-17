@@ -224,9 +224,16 @@ Namespace CMML
         End Sub
 
         Private Sub UpdateFromModel() Handles FactData.ConceptSymbolUpdated
+            Try
+                Call Me.UpdateGUIFromModel()
+            Catch ex As Exception
+                Dim lsMessage1 As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
-            Call Me.UpdateGUIFromModel()
-
+                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
         End Sub
 
         Friend Sub UpdateGUIFromModel()

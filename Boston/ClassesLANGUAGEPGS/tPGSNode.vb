@@ -3,6 +3,7 @@ Imports System.Xml.Serialization
 Imports MindFusion.Diagramming
 Imports MindFusion.Drawing
 Imports System.Reflection
+Imports Boston.RDS
 
 Namespace PGS
 
@@ -161,7 +162,7 @@ Namespace PGS
             loDroppedNode.Tag = Me
 
             Me.Shape = loDroppedNode
-            Me.FactDataInstance.shape = loDroppedNode
+            Me.FactDataInstance.Shape = loDroppedNode
 
             loDroppedNode.Image = My.Resources.ORMShapes.Blank
 
@@ -197,8 +198,8 @@ Namespace PGS
 
         Public Sub NodeDeselected() Implements FBM.iPageObject.NodeDeselected
 
-            Me.shape.Image = My.Resources.ORMShapes.Blank
-            Me.shape.Pen.Color = Color.DeepSkyBlue
+            Me.Shape.Image = My.Resources.ORMShapes.Blank
+            Me.Shape.Pen.Color = Color.DeepSkyBlue
 
         End Sub
 
@@ -407,6 +408,9 @@ Namespace PGS
 
         End Sub
 
+        Private Sub RDSTable_ColumnAdded(ByRef arColumn As Column) Handles RDSTable.ColumnAdded
+            Call Me.Page.AddAttributeToEntity(arColumn)
+        End Sub
     End Class
 
 End Namespace

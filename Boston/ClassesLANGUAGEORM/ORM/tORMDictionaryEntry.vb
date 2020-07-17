@@ -1,5 +1,6 @@
 ﻿Imports System.Xml.Serialization
 Imports System.ComponentModel
+Imports System.Reflection
 
 Namespace FBM
 
@@ -569,9 +570,19 @@ Namespace FBM
 
         Private Sub Concept_Updated() Handles Concept.ConceptSymbolUpdated
 
-            Call TableModelDictionary.ModifySymbol(Me.Model, Me, Me.Concept.Symbol, pcenumConceptType.EntityType)
+            Try
+                Call TableModelDictionary.ModifySymbol(Me.Model, Me, Me.Concept.Symbol, pcenumConceptType.EntityType)
 
-            Me.Symbol = Me.Concept.Symbol
+                Me.Symbol = Me.Concept.Symbol
+
+            Catch ex As Exception
+                Dim lsMessage1 As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
         End Sub
 

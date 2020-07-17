@@ -500,7 +500,7 @@ Namespace FBM
         ''' </summary>
         ''' <remarks></remarks>
         Public Overridable Sub makeDirty()
-            Call Me.Model.MakeDirty()
+            Call Me.Model.MakeDirty(False, False)
             Me.isDirty = True
 
         End Sub

@@ -1313,12 +1313,15 @@ Namespace ORMQL
                     lrModelDictionaryEntry = Me.Model.AddModelDictionaryEntry(lrModelDictionaryEntry, True, True, False)
 
                     lrFactData = New FBM.FactData(lrRole, lrModelDictionaryEntry.Concept, lrFact)
+                    lrFact.isDirty = True
 
                     lrFact.Data.Add(lrFactData)
+                    lrFact.isDirty = True
                     liInd += 1
                 Next
 
                 lrFactType.AddFact(lrFact)
+                lrFactType.isDirty = True
 
                 '---------------------------------------------------
                 'Check to see if the Fact is to be added to a Page
@@ -1340,12 +1343,14 @@ Namespace ORMQL
                         If IsSomething(lrFactTypeInstance) Then
                             Dim lrFactInstance As FBM.FactInstance
                             lrFactTypeInstance.FactTable.TableShape.AddRow()
+
                             lrFactInstance = lrPage.CreateFactInstance(lrFactTypeInstance, lrFact)
 
                             '--------------------------------------------------
                             'Add the new FactInstance to the FactTypeInstance
                             '--------------------------------------------------
                             lrFactTypeInstance.AddFactInstance(lrFactInstance)
+                            lrFactTypeInstance.isDirty = True
 
                             lrFactTypeInstance.FactTable.ResortFactTable()
 

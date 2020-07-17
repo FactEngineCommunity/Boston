@@ -483,6 +483,7 @@ Namespace FBM
             With Me                
                 lrEntity.Model = .Model
                 lrEntity.Page = arPage
+                lrEntity.Fact = .Fact
                 lrEntity.FactData = Me.FactData
                 lrEntity.Name = .Concept.Symbol
                 lrEntity.FactDataInstance = Me
@@ -891,6 +892,7 @@ Namespace FBM
         Public Overrides Sub makeDirty()
             Me.Fact.FactType.isDirty = True
             Me.Fact.isDirty = True
+            Me.isDirty = True
         End Sub
         Public Shadows Sub setData(ByVal asData As String, Optional ByRef arConcept As FBM.Concept = Nothing)
 

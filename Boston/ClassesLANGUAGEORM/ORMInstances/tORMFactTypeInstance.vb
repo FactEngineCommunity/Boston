@@ -726,10 +726,15 @@ Namespace FBM
 
             Dim lrFactInstance As FBM.FactInstance
 
-            lrFactInstance = arFact.CloneInstance(Me.Page)
+            lrFactInstance = arFact.CloneInstance(Me.Page, False, True)
 
+            lrFactInstance.isDirty = True
+            Me.isDirty = True
+            Me.Page.IsDirty = True
             Me.Fact.Add(lrFactInstance)
+
             Me.Page.FactInstance.Add(lrFactInstance)
+
             If IsSomething(Me.FactTable) And abResortFactTable Then
                 Call Me.FactTable.ResortFactTable()
                 'Me.FactTable.TableShape.ResizeToFitText(True)

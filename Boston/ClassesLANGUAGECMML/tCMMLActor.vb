@@ -1,6 +1,7 @@
 ﻿Imports System.ComponentModel
 Imports MindFusion.Diagramming
 Imports System.Xml.Serialization
+Imports System.Reflection
 
 Namespace CMML
     <Serializable()> _
@@ -165,9 +166,17 @@ Namespace CMML
         End Sub
 
         Private Sub UpdateFromModel() Handles FactData.ConceptSymbolUpdated
+            Try
+                Me.Data = MyBase.FactData.Data
+                Call Me.UpdateGUIFromModel()
+            Catch ex As Exception
+                Dim lsMessage1 As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
-            Me.Data = MyBase.FactData.Data
-            Call Me.UpdateGUIFromModel()
+                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
         End Sub
 

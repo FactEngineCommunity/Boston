@@ -136,11 +136,13 @@
                                 Try
                                     lrFact = arFactTypeInstance.FactType.Fact.Find(Function(x) x.Id = lsFactId)
                                     lrFactInstance = lrFact.CloneInstance(arFactTypeInstance.Page, True)
+                                    lrFactInstance.isDirty = True
+                                    arFactTypeInstance.isDirty = True
+                                    arFactTypeInstance.Page.IsDirty = True
                                     For Each lrFactDataInstance In lrFactInstance.Data
                                         arFactTypeInstance.Page.ValueInstance.Add(lrFactDataInstance)
                                         lrFactDataInstance.Role.Data.AddUnique(lrFactDataInstance)
                                     Next
-                                    lrFactInstance.Save()
                                 Catch ex As Exception
                                     Dim lsMessage As String
                                     lsMessage = "Error: GetFactsForFactTypeInstance:"

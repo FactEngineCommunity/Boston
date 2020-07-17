@@ -435,9 +435,7 @@ Namespace FBM
         End Function
 
         Public Overrides Sub makeDirty()
-            MyBase.makeDirty()
-            Me.Fact.FactType.isDirty = True
-            Me.Fact.isDirty = True
+            Me.FactType.isDirty = True
             Me.isDirty = True
         End Sub
 

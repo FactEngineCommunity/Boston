@@ -1295,7 +1295,35 @@ Namespace FBM
             Try
                 Dim larRolesToReturn As New List(Of FBM.Role)
 
-                If Me.FactType.HasTotalRoleConstraint Or Me.FactType.HasPartialButMultiRoleConstraint _
+                If (Me.FactType.IsManyTo1BinaryFactType Or Me.FactType.Is1To1BinaryFactType) And Me.HasInternalUniquenessConstraint Then
+
+                    Dim lrOtherRoleInFactType = Me.FactType.GetOtherRoleOfBinaryFactType(Me.Id)
+
+                    Select Case lrOtherRoleInFactType.JoinedORMObject.ConceptType
+                        Case Is = pcenumConceptType.FactType
+                            larRolesToReturn.AddRange(Me.FactType.GetOtherRoleOfBinaryFactType(Me.Id).getDownstreamRoleActiveRoles(aarCoveredRoles))
+                        Case Is = pcenumConceptType.ValueType
+                            larRolesToReturn.Add(lrOtherRoleInFactType)
+
+                        Case Is = pcenumConceptType.EntityType
+
+                            If lrOtherRoleInFactType.JoinsEntityType.HasSimpleReferenceScheme Then
+
+                                aarCoveredRoles.AddUnique(lrOtherRoleInFactType.JoinsEntityType.ReferenceModeFactType.RoleGroup(0))
+                                aarCoveredRoles.AddUnique(lrOtherRoleInFactType.JoinsEntityType.ReferenceModeFactType.RoleGroup(1))
+
+                                larRolesToReturn.Add(lrOtherRoleInFactType.JoinsEntityType.ReferenceModeFactType.RoleGroup(1))
+
+                            ElseIf Me.JoinsEntityType.HasCompoundReferenceMode Then
+
+                                larRolesToReturn.AddRange(Me.JoinsEntityType.getDownstreamActiveRoles(aarCoveredRoles))
+                            Else
+                                larRolesToReturn.AddUnique(lrOtherRoleInFactType)
+                            End If
+
+                    End Select
+
+                ElseIf Me.FactType.HasTotalRoleConstraint Or Me.FactType.HasPartialButMultiRoleConstraint _
                     Or Me.JoinedORMObject.ConceptType = pcenumConceptType.FactType Then
 
                     Select Case Me.JoinedORMObject.ConceptType
@@ -1330,34 +1358,6 @@ Namespace FBM
                                 aarCoveredRoles.Add(lrRole)
                                 larRolesToReturn.AddRange(lrRole.getDownstreamRoleActiveRoles(aarCoveredRoles))
                             Next
-
-                    End Select
-
-                ElseIf Me.FactType.IsManyTo1BinaryFactType And Me.HasInternalUniquenessConstraint Then
-
-                    Dim lrJoinedModelObject = Me.FactType.GetOtherRoleOfBinaryFactType(Me.Id)
-
-                    Select Case lrJoinedModelObject.JoinedORMObject.ConceptType
-                        Case Is = pcenumConceptType.FactType
-                            larRolesToReturn.AddRange(Me.FactType.GetOtherRoleOfBinaryFactType(Me.Id).getDownstreamRoleActiveRoles(aarCoveredRoles))
-                        Case Is = pcenumConceptType.ValueType
-                            larRolesToReturn.Add(Me)
-
-                        Case Is = pcenumConceptType.EntityType
-
-                            If Me.JoinsEntityType.HasSimpleReferenceScheme Then
-
-                                aarCoveredRoles.AddUnique(Me.JoinsEntityType.ReferenceModeFactType.RoleGroup(0))
-                                aarCoveredRoles.AddUnique(Me.JoinsEntityType.ReferenceModeFactType.RoleGroup(1))
-
-                                larRolesToReturn.Add(Me.JoinsEntityType.ReferenceModeFactType.RoleGroup(1))
-
-                            ElseIf Me.JoinsEntityType.HasCompoundReferenceMode Then
-
-                                larRolesToReturn.AddRange(Me.JoinsEntityType.getDownstreamActiveRoles(aarCoveredRoles))
-                            Else
-                                larRolesToReturn.AddUnique(Me)
-                            End If
 
                     End Select
 
@@ -1776,6 +1776,12 @@ Namespace FBM
 
         'End Sub
 
+        Public Overrides Sub makeDirty()
+            Me.FactType.isDirty = True
+            Me.isDirty = True
+        End Sub
+
+
         ''' <summary>
         ''' Reassigns the joined ModelObject of the Role.
         ''' NB The name of the FactType of the Role must be modified to reflect the new relation.
@@ -1807,6 +1813,15 @@ Namespace FBM
                     'Simple case first, for where Role is Many on ManyToOne FactType linked
                     '  to a ModelObject that is a table. I.e. Linked to an EntityType or an Objectified Fact Type
                     '===================================
+                    Me.JoinedORMObject = arNewJoinedModelObject
+                    Select Case Me.JoinedORMObject.ConceptType
+                        Case Is = pcenumConceptType.ValueType
+                            Me.JoinsValueType = arNewJoinedModelObject
+                        Case Is = pcenumConceptType.EntityType
+                            Me.JoinsEntityType = arNewJoinedModelObject
+                        Case Is = pcenumConceptType.FactType
+                            Me.JoinsFactType = arNewJoinedModelObject
+                    End Select
                     If Me.HasInternalUniquenessConstraint And (Me.FactType.IsManyTo1BinaryFactType Or Me.FactType.Is1To1BinaryFactType) Then
                         '=========================================================
                         'PSEUDOCODE
@@ -1823,14 +1838,17 @@ Namespace FBM
                         Dim larDownstreamActiveRoles = Me.getDownstreamRoleActiveRoles(larCoveredRoles) 'Returns all Roles joined ObjectifiedFactTypes and their Roles' JoinedORMObjects (recursively).
 
                         'Create the new Column/s in the newly joined Table
+                        Dim lrNewColumn As New RDS.Column
                         For Each lrActiveRole In larDownstreamActiveRoles
                             'Dim lrOriginalColumn = larOriginalColumn.Find(Function(x) x.ActiveRole Is lrActiveRole)
-                            Dim lrNewColumn As New RDS.Column(lrNewTable,
-                                                          lrActiveRole.JoinedORMObject.Id,
-                                                          Me,
-                                                          lrActiveRole,
-                                                          Me.Mandatory)
-                            lrNewTable.addColumn(lrNewColumn)
+                            lrNewColumn = New RDS.Column(lrNewTable,
+                                                         lrActiveRole.JoinedORMObject.Id,
+                                                         Me,
+                                                         lrActiveRole,
+                                                         Me.Mandatory)
+                            If lrNewTable.Column.Find(Function(x) x.Role.Id = Me.Id) Is Nothing Then
+                                lrNewTable.addColumn(lrNewColumn)
+                            End If
                         Next
 
                         'Remove the Original Relation
@@ -1860,7 +1878,7 @@ Namespace FBM
                                     Me.JoinsValueType = Nothing
                             End Select
 
-                        Me.isDirty = True
+                        Me.makeDirty()
 
 
                         'Create a Relation for the reassigned Role

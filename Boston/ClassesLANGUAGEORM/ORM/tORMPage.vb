@@ -1623,7 +1623,7 @@ Namespace FBM
                 'Create a new FactInstance for the new Fact
                 '---------------------------------------------
                 lrFactInstance = New FBM.FactInstance(arFact, arFactTypeInstance)
-
+                lrFactInstance.isDirty = True
                 '-------------------------------------------------------------
                 'Create the FactDataInstances to attach to the Cells of the
                 '  new Fact/row in the FactTable
@@ -1639,6 +1639,8 @@ Namespace FBM
                     lrFactDataInstance.Fact = lrFactInstance
                     lrFactDataInstance.TableShape = arFactTypeInstance.FactTable.TableShape
                     lrFactDataInstance.Cell = arFactTypeInstance.FactTable.TableShape.Item(liInd, liRowNr)
+                    lrFactDataInstance.isDirty = True
+
                     arFactTypeInstance.FactTable.TableShape.Item(liInd, liRowNr).Text = Trim(lrFactDataInstance.Concept.Symbol)
                     arFactTypeInstance.FactTable.TableShape.Item(liInd, liRowNr).Tag = lrFactDataInstance
                     lrFactDataInstance.Cell.Tag = lrFactDataInstance

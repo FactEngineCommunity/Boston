@@ -356,7 +356,9 @@ Namespace FBM
         ''' <param name="arFactInstance">The FactInstance for the FactDataInstance. Provide if adding directly to the FactInstance when FactTypeInstance.Fact does not contain the FactInstance</param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Shadows Function CloneInstance(ByRef arPage As FBM.Page, Optional ByRef arFactInstance As FBM.FactInstance = Nothing) As FBM.FactDataInstance
+        Public Shadows Function CloneInstance(ByRef arPage As FBM.Page,
+                                              Optional ByRef arFactInstance As FBM.FactInstance = Nothing,
+                                              Optional ByVal abMakeFactDataDirty As Boolean = False) As FBM.FactDataInstance
 
             Dim lrFactDataInstance As New FBM.FactDataInstance
             Dim lrFactTypeInstance As FBM.FactTypeInstance
@@ -445,9 +447,18 @@ Namespace FBM
         End Property
 
         Public Overrides Sub makeDirty()
-            MyBase.makeDirty()
-            Me.Fact.FactType.isDirty = True
-            Me.Fact.isDirty = True
+            Try
+                Me.isDirty = True
+                Me.Fact.isDirty = True
+                Me.Fact.FactType.isDirty = True
+            Catch ex As Exception
+                Dim lsMessage1 As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
         End Sub
 
         Public Overrides Function RemoveFromModel(Optional ByVal abForceRemoval As Boolean = False, _
@@ -600,8 +611,17 @@ Namespace FBM
         'End Sub
 
         Private Sub update_from_concept() Handles Concept.ConceptSymbolUpdated
-            RaiseEvent ConceptSymbolUpdated()
-            Me.makeDirty()
+            Try
+                RaiseEvent ConceptSymbolUpdated()
+                Me.makeDirty()
+            Catch ex As Exception
+                Dim lsMessage1 As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
         End Sub
 
         Public Function GetSchema() As System.Xml.Schema.XmlSchema Implements System.Xml.Serialization.IXmlSerializable.GetSchema

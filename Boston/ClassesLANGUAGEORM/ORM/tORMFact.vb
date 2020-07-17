@@ -200,7 +200,9 @@ Namespace FBM
 
         End Function
 
-        Public Shadows Function CloneInstance(ByRef arPage As FBM.Page, Optional ByVal abAddToPage As Boolean = False) As FBM.FactInstance
+        Public Shadows Function CloneInstance(ByRef arPage As FBM.Page,
+                                              Optional ByVal abAddToPage As Boolean = False,
+                                              Optional ByVal abMakeFactDataDirty As Boolean = False) As FBM.FactInstance
 
             Dim lrFactInstance As New FBM.FactInstance
             Dim lrFactData As FBM.FactData
@@ -214,7 +216,7 @@ Namespace FBM
                     lrFactInstance.FactType = arPage.FactTypeInstance.Find(Function(x) x.Id = .FactType.Id)
 
                     For Each lrFactData In .Data
-                        lrFactInstance.Data.Add(lrFactData.CloneInstance(arPage, lrFactInstance))
+                        lrFactInstance.Data.Add(lrFactData.CloneInstance(arPage, lrFactInstance, abMakeFactDataDirty))
                     Next
 
                     If abAddToPage Then
@@ -391,12 +393,12 @@ Namespace FBM
         End Function
 
         Public Overridable Shadows Sub makeDirty()
-            MyBase.makeDirty()
-            Me.FactType.isDirty = True
 
+            Me.FactType.isDirty = True
             For Each lrFactData In Me.Data
                 lrFactData.isDirty = True
             Next
+            Me.isDirty = True
         End Sub
 
         Public Function GetFactDataByRoleId(ByVal asRoleId As String) As FBM.FactData
