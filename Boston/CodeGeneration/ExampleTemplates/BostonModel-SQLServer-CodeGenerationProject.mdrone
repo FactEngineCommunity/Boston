@@ -21,7 +21,7 @@
     <Source>
       <Name>Source</Name>
       <Provider>BostonModel</Provider>
-      <BostonModelId>aa8f9065-6c94-45d7-ae50-b4c3e1ffd332</BostonModelId>
+      <BostonModelId>30cfd566-4a6d-4855-b1cf-fb7616c12730</BostonModelId>
       <ConnectionString>None Required</ConnectionString>
       <SchemaQuery>Boston Model direct query. No need for a Schema Query here at all</SchemaQuery>
       <TableSchemaQuery>Boston Model direct query. No need for a Schema Query here at all</TableSchemaQuery>
