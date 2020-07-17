@@ -3964,7 +3964,7 @@ Namespace FBM
                 Me.ValueType = TableValueType.GetValueTypesByModel(Me)
             End If
 
-            If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(1)
+            If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(10)
 
             '------------------------------------
             'Get EntityTypes
@@ -3981,7 +3981,7 @@ Namespace FBM
                 Me.EntityType = TableEntityType.getEntityTypesByModel(Me)
             End If
 
-            If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(2)
+            If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(20)
 
             '------------------------------------
             'Get FactTypes
@@ -3998,11 +3998,11 @@ Namespace FBM
                 TableFactType.GetFactTypesByModel(Me, True)
             End If
 
-            If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(3)
+            If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(30)
 
             Call TableSubtypeRelationship.GetSubtypeRelationshipsByModel(Me)
 
-            If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(3)
+            If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(40)
 
             '---------------------------------------------------
             'Get RoleConstraints 
@@ -4016,7 +4016,7 @@ Namespace FBM
                 Me.RoleConstraint = TableRoleConstraint.GetRoleConstraintsByModel(Me)
             End If
 
-            If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(4)
+            If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(45)
 
             '-----------------------------------------------------------------------------
             'Set the ReferenceMode ObjectTypes for each of the EntityTypes in the Model
@@ -4026,7 +4026,7 @@ Namespace FBM
                 Call lrEntityType.SetReferenceModeObjects()
             Next
 
-            If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(4)
+            If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(50)
 
             '-----------------------------------
             'Load the ModelNotes for the Model
@@ -4039,7 +4039,7 @@ Namespace FBM
                 Me.ModelNote = TableModelNote.getModelNotesByModel(Me)
             End If
 
-            If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(5)
+            If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(55)
 
             '------------------------------------
             'Load the Pages for the Model
