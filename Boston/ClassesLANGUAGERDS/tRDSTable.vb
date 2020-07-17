@@ -501,9 +501,11 @@ Namespace RDS
 
         End Function
 
-        Private Sub FBMModelElement_NameChanged(asNewName As String) Handles FBMModelElement.NameChanged
+        Private Sub FBMModelElement_NameChanged(ByVal asNewName As String) Handles FBMModelElement.NameChanged
 
             Me.Name = asNewName
+
+            RaiseEvent NameChanged(asNewName)
 
         End Sub
 

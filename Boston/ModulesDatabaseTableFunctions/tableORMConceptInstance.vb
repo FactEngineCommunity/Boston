@@ -9,7 +9,6 @@ Namespace TableConceptInstance
             Dim lsSQLQuery As String = ""
 
             Try
-
                 lsSQLQuery = "INSERT INTO ModelConceptInstance"
                 lsSQLQuery &= "  VALUES("
                 lsSQLQuery &= " #" & Now & "#"
@@ -55,6 +54,7 @@ Namespace TableConceptInstance
                 lsSQLQuery &= "   AND PageId = '" & arConceptInstance.PageId & "'"
                 lsSQLQuery &= "   AND Symbol = '" & arConceptInstance.Symbol & "'"
                 lsSQLQuery &= "   AND ConceptType = '" & arConceptInstance.ConceptType.ToString & "'"
+                lsSQLQuery &= "   AND RoleId = '" & arConceptInstance.RoleId & "'"
 
                 pdbConnection.BeginTrans()
                 pdbConnection.Execute(lsSQLQuery)

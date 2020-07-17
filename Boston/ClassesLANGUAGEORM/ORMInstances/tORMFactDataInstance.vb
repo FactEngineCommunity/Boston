@@ -716,9 +716,12 @@ Namespace FBM
                 lrConceptInstance.RoleId = Me.Role.Id
 
                 If TableConceptInstance.ExistsConceptInstance(lrNewConceptInstance) Then 'If the NEW ConceptInstance exists
-                    Call TableConceptInstance.DeleteConceptInstance(lrConceptInstance) 'We don't need the original Concept Instance for the Model, Page, Symbol, Role
+                    Call TableConceptInstance.DeleteConceptInstance(lrConceptInstance) 'We don't need the original Concept Instance for the Model, Page, Symbol, Role                    
                 Else
                     Call TableConceptInstance.ModifySymbol(lrConceptInstance, Me.FactData.Concept.Symbol) 'Update the EXISTING ConceptInstance to the NEW ConceptInstance
+                    If Not TableConceptInstance.ExistsConceptInstance(lrNewConceptInstance) Then
+                        TableConceptInstance.AddConceptInstance(lrNewConceptInstance)
+                    End If
                 End If
 
                 '20180718-VM-Removed because of the above.
@@ -942,6 +945,15 @@ Namespace FBM
             Return lr_state
 
         End Function
+
+        Private Sub FactData_RemovedFromModel() Handles FactData.RemovedFromModel
+
+            Dim lrConceptInstance As New FBM.ConceptInstance(Me.Model, Me.Page, Me.Data, pcenumConceptType.Value)
+            lrConceptInstance.RoleId = Me.Role.Id
+
+            Call TableConceptInstance.DeleteConceptInstance(lrConceptInstance)
+
+        End Sub
 
     End Class
 

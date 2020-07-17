@@ -1208,8 +1208,6 @@ Namespace XMLModel
                                                                     , True
                                                                     )
 
-                        If LCase(lrXMLFactData.Data) = "involves" Then Debugger.Break()
-
                         lrDictionaryEntry = arFactType.Model.AddModelDictionaryEntry(lrDictionaryEntry)
 
                         Dim lrConcept As FBM.Concept = lrDictionaryEntry.Concept

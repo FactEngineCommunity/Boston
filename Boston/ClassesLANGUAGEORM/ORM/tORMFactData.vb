@@ -183,6 +183,7 @@ Namespace FBM
         Public Shadows Event ConceptSymbolUpdated()
         'Public Shadows Event ConceptSwitched(ByRef arConcept As FBM.Concept)
         Public Event ModelErrorAdded(ByRef arModelError As ModelError) Implements iValidationErrorHandler.ModelErrorAdded
+        Public Event RemovedFromModel()
 
         Public Sub New()
             '------------------------------------
@@ -473,6 +474,8 @@ Namespace FBM
 
             Dim lrDictionaryEntry As New FBM.DictionaryEntry(Me.Model, Me.Data, pcenumConceptType.Value)
             Call Me.Model.DeprecateRealisationsForDictionaryEntry(lrDictionaryEntry, pcenumConceptType.Value)
+
+            RaiseEvent RemovedFromModel()
 
         End Function
 
