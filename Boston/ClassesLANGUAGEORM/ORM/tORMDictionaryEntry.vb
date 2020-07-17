@@ -1,5 +1,6 @@
 ﻿Imports System.Xml.Serialization
 Imports System.ComponentModel
+Imports System.Reflection
 
 Namespace FBM
 
@@ -117,8 +118,18 @@ Namespace FBM
         <XmlAttribute()> _
         Public isModelNote As Boolean = False
 
-        <XmlIgnore()> _
-        Public isDirty As Boolean = False
+        <XmlIgnore()>
+        Private _isDirty As Boolean = False
+
+        <XmlIgnore()>
+        Public Property isDirty As Boolean
+            Get
+                Return Me._isDirty
+            End Get
+            Set(value As Boolean)
+                Me._isDirty = value
+            End Set
+        End Property
 
         Public Sub New()
             '-------------
@@ -170,13 +181,13 @@ Namespace FBM
 
             '--------------------------------------------------------
             'NB Me.isDirty = False by default for DictionaryEntries
-            Me.isDirty = abMakeDictionaryEntryDirty
+            If Me.Model.Loaded And Me.Model.Page.FindAll(Function(x) x.Loaded = False) IsNot Nothing Then Me.isDirty = abMakeDictionaryEntryDirty
 
         End Sub
 
         Public Shadows Function Equals(ByVal other As FBM.DictionaryEntry) As Boolean Implements System.IEquatable(Of FBM.DictionaryEntry).Equals
 
-            If Me.Symbol = other.Symbol Then
+            If LCase(Me.Symbol) = LCase(other.Symbol) Then
                 Return True
             Else
                 Return False
@@ -396,7 +407,7 @@ Namespace FBM
             End Select
 
             Me.Realisations.AddUnique(aiConceptType)
-            Me.isDirty = True
+            If Me.Model.Loaded And Me.Model.Page.FindAll(Function(x) x.Loaded = False) IsNot Nothing Then Me.isDirty = True
 
         End Sub
 
@@ -559,9 +570,19 @@ Namespace FBM
 
         Private Sub Concept_Updated() Handles Concept.ConceptSymbolUpdated
 
-            Call TableModelDictionary.ModifySymbol(Me.Model, Me, Me.Concept.Symbol, pcenumConceptType.EntityType)
+            Try
+                Call TableModelDictionary.ModifySymbol(Me.Model, Me, Me.Concept.Symbol, pcenumConceptType.EntityType)
 
-            Me.Symbol = Me.Concept.Symbol
+                Me.Symbol = Me.Concept.Symbol
+
+            Catch ex As Exception
+                Dim lsMessage1 As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
         End Sub
 

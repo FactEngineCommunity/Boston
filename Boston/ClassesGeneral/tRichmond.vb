@@ -434,7 +434,6 @@ Public Class tRichmondApplication
 
                             If abAbortApplication Then Call Application.Exit()
 
-
                         End If
 
                 End Select
@@ -463,5 +462,9 @@ Public Class tRichmondApplication
     Private Sub WorkingModel_MadeDirty(abGlobalBroadcast As Boolean) Handles WorkingModel.MadeDirty
 
         frmMain.ToolStripButton_Save.Enabled = True
+    End Sub
+
+    Private Sub WorkingModel_Saved() Handles WorkingModel.Saved
+        frmMain.ToolStripButton_Save.Enabled = False
     End Sub
 End Class

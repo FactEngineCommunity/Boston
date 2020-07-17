@@ -262,8 +262,10 @@ Namespace FBM
         Public Event ModelUpdated()
         <NonSerialized()> _
         Public Event ModelErrorsUpdated()
-        <NonSerialized()> _
+        <NonSerialized()>
         Public Event RDSColumnAdded(ByRef arColumn As RDS.Column)
+        <NonSerialized()>
+        Public Event Saved()
 
         '--------------------------
         'Parameterless Constructor
@@ -426,11 +428,9 @@ Namespace FBM
             'Add a new DictionaryEntry to the ModelDictionary if the DictionaryEntry doesn't already exist.
             '------------------------------------------------------------------------------------------------
             Dim asSymbol As String = arEntityType.Id
-            lrDictionaryEntry = Me.ModelDictionary.Find(Function(x) x.Symbol = asSymbol)
-            If lrDictionaryEntry Is Nothing Then
-                lrDictionaryEntry = Me.AddModelDictionaryEntry(New FBM.DictionaryEntry(Me, arEntityType.Id, pcenumConceptType.EntityType))
-                Me.MakeDirty()
-            End If
+
+            lrDictionaryEntry = Me.AddModelDictionaryEntry(New FBM.DictionaryEntry(Me, arEntityType.Id, pcenumConceptType.EntityType))
+
 
             arEntityType.Concept = lrDictionaryEntry.Concept
             arEntityType.ShortDescription = lrDictionaryEntry.ShortDescription
@@ -604,10 +604,7 @@ Namespace FBM
                 'Add a new DictionaryEntry to the ModelDictionary if the DictionaryEntry doesn't already exist.
                 '------------------------------------------------------------------------------------------------                
                 Dim asSymbol As String = arRoleConstraint.Id
-                lrDictionaryEntry = Me.ModelDictionary.Find(Function(x) x.Symbol = asSymbol)
-                If lrDictionaryEntry Is Nothing Then
-                    lrDictionaryEntry = Me.AddModelDictionaryEntry(New FBM.DictionaryEntry(Me, arRoleConstraint.Id, pcenumConceptType.RoleConstraint), , abMakeModelDirty)
-                End If
+                lrDictionaryEntry = Me.AddModelDictionaryEntry(New FBM.DictionaryEntry(Me, arRoleConstraint.Id, pcenumConceptType.RoleConstraint), , abMakeModelDirty)
 
                 arRoleConstraint.Concept = lrDictionaryEntry.Concept
                 arRoleConstraint.ShortDescription = lrDictionaryEntry.ShortDescription
@@ -1341,8 +1338,7 @@ Namespace FBM
             'Add a new DictionaryEntry to the ModelDictionary if the DictionaryEntry doesn't already exist.
             '------------------------------------------------------------------------------------------------
             Dim asSymbol As String = arFactType.Id
-            lrDictionaryEntry = Me.ModelDictionary.Find(Function(x) x.Symbol = asSymbol)
-            If lrDictionaryEntry Is Nothing Then lrDictionaryEntry = Me.AddModelDictionaryEntry(New FBM.DictionaryEntry(Me, arFactType.Id, pcenumConceptType.FactType), , abMakeModelDirty)
+            lrDictionaryEntry = Me.AddModelDictionaryEntry(New FBM.DictionaryEntry(Me, arFactType.Id, pcenumConceptType.FactType), , abMakeModelDirty)
 
             arFactType.Concept = lrDictionaryEntry.Concept
             arFactType.ShortDescription = lrDictionaryEntry.ShortDescription
@@ -1501,7 +1497,7 @@ Namespace FBM
                             lrDictionaryEntry.AddRealisation(arDictionaryEntry.ConceptType, True)
                         End If
                     End If
-                    arDictionaryEntry.isDirty = True
+                    If Me.Loaded And Me.Page.FindAll(Function(x) x.Loaded = False) IsNot Nothing Then arDictionaryEntry.isDirty = True
                     Me.ModelDictionary.Add(arDictionaryEntry)
                     If abMakeModelDirty Then
                         Me.MakeDirty(False, abCheckForErrors)
@@ -3020,7 +3016,7 @@ Namespace FBM
                 '-------------------------------------------------
                 ' Save the set of Value Types within the ORM Model
                 '-------------------------------------------------
-                For Each lrValueType In Me.ValueType
+                For Each lrValueType In Me.ValueType.FindAll(Function(x) x.isDirty)
                     Call lrValueType.Save(abRapidSave)
                 Next
 
@@ -3067,7 +3063,7 @@ Namespace FBM
 
         End Sub
 
-        Public Sub SaveModelDictionary(Optional ByRef abRapidSave As Boolean = False)
+        Public Sub SaveModelDictionary(Optional ByVal abRapidSave As Boolean = False)
 
             Dim lrConcept As New FBM.Concept
             Dim lrModelDictionaryEntry As FBM.DictionaryEntry
@@ -3075,14 +3071,14 @@ Namespace FBM
             '---------------------------------------------------
             'Save the DictionaryEntries in the ModelDictionary
             '---------------------------------------------------
-            For Each lrModelDictionaryEntry In Me.ModelDictionary.FindAll(Function(x) x.isDirty).ToArray
+            For Each lrModelDictionaryEntry In Me.ModelDictionary.FindAll(Function(x) x.isDirty Or abRapidSave).ToArray
                 '---------------------------------------------------------
                 'CodeSafe: Only save DictionaryEntries with Realisations
                 '---------------------------------------------------------
                 If (lrModelDictionaryEntry.Realisations.Count >= 1) Or lrModelDictionaryEntry.isGeneralConcept Then
                     lrConcept = New FBM.Concept(lrModelDictionaryEntry.Symbol, True)
-                    lrConcept.Save()
-                    Call lrModelDictionaryEntry.Save()
+                    lrConcept.Save(abRapidSave)
+                    Call lrModelDictionaryEntry.Save(abRapidSave)
                 Else
                     '---------------------------------------------------------------------
                     'Remove unnused DictionaryEntries from the ModelDictionary/database.
@@ -3235,7 +3231,7 @@ Namespace FBM
             ElseIf IsSomething(lrRoleConstraint) Then
                 asActualModelElementName = lrRoleConstraint.Id
                 Return pcenumConceptType.RoleConstraint
-            ElseIf Me.ModelDictionary.Find(Function(x) x.Symbol = asModelElementName And x.isGeneralConcept) IsNot Nothing Then
+            ElseIf Me.ModelDictionary.Find(Function(x) lcase(x.Symbol) = lcase(asModelElementName) And x.isGeneralConcept) IsNot Nothing Then
                 Return pcenumConceptType.GeneralConcept
             Else
                 Return Nothing
@@ -3460,7 +3456,7 @@ Namespace FBM
                 If Me.ExistsModelElement(asModelObjectName) Then
 
                     Dim lrDictionaryEntry As FBM.DictionaryEntry
-                    lrDictionaryEntry = Me.ModelDictionary.Find(Function(x) x.Symbol = asModelObjectName)
+                    lrDictionaryEntry = Me.ModelDictionary.Find(Function(x) LCase(x.Symbol) = LCase(asModelObjectName))
 
                     If lrDictionaryEntry IsNot Nothing Then
                         If lrDictionaryEntry.isValueType Then
@@ -3790,9 +3786,7 @@ Namespace FBM
             Try
                 ExistsModelElement = False
 
-                Dim lrDictionaryEntry As New FBM.DictionaryEntry(Me, Trim(asModelElementName), pcenumConceptType.ValueType)
-
-                lrDictionaryEntry = Me.ModelDictionary.Find(AddressOf lrDictionaryEntry.EqualsBySymbol)
+                Dim lrDictionaryEntry = Me.ModelDictionary.Find(Function(x) LCase(x.Symbol) = LCase(Trim(asModelElementName)))
 
                 If IsSomething(lrDictionaryEntry) Then
                     If lrDictionaryEntry.isValueType Or _
@@ -3970,7 +3964,7 @@ Namespace FBM
                 Me.ValueType = TableValueType.GetValueTypesByModel(Me)
             End If
 
-            If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(1)
+            If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(10)
 
             '------------------------------------
             'Get EntityTypes
@@ -3987,7 +3981,7 @@ Namespace FBM
                 Me.EntityType = TableEntityType.getEntityTypesByModel(Me)
             End If
 
-            If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(2)
+            If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(20)
 
             '------------------------------------
             'Get FactTypes
@@ -4004,11 +3998,11 @@ Namespace FBM
                 TableFactType.GetFactTypesByModel(Me, True)
             End If
 
-            If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(3)
+            If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(30)
 
             Call TableSubtypeRelationship.GetSubtypeRelationshipsByModel(Me)
 
-            If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(3)
+            If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(40)
 
             '---------------------------------------------------
             'Get RoleConstraints 
@@ -4022,7 +4016,7 @@ Namespace FBM
                 Me.RoleConstraint = TableRoleConstraint.GetRoleConstraintsByModel(Me)
             End If
 
-            If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(4)
+            If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(45)
 
             '-----------------------------------------------------------------------------
             'Set the ReferenceMode ObjectTypes for each of the EntityTypes in the Model
@@ -4032,7 +4026,7 @@ Namespace FBM
                 Call lrEntityType.SetReferenceModeObjects()
             Next
 
-            If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(4)
+            If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(50)
 
             '-----------------------------------
             'Load the ModelNotes for the Model
@@ -4045,7 +4039,7 @@ Namespace FBM
                 Me.ModelNote = TableModelNote.getModelNotesByModel(Me)
             End If
 
-            If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(5)
+            If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(55)
 
             '------------------------------------
             'Load the Pages for the Model

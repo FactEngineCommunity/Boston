@@ -109,7 +109,7 @@ Namespace FBM
                         ''lrNewDictionaryEntry.AddConceptType(pcenumConceptType.Value)
 
                         ''RaiseEvent ConceptSwitched(Me.Concept)
-                        Me.makeDirty()
+                        If Me.Model.Loaded Then Call Me.makeDirty()
                         Call Me.SwitchConcept(lrNewDictionaryEntry.Concept, pcenumConceptType.Value)
 
                         'lsDebugMessage = "FactData.Data.Set"
@@ -320,17 +320,19 @@ Namespace FBM
                     'Concept - See lrFactData.Data below
                     lrFactData.Model = arModel
                     lrFactData.ConceptType = .ConceptType
+                    If IsSomething(arFactType) Then
+                        lrFactData.FactType = arFactType
+                    End If
+
+                    If IsSomething(arFact) Then
+                        lrFactData.Fact = arFact
+                    End If
+
                     lrFactData.Data = .Data 'NB Sets the 'Concept' attribute
 
                     Dim lrDictionaryEntry As New FBM.DictionaryEntry(arModel, lrFactData.Data, pcenumConceptType.Value)
                     Call arModel.AddModelDictionaryEntry(lrDictionaryEntry)
 
-                    If IsSomething(arFact) Then
-                        lrFactData.Fact = arFact
-                    End If
-                    If IsSomething(arFactType) Then
-                        lrFactData.FactType = arFactType
-                    End If
                     lrFactData.Role = arFactType.RoleGroup.Find(AddressOf .Role.Equals)
                     lrFactData.Symbol = .Symbol
                 End With
@@ -354,7 +356,9 @@ Namespace FBM
         ''' <param name="arFactInstance">The FactInstance for the FactDataInstance. Provide if adding directly to the FactInstance when FactTypeInstance.Fact does not contain the FactInstance</param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Shadows Function CloneInstance(ByRef arPage As FBM.Page, Optional ByRef arFactInstance As FBM.FactInstance = Nothing) As FBM.FactDataInstance
+        Public Shadows Function CloneInstance(ByRef arPage As FBM.Page,
+                                              Optional ByRef arFactInstance As FBM.FactInstance = Nothing,
+                                              Optional ByVal abMakeFactDataDirty As Boolean = False) As FBM.FactDataInstance
 
             Dim lrFactDataInstance As New FBM.FactDataInstance
             Dim lrFactTypeInstance As FBM.FactTypeInstance
@@ -441,6 +445,21 @@ Namespace FBM
                 Return Me.ModelError.Count > 0
             End Get
         End Property
+
+        Public Overrides Sub makeDirty()
+            Try
+                Me.isDirty = True
+                Me.Fact.isDirty = True
+                Me.Fact.FactType.isDirty = True
+            Catch ex As Exception
+                Dim lsMessage1 As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+        End Sub
 
         Public Overrides Function RemoveFromModel(Optional ByVal abForceRemoval As Boolean = False, _
                                                   Optional ByVal abCheckForErrors As Boolean = True,
@@ -592,8 +611,17 @@ Namespace FBM
         'End Sub
 
         Private Sub update_from_concept() Handles Concept.ConceptSymbolUpdated
-            RaiseEvent ConceptSymbolUpdated()
-            Me.makeDirty()
+            Try
+                RaiseEvent ConceptSymbolUpdated()
+                Me.makeDirty()
+            Catch ex As Exception
+                Dim lsMessage1 As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
         End Sub
 
         Public Function GetSchema() As System.Xml.Schema.XmlSchema Implements System.Xml.Serialization.IXmlSerializable.GetSchema

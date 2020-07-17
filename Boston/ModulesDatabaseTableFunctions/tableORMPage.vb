@@ -167,8 +167,8 @@ Namespace TablePage
 
                         liPageLoadedInd += 1
                         If aoBackgroundWorker IsNot Nothing Then
-                            aoBackgroundWorker.ReportProgress((liPageLoadedInd / lREcordset.RecordCount) * 100)
-                            Richmond.WriteToProgressBar((liPageLoadedInd / lREcordset.RecordCount) * 100)
+                            aoBackgroundWorker.ReportProgress(60 + ((liPageLoadedInd / lREcordset.RecordCount) * 40))
+                            Richmond.WriteToProgressBar(60 + ((liPageLoadedInd / lREcordset.RecordCount) * 40))
                         End If
 
                         If ar_model.Page.Contains(lrPage) Then

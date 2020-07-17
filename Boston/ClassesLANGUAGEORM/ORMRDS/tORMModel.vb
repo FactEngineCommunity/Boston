@@ -876,6 +876,8 @@ Namespace FBM
         Public Sub generateERDRelationships()
 
             Try
+                Dim lrFactType As FBM.FactType
+
                 Richmond.WriteToStatusBar("Creating Relationships.", True)
 
                 '----------------------------------------------------------------------------------
@@ -897,8 +899,6 @@ Namespace FBM
 
                     Call Me.generateRelationFor1To1BinaryFactType(lrFactType.RoleGroup(0))
                 Next 'RoleInstance
-
-
 
                 For Each lrFactType In Me.FactType.FindAll(Function(x) (x.IsMDAModelElement = False _
                                                                         And (x.HasTotalRoleConstraint _

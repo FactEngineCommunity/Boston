@@ -9,8 +9,9 @@
             Me.Timer.Interval = Me.ziIntervalMilliseconds
         End If
 
+        Me.Width = Me.CreateGraphics.MeasureString(Me.zsText & "MMMMMM", Me.Font).Width
+        Me.CenterToParent()
         Call Me.MakeRoundedCorners()
-
         Me.Label1.Text = Me.zsText
 
         Me.Timer.Start()
@@ -33,7 +34,8 @@
 
     Private Sub Timer_Tick(sender As Object, e As EventArgs) Handles Timer.Tick
 
-        Me.Hide()
+        'Me.MdiParent = frmMain
+        'Me.Hide()
         Me.Close()
 
     End Sub

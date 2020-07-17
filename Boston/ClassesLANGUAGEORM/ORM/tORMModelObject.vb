@@ -499,9 +499,8 @@ Namespace FBM
         '''   NB Initially only implemented on Fact/FactInstances/ConceptInstance, which take up the bulk of a CMML enabled model (i.e. e.g. post v4.0 release of Boston).
         ''' </summary>
         ''' <remarks></remarks>
-        Public Sub makeDirty()
-
-            Me.Model.IsDirty = True
+        Public Overridable Sub makeDirty()
+            Call Me.Model.MakeDirty(False, False)
             Me.isDirty = True
 
         End Sub
@@ -569,6 +568,9 @@ Namespace FBM
         Public Sub SetLongDescription(ByVal asLongDescription As String)
             Me.LongDescription = asLongDescription
             RaiseEvent LongDescriptionChanged(asLongDescription)
+
+            Me.isDirty = True
+            Me.Model.MakeDirty(False, False)
         End Sub
 
         Public Overridable Sub setName(ByVal asNewName As String, Optional ByVal abBroadcastInterfaceEvent As Boolean = True)
@@ -578,6 +580,9 @@ Namespace FBM
         Public Sub SetShortDescription(ByVal asShortDescription As String)
             Me.ShortDescription = asShortDescription
             RaiseEvent ShortDescriptionChanged(asShortDescription)
+
+            Me.isDirty = True
+            Me.Model.MakeDirty(False, False)
         End Sub
 
         Public Sub SwitchConcept(ByVal arNewConcept As Concept, ByVal aiConceptType As pcenumConceptType)
@@ -639,8 +644,8 @@ Namespace FBM
                         Me.Concept.Symbol = arNewConcept.Symbol
                     End If
 
-                    Me.makeDirty()
-                    Call Me.Model.MakeDirty(False, False)
+                    If Me.Model.Loaded Then Call Me.makeDirty()
+
 
                     RaiseEvent ConceptSwitched(Me.Concept)
 

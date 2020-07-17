@@ -135,7 +135,7 @@ Namespace SourcePlugins.Boston
             Try
                 'NB Tables sorted in Schema.vb in the LoadSchema method
                 For Each lrTable In Me.BostonModel.RDS.Table
-                    For Each lrColumn In lrTable.Column
+                    For Each lrColumn In lrTable.Column.OrderBy(Function(x) x.OrdinalPosition)
                         sr = New SchemaRow()
                         sr.Name = lrTable.Name
                         sr.Type = "TABLE"

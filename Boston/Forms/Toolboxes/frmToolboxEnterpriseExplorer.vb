@@ -216,15 +216,15 @@ Public Class frmToolboxEnterpriseExplorer
 
     End Sub
 
-    Public Sub AddModelToModelExplorer(ByRef arModel As FBM.Model, Optional ByVal abLoadPages As Boolean = False)
+    Public Function AddModelToModelExplorer(ByRef arModel As FBM.Model, Optional ByVal abLoadPages As Boolean = False) As TreeNode
 
         Dim loNode As TreeNode
 
         loNode = Me.TreeView.Nodes("Models").Nodes.Add(arModel.ModelId, arModel.Name, 1, 1)
-        loNode.Tag = New tEnterpriseEnterpriseView(pcenumMenuType.modelORMModel, _
-                                                   Nothing, _
-                                                   arModel.ModelId, _
-                                                   pcenumLanguage.ORMModel, _
+        loNode.Tag = New tEnterpriseEnterpriseView(pcenumMenuType.modelORMModel,
+                                                   Nothing,
+                                                   arModel.ModelId,
+                                                   pcenumLanguage.ORMModel,
                                                    loNode)
         loNode.Tag.Tag = arModel
 
@@ -242,7 +242,9 @@ Public Class frmToolboxEnterpriseExplorer
 
         prApplication.Models.AddUnique(arModel)
 
-    End Sub
+        Return loNode
+
+    End Function
 
 
     Private Sub frm_enterprise_tree_Disposed(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Disposed
@@ -889,6 +891,8 @@ Public Class frmToolboxEnterpriseExplorer
 
                             lrModel = loObject.tag
 
+                            If MouseButtons = MouseButtons.Right Then Exit Sub
+
                             Me.TreeView.SelectedNode.Expand()
 
                             If lrModel.Loaded Then
@@ -1528,7 +1532,7 @@ Public Class frmToolboxEnterpriseExplorer
 
             Me.zrToolTip.IsBalloon = True
             Me.zrToolTip.ToolTipIcon = ToolTipIcon.None
-            Me.zrToolTip.Show(lsMessage, Me, lrNewTreeNode.Bounds.X, lrNewTreeNode.Bounds.Y + +lrNewTreeNode.Bounds.Height, 4000)
+            Me.zrToolTip.Show(lsMessage, Me, lrNewTreeNode.Bounds.X, lrNewTreeNode.Bounds.Y + lrNewTreeNode.Bounds.Height, 4000)
 
             Call Me.TreeView.Nodes(0).Expand()
 
@@ -2486,6 +2490,8 @@ Public Class frmToolboxEnterpriseExplorer
 
                 xml = XDocument.Load(Me.DialogOpenFile.FileName)
 
+                Richmond.WriteToStatusBar("Loading model.", True)
+
                 lsXSDVersionNr = xml.<Model>.@XSDVersionNr
                 '=====================================================================================================
                 Dim lrSerializer As XmlSerializer = Nothing
@@ -2584,14 +2590,25 @@ Public Class frmToolboxEnterpriseExplorer
                 '-----------------------------------------
                 'Update the TreeView
                 '-----------------------------------------
-                Call Me.AddModelToModelExplorer(lrModel, False)
+                Dim lrNewTreeNode = Me.AddModelToModelExplorer(lrModel, False)
+
+                lrNewTreeNode.Expand()
+                Me.TreeView.Nodes(0).Nodes(Me.TreeView.Nodes(0).Nodes.Count - 1).EnsureVisible()
+
+                Richmond.WriteToStatusBar("Saving model.", True)
+                Dim lfrmFlashCard As New frmFlashCard
+                lfrmFlashCard.ziIntervalMilliseconds = 1500
+                lfrmFlashCard.zsText = "Saving model."
+                lfrmFlashCard.Show(frmMain)
+
+                Me.Focus()
+                Call lrModel.Save(True)
 
                 '================================================================================================================
                 'RDS
                 If (lrModel.ModelId <> "Core") And lrModel.HasCoreModel Then
                     Call lrModel.PopulateRDSStructureFromCoreMDAElements()
                 ElseIf (lrModel.ModelId <> "Core") Then
-                    Call lrModel.Save(True)
                     '==================================================
                     'RDS - Create a CMML Page and then dispose of it.
                     Dim lrPage As FBM.Page '(lrModel)
@@ -2616,9 +2633,28 @@ Public Class frmToolboxEnterpriseExplorer
                     '==================================================
 
                     Call lrModel.createEntityRelationshipArtifacts()
+                    Call lrModel.PopulateRDSStructureFromCoreMDAElements()
+
+                    lfrmFlashCard = New frmFlashCard
+                    lfrmFlashCard.ziIntervalMilliseconds = 3500
+                    lfrmFlashCard.zsText = "Saving model."
+                    lfrmFlashCard.Show(Me)
+                    Richmond.WriteToStatusBar("Saving model.", True)
+                    Call lrModel.Save()
                 End If
 
                 frmMain.Cursor = Cursors.Default
+
+                'Baloon Tooltip
+                lsMessage = "Loaded"
+                Me.zrToolTip.IsBalloon = True
+                Me.zrToolTip.ToolTipIcon = ToolTipIcon.None
+                Me.zrToolTip.ShowAlways = True
+                Me.zrToolTip.Active = True 'turns On the tooltip
+                Me.zrToolTip.AutomaticDelay = 0 'some auto value that will fill others With Default values
+                Me.zrToolTip.AutoPopDelay = 3000 'how Long it will stay before vanishing
+                Me.zrToolTip.InitialDelay = 0 'how Long you need To keep your mouse cursor still before it reacts                
+                Me.zrToolTip.Show(lsMessage, Me, lrNewTreeNode.Bounds.X, lrNewTreeNode.Bounds.Y + 20 + lrNewTreeNode.Bounds.Height, 4000)
 
             Catch ex As Exception
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()

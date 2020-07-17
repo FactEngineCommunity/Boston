@@ -13,8 +13,16 @@ Namespace FBM
         <XmlIgnore()> _
         Public FactType As FBM.FactType
 
-
-        Public WithEvents Data As New List(Of FBM.FactData)
+        Private _Data As New List(Of FBM.FactData)
+        Public Property Data As List(Of FBM.FactData)
+            Get
+                Return Me._Data
+            End Get
+            Set(value As List(Of FBM.FactData))
+                Me._Data = value
+                If Me.Model.Loaded Then Call Me.makeDirty()
+            End Set
+        End Property
 
         <XmlIgnore()> _
         Public DictionarySet As New Dictionary(Of String, String)
@@ -192,7 +200,9 @@ Namespace FBM
 
         End Function
 
-        Public Shadows Function CloneInstance(ByRef arPage As FBM.Page, Optional ByVal abAddToPage As Boolean = False) As FBM.FactInstance
+        Public Shadows Function CloneInstance(ByRef arPage As FBM.Page,
+                                              Optional ByVal abAddToPage As Boolean = False,
+                                              Optional ByVal abMakeFactDataDirty As Boolean = False) As FBM.FactInstance
 
             Dim lrFactInstance As New FBM.FactInstance
             Dim lrFactData As FBM.FactData
@@ -203,11 +213,10 @@ Namespace FBM
                     lrFactInstance.Page = arPage
                     lrFactInstance.Fact = Me
                     lrFactInstance.Id = .Id
-
                     lrFactInstance.FactType = arPage.FactTypeInstance.Find(Function(x) x.Id = .FactType.Id)
 
                     For Each lrFactData In .Data
-                        lrFactInstance.Data.Add(lrFactData.CloneInstance(arPage, lrFactInstance))
+                        lrFactInstance.Data.Add(lrFactData.CloneInstance(arPage, lrFactInstance, abMakeFactDataDirty))
                     Next
 
                     If abAddToPage Then
@@ -383,14 +392,13 @@ Namespace FBM
 
         End Function
 
-        Public Shadows Sub makeDirty()
+        Public Overridable Shadows Sub makeDirty()
 
-            Me.isDirty = True
-
+            Me.FactType.isDirty = True
             For Each lrFactData In Me.Data
                 lrFactData.isDirty = True
             Next
-
+            Me.isDirty = True
         End Sub
 
         Public Function GetFactDataByRoleId(ByVal asRoleId As String) As FBM.FactData

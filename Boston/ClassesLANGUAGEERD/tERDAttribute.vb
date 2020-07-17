@@ -55,7 +55,10 @@ Namespace ERD
         Public _PartOfPrimaryKey As Boolean = False
         Public Overridable Property PartOfPrimaryKey() As Boolean
             Get
-                Return Me._PartOfPrimaryKey
+                Dim lbIsPartOfPrimaryKey = (From Index In Me.Column.Index
+                                            Where Index.IsPrimaryKey
+                                            Select Index).Count > 0
+                Return lbIsPartOfPrimaryKey
             End Get
             Set(ByVal value As Boolean)
                 Me._PartOfPrimaryKey = value
@@ -442,11 +445,18 @@ Namespace ERD
         End Sub
 
         Private Sub Attribute_ConceptSymbolUpdated() Handles Me.ConceptSymbolUpdated
+            Try
+                Me.AttributeName = Me.Concept.Symbol
 
-            Me.AttributeName = Me.Concept.Symbol
+                Call Me.RefreshShape()
+            Catch ex As Exception
+                Dim lsMessage1 As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
-            Call Me.RefreshShape()
-
+                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
         End Sub
 
     End Class

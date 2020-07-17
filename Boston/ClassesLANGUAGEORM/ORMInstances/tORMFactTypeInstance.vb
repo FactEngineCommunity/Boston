@@ -726,10 +726,15 @@ Namespace FBM
 
             Dim lrFactInstance As FBM.FactInstance
 
-            lrFactInstance = arFact.CloneInstance(Me.Page)
+            lrFactInstance = arFact.CloneInstance(Me.Page, False, True)
 
+            lrFactInstance.isDirty = True
+            Me.isDirty = True
+            Me.Page.IsDirty = True
             Me.Fact.Add(lrFactInstance)
+
             Me.Page.FactInstance.Add(lrFactInstance)
+
             If IsSomething(Me.FactTable) And abResortFactTable Then
                 Call Me.FactTable.ResortFactTable()
                 'Me.FactTable.TableShape.ResizeToFitText(True)
@@ -1389,7 +1394,7 @@ Namespace FBM
             '--------------------------------------------
             'Save any Facts within the FactTypeInstance
             '--------------------------------------------
-            For Each lrFactInstance In Me.Fact
+            For Each lrFactInstance In Me.Fact.FindAll(Function(x) x.isDirty)
                 Try
                     lrFactInstance.Save(abRapidSave)
                 Catch arErr As Exception
@@ -1400,6 +1405,8 @@ Namespace FBM
                     prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, arErr.StackTrace)
                 End Try
             Next
+
+            Me.isDirty = False
 
         End Sub
 
@@ -2173,10 +2180,10 @@ Namespace FBM
                             Call Me.FactType.SetDerivationText(Me.DerivationText, True)
                         Case Is = "ShortDescription"
                             Call Me.FactType.SetShortDescription(Me.ShortDescription)
-                            Me.Model.ModelDictionary.Find(Function(x) x.Concept.Symbol = Me.Id).ShortDescription = Me.ShortDescription
+                            Me.Model.ModelDictionary.Find(Function(x) LCase(x.Symbol) = LCase(Me.Id)).ShortDescription = Me.ShortDescription
                         Case Is = "LongDescription"
                             Call Me.FactType.SetLongDescription(Me.LongDescription)
-                            Me.Model.ModelDictionary.Find(Function(x) x.Concept.Symbol = Me.Id).LongDescription = Me.LongDescription
+                            Me.Model.ModelDictionary.Find(Function(x) LCase(x.Symbol) = LCase(Me.Id)).LongDescription = Me.LongDescription
                         Case Is = "IsSubtypeStateControlling"
                             Call Me.FactType.SetIsSubtypeStateControlling(Me.IsSubtypeStateControlling, True)
                     End Select

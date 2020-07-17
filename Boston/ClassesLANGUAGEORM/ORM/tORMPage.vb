@@ -1623,7 +1623,7 @@ Namespace FBM
                 'Create a new FactInstance for the new Fact
                 '---------------------------------------------
                 lrFactInstance = New FBM.FactInstance(arFact, arFactTypeInstance)
-
+                lrFactInstance.isDirty = True
                 '-------------------------------------------------------------
                 'Create the FactDataInstances to attach to the Cells of the
                 '  new Fact/row in the FactTable
@@ -1639,6 +1639,8 @@ Namespace FBM
                     lrFactDataInstance.Fact = lrFactInstance
                     lrFactDataInstance.TableShape = arFactTypeInstance.FactTable.TableShape
                     lrFactDataInstance.Cell = arFactTypeInstance.FactTable.TableShape.Item(liInd, liRowNr)
+                    lrFactDataInstance.isDirty = True
+
                     arFactTypeInstance.FactTable.TableShape.Item(liInd, liRowNr).Text = Trim(lrFactDataInstance.Concept.Symbol)
                     arFactTypeInstance.FactTable.TableShape.Item(liInd, liRowNr).Tag = lrFactDataInstance
                     lrFactDataInstance.Cell.Tag = lrFactDataInstance
@@ -2358,7 +2360,7 @@ Namespace FBM
                 '------------------------------------
                 'Save the FactTypeInstance objects
                 '------------------------------------
-                For Each lrFactTypeInstance In Me.FactTypeInstance
+                For Each lrFactTypeInstance In Me.FactTypeInstance.FindAll(Function(x) x.isDirty)
                     lrFactTypeInstance.Save(abRapidSave)
                     lrFactTypeInstance.FactTable.Save(abRapidSave)
                 Next
@@ -2367,7 +2369,7 @@ Namespace FBM
                 'Save the RoleName objects (if any)
                 '------------------------------------
                 Dim lrRoleInstance As FBM.RoleInstance
-                For Each lrFactTypeInstance In Me.FactTypeInstance
+                For Each lrFactTypeInstance In Me.FactTypeInstance.FindAll(Function(x) x.isDirty)
                     For Each lrRoleInstance In lrFactTypeInstance.RoleGroup
                         If IsSomething(lrRoleInstance.RoleName) Then
                             If lrRoleInstance.Name <> "" Then

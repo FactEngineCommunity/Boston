@@ -160,6 +160,7 @@ Namespace TableFact
                             End If
 
                             Dim lrFactData As New FBM.FactData(lrRole, lrConcept, lrFact)
+
                             lrFactData.isDirty = False
                             lrFactData.Model = arFactType.Model
                             '-----------------------------

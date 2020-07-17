@@ -996,10 +996,10 @@ Namespace FBM
                             End If
                         Case Is = "ShortDescription"
                             Call Me.RoleConstraint.SetShortDescription(Me.ShortDescription)
-                            Me.Model.ModelDictionary.Find(Function(x) x.Concept.Symbol = Me.Id).ShortDescription = Me.ShortDescription
+                            Me.Model.ModelDictionary.Find(Function(x) LCase(x.Symbol) = LCase(Me.Id)).ShortDescription = Me.ShortDescription
                         Case Is = "LongDescription"
                             Call Me.RoleConstraint.SetLongDescription(Me.LongDescription)
-                            Me.Model.ModelDictionary.Find(Function(x) x.Concept.Symbol = Me.Id).LongDescription = Me.LongDescription
+                            Me.Model.ModelDictionary.Find(Function(x) LCase(x.Symbol) = LCase(Me.Id)).LongDescription = Me.LongDescription
                         Case Is = "IsPreferredIdentifier"                            
                             If Me.IsPreferredIdentifier Then
                                 Select Case Me.RoleConstraintType

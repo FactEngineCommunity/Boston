@@ -203,7 +203,7 @@ Namespace FBM
             End Get
             Set(ByVal value As List(Of FBM.Fact))
                 Me._Fact = value
-                Call Me.Model.MakeDirty(False, False)
+                If Me.Model.Loaded Then Call Me.Model.MakeDirty(False, False)
                 RaiseEvent Updated()
             End Set
         End Property

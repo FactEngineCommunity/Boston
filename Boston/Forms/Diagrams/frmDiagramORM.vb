@@ -1043,8 +1043,10 @@ Public Class frmDiagramORM
                             End If
                             loDropPtF = New Point(loPt.X - 15, loPt.Y - 5)
 
-                            Call Me.zrPage.DropValueTypeAtPoint(lrValueType, loDropPtF)
-                            Me.zrPage.Save()
+                            With New WaitCursor
+                                Call Me.zrPage.DropValueTypeAtPoint(lrValueType, loDropPtF)
+                                Me.zrPage.Save()
+                            End With
                             '------------------------------------------------------------------
                         Case Is = "Subtype Connector"
 
@@ -4011,7 +4013,7 @@ Public Class frmDiagramORM
         '-------------------------------------------------------
         'Check to see if the user was clicking over a ShapeNode
         '-------------------------------------------------------
-        lo_point = Diagram.PixelToUnit(e.Location)
+        lo_point = Me.DiagramView.ClientToDoc(e.Location)
 
         For Each lrRoleInstance In Me.zrPage.RoleInstance
             lrRoleInstance.Shape.Brush = New MindFusion.Drawing.SolidBrush(Color.White)

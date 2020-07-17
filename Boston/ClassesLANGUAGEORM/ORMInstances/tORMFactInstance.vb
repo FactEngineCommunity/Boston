@@ -17,8 +17,17 @@ Namespace FBM
         <XmlIgnore()> _
         Public Shadows FactType As New FBM.FactTypeInstance
 
+        Private Shadows _Data As New List(Of FBM.FactDataInstance)
         <XmlIgnore()>
-        Public Shadows Data As New List(Of FBM.FactDataInstance)
+        Public Shadows Property Data As List(Of FBM.FactDataInstance)
+            Get
+                Return Me._Data
+            End Get
+            Set(value As List(Of FBM.FactDataInstance))
+                Me._Data = value
+                If Me.Model.Loaded And Me.Page.Loaded Then Call Me.makeDirty()
+            End Set
+        End Property
 
         <XmlIgnore()>
         Public FactInstance As FBM.FactInstance 'Used to refer to original object when cloned for convenience.
@@ -402,9 +411,9 @@ Namespace FBM
             Try
                 Dim lrFactDataInstance As New FBM.FactDataInstance
 
-                Dim larFactDataInstance = From FactDataInstance In Me.Data _
-                                     Where FactDataInstance.Role.Name = asRoleName _
-                                     Distinct Select FactDataInstance
+                Dim larFactDataInstance = From FactDataInstance In Me.Data
+                                          Where FactDataInstance.Role.Name = asRoleName
+                                          Distinct Select FactDataInstance
 
                 For Each lrFactDataInstance In larFactDataInstance
                     Exit For
@@ -425,6 +434,11 @@ Namespace FBM
 
         End Function
 
+        Public Overrides Sub makeDirty()
+            Me.FactType.isDirty = True
+            Me.isDirty = True
+        End Sub
+
         Public Shadows Sub Save(Optional ByVal abRapidSave As Boolean = False)
 
             Dim lrFactDataInstance As FBM.FactDataInstance
@@ -441,6 +455,27 @@ Namespace FBM
                 If abRapidSave Then
                     Call TableConceptInstance.AddConceptInstance(lrConceptInstance)
 
+
+                    For Each lrFactDataInstance In Me.Data
+
+                        lrConceptInstance = New FBM.ConceptInstance
+                        lrConceptInstance.ModelId = Me.FactType.Model.ModelId
+                        lrConceptInstance.PageId = Me.Page.PageId
+                        lrConceptInstance.Symbol = lrFactDataInstance.Data
+                        lrConceptInstance.RoleId = lrFactDataInstance.Role.Id
+                        lrConceptInstance.X = lrFactDataInstance.X
+                        lrConceptInstance.Y = lrFactDataInstance.Y
+                        lrConceptInstance.ConceptType = pcenumConceptType.Value
+
+                        'NB Don't use abRapidSave here because more than one Fact can use the same ConceptInstance for its FactData.
+                        If TableConceptInstance.ExistsConceptInstance(lrConceptInstance) Then
+                            Call TableConceptInstance.UpdateConceptInstance(lrConceptInstance)
+                        Else
+                            Dim lrConcept As New FBM.Concept(lrFactDataInstance.Data)
+                            lrConcept.Save()
+                            Call TableConceptInstance.AddConceptInstance(lrConceptInstance)
+                        End If
+                    Next
                 ElseIf Me.isDirty Then
 
                     If TableConceptInstance.ExistsConceptInstance(lrConceptInstance) Then

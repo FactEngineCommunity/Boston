@@ -1476,11 +1476,11 @@ Namespace FBM
                             Call Me.Page.Form.EnableSaveButton()
                         Case Is = "ShortDescription"
                             Call Me.EntityType.SetShortDescription(Me.ShortDescription)
-                            Me.Model.ModelDictionary.Find(Function(x) x.Concept.Symbol = Me.Id).ShortDescription = Me.ShortDescription
+                            Me.Model.ModelDictionary.Find(Function(x) LCase(x.Symbol) = LCase(Me.Id)).ShortDescription = Me.ShortDescription
                             Call Me.Page.Form.EnableSaveButton()
                         Case Is = "LongDescription"
                             Call Me.EntityType.SetLongDescription(Me.LongDescription)
-                            Me.Model.ModelDictionary.Find(Function(x) x.Concept.Symbol = Me.Id).LongDescription = Me.LongDescription
+                            Me.Model.ModelDictionary.Find(Function(x) LCase(x.Symbol) = LCase(Me.Id)).LongDescription = Me.LongDescription
                             Call Me.Page.Form.EnableSaveButton()
                         Case Is = "ExpandReferenceMode" 'The name of the Property on the EntityType class related to this EntityTypeInstance
 
