@@ -428,11 +428,9 @@ Namespace FBM
             'Add a new DictionaryEntry to the ModelDictionary if the DictionaryEntry doesn't already exist.
             '------------------------------------------------------------------------------------------------
             Dim asSymbol As String = arEntityType.Id
-            lrDictionaryEntry = Me.ModelDictionary.Find(Function(x) x.Symbol = asSymbol)
-            If lrDictionaryEntry Is Nothing Then
-                lrDictionaryEntry = Me.AddModelDictionaryEntry(New FBM.DictionaryEntry(Me, arEntityType.Id, pcenumConceptType.EntityType))
-                Me.MakeDirty()
-            End If
+
+            lrDictionaryEntry = Me.AddModelDictionaryEntry(New FBM.DictionaryEntry(Me, arEntityType.Id, pcenumConceptType.EntityType))
+
 
             arEntityType.Concept = lrDictionaryEntry.Concept
             arEntityType.ShortDescription = lrDictionaryEntry.ShortDescription
@@ -606,10 +604,7 @@ Namespace FBM
                 'Add a new DictionaryEntry to the ModelDictionary if the DictionaryEntry doesn't already exist.
                 '------------------------------------------------------------------------------------------------                
                 Dim asSymbol As String = arRoleConstraint.Id
-                lrDictionaryEntry = Me.ModelDictionary.Find(Function(x) x.Symbol = asSymbol)
-                If lrDictionaryEntry Is Nothing Then
-                    lrDictionaryEntry = Me.AddModelDictionaryEntry(New FBM.DictionaryEntry(Me, arRoleConstraint.Id, pcenumConceptType.RoleConstraint), , abMakeModelDirty)
-                End If
+                lrDictionaryEntry = Me.AddModelDictionaryEntry(New FBM.DictionaryEntry(Me, arRoleConstraint.Id, pcenumConceptType.RoleConstraint), , abMakeModelDirty)
 
                 arRoleConstraint.Concept = lrDictionaryEntry.Concept
                 arRoleConstraint.ShortDescription = lrDictionaryEntry.ShortDescription
@@ -1343,8 +1338,7 @@ Namespace FBM
             'Add a new DictionaryEntry to the ModelDictionary if the DictionaryEntry doesn't already exist.
             '------------------------------------------------------------------------------------------------
             Dim asSymbol As String = arFactType.Id
-            lrDictionaryEntry = Me.ModelDictionary.Find(Function(x) x.Symbol = asSymbol)
-            If lrDictionaryEntry Is Nothing Then lrDictionaryEntry = Me.AddModelDictionaryEntry(New FBM.DictionaryEntry(Me, arFactType.Id, pcenumConceptType.FactType), , abMakeModelDirty)
+            lrDictionaryEntry = Me.AddModelDictionaryEntry(New FBM.DictionaryEntry(Me, arFactType.Id, pcenumConceptType.FactType), , abMakeModelDirty)
 
             arFactType.Concept = lrDictionaryEntry.Concept
             arFactType.ShortDescription = lrDictionaryEntry.ShortDescription
@@ -3237,7 +3231,7 @@ Namespace FBM
             ElseIf IsSomething(lrRoleConstraint) Then
                 asActualModelElementName = lrRoleConstraint.Id
                 Return pcenumConceptType.RoleConstraint
-            ElseIf Me.ModelDictionary.Find(Function(x) x.Symbol = asModelElementName And x.isGeneralConcept) IsNot Nothing Then
+            ElseIf Me.ModelDictionary.Find(Function(x) lcase(x.Symbol) = lcase(asModelElementName) And x.isGeneralConcept) IsNot Nothing Then
                 Return pcenumConceptType.GeneralConcept
             Else
                 Return Nothing
@@ -3462,7 +3456,7 @@ Namespace FBM
                 If Me.ExistsModelElement(asModelObjectName) Then
 
                     Dim lrDictionaryEntry As FBM.DictionaryEntry
-                    lrDictionaryEntry = Me.ModelDictionary.Find(Function(x) x.Symbol = asModelObjectName)
+                    lrDictionaryEntry = Me.ModelDictionary.Find(Function(x) LCase(x.Symbol) = LCase(asModelObjectName))
 
                     If lrDictionaryEntry IsNot Nothing Then
                         If lrDictionaryEntry.isValueType Then
@@ -3792,7 +3786,7 @@ Namespace FBM
             Try
                 ExistsModelElement = False
 
-                Dim lrDictionaryEntry = Me.ModelDictionary.Find(Function(x) x.Symbol = Trim(asModelElementName))
+                Dim lrDictionaryEntry = Me.ModelDictionary.Find(Function(x) LCase(x.Symbol) = LCase(Trim(asModelElementName)))
 
                 If IsSomething(lrDictionaryEntry) Then
                     If lrDictionaryEntry.isValueType Or _

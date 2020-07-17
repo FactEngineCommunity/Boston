@@ -187,7 +187,7 @@ Namespace FBM
 
         Public Shadows Function Equals(ByVal other As FBM.DictionaryEntry) As Boolean Implements System.IEquatable(Of FBM.DictionaryEntry).Equals
 
-            If Me.Symbol = other.Symbol Then
+            If LCase(Me.Symbol) = LCase(other.Symbol) Then
                 Return True
             Else
                 Return False

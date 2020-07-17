@@ -1201,12 +1201,14 @@ Namespace XMLModel
                         '--------------------------------------------------------------------------------------------------
                         'Get the Concept from the ModelDictionary so that FactData objects are linked directly to the Concept/Value in the ModelDictionary
                         '--------------------------------------------------------------------------------------------------
-                        lrDictionaryEntry = New FBM.DictionaryEntry(arFactType.Model, _
-                                                                    lrXMLFactData.Data, _
-                                                                    pcenumConceptType.Value, _
-                                                                    , _
+                        lrDictionaryEntry = New FBM.DictionaryEntry(arFactType.Model,
+                                                                    lrXMLFactData.Data,
+                                                                    pcenumConceptType.Value,
+                                                                    ,
                                                                     , True
                                                                     )
+
+                        If LCase(lrXMLFactData.Data) = "involves" Then Debugger.Break()
 
                         lrDictionaryEntry = arFactType.Model.AddModelDictionaryEntry(lrDictionaryEntry)
 

@@ -818,12 +818,12 @@ Namespace FBM
                         Case Is = "ShortDescription"
                             With New WaitCursor
                                 Call Me.ValueType.SetShortDescription(Me.ShortDescription)
-                                Me.Model.ModelDictionary.Find(Function(x) x.Concept.Symbol = Me.Id).ShortDescription = Me.ShortDescription
+                                Me.Model.ModelDictionary.Find(Function(x) LCase(x.Symbol) = LCase(Me.Id)).ShortDescription = Me.ShortDescription
                             End With
                         Case Is = "LongDescription"
                             With New WaitCursor
                                 Call Me.ValueType.SetLongDescription(Me.LongDescription)
-                                Me.Model.ModelDictionary.Find(Function(x) x.Concept.Symbol = Me.Id).LongDescription = Me.LongDescription
+                                Me.Model.ModelDictionary.Find(Function(x) LCase(x.Symbol) = LCase(Me.Id)).LongDescription = Me.LongDescription
                             End With
                         Case Is = "Value"
                             With New WaitCursor

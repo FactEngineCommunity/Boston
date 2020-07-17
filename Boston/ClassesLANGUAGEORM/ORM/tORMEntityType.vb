@@ -1917,7 +1917,7 @@ Namespace FBM
             Dim lsMessage As String = ""
 
             Try
-                Dim lrDictionaryEntry = Me.Model.ModelDictionary.Find(Function(x) x.Symbol = Me.Id)
+                Dim lrDictionaryEntry = Me.Model.ModelDictionary.Find(Function(x) LCase(x.Symbol) = LCase(Me.Id))
 
                 '--------------------------------------------------------------------------------
                 'CodeSafe: If there is no dictionary entry for the EntityType, then create one.

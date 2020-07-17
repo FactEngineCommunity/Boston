@@ -339,7 +339,7 @@ Public Class frmGlossary
                     lrFactType = Me.zrModel.GetModelObjectByName(lsSelectedString)
                     Call Me.VerbaliseFactType(lrFactType)
                 Case Is = pcenumConceptType.GeneralConcept
-                    Call Me.VerbaliseGeneralConcept(Me.zrModel.ModelDictionary.Find(Function(x) x.Symbol = lsSelectedString))
+                    Call Me.VerbaliseGeneralConcept(Me.zrModel.ModelDictionary.Find(Function(x) LCase(x.Symbol) = LCase(lsSelectedString)))
             End Select
 
             '-----------------------------------------------
@@ -354,7 +354,7 @@ Public Class frmGlossary
                 If IsSomething(lrPropertyGridForm) Then
                     Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
                     lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute, loMiscFilterAttribute})
-                    lrPropertyGridForm.PropertyGrid.SelectedObject = Me.zrModel.ModelDictionary.Find(Function(x) x.Symbol = lsSelectedString)
+                    lrPropertyGridForm.PropertyGrid.SelectedObject = Me.zrModel.ModelDictionary.Find(Function(x) LCase(x.Symbol) = LCase(lsSelectedString))
                 End If
             Else
                 Call Me.DisplayORMDiagramViewForModelObject(lrModelObject)
