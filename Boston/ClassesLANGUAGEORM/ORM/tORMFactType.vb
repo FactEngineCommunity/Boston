@@ -1285,7 +1285,7 @@ Namespace FBM
 
                             RaiseEvent FactRemoved(lrFact)
 
-                            Call lrFact.RemoveFromModel() 'Permanently deletes the Fact from the database.
+                            Call lrFact.RemoveFromModel(ab_delete_all) 'Permanently deletes the Fact from the database.
 
                             '--------------------------------------------------------
                             'Cascading delete of Facts referencing the Fact removed

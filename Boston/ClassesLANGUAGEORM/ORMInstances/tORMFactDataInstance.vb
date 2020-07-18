@@ -946,12 +946,19 @@ Namespace FBM
 
         End Function
 
-        Private Sub FactData_RemovedFromModel() Handles FactData.RemovedFromModel
+        ''' <summary>
+        ''' If not DeleteAll, then the ConceptInstance/s for the Fact need to be removed from the database elsewhere.
+        '''   The reason for this is that some ConceptInstances are Values for a Role, and may not belong to the Fact being deleted.
+        ''' </summary>
+        ''' <param name="abDeleteAll"></param>
+        Private Sub FactData_RemovedFromModel(ByVal abDeleteAll As Boolean) Handles FactData.RemovedFromModel
 
-            Dim lrConceptInstance As New FBM.ConceptInstance(Me.Model, Me.Page, Me.Data, pcenumConceptType.Value)
-            lrConceptInstance.RoleId = Me.Role.Id
+            If abDeleteAll Then
+                Dim lrConceptInstance As New FBM.ConceptInstance(Me.Model, Me.Page, Me.Data, pcenumConceptType.Value)
+                lrConceptInstance.RoleId = Me.Role.Id
 
-            Call TableConceptInstance.DeleteConceptInstance(lrConceptInstance)
+                Call TableConceptInstance.DeleteConceptInstance(lrConceptInstance)
+            End If
 
         End Sub
 

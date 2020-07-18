@@ -473,10 +473,19 @@ Namespace FBM
 
         End Function
 
-        Public Overrides Function RemoveFromModel(Optional ByVal abForceRemoval As Boolean = False, _
+        ''' <summary>
+        ''' If not DeleteAll, then the ConceptInstance/s for the Fact need to be removed from the database elsewhere.
+        '''   The reason for this is that some ConceptInstances are Values for a Role, and may not belong to the Fact being deleted.
+        ''' </summary>
+        ''' <param name="abForceRemoval"></param>
+        ''' <param name="abCheckForErrors"></param>
+        ''' <param name="abDoDatabaseProcessing"></param>
+        ''' <param name="abDeleteAll"></param>
+        ''' <returns></returns>
+        Public Shadows Function RemoveFromModel(Optional ByVal abForceRemoval As Boolean = False,
                                                   Optional ByVal abCheckForErrors As Boolean = True,
-                                                  Optional ByVal abDoDatabaseProcessing As Boolean = True) As Boolean
-
+                                                  Optional ByVal abDoDatabaseProcessing As Boolean = True,
+                                                  Optional ByVal abDeleteAll As Boolean = False) As Boolean
             Dim lrFactData As FBM.FactData
             Dim lrFactType As New FBM.FactType
             Dim larFactData As New System.Collections.Generic.List(Of FBM.FactData)
@@ -493,7 +502,7 @@ Namespace FBM
             End If
 
             For Each lrFactData In larFactData
-                Call lrFactData.RemoveFromModel()
+                Call lrFactData.RemoveFromModel(False, False,, abDeleteAll)
             Next
 
             Dim lrDictionaryEntry As New FBM.DictionaryEntry(Me.Model, Me.Symbol, pcenumConceptType.Fact)

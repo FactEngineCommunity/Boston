@@ -183,7 +183,7 @@ Namespace FBM
         Public Shadows Event ConceptSymbolUpdated()
         'Public Shadows Event ConceptSwitched(ByRef arConcept As FBM.Concept)
         Public Event ModelErrorAdded(ByRef arModelError As ModelError) Implements iValidationErrorHandler.ModelErrorAdded
-        Public Event RemovedFromModel()
+        Public Event RemovedFromModel(ByVal abDeleteAll As Boolean)
 
         Public Sub New()
             '------------------------------------
@@ -462,9 +462,10 @@ Namespace FBM
             End Try
         End Sub
 
-        Public Overrides Function RemoveFromModel(Optional ByVal abForceRemoval As Boolean = False, _
+        Public Shadows Function RemoveFromModel(Optional ByVal abForceRemoval As Boolean = False,
                                                   Optional ByVal abCheckForErrors As Boolean = True,
-                                                  Optional ByVal abDoDatabaseProcessing As Boolean = True) As Boolean '(ByRef arError As FBM.ModelError) As Boolean
+                                                  Optional ByVal abDoDatabaseProcessing As Boolean = True,
+                                                  Optional ByVal abDeleteAll As Boolean = False) As Boolean '(ByRef arError As FBM.ModelError) As Boolean
 
             Me.Fact.Data.Remove(Me)
 
@@ -475,7 +476,7 @@ Namespace FBM
             Dim lrDictionaryEntry As New FBM.DictionaryEntry(Me.Model, Me.Data, pcenumConceptType.Value)
             Call Me.Model.DeprecateRealisationsForDictionaryEntry(lrDictionaryEntry, pcenumConceptType.Value)
 
-            RaiseEvent RemovedFromModel()
+            RaiseEvent RemovedFromModel(abDeleteAll)
 
         End Function
 

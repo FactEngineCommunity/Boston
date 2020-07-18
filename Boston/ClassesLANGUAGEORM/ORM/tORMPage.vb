@@ -1026,6 +1026,8 @@ Namespace FBM
                 '------------------------------------------------------
                 lrFactTypeInstance.X = ao_pt.X
                 lrFactTypeInstance.Y = ao_pt.Y
+                lrFactTypeInstance.isDirty = True
+                lrFactTypeInstance.Page.IsDirty = True
 
                 If Me.Diagram IsNot Nothing Then
                     Call lrFactTypeInstance.DisplayAndAssociate(abDisplayFactTable, My.Settings.ShowFactTypeNamesOnORMModelLoad)
