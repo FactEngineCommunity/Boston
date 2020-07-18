@@ -111,8 +111,8 @@ Namespace Parser
         End Sub
 
         Public Sub BuildProject()
-        	Call Me.BuildProject(False)
-		End Sub
+            Call Me.BuildProject(False)
+        End Sub
 
 		Public Function BuildProjectToOutput() As OutputCollection
 			Call Me.BuildProject(True)

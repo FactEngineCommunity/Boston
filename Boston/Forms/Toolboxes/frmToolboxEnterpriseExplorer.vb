@@ -1049,7 +1049,7 @@ Public Class frmToolboxEnterpriseExplorer
                     '  if it already hasn't been loaded.
                     '---------------------------------------------------------------                                                        
                     If Not prApplication.WorkingModel.Loaded Then
-                        Call prApplication.WorkingModel.Load()
+                        'Call prApplication.WorkingModel.Load() '20200718-VM-Was previously not commented out. Commented out so can right-click on a Model to delete it.
                     End If
 
                     '--------------------------------------------------------------
@@ -2808,7 +2808,10 @@ Public Class frmToolboxEnterpriseExplorer
             'lrPage = New FBM.Page(prApplication.workingmodel, prApplication.workingpage.PageId, prApplication.workingpage.Name)
             lrEnterpriseView = Me.TreeView.SelectedNode.Tag
             lrPage = lrEnterpriseView.Tag 'prApplication.WorkingPage 
-            'lrPage = lrEnterpriseView.Tag
+
+            If lrPage.Loaded = False Then
+                lrPage.Load(False)
+            End If
 
             If lrPage.Loading Or ((lrPage.Language <> pcenumLanguage.ORMModel) And lrPage.Model.RDSLoading) Then
                 Richmond.WriteToStatusBar("Waiting for background loading of the Page", True)

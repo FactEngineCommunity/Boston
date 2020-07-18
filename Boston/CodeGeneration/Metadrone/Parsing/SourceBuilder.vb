@@ -140,7 +140,7 @@ Namespace Parser
                 Dim compileCompleted As Boolean = False
                 Dim stopRequest As Boolean = False
                 While Not compileCompleted
-                    Application.DoEvents()
+                    'Application.DoEvents()  '20200718-VM-Commented this out.
                     'User aborted
                     If Not stopRequest And Me.StopBuildRequest Then
                         Me.Status.SetParseState(ParserStatus.ProcessState.Cancelled)

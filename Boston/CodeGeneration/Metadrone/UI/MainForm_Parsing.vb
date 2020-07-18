@@ -180,7 +180,7 @@ Namespace UI
                 LockWindowUpdate(Me.txtResult.Handle)
                 Me.txtResult.AppendText(text)
                 Me.txtResult.ScrollToCaret()
-                Application.DoEvents()
+                'Application.DoEvents() '20200718-VM-Commented this out and is much faster.
             Finally
                 LockWindowUpdate(IntPtr.Zero)
             End Try
@@ -222,7 +222,7 @@ Namespace UI
                 Me.txtConsole.SelectionLength = 0
                 Me.txtConsole.ScrollToCaret()
                 Me.txtConsole.Refresh()
-                Application.DoEvents()
+                'Application.DoEvents() '20200718-VM-Commented this out.
             End Try
         End Sub
 

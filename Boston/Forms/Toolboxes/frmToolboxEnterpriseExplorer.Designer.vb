@@ -35,7 +35,7 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.LabelHelpTips = New System.Windows.Forms.Label()
         Me.Button1 = New System.Windows.Forms.Button()
         Me.TextBox1 = New System.Windows.Forms.TextBox()
-        Me.TreeView = New BostonTreeView 'System.Windows.Forms.TreeView()
+        Me.TreeView = New Boston.BostonTreeView()
         Me.ImageList = New System.Windows.Forms.ImageList(Me.components)
         Me.CircularProgressBar = New CircularProgressBar.CircularProgressBar()
         Me.Timer_FormSetup = New System.Windows.Forms.Timer(Me.components)
@@ -255,10 +255,9 @@ Partial Class frmToolboxEnterpriseExplorer
         '
         'ContextMenuStrip_Page
         '
-        Me.ContextMenuStrip_Page.ImageScalingSize = New System.Drawing.Size(24, 24)
         Me.ContextMenuStrip_Page.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.EditPageToolStripMenuItem, Me.DeletePageToolStripMenuItem, Me.ToolStripMenuItemEditPageAsORMDiagram, Me.ToolStripMenuItem2, Me.ToolStripSeparator4, Me.CopyPageToolStripMenuItem})
         Me.ContextMenuStrip_Page.Name = "ContextMenuStrip_Page"
-        Me.ContextMenuStrip_Page.Size = New System.Drawing.Size(224, 160)
+        Me.ContextMenuStrip_Page.Size = New System.Drawing.Size(216, 142)
         '
         'EditPageToolStripMenuItem
         '
@@ -300,10 +299,9 @@ Partial Class frmToolboxEnterpriseExplorer
         '
         'ContextMenuStrip_ORMModel
         '
-        Me.ContextMenuStrip_ORMModel.ImageScalingSize = New System.Drawing.Size(24, 24)
         Me.ContextMenuStrip_ORMModel.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.AddPageToolStripMenuItem1, Me.ToolStripMenuItemPastePage, Me.ToolStripMenuItemLanguage, Me.ToolStripSeparator1, Me.EmptyModelToolStripMenuItem, Me.DeleteModelToolStripMenuItem, Me.RenameToolStripMenuItem, Me.ToolStripSeparator3, Me.ViewModelDictionaryToolStripMenuItem, Me.ViewGlossaryToolStripMenuItem, Me.ToolStripMenuItemModelConfiguration, Me.GenerateDocumentationToolStripMenuItem, Me.ToolStripSeparator5, Me.ImportExportToolStripMenuItem, Me.ToolStripSeparator6, Me.CodeGenerationToolStripMenuItem})
         Me.ContextMenuStrip_ORMModel.Name = "ContextMenuStrip_ORMModel"
-        Me.ContextMenuStrip_ORMModel.Size = New System.Drawing.Size(216, 388)
+        Me.ContextMenuStrip_ORMModel.Size = New System.Drawing.Size(208, 292)
         '
         'AddPageToolStripMenuItem1
         '
@@ -493,28 +491,27 @@ Partial Class frmToolboxEnterpriseExplorer
         '
         'ContextMenuStrip_ORMModels
         '
-        Me.ContextMenuStrip_ORMModels.ImageScalingSize = New System.Drawing.Size(24, 24)
         Me.ContextMenuStrip_ORMModels.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItemAddModel, Me.ToolStripSeparator2, Me.ToolStripMenuItem1})
         Me.ContextMenuStrip_ORMModels.Name = "ContextMenuStrip_ORMModels"
-        Me.ContextMenuStrip_ORMModels.Size = New System.Drawing.Size(168, 70)
+        Me.ContextMenuStrip_ORMModels.Size = New System.Drawing.Size(160, 54)
         '
         'ToolStripMenuItemAddModel
         '
         Me.ToolStripMenuItemAddModel.Image = Global.Boston.My.Resources.MenuImages.DatabaseAdd16x16
         Me.ToolStripMenuItemAddModel.Name = "ToolStripMenuItemAddModel"
-        Me.ToolStripMenuItemAddModel.Size = New System.Drawing.Size(167, 30)
+        Me.ToolStripMenuItemAddModel.Size = New System.Drawing.Size(180, 22)
         Me.ToolStripMenuItemAddModel.Text = "&Add Model"
         '
         'ToolStripSeparator2
         '
         Me.ToolStripSeparator2.Name = "ToolStripSeparator2"
-        Me.ToolStripSeparator2.Size = New System.Drawing.Size(164, 6)
+        Me.ToolStripSeparator2.Size = New System.Drawing.Size(177, 6)
         '
         'ToolStripMenuItem1
         '
         Me.ToolStripMenuItem1.Image = Global.Boston.My.Resources.Resources.XML16x16
         Me.ToolStripMenuItem1.Name = "ToolStripMenuItem1"
-        Me.ToolStripMenuItem1.Size = New System.Drawing.Size(167, 30)
+        Me.ToolStripMenuItem1.Size = New System.Drawing.Size(180, 22)
         Me.ToolStripMenuItem1.Text = "&Import .fbm File"
         '
         'HelpProvider
@@ -559,7 +556,6 @@ Partial Class frmToolboxEnterpriseExplorer
 
     End Sub
     Friend WithEvents GroupBox_main As System.Windows.Forms.GroupBox
-    Friend WithEvents TreeView As System.Windows.Forms.TreeView
     Friend WithEvents Timer_FormSetup As System.Windows.Forms.Timer
     Friend WithEvents ImageList As System.Windows.Forms.ImageList
     Friend WithEvents ContextMenuStrip_Page As System.Windows.Forms.ContextMenuStrip
@@ -617,4 +613,5 @@ Partial Class frmToolboxEnterpriseExplorer
     Friend WithEvents Panel1 As Panel
     Friend WithEvents CodeGenerationToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents ToolStripSeparator6 As ToolStripSeparator
+    Friend WithEvents TreeView As BostonTreeView
 End Class

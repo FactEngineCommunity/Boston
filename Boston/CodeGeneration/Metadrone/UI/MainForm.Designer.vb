@@ -35,14 +35,25 @@
             Me.btnCancel = New System.Windows.Forms.ToolStripButton()
             Me.splitMain = New System.Windows.Forms.SplitContainer()
             Me.splitWorkspace = New System.Windows.Forms.SplitContainer()
+            Me.imlExploreTabPageImages = New System.Windows.Forms.ImageList(Me.components)
+            Me.imlTabPageImages = New System.Windows.Forms.ImageList(Me.components)
+            Me.imlOutputTabPageImages = New System.Windows.Forms.ImageList(Me.components)
+            Me.StatusStrip = New System.Windows.Forms.StatusStrip()
+            Me.lblStatus = New System.Windows.Forms.ToolStripStatusLabel()
+            Me.spliSearchContainer = New System.Windows.Forms.SplitContainer()
+            Me.lblSearchMessage = New System.Windows.Forms.Label()
+            Me.mnuTabControl = New System.Windows.Forms.ContextMenuStrip(Me.components)
+            Me.mniCloseTab = New System.Windows.Forms.ToolStripMenuItem()
+            Me.mniCloseOtherTabs = New System.Windows.Forms.ToolStripMenuItem()
+            Me.mniSep1 = New System.Windows.Forms.ToolStripSeparator()
+            Me.mniCloseAllTabs = New System.Windows.Forms.ToolStripMenuItem()
+            Me.SearchBox = New Boston.UI.SearchBox()
             Me.tcExplore = New Boston.UI.CustTabControl()
             Me.TabPage1 = New System.Windows.Forms.TabPage()
             Me.tvwExplorer = New Boston.UI.Explorer()
-            Me.imlExploreTabPageImages = New System.Windows.Forms.ImageList(Me.components)
             Me.tcMain = New Boston.UI.CustTabControl()
             Me.tpStart = New System.Windows.Forms.TabPage()
             Me.StartPage1 = New Boston.UI.StartPage()
-            Me.imlTabPageImages = New System.Windows.Forms.ImageList(Me.components)
             Me.tcResults = New Boston.UI.CustTabControl()
             Me.tpResult = New System.Windows.Forms.TabPage()
             Me.txtResult = New System.Windows.Forms.TextBox()
@@ -53,17 +64,6 @@
             Me.PathDateModified = New System.Windows.Forms.DataGridViewTextBoxColumn()
             Me.tpConsole = New System.Windows.Forms.TabPage()
             Me.txtConsole = New System.Windows.Forms.TextBox()
-            Me.imlOutputTabPageImages = New System.Windows.Forms.ImageList(Me.components)
-            Me.StatusStrip = New System.Windows.Forms.StatusStrip()
-            Me.lblStatus = New System.Windows.Forms.ToolStripStatusLabel()
-            Me.spliSearchContainer = New System.Windows.Forms.SplitContainer()
-            Me.lblSearchMessage = New System.Windows.Forms.Label()
-            Me.SearchBox = New Boston.UI.SearchBox()
-            Me.mnuTabControl = New System.Windows.Forms.ContextMenuStrip(Me.components)
-            Me.mniCloseTab = New System.Windows.Forms.ToolStripMenuItem()
-            Me.mniCloseOtherTabs = New System.Windows.Forms.ToolStripMenuItem()
-            Me.mniSep1 = New System.Windows.Forms.ToolStripSeparator()
-            Me.mniCloseAllTabs = New System.Windows.Forms.ToolStripMenuItem()
             Me.tsMain.SuspendLayout()
             CType(Me.splitMain, System.ComponentModel.ISupportInitialize).BeginInit()
             Me.splitMain.Panel1.SuspendLayout()
@@ -73,6 +73,12 @@
             Me.splitWorkspace.Panel1.SuspendLayout()
             Me.splitWorkspace.Panel2.SuspendLayout()
             Me.splitWorkspace.SuspendLayout()
+            Me.StatusStrip.SuspendLayout()
+            CType(Me.spliSearchContainer, System.ComponentModel.ISupportInitialize).BeginInit()
+            Me.spliSearchContainer.Panel1.SuspendLayout()
+            Me.spliSearchContainer.Panel2.SuspendLayout()
+            Me.spliSearchContainer.SuspendLayout()
+            Me.mnuTabControl.SuspendLayout()
             Me.tcExplore.SuspendLayout()
             Me.TabPage1.SuspendLayout()
             Me.tcMain.SuspendLayout()
@@ -82,12 +88,6 @@
             Me.tpOutput.SuspendLayout()
             CType(Me.grdOutput, System.ComponentModel.ISupportInitialize).BeginInit()
             Me.tpConsole.SuspendLayout()
-            Me.StatusStrip.SuspendLayout()
-            CType(Me.spliSearchContainer, System.ComponentModel.ISupportInitialize).BeginInit()
-            Me.spliSearchContainer.Panel1.SuspendLayout()
-            Me.spliSearchContainer.Panel2.SuspendLayout()
-            Me.spliSearchContainer.SuspendLayout()
-            Me.mnuTabControl.SuspendLayout()
             Me.SuspendLayout()
             '
             'tsMain
@@ -196,6 +196,123 @@
             Me.splitWorkspace.SplitterDistance = 196
             Me.splitWorkspace.TabIndex = 0
             '
+            'imlExploreTabPageImages
+            '
+            Me.imlExploreTabPageImages.ImageStream = CType(resources.GetObject("imlExploreTabPageImages.ImageStream"), System.Windows.Forms.ImageListStreamer)
+            Me.imlExploreTabPageImages.TransparentColor = System.Drawing.Color.Transparent
+            Me.imlExploreTabPageImages.Images.SetKeyName(0, "sitemap16x16.png")
+            '
+            'imlTabPageImages
+            '
+            Me.imlTabPageImages.ImageStream = CType(resources.GetObject("imlTabPageImages.ImageStream"), System.Windows.Forms.ImageListStreamer)
+            Me.imlTabPageImages.TransparentColor = System.Drawing.Color.Transparent
+            Me.imlTabPageImages.Images.SetKeyName(0, "house16x16.png")
+            Me.imlTabPageImages.Images.SetKeyName(1, "music16x16.png")
+            Me.imlTabPageImages.Images.SetKeyName(2, "Template16x16.png")
+            Me.imlTabPageImages.Images.SetKeyName(3, "VB16x16.png")
+            Me.imlTabPageImages.Images.SetKeyName(4, "CS16x16.png")
+            Me.imlTabPageImages.Images.SetKeyName(5, "Source16x16.png")
+            Me.imlTabPageImages.Images.SetKeyName(6, "Properties16x16.png")
+            Me.imlTabPageImages.Images.SetKeyName(7, "TemplateLibrary16x16.png")
+            '
+            'imlOutputTabPageImages
+            '
+            Me.imlOutputTabPageImages.ImageStream = CType(resources.GetObject("imlOutputTabPageImages.ImageStream"), System.Windows.Forms.ImageListStreamer)
+            Me.imlOutputTabPageImages.TransparentColor = System.Drawing.Color.Transparent
+            Me.imlOutputTabPageImages.Images.SetKeyName(0, "application_view_list16x16.png")
+            Me.imlOutputTabPageImages.Images.SetKeyName(1, "terminal16x16.png")
+            Me.imlOutputTabPageImages.Images.SetKeyName(2, "SavePreview16x16.png")
+            '
+            'StatusStrip
+            '
+            Me.StatusStrip.BackColor = System.Drawing.Color.Transparent
+            Me.StatusStrip.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.lblStatus})
+            Me.StatusStrip.Location = New System.Drawing.Point(0, 742)
+            Me.StatusStrip.Name = "StatusStrip"
+            Me.StatusStrip.Size = New System.Drawing.Size(1196, 22)
+            Me.StatusStrip.TabIndex = 3
+            Me.StatusStrip.Text = "StatusStrip1"
+            '
+            'lblStatus
+            '
+            Me.lblStatus.BackColor = System.Drawing.Color.Transparent
+            Me.lblStatus.Name = "lblStatus"
+            Me.lblStatus.Size = New System.Drawing.Size(1181, 17)
+            Me.lblStatus.Spring = True
+            Me.lblStatus.TextAlign = System.Drawing.ContentAlignment.TopLeft
+            '
+            'spliSearchContainer
+            '
+            Me.spliSearchContainer.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Me.spliSearchContainer.BackColor = System.Drawing.Color.Transparent
+            Me.spliSearchContainer.Location = New System.Drawing.Point(201, 0)
+            Me.spliSearchContainer.Name = "spliSearchContainer"
+            '
+            'spliSearchContainer.Panel1
+            '
+            Me.spliSearchContainer.Panel1.BackColor = System.Drawing.Color.Transparent
+            Me.spliSearchContainer.Panel1.Controls.Add(Me.lblSearchMessage)
+            '
+            'spliSearchContainer.Panel2
+            '
+            Me.spliSearchContainer.Panel2.BackColor = System.Drawing.Color.Transparent
+            Me.spliSearchContainer.Panel2.Controls.Add(Me.SearchBox)
+            Me.spliSearchContainer.Panel2MinSize = 100
+            Me.spliSearchContainer.Size = New System.Drawing.Size(995, 24)
+            Me.spliSearchContainer.SplitterDistance = 790
+            Me.spliSearchContainer.TabIndex = 5
+            '
+            'lblSearchMessage
+            '
+            Me.lblSearchMessage.Dock = System.Windows.Forms.DockStyle.Fill
+            Me.lblSearchMessage.Location = New System.Drawing.Point(0, 0)
+            Me.lblSearchMessage.Name = "lblSearchMessage"
+            Me.lblSearchMessage.Size = New System.Drawing.Size(790, 24)
+            Me.lblSearchMessage.TabIndex = 0
+            Me.lblSearchMessage.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+            '
+            'mnuTabControl
+            '
+            Me.mnuTabControl.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mniCloseTab, Me.mniCloseOtherTabs, Me.mniSep1, Me.mniCloseAllTabs})
+            Me.mnuTabControl.Name = "mnuTabControl"
+            Me.mnuTabControl.Size = New System.Drawing.Size(163, 76)
+            '
+            'mniCloseTab
+            '
+            Me.mniCloseTab.Image = CType(resources.GetObject("mniCloseTab.Image"), System.Drawing.Image)
+            Me.mniCloseTab.Name = "mniCloseTab"
+            Me.mniCloseTab.Size = New System.Drawing.Size(162, 22)
+            Me.mniCloseTab.Text = "Close Tab"
+            '
+            'mniCloseOtherTabs
+            '
+            Me.mniCloseOtherTabs.Image = CType(resources.GetObject("mniCloseOtherTabs.Image"), System.Drawing.Image)
+            Me.mniCloseOtherTabs.Name = "mniCloseOtherTabs"
+            Me.mniCloseOtherTabs.Size = New System.Drawing.Size(162, 22)
+            Me.mniCloseOtherTabs.Text = "Close Other Tabs"
+            '
+            'mniSep1
+            '
+            Me.mniSep1.Name = "mniSep1"
+            Me.mniSep1.Size = New System.Drawing.Size(159, 6)
+            '
+            'mniCloseAllTabs
+            '
+            Me.mniCloseAllTabs.Image = CType(resources.GetObject("mniCloseAllTabs.Image"), System.Drawing.Image)
+            Me.mniCloseAllTabs.Name = "mniCloseAllTabs"
+            Me.mniCloseAllTabs.Size = New System.Drawing.Size(162, 22)
+            Me.mniCloseAllTabs.Text = "Close All Tabs"
+            '
+            'SearchBox
+            '
+            Me.SearchBox.Dock = System.Windows.Forms.DockStyle.Fill
+            Me.SearchBox.Location = New System.Drawing.Point(0, 0)
+            Me.SearchBox.Name = "SearchBox"
+            Me.SearchBox.SearchScope = Boston.UI.SearchBox.SearchScopes.Project
+            Me.SearchBox.Size = New System.Drawing.Size(201, 24)
+            Me.SearchBox.TabIndex = 4
+            '
             'tcExplore
             '
             Me.tcExplore.Controls.Add(Me.TabPage1)
@@ -234,12 +351,6 @@
             Me.tvwExplorer.TabIndex = 3
             Me.tvwExplorer.TopNode = Nothing
             '
-            'imlExploreTabPageImages
-            '
-            Me.imlExploreTabPageImages.ImageStream = CType(resources.GetObject("imlExploreTabPageImages.ImageStream"), System.Windows.Forms.ImageListStreamer)
-            Me.imlExploreTabPageImages.TransparentColor = System.Drawing.Color.Transparent
-            Me.imlExploreTabPageImages.Images.SetKeyName(0, "sitemap16x16.png")
-            '
             'tcMain
             '
             Me.tcMain.Controls.Add(Me.tpStart)
@@ -276,19 +387,6 @@
             Me.StartPage1.Name = "StartPage1"
             Me.StartPage1.Size = New System.Drawing.Size(988, 517)
             Me.StartPage1.TabIndex = 0
-            '
-            'imlTabPageImages
-            '
-            Me.imlTabPageImages.ImageStream = CType(resources.GetObject("imlTabPageImages.ImageStream"), System.Windows.Forms.ImageListStreamer)
-            Me.imlTabPageImages.TransparentColor = System.Drawing.Color.Transparent
-            Me.imlTabPageImages.Images.SetKeyName(0, "house16x16.png")
-            Me.imlTabPageImages.Images.SetKeyName(1, "music16x16.png")
-            Me.imlTabPageImages.Images.SetKeyName(2, "Template16x16.png")
-            Me.imlTabPageImages.Images.SetKeyName(3, "VB16x16.png")
-            Me.imlTabPageImages.Images.SetKeyName(4, "CS16x16.png")
-            Me.imlTabPageImages.Images.SetKeyName(5, "Source16x16.png")
-            Me.imlTabPageImages.Images.SetKeyName(6, "Properties16x16.png")
-            Me.imlTabPageImages.Images.SetKeyName(7, "TemplateLibrary16x16.png")
             '
             'tcResults
             '
@@ -405,104 +503,6 @@
             Me.txtConsole.Size = New System.Drawing.Size(1188, 150)
             Me.txtConsole.TabIndex = 1
             '
-            'imlOutputTabPageImages
-            '
-            Me.imlOutputTabPageImages.ImageStream = CType(resources.GetObject("imlOutputTabPageImages.ImageStream"), System.Windows.Forms.ImageListStreamer)
-            Me.imlOutputTabPageImages.TransparentColor = System.Drawing.Color.Transparent
-            Me.imlOutputTabPageImages.Images.SetKeyName(0, "application_view_list16x16.png")
-            Me.imlOutputTabPageImages.Images.SetKeyName(1, "terminal16x16.png")
-            Me.imlOutputTabPageImages.Images.SetKeyName(2, "SavePreview16x16.png")
-            '
-            'StatusStrip
-            '
-            Me.StatusStrip.BackColor = System.Drawing.Color.Transparent
-            Me.StatusStrip.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.lblStatus})
-            Me.StatusStrip.Location = New System.Drawing.Point(0, 742)
-            Me.StatusStrip.Name = "StatusStrip"
-            Me.StatusStrip.Size = New System.Drawing.Size(1196, 22)
-            Me.StatusStrip.TabIndex = 3
-            Me.StatusStrip.Text = "StatusStrip1"
-            '
-            'lblStatus
-            '
-            Me.lblStatus.BackColor = System.Drawing.Color.Transparent
-            Me.lblStatus.Name = "lblStatus"
-            Me.lblStatus.Size = New System.Drawing.Size(1181, 17)
-            Me.lblStatus.Spring = True
-            Me.lblStatus.TextAlign = System.Drawing.ContentAlignment.TopLeft
-            '
-            'spliSearchContainer
-            '
-            Me.spliSearchContainer.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-            Me.spliSearchContainer.BackColor = System.Drawing.Color.Transparent
-            Me.spliSearchContainer.Location = New System.Drawing.Point(201, 0)
-            Me.spliSearchContainer.Name = "spliSearchContainer"
-            '
-            'spliSearchContainer.Panel1
-            '
-            Me.spliSearchContainer.Panel1.BackColor = System.Drawing.Color.Transparent
-            Me.spliSearchContainer.Panel1.Controls.Add(Me.lblSearchMessage)
-            '
-            'spliSearchContainer.Panel2
-            '
-            Me.spliSearchContainer.Panel2.BackColor = System.Drawing.Color.Transparent
-            Me.spliSearchContainer.Panel2.Controls.Add(Me.SearchBox)
-            Me.spliSearchContainer.Panel2MinSize = 100
-            Me.spliSearchContainer.Size = New System.Drawing.Size(995, 24)
-            Me.spliSearchContainer.SplitterDistance = 790
-            Me.spliSearchContainer.TabIndex = 5
-            '
-            'lblSearchMessage
-            '
-            Me.lblSearchMessage.Dock = System.Windows.Forms.DockStyle.Fill
-            Me.lblSearchMessage.Location = New System.Drawing.Point(0, 0)
-            Me.lblSearchMessage.Name = "lblSearchMessage"
-            Me.lblSearchMessage.Size = New System.Drawing.Size(790, 24)
-            Me.lblSearchMessage.TabIndex = 0
-            Me.lblSearchMessage.TextAlign = System.Drawing.ContentAlignment.MiddleRight
-            '
-            'SearchBox
-            '
-            Me.SearchBox.Dock = System.Windows.Forms.DockStyle.Fill
-            Me.SearchBox.Location = New System.Drawing.Point(0, 0)
-            Me.SearchBox.Name = "SearchBox"
-            Me.SearchBox.SearchScope = Boston.UI.SearchBox.SearchScopes.Project
-            Me.SearchBox.Size = New System.Drawing.Size(201, 24)
-            Me.SearchBox.TabIndex = 4
-            '
-            'mnuTabControl
-            '
-            Me.mnuTabControl.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mniCloseTab, Me.mniCloseOtherTabs, Me.mniSep1, Me.mniCloseAllTabs})
-            Me.mnuTabControl.Name = "mnuTabControl"
-            Me.mnuTabControl.Size = New System.Drawing.Size(163, 76)
-            '
-            'mniCloseTab
-            '
-            Me.mniCloseTab.Image = CType(resources.GetObject("mniCloseTab.Image"), System.Drawing.Image)
-            Me.mniCloseTab.Name = "mniCloseTab"
-            Me.mniCloseTab.Size = New System.Drawing.Size(162, 22)
-            Me.mniCloseTab.Text = "Close Tab"
-            '
-            'mniCloseOtherTabs
-            '
-            Me.mniCloseOtherTabs.Image = CType(resources.GetObject("mniCloseOtherTabs.Image"), System.Drawing.Image)
-            Me.mniCloseOtherTabs.Name = "mniCloseOtherTabs"
-            Me.mniCloseOtherTabs.Size = New System.Drawing.Size(162, 22)
-            Me.mniCloseOtherTabs.Text = "Close Other Tabs"
-            '
-            'mniSep1
-            '
-            Me.mniSep1.Name = "mniSep1"
-            Me.mniSep1.Size = New System.Drawing.Size(159, 6)
-            '
-            'mniCloseAllTabs
-            '
-            Me.mniCloseAllTabs.Image = CType(resources.GetObject("mniCloseAllTabs.Image"), System.Drawing.Image)
-            Me.mniCloseAllTabs.Name = "mniCloseAllTabs"
-            Me.mniCloseAllTabs.Size = New System.Drawing.Size(162, 22)
-            Me.mniCloseAllTabs.Text = "Close All Tabs"
-            '
             'MainForm
             '
             Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -532,6 +532,13 @@
             Me.splitWorkspace.Panel2.ResumeLayout(False)
             CType(Me.splitWorkspace, System.ComponentModel.ISupportInitialize).EndInit()
             Me.splitWorkspace.ResumeLayout(False)
+            Me.StatusStrip.ResumeLayout(False)
+            Me.StatusStrip.PerformLayout()
+            Me.spliSearchContainer.Panel1.ResumeLayout(False)
+            Me.spliSearchContainer.Panel2.ResumeLayout(False)
+            CType(Me.spliSearchContainer, System.ComponentModel.ISupportInitialize).EndInit()
+            Me.spliSearchContainer.ResumeLayout(False)
+            Me.mnuTabControl.ResumeLayout(False)
             Me.tcExplore.ResumeLayout(False)
             Me.TabPage1.ResumeLayout(False)
             Me.tcMain.ResumeLayout(False)
@@ -543,13 +550,6 @@
             CType(Me.grdOutput, System.ComponentModel.ISupportInitialize).EndInit()
             Me.tpConsole.ResumeLayout(False)
             Me.tpConsole.PerformLayout()
-            Me.StatusStrip.ResumeLayout(False)
-            Me.StatusStrip.PerformLayout()
-            Me.spliSearchContainer.Panel1.ResumeLayout(False)
-            Me.spliSearchContainer.Panel2.ResumeLayout(False)
-            CType(Me.spliSearchContainer, System.ComponentModel.ISupportInitialize).EndInit()
-            Me.spliSearchContainer.ResumeLayout(False)
-            Me.mnuTabControl.ResumeLayout(False)
             Me.ResumeLayout(False)
             Me.PerformLayout()
 
