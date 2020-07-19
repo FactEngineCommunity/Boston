@@ -1714,10 +1714,12 @@ Namespace FBM
 
         End Function
 
-        Public Function CreateInternalUniquenessConstraint(ByRef aarRole As List(Of FBM.Role), _
-                                                           Optional ByVal abIsPreferredIdentifier As Boolean = False, _
+        Public Function CreateInternalUniquenessConstraint(ByRef aarRole As List(Of FBM.Role),
+                                                           Optional ByVal abIsPreferredIdentifier As Boolean = False,
                                                            Optional ByVal abMakeModelDirty As Boolean = True,
-                                                           Optional ByVal abAddToModel As Boolean = True) As FBM.RoleConstraint
+                                                           Optional ByVal abAddToModel As Boolean = True,
+                                                           Optional ByVal abIsSubtypeRelationshipSubtypeRole As Boolean = False,
+                                                           Optional ByRef arTopmostSupertypeModelObject As FBM.ModelObject = Nothing) As FBM.RoleConstraint
 
             Try
                 '---------------------------------
@@ -1728,10 +1730,10 @@ Namespace FBM
 
                 liNextUICLevel = Me.HighestInternalUniquenessConstraintLevel + 1
 
-                lrRoleConstraint = Me.Model.CreateRoleConstraint(pcenumRoleConstraintType.InternalUniquenessConstraint, _
-                                                                 aarRole, _
-                                                                 pcenumRoleConstraintType.InternalUniquenessConstraint.ToString, _
-                                                                 liNextUICLevel, _
+                lrRoleConstraint = Me.Model.CreateRoleConstraint(pcenumRoleConstraintType.InternalUniquenessConstraint,
+                                                                 aarRole,
+                                                                 pcenumRoleConstraintType.InternalUniquenessConstraint.ToString,
+                                                                 liNextUICLevel,
                                                                  abMakeModelDirty,
                                                                  False)
 
@@ -1743,7 +1745,7 @@ Namespace FBM
                 Me.AddInternalUniquenessConstraint(lrRoleConstraint)
 
                 If abAddToModel Then
-                    Call Me.Model.AddRoleConstraint(lrRoleConstraint, abMakeModelDirty, True)
+                    Call Me.Model.AddRoleConstraint(lrRoleConstraint, abMakeModelDirty, True, Nothing, abIsSubtypeRelationshipSubtypeRole, arTopmostSupertypeModelObject)
                 End If
 
                 Return lrRoleConstraint
@@ -2236,7 +2238,7 @@ Namespace FBM
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Overrides Function getCorrespondingRDSTable(Optional ByVal arModelObject As FBM.ModelObject = Nothing) As RDS.Table
+        Public Shadows Function getCorrespondingRDSTable(Optional ByVal arModelObject As FBM.ModelObject = Nothing) As RDS.Table
 
             Try
                 Dim lrTable As RDS.Table

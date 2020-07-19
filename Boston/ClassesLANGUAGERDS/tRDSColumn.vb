@@ -143,6 +143,30 @@ Namespace RDS
 
         End Sub
 
+        Public Function Clone() As RDS.Column
+
+            Dim lrColumn As New RDS.Column
+
+            With Me
+                lrColumn.Id = .Id
+                lrColumn.ActiveRole = .ActiveRole
+                lrColumn.DataType = .DataType
+                lrColumn.FactType = .FactType
+                lrColumn.IsMandatory = .IsMandatory
+                lrColumn.IsNullable = .IsNullable
+                lrColumn.Model = .Model
+                lrColumn.Name = .Name
+                lrColumn.Nullable = .Nullable
+                lrColumn.OrdinalPosition = .OrdinalPosition
+                lrColumn.Relation = .Relation
+                lrColumn.Role = .Role
+                lrColumn.Table = .Table
+            End With
+
+            Return lrColumn
+
+        End Function
+
         Public Shadows Function Equals(other As Column) As Boolean Implements IEquatable(Of Column).Equals
 
             Return ((Me.Table.Name = other.Table.Name) And (Me.Name = other.Name)) And (Me.ActiveRole.Id = other.ActiveRole.Id)

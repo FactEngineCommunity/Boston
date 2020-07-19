@@ -8,7 +8,7 @@
       <string>b4c88052-5243-4f89-b8b7-27de2875d8c1</string>
       <string>06d7bba0-a99f-4636-a8be-4071374e5894</string>
     </OpenEditorGUIDs>
-    <SelectedEditorGUID>06d7bba0-a99f-4636-a8be-4071374e5894</SelectedEditorGUID>
+    <SelectedEditorGUID>2a6f72f1-7153-4fff-9b60-a106520641bb</SelectedEditorGUID>
   </Profile>
   <Properties>
     <EditorGUID>8ee3448f-d73e-405a-9ba8-f19cc47ba8ab</EditorGUID>
@@ -21,7 +21,7 @@
     <Source>
       <Name>Source</Name>
       <Provider>BostonModel</Provider>
-      <BostonModelId>30cfd566-4a6d-4855-b1cf-fb7616c12730</BostonModelId>
+      <BostonModelId>a37d3316-26e7-4fcd-8441-66ebc974a7cb</BostonModelId>
       <ConnectionString>None Required</ConnectionString>
       <SchemaQuery>Boston Model direct query. No need for a Schema Query here at all</SchemaQuery>
       <TableSchemaQuery>Boston Model direct query. No need for a Schema Query here at all</TableSchemaQuery>

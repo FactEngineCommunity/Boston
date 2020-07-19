@@ -79,33 +79,72 @@ Namespace RDS
 
         Public Sub New(ByVal asRelationId As String,
                        ByRef arOriginTable As RDS.Table,
-                       ByVal aiOriginMultiplicity As pcenumCMMLMultiplicity, _
-                       ByVal abOriginMandatory As Boolean, _
-                       ByVal abOriginContributesToPrimaryKey As Boolean, _
+                       ByVal aiOriginMultiplicity As pcenumCMMLMultiplicity,
+                       ByVal abOriginMandatory As Boolean,
+                       ByVal abOriginContributesToPrimaryKey As Boolean,
                        ByVal asOriginPredicate As String,
                        ByRef arDestinationTable As RDS.Table,
-                       ByVal aiDestinationMultiplicity As pcenumCMMLMultiplicity, _
-                       ByVal abDestinationMandatory As Boolean, _
-                       ByVal asDestinationPredicate As String, _
+                       ByVal aiDestinationMultiplicity As pcenumCMMLMultiplicity,
+                       ByVal abDestinationMandatory As Boolean,
+                       ByVal asDestinationPredicate As String,
                        ByRef arResponsibleFactType As FBM.FactType)
 
-            Me.Id = asRelationId
+            Try
+                Me.Id = asRelationId
 
-            Me.Model = arOriginTable.Model
+                Me.OriginTable = arOriginTable
+                Me.RelationOriginIsMandatory = abOriginMandatory
+                Me.OriginMultiplicity = aiOriginMultiplicity
+                Me.OriginPredicate = asOriginPredicate
 
-            Me.OriginTable = arOriginTable
-            Me.RelationOriginIsMandatory = abOriginMandatory
-            Me.OriginMultiplicity = aiOriginMultiplicity
-            Me.OriginPredicate = asOriginPredicate
+                Me.DestinationTable = arDestinationTable
+                Me.RelationDestinationIsMandatory = abDestinationMandatory
+                Me.DestinationMultiplicity = aiDestinationMultiplicity
+                Me.DestinationPredicate = asDestinationPredicate
 
-            Me.DestinationTable = arDestinationTable
-            Me.RelationDestinationIsMandatory = abDestinationMandatory
-            Me.DestinationMultiplicity = aiDestinationMultiplicity
-            Me.DestinationPredicate = asDestinationPredicate
+                Me.ResponsibleFactType = arResponsibleFactType
 
-            Me.ResponsibleFactType = arResponsibleFactType
+                Me.Model = arOriginTable.Model 'Keep this last. If the arOriginTable does not exist for some reason then most of the Relation is defined.
+
+            Catch ex As Exception
+                Dim lsMessage1 As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
         End Sub
+
+        Public Function Clone() As RDS.Relation
+
+            Dim lrRelation As New RDS.Relation
+
+            With Me
+                lrRelation.Id = System.Guid.NewGuid.ToString
+                lrRelation.CascadingDelete = .CascadingDelete
+                lrRelation.CascadingUpdate = .CascadingUpdate
+                lrRelation.ContributesToPrimaryKey = .ContributesToPrimaryKey
+                lrRelation.DestinationColumns = .DestinationColumns
+                lrRelation.DestinationMultiplicity = .DestinationMultiplicity
+                lrRelation.DestinationPredicate = .DestinationPredicate
+                lrRelation.DestinationTable = .DestinationTable
+                lrRelation.EnforceReferentialIntegrity = .EnforceReferentialIntegrity
+                lrRelation.Model = .Model
+                lrRelation.OriginColumns = .OriginColumns
+                lrRelation.OriginMultiplicity = .OriginMultiplicity
+                lrRelation.OriginPredicate = .OriginPredicate
+                lrRelation.OriginTable = .OriginTable
+                lrRelation.RelationDestinationIsMandatory = .RelationDestinationIsMandatory
+                lrRelation.RelationOriginIsMandatory = .RelationOriginIsMandatory
+                lrRelation.ResponsibleFactType = .ResponsibleFactType
+                lrRelation.ReverseDestinationColumns = .ReverseDestinationColumns
+                lrRelation.ReverseOriginColumns = .ReverseOriginColumns
+            End With
+
+            Return lrRelation
+        End Function
 
         Public Shadows Function Equals(other As Relation) As Boolean Implements IEquatable(Of Relation).Equals
 

@@ -59,6 +59,16 @@ Namespace FBM
 
         Public GUID As String = System.Guid.NewGuid.ToString
 
+        Public _IsAbsorbed As Boolean = False
+        Public Property IsAbsorbed As Boolean
+            Get
+                Return Me._IsAbsorbed
+            End Get
+            Set(value As Boolean)
+                Me._IsAbsorbed = value
+            End Set
+        End Property
+
         <XmlIgnore()> _
         <System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)> _
         <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
@@ -446,6 +456,10 @@ Namespace FBM
 
         End Function
 
+        Public Overridable Function getSubtypes() As List(Of FBM.ModelObject)
+            Return New List(Of ModelObject)
+        End Function
+
         ''' <summary>
         ''' Used for ValueTypes, EntityTypes, Objectified FactTypes. Returns the set of Roles of FactTypes that reference the ModelObject.
         ''' </summary>
@@ -490,7 +504,7 @@ Namespace FBM
             Return New FBM.ModelObject
         End Function
 
-        Public Overridable Function getCorrespondingRDSTable(Optional ByVal arModelObject As FBM.ModelObject = Nothing) As RDS.Table
+        Public Overridable Function getCorrespondingRDSTable() As RDS.Table
             Return New RDS.Table
         End Function
 

@@ -2032,7 +2032,6 @@ Namespace FBM
                 'RDS Processing
                 For Each lrRoleConstraintRole In Me.RoleConstraintRole
                     'Columns/Attributes/Properties will be set to ContributesToPrimaryKey = True
-                    '  This needs to change to False.
                     Dim larColumn As Object
                     If Me.RoleConstraintRole(0).Role.FactType.Arity = 2 Then
                         larColumn = From Table In Me.Model.RDS.Table
@@ -2047,7 +2046,6 @@ Namespace FBM
                     End If
 
                     For Each lrColumn In larColumn
-
                         lrColumn.setContributesToPrimaryKey(abIsPreferredIdentifier)
                         larColumnsAffected.Add(lrColumn)
                     Next
@@ -2084,6 +2082,10 @@ Namespace FBM
 
                             Call lrTable.addIndex(lrPrimaryKeyIndex)
 
+                            'Need to add the Columns and Index to each Subtype ModelObject/Table that is not absorbed
+                            Call lrTable.addPrimaryKeyToNonAbsorbedTables(lrPrimaryKeyIndex)
+
+
                         End If
 
                     Else
@@ -2091,6 +2093,9 @@ Namespace FBM
                             Call lrExistingIndex.setQualifier("PK")
                             Call lrExistingIndex.setName(lrTable.Name & "_PK")
                             Call lrExistingIndex.setIsPrimaryKey(True)
+
+                            'Need to add the Columns and Index to each Subtype ModelObject/Table that is not absorbed
+                            Call lrTable.addPrimaryKeyToNonAbsorbedTables(lrExistingIndex)
                         End If
                     End If
 

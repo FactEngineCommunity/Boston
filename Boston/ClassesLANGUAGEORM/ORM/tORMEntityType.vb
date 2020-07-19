@@ -734,14 +734,14 @@ Namespace FBM
         ''' PRECONDITION: FactType must have a corresponding RDS Table. Used to save typing.
         ''' </summary>
         ''' <returns></returns>
-        ''' <remarks></remarks>
-        Public Overrides Function getCorrespondingRDSTable(Optional ByVal arModelObject As FBM.ModelObject = Nothing) As RDS.Table
+        Public Overrides Function getCorrespondingRDSTable() As RDS.Table
 
             Try
                 Dim lrTable As RDS.Table = Me.Model.RDS.Table.Find(Function(x) x.Name = Me.Id)
 
                 If lrTable Is Nothing Then
-                    Throw New Exception("There is no corresponding table for FactType: '" & Me.Id & "'")
+                    Return Nothing
+                    'Throw New Exception("There is no corresponding table for FactType: '" & Me.Id & "'")
                 Else
                     Return lrTable
                 End If
@@ -1206,7 +1206,7 @@ Namespace FBM
 
             larRole.Clear()
             larRole.Add(lrSubtypeConstraint.FactType.RoleGroup(0))
-            lrSubtypeConstraint.FactType.CreateInternalUniquenessConstraint(larRole, False, False, True)
+            lrSubtypeConstraint.FactType.CreateInternalUniquenessConstraint(larRole, False, False, True, True, ar_parentEntityType.GetTopmostSupertype)
 
             larRole.Clear()
             larRole.Add(lrSubtypeConstraint.FactType.RoleGroup(1))
@@ -1454,7 +1454,7 @@ Namespace FBM
 
         End Function
 
-        Public Function getSubtypes() As List(Of FBM.ModelObject)
+        Public Overrides Function getSubtypes() As List(Of FBM.ModelObject)
 
             Try
                 'Dim larModelElement = From FactType In Me.Model.FactType
@@ -1743,6 +1743,10 @@ Namespace FBM
                 If abDoDatabaseProcessing Then
                     Call TableEntityType.DeleteEntityType(Me)
                 End If
+
+                For Each lrSubtypeRelationship In Me.SubtypeRelationship
+                    Call Me.Model.RemoveFactType(lrSubtypeRelationship.FactType, True)
+                Next
 
                 Me.Model.RemoveEntityType(Me, abDoDatabaseProcessing)
 

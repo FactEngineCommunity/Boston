@@ -101,6 +101,10 @@ Namespace RDS
                 If abAddIndexToColumns Then
                     lrColumn.addIndex(Me)
                 End If
+
+                If Me.IsPrimaryKey Then 'Make sure mandatory
+                    lrColumn.setMandatory(True)
+                End If
             Next
 
             If abAddToTable Then

@@ -595,7 +595,9 @@ Namespace FBM
         Public Sub AddRoleConstraint(ByRef arRoleConstraint As FBM.RoleConstraint,
                                      Optional ByVal abMakeModelDirty As Boolean = False,
                                      Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
-                                     Optional arConceptInstance As FBM.ConceptInstance = Nothing)
+                                     Optional arConceptInstance As FBM.ConceptInstance = Nothing,
+                                     Optional ByVal abIsSubtypeRelationshipSubtypeRole As Boolean = False,
+                                     Optional ByRef arTopmostSupertypeModelObject As FBM.ModelObject = Nothing)
 
             Dim lrDictionaryEntry As FBM.DictionaryEntry
 
@@ -667,7 +669,71 @@ Namespace FBM
                         And Me.RDFCreated Then 'For now, check this...because otherwise RDS may have no Tables.
 
                         If arRoleConstraint.RoleConstraintType = pcenumRoleConstraintType.InternalUniquenessConstraint _
-                            And Not arRoleConstraint.isSubtypeRelationshipFactTypeIUConstraint Then
+                            And arRoleConstraint.isSubtypeRelationshipFactTypeIUConstraint Then
+                            'PSEUDOCODE
+                            '* We are making a SubtypeRelationship, so if the ModelObject is not absorbed by the Supertype,
+                            '    the ModelObject/Table must have the same Columns as the PrimaryKey of the Supertypes, table.
+                            If abIsSubtypeRelationshipSubtypeRole Then
+                                Dim lrModelObject = arRoleConstraint.RoleConstraintRole(0).Role.JoinedORMObject
+                                'Only for EntityTypes for now
+                                If lrModelObject.ConceptType = pcenumConceptType.EntityType Then
+                                    Dim lrEntityType = CType(lrModelObject, FBM.EntityType)
+                                    If lrEntityType.IsAbsorbed Then
+                                        'Nothing to do here, because is absorbed by the Supertype
+                                        '20200713-VM-The Supertype must absorb all of the Columns of the Subtype
+                                    Else
+                                        'Create the Table for the Subtype if it does not exist.
+                                        Dim lrTable = Me.RDS.getTableByName(lrEntityType.Id)
+
+                                        If lrTable Is Nothing Then
+                                            'Table not created yet                                            
+                                            lrTable = New RDS.Table(Me.RDS, lrEntityType.Id, lrEntityType)
+                                            Me.RDS.Table.AddUnique(lrTable)
+                                        End If
+
+                                        Dim larIndexColumn As New List(Of RDS.Column)
+                                        For Each lrColumn In arTopmostSupertypeModelObject.getCorrespondingRDSTable.getPrimaryKeyColumns
+
+                                            Dim lrNewColumn = lrColumn.Clone
+                                            lrNewColumn.Table = lrTable
+                                            lrNewColumn.Id = System.Guid.NewGuid.ToString
+                                            lrNewColumn.IsMandatory = True
+                                            '20200719-VM-ToDo lrColumn.Index Index for the PrimaryKey
+                                            '20200719-VM-ToDo lrColumn.Relation Relation for any Column in the PK that has a Relation
+                                            Call lrTable.addColumn(lrNewColumn)
+
+                                            larIndexColumn.Add(lrNewColumn)
+                                        Next
+
+                                        '------------------------
+                                        'Index 
+                                        'Commented out below, because should be the new set of Columns added to the Table.
+                                        'larIndexColumn = arTopmostSupertypeModelObject.getCorrespondingRDSTable.getPrimaryKeyColumns
+
+                                        Dim lsQualifier = lrTable.generateUniqueQualifier("PK")
+                                        Dim lbIsPrimaryKey As Boolean = True
+                                        Dim lsIndexName As String = lrTable.Name & "_" & Trim(lsQualifier)
+
+                                        'Add the new Index
+                                        Dim lrIndex As New RDS.Index(lrTable,
+                                                                     lsIndexName,
+                                                                     lsQualifier,
+                                                                     pcenumODBCAscendingOrDescending.Ascending,
+                                                                     lbIsPrimaryKey,
+                                                                     True,
+                                                                     False,
+                                                                     larIndexColumn,
+                                                                     False,
+                                                                     True)
+
+                                        Call lrTable.addIndex(lrIndex)
+                                    End If
+                                End If
+                            End If
+
+                        ElseIf arRoleConstraint.RoleConstraintType = pcenumRoleConstraintType.InternalUniquenessConstraint _
+                        And Not arRoleConstraint.isSubtypeRelationshipFactTypeIUConstraint Then
+
                             'Only interested in InternalUniquenessConstraints for forming Columns.
 
                             Dim lrTable As RDS.Table
@@ -917,17 +983,17 @@ Namespace FBM
                                 'Index 
                                 Dim larIndexColumn As New List(Of RDS.Column)
 
-                                    For Each lrRoleConstraintRole In arRoleConstraint.RoleConstraintRole
+                                For Each lrRoleConstraintRole In arRoleConstraint.RoleConstraintRole
 
-                                        Dim larColumn = From Column In lrTable.Column
-                                                        Where Column.Role.Id = lrRoleConstraintRole.Role.Id
-                                                        Select Column
+                                    Dim larColumn = From Column In lrTable.Column
+                                                    Where Column.Role.Id = lrRoleConstraintRole.Role.Id
+                                                    Select Column
 
-                                        For Each lrColumn In larColumn
-                                            larIndexColumn.Add(lrColumn)
-                                        Next 'Column
+                                    For Each lrColumn In larColumn
+                                        larIndexColumn.Add(lrColumn)
+                                    Next 'Column
 
-                                    Next 'RoleConstraintRole
+                                Next 'RoleConstraintRole
 
                                 Dim lsQualifier As String
                                 Dim lbIsPrimaryKey As Boolean = False
@@ -957,16 +1023,16 @@ Namespace FBM
 
                                 Call lrTable.addIndex(lrIndex)
 
-                                ElseIf arRoleConstraint.RoleConstraintRole.Count = 1 _
+                            ElseIf arRoleConstraint.RoleConstraintRole.Count = 1 _
                                 And arRoleConstraint.RoleConstraintRole(0).Role.FactType.IsBinaryFactType _
                                 And Not arRoleConstraint.RoleConstraintRole(0).Role.FactType.IsLinkFactType _
                                 And Not arRoleConstraint.Role(0).JoinedORMObject.ConceptType = pcenumConceptType.ValueType Then
 
-                                    'BinaryFactType that joins either:
-                                    '1. An EntityType with a CompoundReferenceScheme; or
-                                    '2. An ObjectifiedFactType.
+                                'BinaryFactType that joins either:
+                                '1. An EntityType with a CompoundReferenceScheme; or
+                                '2. An ObjectifiedFactType.
 
-                                    Dim lrFactType As FBM.FactType = arRoleConstraint.RoleConstraintRole(0).Role.FactType
+                                Dim lrFactType As FBM.FactType = arRoleConstraint.RoleConstraintRole(0).Role.FactType
                                 Dim lrRole As FBM.Role = arRoleConstraint.RoleConstraintRole(0).Role
 
                                 Dim larColumn As New List(Of RDS.Column)
@@ -1030,8 +1096,8 @@ Namespace FBM
                                      And lrRole.FactType.InternalUniquenessConstraint.Count = 2 _
                                      And Not lrRole.FactType.IsPreferredReferenceMode Then
 
-                                    Dim larRelation = From Relation In Me.RDS.Relation _
-                                                      Where Relation.ResponsibleFactType.Id = lrRole.FactType.Id _
+                                    Dim larRelation = From Relation In Me.RDS.Relation
+                                                      Where Relation.ResponsibleFactType.Id = lrRole.FactType.Id
                                                       Select Relation
 
                                     If larRelation.Count = 0 Then

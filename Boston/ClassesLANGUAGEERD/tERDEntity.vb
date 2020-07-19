@@ -368,7 +368,7 @@ Namespace ERD
 
         End Sub
 
-        Public Overrides Function getCorrespondingRDSTable(Optional ByVal arModelObject As FBM.ModelObject = Nothing) As RDS.Table
+        Public Overrides Function getCorrespondingRDSTable() As RDS.Table
             Return Me.RDSTable
         End Function
         Public Sub MouseDown() Implements FBM.iPageObject.MouseDown

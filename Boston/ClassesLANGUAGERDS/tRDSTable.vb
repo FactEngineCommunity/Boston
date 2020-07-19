@@ -29,9 +29,15 @@ Namespace RDS
         <XmlAttribute()> _
         Public isPGSRelation As Boolean = False
 
-        <XmlIgnore()> _
-        <NonSerialized()> _
+        <XmlIgnore()>
+        <NonSerialized()>
         Public WithEvents FBMModelElement As FBM.ModelObject 'The ModelElement that the Table relates to. Could be an EntityType or a FactType.
+
+        Public ReadOnly Property isAbsorbed As Boolean
+            Get
+                Return Me.FBMModelElement.isAbsorbed
+            End Get
+        End Property
 
         Public Event ColumnRemoved(ByVal arColumn As RDS.Column)
         Public Event ColumnAdded(ByRef arColumn As RDS.Column)
@@ -206,8 +212,8 @@ Namespace RDS
         Public Function getPrimaryKeyColumns() As List(Of RDS.Column)
 
             Try
-                Dim larColumn = From Column In Me.Column _
-                                Where Column.ContributesToPrimaryKey = True _
+                Dim larColumn = From Column In Me.Column
+                                Where Column.ContributesToPrimaryKey = True
                                 Select Column Distinct
 
                 Return larColumn.ToList
@@ -244,7 +250,19 @@ Namespace RDS
         End Function
 
 
+        Public Function getSubtypeTables() As List(Of RDS.Table)
 
+            Dim larSubtypeTable As New List(Of RDS.Table)
+
+            Dim larEntityType = Me.FBMModelElement.getSubtypes()
+
+            For Each lrEntityType In larEntityType
+                larSubtypeTable.Add(lrEntityType.getCorrespondingRDSTable)
+            Next
+
+            Return larSubtypeTable
+
+        End Function
 
 
         ''' <summary>
@@ -690,6 +708,67 @@ Namespace RDS
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
                 prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
             End Try
+
+        End Sub
+
+        Public Sub addPrimaryKeyToNonAbsorbedTables(ByRef arPrimaryKeyIndex As RDS.Index)
+
+            For Each lrTable In Me.getSubtypeTables.FindAll(Function(x) x.isAbsorbed = False)
+
+                Dim larIndexColumn As New List(Of RDS.Column)
+                For Each lrColumn In arPrimaryKeyIndex.Column
+                    Dim lrNewColumn = lrColumn.Clone
+
+                    lrNewColumn.Id = System.Guid.NewGuid.ToString
+                    lrNewColumn.IsMandatory = True 'To be on the safe side                    
+                    lrNewColumn.OrdinalPosition = lrTable.Column.Count + 1
+                    lrNewColumn.Table = lrTable
+
+                    lrTable.addColumn(lrNewColumn)
+
+                    larIndexColumn.Add(lrNewColumn)
+
+                    lrColumn.Relation = New List(Of RDS.Relation)
+
+                    For Each lrRelation In lrColumn.Relation
+                        Dim lrNewRelation = lrRelation.Clone
+
+                        lrNewRelation.Id = System.Guid.NewGuid.ToString
+                        lrNewRelation.OriginColumns.Add(lrNewColumn)
+                        lrNewRelation.OriginTable = lrTable
+                        lrNewRelation.ResponsibleFactType = lrRelation.ResponsibleFactType
+                        lrNewRelation.ReverseDestinationColumns.Add(lrNewColumn)
+                        lrNewRelation.ReverseOriginColumns = lrRelation.ReverseOriginColumns
+
+                        lrNewColumn.Relation.Add(lrNewRelation)
+
+                        Me.Model.addRelation(lrNewRelation)
+                    Next
+                Next
+
+                '------------------------
+                'Index 
+                Dim lsQualifier = lrTable.generateUniqueQualifier("PK")
+                Dim lbIsPrimaryKey As Boolean = True
+                Dim lsIndexName As String = lrTable.Name & "_" & Trim(lsQualifier)
+
+                'Add the new Index
+                Dim lrIndex As New RDS.Index(lrTable,
+                                             lsIndexName,
+                                             lsQualifier,
+                                             pcenumODBCAscendingOrDescending.Ascending,
+                                             lbIsPrimaryKey,
+                                             True,
+                                             False,
+                                             larIndexColumn,
+                                             False,
+                                             True)
+
+                Call lrTable.addIndex(lrIndex)
+
+                'Recursive
+                Call lrTable.addPrimaryKeyToNonAbsorbedTables(arPrimaryKeyIndex)
+            Next
 
         End Sub
 
