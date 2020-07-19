@@ -749,8 +749,8 @@ Namespace RDS
                                 lrNewColumn.Relation.Add(lrNewRelation)
                                 Me.Model.addRelation(lrNewRelation)
                             End If
-
                         Next
+
                     Next
 
                     '------------------------
@@ -776,9 +776,15 @@ Namespace RDS
 
                         Call lrTable.addIndex(lrIndex)
                     Else
-                        Call lrExistingIndex.setQualifier("PK")
-                        Call lrExistingIndex.setName(lrTable.Name & "_PK")
-                        Call lrExistingIndex.setIsPrimaryKey(True)
+                        If abIsPreferredIdentifier Then
+                            Call lrExistingIndex.setQualifier("PK")
+                            Call lrExistingIndex.setName(lrTable.Name & "_PK")
+                            Call lrExistingIndex.setIsPrimaryKey(True)
+                        Else
+                            Call lrExistingIndex.setQualifier("UK")
+                            Call lrExistingIndex.setName(lrTable.Name & "_UC")
+                            Call lrExistingIndex.setIsPrimaryKey(abIsPreferredIdentifier)
+                        End If
                     End If
 
                     'Recursive

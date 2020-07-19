@@ -681,7 +681,7 @@ Namespace FBM
                                     If lrEntityType.IsAbsorbed Then
                                         'Nothing to do here, because is absorbed by the Supertype
                                         '20200713-VM-The Supertype must absorb all of the Columns of the Subtype
-                                    Else
+                                    ElseIf arRoleConstraint.IsPreferredIdentifier Then
                                         'Create the Table for the Subtype if it does not exist.
                                         Dim lrTable = Me.RDS.getTableByName(lrEntityType.Id)
 

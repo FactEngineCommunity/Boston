@@ -2038,6 +2038,7 @@ Namespace FBM
                         larColumn = From Table In Me.Model.RDS.Table
                                     From Column In Table.Column
                                     Where Column.Role.Id = lrRoleConstraintRole.Role.FactType.GetOtherRoleOfBinaryFactType(lrRoleConstraintRole.Role.Id).Id
+                                    Where lrRoleConstraintRole.Role.FactType.GetOtherRoleOfBinaryFactType(lrRoleConstraintRole.Role.Id).JoinedORMObject Is Table.FBMModelElement
                                     Select Column
                     Else
                         larColumn = From Table In Me.Model.RDS.Table
@@ -2093,10 +2094,10 @@ Namespace FBM
                             Call lrExistingIndex.setQualifier("PK")
                             Call lrExistingIndex.setName(lrTable.Name & "_PK")
                             Call lrExistingIndex.setIsPrimaryKey(True)
-
-                            'Need to add the Columns and Index to each Subtype ModelObject/Table that is not absorbed
-                            Call lrTable.addPrimaryKeyToNonAbsorbedTables(lrExistingIndex, abIsPreferredIdentifier)
                         End If
+
+                        'Need to add the Columns and Index to each Subtype ModelObject/Table that is not absorbed
+                        Call lrTable.addPrimaryKeyToNonAbsorbedTables(lrExistingIndex, abIsPreferredIdentifier)
                     End If
 
                     For Each lrColumn In larColumnsAffected
