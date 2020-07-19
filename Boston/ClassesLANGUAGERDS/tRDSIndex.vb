@@ -12,9 +12,16 @@ Namespace RDS
         <XmlAttribute()> _
         Public Name As String
 
-        <XmlIgnore()> _
-        <NonSerialized()> _
+        <XmlIgnore()>
+        <NonSerialized()>
         Public Table As RDS.Table
+
+        ''' <summary>
+        ''' 20200720-VM-In future will need to modify the Core Model to incorporate this, is derived as of today until new Core is created.
+        ''' </summary>
+        <XmlIgnore()>
+        <NonSerialized()>
+        Public WithEvents ResponsibleRoleConstraint As FBM.RoleConstraint
 
         <XmlAttribute()> _
         Public ReadOnly Property TableName As String
@@ -146,6 +153,50 @@ Namespace RDS
 
         End Sub
 
+        Public Function getResponsibleRoleConstraintFromORMModel() As FBM.RoleConstraint
+
+            Dim lrModelObject = Me.Table.FBMModelElement
+
+            Select Case lrModelObject.ConceptType
+                Case Is = pcenumConceptType.EntityType
+                    'Responsible Role Constraint is either the PrimaryReferenceScheme Role Constraint
+                    '  OR an External Uniqueness Constraint joined to Roles of Fact Types joined to the Entity Type.
+                    Dim lrEntityType = CType(lrModelObject, FBM.EntityType)
+                    Dim lrReferenceModeRoleConstraint = lrEntityType.ReferenceModeRoleConstraint
+                    If lrEntityType.HasSimpleReferenceScheme Then
+                        'PSEUDOCODE
+                        ' * Check whether all the ResponsibleRoles of the Columns of the Index are in the FactTypes of the Roles of the RoleConstraint
+                        Dim liMatch = (From IdxColumn In Me.Column
+                                       From Role In lrReferenceModeRoleConstraint.Role
+                                       Where Role.FactType.RoleGroup.Contains(IdxColumn.Role)
+                                       Select IdxColumn).Count
+
+                        If liMatch = Me.Column.Count Then
+                            Return lrReferenceModeRoleConstraint
+                        End If
+                    End If
+                    If lrEntityType.HasCompoundReferenceMode Then
+                        'PSEUDOCODE
+                        ' * Check whether all the ResponsibleRoles of the Columns of the Index are in the FactTypes of the Roles of the RoleConstraint
+                        Dim liMatch = (From IdxColumn In Me.Column
+                                       From Role In lrReferenceModeRoleConstraint.Role
+                                       Where Role.FactType.RoleGroup.Contains(IdxColumn.Role)
+                                       Where lrReferenceModeRoleConstraint.RoleConstraintRole.Count = Me.Column.Count
+                                       Select IdxColumn).Count
+
+                        If liMatch = Me.Column.Count Then
+                            Return lrReferenceModeRoleConstraint
+                        End If
+                    End If
+
+                    'Otherwise, do the same as the above, but for all RoleConstraints in the FBMModel.
+                Case Is = pcenumConceptType.FactType
+
+            End Select
+
+
+        End Function
+
         Public Sub removeColumn(ByRef arColumn As RDS.Column)
 
             Try
@@ -222,6 +273,12 @@ Namespace RDS
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
                 prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
             End Try
+
+        End Sub
+
+        Private Sub ResponsibleRoleConstraint_RemovedFromModel(abBroadcastInterfaceEvent As Boolean) Handles ResponsibleRoleConstraint.RemovedFromModel
+
+            Call Me.Table.removeIndex(Me)
 
         End Sub
 

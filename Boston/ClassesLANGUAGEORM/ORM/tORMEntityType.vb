@@ -1562,7 +1562,7 @@ Namespace FBM
                     ElseIf Me.HasCompoundReferenceMode Then
                         Return False
                     ElseIf Trim(Me.ReferenceMode) <> "" Then
-                        If Me.ReferenceModeValueType Is Nothing Or _
+                        If Me.ReferenceModeValueType Is Nothing Or
                            Me.ReferenceModeFactType Is Nothing Then
 
                             '--------------------------------------------------------------------------------------
@@ -1578,8 +1578,10 @@ Namespace FBM
                             lsMessage &= vbCrLf & "As a precaution, the ReferenceMode has been removed and the Model saved."
 
                             Throw New Exception(lsMessage)
-                        Else
+                        ElseIf Me.ReferenceModeRoleConstraint IsNot Nothing Then
                             Return True
+                        Else
+                            Return False
                         End If
                     End If
                 End If

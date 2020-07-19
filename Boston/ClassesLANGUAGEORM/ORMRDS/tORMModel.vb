@@ -1536,6 +1536,8 @@ Namespace FBM
                         lrRecordset1.MoveNext()
                     End While
 
+                    lrIndex.ResponsibleRoleConstraint = lrIndex.getResponsibleRoleConstraintFromORMModel()
+
                     'Restrains to Unique Values
                     lsSQLQuery = "SELECT *"
                     lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreIndexRestrainsToUniqueValues.ToString
