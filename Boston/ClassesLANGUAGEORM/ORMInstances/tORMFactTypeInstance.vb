@@ -329,8 +329,9 @@ Namespace FBM
                     lrFactTypeInstance = arPage.FactTypeInstance.Find(Function(x) x.Id = Me.Id)
                 Else
                     With Me
-                        lrFactTypeInstance.Model = arPage.Model                        
-                        lrFactTypeInstance.Page = arPage                        
+                        lrFactTypeInstance.isDirty = True
+                        lrFactTypeInstance.Model = arPage.Model
+                        lrFactTypeInstance.Page = arPage
                         lrFactTypeInstance.FactTypeName.Page = arPage
                         lrFactTypeInstance.Id = .Id
                         lrFactTypeInstance.Name = .Name
@@ -370,34 +371,34 @@ Namespace FBM
                                     Call arPage.Model.moveRelationsOfFactTypeToRespectiveLinkFactTypes(lrFactType)
                                 End If
                             End If
+                        End If
+
+                        lrFactTypeInstance.FactTypeName = .FactTypeName.Clone(arPage, lrFactTypeInstance)
+
+                        lrFactTypeInstance.Shape = New ShapeNode
+                        lrFactTypeInstance.X = .X
+                        lrFactTypeInstance.Y = .Y
+
+                        For Each lrRoleInstance In .RoleGroup
+                            lrClonedRoleInstance = lrRoleInstance.Clone(arPage, abAddToPage)
+                            lrClonedRoleInstance.FactType = lrFactTypeInstance
+                            lrFactTypeInstance.RoleGroup.Add(lrClonedRoleInstance)
+                        Next
+
+                        '------------------------------------------------------------
+                        'Needs to be after RoleInstances have been added to the FactTypeInstance 
+                        '  so that the TableNode has the right ColumnCount
+                        lrFactTypeInstance.FactTable = New FBM.FactTable(arPage, lrFactTypeInstance)
+
+                        For Each lrFactInstance In .Fact
+                            lrFactTypeInstance.Fact.Add(lrFactInstance.Clone(arPage, lrFactTypeInstance))
+                        Next
+
+                        If abAddToPage Then
+                            If Not arPage.FactTypeInstance.Exists(AddressOf lrFactTypeInstance.Equals) Then
+                                arPage.FactTypeInstance.AddUnique(lrFactTypeInstance)
                             End If
-
-                            lrFactTypeInstance.FactTypeName = .FactTypeName.Clone(arPage, lrFactTypeInstance)
-
-                            lrFactTypeInstance.Shape = New ShapeNode
-                            lrFactTypeInstance.X = .X
-                            lrFactTypeInstance.Y = .Y
-
-                            For Each lrRoleInstance In .RoleGroup
-                                lrClonedRoleInstance = lrRoleInstance.Clone(arPage, abAddToPage)
-                                lrClonedRoleInstance.FactType = lrFactTypeInstance
-                                lrFactTypeInstance.RoleGroup.Add(lrClonedRoleInstance)
-                            Next
-
-                            '------------------------------------------------------------
-                            'Needs to be after RoleInstances have been added to the FactTypeInstance 
-                            '  so that the TableNode has the right ColumnCount
-                            lrFactTypeInstance.FactTable = New FBM.FactTable(arPage, lrFactTypeInstance)
-
-                            For Each lrFactInstance In .Fact
-                                lrFactTypeInstance.Fact.Add(lrFactInstance.Clone(arPage, lrFactTypeInstance))
-                            Next
-
-                            If abAddToPage Then
-                                If Not arPage.FactTypeInstance.Exists(AddressOf lrFactTypeInstance.Equals) Then
-                                    arPage.FactTypeInstance.AddUnique(lrFactTypeInstance)
-                                End If
-                            End If
+                        End If
 
                     End With
                 End If

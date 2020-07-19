@@ -1394,9 +1394,10 @@ Namespace FBM
 
         End Sub
 
-        Public Overrides Function RemoveFromModel(Optional ByVal abForceRemoval As Boolean = False, _
+        Public Overrides Function RemoveFromModel(Optional ByVal abForceRemoval As Boolean = False,
                                                   Optional ByVal abCheckForErrors As Boolean = True,
-                                                  Optional ByVal abDoDatabaseProcessing As Boolean = True) As Boolean
+                                                  Optional ByVal abDoDatabaseProcessing As Boolean = True,
+                                                  Optional ByVal abIncludeSubtypeRelationshipFactTypes As Boolean = True) As Boolean
 
             Try
                 Call Me.FactType.RemoveFactTypeReading(Me, abDoDatabaseProcessing)

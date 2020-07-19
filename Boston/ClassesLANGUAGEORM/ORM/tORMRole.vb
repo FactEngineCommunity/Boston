@@ -2137,9 +2137,10 @@ Namespace FBM
         '''   i.e. Will not remove the Role if there is a RoleConstraint attached to the Role.
         ''' </summary>
         ''' <remarks></remarks>
-        Public Overrides Function RemoveFromModel(Optional ByVal abForceRemoval As Boolean = False, _
+        Public Overrides Function RemoveFromModel(Optional ByVal abForceRemoval As Boolean = False,
                                                   Optional ByVal abCheckForErrors As Boolean = True,
-                                                  Optional ByVal abDoDatabaseProcessing As Boolean = True) As Boolean
+                                                  Optional ByVal abDoDatabaseProcessing As Boolean = True,
+                                                  Optional ByVal abIncludeSubtypeRelationshipFactTypes As Boolean = True) As Boolean
 
             Try
                 Me.Model.Role.Remove(Me)

@@ -3031,11 +3031,13 @@ Namespace FBM
         ''' <param name="abForceRemoval"></param>
         ''' <param name="abCheckForErrors"></param>
         ''' <param name="abDoDatabaseProcessing">In Client/Server mode, we might not require that database functions are performed, because another Client may have already done the processing.</param>
+        ''' <param name="abIncludeSubtypeRelationshipFactTypes">Only used for Entity Types.</param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Overrides Function RemoveFromModel(Optional ByVal abForceRemoval As Boolean = False, _
-                                                  Optional ByVal abCheckForErrors As Boolean = True, _
-                                                  Optional ByVal abDoDatabaseProcessing As Boolean = True) As Boolean
+        Public Overrides Function RemoveFromModel(Optional ByVal abForceRemoval As Boolean = False,
+                                                  Optional ByVal abCheckForErrors As Boolean = True,
+                                                  Optional ByVal abDoDatabaseProcessing As Boolean = True,
+                                                  Optional ByVal abIncludeSubtypeRelationshipFactTypes As Boolean = True) As Boolean
 
             Dim liInd As Integer = 0
             Dim lrRole As FBM.Role
@@ -3045,9 +3047,9 @@ Namespace FBM
             Try
 
                 If Me.IsPreferredReferenceMode Then
-                    Dim larEntityType = From Role In Me.RoleGroup _
-                                        From EntityType In Me.Model.EntityType _
-                                        Where EntityType.Id = Role.JoinedORMObject.Id _
+                    Dim larEntityType = From Role In Me.RoleGroup
+                                        From EntityType In Me.Model.EntityType
+                                        Where EntityType.Id = Role.JoinedORMObject.Id
                                         Select EntityType
 
                     If IsSomething(larEntityType) Then

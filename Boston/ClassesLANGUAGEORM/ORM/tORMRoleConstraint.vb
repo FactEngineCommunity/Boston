@@ -1677,7 +1677,8 @@ Namespace FBM
         ''' <remarks></remarks>
         Public Overrides Function RemoveFromModel(Optional ByVal abForceRemoval As Boolean = False,
                                                   Optional ByVal abCheckForErrors As Boolean = True,
-                                                  Optional ByVal abDoDatabaseProcessing As Boolean = True) As Boolean Implements iModelObject.RemoveFromModel
+                                                  Optional ByVal abDoDatabaseProcessing As Boolean = True,
+                                                  Optional ByVal abIncludeSubtypeRelationshipFactTypes As Boolean = True) As Boolean Implements iModelObject.RemoveFromModel
 
             Dim lrModelDictionaryEntry As New FBM.DictionaryEntry(Me.Model, Me.Id, pcenumConceptType.RoleConstraint)
 
@@ -1685,9 +1686,9 @@ Namespace FBM
 
                 If Me.IsReferenceSchemePreferredIdentifierRC And Not abForceRemoval Then
 
-                    Dim larEntityType = From EntityType In Me.Model.EntityType _
+                    Dim larEntityType = From EntityType In Me.Model.EntityType
                                         Where EntityType.PreferredIdentifierRCId = Me.Id _
-                                        And EntityType.HasSimpleReferenceScheme _
+                                        And EntityType.HasSimpleReferenceScheme
                                         Select EntityType
 
                     Dim lrEntityType As FBM.EntityType
@@ -1697,9 +1698,9 @@ Namespace FBM
                         'Will only get here is an EntityType has a SimpleReferenceScheme and the 
                         ' PreferredIndentifierRCID of the EntityType is 'me' (the RoleConstraint).
                         '-------------------------------------------------------------------------------                        
-                        Call prApplication.ThrowErrorMessage("Error: Cannot remove a Role Constraint which identifies the Simple Reference Scheme of an Entity Type", _
-                                                                     pcenumErrorType.Critical, _
-                                                                     Nothing, _
+                        Call prApplication.ThrowErrorMessage("Error: Cannot remove a Role Constraint which identifies the Simple Reference Scheme of an Entity Type",
+                                                                     pcenumErrorType.Critical,
+                                                                     Nothing,
                                                                      False)
                         Return False
                         Exit Function
@@ -2083,7 +2084,7 @@ Namespace FBM
                             Call lrTable.addIndex(lrPrimaryKeyIndex)
 
                             'Need to add the Columns and Index to each Subtype ModelObject/Table that is not absorbed
-                            Call lrTable.addPrimaryKeyToNonAbsorbedTables(lrPrimaryKeyIndex)
+                            Call lrTable.addPrimaryKeyToNonAbsorbedTables(lrPrimaryKeyIndex, abIsPreferredIdentifier)
 
 
                         End If
@@ -2095,7 +2096,7 @@ Namespace FBM
                             Call lrExistingIndex.setIsPrimaryKey(True)
 
                             'Need to add the Columns and Index to each Subtype ModelObject/Table that is not absorbed
-                            Call lrTable.addPrimaryKeyToNonAbsorbedTables(lrExistingIndex)
+                            Call lrTable.addPrimaryKeyToNonAbsorbedTables(lrExistingIndex, abIsPreferredIdentifier)
                         End If
                     End If
 

@@ -261,7 +261,9 @@ Namespace ERD
                     Me.Cell.TextColor = Color.Black
                 End If
 
-                Me.Cell.Table.ResizeToFitText(True)
+                If Me.Cell.Table.Rows.Count > 0 Then
+                    Me.Cell.Table.ResizeToFitText(True)
+                End If
 
 
                 Me.Page.Diagram.Invalidate()

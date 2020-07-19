@@ -161,6 +161,7 @@ Namespace FBM
                     lrValueTypeInstance = arPage.ValueTypeInstance.Find(Function(x) x.Id = Me.Id)
                 Else
                     With Me
+                        lrValueTypeInstance.isDirty = True
                         lrValueTypeInstance.Model = arPage.Model
                         lrValueTypeInstance.Page = arPage
                         lrValueTypeInstance.Symbol = .Symbol

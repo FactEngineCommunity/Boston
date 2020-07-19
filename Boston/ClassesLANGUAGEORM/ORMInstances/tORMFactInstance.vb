@@ -501,7 +501,7 @@ Namespace FBM
                         If TableConceptInstance.ExistsConceptInstance(lrConceptInstance) Then
                             Call TableConceptInstance.UpdateConceptInstance(lrConceptInstance)
                         Else
-                            Dim lrConcept As New FBM.Concept(lrFactDataInstance.Data)
+                            Dim lrConcept As New FBM.Concept(lrFactDataInstance.Data, True)
                             lrConcept.Save()
                             Call TableConceptInstance.AddConceptInstance(lrConceptInstance)
                         End If

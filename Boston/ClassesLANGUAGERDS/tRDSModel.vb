@@ -287,6 +287,10 @@ Namespace RDS
                     Call Me.removeRelation(lrRelation)
                 Next
 
+                For Each lrIndex In Me.Index.FindAll(Function(x) x.Table.Name = lrTable.Name).ToArray
+                    Call Me.removeIndex(lrIndex)
+                Next
+
                 'Remove the Table fromm the RDS Model.
                 Call Me.Table.Remove(arTable)
 

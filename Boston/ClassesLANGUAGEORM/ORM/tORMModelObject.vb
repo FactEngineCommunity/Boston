@@ -538,16 +538,17 @@ Namespace FBM
 
         End Sub
 
-        Public Overridable Function RemoveFromModel(Optional ByVal abForceRemoval As Boolean = False, _
+        Public Overridable Function RemoveFromModel(Optional ByVal abForceRemoval As Boolean = False,
                                                     Optional ByVal abCheckForErrors As Boolean = True,
-                                                    Optional ByVal abDoDatabaseProcessing As Boolean = True) As Boolean '(ByRef arError As FBM.ModelError) As Boolean
+                                                    Optional ByVal abDoDatabaseProcessing As Boolean = True,
+                                                    Optional ByVal abIncludeSubtypeRelationshipFactTypes As Boolean = True) As Boolean '(ByRef arError As FBM.ModelError) As Boolean
             '----------------------------------------------------
             'Shadowed in tEntityType, tValueType, FBM.tFactType etc
             '----------------------------------------------------
         End Function
 
         Public Overridable Sub RemoveSubtypeRelationship(ByRef arSubtypeConstraint As FBM.tSubtypeRelationship)
-
+            Me.SubtypeRelationship.Remove(arSubtypeConstraint)
         End Sub
 
         Public Sub SetPropertyAttributes(ByRef arObject As Object, ByVal asProperty As String, ByVal abIsBrowsable As Boolean)

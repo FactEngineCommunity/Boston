@@ -612,15 +612,17 @@ Namespace FBM
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Function ExistsRolesAssociatedWithEntityType() As Boolean
+        Public Function ExistsRolesAssociatedWithEntityType(Optional ByVal abIncludeSubtypeRelationshipFactTypes As Boolean = False) As Boolean
 
             ExistsRolesAssociatedWithEntityType = False
 
-            Dim larRoles = From FactType In Me.Model.FactType _
-                           From Role In FactType.RoleGroup _
-                          Where Role.TypeOfJoin = pcenumRoleJoinType.EntityType _
-                            And Role.JoinsEntityType Is Me _
-                         Select Role
+            Dim larRoles = From FactType In Me.Model.FactType
+                           From Role In FactType.RoleGroup
+                           Where FactType.IsSubtypeRelationshipFactType = abIncludeSubtypeRelationshipFactTypes
+                           Where Role.TypeOfJoin = pcenumRoleJoinType.EntityType
+                           Where Role.JoinsEntityType Is Me
+                           Select Role
+
 
             Dim lrRole As New FBM.Role
 
@@ -734,10 +736,16 @@ Namespace FBM
         ''' PRECONDITION: FactType must have a corresponding RDS Table. Used to save typing.
         ''' </summary>
         ''' <returns></returns>
-        Public Overrides Function getCorrespondingRDSTable() As RDS.Table
+        Public Shadows Function getCorrespondingRDSTable(Optional abCreateTableIfNotExists As Boolean = False) As RDS.Table
 
             Try
                 Dim lrTable As RDS.Table = Me.Model.RDS.Table.Find(Function(x) x.Name = Me.Id)
+
+                If lrTable Is Nothing And abCreateTableIfNotExists Then
+                    lrTable = New RDS.Table(Me.Model.RDS, Me.Id, Me)
+                    Me.Model.RDS.addTable(lrTable)
+                    Return lrTable
+                End If
 
                 If lrTable Is Nothing Then
                     Return Nothing
@@ -1311,7 +1319,7 @@ Namespace FBM
 
                 If Me.HasSimpleReferenceScheme Then
 
-                    Throw New Exception("This function not called for EntityTypes that have a SimpleReferenceScheme.")
+                    'Throw New Exception("This function not called for EntityTypes that have a SimpleReferenceScheme.")
 
                 ElseIf Me.HasCompoundReferenceMode Then
 
@@ -1677,9 +1685,10 @@ Namespace FBM
 
         End Sub
 
-        Public Overrides Function RemoveFromModel(Optional ByVal abForceRemoval As Boolean = False, _
+        Public Overrides Function RemoveFromModel(Optional ByVal abForceRemoval As Boolean = False,
                                                   Optional ByVal abCheckForErrors As Boolean = True,
-                                                  Optional ByVal abDoDatabaseProcessing As Boolean = True) As Boolean
+                                                  Optional ByVal abDoDatabaseProcessing As Boolean = True,
+                                                  Optional ByVal abIncludeSubtypeRelationshipFactTypes As Boolean = True) As Boolean
 
             Dim lrEntityType As FBM.EntityType
             Dim lrSubtype As FBM.tSubtypeRelationship
@@ -1693,8 +1702,8 @@ Namespace FBM
                         Exit Function
                     End If
 
-                    If Me.ExistsRolesAssociatedWithEntityType And _
-                       Not (Me.HasSimpleReferenceScheme And _
+                    If Me.ExistsRolesAssociatedWithEntityType(abIncludeSubtypeRelationshipFactTypes) And
+                       Not (Me.HasSimpleReferenceScheme And
                             (Me.GetCountRolesAssociatedWithEntityType = 1)) Then
                         MsgBox("You cannot remove Entity Type, '" & Trim(Me.Name) & "' while there are Fact Types/Roles within the Model associated with the Entity Type.")
                         Return False

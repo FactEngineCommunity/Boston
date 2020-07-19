@@ -396,6 +396,7 @@ Namespace FBM
                     lrEntityTypeInstance = arPage.EntityTypeInstance.Find(Function(x) x.Id = Me.Id)
                 Else
                     With Me
+                        lrEntityTypeInstance.isDirty = True
                         lrEntityTypeInstance.Model = arPage.Model
                         lrEntityTypeInstance.Page = arPage
                         lrEntityTypeInstance.Symbol = .Symbol

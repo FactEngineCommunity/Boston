@@ -3399,6 +3399,7 @@ Public Class frmDiagramORM
                     'Special handling for FactTypes.
                     '  FactTypeInstances are not added to zrPage.SelectedObject in Diagram.NodeSelected
                     '------------------------------------------------------------------------------------
+                    loSelectedNode.Selected = True
                     If loSelectedNode.Tag.ConceptType = pcenumConceptType.FactType Then
                         Me.zrPage.SelectedObject.Clear()
                         Me.zrPage.SelectedObject.Add(loSelectedNode.Tag)
@@ -7940,11 +7941,15 @@ Public Class frmDiagramORM
             With New WaitCursor
                 lrEntityTypeInstance = Me.zrPage.SelectedObject(0)
 
-                Me.zrPage.SelectedObject.Remove(lrEntityTypeInstance)
+                'Me.zrPage.SelectedObject.Remove(lrEntityTypeInstance)
 
                 If lrEntityTypeInstance Is Nothing Then Exit Sub
 
-                Call lrEntityTypeInstance.EntityType.RemoveFromModel(False, True, True)
+                For Each lrSubtypeRelationship In lrEntityTypeInstance.EntityType.SubtypeRelationship.ToArray
+                    Call lrSubtypeRelationship.RemoveFromModel()
+                Next
+
+                Call lrEntityTypeInstance.EntityType.RemoveFromModel(False, True, True, False)
             End With
 
         Catch ex As Exception
@@ -9710,6 +9715,7 @@ Public Class frmDiagramORM
         Me.BackgroundWorker.ReportProgress(0)
 
         lrPage = Me.zrPage.CreateEntityRelationshipDiagram(Me.BackgroundWorker)
+        lrPage.Loaded = True
 
         Me.CircularProgressBar.Value = 0
         Me.CircularProgressBar.Text = "0%"
@@ -9733,6 +9739,8 @@ Public Class frmDiagramORM
             End If
 
         End If
+
+
 
     End Sub
 

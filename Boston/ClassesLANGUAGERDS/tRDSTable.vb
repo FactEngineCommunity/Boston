@@ -257,7 +257,7 @@ Namespace RDS
             Dim larEntityType = Me.FBMModelElement.getSubtypes()
 
             For Each lrEntityType In larEntityType
-                larSubtypeTable.Add(lrEntityType.getCorrespondingRDSTable)
+                larSubtypeTable.Add(CType(lrEntityType, FBM.EntityType).getCorrespondingRDSTable(True))
             Next
 
             Return larSubtypeTable
@@ -711,64 +711,88 @@ Namespace RDS
 
         End Sub
 
-        Public Sub addPrimaryKeyToNonAbsorbedTables(ByRef arPrimaryKeyIndex As RDS.Index)
+        Public Sub addPrimaryKeyToNonAbsorbedTables(ByRef arPrimaryKeyIndex As RDS.Index, ByVal abIsPreferredIdentifier As Boolean)
 
-            For Each lrTable In Me.getSubtypeTables.FindAll(Function(x) x.isAbsorbed = False)
+            Try
+                For Each lrTable In Me.getSubtypeTables.FindAll(Function(x) x.isAbsorbed = False)
 
-                Dim larIndexColumn As New List(Of RDS.Column)
-                For Each lrColumn In arPrimaryKeyIndex.Column
-                    Dim lrNewColumn = lrColumn.Clone
+                    Dim larIndexColumn As New List(Of RDS.Column)
+                    For Each lrColumn In arPrimaryKeyIndex.Column
+                        Dim lrNewColumn = lrColumn.Clone
 
-                    lrNewColumn.Id = System.Guid.NewGuid.ToString
-                    lrNewColumn.IsMandatory = True 'To be on the safe side                    
-                    lrNewColumn.OrdinalPosition = lrTable.Column.Count + 1
-                    lrNewColumn.Table = lrTable
+                        lrNewColumn.Id = System.Guid.NewGuid.ToString
+                        lrNewColumn.IsMandatory = True 'To be on the safe side                    
+                        lrNewColumn.OrdinalPosition = lrTable.Column.Count + 1
+                        lrNewColumn.Table = lrTable
 
-                    lrTable.addColumn(lrNewColumn)
+                        If lrTable.Column.Contains(lrNewColumn) Then
+                            lrNewColumn = lrTable.Column.Find(AddressOf lrNewColumn.Equals)
+                        Else
+                            lrTable.addColumn(lrNewColumn)
+                        End If
 
-                    larIndexColumn.Add(lrNewColumn)
+                        lrNewColumn.Relation = New List(Of RDS.Relation) 'Leave here, otherwise Table.addColumn will assign any relation for the Original Column (in the Supertype)
 
-                    lrColumn.Relation = New List(Of RDS.Relation)
+                        larIndexColumn.AddUnique(lrNewColumn)
 
-                    For Each lrRelation In lrColumn.Relation
-                        Dim lrNewRelation = lrRelation.Clone
+                        For Each lrRelation In lrColumn.Relation
+                            Dim lrNewRelation = lrRelation.Clone
 
-                        lrNewRelation.Id = System.Guid.NewGuid.ToString
-                        lrNewRelation.OriginColumns.Add(lrNewColumn)
-                        lrNewRelation.OriginTable = lrTable
-                        lrNewRelation.ResponsibleFactType = lrRelation.ResponsibleFactType
-                        lrNewRelation.ReverseDestinationColumns.Add(lrNewColumn)
-                        lrNewRelation.ReverseOriginColumns = lrRelation.ReverseOriginColumns
+                            lrNewRelation.Id = System.Guid.NewGuid.ToString
+                            lrNewRelation.OriginColumns.Add(lrNewColumn)
+                            lrNewRelation.OriginTable = lrTable
+                            lrNewRelation.ResponsibleFactType = lrRelation.ResponsibleFactType
+                            lrNewRelation.ReverseDestinationColumns.Add(lrNewColumn)
+                            lrNewRelation.ReverseOriginColumns = lrRelation.ReverseOriginColumns
 
-                        lrNewColumn.Relation.Add(lrNewRelation)
+                            If lrNewColumn.Relation.Find(AddressOf lrNewRelation.EqualsByOriginColumnsDesinationTable) Is Nothing Then
+                                lrNewColumn.Relation.Add(lrNewRelation)
+                                Me.Model.addRelation(lrNewRelation)
+                            End If
 
-                        Me.Model.addRelation(lrNewRelation)
+                        Next
                     Next
+
+                    '------------------------
+                    'Index 
+                    Dim lrExistingIndex As RDS.Index = lrTable.getIndexByColumns(larIndexColumn)
+
+                    If lrExistingIndex Is Nothing Then
+                        Dim lsQualifier = lrTable.generateUniqueQualifier("PK")
+                        Dim lbIsPrimaryKey As Boolean = True
+                        Dim lsIndexName As String = lrTable.Name & "_" & Trim(lsQualifier)
+
+                        'Add the new Index
+                        Dim lrIndex As New RDS.Index(lrTable,
+                                                     lsIndexName,
+                                                     lsQualifier,
+                                                     pcenumODBCAscendingOrDescending.Ascending,
+                                                     lbIsPrimaryKey,
+                                                     True,
+                                                     False,
+                                                     larIndexColumn,
+                                                     False,
+                                                     True)
+
+                        Call lrTable.addIndex(lrIndex)
+                    Else
+                        Call lrExistingIndex.setQualifier("PK")
+                        Call lrExistingIndex.setName(lrTable.Name & "_PK")
+                        Call lrExistingIndex.setIsPrimaryKey(True)
+                    End If
+
+                    'Recursive
+                    Call lrTable.addPrimaryKeyToNonAbsorbedTables(arPrimaryKeyIndex, abIsPreferredIdentifier)
                 Next
 
-                '------------------------
-                'Index 
-                Dim lsQualifier = lrTable.generateUniqueQualifier("PK")
-                Dim lbIsPrimaryKey As Boolean = True
-                Dim lsIndexName As String = lrTable.Name & "_" & Trim(lsQualifier)
+            Catch ex As Exception
+                Dim lsMessage1 As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
-                'Add the new Index
-                Dim lrIndex As New RDS.Index(lrTable,
-                                             lsIndexName,
-                                             lsQualifier,
-                                             pcenumODBCAscendingOrDescending.Ascending,
-                                             lbIsPrimaryKey,
-                                             True,
-                                             False,
-                                             larIndexColumn,
-                                             False,
-                                             True)
-
-                Call lrTable.addIndex(lrIndex)
-
-                'Recursive
-                Call lrTable.addPrimaryKeyToNonAbsorbedTables(arPrimaryKeyIndex)
-            Next
+                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
         End Sub
 

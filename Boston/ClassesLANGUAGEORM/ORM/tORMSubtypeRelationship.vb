@@ -130,7 +130,7 @@ Namespace FBM
         Public Shadows Sub RemoveFromModel()
 
             Call Me.EntityType.RemoveSubtypeRelationship(Me)
-            Call Me.FactType.RemoveFromModel(True)
+            Call Me.FactType.RemoveFromModel(True, False, True, True)
             Call Me.Delete()
 
         End Sub

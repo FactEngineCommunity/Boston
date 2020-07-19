@@ -158,7 +158,9 @@ Namespace RDS
                 lrColumn.Name = .Name
                 lrColumn.Nullable = .Nullable
                 lrColumn.OrdinalPosition = .OrdinalPosition
-                lrColumn.Relation = .Relation
+                For Each lrRelation In .Relation
+                    lrColumn.Relation.Add(lrRelation.Clone)
+                Next
                 lrColumn.Role = .Role
                 lrColumn.Table = .Table
             End With
@@ -169,7 +171,12 @@ Namespace RDS
 
         Public Shadows Function Equals(other As Column) As Boolean Implements IEquatable(Of Column).Equals
 
-            Return ((Me.Table.Name = other.Table.Name) And (Me.Name = other.Name)) And (Me.ActiveRole.Id = other.ActiveRole.Id)
+            If other.ActiveRole Is Nothing Then
+                Return Me.Id = other.Id
+            Else
+                Return ((Me.Table.Name = other.Table.Name) And (Me.Name = other.Name)) And (Me.ActiveRole.Id = other.ActiveRole.Id)
+            End If
+
 
         End Function
 

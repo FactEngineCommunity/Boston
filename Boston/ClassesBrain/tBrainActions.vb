@@ -455,9 +455,14 @@ Partial Public Class tBrain
 
         Me.Timeout.Stop()
 
-        Dim lsEntityTypeName = Viev.Strings.MakeCapCamelCase(Me.VAQL.ISANENTITYTYPEStatement.MODELELEMENTNAME)
+        Dim lsEntityTypeName = Trim(Viev.Strings.MakeCapCamelCase(Me.VAQL.ISANENTITYTYPEStatement.MODELELEMENTNAME))
 
-        Dim lrEntityType = Me.Model.CreateEntityType(lsEntityTypeName, False)
+        If Me.Model.ModelDictionary.Find(Function(x) x.Symbol = lsEntityTypeName And x.isEntityType) IsNot Nothing Then
+            Me.send_data("I know.")
+            Exit Sub
+        End If
+
+        Dim lrEntityType = Me.Model.CreateEntityType(Trim(lsEntityTypeName), True)
 
         Dim lrEnityTypeInstance = Me.Page.DropEntityTypeAtPoint(lrEntityType, New PointF(100, 10)) 'VM-20180329-Me.Page.Form.CreateEntityType(lsEntityTypeName, True)
 

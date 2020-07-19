@@ -429,7 +429,7 @@ Namespace FBM
             '------------------------------------------------------------------------------------------------
             Dim asSymbol As String = arEntityType.Id
 
-            lrDictionaryEntry = Me.AddModelDictionaryEntry(New FBM.DictionaryEntry(Me, arEntityType.Id, pcenumConceptType.EntityType))
+            lrDictionaryEntry = Me.AddModelDictionaryEntry(New FBM.DictionaryEntry(Me, arEntityType.Id, pcenumConceptType.EntityType,,, abMakeModelDirty, abMakeModelDirty))
 
 
             arEntityType.Concept = lrDictionaryEntry.Concept
@@ -1627,9 +1627,11 @@ Namespace FBM
                 lrDictionaryEntry = Me.ModelDictionary.Find(AddressOf lrDictionaryEntry.Equals)
                 If IsSomething(lrDictionaryEntry) Then
                     If lrDictionaryEntry.isGeneralConceptOnly Then
-                        lsNewUniqueName = asEntityTypeName
-                    Else
+                        lsNewUniqueName = asEntityTypeName 'I.e. Use that DictionaryEntry
+                    ElseIf Not lrDictionaryEntry.isEntityType Then
                         lsNewUniqueName = Me.CreateUniqueEntityTypeName(lrEntityType.Name, 0)
+                    Else
+                        lsNewUniqueName = asEntityTypeName 'I.e. Use that DictionaryEntry
                     End If
                 Else
                     lsNewUniqueName = Me.CreateUniqueEntityTypeName(lrEntityType.Name, 0)
@@ -3874,6 +3876,7 @@ Namespace FBM
                 prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
+            Return ExistsModelElement
 
         End Function
 
