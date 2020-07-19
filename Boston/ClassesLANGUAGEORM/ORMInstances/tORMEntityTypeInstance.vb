@@ -1230,6 +1230,9 @@ Namespace FBM
                     Me.ReferenceModeRoleConstraint = Nothing
                     Me.ReferenceModeValueType = Nothing
                 Else
+                    If Me.EntityType.ReferenceModeRoleConstraint Is Nothing Then
+                        Exit Sub
+                    End If
                     Me.ReferenceModeRoleConstraint = Me.Page.RoleConstraintInstance.Find(Function(x) x.Id = Me.EntityType.ReferenceModeRoleConstraint.Id)
 
                     If IsSomething(Me.ReferenceModeRoleConstraint) And Me.HasSimpleReferenceScheme Then
@@ -1842,6 +1845,7 @@ Namespace FBM
 
             Me.IsAbsorbed = abNewIsAbsorbed
 
+
         End Sub
 
         Private Sub _EntityType_IsIndependentChanged(abNewIsIndependent As Boolean) Handles _EntityType.IsIndependentChanged
@@ -2040,6 +2044,7 @@ Namespace FBM
                     End If
 
                     Me.ReferenceMode = " "
+                    Me.isDirty = True
 
                     Call Me.RefreshShape()
                 End If

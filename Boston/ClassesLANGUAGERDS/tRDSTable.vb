@@ -739,7 +739,7 @@ Namespace RDS
                             Dim lrNewRelation = lrRelation.Clone
 
                             lrNewRelation.Id = System.Guid.NewGuid.ToString
-                            lrNewRelation.OriginColumns.Add(lrNewColumn)
+                            lrNewRelation.OriginColumns.AddRange(larIndexColumn)
                             lrNewRelation.OriginTable = lrTable
                             lrNewRelation.ResponsibleFactType = lrRelation.ResponsibleFactType
                             lrNewRelation.ReverseDestinationColumns.Add(lrNewColumn)

@@ -124,7 +124,7 @@ Namespace RDS
             If Me.Column.Count = other.Column.Count Then
 
                 For Each lrColumn In Me.Column
-                    If Not other.Column.Find(Function(x) x.Name = lrColumn.Name And x.ActiveRole.Id = lrColumn.ActiveRole.Id) Is Nothing Then
+                    If other.Column.Find(Function(x) x.Name = lrColumn.Name And x.ActiveRole.Id = lrColumn.ActiveRole.Id) Is Nothing Then
                         Return False
                     End If
                 Next

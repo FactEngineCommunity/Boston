@@ -2086,7 +2086,6 @@ Namespace FBM
                             'Need to add the Columns and Index to each Subtype ModelObject/Table that is not absorbed
                             Call lrTable.addPrimaryKeyToNonAbsorbedTables(lrPrimaryKeyIndex, abIsPreferredIdentifier)
 
-
                         End If
 
                     Else
