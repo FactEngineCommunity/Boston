@@ -2350,7 +2350,52 @@ Public Class frmToolboxORMVerbalisation
 
     End Sub
 
+    Public Sub VerbaliseTable(ByVal arTable As RDS.Table)
 
+        Dim lrVerbaliser As New FBM.ORMVerbailser
+        Call lrVerbaliser.Reset()
+
+        '------------------------------------------------------
+        'Declare that the EntityType(Name) is an EntityType
+        '------------------------------------------------------
+        lrVerbaliser.VerbalisePredicateText(arTable.Name)
+        lrVerbaliser.VerbaliseQuantifier(" is an Entity.")
+        lrVerbaliser.HTW.WriteBreak()
+        lrVerbaliser.HTW.WriteBreak()
+
+        lrVerbaliser.VerbaliseHeading("Constraints:")
+        lrVerbaliser.HTW.WriteBreak()
+        lrVerbaliser.HTW.WriteBreak()
+
+        If arTable.Index.Count = 0 Then
+            lrVerbaliser.VerbaliseBlackText("There are no Indexes for this Entity")
+            lrVerbaliser.HTW.WriteBreak()
+            lrVerbaliser.HTW.WriteBreak()
+        Else
+            For Each lrIndex In arTable.Index
+                lrVerbaliser.VerbalisePredicateText(lrIndex.Name & " ")
+
+                If lrIndex.IsPrimaryKey Then
+                    lrVerbaliser.VerbaliseQuantifierLight("is a Primary Key over Columns, ")
+                Else
+                    lrVerbaliser.VerbaliseQuantifierLight("is a Unique Key over Columns, ")
+                End If
+
+                lrVerbaliser.VerbaliseBlackText("(")
+                Dim liInd As Integer = 1
+                For Each lrColumn In lrIndex.Column
+                    lrVerbaliser.VerbaliseModelObject(lrColumn.ActiveRole.JoinedORMObject)
+                    If liInd < lrIndex.Column.Count Then lrVerbaliser.VerbaliseBlackText(", ")
+                    liInd += 1
+                Next
+                lrVerbaliser.VerbaliseBlackText(")")
+                lrVerbaliser.HTW.WriteBreak()
+            Next
+        End If
+
+        Me.WebBrowser.DocumentText = lrVerbaliser.Verbalise
+
+    End Sub
     Public Sub VerbaliseValueType(ByVal arValueType As FBM.ValueType)
         '------------------------------------------------------
         'PSEUDOCODE
@@ -2644,7 +2689,7 @@ Public Class frmToolboxORMVerbalisation
                 Dim liInd As Integer = 1
                 For Each lrColumn In lrIndex.Column
                     lrVerbaliser.VerbaliseModelObject(lrColumn.ActiveRole.JoinedORMObject)
-                    If liInd < lrIndex.Column.Count Then lrVerbaliser.VerbaliseBlackText(",")
+                    If liInd < lrIndex.Column.Count Then lrVerbaliser.VerbaliseBlackText(", ")
                     liInd += 1
                 Next
                 lrVerbaliser.VerbaliseBlackText(")")

@@ -446,9 +446,13 @@ Public Class frmToolboxModelDictionary
                     End If
 
                 Case Is = GetType(RDS.Column).ToString
-                        If IsSomething(lrORMToolboxVerbalisation) Then
-                            lrORMToolboxVerbalisation.VerbaliseColumn(e.Node.Tag)
-                        End If
+                    If IsSomething(lrORMToolboxVerbalisation) Then
+                        lrORMToolboxVerbalisation.VerbaliseColumn(e.Node.Tag)
+                    End If
+                Case Is = GetType(RDS.Table).ToString
+                    If IsSomething(lrORMToolboxVerbalisation) Then
+                        lrORMToolboxVerbalisation.VerbaliseTable(e.Node.Tag)
+                    End If
             End Select
 
         Catch ex As Exception
