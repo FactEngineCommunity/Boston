@@ -81,37 +81,48 @@ Namespace RDS
 
         Public Sub addColumn(ByRef arColumn As RDS.Column)
 
-            arColumn.OrdinalPosition = Me.Column.Count + 1
+            Try
+                arColumn.OrdinalPosition = Me.Column.Count + 1
+                arColumn.Table = Me 'CodeSafe
 
-            Me.Column.AddUnique(arColumn)
+                Me.Column.AddUnique(arColumn)
 
-            If arColumn.Role.isRDSForeignKeyRole Then
+                If arColumn.Role.isRDSForeignKeyRole Then
 
-                Dim lrRelation As RDS.Relation = arColumn.Role.belongsToRelation
-                If lrRelation IsNot Nothing Then
-                    lrRelation.OriginColumns.Add(arColumn)
-                    arColumn.Relation.Add(lrRelation)
+                    Dim lrRelation As RDS.Relation = arColumn.Role.belongsToRelation
+                    If lrRelation IsNot Nothing And arColumn.Relation IsNot Nothing Then
+                        lrRelation.OriginColumns.AddUnique(arColumn)
+                        arColumn.Relation.AddUnique(lrRelation)
+                    End If
                 End If
-            End If
 
-            'Is only IsPGSRelation if the Objectified Fact Type (i.e. The objectified relation) only references ValueTypes. 
-            'i.e.Where ObjectifiedFactType Is only joined To ValueTypes. If Is joined To any EntityType Or another ObjectifiedFactType, then cannot be a PGSRelation, And must be a Node.
-            If (arColumn.ContributesToPrimaryKey = False) And (TypeOf (arColumn.Role.JoinedORMObject) IsNot FBM.ValueType) Then
-                '--------------------------------------------------------------------
-                'Remove IsPGSRelation if join is not to a ValueType
-                Call Me.setIsPGSRelation(False)
-            ElseIf TypeOf (Me.FBMModelElement) Is FBM.FactType Then
-                'FBMModelObject is the ModelElement that the Table relates to.
-                If Not (arColumn.ContributesToPrimaryKey) And (arColumn.FactType IsNot Me.FBMModelElement) And (TypeOf (arColumn.Role.JoinedORMObject) IsNot FBM.ValueType) Then
+                'Is only IsPGSRelation if the Objectified Fact Type (i.e. The objectified relation) only references ValueTypes. 
+                'i.e.Where ObjectifiedFactType Is only joined To ValueTypes. If Is joined To any EntityType Or another ObjectifiedFactType, then cannot be a PGSRelation, And must be a Node.
+                If (arColumn.ContributesToPrimaryKey = False) And (TypeOf (arColumn.Role.JoinedORMObject) IsNot FBM.ValueType) Then
+                    '--------------------------------------------------------------------
+                    'Remove IsPGSRelation if join is not to a ValueType
                     Call Me.setIsPGSRelation(False)
+                ElseIf TypeOf (Me.FBMModelElement) Is FBM.FactType Then
+                    'FBMModelObject is the ModelElement that the Table relates to.
+                    If Not (arColumn.ContributesToPrimaryKey) And (arColumn.FactType IsNot Me.FBMModelElement) And (TypeOf (arColumn.Role.JoinedORMObject) IsNot FBM.ValueType) Then
+                        Call Me.setIsPGSRelation(False)
+                    End If
                 End If
-            End If
 
-            '------------------------------------------------------------------------------
-            'CMML Code
-            Call Me.Model.Model.createCMMLAttribute(Me.Name, arColumn.Name, arColumn.Role, arColumn)
+                '------------------------------------------------------------------------------
+                'CMML Code
+                Call Me.Model.Model.createCMMLAttribute(Me.Name, arColumn.Name, arColumn.Role, arColumn)
 
-            RaiseEvent ColumnAdded(arColumn)
+                RaiseEvent ColumnAdded(arColumn)
+
+            Catch ex As Exception
+                Dim lsMessage1 As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
         End Sub
 
@@ -718,12 +729,12 @@ Namespace RDS
 
                     Dim larIndexColumn As New List(Of RDS.Column)
                     For Each lrColumn In arPrimaryKeyIndex.Column
-                        Dim lrNewColumn = lrColumn.Clone
+
+                        Dim lrNewColumn = lrColumn.Clone(lrTable) 'Without arRelation, so the Cloned Column.Relation is Nothing, see below.
 
                         lrNewColumn.Id = System.Guid.NewGuid.ToString
                         lrNewColumn.IsMandatory = True 'To be on the safe side                    
                         lrNewColumn.OrdinalPosition = lrTable.Column.Count + 1
-                        lrNewColumn.Table = lrTable
 
                         If lrTable.Column.Contains(lrNewColumn) Then
                             lrNewColumn = lrTable.Column.Find(AddressOf lrNewColumn.Equals)
@@ -735,21 +746,31 @@ Namespace RDS
 
                         larIndexColumn.AddUnique(lrNewColumn)
 
+                    Next
+
+                    For Each lrColumn In Me.Column
                         For Each lrRelation In lrColumn.Relation
+
                             Dim lrNewRelation = lrRelation.Clone(lrTable)
 
                             lrNewRelation.Id = System.Guid.NewGuid.ToString
-                            lrNewRelation.OriginColumns.AddRange(larIndexColumn)
                             lrNewRelation.ResponsibleFactType = lrRelation.ResponsibleFactType
-                            lrNewRelation.ReverseDestinationColumns.Add(lrNewColumn)
+                            lrNewRelation.ReverseDestinationColumns.Add(lrColumn)
                             lrNewRelation.ReverseOriginColumns = lrRelation.ReverseOriginColumns
 
-                            If lrNewColumn.Relation.Find(AddressOf lrNewRelation.EqualsByOriginColumnsDesinationTable) Is Nothing Then
-                                lrNewColumn.Relation.Add(lrNewRelation)
-                                Me.Model.addRelation(lrNewRelation)
+                            Dim lrNewColumn = lrTable.Column.Find(Function(x) x.ActiveRole.Id = lrColumn.ActiveRole.Id)
+
+                            'The NewColumn will have a Relation because cloning the Relation adds the Relation to the NewColum in lrTable.
+                            lrNewRelation = lrNewColumn.Relation.Find(AddressOf lrNewRelation.EqualsByOriginColumnsDesinationTable) 'Should be the same Relation
+                            If lrNewRelation IsNot Nothing Then
+                                If Me.Model.Relation.Find(AddressOf lrNewRelation.EqualsByOriginColumnsDesinationTable) Is Nothing Then
+                                    Me.Model.addRelation(lrNewRelation)
+                                Else
+                                    lrNewColumn.Relation.Remove(lrNewRelation)
+                                    lrNewColumn.Relation.Add(Me.Model.Relation.Find(AddressOf lrNewRelation.EqualsByOriginColumnsDesinationTable))
+                                End If
                             End If
                         Next
-
                     Next
 
                     '------------------------

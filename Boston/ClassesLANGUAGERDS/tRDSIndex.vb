@@ -245,6 +245,14 @@ Namespace RDS
 
                 Call Me.Model.Model.updateCMMLIndexIsPrimaryKey(Me, abIsPrimaryKey)
 
+                For Each lrColumn In Me.Column
+                    Dim lbPrimaryIndex = (From Index In lrColumn.Index
+                                          Where Index.IsPrimaryKey
+                                          Select Index).Count > 0
+
+                    Call lrColumn.setContributesToPrimaryKey(lbPrimaryIndex)
+                Next
+
                 RaiseEvent IsPrimaryKeyChanged(abIsPrimaryKey)
 
             Catch ex As Exception

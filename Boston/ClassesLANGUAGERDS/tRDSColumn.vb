@@ -143,14 +143,22 @@ Namespace RDS
 
         End Sub
 
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <param name="arOriginTable">Must be populated if arRelation is populated.</param>
+        ''' <param name="arRelation"></param>
+        ''' <returns></returns>
         Public Function Clone(Optional ByRef arOriginTable As RDS.Table = Nothing,
-                              Optional ByRef arRelation As RDS.Relation) As RDS.Column
+                              Optional ByRef arRelation As RDS.Relation = Nothing) As RDS.Column
 
             Dim lrColumn As New RDS.Column
 
             With Me
                 If arOriginTable IsNot Nothing Then
                     lrColumn.Table = arOriginTable
+                Else
+                    lrColumn.Table = .Table
                 End If
                 lrColumn.Id = .Id
                 lrColumn.ActiveRole = .ActiveRole
@@ -162,13 +170,19 @@ Namespace RDS
                 lrColumn.Name = .Name
                 lrColumn.Nullable = .Nullable
                 lrColumn.OrdinalPosition = .OrdinalPosition
+                lrColumn.Relation = Nothing
                 If arOriginTable Is Nothing Then
                     For Each lrRelation In .Relation
-                        lrColumn.Relation.Add(lrRelation.Clone)
+                        If arRelation IsNot Nothing Then
+                            If lrColumn.Relation Is Nothing Then lrColumn.Relation = New List(Of RDS.Relation)
+                            'Add to that Relation, because most likely calling Clone from Cloning the Relation.
+                            '  The cloned Column is added to the reciprocal Relation in Relation.Clone
+                            lrColumn.Relation.Add(arRelation) 'The relation, most likely, being cloned.
+                        End If
                     Next
                 End If
                 lrColumn.Role = .Role
-                lrColumn.Table = .Table
+
             End With
 
             Return lrColumn

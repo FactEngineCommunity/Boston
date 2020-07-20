@@ -2259,7 +2259,7 @@ Namespace FBM
                     Throw New Exception(lsMessage)
                 End If
 
-                Me.ReferenceModeRoleConstraint.SetIsPreferredIdentifier(False)
+                If Me.ReferenceModeRoleConstraint.IsPreferredIdentifier Then Me.ReferenceModeRoleConstraint.SetIsPreferredIdentifier(False)
 
                 Me.ReferenceModeRoleConstraint = Nothing
 

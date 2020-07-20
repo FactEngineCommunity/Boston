@@ -117,7 +117,7 @@ Namespace RDS
 
         End Sub
 
-        Public Function Clone(Optional arOriginTable As RDS.Table) As RDS.Relation
+        Public Function Clone(Optional arOriginTable As RDS.Table = Nothing) As RDS.Relation
 
             Dim lrRelation As New RDS.Relation
 
@@ -136,7 +136,11 @@ Namespace RDS
                     lrRelation.OriginColumns = New List(Of RDS.Column)
                     For Each lrColumn In .OriginColumns
                         Dim lrNewColumn = arOriginTable.Column.Find(Function(x) x.ActiveRole.Id = lrColumn.ActiveRole.Id)
-                        If lrNewColumn IsNot Nothing Then lrNewColumn = lrNewColumn.Clone(arOriginTable, lrRelation)
+                        If lrNewColumn Is Nothing Then lrNewColumn = lrNewColumn.Clone(arOriginTable, lrRelation) 'Make the Colum for the returned Table/Relation
+                        If lrNewColumn.Relation.Find(AddressOf lrRelation.EqualsByOriginColumnsDesinationTable) Is Nothing Then
+                            lrNewColumn.Relation.AddUnique(lrRelation)
+                        End If
+                        lrRelation.OriginColumns.AddUnique(lrNewColumn)
                     Next
                 End If
                 lrRelation.OriginMultiplicity = .OriginMultiplicity
