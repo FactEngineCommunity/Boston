@@ -736,11 +736,10 @@ Namespace RDS
                         larIndexColumn.AddUnique(lrNewColumn)
 
                         For Each lrRelation In lrColumn.Relation
-                            Dim lrNewRelation = lrRelation.Clone
+                            Dim lrNewRelation = lrRelation.Clone(lrTable)
 
                             lrNewRelation.Id = System.Guid.NewGuid.ToString
                             lrNewRelation.OriginColumns.AddRange(larIndexColumn)
-                            lrNewRelation.OriginTable = lrTable
                             lrNewRelation.ResponsibleFactType = lrRelation.ResponsibleFactType
                             lrNewRelation.ReverseDestinationColumns.Add(lrNewColumn)
                             lrNewRelation.ReverseOriginColumns = lrRelation.ReverseOriginColumns

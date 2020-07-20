@@ -117,7 +117,7 @@ Namespace RDS
 
         End Sub
 
-        Public Function Clone() As RDS.Relation
+        Public Function Clone(Optional arOriginTable As RDS.Table) As RDS.Relation
 
             Dim lrRelation As New RDS.Relation
 
@@ -132,10 +132,20 @@ Namespace RDS
                 lrRelation.DestinationTable = .DestinationTable
                 lrRelation.EnforceReferentialIntegrity = .EnforceReferentialIntegrity
                 lrRelation.Model = .Model
-                lrRelation.OriginColumns = .OriginColumns
+                If arOriginTable IsNot Nothing Then
+                    lrRelation.OriginColumns = New List(Of RDS.Column)
+                    For Each lrColumn In .OriginColumns
+                        Dim lrNewColumn = arOriginTable.Column.Find(Function(x) x.ActiveRole.Id = lrColumn.ActiveRole.Id)
+                        If lrNewColumn IsNot Nothing Then lrNewColumn = lrNewColumn.Clone(arOriginTable, lrRelation)
+                    Next
+                End If
                 lrRelation.OriginMultiplicity = .OriginMultiplicity
                 lrRelation.OriginPredicate = .OriginPredicate
-                lrRelation.OriginTable = .OriginTable
+                If arOriginTable IsNot Nothing Then
+                    lrRelation.OriginTable = arOriginTable
+                Else
+                    lrRelation.OriginTable = .OriginTable
+                End If
                 lrRelation.RelationDestinationIsMandatory = .RelationDestinationIsMandatory
                 lrRelation.RelationOriginIsMandatory = .RelationOriginIsMandatory
                 lrRelation.ResponsibleFactType = .ResponsibleFactType

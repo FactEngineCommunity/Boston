@@ -143,11 +143,15 @@ Namespace RDS
 
         End Sub
 
-        Public Function Clone() As RDS.Column
+        Public Function Clone(Optional ByRef arOriginTable As RDS.Table = Nothing,
+                              Optional ByRef arRelation As RDS.Relation) As RDS.Column
 
             Dim lrColumn As New RDS.Column
 
             With Me
+                If arOriginTable IsNot Nothing Then
+                    lrColumn.Table = arOriginTable
+                End If
                 lrColumn.Id = .Id
                 lrColumn.ActiveRole = .ActiveRole
                 lrColumn.DataType = .DataType
@@ -158,9 +162,11 @@ Namespace RDS
                 lrColumn.Name = .Name
                 lrColumn.Nullable = .Nullable
                 lrColumn.OrdinalPosition = .OrdinalPosition
-                For Each lrRelation In .Relation
-                    lrColumn.Relation.Add(lrRelation.Clone)
-                Next
+                If arOriginTable Is Nothing Then
+                    For Each lrRelation In .Relation
+                        lrColumn.Relation.Add(lrRelation.Clone)
+                    Next
+                End If
                 lrColumn.Role = .Role
                 lrColumn.Table = .Table
             End With
