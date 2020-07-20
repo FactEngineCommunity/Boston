@@ -1608,11 +1608,7 @@ Namespace FBM
         ''' <remarks></remarks>
         Public Function IsSubtype() As Boolean
 
-            If Me.parentModelObjectList.Count = 0 Then
-                Return False
-            Else
-                Return True
-            End If
+            Return Me.parentModelObjectList.Count > 0
 
         End Function
 

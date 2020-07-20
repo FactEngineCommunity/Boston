@@ -22,11 +22,18 @@ Partial Public Class tBrain
             '---------------------------------------------------------
             'Great! The name identified by the user is an EntityType
             '---------------------------------------------------------
-            lsEntityTypeName = lsActualModelElementName
-            lrEntityType = Me.Model.GetModelObjectByName(lsEntityTypeName)
-        Else
-            lrEntityType = Me.Model.CreateEntityType(lsEntityTypeName, False)
 
+            lsEntityTypeName = lsActualModelElementName
+
+            Dim lrModelObject = Me.Model.GetModelObjectByName(lsEntityTypeName)
+            lrEntityType = lrModelObject
+        Else
+            Dim lrModelObject = Me.Model.GetModelObjectByName(lsEntityTypeName)
+            If TypeOf (lrModelObject) IsNot FBM.EntityType Then
+                Me.send_data(lsEntityTypeName & " is not an Entity Type")
+                Exit Sub
+            End If
+            lrEntityType = Me.Model.CreateEntityType(lsEntityTypeName, False)
             lrEntityTypeInstance = Me.Page.DropEntityTypeAtPoint(lrEntityType, New PointF(100, 100))
 
             'Call lrEntityTypeInstance.RepellFromNeighbouringPageObjects(1, False)
@@ -457,11 +464,17 @@ Partial Public Class tBrain
 
         Dim lsEntityTypeName = Trim(Viev.Strings.MakeCapCamelCase(Me.VAQL.ISANENTITYTYPEStatement.MODELELEMENTNAME))
 
+        If Me.Model.ExistsModelElement(lsEntityTypeName) Then
+            Me.send_data("There is already a Model Element with the name, '" & lsEntityTypeName & "'. Try another name")
+            Exit Sub
+        End If
+
         If Me.Model.ModelDictionary.Find(Function(x) x.Symbol = lsEntityTypeName And x.isEntityType) IsNot Nothing Then
             Me.send_data("I know.")
             Exit Sub
         End If
 
+        'Have already checked to see wither it is okay to create the EntityType above.
         Dim lrEntityType = Me.Model.CreateEntityType(Trim(lsEntityTypeName), True)
 
         Dim lrEnityTypeInstance = Me.Page.DropEntityTypeAtPoint(lrEntityType, New PointF(100, 10)) 'VM-20180329-Me.Page.Form.CreateEntityType(lsEntityTypeName, True)

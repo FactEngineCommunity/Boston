@@ -1605,6 +1605,7 @@ Namespace FBM
 
         ''' <summary>
         ''' Creates a new EntityType for the Model (including a ValueType and FactType for the ReferenceMode of the EntityType)
+        ''' PRECONDITION: Have already checked to see that the asEntityTypeName does not clash with another ModelObject.
         ''' </summary>
         ''' <returns>tEntityType</returns>
         ''' <remarks></remarks>
@@ -1614,27 +1615,16 @@ Namespace FBM
             Dim lrEntityType As FBM.EntityType
 
             Try
-
-                If IsSomething(asEntityTypeName) Then
-                    lrEntityType = New FBM.EntityType(Me, pcenumLanguage.ORMModel, asEntityTypeName, asEntityTypeName)
-                Else
-                    lrEntityType = New FBM.EntityType(Me, pcenumLanguage.ORMModel, "NewEntityType", "NewEntityType")
-                End If
-
                 Dim lsNewUniqueName As String = ""
 
-                Dim lrDictionaryEntry = New FBM.DictionaryEntry(Me, asEntityTypeName, pcenumConceptType.GeneralConcept)
-                lrDictionaryEntry = Me.ModelDictionary.Find(AddressOf lrDictionaryEntry.Equals)
-                If IsSomething(lrDictionaryEntry) Then
-                    If lrDictionaryEntry.isGeneralConceptOnly Then
-                        lsNewUniqueName = asEntityTypeName 'I.e. Use that DictionaryEntry
-                    ElseIf Not lrDictionaryEntry.isEntityType Then
-                        lsNewUniqueName = Me.CreateUniqueEntityTypeName(lrEntityType.Name, 0)
-                    Else
-                        lsNewUniqueName = asEntityTypeName 'I.e. Use that DictionaryEntry
-                    End If
+                If IsSomething(asEntityTypeName) Then
+                    lsNewUniqueName = asEntityTypeName
                 Else
-                    lsNewUniqueName = Me.CreateUniqueEntityTypeName(lrEntityType.Name, 0)
+                    lsNewUniqueName = "NewEntityType"
+                End If
+
+                If Me.ExistsModelElement(lsNewUniqueName) Then
+                    lsNewUniqueName = Me.CreateUniqueEntityTypeName(lsNewUniqueName, 0)
                 End If
 
                 '--------------------------------------------------------------------

@@ -956,8 +956,12 @@ Namespace FBM
             If abDeleteAll Then
                 Dim lrConceptInstance As New FBM.ConceptInstance(Me.Model, Me.Page, Me.Data, pcenumConceptType.Value)
                 lrConceptInstance.RoleId = Me.Role.Id
-
                 Call TableConceptInstance.DeleteConceptInstance(lrConceptInstance)
+
+                Dim lrModelDictionaryEntry = Me.Model.ModelDictionary.Find(Function(x) x.Symbol = Me.Data)
+                If lrModelDictionaryEntry IsNot Nothing Then
+                    Call lrModelDictionaryEntry.Realisations.Remove(pcenumConceptType.Value)
+                End If
             End If
 
         End Sub

@@ -3244,7 +3244,13 @@ Public Class frmDiagramORM
         '--------------------------------------------
         'Establish the EntityType for the dropped object
         '--------------------------------------------
-        lrEntityType = Me.zrPage.Model.CreateEntityType(as_entity_type_name)
+        Dim lsEntityTypeName As String
+        If as_entity_type_name Is Nothing Then
+            lsEntityTypeName = "NewEntityType"
+        Else
+            lsEntityTypeName = as_entity_type_name
+        End If
+        lrEntityType = Me.zrPage.Model.CreateEntityType(lsEntityTypeName)
 
         '----------------------------------------------------
         'Create an EntityTypeInstance for the new EntityType

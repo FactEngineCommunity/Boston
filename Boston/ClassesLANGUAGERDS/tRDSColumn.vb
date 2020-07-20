@@ -147,7 +147,7 @@ Namespace RDS
         ''' 
         ''' </summary>
         ''' <param name="arOriginTable">Must be populated if arRelation is populated.</param>
-        ''' <param name="arRelation"></param>
+        ''' <param name="arRelation">Populate if cloning for a Relation</param>
         ''' <returns></returns>
         Public Function Clone(Optional ByRef arOriginTable As RDS.Table = Nothing,
                               Optional ByRef arRelation As RDS.Relation = Nothing) As RDS.Column

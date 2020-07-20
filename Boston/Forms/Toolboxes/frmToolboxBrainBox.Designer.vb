@@ -51,9 +51,10 @@ Partial Class frmToolboxBrainBox
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.TextBox_Output.BackColor = System.Drawing.Color.Ivory
         Me.TextBox_Output.HideSelection = False
-        Me.TextBox_Output.Location = New System.Drawing.Point(2, 3)
+        Me.TextBox_Output.Location = New System.Drawing.Point(3, 5)
+        Me.TextBox_Output.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.TextBox_Output.Name = "TextBox_Output"
-        Me.TextBox_Output.Size = New System.Drawing.Size(538, 181)
+        Me.TextBox_Output.Size = New System.Drawing.Size(802, 217)
         Me.TextBox_Output.TabIndex = 1
         Me.TextBox_Output.Text = ""
         '
@@ -62,7 +63,8 @@ Partial Class frmToolboxBrainBox
         Me.SplitContainer1.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
             Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.SplitContainer1.Location = New System.Drawing.Point(12, 12)
+        Me.SplitContainer1.Location = New System.Drawing.Point(18, 18)
+        Me.SplitContainer1.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.SplitContainer1.Name = "SplitContainer1"
         Me.SplitContainer1.Orientation = System.Windows.Forms.Orientation.Horizontal
         '
@@ -74,8 +76,9 @@ Partial Class frmToolboxBrainBox
         '
         Me.SplitContainer1.Panel2.Controls.Add(Me.ListBoxEnterpriseAware)
         Me.SplitContainer1.Panel2.Controls.Add(Me.TextBox_Output)
-        Me.SplitContainer1.Size = New System.Drawing.Size(544, 235)
-        Me.SplitContainer1.SplitterDistance = 44
+        Me.SplitContainer1.Size = New System.Drawing.Size(813, 289)
+        Me.SplitContainer1.SplitterDistance = 54
+        Me.SplitContainer1.SplitterWidth = 6
         Me.SplitContainer1.TabIndex = 2
         '
         'TextBoxInput
@@ -85,38 +88,43 @@ Partial Class frmToolboxBrainBox
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.TextBoxInput.Font = New System.Drawing.Font("Tahoma", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.TextBoxInput.ForeColor = System.Drawing.Color.SteelBlue
-        Me.TextBoxInput.Location = New System.Drawing.Point(3, 3)
+        Me.TextBoxInput.Location = New System.Drawing.Point(4, 5)
+        Me.TextBoxInput.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.TextBoxInput.MinimumSize = New System.Drawing.Size(0, 50)
         Me.TextBoxInput.Multiline = False
         Me.TextBoxInput.Name = "TextBoxInput"
-        Me.TextBoxInput.Size = New System.Drawing.Size(538, 38)
+        Me.TextBoxInput.Size = New System.Drawing.Size(802, 50)
         Me.TextBoxInput.TabIndex = 1
         Me.TextBoxInput.Text = ""
         '
         'ListBoxEnterpriseAware
         '
         Me.ListBoxEnterpriseAware.FormattingEnabled = True
-        Me.ListBoxEnterpriseAware.Location = New System.Drawing.Point(31, 13)
+        Me.ListBoxEnterpriseAware.ItemHeight = 20
+        Me.ListBoxEnterpriseAware.Location = New System.Drawing.Point(46, 20)
+        Me.ListBoxEnterpriseAware.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.ListBoxEnterpriseAware.Name = "ListBoxEnterpriseAware"
-        Me.ListBoxEnterpriseAware.Size = New System.Drawing.Size(119, 69)
+        Me.ListBoxEnterpriseAware.Size = New System.Drawing.Size(176, 104)
         Me.ListBoxEnterpriseAware.TabIndex = 3
         Me.ListBoxEnterpriseAware.Visible = False
         '
         'ContextMenuVirtualAnalyst
         '
+        Me.ContextMenuVirtualAnalyst.ImageScalingSize = New System.Drawing.Size(24, 24)
         Me.ContextMenuVirtualAnalyst.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItemDictationMode, Me.ToolStripMenuItemQuietMode})
         Me.ContextMenuVirtualAnalyst.Name = "ContextMenuVirtualAnalyst"
-        Me.ContextMenuVirtualAnalyst.Size = New System.Drawing.Size(157, 48)
+        Me.ContextMenuVirtualAnalyst.Size = New System.Drawing.Size(208, 68)
         '
         'ToolStripMenuItemDictationMode
         '
         Me.ToolStripMenuItemDictationMode.Name = "ToolStripMenuItemDictationMode"
-        Me.ToolStripMenuItemDictationMode.Size = New System.Drawing.Size(156, 22)
+        Me.ToolStripMenuItemDictationMode.Size = New System.Drawing.Size(207, 32)
         Me.ToolStripMenuItemDictationMode.Text = "&Dictation Mode"
         '
         'ToolStripMenuItemQuietMode
         '
         Me.ToolStripMenuItemQuietMode.Name = "ToolStripMenuItemQuietMode"
-        Me.ToolStripMenuItemQuietMode.Size = New System.Drawing.Size(156, 22)
+        Me.ToolStripMenuItemQuietMode.Size = New System.Drawing.Size(207, 32)
         Me.ToolStripMenuItemQuietMode.Text = "&Quiet Mode"
         '
         'TimerInput
@@ -125,10 +133,12 @@ Partial Class frmToolboxBrainBox
         '
         'StatusStrip1
         '
+        Me.StatusStrip1.ImageScalingSize = New System.Drawing.Size(24, 24)
         Me.StatusStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.StatusLabelMain})
-        Me.StatusStrip1.Location = New System.Drawing.Point(0, 250)
+        Me.StatusStrip1.Location = New System.Drawing.Point(0, 313)
         Me.StatusStrip1.Name = "StatusStrip1"
-        Me.StatusStrip1.Size = New System.Drawing.Size(564, 22)
+        Me.StatusStrip1.Padding = New System.Windows.Forms.Padding(2, 0, 21, 0)
+        Me.StatusStrip1.Size = New System.Drawing.Size(843, 32)
         Me.StatusStrip1.TabIndex = 4
         Me.StatusStrip1.Text = "StatusStrip1"
         '
@@ -136,28 +146,30 @@ Partial Class frmToolboxBrainBox
         '
         Me.StatusLabelMain.ForeColor = System.Drawing.Color.DarkGray
         Me.StatusLabelMain.Name = "StatusLabelMain"
-        Me.StatusLabelMain.Size = New System.Drawing.Size(94, 17)
+        Me.StatusLabelMain.Size = New System.Drawing.Size(140, 25)
         Me.StatusLabelMain.Text = "StatusLabelMain"
         '
         'ContextMenuStripBrainBox
         '
+        Me.ContextMenuStripBrainBox.ImageScalingSize = New System.Drawing.Size(24, 24)
         Me.ContextMenuStripBrainBox.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.CopyToolStripMenuItem})
         Me.ContextMenuStripBrainBox.Name = "ContextMenuStripBrainBox"
-        Me.ContextMenuStripBrainBox.Size = New System.Drawing.Size(153, 48)
+        Me.ContextMenuStripBrainBox.Size = New System.Drawing.Size(127, 36)
         '
         'CopyToolStripMenuItem
         '
         Me.CopyToolStripMenuItem.Name = "CopyToolStripMenuItem"
-        Me.CopyToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+        Me.CopyToolStripMenuItem.Size = New System.Drawing.Size(126, 32)
         Me.CopyToolStripMenuItem.Text = "&Copy"
         '
         'frmToolboxBrainBox
         '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(564, 272)
+        Me.ClientSize = New System.Drawing.Size(843, 345)
         Me.Controls.Add(Me.StatusStrip1)
         Me.Controls.Add(Me.SplitContainer1)
+        Me.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.Name = "frmToolboxBrainBox"
         Me.TabText = "Virtual Analyst"
         Me.Text = "Virtual Analyst"

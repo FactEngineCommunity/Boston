@@ -2609,35 +2609,6 @@ Public Class frmDiagramORMForGlossary
 
     End Sub
 
-    Public Function CreateEntityType(Optional ByVal as_entity_type_name As String = Nothing, Optional ByVal ab_use_entity_type_name_as_id As Boolean = False) As FBM.EntityTypeInstance
-
-        Dim lrEntityType As New FBM.EntityType
-        Dim ls_entity_type_name As String = ""
-        Dim lo_point_client As Point
-        Dim lo_point As PointF
-
-        lo_point_client = New Point(Me.Width / 2, Me.Height / 2)
-        lo_point = DiagramView.ClientToDoc(New Point(lo_point_client.X, lo_point_client.Y))
-
-        '--------------------------------------------
-        'Establish the EntityType for the dropped object
-        '--------------------------------------------
-        lrEntityType = Me.zrPage.Model.CreateEntityType(as_entity_type_name)
-
-        '----------------------------------------------------
-        'Create an EntityTypeInstance for the new EntityType
-        '----------------------------------------------------
-        Dim lrEntityTypeInstance As New FBM.EntityTypeInstance
-
-        '---------------------------------
-        'Drop the EntityType on the Page
-        '---------------------------------
-        lrEntityTypeInstance = Me.zrPage.DropEntityTypeAtPoint(lrEntityType, lo_point)
-
-        Return lrEntityTypeInstance
-
-    End Function
-
     Public Function CreateValueType(Optional ByVal as_value_type_name As String = Nothing, _
                                     Optional ByVal ab_use_value_type_name_as_id As Boolean = False, _
                                     Optional ByVal aiDataType As pcenumORMDataType = pcenumORMDataType.DataTypeNotSet, _
