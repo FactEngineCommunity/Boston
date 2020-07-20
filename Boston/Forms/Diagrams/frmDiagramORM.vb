@@ -3170,7 +3170,7 @@ Public Class frmDiagramORM
                     Dim lo_point As PointF = Me.zrPage.GetMidOfSelectedObjects
                     Call Me.CreateExternalUniquenessConstraint(larRoleInstance, lo_point)
                 End If
-            Case Is = Keys.S 'Subtype
+            Case Is = Keys.S And Not Keys.Alt 'Subtype
                 If ((Me.zrPage.SelectedObject.Count = 2) And Me.zrPage.are_all_SelectedObjects_entity_types) Or
                    ((Me.zrPage.SelectedObject.Count = 2) And Me.zrPage.areSelectedObjectsEntityTypeAndFactType) Then
 
@@ -3238,31 +3238,33 @@ Public Class frmDiagramORM
         Dim lo_point_client As Point
         Dim lo_point As PointF
 
-        lo_point_client = New Point(Me.Width / 2, Me.Height / 2)
-        lo_point = DiagramView.ClientToDoc(New Point(lo_point_client.X, lo_point_client.Y))
+        With New WaitCursor
+            lo_point_client = New Point(Me.Width / 2, Me.Height / 2)
+            lo_point = DiagramView.ClientToDoc(New Point(lo_point_client.X, lo_point_client.Y))
 
-        '--------------------------------------------
-        'Establish the EntityType for the dropped object
-        '--------------------------------------------
-        Dim lsEntityTypeName As String
-        If as_entity_type_name Is Nothing Then
-            lsEntityTypeName = "NewEntityType"
-        Else
-            lsEntityTypeName = as_entity_type_name
-        End If
-        lrEntityType = Me.zrPage.Model.CreateEntityType(lsEntityTypeName)
+            '--------------------------------------------
+            'Establish the EntityType for the dropped object
+            '--------------------------------------------
+            Dim lsEntityTypeName As String
+            If as_entity_type_name Is Nothing Then
+                lsEntityTypeName = "NewEntityType"
+            Else
+                lsEntityTypeName = as_entity_type_name
+            End If
+            lrEntityType = Me.zrPage.Model.CreateEntityType(lsEntityTypeName)
 
-        '----------------------------------------------------
-        'Create an EntityTypeInstance for the new EntityType
-        '----------------------------------------------------
-        Dim lrEntityTypeInstance As New FBM.EntityTypeInstance
+            '----------------------------------------------------
+            'Create an EntityTypeInstance for the new EntityType
+            '----------------------------------------------------
+            Dim lrEntityTypeInstance As New FBM.EntityTypeInstance
 
-        '---------------------------------
-        'Drop the EntityType on the Page
-        '---------------------------------
-        lrEntityTypeInstance = Me.zrPage.DropEntityTypeAtPoint(lrEntityType, lo_point, True)
+            '---------------------------------
+            'Drop the EntityType on the Page
+            '---------------------------------
+            lrEntityTypeInstance = Me.zrPage.DropEntityTypeAtPoint(lrEntityType, lo_point, True)
 
-        Return lrEntityTypeInstance
+            Return lrEntityTypeInstance
+        End With
 
     End Function
 
@@ -7956,6 +7958,8 @@ Public Class frmDiagramORM
                 Next
 
                 Call lrEntityTypeInstance.EntityType.RemoveFromModel(False, True, True, False)
+
+                Me.zrPage.SelectedObject.Remove(lrEntityTypeInstance)
             End With
 
         Catch ex As Exception

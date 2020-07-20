@@ -1458,12 +1458,12 @@ Public Class tBrain
                 MsgBox("That's not a well formatted Fact Type Reading")
                 Return False
             Else
-                Me.FTRProcessor.FACTTYPEREADINGStatement.FRONTREADINGTEXT = ""
+                Me.FTRProcessor.FACTTYPEREADINGStatement.FRONTREADINGTEXT = New List(Of String)
                 Me.FTRProcessor.FACTTYPEREADINGStatement.MODELELEMENT = New List(Of Object)
                 Me.FTRProcessor.FACTTYPEREADINGStatement.PREDICATECLAUSE = New List(Of Object)
                 Me.FTRProcessor.FACTTYPEREADINGStatement.UNARYPREDICATEPART = ""
                 Me.FTRProcessor.FACTTYPEREADINGStatement.FOLLOWINGREADINGTEXT = ""
-                Call Me.FTRProcessor.GetParseTreeTokens(Me.FTRProcessor.FACTTYPEREADINGStatement, Me.FTRParseTree)
+                Call Me.FTRProcessor.GetParseTreeTokensReflection(Me.FTRProcessor.FACTTYPEREADINGStatement, Me.FTRParseTree)
                 arFactTypeReading.FrontText = Trim(NullVal(Me.FTRProcessor.FACTTYPEREADINGStatement.FRONTREADINGTEXT, ""))
 
                 Dim lrModelElementNode As FTR.ParseNode
@@ -1480,7 +1480,7 @@ Public Class tBrain
                     Me.FTRProcessor.MODELELEMENTClause.PREBOUNDREADINGTEXT = ""
                     Me.FTRProcessor.MODELELEMENTClause.POSTBOUNDREADINGTEXT = ""
                     Me.FTRProcessor.MODELELEMENTClause.MODELELEMENTNAME = ""
-                    Call Me.FTRProcessor.GetParseTreeTokens(Me.FTRProcessor.MODELELEMENTClause, lrModelElementNode)
+                    Call Me.FTRProcessor.GetParseTreeTokensReflection(Me.FTRProcessor.MODELELEMENTClause, lrModelElementNode)
 
                     '------------------------------------------------------------------------------------------------------
                     'Check to see whether the MODELELEMENTNAME is an Object Type that is actually linked by the FactType.
@@ -1514,7 +1514,7 @@ Public Class tBrain
                         Or Me.FTRProcessor.FACTTYPEREADINGStatement.MODELELEMENT.Count = 1 Then
                             lrPredicateClauseNode = Me.FTRProcessor.FACTTYPEREADINGStatement.PREDICATECLAUSE(liInd - 1)
                             Me.FTRProcessor.PREDICATEPARTClause.PREDICATEPART = New List(Of String)
-                            Call Me.FTRProcessor.GetParseTreeTokens(Me.FTRProcessor.PREDICATEPARTClause, lrPredicateClauseNode)
+                            Call Me.FTRProcessor.GetParseTreeTokensReflection(Me.FTRProcessor.PREDICATEPARTClause, lrPredicateClauseNode)
 
                             For Each lsPredicatePartText In Me.FTRProcessor.PREDICATEPARTClause.PREDICATEPART
                                 lrPredicatePart.PredicatePartText &= lsPredicatePartText
@@ -1803,7 +1803,7 @@ Public Class tBrain
         Me.VAQL.ATMOSTONEStatement.MODELELEMENTNAME = New List(Of String)
         Me.VAQL.ATMOSTONEStatement.PREDICATECLAUSE = New List(Of Object)
 
-        Call Me.VAQL.GetParseTreeTokens(Me.VAQL.ATMOSTONEStatement, Me.VAQLParsetree)
+        Call Me.VAQL.GetParseTreeTokensReflection(Me.VAQL.ATMOSTONEStatement, Me.VAQLParsetree.Nodes(0))
 
         '------------------------------
         'Create a Plan
@@ -1897,7 +1897,7 @@ Public Class tBrain
             Me.VAQL.MODELELEMENTClause.PREBOUNDREADINGTEXT = ""
             Me.VAQL.MODELELEMENTClause.POSTBOUNDREADINGTEXT = ""
             Me.VAQL.MODELELEMENTClause.MODELELEMENTNAME = ""
-            Call Me.VAQL.GetParseTreeTokens(Me.VAQL.MODELELEMENTClause, Me.VAQL.ATMOSTONEStatement.MODELELEMENT(liInd - 1))
+            Call Me.VAQL.GetParseTreeTokensReflection(Me.VAQL.MODELELEMENTClause, Me.VAQL.ATMOSTONEStatement.MODELELEMENT(liInd - 1))
 
             Dim lrPredicatePart As New Language.PredicatePart
 
@@ -1909,7 +1909,7 @@ Public Class tBrain
 
             If liInd = 1 Then
                 Me.VAQL.PREDICATEPARTClause.PREDICATEPART = New List(Of String)
-                Call Me.VAQL.GetParseTreeTokens(Me.VAQL.PREDICATEPARTClause, Me.VAQL.ATMOSTONEStatement.PREDICATECLAUSE(liInd - 1))
+                Call Me.VAQL.GetParseTreeTokensReflection(Me.VAQL.PREDICATEPARTClause, Me.VAQL.ATMOSTONEStatement.PREDICATECLAUSE(liInd - 1))
 
                 For Each lsPredicatePartWord In Me.VAQL.PREDICATEPARTClause.PREDICATEPART
                     lsPredicatePart = Trim(lsPredicatePart & " " & lsPredicatePartWord)
@@ -1952,7 +1952,7 @@ Public Class tBrain
     Private Sub ProcessISACONCEPTStatement()
 
         Me.VAQL.ISACONCEPTStatement.MODELELEMENTNAME = ""
-        Call Me.VAQL.GetParseTreeTokens(Me.VAQL.ISACONCEPTStatement, Me.VAQLParsetree)
+        Call Me.VAQL.GetParseTreeTokensReflection(Me.VAQL.ISACONCEPTStatement, Me.VAQLParsetree.Nodes(0))
 
         Dim lsConceptName As String = Me.VAQL.ISACONCEPTStatement.MODELELEMENTNAME
         Dim lrConcept As New FBM.Concept(lsConceptName)
@@ -1986,12 +1986,13 @@ Public Class tBrain
         Dim lrQuestion As tQuestion
 
         Me.VAQL.ATMOSTONEStatement.FRONTREADINGTEXT = ""
+        Me.VAQL.ATMOSTONEStatement.MODELELEMENTNAME = New List(Of String)
         Me.VAQL.ATMOSTONEStatement.MODELELEMENT = New List(Of Object)
         Me.VAQL.ATMOSTONEStatement.PREDICATECLAUSE = New List(Of Object)
         Me.VAQL.ATMOSTONEStatement.UNARYPREDICATEPART = ""
         Me.VAQL.ATMOSTONEStatement.FOLLOWINGREADINGTEXT = ""
 
-        Call Me.VAQL.GetParseTreeTokens(Me.VAQL.ATMOSTONEStatement, Me.VAQLParsetree)
+        Call Me.VAQL.GetParseTreeTokensReflection(Me.VAQL.ATMOSTONEStatement, Me.VAQLParsetree)
 
         lrFactTypeReading.FrontText = Trim(NullVal(Me.VAQL.ATMOSTONEStatement.FRONTREADINGTEXT, ""))
 
@@ -2017,7 +2018,7 @@ Public Class tBrain
             Me.VAQL.MODELELEMENTClause.PREBOUNDREADINGTEXT = ""
             Me.VAQL.MODELELEMENTClause.POSTBOUNDREADINGTEXT = ""
             Me.VAQL.MODELELEMENTClause.MODELELEMENTNAME = ""
-            Call Me.VAQL.GetParseTreeTokens(Me.VAQL.MODELELEMENTClause, lrModelElementNode)
+            Call Me.VAQL.GetParseTreeTokensReflection(Me.VAQL.MODELELEMENTClause, lrModelElementNode)
 
             Dim lsModelObjectName As String = Trim(Me.VAQL.MODELELEMENTClause.MODELELEMENTNAME)
 
@@ -2118,7 +2119,7 @@ Public Class tBrain
                 If liInd < Me.VAQL.ATMOSTONEStatement.MODELELEMENT.Count Then
                     lrPredicateClauseNode = Me.VAQL.ATMOSTONEStatement.PREDICATECLAUSE(liInd - 1)
                     Me.VAQL.PREDICATEPARTClause.PREDICATEPART = New List(Of String)
-                    Call Me.VAQL.GetParseTreeTokens(Me.VAQL.PREDICATEPARTClause, lrPredicateClauseNode)
+                    Call Me.VAQL.GetParseTreeTokensReflection(Me.VAQL.PREDICATEPARTClause, lrPredicateClauseNode)
 
                     For Each lsPredicatePartText In Me.VAQL.PREDICATEPARTClause.PREDICATEPART
                         lrPredicatePart.PredicatePartText &= lsPredicatePartText
@@ -2304,7 +2305,7 @@ Public Class tBrain
             Me.VAQL.FACTTYPEREADINGStatement.UNARYPREDICATEPART = ""
             Me.VAQL.FACTTYPEREADINGStatement.FOLLOWINGREADINGTEXT = ""
 
-            Call Me.VAQL.GetParseTreeTokens(Me.VAQL.FACTTYPEREADINGStatement, Me.VAQLParsetree)
+            Call Me.VAQL.GetParseTreeTokensReflection(Me.VAQL.FACTTYPEREADINGStatement, Me.VAQLParsetree.Nodes(0))
 
             lrFactTypeReading.FrontText = Trim(NullVal(Me.VAQL.FACTTYPEREADINGStatement.FRONTREADINGTEXT, ""))
 
@@ -2330,7 +2331,7 @@ Public Class tBrain
                 Me.VAQL.MODELELEMENTClause.PREBOUNDREADINGTEXT = ""
                 Me.VAQL.MODELELEMENTClause.POSTBOUNDREADINGTEXT = ""
                 Me.VAQL.MODELELEMENTClause.MODELELEMENTNAME = ""
-                Call Me.VAQL.GetParseTreeTokens(Me.VAQL.MODELELEMENTClause, lrModelElementNode)
+                Call Me.VAQL.GetParseTreeTokensReflection(Me.VAQL.MODELELEMENTClause, lrModelElementNode)
 
                 Dim lsModelObjectName As String = Trim(Me.VAQL.MODELELEMENTClause.MODELELEMENTNAME)
 
@@ -2429,7 +2430,7 @@ Public Class tBrain
                     If liInd < Me.VAQL.FACTTYPEREADINGStatement.MODELELEMENT.Count Then
                         lrPredicateClauseNode = Me.VAQL.FACTTYPEREADINGStatement.PREDICATECLAUSE(liInd - 1)
                         Me.VAQL.PREDICATEPARTClause.PREDICATEPART = New List(Of String)
-                        Call Me.VAQL.GetParseTreeTokens(Me.VAQL.PREDICATEPARTClause, lrPredicateClauseNode)
+                        Call Me.VAQL.GetParseTreeTokensReflection(Me.VAQL.PREDICATEPARTClause, lrPredicateClauseNode)
 
                         For Each lsPredicatePartText In Me.VAQL.PREDICATEPARTClause.PREDICATEPART
                             lrPredicatePart.PredicatePartText &= lsPredicatePartText
@@ -3558,7 +3559,7 @@ Public Class tBrain
                     '----------------------------------
                     'Get the Tokens from the ParseTree
                     '----------------------------------
-                    Call Me.Model.GetParseTreeTokens(lrCreateFactTypeStatement, Me.ParseTree.Nodes(0))
+                    Call Me.Model.ORMQL.GetParseTreeTokensReflection(lrCreateFactTypeStatement, Me.ParseTree.Nodes(0))
 
                     Me.CurrentSentence.ModelElement = lrCreateFactTypeStatement.MODELELEMENTNAME
                     Dim lsPredicatePart As String

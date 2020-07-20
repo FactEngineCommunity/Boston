@@ -372,7 +372,7 @@ Public Class frmToolboxORMReadingEditor
                 Me.FTRProcessor.FACTTYPEREADINGStatement.PREDICATECLAUSE = New List(Of Object)
                 Me.FTRProcessor.FACTTYPEREADINGStatement.UNARYPREDICATEPART = ""
                 Me.FTRProcessor.FACTTYPEREADINGStatement.FOLLOWINGREADINGTEXT = ""
-                Call Me.FTRProcessor.GetParseTreeTokens(Me.FTRProcessor.FACTTYPEREADINGStatement, Me.FTRParseTree)
+                Call Me.FTRProcessor.GetParseTreeTokensReflection(Me.FTRProcessor.FACTTYPEREADINGStatement, Me.FTRParseTree.Nodes(0))
 
                 Dim lsFrontReadingTextWord As String = ""
                 arFactTypeReading.FrontText = ""
@@ -395,7 +395,7 @@ Public Class frmToolboxORMReadingEditor
                     Me.FTRProcessor.MODELELEMENTClause.PREBOUNDREADINGTEXT = ""
                     Me.FTRProcessor.MODELELEMENTClause.POSTBOUNDREADINGTEXT = ""
                     Me.FTRProcessor.MODELELEMENTClause.MODELELEMENTNAME = ""
-                    Call Me.FTRProcessor.GetParseTreeTokens(Me.FTRProcessor.MODELELEMENTClause, lrModelElementNode)
+                    Call Me.FTRProcessor.GetParseTreeTokensReflection(Me.FTRProcessor.MODELELEMENTClause, lrModelElementNode)
 
                     '------------------------------------------------------------------------------------------------------
                     'Check to see whether the MODELELEMENTNAME is an Object Type that is actually linked by the FactType.
@@ -439,7 +439,7 @@ Public Class frmToolboxORMReadingEditor
                         If liInd < Me.FTRProcessor.FACTTYPEREADINGStatement.MODELELEMENT.Count Then
                             lrPredicateClauseNode = Me.FTRProcessor.FACTTYPEREADINGStatement.PREDICATECLAUSE(liInd - 1)
                             Me.FTRProcessor.PREDICATEPARTClause.PREDICATEPART = New List(Of String)
-                            Call Me.FTRProcessor.GetParseTreeTokens(Me.FTRProcessor.PREDICATEPARTClause, lrPredicateClauseNode)
+                            Call Me.FTRProcessor.GetParseTreeTokensReflection(Me.FTRProcessor.PREDICATEPARTClause, lrPredicateClauseNode)
 
                             For Each lsPredicatePartText In Me.FTRProcessor.PREDICATEPARTClause.PREDICATEPART
                                 lrPredicatePart.PredicatePartText &= lsPredicatePartText
@@ -1111,7 +1111,7 @@ Public Class frmToolboxORMReadingEditor
             Me.FTRProcessor.FACTTYPEREADINGStatement.PREDICATECLAUSE = New List(Of Object)
             Me.FTRProcessor.FACTTYPEREADINGStatement.UNARYPREDICATEPART = ""
             Me.FTRProcessor.FACTTYPEREADINGStatement.FOLLOWINGREADINGTEXT = ""
-            Call Me.FTRProcessor.GetParseTreeTokens(Me.FTRProcessor.FACTTYPEREADINGStatement, Me.FTRParseTree)
+            Call Me.FTRProcessor.GetParseTreeTokensReflection(Me.FTRProcessor.FACTTYPEREADINGStatement, Me.FTRParseTree.Nodes(0))
 
             Dim lsModelElementName As String = ""
             Dim liModelElementCount As Integer = Me.FTRProcessor.FACTTYPEREADINGStatement.MODELELEMENT.Count
@@ -1121,7 +1121,7 @@ Public Class frmToolboxORMReadingEditor
             Me.FTRProcessor.MODELELEMENTClause.PREBOUNDREADINGTEXT = ""
             Me.FTRProcessor.MODELELEMENTClause.POSTBOUNDREADINGTEXT = ""
             Me.FTRProcessor.MODELELEMENTClause.MODELELEMENTNAME = ""
-            Call Me.FTRProcessor.GetParseTreeTokens(Me.FTRProcessor.MODELELEMENTClause, lrModelElementNode)
+            Call Me.FTRProcessor.GetParseTreeTokensReflection(Me.FTRProcessor.MODELELEMENTClause, lrModelElementNode)
             lsModelElementName = Me.FTRProcessor.MODELELEMENTClause.MODELELEMENTNAME
             If liModelElementCount = Me.zrFactTypeInstance.RoleGroup.Count _
                 And Me.zrFactTypeInstance.Model.ExistsModelElement(lsModelElementName) Then

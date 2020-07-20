@@ -13,7 +13,7 @@ Partial Public Class tBrain
         Me.VAQL.ENTITYTYPEISIDENTIFIEDBYITSStatement.MODELELEMENTNAME = ""
         Me.VAQL.ENTITYTYPEISIDENTIFIEDBYITSStatement.REFERENCEMODE = ""
 
-        Call Me.VAQL.GetParseTreeTokens(Me.VAQL.ENTITYTYPEISIDENTIFIEDBYITSStatement, Me.VAQLParsetree)
+        Call Me.VAQL.GetParseTreeTokensReflection(Me.VAQL.ENTITYTYPEISIDENTIFIEDBYITSStatement, Me.VAQLParsetree.Nodes(0))
 
         Dim lsEntityTypeName As String = Trim(Me.VAQL.ENTITYTYPEISIDENTIFIEDBYITSStatement.MODELELEMENTNAME)
         Dim lsActualModelElementName As String = ""
@@ -453,42 +453,44 @@ Partial Public Class tBrain
 
     Private Sub ProcessISANENTITYTYPECLAUSE()
 
-        Me.Model = prApplication.WorkingModel
+        With New WaitCursor
+            Me.Model = prApplication.WorkingModel
 
-        Me.VAQL.ISANENTITYTYPEStatement.KEYWDISANENTITYTYPE = ""
-        Me.VAQL.ISANENTITYTYPEStatement.MODELELEMENTNAME = ""
+            Me.VAQL.ISANENTITYTYPEStatement.KEYWDISANENTITYTYPE = ""
+            Me.VAQL.ISANENTITYTYPEStatement.MODELELEMENTNAME = ""
 
-        Call Me.VAQL.GetParseTreeTokens(Me.VAQL.ISANENTITYTYPEStatement, Me.VAQLParsetree)
+            Call Me.VAQL.GetParseTreeTokensReflection(Me.VAQL.ISANENTITYTYPEStatement, Me.VAQLParsetree.Nodes(0))
 
-        Me.Timeout.Stop()
+            Me.Timeout.Stop()
 
-        Dim lsEntityTypeName = Trim(Viev.Strings.MakeCapCamelCase(Me.VAQL.ISANENTITYTYPEStatement.MODELELEMENTNAME))
+            Dim lsEntityTypeName = Trim(Viev.Strings.MakeCapCamelCase(Me.VAQL.ISANENTITYTYPEStatement.MODELELEMENTNAME))
 
-        If Me.Model.ExistsModelElement(lsEntityTypeName) Then
-            Me.send_data("There is already a Model Element with the name, '" & lsEntityTypeName & "'. Try another name")
-            Exit Sub
-        End If
+            If Me.Model.ExistsModelElement(lsEntityTypeName) Then
+                Me.send_data("There is already a Model Element with the name, '" & lsEntityTypeName & "'. Try another name")
+                Exit Sub
+            End If
 
-        If Me.Model.ModelDictionary.Find(Function(x) x.Symbol = lsEntityTypeName And x.isEntityType) IsNot Nothing Then
-            Me.send_data("I know.")
-            Exit Sub
-        End If
+            If Me.Model.ModelDictionary.Find(Function(x) x.Symbol = lsEntityTypeName And x.isEntityType) IsNot Nothing Then
+                Me.send_data("I know.")
+                Exit Sub
+            End If
 
-        'Have already checked to see wither it is okay to create the EntityType above.
-        Dim lrEntityType = Me.Model.CreateEntityType(Trim(lsEntityTypeName), True)
+            'Have already checked to see wither it is okay to create the EntityType above.
+            Dim lrEntityType = Me.Model.CreateEntityType(Trim(lsEntityTypeName), True)
 
-        Dim lrEnityTypeInstance = Me.Page.DropEntityTypeAtPoint(lrEntityType, New PointF(100, 10)) 'VM-20180329-Me.Page.Form.CreateEntityType(lsEntityTypeName, True)
+            Dim lrEnityTypeInstance = Me.Page.DropEntityTypeAtPoint(lrEntityType, New PointF(100, 10)) 'VM-20180329-Me.Page.Form.CreateEntityType(lsEntityTypeName, True)
 
-        Call lrEnityTypeInstance.RepellFromNeighbouringPageObjects(1, False)
-        Call lrEnityTypeInstance.Move(lrEnityTypeInstance.X, lrEnityTypeInstance.Y, True)
+            Call lrEnityTypeInstance.RepellFromNeighbouringPageObjects(1, False)
+            Call lrEnityTypeInstance.Move(lrEnityTypeInstance.X, lrEnityTypeInstance.Y, True)
 
-        If Me.AutoLayoutOn Then
-            Me.Page.Form.AutoLayout()
-        End If
+            If Me.AutoLayoutOn Then
+                Me.Page.Form.AutoLayout()
+            End If
 
-        Me.send_data("Ok")
+            Me.send_data("Ok")
 
-        Me.Timeout.Start()
+            Me.Timeout.Start()
+        End With
 
     End Sub
 
@@ -502,7 +504,7 @@ Partial Public Class tBrain
         Me.VAQL.VALUETYPEISWRITTENASStatement.DATATYPEPRECISION = New Object
         Me.VAQL.VALUETYPEISWRITTENASStatement.NUMBER = ""
 
-        Call Me.VAQL.GetParseTreeTokens(Me.VAQL.VALUETYPEISWRITTENASStatement, Me.VAQLParsetree)
+        Call Me.VAQL.GetParseTreeTokensReflection(Me.VAQL.VALUETYPEISWRITTENASStatement, Me.VAQLParsetree.Nodes(0))
 
         Dim lrValueTypeInstance As FBM.ValueTypeInstance
         Dim lsValueTypeName As String = ""

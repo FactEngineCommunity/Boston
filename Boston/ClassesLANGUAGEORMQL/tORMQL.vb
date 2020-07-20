@@ -40,6 +40,39 @@ Namespace ORMQL
 
     End Class
 
+    Public Class CreateFactTypeStatement
+
+        Private _FACTTYPENAME As String
+        Public Property FACTTYPENAME As String
+            Get
+                Return Me._FACTTYPENAME
+            End Get
+            Set(value As String)
+                Me._FACTTYPENAME = value
+            End Set
+        End Property
+
+        Private _MODELELEMENTNAME As List(Of String)
+        Public Property MODELELEMENTNAME As List(Of String)
+            Get
+                Return Me._MODELELEMENTNAME
+            End Get
+            Set(value As List(Of String))
+                Me._MODELELEMENTNAME = value
+            End Set
+        End Property
+
+        Private _PREDICATE As List(Of String)
+        Public Property PREDICATE As List(Of String)
+            Get
+                Return Me._PREDICATE
+            End Get
+            Set(value As List(Of String))
+                Me._PREDICATE = value
+            End Set
+        End Property
+    End Class
+
     Public Class DeleteStatement
 
         Dim _USERTABLENAME As String
@@ -357,7 +390,7 @@ Namespace ORMQL
         Public InsertStatement As New InsertStatement
         Public DeleteStatement As New DeleteStatement
         Public DeleteFactStatement As New DeleteFactStatement
-        Public CreateFactTypeStatement As New Object
+        Public CreateFactTypeStatement As New ORMQL.CreateFactTypeStatement
         Public AddFactStatement As New AddFactStatement
         Public UpdateStatement As New UpdateStatement
         Public RemoveInstanceStatement As New RemoveInstanceStatement
@@ -420,12 +453,12 @@ Namespace ORMQL
                 '================================================
                 'Create the DynamicObject for Select Statements
                 '================================================
-                Dim lrORMQLCreateFactTypeStatement As New DynamicClassLibrary.Factory.tClass
-                lrORMQLCreateFactTypeStatement.add_attribute(New DynamicClassLibrary.Factory.tAttribute("FACTTYPENAME", GetType(String))) '(Optional) Stores the FactTypeName for the new FactType.
-                lrORMQLCreateFactTypeStatement.add_attribute(New DynamicClassLibrary.Factory.tAttribute("MODELELEMENTNAME", GetType(List(Of String)))) 'Stores the list of ModelElements for which the FactType is being created.
-                lrORMQLCreateFactTypeStatement.add_attribute(New DynamicClassLibrary.Factory.tAttribute("PREDICATE", GetType(List(Of String)))) 'Stores the list of PredicateParts for the FactTypeReading for the FactType.
+                'Dim lrORMQLCreateFactTypeStatement As New DynamicClassLibrary.Factory.tClass
+                'lrORMQLCreateFactTypeStatement.add_attribute(New DynamicClassLibrary.Factory.tAttribute("FACTTYPENAME", GetType(String))) '(Optional) Stores the FactTypeName for the new FactType.
+                'lrORMQLCreateFactTypeStatement.add_attribute(New DynamicClassLibrary.Factory.tAttribute("MODELELEMENTNAME", GetType(List(Of String)))) 'Stores the list of ModelElements for which the FactType is being created.
+                'lrORMQLCreateFactTypeStatement.add_attribute(New DynamicClassLibrary.Factory.tAttribute("PREDICATE", GetType(List(Of String)))) 'Stores the list of PredicateParts for the FactTypeReading for the FactType.
 
-                Me.CreateFactTypeStatement = lrORMQLCreateFactTypeStatement.clone
+                'Me.CreateFactTypeStatement = lrORMQLCreateFactTypeStatement.clone
 
                 '-----------------------------------------------
                 'Create the DynamicClass for ADDFACT Statemnts
@@ -1622,7 +1655,7 @@ Namespace ORMQL
             '----------------------------------
             'Get the Tokens from the ParseTree
             '----------------------------------
-            Call Me.GetParseTreeTokens(lrDeleteFactStatement, Me.Parsetree.Nodes(0))
+            Call Me.GetParseTreeTokensReflection(lrDeleteFactStatement, Me.Parsetree.Nodes(0))
             '======================================================================
 
             If Me.Parsetree.Errors.Count > 0 Then
@@ -1713,7 +1746,7 @@ Namespace ORMQL
             '----------------------------------
             'Get the Tokens from the ParseTree
             '----------------------------------
-            Call Me.GetParseTreeTokens(lr_object, Me.Parsetree.Nodes(0))
+            Call Me.GetParseTreeTokensReflection(lr_object, Me.Parsetree.Nodes(0))
 
             If Me.Parsetree.Errors.Count > 0 Then
                 Dim lr_error As TinyPG.ParseError
@@ -1772,7 +1805,7 @@ Namespace ORMQL
             '----------------------------------
             'Get the Tokens from the ParseTree
             '----------------------------------
-            Call Me.GetParseTreeTokens(lrParseValuesObject, Me.Parsetree.Nodes(0))
+            Call Me.GetParseTreeTokensReflection(lrParseValuesObject, Me.Parsetree.Nodes(0))
 
             Dim lrDynamicClass As New DynamicClassLibrary.Factory.tClass
             Dim lsAttributeName As String
