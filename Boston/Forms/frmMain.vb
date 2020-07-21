@@ -1815,7 +1815,7 @@ Public Class frmMain
                 Case Is = pcenumMenuType.modelORMModel
                     Dim lrModel As FBM.Model
                     lrModel = zfrmModelExplorer.TreeView.SelectedNode.Tag.Tag
-                    If lrModel.IsDirty Then
+                    If lrModel.IsDirty Or lrModel.hasADirtyPage Then
                         Me.Cursor = Cursors.WaitCursor
                         Richmond.WriteToStatusBar("Saving Model: '" & lrModel.Name & "'", True)
                         Call lrModel.Save()

@@ -3887,6 +3887,12 @@ Namespace FBM
 
         End Function
 
+        Public Function hasADirtyPage() As Boolean
+
+            Return Me.Page.FindAll(Function(x) x.IsDirty).Count > 0
+
+        End Function
+
         ''' <summary>
         ''' Deprecates the Realisations for a DictionaryEntry in the ModelDictionary
         ''' </summary>
