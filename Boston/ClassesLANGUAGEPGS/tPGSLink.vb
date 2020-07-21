@@ -218,45 +218,63 @@ Namespace PGS
         ''' </summary>
         Public Sub setHeadShapes()
 
-            Me.Link.BaseShapeSize = Me.Link.HeadShapeSize
+            Try
 
-            If Me.RDSRelation IsNot Nothing Then
+                Me.Link.BaseShapeSize = Me.Link.HeadShapeSize
 
-                If Me.RDSRelation.ResponsibleFactType.IsObjectified Or Me.RDSRelation.ResponsibleFactType.IsLinkFactType Then
-                    'Set both head shapes to None to start with
-                    Me.Link.HeadShape = ArrowHead.None
-                    Me.Link.BaseShape = ArrowHead.None
+                If Me.RDSRelation IsNot Nothing Then
 
-                    Dim lrFactType = Me.RDSRelation.ResponsibleFactType.LinkFactTypeRole.FactType
+                    If Me.RDSRelation.ResponsibleFactType.IsObjectified Or Me.RDSRelation.ResponsibleFactType.IsLinkFactType Then
+                        'Set both head shapes to None to start with
+                        Me.Link.HeadShape = ArrowHead.None
+                        Me.Link.BaseShape = ArrowHead.None
 
-                    If lrFactType.FactTypeReading.Count = 1 Then
-                        Dim lrFactTypeReading = lrFactType.FactTypeReading(0)
+                        Dim lrFactType As FBM.FactType
+                        If Me.RDSRelation.ResponsibleFactType.LinkFactTypeRole.FactType.Arity = 2 Then
+                            lrFactType = Me.RDSRelation.ResponsibleFactType.LinkFactTypeRole.FactType
+                        Else
+                            lrFactType = Me.RDSRelation.ResponsibleFactType
+                        End If
 
-                        Dim lrOriginModelObject = Me.Model.GetModelObjectByName(lrFactTypeReading.PredicatePart(0).Role.JoinedORMObject.Id)
-                        Dim lrDestinationModelObject = Me.Model.GetModelObjectByName(lrFactTypeReading.PredicatePart(1).Role.JoinedORMObject.Id)
+                        If lrFactType.FactTypeReading.Count = 1 Then
+                            Dim lrFactTypeReading = lrFactType.FactTypeReading(0)
 
-                        Dim lrOriginNode = Me.Page.ERDiagram.Entity.Find(Function(x) x.Name = lrOriginModelObject.Id)
-                        Dim lrDesinationNode = Me.Page.ERDiagram.Entity.Find(Function(x) x.Name = lrDestinationModelObject.Id)
+                            Dim lrOriginModelObject = Me.Model.GetModelObjectByName(lrFactTypeReading.PredicatePart(0).Role.JoinedORMObject.Id)
+                            Dim lrDestinationModelObject = Me.Model.GetModelObjectByName(lrFactTypeReading.PredicatePart(1).Role.JoinedORMObject.Id)
 
-                        If Me.OriginModelElement.Name = lrOriginNode.Name Then
-                            Me.Link.BaseShape = ArrowHead.None
-                            Me.Link.HeadShape = ArrowHead.PointerArrow
+                            Dim lrOriginNode = Me.Page.ERDiagram.Entity.Find(Function(x) x.Name = lrOriginModelObject.Id)
+                            Dim lrDesinationNode = Me.Page.ERDiagram.Entity.Find(Function(x) x.Name = lrDestinationModelObject.Id)
+
+                            If lrOriginNode Is Nothing Or lrDesinationNode Is Nothing Then Exit Sub
+
+                            If Me.OriginModelElement.Name = lrOriginNode.Name Then
+                                Me.Link.BaseShape = ArrowHead.None
+                                Me.Link.HeadShape = ArrowHead.PointerArrow
+                            Else
+                                Me.Link.BaseShape = ArrowHead.PointerArrow
+                                Me.Link.HeadShape = ArrowHead.None
+                            End If
                         Else
                             Me.Link.BaseShape = ArrowHead.PointerArrow
-                            Me.Link.HeadShape = ArrowHead.None
+                            Me.Link.HeadShape = ArrowHead.PointerArrow
                         End If
-                    Else
-                        Me.Link.BaseShape = ArrowHead.PointerArrow
-                        Me.Link.HeadShape = ArrowHead.PointerArrow
-                    End If
 
-                ElseIf Me.Relation.IsPGSRelationNode Then
-                    If Me.RDSRelation.ResponsibleFactType.FactTypeReading.Count > 1 Then
-                        Me.Link.BaseShape = ArrowHead.PointerArrow
-                        Me.Link.BaseShapeSize = Me.Link.HeadShapeSize
+                    ElseIf Me.Relation.IsPGSRelationNode Then
+                        If Me.RDSRelation.ResponsibleFactType.FactTypeReading.Count > 1 Then
+                            Me.Link.BaseShape = ArrowHead.PointerArrow
+                            Me.Link.BaseShapeSize = Me.Link.HeadShapeSize
+                        End If
                     End If
                 End If
-            End If
+
+            Catch ex As Exception
+                Dim lsMessage1 As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
         End Sub
 

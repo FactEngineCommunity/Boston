@@ -1565,7 +1565,7 @@ Namespace FBM
                 If Me.HasMoreThanOneRoleReferencingTheSameModelObject Then
                     Dim liInd As Integer = 0
                     Dim liInd2 As Integer = 0
-                    Dim lrRole As FBM.Role
+                    Dim lrRole As New FBM.Role
                     Dim lsRoleId As String = ""
                     Dim laRoleOrders As List(Of List(Of Object))
                     Dim lrPredicatePart As FBM.PredicatePart
