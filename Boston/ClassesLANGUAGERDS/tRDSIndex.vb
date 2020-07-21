@@ -155,46 +155,64 @@ Namespace RDS
 
         Public Function getResponsibleRoleConstraintFromORMModel() As FBM.RoleConstraint
 
-            Dim lrModelObject = Me.Table.FBMModelElement
+            Try
+                Dim lrModelObject = Me.Table.FBMModelElement
+                Dim lrReferenceModeRoleConstraint As FBM.RoleConstraint
 
-            Select Case lrModelObject.ConceptType
-                Case Is = pcenumConceptType.EntityType
-                    'Responsible Role Constraint is either the PrimaryReferenceScheme Role Constraint
-                    '  OR an External Uniqueness Constraint joined to Roles of Fact Types joined to the Entity Type.
-                    Dim lrEntityType = CType(lrModelObject, FBM.EntityType)
-                    Dim lrReferenceModeRoleConstraint = lrEntityType.ReferenceModeRoleConstraint
-                    If lrEntityType.HasSimpleReferenceScheme Then
-                        'PSEUDOCODE
-                        ' * Check whether all the ResponsibleRoles of the Columns of the Index are in the FactTypes of the Roles of the RoleConstraint
-                        Dim liMatch = (From IdxColumn In Me.Column
-                                       From Role In lrReferenceModeRoleConstraint.Role
-                                       Where Role.FactType.RoleGroup.Contains(IdxColumn.Role)
-                                       Select IdxColumn).Count
+                Select Case lrModelObject.ConceptType
+                    Case Is = pcenumConceptType.EntityType
+                        'Responsible Role Constraint is either the PrimaryReferenceScheme Role Constraint
+                        '  OR an External Uniqueness Constraint joined to Roles of Fact Types joined to the Entity Type.
+                        Dim lrEntityType = CType(lrModelObject, FBM.EntityType)
+                        lrReferenceModeRoleConstraint = lrEntityType.ReferenceModeRoleConstraint
 
-                        If liMatch = Me.Column.Count Then
-                            Return lrReferenceModeRoleConstraint
+                        If lrEntityType.IsSubtype And lrEntityType.HasSimpleReferenceScheme Then
+                            Dim lrTopmostSupertype = CType(lrEntityType.GetTopmostSupertype, FBM.EntityType)
+                            lrReferenceModeRoleConstraint = lrTopmostSupertype.ReferenceModeRoleConstraint
                         End If
-                    End If
-                    If lrEntityType.HasCompoundReferenceMode Then
-                        'PSEUDOCODE
-                        ' * Check whether all the ResponsibleRoles of the Columns of the Index are in the FactTypes of the Roles of the RoleConstraint
-                        Dim liMatch = (From IdxColumn In Me.Column
-                                       From Role In lrReferenceModeRoleConstraint.Role
-                                       Where Role.FactType.RoleGroup.Contains(IdxColumn.Role)
-                                       Where lrReferenceModeRoleConstraint.RoleConstraintRole.Count = Me.Column.Count
-                                       Select IdxColumn).Count
+                        If lrEntityType.HasSimpleReferenceScheme Then
+                            'PSEUDOCODE
+                            ' * Check whether all the ResponsibleRoles of the Columns of the Index are in the FactTypes of the Roles of the RoleConstraint
+                            Dim liMatch = (From IdxColumn In Me.Column
+                                           From Role In lrReferenceModeRoleConstraint.Role
+                                           Where Role.FactType.RoleGroup.Contains(IdxColumn.Role)
+                                           Select IdxColumn).Count
 
-                        If liMatch = Me.Column.Count Then
-                            Return lrReferenceModeRoleConstraint
+                            If liMatch = Me.Column.Count Then
+                                Return lrReferenceModeRoleConstraint
+                            End If
                         End If
-                    End If
+                        If lrEntityType.HasCompoundReferenceMode Then
+                            'PSEUDOCODE
+                            ' * Check whether all the ResponsibleRoles of the Columns of the Index are in the FactTypes of the Roles of the RoleConstraint
+                            Dim liMatch = (From IdxColumn In Me.Column
+                                           From Role In lrReferenceModeRoleConstraint.Role
+                                           Where Role.FactType.RoleGroup.Contains(IdxColumn.Role)
+                                           Where lrReferenceModeRoleConstraint.RoleConstraintRole.Count = Me.Column.Count
+                                           Select IdxColumn).Count
+
+                            If liMatch = Me.Column.Count Then
+                                Return lrReferenceModeRoleConstraint
+                            End If
+                        End If
 
                     'Otherwise, do the same as the above, but for all RoleConstraints in the FBMModel.
-                Case Is = pcenumConceptType.FactType
+                    Case Is = pcenumConceptType.FactType
 
-            End Select
+                End Select
 
+                Return Nothing
 
+            Catch ex As Exception
+                Dim lsMessage1 As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return Nothing
+            End Try
         End Function
 
         Public Sub removeColumn(ByRef arColumn As RDS.Column)
