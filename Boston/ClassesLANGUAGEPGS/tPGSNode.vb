@@ -186,6 +186,18 @@ Namespace PGS
 
         Public Sub Move(aiNewX As Integer, aiNewY As Integer, abBroadcastInterfaceEvent As Boolean) Implements FBM.iPageObject.Move
 
+            Me.X = aiNewX
+            Me.Y = aiNewY
+
+            Me.FactDataInstance.X = aiNewX
+            Me.FactDataInstance.Y = aiNewY
+
+            Me.FactDataInstance.Fact.FactType.isDirty = True
+            Me.FactDataInstance.Fact.isDirty = True
+            Me.FactDataInstance.isDirty = True
+
+            Me.Page.IsDirty = True
+
         End Sub
 
         Public Sub Moved() Implements FBM.iPageObject.Moved

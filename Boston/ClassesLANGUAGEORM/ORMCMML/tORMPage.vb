@@ -2664,7 +2664,7 @@ Namespace FBM
 
         End Sub
 
-        Public Sub removeRelationsForEntity(ByRef arEntity As ERD.Entity)
+        Public Sub removeRelationsForEntity(ByRef arEntity As FBM.FactDataInstance)
 
             Dim lsSQLQuery As String = ""
             Dim lrRecordset As ORMQL.Recordset

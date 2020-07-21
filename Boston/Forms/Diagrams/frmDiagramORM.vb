@@ -4102,6 +4102,7 @@ Public Class frmDiagramORM
 
             e.Node.Tag.x = e.Node.Bounds.X
             e.Node.Tag.y = e.Node.Bounds.Y
+            Call e.Node.Tag.Move(e.Node.Tag.X, e.Node.Tag.Y, True)
 
             Dim loORMObject As Object = e.Node.Tag
             '==============================================================================

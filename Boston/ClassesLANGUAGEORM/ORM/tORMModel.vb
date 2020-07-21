@@ -2821,7 +2821,6 @@ Namespace FBM
                         End If
                     ElseIf arRoleConstraint.RoleConstraintType = pcenumRoleConstraintType.ExternalUniquenessConstraint Then
 
-                        Dim larIndexColumn As New List(Of RDS.Column)
                         Dim lrTable As RDS.Table = Nothing
 
                         If arRoleConstraint.DoesEachRoleReferenceTheSameModelObject Then
@@ -2831,7 +2830,11 @@ Namespace FBM
                                 Exit Try
                             End If
                         Else
-                            Exit Try
+                            If arRoleConstraint.DoesEachRoleFactTypeOppositeRoleJoinSameModelObject Then
+                                'All good. Can look for an Index to remove
+                            Else
+                                Exit Try
+                            End If
                         End If
 
                         Dim lrOtherRoleOfFactType = arRoleConstraint.RoleConstraintRole(0).Role.FactType.GetOtherRoleOfBinaryFactType(arRoleConstraint.RoleConstraintRole(0).Role.Id)
@@ -2850,27 +2853,7 @@ Namespace FBM
                             Exit Try
                         End If
 
-                        For Each lrRoleConstraintRole In arRoleConstraint.RoleConstraintRole
-
-                            Dim larColumn = From Column In lrTable.Column _
-                                            Where Column.Role.Id = lrRoleConstraintRole.Role.FactType.GetOtherRoleOfBinaryFactType(lrRoleConstraintRole.Role.Id).Id _
-                                            Select Column
-
-                            For Each lrColumn In larColumn
-                                larIndexColumn.Add(lrColumn)
-                            Next 'Column
-
-                        Next 'RoleConstraintRole
-
-                        Dim lrIndex As RDS.Index
-
-                        '------------------------------------------------------------------------
-                        'FInd any existing Index for the previous version of the RoleConstraint
-                        lrIndex = lrTable.getIndexByColumns(larIndexColumn)
-
-                        If lrIndex IsNot Nothing Then
-                            Call Me.RDS.removeIndex(lrIndex)
-                        End If
+                        Call lrTable.removeIndexByRoleConstraint(arRoleConstraint)
 
                     End If 'Is InternalUniquenessConstraint
                 End If

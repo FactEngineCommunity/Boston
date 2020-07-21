@@ -980,6 +980,7 @@ Public Class frmDiagramPGS
                     lrFactDataInstance.Y = e.Node.Bounds.Y
                     lrShapeNode.Tag.X = lrFactDataInstance.X
                     lrShapeNode.Tag.Y = lrFactDataInstance.Y
+                    Call lrShapeNode.Tag.Move(lrFactDataInstance.X, lrFactDataInstance.Y, True)
 
                     Dim lrLink As MindFusion.Diagramming.DiagramLink
                     For Each lrLink In lrShapeNode.OutgoingLinks
@@ -3002,4 +3003,76 @@ Public Class frmDiagramPGS
 
     End Sub
 
+    Private Sub ToolStripMenuItem_RemoveFromPage_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItem_RemoveFromPage.Click
+
+        Dim lrShapeNode As MindFusion.Diagramming.ShapeNode = Me.Diagram.Selection.Items(0)
+        Dim lrNode As New PGS.Node
+        Dim lsAttributeId As String = ""
+        Dim lsIdentifierId As String = ""
+        Dim lsSQLQuery As String = ""
+
+        Me.Cursor = Cursors.WaitCursor
+
+        Try
+            ''---------------------------------------------------------
+            ''Get the EntityType represented by the (selected) Entity
+            ''---------------------------------------------------------
+            lrNode = lrShapeNode.Tag '(above) = Me.Diagram.Selection.Items(0)
+
+            '------------
+            'Relations
+            Call Me.zrPage.removeRelationsForEntity(lrNode)
+
+            '------------
+            'Attributes
+            For Each lrERDAttribute In lrNode.Attribute
+                Call Me.zrPage.removeCMMLAttribute(lrERDAttribute)
+            Next
+
+            '-------------------------------------------------------------------------
+            'Remove the Entity from the Page
+            '---------------------------------
+            lsSQLQuery = " DELETE FROM " & pcenumCMMLRelations.CoreElementHasElementType.ToString
+            lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
+            lsSQLQuery &= " WHERE Element = '" & lrNode.Name & "'"
+
+            Call Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+            Dim larLinkToRemove As New List(Of DiagramLink)
+            For Each lrLink In lrShapeNode.IncomingLinks
+                larLinkToRemove.Add(lrLink)
+            Next
+
+            For Each lrLink In lrShapeNode.OutgoingLinks
+                larLinkToRemove.Add(lrLink)
+            Next
+
+            For Each lrLink In larLinkToRemove
+                Me.Diagram.Links.Remove(lrLink)
+            Next
+
+            '----------------------------------------------------------------------------------------------------------
+            'Remove the TableNode that represents the Entity from the Diagram on the Page.
+            '-------------------------------------------------------------------------------
+            Me.Diagram.Nodes.Remove(lrShapeNode)
+            Me.zrPage.ERDiagram.Entity.Remove(lrNode)
+
+            Me.Cursor = Cursors.Default
+
+            Me.zrPage.SelectedObject.Remove(lrNode)
+            Me.Diagram.Selection.RemoveItem(lrShapeNode)
+
+        Catch ex As Exception
+
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            Me.Cursor = Cursors.Default
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
 End Class

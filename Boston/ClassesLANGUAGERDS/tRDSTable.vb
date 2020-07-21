@@ -695,6 +695,45 @@ Namespace RDS
 
         End Sub
 
+        Public Sub removeIndexByRoleConstraint(ByRef arRoleConstraint As FBM.RoleConstraint)
+
+            Try
+                Dim larIndexColumn As New List(Of RDS.Column)
+                For Each lrRoleConstraintRole In arRoleConstraint.RoleConstraintRole
+
+                    Dim larColumn = From Column In Me.Column
+                                    Where Column.Role.Id = lrRoleConstraintRole.Role.FactType.GetOtherRoleOfBinaryFactType(lrRoleConstraintRole.Role.Id).Id
+                                    Select Column
+
+                    For Each lrColumn In larColumn
+                        larIndexColumn.Add(lrColumn)
+                    Next 'Column
+
+                Next 'RoleConstraintRole
+
+                Dim lrIndex As RDS.Index
+
+                '------------------------------------------------------------------------
+                'FInd any existing Index for the previous version of the RoleConstraint
+                lrIndex = Me.getIndexByColumns(larIndexColumn)
+
+                If lrIndex IsNot Nothing Then
+                    Call Me.Model.removeIndex(lrIndex)
+                End If
+
+                For Each lrSubtypeTable In Me.getSubtypeTables
+                    Call lrSubtypeTable.removeIndexByRoleConstraint(arRoleConstraint)
+                Next
+
+            Catch ex As Exception
+                Dim lsMessage1 As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+        End Sub
         Public Sub setIsPGSRelation(ByVal abIsPGSRelation As Boolean)
 
             Try

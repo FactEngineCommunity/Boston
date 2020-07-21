@@ -3368,6 +3368,8 @@ Namespace FBM
 
             End If
             '==============================================================================
+            Me.isDirty = True
+            Me.Page.IsDirty = True
 
 
         End Sub

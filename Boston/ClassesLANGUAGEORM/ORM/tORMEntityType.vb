@@ -1694,7 +1694,7 @@ Namespace FBM
             Try
                 If abForceRemoval Then
                 Else
-                    If Me.IsObjectifyingEntityType Then
+                    If Me.IsObjectifyingEntityType And Me.ObjectifiedFactType IsNot Nothing Then
                         MsgBox("You cannot remove Entity Type, '" & Trim(Me.Name) & "' while it is the Objectifying Entity Type of a Fact Type.")
                         Return False
                         Exit Function

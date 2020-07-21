@@ -905,13 +905,23 @@ Namespace FBM
 
         Public Sub updateRelationDestinationPredicate(ByRef arRelation As RDS.Relation, ByVal asDestinationPredicate As String)
 
-            Dim lsSQLQuery As String = ""
+            Try
+                Dim lsSQLQuery As String = ""
 
-            lsSQLQuery = "UPDATE " & pcenumCMMLRelations.CoreDestinationPredicate.ToString
-            lsSQLQuery &= " SET Predicate = '" & asDestinationPredicate & "'"
-            lsSQLQuery &= " WHERE Relation= '" & arRelation.Id & "'"
+                lsSQLQuery = "UPDATE " & pcenumCMMLRelations.CoreDestinationPredicate.ToString
+                lsSQLQuery &= " SET Predicate = '" & asDestinationPredicate & "'"
+                lsSQLQuery &= " WHERE Relation= '" & arRelation.Id & "'"
 
-            Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+            Catch ex As Exception
+                Dim lsMessage1 As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
         End Sub
 
