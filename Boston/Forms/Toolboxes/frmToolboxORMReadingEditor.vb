@@ -345,8 +345,8 @@ Public Class frmToolboxORMReadingEditor
     '''   ELSE RETURNS FALSE.
     ''' arFactTypeReading returns populated if asReading is successfully parsed and all Object Types of the reading match those joined by the Fact Type.
     ''' </returns>
-    Private Function GetPredicatePartsFromReadingUsingParser(ByVal asReading As String, _
-                                                             ByRef arFactTypeReading As FBM.FactTypeReading, _
+    Private Function GetPredicatePartsFromReadingUsingParser(ByVal asReading As String,
+                                                             ByRef arFactTypeReading As FBM.FactTypeReading,
                                                              Optional ByRef aarRoleOrder As List(Of FBM.Role) = Nothing) As Boolean
 
         Dim lsMessage As String
@@ -419,13 +419,13 @@ Public Class frmToolboxORMReadingEditor
                     Dim lsTempInd As Integer = lasModelObjectId.FindAll(AddressOf lsModelObjectId.Equals).Count
 
                     If aarRoleOrder Is Nothing Then
-                        lrPredicatePart.Role = arFactTypeReading.FactType.GetRoleByJoinedObjectTypeId(lsModelElementName, _
+                        lrPredicatePart.Role = arFactTypeReading.FactType.GetRoleByJoinedObjectTypeId(lsModelElementName,
                                                                                                       lsTempInd)
-                    ElseIf aarRoleOrder(liInd - 1).JoinedORMObject.Id = arFactTypeReading.FactType.GetRoleByJoinedObjectTypeId(lsModelElementName, _
+                    ElseIf aarRoleOrder(liInd - 1).JoinedORMObject.Id = arFactTypeReading.FactType.GetRoleByJoinedObjectTypeId(lsModelElementName,
                                                                                                                                lsTempInd).JoinedORMObject.Id Then
                         lrPredicatePart.Role = aarRoleOrder(liInd - 1)
                     Else
-                        lrPredicatePart.Role = arFactTypeReading.FactType.GetRoleByJoinedObjectTypeId(lsModelElementName, _
+                        lrPredicatePart.Role = arFactTypeReading.FactType.GetRoleByJoinedObjectTypeId(lsModelElementName,
                                                                                                       lsTempInd)
                     End If
 
@@ -478,6 +478,143 @@ Public Class frmToolboxORMReadingEditor
         End Try
 
     End Function
+
+    Public Sub processFactTypeReading()
+
+        With New WaitCursor
+
+            Dim lbFactTypeReadingSuccessfullyCreated As Boolean = False
+            Dim lrFactTypeReading As New FBM.FactTypeReading(Me.zrFactTypeInstance.FactType)
+            If Me.GetPredicatePartsFromReadingUsingParser(Trim(Me.TextboxReading.Text), lrFactTypeReading) Then
+                '-------------------------------------------------
+                'All good. The reading text parsed successfully.
+                '-------------------------------------------------
+
+                '-------------------------------------------------------------------------------
+                'The first FactTypeReading for a FactType is Preferred for that FactType
+                If Me.zrFactTypeInstance.FactType.FactTypeReading.Count = 0 Then
+                    lrFactTypeReading.IsPreferred = True
+                End If
+
+                '---------------------------------------------------------------------------------------------------------------------
+                'Check FactType.ExistsFactTypeReadingByRoleSequence to see whether a Fact Type already exists for the Role Sequence.
+                '---------------------------------------------------------------------------------------------------------------------
+                If Me.zrFactTypeInstance.FactType.ExistsFactTypeReadingByRoleSequence(lrFactTypeReading) Then
+
+                    lrFactTypeReading.TypedPredicateId = Me.zrFactTypeInstance.FactType.GetTypedPredicateIdByRoleSequence(lrFactTypeReading)
+
+                    lrFactTypeReading.IsPreferredForPredicate = (Me.zrFactTypeInstance.FactType.FactTypeReading.FindAll(AddressOf lrFactTypeReading.EqualsByRoleSequence).Count = 0)
+
+                    '---------------------------------------------------------------------------------------------
+                    'Check to see whether the Fact Type has more than one Role referencing the same Object Type.
+                    '---------------------------------------------------------------------------------------------
+                    If Me.zrFactTypeInstance.FactType.HasMoreThanOneRoleReferencingTheSameModelObject Then
+                        '---------------------------------------------------------------------------------------------------
+                        'Need to check to see whether an alternate sequence of Roles (within the FTR) is possible for the 
+                        '  FactType. It may well be that each possible combination of FTR Role Sequences has been filled
+                        '  for the Fact Type, which is a good scenario. If this is the case, then simply ther is no new
+                        '  FTR to apply to the Fact Type.
+                        '  Otherwise, the algorithm is to select an unused FTR/Role Sequence combination and apply that
+                        '  automatically for the Fact Type.
+                        '---------------------------------------------------------------------------------------------------
+                        If lrFactTypeReading.FactType.ExistsAvailablePermutation(lrFactTypeReading) Then
+                            lrFactTypeReading = lrFactTypeReading.FactType.TransformFactTypeReadingToAvailablePermutation(lrFactTypeReading)
+                            Me.zrFactTypeInstance.FactType.AddFactTypeReading(lrFactTypeReading, True, True)
+                            lbFactTypeReadingSuccessfullyCreated = True
+                        End If
+                    Else
+                        Me.zrFactTypeInstance.FactType.AddFactTypeReading(lrFactTypeReading, True, True)
+
+                        lbFactTypeReadingSuccessfullyCreated = True
+                    End If
+                Else
+                    Me.zrFactTypeInstance.FactType.AddFactTypeReading(lrFactTypeReading, True, True)
+
+                    lbFactTypeReadingSuccessfullyCreated = True
+                End If 'Preexisting FactTypeReading for Role sequence exists.
+            End If 'ReadingText successfully parsed.
+
+            If lbFactTypeReadingSuccessfullyCreated Then
+
+                '===================================================================================================================================
+                'IMPORTANT: Set the name of the FactType based on the FactTypeReadings of the FactType.
+                Dim lsNewName As String = Me.zrFactTypeInstance.FactType.MakeNameFromFactTypeReadings()
+                Dim lsOldName As String = Me.zrFactTypeInstance.FactType.Id
+                If lsNewName <> lsOldName Then
+
+                    Call Me.zrFactTypeInstance.FactType.setName(lsNewName, True)
+
+                    '---------------------------------------------------------------------------------------------
+                    'CMML
+                    Dim lrRecordset As ORMQL.Recordset
+                    Dim lsSQLQuery As String = ""
+
+                    lsSQLQuery = "SELECT *"
+                    lsSQLQuery.AppendString(" FROM " & pcenumCMMLRelations.CoreRelationIsForFactType.ToString)
+                    lsSQLQuery.AppendString(" WHERE FactType = '" & lsOldName & "'")
+
+                    lrRecordset = Me.zrFactTypeInstance.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                    If Not lrRecordset.EOF Then
+                        '20180611-VM-If the code never reaches this breakpoint....then FactType.SetName is modifying the appropriate FactData entries.
+                        '  so can delete this.
+                        Dim lrNewDictionaryEntry As New FBM.DictionaryEntry(Me.zrFactTypeInstance.Model, lsNewName, pcenumConceptType.FactType)
+                        lrNewDictionaryEntry = Me.zrFactTypeInstance.Model.AddModelDictionaryEntry(lrNewDictionaryEntry)
+                        Call lrRecordset("FactType").SwitchConcept(lrNewDictionaryEntry.Concept, pcenumConceptType.FactType)
+                    End If
+
+                End If
+
+                Call Me.zrPage.Form.EnableSaveButton()
+
+                Dim lrSuitableFactTypeReading As FBM.FactTypeReading
+                lrSuitableFactTypeReading = Me.zrFactTypeInstance.FindSuitableFactTypeReading 'Formerly by FactType...ByRoles(larRoles)
+
+                'VM-20180328-Remove this if all seems okay.
+                '----------------------------------------------------------------
+                'Add a FactTypeReadingInstance to the selected FactTypeInstance
+                '----------------------------------------------------------------
+                'Dim lrFactTypeInstance = Me.zrFactTypeInstance
+                'Dim lrFactTypeReadingInstance As FBM.FactTypeReadingInstance = lrFactTypeReading.CloneInstance(lrFactTypeInstance.Page)
+
+                ''---------------------------------------------------------------------------
+                ''The reading may not be suitable for the current RoleGroup sequence/layout
+                ''  so check to see if it is. If it is not, then the reading should not
+                ''  be displayed on the Page.
+                ''---------------------------------------------------------------------------
+                'Dim larRoles As New List(Of FBM.Role)
+                'Dim lrRoleInstance As FBM.RoleInstance
+                'For Each lrRoleInstance In Me.zrFactTypeInstance.RoleGroup
+                '    larRoles.Add(lrRoleInstance.Role)
+                'Next
+
+                'If IsSomething(lrSuitableFactTypeReading) Then
+                '    lrSuitableFactTypeReadingInstance = lrSuitableFactTypeReading.CloneInstance(lrFactTypeInstance.Page)
+                '    If lrSuitableFactTypeReadingInstance.Equals(lrFactTypeReadingInstance) Then
+                '        If IsSomething(Me.zrFactTypeInstance.FactTypeReadingShape.shape) Then
+                '            lrFactTypeReadingInstance.shape = Me.zrFactTypeInstance.FactTypeReadingShape.shape
+                '            Me.zrFactTypeInstance.FactTypeReadingShape = lrFactTypeReadingInstance
+                '            Me.zrFactTypeInstance.FactTypeReadingShape.RefreshShape()
+                '        Else
+                '            Call lrFactTypeReadingInstance.DisplayAndAssociate()
+                '            Me.zrFactTypeInstance.FactTypeReadingShape = lrFactTypeReadingInstance
+                '        End If
+                '    Else
+                '        If IsSomething(Me.zrFactTypeInstance.FactTypeReadingShape.shape) Then
+                '            Me.zrFactTypeInstance.FactTypeReadingShape.RefreshShape()
+                '        End If
+                '    End If
+                'Else
+                '    If IsSomething(Me.zrFactTypeInstance.FactTypeReadingShape.shape) Then
+                '        Me.zrFactTypeInstance.FactTypeReadingShape.shape.Text = ""
+                '    End If
+                'End If
+
+                Me.TextboxReading.Text = ""
+            End If
+        End With
+
+    End Sub
 
     ''' <summary>
     ''' Protects the names of ORM Object Types within the Reading so that
@@ -583,78 +720,79 @@ Public Class frmToolboxORMReadingEditor
 
             If Me.GetPredicatePartsFromReadingUsingParser(Trim(Me.DataGrid_Readings.CurrentCell.Value), lrFactTypeReading, larRoleOrder) Then
 
-                '============================================================================================================================
-                'Code safe. Get rid of any extra PredicateParts 
-                '  in the existing FactTypeReading that should not be there.
-                '  It's not often that it would happen, but if a FactTypeReading ends up with one too many PredicateParts,
-                '  there must be a way to get rid of the extra PrediatePart. This code will get rid of the extra PredicatePart in the exiting
-                '  FactTypeReading.
-                '--------------------------------------------------------------------------
-                Dim lrTestingFactTypeReading As FBM.FactTypeReading
-                lrTestingFactTypeReading = Me.DataGrid_Readings.Rows(e.RowIndex).Tag
-                If lrTestingFactTypeReading.PredicatePart.Count > Me.zrFactTypeInstance.RoleGroup.Count Then
-                    Dim lrPredicatePart As New FBM.PredicatePart(Me.zrFactTypeInstance.Model, New FBM.FactTypeReading(Me.zrFactTypeInstance.FactType, lrTestingFactTypeReading.Id))
-                    lrPredicatePart.SequenceNr = lrTestingFactTypeReading.PredicatePart.Count
-                    tableORMPredicatePart.DeletePredicatePart(lrPredicatePart)
-                End If
-                '===========================================================================================================================
+                With New WaitCursor
+                    '============================================================================================================================
+                    'Code safe. Get rid of any extra PredicateParts 
+                    '  in the existing FactTypeReading that should not be there.
+                    '  It's not often that it would happen, but if a FactTypeReading ends up with one too many PredicateParts,
+                    '  there must be a way to get rid of the extra PrediatePart. This code will get rid of the extra PredicatePart in the exiting
+                    '  FactTypeReading.
+                    '--------------------------------------------------------------------------
+                    Dim lrTestingFactTypeReading As FBM.FactTypeReading
+                    lrTestingFactTypeReading = Me.DataGrid_Readings.Rows(e.RowIndex).Tag
+                    If lrTestingFactTypeReading.PredicatePart.Count > Me.zrFactTypeInstance.RoleGroup.Count Then
+                        Dim lrPredicatePart As New FBM.PredicatePart(Me.zrFactTypeInstance.Model, New FBM.FactTypeReading(Me.zrFactTypeInstance.FactType, lrTestingFactTypeReading.Id))
+                        lrPredicatePart.SequenceNr = lrTestingFactTypeReading.PredicatePart.Count
+                        tableORMPredicatePart.DeletePredicatePart(lrPredicatePart)
+                    End If
+                    '===========================================================================================================================
 
-                Me.DataGrid_Readings.Rows(e.RowIndex).Tag = lrFactTypeReading
+                    Me.DataGrid_Readings.Rows(e.RowIndex).Tag = lrFactTypeReading
 
-                lrFactTypeReadingInstance = lrFactTypeReading.CloneInstance(Me.zrPage)
+                    lrFactTypeReadingInstance = lrFactTypeReading.CloneInstance(Me.zrPage)
 
-                Call Me.zrFactTypeInstance.FactType.SetFactTypeReading(lrFactTypeReading, True)
+                    Call Me.zrFactTypeInstance.FactType.SetFactTypeReading(lrFactTypeReading, True)
 
-                If Me.zrFactTypeInstance.FactTypeReading.Equals(lrFactTypeReadingInstance) Then
+                    If Me.zrFactTypeInstance.FactTypeReading.Equals(lrFactTypeReadingInstance) Then
 
-                    If IsSomething(Me.zrFactTypeInstance.FactTypeReading) Then
-                        If IsSomething(Me.zrFactTypeInstance.FactTypeReadingShape.Shape) Then
-                            lrShapeNode = Me.zrFactTypeInstance.FactTypeReadingShape.Shape
+                        If IsSomething(Me.zrFactTypeInstance.FactTypeReading) Then
+                            If IsSomething(Me.zrFactTypeInstance.FactTypeReadingShape.Shape) Then
+                                lrShapeNode = Me.zrFactTypeInstance.FactTypeReadingShape.Shape
+                            End If
                         End If
+
+                        Me.zrFactTypeInstance.FactTypeReadingShape = lrFactTypeReadingInstance
+                        Me.zrFactTypeInstance.FactTypeReadingShape.Shape = lrShapeNode
+                        Me.zrFactTypeInstance.FactTypeReadingShape.RefreshShape()
                     End If
 
-                    Me.zrFactTypeInstance.FactTypeReadingShape = lrFactTypeReadingInstance
-                    Me.zrFactTypeInstance.FactTypeReadingShape.Shape = lrShapeNode
-                    Me.zrFactTypeInstance.FactTypeReadingShape.RefreshShape()
-                End If
+                    '===================================================================================================================================
+                    'IMPORTANT: Set the name of the FactType based on the FactTypeReadings of the FactType.
+                    Dim lsNewName As String = Me.zrFactTypeInstance.FactType.MakeNameFromFactTypeReadings()
+                    Dim lsOldName As String = Me.zrFactTypeInstance.FactType.Id
+                    If lsNewName <> lsOldName Then
 
-                '===================================================================================================================================
-                'IMPORTANT: Set the name of the FactType based on the FactTypeReadings of the FactType.
-                Dim lsNewName As String = Me.zrFactTypeInstance.FactType.MakeNameFromFactTypeReadings()
-                Dim lsOldName As String = Me.zrFactTypeInstance.FactType.Id
-                If lsNewName <> lsOldName Then
+                        Call Me.zrFactTypeInstance.FactType.setName(lsNewName, True)
 
-                    Call Me.zrFactTypeInstance.FactType.setName(lsNewName, True)
+                        '---------------------------------------------------------------------------------------------
+                        'CMML
+                        Dim lrRecordset As ORMQL.Recordset
+                        Dim lsSQLQuery As String = ""
 
-                    '---------------------------------------------------------------------------------------------
-                    'CMML
-                    Dim lrRecordset As ORMQL.Recordset
-                    Dim lsSQLQuery As String = ""
+                        lsSQLQuery = "SELECT *"
+                        lsSQLQuery.AppendString(" FROM " & pcenumCMMLRelations.CoreRelationIsForFactType.ToString)
+                        lsSQLQuery.AppendString(" WHERE FactType = '" & lsOldName & "'")
 
-                    lsSQLQuery = "SELECT *"
-                    lsSQLQuery.AppendString(" FROM " & pcenumCMMLRelations.CoreRelationIsForFactType.ToString)
-                    lsSQLQuery.AppendString(" WHERE FactType = '" & lsOldName & "'")
+                        lrRecordset = Me.zrFactTypeInstance.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
-                    lrRecordset = Me.zrFactTypeInstance.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                        If Not lrRecordset.EOF Then
+                            '20180611-VM-If the code never reaches this breakpoint....then FactType.SetName is modifying the appropriate FactData entries.
+                            '  so can delete this.
+                            Dim lrNewDictionaryEntry As New FBM.DictionaryEntry(Me.zrFactTypeInstance.Model, lsNewName, pcenumConceptType.FactType)
+                            lrNewDictionaryEntry = Me.zrFactTypeInstance.Model.AddModelDictionaryEntry(lrNewDictionaryEntry)
+                            Call lrRecordset("FactType").SwitchConcept(lrNewDictionaryEntry.Concept, pcenumConceptType.FactType)
+                        End If
 
-                    If Not lrRecordset.EOF Then
-                        '20180611-VM-If the code never reaches this breakpoint....then FactType.SetName is modifying the appropriate FactData entries.
-                        '  so can delete this.
-                        Dim lrNewDictionaryEntry As New FBM.DictionaryEntry(Me.zrFactTypeInstance.Model, lsNewName, pcenumConceptType.FactType)
-                        lrNewDictionaryEntry = Me.zrFactTypeInstance.Model.AddModelDictionaryEntry(lrNewDictionaryEntry)
-                        Call lrRecordset("FactType").SwitchConcept(lrNewDictionaryEntry.Concept, pcenumConceptType.FactType)
                     End If
 
-                End If
+                    Me.zrFactTypeInstance.Model.MakeDirty()
 
-                Me.zrFactTypeInstance.Model.MakeDirty()
-
-                If Me.zrFactTypeInstance.Page.Form IsNot Nothing Then
-                    Me.zrFactTypeInstance.Page.Form.EnableSaveButton()
-                Else
-                    frmMain.ToolStripButton_Save.Enabled = True
-                End If
-
+                    If Me.zrFactTypeInstance.Page.Form IsNot Nothing Then
+                        Me.zrFactTypeInstance.Page.Form.EnableSaveButton()
+                    Else
+                        frmMain.ToolStripButton_Save.Enabled = True
+                    End If
+                End With
             End If
 
         Catch ex As Exception
@@ -732,7 +870,6 @@ Public Class frmToolboxORMReadingEditor
     Private Sub TextboxReading_KeyUp(sender As Object, e As KeyEventArgs) Handles TextboxReading.KeyUp
 
         If e.KeyCode = Keys.Down Or Trim(Me.TextboxReading.Text) <> "NL:" Then
-
             Call Me.ProcessAutoComplete(e)
         End If
 
@@ -812,7 +949,6 @@ Public Class frmToolboxORMReadingEditor
 
         Try
             Dim lsMessage As String = ""
-            Dim lbFactTypeReadingSuccessfullyCreated As Boolean = False
 
             If Me.zrFactTypeInstance Is Nothing Then
                 lsMessage = "You must select a Fact Type within the Page before committing a Fact Type Reading."
@@ -833,138 +969,10 @@ Public Class frmToolboxORMReadingEditor
 
             If e.KeyCode = Keys.Enter Then
                 e.SuppressKeyPress = True
-                Dim lrFactTypeReading As New FBM.FactTypeReading(Me.zrFactTypeInstance.FactType)
-                If Me.GetPredicatePartsFromReadingUsingParser(Trim(Me.TextboxReading.Text), lrFactTypeReading) Then
-                    '-------------------------------------------------
-                    'All good. The reading text parsed successfully.
-                    '-------------------------------------------------
-
-                    '-------------------------------------------------------------------------------
-                    'The first FactTypeReading for a FactType is Preferred for that FactType
-                    If Me.zrFactTypeInstance.FactType.FactTypeReading.Count = 0 Then
-                        lrFactTypeReading.IsPreferred = True
-                    End If
-
-                    '---------------------------------------------------------------------------------------------------------------------
-                    'Check FactType.ExistsFactTypeReadingByRoleSequence to see whether a Fact Type already exists for the Role Sequence.
-                    '---------------------------------------------------------------------------------------------------------------------
-                    If Me.zrFactTypeInstance.FactType.ExistsFactTypeReadingByRoleSequence(lrFactTypeReading) Then
-
-                        lrFactTypeReading.TypedPredicateId = Me.zrFactTypeInstance.FactType.GetTypedPredicateIdByRoleSequence(lrFactTypeReading)
-
-                        lrFactTypeReading.IsPreferredForPredicate = (Me.zrFactTypeInstance.FactType.FactTypeReading.FindAll(AddressOf lrFactTypeReading.EqualsByRoleSequence).Count = 0)
-
-                        '---------------------------------------------------------------------------------------------
-                        'Check to see whether the Fact Type has more than one Role referencing the same Object Type.
-                        '---------------------------------------------------------------------------------------------
-                        If Me.zrFactTypeInstance.FactType.HasMoreThanOneRoleReferencingTheSameModelObject Then
-                            '---------------------------------------------------------------------------------------------------
-                            'Need to check to see whether an alternate sequence of Roles (within the FTR) is possible for the 
-                            '  FactType. It may well be that each possible combination of FTR Role Sequences has been filled
-                            '  for the Fact Type, which is a good scenario. If this is the case, then simply ther is no new
-                            '  FTR to apply to the Fact Type.
-                            '  Otherwise, the algorithm is to select an unused FTR/Role Sequence combination and apply that
-                            '  automatically for the Fact Type.
-                            '---------------------------------------------------------------------------------------------------
-                            If lrFactTypeReading.FactType.ExistsAvailablePermutation(lrFactTypeReading) Then
-                                lrFactTypeReading = lrFactTypeReading.FactType.TransformFactTypeReadingToAvailablePermutation(lrFactTypeReading)
-                                Me.zrFactTypeInstance.FactType.AddFactTypeReading(lrFactTypeReading, True, True)
-                                lbFactTypeReadingSuccessfullyCreated = True
-                            End If
-                        Else
-                            Me.zrFactTypeInstance.FactType.AddFactTypeReading(lrFactTypeReading, True, True)
-
-                            lbFactTypeReadingSuccessfullyCreated = True
-                        End If
-                    Else
-                        Me.zrFactTypeInstance.FactType.AddFactTypeReading(lrFactTypeReading, True, True)
-
-                        lbFactTypeReadingSuccessfullyCreated = True
-                    End If 'Preexisting FactTypeReading for Role sequence exists.
-                End If 'ReadingText successfully parsed.
-
-                If lbFactTypeReadingSuccessfullyCreated Then
-
-                    '===================================================================================================================================
-                    'IMPORTANT: Set the name of the FactType based on the FactTypeReadings of the FactType.
-                    Dim lsNewName As String = Me.zrFactTypeInstance.FactType.MakeNameFromFactTypeReadings()
-                    Dim lsOldName As String = Me.zrFactTypeInstance.FactType.Id
-                    If lsNewName <> lsOldName Then
-
-                        Call Me.zrFactTypeInstance.FactType.setName(lsNewName, True)
-
-                        '---------------------------------------------------------------------------------------------
-                        'CMML
-                        Dim lrRecordset As ORMQL.Recordset
-                        Dim lsSQLQuery As String = ""
-
-                        lsSQLQuery = "SELECT *"
-                        lsSQLQuery.AppendString(" FROM " & pcenumCMMLRelations.CoreRelationIsForFactType.ToString)
-                        lsSQLQuery.AppendString(" WHERE FactType = '" & lsOldName & "'")
-
-                        lrRecordset = Me.zrFactTypeInstance.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-                        If Not lrRecordset.EOF Then
-                            '20180611-VM-If the code never reaches this breakpoint....then FactType.SetName is modifying the appropriate FactData entries.
-                            '  so can delete this.
-                            Dim lrNewDictionaryEntry As New FBM.DictionaryEntry(Me.zrFactTypeInstance.Model, lsNewName, pcenumConceptType.FactType)
-                            lrNewDictionaryEntry = Me.zrFactTypeInstance.Model.AddModelDictionaryEntry(lrNewDictionaryEntry)
-                            Call lrRecordset("FactType").SwitchConcept(lrNewDictionaryEntry.Concept, pcenumConceptType.FactType)
-                        End If
-
-                    End If
-
-                    Call Me.zrPage.Form.EnableSaveButton()
-
-                    Dim lrSuitableFactTypeReading As FBM.FactTypeReading
-                    lrSuitableFactTypeReading = Me.zrFactTypeInstance.FindSuitableFactTypeReading 'Formerly by FactType...ByRoles(larRoles)
-
-                    'VM-20180328-Remove this if all seems okay.
-                    '----------------------------------------------------------------
-                    'Add a FactTypeReadingInstance to the selected FactTypeInstance
-                    '----------------------------------------------------------------
-                    'Dim lrFactTypeInstance = Me.zrFactTypeInstance
-                    'Dim lrFactTypeReadingInstance As FBM.FactTypeReadingInstance = lrFactTypeReading.CloneInstance(lrFactTypeInstance.Page)
-
-                    ''---------------------------------------------------------------------------
-                    ''The reading may not be suitable for the current RoleGroup sequence/layout
-                    ''  so check to see if it is. If it is not, then the reading should not
-                    ''  be displayed on the Page.
-                    ''---------------------------------------------------------------------------
-                    'Dim larRoles As New List(Of FBM.Role)
-                    'Dim lrRoleInstance As FBM.RoleInstance
-                    'For Each lrRoleInstance In Me.zrFactTypeInstance.RoleGroup
-                    '    larRoles.Add(lrRoleInstance.Role)
-                    'Next
-
-                    'If IsSomething(lrSuitableFactTypeReading) Then
-                    '    lrSuitableFactTypeReadingInstance = lrSuitableFactTypeReading.CloneInstance(lrFactTypeInstance.Page)
-                    '    If lrSuitableFactTypeReadingInstance.Equals(lrFactTypeReadingInstance) Then
-                    '        If IsSomething(Me.zrFactTypeInstance.FactTypeReadingShape.shape) Then
-                    '            lrFactTypeReadingInstance.shape = Me.zrFactTypeInstance.FactTypeReadingShape.shape
-                    '            Me.zrFactTypeInstance.FactTypeReadingShape = lrFactTypeReadingInstance
-                    '            Me.zrFactTypeInstance.FactTypeReadingShape.RefreshShape()
-                    '        Else
-                    '            Call lrFactTypeReadingInstance.DisplayAndAssociate()
-                    '            Me.zrFactTypeInstance.FactTypeReadingShape = lrFactTypeReadingInstance
-                    '        End If
-                    '    Else
-                    '        If IsSomething(Me.zrFactTypeInstance.FactTypeReadingShape.shape) Then
-                    '            Me.zrFactTypeInstance.FactTypeReadingShape.RefreshShape()
-                    '        End If
-                    '    End If
-                    'Else
-                    '    If IsSomething(Me.zrFactTypeInstance.FactTypeReadingShape.shape) Then
-                    '        Me.zrFactTypeInstance.FactTypeReadingShape.shape.Text = ""
-                    '    End If
-                    'End If
-
-                    Me.TextboxReading.Text = ""
-                End If
-
-                Call Me.AutoComplete.Hide()
-
+                Call Me.processFactTypeReading()
             End If
+
+            Call Me.AutoComplete.Hide()
 
         Catch ex As Exception
             Dim lsMessage As String
