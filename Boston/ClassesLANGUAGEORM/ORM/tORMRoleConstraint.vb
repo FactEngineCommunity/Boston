@@ -2094,6 +2094,10 @@ Namespace FBM
                             Call lrExistingIndex.setQualifier("PK")
                             Call lrExistingIndex.setName(lrTable.Name & "_PK")
                             Call lrExistingIndex.setIsPrimaryKey(True)
+                        Else
+                            Call lrExistingIndex.setQualifier("UC")
+                            Call lrExistingIndex.setName(lrTable.Name & "_UC")
+                            Call lrExistingIndex.setIsPrimaryKey(False)
                         End If
 
                         'Need to add the Columns and Index to each Subtype ModelObject/Table that is not absorbed
