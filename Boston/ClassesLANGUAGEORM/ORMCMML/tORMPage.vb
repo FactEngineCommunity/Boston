@@ -386,7 +386,7 @@ Namespace FBM
                 'Create the Page for the EntityRelationshipDiagram.
                 '----------------------------------------------------
                 lrPage = lrCorePage.Clone(Me.Model, False, True)
-
+                lrPage.IsDirty = True
                 lrPage.Name = "ERD-" & Trim(Me.Name) '"NewEntityRelationshipDiagram"
                 lrPage.Language = pcenumLanguage.EntityRelationshipDiagram
 
@@ -920,7 +920,7 @@ Namespace FBM
                 End If
 
                 lrPage = lrCorePage.Clone(Me.Model, False, True)
-
+                lrPage.IsDirty = True
                 lrPage.Name = "PGS-" & Me.Name
                 lrPage.Language = pcenumLanguage.PropertyGraphSchema
 

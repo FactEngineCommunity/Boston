@@ -1223,31 +1223,38 @@ Public Class frmToolboxEnterpriseExplorer
         Try
             Dim lsMessage As String = ""
 
-            Dim lrPage As FBM.Page
+            With New WaitCursor
+                'Make sure all the Pages for the Model are loaded before adding another page
+                While prApplication.WorkingModel.Page.FindAll(Function(x) x.Loaded).Count <> prApplication.WorkingModel.Page.Count
+                End While
 
-            Dim lrEnterpriseView As tEnterpriseEnterpriseView
-            lrEnterpriseView = Me.AddPageToModel(Me.TreeView.SelectedNode)
-            lrPage = lrEnterpriseView.Tag
+                Dim lrPage As FBM.Page
 
-            Dim lrInterfaceModel As New Viev.FBM.Interface.Model
-            lrInterfaceModel.ModelId = lrPage.Model.ModelId
-            lrInterfaceModel.Name = lrPage.Model.Name
-            If Not ((lrPage.Model.ModelId <> "MyPersonalModels") Or (lrPage.Model.ProjectId = "")) Then
-                lrInterfaceModel.ProjectId = lrPage.Model.ProjectId
-                lrInterfaceModel.Namespace = lrPage.Model.Namespace.Name
-            End If
+                Dim lrEnterpriseView As tEnterpriseEnterpriseView
+                lrEnterpriseView = Me.AddPageToModel(Me.TreeView.SelectedNode)
+                lrPage = lrEnterpriseView.Tag
 
-            Dim lrInterfacePage As New Viev.FBM.Interface.Page
-            lrInterfacePage.Id = lrPage.PageId
-            lrInterfacePage.Name = lrPage.Name
+                Dim lrInterfaceModel As New Viev.FBM.Interface.Model
+                lrInterfaceModel.ModelId = lrPage.Model.ModelId
+                lrInterfaceModel.Name = lrPage.Model.Name
+                If Not ((lrPage.Model.ModelId <> "MyPersonalModels") Or (lrPage.Model.ProjectId = "")) Then
+                    lrInterfaceModel.ProjectId = lrPage.Model.ProjectId
+                    lrInterfaceModel.Namespace = lrPage.Model.Namespace.Name
+                End If
 
-            lrInterfaceModel.Page = lrInterfacePage
+                Dim lrInterfacePage As New Viev.FBM.Interface.Page
+                lrInterfacePage.Id = lrPage.PageId
+                lrInterfacePage.Name = lrPage.Name
 
-            If My.Settings.UseClientServer And My.Settings.InitialiseClient Then
-                Dim lrBroadcast As New Viev.FBM.Interface.Broadcast
-                lrBroadcast.Model = lrInterfaceModel
-                Call prDuplexServiceClient.SendBroadcast([Interface].pcenumBroadcastType.ModelAddPage, lrBroadcast)
-            End If
+                lrInterfaceModel.Page = lrInterfacePage
+
+                If My.Settings.UseClientServer And My.Settings.InitialiseClient Then
+                    Dim lrBroadcast As New Viev.FBM.Interface.Broadcast
+                    lrBroadcast.Model = lrInterfaceModel
+                    Call prDuplexServiceClient.SendBroadcast([Interface].pcenumBroadcastType.ModelAddPage, lrBroadcast)
+                End If
+
+            End With
 
         Catch ex As Exception
             Dim lsMessage1 As String

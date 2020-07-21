@@ -9401,6 +9401,8 @@ Public Class frmDiagramORM
         Me.BackgroundWorker.ReportProgress(0)
 
         lrPage = Me.zrPage.CreatePropertyGraphSchema(Me.BackgroundWorker)
+        lrPage.Loaded = True
+        lrPage.Save(True, True)
 
         Me.CircularProgressBar.Value = 0
         Me.CircularProgressBar.Text = "0%"
@@ -9431,8 +9433,9 @@ Public Class frmDiagramORM
 
     Private Sub PropertyGraphSchemaToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles PropertyGraphSchemaToolStripMenuItem.Click
 
-        Call Me.createPropertyGraphSchemaPageFromCurrentPage(sender, e)
-
+        With New WaitCursor
+            Call Me.createPropertyGraphSchemaPageFromCurrentPage(sender, e)
+        End With
     End Sub
 
     Private Sub ContextMenuStrip_EntityType_Opening(ByVal sender As System.Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles ContextMenuStrip_EntityType.Opening
@@ -9727,6 +9730,7 @@ Public Class frmDiagramORM
 
         lrPage = Me.zrPage.CreateEntityRelationshipDiagram(Me.BackgroundWorker)
         lrPage.Loaded = True
+        lrPage.Save(True, True)
 
         Me.CircularProgressBar.Value = 0
         Me.CircularProgressBar.Text = "0%"
@@ -9751,13 +9755,13 @@ Public Class frmDiagramORM
 
         End If
 
-
-
     End Sub
 
     Private Sub EntityRelationshipDiagramToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles EntityRelationshipDiagramToolStripMenuItem.Click
 
-        Call Me.createEntityRelationshipDiagramPageForCurrentPage(sender, e)
+        With New WaitCursor
+            Call Me.createEntityRelationshipDiagramPageForCurrentPage(sender, e)
+        End With
 
     End Sub
 
