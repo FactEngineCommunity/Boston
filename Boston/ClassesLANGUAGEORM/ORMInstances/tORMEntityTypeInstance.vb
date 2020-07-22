@@ -634,8 +634,10 @@ Namespace FBM
             '----------------------------------------
             'Create a Model level SubtypeConstraint
             '----------------------------------------
-            lrSubtypeConstraint = Me.EntityType.CreateSubtypeRelationship(arParentEntityTypeInstance.EntityType)
-
+            With New WaitCursor
+                lrSubtypeConstraint = Me.EntityType.CreateSubtypeRelationship(arParentEntityTypeInstance.EntityType)
+                Me.Model.Save(False)
+            End With
         End Sub
 
         Public Sub DisplayAndAssociate()

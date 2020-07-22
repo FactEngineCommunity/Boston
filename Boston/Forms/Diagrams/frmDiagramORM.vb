@@ -2241,7 +2241,10 @@ Public Class frmDiagramORM
                 If MsgBox("Remove the Subtype from the Model?", MsgBoxStyle.YesNo) = MsgBoxResult.Yes Then
 
                     Dim lrSubtypeInstance As FBM.SubtypeRelationshipInstance = e.Link.Tag
-                    Call lrSubtypeInstance.SubtypeRelationship.RemoveFromModel()
+
+                    With New WaitCursor
+                        Call lrSubtypeInstance.SubtypeRelationship.RemoveFromModel()
+                    End With
                 End If
         End Select
 
