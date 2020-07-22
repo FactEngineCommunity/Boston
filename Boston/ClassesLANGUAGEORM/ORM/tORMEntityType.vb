@@ -1346,6 +1346,10 @@ Namespace FBM
                     Call lrExistingIndex.setIsPrimaryKey(True)
                 End If
             End If
+
+            For Each lrSubtype In Me.getSubtypes
+                Call CType(lrSubtype, FBM.EntityType).getRDSPrimaryReferenceSchemeFromSupertypeIfNecessary()
+            Next
         End Sub
 
         ''' <summary>
@@ -1566,12 +1570,6 @@ Namespace FBM
         Public Overrides Function getSubtypes() As List(Of FBM.ModelObject)
 
             Try
-                'Dim larModelElement = From FactType In Me.Model.FactType
-                '                      From Role In FactType.RoleGroup
-                '                      Where FactType.IsSubtypeRelationshipFactType = True
-                '                      Where Role.JoinedORMObject.Id = Me.Id
-                '                      Select FactType.GetOtherRoleOfBinaryFactType(Role.Id).JoinedORMObject
-
                 Dim larModelElement = From EntityType In Me.Model.EntityType
                                       From SubtypeRelationship In EntityType.SubtypeRelationship
                                       Where SubtypeRelationship.parentEntityType.Id = Me.Id
