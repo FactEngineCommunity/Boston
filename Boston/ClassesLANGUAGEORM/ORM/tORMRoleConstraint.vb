@@ -2066,16 +2066,18 @@ Namespace FBM
 
                     '--------------------------------
                     'Modify the existing PrimaryKey
-                    Call lrTable.makeExistingPrimaryKeySimplyUnique(larColumnsAffected)
+                    If Not abIsPreferredIdentifier Then
+                        Call lrTable.makeExistingPrimaryKeySimplyUnique(larColumnsAffected)
+                    End If
 
                     Dim lrExistingIndex As RDS.Index = lrTable.getIndexByColumns(larColumnsAffected)
 
-                    If lrExistingIndex Is Nothing Then
-                        'No existing Index exists for the Columns
-                        If abIsPreferredIdentifier = True Then
-                            '------------------------------
-                            'Add the new PrimaryKey Index
-                            Dim lrPrimaryKeyIndex As New RDS.Index(lrTable,
+                        If lrExistingIndex Is Nothing Then
+                            'No existing Index exists for the Columns
+                            If abIsPreferredIdentifier = True Then
+                                '------------------------------
+                                'Add the new PrimaryKey Index
+                                Dim lrPrimaryKeyIndex As New RDS.Index(lrTable,
                                                                    lrTable.Name & "_PK",
                                                                    "PK",
                                                                    pcenumODBCAscendingOrDescending.Ascending,
@@ -2086,33 +2088,33 @@ Namespace FBM
                                                                    False,
                                                                    True)
 
-                            Call lrTable.addIndex(lrPrimaryKeyIndex)
+                                Call lrTable.addIndex(lrPrimaryKeyIndex)
+
+                                'Need to add the Columns and Index to each Subtype ModelObject/Table that is not absorbed
+                                Call lrTable.addPrimaryKeyToNonAbsorbedTables(lrPrimaryKeyIndex, abIsPreferredIdentifier)
+
+                            End If
+
+                        Else
+                            If abIsPreferredIdentifier Then
+                                Call lrExistingIndex.setQualifier("PK")
+                                Call lrExistingIndex.setName(lrTable.Name & "_PK")
+                                Call lrExistingIndex.setIsPrimaryKey(True)
+                            Else
+                                Call lrExistingIndex.setQualifier("UC")
+                                Call lrExistingIndex.setName(lrTable.Name & "_UC")
+                                Call lrExistingIndex.setIsPrimaryKey(False)
+                            End If
 
                             'Need to add the Columns and Index to each Subtype ModelObject/Table that is not absorbed
-                            Call lrTable.addPrimaryKeyToNonAbsorbedTables(lrPrimaryKeyIndex, abIsPreferredIdentifier)
-
+                            Call lrTable.addPrimaryKeyToNonAbsorbedTables(lrExistingIndex, abIsPreferredIdentifier)
                         End If
 
-                    Else
-                        If abIsPreferredIdentifier Then
-                            Call lrExistingIndex.setQualifier("PK")
-                            Call lrExistingIndex.setName(lrTable.Name & "_PK")
-                            Call lrExistingIndex.setIsPrimaryKey(True)
-                        Else
-                            Call lrExistingIndex.setQualifier("UC")
-                            Call lrExistingIndex.setName(lrTable.Name & "_UC")
-                            Call lrExistingIndex.setIsPrimaryKey(False)
-                        End If
+                        For Each lrColumn In larColumnsAffected
+                            Call lrColumn.triggerForceRefreshEvent()
+                        Next
 
-                        'Need to add the Columns and Index to each Subtype ModelObject/Table that is not absorbed
-                        Call lrTable.addPrimaryKeyToNonAbsorbedTables(lrExistingIndex, abIsPreferredIdentifier)
-                    End If
-
-                    For Each lrColumn In larColumnsAffected
-                        Call lrColumn.triggerForceRefreshEvent()
-                    Next
-
-                End If 'larColumnsAffected.Count > 0
+                    End If 'larColumnsAffected.Count > 0
 
             Catch ex As Exception
                 Dim lsMessage1 As String

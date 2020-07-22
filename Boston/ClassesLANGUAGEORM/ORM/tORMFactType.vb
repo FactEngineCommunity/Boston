@@ -1530,7 +1530,6 @@ Namespace FBM
             '  NB Adds the Role to the RoleGroup of the FactType
             '-----------------------------------------------------
             lrRole = New FBM.Role(Me, aoJoinedObject)
-
             lrRole.makeDirty()
 
             '------------------------------

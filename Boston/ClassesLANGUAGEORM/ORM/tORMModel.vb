@@ -1846,6 +1846,7 @@ Namespace FBM
                 'Create the FBM.FactType to return (with the lsNewUniqueName)
                 '--------------------------------------------------------------------
                 lrFactType = New FBM.FactType(Me, lsNewUniqueName, True)
+                lrFactType.isDirty = True
 
                 If abIsReferenceModeFactType Then
                     lrFactType.IsPreferredReferenceMode = abIsReferenceModeFactType

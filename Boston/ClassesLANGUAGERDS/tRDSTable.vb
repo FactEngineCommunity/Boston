@@ -589,13 +589,15 @@ Namespace RDS
 
                     Dim lrIndex As RDS.Index = larIndex.First
 
-                    lrIndex.setIsPrimaryKey(False)
-                    lrIndex.setQualifier(Me.generateUniqueQualifier("UC"))
-                    lrIndex.setName(Me.Name & "_" & lrIndex.IndexQualifier)
+                    If lrIndex IsNot Nothing Then
+                        lrIndex.setIsPrimaryKey(False)
+                        lrIndex.setQualifier(Me.generateUniqueQualifier("UC"))
+                        lrIndex.setName(Me.Name & "_" & lrIndex.IndexQualifier)
 
-                    For Each lrColumn In lrIndex.Column
-                        Call lrColumn.triggerForceRefreshEvent()
-                    Next
+                        For Each lrColumn In lrIndex.Column
+                            Call lrColumn.triggerForceRefreshEvent()
+                        Next
+                    End If
 
                 End If
 

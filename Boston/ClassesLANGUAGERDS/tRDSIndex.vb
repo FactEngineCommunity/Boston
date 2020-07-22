@@ -291,9 +291,9 @@ Namespace RDS
                                           Where Index.IsPrimaryKey
                                           Select Index).Count > 0
 
-                    If lbPrimaryIndex Then
-                        Call lrColumn.setContributesToPrimaryKey(lbPrimaryIndex)
-                    End If
+                    'If lbPrimaryIndex Then
+                    Call lrColumn.setContributesToPrimaryKey(lbPrimaryIndex)
+                    'End If
                 Next
 
                 RaiseEvent IsPrimaryKeyChanged(abIsPrimaryKey)

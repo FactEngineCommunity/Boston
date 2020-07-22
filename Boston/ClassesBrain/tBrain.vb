@@ -191,8 +191,6 @@ Public Class tBrain
     End Sub
 
 #Region "INPUT"
-
-
     Public Sub receive_data(ByVal as_data As String)
 
         Me.InputBuffer = Trim(as_data)
