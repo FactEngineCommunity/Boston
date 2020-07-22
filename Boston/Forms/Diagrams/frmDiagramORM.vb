@@ -37,7 +37,6 @@ Public Class frmDiagramORM
     Public _ComboBoxEntityTypeInstance As New ComboBox
     Public _ComboBoxValueTypeInstance As New ComboBox
 
-
     Public Shadows Sub BringToFront(Optional asSelectModelElementId As String = Nothing)
 
         Call MyBase.BringToFront()
@@ -2847,7 +2846,6 @@ Public Class frmDiagramORM
                         Call Me.DiagramView.Focus()
                     End If
                 End If
-
 
             Case Is = Keys.R
                 '-----------------------------------------------------------

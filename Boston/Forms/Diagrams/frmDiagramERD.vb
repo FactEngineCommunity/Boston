@@ -599,6 +599,10 @@ Public Class frmDiagramERD
                 lrRecordset.MoveNext()
             End While
 
+            '==================================================================
+            'Subtype Relationships
+            Call Me.mapSubtypeRelationships
+
             If Me.areAllEntitiesAtPoint00() Then
                 Call Me.autoLayout()
             End If
@@ -1083,6 +1087,40 @@ Public Class frmDiagramERD
             End If
         End If
 
+
+    End Sub
+
+    Public Sub mapSubtypeRelationships()
+
+        Try
+            Dim lrEntity, lrSubtypeEntity As ERD.Entity
+
+            For Each lrEntity In Me.zrPage.ERDiagram.Entity
+
+                Dim lrRDSTable = lrEntity.getCorrespondingRDSTable
+
+                For Each lrSubtypeTable In lrRDSTable.getSubtypeTables
+
+                    lrSubtypeEntity = Me.zrPage.ERDiagram.Entity.Find(Function(x) x.Name = lrSubtypeTable.Name)
+
+                    If lrSubtypeEntity IsNot Nothing Then
+                        Dim lo_link As New DiagramLink(Me.zrPage.Diagram, lrSubtypeEntity.TableShape, lrEntity.TableShape)
+                        lo_link.HeadShape = ArrowHead.Arrow
+                        lo_link.Pen.Color = Color.Gray
+                        Me.zrPage.Diagram.Links.Add(lo_link)
+                    End If
+                Next
+
+            Next
+
+        Catch ex As Exception
+            Dim lsMessage1 As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 
@@ -2066,12 +2104,61 @@ Public Class frmDiagramERD
             Return
         End If
 
+        Dim liInd As Integer
+        Dim lrPen As New System.Drawing.Pen(Color.Black, 0.03)
+
         Dim pt1 As PointF
         Dim pt2 As PointF
 
-        Dim lrPen As New System.Drawing.Pen(Color.Black, 0.03)
+        If e.Link.GetType Is GetType(MindFusion.Diagramming.DiagramLink) Then
 
-        Dim liInd As Integer
+            For liInd = 0 To e.Link.ControlPoints.Count - 2
+
+                pt1 = New PointF(e.Link.ControlPoints(liInd).X, e.Link.ControlPoints(liInd).Y)
+                pt2 = New PointF(e.Link.ControlPoints(liInd + 1).X, e.Link.ControlPoints(liInd + 1).Y)
+
+                lrPen = New System.Drawing.Pen(Color.Gray)
+
+                lrPen.DashStyle = DashStyle.Solid
+
+                lrPen.Width = 0.001
+                e.Graphics.DrawLine(lrPen, pt1, pt2)
+            Next
+
+            '---------------------------------------
+            'Arrow
+            Dim a As PointF = pt2
+            Dim an As Double = 0, r = 0
+
+            Dim lsglOffset As Single = 0
+            If pt1.X <= pt2.X Then
+                lsglOffset = 2.7
+            Else
+                lsglOffset = -2.7
+            End If
+
+            If pt1.Y > pt2.Y Then
+                lsglOffset = 2.7
+            ElseIf pt1.Y < pt2.Y Then
+                lsglOffset = -2.7
+            End If
+
+            pt1 = New PointF
+            pt2 = New PointF
+            ' Find two points around the origin control point
+            Conversion.PolarToDekart(a, an - 75, 3, pt1)
+            Conversion.PolarToDekart(a, an, 0, pt2)
+            e.Graphics.DrawLine(lrPen, pt1, pt2)
+
+            Conversion.PolarToDekart(a, an - 105, 3, pt1)
+            Conversion.PolarToDekart(a, an, 0, pt2)
+            e.Graphics.DrawLine(lrPen, pt1, pt2)
+            Return
+        End If
+
+        lrPen = New System.Drawing.Pen(Color.Black, 0.03)
+
+
         For liInd = 0 To e.Link.ControlPoints.Count - 2
 
             pt1 = New PointF(e.Link.ControlPoints(liInd).X, e.Link.ControlPoints(liInd).Y)

@@ -117,14 +117,16 @@ Namespace FBM
         ''' Only used for Entity Types, Fact Types....those ModelObject ConceptTypes that can be Subtypes | Supertypes.
         ''' </summary>
         ''' <remarks></remarks>
-        <XmlIgnore()> _
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <XmlIgnore()>
         Public _parentModelObjectList As New List(Of FBM.ModelObject) 'String = "" '0 -not sub type, otherwise used to store entity_id of super type, if this entity is a subtype
         <XmlIgnore()> _
         <Browsable(False)> _
         Property parentModelObjectList() As List(Of FBM.ModelObject)
             Get
-                Return Me._parentModelObjectList
+                Dim larParentModelObjects = From SubtypeRelationship In Me.SubtypeRelationship
+                                            Select SubtypeRelationship.parentEntityType
+
+                Return larParentModelObjects.ToList
             End Get
             Set(ByVal value As List(Of FBM.ModelObject))
                 Me._parentModelObjectList = value
@@ -424,6 +426,32 @@ Namespace FBM
             Me.Model = arModel
 
         End Sub
+
+        ''' <summary>
+        ''' Ultimately returns the topmost Supertype that is not Absorbed from within in the upper hierarchy,
+        '''   ELSE returns the ModelObject itself.
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public Function GetTopmostNonAbsorbedSupertype() As FBM.ModelObject
+
+            If Me.parentModelObjectList.Count = 0 Then
+                Return Me
+            Else
+                For Each lrSubtypeRelationship In Me.SubtypeRelationship
+                    '20200722-Need to fix this to discern between the PK SubtypeRelationship and other.
+                    '  For now just return the first one.
+                    If Not lrSubtypeRelationship.parentEntityType.IsAbsorbed Then
+                        Return lrSubtypeRelationship.parentEntityType
+                    End If
+                Next
+            End If
+
+            '20200722-Need to fix this to discern between the PK SubtypeRelationship and other.
+            '  For now just return the first one.
+            Return Me.parentModelObjectList(0).GetTopmostNonAbsorbedSupertype()
+
+        End Function
 
         ''' <summary>
         ''' If the EntityType is a Subtype, then returns the topmost Supertype in the hierarchy,

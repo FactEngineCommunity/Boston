@@ -1239,13 +1239,114 @@ Namespace FBM
 
             Me.SubtypeRelationship.Add(lrSubtypeConstraint)
 
+
             RaiseEvent SubtypeRelationshipAdded(lrSubtypeConstraint)
+
+            '=========================================================================
+            'Manage Subtype Primary Reference Schemes.
+            '  * Need to pull the Primary Reference Scheme from the Supertype if this EntityType is not absorbed.
+            Call Me.getRDSPrimaryReferenceSchemeFromSupertypeIfNecessary
 
             Call Me.Model.MakeDirty()
 
             Return lrSubtypeConstraint
 
         End Function
+
+        ''' <summary>
+        ''' Pulls the RDS (Columns) Primary Reference Scheme from a Supertype of the ModelElement if the ModelElement is not absorbed.
+        ''' </summary>
+        Public Sub getRDSPrimaryReferenceSchemeFromSupertypeIfNecessary()
+
+            'If Me.IsAbsorbed then there is nothing to do here.
+            If Me.IsAbsorbed Then Exit Sub
+
+            Dim lrTopmostNonAbsorbedEntityType = CType(Me.GetTopmostNonAbsorbedSupertype, FBM.EntityType)
+
+            If lrTopmostNonAbsorbedEntityType.HasPrimaryReferenceScheme _
+                And Not lrTopmostNonAbsorbedEntityType Is Me Then
+                Dim lrSupertypeTable = lrTopmostNonAbsorbedEntityType.getCorrespondingRDSTable
+
+                Dim larPKColumns = lrSupertypeTable.getPrimaryKeyColumns
+
+                Dim lrTable = Me.getCorrespondingRDSTable
+                Dim lrNewColumn As RDS.Column
+                Dim larIndexColumn As New List(Of RDS.Column)
+
+                For Each lrPKColumn In larPKColumns
+                    lrNewColumn = lrPKColumn.Clone(lrTable)
+
+                    lrNewColumn.Id = System.Guid.NewGuid.ToString
+                    lrNewColumn.IsMandatory = True 'To be on the safe side                    
+                    lrNewColumn.OrdinalPosition = lrTable.Column.Count + 1
+
+                    If lrTable.Column.Contains(lrNewColumn) Then
+                        lrNewColumn = lrTable.Column.Find(AddressOf lrNewColumn.Equals)
+                    Else
+                        lrTable.addColumn(lrNewColumn)
+                    End If
+
+                    lrNewColumn.Relation = New List(Of RDS.Relation) 'Leave here, otherwise Table.addColumn will assign any relation for the Original Column (in the Supertype)
+
+                    lrTable.Column.AddUnique(lrNewColumn)
+                    larIndexColumn.Add(lrNewColumn)
+                Next
+
+                For Each lrPKColumn In larPKColumns
+                    For Each lrRelation In lrPKColumn.Relation
+
+                        Dim lrNewRelation = lrRelation.Clone(lrTable)
+
+                        lrNewRelation.Id = System.Guid.NewGuid.ToString
+                        lrNewRelation.ResponsibleFactType = lrRelation.ResponsibleFactType
+                        lrNewRelation.ReverseDestinationColumns.Add(lrPKColumn)
+                        lrNewRelation.ReverseOriginColumns = lrRelation.ReverseOriginColumns
+
+                        lrNewColumn = lrTable.Column.Find(Function(x) x.ActiveRole.Id = lrPKColumn.ActiveRole.Id)
+
+                        'The NewColumn will have a Relation because cloning the Relation adds the Relation to the NewColum in lrTable.
+                        lrNewRelation = lrNewColumn.Relation.Find(AddressOf lrNewRelation.EqualsByOriginColumnsDesinationTable) 'Should be the same Relation
+                        If lrNewRelation IsNot Nothing Then
+                            If Me.Model.RDS.Relation.Find(AddressOf lrNewRelation.EqualsByOriginColumnsDesinationTable) Is Nothing Then
+                                Me.Model.RDS.addRelation(lrNewRelation)
+                            Else
+                                lrNewColumn.Relation.Remove(lrNewRelation)
+                                lrNewColumn.Relation.Add(Me.Model.RDS.Relation.Find(AddressOf lrNewRelation.EqualsByOriginColumnsDesinationTable))
+                            End If
+                        End If
+                    Next
+                Next
+
+                '------------------------
+                'Index 
+                Dim lrExistingIndex As RDS.Index = lrTable.getIndexByColumns(larPKColumns)
+
+                If lrExistingIndex Is Nothing Then
+                    Dim lsQualifier = lrTable.generateUniqueQualifier("PK")
+                    Dim lbIsPrimaryKey As Boolean = True
+                    Dim lsIndexName As String = lrTable.Name & "_" & Trim(lsQualifier)
+
+                    'Add the new Index
+                    Dim lrIndex As New RDS.Index(lrTable,
+                                                 lsIndexName,
+                                                 lsQualifier,
+                                                 pcenumODBCAscendingOrDescending.Ascending,
+                                                 lbIsPrimaryKey,
+                                                 True,
+                                                 False,
+                                                 larIndexColumn,
+                                                 False,
+                                                 True)
+
+                    Call lrTable.addIndex(lrIndex)
+                Else
+
+                    Call lrExistingIndex.setQualifier("PK")
+                    Call lrExistingIndex.setName(lrTable.Name & "_PK")
+                    Call lrExistingIndex.setIsPrimaryKey(True)
+                End If
+            End If
+        End Sub
 
         ''' <summary>
         ''' Returns the DataType of the EntityType or its topmost Supertype if the EntityType is a Subtype of an EntityType with a ReferenceModeValueType.
