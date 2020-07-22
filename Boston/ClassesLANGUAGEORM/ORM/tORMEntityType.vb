@@ -251,7 +251,7 @@ Namespace FBM
         Public Event IsDerivedChanged(ByVal abIsDerived As Boolean)
         Public Event ModelErrorAdded(ByRef arModelError As ModelError) Implements iValidationErrorHandler.ModelErrorAdded
         'Public Event NameChanged(ByVal asNewName As String)
-        Public Event SubtypeRelationshipAdded(ByRef arSubtypeConstraint As FBM.tSubtypeRelationship)
+        Public Shadows Event SubtypeRelationshipAdded(ByRef arSubtypeConstraint As FBM.tSubtypeRelationship)
         Public Event SubtypeConstraintRemoved(ByRef arSubtypeConstraint As FBM.tSubtypeRelationship)
         Public Event ReferenceModeChanged(ByVal asNewReferenceMode As String, ByVal abSimpleAssignment As Boolean, ByVal abBroadcastInterfaceEvent As Boolean)
         Public Event ReferenceModeFactTypeChanged(ByRef arNewReferenceModeFactType As FBM.FactType)
@@ -1239,6 +1239,7 @@ Namespace FBM
 
             Me.SubtypeRelationship.Add(lrSubtypeConstraint)
 
+            Call Me.getCorrespondingRDSTable.triggerSubtypeRelationshipAdded
 
             RaiseEvent SubtypeRelationshipAdded(lrSubtypeConstraint)
 

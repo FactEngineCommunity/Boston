@@ -182,8 +182,9 @@ Namespace FBM
 
         Public Event ConceptSwitched(ByRef arConcept As FBM.Concept)
         Public Event LongDescriptionChanged(ByVal asLongDescription As String)
-        Public Event ShortDescriptionChanged(ByVal asShortDescription As String)
         Public Event NameChanged(ByVal asNewName As String)
+        Public Event ShortDescriptionChanged(ByVal asShortDescription As String)
+        Public Event SubtypeRelationshipAdded(ByRef arSubtypeConstraint As FBM.tSubtypeRelationship)
 
         ''' <summary>
         ''' Parameterless Constructor.

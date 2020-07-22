@@ -1,32 +1,33 @@
 ﻿Imports System.Reflection
 Imports System.Xml.Serialization
+Imports Boston.FBM
 
 Namespace RDS
 
-    <Serializable()> _
+    <Serializable()>
     Public Class Table
         Implements IEquatable(Of RDS.Table)
 
-        <XmlIgnore()> _
-        <NonSerialized()> _
+        <XmlIgnore()>
+        <NonSerialized()>
         Public Model As RDS.Model
 
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Name As String
 
-        <XmlElement()> _
+        <XmlElement()>
         Public Column As New List(Of RDS.Column)
 
-        <XmlElement()> _
+        <XmlElement()>
         Public WithEvents Index As New List(Of RDS.Index)
 
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public IsSystemTable As Boolean = False
 
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Remarks As String = ""
 
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public isPGSRelation As Boolean = False
 
         <XmlIgnore()>
@@ -35,7 +36,7 @@ Namespace RDS
 
         Public ReadOnly Property isAbsorbed As Boolean
             Get
-                Return Me.FBMModelElement.isAbsorbed
+                Return Me.FBMModelElement.IsAbsorbed
             End Get
         End Property
 
@@ -45,7 +46,8 @@ Namespace RDS
         Public Event IndexRemoved(ByRef arIndex As RDS.Index)
         Public Event IsPGSRelationChanged(ByVal abNewValue As Boolean)
         Public Event NameChanged(ByVal asNewName As String)
-
+        Public Event SubtypeRelationshipAdded()
+        Public Event SubtypeRelationshipRemoved()
 
         ''' <summary>
         ''' Parameterless New
@@ -149,9 +151,9 @@ Namespace RDS
         Public Function getIncomingRelations() As List(Of RDS.Relation)
 
             Try
-                Dim larIncomingRelations = From Relation In Me.Model.Model.RDS.Relation _
-                                           From Column In Relation.DestinationColumns _
-                                           Where Column.Table.Name = Me.Name _
+                Dim larIncomingRelations = From Relation In Me.Model.Model.RDS.Relation
+                                           From Column In Relation.DestinationColumns
+                                           Where Column.Table.Name = Me.Name
                                            Select Relation Distinct
 
                 Return larIncomingRelations.ToList
@@ -284,7 +286,7 @@ Namespace RDS
         ''' <remarks></remarks>
         Public Function hasSingleColumnPrimaryKey() As Boolean
 
-            HasSingleColumnPrimaryKey = False
+            hasSingleColumnPrimaryKey = False
 
             If Me.Index.FindAll(Function(x) x.IsPrimaryKey = True).Count = 0 Then
                 Return False
@@ -569,8 +571,8 @@ Namespace RDS
         Public Sub makeExistingPrimaryKeySimplyUnique()
 
             Try
-                Dim larIndex = From Index In Me.Index _
-                               Where Index.IsPrimaryKey = True _
+                Dim larIndex = From Index In Me.Index
+                               Where Index.IsPrimaryKey = True
                                Select Index
 
                 If larIndex.Count > 0 Then
@@ -618,8 +620,8 @@ Namespace RDS
                     Call Me.Model.Model.setCMMLAttributeOrdinalPosition(lrSwitchingColumn.Id, lrSwitchingColumn.OrdinalPosition)
                 End If
             Else
-                Dim larColumn = From Column In Me.Column _
-                                Where Column.ContributesToPrimaryKey = True _
+                Dim larColumn = From Column In Me.Column
+                                Where Column.ContributesToPrimaryKey = True
                                 Select Column
 
                 Dim liOrdinalPosition As Integer = 0
@@ -702,6 +704,8 @@ Namespace RDS
             For Each lrColumn In larColumn.ToArray
                 Call Me.removeColumn(lrColumn)
             Next
+
+            Me.triggerSubtypeRelationshipRemoved()
 
             If abRecursive Then
                 For Each lrTable In Me.getSubtypeTables.FindAll(Function(x) x.isAbsorbed = False)
@@ -888,6 +892,14 @@ Namespace RDS
                 prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
+        End Sub
+
+        Public Sub triggerSubtypeRelationshipAdded()
+            RaiseEvent SubtypeRelationshipAdded()
+        End Sub
+
+        Public Sub triggerSubtypeRelationshipRemoved()
+            RaiseEvent SubtypeRelationshipRemoved()
         End Sub
 
     End Class

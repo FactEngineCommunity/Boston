@@ -1109,6 +1109,7 @@ Public Class frmDiagramERD
                         lo_link.Pen.Color = Color.Gray
                         lo_link.Locked = True
                         Me.zrPage.Diagram.Links.Add(lo_link)
+                        lrSubtypeEntity.TableShape.OutgoingLinks.Add(lo_link)
                     End If
                 Next
 

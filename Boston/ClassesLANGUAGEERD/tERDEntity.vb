@@ -586,5 +586,45 @@ Namespace ERD
 
         End Sub
 
+        Private Sub RDSTable_SubtypeRelationshipAdded() Handles RDSTable.SubtypeRelationshipAdded
+
+            If Me.Page IsNot Nothing And Me.Page.Diagram IsNot Nothing Then
+
+                For Each lrEntity In Me.Page.ERDiagram.Entity.FindAll(Function(x) CType(x, ERD.Entity).RDSTable.getSubtypeTables.Contains(Me.RDSTable))
+                    Dim lo_link As New DiagramLink(Me.Page.Diagram, Me.TableShape, CType(lrEntity, ERD.Entity).TableShape)
+                    lo_link.HeadShape = ArrowHead.Arrow
+                    lo_link.Pen.Color = Color.Gray
+                    lo_link.Locked = True
+                    Me.Page.Diagram.Links.Add(lo_link)
+                    Me.TableShape.OutgoingLinks.Add(lo_link)
+                    Call lo_link.Route()
+                Next
+                Me.Page.Diagram.RouteAllLinks()
+            End If
+
+        End Sub
+
+        Private Sub RDSTable_SubtypeRelationshipRemoved() Handles RDSTable.SubtypeRelationshipRemoved
+
+            Dim larLink = New List(Of MindFusion.Diagramming.DiagramLink)
+            For Each loLink In Me.TableShape.OutgoingLinks
+                If loLink.GetType Is GetType(MindFusion.Diagramming.DiagramLink) Then
+                    larLink.Add(loLink)
+                End If
+            Next
+            For Each lrLink In larLink
+                Call Me.Page.Diagram.Links.Remove(lrLink)
+            Next
+
+            For Each lrEntity In Me.Page.ERDiagram.Entity.FindAll(Function(x) CType(x, ERD.Entity).RDSTable.getSubtypeTables.Contains(Me.RDSTable))
+                Dim lo_link As New DiagramLink(Me.Page.Diagram, Me.TableShape, CType(lrEntity, ERD.Entity).TableShape)
+                lo_link.HeadShape = ArrowHead.Arrow
+                lo_link.Pen.Color = Color.Gray
+                lo_link.Locked = True
+                Me.Page.Diagram.Links.Add(lo_link)
+            Next
+
+        End Sub
+
     End Class
 End Namespace
