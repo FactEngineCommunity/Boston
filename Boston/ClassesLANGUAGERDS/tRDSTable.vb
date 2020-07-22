@@ -137,6 +137,7 @@ Namespace RDS
             End If
 
             Me.Index.AddUnique(arIndex)
+            Me.Model.Index.AddUnique(arIndex)
 
             '-----------------------------------------------------------------------------
             'CMML Code
@@ -861,15 +862,18 @@ Namespace RDS
                     'Index 
                     Dim lrExistingIndex As RDS.Index = lrTable.getIndexByColumns(larIndexColumn)
 
+                    Dim lsQualifier As String = "UC"
+                    Dim lsQualifierExtention As String = lrTable.generateUniqueQualifier("UC")
+
+                    If abIsPreferredIdentifier Then
+                        lsQualifier = "PK"
+                        lsQualifierExtention = lrTable.generateUniqueQualifier("PK")
+                    End If
+
                     If lrExistingIndex Is Nothing Then
-                        Dim lsQualifier As String
-                        If abIsPreferredIdentifier Then
-                            lsQualifier = lrTable.generateUniqueQualifier("PK")
-                        Else
-                            lsQualifier = lrTable.generateUniqueQualifier("UC")
-                        End If
+
                         Dim lbIsPrimaryKey As Boolean = abIsPreferredIdentifier
-                        Dim lsIndexName As String = lrTable.Name & "_" & Trim(lsQualifier)
+                        Dim lsIndexName As String = lrTable.Name & "_" & Trim(lsQualifierExtention)
 
                         'Add the new Index
                         Dim lrIndex As New RDS.Index(lrTable,
@@ -885,15 +889,9 @@ Namespace RDS
 
                         Call lrTable.addIndex(lrIndex)
                     Else
-                        If abIsPreferredIdentifier Then
-                            Call lrExistingIndex.setQualifier("PK")
-                            Call lrExistingIndex.setName(lrTable.Name & "_PK")
-                            Call lrExistingIndex.setIsPrimaryKey(True)
-                        Else
-                            Call lrExistingIndex.setQualifier("UC")
-                            Call lrExistingIndex.setName(lrTable.Name & "_UC")
-                            Call lrExistingIndex.setIsPrimaryKey(abIsPreferredIdentifier)
-                        End If
+                        Call lrExistingIndex.setQualifier(lsQualifier)
+                        Call lrExistingIndex.setName(lrTable.Name & "_" & lsQualifierExtention)
+                        Call lrExistingIndex.setIsPrimaryKey(True)
                     End If
 
                     'Recursive

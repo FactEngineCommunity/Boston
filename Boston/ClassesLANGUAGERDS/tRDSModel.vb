@@ -92,7 +92,20 @@ Namespace RDS
 
         End Sub
 
+        Public Function createUniqueIndexName(ByRef asTrialName As String, ByVal aiSuffix As Integer) As String
 
+            Dim lsTrialName = asTrialName
+
+            If Me.Index.Find(Function(x) x.Name = lsTrialName) Is Nothing Then
+                Return asTrialName
+            Else
+                aiSuffix += 1
+                asTrialName &= aiSuffix.ToString
+                Call Me.createUniqueIndexName(asTrialName, aiSuffix)
+            End If
+
+            Return asTrialName
+        End Function
         Public Function getColumnsThatReferenceValueType(ByVal arValueType As FBM.ValueType) As List(Of Column)
 
             'Direct Columns

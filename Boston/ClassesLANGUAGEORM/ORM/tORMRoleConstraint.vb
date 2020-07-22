@@ -2066,55 +2066,59 @@ Namespace FBM
 
                     '--------------------------------
                     'Modify the existing PrimaryKey
-                    If Not abIsPreferredIdentifier Then
-                        Call lrTable.makeExistingPrimaryKeySimplyUnique(larColumnsAffected)
-                    End If
+                    '20200722-VM-Removed because if exists, should change the actual Index
+                    'Call lrTable.makeExistingPrimaryKeySimplyUnique(larColumnsAffected)
+
 
                     Dim lrExistingIndex As RDS.Index = lrTable.getIndexByColumns(larColumnsAffected)
 
-                        If lrExistingIndex Is Nothing Then
-                            'No existing Index exists for the Columns
-                            If abIsPreferredIdentifier = True Then
-                                '------------------------------
-                                'Add the new PrimaryKey Index
-                                Dim lrPrimaryKeyIndex As New RDS.Index(lrTable,
-                                                                   lrTable.Name & "_PK",
-                                                                   "PK",
-                                                                   pcenumODBCAscendingOrDescending.Ascending,
-                                                                   True,
-                                                                   True,
-                                                                   False,
-                                                                   larColumnsAffected,
-                                                                   False,
-                                                                   True)
+                    If lrExistingIndex Is Nothing Then
 
-                                Call lrTable.addIndex(lrPrimaryKeyIndex)
+                        Dim lsQualifier As String = "UC"
+                        'No existing Index exists for the Columns
+                        If abIsPreferredIdentifier = True Then
+                            lsQualifier = "PK"
+                        End If
+                        '------------------------------
+                        'Add the new PrimaryKey Index
+                        Dim lrPrimaryKeyIndex As New RDS.Index(lrTable,
+                                                               Me.Model.RDS.createUniqueIndexName(lrTable.Name & "_" & lsQualifier, 0),
+                                                               lsQualifier,
+                                                               pcenumODBCAscendingOrDescending.Ascending,
+                                                               True,
+                                                               True,
+                                                               False,
+                                                               larColumnsAffected,
+                                                               False,
+                                                               True)
 
-                                'Need to add the Columns and Index to each Subtype ModelObject/Table that is not absorbed
-                                Call lrTable.addPrimaryKeyToNonAbsorbedTables(lrPrimaryKeyIndex, abIsPreferredIdentifier)
+                        Call lrTable.addIndex(lrPrimaryKeyIndex)
 
-                            End If
+                        'Need to add the Columns and Index to each Subtype ModelObject/Table that is not absorbed
+                        Call lrTable.addPrimaryKeyToNonAbsorbedTables(lrPrimaryKeyIndex, abIsPreferredIdentifier)
 
+                    Else 'Index already exists
+                        If abIsPreferredIdentifier Then
+                            lrExistingIndex.IsPrimaryKey = abIsPreferredIdentifier
+                            Call lrExistingIndex.setQualifier("PK")
+                            Call lrExistingIndex.setName(Me.Model.RDS.createUniqueIndexName(lrTable.Name & "_PK", 0))
+                            Call lrExistingIndex.setIsPrimaryKey(True)
                         Else
-                            If abIsPreferredIdentifier Then
-                                Call lrExistingIndex.setQualifier("PK")
-                                Call lrExistingIndex.setName(lrTable.Name & "_PK")
-                                Call lrExistingIndex.setIsPrimaryKey(True)
-                            Else
-                                Call lrExistingIndex.setQualifier("UC")
-                                Call lrExistingIndex.setName(lrTable.Name & "_UC")
-                                Call lrExistingIndex.setIsPrimaryKey(False)
-                            End If
-
-                            'Need to add the Columns and Index to each Subtype ModelObject/Table that is not absorbed
-                            Call lrTable.addPrimaryKeyToNonAbsorbedTables(lrExistingIndex, abIsPreferredIdentifier)
+                            lrExistingIndex.IsPrimaryKey = abIsPreferredIdentifier
+                            Call lrExistingIndex.setQualifier("UC")
+                            Call lrExistingIndex.setName(Me.Model.RDS.createUniqueIndexName(lrTable.Name & "_UC", 0))
+                            Call lrExistingIndex.setIsPrimaryKey(False)
                         End If
 
-                        For Each lrColumn In larColumnsAffected
-                            Call lrColumn.triggerForceRefreshEvent()
-                        Next
+                        'Need to add the Columns and Index to each Subtype ModelObject/Table that is not absorbed
+                        Call lrTable.addPrimaryKeyToNonAbsorbedTables(lrExistingIndex, abIsPreferredIdentifier)
+                    End If
 
-                    End If 'larColumnsAffected.Count > 0
+                    For Each lrColumn In larColumnsAffected
+                        Call lrColumn.triggerForceRefreshEvent()
+                    Next
+
+                End If 'larColumnsAffected.Count > 0
 
             Catch ex As Exception
                 Dim lsMessage1 As String
