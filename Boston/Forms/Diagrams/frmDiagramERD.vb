@@ -2117,9 +2117,9 @@ Public Class frmDiagramERD
                 pt1 = New PointF(e.Link.ControlPoints(liInd).X, e.Link.ControlPoints(liInd).Y)
                 pt2 = New PointF(e.Link.ControlPoints(liInd + 1).X, e.Link.ControlPoints(liInd + 1).Y)
 
-                lrPen = New System.Drawing.Pen(Color.Gray)
+                lrPen = New System.Drawing.Pen(ColorTranslator.FromHtml("#BDBCBC"))
 
-                lrPen.DashStyle = DashStyle.Solid
+                lrPen.DashStyle = DashStyle.Dash
 
                 lrPen.Width = 0.001
                 e.Graphics.DrawLine(lrPen, pt1, pt2)
@@ -2133,24 +2133,28 @@ Public Class frmDiagramERD
             Dim lsglOffset As Single = 0
             If pt1.X <= pt2.X Then
                 lsglOffset = 2.7
+                an = 270
             Else
                 lsglOffset = -2.7
+                an = 270
             End If
 
             If pt1.Y > pt2.Y Then
                 lsglOffset = 2.7
+                an = 0
             ElseIf pt1.Y < pt2.Y Then
                 lsglOffset = -2.7
+                an = 0
             End If
 
             pt1 = New PointF
             pt2 = New PointF
             ' Find two points around the origin control point
-            Conversion.PolarToDekart(a, an - 75, 3, pt1)
+            Conversion.PolarToDekart(a, an - 75, lsglOffset, pt1)
             Conversion.PolarToDekart(a, an, 0, pt2)
             e.Graphics.DrawLine(lrPen, pt1, pt2)
 
-            Conversion.PolarToDekart(a, an - 105, 3, pt1)
+            Conversion.PolarToDekart(a, an - 105, lsglOffset, pt1)
             Conversion.PolarToDekart(a, an, 0, pt2)
             e.Graphics.DrawLine(lrPen, pt1, pt2)
             Return
@@ -2183,6 +2187,8 @@ Public Class frmDiagramERD
 
         Try
             Dim lrERDLink As ERD.Link
+
+            If e.Link.GetType Is GetType(MindFusion.Diagramming.DiagramLink) Then Exit Sub
 
             lrERDLink = e.Link.Tag
 
@@ -2696,6 +2702,8 @@ Public Class frmDiagramERD
 
         Try
             Dim lrERDLink As ERD.Link
+
+            If e.Link.GetType Is GetType(MindFusion.Diagramming.DiagramLink) Then Exit Sub
 
             lrERDLink = e.Link.Tag
 
