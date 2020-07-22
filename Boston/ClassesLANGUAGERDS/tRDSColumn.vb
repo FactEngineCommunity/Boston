@@ -370,7 +370,7 @@ Namespace RDS
         ''' <returns></returns>
         Public Function isPartOfPrimaryKey() As Boolean
 
-            Return Me.Model.Index.Find(Function(x) x.IsPrimaryKey And (x.Column.Find(Function(y) y.Id = Me.Id) IsNot Nothing)) IsNot Nothing
+            Return Me.Table.Index.Find(Function(x) x.IsPrimaryKey And (x.Column.Find(Function(y) y.Id = Me.Id) IsNot Nothing)) IsNot Nothing
 
         End Function
 

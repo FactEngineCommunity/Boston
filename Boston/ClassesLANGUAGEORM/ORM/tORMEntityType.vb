@@ -1279,6 +1279,7 @@ Namespace FBM
                     lrNewColumn.Id = System.Guid.NewGuid.ToString
                     lrNewColumn.IsMandatory = True 'To be on the safe side                    
                     lrNewColumn.OrdinalPosition = lrTable.Column.Count + 1
+                    lrNewColumn.ContributesToPrimaryKey = True
 
                     If lrTable.Column.Contains(lrNewColumn) Then
                         lrNewColumn = lrTable.Column.Find(AddressOf lrNewColumn.Equals)

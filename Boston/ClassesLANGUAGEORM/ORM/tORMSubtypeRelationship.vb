@@ -133,6 +133,15 @@ Namespace FBM
             Call Me.FactType.RemoveFromModel(True, False, True, True)
             Call Me.Delete()
 
+            Dim lrTable = CType(Me.EntityType, FBM.EntityType).getCorrespondingRDSTable
+
+            If lrTable.getPrimaryKeyColumns.Count > 0 Then
+                If lrTable.getPrimaryKeyColumns(0).Role.JoinedORMObject IsNot Me Then
+                    'Must have got the Primary Key from a Supertype.
+                    Call lrTable.removeExistingPrimaryKeyColumnsAndIndex(True)
+                End If
+            End If
+
         End Sub
 
 

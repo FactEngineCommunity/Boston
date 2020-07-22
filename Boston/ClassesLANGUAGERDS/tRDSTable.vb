@@ -224,7 +224,7 @@ Namespace RDS
 
             Try
                 Dim larColumn = From Column In Me.Column
-                                Where Column.ContributesToPrimaryKey = True
+                                Where Column.isPartOfPrimaryKey = True
                                 Select Column Distinct
 
                 Return larColumn.ToList
@@ -673,8 +673,8 @@ Namespace RDS
 
         Public Sub removeExistingPrimaryKey()
 
-            Dim larIndex = From Index In Me.Index _
-                           Where Index.IsPrimaryKey = True _
+            Dim larIndex = From Index In Me.Index
+                           Where Index.IsPrimaryKey = True
                            Select Index
 
             If larIndex.Count > 0 Then
@@ -683,9 +683,38 @@ Namespace RDS
 
         End Sub
 
+        Public Sub removeExistingPrimaryKeyColumnsAndIndex(Optional ByVal abRecursive As Boolean = False)
+
+            'Remove the Index
+            Dim larIndex = From Index In Me.Index
+                           Where Index.IsPrimaryKey = True
+                           Select Index
+
+            If larIndex.Count > 0 Then
+                Call Me.removeIndex(larIndex.First)
+            End If
+
+            'Remove the Columns
+            Dim larColumn = From Column In Me.Column
+                            Where Column.ContributesToPrimaryKey = True
+                            Select Column
+
+            For Each lrColumn In larColumn.ToArray
+                Call Me.removeColumn(lrColumn)
+            Next
+
+            If abRecursive Then
+                For Each lrTable In Me.getSubtypeTables.FindAll(Function(x) x.isAbsorbed = False)
+                    Call lrTable.removeExistingPrimaryKeyColumnsAndIndex(abRecursive)
+                Next
+            End If
+
+        End Sub
+
         Public Sub removeIndex(ByRef arIndex As RDS.Index)
 
             Call Me.Index.Remove(arIndex)
+            Call Me.Model.Index.Remove(arIndex)
 
             '----------------------------------------------------------------------
             'CMML
