@@ -1528,7 +1528,7 @@ Namespace FBM
                             lrColumn.Id = lrRecordset1("Property").Data
                             lrIndex.removeColumn(lrColumn)
                         Else
-                            lrColumn.Index.Add(lrIndex)
+                            lrColumn.Index.AddUnique(lrIndex)
 
                             lrIndex.Column.Add(lrColumn)
                         End If
@@ -1584,7 +1584,7 @@ Namespace FBM
 
                     '==========================
                     'Add the Index to the RDS
-                    Me.RDS.Index.Add(lrIndex)
+                    Me.RDS.Index.AddUnique(lrIndex)
 
                     arTable.Index.AddUnique(lrIndex)
 

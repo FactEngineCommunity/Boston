@@ -128,7 +128,13 @@ Namespace RDS
 
         End Sub
 
-        Public Sub addIndex(ByRef arIndex As RDS.Index)
+        Public Sub addIndex(ByRef arIndex As RDS.Index, Optional ByRef arRoleConstraint As FBM.RoleConstraint = Nothing)
+
+            If arRoleConstraint Is Nothing Then
+                arIndex.ResponsibleRoleConstraint = arIndex.getResponsibleRoleConstraintFromORMModel()
+            Else
+                arIndex.ResponsibleRoleConstraint = arRoleConstraint
+            End If
 
             Me.Index.AddUnique(arIndex)
 
@@ -434,9 +440,9 @@ Namespace RDS
                             lrColumn.Id = lrRecordset1("Property").Data
                             lrIndex.removeColumn(lrColumn)
                         Else
-                            lrColumn.Index.Add(lrIndex)
+                            lrColumn.Index.AddUnique(lrIndex)
 
-                            lrIndex.Column.Add(lrColumn)
+                            lrIndex.Column.AddUnique(lrColumn)
                         End If
 
                         lrRecordset1.MoveNext()
@@ -488,7 +494,7 @@ Namespace RDS
 
                     '==========================
                     'Add the Index to the RDS
-                    Me.Model.Model.RDS.Index.Add(lrIndex)
+                    Me.Model.Model.RDS.Index.AddUnique(lrIndex)
 
                     Me.Index.AddUnique(lrIndex)
 
@@ -568,12 +574,16 @@ Namespace RDS
         ''' Used when the User changes a Unique Index (that is not the existing Primary Key) to the Primary Key. Therefore, the existing Primary Key becomes simple a Unique Index (not Primary Key)
         ''' </summary>
         ''' <remarks></remarks>
-        Public Sub makeExistingPrimaryKeySimplyUnique()
+        Public Sub makeExistingPrimaryKeySimplyUnique(ByRef larColumnsAffected As List(Of RDS.Column))
 
             Try
-                Dim larIndex = From Index In Me.Index
-                               Where Index.IsPrimaryKey = True
-                               Select Index
+                Dim larIndex = (From Index In Me.Index
+                                Where Index.IsPrimaryKey = True
+                                Select Index).ToList
+
+                If larIndex.Count = 0 Then
+                    larIndex.Add(Me.getIndexByColumns(larColumnsAffected))
+                End If
 
                 If larIndex.Count > 0 Then
 
@@ -850,21 +860,26 @@ Namespace RDS
                     Dim lrExistingIndex As RDS.Index = lrTable.getIndexByColumns(larIndexColumn)
 
                     If lrExistingIndex Is Nothing Then
-                        Dim lsQualifier = lrTable.generateUniqueQualifier("PK")
-                        Dim lbIsPrimaryKey As Boolean = True
+                        Dim lsQualifier As String
+                        If abIsPreferredIdentifier Then
+                            lsQualifier = lrTable.generateUniqueQualifier("PK")
+                        Else
+                            lsQualifier = lrTable.generateUniqueQualifier("UC")
+                        End If
+                        Dim lbIsPrimaryKey As Boolean = abIsPreferredIdentifier
                         Dim lsIndexName As String = lrTable.Name & "_" & Trim(lsQualifier)
 
                         'Add the new Index
                         Dim lrIndex As New RDS.Index(lrTable,
-                                                     lsIndexName,
-                                                     lsQualifier,
-                                                     pcenumODBCAscendingOrDescending.Ascending,
-                                                     lbIsPrimaryKey,
-                                                     True,
-                                                     False,
-                                                     larIndexColumn,
-                                                     False,
-                                                     True)
+                                                 lsIndexName,
+                                                 lsQualifier,
+                                                 pcenumODBCAscendingOrDescending.Ascending,
+                                                 lbIsPrimaryKey,
+                                                 True,
+                                                 False,
+                                                 larIndexColumn,
+                                                 False,
+                                                 True)
 
                         Call lrTable.addIndex(lrIndex)
                     Else
@@ -873,7 +888,7 @@ Namespace RDS
                             Call lrExistingIndex.setName(lrTable.Name & "_PK")
                             Call lrExistingIndex.setIsPrimaryKey(True)
                         Else
-                            Call lrExistingIndex.setQualifier("UK")
+                            Call lrExistingIndex.setQualifier("UC")
                             Call lrExistingIndex.setName(lrTable.Name & "_UC")
                             Call lrExistingIndex.setIsPrimaryKey(abIsPreferredIdentifier)
                         End If

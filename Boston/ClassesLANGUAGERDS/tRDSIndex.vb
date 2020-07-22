@@ -122,7 +122,17 @@ Namespace RDS
 
         Public Shadows Function Equals(other As Index) As Boolean Implements IEquatable(Of Index).Equals
 
-            Return Me.Name = other.Name
+            If Me.Column.Count = other.Column.Count Then
+
+                For Each lrColumn In Me.Column
+                    If other.Column.Find(Function(x) x.Name = lrColumn.Name And x.ActiveRole.Id = lrColumn.ActiveRole.Id) Is Nothing Then
+                        Return False
+                    End If
+                Next
+                Return True
+            Else
+                Return False
+            End If
 
         End Function
 
@@ -194,6 +204,19 @@ Namespace RDS
                             If liMatch = Me.Column.Count Then
                                 Return lrReferenceModeRoleConstraint
                             End If
+                        End If
+
+                        '---------------------------------------------------------------
+                        'Try and find the RoleConstraint in the FBM Model
+                        Dim loRoleConstraint = From RoleConstraint In Me.Model.Model.RoleConstraint
+                                               From RoleConstraintRole In RoleConstraint.RoleConstraintRole
+                                               From Column In Me.Column
+                                               Where RoleConstraintRole.Role.FactType Is Column.Role.FactType
+                                               Where RoleConstraint.RoleConstraintRole.Count = Me.Column.Count
+                                               Select RoleConstraint Distinct
+
+                        If loRoleConstraint.Count > 0 Then
+                            Return loRoleConstraint.First
                         End If
 
                     'Otherwise, do the same as the above, but for all RoleConstraints in the FBMModel.
@@ -268,7 +291,9 @@ Namespace RDS
                                           Where Index.IsPrimaryKey
                                           Select Index).Count > 0
 
-                    Call lrColumn.setContributesToPrimaryKey(lbPrimaryIndex)
+                    If lbPrimaryIndex Then
+                        Call lrColumn.setContributesToPrimaryKey(lbPrimaryIndex)
+                    End If
                 Next
 
                 RaiseEvent IsPrimaryKeyChanged(abIsPrimaryKey)

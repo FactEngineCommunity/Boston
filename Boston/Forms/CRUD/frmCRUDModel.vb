@@ -184,8 +184,8 @@ Public Class frmCRUDModel
 
                     If lrIndex Is Nothing Then
                         lrIndex = New RDS.Index(lrTable, lrRow(lrODBCTable.Columns("INDEX_NAME")))
-                        lrTable.Index.Add(lrIndex)
-                        Me.zrModel.RDS.Index.Add(lrIndex)
+                        lrTable.Index.AddUnique(lrIndex)
+                        Me.zrModel.RDS.Index.AddUnique(lrIndex)
 
                         lrIndex.NonUnique = CBool(lrRow(lrODBCTable.Columns("NON_UNIQUE")))
                         lrIndex.IndexQualifier = lrRow(lrODBCTable.Columns("INDEX_QUALIFIER"))

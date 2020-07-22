@@ -1211,18 +1211,20 @@ Namespace ORMQL
                 lrFactType = Me.Model.FactType.Find(Function(x) x.Id = lrupdateStatement.USERTABLENAME)
 
                 'Where Clause
-                lrFact = lrFactType.Fact.Find(Function(x) x.Data.Find(Function(y) y.Role.Name = lrupdateStatement.COLUMNNAMESTR(1)).Data = lrupdateStatement.VALUE(1))
+                For Each lrFact In lrFactType.Fact.FindAll(Function(x) x.Data.Find(Function(y) y.Role.Name = lrupdateStatement.COLUMNNAMESTR(1)).Data = lrupdateStatement.VALUE(1))
+                    lrFact = lrFactType.Fact.Find(Function(x) x.Data.Find(Function(y) y.Role.Name = lrupdateStatement.COLUMNNAMESTR(1)).Data = lrupdateStatement.VALUE(1))
 
-                'Update Data
-                If lrFact IsNot Nothing Then
-                    Dim lrFactData As FBM.FactData
-                    lrFactData = lrFact.Data.Find(Function(x) x.Role.Name = lrupdateStatement.COLUMNNAMESTR(0))
-                    lrFactData.Data = lrupdateStatement.VALUE(0)
-                    lrFact.isDirty = True
-                    lrFactData.isDirty = True
-                    lrFactType.isDirty = True
-                    Me.Model.IsDirty = True
-                End If
+                    'Update Data
+                    If lrFact IsNot Nothing Then
+                        Dim lrFactData As FBM.FactData
+                        lrFactData = lrFact.Data.Find(Function(x) x.Role.Name = lrupdateStatement.COLUMNNAMESTR(0))
+                        lrFactData.Data = lrupdateStatement.VALUE(0)
+                        lrFact.isDirty = True
+                        lrFactData.isDirty = True
+                        lrFactType.isDirty = True
+                        Me.Model.IsDirty = True
+                    End If
+                Next
 
                 Return True
 

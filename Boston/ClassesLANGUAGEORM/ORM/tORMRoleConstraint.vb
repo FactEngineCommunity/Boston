@@ -593,7 +593,11 @@ Namespace FBM
                                                             False,
                                                             True)
 
-                                    Call lrTable.addIndex(lrIndex)
+                                    Call lrTable.addIndex(lrIndex, Me)
+
+                                    For Each lrSubtypeTable In lrTable.getSubtypeTables.FindAll(Function(x) x.isAbsorbed = False)
+                                        Call lrTable.addPrimaryKeyToNonAbsorbedTables(lrIndex, False)
+                                    Next
                                 Else
                                     'Just add the Column (for the RoleConstraintRole) to the Index
                                     Dim lrColumn As RDS.Column
@@ -2062,7 +2066,7 @@ Namespace FBM
 
                     '--------------------------------
                     'Modify the existing PrimaryKey
-                    Call lrTable.makeExistingPrimaryKeySimplyUnique()
+                    Call lrTable.makeExistingPrimaryKeySimplyUnique(larColumnsAffected)
 
                     Dim lrExistingIndex As RDS.Index = lrTable.getIndexByColumns(larColumnsAffected)
 

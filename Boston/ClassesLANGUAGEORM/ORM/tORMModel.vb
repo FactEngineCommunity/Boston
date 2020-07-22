@@ -2718,6 +2718,12 @@ Namespace FBM
 
                                 For Each lrTable In larTable.ToList
 
+                                    '---------------------------------------------------------------
+                                    'Remove the Index first, because finds the Index by the Column
+                                    Call lrTable.removeIndexByRoleConstraint(arRoleConstraint)
+
+                                    '-----------------------------------------
+                                    'Remove the Columns
                                     Dim larColumn As New List(Of RDS.Column)
                                     larColumn = lrTable.Column.FindAll(Function(x) x.Role.Id = lrRole.Id)
 
@@ -2773,6 +2779,21 @@ Namespace FBM
 
                             lrTable = Me.RDS.getTableByName(arRoleConstraint.RoleConstraintRole(0).Role.FactType.Id)
 
+                            '==================================================
+                            'Remove any Indexes related to the RoleConstraint
+                            Dim lrResponsibleRoleConstraint = arRoleConstraint
+                            Dim larTable = From Index In Me.RDS.Index
+                                           Where Index.ResponsibleRoleConstraint Is lrResponsibleRoleConstraint
+                                           Select Index.Table
+
+                            For Each lrTable In larTable
+                                '---------------------------------------------------------------
+                                'Remove the Index first, because finds the Index by the Column
+                                Call lrTable.removeIndexByRoleConstraint(arRoleConstraint)
+                            Next
+
+                            '==============================
+                            'Remove Columns and Relations
                             If (lrFactType.isRDSTable Or (lrTable IsNot Nothing)) And lrFactType.InternalUniquenessConstraint.Count = 0 Then
                                 'Remove the Table from the RDSModel/Database                                
 

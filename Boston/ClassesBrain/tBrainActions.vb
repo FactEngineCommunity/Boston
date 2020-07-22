@@ -28,19 +28,21 @@ Partial Public Class tBrain
             Dim lrModelObject = Me.Model.GetModelObjectByName(lsEntityTypeName)
             lrEntityType = lrModelObject
         Else
-            Dim lrModelObject = Me.Model.GetModelObjectByName(lsEntityTypeName)
-            If TypeOf (lrModelObject) IsNot FBM.EntityType Then
-                Me.send_data(lsEntityTypeName & " is not an Entity Type")
-                Exit Sub
+            If Me.Model.ExistsModelElement(lsEntityTypeName) Then
+                Dim lrModelObject = Me.Model.GetModelObjectByName(lsEntityTypeName)
+                If lrModelObject.GetType IsNot GetType(FBM.EntityType) Then
+                    Me.send_data(lsEntityTypeName & " is not an Entity Type")
+                    Exit Sub
+                End If
             End If
-            lrEntityType = Me.Model.CreateEntityType(lsEntityTypeName, False)
+            lrEntityType = Me.Model.CreateEntityType(lsEntityTypeName, True)
             lrEntityTypeInstance = Me.Page.DropEntityTypeAtPoint(lrEntityType, New PointF(100, 100))
 
             'Call lrEntityTypeInstance.RepellFromNeighbouringPageObjects(1, False)
             'Call lrEntityTypeInstance.Move(lrEntityTypeInstance.X, lrEntityTypeInstance.Y, True)
         End If
 
-        Dim lsReferenceMode As String = Me.VAQL.ENTITYTYPEISIDENTIFIEDBYITSStatement.REFERENCEMODE
+            Dim lsReferenceMode As String = Me.VAQL.ENTITYTYPEISIDENTIFIEDBYITSStatement.REFERENCEMODE
 
         Dim items As Array
         items = System.Enum.GetValues(GetType(pcenumReferenceModeEndings))
@@ -57,11 +59,15 @@ Partial Public Class tBrain
 
         Call lrEntityType.SetReferenceMode(lsReferenceMode, False, Nothing, True)
 
-        Call lrEntityType.ReferenceModeValueType.Save()
-        Call lrEntityType.ReferenceModeFactType.Save()
-        For Each lrInternalUniquenessConstraint In lrEntityType.ReferenceModeFactType.InternalUniquenessConstraint
-            Call lrInternalUniquenessConstraint.Save()
-        Next
+        If lrEntityType.ReferenceModeValueType IsNot Nothing And lrEntityType.ReferenceModeFactType IsNot Nothing Then
+            Call lrEntityType.ReferenceModeValueType.Save()
+            Call lrEntityType.ReferenceModeFactType.Save()
+
+            For Each lrInternalUniquenessConstraint In lrEntityType.ReferenceModeFactType.InternalUniquenessConstraint
+                Call lrInternalUniquenessConstraint.Save()
+            Next
+        End If
+
         Call lrEntityType.Save()
 
         Me.send_data("Ok")
