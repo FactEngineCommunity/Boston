@@ -1534,12 +1534,15 @@ Namespace FBM
             Try
                 Dim lrDictionaryEntry As FBM.DictionaryEntry
 
-                If Me.ModelDictionary.Exists(AddressOf arDictionaryEntry.Equals) Then
+                'Dim lrDictionaryEntryTemp = arDictionaryEntry
+                lrDictionaryEntry = Me.ModelDictionary.Find(AddressOf arDictionaryEntry.Equals)
+
+                If lrDictionaryEntry IsNot Nothing Then 'Me.ModelDictionary.Exists(AddressOf arDictionaryEntry.Equals) Then
                     '-------------------------------------------------------------------------------------------------------
                     'Concept already exists in the ModelDictionary.
                     ' Make sure the DictionaryEntry contains the ConceptType of the DictionaryEntry attempted to be added.
                     '-------------------------------------------------------------------------------------------------------
-                    lrDictionaryEntry = Me.ModelDictionary.Find(AddressOf arDictionaryEntry.Equals)
+                    'lrDictionaryEntry = Me.ModelDictionary.Find(AddressOf arDictionaryEntry.Equals)
                     lrDictionaryEntry.AddConceptType(arDictionaryEntry.GetConceptType)
                     If abAppendRealisations Then
                         'CodeSafe - Only allow multiple Value realisations.

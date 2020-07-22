@@ -284,15 +284,23 @@ Public Class frmToolboxBrainBox
                 End If
                 e.Handled = True
             Case Is = Keys.Down  'DownArrow
-                'If Me.inputbuffer.Count > 0 Then
-                '    Me.inputbuffer_pointer -= 1
-                '    If Me.inputbuffer_pointer <= 0 Then Me.inputbuffer_pointer = Me.inputbuffer.Count
-                '    'Me.TextBoxInput.Text = ""
-                '    Call Me.SetThoughtModeCursor()
-                '    Me.TextBoxInput.AppendText(LTrim(Me.inputbuffer(Me.inputbuffer.Count - Me.inputbuffer_pointer)))
-                'Else
-                '    'Me.TextBoxInput.Clear()
-                'End If
+                If Me.inputbuffer.Count > 0 Then
+                    Me.inputbuffer_pointer -= 1
+                    If Me.inputbuffer_pointer < 0 Then Me.inputbuffer_pointer = Me.inputbuffer.Count - 1
+                    'CodeSafe
+                    If Me.inputbuffer_pointer = Me.inputbuffer.Count Then Me.inputbuffer_pointer = Me.inputbuffer.Count - 1
+                    Me.TextBoxInput.Text = ""
+                    Call Me.SetThoughtModeCursor()
+                    Select Case Trim(Me.inputbuffer(Me.inputbuffer_pointer).ToLower)
+                        Case Is = "yes", "no"
+                            If Me.inputbuffer_pointer - 1 <= 0 Then
+                                Me.inputbuffer_pointer -= 1
+                            End If
+                    End Select
+                    Me.TextBoxInput.AppendText(LTrim(Me.inputbuffer(Me.inputbuffer_pointer)))
+                Else
+                    'Me.TextBoxInput.Clear()
+                End If
                 e.Handled = True
             Case Is = Keys.Enter 'Enter
 
