@@ -1107,6 +1107,7 @@ Public Class frmDiagramERD
                         Dim lo_link As New DiagramLink(Me.zrPage.Diagram, lrSubtypeEntity.TableShape, lrEntity.TableShape)
                         lo_link.HeadShape = ArrowHead.Arrow
                         lo_link.Pen.Color = Color.Gray
+                        lo_link.Locked = True
                         Me.zrPage.Diagram.Links.Add(lo_link)
                     End If
                 Next
