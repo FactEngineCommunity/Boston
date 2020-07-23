@@ -54,7 +54,7 @@ Partial Class frmToolboxBrainBox
         Me.TextBox_Output.Location = New System.Drawing.Point(3, 5)
         Me.TextBox_Output.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.TextBox_Output.Name = "TextBox_Output"
-        Me.TextBox_Output.Size = New System.Drawing.Size(802, 217)
+        Me.TextBox_Output.Size = New System.Drawing.Size(802, 215)
         Me.TextBox_Output.TabIndex = 1
         Me.TextBox_Output.Text = ""
         '
@@ -83,17 +83,15 @@ Partial Class frmToolboxBrainBox
         '
         'TextBoxInput
         '
-        Me.TextBoxInput.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-            Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.TextBoxInput.Dock = System.Windows.Forms.DockStyle.Fill
         Me.TextBoxInput.Font = New System.Drawing.Font("Tahoma", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.TextBoxInput.ForeColor = System.Drawing.Color.SteelBlue
-        Me.TextBoxInput.Location = New System.Drawing.Point(4, 5)
+        Me.TextBoxInput.Location = New System.Drawing.Point(0, 0)
         Me.TextBoxInput.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.TextBoxInput.MinimumSize = New System.Drawing.Size(0, 50)
+        Me.TextBoxInput.MinimumSize = New System.Drawing.Size(4, 50)
         Me.TextBoxInput.Multiline = False
         Me.TextBoxInput.Name = "TextBoxInput"
-        Me.TextBoxInput.Size = New System.Drawing.Size(802, 50)
+        Me.TextBoxInput.Size = New System.Drawing.Size(813, 54)
         Me.TextBoxInput.TabIndex = 1
         Me.TextBoxInput.Text = ""
         '
