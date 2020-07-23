@@ -94,7 +94,7 @@ Partial Class frmToolboxBrainBox
         'ListBoxEnterpriseAware
         '
         Me.ListBoxEnterpriseAware.FormattingEnabled = True
-        Me.ListBoxEnterpriseAware.Location = New System.Drawing.Point(31, 13)
+        Me.ListBoxEnterpriseAware.Location = New System.Drawing.Point(75, 16)
         Me.ListBoxEnterpriseAware.Name = "ListBoxEnterpriseAware"
         Me.ListBoxEnterpriseAware.Size = New System.Drawing.Size(119, 69)
         Me.ListBoxEnterpriseAware.TabIndex = 3
