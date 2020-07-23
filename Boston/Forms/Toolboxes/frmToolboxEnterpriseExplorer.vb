@@ -1482,7 +1482,9 @@ Public Class frmToolboxEnterpriseExplorer
             Dim lrNewTreeNode As TreeNode = Nothing
             Dim lrModel As FBM.Model
 
-            Me.TreeView.Nodes(0).Nodes(Me.TreeView.Nodes(0).Nodes.Count - 1).EnsureVisible()
+            If Me.TreeView.Nodes(0).Nodes.Count > 0 Then
+                Me.TreeView.Nodes(0).Nodes(Me.TreeView.Nodes(0).Nodes.Count - 1).EnsureVisible()
+            End If
 
             lrModel = Me.AddNewModel(lrNewTreeNode)
 
@@ -1587,6 +1589,10 @@ Public Class frmToolboxEnterpriseExplorer
 
             If My.Settings.UseClientServer Or (prApplication.User IsNot Nothing) Then
                 lrModel.CreatedByUserId = prApplication.User.Id
+            End If
+
+            If prApplication.WorkingProject Is Nothing Then
+                prApplication.WorkingProject = New ClientServer.Project("MyPersonalModels", "MyPersonalModels")
             End If
 
             lrModel.ProjectId = prApplication.WorkingProject.Id
