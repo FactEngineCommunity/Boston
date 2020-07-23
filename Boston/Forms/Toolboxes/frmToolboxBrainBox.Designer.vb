@@ -78,16 +78,14 @@ Partial Class frmToolboxBrainBox
         '
         'TextBoxInput
         '
-        Me.TextBoxInput.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-            Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.TextBoxInput.Dock = System.Windows.Forms.DockStyle.Fill
         Me.TextBoxInput.Font = New System.Drawing.Font("Tahoma", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.TextBoxInput.ForeColor = System.Drawing.Color.SteelBlue
-        Me.TextBoxInput.Location = New System.Drawing.Point(3, 3)
+        Me.TextBoxInput.Location = New System.Drawing.Point(0, 0)
         Me.TextBoxInput.MinimumSize = New System.Drawing.Size(4, 34)
         Me.TextBoxInput.Multiline = False
         Me.TextBoxInput.Name = "TextBoxInput"
-        Me.TextBoxInput.Size = New System.Drawing.Size(536, 34)
+        Me.TextBoxInput.Size = New System.Drawing.Size(542, 35)
         Me.TextBoxInput.TabIndex = 1
         Me.TextBoxInput.Text = ""
         '
