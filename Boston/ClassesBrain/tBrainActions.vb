@@ -277,7 +277,7 @@ Partial Public Class tBrain
                 lsFactTypeName &= lrModelObject.Name
             Next
 
-            lrFactType = Me.Model.CreateFactType(lsFactTypeName, larModelObject, False, False, , , False, )
+            lrFactType = Me.Model.CreateFactType(lsFactTypeName, larModelObject, False, False, , , True,  )
 
             Dim lrRole As FBM.Role
             Dim larRole As New List(Of FBM.Role)

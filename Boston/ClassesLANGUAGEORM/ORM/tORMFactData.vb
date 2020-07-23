@@ -49,7 +49,16 @@ Namespace FBM
         ''' <remarks></remarks>
         Public Property Data() As String
             Get
-                Return Me.Concept.Symbol
+                Try
+                    Return Me.Concept.Symbol
+                Catch ex As Exception
+                    'Oops, this shouldn't happen.
+                    Dim lsMessage As String = "FactData item does not have a Concept."
+                    lsMessage &= vbCrLf & vbCrLf & "Fact.Id: " & Me.Fact.Id
+                    lsMessage &= vbCrLf & "FactType.Id: " & Me.Fact.FactType.Id
+                    prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                    Return "DummyValue"
+                End Try
             End Get
             Set(ByVal value As String)
                 '--------------------------------------------------------

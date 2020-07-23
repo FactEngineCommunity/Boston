@@ -314,7 +314,7 @@ Public Class tBrain
 
 #End Region
 
-#Region "COMMANDCHECKS"
+#Region "COMMANDCHECKS" 'Checks to see if if the User made a command
 
     Private Function CheckCommand(ByVal asString As String) As Boolean
         CheckCommand = False
@@ -424,6 +424,9 @@ Public Class tBrain
             Exit Function
         ElseIf Me.check_reboot(Me.InputBuffer) Then
             Me.send_data("Okay. Back again.")
+            If Me.Question.Count = 0 Then
+                Me.send_data("I don't have any questions.")
+            End If
             CheckCommand = True
             Exit Function
         End If
@@ -463,6 +466,29 @@ Public Class tBrain
             For Each lrSentence In Me.Sentence
                 Me.send_data(lrSentence.Sentence)
             Next
+            CheckCommand = True
+        End If
+
+        If Me.CheckCommandWhatIsYourPlan(Me.InputBuffer) Then
+
+            If Me.CurrentQuestion Is Nothing Then
+                Me.send_data("I don't have a current plan.")
+                CheckCommand = True
+                Exit Function
+            End If
+
+            For Each lrPlanStep In Me.CurrentQuestion.Plan.Step
+                Me.send_data(lrPlanStep.ActionType.ToString)
+                If Not lrPlanStep.AlternateActionType = pcenumActionType.None Then
+                    Me.send_data("  Alternatively: " & lrPlanStep.AlternateActionType.ToString)
+                End If
+            Next
+            CheckCommand = True
+        End If
+
+        If Me.CheckCommandDropThatPlan(Me.InputBuffer) Then
+
+            Call Me.AbortCurrentPlan()
             CheckCommand = True
         End If
 
@@ -683,7 +709,8 @@ Public Class tBrain
                 Me.Timeout.Interval = CInt(Me.Timeout.Interval * (3 / 2))
             Case Is = "ask intelligent questions"
                 'Call Me.formulate_intelligentQuestions()
-                Throw New NotImplementedException("This functionality is not yet implemented in Boston")
+                Me.send_data("This is turned off at the moment.")
+                'Throw New NotImplementedException("This functionality is not yet implemented in Boston")
         End Select
 
     End Function
@@ -949,6 +976,18 @@ Public Class tBrain
         If asString = "list current sentence" Then
             CheckCommandListCurrentSentence = True
         End If
+
+    End Function
+
+    Private Function CheckCommandWhatIsYourPlan(ByVal asString) As Boolean
+
+        Return asString = "what is your plan"
+
+    End Function
+
+    Private Function CheckCommandDropThatPlan(ByVal asString) As Boolean
+
+        Return asString = "drop that plan"
 
     End Function
 
@@ -3531,49 +3570,61 @@ Public Class tBrain
 
     Private Sub ValidateIfCurrentSentenceIsAFactType()
 
-        Dim lsStatement As String = "CREATE FACTTYPE FOR '" & Me.CurrentSentence.SentenceResolved & "'"
+        Try
 
-        If Me.PreParseORMQL(lsStatement).GetType Is GetType(TinyPG.ParseErrors) Then
-            'Dim lrParseError As TinyPG.ParseError
+            Dim lsStatement As String = "CREATE FACTTYPE FOR '" & Me.CurrentSentence.SentenceResolved & "'"
 
-            'Dim larParseErrors = Me.PreParseORMQL(lsStatement)
+            If Me.PreParseORMQL(lsStatement).GetType Is GetType(TinyPG.ParseErrors) Then
+                'Dim lrParseError As TinyPG.ParseError
 
-            'For Each lrParseError In larParseErrors
-            '    Me.send_data(lrParseError.Message)
-            'Next
-        Else
-            Select Case Me.ParseTree.Nodes(0).Nodes(0).Nodes(1).Text
-                Case Is = "CREATEFACTTYPESTMT"
-                    '-------------------------
-                    'Create the DynamicObject
-                    '-------------------------
-                    Dim lrCreateFactTypeStatement As New Object
-                    lrCreateFactTypeStatement = prApplication.ORMQL.CreateFactTypeStatement
+                'Dim larParseErrors = Me.PreParseORMQL(lsStatement)
 
-                    lrCreateFactTypeStatement.FACTTYPENAME = ""
-                    lrCreateFactTypeStatement.MODELELEMENTNAME.Clear()
-                    lrCreateFactTypeStatement.PREDICATE.Clear()
+                'For Each lrParseError In larParseErrors
+                '    Me.send_data(lrParseError.Message)
+                'Next
+            Else
+                Select Case Me.ParseTree.Nodes(0).Nodes(0).Nodes(1).Text
+                    Case Is = "CREATEFACTTYPESTMT"
+                        '-------------------------
+                        'Create the DynamicObject
+                        '-------------------------
+                        Dim lrCreateFactTypeStatement As New Object
+                        lrCreateFactTypeStatement = prApplication.ORMQL.CreateFactTypeStatement
 
-                    '----------------------------------
-                    'Get the Tokens from the ParseTree
-                    '----------------------------------
-                    Call Me.Model.ORMQL.GetParseTreeTokensReflection(lrCreateFactTypeStatement, Me.ParseTree.Nodes(0))
+                        lrCreateFactTypeStatement.FACTTYPENAME = ""
+                        lrCreateFactTypeStatement.MODELELEMENTNAME.Clear()
+                        lrCreateFactTypeStatement.PREDICATE.Clear()
 
-                    Me.CurrentSentence.ModelElement = lrCreateFactTypeStatement.MODELELEMENTNAME
-                    Dim lsPredicatePart As String
-                    Dim lrPredicatePart As Language.PredicatePart
-                    For Each lsPredicatePart In lrCreateFactTypeStatement.PREDICATE
-                        lrPredicatePart = New Language.PredicatePart
-                        lrPredicatePart.PredicatePartText = Trim(lsPredicatePart)
-                        Me.CurrentSentence.PredicatePart.Add(lrPredicatePart)
-                    Next
-                    '--------------------------------------------------------------------------------
-                    'Add an empty Predicate Part to the end for the new Fact Type Reading model,
-                    '  as per the FBMWG08 working draft model (Fact-Based Modeling, Working Group).
-                    '--------------------------------------------------------------------------------
-                    Me.CurrentSentence.PredicatePart.Add(New Language.PredicatePart)
-            End Select
-        End If
+                        '----------------------------------
+                        'Get the Tokens from the ParseTree
+                        '----------------------------------
+                        Call Me.Model.ORMQL.GetParseTreeTokensReflection(lrCreateFactTypeStatement, Me.ParseTree.Nodes(0))
+
+                        Me.CurrentSentence.ModelElement = lrCreateFactTypeStatement.MODELELEMENTNAME
+                        Dim lsPredicatePart As String
+                        Dim lrPredicatePart As Language.PredicatePart
+                        For Each lsPredicatePart In lrCreateFactTypeStatement.PREDICATE
+                            lrPredicatePart = New Language.PredicatePart
+                            lrPredicatePart.PredicatePartText = Trim(lsPredicatePart)
+                            Me.CurrentSentence.PredicatePart.Add(lrPredicatePart)
+                        Next
+                        '--------------------------------------------------------------------------------
+                        'Add an empty Predicate Part to the end for the new Fact Type Reading model,
+                        '  as per the FBMWG08 working draft model (Fact-Based Modeling, Working Group).
+                        '--------------------------------------------------------------------------------
+                        Me.CurrentSentence.PredicatePart.Add(New Language.PredicatePart)
+                End Select
+            End If
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Oops, there was a problem:"
+            lsMessage &= vbCrLf & "Error: " & mb.ReflectedType.Name & "." & mb.Name
+
+            Me.send_data(lsMessage)
+
+        End Try
     End Sub
 
 #End Region
