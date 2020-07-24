@@ -13,7 +13,7 @@ Public Class frmMain
     Private ltThread As Thread
     Private ltSplashThread As Thread
 
-    Public zfrmModelExplorer As frmToolboxEnterpriseExplorer = Nothing
+    Public WithEvents zfrmModelExplorer As frmToolboxEnterpriseExplorer = Nothing
     Public zfrm_toolbox As frmToolbox = Nothing
     Public zfrm_diagram_overview As frmDiagramOverview = Nothing
     Public zfrm_orm_reading_editor As frmToolboxORMReadingEditor = Nothing
@@ -3833,4 +3833,7 @@ Public Class frmMain
 
     End Sub
 
+    Private Sub zfrmModelExplorer_Disposed(sender As Object, e As EventArgs) Handles zfrmModelExplorer.Disposed
+        GC.Collect()
+    End Sub
 End Class
