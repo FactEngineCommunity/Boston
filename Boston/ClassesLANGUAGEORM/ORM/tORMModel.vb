@@ -42,9 +42,11 @@ Namespace FBM
         <XmlIgnore()> _
         Public AllowCheckForErrors As Boolean = False
 
-        <XmlIgnore()> _
-        <NonSerialized()> _
+        <XmlIgnore()>
+        <NonSerialized()>
         Public TreeNode As TreeNode
+
+        Public Loading As Boolean = False
 
         <XmlIgnore()>
         Public Loaded As Boolean = False 'Used to stop reloading every time the User selects a Model in the navigation tree.
@@ -4006,6 +4008,7 @@ Namespace FBM
                         Optional ByVal abUseThreading As Boolean = True,
                         Optional ByRef aoBackgroundWorker As System.ComponentModel.BackgroundWorker = Nothing)
 
+            Me.Loading = True
             '-------------------------------------------------------
             'Loads an ORM model from the database
             '-------------------------------------------------------
@@ -4195,6 +4198,8 @@ Namespace FBM
             Me.RDFCreated = True 'For now for testing. 
 
             Richmond.WriteToStatusBar(".")
+
+            Me.Loading = False
 
         End Sub
 

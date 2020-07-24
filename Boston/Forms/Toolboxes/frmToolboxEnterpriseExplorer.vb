@@ -256,7 +256,7 @@ Public Class frmToolboxEnterpriseExplorer
         Call Me.zoRecentNodes.Serialize(Me.zsRecentNodesFileName)
 
         frmMain.MenuItem_ShowEnterpriseTreeView.Checked = False
-        frmMain.zfrmModelExplorer = Nothing
+        'frmMain.zfrmModelExplorer = Nothing
 
         '----------------------------------------------
         'Close the ModelDictionary form if it is open
@@ -322,41 +322,61 @@ Public Class frmToolboxEnterpriseExplorer
 
         Using loWaitCursor As New WaitCursor
 
-            Dim lrEnterpriseView As New tEnterpriseEnterpriseView
-            Dim lrPage As FBM.Page
+            Try
+                Dim lrEnterpriseView As New tEnterpriseEnterpriseView
+                Dim lrPage As FBM.Page
 
-            For Each lrEnterpriseView In prPageNodes
-                lrPage = lrEnterpriseView.Tag
-                If IsSomething(lrPage.Form) Then
-                    lrPage.Form.Close()
+                For Each lrEnterpriseView In prPageNodes
+                    lrPage = lrEnterpriseView.Tag
+                    If IsSomething(lrPage.Form) Then
+                        lrPage.Form.Close()
+                    End If
+                Next
+
+                If IsSomething(frmMain.zfrmStartup) Then
+                    frmMain.zfrmStartup.Close()
                 End If
-            Next
 
-            If IsSomething(frmMain.zfrmStartup) Then
-                frmMain.zfrmStartup.Close()
-            End If
+                prApplication.WorkingModel = Nothing
+                prApplication.WorkingPage = Nothing
+                prApplication.WorkingValueType = Nothing
+                prApplication.WorkingProject = Nothing
+                prApplication.WorkingNamespace = Nothing
 
-            prApplication.WorkingModel = Nothing
-            prApplication.WorkingPage = Nothing
-            prApplication.WorkingValueType = Nothing
-            prApplication.WorkingProject = Nothing
-            prApplication.WorkingNamespace = Nothing
+                prApplication.ORMQL = New ORMQL.Processor
 
-            prApplication.ORMQL = New ORMQL.Processor
+                prPageNodes.Clear()
+                Dim lasExcludedModels = {"Core", "English"}
+                For Each lrModel In prApplication.Models.ToArray
+                    If Not lasExcludedModels.Contains(lrModel.ModelId) Then
+                        prApplication.Models.Remove(lrModel)
+                    End If
+                Next
 
-            prPageNodes.Clear()
-            Dim lasExcludedModels = {"Core", "English"}
-            For Each lrModel In prApplication.Models.ToArray
-                If Not lasExcludedModels.Contains(lrModel.ModelId) Then
-                    prApplication.Models.Remove(lrModel)
-                End If
-            Next
+                prApplication.ActivePages.Clear()
 
-            prApplication.ActivePages.Clear()
+                frmMain.zfrmModelExplorer = Nothing
 
-            Call frmMain.ShowHideMenuOptions()
+                Call frmMain.ShowHideMenuOptions()
 
-            GC.Collect()
+            Catch ex As Exception
+                Dim lsMessage1 As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+            Me.zrToolTip.Dispose()
+
+            'See also the Disposed event for this form
+            'See also in frmMain
+            'Private Sub zfrmModelExplorer_Closed(sender As Object, e As EventArgs) Handles zfrmModelExplorer.Closed
+
+            '    GC.Collect()
+            'End Sub
+
         End Using
 
     End Sub
@@ -1592,10 +1612,7 @@ Public Class frmToolboxEnterpriseExplorer
                 lrModel.CreatedByUserId = prApplication.User.Id
             End If
 
-            If prApplication.WorkingProject Is Nothing Then
-                prApplication.WorkingProject = New ClientServer.Project("MyPersonalModels", "MyPersonalModels")
-            End If
-
+            If prApplication.WorkingProject Is Nothing Then prApplication.WorkingProject = New ClientServer.Project("MyPersonalModels", "MyPersonalModels")
             lrModel.ProjectId = prApplication.WorkingProject.Id
 
             'Namespace
@@ -1755,78 +1772,82 @@ Public Class frmToolboxEnterpriseExplorer
         Dim lrModel As FBM.Model
 
         Try
-            '-----------------------------------------
-            'Get the Model from the selected TreeNode
-            '-----------------------------------------
-            lrModel = Me.TreeView.SelectedNode.Tag.Tag
+            With New WaitCursor
+                '-----------------------------------------
+                'Get the Model from the selected TreeNode
+                '-----------------------------------------
+                lrModel = Me.TreeView.SelectedNode.Tag.Tag
 
-            lsMessage = "Are you sure you want to delete the Model, '" & lrModel.Name & "' ?"
+                lsMessage = "Are you sure you want to delete the Model, '" & lrModel.Name & "' ?"
 
-            If MsgBox(lsMessage, MsgBoxStyle.Critical + MsgBoxStyle.YesNo) = MsgBoxResult.Yes Then
+                If MsgBox(lsMessage, MsgBoxStyle.Critical + MsgBoxStyle.YesNo) = MsgBoxResult.Yes Then
 
-                Using loWaitCursor As New WaitCursor
+                    While (lrModel.Loading And Not lrModel.Loaded) Or lrModel.Page.FindAll(Function(x) x.Loading).Count > 0
+                    End While
 
-                    'Call lrModel.Save()
+                    Using loWaitCursor As New WaitCursor
 
-                    Application.DoEvents()
+                        'Call lrModel.Save()
 
-                    '-------------------------------------
-                    'Remove all the Pages for the Model.
-                    '-------------------------------------
-                    Dim liPageCount As Integer = lrModel.Page.Count
-                    For liInd = liPageCount To 1 Step -1
-                        lrPage = lrModel.Page(liInd - 1)
+                        Application.DoEvents()
 
-                        Dim lr_enterprise_view As tEnterpriseEnterpriseView
-                        Dim loTreeNode As TreeNode
-                        lr_enterprise_view = New tEnterpriseEnterpriseView(pcenumMenuType.pageORMModel, _
-                                                                   lrPage, _
-                                                                   lrPage.Model.ModelId, _
-                                                                   pcenumLanguage.ORMModel, _
-                                                                   Nothing, lrPage.PageId)
+                        '-------------------------------------
+                        'Remove all the Pages for the Model.
+                        '-------------------------------------
+                        Dim liPageCount As Integer = lrModel.Page.Count
+                        For liInd = liPageCount To 1 Step -1
+                            lrPage = lrModel.Page(liInd - 1)
+
+                            Dim lr_enterprise_view As tEnterpriseEnterpriseView
+                            Dim loTreeNode As TreeNode
+                            lr_enterprise_view = New tEnterpriseEnterpriseView(pcenumMenuType.pageORMModel,
+                                                                       lrPage,
+                                                                       lrPage.Model.ModelId,
+                                                                       pcenumLanguage.ORMModel,
+                                                                       Nothing, lrPage.PageId)
 
 
 
-                        If IsSomething(prPageNodes.Find(AddressOf lr_enterprise_view.Equals)) Then
+                            If IsSomething(prPageNodes.Find(AddressOf lr_enterprise_view.Equals)) Then
 
-                            loTreeNode = prPageNodes.Find(AddressOf lr_enterprise_view.Equals).TreeNode
+                                loTreeNode = prPageNodes.Find(AddressOf lr_enterprise_view.Equals).TreeNode
 
-                            If loTreeNode Is Nothing Then
-                                Throw New System.Exception("Cannot find TreeNode for Page")
+                                If loTreeNode Is Nothing Then
+                                    Throw New System.Exception("Cannot find TreeNode for Page")
+                                End If
+
+                                If IsSomething(lrPage.Form) Then
+                                    Call lrPage.Form.Close()
+                                End If
+
+                                loTreeNode.Remove()
+
                             End If
 
-                            If IsSomething(lrPage.Form) Then
-                                Call lrPage.Form.Close()
-                            End If
+                            lrPage.RemoveFromModel()
+                        Next
 
-                            loTreeNode.Remove()
+                        Application.DoEvents()
+                        Call lrModel.RemoveFromDatabase()
 
+
+                        Dim lrTempNode As TreeNode = Me.TreeView.SelectedNode
+                        Me.TreeView.SelectedNode = Me.TreeView.Nodes(0)
+                        lrTempNode.Remove()
+
+                        Dim lrInterfaceModel As New Viev.FBM.Interface.Model
+                        lrInterfaceModel.ModelId = lrModel.ModelId
+
+                        If My.Settings.UseClientServer And My.Settings.InitialiseClient Then
+                            Dim lrBroadcast As New Viev.FBM.Interface.Broadcast
+                            lrBroadcast.Model = lrInterfaceModel
+                            Call prDuplexServiceClient.SendBroadcast([Interface].pcenumBroadcastType.DeleteModel, lrBroadcast)
                         End If
 
-                        lrPage.RemoveFromModel()
-                    Next
+                    End Using
 
-                    Application.DoEvents()
-                    Call lrModel.RemoveFromDatabase()
-
-
-                    Dim lrTempNode As TreeNode = Me.TreeView.SelectedNode
-                    Me.TreeView.SelectedNode = Me.TreeView.Nodes(0)
-                    lrTempNode.Remove()
-
-                    Dim lrInterfaceModel As New Viev.FBM.Interface.Model
-                    lrInterfaceModel.ModelId = lrModel.ModelId
-
-                    If My.Settings.UseClientServer And My.Settings.InitialiseClient Then
-                        Dim lrBroadcast As New Viev.FBM.Interface.Broadcast
-                        lrBroadcast.Model = lrInterfaceModel
-                        Call prDuplexServiceClient.SendBroadcast([Interface].pcenumBroadcastType.DeleteModel, lrBroadcast)
-                    End If
-
-                End Using
-
-            End If
-
+                End If
+            End With
         Catch ex As Exception
             Dim lsMessage1 As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
@@ -1918,6 +1939,9 @@ Public Class frmToolboxEnterpriseExplorer
         lsMessage &= vbCrLf & vbCrLf & "All Model Objects will be removed from the Model, '" & lrModel.Name & "'. This operation cannot be Undone."
 
         If MsgBox(lsMessage, MsgBoxStyle.YesNo + MsgBoxStyle.Critical) = MsgBoxResult.Yes Then
+
+            While (lrModel.Loading And Not lrModel.Loaded) Or lrModel.Page.FindAll(Function(x) x.Loading).Count > 0
+            End While
 
             '------------------------------------------------------------------------------------------------------------
             'Remove all the Pages for the Model.
@@ -2707,81 +2731,82 @@ Public Class frmToolboxEnterpriseExplorer
 
     End Sub
 
-    Public Sub LoadFBMXMLFile(ByVal asFilePathName As String)
+    '20200725-VM-Remove the below if all okay. Replaced with LoadFBMXMLFile2 in this document.
+    'Public Sub LoadFBMXMLFile(ByVal asFilePathName As String)
 
-        Try
-            If asFilePathName = "" Then
-                Exit Sub
-            End If
+    '    Try
+    '        If asFilePathName = "" Then
+    '            Exit Sub
+    '        End If
 
-            prApplication.ThrowErrorMessage("About to deserialise the model from .fbm file: " & asFilePathName, pcenumErrorType.Information)
+    '        prApplication.ThrowErrorMessage("About to deserialise the model from .fbm file: " & asFilePathName, pcenumErrorType.Information)
 
 
-            'Deserialize text file to a new object.
-            Dim objStreamReader As New StreamReader(asFilePathName)
-            Dim p2 As New XMLModel.Model
-            Dim x As New XmlSerializer(GetType(XMLModel.Model))
-            p2 = x.Deserialize(objStreamReader)
-            objStreamReader.Close()
+    '        'Deserialize text file to a new object.
+    '        Dim objStreamReader As New StreamReader(asFilePathName)
+    '        Dim p2 As New XMLModel.Model
+    '        Dim x As New XmlSerializer(GetType(XMLModel.Model))
+    '        p2 = x.Deserialize(objStreamReader)
+    '        objStreamReader.Close()
 
-            prApplication.ThrowErrorMessage("Successfully deserialised the model from .fbm file: " & asFilePathName, pcenumErrorType.Information)
+    '        prApplication.ThrowErrorMessage("Successfully deserialised the model from .fbm file: " & asFilePathName, pcenumErrorType.Information)
 
-            Dim lrModel As New FBM.Model
+    '        Dim lrModel As New FBM.Model
 
-            lrModel = p2.MapToFBMModel
+    '        lrModel = p2.MapToFBMModel
 
-            '====================================================================================
-            Dim lsMessage As String = ""
-            If TableModel.ExistsModelById(lrModel.ModelId) Then
-                lsMessage = "A Model with the Id: " & lrModel.ModelId
-                lsMessage &= vbCrLf & "already exists in the database."
-                lsMessage &= vbCrLf & vbCrLf
-                lsMessage &= "The Model that you are loading will be given a new Id. All Pages within the Model will also be given a new Id."
-                lsMessage &= vbCrLf & "NB The name of the Model ('" & lrModel.Name & "') will stay the same if there is no other Model in the database with the same name."
-                lrModel.ModelId = System.Guid.NewGuid.ToString
-                '---------------------------------------------------------------------------------------------
-                'All of the Page.Ids must be updated as well, as each PageId is unique in the database.
-                '  i.e. If the Model is not unique, there's a very good chance that neither are the PageIds.
-                '---------------------------------------------------------------------------------------------
-                Dim lrPage As FBM.Page
-                For Each lrPage In lrModel.Page
-                    lrPage.PageId = System.Guid.NewGuid.ToString
-                Next
+    '        '====================================================================================
+    '        Dim lsMessage As String = ""
+    '        If TableModel.ExistsModelById(lrModel.ModelId) Then
+    '            lsMessage = "A Model with the Id: " & lrModel.ModelId
+    '            lsMessage &= vbCrLf & "already exists in the database."
+    '            lsMessage &= vbCrLf & vbCrLf
+    '            lsMessage &= "The Model that you are loading will be given a new Id. All Pages within the Model will also be given a new Id."
+    '            lsMessage &= vbCrLf & "NB The name of the Model ('" & lrModel.Name & "') will stay the same if there is no other Model in the database with the same name."
+    '            lrModel.ModelId = System.Guid.NewGuid.ToString
+    '            '---------------------------------------------------------------------------------------------
+    '            'All of the Page.Ids must be updated as well, as each PageId is unique in the database.
+    '            '  i.e. If the Model is not unique, there's a very good chance that neither are the PageIds.
+    '            '---------------------------------------------------------------------------------------------
+    '            Dim lrPage As FBM.Page
+    '            For Each lrPage In lrModel.Page
+    '                lrPage.PageId = System.Guid.NewGuid.ToString
+    '            Next
 
-                lrModel.MakeDirty(False, True)
+    '            lrModel.MakeDirty(False, True)
 
-                MsgBox(lsMessage)
-            End If
+    '            MsgBox(lsMessage)
+    '        End If
 
-            If TableModel.ExistsModelByName(lrModel.Name) Then
-                lsMessage = "A Model with the Name: " & lrModel.Name
-                lsMessage &= vbCrLf & "already exists in the database."
-                lsMessage &= vbCrLf & vbCrLf
-                lrModel.Name = lrModel.CreateUniqueModelName(lrModel.Name, 0)
-                lsMessage &= "The Model that you are loading will be given the new Name: " & lrModel.Name
-                MsgBox(lsMessage)
-            End If
-            '====================================================================================
+    '        If TableModel.ExistsModelByName(lrModel.Name) Then
+    '            lsMessage = "A Model with the Name: " & lrModel.Name
+    '            lsMessage &= vbCrLf & "already exists in the database."
+    '            lsMessage &= vbCrLf & vbCrLf
+    '            lrModel.Name = lrModel.CreateUniqueModelName(lrModel.Name, 0)
+    '            lsMessage &= "The Model that you are loading will be given the new Name: " & lrModel.Name
+    '            MsgBox(lsMessage)
+    '        End If
+    '        '====================================================================================
 
-            prApplication.ThrowErrorMessage("Successfully mapped the model from .fbm file: " & asFilePathName, pcenumErrorType.Information)
+    '        prApplication.ThrowErrorMessage("Successfully mapped the model from .fbm file: " & asFilePathName, pcenumErrorType.Information)
 
-            '-----------------------------------------
-            'Update the TreeView
-            '-----------------------------------------
-            Call Me.AddModelToModelExplorer(lrModel, False)
+    '        '-----------------------------------------
+    '        'Update the TreeView
+    '        '-----------------------------------------
+    '        Call Me.AddModelToModelExplorer(lrModel, False)
 
-            Directory.SetCurrentDirectory(Richmond.MyPath)
+    '        Directory.SetCurrentDirectory(Richmond.MyPath)
 
-        Catch ex As Exception
-            Dim lsMessage As String
-            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+    '    Catch ex As Exception
+    '        Dim lsMessage As String
+    '        Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
-            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
-            lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
-        End Try
+    '        lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+    '        lsMessage &= vbCrLf & vbCrLf & ex.Message
+    '        prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+    '    End Try
 
-    End Sub
+    'End Sub
 
 
     Private Sub ContextMenuStrip_Page_Opening(ByVal sender As System.Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles ContextMenuStrip_Page.Opening
@@ -3207,35 +3232,44 @@ Public Class frmToolboxEnterpriseExplorer
 
     Private Sub ViewGlossaryToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ViewGlossaryToolStripMenuItem.Click
 
+        With New WaitCursor
+            While (prApplication.WorkingModel.Loading And Not prApplication.WorkingModel.Loaded) Or prApplication.WorkingModel.Page.FindAll(Function(x) x.Loading).Count > 0
+                WriteToStatusBar("Still loading the Model's Pages")
+            End While
 
-        Call frmMain.LoadGlossaryForm()
+            Call frmMain.LoadGlossaryForm()
+        End With
 
     End Sub
 
     Public Sub LoadProjects()
 
         Try
-            Dim lrProject As ClientServer.Project
-            Dim larProject As New List(Of ClientServer.Project)
 
-            Call tableClientServerProject.GetProjects(larProject, prApplication.User)
+            With New WaitCursor
 
-            Dim lrComboboxItem As tComboboxItem
+                Dim lrProject As ClientServer.Project
+                Dim larProject As New List(Of ClientServer.Project)
 
-            Me.zbLoadingProjects = True 'So that changing the Index item doesn't trigger loading Namespaces for each Project loaded
+                Call tableClientServerProject.GetProjects(larProject, prApplication.User)
 
-            lrProject = New ClientServer.Project("MyPersonalModels", "My Personal Models")
-            lrComboboxItem = New tComboboxItem(lrProject.Id, lrProject.Name, lrProject)
-            Me.ComboBoxProject.Items.Add(lrComboboxItem)
+                Dim lrComboboxItem As tComboboxItem
 
-            For Each lrProject In larProject
+                Me.zbLoadingProjects = True 'So that changing the Index item doesn't trigger loading Namespaces for each Project loaded
+
+                lrProject = New ClientServer.Project("MyPersonalModels", "My Personal Models")
                 lrComboboxItem = New tComboboxItem(lrProject.Id, lrProject.Name, lrProject)
                 Me.ComboBoxProject.Items.Add(lrComboboxItem)
-            Next
-            Me.zbLoadingProjects = False
+
+                For Each lrProject In larProject
+                    lrComboboxItem = New tComboboxItem(lrProject.Id, lrProject.Name, lrProject)
+                    Me.ComboBoxProject.Items.Add(lrComboboxItem)
+                Next
+                Me.zbLoadingProjects = False
 
 
-            Me.ComboBoxProject.SelectedIndex = Me.ComboBoxProject.FindString("My Personal Models")
+                Me.ComboBoxProject.SelectedIndex = Me.ComboBoxProject.FindString("My Personal Models")
+            End With
 
         Catch ex As Exception
             Dim lsMessage1 As String
@@ -3805,21 +3839,25 @@ Public Class frmToolboxEnterpriseExplorer
     Private Sub GenerateDocumentationToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles GenerateDocumentationToolStripMenuItem.Click
 
         Try
+            With New WaitCursor
 
-            Dim rd As Gios.Word.WordDocument = New WordDocument(WordDocumentFormat.Letter_8_5x11)
-            Dim lrFBMWordVerbaliser As New Boston.FBM.ORMWordVerbailser(rd)
+                While (prApplication.WorkingModel.Loading And Not prApplication.WorkingModel.Loaded) Or prApplication.WorkingModel.Page.FindAll(Function(x) x.Loading).Count > 0
+                End While
 
-            Dim lrFrmGetDocumentGenerationSettings As New frmDocumentGeneratorSettings
-            lrFrmGetDocumentGenerationSettings.zrORMWordVerbaliser = lrFBMWordVerbaliser
+                Dim rd As Gios.Word.WordDocument = New WordDocument(WordDocumentFormat.Letter_8_5x11)
+                Dim lrFBMWordVerbaliser As New Boston.FBM.ORMWordVerbailser(rd)
 
-            If lrFrmGetDocumentGenerationSettings.ShowDialog = Windows.Forms.DialogResult.OK Then
+                Dim lrFrmGetDocumentGenerationSettings As New frmDocumentGeneratorSettings
+                lrFrmGetDocumentGenerationSettings.zrORMWordVerbaliser = lrFBMWordVerbaliser
 
-                Using lrWaitCursor As New WaitCursor
-                    Call lrFBMWordVerbaliser.createWordDocument(prApplication.WorkingModel)
-                End Using
+                If lrFrmGetDocumentGenerationSettings.ShowDialog = Windows.Forms.DialogResult.OK Then
 
-            End If
+                    Using lrWaitCursor As New WaitCursor
+                        Call lrFBMWordVerbaliser.createWordDocument(prApplication.WorkingModel)
+                    End Using
 
+                End If
+            End With
         Catch ex As Exception
             Dim lsMessage1 As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
