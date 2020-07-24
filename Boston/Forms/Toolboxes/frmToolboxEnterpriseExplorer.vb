@@ -125,7 +125,8 @@ Public Class frmToolboxEnterpriseExplorer
 
             '--------------------------------------------------------------------------------------
             'If the User double-clicked on a .fbm file to start Boston, psStartupFBMFile is populated.
-            Call Me.LoadFBMXMLFile(psStartupFBMFile)
+            Call Me.loadFBMXMLFile2(psStartupFBMFile)
+            psStartupFBMFile = ""
 
             Me.LabelHelpTips.Text = "Right click on [Models] to add a new model."
 
@@ -2489,185 +2490,12 @@ Public Class frmToolboxEnterpriseExplorer
 
         If Me.DialogOpenFile.ShowDialog() = System.Windows.Forms.DialogResult.OK Then
 
-            'Deserialize text file to a new object.
-            Dim objStreamReader As New StreamReader(Me.DialogOpenFile.FileName)
-
             Try
-                frmMain.Cursor = Cursors.WaitCursor
-
-                '=====================================================================================================
-                'Find the version of the XML's XSD                        
-                Dim xml As XDocument = Nothing
-                Dim lsXSDVersionNr As String = ""
-                Dim lrModel As New FBM.Model
-
-                xml = XDocument.Load(Me.DialogOpenFile.FileName)
-
-                Richmond.WriteToStatusBar("Loading model.", True)
-
-                lsXSDVersionNr = xml.<Model>.@XSDVersionNr
-                '=====================================================================================================
-                Dim lrSerializer As XmlSerializer = Nothing
-                Select Case lsXSDVersionNr
-                    Case Is = "0.81"
-                        lrSerializer = New XmlSerializer(GetType(XMLModelv081.Model))
-                        Dim lrXMLModel As New XMLModelv081.Model
-                        lrXMLModel = lrSerializer.Deserialize(objStreamReader)
-                        objStreamReader.Close()
-                        lrModel = lrXMLModel.MapToFBMModel
-                    Case Is = "1"
-                        lrSerializer = New XmlSerializer(GetType(XMLModel1.Model))
-                        Dim lrXMLModel As New XMLModel1.Model
-                        lrXMLModel = lrSerializer.Deserialize(objStreamReader)
-                        objStreamReader.Close()
-                        lrModel = lrXMLModel.MapToFBMModel
-                    Case Is = "1.1"
-                        lrSerializer = New XmlSerializer(GetType(XMLModel11.Model))
-                        Dim lrXMLModel As New XMLModel11.Model
-                        lrXMLModel = lrSerializer.Deserialize(objStreamReader)
-                        objStreamReader.Close()
-                        lrModel = lrXMLModel.MapToFBMModel
-                    Case Is = "1.2"
-                        lrSerializer = New XmlSerializer(GetType(XMLModel12.Model))
-                        Dim lrXMLModel As New XMLModel12.Model
-                        lrXMLModel = lrSerializer.Deserialize(objStreamReader)
-                        objStreamReader.Close()
-                        lrModel = lrXMLModel.MapToFBMModel
-                    Case Is = "1.3"
-                        lrSerializer = New XmlSerializer(GetType(XMLModel13.Model))
-                        Dim lrXMLModel As New XMLModel13.Model
-                        lrXMLModel = lrSerializer.Deserialize(objStreamReader)
-                        objStreamReader.Close()
-
-                        lrModel = lrXMLModel.MapToFBMModel
-                    Case Is = "1.4"
-                        lrSerializer = New XmlSerializer(GetType(XMLModel14.Model))
-                        Dim lrXMLModel As New XMLModel14.Model
-                        lrXMLModel = lrSerializer.Deserialize(objStreamReader)
-                        objStreamReader.Close()
-                        lrModel = lrXMLModel.MapToFBMModel
-                    Case Is = "1.5"
-                        lrSerializer = New XmlSerializer(GetType(XMLModel15.Model))
-                        Dim lrXMLModel As New XMLModel15.Model
-                        lrXMLModel = lrSerializer.Deserialize(objStreamReader)
-                        objStreamReader.Close()
-                        lrModel = lrXMLModel.MapToFBMModel
-                    Case Is = "1.6"
-                        lrSerializer = New XmlSerializer(GetType(XMLModel16.Model))
-                        Dim lrXMLModel As New XMLModel16.Model
-                        lrXMLModel = lrSerializer.Deserialize(objStreamReader)
-                        objStreamReader.Close()
-                        lrModel = lrXMLModel.MapToFBMModel
-                    Case Is = "1.7"
-                        lrSerializer = New XmlSerializer(GetType(XMLModel.Model))
-                        Dim lrXMLModel As New XMLModel.Model
-                        lrXMLModel = lrSerializer.Deserialize(objStreamReader)
-                        objStreamReader.Close()
-                        lrModel = lrXMLModel.MapToFBMModel
-                End Select
-
-                If TableModel.ExistsModelById(lrModel.ModelId) Then
-                    lsMessage = "A Model with the Id: " & lrModel.ModelId
-                    lsMessage &= vbCrLf & "already exists in the database."
-                    lsMessage &= vbCrLf & vbCrLf
-                    lsMessage &= "The Model that you are loading will be given a new Id. All Pages within the Model will also be given a new Id."
-                    lsMessage &= vbCrLf & "NB The name of the Model ('" & lrModel.Name & "') will stay the same if there is no other Model in the database with the same name."
-                    lrModel.ModelId = System.Guid.NewGuid.ToString
-                    '---------------------------------------------------------------------------------------------
-                    'All of the Page.Ids must be updated as well, as each PageId is unique in the database.
-                    '  i.e. If the Model is not unique, there's a very good chance that neither are the PageIds.
-                    '---------------------------------------------------------------------------------------------
-                    Dim lrPage As FBM.Page
-                    For Each lrPage In lrModel.Page
-                        lrPage.PageId = System.Guid.NewGuid.ToString
-                    Next
-
-                    lrModel.MakeDirty(False, True)
-
-                    MsgBox(lsMessage)
-                End If
-
-                If TableModel.ExistsModelByName(lrModel.Name) Then
-                    lsMessage = "A Model with the Name: " & lrModel.Name
-                    lsMessage &= vbCrLf & "already exists in the database."
-                    lsMessage &= vbCrLf & vbCrLf
-                    lrModel.Name = lrModel.CreateUniqueModelName(lrModel.Name, 0)
-                    lsMessage &= "The Model that you are loading will be given the new Name: " & lrModel.Name
-                    MsgBox(lsMessage)
-                End If
-
-                If My.Settings.UseClientServer And (prApplication.User IsNot Nothing) Then
-                    lrModel.CreatedByUserId = prApplication.User.Id
-                End If
-
-                '-----------------------------------------
-                'Update the TreeView
-                '-----------------------------------------
-                Dim lrNewTreeNode = Me.AddModelToModelExplorer(lrModel, False)
-
-                lrNewTreeNode.Expand()
-                Me.TreeView.Nodes(0).Nodes(Me.TreeView.Nodes(0).Nodes.Count - 1).EnsureVisible()
-
-                Richmond.WriteToStatusBar("Saving model.", True)
-                Dim lfrmFlashCard As New frmFlashCard
-                lfrmFlashCard.ziIntervalMilliseconds = 1500
-                lfrmFlashCard.zsText = "Saving model."
-                lfrmFlashCard.Show(frmMain)
-
-                Me.Focus()
-                Call lrModel.Save(True)
-
-                '================================================================================================================
-                'RDS
-                If (lrModel.ModelId <> "Core") And lrModel.HasCoreModel Then
-                    Call lrModel.PopulateRDSStructureFromCoreMDAElements()
-                ElseIf (lrModel.ModelId <> "Core") Then
-                    '==================================================
-                    'RDS - Create a CMML Page and then dispose of it.
-                    Dim lrPage As FBM.Page '(lrModel)
-                    Dim lrCorePage As FBM.Page
-
-                    lrCorePage = prApplication.CMML.Core.Page.Find(Function(x) x.Name = pcenumCMMLCorePage.CoreEntityRelationshipDiagram.ToString) 'AddressOf lrCorePage.EqualsByName)
-
-                    If lrCorePage Is Nothing Then
-                        Throw New Exception("Couldn't find Page, '" & pcenumCMMLCorePage.CoreEntityRelationshipDiagram.ToString & "', in the Core Model.")
-                    End If
-
-                    lrPage = lrCorePage.Clone(lrModel, False, True, False) 'Clone the Page Model Elements for the EntityRelationshipDiagram into the metamodel
-
-                    'StateTransitionDiagrams
-                    lrCorePage = prApplication.CMML.Core.Page.Find(Function(x) x.Name = pcenumCMMLCorePage.CoreStateTransitionDiagram.ToString) 'AddressOf lrCorePage.EqualsByName)
-
-                    If lrCorePage Is Nothing Then
-                        Throw New Exception("Couldn't find Page, '" & pcenumCMMLCorePage.CoreStateTransitionDiagram.ToString & "', in the Core Model.")
-                    End If
-
-                    lrPage = lrCorePage.Clone(lrModel, False, True, False) 'Clone the Page Model Elements for the StateTransitionDiagram into the metamodel
-                    '==================================================
-
-                    Call lrModel.createEntityRelationshipArtifacts()
-                    Call lrModel.PopulateRDSStructureFromCoreMDAElements()
-
-                    lfrmFlashCard = New frmFlashCard
-                    lfrmFlashCard.ziIntervalMilliseconds = 3500
-                    lfrmFlashCard.zsText = "Saving model."
-                    lfrmFlashCard.Show(Me)
-                    Richmond.WriteToStatusBar("Saving model.", True)
-                    Call lrModel.Save()
-                End If
-
-                frmMain.Cursor = Cursors.Default
-
-                'Baloon Tooltip
-                lsMessage = "Loaded"
-                Me.zrToolTip.IsBalloon = True
-                Me.zrToolTip.ToolTipIcon = ToolTipIcon.None
-                Me.zrToolTip.ShowAlways = True
-                Me.zrToolTip.Active = True 'turns On the tooltip
-                Me.zrToolTip.AutomaticDelay = 0 'some auto value that will fill others With Default values
-                Me.zrToolTip.AutoPopDelay = 3000 'how Long it will stay before vanishing
-                Me.zrToolTip.InitialDelay = 0 'how Long you need To keep your mouse cursor still before it reacts                
-                Me.zrToolTip.Show(lsMessage, Me, lrNewTreeNode.Bounds.X, lrNewTreeNode.Bounds.Y + 20 + lrNewTreeNode.Bounds.Height, 4000)
+                With New WaitCursor
+                    '=====================================================================================================
+                    'Find the version of the XML's XSD                        
+                    Call Me.loadFBMXMLFile2(Me.DialogOpenFile.FileName)
+                End With
 
             Catch ex As Exception
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
@@ -2680,6 +2508,202 @@ Public Class frmToolboxEnterpriseExplorer
             End Try
 
         End If
+
+    End Sub
+
+    Public Sub loadFBMXMLFile2(ByVal asFileName As String)
+
+        Try
+            Dim xml As XDocument = Nothing
+            Dim lsXSDVersionNr As String = ""
+            Dim lrModel As New FBM.Model
+            Dim lsMessage As String
+
+            If asFileName = "" Then
+                Exit Sub
+            End If
+
+            'Deserialize text file to a new object.
+            Dim objStreamReader As New StreamReader(asFileName)
+
+            xml = XDocument.Load(asFileName)
+
+            Richmond.WriteToStatusBar("Loading model.", True)
+
+            lsXSDVersionNr = xml.<Model>.@XSDVersionNr
+            '=====================================================================================================
+            Dim lrSerializer As XmlSerializer = Nothing
+            Select Case lsXSDVersionNr
+                Case Is = "0.81"
+                    lrSerializer = New XmlSerializer(GetType(XMLModelv081.Model))
+                    Dim lrXMLModel As New XMLModelv081.Model
+                    lrXMLModel = lrSerializer.Deserialize(objStreamReader)
+                    objStreamReader.Close()
+                    lrModel = lrXMLModel.MapToFBMModel
+                Case Is = "1"
+                    lrSerializer = New XmlSerializer(GetType(XMLModel1.Model))
+                    Dim lrXMLModel As New XMLModel1.Model
+                    lrXMLModel = lrSerializer.Deserialize(objStreamReader)
+                    objStreamReader.Close()
+                    lrModel = lrXMLModel.MapToFBMModel
+                Case Is = "1.1"
+                    lrSerializer = New XmlSerializer(GetType(XMLModel11.Model))
+                    Dim lrXMLModel As New XMLModel11.Model
+                    lrXMLModel = lrSerializer.Deserialize(objStreamReader)
+                    objStreamReader.Close()
+                    lrModel = lrXMLModel.MapToFBMModel
+                Case Is = "1.2"
+                    lrSerializer = New XmlSerializer(GetType(XMLModel12.Model))
+                    Dim lrXMLModel As New XMLModel12.Model
+                    lrXMLModel = lrSerializer.Deserialize(objStreamReader)
+                    objStreamReader.Close()
+                    lrModel = lrXMLModel.MapToFBMModel
+                Case Is = "1.3"
+                    lrSerializer = New XmlSerializer(GetType(XMLModel13.Model))
+                    Dim lrXMLModel As New XMLModel13.Model
+                    lrXMLModel = lrSerializer.Deserialize(objStreamReader)
+                    objStreamReader.Close()
+
+                    lrModel = lrXMLModel.MapToFBMModel
+                Case Is = "1.4"
+                    lrSerializer = New XmlSerializer(GetType(XMLModel14.Model))
+                    Dim lrXMLModel As New XMLModel14.Model
+                    lrXMLModel = lrSerializer.Deserialize(objStreamReader)
+                    objStreamReader.Close()
+                    lrModel = lrXMLModel.MapToFBMModel
+                Case Is = "1.5"
+                    lrSerializer = New XmlSerializer(GetType(XMLModel15.Model))
+                    Dim lrXMLModel As New XMLModel15.Model
+                    lrXMLModel = lrSerializer.Deserialize(objStreamReader)
+                    objStreamReader.Close()
+                    lrModel = lrXMLModel.MapToFBMModel
+                Case Is = "1.6"
+                    lrSerializer = New XmlSerializer(GetType(XMLModel16.Model))
+                    Dim lrXMLModel As New XMLModel16.Model
+                    lrXMLModel = lrSerializer.Deserialize(objStreamReader)
+                    objStreamReader.Close()
+                    lrModel = lrXMLModel.MapToFBMModel
+                Case Is = "1.7"
+                    lrSerializer = New XmlSerializer(GetType(XMLModel.Model))
+                    Dim lrXMLModel As New XMLModel.Model
+                    lrXMLModel = lrSerializer.Deserialize(objStreamReader)
+                    objStreamReader.Close()
+                    lrModel = lrXMLModel.MapToFBMModel
+            End Select
+
+            If TableModel.ExistsModelById(lrModel.ModelId) Then
+                lsMessage = "A Model with the Id: " & lrModel.ModelId
+                lsMessage &= vbCrLf & "already exists in the database."
+                lsMessage &= vbCrLf & vbCrLf
+                lsMessage &= "The Model that you are loading will be given a new Id. All Pages within the Model will also be given a new Id."
+                lsMessage &= vbCrLf & "NB The name of the Model ('" & lrModel.Name & "') will stay the same if there is no other Model in the database with the same name."
+                lrModel.ModelId = System.Guid.NewGuid.ToString
+                '---------------------------------------------------------------------------------------------
+                'All of the Page.Ids must be updated as well, as each PageId is unique in the database.
+                '  i.e. If the Model is not unique, there's a very good chance that neither are the PageIds.
+                '---------------------------------------------------------------------------------------------
+                Dim lrPage As FBM.Page
+                For Each lrPage In lrModel.Page
+                    lrPage.PageId = System.Guid.NewGuid.ToString
+                Next
+
+                lrModel.MakeDirty(False, True)
+
+                MsgBox(lsMessage)
+            End If
+
+            If TableModel.ExistsModelByName(lrModel.Name) Then
+                lsMessage = "A Model with the Name: " & lrModel.Name
+                lsMessage &= vbCrLf & "already exists in the database."
+                lsMessage &= vbCrLf & vbCrLf
+                lrModel.Name = lrModel.CreateUniqueModelName(lrModel.Name, 0)
+                lsMessage &= "The Model that you are loading will be given the new Name: " & lrModel.Name
+                MsgBox(lsMessage)
+            End If
+
+            If My.Settings.UseClientServer And (prApplication.User IsNot Nothing) Then
+                lrModel.CreatedByUserId = prApplication.User.Id
+            End If
+
+            '-----------------------------------------
+            'Update the TreeView
+            '-----------------------------------------
+            Dim lrNewTreeNode = Me.AddModelToModelExplorer(lrModel, False)
+
+            lrNewTreeNode.Expand()
+            Me.TreeView.Nodes(0).Nodes(Me.TreeView.Nodes(0).Nodes.Count - 1).EnsureVisible()
+
+            Richmond.WriteToStatusBar("Saving model.", True)
+            Dim lfrmFlashCard As New frmFlashCard
+            lfrmFlashCard.ziIntervalMilliseconds = 1500
+            lfrmFlashCard.zsText = "Saving model."
+            lfrmFlashCard.Show(frmMain)
+
+            Me.Focus()
+            Call lrModel.Save(True)
+
+            '================================================================================================================
+            'RDS
+            If (lrModel.ModelId <> "Core") And lrModel.HasCoreModel Then
+                Call lrModel.PopulateRDSStructureFromCoreMDAElements()
+            ElseIf (lrModel.ModelId <> "Core") Then
+                '==================================================
+                'RDS - Create a CMML Page and then dispose of it.
+                Dim lrPage As FBM.Page '(lrModel)
+                Dim lrCorePage As FBM.Page
+
+                lrCorePage = prApplication.CMML.Core.Page.Find(Function(x) x.Name = pcenumCMMLCorePage.CoreEntityRelationshipDiagram.ToString) 'AddressOf lrCorePage.EqualsByName)
+
+                If lrCorePage Is Nothing Then
+                    Throw New Exception("Couldn't find Page, '" & pcenumCMMLCorePage.CoreEntityRelationshipDiagram.ToString & "', in the Core Model.")
+                End If
+
+                lrPage = lrCorePage.Clone(lrModel, False, True, False) 'Clone the Page Model Elements for the EntityRelationshipDiagram into the metamodel
+
+                'StateTransitionDiagrams
+                lrCorePage = prApplication.CMML.Core.Page.Find(Function(x) x.Name = pcenumCMMLCorePage.CoreStateTransitionDiagram.ToString) 'AddressOf lrCorePage.EqualsByName)
+
+                If lrCorePage Is Nothing Then
+                    Throw New Exception("Couldn't find Page, '" & pcenumCMMLCorePage.CoreStateTransitionDiagram.ToString & "', in the Core Model.")
+                End If
+
+                lrPage = lrCorePage.Clone(lrModel, False, True, False) 'Clone the Page Model Elements for the StateTransitionDiagram into the metamodel
+                '==================================================
+
+                Call lrModel.createEntityRelationshipArtifacts()
+                Call lrModel.PopulateRDSStructureFromCoreMDAElements()
+
+                lfrmFlashCard = New frmFlashCard
+                lfrmFlashCard.ziIntervalMilliseconds = 3500
+                lfrmFlashCard.zsText = "Saving model."
+                lfrmFlashCard.Show(Me)
+                Richmond.WriteToStatusBar("Saving model.", True)
+                Call lrModel.Save()
+            End If
+
+            frmMain.Cursor = Cursors.Default
+
+            'Baloon Tooltip
+            lsMessage = "Loaded"
+            Me.zrToolTip.IsBalloon = True
+            Me.zrToolTip.ToolTipIcon = ToolTipIcon.None
+            Me.zrToolTip.ShowAlways = True
+            Me.zrToolTip.Active = True 'turns On the tooltip
+            Me.zrToolTip.AutomaticDelay = 0 'some auto value that will fill others With Default values
+            Me.zrToolTip.AutoPopDelay = 3000 'how Long it will stay before vanishing
+            Me.zrToolTip.InitialDelay = 0 'how Long you need To keep your mouse cursor still before it reacts                
+            Me.zrToolTip.Show(lsMessage, Me, lrNewTreeNode.Bounds.X, lrNewTreeNode.Bounds.Y + 20 + lrNewTreeNode.Bounds.Height, 4000)
+
+        Catch ex As Exception
+            Dim lsMessage1 As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            frmMain.Cursor = Cursors.Default
+
+            lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 
