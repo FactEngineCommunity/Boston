@@ -22,13 +22,14 @@ Partial Class frmAbout
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        Me.button_close = New System.Windows.Forms.Button
-        Me.labelprompt_rosters = New System.Windows.Forms.Label
-        Me.label_versioning = New System.Windows.Forms.Label
-        Me.label_details = New System.Windows.Forms.Label
-        Me.PictureBox2 = New System.Windows.Forms.PictureBox
-        Me.LabelPromptLicenses = New System.Windows.Forms.Label
-        Me.Label1 = New System.Windows.Forms.Label
+        Me.button_close = New System.Windows.Forms.Button()
+        Me.labelprompt_rosters = New System.Windows.Forms.Label()
+        Me.label_versioning = New System.Windows.Forms.Label()
+        Me.label_details = New System.Windows.Forms.Label()
+        Me.PictureBox2 = New System.Windows.Forms.PictureBox()
+        Me.LabelPromptLicenses = New System.Windows.Forms.Label()
+        Me.Label1 = New System.Windows.Forms.Label()
+        Me.LabelCategory = New System.Windows.Forms.Label()
         CType(Me.PictureBox2, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
@@ -101,6 +102,15 @@ Partial Class frmAbout
         Me.Label1.TabIndex = 10
         Me.Label1.Text = "support@viev.com"
         '
+        'LabelCategory
+        '
+        Me.LabelCategory.AutoSize = True
+        Me.LabelCategory.Location = New System.Drawing.Point(143, 33)
+        Me.LabelCategory.Name = "LabelCategory"
+        Me.LabelCategory.Size = New System.Drawing.Size(75, 13)
+        Me.LabelCategory.TabIndex = 11
+        Me.LabelCategory.Text = "LabelCategory"
+        '
         'frmAbout
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -108,6 +118,7 @@ Partial Class frmAbout
         Me.BackColor = System.Drawing.Color.White
         Me.ClientSize = New System.Drawing.Size(328, 219)
         Me.ControlBox = False
+        Me.Controls.Add(Me.LabelCategory)
         Me.Controls.Add(Me.Label1)
         Me.Controls.Add(Me.LabelPromptLicenses)
         Me.Controls.Add(Me.PictureBox2)
@@ -130,4 +141,5 @@ Partial Class frmAbout
     Friend WithEvents PictureBox2 As System.Windows.Forms.PictureBox
     Friend WithEvents LabelPromptLicenses As System.Windows.Forms.Label
     Friend WithEvents Label1 As System.Windows.Forms.Label
+    Friend WithEvents LabelCategory As Label
 End Class
