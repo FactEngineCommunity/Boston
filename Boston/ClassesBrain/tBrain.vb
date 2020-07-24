@@ -218,7 +218,7 @@ Public Class tBrain
         '--------------------------------------------------
         If check_what_can_i_say(Me.InputBuffer) Then
             For Each lsString In Me.CommandList
-                Me.send_data(lsString)
+                Me.send_data(lsString, False, True)
             Next
             Exit Sub
         End If
@@ -269,7 +269,7 @@ Public Class tBrain
 
     End Sub
 
-    Public Sub send_data(ByVal asData As String, Optional ByVal ab_is_echo As Boolean = False)
+    Public Sub send_data(ByVal asData As String, Optional ByVal ab_is_echo As Boolean = False, Optional abSuppressLineLimit As Boolean = False)
 
         Dim lsString As String = ""
 
@@ -307,10 +307,32 @@ Public Class tBrain
 
         Me.OutputChannel.AppendText(lsString & vbCrLf)
 
+        '======================================================================
+        '20200725-VM Test to see if can limit the number of lines in the textbox
+        Try
+            Dim numOfLines As Integer = 10
+            Dim loTextBox As RichTextBox = Me.OutputChannel
+            Dim lines As List(Of String) = loTextBox.Lines.ToList
+            If (lines.Count > numOfLines) And Not abSuppressLineLimit Then
+                Me.OutputChannel.Select(0, Me.OutputChannel.GetFirstCharIndexFromLine(Viev.Greater(1, (loTextBox.Lines.Count - numOfLines) - 1))) 'Select the first line
+                Me.OutputChannel.SelectedText = ""
+            End If
+        Catch ex As Exception
+        End Try
+        '-------------------------------------------------------
+
         Me.OutputChannel.SelectionStart = Me.OutputChannel.Text.Length
         Me.OutputChannel.ScrollToCaret()
 
     End Sub
+
+    Private Function ColorForLine(Line As String) As Color
+        If Line.StartsWith("Briana") Then
+            Return Color.Blue
+        Else
+            Return Color.Black
+        End If
+    End Function
 
 #End Region
 

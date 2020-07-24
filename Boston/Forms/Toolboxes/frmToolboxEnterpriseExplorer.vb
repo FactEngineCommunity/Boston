@@ -1492,8 +1492,9 @@ Public Class frmToolboxEnterpriseExplorer
 
     Private Sub ToolStripMenuItemAddModel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripMenuItemAddModel.Click
 
-
-        Call Me.addNewModelToBoston()
+        With New WaitCursor
+            Call Me.addNewModelToBoston()
+        End With
 
     End Sub
 

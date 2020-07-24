@@ -2057,7 +2057,6 @@ Namespace FBM
                     Next
                 Next
 
-
                 If larColumnsAffected.Count > 0 Then
 
                     '==================================================

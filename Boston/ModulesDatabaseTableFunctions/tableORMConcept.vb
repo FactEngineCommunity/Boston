@@ -26,6 +26,19 @@
 
         End Sub
 
+        Public Sub addConceptWhereNotExists()
+
+            '20200725-This works and is very fast
+            '        INSERT INTO MetaModelConcept (Symbol)
+            'Select Case TOP 1 'Hi there' AS Symbol  
+            'From MetaModelConcept
+            'Where
+            '  Not EXISTS(SELECT TOP 1 Symbol 
+            '                From MetaModelConcept
+            '                Where Symbol = 'Hi there');
+
+        End Sub
+
         ''' <summary>
         ''' Deletes any Concepts no longer required by any Model/Page within Richmond.
         ''' </summary>

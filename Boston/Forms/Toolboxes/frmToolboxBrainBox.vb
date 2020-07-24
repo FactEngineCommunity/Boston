@@ -284,6 +284,17 @@ Public Class frmToolboxBrainBox
                 End If
                 e.Handled = True
             Case Is = Keys.Down  'DownArrow
+                '============================================
+                'If Optionals exist, then show AutoComplete
+
+                Me.zrTextHighlighter.Tree = Me.zrParser.Parse(Me.TextBoxInput.Text)
+                If (Me.zrTextHighlighter.Tree.Errors.Count > 0) Or (Me.zrTextHighlighter.Tree.Optionals.Count > 0) Then
+                    Call Me.ProcessAutoComplete()
+                    e.Handled = True
+                    Exit Sub
+                End If
+
+                '======================================
                 If Me.inputbuffer.Count > 0 Then
                     Me.inputbuffer_pointer -= 1
                     If Me.inputbuffer_pointer < 0 Then Me.inputbuffer_pointer = Me.inputbuffer.Count - 1
