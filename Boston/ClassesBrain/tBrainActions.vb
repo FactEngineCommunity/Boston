@@ -199,6 +199,15 @@ Partial Public Class tBrain
 
             Dim lrFactTypeReading As New FBM.FactTypeReading(lrFactType, larRole, Me.CurrentQuestion.sentence)
             lrFactTypeReading.IsPreferred = True
+
+            '====================================================================
+            'Check to see that the FactType doesn't clash with another FactType
+            Dim lrClashFactType = Me.Model.getFactTypeByModelObjectsFactTypeReading(larModelObject, lrFactTypeReading)
+            If lrClashFactType IsNot Nothing Then
+                Call Me.send_data("A Fact Type already exists with the Fact Type Reading, '" & lrFactTypeReading.GetReadingText & "'.")
+                Return False
+            End If
+
             Call lrFactType.AddFactTypeReading(lrFactTypeReading, False, True)
 
             If lrFactType.MakeNameFromFactTypeReadings <> lrFactType.Id Then

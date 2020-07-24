@@ -1677,6 +1677,55 @@ Namespace FBM
         End Function
 
         ''' <summary>
+        ''' Returns a FactType, else Nothing, if the list of ModelObjects and FactTypeReading match.
+        '''   * Used to thwart attempts to create more than one FactType with the same reading.
+        ''' </summary>
+        ''' <param name="aarModelObject"></param>
+        ''' <param name="arFactTypeReading"></param>
+        ''' <returns></returns>
+        Public Function getFactTypeByModelObjectsFactTypeReading(ByVal aarModelObject As List(Of FBM.ModelObject), ByVal arFactTypeReading As FBM.FactTypeReading) As FBM.FactType
+
+            Try
+                '---------------------------------------------------
+                'Check to see if the ModelObjects are in the FactType
+                Dim larFactType = From FactType In Me.FactType
+                                  Where FactType.RoleGroup.Count = aarModelObject.Count
+                                  From Role In FactType.RoleGroup
+                                  From ModelObject In aarModelObject
+                                  Where Role.JoinedORMObject.Id = ModelObject.Id
+                                  Select FactType Distinct
+
+                If larFactType.Count = 0 Then
+                    Return Nothing
+                Else
+                    Dim larFTRFactType = From FactType In larFactType
+                                         From FactTypeReading In FactType.FactTypeReading
+                                         Where arFactTypeReading.EqualsByRoleJoinedModelObjectSequence(FactTypeReading)
+                                         Select FactType
+
+                    If larFTRFactType.Count = 0 Then
+                        Return Nothing
+                    Else
+                        Return larFTRFactType.First
+                    End If
+                End If
+
+                Return Nothing
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return Nothing
+            End Try
+
+        End Function
+
+        ''' <summary>
         ''' Creates a random fact for the specified FactType.
         ''' </summary>
         ''' <param name="arFactType">The FactType for which a random Fact will be created.</param>
