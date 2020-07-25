@@ -87,6 +87,11 @@ Namespace RDS
                 arColumn.OrdinalPosition = Me.Column.Count + 1
                 arColumn.Table = Me 'CodeSafe
 
+                'CodeSafe: Don't add the Column if it already exists.
+                If Me.Column.Contains(arColumn) Then
+                    Exit Sub
+                End If
+
                 Me.Column.AddUnique(arColumn)
 
                 If arColumn.Role.isRDSForeignKeyRole Then

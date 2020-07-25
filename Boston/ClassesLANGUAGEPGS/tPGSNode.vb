@@ -423,6 +423,16 @@ Namespace PGS
         Private Sub RDSTable_ColumnAdded(ByRef arColumn As Column) Handles RDSTable.ColumnAdded
             Call Me.Page.AddAttributeToEntity(arColumn)
         End Sub
+
+        Private Sub RDSTable_NameChanged(asNewName As String) Handles RDSTable.NameChanged
+
+            Me.Id = asNewName
+            Me.Name = asNewName
+            Me.Shape.Text = asNewName
+            Call Me.Page.Diagram.Invalidate()
+
+        End Sub
+
     End Class
 
 End Namespace

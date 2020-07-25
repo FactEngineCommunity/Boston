@@ -10,10 +10,10 @@ Namespace ERD
 
         Public Entity As ERD.Entity
 
-        <CategoryAttribute("Name"), _
-        [ReadOnly](True), _
-        DefaultValueAttribute(GetType(String), ""), _
-        DescriptionAttribute("A unique Name for the model object.")> _
+        <CategoryAttribute("Name"),
+        [ReadOnly](True),
+        DefaultValueAttribute(GetType(String), ""),
+        DescriptionAttribute("A unique Name for the model object.")>
         Public Overrides Property Name() As String
             Get
                 Return Me._AttributeName

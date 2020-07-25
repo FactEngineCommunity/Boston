@@ -72,7 +72,12 @@ Namespace RDS
                 Dim lrTable As RDS.Table = arTable
                 'CodeSafe - Check that the Table doesn't already exist
                 If Me.Table.Find(Function(x) x.Name = lrTable.Name) IsNot Nothing Then
-                    Throw New Exception("Table with name, " & arTable.Name & ", already exists in the Relational Data Structure.")
+                    'CodeSafe: Set arTable to the existing Table.
+                    '20200725-VM-This might not be the right strategy. Need to revisit. Why is a Table being created that already exists.
+                    'See FBM.FactType.Objectify for ManyToOne FactType.
+                    arTable = Me.Table.Find(Function(x) x.Name = lrTable.Name)
+                    Exit Sub
+                    'Throw New Exception("Table with name, " & arTable.Name & ", already exists in the Relational Data Structure.")
                 End If
 
                 Me.Table.AddUnique(arTable)

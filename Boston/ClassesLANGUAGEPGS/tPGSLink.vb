@@ -230,7 +230,9 @@ Namespace PGS
                         Me.Link.BaseShape = ArrowHead.None
 
                         Dim lrFactType As FBM.FactType
-                        If Me.RDSRelation.ResponsibleFactType.LinkFactTypeRole.FactType.Arity = 2 Then
+                        If Me.RDSRelation.ResponsibleFactType.LinkFactTypeRole Is Nothing Then
+                            lrFactType = Me.RDSRelation.ResponsibleFactType
+                        ElseIf Me.RDSRelation.ResponsibleFactType.LinkFactTypeRole.FactType.Arity = 2 Then
                             lrFactType = Me.RDSRelation.ResponsibleFactType.LinkFactTypeRole.FactType
                         Else
                             lrFactType = Me.RDSRelation.ResponsibleFactType
@@ -400,7 +402,7 @@ Namespace PGS
                 Me.Page.Diagram.Links.Remove(Me.Link)
 
                 Dim lrDiagramingLink As MindFusion.Diagramming.DiagramLink = Me.Link
-
+                Me.Page.Diagram.Links.Remove(lrDiagramingLink)
                 lrDiagramingLink.Dispose()
                 Me.Page.Diagram.Invalidate()
 

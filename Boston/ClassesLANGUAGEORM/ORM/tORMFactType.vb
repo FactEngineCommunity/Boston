@@ -3209,9 +3209,11 @@ Namespace FBM
                 '====================================================================
                 'RDS
                 If Me.IsManyTo1BinaryFactType Then
-                    'Special case. Need to remove the existing RDS.Relation and create a RDS.Table that is a PGSRelationNode
-                    Dim lrRelation As RDS.Relation = Me.Model.RDS.getRelationByResponsibleFactType(Me)
 
+                    '--------------------------------------------------------
+                    'Special case. Need to remove the existing RDS.Relation
+                    '  and create a RDS.Table that is a PGSRelationNode
+                    Dim lrRelation As RDS.Relation = Me.Model.RDS.getRelationByResponsibleFactType(Me)
                     Call Me.Model.RDS.removeRelation(lrRelation)
 
                     Dim lrTable As New RDS.Table(Me.Model.RDS, Me.Name, Me)

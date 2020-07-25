@@ -288,7 +288,6 @@ Public Class frmDiagramPGS
             '--------------------
             Dim lsSQLQuery As String = ""
             Dim lrRecordset As ORMQL.Recordset
-            Dim lrRecordset2 As ORMQL.Recordset
 
             lsSQLQuery = "SELECT *"
             lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreElementHasElementType.ToString
@@ -1634,6 +1633,8 @@ Public Class frmDiagramPGS
 
     Private Sub DiagramView_DragDrop(ByVal sender As Object, ByVal e As System.Windows.Forms.DragEventArgs) Handles DiagramView.DragDrop
 
+        Dim lsMessage As String
+
         If e.Data.GetDataPresent(tShapeNodeDragItem.DraggedItemObjectType) Then
 
             '------------------------------------------------------------------------------------------------------------------------------------
@@ -1650,6 +1651,17 @@ Public Class frmDiagramPGS
 
                 Dim lrTable As RDS.Table
                 lrTable = loDraggedNode.Tag
+
+                Dim lrClashNode = Me.zrPage.ERDiagram.Entity.Find(Function(x) x.Name = lrTable.Name)
+                If lrClashNode IsNot Nothing Then
+                    'The Node is already on the Page.
+                    lsMessage = "This Page already contains a Node with the name, '" & lrTable.Name & "'."
+                    If lrClashNode.getCorrespondingRDSTable.isPGSRelation Then
+                        lsMessage &= vbCrLf & vbCrLf & "If the existing Node is not visible it is because it is represented by an Edge/Relation."
+                    End If
+                    MsgBox(lsMessage)
+                    Exit Sub
+                End If
 
                 '------------------
                 'Load the Entity.
@@ -1681,10 +1693,7 @@ Public Class frmDiagramPGS
                 Call Me.zrPage.loadPropertyRelationsForPGSNode(lrNode)
             End If
 
-
         End If
-
-
 
     End Sub
 

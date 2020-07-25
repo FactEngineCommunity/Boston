@@ -69,7 +69,13 @@ Namespace FBM
                     lrERDRelation.IsPGSRelationNode = True
                     Dim lrOriginatingNode = arOriginatingNode
                     lrERDRelation.ActualPGSNode = Me.ERDiagram.Entity.Find(Function(x) x.Id = lrOriginatingNode.Id)
-                    lrERDRelation.ActualPGSNode.PGSRelation = lrERDRelation
+
+                    Try
+                        lrERDRelation.ActualPGSNode.PGSRelation = lrERDRelation
+                    Catch ex As Exception
+                        Call prApplication.ThrowErrorMessage("Node with name, '" & arOriginatingNode.Name & "', is not on Page, '" & Me.Name & "'", pcenumErrorType.Warning)
+                    End Try
+
 
                     'NB Even though the RDSRelation is stored against the Link (below), the Predicates for the Link come from the ResponsibleFactType.
                     '  because the relation is actually a PGSRelationNode.                    
@@ -92,7 +98,8 @@ Namespace FBM
 
                     lrLink.DisplayAndAssociate()
 
-                    lrLink.Link.Text = lrERDRelation.ActualPGSNode.Id
+                    Call lrLink.setPredicate() '20200725-VM-Remove the following if all seems okay....Text = lrERDRelation.ActualPGSNode.Id
+                    Call lrLink.setHeadShapes()
                     lrLink.Relation.Link = lrLink
                     lrERDRelation.Link = lrLink
                     If Me.ERDiagram.Relation.FindAll(Function(x) x.Id = lrERDRelation.Id).Count = 0 Then ERDiagram.Relation.AddUnique(lrERDRelation)
@@ -237,7 +244,8 @@ Namespace FBM
                                 lrLink = New PGS.Link(Me, New FBM.FactInstance, lrOriginEntity, lrDestinationEntity, Nothing, Nothing, lrERDRelation)
                                 lrLink.RDSRelation = arRelation
                                 lrLink.DisplayAndAssociate()
-                                'lrLink.Link.Text = arRelation.ActualPGSNode.Id
+                                Call lrLink.setPredicate()
+                                Call lrLink.setHeadShapes()
 
                         End Select
 
