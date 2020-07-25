@@ -9434,9 +9434,25 @@ Public Class frmDiagramORM
 
     Private Sub PropertyGraphSchemaToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles PropertyGraphSchemaToolStripMenuItem.Click
 
+        Dim lsMessage As String
+
+        '====================================================================================
+        'Check to see that there are no Entity Types on this Page with no Reference Scheme
+        Dim larEntityTypeInstance As New List(Of FBM.EntityTypeInstance)
+        If Me.zrPage.hasEntityTypeInstancessWithoutReferenceScheme(larEntityTypeInstance) Then
+            lsMessage = "There are Entity Types on this Page that have no Reference Scheme."
+            lsMessage &= vbCrLf & vbCrLf & "Create a Reference Scheme for the following Entity Types before convertinng this page to a Property Graph Schema:" & vbCrLf
+            For Each lrEntityTypeInstance In larEntityTypeInstance
+                lsMessage &= vbCrLf & " - " & lrEntityTypeInstance.Id
+            Next
+            MsgBox(lsMessage)
+            Exit Sub
+        End If
+
         With New WaitCursor
             Call Me.createPropertyGraphSchemaPageFromCurrentPage(sender, e)
         End With
+
     End Sub
 
     Private Sub ContextMenuStrip_EntityType_Opening(ByVal sender As System.Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles ContextMenuStrip_EntityType.Opening

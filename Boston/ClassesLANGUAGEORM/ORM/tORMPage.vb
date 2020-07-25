@@ -1320,6 +1320,28 @@ Namespace FBM
 
         End Function
 
+        Public Function hasEntityTypeInstancessWithoutReferenceScheme(ByRef aarEntityTypeInstance As List(Of FBM.EntityTypeInstance)) As Boolean
+
+            Try
+                Dim larEntityTypeInstance = From ETInstance In Me.EntityTypeInstance
+                                            Where ETInstance.EntityType.ReferenceModeRoleConstraint Is Nothing
+                                            Select ETInstance
+
+                aarEntityTypeInstance = larEntityTypeInstance.ToList
+                Return larEntityTypeInstance.Count > 0
+
+            Catch ex As Exception
+                Dim lsMessage1 As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return False
+            End Try
+        End Function
+
         Public Function GetAllPageObjects(Optional abGetRoleConstraints As Boolean = False, _
                                           Optional abGetModelNotes As Boolean = False) As List(Of Object)
 
