@@ -2425,25 +2425,24 @@ Public Class frmDiagramERD
                 lrEntity.Attribute.Insert(lrAttribute.OrdinalPosition - 1, lrAttribute)
                 lrEntity.Attribute.RemoveAt(lrAttribute.OrdinalPosition + 1)
 
-                Dim lrFactInstance As FBM.FactInstance
+                Dim lrFact As FBM.Fact
 
                 lsSQLQuery = "SELECT * FROM " & pcenumCMMLRelations.CorePropertyHasOrdinalPosition.ToString
-                lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
                 lsSQLQuery &= " WHERE Property = '" & lrAttribute.Id & "'"
 
                 Dim lrRecordset As ORMQL.Recordset = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-                lrFactInstance = lrRecordset.CurrentFact
-                lrFactInstance.GetFactDataInstanceByRoleName("Position").FactData.Data = lrAttribute.OrdinalPosition.ToString
+                lrFact = lrRecordset.CurrentFact
+                lrFact.GetFactDataByRoleName("Position").Data = lrAttribute.OrdinalPosition.ToString
 
                 lsSQLQuery = "SELECT * FROM " & pcenumCMMLRelations.CorePropertyHasOrdinalPosition.ToString
-                lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
                 lsSQLQuery &= " WHERE Property = '" & lrChangingAttribute.Id & "'"
 
                 lrRecordset = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-                lrFactInstance = lrRecordset.CurrentFact
-                lrFactInstance.GetFactDataInstanceByRoleName("Position").FactData.Data = lrChangingAttribute.OrdinalPosition.ToString
+                lrFact = lrRecordset.CurrentFact
+                lrFact.GetFactDataByRoleName("Position").Data = lrChangingAttribute.OrdinalPosition.ToString
 
-                Call lrFactInstance.FactType.FactTable.ResortFactTable()
+                '20200725-VM-Might still need this.
+                'Call lrFactInstance.FactType.FactTable.ResortFactTable()
 
             End If
 
@@ -2500,25 +2499,24 @@ Public Class frmDiagramERD
             lrEntity.Attribute.Insert(lrAttribute.OrdinalPosition, lrAttribute)
             lrEntity.Attribute.RemoveAt(lrAttribute.OrdinalPosition - 2)
 
-            Dim lrFactInstance As FBM.FactInstance
+            Dim lrFact As FBM.Fact
 
             lsSQLQuery = "SELECT * FROM " & pcenumCMMLRelations.CorePropertyHasOrdinalPosition.ToString
-            lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
             lsSQLQuery &= " WHERE Property = '" & lrAttribute.Id & "'"
 
             Dim lrRecordset As ORMQL.Recordset = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-            lrFactInstance = lrRecordset.CurrentFact
-            lrFactInstance.GetFactDataInstanceByRoleName("Position").FactData.Data = lrAttribute.OrdinalPosition.ToString
+            lrFact = lrRecordset.CurrentFact
+            lrFact.GetFactDataByRoleName("Position").Data = lrAttribute.OrdinalPosition.ToString
 
             lsSQLQuery = "SELECT * FROM " & pcenumCMMLRelations.CorePropertyHasOrdinalPosition.ToString
-            lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
             lsSQLQuery &= " WHERE Property = '" & lrChangingAttribute.Id & "'"
 
             lrRecordset = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-            lrFactInstance = lrRecordset.CurrentFact
-            lrFactInstance.GetFactDataInstanceByRoleName("Position").FactData.Data = lrChangingAttribute.OrdinalPosition.ToString
+            lrFact = lrRecordset.CurrentFact
+            lrFact.GetFactDataByRoleName("Position").Data = lrChangingAttribute.OrdinalPosition.ToString
 
-            Call lrFactInstance.FactType.FactTable.ResortFactTable()
+            '20200725-VM-Might still need this.
+            'Call lrFactInstance.FactType.FactTable.ResortFactTable()
 
         End If
 
