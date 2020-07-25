@@ -277,7 +277,6 @@ Namespace RDS
 
             Try
                 Dim lrTable As RDS.Table = arTable
-
                 '-----------------------------------------------------------------------------------------------------
                 'Indexes
                 For Each lrIndex In arTable.Index.ToList
