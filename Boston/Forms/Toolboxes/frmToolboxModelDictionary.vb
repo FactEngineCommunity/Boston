@@ -856,46 +856,41 @@ Public Class frmToolboxModelDictionary
 
     Private Sub ContextMenuStrip1_Opening(ByVal sender As Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles ContextMenuStrip1.Opening
 
+        '20200725-Remove if everything seems okay. Is covered in MouseDown
+
         'Dim larPage As List(Of FBM.Page)
         'Dim lrPage As FBM.Page
         'Dim lrModelObject As FBM.ModelObject
-        'Dim lo_menu_option As ToolStripItem
 
         'lrModelObject = Me.TreeView1.SelectedNode.Tag
 
         'Select Case lrModelObject.ConceptType
         '    Case Is = pcenumConceptType.EntityType
-        '        larPage = get_orm_diagram_pages_for_entity_type(lrModelObject)
+        '        larPage = Me.zrORMModel.GetPagesContainingModelObject(lrModelObject)
         '        If larPage.Count > 0 Then
         '            Me.ViewOnPageToolStripMenuItem.Enabled = True
         '            For Each lrPage In larPage
-
-        '                lo_menu_option = New Viev.Controls.ToolStripItem
-
         '                '----------------------------------------------------------
         '                'Try and find the Page within the EnterpriseView.TreeView
         '                '  NB If 'Core' Pages are not shown for the model, 
         '                '  they will not be in the TreeView and so a menuOption
         '                '  is now added for those hidden Pages.
         '                '----------------------------------------------------------
-        '                Dim lr_enterprise_view As tEnterpriseView
-        '                lr_enterprise_view = New tEnterpriseView(pcenumMenuType.pageORMModel, _
-        '                                                           lrPage, _
-        '                                                           lrPage.Model.EnterpriseId, _
-        '                                                           lrPage.Model.SubjectAreaId, _
-        '                                                           lrPage.Model.ProjectId, _
-        '                                                           lrPage.Model.SolutionId, _
-        '                                                           lrPage.Model.ModelId, _
-        '                                                           pcenumLanguage.ORMModel, _
-        '                                                           Nothing, _
-        '                                                           lrPage.PageId)
+
+        '                Dim lr_enterprise_view = New tEnterpriseEnterpriseView(pcenumMenuType.pageORMModel,
+        '                                                                       lrModelObject,
+        '                                                                       Me.zrORMModel.ModelId,
+        '                                                                       pcenumLanguage.ORMModel,
+        '                                                                       Nothing,
+        '                                                                       lrPage.PageId)
+
         '                lr_enterprise_view = prPageNodes.Find(AddressOf lr_enterprise_view.Equals)
+
         '                If IsSomething(lr_enterprise_view) Then
         '                    '---------------------------------------------------
         '                    'Add the Page(Name) to the MenuOption.DropDownItems
         '                    '---------------------------------------------------
-        '                    lo_menu_option = Me.ViewOnPageToolStripMenuItem.DropDownItems.Add(lrPage.Name)
-        '                    MsgBox("Here")
+        '                    Dim lo_menu_option = Me.ViewOnPageToolStripMenuItem.DropDownItems.Add(lrPage.Name)
         '                    lo_menu_option.Tag = prPageNodes.Find(AddressOf lr_enterprise_view.Equals)
         '                    AddHandler lo_menu_option.Click, AddressOf Me.OpenORMDiagram
         '                End If
@@ -904,8 +899,6 @@ Public Class frmToolboxModelDictionary
         '            Me.ViewOnPageToolStripMenuItem.Enabled = False
         '        End If
         'End Select
-
-
 
     End Sub
 

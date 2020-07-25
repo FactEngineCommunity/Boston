@@ -3706,43 +3706,19 @@ Namespace FBM
 
         Function GetPagesContainingModelObject(ByVal arModelObject As FBM.ModelObject) As List(Of FBM.Page)
 
-            Dim lrPage As FBM.Page
             Dim larPage As New List(Of FBM.Page)
-
             Select Case arModelObject.ConceptType
-                Case Is = pcenumConceptType.EntityType
-                    Dim lrEntityTypeInstance As FBM.EntityTypeInstance = arModelObject.CloneEntityTypeInstance(New FBM.Page)
-                    Dim larPageList = From Page In Me.Page _
-                                      From EntityTypeInstance In Page.EntityTypeInstance _
-                                      Where EntityTypeInstance.Id = lrEntityTypeInstance.Id _
-                                      And EntityTypeInstance.Page.PageId = Page.PageId _
+                Case Is = pcenumConceptType.EntityType,
+                          pcenumConceptType.ValueType,
+                          pcenumConceptType.FactType
+
+                    Dim larPageList = From Page In Me.Page
+                                      From EntityTypeInstance In Page.EntityTypeInstance
+                                      Where EntityTypeInstance.Id = arModelObject.Id _
+                                      And EntityTypeInstance.Page.PageId = Page.PageId
                                       Select Page
 
-                    For Each lrPage In larPage
-                        larPage.Add(lrPage)
-                    Next
-                Case Is = pcenumConceptType.EntityType
-                    Dim lrValueTypeInstance As FBM.ValueTypeInstance = arModelObject
-                    Dim larPageList = From Page In Me.Page _
-                                  From ValueTypeInstance In Page.ValueTypeInstance _
-                                  Where ValueTypeInstance.Id = lrValueTypeInstance.Id _
-                                  And ValueTypeInstance.Page.PageId = Page.PageId _
-                                  Select Page
-
-                    For Each lrPage In larPage
-                        larPage.Add(lrPage)
-                    Next
-                Case Is = pcenumConceptType.EntityType
-                    Dim lrFactTypeInstance As FBM.FactTypeInstance = arModelObject
-                    Dim larPageList = From Page In Me.Page _
-                                      From FactTypeInstance In Page.FactTypeInstance _
-                                      Where FactTypeInstance.Id = lrFactTypeInstance.Id _
-                                      And FactTypeInstance.Page.PageId = Page.PageId _
-                                      Select Page
-
-                    For Each lrPage In larPage
-                        larPage.Add(lrPage)
-                    Next
+                    larPage = larPageList.ToList
             End Select
 
             Return larPage
