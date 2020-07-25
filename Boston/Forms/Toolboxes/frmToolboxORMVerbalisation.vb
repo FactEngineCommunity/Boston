@@ -2754,6 +2754,7 @@ Public Class frmToolboxORMVerbalisation
                 lrVerbaliser.VerbaliseModelObject(lrFactType)
                 lrVerbaliser.VerbaliseQuantifier(" has a Total Internal Uniqueness Constraint.")
                 lrVerbaliser.HTW.WriteBreak()
+                lrVerbaliser.HTW.WriteBreak()
                 lrVerbaliser.VerbaliseQuantifier("Role Constraint:")
                 lrVerbaliser.VerbaliseModelObject(lrRoleConstraint)
                 lrVerbaliser.HTW.WriteBreak()
@@ -2880,11 +2881,32 @@ Public Class frmToolboxORMVerbalisation
                 End Select
             End If
 
+            lrVerbaliser.HTW.WriteBreak()
+            lrVerbaliser.HTW.WriteBreak()
+            lrVerbaliser.VerbaliseHeading("Value Constraints:")
+            lrVerbaliser.HTW.WriteBreak()
+            lrVerbaliser.HTW.WriteBreak()
 
+            Dim liCounter As Integer = 0
+            Dim lrResponsibleModelObject As FBM.ModelObject = Nothing
+            If arAttribute.Column.getMetamodelValueContraintValues(lrResponsibleModelObject).Count > 0 Then
+                lrVerbaliser.VerbaliseQuantifier("Possible Values for ")
+                lrVerbaliser.VerbaliseModelObject(lrResponsibleModelObject)
+                lrVerbaliser.VerbaliseQuantifier(" are {")
+                For Each lsString In arAttribute.Column.getMetamodelValueContraintValues(lrResponsibleModelObject)
+                    liCounter += 1
+                    If liCounter = 1 Then
+                        lrVerbaliser.HTW.Write("'" & lsString & "'")
+                    Else
+                        lrVerbaliser.HTW.Write(", '" & lsString & "'")
+                    End If
+                Next
+                lrVerbaliser.VerbaliseQuantifier("}")
+            Else
+                lrVerbaliser.VerbaliseQuantifier("There are no Value Constraints for this Attribute.")
+            End If
 
-                lrVerbaliser.HTW.WriteBreak()
-
-                Me.WebBrowser.DocumentText = lrVerbaliser.Verbalise
+            Me.WebBrowser.DocumentText = lrVerbaliser.Verbalise
 
         Catch ex As Exception
             Dim lsMessage1 As String
@@ -2912,6 +2934,20 @@ Public Class frmToolboxORMVerbalisation
 
         lrVerbaliser.VerbaliseQuantifier("Data Type: ")
         lrVerbaliser.VerbalisePredicateText(arColumn.getMetamodelDataType.ToString)
+        Dim liDataTypeLength = arColumn.getMetamodelDataTypeLength
+        Dim liDataTypePrecision = arColumn.getMetamodelDataTypePrecision
+        Dim lbPrecisionDone = False
+        If liDataTypeLength > 0 Then
+            lrVerbaliser.VerbaliseBlackText("(" & liDataTypeLength.ToString)
+            If liDataTypePrecision > 0 Then
+                lrVerbaliser.VerbaliseBlackText("," & liDataTypePrecision.ToString)
+            End If
+            lrVerbaliser.VerbaliseBlackText(")")
+        End If
+        If liDataTypePrecision > 0 And Not lbPrecisionDone Then
+            lrVerbaliser.VerbaliseBlackText("(" & liDataTypePrecision.ToString & ")")
+        End If
+
 
         Me.WebBrowser.DocumentText = lrVerbaliser.Verbalise
 

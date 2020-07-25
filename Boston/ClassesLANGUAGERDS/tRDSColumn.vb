@@ -284,6 +284,37 @@ Namespace RDS
 
         End Function
 
+        Public Function getMetamodelValueContraintValues(ByRef arModelObject As FBM.ModelObject) As StringCollection
+
+            Try
+                'Get it using the FactType of the Function.
+                If Me.ActiveRole.FactType.IsUnaryFactType Then
+                    Return New StringCollection
+                ElseIf Me.ActiveRole.JoinedORMObject.ConceptType = pcenumConceptType.ValueType Then 'FactType.IsManyTo1BinaryFactType Or Me.FactType.Is1To1BinaryFactType Then                    
+                    arModelObject = Me.ActiveRole.JoinsValueType
+                    Return Me.ActiveRole.JoinsValueType.ValueConstraint
+                ElseIf Me.ActiveRole.JoinedORMObject.ConceptType = pcenumConceptType.EntityType Then
+                    If Me.ActiveRole.JoinsEntityType.HasSimpleReferenceScheme Then
+                        arModelObject = Me.ActiveRole.JoinsEntityType.ReferenceModeValueType
+                        Return Me.ActiveRole.JoinsEntityType.ReferenceModeValueType.ValueConstraint
+                    Else
+                        Return New StringCollection
+                    End If
+                Else
+                    Return New StringCollection
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage1 As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Function
+
         Public Function getMetamodelDataTypeLength() As Integer
 
             Try
