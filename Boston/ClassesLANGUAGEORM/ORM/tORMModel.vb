@@ -2705,9 +2705,17 @@ Namespace FBM
 
         End Sub
 
-        Public Sub RemoveRoleConstraint(ByRef arRoleConstraint As FBM.RoleConstraint, _
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <param name="arRoleConstraint"></param>
+        ''' <param name="abCheckForErrors"></param>
+        ''' <param name="abBroadcastInterfaceEvent"></param>
+        ''' <param name="abReplacingRoleConstraint">If replacing existing RoleConstraint, then don't remove RDSRelation table for the right circumstances.</param>
+        Public Sub RemoveRoleConstraint(ByRef arRoleConstraint As FBM.RoleConstraint,
                                         ByVal abCheckForErrors As Boolean,
-                                        ByVal abBroadcastInterfaceEvent As Boolean)
+                                        ByVal abBroadcastInterfaceEvent As Boolean,
+                                        Optional ByVal abReplacingRoleConstraint As Boolean = False)
 
             Try
                 If Me.RoleConstraint.Contains(arRoleConstraint) Then
@@ -2719,7 +2727,7 @@ Namespace FBM
                     End If
                 End If
 
-                    Dim lrDictionaryEntry As New FBM.DictionaryEntry(Me, arRoleConstraint.Id, pcenumConceptType.RoleConstraint)
+                Dim lrDictionaryEntry As New FBM.DictionaryEntry(Me, arRoleConstraint.Id, pcenumConceptType.RoleConstraint)
 
                 If Me.ModelDictionary.Exists(AddressOf lrDictionaryEntry.EqualsByOtherConceptType) Then
                     '----------------------------------------------------------------------------------------------
@@ -2766,9 +2774,9 @@ Namespace FBM
 
                                 lrRole = arRoleConstraint.RoleConstraintRole(0).Role
 
-                                Dim larTable = From Table In Me.RDS.Table _
-                                               From Column In Table.Column _
-                                               Where Column.Role.Id = lrRole.Id _
+                                Dim larTable = From Table In Me.RDS.Table
+                                               From Column In Table.Column
+                                               Where Column.Role.Id = lrRole.Id
                                                Select Table Distinct
 
                                 For Each lrTable In larTable.ToList
@@ -2849,7 +2857,14 @@ Namespace FBM
 
                             '==============================
                             'Remove Columns and Relations
-                            If (lrFactType.isRDSTable Or (lrTable IsNot Nothing)) And lrFactType.InternalUniquenessConstraint.Count = 0 Then
+                            If (lrFactType.isRDSTable Or (lrTable IsNot Nothing)) And
+                                lrFactType.InternalUniquenessConstraint.Count = 0 And
+                                Not abReplacingRoleConstraint Then
+
+                                '--------------------------------------------------------------------------------------------
+                                'NB If replacing the RoleConstraint (see frmDiagramORM event for adding new RoleConstraint)
+                                '  then we don't want to remove the Table or its Columns or Relations, especially if is an RDSRelation table
+
                                 'Remove the Table from the RDSModel/Database                                
 
                                 '--------------------------------------------------------------------
@@ -2881,9 +2896,9 @@ Namespace FBM
 
                                 Dim lrResponsibleRole As FBM.Role = arRoleConstraint.RoleConstraintRole(0).Role
 
-                                Dim larColumn = From Table In Me.RDS.Table _
-                                                From Column In Table.Column _
-                                                Where Column.Role Is lrResponsibleRole _
+                                Dim larColumn = From Table In Me.RDS.Table
+                                                From Column In Table.Column
+                                                Where Column.Role Is lrResponsibleRole
                                                 Select Column
 
                                 For Each lrColumn In larColumn.ToList
@@ -2892,8 +2907,6 @@ Namespace FBM
 
                                 'Relations: Already removed within FactType.RemoveInternalUniquenessConstraint.
                             End If
-
-
                         End If
                     ElseIf arRoleConstraint.RoleConstraintType = pcenumRoleConstraintType.ExternalUniquenessConstraint Then
 

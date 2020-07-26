@@ -6398,6 +6398,9 @@ Public Class frmDiagramORM
                 End If
 
                 If Me.zrPage.do_selected_roles_span_minimum_for_FactType Then
+
+                    Dim lbRemoveExistingRoleConstraint As Boolean = False
+
                     If lrFactTypeInstance.FactType.InternalUniquenessConstraint.Count > 0 Then
                         '---------------------------------------------------
                         'The FactType already has an InternalRoleConstraint
@@ -6419,7 +6422,7 @@ Public Class frmDiagramORM
                                 Call Me.zrPage.SelectedObject(0).factType.FactType.RemoveInternalUniquenessConstraints(True)  'Because we are about to replace the TotalInternalUniquenessConstraint with one that spans FT.Arity-1 Roles.
                             End If
                         ElseIf lrFactTypeInstance.FactType.InternalUniquenessConstraint(0).RoleConstraintRole.Count = lrFactTypeInstance.Arity Then
-                            Call lrFactTypeInstance.FactType.RemoveInternalUniquenessConstraints(True) 'Because we are about to replace the TotalInternalUniquenessConstraint with one that spans FT.Arity-1 Roles.
+                            lbRemoveExistingRoleConstraint = True 'Because we are about to replace the TotalInternalUniquenessConstraint with one that spans FT.Arity-1 Roles.
                         End If
 
                     End If
@@ -6455,11 +6458,13 @@ Public Class frmDiagramORM
                         'Create a Uniqueness Constraint for the selected Roles
                         '  using the RoleConstraint created for the Model
                         '------------------------------------------------------
+                        If lbRemoveExistingRoleConstraint Then
+                            Call lrFactTypeInstance.FactType.RemoveInternalUniquenessConstraints(True, True)
+                        End If
+
                         Call lrFactTypeInstance.FactType.CreateInternalUniquenessConstraint(larRole)
 
                         Call lrFactTypeInstance.Model.Save()
-
-                        Call Me.EnableSaveButton()
                     End If
 
                     '---------------------------

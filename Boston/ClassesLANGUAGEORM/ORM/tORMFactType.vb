@@ -3159,7 +3159,7 @@ Namespace FBM
         End Sub
 
 
-        Sub RemoveInternalUniquenessConstraints(ByRef abBroadcastInterfaceEvent As Boolean)
+        Sub RemoveInternalUniquenessConstraints(ByRef abBroadcastInterfaceEvent As Boolean, Optional ByVal abReplacingRoleConstraint As Boolean = False)
 
             Dim lrRoleConstraint As FBM.RoleConstraint
 
@@ -3167,7 +3167,7 @@ Namespace FBM
 
                 For Each lrRoleConstraint In Me.InternalUniquenessConstraint.ToArray
 
-                    Me.Model.RemoveRoleConstraint(lrRoleConstraint, False, abBroadcastInterfaceEvent)
+                    Me.Model.RemoveRoleConstraint(lrRoleConstraint, False, abBroadcastInterfaceEvent, abReplacingRoleConstraint)
                     Me.InternalUniquenessConstraint.Remove(lrRoleConstraint)
 
                     RaiseEvent IUConstraintRemoved(Me, lrRoleConstraint)
