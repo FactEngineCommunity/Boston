@@ -103,12 +103,16 @@ Namespace RDS
                     End If
                 End If
 
+                '20200726-VM-Review the follow because is not true. Have modified the code to stop this.
+                '  If something is going wrong then revise. If a a PGSRelation Node/Table adds a Column for an Active role
+                '  on a ManyTo1FT attached to the PGSRelationNode, for instance, then certainly the PGSRelation Note/Table remains.
                 'Is only IsPGSRelation if the Objectified Fact Type (i.e. The objectified relation) only references ValueTypes. 
-                'i.e.Where ObjectifiedFactType Is only joined To ValueTypes. If Is joined To any EntityType Or another ObjectifiedFactType, then cannot be a PGSRelation, And must be a Node.
+                'i.e.Where ObjectifiedFactType Is only joined To ValueTypes.
+                ' If Is joined To any EntityType Or another ObjectifiedFactType, Then cannot be a PGSRelation, And must be a Node.
                 If (arColumn.ContributesToPrimaryKey = False) And (TypeOf (arColumn.Role.JoinedORMObject) IsNot FBM.ValueType) Then
                     '--------------------------------------------------------------------
                     'Remove IsPGSRelation if join is not to a ValueType
-                    Call Me.setIsPGSRelation(False)
+                    'Call Me.setIsPGSRelation(False) '20200726-VM-Commented this out. See notes above.
                 ElseIf TypeOf (Me.FBMModelElement) Is FBM.FactType Then
                     'FBMModelObject is the ModelElement that the Table relates to.
                     If Not (arColumn.ContributesToPrimaryKey) And (arColumn.FactType IsNot Me.FBMModelElement) And (TypeOf (arColumn.Role.JoinedORMObject) IsNot FBM.ValueType) Then

@@ -2892,7 +2892,7 @@ Namespace FBM
 
                                 Call Me.RDS.removeTable(lrTable)
 
-                            ElseIf lrFactType.Arity = 2 Then
+                            ElseIf lrFactType.Arity = 2 And Not abReplacingRoleConstraint Then
 
                                 Dim lrResponsibleRole As FBM.Role = arRoleConstraint.RoleConstraintRole(0).Role
 

@@ -598,7 +598,8 @@ Namespace FBM
                             Try
                                 Call lrRDSRelation.changeResponsibleFactType(lrLinkFactType)
                             Catch ex As Exception
-                                Debugger.Break()
+                                '20200726-VM-Unusual occurence, consider throwing an Exception.
+                                'Debugger.Break()
                             End Try
 
 
@@ -650,7 +651,8 @@ Namespace FBM
                         Try
                             Call lrRDSRelation.changeResponsibleFactType(arFactType)
                         Catch ex As Exception
-                            Debugger.Break()
+                            '20200726-VM-Unusual occurence, consider throwing an Exception.
+                            'Debugger.Break()
                         End Try
 
                         lrRecordset.MoveNext()

@@ -283,7 +283,7 @@ Namespace PGS
         Public Sub setPredicate()
 
             Try
-                If Me.Relation.IsPGSRelationNode Then
+                If Me.Relation.IsPGSRelationNode Or Me.RDSRelation.ResponsibleFactType.isRDSTable Then
                     '=================================================================
                     'Origin/Destination Predicates
                     Dim lsOriginPredicate As String = ""
@@ -293,7 +293,11 @@ Namespace PGS
                     Dim lrFactType As FBM.FactType
 
                     If Me.RDSRelation.ResponsibleFactType.IsObjectified Or Me.RDSRelation.ResponsibleFactType.IsLinkFactType Then
-                        lrFactType = Me.RDSRelation.ResponsibleFactType.LinkFactTypeRole.FactType
+                        If Me.RDSRelation.ResponsibleFactType.IsLinkFactType Then
+                            lrFactType = Me.RDSRelation.ResponsibleFactType.LinkFactTypeRole.FactType
+                        Else
+                            lrFactType = Me.RDSRelation.ResponsibleFactType
+                        End If
                     Else
                         lrFactType = Me.RDSRelation.ResponsibleFactType
                     End If
