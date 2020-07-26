@@ -98,17 +98,33 @@ Public Class frmCRUDModel
     Private Sub ButtonTestConnection_Click(sender As Object, e As EventArgs) Handles ButtonTestConnection.Click
 
         Try
-            Dim lrODBCConnection As New System.Data.Odbc.OdbcConnection(Me.TextBoxDatabaseConnectionString.Text)
+            Select Case Trim(Me.ComboBoxDatabaseType.SelectedItem)
+                Case Is = "SQLite"
 
-            Me.LabelOpenSuccessfull.Text = "Testing Connection"
-            Me.LabelOpenSuccessfull.Visible = True
+                    Me.LabelOpenSuccessfull.Visible = True
+                    If Database.SQLiteDatabase.CreateConnection(Me.TextBoxDatabaseConnectionString.Text) Is Nothing Then
+                        Me.LabelOpenSuccessfull.ForeColor = Color.Red
+                        Me.LabelOpenSuccessfull.Text = "Fail"
+                    Else
+                        Me.LabelOpenSuccessfull.ForeColor = Color.Green
+                        Me.LabelOpenSuccessfull.Text = "Success"
+                    End If
 
-            lrODBCConnection.Open()
+                Case Else
 
-            Me.LabelOpenSuccessfull.ForeColor = Color.Green
-            Me.LabelOpenSuccessfull.Text = "Success"            
+                    Dim lrODBCConnection As New System.Data.Odbc.OdbcConnection(Me.TextBoxDatabaseConnectionString.Text)
 
-            lrODBCConnection.Close()
+                    Me.LabelOpenSuccessfull.Text = "Testing Connection"
+                    Me.LabelOpenSuccessfull.Visible = True
+
+                    lrODBCConnection.Open()
+
+                    Me.LabelOpenSuccessfull.ForeColor = Color.Green
+                    Me.LabelOpenSuccessfull.Text = "Success"
+
+                    lrODBCConnection.Close()
+
+            End Select
 
         Catch ex As Exception
 

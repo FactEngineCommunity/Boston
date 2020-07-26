@@ -65,6 +65,7 @@
     <Compile Include="ReadResource.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="Resources\Assemblies\FirebirdSql.Data.FirebirdClient.dll" />
     <None Include="Resources\img\tblmeta16x16.pdn" />
   </ItemGroup>
