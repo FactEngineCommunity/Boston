@@ -2023,6 +2023,18 @@ Namespace FBM
                                             Optional ByVal abDoRDSProcessing As Boolean = True)
 
             Try
+                '============================================================================================
+                'If changing the PK/Preferred Identifier for a FactType, make sure the exising RC/preferredIdentifier is False
+                '  E.g. If a Fact Type accross Part, Bin and Warehouse has a binary Internal RC that is Preferred,
+                '    and now we are making a second IUC preferred, then neeed to set the existing preferred IUC to isPreferred = False.
+                If Me.RoleConstraintType = pcenumRoleConstraintType.InternalUniquenessConstraint Then
+                    Dim lrExistingPreferredIndentifierRoleConstraint = Me.RoleConstraintRole(0).Role.FactType.getPreferredInternalUniquenessConstraint
+                    If (Not lrExistingPreferredIndentifierRoleConstraint Is Me) And abIsPreferredIdentifier Then
+                        Call lrExistingPreferredIndentifierRoleConstraint.SetIsPreferredIdentifier(False)
+                    End If
+                End If
+
+
                 Me.IsPreferredIdentifier = abIsPreferredIdentifier
 
                 Call Me.makeDirty()
