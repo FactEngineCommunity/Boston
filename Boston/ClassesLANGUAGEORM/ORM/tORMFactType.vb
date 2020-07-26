@@ -3251,11 +3251,13 @@ Namespace FBM
                     'NB Do this before setting IsPGSRelation, such that the single Relation is created.
                     Call Me.Model.moveRelationsOfFactTypeToRespectiveLinkFactTypes(Me)
 
-                    lrTable.setIsPGSRelation(True)
+                    If Not lrTable.isPGSRelation Then
+                        lrTable.setIsPGSRelation(True)
+                    End If
 
                 End If
 
-                Call Me.Model.MakeDirty(True, False)
+                    Call Me.Model.MakeDirty(True, False)
 
                 RaiseEvent Objectified()
 

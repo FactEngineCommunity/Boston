@@ -572,30 +572,35 @@ Namespace FBM
                     lrRecordset.MoveNext()
                 End While
 
-                Dim larFactType = From FactType In Me.FactType
-                                  Where FactType.IsLinkFactType = True _
-                                  And arFactType.RoleGroup.Contains(FactType.LinkFactTypeRole)
-                                  Select FactType
+                Dim larLinkFactType = From FactType In Me.FactType
+                                      Where FactType.IsLinkFactType = True _
+                                      And arFactType.RoleGroup.Contains(FactType.LinkFactTypeRole)
+                                      Select FactType
 
-                For Each lrFactType In larFactType
+                For Each lrLinkFactType In larLinkFactType
 
                     For Each lsRelationId In lasRelationId
                         lsSQLQuery = "SELECT *"
                         lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreRelationHasDestinationEntity.ToString
-                        lsSQLQuery &= " WHERE Entity = '" & lrFactType.LinkFactTypeRole.JoinedORMObject.Id & "'"
+                        lsSQLQuery &= " WHERE Entity = '" & lrLinkFactType.LinkFactTypeRole.JoinedORMObject.Id & "'"
                         lsSQLQuery &= " AND Relation = '" & lsRelationId & "'"
 
                         lrRecordset1 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
                         If Not lrRecordset1.EOF Then
                             lsSQLQuery = "UPDATE " & pcenumCMMLRelations.CoreRelationIsForFactType.ToString
-                            lsSQLQuery &= " SET FactType = '" & lrFactType.Id & "'"
+                            lsSQLQuery &= " SET FactType = '" & lrLinkFactType.Id & "'"
                             lsSQLQuery &= " WHERE Relation = '" & lrRecordset1("Relation").Data & "'"
 
                             '============================================================================
                             'RDS
                             Dim lrRDSRelation As RDS.Relation = Me.RDS.Relation.Find(Function(x) x.Id = lsRelationId)
-                            Call lrRDSRelation.changeResponsibleFactType(lrFactType)
+                            Try
+                                Call lrRDSRelation.changeResponsibleFactType(lrLinkFactType)
+                            Catch ex As Exception
+                                Debugger.Break()
+                            End Try
+
 
                             Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
                         End If
@@ -639,10 +644,14 @@ Namespace FBM
 
                         '============================================================================
                         'RDS
-                        Dim lrRDSRelation As RDS.Relation = Me.RDS.Relation.Find(Function(x) x.Id = lrRecordset("Relation").Data)
-                        Call lrRDSRelation.changeResponsibleFactType(arFactType)
-
                         Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                        Dim lrRDSRelation As RDS.Relation = Me.RDS.Relation.Find(Function(x) x.Id = lrRecordset("Relation").Data)
+                        Try
+                            Call lrRDSRelation.changeResponsibleFactType(arFactType)
+                        Catch ex As Exception
+                            Debugger.Break()
+                        End Try
 
                         lrRecordset.MoveNext()
                     End While

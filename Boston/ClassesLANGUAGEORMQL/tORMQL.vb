@@ -776,6 +776,71 @@ Namespace ORMQL
 
         End Function
 
+        Private Function ProcessSelectINSTANCESStatement(ByVal asORMQLStatement As String) As Object
+
+            Try
+                '---------------------------------------------------------------------------------
+                'Create a DynamicClass within the Factor, to store the ParseTreeTokens as they
+                '  are collected from the ParseText
+                '---------------------------------------------------------------------------------
+
+                '=============================================================
+                Dim lrselectStatement As ORMQL.SelectStatement
+                lrselectStatement = prApplication.ORMQL.SelectStatement
+
+                lrselectStatement.COLUMNLIST = New List(Of Object)
+                lrselectStatement.KEYWDDISTINCT = New Object
+                lrselectStatement.COLUMNNAMESTR = New List(Of String)
+                lrselectStatement.MODELID = Nothing
+                lrselectStatement.USERTABLENAME = Nothing
+                lrselectStatement.PAGENAME = Nothing
+                lrselectStatement.WHERESTMT = New Object
+
+                '----------------------------------
+                'Get the Tokens from the ParseTree
+                '----------------------------------
+                Call Me.GetParseTreeTokensReflection(lrselectStatement, Me.Parsetree.Nodes(0))
+                '======================================================================
+
+                'Facts to return
+                Dim larFact As New List(Of FBM.Fact)
+                Dim lrFact As FBM.Fact
+                Dim lrFactType = New FBM.FactType(Me.Model, "DummyFactType", True)
+                Dim lrRole = New FBM.Role(lrFactType, "INSTANCES", True, Nothing)
+                lrFactType.RoleGroup.Add(lrRole)
+
+                Dim lrModelElement = Me.Model.GetModelObjectByName(lrselectStatement.USERTABLENAME)
+
+                Select Case lrModelElement.ConceptType
+                    Case Is = pcenumConceptType.EntityType
+                        Dim lrEntityType = CType(lrModelElement, FBM.EntityType)
+                        For Each lsInstance In lrEntityType.Instance
+                            lrFact = New FBM.Fact(lrFactType, False)
+                            lrFact.Data.Add(New FBM.FactData(lrRole, New FBM.Concept(lsInstance), lrFact))
+                            larFact.Add(lrFact)
+                        Next
+                End Select
+
+                Dim lrORMQlREcordset As New ORMQL.Recordset
+
+                lrORMQlREcordset.Facts = larFact
+                lrORMQlREcordset.Columns = lrselectStatement.COLUMNNAMESTR
+
+                Return lrORMQlREcordset
+
+            Catch ex As Exception
+                Dim lsMessage1 As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return New ORMQL.Recordset
+            End Try
+
+        End Function
+
         Private Function ProcessSelectStatement(ByVal asORMQLStatement As String) As Object
 
             Dim lrFact As New FBM.Fact
@@ -938,8 +1003,8 @@ Namespace ORMQL
                         Case Is = GetType(FBM.FactType).ToString
                             lrFactList = lrFactType.Fact
                         Case Is = GetType(FBM.FactTypeInstance).ToString
-                            Dim lrReturnFactTypeInstance As FBM.FactTypeInstance
-                            lrReturnFactTypeInstance = lrFactType
+                            Dim lrReturnFactTypeInstance As FBM.FactTypeInstance = lrFactType
+                            'lrReturnFactTypeInstance = lrFactType
                             larFactList = lrReturnFactTypeInstance.Fact
                             For Each lrReturnFactInstance In larFactList
                                 lrFactList.Add(lrReturnFactInstance)
@@ -1009,8 +1074,8 @@ Namespace ORMQL
                         Case Is = GetType(FBM.FactType).ToString
                             lrFactList = lrFactType.Fact.FindAll(AddressOf lrFactPredicate.Equals)
                         Case Is = GetType(FBM.FactTypeInstance).ToString
-                            Dim lrReturnFactTypeInstance As FBM.FactTypeInstance
-                            lrReturnFactTypeInstance = lrFactType
+                            Dim lrReturnFactTypeInstance As FBM.FactTypeInstance = lrFactType
+                            'lrReturnFactTypeInstance = lrFactType 'As above to make faster
                             larFactList = lrReturnFactTypeInstance.Fact.FindAll(AddressOf lrFactPredicate.Equals)
                             Dim lrReturnFactInstance As FBM.FactInstance
                             For Each lrReturnFactInstance In larFactList
@@ -1113,13 +1178,11 @@ Namespace ORMQL
                             For Each lrFact In lrFactList
                                 For Each lrRoleData In lrFact.Data
                                     If StrComp(lrRoleData.Role.Name, "") = 0 Then
-                                        If lrFact.DictionarySet.Keys.Contains(lrRoleData.Role.Id) Then
-                                        Else
+                                        If Not lrFact.DictionarySet.Keys.Contains(lrRoleData.Role.Id) Then
                                             lrFact.DictionarySet.Add(lrRoleData.Role.Id, lrRoleData.Data)
                                         End If
                                     Else
-                                        If lrFact.DictionarySet.Keys.Contains(lrRoleData.Role.Name) Then
-                                        Else
+                                        If Not lrFact.DictionarySet.Keys.Contains(lrRoleData.Role.Name) Then
                                             lrFact.DictionarySet.Add(lrRoleData.Role.Name, lrRoleData.Data)
                                         End If
                                     End If
@@ -1919,10 +1982,36 @@ Namespace ORMQL
 
                     Select Case Me.Parsetree.Nodes(0).Nodes(0).Text
                         Case Is = "SELECTSTMT"
-                            Dim lrRecordset As New ORMQL.Recordset
-                            lrRecordset = Me.ProcessSelectStatement(as_ORMQL_statement)
 
-                            Return lrRecordset
+                            '=============================================================
+                            Dim lrselectStatement As ORMQL.SelectStatement
+                            lrselectStatement = prApplication.ORMQL.SelectStatement
+
+                            lrselectStatement.COLUMNLIST = New List(Of Object)
+                            lrselectStatement.KEYWDDISTINCT = New Object
+                            lrselectStatement.COLUMNNAMESTR = New List(Of String)
+                            lrselectStatement.MODELID = Nothing
+                            lrselectStatement.USERTABLENAME = Nothing
+                            lrselectStatement.PAGENAME = Nothing
+                            lrselectStatement.WHERESTMT = New Object
+
+                            '----------------------------------
+                            'Get the Tokens from the ParseTree
+                            '----------------------------------
+                            Call Me.GetParseTreeTokensReflection(lrselectStatement, Me.Parsetree.Nodes(0))
+
+                            If lrselectStatement.COLUMNLIST.Count = 1 And lrselectStatement.COLUMNNAMESTR.Count = 1 Then
+                                If lrselectStatement.COLUMNNAMESTR(0) = "INSTANCES" Then
+                                    Dim lrRecordset = Me.ProcessSelectINSTANCESStatement(as_ORMQL_statement)
+                                    Return lrRecordset
+                                Else
+                                    Dim lrRecordset = Me.ProcessSelectStatement(as_ORMQL_statement)
+                                    Return lrRecordset
+                                End If
+                            Else
+                                Dim lrRecordset = Me.ProcessSelectStatement(as_ORMQL_statement)
+                                Return lrRecordset
+                            End If
 
                             '----------------------------------------------------------------------------------
                             'Exit the sub because have found what the User was trying to do, and have done it 
