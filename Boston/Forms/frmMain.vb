@@ -21,6 +21,7 @@ Public Class frmMain
     Public zfrm_KL_theorem_writer As frmToolboxKLTheoremWriter = Nothing
     Public zrORMModel_view As frmDiagramORM = Nothing
     Public zfrm_Brain_box As frmToolboxBrainBox = Nothing
+    Public zfrmFactEngine As frmFactEngine = Nothing
     Public zfrmStartup As frmStartup = Nothing
     Public zfrmCRUDAddGroup As frmCRUDAddGroup = Nothing
     Public zfrmCRUDAddNamespace As frmCRUDAddNamespace = Nothing
@@ -1171,6 +1172,29 @@ Public Class frmMain
 
             If pbLogStartup Then
                 prApplication.ThrowErrorMessage("Successfully loaded the Model Explorer", pcenumErrorType.Information)
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
+    Sub LoadFactEngine()
+
+        Try
+            Dim child As New frmFactEngine
+
+            If Me.zfrmFactEngine Is Nothing Then
+                child.Show(DockPanel)
+                Me.zfrmFactEngine = child
+            Else
+                Me.zfrmFactEngine.BringToFront()
             End If
 
         Catch ex As Exception
@@ -3835,5 +3859,11 @@ Public Class frmMain
 
     Private Sub zfrmModelExplorer_Disposed(sender As Object, e As EventArgs) Handles zfrmModelExplorer.Disposed
         GC.Collect()
+    End Sub
+
+    Private Sub ToolStripMenuItemFactEngine_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItemFactEngine.Click
+
+        Call Me.LoadFactEngine()
+
     End Sub
 End Class

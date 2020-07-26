@@ -342,6 +342,10 @@
     <Compile Include="ClassesClientServer\tRole.vb" />
     <Compile Include="ClassesClientServer\tUser.vb" />
     <Compile Include="ClassesDatabase\SQLite\Database.vb" />
+    <Compile Include="ClassesFactEngine\Constants.vb" />
+    <Compile Include="ClassesFactEngine\tQueryEdge.vb" />
+    <Compile Include="ClassesFactEngine\tQueryGraph.vb" />
+    <Compile Include="ClassesFactEngine\tQueryNode.vb" />
     <Compile Include="ClassesFBMInterfaceHost\tFBMInterfaceHost.vb" />
     <Compile Include="ClassesGeneral\BostonTreeView.vb">
       <SubType>Component</SubType>
@@ -1139,6 +1143,12 @@
     <Compile Include="Forms\Diagrams\frmDiagramSTD.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Forms\FactEngine\frmFactEngine.Designer.vb">
+      <DependentUpon>frmFactEngine.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\FactEngine\frmFactEngine.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Forms\frmBroadcastEventMonitor.Designer.vb">
       <DependentUpon>frmBroadcastEventMonitor.vb</DependentUpon>
     </Compile>
@@ -1863,6 +1873,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\Diagrams\frmDiagramSTD.resx">
       <DependentUpon>frmDiagramSTD.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\FactEngine\frmFactEngine.resx">
+      <DependentUpon>frmFactEngine.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\frmAbout.resx">
       <DependentUpon>frmAbout.vb</DependentUpon>
