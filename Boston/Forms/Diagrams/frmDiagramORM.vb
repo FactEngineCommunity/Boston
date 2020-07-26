@@ -9400,6 +9400,7 @@ Public Class frmDiagramORM
         frmMain.Cursor = Cursors.WaitCursor
         Me.zrPage.Model.AllowCheckForErrors = False
 
+        Me.CircularProgressBar.Left = (Me.Width / 2) - (Me.CircularProgressBar.Size.Width / 2)
         Me.CircularProgressBar.BringToFront()
         Me.CircularProgressBar.Value = 1
         Me.CircularProgressBar.Invalidate()
@@ -9744,6 +9745,7 @@ Public Class frmDiagramORM
         frmMain.Cursor = Cursors.WaitCursor
         Me.zrPage.Model.AllowCheckForErrors = False
 
+        Me.CircularProgressBar.Left = (Me.Width / 2) - (Me.CircularProgressBar.Size.Width / 2)
         Me.CircularProgressBar.BringToFront()
         Me.CircularProgressBar.Value = 1
         Me.CircularProgressBar.Invalidate()

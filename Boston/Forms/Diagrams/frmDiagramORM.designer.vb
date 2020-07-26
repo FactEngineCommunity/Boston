@@ -702,7 +702,7 @@ Partial Class frmDiagramORM
         Me.LanguageToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.PropertyGraphSchemaToolStripMenuItem, Me.EntityRelationshipDiagramToolStripMenuItem})
         Me.LanguageToolStripMenuItem.Image = CType(resources.GetObject("LanguageToolStripMenuItem.Image"), System.Drawing.Image)
         Me.LanguageToolStripMenuItem.Name = "LanguageToolStripMenuItem"
-        Me.LanguageToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
+        Me.LanguageToolStripMenuItem.Size = New System.Drawing.Size(150, 22)
         Me.LanguageToolStripMenuItem.Text = "To &Language..."
         '
         'PropertyGraphSchemaToolStripMenuItem
@@ -1842,17 +1842,17 @@ Partial Class frmDiagramORM
         Me.CircularProgressBar.ProgressColor = System.Drawing.Color.SteelBlue
         Me.CircularProgressBar.ProgressWidth = 6
         Me.CircularProgressBar.SecondaryFont = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.CircularProgressBar.Size = New System.Drawing.Size(87, 87)
+        Me.CircularProgressBar.Size = New System.Drawing.Size(50, 50)
         Me.CircularProgressBar.StartAngle = 270
         Me.CircularProgressBar.SubscriptColor = System.Drawing.Color.FromArgb(CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer))
         Me.CircularProgressBar.SubscriptMargin = New System.Windows.Forms.Padding(-5, -27, 0, 0)
-        Me.CircularProgressBar.SubscriptText = "Loading"
+        Me.CircularProgressBar.SubscriptText = ""
         Me.CircularProgressBar.SuperscriptColor = System.Drawing.Color.FromArgb(CType(CType(166, Byte), Integer), CType(CType(166, Byte), Integer), CType(CType(166, Byte), Integer))
         Me.CircularProgressBar.SuperscriptMargin = New System.Windows.Forms.Padding(12, 25, 0, 0)
         Me.CircularProgressBar.SuperscriptText = ""
         Me.CircularProgressBar.TabIndex = 15
         Me.CircularProgressBar.Text = "0"
-        Me.CircularProgressBar.TextMargin = New System.Windows.Forms.Padding(2, 5, 0, 0)
+        Me.CircularProgressBar.TextMargin = New System.Windows.Forms.Padding(2, 2, 0, 0)
         Me.CircularProgressBar.Value = 68
         '
         'BackgroundWorker

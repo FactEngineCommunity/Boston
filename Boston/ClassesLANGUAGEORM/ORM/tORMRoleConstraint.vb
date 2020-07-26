@@ -2034,7 +2034,6 @@ Namespace FBM
                     End If
                 End If
 
-
                 Me.IsPreferredIdentifier = abIsPreferredIdentifier
 
                 Call Me.makeDirty()

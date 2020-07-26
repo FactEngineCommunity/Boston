@@ -55,8 +55,8 @@ Namespace FBM
         <XmlIgnore()> _
         Public Page As FBM.Page
 
-        <NonSerialized()> _
-        <XmlIgnore()> _
+        <NonSerialized()>
+        <XmlIgnore()>
         Public Shape As New ShapeNode
 
         <NonSerialized(), _
