@@ -1677,6 +1677,7 @@ Namespace FBM
         End Function
 
         ''' <summary>
+        ''' 202007-VM-Created
         ''' Returns a FactType, else Nothing, if the list of ModelObjects and FactTypeReading match.
         '''   * Used to thwart attempts to create more than one FactType with the same reading.
         ''' </summary>
@@ -1686,7 +1687,7 @@ Namespace FBM
         Public Function getFactTypeByModelObjectsFactTypeReading(ByVal aarModelObject As List(Of FBM.ModelObject), ByVal arFactTypeReading As FBM.FactTypeReading) As FBM.FactType
 
             Try
-                '---------------------------------------------------
+                '------------------------------------------------------
                 'Check to see if the ModelObjects are in the FactType
                 Dim larFactType = From FactType In Me.FactType
                                   Where FactType.RoleGroup.Count = aarModelObject.Count
@@ -1701,7 +1702,9 @@ Namespace FBM
                     Dim larFTRFactType = From FactType In larFactType
                                          From FactTypeReading In FactType.FactTypeReading
                                          Where arFactTypeReading.EqualsByRoleJoinedModelObjectSequence(FactTypeReading)
+                                         Where arFactTypeReading.EqualsByPredicatePartText(FactTypeReading)
                                          Select FactType
+
 
                     If larFTRFactType.Count = 0 Then
                         Return Nothing

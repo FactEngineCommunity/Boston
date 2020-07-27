@@ -5,6 +5,8 @@
         Public Facts As New List(Of FBM.Fact)
         Public Columns As New List(Of String)
 
+        Public ErrorString As String = Nothing
+
         Private _CurrentFact As FBM.Fact
         Public Property CurrentFact() As FBM.Fact
             Get

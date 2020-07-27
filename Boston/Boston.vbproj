@@ -2723,6 +2723,7 @@
     <Content Include="Images\MenuImages\FactTypeReading16x16.png" />
     <Content Include="Images\MenuImages\FactTypeRemoveUniquenessConstraints16x16.png" />
     <None Include="Images\MenuImages\Glossary16x16.png" />
+    <None Include="Images\MenuImages\GO16x16.png" />
     <Content Include="Images\MenuImages\Grid.jpg" />
     <None Include="Images\MenuImages\Help16x16.png" />
     <None Include="Images\MenuImages\Group16x16.png" />

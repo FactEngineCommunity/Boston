@@ -75,7 +75,8 @@ Namespace FBM
         Public IsPreferred As Boolean = False
 
         ''' <summary>
-        ''' If there is more than one FactTypeReading for a FactType with the same TypedPredicateId, one of them may be 'Preferred'.
+        ''' If there is more than one FactTypeReading for a FactType with the same TypedPredicateId,
+        ''' one of them may be 'Preferred'.
         ''' </summary>
         ''' <remarks></remarks>
         Public IsPreferredForPredicate As Boolean = True
@@ -206,6 +207,25 @@ Namespace FBM
 
             For Each lrPredicatePart In Me.PredicatePart
                 If lrPredicatePart.RoleId <> other.PredicatePart(liInd).RoleId Then
+                    Return False
+                End If
+                liInd += 1
+            Next
+
+            Return True
+
+        End Function
+
+        Public Function EqualsByPredicatePartText(ByVal other As FBM.FactTypeReading) As Boolean
+
+            Dim liInd As Integer = 0
+
+            If Me.PredicatePart.Count <> other.PredicatePart.Count Then
+                Return False
+            End If
+
+            For Each lrPredicatePart In Me.PredicatePart
+                If lrPredicatePart.PredicatePartText <> other.PredicatePart(liInd).PredicatePartText Then
                     Return False
                 End If
                 liInd += 1

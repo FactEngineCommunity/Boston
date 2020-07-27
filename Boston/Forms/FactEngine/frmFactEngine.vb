@@ -1,8 +1,10 @@
 ﻿Public Class frmFactEngine
 
-    Public zrScanner As FEQL.Scanner
-    Public zrParser As FEQL.Parser
+    Public zrScanner As New FEQL.Scanner
+    Public zrParser As New FEQL.Parser(Me.zrScanner)
     Public WithEvents zrTextHighlighter As FEQL.TextHighlighter
+
+    Public FEQLProcessor As New FEQL.Processor(prApplication.WorkingModel)
 
     Private Sub frmFactEngine_Load(sender As Object, e As EventArgs) Handles Me.Load
 
@@ -13,11 +15,8 @@
         End If
 
         '-------------------------------------------------------
-        'Setup the Parser etc
-        '---------------------
-        zrScanner = New FEQL.Scanner
-        zrParser = New FEQL.Parser(zrScanner)
-
+        'Setup the Text Highlighter
+        '----------------------------
         Me.zrTextHighlighter = New FEQL.TextHighlighter(
                                Me.TextBoxInput,
                                Me.zrScanner,
@@ -26,4 +25,22 @@
 
     End Sub
 
+    Private Sub ToolStripButtonGO_Click(sender As Object, e As EventArgs) Handles ToolStripButtonGO.Click
+
+        Dim lrRecordset As New ORMQL.Recordset
+
+        lrRecordset = Me.FEQLProcessor.ProcessFEQLStatement(Me.TextBoxInput.Text)
+
+        If lrRecordset.ErrorString IsNot Nothing Then
+            Me.LabelError.BringToFront()
+            Me.LabelError.Text = lrRecordset.ErrorString
+        Else
+            'ToDo
+        End If
+
+    End Sub
+
+    Private Sub TextBoxInput_TextChanged(sender As Object, e As EventArgs) Handles TextBoxInput.TextChanged
+
+    End Sub
 End Class
