@@ -749,10 +749,11 @@ Namespace FBM
 
                                     lrRole = arRoleConstraint.RoleConstraintRole(0).Role
 
+                                    lrTable = Nothing
+
                                     If lrRole.IsERDPropertyRole Then
 
                                         lsTableName = lrRole.BelongsToTable
-
                                         lrTable = Me.RDS.getTableByName(lsTableName)
 
                                         If lrTable Is Nothing Then
@@ -771,6 +772,7 @@ Namespace FBM
                                         lrTable.addColumn(lrColumn)
                                     End If
 
+                                    'Relation
                                     If lrRole.FactType.Arity = 2 _
                                         And lrRole.FactType.InternalUniquenessConstraint.Count = 1 _
                                         And Not (lrRole.FactType.GetOtherRoleOfBinaryFactType(lrRole.Id).ConceptType = pcenumConceptType.ValueType) Then
@@ -806,11 +808,41 @@ Namespace FBM
 
                                         End If
 
+                                    End If 'Relation
+
+                                    'Index 
+                                    If arRoleConstraint.FirstRoleConstraintRoleFactType.Is1To1BinaryFactType Then
+                                        Dim larIndexColumn As New List(Of RDS.Column)
+                                        Dim lrFirstRole = arRoleConstraint.FirstRoleConstraintRole
+
+                                        Dim larColumn = From Column In lrTable.Column
+                                                        Where Column.Role.Id = lrFirstRole.Id
+                                                        Select Column
+
+                                        larIndexColumn.Add(larColumn.First)
+
+                                        Dim lsQualifier As String = lrTable.generateUniqueQualifier("UC")
+                                        Dim lbIsPrimaryKey As Boolean = False
+                                        Dim lsIndexName As String = lrTable.Name & "_" & Trim(lsQualifier)
+
+                                        'Add the new Index
+                                        Dim lrIndex As New RDS.Index(lrTable,
+                                                                 lsIndexName,
+                                                                 lsQualifier,
+                                                                 pcenumODBCAscendingOrDescending.Ascending,
+                                                                 lbIsPrimaryKey,
+                                                                 True,
+                                                                 False,
+                                                                 larIndexColumn,
+                                                                 False,
+                                                                 True)
+
+                                        Call lrTable.addIndex(lrIndex)
                                     End If
 
                                 End If
 
-                            ElseIf arRoleConstraint.Role(0).FactType.IsManyTo1BinaryFactType And
+                                ElseIf arRoleConstraint.Role(0).FactType.IsManyTo1BinaryFactType And
                                    arRoleConstraint.Role(0).HasInternalUniquenessConstraint And
                                    Not arRoleConstraint.Role(0).FactType.IsLinkFactType Then
 
@@ -841,6 +873,49 @@ Namespace FBM
 
                                 'Relation
                                 Call Me.generateRelationForManyTo1BinaryFactType(lrRoleConstraintRole)
+
+                            ElseIf arRoleConstraint.RoleConstraintRole.Count = 1 _
+                                   And arRoleConstraint.RoleConstraintRole(0).Role.FactType.Is1To1BinaryFactType Then
+                                'Need to create an Index on the corresponding Table
+
+                                If Not arRoleConstraint.impliesSingleColumnForRDSTable And
+                                       arRoleConstraint.RoleConstraintRole(0).Role.TypeOfJoin = pcenumRoleJoinType.ValueType Then
+
+                                    Dim lrFactType = arRoleConstraint.FirstRoleConstraintRoleFactType
+                                    Dim lrOtherRole = lrFactType.GetOtherRoleOfBinaryFactType(arRoleConstraint.FirstRoleConstraintRole.Id)
+                                    lrTable = lrOtherRole.JoinedORMObject.getCorrespondingRDSTable
+
+                                    'Index 
+                                    Dim larIndexColumn As New List(Of RDS.Column)
+
+                                    Dim larColumn = From Column In lrTable.Column
+                                                    Where Column.Role.Id = lrOtherRole.Id
+                                                    Select Column
+
+                                    larIndexColumn.Add(larColumn.First)
+
+                                    Dim lsQualifier As String = lrTable.generateUniqueQualifier("UC")
+                                    Dim lbIsPrimaryKey As Boolean = False
+                                    Dim lsIndexName As String = lrTable.Name & "_" & Trim(lsQualifier)
+
+                                    'Add the new Index
+                                    Dim lrIndex As New RDS.Index(lrTable,
+                                                                 lsIndexName,
+                                                                 lsQualifier,
+                                                                 pcenumODBCAscendingOrDescending.Ascending,
+                                                                 lbIsPrimaryKey,
+                                                                 True,
+                                                                 False,
+                                                                 larIndexColumn,
+                                                                 False,
+                                                                 True)
+
+                                    Call lrTable.addIndex(lrIndex)
+
+                                Else
+
+
+                                End If
 
                             ElseIf (arRoleConstraint.RoleConstraintRole.Count <> 1) _
                                 Or (arRoleConstraint.RoleConstraintRole.Count = 1 And arRoleConstraint.RoleConstraintRole(0).Role.FactType.IsObjectified) Then 'And (arRoleConstraint.RoleConstraintRole(0).Role.JoinedORMObject.ConceptType <> pcenumConceptType.ValueType)

@@ -168,8 +168,21 @@ Namespace FBM
             End Set
         End Property
 
-        <XmlElement()> _
+        <XmlElement()>
         Public RoleConstraintRole As New List(Of FBM.RoleConstraintRole)
+
+        <XmlIgnore()>
+        Public ReadOnly Property FirstRoleConstraintRole As FBM.Role
+            Get
+                Return Me.RoleConstraintRole(0).Role
+            End Get
+        End Property
+
+        Public ReadOnly Property FirstRoleConstraintRoleFactType As FBM.FactType
+            Get
+                Return Me.RoleConstraintRole(0).Role.FactType
+            End Get
+        End Property
 
         ''' <summary>
         ''' List of Arguments for the RoleConstraint, if the RoleConstraint is of a type that has Arguments.
