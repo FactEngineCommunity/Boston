@@ -40,6 +40,10 @@
         Else
             Me.LabelError.Text = ""
 
+            For Each lrFact In lrRecordset.Facts
+                Me.LabelError.Text = lrFact.EnumerateAsBracketedFact & vbCrLf
+            Next
+
             'ToDo
         End If
 

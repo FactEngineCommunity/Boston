@@ -22,6 +22,17 @@ Namespace Database
             Return sqlite_conn
         End Function
 
+        Public Function getReaderForSQL(ByVal conn As SQLiteConnection, ByVal asSQLQuery As String) As SQLiteDataReader
+
+            Dim sqlite_datareader As SQLiteDataReader
+            Dim sqlite_cmd As SQLiteCommand
+            sqlite_cmd = conn.CreateCommand()
+            sqlite_cmd.CommandText = asSQLQuery
+            sqlite_datareader = sqlite_cmd.ExecuteReader()
+
+            Return sqlite_datareader
+
+        End Function
     End Module
 
 End Namespace

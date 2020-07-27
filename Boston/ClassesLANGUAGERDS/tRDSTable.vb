@@ -238,6 +238,38 @@ Namespace RDS
 
         End Function
 
+        ''' <summary>
+        ''' Returns the first Uniqueness Constraint Columns, even if the Index is the PrimaryKey
+        ''' </summary>
+        ''' <returns></returns>
+        Public Function getFirstUniquenessConstraintColumns() As List(Of RDS.Column)
+
+            Try
+                Dim lrIndex As RDS.Index = Me.Index.Find(Function(x) x.IsPrimaryKey = False)
+
+                If lrIndex Is Nothing Then
+                    Dim larColumn = From Column In Me.Column
+                                    Where Column.isPartOfPrimaryKey = True
+                                    Select Column Distinct
+
+                    Return larColumn.ToList
+                Else
+                    Return lrIndex.Column
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage1 As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return New List(Of RDS.Column)
+            End Try
+
+        End Function
+
         Public Function getPrimaryKeyColumns() As List(Of RDS.Column)
 
             Try
