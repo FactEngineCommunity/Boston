@@ -534,7 +534,15 @@ Namespace FBM
         End Function
 
         Public Overridable Function getCorrespondingRDSTable() As RDS.Table
-            Return New RDS.Table
+
+            Select Case Me.GetType.ToString
+                Case Is = GetType(FBM.EntityType).ToString
+                    Return CType(Me, FBM.EntityType).getCorrespondingRDSTable
+                Case Else
+                    Return New RDS.Table
+            End Select
+
+
         End Function
 
         ''' <summary>
