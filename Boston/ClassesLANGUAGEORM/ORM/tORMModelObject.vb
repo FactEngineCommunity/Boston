@@ -538,6 +538,8 @@ Namespace FBM
             Select Case Me.GetType.ToString
                 Case Is = GetType(FBM.EntityType).ToString
                     Return CType(Me, FBM.EntityType).getCorrespondingRDSTable
+                Case Is = GetType(FBM.FactType).ToString
+                    Return CType(Me, FBM.FactType).getCorrespondingRDSTable
                 Case Else
                     Return New RDS.Table
             End Select

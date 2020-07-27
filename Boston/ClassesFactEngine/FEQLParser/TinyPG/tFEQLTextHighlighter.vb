@@ -212,29 +212,27 @@ Namespace FEQL
         End Get
     End Property
 
-        Public Sub New(ByVal textbox As RichTextBox, ByVal scanner As Scanner, ByVal parser As Parser)
+    Public Sub New(ByVal textbox As RichTextBox, ByVal scanner As Scanner, ByVal parser As Parser)
+        Me.Textbox = textbox
+        Me.Scanner = scanner
+        Me.Parser = parser
 
-            Me.Textbox = textbox
-            Me.Scanner = scanner
+        ClearUndo()
 
-            Me.Parser = parser
+        AddHandler Textbox.TextChanged, AddressOf Textbox_TextChanged
+        AddHandler textbox.KeyUp, AddressOf textbox_KeyDown
+        AddHandler Textbox.SelectionChanged, AddressOf Textbox_SelectionChanged
+        AddHandler Textbox.Disposed, AddressOf Textbox_Disposed
 
-            ClearUndo()
+        Tree = New ParseTree()
+        currentContext = Tree
 
-            AddHandler textbox.TextChanged, AddressOf Textbox_TextChanged
-            AddHandler textbox.KeyUp, AddressOf textbox_KeyDown
-            AddHandler textbox.SelectionChanged, AddressOf Textbox_SelectionChanged
-            AddHandler textbox.Disposed, AddressOf Textbox_Disposed
-
-            Tree = New ParseTree()
-            currentContext = Tree
-
-            threadAutoHighlight = New Thread(AddressOf AutoHighlightStart)
-            threadAutoHighlight.Start()
-        End Sub
+        threadAutoHighlight = New Thread(AddressOf AutoHighlightStart)
+        threadAutoHighlight.Start()
+    End Sub
 
 
-        Public Sub Lock()
+    Public Sub Lock()
         ' Stop redrawing:  
         SendMessage(Textbox.Handle, WM_SETREDRAW, 0, IntPtr.Zero)
         ' Stop sending of events:  
@@ -276,12 +274,10 @@ Namespace FEQL
     End Sub
 
     Sub Textbox_TextChanged(ByVal sender As Object, ByVal e As EventArgs)
-            If stateLocked <> IntPtr.Zero Then
-                Return
-            End If
-            DoAction(Textbox.Rtf, Textbox.SelectionStart)
-            HighlightText()
-        End Sub
+        If stateLocked <> IntPtr.Zero Then
+            Return
+        End If
+    End Sub
 
     Sub Textbox_SelectionChanged(ByVal sender As Object, ByVal e As EventArgs)
         If stateLocked <> IntPtr.Zero Then
@@ -489,7 +485,7 @@ Namespace FEQL
     ''' <param name="sb">the final output string</param>
     Private Sub HighlightToken(ByVal token As Token, ByVal sb As StringBuilder)
         Select Case token.Type
-                    Case TokenType.ID:
+                    Case TokenType.IDENTIFIER:
                         sb.Append("{{\cf1 ")
                         Exit Select
                     Case TokenType.MODELELEMENTNAME:
@@ -864,8 +860,8 @@ Namespace FEQL
 
     ' define the color palette to be used here
     Private Sub AddRtfHeader(ByVal sb As StringBuilder)
-            sb.Insert(0, "{\rtf1\ansi\deff0{\fonttbl{\f0\fnil\fcharset0 Tahoma;}}{\colortbl;\red153\green0\blue0;\red76\green153\blue0;\red153\green0\blue153;\red76\green153\blue0;\red153\green76\blue0;\red153\green0\blue0;\red0\green0\blue255;\red153\green0\blue0;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;}\viewkind4\uc1\pard\lang1033\f0\fs16")
-        End Sub
+        sb.Insert(0, "{\rtf1\ansi\deff0{\fonttbl{\f0\fnil\fcharset0 Tahoma;}}{\colortbl;\red153\green0\blue0;\red76\green153\blue0;\red153\green0\blue153;\red76\green153\blue0;\red153\green76\blue0;\red153\green0\blue0;\red0\green0\blue255;\red153\green0\blue0;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;}\viewkind4\uc1\pard\lang1033\f0\fs20")
+    End Sub
 
     Private Sub AddRtfEnd(ByVal sb As StringBuilder)
         sb.Append("} ")

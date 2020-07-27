@@ -62,7 +62,9 @@ Partial Class frmFactEngine
         '
         'TextBoxInput
         '
+        Me.TextBoxInput.BackColor = System.Drawing.Color.White
         Me.TextBoxInput.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.TextBoxInput.ForeColor = System.Drawing.Color.Black
         Me.TextBoxInput.Location = New System.Drawing.Point(0, 33)
         Me.TextBoxInput.Name = "TextBoxInput"
         Me.TextBoxInput.Size = New System.Drawing.Size(1178, 231)

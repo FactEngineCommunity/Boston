@@ -226,6 +226,9 @@ Namespace FEQL
                 Case TokenType.ADDITIONALCOMPARISON
                     Value = EvalADDITIONALCOMPARISON(tree, paramlist)
                     Exit Select
+                Case TokenType.ADDITIONALQUOTEDIDENTIFIER
+                    Value = EvalADDITIONALQUOTEDIDENTIFIER(tree, paramlist)
+                    Exit Select
                 Case TokenType.ADDITIONALVALUE
                     Value = EvalADDITIONALVALUE(tree, paramlist)
                     Exit Select
@@ -300,6 +303,12 @@ Namespace FEQL
                     Exit Select
                 Case TokenType.PREDICATECLAUSE
                     Value = EvalPREDICATECLAUSE(tree, paramlist)
+                    Exit Select
+                Case TokenType.QUOTEDIDENTIFIER
+                    Value = EvalQUOTEDIDENTIFIER(tree, paramlist)
+                    Exit Select
+                Case TokenType.QUOTEDIDENTIFIERLIST
+                    Value = EvalQUOTEDIDENTIFIERLIST(tree, paramlist)
                     Exit Select
                 Case TokenType.REFERENCEMODECLAUSE
                     Value = EvalREFERENCEMODECLAUSE(tree, paramlist)
@@ -520,6 +529,10 @@ Namespace FEQL
             Throw New NotImplementedException()
         End Function
 
+        Protected Overridable Function EvalADDITIONALQUOTEDIDENTIFIER(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
         Protected Overridable Function EvalADDITIONALVALUE(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
             Throw New NotImplementedException()
         End Function
@@ -617,6 +630,14 @@ Namespace FEQL
         End Function
 
         Protected Overridable Function EvalPREDICATECLAUSE(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalQUOTEDIDENTIFIER(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalQUOTEDIDENTIFIERLIST(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
             Throw New NotImplementedException()
         End Function
 
