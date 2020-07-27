@@ -2709,6 +2709,7 @@
     <None Include="Images\MenuImages\ERD16x16.png" />
     <Content Include="Images\MenuImages\ErrorList.png" />
     <None Include="Images\MenuImages\Export16x16.png" />
+    <None Include="Images\MenuImages\FactEngine16x16.png" />
     <Content Include="Images\MenuImages\FactTables16x16.png" />
     <Content Include="Images\MenuImages\FactTypeObjectified16x16.png" />
     <Content Include="Images\MenuImages\FactTypeReading16x16.png" />
