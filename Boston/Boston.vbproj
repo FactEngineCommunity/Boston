@@ -112,9 +112,11 @@
     </Reference>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>..\packages\EntityFramework.6.3.0\lib\net45\EntityFramework.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>..\packages\EntityFramework.6.3.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="FilteredPropertyGrid, Version=1.0.5547.36338, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -343,6 +345,10 @@
     <Compile Include="ClassesClientServer\tUser.vb" />
     <Compile Include="ClassesDatabase\SQLite\Database.vb" />
     <Compile Include="ClassesFactEngine\Constants.vb" />
+    <Compile Include="ClassesFactEngine\FEQLParser\TinyPG\tFEQLParser.vb" />
+    <Compile Include="ClassesFactEngine\FEQLParser\TinyPG\tFEQLParseTree.vb" />
+    <Compile Include="ClassesFactEngine\FEQLParser\TinyPG\tFEQLScanner.vb" />
+    <Compile Include="ClassesFactEngine\FEQLParser\TinyPG\tFEQLTextHighlighter.vb" />
     <Compile Include="ClassesFactEngine\tQueryEdge.vb" />
     <Compile Include="ClassesFactEngine\tQueryGraph.vb" />
     <Compile Include="ClassesFactEngine\tQueryNode.vb" />
