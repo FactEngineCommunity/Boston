@@ -23,9 +23,9 @@ Partial Class frmFactEngine
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         Me.SplitContainer1 = New System.Windows.Forms.SplitContainer()
+        Me.TextBoxInput = New System.Windows.Forms.RichTextBox()
         Me.ToolStrip1 = New System.Windows.Forms.ToolStrip()
         Me.ToolStripButtonGO = New System.Windows.Forms.ToolStripButton()
-        Me.TextBoxInput = New System.Windows.Forms.RichTextBox()
         Me.StatusStrip2 = New System.Windows.Forms.StatusStrip()
         Me.ToolStripStatusLabelWorkingModelName = New System.Windows.Forms.ToolStripStatusLabel()
         Me.StatusStrip1 = New System.Windows.Forms.StatusStrip()
@@ -60,6 +60,15 @@ Partial Class frmFactEngine
         Me.SplitContainer1.SplitterWidth = 5
         Me.SplitContainer1.TabIndex = 0
         '
+        'TextBoxInput
+        '
+        Me.TextBoxInput.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.TextBoxInput.Location = New System.Drawing.Point(0, 33)
+        Me.TextBoxInput.Name = "TextBoxInput"
+        Me.TextBoxInput.Size = New System.Drawing.Size(1178, 231)
+        Me.TextBoxInput.TabIndex = 2
+        Me.TextBoxInput.Text = ""
+        '
         'ToolStrip1
         '
         Me.ToolStrip1.ImageScalingSize = New System.Drawing.Size(24, 24)
@@ -78,15 +87,6 @@ Partial Class frmFactEngine
         Me.ToolStripButtonGO.Name = "ToolStripButtonGO"
         Me.ToolStripButtonGO.Size = New System.Drawing.Size(34, 28)
         Me.ToolStripButtonGO.Text = "ToolStripButton1"
-        '
-        'TextBoxInput
-        '
-        Me.TextBoxInput.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.TextBoxInput.Location = New System.Drawing.Point(0, 33)
-        Me.TextBoxInput.Name = "TextBoxInput"
-        Me.TextBoxInput.Size = New System.Drawing.Size(1178, 231)
-        Me.TextBoxInput.TabIndex = 2
-        Me.TextBoxInput.Text = ""
         '
         'StatusStrip2
         '

@@ -61,6 +61,7 @@ Public Class tRichmondApplication
     Public RedoLog As New List(Of tUserAction)
 
     Public Event ModelAdded(ByRef arModel As FBM.Model)
+    Public Event WorkingModelChanged()
 
     Public Sub New()
 
@@ -322,6 +323,8 @@ Public Class tRichmondApplication
         Me.WorkingModel = arWorkingEnvironment.Model
         Me.WorkingPage = arWorkingEnvironment.Page
 
+        RaiseEvent WorkingModelChanged()
+
     End Sub
 
     ''' <summary>
@@ -457,6 +460,11 @@ Public Class tRichmondApplication
             MsgBox(lsMessage)
         End Try
 
+    End Sub
+
+    Public Sub setWorkingModel(ByRef arModel As FBM.Model)
+        Me.WorkingModel = arModel
+        RaiseEvent WorkingModelChanged()
     End Sub
 
     Private Sub WorkingModel_MadeDirty(abGlobalBroadcast As Boolean) Handles WorkingModel.MadeDirty

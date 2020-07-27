@@ -3,16 +3,19 @@
     Public zrScanner As New FEQL.Scanner
     Public zrParser As New FEQL.Parser(Me.zrScanner)
     Public WithEvents zrTextHighlighter As FEQL.TextHighlighter
+    Public WithEvents Application As tRichmondApplication = prApplication
 
     Public FEQLProcessor As New FEQL.Processor(prApplication.WorkingModel)
 
-    Private Sub frmFactEngine_Load(sender As Object, e As EventArgs) Handles Me.Load
-
+    Private Sub displayModelName()
         If prApplication.WorkingModel Is Nothing Then
             Me.ToolStripStatusLabelWorkingModelName.Text = "Model: Select a Model in the Model Explorer"
         Else
             Me.ToolStripStatusLabelWorkingModelName.Text = "Model: " & prApplication.WorkingModel.Name
         End If
+    End Sub
+
+    Private Sub frmFactEngine_Load(sender As Object, e As EventArgs) Handles Me.Load
 
         '-------------------------------------------------------
         'Setup the Text Highlighter
@@ -35,12 +38,15 @@
             Me.LabelError.BringToFront()
             Me.LabelError.Text = lrRecordset.ErrorString
         Else
+            Me.LabelError.Text = ""
+
             'ToDo
         End If
 
     End Sub
 
-    Private Sub TextBoxInput_TextChanged(sender As Object, e As EventArgs) Handles TextBoxInput.TextChanged
-
+    Private Sub Application_WorkingModelChanged() Handles Application.WorkingModelChanged
+        Call Me.displayModelName()
+        Me.FEQLProcessor = New FEQL.Processor(prApplication.WorkingModel)
     End Sub
 End Class

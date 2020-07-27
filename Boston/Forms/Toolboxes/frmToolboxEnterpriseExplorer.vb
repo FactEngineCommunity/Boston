@@ -859,7 +859,6 @@ Public Class frmToolboxEnterpriseExplorer
         Dim lsMessage As String
 
         Try
-
             If Me.zbRemovingModels Or Me.zbDraggingOver Then
                 Exit Sub
             End If
@@ -957,7 +956,7 @@ Public Class frmToolboxEnterpriseExplorer
                                 '------------------------------
                                 'Load the Model and the Pages
                                 '------------------------------                                
-                                If TableModel.ExistsModelById(lrModel.ModelId) Then
+                                If TableModel.ExistsModelById(lrModel.ModelId) And Not lrModel.Loaded Then
                                     Call TableModel.GetModelDetails(lrModel)
 
                                     Me.Cursor = Cursors.WaitCursor
@@ -1061,7 +1060,7 @@ Public Class frmToolboxEnterpriseExplorer
 
                 Case Is = pcenumMenuType.modelORMModel
 
-                    prApplication.WorkingModel = ao_object.Tag
+                    Call prApplication.setWorkingModel(ao_object.Tag)
                     prApplication.PluginInterface.SharedModel = prApplication.WorkingModel.SharedModel
                     prApplication.PluginInterface.SharedModel.ModelId = prApplication.WorkingModel.ModelId
 
