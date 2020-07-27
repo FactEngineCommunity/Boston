@@ -349,9 +349,11 @@
     <Compile Include="ClassesFactEngine\FEQLParser\TinyPG\tFEQLParseTree.vb" />
     <Compile Include="ClassesFactEngine\FEQLParser\TinyPG\tFEQLScanner.vb" />
     <Compile Include="ClassesFactEngine\FEQLParser\TinyPG\tFEQLTextHighlighter.vb" />
-    <Compile Include="ClassesFactEngine\tQueryEdge.vb" />
-    <Compile Include="ClassesFactEngine\tQueryGraph.vb" />
-    <Compile Include="ClassesFactEngine\tQueryNode.vb" />
+    <Compile Include="ClassesFactEngine\tFEQLProcessor.vb" />
+    <Compile Include="ClassesFactEngine\Parsing\QueryGraph\tQueryEdge.vb" />
+    <Compile Include="ClassesFactEngine\Parsing\QueryGraph\tQueryGraph.vb" />
+    <Compile Include="ClassesFactEngine\Parsing\QueryGraph\tQueryNode.vb" />
+    <Compile Include="ClassesFactEngine\tFEQLProcessorStatementProcessing.vb" />
     <Compile Include="ClassesFBMInterfaceHost\tFBMInterfaceHost.vb" />
     <Compile Include="ClassesGeneral\BostonTreeView.vb">
       <SubType>Component</SubType>
