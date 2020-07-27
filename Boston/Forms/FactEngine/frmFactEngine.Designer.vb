@@ -62,7 +62,7 @@ Partial Class frmFactEngine
         '
         'TextBoxInput
         '
-        Me.TextBoxInput.BackColor = System.Drawing.Color.White
+        Me.TextBoxInput.BackColor = System.Drawing.Color.FromArgb(CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer))
         Me.TextBoxInput.Dock = System.Windows.Forms.DockStyle.Fill
         Me.TextBoxInput.ForeColor = System.Drawing.Color.Black
         Me.TextBoxInput.Location = New System.Drawing.Point(0, 33)
