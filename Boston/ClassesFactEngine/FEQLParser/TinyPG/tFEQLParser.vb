@@ -8902,6 +8902,22 @@ Namespace FEQL
                         parent.Token.UpdateRange(node.Token)
                         Exit Sub
             End If
+
+             ' Concat Rule
+            tok = m_scanner.Scan(TokenType.EOF) ' Terminal Rule: EOF
+            n = node.CreateNode(tok, tok.ToString() )
+            node.Token.UpdateRange(tok)
+            node.Nodes.Add(n)
+            If tok.Type <> TokenType.EOF Then
+                m_tree.Errors.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.EOF.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "EOF"))
+                Return
+
+            End If
+
+            If m_tree.Errors.Count > 0 Then
+                        parent.Token.UpdateRange(node.Token)
+                        Exit Sub
+            End If
             If m_tree.Errors.Count > 0 Then
                         parent.Token.UpdateRange(node.Token)
                         Exit Sub

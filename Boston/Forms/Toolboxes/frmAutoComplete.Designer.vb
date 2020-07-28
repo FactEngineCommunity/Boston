@@ -22,33 +22,37 @@ Partial Class frmAutoComplete
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
-        Me.ListBox = New FlickerFreeListBox 'System.Windows.Forms.ListBox()
+        Me.ListBox = New Boston.FlickerFreeListBox()
         Me.SuspendLayout()
         '
         'ListBox
         '
-        Me.ListBox.BackColor = System.Drawing.Color.White
+        Me.ListBox.BackColor = System.Drawing.Color.GhostWhite
+        Me.ListBox.BorderStyle = System.Windows.Forms.BorderStyle.None
         Me.ListBox.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable
+        Me.ListBox.Font = New System.Drawing.Font("Tahoma", 8.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.ListBox.FormattingEnabled = True
         Me.ListBox.IntegralHeight = False
-        Me.ListBox.Location = New System.Drawing.Point(3, 4)
+        Me.ListBox.Location = New System.Drawing.Point(5, 2)
+        Me.ListBox.Margin = New System.Windows.Forms.Padding(3, 0, 3, 3)
         Me.ListBox.Name = "ListBox"
-        Me.ListBox.Size = New System.Drawing.Size(236, 134)
+        Me.ListBox.Size = New System.Drawing.Size(352, 204)
         Me.ListBox.TabIndex = 0
         '
         'frmAutoComplete
         '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(244, 144)
+        Me.BackColor = System.Drawing.Color.White
+        Me.ClientSize = New System.Drawing.Size(362, 215)
         Me.ControlBox = False
         Me.Controls.Add(Me.ListBox)
-        Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle
+        Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None
+        Me.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.Name = "frmAutoComplete"
         Me.ResumeLayout(False)
 
     End Sub
 
-    Friend WithEvents ListBox As System.Windows.Forms.ListBox
-
+    Friend WithEvents ListBox As FlickerFreeListBox
 End Class

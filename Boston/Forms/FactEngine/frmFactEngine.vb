@@ -132,7 +132,7 @@ Public Class frmFactEngine
 
             Me.AutoComplete.Show()
             Me.AutoComplete.ListBox.Focus()
-            Me.AutoComplete.ListBox.SelectedIndex = 0
+            'Me.AutoComplete.ListBox.SelectedIndex = 0
         End If
 
     End Sub
@@ -161,7 +161,7 @@ Public Class frmFactEngine
             Me.AutoComplete.Show()
             Me.AutoComplete.ListBox.Focus()
             If (aarPredicatePart.Count > 0) And (Me.AutoComplete.ListBox.Items.Count > 0) Then
-                Me.AutoComplete.ListBox.SelectedIndex = 0
+                'Me.AutoComplete.ListBox.SelectedIndex = 0
             End If
         Catch ex As Exception
             Dim lsMessage As String
@@ -244,6 +244,12 @@ Public Class frmFactEngine
 
     Private Sub GO()
         Dim lrRecordset As New ORMQL.Recordset
+
+        If prApplication.WorkingModel.TargetDatabaseConnectionString = "" Then
+            Me.LabelError.ForeColor = Color.Orange
+            Me.LabelError.Text = "The Model needs a database connection string."
+            Exit Sub
+        End If
 
         lrRecordset = Me.FEQLProcessor.ProcessFEQLStatement(Me.TextBoxInput.Text)
 
@@ -352,6 +358,23 @@ Public Class frmFactEngine
 
         If Me.TextBoxInput.SelectionColor = Color.Black Then Me.TextBoxInput.SelectionColor = Color.Wheat
 
+        If Me.zrTextHighlighter.Tree.Nodes.Count > 0 Then
+            If Me.zrTextHighlighter.Tree.Nodes(0).Nodes.Count > 0 Then
+                If Me.zrTextHighlighter.Tree.Nodes(0).Nodes(0).Nodes.Count > 0 Then
+                    Dim liInd = Me.zrTextHighlighter.Tree.Nodes(0).Nodes(0).Nodes.Count
+                    If liInd > 0 Then
+                        Dim lrLastToken = Me.zrTextHighlighter.Tree.Nodes(0).Nodes(0).Nodes(liInd - 1).Token
+                        If lrLastToken.Type = FEQL.TokenType.EOF Then
+                            Me.ToolStripStatusLabelGOPrompt.Text = "Valid FEQL Statement"
+                            Me.ToolStripStatusLabelGOPrompt.Visible = True
+                        Else
+                            Me.ToolStripStatusLabelGOPrompt.Visible = False
+                        End If
+                    End If
+                End If
+            End If
+        End If
+
     End Sub
 
     Private Sub ProcessAutoComplete(ByVal e As System.Windows.Forms.KeyEventArgs)
@@ -433,6 +456,19 @@ Public Class frmFactEngine
                     If Not e.KeyCode = Keys.ShiftKey Then
                         Call Me.PopulateEnterpriseAwareWithObjectTypes()
                     End If
+                    '20200729-VM-Might be able to remove the below because no optionals or errors.
+                    Dim lsModelElementName = Me.TextBoxInput.Text.Trim.Split(" ").Last
+                    lrModelElement = prApplication.WorkingModel.GetModelObjectByName(lsModelElementName)
+                    If lrModelElement IsNot Nothing Then
+                        Select Case lrModelElement.GetType
+                            Case Is = GetType(FBM.FactType)
+                                Call Me.AddPredicatePartsToEnterpriseAware(CType(lrModelElement, FBM.FactType).getPredicateParts)
+                            Case Is = GetType(FBM.EntityType)
+                                For Each lrFactType In lrModelElement.getConnectedFactTypes
+                                    Call Me.AddPredicatePartsToEnterpriseAware(lrFactType.getPredicateParts)
+                                Next
+                        End Select
+                    End If
                 Case Is = FEQL.TokenType.VALUE
                 Case Is = FEQL.TokenType.IDENTIFIER
                 Case Else
@@ -465,7 +501,7 @@ Public Class frmFactEngine
             If e.KeyCode = Keys.Down Then
                 If Me.AutoComplete.ListBox.Items.Count > 0 Then
                     Me.AutoComplete.ListBox.Focus()
-                    Me.AutoComplete.ListBox.SelectedIndex = 0
+                    'Me.AutoComplete.ListBox.SelectedIndex = 0
                     e.Handled = True
                 End If
                 e.Handled = True
@@ -506,6 +542,18 @@ Public Class frmFactEngine
                     Case Is = FEQL.TokenType.MODELELEMENTNAME
                         Me.AutoComplete.Enabled = True
                         Call Me.PopulateEnterpriseAwareWithObjectTypes()
+                        Dim lsModelElementName = Me.TextBoxInput.Text.Trim.Split(" ").Last
+                        lrModelElement = prApplication.WorkingModel.GetModelObjectByName(lsModelElementName)
+                        If lrModelElement IsNot Nothing Then
+                            Select Case lrModelElement.GetType
+                                Case Is = GetType(FBM.FactType)
+                                    Call Me.AddPredicatePartsToEnterpriseAware(CType(lrModelElement, FBM.FactType).getPredicateParts)
+                                Case Is = GetType(FBM.EntityType)
+                                    For Each lrFactType In lrModelElement.getConnectedFactTypes
+                                        Call Me.AddPredicatePartsToEnterpriseAware(lrFactType.getPredicateParts)
+                                    Next
+                            End Select
+                        End If
                     Case Else
                         Me.AutoComplete.Enabled = False
                 End Select

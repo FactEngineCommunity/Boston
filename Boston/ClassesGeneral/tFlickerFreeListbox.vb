@@ -28,9 +28,9 @@
 
                 Select Case liTokenType
                     Case Is = FEQL.TokenType.MODELELEMENTNAME
-                        ForeColor = Color.FromArgb(76, 153, 0)
+                        ForeColor = Color.FromArgb(76, 153, 0) '94, 213, 165
                     Case Is = FEQL.TokenType.PREDICATE
-                        ForeColor = Color.FromArgb(153, 0, 153)
+                        ForeColor = Color.FromArgb(153, 0, 153) '227, 143, 247
                 End Select
 
                 Select Case liTokenType.ToString Like "KEYWD*"
