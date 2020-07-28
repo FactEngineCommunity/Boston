@@ -273,6 +273,12 @@
                 zsIntellisenseBuffer &= LCase(e.KeyCode.ToString)
         End Select
 
+        Select Case e.KeyCode
+            Case Is = Keys.Escape
+                Me.AutoComplete.Hide()
+                Exit Sub
+        End Select
+
         If Not e.KeyCode = Keys.Down Then
             Call Me.ProcessAutoComplete(e)
         End If
@@ -280,6 +286,7 @@
 
         Select Case e.KeyCode
             Case Is = Keys.F5
+                Me.AutoComplete.Hide()
                 Call Me.GO()
             Case Is = Keys.Down
                 If (Me.AutoComplete.ListBox.Items.Count > 0) Or Me.AutoComplete.Visible Then
@@ -462,6 +469,9 @@
                               FEQL.TokenType.PREDICATESPACE
                         Me.AutoComplete.Enabled = True
                         Call Me.AddFactTypeReadingsToEnterpriseAware()
+                    Case Is = FEQL.TokenType.MODELELEMENTNAME
+                        Me.AutoComplete.Enabled = True
+                        Call Me.PopulateEnterpriseAwareWithObjectTypes()
                     Case Else
                         Me.AutoComplete.Enabled = False
                 End Select
@@ -580,6 +590,10 @@
     End Sub
 
     Private Sub frmFactEngine_LostFocus(sender As Object, e As EventArgs) Handles Me.LostFocus
+        Me.AutoComplete.Hide()
+    End Sub
+
+    Private Sub frmFactEngine_Leave(sender As Object, e As EventArgs) Handles Me.Leave
         Me.AutoComplete.Hide()
     End Sub
 End Class

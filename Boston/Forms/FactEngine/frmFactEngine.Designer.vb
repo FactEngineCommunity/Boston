@@ -30,9 +30,9 @@ Partial Class frmFactEngine
         Me.ToolStripStatusLabelWorkingModelName = New System.Windows.Forms.ToolStripStatusLabel()
         Me.ToolStripStatusLabelLookingFor = New System.Windows.Forms.ToolStripStatusLabel()
         Me.ToolStripStatusLabelCurrentProduction = New System.Windows.Forms.ToolStripStatusLabel()
+        Me.ToolStripStatusLabelRequiresConnectionString = New System.Windows.Forms.ToolStripStatusLabel()
         Me.StatusStrip1 = New System.Windows.Forms.StatusStrip()
         Me.LabelError = New System.Windows.Forms.Label()
-        Me.ToolStripStatusLabelRequiresConnectionString = New System.Windows.Forms.ToolStripStatusLabel()
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SplitContainer1.Panel1.SuspendLayout()
         Me.SplitContainer1.Panel2.SuspendLayout()
@@ -114,14 +114,20 @@ Partial Class frmFactEngine
         'ToolStripStatusLabelLookingFor
         '
         Me.ToolStripStatusLabelLookingFor.Name = "ToolStripStatusLabelLookingFor"
-        Me.ToolStripStatusLabelLookingFor.Size = New System.Drawing.Size(108, 25)
-        Me.ToolStripStatusLabelLookingFor.Text = "Looking for:"
+        Me.ToolStripStatusLabelLookingFor.Size = New System.Drawing.Size(92, 25)
+        Me.ToolStripStatusLabelLookingFor.Text = "Expecting:"
         '
         'ToolStripStatusLabelCurrentProduction
         '
         Me.ToolStripStatusLabelCurrentProduction.Name = "ToolStripStatusLabelCurrentProduction"
         Me.ToolStripStatusLabelCurrentProduction.Size = New System.Drawing.Size(315, 25)
         Me.ToolStripStatusLabelCurrentProduction.Text = "ToolStripStatusLabelCurrentProduction"
+        '
+        'ToolStripStatusLabelRequiresConnectionString
+        '
+        Me.ToolStripStatusLabelRequiresConnectionString.Name = "ToolStripStatusLabelRequiresConnectionString"
+        Me.ToolStripStatusLabelRequiresConnectionString.Size = New System.Drawing.Size(312, 25)
+        Me.ToolStripStatusLabelRequiresConnectionString.Text = "TlStrpSttsLblRequiresConnectionString"
         '
         'StatusStrip1
         '
@@ -142,12 +148,6 @@ Partial Class frmFactEngine
         Me.LabelError.Size = New System.Drawing.Size(57, 20)
         Me.LabelError.TabIndex = 0
         Me.LabelError.Text = "Label1"
-        '
-        'ToolStripStatusLabelRequiresConnectionString
-        '
-        Me.ToolStripStatusLabelRequiresConnectionString.Name = "ToolStripStatusLabelRequiresConnectionString"
-        Me.ToolStripStatusLabelRequiresConnectionString.Size = New System.Drawing.Size(312, 25)
-        Me.ToolStripStatusLabelRequiresConnectionString.Text = "TlStrpSttsLblRequiresConnectionString"
         '
         'frmFactEngine
         '

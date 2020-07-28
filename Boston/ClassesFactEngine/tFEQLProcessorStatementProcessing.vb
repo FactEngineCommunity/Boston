@@ -198,8 +198,20 @@
                         lrQueryEdge.BaseNode = lrQueryGraph.HeadNode
 
                         'Get the TargetNode                        
-                        lrFBMModelObject = Me.Model.GetModelObjectByName(Me.WHICHCLAUSE.MODELELEMENTNAME(0))
-                        If lrFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & Me.WHICHCLAUSE.MODELELEMENTNAME(0) & "'.")
+                        If Me.NODEPROPERTYIDENTIFICATION IsNot Nothing Then
+                            Me.NODEPROPERTYIDENTIFICATION = New FEQL.NODEPROPERTYIDENTIFICATION
+                            Call Me.GetParseTreeTokensReflection(Me.NODEPROPERTYIDENTIFICATION, Me.WHICHCLAUSE.NODEPROPERTYIDENTIFICATION)
+                            lrFBMModelObject = Me.Model.GetModelObjectByName(Me.NODEPROPERTYIDENTIFICATION.MODELELEMENTNAME)
+                            If lrFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & Me.NODEPROPERTYIDENTIFICATION.MODELELEMENTNAME & "'.")
+                            '---------------------------------------------------------
+                            'Set the Identification
+                            For Each lsIdentifier In Me.NODEPROPERTYIDENTIFICATION.IDENTIFIER
+                                lrQueryEdge.IdentifierList.Add(lsIdentifier)
+                            Next
+                        Else
+                            lrFBMModelObject = Me.Model.GetModelObjectByName(Me.WHICHCLAUSE.MODELELEMENTNAME(0))
+                            If lrFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & Me.WHICHCLAUSE.MODELELEMENTNAME(0) & "'.")
+                        End If
                         lrQueryEdge.TargetNode = New FactEngine.QueryNode(lrFBMModelObject)
                         lrQueryGraph.Nodes.AddUnique(lrQueryEdge.TargetNode)
 

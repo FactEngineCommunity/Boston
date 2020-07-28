@@ -16,7 +16,7 @@ DOUBLEQUOTE   -> @"""";
 EOF           -> @"^$";
 EQUALS        -> "=";
 FACTTYPENAME -> @"[aA-zZ]+";
-[Color(216, 127, 178)]	IDENTIFIER -> @"[aA-zZ0-9]+";
+[Color(216, 127, 178)]	IDENTIFIER -> @"[aA-zZ0-9 ]+";
 MULTDIV 	-> @"\*|/";
 MODELNAME     -> @"[aA-zZ]+";
 [Color(94, 213, 165)]	MODELELEMENTNAME -> @"[aA-zZ]+";
