@@ -6,6 +6,7 @@
             Dim lrRecordset As New ORMQL.Recordset
 
             Try
+                'Richmond.WriteToStatusBar("Processsing WHICH Statement.", True)
                 Me.WHICHSELECTStatement = New FEQL.WHICHSELECTStatement
 
                 Call Me.GetParseTreeTokensReflection(Me.WHICHSELECTStatement, Me.Parsetree.Nodes(0))
@@ -198,7 +199,7 @@
                         lrQueryEdge.BaseNode = lrQueryGraph.HeadNode
 
                         'Get the TargetNode                        
-                        If Me.NODEPROPERTYIDENTIFICATION IsNot Nothing Then
+                        If Me.WHICHCLAUSE.NODEPROPERTYIDENTIFICATION IsNot Nothing Then
                             Me.NODEPROPERTYIDENTIFICATION = New FEQL.NODEPROPERTYIDENTIFICATION
                             Call Me.GetParseTreeTokensReflection(Me.NODEPROPERTYIDENTIFICATION, Me.WHICHCLAUSE.NODEPROPERTYIDENTIFICATION)
                             lrFBMModelObject = Me.Model.GetModelObjectByName(Me.NODEPROPERTYIDENTIFICATION.MODELELEMENTNAME)
@@ -239,18 +240,25 @@
 
                 Next
 
+                'Richmond.WriteToStatusBar("Generating SQL", True)
+
                 '==========================================================================
                 'Get the records
                 Dim lsSQLQuery = lrQueryGraph.generateSQL
 
                 '==========================================================
                 'Populate the lrRecordset with results from the database
+                'Richmond.WriteToStatusBar("Connecting to database.", True)
                 Dim lrSQLiteConnection = Database.CreateConnection(Me.Model.TargetDatabaseConnectionString)
                 Dim lrSQLiteDataReader = Database.getReaderForSQL(lrSQLiteConnection, lsSQLQuery)
 
                 Dim larFact As New List(Of FBM.Fact)
                 Dim lrFactType = New FBM.FactType(Me.Model, "DummyFactType", True)
                 Dim lrFact As FBM.Fact
+                'Richmond.WriteToStatusBar("Reading results.", True)
+
+                Dim larProjectColumns = lrQueryGraph.getProjectionColumns
+
                 While lrSQLiteDataReader.Read()
 
                     lrFact = New FBM.Fact(lrFactType, False)
@@ -259,10 +267,9 @@
                         Dim myreader As String = lrSQLiteDataReader.GetString(0)
                         '=====================================================
                         'Column Names
-                        lrRecordset.Columns.Add(liInd.ToString)
+                        lrRecordset.Columns.Add(larProjectColumns(liInd - 1).Name)
 
-
-                        Dim lrRole = New FBM.Role(lrFactType, liInd.ToString, True, Nothing)
+                        Dim lrRole = New FBM.Role(lrFactType, larProjectColumns(liInd - 1).Name, True, Nothing)
                         lrFactType.RoleGroup.Add(lrRole)
 
                         lrFact.Data.Add(New FBM.FactData(lrRole, New FBM.Concept(lrSQLiteDataReader.GetString(liInd - 1)), lrFact))

@@ -1,4 +1,6 @@
-﻿Public Class frmFactEngine
+﻿Imports System.Reflection
+
+Public Class frmFactEngine
 
     Public zrScanner As New FEQL.Scanner
     Public zrParser As New FEQL.Parser(Me.zrScanner)
@@ -137,29 +139,38 @@
 
     Private Sub AddPredicatePartsToEnterpriseAware(ByVal aarPredicatePart As List(Of FBM.PredicatePart))
 
-        Me.AutoComplete.ListBox.Sorted = True
+        Try
+            Me.AutoComplete.ListBox.Sorted = True
 
-        Dim lasPredicatePartText As New List(Of String)
-        For Each lrPredicatePart In aarPredicatePart
-            lasPredicatePartText.AddUnique(lrPredicatePart.PredicatePartText)
-        Next
+            Dim lasPredicatePartText As New List(Of String)
+            For Each lrPredicatePart In aarPredicatePart
+                lasPredicatePartText.AddUnique(lrPredicatePart.PredicatePartText)
+            Next
 
-        For Each lsPredicatePartText In lasPredicatePartText
-            If zsIntellisenseBuffer.Length > 0 Then
-                If lsPredicatePartText.StartsWith(zsIntellisenseBuffer, True, System.Globalization.CultureInfo.CurrentUICulture) Then
+            For Each lsPredicatePartText In lasPredicatePartText
+                If zsIntellisenseBuffer.Length > 0 Then
+                    If lsPredicatePartText.StartsWith(zsIntellisenseBuffer, True, System.Globalization.CultureInfo.CurrentUICulture) Then
+                        Call Me.AddEnterpriseAwareItem(lsPredicatePartText, FEQL.TokenType.PREDICATE)
+                    End If
+                Else
                     Call Me.AddEnterpriseAwareItem(lsPredicatePartText, FEQL.TokenType.PREDICATE)
                 End If
-            Else
-                Call Me.AddEnterpriseAwareItem(lsPredicatePartText, FEQL.TokenType.PREDICATE)
+
+            Next
+
+            Me.AutoComplete.Show()
+            Me.AutoComplete.ListBox.Focus()
+            If (aarPredicatePart.Count > 0) And (Me.AutoComplete.ListBox.Items.Count > 0) Then
+                Me.AutoComplete.ListBox.SelectedIndex = 0
             End If
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
-        Next
-
-        Me.AutoComplete.Show()
-        Me.AutoComplete.ListBox.Focus()
-        If aarPredicatePart.Count > 0 Then
-            Me.AutoComplete.ListBox.SelectedIndex = 0
-        End If
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 
@@ -243,10 +254,22 @@
             Me.LabelError.Text = ""
 
             If lrRecordset.Facts.Count = 0 Then
+                Me.LabelError.ForeColor = Color.Orange
                 Me.LabelError.Text = "No results returned"
             Else
+                Me.LabelError.ForeColor = Color.Black
+                Me.LabelError.Text = ""
+
+                Dim liInd = 0
+                For Each lsColumnName In lrRecordset.Columns
+                    liInd += 1
+                    Me.LabelError.Text &= " " & lsColumnName & " "
+                    If liInd < lrRecordset.Columns.Count Then Me.LabelError.Text &= ","
+                Next
+                Me.LabelError.Text &= vbCrLf & "=======================================" & vbCrLf
                 For Each lrFact In lrRecordset.Facts
-                    Me.LabelError.Text = lrFact.EnumerateAsBracketedFact & vbCrLf
+
+                    Me.LabelError.Text &= lrFact.EnumerateAsBracketedFact & vbCrLf
                 Next
             End If
         End If
@@ -295,7 +318,6 @@
                     e.Handled = True
                     Exit Sub
                 End If
-                e.Handled = True
             Case Is = Keys.Space
             Case Is = Keys.Back
             Case Is = Keys.Left
@@ -414,21 +436,21 @@
                     Me.ToolStripStatusLabelCurrentProduction.Text = lsCurrentTokenType
                 End If
                 Select Case Me.zrTextHighlighter.GetCurrentContext.Token.Type
-                        Case Is = FEQL.TokenType.KEYWDNULL
-                            Me.AutoComplete.Enabled = Me.CheckIfCanDisplayEnterpriseAwareBox
-                        Case Is = FEQL.TokenType.FACTTYPEPRODUCTION
-                            Me.AutoComplete.Enabled = Me.CheckIfCanDisplayEnterpriseAwareBox
-                        Case Is = FEQL.TokenType.MODELELEMENTNAME
-                            Me.AutoComplete.Enabled = True
-                            Call Me.PopulateEnterpriseAwareWithObjectTypes()
-                        Case Is = FEQL.TokenType.PREDICATE,
+                    Case Is = FEQL.TokenType.KEYWDNULL
+                        Me.AutoComplete.Enabled = Me.CheckIfCanDisplayEnterpriseAwareBox
+                    Case Is = FEQL.TokenType.FACTTYPEPRODUCTION
+                        Me.AutoComplete.Enabled = Me.CheckIfCanDisplayEnterpriseAwareBox
+                    Case Is = FEQL.TokenType.MODELELEMENTNAME
+                        Me.AutoComplete.Enabled = True
+                        Call Me.PopulateEnterpriseAwareWithObjectTypes()
+                    Case Is = FEQL.TokenType.PREDICATE,
                               FEQL.TokenType.PREDICATESPACE
-                            Me.AutoComplete.Enabled = True
-                            Call Me.AddFactTypePredicatePartsToEnterpriseAware()
-                    End Select
-                End If
+                        Me.AutoComplete.Enabled = True
+                        Call Me.AddFactTypePredicatePartsToEnterpriseAware()
+                End Select
+            End If
 
-                If e.KeyCode = Keys.Down Then
+            If e.KeyCode = Keys.Down Then
                 If Me.AutoComplete.ListBox.Items.Count > 0 Then
                     Me.AutoComplete.ListBox.Focus()
                     Me.AutoComplete.ListBox.SelectedIndex = 0
@@ -525,7 +547,7 @@
                     lrModelElement = prApplication.WorkingModel.GetModelObjectByName(lsModelElementName)
                     If IsSomething(lrModelElement) Then
                         If lrModelElement.GetType = GetType(FBM.FactType) Then
-                            Call Me.AddPredicatePartsToEnterpriseAware(CType(lrModelElement, FBM.FactType).GetPredicateParts)
+                            Call Me.AddPredicatePartsToEnterpriseAware(CType(lrModelElement, FBM.FactType).getPredicateParts)
                         End If
                     Else
                         Dim larCharBeginning() As Char = {"("}
@@ -534,10 +556,10 @@
                         lrModelElement = prApplication.WorkingModel.GetModelObjectByName(lsModelElementName)
                         If IsSomething(lrModelElement) Then
                             If lrModelElement.GetType = GetType(FBM.FactType) Then
-                                Call Me.AddPredicatePartsToEnterpriseAware(CType(lrModelElement, FBM.FactType).GetPredicateParts)
+                                Call Me.AddPredicatePartsToEnterpriseAware(CType(lrModelElement, FBM.FactType).getPredicateParts)
                             End If
                         End If
-                        End If
+                    End If
                 Case Is = FEQL.TokenType.MODELELEMENTNAME
                     Call Me.PopulateEnterpriseAwareWithObjectTypes()
                 Case Else

@@ -69,9 +69,9 @@ Partial Class frmFactEngine
         Me.TextBoxInput.Dock = System.Windows.Forms.DockStyle.Fill
         Me.TextBoxInput.Font = New System.Drawing.Font("Tahoma", 10.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.TextBoxInput.ForeColor = System.Drawing.Color.Wheat
-        Me.TextBoxInput.Location = New System.Drawing.Point(0, 38)
+        Me.TextBoxInput.Location = New System.Drawing.Point(0, 33)
         Me.TextBoxInput.Name = "TextBoxInput"
-        Me.TextBoxInput.Size = New System.Drawing.Size(1178, 226)
+        Me.TextBoxInput.Size = New System.Drawing.Size(1178, 231)
         Me.TextBoxInput.TabIndex = 2
         Me.TextBoxInput.Text = ""
         '
@@ -81,7 +81,7 @@ Partial Class frmFactEngine
         Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButtonGO})
         Me.ToolStrip1.Location = New System.Drawing.Point(0, 0)
         Me.ToolStrip1.Name = "ToolStrip1"
-        Me.ToolStrip1.Size = New System.Drawing.Size(1178, 38)
+        Me.ToolStrip1.Size = New System.Drawing.Size(1178, 33)
         Me.ToolStrip1.TabIndex = 3
         Me.ToolStrip1.Text = "ToolStrip1"
         '
@@ -91,7 +91,7 @@ Partial Class frmFactEngine
         Me.ToolStripButtonGO.Image = Global.Boston.My.Resources.MenuImagesMain.GO16x16
         Me.ToolStripButtonGO.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ToolStripButtonGO.Name = "ToolStripButtonGO"
-        Me.ToolStripButtonGO.Size = New System.Drawing.Size(34, 33)
+        Me.ToolStripButtonGO.Size = New System.Drawing.Size(34, 28)
         Me.ToolStripButtonGO.Text = "ToolStripButton1"
         '
         'StatusStrip2

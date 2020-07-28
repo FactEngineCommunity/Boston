@@ -111,6 +111,24 @@
 
         End Function
 
+        Public Function getProjectionColumns() As List(Of RDS.Column)
+
+            Dim larColumn As New List(Of RDS.Column)
+
+            'Head Column/s
+            Dim larHeadColumn = Me.HeadNode.FBMModelObject.getCorrespondingRDSTable.getFirstUniquenessConstraintColumns
+            larColumn.AddRange(larHeadColumn.ToList)
+
+            'Edge Column/s
+            For Each lrQueryEdge In Me.getProjectQueryEdges()
+                Dim larEdgeColumn = lrQueryEdge.FBMFactType.RoleGroup(1).JoinedORMObject.getCorrespondingRDSTable.getFirstUniquenessConstraintColumns
+                larColumn.AddRange(larEdgeColumn.ToList)
+            Next
+
+            Return larColumn
+
+        End Function
+
     End Class
 
 End Namespace
