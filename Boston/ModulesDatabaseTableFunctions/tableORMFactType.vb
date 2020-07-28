@@ -233,7 +233,6 @@ Namespace TableFactType
                     'Get the Roles within the RoleGroup for the FactType as well
                     '------------------------------------------------------------
                     arFactType.RoleGroup = TableRole.GetRolesForModelFactType(arFactType, abAddFactTypeToModel)
-                    arFactType.Arity = arFactType.RoleGroup.Count
 
                     '------------------------------------------------------------
                     'Get the FactTypeReadings for the FactType
@@ -253,8 +252,7 @@ Namespace TableFactType
                     If Viev.NullVal(lREcordset("ObjectifyingEntityTypeId").Value, "") = "" Then
                         arFactType.ObjectifyingEntityType = Nothing
                     Else
-                        Dim lsEntityTypeId As String = ""
-                        lsEntityTypeId = lREcordset("ObjectifyingEntityTypeId").Value
+                        Dim lsEntityTypeId = lREcordset("ObjectifyingEntityTypeId").Value
                         arFactType.ObjectifyingEntityType = arFactType.Model.EntityType.Find(Function(x) x.Id = lsEntityTypeId)
                         If arFactType.ObjectifyingEntityType IsNot Nothing Then
                             '---------------------------------------------

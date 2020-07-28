@@ -330,8 +330,6 @@ Namespace TableFactTypeInstance
                             lrFactTypeInstance.FactTable = New FBM.FactTable(arPage, lrFactTypeInstance)
                             Call TableFactTableInstance.GetFactTableDetails(lrFactTypeInstance.FactTable)
 
-                            lrFactTypeInstance.Arity = lrFactTypeInstance.RoleGroup.Count
-
                             If lrFactTypeInstance.IsSubtypeRelationshipFactType Then
                                 Dim lrEntityTypeInstance As FBM.EntityTypeInstance
                                 Dim lrParentEntityTypeInstance As FBM.EntityTypeInstance

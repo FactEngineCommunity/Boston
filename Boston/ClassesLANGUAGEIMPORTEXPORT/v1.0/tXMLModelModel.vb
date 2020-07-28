@@ -978,8 +978,6 @@ Namespace XMLModel1
                 arFactType.RoleGroup.Add(lrRole)
             Next
 
-            arFactType.Arity = arFactType.RoleGroup.Count
-
             If Not arFactType.Model.FactType.Exists(AddressOf arFactType.Equals) Then
                 arFactType.Model.FactType.Add(arFactType)
             End If

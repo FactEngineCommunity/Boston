@@ -70,7 +70,7 @@ Namespace FBM
             Call Me.New()
             Me.Model = arFactType.Model
             Me.Id = Trim(asFactId)
-            Me.Symbol = Trim(asFactId)
+            Me.Symbol = Me.Id
             Me.FactType = arFactType
 
         End Sub

@@ -147,15 +147,12 @@ Namespace FBM
         <CategoryAttribute("Fact Type"), _
              DefaultValueAttribute(GetType(Integer), "0"), _
              DescriptionAttribute("The Cardinality of the Fact Type."), _
-             ReadOnlyAttribute(True), _
-             Browsable(False)> _
-        Public Overridable Property Arity() As Integer
+             ReadOnlyAttribute(True),
+             Browsable(False)>
+        Public ReadOnly Overridable Property Arity() As Integer
             Get
                 Return Me.RoleGroup.Count
             End Get
-            Set(ByVal Value As Integer)
-                _Arity = Value
-            End Set
         End Property
 
         <XmlIgnore()> _
@@ -3465,7 +3462,6 @@ Namespace FBM
                 Call Me.Model.removeColumnsIndexColumnsForRole(arRole)
 
                 Me.RoleGroup.Remove(arRole)
-                Me.Arity -= 1
 
                 '-------------------
                 'Model is now Dirty

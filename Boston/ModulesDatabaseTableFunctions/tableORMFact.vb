@@ -110,8 +110,6 @@ Namespace TableFact
                 lRecordset.ActiveConnection = pdbConnection
                 lRecordset.CursorType = pcOpenStatic
 
-                'GetFactsForFactType = New List(Of FBM.Fact)
-
                 lsSQLQuery = "  SELECT f.Symbol, fd.RoleId, fd.ValueSymbol"
                 lsSQLQuery &= "   FROM MetaModelFact f,"
                 lsSQLQuery &= "        MetaModelFactData fd"
@@ -140,7 +138,7 @@ Namespace TableFact
                             lrDictionaryEntry = New FBM.DictionaryEntry(arFactType.Model, lRecordset("ValueSymbol").Value, pcenumConceptType.Value)
                             lrDictionaryEntry = arFactType.Model.AddModelDictionaryEntry(lrDictionaryEntry, , False)
 
-                            Dim lrConcept As FBM.Concept = lrDictionaryEntry.Concept
+                            Dim lrConcept = lrDictionaryEntry.Concept
 
                             If lrDictionaryEntry Is Nothing Then
                                 lsMessage = "Missing ModelDictionary (IsValue) entry for:"
@@ -171,9 +169,9 @@ Namespace TableFact
                             'Add the RoleData to the Role as well
                             '-------------------------------------
                             lrRole.Data.Add(lrFactData)
-                            If Not lrRole.JoinedORMObject.Instance.Exists(Function(x) x = lrFactData.Data) Then
-                                lrRole.JoinedORMObject.Instance.Add(lrFactData.Data)
-                            End If
+                            'If Not lrRole.JoinedORMObject.Instance.Exists(Function(x) x = lrFactData.Data) Then
+                            lrRole.JoinedORMObject.Instance.AddUnique(lrFactData.Data)
+                            'End If
                             lRecordset.MoveNext()
                         Next liInd
 
@@ -234,13 +232,10 @@ Namespace TableFact
                         '----------------------------------------------------------------------------------------------------------
                         'If the FactType of the Fact is Objectified, add the Fact.Id as an instance of the ObjectifyingEntityType
                         '----------------------------------------------------------------------------------------------------------
-                        If arFactType.IsObjectified Then
-                            If IsSomething(arFactType.ObjectifyingEntityType) Then
-                                arFactType.ObjectifyingEntityType.Instance.Add(lrFact.Id)
-                            End If
+                        If arFactType.IsObjectified And arFactType.ObjectifyingEntityType IsNot Nothing Then
+                            arFactType.ObjectifyingEntityType.Instance.Add(lrFact.Id)
                         End If
 
-                        'GetFactsForFactType.Add(lrFact)
                         'SyncLock arFactType.Fact
                         arFactType.Fact.Add(lrFact)
                         'End SyncLock

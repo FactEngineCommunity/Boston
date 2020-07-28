@@ -19,7 +19,6 @@ Namespace DuplexServiceClient
             lrFactType.IsStored = lrInterfaceFactType.IsStored
             lrFactType.IsPreferredReferenceMode = lrInterfaceFactType.IsPreferredReferenceSchemeFT
             lrFactType.IsSubtypeRelationshipFactType = lrInterfaceFactType.IsSubtypeRelationshipFactType
-            lrFactType.Arity = lrInterfaceFactType.RoleGroup.Count
             lrFactType.DerivationText = lrInterfaceFactType.DerivationText
             lrFactType.IsDerived = lrInterfaceFactType.IsDerived
             lrFactType.IsLinkFactType = lrInterfaceFactType.IsLinkFactType

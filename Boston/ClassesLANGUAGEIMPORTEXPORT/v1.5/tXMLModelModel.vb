@@ -1318,8 +1318,6 @@ Namespace XMLModel15
                 arFactType.RoleGroup.Add(lrRole)
             Next
 
-            arFactType.Arity = arFactType.RoleGroup.Count
-
             '-------------------------------------------
             'Get the FactTypeReadings for the FactType
             '-------------------------------------------

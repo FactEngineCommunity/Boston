@@ -49,15 +49,12 @@ Namespace FBM
         <CategoryAttribute("Fact Type"), _
              DefaultValueAttribute(GetType(Integer), "0"), _
              DescriptionAttribute("The Cardinality of the Fact Type."), _
-             ReadOnlyAttribute(True), _
-             Browsable(False)> _
-        Public Overrides Property Arity() As Integer
+             ReadOnlyAttribute(True),
+             Browsable(False)>
+        Public ReadOnly Overrides Property Arity() As Integer
             Get
                 Return Me.RoleGroup.Count
             End Get
-            Set(ByVal Value As Integer)
-                _Arity = Value
-            End Set
         End Property
 
         <XmlIgnore()>
@@ -511,9 +508,6 @@ Namespace FBM
 
             Me.RoleGroup.Add(arRoleInstance)
             Me.Page.RoleInstance.AddUnique(arRoleInstance)
-
-            Me.Arity += 1
-
         End Sub
 
         Public Sub BringStrandedJoinedObjectsCloser()
@@ -1282,7 +1276,6 @@ Namespace FBM
 
                 Me.Page.RemoveRoleInstance(arRoleInstance)
                 Me.RoleGroup.Remove(arRoleInstance)
-                Me.Arity -= 1
 
                 '-------------------------------------------------------------------------------
                 'Remove the Role from any FactTypeReading associated with the FactTypeInstance

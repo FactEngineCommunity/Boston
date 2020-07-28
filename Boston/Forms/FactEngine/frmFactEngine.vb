@@ -282,50 +282,62 @@ Public Class frmFactEngine
 
     Private Sub TextBoxInput_KeyDown(sender As Object, e As KeyEventArgs) Handles TextBoxInput.KeyDown
 
-        If Me.TextBoxInput.SelectionColor = Color.Black Then Me.TextBoxInput.SelectionColor = Color.Wheat
-        '===============================================================================
-        'Intellisense Buffer. Populate first for AutoComplete below that...
-        Select Case e.KeyCode
-            Case Is = Keys.Back
-                If zsIntellisenseBuffer.Length > 0 Then
-                    zsIntellisenseBuffer = zsIntellisenseBuffer.Substring(0, zsIntellisenseBuffer.Length - 1)
-                End If
-            Case Is = Keys.Space, Keys.Escape, Keys.Down, Keys.Up, Keys.Shift, Keys.ShiftKey
-                Me.zsIntellisenseBuffer = ""
-            Case Else
-                zsIntellisenseBuffer &= LCase(e.KeyCode.ToString)
-        End Select
+        Try
+            If Me.TextBoxInput.SelectionColor = Color.Black Then Me.TextBoxInput.SelectionColor = Color.Wheat
+            '===============================================================================
+            'Intellisense Buffer. Populate first for AutoComplete below that...
+            Select Case e.KeyCode
+                Case Is = Keys.Back
+                    If zsIntellisenseBuffer.Length > 0 Then
+                        zsIntellisenseBuffer = zsIntellisenseBuffer.Substring(0, zsIntellisenseBuffer.Length - 1)
+                    End If
+                Case Is = Keys.Space, Keys.Escape, Keys.Down, Keys.Up, Keys.Shift, Keys.ShiftKey
+                    Me.zsIntellisenseBuffer = ""
+                Case Else
+                    zsIntellisenseBuffer &= LCase(e.KeyCode.ToString)
+            End Select
 
-        Select Case e.KeyCode
-            Case Is = Keys.Escape
-                Me.AutoComplete.Hide()
-                Exit Sub
-        End Select
-
-        If Not e.KeyCode = Keys.Down Then
-            Call Me.ProcessAutoComplete(e)
-        End If
-
-
-        Select Case e.KeyCode
-            Case Is = Keys.F5
-                Me.AutoComplete.Hide()
-                Call Me.GO()
-            Case Is = Keys.Down
-                If (Me.AutoComplete.ListBox.Items.Count > 0) Or Me.AutoComplete.Visible Then
-                    Me.AutoComplete.ListBox.Focus()
-                    Me.AutoComplete.ListBox.SelectedIndex = 0
-                    e.Handled = True
+            Select Case e.KeyCode
+                Case Is = Keys.Escape
+                    Me.AutoComplete.Hide()
                     Exit Sub
-                End If
-            Case Is = Keys.Space
-            Case Is = Keys.Back
-            Case Is = Keys.Left
-            Case Else
-                'e.Handled = True
-        End Select
+            End Select
 
-        Me.TextBoxInput.Focus()
+            If Not e.KeyCode = Keys.Down Then
+                Call Me.ProcessAutoComplete(e)
+            End If
+
+
+            Select Case e.KeyCode
+                Case Is = Keys.F5
+                    Me.AutoComplete.Hide()
+                    Call Me.GO()
+                Case Is = Keys.Down
+                    If (Me.AutoComplete.ListBox.Items.Count > 0) Or Me.AutoComplete.Visible Then
+                        Me.AutoComplete.ListBox.Focus()
+                        If Me.AutoComplete.ListBox.Items.Count > 0 Then
+                            Me.AutoComplete.ListBox.SelectedIndex = 0
+                        End If
+                        e.Handled = True
+                        Exit Sub
+                    End If
+                Case Is = Keys.Space
+                Case Is = Keys.Back
+                Case Is = Keys.Left
+                Case Else
+                    'e.Handled = True
+            End Select
+
+            Me.TextBoxInput.Focus()
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
     End Sub
 
     Private Sub TextBoxInput_KeyUp(sender As Object, e As KeyEventArgs) Handles TextBoxInput.KeyUp
