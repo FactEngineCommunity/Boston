@@ -7,6 +7,8 @@
     Private AutoComplete As frmAutoComplete
     Public zsIntellisenseBuffer As String = ""
 
+    Public msPreviousProductionLookedFor As String
+
     Public FEQLProcessor As New FEQL.Processor(prApplication.WorkingModel)
     Private TextMarker As FEQL.Controls.TextMarker
 
@@ -163,10 +165,20 @@
 
     Private Sub displayModelName()
         If prApplication.WorkingModel Is Nothing Then
+            Me.ToolStripStatusLabelWorkingModelName.ForeColor = Color.Orange
             Me.ToolStripStatusLabelWorkingModelName.Text = "Model: Select a Model in the Model Explorer"
         Else
+            Me.ToolStripStatusLabelWorkingModelName.ForeColor = Color.Black
             Me.ToolStripStatusLabelWorkingModelName.Text = "Model: " & prApplication.WorkingModel.Name
+            If Trim(prApplication.WorkingModel.TargetDatabaseConnectionString) = "" Then
+                Me.ToolStripStatusLabelRequiresConnectionString.ForeColor = Color.Orange
+                Me.ToolStripStatusLabelRequiresConnectionString.Text = "Model requires a database connection string"
+            Else
+                Me.ToolStripStatusLabelRequiresConnectionString.Text = ""
+            End If
         End If
+
+
     End Sub
 
     Private Sub GetMODELELEMENTParseNodes(ByRef arParseNode As FEQL.ParseNode, ByRef aarParseNode As List(Of FEQL.ParseNode))
@@ -196,6 +208,20 @@
                                Me.zrParser)
 
         Me.TextMarker = New FEQL.Controls.TextMarker(Me.TextBoxInput)
+
+        Call Me.displayModelName()
+        Me.FEQLProcessor = New FEQL.Processor(prApplication.WorkingModel)
+
+        If prApplication.WorkingModel IsNot Nothing Then
+            If Trim(prApplication.WorkingModel.TargetDatabaseConnectionString) = "" Then
+                Me.ToolStripStatusLabelRequiresConnectionString.ForeColor = Color.Orange
+                Me.ToolStripStatusLabelRequiresConnectionString.Text = "Model requires a database connection string"
+            Else
+                Me.ToolStripStatusLabelRequiresConnectionString.Text = ""
+            End If
+        End If
+
+        Me.ToolStripStatusLabelCurrentProduction.Text = "FactEngine Statement"
 
     End Sub
 
@@ -233,6 +259,7 @@
 
     Private Sub TextBoxInput_KeyDown(sender As Object, e As KeyEventArgs) Handles TextBoxInput.KeyDown
 
+        If Me.TextBoxInput.SelectionColor = Color.Black Then Me.TextBoxInput.SelectionColor = Color.Wheat
         '===============================================================================
         'Intellisense Buffer. Populate first for AutoComplete below that...
         Select Case e.KeyCode
@@ -274,9 +301,15 @@
 
     Private Sub TextBoxInput_KeyUp(sender As Object, e As KeyEventArgs) Handles TextBoxInput.KeyUp
 
-        If e.KeyCode = Keys.Space Then
-            Me.TextBoxInput.SelectionColor = Color.Wheat
-        End If
+        Select Case e.KeyCode
+            Case Is = Keys.Space,
+                      Keys.Enter,
+                      Keys.Back,
+                      Keys.Up
+                Me.TextBoxInput.SelectionColor = Color.Wheat
+        End Select
+
+        If Me.TextBoxInput.SelectionColor = Color.Black Then Me.TextBoxInput.SelectionColor = Color.Wheat
 
     End Sub
 
@@ -369,23 +402,26 @@
             lsCurrentTokenType = Me.zrTextHighlighter.GetCurrentContext
             If IsSomething(lsCurrentTokenType) And (Me.TextBoxInput.Text.Length > 0) Then
                 lsCurrentTokenType = Me.zrTextHighlighter.GetCurrentContext.Token.Type.ToString
-                Me.ToolStripStatusLabelCurrentProduction.Text = lsCurrentTokenType
+                Me.msPreviousProductionLookedFor = Me.ToolStripStatusLabelCurrentProduction.Text
+                If lsCurrentTokenType IsNot Nothing Then
+                    Me.ToolStripStatusLabelCurrentProduction.Text = lsCurrentTokenType
+                End If
                 Select Case Me.zrTextHighlighter.GetCurrentContext.Token.Type
-                    Case Is = FEQL.TokenType.KEYWDNULL
-                        Me.AutoComplete.Enabled = Me.CheckIfCanDisplayEnterpriseAwareBox
-                    Case Is = FEQL.TokenType.FACTTYPEPRODUCTION
-                        Me.AutoComplete.Enabled = Me.CheckIfCanDisplayEnterpriseAwareBox
-                    Case Is = FEQL.TokenType.MODELELEMENTNAME
-                        Me.AutoComplete.Enabled = True
-                        Call Me.PopulateEnterpriseAwareWithObjectTypes()
-                    Case Is = FEQL.TokenType.PREDICATE,
+                        Case Is = FEQL.TokenType.KEYWDNULL
+                            Me.AutoComplete.Enabled = Me.CheckIfCanDisplayEnterpriseAwareBox
+                        Case Is = FEQL.TokenType.FACTTYPEPRODUCTION
+                            Me.AutoComplete.Enabled = Me.CheckIfCanDisplayEnterpriseAwareBox
+                        Case Is = FEQL.TokenType.MODELELEMENTNAME
+                            Me.AutoComplete.Enabled = True
+                            Call Me.PopulateEnterpriseAwareWithObjectTypes()
+                        Case Is = FEQL.TokenType.PREDICATE,
                               FEQL.TokenType.PREDICATESPACE
-                        Me.AutoComplete.Enabled = True
-                        Call Me.AddFactTypePredicatePartsToEnterpriseAware()
-                End Select
-            End If
+                            Me.AutoComplete.Enabled = True
+                            Call Me.AddFactTypePredicatePartsToEnterpriseAware()
+                    End Select
+                End If
 
-            If e.KeyCode = Keys.Down Then
+                If e.KeyCode = Keys.Down Then
                 If Me.AutoComplete.ListBox.Items.Count > 0 Then
                     Me.AutoComplete.ListBox.Focus()
                     Me.AutoComplete.ListBox.SelectedIndex = 0
@@ -543,4 +579,7 @@
 
     End Sub
 
+    Private Sub frmFactEngine_LostFocus(sender As Object, e As EventArgs) Handles Me.LostFocus
+        Me.AutoComplete.Hide()
+    End Sub
 End Class

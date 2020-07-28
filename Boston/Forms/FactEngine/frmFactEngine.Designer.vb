@@ -28,9 +28,11 @@ Partial Class frmFactEngine
         Me.ToolStripButtonGO = New System.Windows.Forms.ToolStripButton()
         Me.StatusStrip2 = New System.Windows.Forms.StatusStrip()
         Me.ToolStripStatusLabelWorkingModelName = New System.Windows.Forms.ToolStripStatusLabel()
+        Me.ToolStripStatusLabelLookingFor = New System.Windows.Forms.ToolStripStatusLabel()
+        Me.ToolStripStatusLabelCurrentProduction = New System.Windows.Forms.ToolStripStatusLabel()
         Me.StatusStrip1 = New System.Windows.Forms.StatusStrip()
         Me.LabelError = New System.Windows.Forms.Label()
-        Me.ToolStripStatusLabelCurrentProduction = New System.Windows.Forms.ToolStripStatusLabel()
+        Me.ToolStripStatusLabelRequiresConnectionString = New System.Windows.Forms.ToolStripStatusLabel()
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SplitContainer1.Panel1.SuspendLayout()
         Me.SplitContainer1.Panel2.SuspendLayout()
@@ -65,6 +67,7 @@ Partial Class frmFactEngine
         '
         Me.TextBoxInput.BackColor = System.Drawing.Color.FromArgb(CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer))
         Me.TextBoxInput.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.TextBoxInput.Font = New System.Drawing.Font("Tahoma", 10.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.TextBoxInput.ForeColor = System.Drawing.Color.Wheat
         Me.TextBoxInput.Location = New System.Drawing.Point(0, 38)
         Me.TextBoxInput.Name = "TextBoxInput"
@@ -88,13 +91,13 @@ Partial Class frmFactEngine
         Me.ToolStripButtonGO.Image = Global.Boston.My.Resources.MenuImagesMain.GO16x16
         Me.ToolStripButtonGO.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ToolStripButtonGO.Name = "ToolStripButtonGO"
-        Me.ToolStripButtonGO.Size = New System.Drawing.Size(34, 28)
+        Me.ToolStripButtonGO.Size = New System.Drawing.Size(34, 33)
         Me.ToolStripButtonGO.Text = "ToolStripButton1"
         '
         'StatusStrip2
         '
         Me.StatusStrip2.ImageScalingSize = New System.Drawing.Size(24, 24)
-        Me.StatusStrip2.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripStatusLabelWorkingModelName, Me.ToolStripStatusLabelCurrentProduction})
+        Me.StatusStrip2.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripStatusLabelWorkingModelName, Me.ToolStripStatusLabelLookingFor, Me.ToolStripStatusLabelCurrentProduction, Me.ToolStripStatusLabelRequiresConnectionString})
         Me.StatusStrip2.Location = New System.Drawing.Point(0, 264)
         Me.StatusStrip2.Name = "StatusStrip2"
         Me.StatusStrip2.Padding = New System.Windows.Forms.Padding(2, 0, 14, 0)
@@ -107,6 +110,18 @@ Partial Class frmFactEngine
         Me.ToolStripStatusLabelWorkingModelName.Name = "ToolStripStatusLabelWorkingModelName"
         Me.ToolStripStatusLabelWorkingModelName.Size = New System.Drawing.Size(335, 25)
         Me.ToolStripStatusLabelWorkingModelName.Text = "ToolStripStatusLabelWorkingModelName"
+        '
+        'ToolStripStatusLabelLookingFor
+        '
+        Me.ToolStripStatusLabelLookingFor.Name = "ToolStripStatusLabelLookingFor"
+        Me.ToolStripStatusLabelLookingFor.Size = New System.Drawing.Size(108, 25)
+        Me.ToolStripStatusLabelLookingFor.Text = "Looking for:"
+        '
+        'ToolStripStatusLabelCurrentProduction
+        '
+        Me.ToolStripStatusLabelCurrentProduction.Name = "ToolStripStatusLabelCurrentProduction"
+        Me.ToolStripStatusLabelCurrentProduction.Size = New System.Drawing.Size(315, 25)
+        Me.ToolStripStatusLabelCurrentProduction.Text = "ToolStripStatusLabelCurrentProduction"
         '
         'StatusStrip1
         '
@@ -128,11 +143,11 @@ Partial Class frmFactEngine
         Me.LabelError.TabIndex = 0
         Me.LabelError.Text = "Label1"
         '
-        'ToolStripStatusLabelCurrentProduction
+        'ToolStripStatusLabelRequiresConnectionString
         '
-        Me.ToolStripStatusLabelCurrentProduction.Name = "ToolStripStatusLabelCurrentProduction"
-        Me.ToolStripStatusLabelCurrentProduction.Size = New System.Drawing.Size(180, 25)
-        Me.ToolStripStatusLabelCurrentProduction.Text = "ToolStripStatusLabel1"
+        Me.ToolStripStatusLabelRequiresConnectionString.Name = "ToolStripStatusLabelRequiresConnectionString"
+        Me.ToolStripStatusLabelRequiresConnectionString.Size = New System.Drawing.Size(312, 25)
+        Me.ToolStripStatusLabelRequiresConnectionString.Text = "TlStrpSttsLblRequiresConnectionString"
         '
         'frmFactEngine
         '
@@ -165,4 +180,6 @@ Partial Class frmFactEngine
     Friend WithEvents ToolStripButtonGO As ToolStripButton
     Friend WithEvents LabelError As Label
     Friend WithEvents ToolStripStatusLabelCurrentProduction As ToolStripStatusLabel
+    Friend WithEvents ToolStripStatusLabelLookingFor As ToolStripStatusLabel
+    Friend WithEvents ToolStripStatusLabelRequiresConnectionString As ToolStripStatusLabel
 End Class
