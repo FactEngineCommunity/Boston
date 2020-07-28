@@ -30,6 +30,11 @@
 
     Private Sub ToolStripButtonGO_Click(sender As Object, e As EventArgs) Handles ToolStripButtonGO.Click
 
+        Call Me.GO
+
+    End Sub
+
+    Private Sub GO()
         Dim lrRecordset As New ORMQL.Recordset
 
         lrRecordset = Me.FEQLProcessor.ProcessFEQLStatement(Me.TextBoxInput.Text)
@@ -40,17 +45,26 @@
         Else
             Me.LabelError.Text = ""
 
-            For Each lrFact In lrRecordset.Facts
-                Me.LabelError.Text = lrFact.EnumerateAsBracketedFact & vbCrLf
-            Next
-
-            'ToDo
+            If lrRecordset.Facts.Count = 0 Then
+                Me.LabelError.Text = "No results returned"
+            Else
+                For Each lrFact In lrRecordset.Facts
+                    Me.LabelError.Text = lrFact.EnumerateAsBracketedFact & vbCrLf
+                Next
+            End If
         End If
-
     End Sub
 
     Private Sub Application_WorkingModelChanged() Handles Application.WorkingModelChanged
         Call Me.displayModelName()
         Me.FEQLProcessor = New FEQL.Processor(prApplication.WorkingModel)
+    End Sub
+
+    Private Sub TextBoxInput_KeyDown(sender As Object, e As KeyEventArgs) Handles TextBoxInput.KeyDown
+        Select Case e.KeyCode
+            Case Is = Keys.F5
+                Call Me.GO()
+        End Select
+
     End Sub
 End Class
