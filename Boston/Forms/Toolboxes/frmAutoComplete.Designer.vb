@@ -22,7 +22,7 @@ Partial Class frmAutoComplete
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        Me.ListBox = New System.Windows.Forms.ListBox()
+        Me.ListBox = New FlickerFreeListBox 'System.Windows.Forms.ListBox()
         Me.SuspendLayout()
         '
         'ListBox

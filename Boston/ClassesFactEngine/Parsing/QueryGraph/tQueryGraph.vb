@@ -1,0 +1,116 @@
+﻿Namespace FactEngine
+    Public Class QueryGraph
+
+        Public Model As FBM.Model
+
+        '============================================
+        'Example Fact Engine Query
+        '--------------------------
+        'WHICH Lecturer is located in WHICH Room 
+        'AND holds WHICH Position
+        'AND is in WHICH School
+        'AND is in A School WHICH is in (Factulty:'IT') 
+        'AND THAT Lecturer works for THAT Faculty 
+        '------------------------------------------
+
+        ''' <summary>
+        ''' The HeadNode of the FactEngine WHICH Query, as in Lecturer in "WHICH Lecturer is located in WHICH Room"
+        ''' </summary>
+        Public HeadNode As New FactEngine.QueryNode()
+
+        Public QueryEdges As New List(Of FactEngine.QueryEdge)
+
+        'The set of Nodes queried in a WHICH query statement
+        Public Nodes As New List(Of FactEngine.QueryNode)
+
+        Public Sub New(ByRef arFBMModel As FBM.Model)
+            Me.Model = arFBMModel
+        End Sub
+
+        ''' <summary>
+        ''' Generates SQL to run against the database for this QueryGraph
+        ''' </summary>
+        ''' <returns></returns>
+        Public Function generateSQL() As String
+
+            Dim lsSQLQuery As String = ""
+
+            lsSQLQuery = "SELECT "
+            'Dim larColumn = Me.HeadNode.FBMModelObject.getCorrespondingRDSTable.getPrimaryKeyColumns
+            Dim larColumn = Me.HeadNode.FBMModelObject.getCorrespondingRDSTable.getFirstUniquenessConstraintColumns
+            Dim liInd = 1
+            For Each lrColumn In larColumn
+                lsSQLQuery &= lrColumn.Table.Name & "." & lrColumn.Name
+                If liInd < larColumn.Count Then lsSQLQuery &= ","
+                liInd += 1
+            Next
+
+            If Me.getProjectQueryEdges.Count > 0 Then lsSQLQuery &= ","
+
+            liInd = 1
+            For Each lrQueryEdge In Me.getProjectQueryEdges()
+                'larColumn = lrQueryEdge.FBMFactType.RoleGroup(1).JoinedORMObject.getCorrespondingRDSTable.getPrimaryKeyColumns
+                larColumn = lrQueryEdge.FBMFactType.RoleGroup(1).JoinedORMObject.getCorrespondingRDSTable.getFirstUniquenessConstraintColumns
+                Dim liInd2 = 1
+                For Each lrColumn In larColumn
+                    lsSQLQuery &= lrQueryEdge.FBMFactType.RoleGroup(1).JoinedORMObject.getCorrespondingRDSTable.Name & "." _
+                                  & lrColumn.Name
+                    If liInd2 < larColumn.Count Then lsSQLQuery &= ","
+                    liInd2 += 1
+                Next
+
+                If liInd < Me.getProjectQueryEdges.Count Then lsSQLQuery &= ","
+                liInd += 1
+            Next
+
+            lsSQLQuery &= vbCrLf & "FROM "
+
+            liInd = 1
+            For Each lrQueryNode In Me.Nodes
+                lsSQLQuery &= lrQueryNode.FBMModelObject.getCorrespondingRDSTable.Name
+                If liInd < Me.Nodes.Count Then lsSQLQuery &= "," & vbCrLf
+                liInd += 1
+            Next
+
+            lsSQLQuery &= vbCrLf & "WHERE "
+
+            liInd = 1
+            For Each lrQueryEdge In Me.QueryEdges
+
+                Dim larTargetColumn = lrQueryEdge.TargetNode.FBMModelObject.getCorrespondingRDSTable.getPrimaryKeyColumns
+                For Each lrColumn In larTargetColumn
+                    lsSQLQuery &= lrQueryEdge.BaseNode.FBMModelObject.Id & "." & lrColumn.Name
+                    lsSQLQuery &= " = " & lrQueryEdge.TargetNode.FBMModelObject.Id & "." & lrColumn.Name
+                Next
+                lsSQLQuery &= vbCrLf
+                If liInd < Me.QueryEdges.Count Then lsSQLQuery &= "AND "
+                liInd += 1
+            Next
+
+            'WHERE Conditional
+            Dim larConditionalQueryEdges As New List(Of FactEngine.QueryEdge)
+            larConditionalQueryEdges = Me.QueryEdges.FindAll(Function(x) x.IdentifierList.Count > 0)
+
+            For Each lrQueryEdge In larConditionalQueryEdges
+                Dim lrTargetTable = lrQueryEdge.TargetNode.FBMModelObject.getCorrespondingRDSTable
+                Dim larIndexColumns = lrTargetTable.getFirstUniquenessConstraintColumns
+                liInd = 0
+                For Each lsIdentifier In lrQueryEdge.IdentifierList
+                    lsSQLQuery &= "AND " & lrTargetTable.Name & "." & larIndexColumns(0).Name & " = '" & lsIdentifier & "'" & vbCrLf
+                    liInd += 1
+                Next
+            Next
+
+            Return lsSQLQuery
+
+        End Function
+
+        Public Function getProjectQueryEdges() As List(Of FactEngine.QueryEdge)
+
+            Return Me.QueryEdges.FindAll(Function(x) x.IsProjectColumn).ToList
+
+        End Function
+
+    End Class
+
+End Namespace

@@ -2413,12 +2413,12 @@ Namespace FBM
             Dim lrPredicatePart As FBM.PredicatePart
 
             Try
-                Dim larPredicatePart = From FactTypeReading In Me.FactTypeReading _
-                                      From PredicatePart In FactTypeReading.PredicatePart _
-                                      Where FactTypeReading.Id = arFactTypeReading.Id _
+                Dim larPredicatePart = From FactTypeReading In Me.FactTypeReading
+                                       From PredicatePart In FactTypeReading.PredicatePart
+                                       Where FactTypeReading.Id = arFactTypeReading.Id _
                                       And PredicatePart.SequenceNr = aiSequenceNr _
-                                      And PredicatePart.RoleId = asRoleId _
-                                      Select PredicatePart
+                                      And PredicatePart.RoleId = asRoleId
+                                       Select PredicatePart
 
                 If IsSomething(larPredicatePart) Then
                     For Each lrPredicatePart In larPredicatePart
@@ -2440,6 +2440,16 @@ Namespace FBM
             End Try
 
             Return Nothing
+
+        End Function
+
+        Public Function getPredicateParts() As List(Of FBM.PredicatePart)
+
+            Dim larPredicatePart = From FactTypeReading In Me.FactTypeReading
+                                   From PredicatePart In FactTypeReading.PredicatePart
+                                   Select PredicatePart
+
+            Return larPredicatePart.ToList
 
         End Function
 

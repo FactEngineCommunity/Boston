@@ -140,6 +140,17 @@ Namespace FBM
             End Set
         End Property
 
+        Public ReadOnly Property FactTypeReading As List(Of FBM.FactTypeReading)
+            Get
+                Dim larFactTypeReading = From FactType In Me.FactType.FindAll(Function(x) Not x.IsMDAModelElement)
+                                         From lrFactTypeReading In FactType.FactTypeReading
+                                         Select lrFactTypeReading
+
+                Return larFactTypeReading.ToList
+
+            End Get
+        End Property
+
         <XmlIgnore()> _
         <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
         Public _Role As New List(Of FBM.Role)

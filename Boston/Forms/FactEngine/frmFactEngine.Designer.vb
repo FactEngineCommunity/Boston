@@ -30,6 +30,7 @@ Partial Class frmFactEngine
         Me.ToolStripStatusLabelWorkingModelName = New System.Windows.Forms.ToolStripStatusLabel()
         Me.StatusStrip1 = New System.Windows.Forms.StatusStrip()
         Me.LabelError = New System.Windows.Forms.Label()
+        Me.ToolStripStatusLabelCurrentProduction = New System.Windows.Forms.ToolStripStatusLabel()
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SplitContainer1.Panel1.SuspendLayout()
         Me.SplitContainer1.Panel2.SuspendLayout()
@@ -64,10 +65,10 @@ Partial Class frmFactEngine
         '
         Me.TextBoxInput.BackColor = System.Drawing.Color.FromArgb(CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer))
         Me.TextBoxInput.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.TextBoxInput.ForeColor = System.Drawing.Color.Black
-        Me.TextBoxInput.Location = New System.Drawing.Point(0, 33)
+        Me.TextBoxInput.ForeColor = System.Drawing.Color.Wheat
+        Me.TextBoxInput.Location = New System.Drawing.Point(0, 38)
         Me.TextBoxInput.Name = "TextBoxInput"
-        Me.TextBoxInput.Size = New System.Drawing.Size(1178, 231)
+        Me.TextBoxInput.Size = New System.Drawing.Size(1178, 226)
         Me.TextBoxInput.TabIndex = 2
         Me.TextBoxInput.Text = ""
         '
@@ -77,7 +78,7 @@ Partial Class frmFactEngine
         Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButtonGO})
         Me.ToolStrip1.Location = New System.Drawing.Point(0, 0)
         Me.ToolStrip1.Name = "ToolStrip1"
-        Me.ToolStrip1.Size = New System.Drawing.Size(1178, 33)
+        Me.ToolStrip1.Size = New System.Drawing.Size(1178, 38)
         Me.ToolStrip1.TabIndex = 3
         Me.ToolStrip1.Text = "ToolStrip1"
         '
@@ -93,7 +94,7 @@ Partial Class frmFactEngine
         'StatusStrip2
         '
         Me.StatusStrip2.ImageScalingSize = New System.Drawing.Size(24, 24)
-        Me.StatusStrip2.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripStatusLabelWorkingModelName})
+        Me.StatusStrip2.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripStatusLabelWorkingModelName, Me.ToolStripStatusLabelCurrentProduction})
         Me.StatusStrip2.Location = New System.Drawing.Point(0, 264)
         Me.StatusStrip2.Name = "StatusStrip2"
         Me.StatusStrip2.Padding = New System.Windows.Forms.Padding(2, 0, 14, 0)
@@ -127,6 +128,12 @@ Partial Class frmFactEngine
         Me.LabelError.TabIndex = 0
         Me.LabelError.Text = "Label1"
         '
+        'ToolStripStatusLabelCurrentProduction
+        '
+        Me.ToolStripStatusLabelCurrentProduction.Name = "ToolStripStatusLabelCurrentProduction"
+        Me.ToolStripStatusLabelCurrentProduction.Size = New System.Drawing.Size(180, 25)
+        Me.ToolStripStatusLabelCurrentProduction.Text = "ToolStripStatusLabel1"
+        '
         'frmFactEngine
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
@@ -157,4 +164,5 @@ Partial Class frmFactEngine
     Friend WithEvents ToolStrip1 As ToolStrip
     Friend WithEvents ToolStripButtonGO As ToolStripButton
     Friend WithEvents LabelError As Label
+    Friend WithEvents ToolStripStatusLabelCurrentProduction As ToolStripStatusLabel
 End Class

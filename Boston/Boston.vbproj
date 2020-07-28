@@ -349,6 +349,7 @@
     <Compile Include="ClassesFactEngine\FEQLParser\TinyPG\tFEQLParseTree.vb" />
     <Compile Include="ClassesFactEngine\FEQLParser\TinyPG\tFEQLScanner.vb" />
     <Compile Include="ClassesFactEngine\FEQLParser\TinyPG\tFEQLTextHighlighter.vb" />
+    <Compile Include="ClassesFactEngine\FEQLParser\TinyPG\tTextMarker.vb" />
     <Compile Include="ClassesFactEngine\tFEQLProcessor.vb" />
     <Compile Include="ClassesFactEngine\Parsing\QueryGraph\tQueryEdge.vb" />
     <Compile Include="ClassesFactEngine\Parsing\QueryGraph\tQueryGraph.vb" />
@@ -394,6 +395,9 @@
     </Compile>
     <Compile Include="ClassesGeneral\ProjectUserDetails.vb">
       <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="ClassesGeneral\tFlickerFreeListbox.vb">
+      <SubType>Component</SubType>
     </Compile>
     <Compile Include="ClassesGeneral\tMorphVector.vb" />
     <Compile Include="ClassesGeneral\tRecentNodes.vb" />
@@ -2871,6 +2875,7 @@
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="ClassesLINFUORM\" />
     <Folder Include="CodeGeneration\bin\Debug\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />

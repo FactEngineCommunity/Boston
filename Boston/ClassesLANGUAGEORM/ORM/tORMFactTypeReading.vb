@@ -633,6 +633,45 @@ Namespace FBM
 
         End Function
 
+        Public Function GetPredicateText() As String
+
+            '----------------------------------------------------
+            'Create the dotted reading from the PredicateParts
+            '----------------------------------------------------        
+            Dim liSequenceNr As Integer = 0
+            Dim lrPredicatePart As FBM.PredicatePart
+
+            Try
+                GetPredicateText = ""
+                GetPredicateText &= Me.FrontText & " "
+
+                For Each lrPredicatePart In Me.PredicatePart
+                    liSequenceNr += 1
+
+                    If (liSequenceNr < Me.PredicatePart.Count) Or (lrPredicatePart.PredicatePartText <> "") Then
+                        GetPredicateText &= " "
+                    End If
+                    GetPredicateText &= lrPredicatePart.PredicatePartText
+
+                    If liSequenceNr < Me.PredicatePart.Count Then
+                        GetPredicateText &= " "
+                    End If
+
+                Next
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return "Error"
+            End Try
+
+        End Function
+
         ''' <summary>
         ''' Adds the FactTypeReading text of the FactTypeReading to the Verbaliser.
         ''' </summary>

@@ -533,6 +533,16 @@ Namespace FBM
             Return New FBM.ModelObject
         End Function
 
+        Public Function getConnectedFactTypes() As List(Of FBM.FactType)
+
+            Dim larFactType = From FactType In Me.Model.FactType
+                              From Role In FactType.RoleGroup
+                              Where Role.JoinedORMObject.Id = Me.Id
+                              Select FactType
+
+            Return larFactType.ToList
+
+        End Function
         Public Overridable Function getCorrespondingRDSTable() As RDS.Table
 
             Select Case Me.GetType.ToString

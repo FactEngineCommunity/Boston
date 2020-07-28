@@ -102,7 +102,7 @@ Public Class frmAutoComplete
                 Me.Hide()
             End If
 
-            If ((e.KeyCode = Keys.Enter) Or (e.KeyCode = Keys.Space)) And (Me.ListBox.SelectedIndex >= 0) Then
+            If ((e.KeyCode = Keys.Enter) Or (e.KeyCode = Keys.Space) Or (e.KeyCode = Keys.Tab)) And (Me.ListBox.SelectedIndex >= 0) Then
                 Call Me.processKeyDown()
                 e.Handled = True
             End If
@@ -162,6 +162,7 @@ Public Class frmAutoComplete
         Me.zoTextEditor.SelectionProtected = False
         Me.zoTextEditor.SelectionStart = Me.zoTextEditor.Text.Length
         Me.zoTextEditor.AppendText(Trim(Me.ListBox.SelectedItem.ToString) & " ") 'Text.AppendString
+        Me.zoTextEditor.SelectionColor = Color.Wheat
 
         Me.Enabled = False
         Me.Hide()
