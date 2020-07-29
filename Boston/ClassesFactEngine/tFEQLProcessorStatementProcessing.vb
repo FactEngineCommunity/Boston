@@ -257,22 +257,27 @@
                 Dim lrFact As FBM.Fact
                 'Richmond.WriteToStatusBar("Reading results.", True)
 
-                Dim larProjectColumns = lrQueryGraph.getProjectionColumns
+                '=====================================================
+                'Column Names        
+                For Each lrProjectColumn In lrQueryGraph.getProjectionColumns
+                    lrRecordset.Columns.Add(lrProjectColumn.Name)
+                    Dim lrRole = New FBM.Role(lrFactType, lrProjectColumn.Name, True, Nothing)
+                    lrFactType.RoleGroup.AddUnique(lrRole)
+                Next
 
                 While lrSQLiteDataReader.Read()
 
                     lrFact = New FBM.Fact(lrFactType, False)
+                    Dim loFieldValue As Object = Nothing
+                    For liInd = 0 To lrSQLiteDataReader.FieldCount - 1
+                        Select Case lrSQLiteDataReader.GetFieldType(liInd)
+                            Case Is = GetType(String)
+                                loFieldValue = lrSQLiteDataReader.GetString(liInd)
+                            Case Else
+                                loFieldValue = lrSQLiteDataReader.GetValue(liInd)
+                        End Select
 
-                    For liInd = 1 To lrSQLiteDataReader.FieldCount
-                        Dim myreader As String = lrSQLiteDataReader.GetString(0)
-                        '=====================================================
-                        'Column Names
-                        lrRecordset.Columns.Add(larProjectColumns(liInd - 1).Name)
-
-                        Dim lrRole = New FBM.Role(lrFactType, larProjectColumns(liInd - 1).Name, True, Nothing)
-                        lrFactType.RoleGroup.Add(lrRole)
-
-                        lrFact.Data.Add(New FBM.FactData(lrRole, New FBM.Concept(lrSQLiteDataReader.GetString(liInd - 1)), lrFact))
+                        lrFact.Data.Add(New FBM.FactData(lrFactType.RoleGroup(liInd), New FBM.Concept(loFieldValue), lrFact))
                         '=====================================================
                     Next
 

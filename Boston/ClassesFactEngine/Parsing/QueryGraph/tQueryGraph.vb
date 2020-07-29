@@ -96,7 +96,7 @@
                 Dim larIndexColumns = lrTargetTable.getFirstUniquenessConstraintColumns
                 liInd = 0
                 For Each lsIdentifier In lrQueryEdge.IdentifierList
-                    lsSQLQuery &= "AND " & lrTargetTable.Name & "." & larIndexColumns(0).Name & " = '" & lsIdentifier & "'" & vbCrLf
+                    lsSQLQuery &= "AND " & lrTargetTable.Name & "." & larIndexColumns(liInd).Name & " = '" & lsIdentifier & "'" & vbCrLf
                     liInd += 1
                 Next
             Next
