@@ -1060,7 +1060,7 @@ Public Class frmToolboxBrainBox
                     Dim lo_point As New Point(Me.TextBoxInput.GetPositionFromCharIndex(Me.TextBoxInput.SelectionStart))
                     lo_point.X += Me.TextBoxInput.Bounds.X
                     lo_point.Y += Me.TextBoxInput.Bounds.Y
-                    lo_point.Y += CInt(Me.TextBoxInput.Font.GetHeight()) + 13
+                    lo_point.Y += CInt(Me.TextBoxInput.Font.GetHeight()) + 24
                     Me.AutoComplete.Location = PointToScreen(lo_point)
                 End If
 

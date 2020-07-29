@@ -17,8 +17,10 @@ Public Class frmAutoComplete
 
     Private Sub frmAutoComplete_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
 
-        Me.FormBorderStyle = Windows.Forms.FormBorderStyle.SizableToolWindow
-        SetStyle(ControlStyles.SupportsTransparentBackColor, True)
+        Call Me.roundCorners(Me)
+
+        'Me.FormBorderStyle = Windows.Forms.FormBorderStyle.SizableToolWindow
+        'SetStyle(ControlStyles.SupportsTransparentBackColor, True)
         Me.Opacity = 1
         'Me.BackColor = Color.Transparent
         'Me.TransparencyKey = Color.White
@@ -31,7 +33,7 @@ Public Class frmAutoComplete
         If e.Index < 0 Then
             Exit Sub
         End If
-        Dim CurrentText As String = ListBox.Items(e.Index).ToString
+        Dim CurrentText As String = Me.ListBox.Items(e.Index).ToString
         Dim ForeColor As Color = e.ForeColor
 
         ' Draw the background of the ListBox control for each item.
@@ -43,9 +45,9 @@ Public Class frmAutoComplete
 
 
         Select Case liTokenType
-            Case Is = VAQL.TokenType.MODELELEMENTNAME
+            Case Is = FEQL.TokenType.MODELELEMENTNAME, VAQL.TokenType.MODELELEMENTNAME
                 ForeColor = Color.FromArgb(76, 153, 0)
-            Case Is = VAQL.TokenType.PREDICATEPART
+            Case Is = VAQL.TokenType.PREDICATEPART, FEQL.TokenType.PREDICATE
                 ForeColor = Color.FromArgb(153, 0, 153)
         End Select
 
@@ -62,7 +64,7 @@ Public Class frmAutoComplete
         End Select
 
         e.DrawFocusRectangle()
-        e.Graphics.DrawString(CurrentText, ListBox.Font, New SolidBrush(ForeColor), e.Bounds, StringFormat.GenericDefault)
+        e.Graphics.DrawString(CurrentText, Me.ListBox.Font, New SolidBrush(ForeColor), e.Bounds, StringFormat.GenericDefault)
 
     End Sub
 
@@ -162,7 +164,7 @@ Public Class frmAutoComplete
         Me.zoTextEditor.SelectionProtected = False
         Me.zoTextEditor.SelectionStart = Me.zoTextEditor.Text.Length
         Me.zoTextEditor.AppendText(Trim(Me.ListBox.SelectedItem.ToString) & " ") 'Text.AppendString
-        Me.zoTextEditor.SelectionColor = Color.Wheat
+        Me.zoTextEditor.SelectionColor = Me.zoTextEditor.ForeColor
 
         Me.Enabled = False
         Me.Hide()
@@ -203,4 +205,32 @@ Public Class frmAutoComplete
         End If
 
     End Sub
+
+    Private Sub roundCorners(obj As Form)
+
+        obj.FormBorderStyle = FormBorderStyle.None
+        obj.BackColor = Color.GhostWhite
+
+        Dim DGP As New Drawing2D.GraphicsPath
+        DGP.StartFigure()
+        'top left corner
+        DGP.AddArc(New Rectangle(0, 0, 40, 40), 180, 90)
+        DGP.AddLine(40, 0, obj.Width - 40, 0)
+
+        'top right corner
+        DGP.AddArc(New Rectangle(obj.Width - 40, 0, 40, 40), -90, 90)
+        DGP.AddLine(obj.Width, 40, obj.Width, obj.Height - 40)
+
+        'buttom right corner
+        DGP.AddArc(New Rectangle(obj.Width - 40, obj.Height - 40, 40, 40), 0, 90)
+        DGP.AddLine(obj.Width - 40, obj.Height, 40, obj.Height)
+
+        'buttom left corner
+        DGP.AddArc(New Rectangle(0, obj.Height - 40, 40, 40), 90, 90)
+        DGP.CloseFigure()
+
+        obj.Region = New Region(DGP)
+
+    End Sub
+
 End Class
