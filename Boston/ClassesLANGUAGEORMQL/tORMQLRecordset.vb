@@ -7,6 +7,8 @@
 
         Public ErrorString As String = Nothing
 
+        Public Query As String = Nothing
+
         ''' <summary>
         ''' The type of statement made by the User. E.g. a DESCRIBEStatement.
         ''' </summary>

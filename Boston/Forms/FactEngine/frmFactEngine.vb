@@ -288,7 +288,13 @@ Public Class frmFactEngine
             Exit Sub
         End If
 
-        lrRecordset = Me.FEQLProcessor.ProcessFEQLStatement(Me.TextBoxInput.Text)
+        Me.LabelError.Text = ""
+
+        lrRecordset = Me.FEQLProcessor.ProcessFEQLStatement(Me.TextBoxInput.Text.Replace(vbLf, " "))
+
+        If lrRecordset.Query IsNot Nothing Then
+            Me.TextBoxQuery.Text = lrRecordset.Query
+        End If
 
         If lrRecordset.ErrorString IsNot Nothing Then
             Me.LabelError.BringToFront()
@@ -322,6 +328,9 @@ Public Class frmFactEngine
                     End If
             End Select
         End If
+
+        Me.TabPageResults.Show()
+
     End Sub
 
     Private Sub Application_WorkingModelChanged() Handles Application.WorkingModelChanged

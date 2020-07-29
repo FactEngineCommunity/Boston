@@ -3084,4 +3084,9 @@ Public Class frmDiagramPGS
         End Try
 
     End Sub
+
+    Private Sub ToolStripMenuItemEdgeReadingEditor_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItemEdgeReadingEditor.Click
+        prApplication.WorkingPage = Me.zrPage
+        Call frmMain.loadToolboxORMReadingEditor(Me.zrPage, Me.DockPanel.ActivePane)
+    End Sub
 End Class

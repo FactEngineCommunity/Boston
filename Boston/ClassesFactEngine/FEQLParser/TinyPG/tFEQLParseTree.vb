@@ -496,6 +496,9 @@ Namespace FEQL
                 Case TokenType.WHERESTMT
                     Value = EvalWHERESTMT(tree, paramlist)
                     Exit Select
+                Case TokenType.WHICHTHATCLAUSE
+                    Value = EvalWHICHTHATCLAUSE(tree, paramlist)
+                    Exit Select
                 Case TokenType.WHICHCLAUSE
                     Value = EvalWHICHCLAUSE(tree, paramlist)
                     Exit Select
@@ -889,6 +892,10 @@ Namespace FEQL
         End Function
 
         Protected Overridable Function EvalWHERESTMT(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalWHICHTHATCLAUSE(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
             Throw New NotImplementedException()
         End Function
 
