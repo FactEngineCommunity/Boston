@@ -57,6 +57,16 @@ Namespace FEQL
 
     Public Class WHICHCLAUSE
 
+        Private _KEYWDA As String = Nothing
+        Public Property KEYWDA As String
+            Get
+                Return Me._KEYWDA
+            End Get
+            Set(value As String)
+                Me._KEYWDA = value
+            End Set
+        End Property
+
         Private _KEYWDAND As String = Nothing
         Public Property KEYWDAND As String
             Get

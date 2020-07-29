@@ -76,10 +76,10 @@ Public Class frmFactEngine
         If IsSomething(lrModelElement) Then
             Select Case lrModelElement.GetType
                 Case Is = GetType(FBM.FactType)
-                    Call Me.AddPredicatePartsToEnterpriseAware(CType(lrModelElement, FBM.FactType).getPredicateParts)
+                    Call Me.AddPredicatePartsToEnterpriseAware(CType(lrModelElement, FBM.FactType).getPredicatePartsForModelObject(lrModelElement))
                 Case Is = GetType(FBM.EntityType)
                     For Each lrFactType In lrModelElement.getConnectedFactTypes
-                        Call Me.AddPredicatePartsToEnterpriseAware(lrFactType.getPredicateParts)
+                        Call Me.AddPredicatePartsToEnterpriseAware(lrFactType.getPredicatePartsForModelObject(lrModelElement))
                     Next
             End Select
         Else
@@ -89,7 +89,7 @@ Public Class frmFactEngine
             lrModelElement = prApplication.WorkingModel.GetModelObjectByName(lsModelElementName)
             If IsSomething(lrModelElement) Then
                 If lrModelElement.GetType = GetType(FBM.FactType) Then
-                    Call Me.AddPredicatePartsToEnterpriseAware(CType(lrModelElement, FBM.FactType).getPredicateParts)
+                    Call Me.AddPredicatePartsToEnterpriseAware(CType(lrModelElement, FBM.FactType).getPredicatePartsForModelObject(lrModelElement))
                 End If
             End If
         End If
@@ -143,10 +143,12 @@ Public Class frmFactEngine
             Me.AutoComplete.ListBox.Sorted = True
 
             Dim lasPredicatePartText As New List(Of String)
+
             For Each lrPredicatePart In aarPredicatePart
                 lasPredicatePartText.AddUnique(lrPredicatePart.PredicatePartText)
             Next
 
+            Dim lbBufferIgnored = False
             For Each lsPredicatePartText In lasPredicatePartText
                 If zsIntellisenseBuffer.Length > 0 Then
                     If lsPredicatePartText.StartsWith(zsIntellisenseBuffer, True, System.Globalization.CultureInfo.CurrentUICulture) Then
@@ -154,9 +156,20 @@ Public Class frmFactEngine
                     End If
                 Else
                     Call Me.AddEnterpriseAwareItem(lsPredicatePartText, FEQL.TokenType.PREDICATE)
+                    lbBufferIgnored = True
                 End If
 
             Next
+
+            If Not lbBufferIgnored Then
+                For Each lsPredicatePartText In lasPredicatePartText
+                    If zsIntellisenseBuffer.Length > 0 Then
+                        If Not lsPredicatePartText.StartsWith(zsIntellisenseBuffer, True, System.Globalization.CultureInfo.CurrentUICulture) Then
+                            Call Me.AddEnterpriseAwareItem(lsPredicatePartText, FEQL.TokenType.PREDICATE)
+                        End If
+                    End If
+                Next
+            End If
 
             Me.AutoComplete.Show()
             Me.AutoComplete.ListBox.Focus()
@@ -374,9 +387,17 @@ Public Class frmFactEngine
 
         Try
             If Me.TextBoxInput.SelectionColor = Color.Black Then Me.TextBoxInput.SelectionColor = Color.Wheat
+
+            'Handle Paste
+            If (e.KeyCode = Keys.ControlKey) Or (e.Modifiers = Keys.Control AndAlso e.KeyCode = Keys.V) Then
+                Exit Sub
+            End If
+
             '===============================================================================
             'Intellisense Buffer. Populate first for AutoComplete below that...
             Select Case e.KeyCode
+                Case Is = Keys.Control & Keys.V
+                    Debugger.Break()
                 Case Is = Keys.Back
                     If zsIntellisenseBuffer.Length > 0 Then
                         zsIntellisenseBuffer = zsIntellisenseBuffer.Substring(0, zsIntellisenseBuffer.Length - 1)
@@ -510,7 +531,7 @@ Public Class frmFactEngine
 
         Call Me.CheckStartProductions(Me.zrTextHighlighter.Tree)
 
-        Me.AutoComplete.Hide()
+        'Me.AutoComplete.Hide()
         Me.AutoComplete.ListBox.Items.Clear()
 
         If (Me.zrTextHighlighter.Tree.Errors.Count > 0) Or (Me.zrTextHighlighter.Tree.Optionals.Count > 0) Then
@@ -542,7 +563,18 @@ Public Class frmFactEngine
                 Case Is = FEQL.TokenType.FACTTYPEPRODUCTION
                     Me.AutoComplete.Visible = Me.CheckIfCanDisplayEnterpriseAwareBox
                 Case Is = FEQL.TokenType.PREDICATE
-                    'Don't add anything
+                    Dim lsModelElementName = Me.TextBoxInput.Text.Trim.Split(" ").Last
+                    lrModelElement = prApplication.WorkingModel.GetModelObjectByName(lsModelElementName)
+                    If lrModelElement IsNot Nothing Then
+                        Select Case lrModelElement.GetType
+                            Case Is = GetType(FBM.FactType)
+                                Call Me.AddPredicatePartsToEnterpriseAware(CType(lrModelElement, FBM.FactType).getPredicatePartsForModelObject(lrModelElement, True))
+                            Case Is = GetType(FBM.EntityType)
+                                For Each lrFactType In lrModelElement.getConnectedFactTypes
+                                    Call Me.AddPredicatePartsToEnterpriseAware(lrFactType.getPredicatePartsForModelObject(lrModelElement))
+                                Next
+                        End Select
+                    End If
                 Case Is = FEQL.TokenType.PREDICATESPACE
                     Me.AutoComplete.Visible = Me.CheckIfCanDisplayEnterpriseAwareBox
                 Case Is = FEQL.TokenType.SPACE
@@ -558,10 +590,10 @@ Public Class frmFactEngine
                     If lrModelElement IsNot Nothing Then
                         Select Case lrModelElement.GetType
                             Case Is = GetType(FBM.FactType)
-                                Call Me.AddPredicatePartsToEnterpriseAware(CType(lrModelElement, FBM.FactType).getPredicateParts)
+                                Call Me.AddPredicatePartsToEnterpriseAware(CType(lrModelElement, FBM.FactType).getPredicatePartsForModelObject(lrModelElement, True))
                             Case Is = GetType(FBM.EntityType)
                                 For Each lrFactType In lrModelElement.getConnectedFactTypes
-                                    Call Me.AddPredicatePartsToEnterpriseAware(lrFactType.getPredicateParts)
+                                    Call Me.AddPredicatePartsToEnterpriseAware(lrFactType.getPredicatePartsForModelObject(lrModelElement))
                                 Next
                         End Select
                     End If
@@ -635,6 +667,19 @@ Public Class frmFactEngine
                               FEQL.TokenType.PREDICATESPACE
                         Me.AutoComplete.Enabled = True
                         Call Me.AddFactTypeReadingsToEnterpriseAware()
+                    Case Is = FEQL.TokenType.EOF
+                        Dim lsModelElementName = Me.TextBoxInput.Text.Trim.Split(" ").Last
+                        lrModelElement = prApplication.WorkingModel.GetModelObjectByName(lsModelElementName)
+                        If lrModelElement IsNot Nothing Then
+                            Select Case lrModelElement.GetType
+                                Case Is = GetType(FBM.FactType)
+                                    Call Me.AddPredicatePartsToEnterpriseAware(CType(lrModelElement, FBM.FactType).getPredicatePartsForModelObject(lrModelElement, True))
+                                Case Is = GetType(FBM.EntityType)
+                                    For Each lrFactType In lrModelElement.getConnectedFactTypes
+                                        Call Me.AddPredicatePartsToEnterpriseAware(lrFactType.getPredicatePartsForModelObject(lrModelElement))
+                                    Next
+                            End Select
+                        End If
                     Case Is = FEQL.TokenType.MODELELEMENTNAME
                         Me.AutoComplete.Enabled = True
                         Call Me.PopulateEnterpriseAwareWithObjectTypes()
@@ -643,10 +688,10 @@ Public Class frmFactEngine
                         If lrModelElement IsNot Nothing Then
                             Select Case lrModelElement.GetType
                                 Case Is = GetType(FBM.FactType)
-                                    Call Me.AddPredicatePartsToEnterpriseAware(CType(lrModelElement, FBM.FactType).getPredicateParts)
+                                    Call Me.AddPredicatePartsToEnterpriseAware(CType(lrModelElement, FBM.FactType).getPredicatePartsForModelObject(lrModelElement, True))
                                 Case Is = GetType(FBM.EntityType)
                                     For Each lrFactType In lrModelElement.getConnectedFactTypes
-                                        Call Me.AddPredicatePartsToEnterpriseAware(lrFactType.getPredicateParts)
+                                        Call Me.AddPredicatePartsToEnterpriseAware(lrFactType.getPredicatePartsForModelObject(lrModelElement))
                                     Next
                             End Select
                         End If
@@ -703,7 +748,7 @@ Public Class frmFactEngine
                     lrModelElement = prApplication.WorkingModel.GetModelObjectByName(lsModelElementName)
                     If IsSomething(lrModelElement) Then
                         If lrModelElement.GetType = GetType(FBM.FactType) Then
-                            Call Me.AddPredicatePartsToEnterpriseAware(CType(lrModelElement, FBM.FactType).getPredicateParts)
+                            Call Me.AddPredicatePartsToEnterpriseAware(CType(lrModelElement, FBM.FactType).getPredicatePartsForModelObject(lrModelElement))
                         End If
                     Else
                         Dim larCharBeginning() As Char = {"("}
@@ -712,7 +757,7 @@ Public Class frmFactEngine
                         lrModelElement = prApplication.WorkingModel.GetModelObjectByName(lsModelElementName)
                         If IsSomething(lrModelElement) Then
                             If lrModelElement.GetType = GetType(FBM.FactType) Then
-                                Call Me.AddPredicatePartsToEnterpriseAware(CType(lrModelElement, FBM.FactType).getPredicateParts)
+                                Call Me.AddPredicatePartsToEnterpriseAware(CType(lrModelElement, FBM.FactType).getPredicatePartsForModelObject(lrModelElement))
                             End If
                         End If
                     End If
@@ -762,6 +807,16 @@ Public Class frmFactEngine
                 End If
             Else
                 Call Me.AddEnterpriseAwareItem(lrEntityType.Name, FEQL.TokenType.MODELELEMENTNAME)
+            End If
+        Next
+
+        For Each lrFactType In prApplication.WorkingModel.FactType.FindAll(Function(x) x.IsObjectified And x.IsMDAModelElement = False)
+            If zsIntellisenseBuffer.Length > 0 Then
+                If lrFactType.Name.StartsWith(zsIntellisenseBuffer, True, System.Globalization.CultureInfo.CurrentUICulture) Then
+                    Call Me.AddEnterpriseAwareItem(lrFactType.Name, FEQL.TokenType.MODELELEMENTNAME)
+                End If
+            Else
+                Call Me.AddEnterpriseAwareItem(lrFactType.Name, FEQL.TokenType.MODELELEMENTNAME)
             End If
         Next
 

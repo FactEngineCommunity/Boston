@@ -2440,13 +2440,50 @@ Namespace FBM
 
         End Function
 
-        Public Function getPredicateParts() As List(Of FBM.PredicatePart)
+        Public Function getPredicatePartsForModelObject(ByVal arModelObject As FBM.ModelObject,
+                                                        Optional ByVal abGetAdjoiningFactTypePredicateParts As Boolean = False) As List(Of FBM.PredicatePart)
 
-            Dim larPredicatePart = From FactTypeReading In Me.FactTypeReading
-                                   From PredicatePart In FactTypeReading.PredicatePart
-                                   Select PredicatePart
+            Try
 
-            Return larPredicatePart.ToList
+                Dim larReturnPredicatePart As New List(Of FBM.PredicatePart)
+
+                Dim larPredicatePart = From FactTypeReading In Me.FactTypeReading
+                                       From PredicatePart In FactTypeReading.PredicatePart
+                                       Where PredicatePart.Role.JoinedORMObject.Id = arModelObject.Id
+                                       Select PredicatePart
+
+                If abGetAdjoiningFactTypePredicateParts Then
+
+                    Dim larAdjoiningFactType = From FactType In Me.Model.FactType
+                                               From Role In FactType.RoleGroup
+                                               Where Role.JoinedORMObject.Id = Me.Id
+                                               Select FactType
+
+                    Dim larAdjoiningPredicateParts = From FactType In larAdjoiningFactType
+                                                     From FactTypeReading In FactType.FactTypeReading
+                                                     From PredicatePart In FactTypeReading.PredicatePart
+                                                     Where PredicatePart.Role.JoinedORMObject Is Me
+                                                     Select PredicatePart
+
+                    larReturnPredicatePart.AddRange(larPredicatePart.ToList)
+                    larReturnPredicatePart.AddRange(larAdjoiningPredicateParts.ToList)
+
+                    Return larReturnPredicatePart
+                End If
+
+                larReturnPredicatePart.AddRange(larPredicatePart.ToList)
+                Return larReturnPredicatePart
+
+            Catch ex As Exception
+                Dim lsMessage1 As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return Nothing
+            End Try
 
         End Function
 

@@ -168,7 +168,7 @@
 
                     ElseIf Me.WHICHCLAUSE.KEYWDAND IsNot Nothing And
                            Me.WHICHCLAUSE.KEYWDTHAT.Count = 1 And
-                           Me.WHICHCLAUSE.KEYWDWHICH IsNot Nothing Then
+                           (Me.WHICHCLAUSE.KEYWDWHICH IsNot Nothing Or Me.WHICHCLAUSE.KEYWDA IsNot Nothing) Then
 
                         Call Me.analyseANDTHATWHICHClause(Me.WHICHCLAUSE, lrQueryGraph, lrQueryEdge)
 
@@ -380,7 +380,9 @@
             'E.g. AND THAT School is in WHICH Faculty
 
             arQueryEdge.WhichClauseType = FactEngine.Constants.pcenumWhichClauseType.AndThatModelElementPredicatetModelElement
-            arQueryEdge.IsProjectColumn = True
+            If arWHICHCLAUSE.KEYWDA Is Nothing Then
+                arQueryEdge.IsProjectColumn = True
+            End If
 
             'Set the BaseNode
             If arWHICHCLAUSE.KEYWDTHAT.Count = 1 And CType(arWHICHCLAUSE.WHICHTHATCLAUSE, FEQL.ParseNode).Nodes(0).Token.Type <> TokenType.KEYWDTHAT Then
