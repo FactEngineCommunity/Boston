@@ -1,6 +1,36 @@
 ﻿Imports System.Reflection
 
 Namespace FEQL
+
+
+    Public Class DESCRIBEStatement
+
+        Private _MODELELEMENTNAME As String = Nothing
+        Public Property MODELELEMENTNAME As String
+            Get
+                Return Me._MODELELEMENTNAME
+            End Get
+            Set(value As String)
+                Me._MODELELEMENTNAME = value
+            End Set
+        End Property
+
+    End Class
+
+    Public Class ENUMERATEStatement
+
+        Private _MODELELEMENTNAME As String = Nothing
+        Public Property MODELELEMENTNAME As String
+            Get
+                Return Me._MODELELEMENTNAME
+            End Get
+            Set(value As String)
+                Me._MODELELEMENTNAME = value
+            End Set
+        End Property
+
+    End Class
+
     Public Class WHICHSELECTStatement
 
         Private _MODELELEMENTNAME As New List(Of String)
@@ -120,6 +150,8 @@ Namespace FEQL
         Private Parser As New FEQL.Parser(New FEQL.Scanner) 'Used to parse Text input into the Brain; especially for ORMQL.
         Private Parsetree As New FEQL.ParseTree 'Used with the Parser, is populated during the parsing of text input into the Brain; especially ORMQL
 
+        Public DESCRIBEStatement As New FEQL.DESCRIBEStatement
+        Public ENUMMERATEStatement As New FEQL.ENUMERATEStatement
         Public WHICHSELECTStatement As New FEQL.WHICHSELECTStatement
         Public WHICHCLAUSE As New FEQL.WHICHCLAUSE
         Public NODEPROPERTYIDENTIFICATION As New FEQL.NODEPROPERTYIDENTIFICATION
@@ -243,6 +275,15 @@ Namespace FEQL
                             '----------------------------------------------------------------------------------
                             Exit Function
 
+                        Case Is = "ENUMERATESTMT"
+
+                            '=============================================================
+                            Return Me.ProcessENUMERATEStatement(asFEQLStatement)
+
+                        Case Is = "DESCRIBESTMT"
+
+                            '=============================================================
+                            Return Me.ProcessDESCRIBEStatement(asFEQLStatement)
 
                         Case Is = "DELETEFACTSTMT"
                             '20200727-VM-Just here as an example.

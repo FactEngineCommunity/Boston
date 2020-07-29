@@ -354,6 +354,8 @@
     <Compile Include="ClassesFactEngine\Parsing\QueryGraph\tQueryEdge.vb" />
     <Compile Include="ClassesFactEngine\Parsing\QueryGraph\tQueryGraph.vb" />
     <Compile Include="ClassesFactEngine\Parsing\QueryGraph\tQueryNode.vb" />
+    <Compile Include="ClassesFactEngine\tFEQLProcessorDESCRIBEStatementProcessing.vb" />
+    <Compile Include="ClassesFactEngine\tFEQLProcessorENUMERATEStatementProcessing.vb" />
     <Compile Include="ClassesFactEngine\tFEQLProcessorStatementProcessing.vb" />
     <Compile Include="ClassesFBMInterfaceHost\tFBMInterfaceHost.vb" />
     <Compile Include="ClassesGeneral\BostonTreeView.vb">

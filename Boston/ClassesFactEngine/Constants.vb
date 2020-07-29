@@ -10,6 +10,13 @@
             AndThatModelElementPredicateThatModelElement
         End Enum
 
+        Public Enum pcenumFEQLStatementType
+            None
+            DESCRIBEStatement
+            ENUMERATEStatement
+            WHICHSELECTStatement
+        End Enum
+
 
     End Module
 

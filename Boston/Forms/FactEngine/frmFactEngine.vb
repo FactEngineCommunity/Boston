@@ -174,6 +174,43 @@ Public Class frmFactEngine
 
     End Sub
 
+    Private Sub DesbribeModelElement(ByRef arModelElement As FBM.ModelObject)
+
+        Me.LabelError.Text = ""
+
+        If arModelElement Is Nothing Then
+            Me.LabelError.ForeColor = Color.Orange
+            Me.LabelError.Text = "No Model Element found."
+        Else
+            Me.LabelError.ForeColor = Color.Black
+            Me.LabelError.Text = ""
+
+            Dim lrTable = arModelElement.getCorrespondingRDSTable
+
+            Me.LabelError.Text &= lrTable.Name
+            Me.LabelError.Text &= vbCrLf & vbCrLf
+            For Each lrCOlumn In lrTable.Column
+                Dim lsString = String.Format("{0,6}{1,-" & 20 - lrCOlumn.Name.Length & "}{2}", lrCOlumn.Name, " ", lrCOlumn.getMetamodelDataType.ToString)
+                Me.LabelError.Text &= lsString & vbCrLf
+            Next
+
+            Me.LabelError.Text &= vbCrLf & vbCrLf
+            Me.LabelError.Text &= "Relations" & vbCrLf & vbCrLf
+
+            For Each lrRelation In lrTable.getOutgoingRelations
+
+                Dim lrFactType = lrRelation.ResponsibleFactType
+
+                Dim lrFactTypeReading = lrFactType.getOutgoingFactTypeReadingForTabe(lrTable)
+                Me.LabelError.Text &= lrFactTypeReading.GetReadingTextCQL & vbCrLf
+
+            Next
+
+        End If
+
+    End Sub
+
+
     Private Sub displayModelName()
         If prApplication.WorkingModel Is Nothing Then
             Me.ToolStripStatusLabelWorkingModelName.ForeColor = Color.Orange
@@ -257,27 +294,33 @@ Public Class frmFactEngine
             Me.LabelError.BringToFront()
             Me.LabelError.Text = lrRecordset.ErrorString
         Else
-            Me.LabelError.Text = ""
+            Select Case lrRecordset.StatementType
+                Case Is = FactEngine.pcenumFEQLStatementType.DESCRIBEStatement
+                    Call Me.DesbribeModelElement(lrRecordset.ModelElement)
+                Case Else
 
-            If lrRecordset.Facts.Count = 0 Then
-                Me.LabelError.ForeColor = Color.Orange
-                Me.LabelError.Text = "No results returned"
-            Else
-                Me.LabelError.ForeColor = Color.Black
-                Me.LabelError.Text = ""
+                    Me.LabelError.Text = ""
 
-                Dim liInd = 0
-                For Each lsColumnName In lrRecordset.Columns
-                    liInd += 1
-                    Me.LabelError.Text &= " " & lsColumnName & " "
-                    If liInd < lrRecordset.Columns.Count Then Me.LabelError.Text &= ","
-                Next
-                Me.LabelError.Text &= vbCrLf & "=======================================" & vbCrLf
-                For Each lrFact In lrRecordset.Facts
+                    If lrRecordset.Facts.Count = 0 Then
+                        Me.LabelError.ForeColor = Color.Orange
+                        Me.LabelError.Text = "No results returned"
+                    Else
+                        Me.LabelError.ForeColor = Color.Black
+                        Me.LabelError.Text = ""
 
-                    Me.LabelError.Text &= lrFact.EnumerateAsBracketedFact & vbCrLf
-                Next
-            End If
+                        Dim liInd = 0
+                        For Each lsColumnName In lrRecordset.Columns
+                            liInd += 1
+                            Me.LabelError.Text &= " " & lsColumnName & " "
+                            If liInd < lrRecordset.Columns.Count Then Me.LabelError.Text &= ","
+                        Next
+                        Me.LabelError.Text &= vbCrLf & "=======================================" & vbCrLf
+                        For Each lrFact In lrRecordset.Facts
+
+                            Me.LabelError.Text &= lrFact.EnumerateAsBracketedFact(True) & vbCrLf
+                        Next
+                    End If
+            End Select
         End If
     End Sub
 

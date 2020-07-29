@@ -31,9 +31,9 @@ Partial Class frmFactEngine
         Me.ToolStripStatusLabelLookingFor = New System.Windows.Forms.ToolStripStatusLabel()
         Me.ToolStripStatusLabelCurrentProduction = New System.Windows.Forms.ToolStripStatusLabel()
         Me.ToolStripStatusLabelRequiresConnectionString = New System.Windows.Forms.ToolStripStatusLabel()
-        Me.StatusStrip1 = New System.Windows.Forms.StatusStrip()
-        Me.LabelError = New System.Windows.Forms.Label()
         Me.ToolStripStatusLabelGOPrompt = New System.Windows.Forms.ToolStripStatusLabel()
+        Me.StatusStrip1 = New System.Windows.Forms.StatusStrip()
+        Me.LabelError = New System.Windows.Forms.TextBox()
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SplitContainer1.Panel1.SuspendLayout()
         Me.SplitContainer1.Panel2.SuspendLayout()
@@ -70,9 +70,9 @@ Partial Class frmFactEngine
         Me.TextBoxInput.Dock = System.Windows.Forms.DockStyle.Fill
         Me.TextBoxInput.Font = New System.Drawing.Font("Tahoma", 10.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.TextBoxInput.ForeColor = System.Drawing.Color.Wheat
-        Me.TextBoxInput.Location = New System.Drawing.Point(0, 38)
+        Me.TextBoxInput.Location = New System.Drawing.Point(0, 33)
         Me.TextBoxInput.Name = "TextBoxInput"
-        Me.TextBoxInput.Size = New System.Drawing.Size(1178, 226)
+        Me.TextBoxInput.Size = New System.Drawing.Size(1178, 231)
         Me.TextBoxInput.TabIndex = 2
         Me.TextBoxInput.Text = ""
         '
@@ -82,7 +82,7 @@ Partial Class frmFactEngine
         Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButtonGO})
         Me.ToolStrip1.Location = New System.Drawing.Point(0, 0)
         Me.ToolStrip1.Name = "ToolStrip1"
-        Me.ToolStrip1.Size = New System.Drawing.Size(1178, 38)
+        Me.ToolStrip1.Size = New System.Drawing.Size(1178, 33)
         Me.ToolStrip1.TabIndex = 3
         Me.ToolStrip1.Text = "ToolStrip1"
         '
@@ -130,6 +130,13 @@ Partial Class frmFactEngine
         Me.ToolStripStatusLabelRequiresConnectionString.Size = New System.Drawing.Size(215, 25)
         Me.ToolStripStatusLabelRequiresConnectionString.Text = "RequiresConnectionString"
         '
+        'ToolStripStatusLabelGOPrompt
+        '
+        Me.ToolStripStatusLabelGOPrompt.Name = "ToolStripStatusLabelGOPrompt"
+        Me.ToolStripStatusLabelGOPrompt.Size = New System.Drawing.Size(98, 25)
+        Me.ToolStripStatusLabelGOPrompt.Text = "GOPrompt"
+        Me.ToolStripStatusLabelGOPrompt.Visible = False
+        '
         'StatusStrip1
         '
         Me.StatusStrip1.ImageScalingSize = New System.Drawing.Size(24, 24)
@@ -142,20 +149,14 @@ Partial Class frmFactEngine
         '
         'LabelError
         '
-        Me.LabelError.AutoSize = True
+        Me.LabelError.BackColor = System.Drawing.SystemColors.Control
         Me.LabelError.Dock = System.Windows.Forms.DockStyle.Fill
         Me.LabelError.Location = New System.Drawing.Point(0, 0)
+        Me.LabelError.Multiline = True
         Me.LabelError.Name = "LabelError"
-        Me.LabelError.Size = New System.Drawing.Size(57, 20)
-        Me.LabelError.TabIndex = 0
-        Me.LabelError.Text = "Label1"
-        '
-        'ToolStripStatusLabelGOPrompt
-        '
-        Me.ToolStripStatusLabelGOPrompt.Name = "ToolStripStatusLabelGOPrompt"
-        Me.ToolStripStatusLabelGOPrompt.Size = New System.Drawing.Size(98, 25)
-        Me.ToolStripStatusLabelGOPrompt.Text = "GOPrompt"
-        Me.ToolStripStatusLabelGOPrompt.Visible = False
+        Me.LabelError.ScrollBars = System.Windows.Forms.ScrollBars.Vertical
+        Me.LabelError.Size = New System.Drawing.Size(1178, 262)
+        Me.LabelError.TabIndex = 1
         '
         'frmFactEngine
         '
@@ -186,9 +187,9 @@ Partial Class frmFactEngine
     Friend WithEvents StatusStrip1 As StatusStrip
     Friend WithEvents ToolStrip1 As ToolStrip
     Friend WithEvents ToolStripButtonGO As ToolStripButton
-    Friend WithEvents LabelError As Label
     Friend WithEvents ToolStripStatusLabelCurrentProduction As ToolStripStatusLabel
     Friend WithEvents ToolStripStatusLabelLookingFor As ToolStripStatusLabel
     Friend WithEvents ToolStripStatusLabelRequiresConnectionString As ToolStripStatusLabel
     Friend WithEvents ToolStripStatusLabelGOPrompt As ToolStripStatusLabel
+    Friend WithEvents LabelError As TextBox
 End Class

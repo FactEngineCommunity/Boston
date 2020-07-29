@@ -4,6 +4,7 @@
         Public Function ProcessWHICHSELECTStatement(ByVal asFEQLStatement As String) As ORMQL.Recordset
 
             Dim lrRecordset As New ORMQL.Recordset
+            lrRecordset.StatementType = FactEngine.Constants.pcenumFEQLStatementType.WHICHSELECTStatement
 
             Try
                 'Richmond.WriteToStatusBar("Processsing WHICH Statement.", True)

@@ -418,6 +418,9 @@ Namespace FEQL
                 Case TokenType.ENUMERATESTMT
                     Value = EvalENUMERATESTMT(tree, paramlist)
                     Exit Select
+                Case TokenType.DESCRIBESTMT
+                    Value = EvalDESCRIBESTMT(tree, paramlist)
+                    Exit Select
                 Case TokenType.EXISTSSTMT
                     Value = EvalEXISTSSTMT(tree, paramlist)
                     Exit Select
@@ -782,6 +785,10 @@ Namespace FEQL
         End Function
 
         Protected Overridable Function EvalENUMERATESTMT(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalDESCRIBESTMT(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
             Throw New NotImplementedException()
         End Function
 

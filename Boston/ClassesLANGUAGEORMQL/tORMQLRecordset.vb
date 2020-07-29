@@ -7,6 +7,16 @@
 
         Public ErrorString As String = Nothing
 
+        ''' <summary>
+        ''' The type of statement made by the User. E.g. a DESCRIBEStatement.
+        ''' </summary>
+        Public StatementType As FactEngine.pcenumFEQLStatementType = FactEngine.Constants.pcenumFEQLStatementType.None
+
+        ''' <summary>
+        ''' As used in a DESCRIBE Statement, is pushed back to the client to process.
+        ''' </summary>
+        Public ModelElement As FBM.ModelObject
+
         Private _CurrentFact As FBM.Fact
         Public Property CurrentFact() As FBM.Fact
             Get
@@ -36,6 +46,20 @@
                 Me._EOF = value
             End Set
         End Property
+
+        ''' <summary>
+        ''' Parameterless New
+        ''' </summary>
+        Public Sub New()
+        End Sub
+
+        ''' <summary>
+        ''' Constructor
+        ''' </summary>
+        ''' <param name="aiStatementType">The type of Statement raised by the User.</param>
+        Public Sub New(ByVal aiStatementType As FactEngine.pcenumFEQLStatementType)
+            Me.StatementType = aiStatementType
+        End Sub
 
         Default Public Property Item(ByVal asItemValue As String) As FBM.FactData
             Get

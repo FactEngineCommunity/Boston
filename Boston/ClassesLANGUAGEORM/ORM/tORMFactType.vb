@@ -2928,7 +2928,7 @@ Namespace FBM
 
             Dim larModelObject As New List(Of FBM.ModelObject)
 
-            Dim larRoleJoinedModelObject = From Role In Me.RoleGroup _
+            Dim larRoleJoinedModelObject = From Role In Me.RoleGroup
                                            Select Role.JoinedORMObject
 
             larModelObject = larRoleJoinedModelObject.ToList
@@ -2937,6 +2937,20 @@ Namespace FBM
 
         End Function
 
+        ''' <summary>
+        ''' Returns an Outgoing FactTypeReading for this FactType for the given Table.
+        ''' </summary>
+        ''' <param name="arTable"></param>
+        ''' <returns></returns>
+        Public Function getOutgoingFactTypeReadingForTabe(ByVal arTable As RDS.Table) As FBM.FactTypeReading
+
+            Dim lrFactTypeReading = From FactTypeReading In Me.FactTypeReading
+                                    Where FactTypeReading.PredicatePart(0).Role.JoinedORMObject.Id = arTable.Name
+                                    Select FactTypeReading
+
+            Return lrFactTypeReading.First
+
+        End Function
         Function GetOtherRoleOfBinaryFactType(ByVal asRoleId As String) As FBM.Role
 
             'RETURNS the complimentory RoleId of the FactType in which asRoleId is involved

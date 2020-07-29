@@ -280,7 +280,7 @@ Namespace FBM
 
         End Function
 
-        Public Function EnumerateAsBracketedFact() As String
+        Public Function EnumerateAsBracketedFact(Optional abAddSpaces As Boolean = False) As String
 
             Dim lrRole As FBM.Role
             Dim lrRoleGroup As New List(Of FBM.Role)
@@ -289,6 +289,7 @@ Namespace FBM
 
             Try
                 EnumerateAsBracketedFact = "{"
+                If abAddSpaces Then EnumerateAsBracketedFact &= " "
 
                 For Each lrRole In Me.FactType.RoleGroup
                     lrFactData = New FBM.FactData
@@ -314,10 +315,16 @@ Namespace FBM
 
                     liInd += 1
                     If (liInd > 0) And (liInd < Me.Data.Count) Then
-                        EnumerateAsBracketedFact &= ","
+                        If abAddSpaces Then
+                            EnumerateAsBracketedFact &= " , "
+                        Else
+                            EnumerateAsBracketedFact &= ","
+                        End If
+
                     End If
                 Next
 
+                If abAddSpaces Then EnumerateAsBracketedFact &= " "
                 EnumerateAsBracketedFact &= "}"
             Catch ex As Exception
                 Dim lsMessage As String = ""
