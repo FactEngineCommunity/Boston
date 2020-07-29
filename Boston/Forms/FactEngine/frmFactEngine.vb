@@ -243,6 +243,34 @@ Public Class frmFactEngine
 
     End Sub
 
+    Private Sub GetPredicateNodes(ByRef arParseNode As FEQL.ParseNode, ByRef aarParseNode As List(Of FEQL.ParseNode))
+
+        Dim lrParseNode As FEQL.ParseNode
+
+        If arParseNode.Token.Type = FEQL.TokenType.PREDICATE Then
+            aarParseNode.Add(arParseNode)
+        End If
+
+        For Each lrParseNode In arParseNode.Nodes
+            Call GetPredicateNodes(lrParseNode, aarParseNode)
+        Next
+
+    End Sub
+
+    Private Sub GetPredicateClauseNodes(ByRef arParseNode As FEQL.ParseNode, ByRef aarParseNode As List(Of FEQL.ParseNode))
+
+        Dim lrParseNode As FEQL.ParseNode
+
+        If arParseNode.Token.Type = FEQL.TokenType.PREDICATECLAUSE Then
+            aarParseNode.Add(arParseNode)
+        End If
+
+        For Each lrParseNode In arParseNode.Nodes
+            Call GetPredicateClauseNodes(lrParseNode, aarParseNode)
+        Next
+
+    End Sub
+
     Private Sub frmFactEngine_Load(sender As Object, e As EventArgs) Handles Me.Load
 
         Me.AutoComplete = New frmAutoComplete(Me.TextBoxInput)
@@ -289,8 +317,12 @@ Public Class frmFactEngine
         End If
 
         Me.LabelError.Text = ""
+        Dim lsQuery = Me.TextBoxInput.Text.Replace(vbLf, " ")
+        If Me.TextBoxInput.SelectionLength > 0 Then
+            lsQuery = Me.TextBoxInput.SelectedText
+        End If
 
-        lrRecordset = Me.FEQLProcessor.ProcessFEQLStatement(Me.TextBoxInput.Text.Replace(vbLf, " "))
+        lrRecordset = Me.FEQLProcessor.ProcessFEQLStatement(lsQuery)
 
         If lrRecordset.Query IsNot Nothing Then
             Me.TextBoxQuery.Text = lrRecordset.Query
@@ -452,11 +484,23 @@ Public Class frmFactEngine
             Call Me.GetMODELELEMENTParseNodes(Me.zrTextHighlighter.Tree.Nodes(0), larParseNode)
 
             For Each lrParseNode In larParseNode
-
                 lrModelElement = prApplication.WorkingModel.GetModelObjectByName(lrParseNode.Token.Text)
-
                 If lrModelElement Is Nothing Then
                     Me.TextMarker.AddWord(lrParseNode.Token.StartPos, lrParseNode.Token.Length, Color.Red, "Uknown Model Element")
+                End If
+            Next
+
+            larParseNode = New List(Of FEQL.ParseNode)
+            Call Me.GetPredicateClauseNodes(Me.zrTextHighlighter.Tree.Nodes(0), larParseNode)
+            For Each lrParseNode In larParseNode
+                Dim larPredicateNode As New List(Of FEQL.ParseNode)
+                Call Me.GetPredicateNodes(lrParseNode, larPredicateNode)
+                Dim lsPredicatePartText As String = ""
+                For Each lrPredicateNode In larPredicateNode
+                    lsPredicatePartText &= lrPredicateNode.Token.Text & " "
+                Next
+                If Not prApplication.WorkingModel.existsPredicatePart(Trim(lsPredicatePartText)) Then
+                    Me.TextMarker.AddWord(lrParseNode.Token.StartPos, lrParseNode.Token.Length, Color.Red, "Uknown Predicate")
                 End If
             Next
 
@@ -730,4 +774,5 @@ Public Class frmFactEngine
     Private Sub frmFactEngine_Leave(sender As Object, e As EventArgs) Handles Me.Leave
         Me.AutoComplete.Hide()
     End Sub
+
 End Class

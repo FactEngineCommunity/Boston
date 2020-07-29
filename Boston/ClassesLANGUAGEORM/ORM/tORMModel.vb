@@ -3985,10 +3985,10 @@ Namespace FBM
                 Dim lrDictionaryEntry = Me.ModelDictionary.Find(Function(x) LCase(x.Symbol) = LCase(Trim(asModelElementName)))
 
                 If IsSomething(lrDictionaryEntry) Then
-                    If lrDictionaryEntry.isValueType Or _
-                       lrDictionaryEntry.isEntityType Or _
-                       lrDictionaryEntry.isFactType Or _
-                       lrDictionaryEntry.isRoleConstraint Or _
+                    If lrDictionaryEntry.isValueType Or
+                       lrDictionaryEntry.isEntityType Or
+                       lrDictionaryEntry.isFactType Or
+                       lrDictionaryEntry.isRoleConstraint Or
                        lrDictionaryEntry.isModelNote Then
 
                         ExistsModelElement = True
@@ -4005,6 +4005,18 @@ Namespace FBM
             End Try
 
             Return ExistsModelElement
+
+        End Function
+
+        Public Function existsPredicatePart(ByVal asPredicatePartText) As Boolean
+
+            Dim larPredicatePart = From FactType In Me.FactType
+                                   From FactTypeReading In FactType.FactTypeReading
+                                   From PredicatePart In FactTypeReading.PredicatePart
+                                   Where PredicatePart.PredicatePartText = asPredicatePartText
+                                   Select PredicatePart
+
+            Return larPredicatePart.Count > 0
 
         End Function
 
@@ -4511,5 +4523,8 @@ Namespace FBM
             RaiseEvent FinishedErrorChecking()
         End Sub
 
+        Protected Overrides Sub Finalize()
+            MyBase.Finalize()
+        End Sub
     End Class
 End Namespace
