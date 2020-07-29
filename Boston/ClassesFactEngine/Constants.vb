@@ -7,7 +7,9 @@
             AndPredicateWhichModelElement
             AndPredicateAModelElement
             WhichPredicateNodePropertyIdentification
+            AndThatModelElementPredicatetModelElement
             AndThatModelElementPredicateThatModelElement
+            AndThatModelElementPredicateWhichModelElement
         End Enum
 
         Public Enum pcenumFEQLStatementType

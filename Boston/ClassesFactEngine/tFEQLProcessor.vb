@@ -67,6 +67,16 @@ Namespace FEQL
             End Set
         End Property
 
+        Private _WHICHTHATCLAUSE As Object = Nothing 'NB Is used to disambiguate where the THAT is in the WHICHCLAUSE
+        Public Property WHICHTHATCLAUSE As Object
+            Get
+                Return Me._WHICHTHATCLAUSE
+            End Get
+            Set(value As Object)
+                Me._WHICHTHATCLAUSE = value
+            End Set
+        End Property
+
         Private _KEYWDTHAT As New List(Of String)
         Public Property KEYWDTHAT As List(Of String)
             Get
