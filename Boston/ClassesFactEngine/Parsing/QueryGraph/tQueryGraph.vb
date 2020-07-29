@@ -50,10 +50,16 @@
             liInd = 1
             For Each lrQueryEdge In Me.getProjectQueryEdges()
                 'larColumn = lrQueryEdge.FBMFactType.RoleGroup(1).JoinedORMObject.getCorrespondingRDSTable.getPrimaryKeyColumns
-                larColumn = lrQueryEdge.FBMFactType.RoleGroup(1).JoinedORMObject.getCorrespondingRDSTable.getFirstUniquenessConstraintColumns
+                Dim liRoleInd As Integer
+                If lrQueryEdge.FBMFactType.RoleGroup(0).JoinedORMObject.Id = lrQueryEdge.BaseNode.FBMModelObject.Id Then
+                    liRoleInd = 1
+                Else
+                    liRoleInd = 0
+                End If
+                larColumn = lrQueryEdge.FBMFactType.RoleGroup(liRoleInd).JoinedORMObject.getCorrespondingRDSTable.getFirstUniquenessConstraintColumns
                 Dim liInd2 = 1
                 For Each lrColumn In larColumn
-                    lsSQLQuery &= lrQueryEdge.FBMFactType.RoleGroup(1).JoinedORMObject.getCorrespondingRDSTable.Name & "." _
+                    lsSQLQuery &= lrQueryEdge.FBMFactType.RoleGroup(liRoleInd).JoinedORMObject.getCorrespondingRDSTable.Name & "." _
                                   & lrColumn.Name
                     If liInd2 < larColumn.Count Then lsSQLQuery &= ","
                     liInd2 += 1
@@ -77,11 +83,25 @@
             liInd = 1
             For Each lrQueryEdge In Me.QueryEdges
 
-                Dim larTargetColumn = lrQueryEdge.TargetNode.FBMModelObject.getCorrespondingRDSTable.getPrimaryKeyColumns
-                For Each lrColumn In larTargetColumn
-                    lsSQLQuery &= lrQueryEdge.BaseNode.FBMModelObject.Id & "." & lrColumn.Name
-                    lsSQLQuery &= " = " & lrQueryEdge.TargetNode.FBMModelObject.Id & "." & lrColumn.Name
-                Next
+                Dim lrOriginTable = lrQueryEdge.BaseNode.FBMModelObject.getCorrespondingRDSTable
+                Dim larModelObject = New List(Of FBM.ModelObject)
+                larModelObject.Add(lrQueryEdge.BaseNode.FBMModelObject)
+                larModelObject.Add(lrQueryEdge.TargetNode.FBMModelObject)
+                Dim lrRelation = lrOriginTable.getRelationByFBMModelObjects(larModelObject)
+
+                If lrRelation.OriginTable Is lrOriginTable Then
+                    Dim larTargetColumn = lrQueryEdge.TargetNode.FBMModelObject.getCorrespondingRDSTable.getPrimaryKeyColumns
+                    For Each lrColumn In larTargetColumn
+                        lsSQLQuery &= lrQueryEdge.BaseNode.FBMModelObject.Id & "." & lrColumn.Name
+                        lsSQLQuery &= " = " & lrQueryEdge.TargetNode.FBMModelObject.Id & "." & lrColumn.Name
+                    Next
+                Else
+                    Dim larTargetColumn = lrQueryEdge.BaseNode.FBMModelObject.getCorrespondingRDSTable.getPrimaryKeyColumns
+                    For Each lrColumn In larTargetColumn
+                        lsSQLQuery &= lrQueryEdge.TargetNode.FBMModelObject.Id & "." & lrColumn.Name
+                        lsSQLQuery &= " = " & lrQueryEdge.BaseNode.FBMModelObject.Id & "." & lrColumn.Name
+                    Next
+                End If
                 lsSQLQuery &= vbCrLf
                 If liInd < Me.QueryEdges.Count Then lsSQLQuery &= "AND "
                 liInd += 1
@@ -119,9 +139,15 @@
             Dim larHeadColumn = Me.HeadNode.FBMModelObject.getCorrespondingRDSTable.getFirstUniquenessConstraintColumns
             larColumn.AddRange(larHeadColumn.ToList)
 
+            Dim liRoleInd As Integer
             'Edge Column/s
             For Each lrQueryEdge In Me.getProjectQueryEdges()
-                Dim larEdgeColumn = lrQueryEdge.FBMFactType.RoleGroup(1).JoinedORMObject.getCorrespondingRDSTable.getFirstUniquenessConstraintColumns
+                If lrQueryEdge.BaseNode.FBMModelObject.Id = lrQueryEdge.FBMFactType.RoleGroup(0).JoinedORMObject.Id Then
+                    liRoleInd = 1
+                Else
+                    liRoleInd = 0
+                End If
+                Dim larEdgeColumn = lrQueryEdge.FBMFactType.RoleGroup(liRoleInd).JoinedORMObject.getCorrespondingRDSTable.getFirstUniquenessConstraintColumns
                 larColumn.AddRange(larEdgeColumn.ToList)
             Next
 

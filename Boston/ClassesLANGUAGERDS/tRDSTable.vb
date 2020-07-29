@@ -187,6 +187,40 @@ Namespace RDS
 
         End Function
 
+        Public Function getRelations() As List(Of RDS.Relation)
+
+            Try
+                Dim larRelation As New List(Of RDS.Relation)
+
+                Dim larOutgoingRelation = From Relation In Me.Model.Model.RDS.Relation
+                                          From Column In Relation.OriginColumns
+                                          Where Column.Table.Name = Me.Name
+                                          Select Relation Distinct
+
+                larRelation.AddRange(larOutgoingRelation.ToList)
+
+                Dim larIncomingRelation = From Relation In Me.Model.Model.RDS.Relation
+                                          From Column In Relation.DestinationColumns
+                                          Where Column.Table.Name = Me.Name
+                                          Select Relation Distinct
+
+                larRelation.AddRange(larIncomingRelation.ToList)
+
+                Return larRelation
+
+            Catch ex As Exception
+                Dim lsMessage1 As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return New List(Of RDS.Relation)
+            End Try
+
+        End Function
+
         Public Function getOutgoingRelations() As List(Of RDS.Relation)
 
             Try
@@ -307,6 +341,17 @@ Namespace RDS
             Else
                 Return Me.generateUniqueQualifier(asRootQualifier, aiIndex + 1)
             End If
+
+        End Function
+
+        Public Function getRelationByFBMModelObjects(ByVal aarFBMModelObject As List(Of FBM.ModelObject)) As RDS.Relation
+
+            Dim larRelation = From Relation In Me.getRelations
+                              Where aarFBMModelObject.Contains(Relation.DestinationTable.FBMModelElement)
+                              Where aarFBMModelObject.Contains(Relation.OriginTable.FBMModelElement)
+                              Select Relation
+
+            Return larRelation.First
 
         End Function
 
