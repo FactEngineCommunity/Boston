@@ -1,8 +1,6 @@
 ﻿Imports System.Reflection
 
 Namespace FEQL
-
-
     Public Class DESCRIBEStatement
 
         Private _MODELELEMENTNAME As String = Nothing
@@ -56,6 +54,16 @@ Namespace FEQL
     End Class
 
     Public Class WHICHCLAUSE
+
+        Private _KEYWDIS As String = Nothing
+        Public Property KEYWDIS As String
+            Get
+                Return Me._KEYWDIS
+            End Get
+            Set(value As String)
+                Me._KEYWDIS = value
+            End Set
+        End Property
 
         Private _KEYWDA As String = Nothing
         Public Property KEYWDA As String

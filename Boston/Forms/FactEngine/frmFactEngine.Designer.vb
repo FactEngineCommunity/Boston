@@ -22,6 +22,7 @@ Partial Class frmFactEngine
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmFactEngine))
         Me.SplitContainer1 = New System.Windows.Forms.SplitContainer()
         Me.TextBoxInput = New System.Windows.Forms.RichTextBox()
         Me.ToolStrip1 = New System.Windows.Forms.ToolStrip()
@@ -33,9 +34,9 @@ Partial Class frmFactEngine
         Me.ToolStripStatusLabelRequiresConnectionString = New System.Windows.Forms.ToolStripStatusLabel()
         Me.ToolStripStatusLabelGOPrompt = New System.Windows.Forms.ToolStripStatusLabel()
         Me.StatusStrip1 = New System.Windows.Forms.StatusStrip()
-        Me.LabelError = New System.Windows.Forms.TextBox()
         Me.TabControl1 = New System.Windows.Forms.TabControl()
         Me.TabPageResults = New System.Windows.Forms.TabPage()
+        Me.LabelError = New System.Windows.Forms.TextBox()
         Me.TabPageQuery = New System.Windows.Forms.TabPage()
         Me.TextBoxQuery = New System.Windows.Forms.TextBox()
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -154,17 +155,6 @@ Partial Class frmFactEngine
         Me.StatusStrip1.TabIndex = 0
         Me.StatusStrip1.Text = "StatusStrip1"
         '
-        'LabelError
-        '
-        Me.LabelError.BackColor = System.Drawing.SystemColors.Control
-        Me.LabelError.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.LabelError.Location = New System.Drawing.Point(3, 3)
-        Me.LabelError.Multiline = True
-        Me.LabelError.Name = "LabelError"
-        Me.LabelError.ScrollBars = System.Windows.Forms.ScrollBars.Vertical
-        Me.LabelError.Size = New System.Drawing.Size(1164, 223)
-        Me.LabelError.TabIndex = 1
-        '
         'TabControl1
         '
         Me.TabControl1.Controls.Add(Me.TabPageResults)
@@ -186,6 +176,17 @@ Partial Class frmFactEngine
         Me.TabPageResults.TabIndex = 0
         Me.TabPageResults.Text = "Results"
         Me.TabPageResults.UseVisualStyleBackColor = True
+        '
+        'LabelError
+        '
+        Me.LabelError.BackColor = System.Drawing.SystemColors.Control
+        Me.LabelError.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.LabelError.Location = New System.Drawing.Point(3, 3)
+        Me.LabelError.Multiline = True
+        Me.LabelError.Name = "LabelError"
+        Me.LabelError.ScrollBars = System.Windows.Forms.ScrollBars.Vertical
+        Me.LabelError.Size = New System.Drawing.Size(1164, 223)
+        Me.LabelError.TabIndex = 1
         '
         'TabPageQuery
         '
@@ -213,6 +214,7 @@ Partial Class frmFactEngine
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1178, 585)
         Me.Controls.Add(Me.SplitContainer1)
+        Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.Name = "frmFactEngine"
         Me.Text = "Fact Engine"
         Me.SplitContainer1.Panel1.ResumeLayout(False)

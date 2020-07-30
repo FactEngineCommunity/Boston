@@ -425,6 +425,10 @@ Namespace FEQL
             Patterns.Add(TokenType.KEYWDINTO, regex)
             Tokens.Add(TokenType.KEYWDINTO)
 
+            regex = new Regex("IS", RegexOptions.Compiled)
+            Patterns.Add(TokenType.KEYWDIS, regex)
+            Tokens.Add(TokenType.KEYWDIS)
+
             regex = new Regex("IS A", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDISA, regex)
             Tokens.Add(TokenType.KEYWDISA)
@@ -942,55 +946,56 @@ Namespace FEQL
         KEYWDIN     = 196
         KEYWDINSERT = 197
         KEYWDINTO   = 198
-        KEYWDISA    = 199
-        KEYWDISIDENTIFIEDBYITS= 200
-        KEYWDISWHERE= 201
-        KEYWDISWRITTENAS= 202
-        KEYWDITISMANDATORYTHAT= 203
-        KEYWDJOINING= 204
-        KEYWDINDEX  = 205
-        KEYWDLANGUAGE= 206
-        KEYWDLANGUAGEDFD= 207
-        KEYWDLANGUAGEERD= 208
-        KEYWDLANGUAGEETD= 209
-        KEYWDLANGUAGEORM= 210
-        KEYWDLANGUAGESTD= 211
-        KEYWDLANGUAGEUCD= 212
-        KEYWDLIST   = 213
-        KEYWDMATCH  = 214
-        KEYWDMODEL  = 215
-        KEYWDMODELNOTES= 216
-        KEYWDMODELDICTIONARY= 217
-        KEYWDNULL   = 218
-        KEYWDOBJECT = 219
-        KEYWDOCCURSATLEASTONETIME= 220
-        KEYWDOCCURSATLEASTONETIMEINEACHOF= 221
-        KEYWDOF     = 222
-        KEYWDON     = 223
-        KEYWDONE    = 224
-        KEYWDONPAGE = 225
-        KEYWDOPEN   = 226
-        KEYWDOR     = 227
-        KEYWDPAGE   = 228
-        KEYWDPREDICATE= 229
-        KEYWDRETURN = 230
-        KEYWDROLE   = 231
-        KEYWDSELECT = 232
-        KEYWDRESTRICTEDTO= 233
-        KEYWDROLECONSTRAINTS= 234
-        KEYWDSET    = 235
-        KEYWDSUPERTYPE= 236
-        KEYWDTHAT   = 237
-        KEYWDTO     = 238
-        KEYWDUPDATE = 239
-        KEYWDVALUES = 240
-        KEYWDVALUETYPE= 241
-        KEYWDVALUETYPES= 242
-        KEYWDWHEN   = 243
-        KEYWDWHERE  = 244
-        KEYWDWHICH  = 245
-        KEYWDWITH   = 246
-        WHITESPACE  = 247
+        KEYWDIS     = 199
+        KEYWDISA    = 200
+        KEYWDISIDENTIFIEDBYITS= 201
+        KEYWDISWHERE= 202
+        KEYWDISWRITTENAS= 203
+        KEYWDITISMANDATORYTHAT= 204
+        KEYWDJOINING= 205
+        KEYWDINDEX  = 206
+        KEYWDLANGUAGE= 207
+        KEYWDLANGUAGEDFD= 208
+        KEYWDLANGUAGEERD= 209
+        KEYWDLANGUAGEETD= 210
+        KEYWDLANGUAGEORM= 211
+        KEYWDLANGUAGESTD= 212
+        KEYWDLANGUAGEUCD= 213
+        KEYWDLIST   = 214
+        KEYWDMATCH  = 215
+        KEYWDMODEL  = 216
+        KEYWDMODELNOTES= 217
+        KEYWDMODELDICTIONARY= 218
+        KEYWDNULL   = 219
+        KEYWDOBJECT = 220
+        KEYWDOCCURSATLEASTONETIME= 221
+        KEYWDOCCURSATLEASTONETIMEINEACHOF= 222
+        KEYWDOF     = 223
+        KEYWDON     = 224
+        KEYWDONE    = 225
+        KEYWDONPAGE = 226
+        KEYWDOPEN   = 227
+        KEYWDOR     = 228
+        KEYWDPAGE   = 229
+        KEYWDPREDICATE= 230
+        KEYWDRETURN = 231
+        KEYWDROLE   = 232
+        KEYWDSELECT = 233
+        KEYWDRESTRICTEDTO= 234
+        KEYWDROLECONSTRAINTS= 235
+        KEYWDSET    = 236
+        KEYWDSUPERTYPE= 237
+        KEYWDTHAT   = 238
+        KEYWDTO     = 239
+        KEYWDUPDATE = 240
+        KEYWDVALUES = 241
+        KEYWDVALUETYPE= 242
+        KEYWDVALUETYPES= 243
+        KEYWDWHEN   = 244
+        KEYWDWHERE  = 245
+        KEYWDWHICH  = 246
+        KEYWDWITH   = 247
+        WHITESPACE  = 248
     End Enum
 
     <Serializable()> _

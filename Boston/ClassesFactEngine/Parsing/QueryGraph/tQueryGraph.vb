@@ -81,7 +81,8 @@
             lsSQLQuery &= vbCrLf & "WHERE "
 
             liInd = 1
-            For Each lrQueryEdge In Me.QueryEdges
+            Dim lbIntialWhere = Nothing
+            For Each lrQueryEdge In Me.QueryEdges.FindAll(Function(x) x.TargetNode.FBMModelObject.ConceptType <> pcenumConceptType.ValueType)
 
                 Dim lrOriginTable = lrQueryEdge.BaseNode.FBMModelObject.getCorrespondingRDSTable
                 Dim larModelObject = New List(Of FBM.ModelObject)
@@ -105,6 +106,7 @@
                 lsSQLQuery &= vbCrLf
                 If liInd < Me.QueryEdges.Count Then lsSQLQuery &= "AND "
                 liInd += 1
+                lbIntialWhere = "AND "
             Next
 
             'WHERE Conditional
@@ -112,13 +114,51 @@
             larConditionalQueryEdges = Me.QueryEdges.FindAll(Function(x) x.IdentifierList.Count > 0)
 
             For Each lrQueryEdge In larConditionalQueryEdges
-                Dim lrTargetTable = lrQueryEdge.TargetNode.FBMModelObject.getCorrespondingRDSTable
-                Dim larIndexColumns = lrTargetTable.getFirstUniquenessConstraintColumns
-                liInd = 0
-                For Each lsIdentifier In lrQueryEdge.IdentifierList
-                    lsSQLQuery &= "AND " & lrTargetTable.Name & "." & larIndexColumns(liInd).Name & " = '" & lsIdentifier & "'" & vbCrLf
-                    liInd += 1
-                Next
+                Select Case lrQueryEdge.WhichClauseType
+                    Case Is = FactEngine.Constants.pcenumWhichClauseType.IsPredicateNodePropertyIdentification
+                        Dim lrFactType = CType(lrQueryEdge.BaseNode.FBMModelObject, FBM.FactType)
+
+                        Dim lrPredicatePart = (From FactTypeReading In lrFactType.FactTypeReading
+                                               From PredicatePart In FactTypeReading.PredicatePart
+                                               Where PredicatePart.PredicatePartText = Trim(lrQueryEdge.Predicate)
+                                               Select PredicatePart).First
+
+                        Dim lrResponsibleRole As FBM.Role
+
+                        If Not lrPredicatePart.Role.JoinedORMObject Is lrQueryEdge.TargetNode.FBMModelObject Then
+                            lrQueryEdge.Predicate = "is " & lrQueryEdge.Predicate
+
+                            lrPredicatePart = (From FactTypeReading In lrFactType.FactTypeReading
+                                               From PredicatePart In FactTypeReading.PredicatePart
+                                               Where PredicatePart.PredicatePartText = Trim(lrQueryEdge.Predicate)
+                                               Select PredicatePart).First
+                        End If
+
+                        If lrPredicatePart Is Nothing Then
+                            Throw New Exception("There is no Predicate (Part) of Fact Type, '" & lrQueryEdge.FBMFactType.Id & "', that is '" & lrQueryEdge.Predicate & "'.")
+                        Else
+                            lrResponsibleRole = lrPredicatePart.Role
+                        End If
+
+                        Dim lrTable = lrQueryEdge.BaseNode.FBMModelObject.getCorrespondingRDSTable
+
+                        Dim lrColumn = (From Column In lrTable.Column
+                                        Where Column.Role Is lrResponsibleRole
+                                        Where Column.ActiveRole.JoinedORMObject Is lrQueryEdge.TargetNode.FBMModelObject
+                                        Select Column).First
+
+                        lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") & lrQueryEdge.BaseNode.FBMModelObject.Id & "." & lrColumn.Name & " = '" & lrQueryEdge.IdentifierList(0) & "'" & vbCrLf
+
+                    Case Else
+                        Dim lrTargetTable = lrQueryEdge.TargetNode.FBMModelObject.getCorrespondingRDSTable
+                        Dim larIndexColumns = lrTargetTable.getFirstUniquenessConstraintColumns
+                        liInd = 0
+                        For Each lsIdentifier In lrQueryEdge.IdentifierList
+                            lsSQLQuery &= "AND " & lrTargetTable.Name & "." & larIndexColumns(liInd).Name & " = '" & lsIdentifier & "'" & vbCrLf
+                            liInd += 1
+                        Next
+                End Select
+
             Next
 
             Return lsSQLQuery

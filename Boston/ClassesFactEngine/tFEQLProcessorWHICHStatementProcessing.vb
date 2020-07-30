@@ -50,7 +50,41 @@
                     'MODELELEMENTNAME As List(Of String)
                     'NODEPROPERTYIDENTIFICATION As Object
 
-                    If Me.WHICHCLAUSE.KEYWDAND Is Nothing And Me.WHICHCLAUSE.NODEPROPERTYIDENTIFICATION IsNot Nothing Then
+                    If Me.WHICHCLAUSE.KEYWDIS IsNot Nothing And
+                       Me.WHICHCLAUSE.NODEPROPERTYIDENTIFICATION IsNot Nothing Then
+
+                        'E.g. 'IS in (Semester:'1') as in when queryinging 'WHICH TimetableBooking IS in (Semester:'1')
+                        lrQueryEdge.WhichClauseType = FactEngine.Constants.pcenumWhichClauseType.IsPredicateNodePropertyIdentification
+
+                        If lrPreviousTargetNode Is Nothing Then
+                            lrQueryEdge.BaseNode = lrQueryGraph.HeadNode
+                        Else
+                            lrQueryEdge.BaseNode = lrPreviousTargetNode
+                        End If
+
+                        'Get the TargetNode
+                        Me.NODEPROPERTYIDENTIFICATION = New FEQL.NODEPROPERTYIDENTIFICATION
+                        Call Me.GetParseTreeTokensReflection(Me.NODEPROPERTYIDENTIFICATION, Me.WHICHCLAUSE.NODEPROPERTYIDENTIFICATION)
+                        lrFBMModelObject = Me.Model.GetModelObjectByName(Me.NODEPROPERTYIDENTIFICATION.MODELELEMENTNAME)
+                        If lrFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & Me.NODEPROPERTYIDENTIFICATION.MODELELEMENTNAME & "'.")
+                        lrQueryEdge.TargetNode = New FactEngine.QueryNode(lrFBMModelObject)
+                        'lrQueryGraph.Nodes.AddUnique(lrQueryEdge.TargetNode)
+
+                        '---------------------------------------------------------
+                        'Set the Identification
+                        For Each lsIdentifier In Me.NODEPROPERTYIDENTIFICATION.IDENTIFIER
+                            lrQueryEdge.IdentifierList.Add(lsIdentifier)
+                        Next
+
+                        '---------------------------------------------------------
+                        'Get the Predicate
+                        For Each lsPredicatePart In Me.WHICHCLAUSE.PREDICATE
+                            lrQueryEdge.Predicate = Trim(lrQueryEdge.Predicate & " " & lsPredicatePart)
+                        Next
+
+                    ElseIf Me.WHICHCLAUSE.KEYWDAND Is Nothing And Me.WHICHCLAUSE.NODEPROPERTYIDENTIFICATION IsNot Nothing Then
+
+
                         'E.g. "WHICH is in (Factulty:'IT') "
                         lrQueryEdge.WhichClauseType = FactEngine.Constants.pcenumWhichClauseType.WhichPredicateNodePropertyIdentification
 

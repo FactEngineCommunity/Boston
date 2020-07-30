@@ -6,6 +6,7 @@
             PredicateWhichModelElement
             AndPredicateWhichModelElement
             AndPredicateAModelElement
+            IsPredicateNodePropertyIdentification
             WhichPredicateNodePropertyIdentification
             AndThatModelElementPredicatetModelElement
             AndThatModelElementPredicateThatModelElement

@@ -1,5 +1,6 @@
-﻿Namespace FactEngine
+﻿Imports System.Reflection
 
+Namespace FactEngine
     Public Class QueryEdge
 
         Public QueryGraph As FactEngine.QueryGraph = Nothing
@@ -46,23 +47,47 @@
         Public Sub getAndSetFBMFactType(ByRef arBaseNode As FactEngine.QueryNode,
                                         ByRef arTargetNode As FactEngine.QueryNode,
                                         ByVal asPredicate As String)
+            Try
+                If Me.WhichClauseType = pcenumWhichClauseType.IsPredicateNodePropertyIdentification Then
 
-            Dim larModelObject As New List(Of FBM.ModelObject)
-            larModelObject.Add(arBaseNode.FBMModelObject)
-            larModelObject.Add(arTargetNode.FBMModelObject)
-            Dim lasPredicatePart As New List(Of String)
-            lasPredicatePart.Add(asPredicate)
-            lasPredicatePart.Add("")
-            Dim larRole As New List(Of FBM.Role)
-            Dim lrDummyFactType As New FBM.FactType
-            larRole.Add(New FBM.Role(lrDummyFactType, larModelObject(0)))
-            larRole.Add(New FBM.Role(lrDummyFactType, larModelObject(1)))
-            Dim lrFactTypeReading As New FBM.FactTypeReading(lrDummyFactType, larRole, lasPredicatePart)
-            Me.FBMFactType = Me.QueryGraph.Model.getFactTypeByModelObjectsFactTypeReading(larModelObject,
-                                                                                        lrFactTypeReading)
-            If Me.FBMFactType Is Nothing Then
-                Throw New Exception("There is not Fact Type, '" & arBaseNode.FBMModelObject.Id & " " & asPredicate & " " & arTargetNode.FBMModelObject.Id & "', in the Model.")
-            End If
+                    Select Case Me.BaseNode.FBMModelObject.GetType
+                        Case Is = GetType(FBM.FactType)
+
+                            Me.FBMFactType = Me.BaseNode.FBMModelObject
+
+                        Case Else
+                            Throw New Exception("QueryEdge.getAndSetFBMFactType: Only implemented for Objectified Fact Types at this time.")
+                    End Select
+
+                Else
+
+                    Dim larModelObject As New List(Of FBM.ModelObject)
+                    larModelObject.Add(arBaseNode.FBMModelObject)
+                    larModelObject.Add(arTargetNode.FBMModelObject)
+                    Dim lasPredicatePart As New List(Of String)
+                    lasPredicatePart.Add(asPredicate)
+                    lasPredicatePart.Add("")
+                    Dim larRole As New List(Of FBM.Role)
+                    Dim lrDummyFactType As New FBM.FactType
+                    larRole.Add(New FBM.Role(lrDummyFactType, larModelObject(0)))
+                    larRole.Add(New FBM.Role(lrDummyFactType, larModelObject(1)))
+                    Dim lrFactTypeReading As New FBM.FactTypeReading(lrDummyFactType, larRole, lasPredicatePart)
+                    Me.FBMFactType = Me.QueryGraph.Model.getFactTypeByModelObjectsFactTypeReading(larModelObject,
+                                                                                                lrFactTypeReading)
+                    If Me.FBMFactType Is Nothing Then
+                        Throw New Exception("There is not Fact Type, '" & arBaseNode.FBMModelObject.Id & " " & asPredicate & " " & arTargetNode.FBMModelObject.Id & "', in the Model.")
+                    End If
+
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
 
         End Sub
 
