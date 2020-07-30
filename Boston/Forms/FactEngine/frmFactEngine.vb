@@ -404,7 +404,7 @@ Public Class frmFactEngine
                     End If
                 Case Is = Keys.Space, Keys.Escape, Keys.Down, Keys.Up, Keys.Shift, Keys.ShiftKey
                     Me.zsIntellisenseBuffer = ""
-                Case Else
+                Case Is <> Keys.Menu
                     zsIntellisenseBuffer &= LCase(e.KeyCode.ToString)
             End Select
 
@@ -561,7 +561,7 @@ Public Class frmFactEngine
 
                         Dim lsPredicateText As String = ""
                         For Each lsPredicatePart In lrLastWhichClause.PREDICATE
-                            lsPredicateText = Trim(lsPredicateText & " " & lsPredicatePart)
+                            lsPredicateText = Trim(lsPredicateText & " " & Trim(lsPredicatePart))
                         Next
 
                         Dim larFactTypeReading = From FactType In prApplication.WorkingModel.FactType
@@ -574,7 +574,7 @@ Public Class frmFactEngine
                         If larFactTypeReading.Count = 0 Then
                             'nothing to do here
                         Else
-                            Me.AutoComplete.ListBox.Items.Clear()
+                            'Me.AutoComplete.ListBox.Items.Clear()
                             Dim lrFactTypeReading = larFactTypeReading.First
                             Call Me.AddEnterpriseAwareItem(lrFactTypeReading.PredicatePart(1).Role.JoinedORMObject.Id, FEQL.TokenType.MODELELEMENTNAME)
                             If Me.AutoComplete.Visible = False Then
@@ -737,6 +737,8 @@ Public Class frmFactEngine
                                         Call Me.AddPredicatePartsToEnterpriseAware(lrFactType.getPredicatePartsForModelObject(lrModelElement))
                                     Next
                             End Select
+                        Else
+                            Call Me.PopulateEnterpriseAwareWithObjectTypes()
                         End If
                     Case Is = FEQL.TokenType.MODELELEMENTNAME
                         Me.AutoComplete.Enabled = True
@@ -834,6 +836,8 @@ Public Class frmFactEngine
 
         Dim lrValueType As FBM.ValueType
         Dim lrEntityType As FBM.EntityType
+
+        Me.AutoComplete.ListBox.Sorted = False
 
         'Select Case e.KeyCode
         '    Case Is = Keys.Back
