@@ -81,7 +81,7 @@
             lsSQLQuery &= vbCrLf & "WHERE "
 
             liInd = 1
-            Dim lbIntialWhere = Nothing
+            Dim lbIntialWhere = ""
             For Each lrQueryEdge In Me.QueryEdges.FindAll(Function(x) x.TargetNode.FBMModelObject.ConceptType <> pcenumConceptType.ValueType)
 
                 Dim lrOriginTable = lrQueryEdge.BaseNode.FBMModelObject.getCorrespondingRDSTable
@@ -106,7 +106,7 @@
                 lsSQLQuery &= vbCrLf
                 If liInd < Me.QueryEdges.Count Then lsSQLQuery &= "AND "
                 liInd += 1
-                lbIntialWhere = "AND "
+                lbIntialWhere = Nothing
             Next
 
             'WHERE Conditional
@@ -118,15 +118,34 @@
                     Case Is = FactEngine.Constants.pcenumWhichClauseType.IsPredicateNodePropertyIdentification
                         Dim lrFactType = CType(lrQueryEdge.BaseNode.FBMModelObject, FBM.FactType)
 
-                        Dim lrPredicatePart = (From FactTypeReading In lrFactType.FactTypeReading
+                        Dim larPredicatePart = From FactTypeReading In lrFactType.FactTypeReading
                                                From PredicatePart In FactTypeReading.PredicatePart
                                                Where PredicatePart.PredicatePartText = Trim(lrQueryEdge.Predicate)
-                                               Select PredicatePart).First
+                                               Select PredicatePart
+
+                        Dim lrPredicatePart As FBM.PredicatePart
+                        If larPredicatePart.Count = 0 Then
+
+                            larPredicatePart = From FactType In Me.Model.FactType
+                                               From FactTypeReading In FactType.FactTypeReading
+                                               From PredicatePart In FactTypeReading.PredicatePart
+                                               Where FactType.RoleGroup.FindAll(Function(x) x.JoinedORMObject.Id = lrQueryEdge.BaseNode.FBMModelObject.Id _
+                                                  Or x.JoinedORMObject.Id = lrQueryEdge.TargetNode.FBMModelObject.Id).Count = 2
+                                               Where PredicatePart.PredicatePartText = lrQueryEdge.Predicate
+                                               Select PredicatePart
+
+
+                            lrPredicatePart = larPredicatePart.First
+                            lrFactType = lrPredicatePart.FactTypeReading.FactType
+                        Else
+                            lrPredicatePart = larPredicatePart.First
+                        End If
 
                         Dim lrResponsibleRole As FBM.Role
 
                         If Not lrPredicatePart.Role.JoinedORMObject Is lrQueryEdge.TargetNode.FBMModelObject Then
-                            lrQueryEdge.Predicate = "is " & lrQueryEdge.Predicate
+
+                            'lrQueryEdge.Predicate = "is " & lrQueryEdge.Predicate
 
                             lrPredicatePart = (From FactTypeReading In lrFactType.FactTypeReading
                                                From PredicatePart In FactTypeReading.PredicatePart

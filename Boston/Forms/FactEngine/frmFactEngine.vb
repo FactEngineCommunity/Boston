@@ -642,7 +642,7 @@ Public Class frmFactEngine
                 End If
             End If
 
-            If Me.AutoComplete.Enabled Then
+            If Me.AutoComplete.Enabled And Me.AutoComplete.ListBox.Items.Count > 0 Then
 
                 Me.AutoComplete.Owner = Me
                 Me.AutoComplete.Show()
@@ -652,6 +652,8 @@ Public Class frmFactEngine
                 lo_point.Y += Me.TextBoxInput.Bounds.Y
                 lo_point.Y += CInt(Me.TextBoxInput.Font.GetHeight()) + 6
                 Me.AutoComplete.Location = PointToScreen(lo_point)
+            ElseIf Me.AutoComplete.ListBox.Items.Count = 0 Then
+                Me.AutoComplete.Hide()
             End If
 
             If e.KeyCode <> Keys.Down Then
@@ -700,7 +702,7 @@ Public Class frmFactEngine
                 End Select
             End If
 
-            If Me.AutoComplete.Enabled Then
+            If Me.AutoComplete.Enabled And Me.AutoComplete.ListBox.Items.Count > 0 Then
 
                 Me.AutoComplete.Owner = Me
                 Me.AutoComplete.Show()
@@ -710,6 +712,8 @@ Public Class frmFactEngine
                 lo_point.Y += Me.TextBoxInput.Bounds.Y
                 lo_point.Y += CInt(Me.TextBoxInput.Font.GetHeight()) + 8
                 Me.AutoComplete.Location = PointToScreen(lo_point)
+            ElseIf Me.AutoComplete.ListBox.Items.Count = 0 Then
+                Me.AutoComplete.Hide()
             End If
 
             If e.KeyCode <> Keys.Down Then

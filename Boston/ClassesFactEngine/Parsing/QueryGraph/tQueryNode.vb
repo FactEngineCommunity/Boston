@@ -2,6 +2,9 @@
     Public Class QueryNode
         Implements IEquatable(Of FactEngine.QueryNode)
 
+        Public PreboundText As String = Nothing
+        Public PostboundText As String = Nothing
+
         ''' <summary>
         ''' The FBM ModelObject represented by this QueryNode in the QueryGraph
         ''' </summary>

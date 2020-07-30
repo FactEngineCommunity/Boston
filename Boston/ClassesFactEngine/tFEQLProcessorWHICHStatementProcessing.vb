@@ -50,201 +50,208 @@
                     'MODELELEMENTNAME As List(Of String)
                     'NODEPROPERTYIDENTIFICATION As Object
 
-                    If Me.WHICHCLAUSE.KEYWDIS IsNot Nothing And
-                       Me.WHICHCLAUSE.NODEPROPERTYIDENTIFICATION IsNot Nothing Then
+                    'If Me.WHICHCLAUSE.KEYWDIS IsNot Nothing And
+                    '   Me.WHICHCLAUSE.NODEPROPERTYIDENTIFICATION IsNot Nothing Then
 
-                        'E.g. 'IS in (Semester:'1') as in when queryinging 'WHICH TimetableBooking IS in (Semester:'1')
-                        lrQueryEdge.WhichClauseType = FactEngine.Constants.pcenumWhichClauseType.IsPredicateNodePropertyIdentification
+                    '    'E.g. 'IS in (Semester:'1') as in when queryinging 'WHICH TimetableBooking IS in (Semester:'1')
+                    '    lrQueryEdge.WhichClauseType = FactEngine.Constants.pcenumWhichClauseType.IsPredicateNodePropertyIdentification
 
-                        If lrPreviousTargetNode Is Nothing Then
+                    '    If lrPreviousTargetNode Is Nothing Then
+                    '        lrQueryEdge.BaseNode = lrQueryGraph.HeadNode
+                    '    Else
+                    '        lrQueryEdge.BaseNode = lrPreviousTargetNode
+                    '    End If
+
+                    '    'Get the TargetNode
+                    '    Me.NODEPROPERTYIDENTIFICATION = New FEQL.NODEPROPERTYIDENTIFICATION
+                    '    Call Me.GetParseTreeTokensReflection(Me.NODEPROPERTYIDENTIFICATION, Me.WHICHCLAUSE.NODEPROPERTYIDENTIFICATION)
+                    '    lrFBMModelObject = Me.Model.GetModelObjectByName(Me.NODEPROPERTYIDENTIFICATION.MODELELEMENTNAME)
+                    '    If lrFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & Me.NODEPROPERTYIDENTIFICATION.MODELELEMENTNAME & "'.")
+                    '    lrQueryEdge.TargetNode = New FactEngine.QueryNode(lrFBMModelObject)
+                    '    'lrQueryGraph.Nodes.AddUnique(lrQueryEdge.TargetNode)
+
+                    '    '---------------------------------------------------------
+                    '    'Set the Identification
+                    '    For Each lsIdentifier In Me.NODEPROPERTYIDENTIFICATION.IDENTIFIER
+                    '        lrQueryEdge.IdentifierList.Add(lsIdentifier)
+                    '    Next
+
+                    '    '---------------------------------------------------------
+                    '    'Get the Predicate
+                    '    For Each lsPredicatePart In Me.WHICHCLAUSE.PREDICATE
+                    '        lrQueryEdge.Predicate = Trim(lrQueryEdge.Predicate & " " & lsPredicatePart)
+                    '    Next
+
+                    'Else
+                    If Me.WHICHCLAUSE.KEYWDAND Is Nothing And Me.WHICHCLAUSE.NODEPROPERTYIDENTIFICATION IsNot Nothing Then
+
+
+                            'E.g. "WHICH is in (Factulty:'IT') "
+                            lrQueryEdge.WhichClauseType = FactEngine.Constants.pcenumWhichClauseType.WhichPredicateNodePropertyIdentification
+
+                            If lrPreviousTargetNode Is Nothing Then
+                                lrQueryEdge.BaseNode = lrQueryGraph.HeadNode
+                            Else
+                                lrQueryEdge.BaseNode = lrPreviousTargetNode
+                            End If
+
+                            'Get the TargetNode
+                            Me.NODEPROPERTYIDENTIFICATION = New FEQL.NODEPROPERTYIDENTIFICATION
+                            Call Me.GetParseTreeTokensReflection(Me.NODEPROPERTYIDENTIFICATION, Me.WHICHCLAUSE.NODEPROPERTYIDENTIFICATION)
+                            lrFBMModelObject = Me.Model.GetModelObjectByName(Me.NODEPROPERTYIDENTIFICATION.MODELELEMENTNAME)
+                            If lrFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & Me.NODEPROPERTYIDENTIFICATION.MODELELEMENTNAME & "'.")
+                            lrQueryEdge.TargetNode = New FactEngine.QueryNode(lrFBMModelObject)
+
+                            If lrFBMModelObject.ConceptType = pcenumConceptType.ValueType Then
+                                lrQueryEdge.WhichClauseType = FactEngine.Constants.pcenumWhichClauseType.IsPredicateNodePropertyIdentification
+                            Else
+                                lrQueryGraph.Nodes.AddUnique(lrQueryEdge.TargetNode)
+                            End If
+
+                            '---------------------------------------------------------
+                            'Set the Identification
+                            For Each lsIdentifier In Me.NODEPROPERTYIDENTIFICATION.IDENTIFIER
+                                lrQueryEdge.IdentifierList.Add(lsIdentifier)
+                            Next
+
+                            '---------------------------------------------------------
+                            'Get the Predicate
+                            For Each lsPredicatePart In Me.WHICHCLAUSE.PREDICATE
+                                lrQueryEdge.Predicate = Trim(lrQueryEdge.Predicate & " " & lsPredicatePart)
+                            Next
+
+                            '-----------------------------------------
+                            'Get the relevant FBM.FactType
+                            Call lrQueryEdge.getAndSetFBMFactType(lrQueryEdge.BaseNode,
+                                                                  lrQueryEdge.TargetNode,
+                                                                  lrQueryEdge.Predicate)
+
+                        ElseIf Me.WHICHCLAUSE.KEYWDAND Is Nothing And
+                               Me.WHICHCLAUSE.KEYWDWHICH IsNot Nothing Then
+                            'E.G. "AND holds WHICH Position"
+                            lrQueryEdge.WhichClauseType = FactEngine.Constants.pcenumWhichClauseType.AndPredicateAModelElement
+                            lrQueryEdge.IsProjectColumn = True
+
+                            'Set the BaseNode
                             lrQueryEdge.BaseNode = lrQueryGraph.HeadNode
-                        Else
-                            lrQueryEdge.BaseNode = lrPreviousTargetNode
-                        End If
 
-                        'Get the TargetNode
-                        Me.NODEPROPERTYIDENTIFICATION = New FEQL.NODEPROPERTYIDENTIFICATION
-                        Call Me.GetParseTreeTokensReflection(Me.NODEPROPERTYIDENTIFICATION, Me.WHICHCLAUSE.NODEPROPERTYIDENTIFICATION)
-                        lrFBMModelObject = Me.Model.GetModelObjectByName(Me.NODEPROPERTYIDENTIFICATION.MODELELEMENTNAME)
-                        If lrFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & Me.NODEPROPERTYIDENTIFICATION.MODELELEMENTNAME & "'.")
-                        lrQueryEdge.TargetNode = New FactEngine.QueryNode(lrFBMModelObject)
-                        'lrQueryGraph.Nodes.AddUnique(lrQueryEdge.TargetNode)
+                            'Get the TargetNode                        
+                            lrFBMModelObject = Me.Model.GetModelObjectByName(Me.WHICHCLAUSE.MODELELEMENTNAME(0))
+                            If lrFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & Me.WHICHCLAUSE.MODELELEMENTNAME(0) & "'.")
+                            lrQueryEdge.TargetNode = New FactEngine.QueryNode(lrFBMModelObject)
+                            lrQueryGraph.Nodes.AddUnique(lrQueryEdge.TargetNode)
 
-                        '---------------------------------------------------------
-                        'Set the Identification
-                        For Each lsIdentifier In Me.NODEPROPERTYIDENTIFICATION.IDENTIFIER
-                            lrQueryEdge.IdentifierList.Add(lsIdentifier)
-                        Next
+                            '---------------------------------------------------------
+                            'Get the Predicate
+                            For Each lsPredicatePart In Me.WHICHCLAUSE.PREDICATE
+                                lrQueryEdge.Predicate = Trim(lrQueryEdge.Predicate & " " & lsPredicatePart)
+                            Next
 
-                        '---------------------------------------------------------
-                        'Get the Predicate
-                        For Each lsPredicatePart In Me.WHICHCLAUSE.PREDICATE
-                            lrQueryEdge.Predicate = Trim(lrQueryEdge.Predicate & " " & lsPredicatePart)
-                        Next
+                            '-----------------------------------------
+                            'Get the relevant FBM.FactType
+                            Call lrQueryEdge.getAndSetFBMFactType(lrQueryEdge.BaseNode,
+                                                                  lrQueryEdge.TargetNode,
+                                                                  lrQueryEdge.Predicate)
 
-                    ElseIf Me.WHICHCLAUSE.KEYWDAND Is Nothing And Me.WHICHCLAUSE.NODEPROPERTYIDENTIFICATION IsNot Nothing Then
+                        ElseIf Me.WHICHCLAUSE.KEYWDAND Is Nothing Then
+                            'E.g. "is in WHICH Room" in the above example
+                            lrQueryEdge.WhichClauseType = FactEngine.Constants.pcenumWhichClauseType.PredicateWhichModelElement
+                            lrQueryEdge.IsProjectColumn = True
 
-
-                        'E.g. "WHICH is in (Factulty:'IT') "
-                        lrQueryEdge.WhichClauseType = FactEngine.Constants.pcenumWhichClauseType.WhichPredicateNodePropertyIdentification
-
-                        If lrPreviousTargetNode Is Nothing Then
+                            'Set the BaseNode
                             lrQueryEdge.BaseNode = lrQueryGraph.HeadNode
-                        Else
-                            lrQueryEdge.BaseNode = lrPreviousTargetNode
-                        End If
 
-                        'Get the TargetNode
-                        Me.NODEPROPERTYIDENTIFICATION = New FEQL.NODEPROPERTYIDENTIFICATION
-                        Call Me.GetParseTreeTokensReflection(Me.NODEPROPERTYIDENTIFICATION, Me.WHICHCLAUSE.NODEPROPERTYIDENTIFICATION)
-                        lrFBMModelObject = Me.Model.GetModelObjectByName(Me.NODEPROPERTYIDENTIFICATION.MODELELEMENTNAME)
-                        If lrFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & Me.NODEPROPERTYIDENTIFICATION.MODELELEMENTNAME & "'.")
-                        lrQueryEdge.TargetNode = New FactEngine.QueryNode(lrFBMModelObject)
-                        lrQueryGraph.Nodes.AddUnique(lrQueryEdge.TargetNode)
+                            'Get the TargetNode                        
+                            lrFBMModelObject = Me.Model.GetModelObjectByName(Me.WHICHCLAUSE.MODELELEMENTNAME(0))
+                            If lrFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & Me.WHICHCLAUSE.MODELELEMENTNAME(0) & "'.")
+                            lrQueryEdge.TargetNode = New FactEngine.QueryNode(lrFBMModelObject)
+                            lrQueryGraph.Nodes.AddUnique(lrQueryEdge.TargetNode)
 
-                        '---------------------------------------------------------
-                        'Set the Identification
-                        For Each lsIdentifier In Me.NODEPROPERTYIDENTIFICATION.IDENTIFIER
-                            lrQueryEdge.IdentifierList.Add(lsIdentifier)
-                        Next
+                            '---------------------------------------------------------
+                            'Get the Predicate
+                            For Each lsPredicatePart In Me.WHICHCLAUSE.PREDICATE
+                                lrQueryEdge.Predicate = Trim(lrQueryEdge.Predicate & " " & lsPredicatePart)
+                            Next
 
-                        '---------------------------------------------------------
-                        'Get the Predicate
-                        For Each lsPredicatePart In Me.WHICHCLAUSE.PREDICATE
-                            lrQueryEdge.Predicate = Trim(lrQueryEdge.Predicate & " " & lsPredicatePart)
-                        Next
+                            '-----------------------------------------
+                            'Get the relevant FBM.FactType
+                            Call lrQueryEdge.getAndSetFBMFactType(lrQueryEdge.BaseNode,
+                                                                  lrQueryEdge.TargetNode,
+                                                                  lrQueryEdge.Predicate)
 
-                        '-----------------------------------------
-                        'Get the relevant FBM.FactType
-                        Call lrQueryEdge.getAndSetFBMFactType(lrQueryEdge.BaseNode,
-                                                              lrQueryEdge.TargetNode,
-                                                              lrQueryEdge.Predicate)
+                        ElseIf Me.WHICHCLAUSE.KEYWDAND IsNot Nothing And
+                               Me.WHICHCLAUSE.KEYWDWHICH IsNot Nothing And
+                               Me.WHICHCLAUSE.KEYWDTHAT.Count = 0 Then
+                            'E.g. "AND holds WHICH Position"
+                            lrQueryEdge.WhichClauseType = FactEngine.Constants.pcenumWhichClauseType.AndPredicateWhichModelElement
+                            lrQueryEdge.IsProjectColumn = True
 
-                    ElseIf Me.WHICHCLAUSE.KEYWDAND Is Nothing And Me.WHICHCLAUSE.KEYWDWHICH IsNot Nothing Then
-                        'E.G. "AND holds WHICH Position"
-                        lrQueryEdge.WhichClauseType = FactEngine.Constants.pcenumWhichClauseType.AndPredicateAModelElement
-                        lrQueryEdge.IsProjectColumn = True
+                            'Set the BaseNode
+                            lrQueryEdge.BaseNode = lrQueryGraph.HeadNode
 
-                        'Set the BaseNode
-                        lrQueryEdge.BaseNode = lrQueryGraph.HeadNode
+                            'Get the TargetNode                        
+                            lrFBMModelObject = Me.Model.GetModelObjectByName(Me.WHICHCLAUSE.MODELELEMENTNAME(0))
+                            If lrFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & Me.WHICHCLAUSE.MODELELEMENTNAME(0) & "'.")
+                            lrQueryEdge.TargetNode = New FactEngine.QueryNode(lrFBMModelObject)
+                            lrQueryGraph.Nodes.AddUnique(lrQueryEdge.TargetNode)
 
-                        'Get the TargetNode                        
-                        lrFBMModelObject = Me.Model.GetModelObjectByName(Me.WHICHCLAUSE.MODELELEMENTNAME(0))
-                        If lrFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & Me.WHICHCLAUSE.MODELELEMENTNAME(0) & "'.")
-                        lrQueryEdge.TargetNode = New FactEngine.QueryNode(lrFBMModelObject)
-                        lrQueryGraph.Nodes.AddUnique(lrQueryEdge.TargetNode)
+                            '---------------------------------------------------------
+                            'Get the Predicate
+                            For Each lsPredicatePart In Me.WHICHCLAUSE.PREDICATE
+                                lrQueryEdge.Predicate = Trim(lrQueryEdge.Predicate & " " & lsPredicatePart)
+                            Next
 
-                        '---------------------------------------------------------
-                        'Get the Predicate
-                        For Each lsPredicatePart In Me.WHICHCLAUSE.PREDICATE
-                            lrQueryEdge.Predicate = Trim(lrQueryEdge.Predicate & " " & lsPredicatePart)
-                        Next
+                            '-----------------------------------------
+                            'Get the relevant FBM.FactType
+                            Call lrQueryEdge.getAndSetFBMFactType(lrQueryEdge.BaseNode,
+                                                                  lrQueryEdge.TargetNode,
+                                                                  lrQueryEdge.Predicate)
 
-                        '-----------------------------------------
-                        'Get the relevant FBM.FactType
-                        Call lrQueryEdge.getAndSetFBMFactType(lrQueryEdge.BaseNode,
-                                                              lrQueryEdge.TargetNode,
-                                                              lrQueryEdge.Predicate)
+                        ElseIf Me.WHICHCLAUSE.KEYWDAND IsNot Nothing And
+                               Me.WHICHCLAUSE.KEYWDTHAT.Count = 1 And
+                               (Me.WHICHCLAUSE.KEYWDWHICH IsNot Nothing Or Me.WHICHCLAUSE.KEYWDA IsNot Nothing) Then
 
-                    ElseIf Me.WHICHCLAUSE.KEYWDAND Is Nothing Then
-                        'E.g. "is in WHICH Room" in the above example
-                        lrQueryEdge.WhichClauseType = FactEngine.Constants.pcenumWhichClauseType.PredicateWhichModelElement
-                        lrQueryEdge.IsProjectColumn = True
+                            Call Me.analyseANDTHATWHICHClause(Me.WHICHCLAUSE, lrQueryGraph, lrQueryEdge)
 
-                        'Set the BaseNode
-                        lrQueryEdge.BaseNode = lrQueryGraph.HeadNode
+                        ElseIf Me.WHICHCLAUSE.KEYWDAND IsNot Nothing And
+                               Me.WHICHCLAUSE.KEYWDTHAT.Count = 1 Then
 
-                        'Get the TargetNode                        
-                        lrFBMModelObject = Me.Model.GetModelObjectByName(Me.WHICHCLAUSE.MODELELEMENTNAME(0))
-                        If lrFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & Me.WHICHCLAUSE.MODELELEMENTNAME(0) & "'.")
-                        lrQueryEdge.TargetNode = New FactEngine.QueryNode(lrFBMModelObject)
-                        lrQueryGraph.Nodes.AddUnique(lrQueryEdge.TargetNode)
+                            Call Me.analyseANDTHATClause(Me.WHICHCLAUSE, lrQueryGraph, lrQueryEdge)
 
-                        '---------------------------------------------------------
-                        'Get the Predicate
-                        For Each lsPredicatePart In Me.WHICHCLAUSE.PREDICATE
-                            lrQueryEdge.Predicate = Trim(lrQueryEdge.Predicate & " " & lsPredicatePart)
-                        Next
+                        ElseIf Me.WHICHCLAUSE.KEYWDAND IsNot Nothing And
+                               Me.WHICHCLAUSE.KEYWDTHAT.Count = 2 Then
+                            'E.g. "AND THAT Lecturer works for THAT Faculty"
+                            lrQueryEdge.WhichClauseType = FactEngine.Constants.pcenumWhichClauseType.AndThatModelElementPredicateThatModelElement
 
-                        '-----------------------------------------
-                        'Get the relevant FBM.FactType
-                        Call lrQueryEdge.getAndSetFBMFactType(lrQueryEdge.BaseNode,
-                                                              lrQueryEdge.TargetNode,
-                                                              lrQueryEdge.Predicate)
+                            'Set the BaseNode
+                            Dim lrBaseFBMModelObject = Me.Model.GetModelObjectByName(Me.WHICHCLAUSE.MODELELEMENTNAME(0))
+                            If lrBaseFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & Me.WHICHCLAUSE.MODELELEMENTNAME(0) & "'.")
+                            lrQueryEdge.BaseNode = New FactEngine.QueryNode(lrBaseFBMModelObject)
 
-                    ElseIf Me.WHICHCLAUSE.KEYWDAND IsNot Nothing And
-                           Me.WHICHCLAUSE.KEYWDWHICH IsNot Nothing And
-                           Me.WHICHCLAUSE.KEYWDTHAT.Count = 0 Then
-                        'E.g. "AND holds WHICH Position"
-                        lrQueryEdge.WhichClauseType = FactEngine.Constants.pcenumWhichClauseType.AndPredicateWhichModelElement
-                        lrQueryEdge.IsProjectColumn = True
+                            'Get the TargetNode                        
+                            Dim lrTargetFBMModelObject = Me.Model.GetModelObjectByName(Me.WHICHCLAUSE.MODELELEMENTNAME(1))
+                            If lrTargetFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & Me.WHICHCLAUSE.MODELELEMENTNAME(1) & "'.")
+                            lrQueryEdge.TargetNode = New FactEngine.QueryNode(lrTargetFBMModelObject)
+                            lrQueryGraph.Nodes.AddUnique(lrQueryEdge.TargetNode)
 
-                        'Set the BaseNode
-                        lrQueryEdge.BaseNode = lrQueryGraph.HeadNode
+                            '---------------------------------------------------------
+                            'Get the Predicate
+                            For Each lsPredicatePart In Me.WHICHCLAUSE.PREDICATE
+                                lrQueryEdge.Predicate = Trim(lrQueryEdge.Predicate & " " & lsPredicatePart)
+                            Next
 
-                        'Get the TargetNode                        
-                        lrFBMModelObject = Me.Model.GetModelObjectByName(Me.WHICHCLAUSE.MODELELEMENTNAME(0))
-                        If lrFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & Me.WHICHCLAUSE.MODELELEMENTNAME(0) & "'.")
-                        lrQueryEdge.TargetNode = New FactEngine.QueryNode(lrFBMModelObject)
-                        lrQueryGraph.Nodes.AddUnique(lrQueryEdge.TargetNode)
+                            '-----------------------------------------
+                            'Get the relevant FBM.FactType
+                            Call lrQueryEdge.getAndSetFBMFactType(lrQueryEdge.BaseNode,
+                                                                  lrQueryEdge.TargetNode,
+                                                                  lrQueryEdge.Predicate)
 
-                        '---------------------------------------------------------
-                        'Get the Predicate
-                        For Each lsPredicatePart In Me.WHICHCLAUSE.PREDICATE
-                            lrQueryEdge.Predicate = Trim(lrQueryEdge.Predicate & " " & lsPredicatePart)
-                        Next
+                        ElseIf Me.WHICHCLAUSE.KEYWDAND IsNot Nothing And Me.WHICHCLAUSE.MODELELEMENTNAME IsNot Nothing Then
+                            'E.g. "AND is in A School"
+                            lrQueryEdge.WhichClauseType = FactEngine.Constants.pcenumWhichClauseType.AndPredicateWhichModelElement
 
-                        '-----------------------------------------
-                        'Get the relevant FBM.FactType
-                        Call lrQueryEdge.getAndSetFBMFactType(lrQueryEdge.BaseNode,
-                                                              lrQueryEdge.TargetNode,
-                                                              lrQueryEdge.Predicate)
-
-                    ElseIf Me.WHICHCLAUSE.KEYWDAND IsNot Nothing And
-                           Me.WHICHCLAUSE.KEYWDTHAT.Count = 1 And
-                           (Me.WHICHCLAUSE.KEYWDWHICH IsNot Nothing Or Me.WHICHCLAUSE.KEYWDA IsNot Nothing) Then
-
-                        Call Me.analyseANDTHATWHICHClause(Me.WHICHCLAUSE, lrQueryGraph, lrQueryEdge)
-
-                    ElseIf Me.WHICHCLAUSE.KEYWDAND IsNot Nothing And
-                           Me.WHICHCLAUSE.KEYWDTHAT.Count = 1 Then
-
-                        Call Me.analyseANDTHATClause(Me.WHICHCLAUSE, lrQueryGraph, lrQueryEdge)
-
-                    ElseIf Me.WHICHCLAUSE.KEYWDAND IsNot Nothing And
-                           Me.WHICHCLAUSE.KEYWDTHAT.Count = 2 Then
-                        'E.g. "AND THAT Lecturer works for THAT Faculty"
-                        lrQueryEdge.WhichClauseType = FactEngine.Constants.pcenumWhichClauseType.AndThatModelElementPredicateThatModelElement
-
-                        'Set the BaseNode
-                        Dim lrBaseFBMModelObject = Me.Model.GetModelObjectByName(Me.WHICHCLAUSE.MODELELEMENTNAME(0))
-                        If lrBaseFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & Me.WHICHCLAUSE.MODELELEMENTNAME(0) & "'.")
-                        lrQueryEdge.BaseNode = New FactEngine.QueryNode(lrBaseFBMModelObject)
-
-                        'Get the TargetNode                        
-                        Dim lrTargetFBMModelObject = Me.Model.GetModelObjectByName(Me.WHICHCLAUSE.MODELELEMENTNAME(1))
-                        If lrTargetFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & Me.WHICHCLAUSE.MODELELEMENTNAME(1) & "'.")
-                        lrQueryEdge.TargetNode = New FactEngine.QueryNode(lrTargetFBMModelObject)
-                        lrQueryGraph.Nodes.AddUnique(lrQueryEdge.TargetNode)
-
-                        '---------------------------------------------------------
-                        'Get the Predicate
-                        For Each lsPredicatePart In Me.WHICHCLAUSE.PREDICATE
-                            lrQueryEdge.Predicate = Trim(lrQueryEdge.Predicate & " " & lsPredicatePart)
-                        Next
-
-                        '-----------------------------------------
-                        'Get the relevant FBM.FactType
-                        Call lrQueryEdge.getAndSetFBMFactType(lrQueryEdge.BaseNode,
-                                                              lrQueryEdge.TargetNode,
-                                                              lrQueryEdge.Predicate)
-
-                    ElseIf Me.WHICHCLAUSE.KEYWDAND IsNot Nothing And Me.WHICHCLAUSE.MODELELEMENTNAME IsNot Nothing Then
-                        'E.g. "AND is in A School"
-                        lrQueryEdge.WhichClauseType = FactEngine.Constants.pcenumWhichClauseType.AndPredicateWhichModelElement
-
-                        'Set the BaseNode
-                        lrQueryEdge.BaseNode = lrQueryGraph.HeadNode
+                            'Set the BaseNode
+                            lrQueryEdge.BaseNode = lrQueryGraph.HeadNode
 
                         'Get the TargetNode                        
                         If Me.WHICHCLAUSE.NODEPROPERTYIDENTIFICATION IsNot Nothing Then
@@ -261,23 +268,29 @@
                             lrFBMModelObject = Me.Model.GetModelObjectByName(Me.WHICHCLAUSE.MODELELEMENTNAME(0))
                             If lrFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & Me.WHICHCLAUSE.MODELELEMENTNAME(0) & "'.")
                         End If
+
                         lrQueryEdge.TargetNode = New FactEngine.QueryNode(lrFBMModelObject)
-                        lrQueryGraph.Nodes.AddUnique(lrQueryEdge.TargetNode)
+                        If lrFBMModelObject.ConceptType = pcenumConceptType.ValueType Then
+                            lrQueryEdge.WhichClauseType = FactEngine.Constants.pcenumWhichClauseType.IsPredicateNodePropertyIdentification
+                        Else
+                            lrQueryGraph.Nodes.AddUnique(lrQueryEdge.TargetNode)
+                        End If
+
 
                         '---------------------------------------------------------
                         'Get the Predicate
                         For Each lsPredicatePart In Me.WHICHCLAUSE.PREDICATE
-                            lrQueryEdge.Predicate = Trim(lrQueryEdge.Predicate & " " & lsPredicatePart)
-                        Next
+                                lrQueryEdge.Predicate = Trim(lrQueryEdge.Predicate & " " & lsPredicatePart)
+                            Next
 
-                        '-----------------------------------------
-                        'Get the relevant FBM.FactType
-                        Call lrQueryEdge.getAndSetFBMFactType(lrQueryEdge.BaseNode,
-                                                              lrQueryEdge.TargetNode,
-                                                              lrQueryEdge.Predicate)
-                        'lrRecordset.Error = New ORMQL.Error("Which subclause not recognised")
-                    Else
-                        Throw New Exception("Unknown WHICH Clause.")
+                            '-----------------------------------------
+                            'Get the relevant FBM.FactType
+                            Call lrQueryEdge.getAndSetFBMFactType(lrQueryEdge.BaseNode,
+                                                                  lrQueryEdge.TargetNode,
+                                                                  lrQueryEdge.Predicate)
+                            'lrRecordset.Error = New ORMQL.Error("Which subclause not recognised")
+                        Else
+                            Throw New Exception("Unknown WHICH Clause.")
                     End If
 
                     '-------------------------------------------------
@@ -390,8 +403,13 @@
                 lrFBMModelObject = Me.Model.GetModelObjectByName(Me.WHICHCLAUSE.MODELELEMENTNAME(liModelElementInd))
                 If lrFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & Me.WHICHCLAUSE.MODELELEMENTNAME(0) & "'.")
             End If
+            If lrFBMModelObject.ConceptType = pcenumConceptType.ValueType Then
+                arQueryEdge.WhichClauseType = FactEngine.Constants.pcenumWhichClauseType.IsPredicateNodePropertyIdentification
+            Else
+                arQueryGraph.Nodes.AddUnique(arQueryEdge.TargetNode)
+            End If
             arQueryEdge.TargetNode = New FactEngine.QueryNode(lrFBMModelObject)
-            arQueryGraph.Nodes.AddUnique(arQueryEdge.TargetNode)
+
 
             '---------------------------------------------------------
             'Get the Predicate
