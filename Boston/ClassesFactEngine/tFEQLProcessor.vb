@@ -342,6 +342,35 @@ Namespace FEQL
 
         End Function
 
+        Public Function getWhichStatementType(ByVal asFEQLStatement As String,
+                                              Optional ByVal abParse As Boolean = False) As FactEngine.Constants.pcenumFEQLStatementType
+
+            Try
+                SyncLock Me.Parsetree
+                    If abParse Then
+                        Me.Parsetree = Me.Parser.Parse(asFEQLStatement)
+                    End If
+
+                    If Me.Parsetree Is Nothing Then
+                        Return FactEngine.pcenumFEQLStatementType.None
+                    Else
+                        If Me.Parsetree.Nodes.Count = 0 Then Return FactEngine.Constants.pcenumFEQLStatementType.None
+                    End If
+
+                    Select Case Me.Parsetree.Nodes(0).Nodes(0).Token.Type
+                        Case Is = FEQL.TokenType.WHICHSELECTSTMT   '"WHICHSELECTSTMT"
+                            Return FactEngine.pcenumFEQLStatementType.WHICHSELECTStatement
+                        Case Is = FEQL.TokenType.ENUMERATESTMT  '"ENUMERATESTMT"
+                            Return FactEngine.pcenumFEQLStatementType.ENUMERATEStatement
+                        Case Is = FEQL.TokenType.DESCRIBESTMT
+                            Return FactEngine.pcenumFEQLStatementType.DESCRIBEStatement
+                    End Select
+                End SyncLock
+            Catch ex As Exception
+
+            End Try
+
+        End Function
 
     End Class
 

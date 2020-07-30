@@ -491,20 +491,22 @@ Public Class frmFactEngine
         '-------------------
         'Get the ParseTree
         '-------------------
-        Me.zrTextHighlighter.Tree = Me.zrParser.Parse(Me.TextBoxInput.Text)
+        Me.zrTextHighlighter.Tree = Me.zrParser.Parse(Trim(Me.TextBoxInput.Text))
 
         '=================================================================
         'Check valid ModelElement Names
         Dim lrParseNode As FEQL.ParseNode
+        Dim larModelElementNameParseNode As New List(Of FEQL.ParseNode)
+        Dim larModelPredicateClauseParseNode As New List(Of FEQL.ParseNode)
         Dim larParseNode As New List(Of FEQL.ParseNode)
         Dim lrModelElement As FBM.ModelObject
 
-        If Me.TextBoxInput.Text.Length > 21 Then
+        If Me.TextBoxInput.Text.Length > 10 Then 'was 21
             Me.TextMarker.Clear()
 
-            Call Me.GetMODELELEMENTParseNodes(Me.zrTextHighlighter.Tree.Nodes(0), larParseNode)
+            Call Me.GetMODELELEMENTParseNodes(Me.zrTextHighlighter.Tree.Nodes(0), larModelElementNameParseNode)
 
-            For Each lrParseNode In larParseNode
+            For Each lrParseNode In larModelElementNameParseNode
                 lrModelElement = prApplication.WorkingModel.GetModelObjectByName(lrParseNode.Token.Text)
                 If lrModelElement Is Nothing Then
                     Me.TextMarker.AddWord(lrParseNode.Token.StartPos, lrParseNode.Token.Length, Color.Red, "Uknown Model Element")
@@ -512,13 +514,13 @@ Public Class frmFactEngine
             Next
 
             larParseNode = New List(Of FEQL.ParseNode)
-            Call Me.GetPredicateClauseNodes(Me.zrTextHighlighter.Tree.Nodes(0), larParseNode)
-            For Each lrParseNode In larParseNode
+            Call Me.GetPredicateClauseNodes(Me.zrTextHighlighter.Tree.Nodes(0), larModelPredicateClauseParseNode)
+            For Each lrParseNode In larModelPredicateClauseParseNode
                 Dim larPredicateNode As New List(Of FEQL.ParseNode)
                 Call Me.GetPredicateNodes(lrParseNode, larPredicateNode)
                 Dim lsPredicatePartText As String = ""
                 For Each lrPredicateNode In larPredicateNode
-                    lsPredicatePartText &= lrPredicateNode.Token.Text & " "
+                    lsPredicatePartText &= Trim(lrPredicateNode.Token.Text) & " "
                 Next
                 If Not prApplication.WorkingModel.existsPredicatePart(Trim(lsPredicatePartText)) Then
                     Me.TextMarker.AddWord(lrParseNode.Token.StartPos, lrParseNode.Token.Length, Color.Red, "Uknown Predicate")
@@ -533,6 +535,60 @@ Public Class frmFactEngine
 
         'Me.AutoComplete.Hide()
         Me.AutoComplete.ListBox.Items.Clear()
+
+        '============================================================================================
+        'Do ultrasmart checking. Finds the last ModelElementName and the last PredicateClause
+        '  and if a FactTypeReading is being attempted to be made, finds the next ModelElementName
+        If larModelElementNameParseNode.Count > 0 And larModelPredicateClauseParseNode.Count > 0 Then
+
+            Dim lrLastModelElementNameParseNode = larModelElementNameParseNode(larModelElementNameParseNode.Count - 1)
+            Dim lrLastPredicateClauseParseNode = larModelPredicateClauseParseNode(larModelPredicateClauseParseNode.Count - 1)
+
+            lrModelElement = prApplication.WorkingModel.GetModelObjectByName(lrLastModelElementNameParseNode.Token.Text)
+
+            If lrModelElement Is Nothing Then
+                'Nothing to do here
+            Else
+                Select Case Me.FEQLProcessor.getWhichStatementType(Trim(Me.TextBoxInput.Text), True)
+                    Case Is = FactEngine.pcenumFEQLStatementType.WHICHSELECTStatement
+
+                        Dim lrWHICHSELECTStatement As New FEQL.WHICHSELECTStatement
+                        Call Me.FEQLProcessor.GetParseTreeTokensReflection(lrWHICHSELECTStatement, Me.zrTextHighlighter.Tree.Nodes(0))
+
+                        Dim loLastWhichClauseObject = lrWHICHSELECTStatement.WHICHCLAUSE(lrWHICHSELECTStatement.WHICHCLAUSE.Count - 1)
+                        Dim lrLastWhichClause As New FEQL.WHICHCLAUSE
+                        Call Me.FEQLProcessor.GetParseTreeTokensReflection(lrLastWhichClause, loLastWhichClauseObject)
+
+                        Dim lsPredicateText As String = ""
+                        For Each lsPredicatePart In lrLastWhichClause.PREDICATE
+                            lsPredicateText = Trim(lsPredicateText & " " & lsPredicatePart)
+                        Next
+
+                        Dim larFactTypeReading = From FactType In prApplication.WorkingModel.FactType
+                                                 From FactTypeReading In FactType.FactTypeReading
+                                                 From PredicatePart In FactTypeReading.PredicatePart
+                                                 Where PredicatePart.Role.JoinedORMObject.Id = lrModelElement.Id
+                                                 Where PredicatePart.PredicatePartText = lsPredicateText
+                                                 Select FactTypeReading
+
+                        If larFactTypeReading.Count = 0 Then
+                            'nothing to do here
+                        Else
+                            Me.AutoComplete.ListBox.Items.Clear()
+                            Dim lrFactTypeReading = larFactTypeReading.First
+                            Call Me.AddEnterpriseAwareItem(lrFactTypeReading.PredicatePart(1).Role.JoinedORMObject.Id, FEQL.TokenType.MODELELEMENTNAME)
+                            If Me.AutoComplete.Visible = False Then
+                                Me.AutoComplete.Show()
+                            End If
+                        End If
+
+                End Select
+
+            End If
+        End If
+
+
+        '============================================================================================
 
         If (Me.zrTextHighlighter.Tree.Errors.Count > 0) Or (Me.zrTextHighlighter.Tree.Optionals.Count > 0) Then
             If Me.zrTextHighlighter.Tree.Errors.Count > 0 Then
