@@ -206,14 +206,13 @@ Namespace FBM
             Me.ConceptType = pcenumConceptType.RoleData
             Me.Model = arRole.Model
             Me.Role = arRole
-            If IsSomething(arFact) Then
-                Me.Fact = arFact
-                Me.FactType = arFact.FactType
-            End If
-
             Me.Concept = arConcept
             Me.Symbol = arConcept.Symbol
 
+            If arFact IsNot Nothing Then
+                Me.Fact = arFact
+                Me.FactType = arFact.FactType
+            End If
 
         End Sub
 

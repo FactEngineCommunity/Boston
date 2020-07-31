@@ -1614,32 +1614,27 @@ Namespace FBM
         ''' <param name="arDictionaryEntry">The DictionaryEntry being added to the ModelDictionary.</param>
         ''' <param name="abAppendRealisations">Defaults to True. If True the Realisations for the DictionaryEntry is appended with the Concept of the DictionaryEntry</param>
         ''' <remarks>This function can be used to check if a DictionaryEntry already exists in the ModelDictionary. Set abAppendRealisations to False if you don't wish for the Realisations of the DictionaryEntry to be appended with the Concept of the DictionaryEntry.</remarks>
-        Public Function AddModelDictionaryEntry(ByRef arDictionaryEntry As FBM.DictionaryEntry, _
-                                                Optional ByVal abAppendRealisations As Boolean = True, _
+        Public Function AddModelDictionaryEntry(ByRef arDictionaryEntry As FBM.DictionaryEntry,
+                                                Optional ByVal abAppendRealisations As Boolean = True,
                                                 Optional ByVal abMakeModelDirty As Boolean = True,
-                                                Optional ByVal abCheckForErrors As Boolean = False) As FBM.DictionaryEntry
+                                                Optional ByVal abCheckForErrors As Boolean = False
+                                                ) As FBM.DictionaryEntry
 
             Try
                 Dim lrDictionaryEntry As FBM.DictionaryEntry
 
-                'Dim lrDictionaryEntryTemp = arDictionaryEntry
+
                 lrDictionaryEntry = Me.ModelDictionary.Find(AddressOf arDictionaryEntry.Equals)
 
-                If lrDictionaryEntry IsNot Nothing Then 'Me.ModelDictionary.Exists(AddressOf arDictionaryEntry.Equals) Then
+                If lrDictionaryEntry IsNot Nothing Then
                     '-------------------------------------------------------------------------------------------------------
                     'Concept already exists in the ModelDictionary.
                     ' Make sure the DictionaryEntry contains the ConceptType of the DictionaryEntry attempted to be added.
-                    '-------------------------------------------------------------------------------------------------------
-                    'lrDictionaryEntry = Me.ModelDictionary.Find(AddressOf arDictionaryEntry.Equals)
+                    '-------------------------------------------------------------------------------------------------------                    
                     lrDictionaryEntry.AddConceptType(arDictionaryEntry.GetConceptType)
                     If abAppendRealisations Then
                         'CodeSafe - Only allow multiple Value realisations.
-                        If arDictionaryEntry.ConceptType = pcenumConceptType.Value Then
-                            lrDictionaryEntry.AddRealisation(arDictionaryEntry.ConceptType)
-                        Else
-                            lrDictionaryEntry.AddRealisation(arDictionaryEntry.ConceptType, True)
-                        End If
-
+                        lrDictionaryEntry.AddRealisation(arDictionaryEntry.ConceptType, arDictionaryEntry.ConceptType <> pcenumConceptType.Value)
                     End If
                 Else
                     '----------------------------------------------
@@ -1648,11 +1643,7 @@ Namespace FBM
                     lrDictionaryEntry = arDictionaryEntry
                     If abAppendRealisations Then
                         'CodeSafe - Only allow multiple Value realisations.
-                        If arDictionaryEntry.ConceptType = pcenumConceptType.Value Then
-                            lrDictionaryEntry.AddRealisation(arDictionaryEntry.ConceptType)
-                        Else
-                            lrDictionaryEntry.AddRealisation(arDictionaryEntry.ConceptType, True)
-                        End If
+                        lrDictionaryEntry.AddRealisation(arDictionaryEntry.ConceptType, arDictionaryEntry.ConceptType <> pcenumConceptType.Value)
                     End If
                     If Me.Loaded And Me.Page.FindAll(Function(x) x.Loaded = False) IsNot Nothing Then arDictionaryEntry.isDirty = True
                     Me.ModelDictionary.Add(arDictionaryEntry)

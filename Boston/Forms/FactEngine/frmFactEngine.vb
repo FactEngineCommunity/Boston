@@ -541,9 +541,11 @@ Public Class frmFactEngine
         '  and if a FactTypeReading is being attempted to be made, finds the next ModelElementName
         If larModelElementNameParseNode.Count > 0 And larModelPredicateClauseParseNode.Count > 0 Then
 
+            Dim lrFirstModelElementNameParseNode = larModelElementNameParseNode(0)
             Dim lrLastModelElementNameParseNode = larModelElementNameParseNode(larModelElementNameParseNode.Count - 1)
             Dim lrLastPredicateClauseParseNode = larModelPredicateClauseParseNode(larModelPredicateClauseParseNode.Count - 1)
 
+            Dim lrFirstModelElement = prApplication.WorkingModel.GetModelObjectByName(lrFirstModelElementNameParseNode.Token.Text)
             lrModelElement = prApplication.WorkingModel.GetModelObjectByName(lrLastModelElementNameParseNode.Token.Text)
 
             If lrModelElement Is Nothing Then
@@ -581,6 +583,13 @@ Public Class frmFactEngine
                                 Me.AutoComplete.Show()
                             End If
                         End If
+
+                        For Each lsPredicateText In lrFirstModelElement.getOutgoingFactTypeReadingPredicates
+                            Call Me.AddEnterpriseAwareItem(lsPredicateText, FEQL.TokenType.PREDICATE)
+                            If Me.AutoComplete.Visible = False Then
+                                Me.AutoComplete.Show()
+                            End If
+                        Next
 
                 End Select
 

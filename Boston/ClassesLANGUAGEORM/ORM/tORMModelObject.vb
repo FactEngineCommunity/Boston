@@ -470,6 +470,22 @@ Namespace FBM
 
         End Function
 
+        Public Function getOutgoingFactTypeReadingPredicates() As List(Of String)
+
+            Dim larFactTypeReadingPredicates = From FactType In Me.Model.FactType
+                                               From Role In FactType.RoleGroup
+                                               From FactTypeReading In FactType.FactTypeReading
+                                               Where FactType.RoleGroup.Count = 2
+                                               Where Role.JoinedORMObject.Id = Me.Id
+                                               Where Role.HasInternalUniquenessConstraint
+                                               Where FactTypeReading.PredicatePart(0).Role.JoinedORMObject.Id = Me.Id
+                                               Where FactTypeReading.PredicatePart(0).Role Is Role
+                                               Select FactTypeReading.GetPredicateText Distinct
+
+            Return larFactTypeReadingPredicates.ToList
+
+        End Function
+
         ''' <summary>
         ''' Returns the unique Signature of the ModelObject
         ''' </summary>
