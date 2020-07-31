@@ -44,9 +44,9 @@ Namespace FactEngine
 
         End Sub
 
-        Public Sub getAndSetFBMFactType(ByRef arBaseNode As FactEngine.QueryNode,
+        Public Function getAndSetFBMFactType(ByRef arBaseNode As FactEngine.QueryNode,
                                         ByRef arTargetNode As FactEngine.QueryNode,
-                                        ByVal asPredicate As String)
+                                        ByVal asPredicate As String) As Exception
             Try
                 If Me.WhichClauseType = pcenumWhichClauseType.IsPredicateNodePropertyIdentification Then
 
@@ -84,12 +84,15 @@ Namespace FactEngine
                 Dim lsMessage As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
-                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                Return ex
+
+                Me.FBMFactType = Nothing
+                Throw New Exception(ex.Message)
                 'prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
 
-        End Sub
+        End Function
 
     End Class
 
