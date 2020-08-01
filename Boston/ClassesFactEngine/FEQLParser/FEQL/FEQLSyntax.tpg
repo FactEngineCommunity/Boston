@@ -26,7 +26,7 @@ PAGENAME      -> @"[aA-zZ0-9\s\-]+";
 PLUSMINUS 	-> @"(\+|-)";
 [Color(153, 76, 0)] PREBOUNDREADINGTEXT -> @"[a-z]+\-";
 [Color(153, 76, 0)] POSTBOUNDREADINGTEXT -> @"\-[a-z]+";
-[Color(227, 143, 247)]  PREDICATE	-> @"(?!([a-z]+\-))(?!([a-z\s]+$))([a-z]+[^\-])";  //@"[a-z]+";
+[Color(227, 143, 247)]  PREDICATE	-> @"(?!([a-z]+\-))(?!([a-z\s]+$)^$?)([a-z]+[^\-])";  //@"[a-z]+";
 PREDICATESPACE -> @"[\s]+";
 [Color(76, 153, 0)]	REFERENCEMODE -> @"[aA-zZ]+";
 [Color(153, 76, 0)] ROLENAME      ->  @"[a-z]+\-?";

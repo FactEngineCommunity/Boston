@@ -605,6 +605,8 @@ Public Class frmFactEngine
                         End If
                         If lrLastWhichClause.KEYWDWHICH IsNot Nothing Then
                             lrPredicateModelObject = lrlastModelElement
+                        ElseIf lrLastWhichClause.KEYWDTHAT.Count > 0 Then
+                            lrPredicateModelObject = lrlastModelElement
                         Else
                             lrPredicateModelObject = lrFirstModelElement
                         End If
@@ -937,6 +939,7 @@ Public Class frmFactEngine
         lo_point.Y += Me.TextBoxInput.Bounds.Y
         lo_point.Y += CInt(Me.TextBoxInput.Font.GetHeight()) + 6
         Me.AutoComplete.Location = PointToScreen(lo_point)
+        Me.TextBoxInput.Focus()
     End Sub
 
     Private Sub TextBoxInput_GotFocus(sender As Object, e As EventArgs) Handles TextBoxInput.GotFocus

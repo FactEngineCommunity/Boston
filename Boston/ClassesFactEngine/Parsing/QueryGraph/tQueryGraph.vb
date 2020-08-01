@@ -167,15 +167,16 @@
                                         Select Column).First
 
                         lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") & lrQueryEdge.BaseNode.FBMModelObject.Id & "." & lrColumn.Name & " = '" & lrQueryEdge.IdentifierList(0) & "'" & vbCrLf
-
+                        lbIntialWhere = "AND "
                     Case Else
                         Dim lrTargetTable = lrQueryEdge.TargetNode.FBMModelObject.getCorrespondingRDSTable
                         Dim larIndexColumns = lrTargetTable.getFirstUniquenessConstraintColumns
                         liInd = 0
                         For Each lsIdentifier In lrQueryEdge.IdentifierList
-                            lsSQLQuery &= "AND " & lrTargetTable.Name & "." & larIndexColumns(liInd).Name & " = '" & lsIdentifier & "'" & vbCrLf
+                            lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") & lrTargetTable.Name & "." & larIndexColumns(liInd).Name & " = '" & lsIdentifier & "'" & vbCrLf
                             liInd += 1
                         Next
+                        lbIntialWhere = "AND "
                 End Select
 
             Next

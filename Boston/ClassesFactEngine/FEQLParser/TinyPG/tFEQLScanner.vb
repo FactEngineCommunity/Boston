@@ -117,7 +117,7 @@ Namespace FEQL
             Patterns.Add(TokenType.POSTBOUNDREADINGTEXT, regex)
             Tokens.Add(TokenType.POSTBOUNDREADINGTEXT)
 
-            regex = new Regex("(?!([a-z]+\-))(?!([a-z\s]+$))([a-z]+[^\-])", RegexOptions.Compiled)
+            regex = new Regex("(?!([a-z]+\-))(?!([a-z\s]+$)^$?)([a-z]+[^\-])", RegexOptions.Compiled)
             Patterns.Add(TokenType.PREDICATE, regex)
             Tokens.Add(TokenType.PREDICATE)
 
