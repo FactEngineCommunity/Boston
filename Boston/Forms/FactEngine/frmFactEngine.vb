@@ -16,9 +16,10 @@ Public Class frmFactEngine
 
     Private Sub AddEnterpriseAwareItem(ByVal asEAItem As String,
                                        Optional ByVal aoTagObject As Object = Nothing,
-                                       Optional abSetSelectedIndex As Boolean = False)
+                                       Optional abSetSelectedIndex As Boolean = False,
+                                       Optional asModelElementName As String = "")
 
-        Dim lrListItem = New tComboboxItem(asEAItem, asEAItem, aoTagObject)
+        Dim lrListItem = New tComboboxItem(asModelElementName, asEAItem, aoTagObject)
 
         If (asEAItem <> "") And Not (Me.AutoComplete.ListBox.FindStringExact(asEAItem) >= 0) Then
             Me.AutoComplete.ListBox.Items.Add(lrListItem)
@@ -498,272 +499,174 @@ Public Class frmFactEngine
         Dim liTokenType As FEQL.TokenType
         Dim lsCurrentTokenType As Object
 
-        '-------------------
-        'Get the ParseTree
-        '-------------------
-        Me.zrTextHighlighter.Tree = Me.zrParser.Parse(Trim(Me.TextBoxInput.Text))
+        Try
 
-        '=================================================================
-        'Check valid ModelElement Names
-        Dim lrParseNode As FEQL.ParseNode
-        Dim larModelElementNameParseNode As New List(Of FEQL.ParseNode)
-        Dim larModelPredicateClauseParseNode As New List(Of FEQL.ParseNode)
-        Dim larParseNode As New List(Of FEQL.ParseNode)
-        Dim lrModelElement As FBM.ModelObject
+            '-------------------
+            'Get the ParseTree
+            '-------------------
+            Me.zrTextHighlighter.Tree = Me.zrParser.Parse(Trim(Me.TextBoxInput.Text))
 
-        If Me.TextBoxInput.Text.Length > 10 Then 'was 21            
-            Me.TextMarker.Clear()
+            '=================================================================
+            'Check valid ModelElement Names
+            Dim lrParseNode As FEQL.ParseNode
+            Dim larModelElementNameParseNode As New List(Of FEQL.ParseNode)
+            Dim larModelPredicateClauseParseNode As New List(Of FEQL.ParseNode)
+            Dim larParseNode As New List(Of FEQL.ParseNode)
+            Dim lrModelElement As FBM.ModelObject
 
-            Call Me.GetMODELELEMENTParseNodes(Me.zrTextHighlighter.Tree.Nodes(0), larModelElementNameParseNode)
+            If Me.TextBoxInput.Text.Length > 10 Then 'was 21            
+                Me.TextMarker.Clear()
 
-            For Each lrParseNode In larModelElementNameParseNode
-                lrModelElement = prApplication.WorkingModel.GetModelObjectByName(lrParseNode.Token.Text)
-                If lrModelElement Is Nothing Then
-                    Me.TextMarker.AddWord(lrParseNode.Token.StartPos, lrParseNode.Token.Length, Color.Red, "Uknown Model Element")
-                End If
-            Next
+                Call Me.GetMODELELEMENTParseNodes(Me.zrTextHighlighter.Tree.Nodes(0), larModelElementNameParseNode)
 
-            larParseNode = New List(Of FEQL.ParseNode)
-            Call Me.GetPredicateClauseNodes(Me.zrTextHighlighter.Tree.Nodes(0), larModelPredicateClauseParseNode)
-            For Each lrParseNode In larModelPredicateClauseParseNode
-                Dim larPredicateNode As New List(Of FEQL.ParseNode)
-                Call Me.GetPredicateNodes(lrParseNode, larPredicateNode)
-                Dim lsPredicatePartText As String = ""
-                For Each lrPredicateNode In larPredicateNode
-                    lsPredicatePartText &= Trim(lrPredicateNode.Token.Text) & " "
+                For Each lrParseNode In larModelElementNameParseNode
+                    lrModelElement = prApplication.WorkingModel.GetModelObjectByName(lrParseNode.Token.Text)
+                    If lrModelElement Is Nothing Then
+                        Me.TextMarker.AddWord(lrParseNode.Token.StartPos, lrParseNode.Token.Length, Color.Red, "Uknown Model Element")
+                    End If
                 Next
-                If Not prApplication.WorkingModel.existsPredicatePart(Trim(lsPredicatePartText)) Then
-                    Me.TextMarker.AddWord(lrParseNode.Token.StartPos, lrParseNode.Token.Length, Color.Red, "Uknown Predicate")
-                End If
-            Next
 
-            Me.TextMarker.MarkWords()
-        End If
-        '=======================================
+                larParseNode = New List(Of FEQL.ParseNode)
+                Call Me.GetPredicateClauseNodes(Me.zrTextHighlighter.Tree.Nodes(0), larModelPredicateClauseParseNode)
+                For Each lrParseNode In larModelPredicateClauseParseNode
+                    Dim larPredicateNode As New List(Of FEQL.ParseNode)
+                    Call Me.GetPredicateNodes(lrParseNode, larPredicateNode)
+                    Dim lsPredicatePartText As String = ""
+                    For Each lrPredicateNode In larPredicateNode
+                        lsPredicatePartText &= Trim(lrPredicateNode.Token.Text) & " "
+                    Next
+                    If Not prApplication.WorkingModel.existsPredicatePart(Trim(lsPredicatePartText)) Then
+                        Me.TextMarker.AddWord(lrParseNode.Token.StartPos, lrParseNode.Token.Length, Color.Red, "Uknown Predicate")
+                    End If
+                Next
 
-        Call Me.CheckStartProductions(Me.zrTextHighlighter.Tree)
+                Me.TextMarker.MarkWords()
+            End If
+            '=======================================
 
-        'Me.AutoComplete.Hide()
-        Me.AutoComplete.ListBox.Items.Clear()
+            Call Me.CheckStartProductions(Me.zrTextHighlighter.Tree)
 
-        '============================================================================================
-        'Do ultrasmart checking. Finds the last ModelElementName and the last PredicateClause
-        '  and if a FactTypeReading is being attempted to be made, finds the next ModelElementName
-        If larModelElementNameParseNode.Count > 0 And larModelPredicateClauseParseNode.Count > 0 Then
+            'Me.AutoComplete.Hide()
+            Me.AutoComplete.ListBox.Items.Clear()
 
-            Dim lrFirstModelElementNameParseNode = larModelElementNameParseNode(0)
-            Dim lrLastModelElementNameParseNode = larModelElementNameParseNode(larModelElementNameParseNode.Count - 1)
-            Dim lrLastPredicateClauseParseNode = larModelPredicateClauseParseNode(larModelPredicateClauseParseNode.Count - 1)
+            '============================================================================================
+            'Do ultrasmart checking. Finds the last ModelElementName and the last PredicateClause
+            '  and if a FactTypeReading is being attempted to be made, finds the next ModelElementName
+            If larModelElementNameParseNode.Count > 0 And larModelPredicateClauseParseNode.Count > 0 Then
 
-            Dim lrFirstModelElement = prApplication.WorkingModel.GetModelObjectByName(lrFirstModelElementNameParseNode.Token.Text)
-            Dim lrlastModelElement = prApplication.WorkingModel.GetModelObjectByName(lrLastModelElementNameParseNode.Token.Text)
+                Dim lrFirstModelElementNameParseNode = larModelElementNameParseNode(0)
+                Dim lrLastModelElementNameParseNode = larModelElementNameParseNode(larModelElementNameParseNode.Count - 1)
+                Dim lrLastPredicateClauseParseNode = larModelPredicateClauseParseNode(larModelPredicateClauseParseNode.Count - 1)
 
-            lrModelElement = prApplication.WorkingModel.GetModelObjectByName(lrLastModelElementNameParseNode.Token.Text)
+                Dim lrFirstModelElement = prApplication.WorkingModel.GetModelObjectByName(lrFirstModelElementNameParseNode.Token.Text)
+                Dim lrlastModelElement = prApplication.WorkingModel.GetModelObjectByName(lrLastModelElementNameParseNode.Token.Text)
 
-            If lrModelElement Is Nothing Then
-                'Nothing to do here
-            Else
-                Select Case Me.FEQLProcessor.getWhichStatementType(Trim(Me.TextBoxInput.Text), True)
-                    Case Is = FactEngine.pcenumFEQLStatementType.WHICHSELECTStatement
+                lrModelElement = prApplication.WorkingModel.GetModelObjectByName(lrLastModelElementNameParseNode.Token.Text)
 
-                        Dim lrWHICHSELECTStatement As New FEQL.WHICHSELECTStatement
-                        Call Me.FEQLProcessor.GetParseTreeTokensReflection(lrWHICHSELECTStatement, Me.zrTextHighlighter.Tree.Nodes(0))
+                If lrModelElement Is Nothing Then
+                    'Nothing to do here
+                Else
+                    Select Case Me.FEQLProcessor.getWhichStatementType(Trim(Me.TextBoxInput.Text), True)
+                        Case Is = FactEngine.pcenumFEQLStatementType.WHICHSELECTStatement
 
-                        Dim loLastWhichClauseObject = lrWHICHSELECTStatement.WHICHCLAUSE(lrWHICHSELECTStatement.WHICHCLAUSE.Count - 1)
-                        Dim lrLastWhichClause As New FEQL.WHICHCLAUSE
-                        Call Me.FEQLProcessor.GetParseTreeTokensReflection(lrLastWhichClause, loLastWhichClauseObject)
+                            Dim lrWHICHSELECTStatement As New FEQL.WHICHSELECTStatement
+                            Call Me.FEQLProcessor.GetParseTreeTokensReflection(lrWHICHSELECTStatement, Me.zrTextHighlighter.Tree.Nodes(0))
 
-                        '==========================================================
-                        'ModelElement
-                        Dim lsPredicateText As String = ""
-                        For Each lsPredicatePart In lrLastWhichClause.PREDICATE
-                            lsPredicateText = Trim(lsPredicateText & " " & Trim(lsPredicatePart))
-                        Next
+                            Dim loLastWhichClauseObject = lrWHICHSELECTStatement.WHICHCLAUSE(lrWHICHSELECTStatement.WHICHCLAUSE.Count - 1)
+                            Dim lrLastWhichClause As New FEQL.WHICHCLAUSE
+                            Call Me.FEQLProcessor.GetParseTreeTokensReflection(lrLastWhichClause, loLastWhichClauseObject)
 
-                        Dim larPredicatePart = From FactType In prApplication.WorkingModel.FactType
-                                               From FactTypeReading In FactType.FactTypeReading
-                                               From PredicatePart In FactTypeReading.PredicatePart
-                                               Where PredicatePart.Role.JoinedORMObject.Id = lrModelElement.Id
-                                               Where PredicatePart.PredicatePartText = lsPredicateText
-                                               Select PredicatePart
+                            '==========================================================
+                            'ModelElement
+                            Dim lsPredicateText As String = ""
+                            For Each lsPredicatePart In lrLastWhichClause.PREDICATE
+                                lsPredicateText = Trim(lsPredicateText & " " & Trim(lsPredicatePart))
+                            Next
 
-                        If larPredicatePart.Count = 0 Then
-                            'nothing to do here
-                        Else
-                            Me.AutoComplete.ListBox.Items.Clear()
-                            Dim lrPredicatePart = larPredicatePart.First
-                            If Me.TextBoxInput.Text.Trim.Split(" ").Last <> lrPredicatePart.FactTypeReading.PredicatePart(1).Role.JoinedORMObject.Id Then
-                                Call Me.AddEnterpriseAwareItem(lrPredicatePart.FactTypeReading.PredicatePart(1).Role.JoinedORMObject.Id, FEQL.TokenType.MODELELEMENTNAME, True)
-                                If Me.AutoComplete.Visible = False Then
-                                    Me.showAutoCompleteForm()
-                                    Exit Sub
+                            Dim larPredicatePart = From FactType In prApplication.WorkingModel.FactType
+                                                   From FactTypeReading In FactType.FactTypeReading
+                                                   From PredicatePart In FactTypeReading.PredicatePart
+                                                   Where PredicatePart.Role.JoinedORMObject.Id = lrModelElement.Id
+                                                   Where PredicatePart.PredicatePartText = lsPredicateText
+                                                   Select PredicatePart
+
+                            If larPredicatePart.Count = 0 Then
+                                'nothing to do here
+                            Else
+                                Me.AutoComplete.ListBox.Items.Clear()
+                                Dim lrPredicatePart = larPredicatePart.First
+                                If Me.TextBoxInput.Text.Trim.Split(" ").Last <> lrPredicatePart.FactTypeReading.PredicatePart(1).Role.JoinedORMObject.Id Then
+                                    Call Me.AddEnterpriseAwareItem(lrPredicatePart.FactTypeReading.PredicatePart(1).Role.JoinedORMObject.Id, FEQL.TokenType.MODELELEMENTNAME, True)
+                                    If Me.AutoComplete.Visible = False Then
+                                        Me.showAutoCompleteForm()
+                                        Exit Sub
+                                    End If
                                 End If
                             End If
-                        End If
 
-                        Dim lrPredicateModelObject As FBM.ModelObject
-                        If lrLastWhichClause.KEYWDAND IsNot Nothing And lrLastWhichClause.KEYWDTHAT.Count = 1 Then
-                            lrModelElement = prApplication.WorkingModel.GetModelObjectByName(lrLastModelElementNameParseNode.Token.Text)
-                        End If
-                        If lrLastWhichClause.KEYWDWHICH IsNot Nothing Then
-                            lrPredicateModelObject = lrlastModelElement
-                        ElseIf lrLastWhichClause.KEYWDTHAT.Count > 0 Then
-                            lrPredicateModelObject = lrlastModelElement
-                        Else
-                            lrPredicateModelObject = lrFirstModelElement
-                        End If
+                            Dim lrPredicateModelObject As FBM.ModelObject
+                            If lrLastWhichClause.KEYWDAND IsNot Nothing And lrLastWhichClause.KEYWDTHAT.Count = 1 Then
+                                lrModelElement = prApplication.WorkingModel.GetModelObjectByName(lrLastModelElementNameParseNode.Token.Text)
+                            End If
+                            If lrLastWhichClause.KEYWDWHICH IsNot Nothing Then
+                                lrPredicateModelObject = lrlastModelElement
+                            ElseIf lrLastWhichClause.KEYWDTHAT.Count > 0 Then
+                                lrPredicateModelObject = lrlastModelElement
+                            Else
+                                lrPredicateModelObject = lrFirstModelElement
+                            End If
 
-                        For Each lsPredicateText In lrPredicateModelObject.getOutgoingFactTypeReadingPredicates
-                            Call Me.AddEnterpriseAwareItem(lsPredicateText, FEQL.TokenType.PREDICATE)
-                        Next
+                            For Each lrFactTypeReading In lrPredicateModelObject.getOutgoingFactTypeReadings
+                                If lrFactTypeReading.PredicatePart.Count > 1 Then
+                                    Call Me.AddEnterpriseAwareItem(lrFactTypeReading.GetPredicateText, FEQL.TokenType.PREDICATE, , lrFactTypeReading.PredicatePart(1).Role.JoinedORMObject.Id)
+                                Else
+                                    Call Me.AddEnterpriseAwareItem(lrFactTypeReading.GetPredicateText, FEQL.TokenType.PREDICATE)
+                                End If
+                            Next
 
-                        If Me.AutoComplete.Visible = False Then
-                            Me.showAutoCompleteForm()
-                        End If
+                            If Me.AutoComplete.Visible = False Then
+                                Me.showAutoCompleteForm()
+                            End If
 
-                End Select
+                    End Select
 
-            End If
-        End If
-
-
-        '============================================================================================
-
-        If (Me.zrTextHighlighter.Tree.Errors.Count > 0) Or (Me.zrTextHighlighter.Tree.Optionals.Count > 0) Then
-            If Me.zrTextHighlighter.Tree.Errors.Count > 0 Then
-                lsExpectedToken = Me.zrTextHighlighter.Tree.Errors(0).ExpectedToken
-            Else
-                lsExpectedToken = Me.zrTextHighlighter.Tree.Optionals(0).ExpectedToken
-            End If
-            If lsExpectedToken <> "" Then
-                liTokenType = DirectCast([Enum].Parse(GetType(FEQL.TokenType), lsExpectedToken), FEQL.TokenType)
-                'MsgBox("Expecting: " & Me.zrScanner.Patterns(liTokenType).ToString)
-            End If
-
-            If Me.zrTextHighlighter.Tree.Optionals.Count > 0 Then
-                Call Me.PopulateEnterpriseAwareFromOptionals(Me.zrTextHighlighter.Tree.Optionals)
-            End If
-
-            Select Case liTokenType
-                Case Is = FEQL.TokenType.BROPEN
-                    Me.AutoComplete.Enabled = True
-                    Call Me.AddEnterpriseAwareItem("(", liTokenType, True)
-                Case Is = FEQL.TokenType.BRCLOSE
-                    Me.AutoComplete.Enabled = True
-                    Call Me.AddEnterpriseAwareItem(")", liTokenType, True)
-                Case Is = FEQL.TokenType.PREBOUNDREADINGTEXT, FEQL.TokenType.POSTBOUNDREADINGTEXT
-                    'Nothing at this stage
-                Case Is = FEQL.TokenType._NONE_
-                    Me.AutoComplete.Visible = Me.CheckIfCanDisplayEnterpriseAwareBox
-                Case Is = FEQL.TokenType.KEYWDNULL
-                    Me.AutoComplete.Visible = Me.CheckIfCanDisplayEnterpriseAwareBox
-                Case Is = FEQL.TokenType.FACTTYPEPRODUCTION
-                    Me.AutoComplete.Visible = Me.CheckIfCanDisplayEnterpriseAwareBox
-                Case Is = FEQL.TokenType.PREDICATE
-                    Dim lsModelElementName = Me.TextBoxInput.Text.Trim.Split(" ").Last
-                    lrModelElement = prApplication.WorkingModel.GetModelObjectByName(lsModelElementName)
-                    If lrModelElement IsNot Nothing Then
-                        Select Case lrModelElement.GetType
-                            Case Is = GetType(FBM.FactType)
-                                Call Me.AddPredicatePartsToEnterpriseAware(CType(lrModelElement, FBM.FactType).getPredicatePartsForModelObject(lrModelElement, True))
-                            Case Is = GetType(FBM.EntityType)
-                                For Each lrFactType In lrModelElement.getConnectedFactTypes
-                                    Call Me.AddPredicatePartsToEnterpriseAware(lrFactType.getPredicatePartsForModelObject(lrModelElement))
-                                Next
-                        End Select
-                    End If
-                Case Is = FEQL.TokenType.PREDICATESPACE
-                    Me.AutoComplete.Visible = Me.CheckIfCanDisplayEnterpriseAwareBox
-                Case Is = FEQL.TokenType.SPACE
-                    Me.AutoComplete.Visible = Me.CheckIfCanDisplayEnterpriseAwareBox
-                Case Is = FEQL.TokenType.MODELELEMENTNAME
-                    Me.AutoComplete.Enabled = True
-                    If Not e.KeyCode = Keys.ShiftKey Then
-                        Call Me.PopulateEnterpriseAwareWithObjectTypes()
-                    End If
-                    '20200729-VM-Might be able to remove the below because no optionals or errors.
-                    Dim lsModelElementName = Me.TextBoxInput.Text.Trim.Split(" ").Last
-                    lrModelElement = prApplication.WorkingModel.GetModelObjectByName(lsModelElementName)
-                    If lrModelElement IsNot Nothing Then
-                        Select Case lrModelElement.GetType
-                            Case Is = GetType(FBM.FactType)
-                                Call Me.AddPredicatePartsToEnterpriseAware(CType(lrModelElement, FBM.FactType).getPredicatePartsForModelObject(lrModelElement, True))
-                            Case Is = GetType(FBM.EntityType)
-                                For Each lrFactType In lrModelElement.getConnectedFactTypes
-                                    Call Me.AddPredicatePartsToEnterpriseAware(lrFactType.getPredicatePartsForModelObject(lrModelElement))
-                                Next
-                        End Select
-                    End If
-                Case Is = FEQL.TokenType.VALUE
-                Case Is = FEQL.TokenType.IDENTIFIER
-                Case Else
-                    Me.AutoComplete.Enabled = True
-                    Me.AddEnterpriseAwareItem(Me.zrScanner.Patterns(liTokenType).ToString, liTokenType, True)
-            End Select
-
-            lsCurrentTokenType = Me.zrTextHighlighter.GetCurrentContext
-            If IsSomething(lsCurrentTokenType) And (Me.TextBoxInput.Text.Length > 0) Then
-                lsCurrentTokenType = Me.zrTextHighlighter.GetCurrentContext.Token.Type.ToString
-                Me.msPreviousProductionLookedFor = Me.ToolStripStatusLabelCurrentProduction.Text
-                If lsCurrentTokenType IsNot Nothing Then
-                    Me.ToolStripStatusLabelCurrentProduction.Text = lsCurrentTokenType
                 End If
-                Select Case Me.zrTextHighlighter.GetCurrentContext.Token.Type
-                    Case Is = FEQL.TokenType.KEYWDNULL
-                        'Me.AutoComplete.Enabled = Me.CheckIfCanDisplayEnterpriseAwareBox
-                    Case Is = FEQL.TokenType.FACTTYPEPRODUCTION
-                        'Me.AutoComplete.Enabled = Me.CheckIfCanDisplayEnterpriseAwareBox
-                    Case Is = FEQL.TokenType.MODELELEMENTNAME
+            End If
+
+
+            '============================================================================================
+
+            If (Me.zrTextHighlighter.Tree.Errors.Count > 0) Or (Me.zrTextHighlighter.Tree.Optionals.Count > 0) Then
+                If Me.zrTextHighlighter.Tree.Errors.Count > 0 Then
+                    lsExpectedToken = Me.zrTextHighlighter.Tree.Errors(0).ExpectedToken
+                Else
+                    lsExpectedToken = Me.zrTextHighlighter.Tree.Optionals(0).ExpectedToken
+                End If
+                If lsExpectedToken <> "" Then
+                    liTokenType = DirectCast([Enum].Parse(GetType(FEQL.TokenType), lsExpectedToken), FEQL.TokenType)
+                    'MsgBox("Expecting: " & Me.zrScanner.Patterns(liTokenType).ToString)
+                End If
+
+                If Me.zrTextHighlighter.Tree.Optionals.Count > 0 Then
+                    Call Me.PopulateEnterpriseAwareFromOptionals(Me.zrTextHighlighter.Tree.Optionals)
+                End If
+
+                Select Case liTokenType
+                    Case Is = FEQL.TokenType.BROPEN
                         Me.AutoComplete.Enabled = True
-                        Call Me.PopulateEnterpriseAwareWithObjectTypes()
-                    Case Is = FEQL.TokenType.PREDICATE,
-                              FEQL.TokenType.PREDICATESPACE
+                        Call Me.AddEnterpriseAwareItem("(", liTokenType, True)
+                    Case Is = FEQL.TokenType.BRCLOSE
                         Me.AutoComplete.Enabled = True
-                        Call Me.AddFactTypePredicatePartsToEnterpriseAware()
-                End Select
-            End If
-
-            If e.KeyCode = Keys.Down Then
-                If Me.AutoComplete.ListBox.Items.Count > 0 Then
-                    Me.AutoComplete.ListBox.Focus()
-                    'Me.AutoComplete.ListBox.SelectedIndex = 0
-                    e.Handled = True
-                End If
-                e.Handled = True
-            End If
-
-            If e.Control Then
-                If e.KeyValue = Keys.J Then
-                    Call Me.AddFactTypeReadingsToEnterpriseAware()
-                    Exit Sub
-                End If
-            End If
-
-            If Me.AutoComplete.Enabled And Me.AutoComplete.ListBox.Items.Count > 0 Then
-
-                Call Me.showAutoCompleteForm()
-
-                Call Me.setAutoCompletePosition()
-            ElseIf Me.AutoComplete.ListBox.Items.Count = 0 Then
-                Me.AutoComplete.Hide()
-            End If
-
-            If e.KeyCode <> Keys.Down Then
-                Me.TextBoxInput.Focus()
-            End If
-        Else
-            lsCurrentTokenType = Me.zrTextHighlighter.GetCurrentContext
-            If IsSomething(lsCurrentTokenType) And (Me.TextBoxInput.Text.Length > 0) Then
-                lsCurrentTokenType = Me.zrTextHighlighter.GetCurrentContext.Token.Type.ToString
-                Me.ToolStripStatusLabelCurrentProduction.Text = lsCurrentTokenType
-                Select Case Me.zrTextHighlighter.GetCurrentContext.Token.Type
+                        Call Me.AddEnterpriseAwareItem(")", liTokenType, True)
                     Case Is = FEQL.TokenType.PREBOUNDREADINGTEXT, FEQL.TokenType.POSTBOUNDREADINGTEXT
-                            'Nothing at this stage
-                    Case Is = FEQL.TokenType.PREDICATE,
-                              FEQL.TokenType.PREDICATESPACE
-                        Me.AutoComplete.Enabled = True
-                        Call Me.AddFactTypeReadingsToEnterpriseAware()
-                    Case Is = FEQL.TokenType.EOF
+                    'Nothing at this stage
+                    Case Is = FEQL.TokenType._NONE_
+                        Me.AutoComplete.Visible = Me.CheckIfCanDisplayEnterpriseAwareBox
+                    Case Is = FEQL.TokenType.KEYWDNULL
+                        Me.AutoComplete.Visible = Me.CheckIfCanDisplayEnterpriseAwareBox
+                    Case Is = FEQL.TokenType.FACTTYPEPRODUCTION
+                        Me.AutoComplete.Visible = Me.CheckIfCanDisplayEnterpriseAwareBox
+                    Case Is = FEQL.TokenType.PREDICATE
                         Dim lsModelElementName = Me.TextBoxInput.Text.Trim.Split(" ").Last
                         lrModelElement = prApplication.WorkingModel.GetModelObjectByName(lsModelElementName)
                         If lrModelElement IsNot Nothing Then
@@ -775,12 +678,17 @@ Public Class frmFactEngine
                                         Call Me.AddPredicatePartsToEnterpriseAware(lrFactType.getPredicatePartsForModelObject(lrModelElement))
                                     Next
                             End Select
-                        Else
+                        End If
+                    Case Is = FEQL.TokenType.PREDICATESPACE
+                        Me.AutoComplete.Visible = Me.CheckIfCanDisplayEnterpriseAwareBox
+                    Case Is = FEQL.TokenType.SPACE
+                        Me.AutoComplete.Visible = Me.CheckIfCanDisplayEnterpriseAwareBox
+                    Case Is = FEQL.TokenType.MODELELEMENTNAME
+                        Me.AutoComplete.Enabled = True
+                        If Not e.KeyCode = Keys.ShiftKey Then
                             Call Me.PopulateEnterpriseAwareWithObjectTypes()
                         End If
-                    Case Is = FEQL.TokenType.MODELELEMENTNAME
-                        Me.AutoComplete.Enabled = True
-                        Call Me.PopulateEnterpriseAwareWithObjectTypes()
+                        '20200729-VM-Might be able to remove the below because no optionals or errors.
                         Dim lsModelElementName = Me.TextBoxInput.Text.Trim.Split(" ").Last
                         lrModelElement = prApplication.WorkingModel.GetModelObjectByName(lsModelElementName)
                         If lrModelElement IsNot Nothing Then
@@ -793,26 +701,134 @@ Public Class frmFactEngine
                                     Next
                             End Select
                         End If
+                    Case Is = FEQL.TokenType.VALUE
+                    Case Is = FEQL.TokenType.IDENTIFIER
                     Case Else
-                        'Me.AutoComplete.Enabled = False
+                        Me.AutoComplete.Enabled = True
+                        Me.AddEnterpriseAwareItem(Me.zrScanner.Patterns(liTokenType).ToString, liTokenType, True)
                 End Select
-            End If
 
-            If Me.AutoComplete.Enabled And Me.AutoComplete.ListBox.Items.Count > 0 Then
-                If Me.AutoComplete.Visible = False Then
-                    Call Me.showAutoCompleteForm()
+                lsCurrentTokenType = Me.zrTextHighlighter.GetCurrentContext
+                If IsSomething(lsCurrentTokenType) And (Me.TextBoxInput.Text.Length > 0) Then
+                    lsCurrentTokenType = Me.zrTextHighlighter.GetCurrentContext.Token.Type.ToString
+                    Me.msPreviousProductionLookedFor = Me.ToolStripStatusLabelCurrentProduction.Text
+                    If lsCurrentTokenType IsNot Nothing Then
+                        Me.ToolStripStatusLabelCurrentProduction.Text = lsCurrentTokenType
+                    End If
+                    Select Case Me.zrTextHighlighter.GetCurrentContext.Token.Type
+                        Case Is = FEQL.TokenType.KEYWDNULL
+                        'Me.AutoComplete.Enabled = Me.CheckIfCanDisplayEnterpriseAwareBox
+                        Case Is = FEQL.TokenType.FACTTYPEPRODUCTION
+                        'Me.AutoComplete.Enabled = Me.CheckIfCanDisplayEnterpriseAwareBox
+                        Case Is = FEQL.TokenType.MODELELEMENTNAME
+                            Me.AutoComplete.Enabled = True
+                            Call Me.PopulateEnterpriseAwareWithObjectTypes()
+                        Case Is = FEQL.TokenType.PREDICATE,
+                                  FEQL.TokenType.PREDICATESPACE
+                            Me.AutoComplete.Enabled = True
+                            Call Me.AddFactTypePredicatePartsToEnterpriseAware()
+                    End Select
                 End If
 
-                Call Me.setAutoCompletePosition()
-            ElseIf Me.AutoComplete.ListBox.Items.Count = 0 Then
-                Me.AutoComplete.Hide()
+                If e.KeyCode = Keys.Down Then
+                    If Me.AutoComplete.ListBox.Items.Count > 0 Then
+                        Me.AutoComplete.ListBox.Focus()
+                        'Me.AutoComplete.ListBox.SelectedIndex = 0
+                        e.Handled = True
+                    End If
+                    e.Handled = True
+                End If
+
+                If e.Control Then
+                    If e.KeyValue = Keys.J Then
+                        Call Me.AddFactTypeReadingsToEnterpriseAware()
+                        Exit Sub
+                    End If
+                End If
+
+                If Me.AutoComplete.Enabled And Me.AutoComplete.ListBox.Items.Count > 0 Then
+
+                    Call Me.showAutoCompleteForm()
+
+                    Call Me.setAutoCompletePosition()
+                ElseIf Me.AutoComplete.ListBox.Items.Count = 0 Then
+                    Me.AutoComplete.Hide()
+                End If
+
+                If e.KeyCode <> Keys.Down Then
+                    Me.TextBoxInput.Focus()
+                End If
+            Else
+                lsCurrentTokenType = Me.zrTextHighlighter.GetCurrentContext
+                If IsSomething(lsCurrentTokenType) And (Me.TextBoxInput.Text.Length > 0) Then
+                    lsCurrentTokenType = Me.zrTextHighlighter.GetCurrentContext.Token.Type.ToString
+                    Me.ToolStripStatusLabelCurrentProduction.Text = lsCurrentTokenType
+                    Select Case Me.zrTextHighlighter.GetCurrentContext.Token.Type
+                        Case Is = FEQL.TokenType.PREBOUNDREADINGTEXT, FEQL.TokenType.POSTBOUNDREADINGTEXT
+                            'Nothing at this stage
+                        Case Is = FEQL.TokenType.PREDICATE,
+                                  FEQL.TokenType.PREDICATESPACE
+                            Me.AutoComplete.Enabled = True
+                            Call Me.AddFactTypeReadingsToEnterpriseAware()
+                        Case Is = FEQL.TokenType.EOF
+                            Dim lsModelElementName = Me.TextBoxInput.Text.Trim.Split(" ").Last
+                            lrModelElement = prApplication.WorkingModel.GetModelObjectByName(lsModelElementName)
+                            If lrModelElement IsNot Nothing Then
+                                Select Case lrModelElement.GetType
+                                    Case Is = GetType(FBM.FactType)
+                                        Call Me.AddPredicatePartsToEnterpriseAware(CType(lrModelElement, FBM.FactType).getPredicatePartsForModelObject(lrModelElement, True))
+                                    Case Is = GetType(FBM.EntityType)
+                                        For Each lrFactType In lrModelElement.getConnectedFactTypes
+                                            Call Me.AddPredicatePartsToEnterpriseAware(lrFactType.getPredicatePartsForModelObject(lrModelElement))
+                                        Next
+                                End Select
+                            Else
+                                Call Me.PopulateEnterpriseAwareWithObjectTypes()
+                            End If
+                        Case Is = FEQL.TokenType.MODELELEMENTNAME
+                            Me.AutoComplete.Enabled = True
+                            Call Me.PopulateEnterpriseAwareWithObjectTypes()
+                            Dim lsModelElementName = Me.TextBoxInput.Text.Trim.Split(" ").Last
+                            lrModelElement = prApplication.WorkingModel.GetModelObjectByName(lsModelElementName)
+                            If lrModelElement IsNot Nothing Then
+                                Select Case lrModelElement.GetType
+                                    Case Is = GetType(FBM.FactType)
+                                        Call Me.AddPredicatePartsToEnterpriseAware(CType(lrModelElement, FBM.FactType).getPredicatePartsForModelObject(lrModelElement, True))
+                                    Case Is = GetType(FBM.EntityType)
+                                        For Each lrFactType In lrModelElement.getConnectedFactTypes
+                                            Call Me.AddPredicatePartsToEnterpriseAware(lrFactType.getPredicatePartsForModelObject(lrModelElement))
+                                        Next
+                                End Select
+                            End If
+                        Case Else
+                            'Me.AutoComplete.Enabled = False
+                    End Select
+                End If
+
+                If Me.AutoComplete.Enabled And Me.AutoComplete.ListBox.Items.Count > 0 Then
+                    If Me.AutoComplete.Visible = False Then
+                        Call Me.showAutoCompleteForm()
+                    End If
+
+                    Call Me.setAutoCompletePosition()
+                ElseIf Me.AutoComplete.ListBox.Items.Count = 0 Then
+                    Me.AutoComplete.Hide()
+                End If
+
+                If e.KeyCode <> Keys.Down Then
+                    Me.TextBoxInput.Focus()
+                End If
+
             End If
 
-            If e.KeyCode <> Keys.Down Then
-                Me.TextBoxInput.Focus()
-            End If
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
-        End If
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 

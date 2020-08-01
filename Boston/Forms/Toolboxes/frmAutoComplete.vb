@@ -37,7 +37,7 @@ Public Class frmAutoComplete
         e.DrawBackground()
 
         If (e.State And DrawItemState.Selected) = DrawItemState.Selected Then
-            e.Graphics.FillRectangle(Brushes.LightGray, e.Bounds)
+            e.Graphics.FillRectangle(New SolidBrush(Color.FromArgb(210, 210, 210)), e.Bounds)
         End If
 
         Dim liTokenType As VAQL.TokenType
@@ -67,10 +67,19 @@ Public Class frmAutoComplete
         e.DrawFocusRectangle()
         e.Graphics.DrawString(CurrentText, Me.ListBox.Font, New SolidBrush(ForeColor), e.Bounds, StringFormat.GenericDefault)
 
+        Dim lrFEQLTokenType = CType(Me.ListBox.Items(e.Index), tComboboxItem)
+        If lrFEQLTokenType.Tag = FEQL.TokenType.PREDICATE Then
+            Dim liStringWidth = e.Graphics.MeasureString(CurrentText, Me.ListBox.Font).Width
+            Dim lrRectangle = New Rectangle(e.Bounds.X + liStringWidth + 2, e.Bounds.Y, e.Bounds.Width, e.Bounds.Height)
+            e.Graphics.DrawString(lrFEQLTokenType.ItemData, Me.ListBox.Font, New SolidBrush(Color.FromArgb(158, 158, 158)), lrRectangle, StringFormat.GenericDefault)
+        End If
+
     End Sub
 
     Private Sub MeasureItem(ByVal sender As Object, ByVal e As MeasureItemEventArgs) Handles ListBox.MeasureItem
+        Dim font As Font = Me.ListBox.Font
         e.ItemHeight = ListBox.DefaultItemHeight + 5
+        e.ItemWidth = e.Graphics.MeasureString(font.Name, font).Width
     End Sub
 
     ''==============================================================
