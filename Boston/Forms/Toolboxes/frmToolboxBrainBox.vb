@@ -1104,7 +1104,7 @@ Public Class frmToolboxBrainBox
                 Me.AutoComplete.Hide()
             ElseIf (Me.AutoComplete.Enabled = True) And (Me.AutoComplete.ListBox.Items.Count > 0) Then
                 Me.AutoComplete.Owner = Me
-                Me.AutoComplete.zrBrainboxForm = Me
+                Me.AutoComplete.zrCallingForm = Me
                 Me.AutoComplete.Show()
                 If e IsNot Nothing Then
                     e.Handled = True

@@ -46,9 +46,7 @@ Public Class frmFactEngine
         Dim lasPredicatePart As New List(Of String)
         Dim lsPredicateReadingText As String = ""
 
-        'If prApplication.WorkingModel.FactTypeReading.Count > 0 Then
-
-        Me.AutoComplete.ListBox.Sorted = True
+        'If prApplication.WorkingModel.FactTypeReading.Count > 0 Then        
 
         'For Each lrFactTypeReading In prApplication.WorkingModel.FactTypeReading
 
@@ -112,7 +110,6 @@ Public Class frmFactEngine
 
         If prApplication.WorkingModel.FactTypeReading.Count > 0 Then
             Me.AutoComplete.ListBox.Items.Clear()
-            Me.AutoComplete.ListBox.Sorted = True
 
             For Each lrFactTypeReading In prApplication.WorkingModel.FactTypeReading
 
@@ -137,8 +134,6 @@ Public Class frmFactEngine
     Private Sub AddPredicatePartsToEnterpriseAware(ByVal aarPredicatePart As List(Of FBM.PredicatePart))
 
         Try
-            Me.AutoComplete.ListBox.Sorted = True
-
             Dim lasPredicatePartText As New List(Of String)
 
             For Each lrPredicatePart In aarPredicatePart
@@ -146,6 +141,7 @@ Public Class frmFactEngine
             Next
 
             Dim lbBufferIgnored = False
+            lasPredicatePartText.Sort()
             For Each lsPredicatePartText In lasPredicatePartText
                 If zsIntellisenseBuffer.Length > 0 Then
                     If lsPredicatePartText.StartsWith(zsIntellisenseBuffer, True, System.Globalization.CultureInfo.CurrentUICulture) Then
@@ -281,7 +277,7 @@ Public Class frmFactEngine
     Private Sub frmFactEngine_Load(sender As Object, e As EventArgs) Handles Me.Load
 
         Me.AutoComplete = New frmAutoComplete(Me.TextBoxInput)
-
+        Me.AutoComplete.Owner = Me
         '-------------------------------------------------------
         'Setup the Text Highlighter
         '----------------------------
@@ -420,6 +416,8 @@ Public Class frmFactEngine
                     If (Me.AutoComplete.ListBox.Items.Count > 0) Or Me.AutoComplete.Visible Then
                         e.Handled = True
                         Call Me.showAutoCompleteForm()
+                        Me.AutoComplete.ListBox.SelectedIndex = 0
+                        Me.AutoComplete.ListBox.Focus()
                         Exit Sub
                     End If
                     e.Handled = True
@@ -444,38 +442,48 @@ Public Class frmFactEngine
 
     Private Sub TextBoxInput_KeyUp(sender As Object, e As KeyEventArgs) Handles TextBoxInput.KeyUp
 
-        Exit Sub
+        Try
+            Select Case e.KeyCode
+                Case Is = Keys.Space,
+                          Keys.Enter,
+                          Keys.Back,
+                          Keys.Up
+                    Me.TextBoxInput.SelectionColor = Color.Wheat
+            End Select
 
-        Select Case e.KeyCode
-            Case Is = Keys.Space,
-                      Keys.Enter,
-                      Keys.Back,
-                      Keys.Up
-                Me.TextBoxInput.SelectionColor = Color.Wheat
-        End Select
+            If Me.TextBoxInput.SelectionColor = Color.Black Then Me.TextBoxInput.SelectionColor = Color.Wheat
 
-        If Me.TextBoxInput.SelectionColor = Color.Black Then Me.TextBoxInput.SelectionColor = Color.Wheat
-
-        If Me.zrTextHighlighter.Tree.Nodes.Count > 0 Then
-            If Me.zrTextHighlighter.Tree.Nodes(0).Nodes.Count > 0 Then
-                If Me.zrTextHighlighter.Tree.Nodes(0).Nodes(0).Nodes.Count > 0 Then
-                    Dim liInd = Me.zrTextHighlighter.Tree.Nodes(0).Nodes(0).Nodes.Count
-                    If liInd > 0 Then
-                        Dim lrLastToken = Me.zrTextHighlighter.Tree.Nodes(0).Nodes(0).Nodes(liInd - 1).Token
-                        If lrLastToken.Type = FEQL.TokenType.EOF Then
-                            Me.ToolStripStatusLabelGOPrompt.Text = "Valid FEQL Statement"
-                            Me.ToolStripStatusLabelGOPrompt.Visible = True
-                        Else
-                            Me.ToolStripStatusLabelGOPrompt.Visible = False
+            If Me.zrTextHighlighter.Tree.Nodes.Count > 0 Then
+                If Me.zrTextHighlighter.Tree.Nodes(0).Nodes.Count > 0 Then
+                    If Me.zrTextHighlighter.Tree.Nodes(0).Nodes(0).Nodes.Count > 0 Then
+                        Dim liInd = Me.zrTextHighlighter.Tree.Nodes(0).Nodes(0).Nodes.Count
+                        If liInd > 0 Then
+                            Dim lrLastToken = Me.zrTextHighlighter.Tree.Nodes(0).Nodes(0).Nodes(liInd - 1).Token
+                            If lrLastToken.Type = FEQL.TokenType.EOF Then
+                                Me.ToolStripStatusLabelGOPrompt.Text = "Valid FEQL Statement"
+                                Me.ToolStripStatusLabelGOPrompt.Visible = True
+                            Else
+                                Me.ToolStripStatusLabelGOPrompt.Visible = False
+                            End If
                         End If
                     End If
                 End If
             End If
-        End If
+
+            Call Me.ProcessAutoComplete(New KeyEventArgs(e.KeyCode))
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 
-    Private Sub ProcessAutoComplete(ByVal e As System.Windows.Forms.KeyEventArgs)
+    Public Sub ProcessAutoComplete(ByVal e As System.Windows.Forms.KeyEventArgs)
 
         Dim lsExpectedToken As String = ""
         Dim liTokenType As FEQL.TokenType
@@ -539,6 +547,8 @@ Public Class frmFactEngine
             Dim lrLastPredicateClauseParseNode = larModelPredicateClauseParseNode(larModelPredicateClauseParseNode.Count - 1)
 
             Dim lrFirstModelElement = prApplication.WorkingModel.GetModelObjectByName(lrFirstModelElementNameParseNode.Token.Text)
+            Dim lrlastModelElement = prApplication.WorkingModel.GetModelObjectByName(lrLastModelElementNameParseNode.Token.Text)
+
             lrModelElement = prApplication.WorkingModel.GetModelObjectByName(lrLastModelElementNameParseNode.Token.Text)
 
             If lrModelElement Is Nothing Then
@@ -554,35 +564,50 @@ Public Class frmFactEngine
                         Dim lrLastWhichClause As New FEQL.WHICHCLAUSE
                         Call Me.FEQLProcessor.GetParseTreeTokensReflection(lrLastWhichClause, loLastWhichClauseObject)
 
+                        '==========================================================
+                        'ModelElement
                         Dim lsPredicateText As String = ""
                         For Each lsPredicatePart In lrLastWhichClause.PREDICATE
                             lsPredicateText = Trim(lsPredicateText & " " & Trim(lsPredicatePart))
                         Next
 
-                        Dim larFactTypeReading = From FactType In prApplication.WorkingModel.FactType
-                                                 From FactTypeReading In FactType.FactTypeReading
-                                                 From PredicatePart In FactTypeReading.PredicatePart
-                                                 Where PredicatePart.Role.JoinedORMObject.Id = lrModelElement.Id
-                                                 Where PredicatePart.PredicatePartText = lsPredicateText
-                                                 Select FactTypeReading
+                        Dim larPredicatePart = From FactType In prApplication.WorkingModel.FactType
+                                               From FactTypeReading In FactType.FactTypeReading
+                                               From PredicatePart In FactTypeReading.PredicatePart
+                                               Where PredicatePart.Role.JoinedORMObject.Id = lrModelElement.Id
+                                               Where PredicatePart.PredicatePartText = lsPredicateText
+                                               Select PredicatePart
 
-                        If larFactTypeReading.Count = 0 Then
+                        If larPredicatePart.Count = 0 Then
                             'nothing to do here
                         Else
-                            'Me.AutoComplete.ListBox.Items.Clear()
-                            Dim lrFactTypeReading = larFactTypeReading.First
-                            Call Me.AddEnterpriseAwareItem(lrFactTypeReading.PredicatePart(1).Role.JoinedORMObject.Id, FEQL.TokenType.MODELELEMENTNAME)
-                            If Me.AutoComplete.Visible = False Then
-                                Me.showAutoCompleteForm()
+                            Me.AutoComplete.ListBox.Items.Clear()
+                            Dim lrPredicatePart = larPredicatePart.First
+                            If Me.TextBoxInput.Text.Trim.Split(" ").Last <> lrPredicatePart.FactTypeReading.PredicatePart(1).Role.JoinedORMObject.Id Then
+                                Call Me.AddEnterpriseAwareItem(lrPredicatePart.FactTypeReading.PredicatePart(1).Role.JoinedORMObject.Id, FEQL.TokenType.MODELELEMENTNAME)
+                                If Me.AutoComplete.Visible = False Then
+                                    Me.showAutoCompleteForm()
+                                End If
                             End If
                         End If
 
-                        For Each lsPredicateText In lrFirstModelElement.getOutgoingFactTypeReadingPredicates
+                        Dim lrPredicateModelObject As FBM.ModelObject
+                        If lrLastWhichClause.KEYWDAND IsNot Nothing And lrLastWhichClause.KEYWDTHAT.Count = 1 Then
+                            lrModelElement = prApplication.WorkingModel.GetModelObjectByName(lrLastModelElementNameParseNode.Token.Text)
+                        End If
+                        If lrLastWhichClause.KEYWDWHICH IsNot Nothing Then
+                            lrPredicateModelObject = lrlastModelElement
+                        Else
+                            lrPredicateModelObject = lrFirstModelElement
+                        End If
+
+                        For Each lsPredicateText In lrPredicateModelObject.getOutgoingFactTypeReadingPredicates
                             Call Me.AddEnterpriseAwareItem(lsPredicateText, FEQL.TokenType.PREDICATE)
-                            If Me.AutoComplete.Visible = False Then
-                                Me.showAutoCompleteForm()
-                            End If
                         Next
+
+                        If Me.AutoComplete.Visible = False Then
+                            Me.showAutoCompleteForm()
+                        End If
 
                 End Select
 
@@ -673,9 +698,9 @@ Public Class frmFactEngine
                 End If
                 Select Case Me.zrTextHighlighter.GetCurrentContext.Token.Type
                     Case Is = FEQL.TokenType.KEYWDNULL
-                        Me.AutoComplete.Enabled = Me.CheckIfCanDisplayEnterpriseAwareBox
+                        'Me.AutoComplete.Enabled = Me.CheckIfCanDisplayEnterpriseAwareBox
                     Case Is = FEQL.TokenType.FACTTYPEPRODUCTION
-                        Me.AutoComplete.Enabled = Me.CheckIfCanDisplayEnterpriseAwareBox
+                        'Me.AutoComplete.Enabled = Me.CheckIfCanDisplayEnterpriseAwareBox
                     Case Is = FEQL.TokenType.MODELELEMENTNAME
                         Me.AutoComplete.Enabled = True
                         Call Me.PopulateEnterpriseAwareWithObjectTypes()
@@ -706,11 +731,7 @@ Public Class frmFactEngine
 
                 Call Me.showAutoCompleteForm()
 
-                Dim lo_point As New Point(Me.TextBoxInput.GetPositionFromCharIndex(Me.TextBoxInput.SelectionStart))
-                lo_point.X += Me.TextBoxInput.Bounds.X
-                lo_point.Y += Me.TextBoxInput.Bounds.Y
-                lo_point.Y += CInt(Me.TextBoxInput.Font.GetHeight()) + 6
-                Me.AutoComplete.Location = PointToScreen(lo_point)
+                Call Me.setAutoCompletePosition()
             ElseIf Me.AutoComplete.ListBox.Items.Count = 0 Then
                 Me.AutoComplete.Hide()
             End If
@@ -761,19 +782,16 @@ Public Class frmFactEngine
                             End Select
                         End If
                     Case Else
-                        Me.AutoComplete.Enabled = False
+                        'Me.AutoComplete.Enabled = False
                 End Select
             End If
 
             If Me.AutoComplete.Enabled And Me.AutoComplete.ListBox.Items.Count > 0 Then
+                If Me.AutoComplete.Visible = False Then
+                    Call Me.showAutoCompleteForm()
+                End If
 
-                Call Me.showAutoCompleteForm()
-
-                Dim lo_point As New Point(Me.TextBoxInput.GetPositionFromCharIndex(Me.TextBoxInput.SelectionStart))
-                lo_point.X += Me.TextBoxInput.Bounds.X
-                lo_point.Y += Me.TextBoxInput.Bounds.Y
-                lo_point.Y += CInt(Me.TextBoxInput.Font.GetHeight()) + 8
-                Me.AutoComplete.Location = PointToScreen(lo_point)
+                Call Me.setAutoCompletePosition()
             ElseIf Me.AutoComplete.ListBox.Items.Count = 0 Then
                 Me.AutoComplete.Hide()
             End If
@@ -897,11 +915,34 @@ Public Class frmFactEngine
     End Sub
 
     Private Sub showAutoCompleteForm()
-        Me.AutoComplete.Owner = Me
-        Me.AutoComplete.Enabled = True
-        Me.AutoComplete.Show()
-        Me.AutoComplete.ListBox.Focus()
+        Me.AutoComplete.zsIntellisenseBuffer = Me.zsIntellisenseBuffer
+        Me.AutoComplete.zrCallingForm = Me
+        If Me.AutoComplete.Visible = False Then
+            Me.AutoComplete.Visible = True
+        End If
+        'Me.AutoComplete.ListBox.Focus()
     End Sub
 
+    Private Sub setAutoCompletePosition()
+        Dim lo_point As New Point(Me.TextBoxInput.GetPositionFromCharIndex(Me.TextBoxInput.SelectionStart))
+        lo_point.X += Me.TextBoxInput.Bounds.X
+        lo_point.Y += Me.TextBoxInput.Bounds.Y
+        lo_point.Y += CInt(Me.TextBoxInput.Font.GetHeight()) + 6
+        Me.AutoComplete.Location = PointToScreen(lo_point)
+    End Sub
+
+    Private Sub TextBoxInput_GotFocus(sender As Object, e As EventArgs) Handles TextBoxInput.GotFocus
+        Call Me.setAutoCompletePosition()
+    End Sub
+
+    Private Sub TextBoxInput_KeyPress(sender As Object, e As KeyPressEventArgs) Handles TextBoxInput.KeyPress
+
+        If Me.AutoComplete.ListBox.Items.Count > 0 Then
+            If e.KeyChar.ToString = Me.AutoComplete.ListBox.Items(0).ToString Then
+                Call Me.ProcessAutoComplete(New KeyEventArgs(Keys.Space))
+            End If
+        End If
+
+    End Sub
 
 End Class

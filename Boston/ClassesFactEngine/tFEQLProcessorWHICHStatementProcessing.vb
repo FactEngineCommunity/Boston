@@ -465,5 +465,109 @@
 
         End Sub
 
+        Public Function getWHICHClauseType(ByRef arWHICHClause As FEQL.WHICHCLAUSE) As FactEngine.pcenumWhichClauseType
+
+            Dim lrFBMModelObject As FBM.ModelObject
+
+            If arWHICHClause.KEYWDAND Is Nothing And arWHICHClause.NODEPROPERTYIDENTIFICATION IsNot Nothing Then
+
+                'E.g. "WHICH is in (Factulty:'IT') "
+                'Get the TargetNode
+                Me.NODEPROPERTYIDENTIFICATION = New FEQL.NODEPROPERTYIDENTIFICATION
+                Call Me.GetParseTreeTokensReflection(Me.NODEPROPERTYIDENTIFICATION, arWHICHClause.NODEPROPERTYIDENTIFICATION)
+                lrFBMModelObject = Me.Model.GetModelObjectByName(Me.NODEPROPERTYIDENTIFICATION.MODELELEMENTNAME)
+                If lrFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & Me.NODEPROPERTYIDENTIFICATION.MODELELEMENTNAME & "'.")
+
+                If lrFBMModelObject.ConceptType = pcenumConceptType.ValueType Then
+                    Return FactEngine.Constants.pcenumWhichClauseType.IsPredicateNodePropertyIdentification
+                Else
+                    Return FactEngine.Constants.pcenumWhichClauseType.WhichPredicateNodePropertyIdentification
+                End If
+
+            ElseIf arWHICHClause.KEYWDAND Is Nothing And
+                               arWHICHClause.KEYWDWHICH IsNot Nothing Then
+                'E.G. "AND holds WHICH Position"
+                Return FactEngine.Constants.pcenumWhichClauseType.AndPredicateAModelElement
+
+            ElseIf arWHICHClause.KEYWDAND Is Nothing Then
+                'E.g. "is in WHICH Room" in the above example
+                Return FactEngine.Constants.pcenumWhichClauseType.PredicateWhichModelElement
+
+            ElseIf arWHICHClause.KEYWDAND IsNot Nothing And
+                               arWHICHClause.KEYWDWHICH IsNot Nothing And
+                               arWHICHClause.KEYWDTHAT.Count = 0 Then
+                'E.g. "AND holds WHICH Position"
+                Return FactEngine.Constants.pcenumWhichClauseType.AndPredicateWhichModelElement
+
+            ElseIf arWHICHClause.KEYWDAND IsNot Nothing And
+                               arWHICHClause.KEYWDTHAT.Count = 1 And
+                               (arWHICHClause.KEYWDWHICH IsNot Nothing Or arWHICHClause.KEYWDA IsNot Nothing) Then
+
+                'Get the TargetNode                        
+                If arWHICHClause.NODEPROPERTYIDENTIFICATION IsNot Nothing Then
+                    Me.NODEPROPERTYIDENTIFICATION = New FEQL.NODEPROPERTYIDENTIFICATION
+                    Call Me.GetParseTreeTokensReflection(Me.NODEPROPERTYIDENTIFICATION, arWHICHClause.NODEPROPERTYIDENTIFICATION)
+                    lrFBMModelObject = Me.Model.GetModelObjectByName(Me.NODEPROPERTYIDENTIFICATION.MODELELEMENTNAME)
+                    If lrFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & Me.NODEPROPERTYIDENTIFICATION.MODELELEMENTNAME & "'.")
+                Else
+                    Dim liModelElementInd = 0
+                    If arWHICHClause.KEYWDTHAT.Count = 2 Then liModelElementInd = 1
+                    lrFBMModelObject = Me.Model.GetModelObjectByName(arWHICHClause.MODELELEMENTNAME(liModelElementInd))
+                    If lrFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & arWHICHClause.MODELELEMENTNAME(0) & "'.")
+                End If
+                If lrFBMModelObject.ConceptType = pcenumConceptType.ValueType Then
+                    Return FactEngine.Constants.pcenumWhichClauseType.IsPredicateNodePropertyIdentification
+                Else
+                    Return FactEngine.Constants.pcenumWhichClauseType.AndThatModelElementPredicatetModelElement
+                End If
+
+            ElseIf arWHICHClause.KEYWDAND IsNot Nothing And
+                               arWHICHClause.KEYWDTHAT.Count = 1 Then
+
+                'Get the TargetNode                        
+                If arWHICHClause.NODEPROPERTYIDENTIFICATION IsNot Nothing Then
+                    Me.NODEPROPERTYIDENTIFICATION = New FEQL.NODEPROPERTYIDENTIFICATION
+                    Call Me.GetParseTreeTokensReflection(Me.NODEPROPERTYIDENTIFICATION, arWHICHClause.NODEPROPERTYIDENTIFICATION)
+                    lrFBMModelObject = Me.Model.GetModelObjectByName(Me.NODEPROPERTYIDENTIFICATION.MODELELEMENTNAME)
+                    If lrFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & Me.NODEPROPERTYIDENTIFICATION.MODELELEMENTNAME & "'.")
+                Else
+                    Dim liModelElementInd = 0
+                    If arWHICHClause.KEYWDTHAT.Count = 2 Then liModelElementInd = 1
+                    lrFBMModelObject = Me.Model.GetModelObjectByName(arWHICHClause.MODELELEMENTNAME(liModelElementInd))
+                    If lrFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & arWHICHClause.MODELELEMENTNAME(0) & "'.")
+                End If
+                If lrFBMModelObject.ConceptType = pcenumConceptType.ValueType Then
+                    Return FactEngine.Constants.pcenumWhichClauseType.IsPredicateNodePropertyIdentification
+                Else
+                    Return FactEngine.Constants.pcenumWhichClauseType.AndThatModelElementPredicatetModelElement
+                End If
+
+            ElseIf arWHICHClause.KEYWDAND IsNot Nothing And
+                               arWHICHClause.KEYWDTHAT.Count = 2 Then
+                'E.g. "AND THAT Lecturer works for THAT Faculty"
+
+            ElseIf arWHICHClause.KEYWDAND IsNot Nothing And arWHICHClause.MODELELEMENTNAME IsNot Nothing Then
+                'E.g. "AND is in A School"
+
+                'Get the TargetNode                        
+                If arWHICHClause.NODEPROPERTYIDENTIFICATION IsNot Nothing Then
+                    Me.NODEPROPERTYIDENTIFICATION = New FEQL.NODEPROPERTYIDENTIFICATION
+                    Call Me.GetParseTreeTokensReflection(Me.NODEPROPERTYIDENTIFICATION, arWHICHClause.NODEPROPERTYIDENTIFICATION)
+                    lrFBMModelObject = Me.Model.GetModelObjectByName(Me.NODEPROPERTYIDENTIFICATION.MODELELEMENTNAME)
+                    If lrFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & Me.NODEPROPERTYIDENTIFICATION.MODELELEMENTNAME & "'.")
+                Else
+                    lrFBMModelObject = Me.Model.GetModelObjectByName(arWHICHClause.MODELELEMENTNAME(0))
+                    If lrFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & arWHICHClause.MODELELEMENTNAME(0) & "'.")
+                End If
+
+                If lrFBMModelObject.ConceptType = pcenumConceptType.ValueType Then
+                    Return FactEngine.Constants.pcenumWhichClauseType.IsPredicateNodePropertyIdentification
+                Else
+                    Return FactEngine.Constants.pcenumWhichClauseType.AndPredicateWhichModelElement
+                End If
+
+            End If
+        End Function
+
     End Class
 End Namespace

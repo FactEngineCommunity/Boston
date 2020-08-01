@@ -8,6 +8,7 @@ Imports System.Data.SqlClient
 Imports System.Runtime.CompilerServices
 Imports Microsoft.VisualBasic
 Imports System.Configuration
+Imports System.Text
 
 Namespace Richmond
 
@@ -507,6 +508,24 @@ Namespace Richmond
             Directory.CreateDirectory(asDirectoryPath)
 
         End Sub
+
+        Public Function UnicodeToAscii(ByVal unicodeString As String) As String
+
+
+            Dim ascii As Encoding = Encoding.ASCII
+            Dim unicode As Encoding = Encoding.Unicode
+            ' Convert the string into a byte array. 
+            Dim unicodeBytes As Byte() = unicode.GetBytes(unicodeString)
+
+            ' Perform the conversion from one encoding to the other. 
+            Dim asciiBytes As Byte() = Encoding.Convert(unicode, ascii, unicodeBytes)
+
+            ' Convert the new byte array into a char array and then into a string. 
+            Dim asciiChars(ascii.GetCharCount(asciiBytes, 0, asciiBytes.Length) - 1) As Char
+            ascii.GetChars(asciiBytes, 0, asciiBytes.Length, asciiChars, 0)
+            Dim asciiString As New String(asciiChars)
+            Return asciiString
+        End Function
 
     End Module
 End Namespace
