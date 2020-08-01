@@ -472,14 +472,15 @@ Namespace FBM
 
         Public Function getOutgoingFactTypeReadingPredicates() As List(Of String)
 
-            Dim larFactTypeReadingPredicates = From FactType In Me.Model.FactType
-                                               From Role In FactType.RoleGroup
+            Dim larOutgoingFactType = From FactType In Me.Model.FactType
+                                      From Role In FactType.RoleGroup
+                                      Where Role.JoinedORMObject.Id = Me.Id
+                                      Where Role.HasInternalUniquenessConstraint
+                                      Select FactType
+
+            Dim larFactTypeReadingPredicates = From FactType In larOutgoingFactType
                                                From FactTypeReading In FactType.FactTypeReading
-                                               Where FactType.RoleGroup.Count = 2
-                                               Where Role.JoinedORMObject.Id = Me.Id
-                                               Where Role.HasInternalUniquenessConstraint
                                                Where FactTypeReading.PredicatePart(0).Role.JoinedORMObject.Id = Me.Id
-                                               Where FactTypeReading.PredicatePart(0).Role Is Role
                                                Select FactTypeReading.GetPredicateText Distinct
 
             Return larFactTypeReadingPredicates.ToList

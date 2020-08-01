@@ -129,10 +129,7 @@ Public Class frmFactEngine
                 Call Me.AddEnterpriseAwareItem(lrFactTypeReading.GetPredicateText)
             Next
 
-
-            Me.AutoComplete.Show()
-            Me.AutoComplete.ListBox.Focus()
-            'Me.AutoComplete.ListBox.SelectedIndex = 0
+            Call Me.showAutoCompleteForm()
         End If
 
     End Sub
@@ -171,11 +168,8 @@ Public Class frmFactEngine
                 Next
             End If
 
-            Me.AutoComplete.Show()
-            Me.AutoComplete.ListBox.Focus()
-            If (aarPredicatePart.Count > 0) And (Me.AutoComplete.ListBox.Items.Count > 0) Then
-                'Me.AutoComplete.ListBox.SelectedIndex = 0
-            End If
+            Call Me.showAutoCompleteForm()
+
         Catch ex As Exception
             Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
@@ -291,10 +285,9 @@ Public Class frmFactEngine
         '-------------------------------------------------------
         'Setup the Text Highlighter
         '----------------------------
-        Me.zrTextHighlighter = New FEQL.TextHighlighter(
-                               Me.TextBoxInput,
-                               Me.zrScanner,
-                               Me.zrParser)
+        Me.zrTextHighlighter = New FEQL.TextHighlighter(Me.TextBoxInput,
+                                                        Me.zrScanner,
+                                                        Me.zrParser)
 
         Me.TextMarker = New FEQL.Controls.TextMarker(Me.TextBoxInput)
 
@@ -389,7 +382,7 @@ Public Class frmFactEngine
             If Me.TextBoxInput.SelectionColor = Color.Black Then Me.TextBoxInput.SelectionColor = Color.Wheat
 
             'Handle Paste
-            If (e.KeyCode = Keys.ControlKey) Or (e.Modifiers = Keys.Control AndAlso e.KeyCode = Keys.V) Then
+            If (e.KeyCode = Keys.Shift) Or (e.KeyCode = Keys.ControlKey) Or (e.Modifiers = Keys.Control AndAlso e.KeyCode = Keys.V) Then
                 Exit Sub
             End If
 
@@ -414,7 +407,7 @@ Public Class frmFactEngine
                     Exit Sub
             End Select
 
-            If Not e.KeyCode = Keys.Down Then
+            If Not e.KeyCode = Keys.Down Then 'And Not Me.AutoComplete.Visible Then
                 Call Me.ProcessAutoComplete(e)
             End If
 
@@ -425,13 +418,11 @@ Public Class frmFactEngine
                     Call Me.GO()
                 Case Is = Keys.Down
                     If (Me.AutoComplete.ListBox.Items.Count > 0) Or Me.AutoComplete.Visible Then
-                        Me.AutoComplete.ListBox.Focus()
-                        If Me.AutoComplete.ListBox.Items.Count > 0 Then
-                            Me.AutoComplete.ListBox.SelectedIndex = 0
-                        End If
                         e.Handled = True
+                        Call Me.showAutoCompleteForm()
                         Exit Sub
                     End If
+                    e.Handled = True
                 Case Is = Keys.Space
                 Case Is = Keys.Back
                 Case Is = Keys.Left
@@ -452,6 +443,8 @@ Public Class frmFactEngine
     End Sub
 
     Private Sub TextBoxInput_KeyUp(sender As Object, e As KeyEventArgs) Handles TextBoxInput.KeyUp
+
+        Exit Sub
 
         Select Case e.KeyCode
             Case Is = Keys.Space,
@@ -501,7 +494,7 @@ Public Class frmFactEngine
         Dim larParseNode As New List(Of FEQL.ParseNode)
         Dim lrModelElement As FBM.ModelObject
 
-        If Me.TextBoxInput.Text.Length > 10 Then 'was 21
+        If Me.TextBoxInput.Text.Length > 10 Then 'was 21            
             Me.TextMarker.Clear()
 
             Call Me.GetMODELELEMENTParseNodes(Me.zrTextHighlighter.Tree.Nodes(0), larModelElementNameParseNode)
@@ -580,14 +573,14 @@ Public Class frmFactEngine
                             Dim lrFactTypeReading = larFactTypeReading.First
                             Call Me.AddEnterpriseAwareItem(lrFactTypeReading.PredicatePart(1).Role.JoinedORMObject.Id, FEQL.TokenType.MODELELEMENTNAME)
                             If Me.AutoComplete.Visible = False Then
-                                Me.AutoComplete.Show()
+                                Me.showAutoCompleteForm()
                             End If
                         End If
 
                         For Each lsPredicateText In lrFirstModelElement.getOutgoingFactTypeReadingPredicates
                             Call Me.AddEnterpriseAwareItem(lsPredicateText, FEQL.TokenType.PREDICATE)
                             If Me.AutoComplete.Visible = False Then
-                                Me.AutoComplete.Show()
+                                Me.showAutoCompleteForm()
                             End If
                         Next
 
@@ -711,8 +704,7 @@ Public Class frmFactEngine
 
             If Me.AutoComplete.Enabled And Me.AutoComplete.ListBox.Items.Count > 0 Then
 
-                Me.AutoComplete.Owner = Me
-                Me.AutoComplete.Show()
+                Call Me.showAutoCompleteForm()
 
                 Dim lo_point As New Point(Me.TextBoxInput.GetPositionFromCharIndex(Me.TextBoxInput.SelectionStart))
                 lo_point.X += Me.TextBoxInput.Bounds.X
@@ -775,8 +767,7 @@ Public Class frmFactEngine
 
             If Me.AutoComplete.Enabled And Me.AutoComplete.ListBox.Items.Count > 0 Then
 
-                Me.AutoComplete.Owner = Me
-                Me.AutoComplete.Show()
+                Call Me.showAutoCompleteForm()
 
                 Dim lo_point As New Point(Me.TextBoxInput.GetPositionFromCharIndex(Me.TextBoxInput.SelectionStart))
                 lo_point.X += Me.TextBoxInput.Bounds.X
@@ -901,12 +892,16 @@ Public Class frmFactEngine
 
     End Sub
 
-    Private Sub frmFactEngine_LostFocus(sender As Object, e As EventArgs) Handles Me.LostFocus
-        Me.AutoComplete.Hide()
-    End Sub
-
     Private Sub frmFactEngine_Leave(sender As Object, e As EventArgs) Handles Me.Leave
         Me.AutoComplete.Hide()
     End Sub
+
+    Private Sub showAutoCompleteForm()
+        Me.AutoComplete.Owner = Me
+        Me.AutoComplete.Enabled = True
+        Me.AutoComplete.Show()
+        Me.AutoComplete.ListBox.Focus()
+    End Sub
+
 
 End Class

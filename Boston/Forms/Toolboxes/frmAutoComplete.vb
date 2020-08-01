@@ -18,19 +18,14 @@ Public Class frmAutoComplete
     Private Sub frmAutoComplete_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
 
         Call Me.roundCorners(Me)
-
-        'Me.FormBorderStyle = Windows.Forms.FormBorderStyle.SizableToolWindow
-        'SetStyle(ControlStyles.SupportsTransparentBackColor, True)
         Me.Opacity = 1
-        'Me.BackColor = Color.Transparent
-        'Me.TransparencyKey = Color.White
-        'Me.BackColor = Me.TransparencyColour
-        'Me.Opacity = 0.8
+
     End Sub
 
     Private Sub ListBox_DrawItem(ByVal sender As Object, ByVal e As System.Windows.Forms.DrawItemEventArgs) Handles ListBox.DrawItem
 
         If e.Index < 0 Then
+            e.DrawFocusRectangle()
             Exit Sub
         End If
         Dim CurrentText As String = Me.ListBox.Items(e.Index).ToString
@@ -87,12 +82,9 @@ Public Class frmAutoComplete
     'End Class
     ''==============================================================
 
-
-
     Private Sub ListBox_GotFocus(ByVal sender As Object, ByVal e As System.EventArgs) Handles ListBox.GotFocus
 
         Me.Opacity = 1
-        'Me.TransparencyKey = Color.Red
 
     End Sub
 
@@ -100,6 +92,7 @@ Public Class frmAutoComplete
 
         Try
             If e.KeyCode = Keys.Escape Then
+                e.Handled = True
                 Me.zoTextEditor.Focus()
                 Me.Hide()
             End If
@@ -171,25 +164,16 @@ Public Class frmAutoComplete
 
         Me.zoTextEditor.Focus()
 
-        If Me.zrBrainboxForm IsNot Nothing Then
-            Me.zrBrainboxForm.ProcessAutoComplete(Nothing)
-        End If
+        'If Me.zrBrainboxForm IsNot Nothing Then
+        '    Me.zrBrainboxForm.ProcessAutoComplete(Nothing)
+        'End If
 
         'Me.Visible = Me.CheckIfCanDisplayEnterpriseAwareBox
 
     End Sub
 
     Private Sub frmAutoComplete_Shown(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Shown
-
         'Me.TopMost = True
-
-    End Sub
-
-    Private Sub ListBox_LostFocus(ByVal sender As Object, ByVal e As System.EventArgs) Handles ListBox.LostFocus
-
-        Me.Opacity = 1 '0.8
-        'Me.TransparencyKey = Me.TransparencyColour
-
     End Sub
 
     Private Sub ListBox_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles ListBox.SelectedIndexChanged
@@ -200,9 +184,9 @@ Public Class frmAutoComplete
 
     Private Sub ListBox_PreviewKeyDown(sender As Object, e As PreviewKeyDownEventArgs) Handles ListBox.PreviewKeyDown
 
-        If e.KeyCode = Keys.Tab Then
-            Call Me.processKeyDown()
-        End If
+        'If e.KeyCode = Keys.Tab Then
+        '    Call Me.processKeyDown()
+        'End If
 
     End Sub
 
