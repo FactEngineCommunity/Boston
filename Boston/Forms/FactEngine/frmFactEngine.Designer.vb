@@ -74,6 +74,7 @@ Partial Class frmFactEngine
         '
         'TextBoxInput
         '
+        Me.TextBoxInput.AcceptsTab = True
         Me.TextBoxInput.BackColor = System.Drawing.Color.FromArgb(CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer))
         Me.TextBoxInput.Dock = System.Windows.Forms.DockStyle.Fill
         Me.TextBoxInput.Font = New System.Drawing.Font("Tahoma", 10.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
@@ -82,6 +83,7 @@ Partial Class frmFactEngine
         Me.TextBoxInput.Name = "TextBoxInput"
         Me.TextBoxInput.Size = New System.Drawing.Size(1178, 231)
         Me.TextBoxInput.TabIndex = 2
+        Me.TextBoxInput.TabStop = False
         Me.TextBoxInput.Text = ""
         '
         'ToolStrip1

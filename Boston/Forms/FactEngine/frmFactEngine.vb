@@ -14,12 +14,17 @@ Public Class frmFactEngine
     Public FEQLProcessor As New FEQL.Processor(prApplication.WorkingModel)
     Private TextMarker As FEQL.Controls.TextMarker
 
-    Private Sub AddEnterpriseAwareItem(ByVal asEAItem As String, Optional ByVal aoTagObject As Object = Nothing)
+    Private Sub AddEnterpriseAwareItem(ByVal asEAItem As String,
+                                       Optional ByVal aoTagObject As Object = Nothing,
+                                       Optional abSetSelectedIndex As Boolean = False)
 
         Dim lrListItem = New tComboboxItem(asEAItem, asEAItem, aoTagObject)
 
         If (asEAItem <> "") And Not (Me.AutoComplete.ListBox.FindStringExact(asEAItem) >= 0) Then
             Me.AutoComplete.ListBox.Items.Add(lrListItem)
+            If abSetSelectedIndex Then
+                Me.AutoComplete.ListBox.SelectedIndex = Me.AutoComplete.ListBox.Items.Count - 1
+            End If
         End If
 
     End Sub
@@ -470,7 +475,9 @@ Public Class frmFactEngine
                 End If
             End If
 
-            Call Me.ProcessAutoComplete(New KeyEventArgs(e.KeyCode))
+            If e.KeyCode <> Keys.Escape Then
+                Call Me.ProcessAutoComplete(New KeyEventArgs(e.KeyCode))
+            End If
 
         Catch ex As Exception
             Dim lsMessage As String
@@ -584,9 +591,10 @@ Public Class frmFactEngine
                             Me.AutoComplete.ListBox.Items.Clear()
                             Dim lrPredicatePart = larPredicatePart.First
                             If Me.TextBoxInput.Text.Trim.Split(" ").Last <> lrPredicatePart.FactTypeReading.PredicatePart(1).Role.JoinedORMObject.Id Then
-                                Call Me.AddEnterpriseAwareItem(lrPredicatePart.FactTypeReading.PredicatePart(1).Role.JoinedORMObject.Id, FEQL.TokenType.MODELELEMENTNAME)
+                                Call Me.AddEnterpriseAwareItem(lrPredicatePart.FactTypeReading.PredicatePart(1).Role.JoinedORMObject.Id, FEQL.TokenType.MODELELEMENTNAME, True)
                                 If Me.AutoComplete.Visible = False Then
                                     Me.showAutoCompleteForm()
+                                    Exit Sub
                                 End If
                             End If
                         End If
@@ -635,10 +643,10 @@ Public Class frmFactEngine
             Select Case liTokenType
                 Case Is = FEQL.TokenType.BROPEN
                     Me.AutoComplete.Enabled = True
-                    Call Me.AddEnterpriseAwareItem("(", liTokenType)
+                    Call Me.AddEnterpriseAwareItem("(", liTokenType, True)
                 Case Is = FEQL.TokenType.BRCLOSE
                     Me.AutoComplete.Enabled = True
-                    Call Me.AddEnterpriseAwareItem(")", liTokenType)
+                    Call Me.AddEnterpriseAwareItem(")", liTokenType, True)
                 Case Is = FEQL.TokenType.PREBOUNDREADINGTEXT, FEQL.TokenType.POSTBOUNDREADINGTEXT
                     'Nothing at this stage
                 Case Is = FEQL.TokenType._NONE_
@@ -686,7 +694,7 @@ Public Class frmFactEngine
                 Case Is = FEQL.TokenType.IDENTIFIER
                 Case Else
                     Me.AutoComplete.Enabled = True
-                    Me.AddEnterpriseAwareItem(Me.zrScanner.Patterns(liTokenType).ToString, liTokenType)
+                    Me.AddEnterpriseAwareItem(Me.zrScanner.Patterns(liTokenType).ToString, liTokenType, True)
             End Select
 
             lsCurrentTokenType = Me.zrTextHighlighter.GetCurrentContext
@@ -878,16 +886,6 @@ Public Class frmFactEngine
         'Dim lbStartsWith As Boolean = False
         'lbStartsWith = "asdf".StartsWith(zsIntellisenseBuffer, True, System.Globalization.CultureInfo.CurrentUICulture)
 
-        For Each lrValueType In prApplication.WorkingModel.ValueType.FindAll(Function(x) x.IsMDAModelElement = False)
-            If zsIntellisenseBuffer.Length > 0 Then
-                If lrValueType.Name.StartsWith(zsIntellisenseBuffer, True, System.Globalization.CultureInfo.CurrentUICulture) Then
-                    Call Me.AddEnterpriseAwareItem(lrValueType.Name, FEQL.TokenType.MODELELEMENTNAME)
-                End If
-            Else
-                Call Me.AddEnterpriseAwareItem(lrValueType.Name, FEQL.TokenType.MODELELEMENTNAME)
-            End If
-        Next
-
         For Each lrEntityType In prApplication.WorkingModel.EntityType.FindAll(Function(x) x.IsMDAModelElement = False)
             If zsIntellisenseBuffer.Length > 0 Then
                 If lrEntityType.Name.StartsWith(zsIntellisenseBuffer, True, System.Globalization.CultureInfo.CurrentUICulture) Then
@@ -895,6 +893,16 @@ Public Class frmFactEngine
                 End If
             Else
                 Call Me.AddEnterpriseAwareItem(lrEntityType.Name, FEQL.TokenType.MODELELEMENTNAME)
+            End If
+        Next
+
+        For Each lrValueType In prApplication.WorkingModel.ValueType.FindAll(Function(x) x.IsMDAModelElement = False)
+            If zsIntellisenseBuffer.Length > 0 Then
+                If lrValueType.Name.StartsWith(zsIntellisenseBuffer, True, System.Globalization.CultureInfo.CurrentUICulture) Then
+                    Call Me.AddEnterpriseAwareItem(lrValueType.Name, FEQL.TokenType.MODELELEMENTNAME)
+                End If
+            Else
+                Call Me.AddEnterpriseAwareItem(lrValueType.Name, FEQL.TokenType.MODELELEMENTNAME)
             End If
         Next
 
@@ -945,4 +953,20 @@ Public Class frmFactEngine
 
     End Sub
 
+    Private Sub TextBoxInput_PreviewKeyDown(sender As Object, e As PreviewKeyDownEventArgs) Handles TextBoxInput.PreviewKeyDown
+        Select Case e.KeyCode
+            Case Is = Keys.Tab
+                If Me.AutoComplete.ListBox.Items.Count > 0 Then
+                    Me.TextBoxInput.SelectionProtected = False
+                    Me.TextBoxInput.SelectionStart = Me.TextBoxInput.Text.Length
+                    If Me.AutoComplete.ListBox.SelectedIndex < 0 Then
+                        Me.TextBoxInput.AppendText(Trim(Me.AutoComplete.ListBox.Items(0).ToString)) 'Text.AppendString
+                    Else
+                        Me.TextBoxInput.AppendText(Trim(Me.AutoComplete.ListBox.SelectedItem.ToString))
+                    End If
+                    Me.TextBoxInput.SelectionColor = Me.TextBoxInput.ForeColor
+                    Me.AutoComplete.Hide()
+                End If
+        End Select
+    End Sub
 End Class

@@ -36,6 +36,10 @@ Public Class frmAutoComplete
         ' Draw the background of the ListBox control for each item.
         e.DrawBackground()
 
+        If (e.State And DrawItemState.Selected) = DrawItemState.Selected Then
+            e.Graphics.FillRectangle(Brushes.LightGray, e.Bounds)
+        End If
+
         Dim liTokenType As VAQL.TokenType
 
         liTokenType = Me.ListBox.Items(e.Index).Tag
@@ -193,9 +197,9 @@ Public Class frmAutoComplete
 
     Private Sub ListBox_PreviewKeyDown(sender As Object, e As PreviewKeyDownEventArgs) Handles ListBox.PreviewKeyDown
 
-        'If e.KeyCode = Keys.Tab Then
-        '    Call Me.processKeyDown()
-        'End If
+        If e.KeyCode = Keys.Tab Then
+            Call Me.processKeyDown()
+        End If
 
     End Sub
 
