@@ -475,9 +475,11 @@ Public Class frmFactEngine
                 End If
             End If
 
-            If e.KeyCode <> Keys.Escape Then
-                Call Me.ProcessAutoComplete(New KeyEventArgs(e.KeyCode))
-            End If
+            Select Case e.KeyCode
+                Case Is = Keys.Escape, Keys.F5
+                Case Else
+                    Call Me.ProcessAutoComplete(New KeyEventArgs(e.KeyCode))
+            End Select
 
         Catch ex As Exception
             Dim lsMessage As String
