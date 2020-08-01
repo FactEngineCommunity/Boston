@@ -53,8 +53,28 @@ Namespace FactEngine
                     Select Case Me.BaseNode.FBMModelObject.GetType
                         Case Is = GetType(FBM.FactType)
 
-                            Me.FBMFactType = Me.BaseNode.FBMModelObject
+                            '========================================================
+                            '20200802-VM-NB Can probably do the following regardless of whether is a FactType
+                            Dim larModelObject As New List(Of FBM.ModelObject)
+                            larModelObject.Add(arBaseNode.FBMModelObject)
+                            larModelObject.Add(arTargetNode.FBMModelObject)
+                            Dim lasPredicatePart As New List(Of String)
+                            lasPredicatePart.Add(asPredicate)
+                            lasPredicatePart.Add("")
+                            Dim larRole As New List(Of FBM.Role)
+                            Dim lrDummyFactType As New FBM.FactType
+                            larRole.Add(New FBM.Role(lrDummyFactType, larModelObject(0)))
+                            larRole.Add(New FBM.Role(lrDummyFactType, larModelObject(1)))
+                            Dim lrFactTypeReading As New FBM.FactTypeReading(lrDummyFactType, larRole, lasPredicatePart)
+                            Me.FBMFactType = Me.QueryGraph.Model.getFactTypeByModelObjectsFactTypeReading(larModelObject,
+                                                                                                lrFactTypeReading)
+                            '========================================================
 
+                            If Me.FBMFactType Is Nothing Then
+                                Me.FBMFactType = Me.BaseNode.FBMModelObject
+                                'Else
+                                '    Throw New Exception("There is not Fact Type, '" & arBaseNode.FBMModelObject.Id & " " & asPredicate & " " & arTargetNode.FBMModelObject.Id & "', in the Model.")
+                            End If
                         Case Else
                             Throw New Exception("QueryEdge.getAndSetFBMFactType: Only implemented for Objectified Fact Types at this time.")
                     End Select

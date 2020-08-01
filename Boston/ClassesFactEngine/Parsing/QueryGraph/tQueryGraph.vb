@@ -170,7 +170,13 @@
                             If lrPredicatePart Is Nothing Then
                                 Throw New Exception("There is no Predicate (Part) of Fact Type, '" & lrQueryEdge.FBMFactType.Id & "', that is '" & lrQueryEdge.Predicate & "'.")
                             Else
-                                lrResponsibleRole = lrPredicatePart.Role
+                                If lrFactType.IsLinkFactType Then
+                                    'Want the Role from the actual FactType
+                                    lrResponsibleRole = lrFactType.LinkFactTypeRole
+                                Else
+                                    lrResponsibleRole = lrPredicatePart.Role
+                                End If
+
                             End If
 
                             Dim lrTable = lrQueryEdge.BaseNode.FBMModelObject.getCorrespondingRDSTable
