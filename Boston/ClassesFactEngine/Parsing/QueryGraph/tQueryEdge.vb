@@ -47,6 +47,7 @@ Namespace FactEngine
         Public Function getAndSetFBMFactType(ByRef arBaseNode As FactEngine.QueryNode,
                                         ByRef arTargetNode As FactEngine.QueryNode,
                                         ByVal asPredicate As String) As Exception
+            Dim lsMessage As String = ""
             Try
                 If Me.WhichClauseType = pcenumWhichClauseType.IsPredicateNodePropertyIdentification Then
 
@@ -76,7 +77,46 @@ Namespace FactEngine
                                 '    Throw New Exception("There is not Fact Type, '" & arBaseNode.FBMModelObject.Id & " " & asPredicate & " " & arTargetNode.FBMModelObject.Id & "', in the Model.")
                             End If
                         Case Else
-                            Throw New Exception("QueryEdge.getAndSetFBMFactType: Only implemented for Objectified Fact Types at this time.")
+                            Dim larModelObject As New List(Of FBM.ModelObject)
+                            larModelObject.Add(arBaseNode.FBMModelObject)
+                            larModelObject.Add(arTargetNode.FBMModelObject)
+                            Dim lasPredicatePart As New List(Of String)
+                            lasPredicatePart.Add(asPredicate)
+                            Dim larRole As New List(Of FBM.Role)
+                            Dim lrDummyFactType As New FBM.FactType
+                            larRole.Add(New FBM.Role(lrDummyFactType, larModelObject(0)))
+                            larRole.Add(New FBM.Role(lrDummyFactType, larModelObject(1)))
+
+                            Dim larFactTypeReading = From FactType In Me.QueryGraph.Model.FactType
+                                                     From FactTypeReading In FactType.FactTypeReading
+                                                     Where FactTypeReading.PredicatePart.Count > 1
+                                                     Select FactTypeReading
+
+                            Dim larFinalFactTypeReading As New List(Of FBM.FactTypeReading)
+                            For Each lrFactTypeReading In larFactTypeReading
+                                If lrFactTypeReading.PredicatePart(0).Role.JoinedORMObject.Id = larRole(0).JoinedORMObject.Id And
+                                   lrFactTypeReading.PredicatePart(1).Role.JoinedORMObject.Id = larRole(1).JoinedORMObject.Id Then
+                                    larFinalFactTypeReading.Add(lrFactTypeReading)
+                                End If
+                            Next
+
+                            If larFinalFactTypeReading.Count > 1 Then
+                                lsMessage = "More than one Fact Type has a Predicate Part, '" & asPredicate & "', for Model Elements, '" & arBaseNode.FBMModelObject.Id & " and " & arTargetNode.FBMModelObject.Id & "."
+                                lsMessage &= vbCrLf & vbCrLf & "Try referencing the following Fact Types directly in your query:"
+                                lsMessage &= vbCrLf & vbCrLf
+                                For Each lrFactTypeReading In larFinalFactTypeReading
+                                    lsMessage &= "- " & lrFactTypeReading.FactType.Id & vbCrLf
+                                Next
+                                Throw New Exception(lsMessage)
+                            Else
+                                If larFinalFactTypeReading.Count = 1 Then
+                                    Me.FBMFactType = larFinalFactTypeReading(0).FactType
+                                Else
+                                    lsMessage = "There is no Predicate Part for any Fact Type that has a Predicate Part, '" & asPredicate & "', for Model Elements, '" & arBaseNode.FBMModelObject.Id & " and " & arTargetNode.FBMModelObject.Id & ". Try revising your query."
+                                    Throw New Exception(lsMessage)
+                                End If
+                            End If
+
                     End Select
 
                 Else
@@ -101,17 +141,11 @@ Namespace FactEngine
                 End If
 
             Catch ex As Exception
-                Dim lsMessage As String
-                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
-                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
-                Return ex
-
-                Me.FBMFactType = Nothing
                 Throw New Exception(ex.Message)
                 'prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
-
+            Return Nothing
         End Function
 
     End Class

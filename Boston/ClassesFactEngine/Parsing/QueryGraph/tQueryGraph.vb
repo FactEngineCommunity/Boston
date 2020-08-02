@@ -32,54 +32,71 @@
         ''' </summary>
         ''' <returns></returns>
         Public Function generateSQL() As String
+
             Dim lsSQLQuery As String = ""
+            Dim liInd As Integer
+            Dim larColumn As New List(Of RDS.Column)
+
             Try
                 lsSQLQuery = "SELECT "
-                'Dim larColumn = Me.HeadNode.FBMModelObject.getCorrespondingRDSTable.getPrimaryKeyColumns
-                Dim larColumn = Me.HeadNode.FBMModelObject.getCorrespondingRDSTable.getFirstUniquenessConstraintColumns
-                Dim liInd = 1
-                For Each lrColumn In larColumn
-                    lsSQLQuery &= lrColumn.Table.Name & "." & lrColumn.Name
-                    If liInd < larColumn.Count Then lsSQLQuery &= ","
-                    liInd += 1
-                Next
-
-                If Me.getProjectQueryEdges.Count > 0 Then lsSQLQuery &= ","
 
                 liInd = 1
-                Dim larProjectQueryEdge = Me.getProjectQueryEdges()
-                For Each lrQueryEdge In larProjectQueryEdge
-                    'larColumn = lrQueryEdge.FBMFactType.RoleGroup(1).JoinedORMObject.getCorrespondingRDSTable.getPrimaryKeyColumns
-                    Dim liRoleInd As Integer
-                    If lrQueryEdge.FBMFactType.RoleGroup(0).JoinedORMObject.Id = lrQueryEdge.BaseNode.FBMModelObject.Id Then
-                        liRoleInd = 1
-                    Else
-                        liRoleInd = 0
-                    End If
-                    larColumn = New List(Of RDS.Column)
-                    If lrQueryEdge.FBMFactType.RoleGroup(liRoleInd).JoinedORMObject.ConceptType = pcenumConceptType.ValueType Then
-                        larColumn.Add(lrQueryEdge.BaseNode.FBMModelObject.getCorrespondingRDSTable.Column.Find(Function(x) x.Role.FactType Is lrQueryEdge.FBMFactType))
-                    Else
-                        larColumn = lrQueryEdge.FBMFactType.RoleGroup(liRoleInd).JoinedORMObject.getCorrespondingRDSTable.getFirstUniquenessConstraintColumns
-                    End If
-
-                    Dim liInd2 = 1
-                    For Each lrColumn In larColumn
-                        If lrQueryEdge.FBMFactType.RoleGroup(liRoleInd).JoinedORMObject.ConceptType = pcenumConceptType.ValueType Then
-                            lsSQLQuery &= lrColumn.Table.Name & "." _
-                                      & lrColumn.Name
-                        Else
-                            lsSQLQuery &= lrColumn.Table.Name & "." _ 'lrQueryEdge.FBMFactType.RoleGroup(liRoleInd).JoinedORMObject.getCorrespondingRDSTable.Name & "." _
-                                      & lrColumn.Name
-                        End If
-
-                        If liInd2 < larColumn.Count Then lsSQLQuery &= ","
-                        liInd2 += 1
-                    Next
-
-                    If liInd < Me.getProjectQueryEdges.Count Then lsSQLQuery &= ","
+                Dim larProjectionColumn = Me.getProjectionColumns
+                For Each lrProjectColumn In larProjectionColumn
+                    lsSQLQuery &= lrProjectColumn.Table.Name & "." & lrProjectColumn.Name
+                    If liInd < larProjectionColumn.Count Then lsSQLQuery &= ","
                     liInd += 1
                 Next
+
+                'Select Case (Me.HeadNode.FBMModelObject).GetType
+                '    Case GetType(FBM.ValueType)
+                '        'lsSQLQuery &= Me.HeadNode. Me.HeadNode.FBMModelObject.Id
+                '    Case Else
+                '        larColumn = Me.HeadNode.FBMModelObject.getCorrespondingRDSTable.getFirstUniquenessConstraintColumns
+                '        liInd = 1
+                '        For Each lrColumn In larColumn
+                '            lsSQLQuery &= lrColumn.Table.Name & "." & lrColumn.Name
+                '            If liInd < larColumn.Count Then lsSQLQuery &= ","
+                '            liInd += 1
+                '        Next
+                'End Select
+
+                'If Me.getProjectQueryEdges.Count > 0 And larColumn.Count > 0 Then lsSQLQuery &= ", "
+
+                'liInd = 1
+                'Dim larProjectQueryEdge = Me.getProjectQueryEdges()
+                'For Each lrQueryEdge In larProjectQueryEdge
+                '    'larColumn = lrQueryEdge.FBMFactType.RoleGroup(1).JoinedORMObject.getCorrespondingRDSTable.getPrimaryKeyColumns
+                '    Dim liRoleInd As Integer
+                '    If lrQueryEdge.FBMFactType.RoleGroup(0).JoinedORMObject.Id = lrQueryEdge.BaseNode.FBMModelObject.Id Then
+                '        liRoleInd = 1
+                '    Else
+                '        liRoleInd = 0
+                '    End If
+                '    larColumn = New List(Of RDS.Column)
+                '    If lrQueryEdge.FBMFactType.RoleGroup(liRoleInd).JoinedORMObject.ConceptType = pcenumConceptType.ValueType Then
+                '        larColumn.Add(lrQueryEdge.BaseNode.FBMModelObject.getCorrespondingRDSTable.Column.Find(Function(x) x.Role.FactType Is lrQueryEdge.FBMFactType))
+                '    Else
+                '        larColumn = lrQueryEdge.FBMFactType.RoleGroup(liRoleInd).JoinedORMObject.getCorrespondingRDSTable.getFirstUniquenessConstraintColumns
+                '    End If
+
+                '    Dim liInd2 = 1
+                '    For Each lrColumn In larColumn
+                '        If lrQueryEdge.FBMFactType.RoleGroup(liRoleInd).JoinedORMObject.ConceptType = pcenumConceptType.ValueType Then
+                '            lsSQLQuery &= lrColumn.Table.Name & "." _
+                '                      & lrColumn.Name
+                '        Else
+                '            lsSQLQuery &= lrColumn.Table.Name & "." _ 'lrQueryEdge.FBMFactType.RoleGroup(liRoleInd).JoinedORMObject.getCorrespondingRDSTable.Name & "." _
+                '                      & lrColumn.Name
+                '        End If
+
+                '        If liInd2 < larColumn.Count Then lsSQLQuery &= ","
+                '        liInd2 += 1
+                '    Next
+
+                '    If liInd < Me.getProjectQueryEdges.Count Then lsSQLQuery &= ","
+                '    liInd += 1
+                'Next
 
                 lsSQLQuery &= vbCrLf & "FROM "
 
@@ -94,10 +111,17 @@
 
                 lsSQLQuery &= vbCrLf & "WHERE "
 
-                liInd = 1
-                Dim lbIntialWhere = ""
-                For Each lrQueryEdge In Me.QueryEdges.FindAll(Function(x) x.TargetNode.FBMModelObject.ConceptType <> pcenumConceptType.ValueType)
+                'WHERE Conditional
+                Dim larConditionalQueryEdges As New List(Of FactEngine.QueryEdge)
+                larConditionalQueryEdges = Me.QueryEdges.FindAll(Function(x) x.IdentifierList.Count > 0)
 
+                liInd = 1
+                Dim lbAddedAND = False
+                Dim lbIntialWhere = ""
+                For Each lrQueryEdge In Me.QueryEdges.FindAll(Function(x) x.TargetNode.FBMModelObject.ConceptType <> pcenumConceptType.ValueType And
+                                                                          x.BaseNode.FBMModelObject.ConceptType <> pcenumConceptType.ValueType)
+
+                    lbAddedAND = False
                     Dim lrOriginTable = lrQueryEdge.BaseNode.FBMModelObject.getCorrespondingRDSTable
                     Dim larModelObject = New List(Of FBM.ModelObject)
                     larModelObject.Add(lrQueryEdge.BaseNode.FBMModelObject)
@@ -118,14 +142,16 @@
                         Next
                     End If
                     lsSQLQuery &= vbCrLf
-                    If liInd < Me.QueryEdges.Count Then lsSQLQuery &= "AND "
+                    If liInd < Me.QueryEdges.Count Then
+                        lsSQLQuery &= "AND "
+                        lbAddedAND = True
+                    End If
+
                     liInd += 1
                     lbIntialWhere = Nothing
                 Next
 
-                'WHERE Conditional
-                Dim larConditionalQueryEdges As New List(Of FactEngine.QueryEdge)
-                larConditionalQueryEdges = Me.QueryEdges.FindAll(Function(x) x.IdentifierList.Count > 0)
+                If Not lbAddedAND And larConditionalQueryEdges.Count > 0 Then lsSQLQuery &= " AND "
 
                 For Each lrQueryEdge In larConditionalQueryEdges
                     Select Case lrQueryEdge.WhichClauseType
@@ -220,7 +246,20 @@
             Dim larColumn As New List(Of RDS.Column)
 
             'Head Column/s
-            Dim larHeadColumn = Me.HeadNode.FBMModelObject.getCorrespondingRDSTable.getFirstUniquenessConstraintColumns
+            Dim larHeadColumn As New List(Of RDS.Column)
+            Select Case Me.HeadNode.FBMModelObject.ConceptType
+                Case Is = pcenumConceptType.ValueType
+                    Dim larVTColumn = (From Column In Me.QueryEdges(0).TargetNode.FBMModelObject.getCorrespondingRDSTable.Column
+                                       Where Column.Role Is Me.QueryEdges(0).FBMFactType.RoleGroup(0)
+                                       Where Column.ActiveRole Is Me.QueryEdges(0).FBMFactType.RoleGroup(1)
+                                       Select Column).First
+
+                    larHeadColumn.Add(larVTColumn)
+
+                Case Else
+                    larHeadColumn = Me.HeadNode.FBMModelObject.getCorrespondingRDSTable.getFirstUniquenessConstraintColumns
+            End Select
+
             larColumn.AddRange(larHeadColumn.ToList)
 
             Dim liRoleInd As Integer
@@ -233,7 +272,7 @@
                 End If
                 Select Case lrQueryEdge.FBMFactType.RoleGroup(liRoleInd).JoinedORMObject.ConceptType
                     Case Is = pcenumConceptType.ValueType
-                        larColumn.Add(lrQueryEdge.BaseNode.FBMModelObject.getCorrespondingRDSTable.Column.Find(Function(x) x.Role.FactType Is lrQueryEdge.FBMFactType))
+                        larColumn.AddUnique(lrQueryEdge.BaseNode.FBMModelObject.getCorrespondingRDSTable.Column.Find(Function(x) x.Role.FactType Is lrQueryEdge.FBMFactType))
                     Case Else
                         Dim larEdgeColumn = lrQueryEdge.FBMFactType.RoleGroup(liRoleInd).JoinedORMObject.getCorrespondingRDSTable.getFirstUniquenessConstraintColumns
                         larColumn.AddRange(larEdgeColumn.ToList)
