@@ -109,18 +109,27 @@
                     liInd += 1
                 Next
 
-                lsSQLQuery &= vbCrLf & "WHERE "
-
                 'WHERE Conditional
                 Dim larConditionalQueryEdges As New List(Of FactEngine.QueryEdge)
                 larConditionalQueryEdges = Me.QueryEdges.FindAll(Function(x) x.IdentifierList.Count > 0)
 
+                Dim larWhereEdges = Me.QueryEdges.FindAll(Function(x) x.TargetNode.FBMModelObject.ConceptType <> pcenumConceptType.ValueType And
+                                                                          x.BaseNode.FBMModelObject.ConceptType <> pcenumConceptType.ValueType)
+
+                If larWhereEdges.Count = 0 And larConditionalQueryEdges.Count = 0 Then
+                    Return lsSQLQuery
+                End If
+
+                lsSQLQuery &= vbCrLf & "WHERE "
+
                 liInd = 1
                 Dim lbAddedAND = False
                 Dim lbIntialWhere = ""
-                For Each lrQueryEdge In Me.QueryEdges.FindAll(Function(x) x.TargetNode.FBMModelObject.ConceptType <> pcenumConceptType.ValueType And
-                                                                          x.BaseNode.FBMModelObject.ConceptType <> pcenumConceptType.ValueType)
+                For Each lrQueryEdge In larWhereEdges
 
+                    If lbAddedAND Then
+                        lsSQLQuery &= "AND "
+                    End If
                     lbAddedAND = False
                     Dim lrOriginTable = lrQueryEdge.BaseNode.FBMModelObject.getCorrespondingRDSTable
                     Dim larModelObject = New List(Of FBM.ModelObject)
@@ -143,7 +152,6 @@
                     End If
                     lsSQLQuery &= vbCrLf
                     If liInd < Me.QueryEdges.Count Then
-                        lsSQLQuery &= "AND "
                         lbAddedAND = True
                     End If
 

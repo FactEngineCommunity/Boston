@@ -390,7 +390,13 @@ Public Class frmFactEngine
             End Select
 
             'Handle Paste
-            If (e.KeyCode = Keys.ShiftKey) Or (e.KeyCode = Keys.ControlKey) Or (e.Modifiers = Keys.Control AndAlso e.KeyCode = Keys.V) Then
+            Dim ctrlV As Boolean = e.Modifiers = Keys.Control AndAlso e.KeyCode = Keys.V
+            Dim shiftIns As Boolean = e.Modifiers = Keys.Shift AndAlso e.KeyCode = Keys.Insert
+            If ctrlV OrElse shiftIns Then
+                Exit Sub
+            End If
+
+            If (e.KeyCode = Keys.ShiftKey) Or (e.KeyCode = Keys.ControlKey) Then 'Or (e.Modifiers = Keys.Control AndAlso e.KeyCode = Keys.V) Then
                 Exit Sub
             End If
 
@@ -461,6 +467,13 @@ Public Class frmFactEngine
                           Keys.Up
                     Me.TextBoxInput.SelectionColor = Color.Wheat
             End Select
+
+            Dim ctrlV As Boolean = e.Modifiers = Keys.Control AndAlso e.KeyCode = Keys.V
+            Dim shiftIns As Boolean = e.Modifiers = Keys.Shift AndAlso e.KeyCode = Keys.Insert
+            If ctrlV OrElse shiftIns Then
+                Me.zrTextHighlighter.HighlightText()
+                Exit Sub
+            End If
 
             If Me.TextBoxInput.SelectionColor = Color.Black Then Me.TextBoxInput.SelectionColor = Color.Wheat
 
@@ -551,8 +564,9 @@ Public Class frmFactEngine
 
             Call Me.CheckStartProductions(Me.zrTextHighlighter.Tree)
 
-            'Me.AutoComplete.Hide()
-            Me.AutoComplete.ListBox.Items.Clear()
+            If Not e.KeyCode = Keys.Up Then
+                Me.AutoComplete.ListBox.Items.Clear()
+            End If
 
             '============================================================================================
             'Do ultrasmart checking. Finds the last ModelElementName and the last PredicateClause
@@ -748,7 +762,7 @@ Public Class frmFactEngine
                         'Me.AutoComplete.Enabled = Me.CheckIfCanDisplayEnterpriseAwareBox
                         Case Is = FEQL.TokenType.MODELELEMENTNAME
                             Me.AutoComplete.Enabled = True
-                            Call Me.PopulateEnterpriseAwareWithObjectTypes()
+                            'Call Me.PopulateEnterpriseAwareWithObjectTypes()
                         Case Is = FEQL.TokenType.PREDICATE,
                                   FEQL.TokenType.PREDICATESPACE
                             Me.AutoComplete.Enabled = True
@@ -772,7 +786,7 @@ Public Class frmFactEngine
                     End If
                 End If
 
-                If Me.AutoComplete.Enabled And Me.AutoComplete.ListBox.Items.Count > 0 Then
+                If Me.AutoComplete.ListBox.Items.Count > 0 Then
 
                     Call Me.showAutoCompleteForm()
 
@@ -813,7 +827,7 @@ Public Class frmFactEngine
                             End If
                         Case Is = FEQL.TokenType.MODELELEMENTNAME
                             Me.AutoComplete.Enabled = True
-                            Call Me.PopulateEnterpriseAwareWithObjectTypes()
+                            'Call Me.PopulateEnterpriseAwareWithObjectTypes()
                             Dim lsModelElementName = Me.TextBoxInput.Text.Trim.Split(" ").Last
                             lrModelElement = prApplication.WorkingModel.GetModelObjectByName(lsModelElementName)
                             If lrModelElement IsNot Nothing Then
@@ -831,7 +845,7 @@ Public Class frmFactEngine
                     End Select
                 End If
 
-                If Me.AutoComplete.Enabled And Me.AutoComplete.ListBox.Items.Count > 0 Then
+                If Me.AutoComplete.ListBox.Items.Count > 0 Then
                     If Me.AutoComplete.Visible = False Then
                         Call Me.showAutoCompleteForm()
                     End If
@@ -934,7 +948,7 @@ Public Class frmFactEngine
 
         For Each lrEntityType In prApplication.WorkingModel.EntityType.FindAll(Function(x) x.IsMDAModelElement = False)
             If zsIntellisenseBuffer.Length > 0 Then
-                If lrEntityType.Name.StartsWith(zsIntellisenseBuffer, True, System.Globalization.CultureInfo.CurrentUICulture) Then
+                If LCase(lrEntityType.Name).StartsWith(LCase(zsIntellisenseBuffer), True, System.Globalization.CultureInfo.CurrentUICulture) Then
                     Call Me.AddEnterpriseAwareItem(lrEntityType.Name, FEQL.TokenType.MODELELEMENTNAME)
                 End If
             Else
@@ -1039,8 +1053,6 @@ Public Class frmFactEngine
                         Me.TextBoxInput.Text = lsOldText.Remove(liRemoveFromPosition, lsSubString.Length)
                     End If
                 End If
-
-
 
                 If Me.AutoComplete.ListBox.Items.Count > 0 Then
                     Me.TextBoxInput.SelectionProtected = False
