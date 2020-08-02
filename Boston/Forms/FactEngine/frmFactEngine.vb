@@ -384,6 +384,11 @@ Public Class frmFactEngine
         Try
             If Me.TextBoxInput.SelectionColor = Color.Black Then Me.TextBoxInput.SelectionColor = Color.Wheat
 
+            Select Case e.KeyCode
+                Case Is = Keys.Home, Keys.End
+                    Exit Sub
+            End Select
+
             'Handle Paste
             If (e.KeyCode = Keys.ShiftKey) Or (e.KeyCode = Keys.ControlKey) Or (e.Modifiers = Keys.Control AndAlso e.KeyCode = Keys.V) Then
                 Exit Sub
@@ -393,7 +398,6 @@ Public Class frmFactEngine
             'Intellisense Buffer. Populate first for AutoComplete below that...
             Select Case e.KeyCode
                 Case Is = Keys.Control & Keys.V
-                    Debugger.Break()
                 Case Is = Keys.Back
                     If zsIntellisenseBuffer.Length > 0 Then
                         zsIntellisenseBuffer = zsIntellisenseBuffer.Substring(0, zsIntellisenseBuffer.Length - 1)
@@ -478,7 +482,7 @@ Public Class frmFactEngine
             End If
 
             Select Case e.KeyCode
-                Case Is = Keys.Escape, Keys.F5
+                Case Is = Keys.Escape, Keys.F5, Keys.Home, Keys.End, Keys.ShiftKey
                 Case Else
                     Call Me.ProcessAutoComplete(New KeyEventArgs(e.KeyCode))
             End Select
@@ -1050,5 +1054,9 @@ Public Class frmFactEngine
                     Me.AutoComplete.Hide()
                 End If
         End Select
+    End Sub
+
+    Private Sub TextBoxInput_MouseLeave(sender As Object, e As EventArgs) Handles TextBoxInput.MouseLeave
+
     End Sub
 End Class
