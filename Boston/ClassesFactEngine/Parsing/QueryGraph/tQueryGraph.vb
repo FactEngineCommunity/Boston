@@ -151,12 +151,19 @@
                     lbIntialWhere = Nothing
                 Next
 
-                If Not lbAddedAND And larConditionalQueryEdges.Count > 0 Then lsSQLQuery &= " AND "
+                If Not lbAddedAND And lbIntialWhere <> "" And larConditionalQueryEdges.Count > 0 Then lsSQLQuery &= " AND "
 
                 For Each lrQueryEdge In larConditionalQueryEdges
                     Select Case lrQueryEdge.WhichClauseType
                         Case Is = FactEngine.Constants.pcenumWhichClauseType.IsPredicateNodePropertyIdentification
-                            Dim lrFactType = CType(lrQueryEdge.BaseNode.FBMModelObject, FBM.FactType)
+                            Dim lrFactType As FBM.FactType
+                            Select Case lrQueryEdge.BaseNode.FBMModelObject.GetType
+                                Case GetType(FBM.FactType)
+                                    lrFactType = CType(lrQueryEdge.BaseNode.FBMModelObject, FBM.FactType)
+                                Case GetType(FBM.EntityType)
+                                    lrFactType = lrQueryEdge.FBMFactType
+                            End Select
+
 
                             Dim larPredicatePart = From FactTypeReading In lrFactType.FactTypeReading
                                                    From PredicatePart In FactTypeReading.PredicatePart

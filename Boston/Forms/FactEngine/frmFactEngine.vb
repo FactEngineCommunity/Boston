@@ -339,6 +339,7 @@ Public Class frmFactEngine
         If lrRecordset.ErrorString IsNot Nothing Then
             Me.LabelError.BringToFront()
             Me.LabelError.Text = lrRecordset.ErrorString
+            Me.TabControl1.SelectedTab = Me.TabPageResults
         Else
             Select Case lrRecordset.StatementType
                 Case Is = FactEngine.pcenumFEQLStatementType.DESCRIBEStatement
@@ -996,8 +997,47 @@ Public Class frmFactEngine
     End Sub
 
     Private Sub TextBoxInput_PreviewKeyDown(sender As Object, e As PreviewKeyDownEventArgs) Handles TextBoxInput.PreviewKeyDown
+
+        Dim liInd As Integer
+        Dim lsSubString As String = ""
+        Dim liRemoveFromPosition As Integer = -1
+        Dim lsSelectedItem As String = ""
+
         Select Case e.KeyCode
             Case Is = Keys.Tab
+                '==============================================================
+                'Calculate liRemoveFromPosition to remove relevant characters
+                If Me.TextBoxInput.Text.Substring(Me.TextBoxInput.Text.Length - 1, 1) = " " Then
+                    '---------------------
+                    'Don't remove spaces
+                    '---------------------
+                ElseIf Me.AutoComplete.ListBox.SelectedItem.ToString.Length = 1 Then
+                    If Me.TextBoxInput.Text.Substring(Me.TextBoxInput.Text.Length - 1, 1) = Me.AutoComplete.ListBox.SelectedItem.ToString Then
+                        liRemoveFromPosition = Me.TextBoxInput.Text.Length - 1
+                    End If
+                Else
+                    For liInd = Me.AutoComplete.ListBox.SelectedItem.ToString.Length - 1 To 0 Step -1
+                        lsSubString = Me.AutoComplete.ListBox.SelectedItem.ToString.Substring(0, liInd + 1)
+                        If Me.TextBoxInput.Text.LastIndexOf(Me.AutoComplete.ListBox.SelectedItem.ToString.Substring(0, liInd + 1)) >= 0 Then
+                            If Me.TextBoxInput.Text.LastIndexOf(lsSubString) + lsSubString.Length = Me.TextBoxInput.Text.Length Then
+                                liRemoveFromPosition = Me.TextBoxInput.Text.LastIndexOf(lsSubString)
+                                Exit For
+                            End If
+                        End If
+                    Next
+                End If
+
+                If liRemoveFromPosition >= 0 Then
+                    Me.TextBoxInput.SelectionProtected = False
+                    Dim lsOldText = Me.TextBoxInput.Text
+                    Me.TextBoxInput.Text = ""
+                    If (Me.TextBoxInput.Text.Length - liRemoveFromPosition) <= Me.AutoComplete.ListBox.SelectedItem.ToString.Length Then
+                        Me.TextBoxInput.Text = lsOldText.Remove(liRemoveFromPosition, lsSubString.Length)
+                    End If
+                End If
+
+
+
                 If Me.AutoComplete.ListBox.Items.Count > 0 Then
                     Me.TextBoxInput.SelectionProtected = False
                     Me.TextBoxInput.SelectionStart = Me.TextBoxInput.Text.Length

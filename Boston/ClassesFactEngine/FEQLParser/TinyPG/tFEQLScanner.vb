@@ -77,7 +77,7 @@ Namespace FEQL
             Patterns.Add(TokenType.FACTTYPENAME, regex)
             Tokens.Add(TokenType.FACTTYPENAME)
 
-            regex = new Regex("[aA-zZ0-9 ]+", RegexOptions.Compiled)
+            regex = new Regex("[aA-zZ0-9 \-]+", RegexOptions.Compiled)
             Patterns.Add(TokenType.IDENTIFIER, regex)
             Tokens.Add(TokenType.IDENTIFIER)
 

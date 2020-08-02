@@ -116,7 +116,7 @@ Public Class frmAutoComplete
                 Case Is = Keys.Enter,
                           Keys.Space,
                           Keys.Tab
-                    Call Me.processKeyDown()
+                    Call Me.processKeyDown(publicConstantsAutoComplete.pcenumACActionType.None)
                     e.Handled = True
                 Case Is = Keys.A
                     Call Me.processKeyDown(publicConstantsAutoComplete.pcenumACActionType.A)
@@ -237,7 +237,7 @@ Public Class frmAutoComplete
 
         Select Case e.KeyCode
             Case Is = Keys.Tab
-                Call Me.processKeyDown()
+                Call Me.processKeyDown(pcenumACActionType.None)
         End Select
 
     End Sub
