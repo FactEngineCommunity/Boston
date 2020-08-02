@@ -112,10 +112,25 @@ Public Class frmAutoComplete
                 Me.Hide()
             End If
 
-            If ((e.KeyCode = Keys.Enter) Or (e.KeyCode = Keys.Space) Or (e.KeyCode = Keys.Tab)) And (Me.ListBox.SelectedIndex >= 0) Then
-                Call Me.processKeyDown()
-                e.Handled = True
-            End If
+            Select Case e.KeyCode
+                Case Is = Keys.Enter,
+                          Keys.Space,
+                          Keys.Tab
+                    Call Me.processKeyDown()
+                    e.Handled = True
+                Case Is = Keys.A
+                    Call Me.processKeyDown(publicConstantsAutoComplete.pcenumACActionType.A)
+                    e.Handled = True
+                Case Is = Keys.N
+                    Call Me.processKeyDown(publicConstantsAutoComplete.pcenumACActionType.NodePropertyIdentification)
+                    e.Handled = True
+                Case Is = Keys.T
+                    Call Me.processKeyDown(publicConstantsAutoComplete.pcenumACActionType.THAT)
+                    e.Handled = True
+                Case Is = Keys.W
+                    Call Me.processKeyDown(publicConstantsAutoComplete.pcenumACActionType.WHICH)
+                    e.Handled = True
+            End Select
 
         Catch ex As Exception
             Dim lsMessage1 As String
@@ -127,67 +142,81 @@ Public Class frmAutoComplete
         End Try
     End Sub
 
-    Private Sub processKeyDown()
+    Private Sub processKeyDown(Optional ByVal aiActionType As publicConstantsAutoComplete.pcenumACActionType = Nothing)
 
         Try
-            Dim liInd As Integer
-            Dim lsSubString As String = ""
-            Dim liRemoveFromPosition As Integer = -1
+            If Me.ListBox.SelectedIndex >= 0 Then
+                Dim liInd As Integer
+                Dim lsSubString As String = ""
+                Dim liRemoveFromPosition As Integer = -1
+                Dim lsSelectedItem As String = ""
 
-            If Me.zoTextEditor.Text.Length = 0 Then
-                '-------------------
-                'Nothing to remove
-                '-------------------
-            Else
-                If Me.zoTextEditor.Text.Substring(Me.zoTextEditor.Text.Length - 1, 1) = " " Then
-                    '---------------------
-                    'Don't remove spaces
-                    '---------------------
-                ElseIf Me.ListBox.SelectedItem.ToString.Length = 1 Then
-                    If Me.zoTextEditor.Text.Substring(Me.zoTextEditor.Text.Length - 1, 1) = Me.ListBox.SelectedItem.ToString Then
-                        liRemoveFromPosition = Me.zoTextEditor.Text.Length - 1
-                    End If
+                If Me.zoTextEditor.Text.Length = 0 Then
+                    '-------------------
+                    'Nothing to remove
+                    '-------------------
                 Else
-                    For liInd = Me.ListBox.SelectedItem.ToString.Length - 1 To 0 Step -1
-                        lsSubString = Me.ListBox.SelectedItem.ToString.Substring(0, liInd + 1)
-                        If Me.zoTextEditor.Text.LastIndexOf(lsSubString) >= 0 Then
-                            If Me.zoTextEditor.Text.LastIndexOf(lsSubString) + lsSubString.Length = Me.zoTextEditor.Text.Length Then
-                                liRemoveFromPosition = Me.zoTextEditor.Text.LastIndexOf(lsSubString)
-                                Exit For
-                            End If
+                    Select Case aiActionType
+                        Case Is = publicConstantsAutoComplete.pcenumACActionType.None
+                            lsSelectedItem = Me.ListBox.SelectedItem.ToString
+                        Case Is = publicConstantsAutoComplete.pcenumACActionType.A
+                            lsSelectedItem = Me.ListBox.SelectedItem.ToString & " A " & Trim(Me.ListBox.SelectedItem.ItemData) & " "
+                        Case Is = publicConstantsAutoComplete.pcenumACActionType.NodePropertyIdentification
+                            lsSelectedItem = Me.ListBox.SelectedItem.ToString & " (" & Trim(Me.ListBox.SelectedItem.ItemData) & ":'"
+                        Case Is = publicConstantsAutoComplete.pcenumACActionType.THAT
+                            lsSelectedItem = " THAT " & Me.ListBox.SelectedItem.ToString & " A " & Trim(Me.ListBox.SelectedItem.ItemData)
+                        Case Is = publicConstantsAutoComplete.pcenumACActionType.WHICH
+                            lsSelectedItem = Me.ListBox.SelectedItem.ToString & " WHICH " & Trim(Me.ListBox.SelectedItem.ItemData)
+                    End Select
+
+                    If Me.zoTextEditor.Text.Substring(Me.zoTextEditor.Text.Length - 1, 1) = " " Then
+                        '---------------------
+                        'Don't remove spaces
+                        '---------------------
+                    ElseIf Me.ListBox.SelectedItem.ToString.Length = 1 Then
+                        If Me.zoTextEditor.Text.Substring(Me.zoTextEditor.Text.Length - 1, 1) = Me.ListBox.SelectedItem.ToString Then
+                            liRemoveFromPosition = Me.zoTextEditor.Text.Length - 1
                         End If
-                    Next
-                End If
-
-                If liRemoveFromPosition >= 0 Then
-                    Me.zoTextEditor.SelectionProtected = False
-                    Dim lsOldText = Me.zoTextEditor.Text
-                    Me.zoTextEditor.Text = ""
-                    If (Me.zoTextEditor.Text.Length - liRemoveFromPosition) <= Me.ListBox.SelectedItem.ToString.Length Then
-                        Me.zoTextEditor.Text = lsOldText.Remove(liRemoveFromPosition, lsSubString.Length)
+                    Else
+                        For liInd = Me.ListBox.SelectedItem.ToString.Length - 1 To 0 Step -1
+                            lsSubString = Me.ListBox.SelectedItem.ToString.Substring(0, liInd + 1)
+                            If Me.zoTextEditor.Text.LastIndexOf(Me.ListBox.SelectedItem.ToString.Substring(0, liInd + 1)) >= 0 Then
+                                If Me.zoTextEditor.Text.LastIndexOf(lsSubString) + lsSubString.Length = Me.zoTextEditor.Text.Length Then
+                                    liRemoveFromPosition = Me.zoTextEditor.Text.LastIndexOf(lsSubString)
+                                    Exit For
+                                End If
+                            End If
+                        Next
                     End If
+
+                    If liRemoveFromPosition >= 0 Then
+                        Me.zoTextEditor.SelectionProtected = False
+                        Dim lsOldText = Me.zoTextEditor.Text
+                        Me.zoTextEditor.Text = ""
+                        If (Me.zoTextEditor.Text.Length - liRemoveFromPosition) <= Me.ListBox.SelectedItem.ToString.Length Then
+                            Me.zoTextEditor.Text = lsOldText.Remove(liRemoveFromPosition, lsSubString.Length)
+                        End If
+                    End If
+
                 End If
 
+                Me.zoTextEditor.SelectionProtected = False
+                Me.zoTextEditor.SelectionStart = Me.zoTextEditor.Text.Length
+                Me.zoTextEditor.AppendText(lsSelectedItem) 'Text.AppendString
+                Me.zoTextEditor.SelectionColor = Me.zoTextEditor.ForeColor
+
+                Me.Hide()
+
+                Me.zoTextEditor.Focus()
+
+                Me.zsIntellisenseBuffer = Trim(Me.ListBox.SelectedItem.ToString)
+                Select Case Me.zrCallingForm.Name
+                    Case Is = "frmFactEngine"
+                        CType(Me.zrCallingForm, frmFactEngine).ProcessAutoComplete(New KeyEventArgs(Keys.Space))
+                End Select
+
+                'Me.Visible = Me.CheckIfCanDisplayEnterpriseAwareBox
             End If
-
-            Me.zoTextEditor.SelectionProtected = False
-            Me.zoTextEditor.SelectionStart = Me.zoTextEditor.Text.Length
-            Me.zoTextEditor.AppendText(Trim(Me.ListBox.SelectedItem.ToString) & " ") 'Text.AppendString
-            Me.zoTextEditor.SelectionColor = Me.zoTextEditor.ForeColor
-
-            Me.Hide()
-
-            Me.zoTextEditor.Focus()
-
-            Me.zsIntellisenseBuffer = Trim(Me.ListBox.SelectedItem.ToString)
-            Select Case Me.zrCallingForm.Name
-                Case Is = "frmFactEngine"
-                    CType(Me.zrCallingForm, frmFactEngine).ProcessAutoComplete(New KeyEventArgs(Keys.Space))
-            End Select
-
-
-            'Me.Visible = Me.CheckIfCanDisplayEnterpriseAwareBox
-
         Catch ex As Exception
 
         End Try
@@ -206,9 +235,10 @@ Public Class frmAutoComplete
 
     Private Sub ListBox_PreviewKeyDown(sender As Object, e As PreviewKeyDownEventArgs) Handles ListBox.PreviewKeyDown
 
-        If e.KeyCode = Keys.Tab Then
-            Call Me.processKeyDown()
-        End If
+        Select Case e.KeyCode
+            Case Is = Keys.Tab
+                Call Me.processKeyDown()
+        End Select
 
     End Sub
 
