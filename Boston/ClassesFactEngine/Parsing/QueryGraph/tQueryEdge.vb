@@ -135,6 +135,22 @@ Namespace FactEngine
                     Dim lrFactTypeReading As New FBM.FactTypeReading(lrDummyFactType, larRole, lasPredicatePart)
                     Me.FBMFactType = Me.QueryGraph.Model.getFactTypeByModelObjectsFactTypeReading(larModelObject,
                                                                                                 lrFactTypeReading)
+
+                    If Me.FBMFactType Is Nothing Then
+                        Dim larAltFactType = From FactType In Me.QueryGraph.Model.FactType
+                                             From FactTypeReading In FactType.FactTypeReading
+                                             From PredicatePart In FactTypeReading.PredicatePart
+                                             Where PredicatePart.Role.JoinedORMObject.Id = larModelObject(0).Id
+                                             Where PredicatePart.PredicatePartText = asPredicate
+                                             Select FactType
+
+                        If larAltFactType.Count > 1 Then
+                            Throw New Exception("There is more than one Fact Type Reading that is or starts, '" & arBaseNode.FBMModelObject.Id & " " & asPredicate)
+                        Else
+                            Me.FBMFactType = larAltFactType.First
+                        End If
+                    End If
+
                     If Me.FBMFactType Is Nothing Then
                         Throw New Exception("There is not Fact Type, '" & arBaseNode.FBMModelObject.Id & " " & asPredicate & " " & arTargetNode.FBMModelObject.Id & "', in the Model.")
                     End If
