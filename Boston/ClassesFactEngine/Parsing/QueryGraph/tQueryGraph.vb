@@ -127,8 +127,9 @@
                 Dim lbIntialWhere = ""
                 For Each lrQueryEdge In larWhereEdges
 
-                    If lbAddedAND Then
+                    If lbAddedAND Or liInd > 1 Then
                         lsSQLQuery &= "AND "
+                        lbAddedAND = True
                     End If
                     lbAddedAND = False
                     Dim lrOriginTable = lrQueryEdge.BaseNode.FBMModelObject.getCorrespondingRDSTable
@@ -151,15 +152,15 @@
                         Next
                     End If
                     lsSQLQuery &= vbCrLf
-                    If liInd < Me.QueryEdges.Count Then
-                        lbAddedAND = True
-                    End If
+                    'If liInd < Me.QueryEdges.Count Then
+                    '    lbAddedAND = True
+                    'End If
 
                     liInd += 1
                     lbIntialWhere = Nothing
                 Next
 
-                If Not lbAddedAND And lbIntialWhere <> "" And larConditionalQueryEdges.Count > 0 Then lsSQLQuery &= " AND "
+                If Not lbAddedAND And lbIntialWhere Is Nothing And larConditionalQueryEdges.Count > 0 Then lsSQLQuery &= " AND "
 
                 For Each lrQueryEdge In larConditionalQueryEdges
                     Select Case lrQueryEdge.WhichClauseType

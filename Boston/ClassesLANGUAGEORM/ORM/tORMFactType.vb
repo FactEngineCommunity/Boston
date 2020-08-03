@@ -1540,6 +1540,26 @@ Namespace FBM
 
         End Function
 
+        Public Function CreateUniqueRoleName(ByVal asRootRoleName As String, ByVal aiCounter As Integer) As String
+
+            Dim lsTrialRoleName As String
+
+            If aiCounter = 0 Then
+                lsTrialRoleName = asRootRoleName
+            Else
+                lsTrialRoleName = asRootRoleName & CStr(aiCounter)
+            End If
+
+            CreateUniqueRoleName = lsTrialRoleName
+
+            If Me.RoleGroup.Exists(Function(x) x.Name = lsTrialRoleName) Then
+                CreateUniqueRoleName = Me.CreateUniqueRoleName(asRootRoleName, aiCounter + 1)
+            Else
+                Return lsTrialRoleName
+            End If
+
+        End Function
+
         ''' <summary>
         ''' Returns TRUE if not all of the RoleGroup Role order permutations are used for a FactType with more than on Role referencing the same ModelObject,
         '''   else returns FALSE.
