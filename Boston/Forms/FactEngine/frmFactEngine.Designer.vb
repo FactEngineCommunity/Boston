@@ -105,14 +105,14 @@ Partial Class frmFactEngine
         Me.ContextMenuStripFactEngine.ImageScalingSize = New System.Drawing.Size(24, 24)
         Me.ContextMenuStripFactEngine.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItemHelpTips})
         Me.ContextMenuStripFactEngine.Name = "ContextMenuStripFactEngine"
-        Me.ContextMenuStripFactEngine.Size = New System.Drawing.Size(241, 69)
+        Me.ContextMenuStripFactEngine.Size = New System.Drawing.Size(159, 36)
         '
         'ToolStripMenuItemHelpTips
         '
         Me.ToolStripMenuItemHelpTips.Checked = True
         Me.ToolStripMenuItemHelpTips.CheckState = System.Windows.Forms.CheckState.Checked
         Me.ToolStripMenuItemHelpTips.Name = "ToolStripMenuItemHelpTips"
-        Me.ToolStripMenuItemHelpTips.Size = New System.Drawing.Size(240, 32)
+        Me.ToolStripMenuItemHelpTips.Size = New System.Drawing.Size(158, 32)
         Me.ToolStripMenuItemHelpTips.Text = "&Help Tips"
         '
         'LabelHelp
@@ -120,7 +120,7 @@ Partial Class frmFactEngine
         Me.LabelHelp.BackColor = System.Drawing.SystemColors.Info
         Me.LabelHelp.ContextMenuStrip = Me.ContextMenuStripHelpLabel
         Me.LabelHelp.Dock = System.Windows.Forms.DockStyle.Bottom
-        Me.LabelHelp.ForeColor = System.Drawing.Color.Silver
+        Me.LabelHelp.ForeColor = System.Drawing.Color.DarkGray
         Me.LabelHelp.Location = New System.Drawing.Point(0, 155)
         Me.LabelHelp.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.LabelHelp.Name = "LabelHelp"

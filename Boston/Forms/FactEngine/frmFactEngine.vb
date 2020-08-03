@@ -413,23 +413,28 @@ Public Class frmFactEngine
                 Exit Sub
             End If
 
+            Dim liIndex = 0
             Select Case e.KeyData
                 Case Is = Keys.Control Or Keys.A
                     If Me.AutoComplete.ListBox.Items.Count > 0 Then
-                        Dim lrComboboxItem As tComboboxItem = Me.AutoComplete.ListBox.Items(0)
+                        If Trim(Me.AutoComplete.ListBox.Items(0).Text) = "AND" And Me.AutoComplete.ListBox.Items.Count > 1 Then liIndex = 1
+                        Dim lrComboboxItem As tComboboxItem = Me.AutoComplete.ListBox.Items(liIndex)
                         Me.TextBoxInput.Text &= Trim(lrComboboxItem.Text) & " A " & Trim(lrComboboxItem.ItemData)
                     End If
+                    e.SuppressKeyPress = True
                     e.Handled = True
                     Exit Sub
                 Case Is = Keys.Control Or Keys.T
                     If Me.AutoComplete.ListBox.Items.Count > 0 Then
-                        Dim lrComboboxItem As tComboboxItem = Me.AutoComplete.ListBox.Items(0)
+                        If Trim(Me.AutoComplete.ListBox.Items(0).Text) = "AND" And Me.AutoComplete.ListBox.Items.Count > 1 Then liIndex = 1
+                        Dim lrComboboxItem As tComboboxItem = Me.AutoComplete.ListBox.Items(liIndex)
                         Me.TextBoxInput.Text &= "THAT " & Trim(lrComboboxItem.Text) & " A " & Trim(lrComboboxItem.ItemData)
                     End If
                     Exit Sub
                 Case Is = Keys.Control Or Keys.N
                     If Me.AutoComplete.ListBox.Items.Count > 0 Then
-                        Dim lrComboboxItem As tComboboxItem = Me.AutoComplete.ListBox.Items(0)
+                        If Trim(Me.AutoComplete.ListBox.Items(0).Text) = "AND" And Me.AutoComplete.ListBox.Items.Count > 1 Then liIndex = 1
+                        Dim lrComboboxItem As tComboboxItem = Me.AutoComplete.ListBox.Items(liIndex)
                         Me.TextBoxInput.Text &= Trim(lrComboboxItem.Text) & " (" & Trim(lrComboboxItem.ItemData) & ":'"
                     End If
                     Exit Sub
@@ -463,7 +468,7 @@ Public Class frmFactEngine
                 Case Is = Keys.Escape
                     Call Me.hideAutoComplete()
                     Exit Sub
-                Case Is = Keys.Space, Keys.Down
+                Case Is = Keys.Down ',Keys.Space
                 Case Else
                     Call Me.ProcessAutoComplete(e)
             End Select
@@ -540,14 +545,27 @@ Public Class frmFactEngine
             Select Case e.KeyCode
                 Case Is = Keys.Escape, Keys.F5, Keys.Home, Keys.End, Keys.ShiftKey
                 Case Is = Keys.Down, Keys.Up, Keys.Space
-
+                Case Is = Keys.A
                 Case Else
                     Select Case e.KeyData
-                        Case Is = Keys.A
+                        Case Is = Keys.ControlKey
+                            Me.TextBoxInput.SelectionStart = Me.TextBoxInput.Text.Length
+                            Me.TextBoxInput.SelectionLength = 0
+                            e.SuppressKeyPress = True
+                            e.Handled = True
+                            Call Me.setAutoCompletePosition()
+                        Case Is = Keys.A Or Keys.Control
+                            Me.TextBoxInput.SelectionStart = Me.TextBoxInput.Text.Length
+                            Me.TextBoxInput.SelectionLength = 0
+                            e.SuppressKeyPress = True
+                            e.Handled = True
+                            Call Me.setAutoCompletePosition()
                         Case Else
                             Call Me.ProcessAutoComplete(New KeyEventArgs(e.KeyCode))
                     End Select
             End Select
+
+            Call Me.setAutoCompletePosition()
 
         Catch ex As Exception
             Dim lsMessage As String
@@ -691,7 +709,7 @@ Public Class frmFactEngine
                                     Me.AutoComplete.ListBox.Items.Clear()
                                     Dim lrPredicatePart = larPredicatePart.First
                                     If Me.TextBoxInput.Text.Trim.Split(" ").Last <> lrPredicatePart.FactTypeReading.PredicatePart(1).Role.JoinedORMObject.Id Then
-                                        Call Me.AddEnterpriseAwareItem(lrPredicatePart.FactTypeReading.PredicatePart(1).Role.JoinedORMObject.Id, FEQL.TokenType.MODELELEMENTNAME, True)
+                                        Call Me.AddEnterpriseAwareItem(lrPredicatePart.FactTypeReading.PredicatePart(1).Role.JoinedORMObject.Id, FEQL.TokenType.MODELELEMENTNAME, False)
                                         If Me.AutoComplete.Visible = False Then
                                             Me.showAutoCompleteForm()
                                             Exit Sub
@@ -881,7 +899,7 @@ Public Class frmFactEngine
                                 Call Me.PopulateEnterpriseAwareWithObjectTypes()
                             End If
 
-                            Call Me.AddEnterpriseAwareItem("AND", Nothing, False, , True)
+                            Call Me.AddEnterpriseAwareItem("AND ", Nothing, False, , True)
                         Case Is = FEQL.TokenType.MODELELEMENTNAME
                             Me.AutoComplete.Enabled = True
                             'Call Me.PopulateEnterpriseAwareWithObjectTypes()
@@ -1045,6 +1063,7 @@ Public Class frmFactEngine
             Me.AutoComplete.zrCallingForm = Me
             If Me.AutoComplete.Visible = False Then
                 Me.AutoComplete.Visible = True
+                Me.TextBoxInput.Focus()
             End If
             Call Me.populateHelpLabel()
         End If
@@ -1085,7 +1104,9 @@ Public Class frmFactEngine
             Select Case e.KeyCode
                 Case Is = Keys.Tab
                     If Me.AutoComplete.ListBox.Items.Count > 0 Then
-                        Me.AutoComplete.ListBox.SelectedIndex = 0
+                        Dim liListboxInd = 0
+                        If Trim(Me.AutoComplete.ListBox.Items(0).Text) = "AND" And Me.AutoComplete.ListBox.Items.Count > 1 Then liListboxInd = 1
+                        Me.AutoComplete.ListBox.SelectedIndex = liListboxInd
                         '==============================================================
                         'Calculate liRemoveFromPosition to remove relevant characters
                         If Me.TextBoxInput.Text.Substring(Me.TextBoxInput.Text.Length - 1, 1) = " " Then
