@@ -236,6 +236,7 @@
                             liInd = 0
                             For Each lsIdentifier In lrQueryEdge.IdentifierList
                                 lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") & lrTargetTable.Name & "." & larIndexColumns(liInd).Name & " = '" & lsIdentifier & "'" & vbCrLf
+                                If liInd < lrQueryEdge.IdentifierList.Count - 1 Then lsSQLQuery &= "AND "
                                 liInd += 1
                             Next
                             lbIntialWhere = "AND "

@@ -400,6 +400,34 @@ Public Class frmFactEngine
                 Exit Sub
             End If
 
+            Select Case e.KeyData
+                Case Is = Keys.Control Or Keys.A
+                    If Me.AutoComplete.ListBox.Items.Count > 0 Then
+                        Dim lrComboboxItem As tComboboxItem = Me.AutoComplete.ListBox.Items(0)
+                        Me.TextBoxInput.Text &= Trim(lrComboboxItem.Text) & " A " & Trim(lrComboboxItem.ItemData)
+                    End If
+                    e.Handled = True
+                    Exit Sub
+                Case Is = Keys.Control Or Keys.T
+                    If Me.AutoComplete.ListBox.Items.Count > 0 Then
+                        Dim lrComboboxItem As tComboboxItem = Me.AutoComplete.ListBox.Items(0)
+                        Me.TextBoxInput.Text &= "THAT " & Trim(lrComboboxItem.Text) & " A " & Trim(lrComboboxItem.ItemData)
+                    End If
+                    Exit Sub
+                Case Is = Keys.Control Or Keys.N
+                    If Me.AutoComplete.ListBox.Items.Count > 0 Then
+                        Dim lrComboboxItem As tComboboxItem = Me.AutoComplete.ListBox.Items(0)
+                        Me.TextBoxInput.Text &= Trim(lrComboboxItem.Text) & " (" & Trim(lrComboboxItem.ItemData) & ":'"
+                    End If
+                    Exit Sub
+                Case Is = Keys.Control Or Keys.W
+                    If Me.AutoComplete.ListBox.Items.Count > 0 Then
+                        Dim lrComboboxItem As tComboboxItem = Me.AutoComplete.ListBox.Items(0)
+                        Me.TextBoxInput.Text &= Trim(lrComboboxItem.Text) & " WHICH " & Trim(lrComboboxItem.ItemData) & ":'"
+                    End If
+                    Exit Sub
+            End Select
+
             '===============================================================================
             'Intellisense Buffer. Populate first for AutoComplete below that...
             Select Case e.KeyCode
@@ -420,7 +448,7 @@ Public Class frmFactEngine
 
             Select Case e.KeyCode
                 Case Is = Keys.Escape
-                    Me.AutoComplete.Hide()
+                    Call Me.hideAutoComplete()
                     Exit Sub
             End Select
 
@@ -428,10 +456,9 @@ Public Class frmFactEngine
                 Call Me.ProcessAutoComplete(e)
             End If
 
-
             Select Case e.KeyCode
                 Case Is = Keys.F5
-                    Me.AutoComplete.Hide()
+                    Call Me.hideAutoComplete()
                     Call Me.GO()
                 Case Is = Keys.Down
                     If (Me.AutoComplete.ListBox.Items.Count > 0) Or Me.AutoComplete.Visible Then
@@ -796,7 +823,7 @@ Public Class frmFactEngine
 
                     Call Me.setAutoCompletePosition()
                 ElseIf Me.AutoComplete.ListBox.Items.Count = 0 Then
-                    Me.AutoComplete.Hide()
+                    Call Me.hideAutoComplete()
                 End If
 
                 If e.KeyCode <> Keys.Down Then
@@ -856,7 +883,7 @@ Public Class frmFactEngine
 
                     Call Me.setAutoCompletePosition()
                 ElseIf Me.AutoComplete.ListBox.Items.Count = 0 Then
-                    Me.AutoComplete.Hide()
+                    Call Me.hideAutoComplete()
                 End If
 
                 If e.KeyCode <> Keys.Down Then
@@ -983,14 +1010,17 @@ Public Class frmFactEngine
     End Sub
 
     Private Sub frmFactEngine_Leave(sender As Object, e As EventArgs) Handles Me.Leave
-        Me.AutoComplete.Hide()
+        Call Me.hideAutoComplete()
     End Sub
 
     Private Sub showAutoCompleteForm()
-        Me.AutoComplete.zsIntellisenseBuffer = Me.zsIntellisenseBuffer
-        Me.AutoComplete.zrCallingForm = Me
-        If Me.AutoComplete.Visible = False Then
-            Me.AutoComplete.Visible = True
+        If Me.AutoComplete.ListBox.Items.Count > 0 Then
+            Me.AutoComplete.zsIntellisenseBuffer = Me.zsIntellisenseBuffer
+            Me.AutoComplete.zrCallingForm = Me
+            If Me.AutoComplete.Visible = False Then
+                Me.AutoComplete.Visible = True
+            End If
+            Call Me.populateHelpLabel()
         End If
         'Me.AutoComplete.ListBox.Focus()
     End Sub
@@ -1070,7 +1100,7 @@ Public Class frmFactEngine
                                 Me.TextBoxInput.AppendText(Trim(Me.AutoComplete.ListBox.SelectedItem.ToString))
                             End If
                             Me.TextBoxInput.SelectionColor = Me.TextBoxInput.ForeColor
-                            Me.AutoComplete.Hide()
+                            Call Me.hideAutoComplete()
                         End If
                     End If
             End Select
@@ -1078,7 +1108,30 @@ Public Class frmFactEngine
         End Try
     End Sub
 
-    Private Sub TextBoxInput_MouseLeave(sender As Object, e As EventArgs) Handles TextBoxInput.MouseLeave
+    Private Sub populateHelpLabel()
 
+        If Me.AutoComplete.ListBox.Items.Count > 0 Then
+            Me.LabelHelp.Text = ""
+
+            Dim lrComboboxItem As tComboboxItem = Me.AutoComplete.ListBox.Items(0)
+
+            Me.LabelHelp.Text &= "Press [Tab] to add " & lrComboboxItem.Text
+
+            If lrComboboxItem.ItemData <> "" Then Me.LabelHelp.Text &= vbCrLf & "Press [Ctrl] and [A] to add '" & Trim(lrComboboxItem.Text) & " A " & Trim(lrComboboxItem.ItemData) & "'"
+            If lrComboboxItem.ItemData <> "" Then Me.LabelHelp.Text &= vbCrLf & "Press [Ctrl] and [T] to add 'THAT " & Trim(lrComboboxItem.Text) & " A " & Trim(lrComboboxItem.ItemData) & "'"
+            If lrComboboxItem.ItemData <> "" Then Me.LabelHelp.Text &= vbCrLf & "Press [Ctrl] and [N] to add '" & Trim(lrComboboxItem.Text) & " (" & Trim(lrComboboxItem.ItemData) & ":'"
+            If lrComboboxItem.ItemData <> "" Then Me.LabelHelp.Text &= vbCrLf & "Press [Ctrl] and [W] to add '" & Trim(lrComboboxItem.Text) & " WHICH " & Trim(lrComboboxItem.ItemData) & "'"
+
+        End If
+
+    End Sub
+
+    Public Sub hideAutoComplete()
+        Me.AutoComplete.Hide()
+        Me.LabelHelp.Text = ""
+    End Sub
+
+    Private Sub TextBoxInput_LostFocus(sender As Object, e As EventArgs) Handles TextBoxInput.LostFocus
+        Me.LabelHelp.Text = ""
     End Sub
 End Class
