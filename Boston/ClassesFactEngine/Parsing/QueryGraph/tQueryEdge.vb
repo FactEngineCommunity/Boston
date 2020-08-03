@@ -95,7 +95,8 @@ Namespace FactEngine
                             Dim larFinalFactTypeReading As New List(Of FBM.FactTypeReading)
                             For Each lrFactTypeReading In larFactTypeReading
                                 If lrFactTypeReading.PredicatePart(0).Role.JoinedORMObject.Id = larRole(0).JoinedORMObject.Id And
-                                   lrFactTypeReading.PredicatePart(1).Role.JoinedORMObject.Id = larRole(1).JoinedORMObject.Id Then
+                                   lrFactTypeReading.PredicatePart(1).Role.JoinedORMObject.Id = larRole(1).JoinedORMObject.Id And
+                                   lrFactTypeReading.PredicatePart(0).PredicatePartText = asPredicate Then
                                     larFinalFactTypeReading.Add(lrFactTypeReading)
                                 End If
                             Next

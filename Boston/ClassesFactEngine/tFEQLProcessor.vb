@@ -296,7 +296,7 @@ Namespace FEQL
                         Case Is = "WHICHSELECTSTMT"
 
                             '=============================================================
-                            Return Me.ProcessWHICHSELECTStatement(asFEQLStatement)
+                            Return Me.ProcessWHICHSELECTStatementNew(asFEQLStatement)
 
                             '----------------------------------------------------------------------------------
                             'Exit the sub because have found what the User was trying to do, and have done it 
