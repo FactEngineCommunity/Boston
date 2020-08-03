@@ -118,18 +118,23 @@ Public Class frmAutoComplete
                           Keys.Tab
                     Call Me.processKeyDown(publicConstantsAutoComplete.pcenumACActionType.None)
                     e.Handled = True
+                    Me.zoTextEditor.Focus()
                 Case Is = Keys.A
                     Call Me.processKeyDown(publicConstantsAutoComplete.pcenumACActionType.A)
                     e.Handled = True
+                    Me.zoTextEditor.Focus()
                 Case Is = Keys.N
                     Call Me.processKeyDown(publicConstantsAutoComplete.pcenumACActionType.NodePropertyIdentification)
                     e.Handled = True
+                    Me.zoTextEditor.Focus()
                 Case Is = Keys.T
                     Call Me.processKeyDown(publicConstantsAutoComplete.pcenumACActionType.THAT)
                     e.Handled = True
+                    Me.zoTextEditor.Focus()
                 Case Is = Keys.W
                     Call Me.processKeyDown(publicConstantsAutoComplete.pcenumACActionType.WHICH)
                     e.Handled = True
+                    Me.zoTextEditor.Focus()
             End Select
 
         Catch ex As Exception

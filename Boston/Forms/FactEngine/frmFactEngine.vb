@@ -17,12 +17,17 @@ Public Class frmFactEngine
     Private Sub AddEnterpriseAwareItem(ByVal asEAItem As String,
                                        Optional ByVal aoTagObject As Object = Nothing,
                                        Optional abSetSelectedIndex As Boolean = False,
-                                       Optional asModelElementName As String = "")
+                                       Optional asModelElementName As String = "",
+                                       Optional ab0Index As Boolean = False)
 
         Dim lrListItem = New tComboboxItem(asModelElementName, asEAItem, aoTagObject)
 
         If (asEAItem <> "") And Not (Me.AutoComplete.ListBox.FindStringExact(asEAItem) >= 0) Then
-            Me.AutoComplete.ListBox.Items.Add(lrListItem)
+            If ab0Index Then
+                Me.AutoComplete.ListBox.Items.Insert(0, lrListItem)
+            Else
+                Me.AutoComplete.ListBox.Items.Add(lrListItem)
+            End If
             If abSetSelectedIndex Then
                 Me.AutoComplete.ListBox.SelectedIndex = Me.AutoComplete.ListBox.Items.Count - 1
             End If
@@ -140,31 +145,39 @@ Public Class frmFactEngine
     Private Sub AddPredicatePartsToEnterpriseAware(ByVal aarPredicatePart As List(Of FBM.PredicatePart))
 
         Try
-            Dim lasPredicatePartText As New List(Of String)
-
-            For Each lrPredicatePart In aarPredicatePart
-                lasPredicatePartText.AddUnique(lrPredicatePart.PredicatePartText)
-            Next
+            aarPredicatePart.OrderBy(Function(x) x.PredicatePartText)
 
             Dim lbBufferIgnored = False
-            lasPredicatePartText.Sort()
-            For Each lsPredicatePartText In lasPredicatePartText
+
+            For Each lrPredicatePart In aarPredicatePart
                 If zsIntellisenseBuffer.Length > 0 Then
-                    If lsPredicatePartText.StartsWith(zsIntellisenseBuffer, True, System.Globalization.CultureInfo.CurrentUICulture) Then
-                        Call Me.AddEnterpriseAwareItem(lsPredicatePartText, FEQL.TokenType.PREDICATE)
+                    If lrPredicatePart.PredicatePartText.StartsWith(zsIntellisenseBuffer, True, System.Globalization.CultureInfo.CurrentUICulture) Then
+                        If lrPredicatePart.FactTypeReading.PredicatePart.Count > 1 Then
+                            Call Me.AddEnterpriseAwareItem(lrPredicatePart.PredicatePartText, FEQL.TokenType.PREDICATE, , lrPredicatePart.FactTypeReading.PredicatePart(1).Role.JoinedORMObject.Id)
+                        Else
+                            Call Me.AddEnterpriseAwareItem(lrPredicatePart.PredicatePartText, FEQL.TokenType.PREDICATE)
+                        End If
                     End If
                 Else
-                    Call Me.AddEnterpriseAwareItem(lsPredicatePartText, FEQL.TokenType.PREDICATE)
+                    If lrPredicatePart.FactTypeReading.PredicatePart.Count > 1 Then
+                        Call Me.AddEnterpriseAwareItem(lrPredicatePart.PredicatePartText, FEQL.TokenType.PREDICATE, , lrPredicatePart.FactTypeReading.PredicatePart(1).Role.JoinedORMObject.Id)
+                    Else
+                        Call Me.AddEnterpriseAwareItem(lrPredicatePart.PredicatePartText, FEQL.TokenType.PREDICATE)
+                    End If
                     lbBufferIgnored = True
                 End If
 
             Next
 
             If Not lbBufferIgnored Then
-                For Each lsPredicatePartText In lasPredicatePartText
+                For Each lrPredicatePart In aarPredicatePart
                     If zsIntellisenseBuffer.Length > 0 Then
-                        If Not lsPredicatePartText.StartsWith(zsIntellisenseBuffer, True, System.Globalization.CultureInfo.CurrentUICulture) Then
-                            Call Me.AddEnterpriseAwareItem(lsPredicatePartText, FEQL.TokenType.PREDICATE)
+                        If Not lrPredicatePart.PredicatePartText.StartsWith(zsIntellisenseBuffer, True, System.Globalization.CultureInfo.CurrentUICulture) Then
+                            If lrPredicatePart.FactTypeReading.PredicatePart.Count > 1 Then
+                                Call Me.AddEnterpriseAwareItem(lrPredicatePart.PredicatePartText, FEQL.TokenType.PREDICATE, , lrPredicatePart.FactTypeReading.PredicatePart(1).Role.JoinedORMObject.Id)
+                            Else
+                                Call Me.AddEnterpriseAwareItem(lrPredicatePart.PredicatePartText, FEQL.TokenType.PREDICATE)
+                            End If
                         End If
                     End If
                 Next
@@ -450,11 +463,10 @@ Public Class frmFactEngine
                 Case Is = Keys.Escape
                     Call Me.hideAutoComplete()
                     Exit Sub
+                Case Is = Keys.Space, Keys.Down
+                Case Else
+                    Call Me.ProcessAutoComplete(e)
             End Select
-
-            If Not e.KeyCode = Keys.Down Then 'And Not Me.AutoComplete.Visible Then
-                Call Me.ProcessAutoComplete(e)
-            End If
 
             Select Case e.KeyCode
                 Case Is = Keys.F5
@@ -527,9 +539,14 @@ Public Class frmFactEngine
 
             Select Case e.KeyCode
                 Case Is = Keys.Escape, Keys.F5, Keys.Home, Keys.End, Keys.ShiftKey
-                Case Is = Keys.Down
+                Case Is = Keys.Down, Keys.Up, Keys.Space
+
                 Case Else
-                    Call Me.ProcessAutoComplete(New KeyEventArgs(e.KeyCode))
+                    Select Case e.KeyData
+                        Case Is = Keys.A
+                        Case Else
+                            Call Me.ProcessAutoComplete(New KeyEventArgs(e.KeyCode))
+                    End Select
             End Select
 
         Catch ex As Exception
@@ -596,8 +613,15 @@ Public Class frmFactEngine
 
             Call Me.CheckStartProductions(Me.zrTextHighlighter.Tree)
 
-            If Not e.KeyCode = Keys.Up Then
+            If e.KeyCode = Keys.Up And Me.AutoComplete.ListBox.Items.Count > 0 Then
                 Me.AutoComplete.ListBox.Items.Clear()
+            Else
+                Select Case e.KeyCode
+                    Case Is = Keys.Down
+                    Case Else
+                        Me.AutoComplete.ListBox.Items.Clear()
+                End Select
+
             End If
 
             '============================================================================================
@@ -627,9 +651,9 @@ Public Class frmFactEngine
                                 lrModelElement = prApplication.WorkingModel.GetModelObjectByName(lrWHICHSELECTStatement.MODELELEMENTNAME(0))
 
                                 If lrModelElement IsNot Nothing Then
-                                    Dim larFactTypeReading = lrModelElement.getOutgoingFactTypeReadings
+                                    Dim larFactTypeReading = lrModelElement.getOutgoingFactTypeReadings(2)
 
-                                    For Each lrFactTypeReading In lrModelElement.getOutgoingFactTypeReadings
+                                    For Each lrFactTypeReading In larFactTypeReading
                                         If lrFactTypeReading.PredicatePart.Count > 1 Then
                                             Call Me.AddEnterpriseAwareItem(lrFactTypeReading.GetPredicateText, FEQL.TokenType.PREDICATE, , lrFactTypeReading.PredicatePart(1).Role.JoinedORMObject.Id)
                                         Else
@@ -675,6 +699,7 @@ Public Class frmFactEngine
                                     End If
                                 End If
 
+                                'Predicates
                                 Dim lrPredicateModelObject As FBM.ModelObject
                                 If lrLastWhichClause.KEYWDAND IsNot Nothing And lrLastWhichClause.KEYWDTHAT.Count = 1 Then
                                     lrModelElement = prApplication.WorkingModel.GetModelObjectByName(lrLastModelElementNameParseNode.Token.Text)
@@ -687,7 +712,7 @@ Public Class frmFactEngine
                                     lrPredicateModelObject = lrFirstModelElement
                                 End If
 
-                                For Each lrFactTypeReading In lrPredicateModelObject.getOutgoingFactTypeReadings
+                                For Each lrFactTypeReading In lrPredicateModelObject.getOutgoingFactTypeReadings(2)
                                     If lrFactTypeReading.PredicatePart.Count > 1 Then
                                         Call Me.AddEnterpriseAwareItem(lrFactTypeReading.GetPredicateText, FEQL.TokenType.PREDICATE, , lrFactTypeReading.PredicatePart(1).Role.JoinedORMObject.Id)
                                     Else
@@ -704,7 +729,6 @@ Public Class frmFactEngine
 
                 End If
             End If
-
 
             '============================================================================================
 
@@ -856,6 +880,8 @@ Public Class frmFactEngine
                             Else
                                 Call Me.PopulateEnterpriseAwareWithObjectTypes()
                             End If
+
+                            Call Me.AddEnterpriseAwareItem("AND", Nothing, False, , True)
                         Case Is = FEQL.TokenType.MODELELEMENTNAME
                             Me.AutoComplete.Enabled = True
                             'Call Me.PopulateEnterpriseAwareWithObjectTypes()

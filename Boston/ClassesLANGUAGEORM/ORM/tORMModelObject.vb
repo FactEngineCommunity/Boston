@@ -487,7 +487,7 @@ Namespace FBM
 
         End Function
 
-        Public Function getOutgoingFactTypeReadings() As List(Of FBM.FactTypeReading)
+        Public Function getOutgoingFactTypeReadings(Optional ByVal aiMaximumFactTypeArity As Integer = 10) As List(Of FBM.FactTypeReading)
 
             Dim larOutgoingFactType = From FactType In Me.Model.FactType
                                       From Role In FactType.RoleGroup
@@ -497,6 +497,7 @@ Namespace FBM
 
             Dim larFactTypeReading = From FactType In larOutgoingFactType
                                      From FactTypeReading In FactType.FactTypeReading
+                                     Where FactType.Arity <= aiMaximumFactTypeArity
                                      Where FactTypeReading.PredicatePart(0).Role.JoinedORMObject.Id = Me.Id
                                      Select FactTypeReading Distinct
 
