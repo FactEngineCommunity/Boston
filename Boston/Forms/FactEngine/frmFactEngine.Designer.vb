@@ -39,6 +39,10 @@ Partial Class frmFactEngine
         Me.LabelError = New System.Windows.Forms.TextBox()
         Me.TabPageQuery = New System.Windows.Forms.TabPage()
         Me.TextBoxQuery = New System.Windows.Forms.TextBox()
+        Me.ToolStrip2 = New System.Windows.Forms.ToolStrip()
+        Me.ToolStrip3 = New System.Windows.Forms.ToolStrip()
+        Me.ToolStripButtonQueryGO = New System.Windows.Forms.ToolStripButton()
+        Me.LabelHelp = New System.Windows.Forms.Label()
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SplitContainer1.Panel1.SuspendLayout()
         Me.SplitContainer1.Panel2.SuspendLayout()
@@ -48,6 +52,7 @@ Partial Class frmFactEngine
         Me.TabControl1.SuspendLayout()
         Me.TabPageResults.SuspendLayout()
         Me.TabPageQuery.SuspendLayout()
+        Me.ToolStrip3.SuspendLayout()
         Me.SuspendLayout()
         '
         'SplitContainer1
@@ -60,6 +65,7 @@ Partial Class frmFactEngine
         'SplitContainer1.Panel1
         '
         Me.SplitContainer1.Panel1.Controls.Add(Me.TextBoxInput)
+        Me.SplitContainer1.Panel1.Controls.Add(Me.LabelHelp)
         Me.SplitContainer1.Panel1.Controls.Add(Me.ToolStrip1)
         Me.SplitContainer1.Panel1.Controls.Add(Me.StatusStrip2)
         Me.SplitContainer1.Panel1.Controls.Add(Me.StatusStrip1)
@@ -81,7 +87,7 @@ Partial Class frmFactEngine
         Me.TextBoxInput.ForeColor = System.Drawing.Color.Wheat
         Me.TextBoxInput.Location = New System.Drawing.Point(0, 33)
         Me.TextBoxInput.Name = "TextBoxInput"
-        Me.TextBoxInput.Size = New System.Drawing.Size(1178, 231)
+        Me.TextBoxInput.Size = New System.Drawing.Size(1178, 122)
         Me.TextBoxInput.TabIndex = 2
         Me.TextBoxInput.TabStop = False
         Me.TextBoxInput.Text = ""
@@ -170,6 +176,7 @@ Partial Class frmFactEngine
         '
         'TabPageResults
         '
+        Me.TabPageResults.Controls.Add(Me.ToolStrip2)
         Me.TabPageResults.Controls.Add(Me.LabelError)
         Me.TabPageResults.Location = New System.Drawing.Point(4, 29)
         Me.TabPageResults.Name = "TabPageResults"
@@ -193,6 +200,7 @@ Partial Class frmFactEngine
         'TabPageQuery
         '
         Me.TabPageQuery.Controls.Add(Me.TextBoxQuery)
+        Me.TabPageQuery.Controls.Add(Me.ToolStrip3)
         Me.TabPageQuery.Location = New System.Drawing.Point(4, 29)
         Me.TabPageQuery.Name = "TabPageQuery"
         Me.TabPageQuery.Padding = New System.Windows.Forms.Padding(3)
@@ -204,11 +212,49 @@ Partial Class frmFactEngine
         'TextBoxQuery
         '
         Me.TextBoxQuery.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.TextBoxQuery.Location = New System.Drawing.Point(3, 3)
+        Me.TextBoxQuery.Location = New System.Drawing.Point(3, 36)
         Me.TextBoxQuery.Multiline = True
         Me.TextBoxQuery.Name = "TextBoxQuery"
-        Me.TextBoxQuery.Size = New System.Drawing.Size(1164, 223)
+        Me.TextBoxQuery.Size = New System.Drawing.Size(1164, 190)
         Me.TextBoxQuery.TabIndex = 2
+        '
+        'ToolStrip2
+        '
+        Me.ToolStrip2.ImageScalingSize = New System.Drawing.Size(24, 24)
+        Me.ToolStrip2.Location = New System.Drawing.Point(3, 3)
+        Me.ToolStrip2.Name = "ToolStrip2"
+        Me.ToolStrip2.Size = New System.Drawing.Size(1164, 25)
+        Me.ToolStrip2.TabIndex = 2
+        Me.ToolStrip2.Text = "ToolStrip2"
+        '
+        'ToolStrip3
+        '
+        Me.ToolStrip3.ImageScalingSize = New System.Drawing.Size(24, 24)
+        Me.ToolStrip3.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButtonQueryGO})
+        Me.ToolStrip3.Location = New System.Drawing.Point(3, 3)
+        Me.ToolStrip3.Name = "ToolStrip3"
+        Me.ToolStrip3.Size = New System.Drawing.Size(1164, 33)
+        Me.ToolStrip3.TabIndex = 3
+        Me.ToolStrip3.Text = "ToolStrip3"
+        '
+        'ToolStripButtonQueryGO
+        '
+        Me.ToolStripButtonQueryGO.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.ToolStripButtonQueryGO.Image = Global.Boston.My.Resources.MenuImagesMain.GO16x16
+        Me.ToolStripButtonQueryGO.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ToolStripButtonQueryGO.Name = "ToolStripButtonQueryGO"
+        Me.ToolStripButtonQueryGO.Size = New System.Drawing.Size(34, 28)
+        Me.ToolStripButtonQueryGO.Text = "ToolStripButton1"
+        '
+        'LabelHelp
+        '
+        Me.LabelHelp.BackColor = System.Drawing.SystemColors.Info
+        Me.LabelHelp.Dock = System.Windows.Forms.DockStyle.Bottom
+        Me.LabelHelp.Location = New System.Drawing.Point(0, 155)
+        Me.LabelHelp.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
+        Me.LabelHelp.Name = "LabelHelp"
+        Me.LabelHelp.Size = New System.Drawing.Size(1178, 109)
+        Me.LabelHelp.TabIndex = 12
         '
         'frmFactEngine
         '
@@ -233,6 +279,8 @@ Partial Class frmFactEngine
         Me.TabPageResults.PerformLayout()
         Me.TabPageQuery.ResumeLayout(False)
         Me.TabPageQuery.PerformLayout()
+        Me.ToolStrip3.ResumeLayout(False)
+        Me.ToolStrip3.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub
@@ -253,4 +301,8 @@ Partial Class frmFactEngine
     Friend WithEvents TabPageQuery As TabPage
     Friend WithEvents TextBoxQuery As TextBox
     Friend WithEvents TabPageResults As TabPage
+    Friend WithEvents ToolStrip2 As ToolStrip
+    Friend WithEvents ToolStrip3 As ToolStrip
+    Friend WithEvents ToolStripButtonQueryGO As ToolStripButton
+    Friend WithEvents LabelHelp As Label
 End Class

@@ -175,6 +175,11 @@ Namespace FEQL
 
         Public Model As FBM.Model
 
+        ''' <summary>
+        ''' The database manager that handles connection and queries/commands to the database.
+        ''' </summary>
+        Public DatabaseManager As FactEngine.DatabaseManager
+
         Private Parser As New FEQL.Parser(New FEQL.Scanner) 'Used to parse Text input into the Brain; especially for ORMQL.
         Private Parsetree As New FEQL.ParseTree 'Used with the Parser, is populated during the parsing of text input into the Brain; especially ORMQL
 

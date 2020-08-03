@@ -403,6 +403,10 @@ Public Class frmFactEngine
             '===============================================================================
             'Intellisense Buffer. Populate first for AutoComplete below that...
             Select Case e.KeyCode
+                Case Is = Keys.Tab
+                    e.Handled = True
+                    e.SuppressKeyPress = True
+                    Exit Sub
                 Case Is = Keys.Control & Keys.V
                 Case Is = Keys.Back
                     If zsIntellisenseBuffer.Length > 0 Then
@@ -496,6 +500,7 @@ Public Class frmFactEngine
 
             Select Case e.KeyCode
                 Case Is = Keys.Escape, Keys.F5, Keys.Home, Keys.End, Keys.ShiftKey
+                Case Is = Keys.Down
                 Case Else
                     Call Me.ProcessAutoComplete(New KeyEventArgs(e.KeyCode))
             End Select
@@ -772,7 +777,6 @@ Public Class frmFactEngine
 
                 If e.KeyCode = Keys.Down Then
                     If Me.AutoComplete.ListBox.Items.Count > 0 Then
-                        Me.AutoComplete.ListBox.Focus()
                         'Me.AutoComplete.ListBox.SelectedIndex = 0
                         e.Handled = True
                     End If
@@ -1021,51 +1025,57 @@ Public Class frmFactEngine
         Dim liRemoveFromPosition As Integer = -1
         Dim lsSelectedItem As String = ""
 
-        Select Case e.KeyCode
-            Case Is = Keys.Tab
-                '==============================================================
-                'Calculate liRemoveFromPosition to remove relevant characters
-                If Me.TextBoxInput.Text.Substring(Me.TextBoxInput.Text.Length - 1, 1) = " " Then
-                    '---------------------
-                    'Don't remove spaces
-                    '---------------------
-                ElseIf Me.AutoComplete.ListBox.SelectedItem.ToString.Length = 1 Then
-                    If Me.TextBoxInput.Text.Substring(Me.TextBoxInput.Text.Length - 1, 1) = Me.AutoComplete.ListBox.SelectedItem.ToString Then
-                        liRemoveFromPosition = Me.TextBoxInput.Text.Length - 1
-                    End If
-                Else
-                    For liInd = Me.AutoComplete.ListBox.SelectedItem.ToString.Length - 1 To 0 Step -1
-                        lsSubString = Me.AutoComplete.ListBox.SelectedItem.ToString.Substring(0, liInd + 1)
-                        If Me.TextBoxInput.Text.LastIndexOf(Me.AutoComplete.ListBox.SelectedItem.ToString.Substring(0, liInd + 1)) >= 0 Then
-                            If Me.TextBoxInput.Text.LastIndexOf(lsSubString) + lsSubString.Length = Me.TextBoxInput.Text.Length Then
-                                liRemoveFromPosition = Me.TextBoxInput.Text.LastIndexOf(lsSubString)
-                                Exit For
+        Try
+            Select Case e.KeyCode
+                Case Is = Keys.Tab
+                    If Me.AutoComplete.ListBox.Items.Count > 0 Then
+                        Me.AutoComplete.ListBox.SelectedIndex = 0
+                        '==============================================================
+                        'Calculate liRemoveFromPosition to remove relevant characters
+                        If Me.TextBoxInput.Text.Substring(Me.TextBoxInput.Text.Length - 1, 1) = " " Then
+                            '---------------------
+                            'Don't remove spaces
+                            '---------------------
+                        ElseIf Me.AutoComplete.ListBox.SelectedItem.ToString.Length = 1 Then
+                            If Me.TextBoxInput.Text.Substring(Me.TextBoxInput.Text.Length - 1, 1) = Me.AutoComplete.ListBox.SelectedItem.ToString Then
+                                liRemoveFromPosition = Me.TextBoxInput.Text.Length - 1
+                            End If
+                        Else
+                            For liInd = Me.AutoComplete.ListBox.SelectedItem.ToString.Length - 1 To 0 Step -1
+                                lsSubString = Me.AutoComplete.ListBox.SelectedItem.ToString.Substring(0, liInd + 1)
+                                If Me.TextBoxInput.Text.LastIndexOf(Me.AutoComplete.ListBox.SelectedItem.ToString.Substring(0, liInd + 1)) >= 0 Then
+                                    If Me.TextBoxInput.Text.LastIndexOf(lsSubString) + lsSubString.Length = Me.TextBoxInput.Text.Length Then
+                                        liRemoveFromPosition = Me.TextBoxInput.Text.LastIndexOf(lsSubString)
+                                        Exit For
+                                    End If
+                                End If
+                            Next
+                        End If
+
+                        If liRemoveFromPosition >= 0 Then
+                            Me.TextBoxInput.SelectionProtected = False
+                            Dim lsOldText = Me.TextBoxInput.Text
+                            Me.TextBoxInput.Text = ""
+                            If (Me.TextBoxInput.Text.Length - liRemoveFromPosition) <= Me.AutoComplete.ListBox.SelectedItem.ToString.Length Then
+                                Me.TextBoxInput.Text = lsOldText.Remove(liRemoveFromPosition, lsSubString.Length)
                             End If
                         End If
-                    Next
-                End If
 
-                If liRemoveFromPosition >= 0 Then
-                    Me.TextBoxInput.SelectionProtected = False
-                    Dim lsOldText = Me.TextBoxInput.Text
-                    Me.TextBoxInput.Text = ""
-                    If (Me.TextBoxInput.Text.Length - liRemoveFromPosition) <= Me.AutoComplete.ListBox.SelectedItem.ToString.Length Then
-                        Me.TextBoxInput.Text = lsOldText.Remove(liRemoveFromPosition, lsSubString.Length)
+                        If Me.AutoComplete.ListBox.Items.Count > 0 Then
+                            Me.TextBoxInput.SelectionProtected = False
+                            Me.TextBoxInput.SelectionStart = Me.TextBoxInput.Text.Length
+                            If Me.AutoComplete.ListBox.SelectedIndex < 0 Then
+                                Me.TextBoxInput.AppendText(Trim(Me.AutoComplete.ListBox.Items(0).ToString)) 'Text.AppendString
+                            Else
+                                Me.TextBoxInput.AppendText(Trim(Me.AutoComplete.ListBox.SelectedItem.ToString))
+                            End If
+                            Me.TextBoxInput.SelectionColor = Me.TextBoxInput.ForeColor
+                            Me.AutoComplete.Hide()
+                        End If
                     End If
-                End If
-
-                If Me.AutoComplete.ListBox.Items.Count > 0 Then
-                    Me.TextBoxInput.SelectionProtected = False
-                    Me.TextBoxInput.SelectionStart = Me.TextBoxInput.Text.Length
-                    If Me.AutoComplete.ListBox.SelectedIndex < 0 Then
-                        Me.TextBoxInput.AppendText(Trim(Me.AutoComplete.ListBox.Items(0).ToString)) 'Text.AppendString
-                    Else
-                        Me.TextBoxInput.AppendText(Trim(Me.AutoComplete.ListBox.SelectedItem.ToString))
-                    End If
-                    Me.TextBoxInput.SelectionColor = Me.TextBoxInput.ForeColor
-                    Me.AutoComplete.Hide()
-                End If
-        End Select
+            End Select
+        Catch ex As Exception
+        End Try
     End Sub
 
     Private Sub TextBoxInput_MouseLeave(sender As Object, e As EventArgs) Handles TextBoxInput.MouseLeave

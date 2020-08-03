@@ -73,11 +73,13 @@ Public Module publicConstants
     End Enum
 
 
-    <Serializable()> _
+    <Serializable()>
     Public Enum pcenumDatabaseType
+        None = 100
         MSJet = 101
         SQLServer = 102
         ORACLE = 103
+        SQLite = 104
     End Enum
 
     Public Enum pcenumDebugMode
