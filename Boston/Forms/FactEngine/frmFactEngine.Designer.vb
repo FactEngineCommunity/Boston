@@ -22,9 +22,15 @@ Partial Class frmFactEngine
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
+        Me.components = New System.ComponentModel.Container()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmFactEngine))
         Me.SplitContainer1 = New System.Windows.Forms.SplitContainer()
         Me.TextBoxInput = New System.Windows.Forms.RichTextBox()
+        Me.ContextMenuStripFactEngine = New System.Windows.Forms.ContextMenuStrip(Me.components)
+        Me.ToolStripMenuItemHelpTips = New System.Windows.Forms.ToolStripMenuItem()
+        Me.LabelHelp = New System.Windows.Forms.Label()
+        Me.ContextMenuStripHelpLabel = New System.Windows.Forms.ContextMenuStrip(Me.components)
+        Me.HideToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStrip1 = New System.Windows.Forms.ToolStrip()
         Me.ToolStripButtonGO = New System.Windows.Forms.ToolStripButton()
         Me.StatusStrip2 = New System.Windows.Forms.StatusStrip()
@@ -36,17 +42,18 @@ Partial Class frmFactEngine
         Me.StatusStrip1 = New System.Windows.Forms.StatusStrip()
         Me.TabControl1 = New System.Windows.Forms.TabControl()
         Me.TabPageResults = New System.Windows.Forms.TabPage()
+        Me.ToolStrip2 = New System.Windows.Forms.ToolStrip()
         Me.LabelError = New System.Windows.Forms.TextBox()
         Me.TabPageQuery = New System.Windows.Forms.TabPage()
         Me.TextBoxQuery = New System.Windows.Forms.TextBox()
-        Me.ToolStrip2 = New System.Windows.Forms.ToolStrip()
         Me.ToolStrip3 = New System.Windows.Forms.ToolStrip()
         Me.ToolStripButtonQueryGO = New System.Windows.Forms.ToolStripButton()
-        Me.LabelHelp = New System.Windows.Forms.Label()
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SplitContainer1.Panel1.SuspendLayout()
         Me.SplitContainer1.Panel2.SuspendLayout()
         Me.SplitContainer1.SuspendLayout()
+        Me.ContextMenuStripFactEngine.SuspendLayout()
+        Me.ContextMenuStripHelpLabel.SuspendLayout()
         Me.ToolStrip1.SuspendLayout()
         Me.StatusStrip2.SuspendLayout()
         Me.TabControl1.SuspendLayout()
@@ -82,6 +89,7 @@ Partial Class frmFactEngine
         '
         Me.TextBoxInput.AcceptsTab = True
         Me.TextBoxInput.BackColor = System.Drawing.Color.FromArgb(CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer))
+        Me.TextBoxInput.ContextMenuStrip = Me.ContextMenuStripFactEngine
         Me.TextBoxInput.Dock = System.Windows.Forms.DockStyle.Fill
         Me.TextBoxInput.Font = New System.Drawing.Font("Tahoma", 10.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.TextBoxInput.ForeColor = System.Drawing.Color.Wheat
@@ -91,6 +99,46 @@ Partial Class frmFactEngine
         Me.TextBoxInput.TabIndex = 2
         Me.TextBoxInput.TabStop = False
         Me.TextBoxInput.Text = ""
+        '
+        'ContextMenuStripFactEngine
+        '
+        Me.ContextMenuStripFactEngine.ImageScalingSize = New System.Drawing.Size(24, 24)
+        Me.ContextMenuStripFactEngine.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItemHelpTips})
+        Me.ContextMenuStripFactEngine.Name = "ContextMenuStripFactEngine"
+        Me.ContextMenuStripFactEngine.Size = New System.Drawing.Size(241, 69)
+        '
+        'ToolStripMenuItemHelpTips
+        '
+        Me.ToolStripMenuItemHelpTips.Checked = True
+        Me.ToolStripMenuItemHelpTips.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.ToolStripMenuItemHelpTips.Name = "ToolStripMenuItemHelpTips"
+        Me.ToolStripMenuItemHelpTips.Size = New System.Drawing.Size(240, 32)
+        Me.ToolStripMenuItemHelpTips.Text = "&Help Tips"
+        '
+        'LabelHelp
+        '
+        Me.LabelHelp.BackColor = System.Drawing.SystemColors.Info
+        Me.LabelHelp.ContextMenuStrip = Me.ContextMenuStripHelpLabel
+        Me.LabelHelp.Dock = System.Windows.Forms.DockStyle.Bottom
+        Me.LabelHelp.ForeColor = System.Drawing.Color.Silver
+        Me.LabelHelp.Location = New System.Drawing.Point(0, 155)
+        Me.LabelHelp.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
+        Me.LabelHelp.Name = "LabelHelp"
+        Me.LabelHelp.Size = New System.Drawing.Size(1178, 109)
+        Me.LabelHelp.TabIndex = 12
+        '
+        'ContextMenuStripHelpLabel
+        '
+        Me.ContextMenuStripHelpLabel.ImageScalingSize = New System.Drawing.Size(24, 24)
+        Me.ContextMenuStripHelpLabel.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.HideToolStripMenuItem})
+        Me.ContextMenuStripHelpLabel.Name = "ContextMenuStripHelpLabel"
+        Me.ContextMenuStripHelpLabel.Size = New System.Drawing.Size(122, 36)
+        '
+        'HideToolStripMenuItem
+        '
+        Me.HideToolStripMenuItem.Name = "HideToolStripMenuItem"
+        Me.HideToolStripMenuItem.Size = New System.Drawing.Size(121, 32)
+        Me.HideToolStripMenuItem.Text = "&Hide"
         '
         'ToolStrip1
         '
@@ -186,6 +234,15 @@ Partial Class frmFactEngine
         Me.TabPageResults.Text = "Results"
         Me.TabPageResults.UseVisualStyleBackColor = True
         '
+        'ToolStrip2
+        '
+        Me.ToolStrip2.ImageScalingSize = New System.Drawing.Size(24, 24)
+        Me.ToolStrip2.Location = New System.Drawing.Point(3, 3)
+        Me.ToolStrip2.Name = "ToolStrip2"
+        Me.ToolStrip2.Size = New System.Drawing.Size(1164, 25)
+        Me.ToolStrip2.TabIndex = 2
+        Me.ToolStrip2.Text = "ToolStrip2"
+        '
         'LabelError
         '
         Me.LabelError.BackColor = System.Drawing.SystemColors.Control
@@ -218,15 +275,6 @@ Partial Class frmFactEngine
         Me.TextBoxQuery.Size = New System.Drawing.Size(1164, 190)
         Me.TextBoxQuery.TabIndex = 2
         '
-        'ToolStrip2
-        '
-        Me.ToolStrip2.ImageScalingSize = New System.Drawing.Size(24, 24)
-        Me.ToolStrip2.Location = New System.Drawing.Point(3, 3)
-        Me.ToolStrip2.Name = "ToolStrip2"
-        Me.ToolStrip2.Size = New System.Drawing.Size(1164, 25)
-        Me.ToolStrip2.TabIndex = 2
-        Me.ToolStrip2.Text = "ToolStrip2"
-        '
         'ToolStrip3
         '
         Me.ToolStrip3.ImageScalingSize = New System.Drawing.Size(24, 24)
@@ -246,16 +294,6 @@ Partial Class frmFactEngine
         Me.ToolStripButtonQueryGO.Size = New System.Drawing.Size(34, 28)
         Me.ToolStripButtonQueryGO.Text = "ToolStripButton1"
         '
-        'LabelHelp
-        '
-        Me.LabelHelp.BackColor = System.Drawing.SystemColors.Info
-        Me.LabelHelp.Dock = System.Windows.Forms.DockStyle.Bottom
-        Me.LabelHelp.Location = New System.Drawing.Point(0, 155)
-        Me.LabelHelp.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
-        Me.LabelHelp.Name = "LabelHelp"
-        Me.LabelHelp.Size = New System.Drawing.Size(1178, 109)
-        Me.LabelHelp.TabIndex = 12
-        '
         'frmFactEngine
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
@@ -270,6 +308,8 @@ Partial Class frmFactEngine
         Me.SplitContainer1.Panel2.ResumeLayout(False)
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).EndInit()
         Me.SplitContainer1.ResumeLayout(False)
+        Me.ContextMenuStripFactEngine.ResumeLayout(False)
+        Me.ContextMenuStripHelpLabel.ResumeLayout(False)
         Me.ToolStrip1.ResumeLayout(False)
         Me.ToolStrip1.PerformLayout()
         Me.StatusStrip2.ResumeLayout(False)
@@ -305,4 +345,8 @@ Partial Class frmFactEngine
     Friend WithEvents ToolStrip3 As ToolStrip
     Friend WithEvents ToolStripButtonQueryGO As ToolStripButton
     Friend WithEvents LabelHelp As Label
+    Friend WithEvents ContextMenuStripHelpLabel As ContextMenuStrip
+    Friend WithEvents HideToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ContextMenuStripFactEngine As ContextMenuStrip
+    Friend WithEvents ToolStripMenuItemHelpTips As ToolStripMenuItem
 End Class

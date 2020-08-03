@@ -1134,4 +1134,15 @@ Public Class frmFactEngine
     Private Sub TextBoxInput_LostFocus(sender As Object, e As EventArgs) Handles TextBoxInput.LostFocus
         Me.LabelHelp.Text = ""
     End Sub
+
+    Private Sub HideToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles HideToolStripMenuItem.Click
+        Me.ToolStripMenuItemHelpTips.Checked = False
+        Me.LabelHelp.Visible = False
+    End Sub
+
+    Private Sub ToolStripMenuItemHelpTips_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItemHelpTips.Click
+        Me.ToolStripMenuItemHelpTips.Checked = Not Me.ToolStripMenuItemHelpTips.Checked
+
+        Me.LabelHelp.Visible = Me.ToolStripMenuItemHelpTips.Checked
+    End Sub
 End Class
