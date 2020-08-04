@@ -345,6 +345,9 @@
     <Compile Include="ClassesClientServer\tUser.vb" />
     <Compile Include="ClassesDatabase\SQLite\Database.vb" />
     <Compile Include="ClassesFactEngine\Constants.vb" />
+    <Compile Include="ClassesFactEngine\DatabaseManager\DatabaseClasses\tSQLite.vb" />
+    <Compile Include="ClassesFactEngine\DatabaseManager\Interfaces\iDatabaseConnection.vb" />
+    <Compile Include="ClassesFactEngine\DatabaseManager\tDatabaseConnection.vb" />
     <Compile Include="ClassesFactEngine\DatabaseManager\tDatabaseManager.vb" />
     <Compile Include="ClassesFactEngine\FEQLParser\TinyPG\tFEQLParser.vb" />
     <Compile Include="ClassesFactEngine\FEQLParser\TinyPG\tFEQLParseTree.vb" />

@@ -1192,4 +1192,64 @@ Public Class frmFactEngine
 
         Me.LabelHelp.Visible = Me.ToolStripMenuItemHelpTips.Checked
     End Sub
+
+    Private Sub ToolStripButtonQueryGO_Click(sender As Object, e As EventArgs) Handles ToolStripButtonQueryGO.Click
+
+        Dim lrRecordset As New ORMQL.Recordset
+
+        If prApplication.WorkingModel.TargetDatabaseConnectionString = "" Then
+            Me.LabelError.ForeColor = Color.Orange
+            Me.LabelError.Text = "The Model needs a database connection string."
+            Exit Sub
+        End If
+
+        Me.LabelError.Text = ""
+        Dim lsQuery = Me.TextBoxInput.Text.Replace(vbLf, " ")
+        If Me.TextBoxInput.SelectionLength > 0 Then
+            lsQuery = Me.TextBoxInput.SelectedText
+        End If
+
+        lrRecordset = Me.FEQLProcessor.DatabaseManager.GO(lsQuery)
+
+        If lrRecordset.Query IsNot Nothing Then
+            Me.TextBoxQuery.Text = lrRecordset.Query
+        End If
+
+        If lrRecordset.ErrorString IsNot Nothing Then
+            Me.LabelError.BringToFront()
+            Me.LabelError.Text = lrRecordset.ErrorString
+            Me.TabControl1.SelectedTab = Me.TabPageResults
+        Else
+            Select Case lrRecordset.StatementType
+                Case Is = FactEngine.pcenumFEQLStatementType.DESCRIBEStatement
+                    Call Me.DesbribeModelElement(lrRecordset.ModelElement)
+                Case Else
+
+                    Me.LabelError.Text = ""
+
+                    If lrRecordset.Facts.Count = 0 Then
+                        Me.LabelError.ForeColor = Color.Orange
+                        Me.LabelError.Text = "No results returned"
+                    Else
+                        Me.LabelError.ForeColor = Color.Black
+                        Me.LabelError.Text = ""
+
+                        Dim liInd = 0
+                        For Each lsColumnName In lrRecordset.Columns
+                            liInd += 1
+                            Me.LabelError.Text &= " " & lsColumnName & " "
+                            If liInd < lrRecordset.Columns.Count Then Me.LabelError.Text &= ","
+                        Next
+                        Me.LabelError.Text &= vbCrLf & "=======================================" & vbCrLf
+                        For Each lrFact In lrRecordset.Facts
+
+                            Me.LabelError.Text &= lrFact.EnumerateAsBracketedFact(True) & vbCrLf
+                        Next
+                    End If
+            End Select
+        End If
+
+        Me.TabPageResults.Show()
+
+    End Sub
 End Class

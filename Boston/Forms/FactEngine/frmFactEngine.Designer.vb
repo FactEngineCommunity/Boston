@@ -224,8 +224,8 @@ Partial Class frmFactEngine
         '
         'TabPageResults
         '
-        Me.TabPageResults.Controls.Add(Me.ToolStrip2)
         Me.TabPageResults.Controls.Add(Me.LabelError)
+        Me.TabPageResults.Controls.Add(Me.ToolStrip2)
         Me.TabPageResults.Location = New System.Drawing.Point(4, 29)
         Me.TabPageResults.Name = "TabPageResults"
         Me.TabPageResults.Padding = New System.Windows.Forms.Padding(3)
@@ -247,11 +247,11 @@ Partial Class frmFactEngine
         '
         Me.LabelError.BackColor = System.Drawing.SystemColors.Control
         Me.LabelError.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.LabelError.Location = New System.Drawing.Point(3, 3)
+        Me.LabelError.Location = New System.Drawing.Point(3, 28)
         Me.LabelError.Multiline = True
         Me.LabelError.Name = "LabelError"
         Me.LabelError.ScrollBars = System.Windows.Forms.ScrollBars.Vertical
-        Me.LabelError.Size = New System.Drawing.Size(1164, 223)
+        Me.LabelError.Size = New System.Drawing.Size(1164, 198)
         Me.LabelError.TabIndex = 1
         '
         'TabPageQuery
