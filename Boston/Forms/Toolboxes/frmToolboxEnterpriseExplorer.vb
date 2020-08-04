@@ -3987,4 +3987,8 @@ Public Class frmToolboxEnterpriseExplorer
 
 
     End Sub
+
+    Private Sub FactEngineToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles FactEngineToolStripMenuItem.Click
+        Call frmMain.LoadFactEngine()
+    End Sub
 End Class
