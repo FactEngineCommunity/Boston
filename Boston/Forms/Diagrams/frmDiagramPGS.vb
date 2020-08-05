@@ -316,15 +316,23 @@ Public Class frmDiagramPGS
                 End If
 
                 '----------------------------------------------
+                'RDS
+                lrPGSNode.RDSTable = Me.zrPage.Model.RDS.Table.Find(Function(x) x.Name = lrPGSNode.Name)
+
+                '----------------------------------------------
                 'Create a TableNode on the Page for the Entity
                 '----------------------------------------------
                 If lrPGSNode.NodeType <> pcenumPGSEntityType.Relationship Then
                     lrPGSNode.DisplayAndAssociate()
                 End If
 
-                '----------------------------------------------
-                'RDS
-                lrPGSNode.RDSTable = Me.zrPage.Model.RDS.Table.Find(Function(x) x.Name = lrPGSNode.Name)
+                If lrPGSNode.RDSTable.FBMModelElement.ConceptType = pcenumConceptType.FactType Then
+                    If CType(lrPGSNode.RDSTable.FBMModelElement, FBM.FactType).Arity > 2 Then
+                        lrPGSNode.DisplayAndAssociate()
+                    End If
+                End If
+
+
 
                 Me.zrPage.ERDiagram.Entity.Add(lrPGSNode)
 

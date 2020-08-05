@@ -1635,9 +1635,11 @@ Namespace FBM
 
         End Function
 
-        Public Overridable Function HasPrimaryReferenceScheme() As Boolean
+        Public Overrides Function HasPrimaryReferenceScheme() As Boolean
 
-            If Me.HasSimpleReferenceScheme Or Me.HasCompoundReferenceMode Then
+            If Me.IsObjectifyingEntityType Then
+                Return False
+            ElseIf (Me.HasSimpleReferenceScheme Or Me.HasCompoundReferenceMode) Then
                 Return True
             Else
                 Return False

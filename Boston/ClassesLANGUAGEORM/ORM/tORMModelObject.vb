@@ -524,6 +524,15 @@ Namespace FBM
             Return New List(Of ModelObject)
         End Function
 
+        Public Overridable Function HasPrimaryReferenceScheme() As Boolean
+
+            If Me.ConceptType = pcenumConceptType.ValueType Then
+                Return False
+            Else
+                Return Nothing
+            End If
+        End Function
+
         ''' <summary>
         ''' Used for ValueTypes, EntityTypes, Objectified FactTypes. Returns the set of Roles of FactTypes that reference the ModelObject.
         ''' </summary>

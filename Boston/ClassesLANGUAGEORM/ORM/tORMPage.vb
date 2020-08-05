@@ -1324,7 +1324,7 @@ Namespace FBM
 
             Try
                 Dim larEntityTypeInstance = From ETInstance In Me.EntityTypeInstance
-                                            Where ETInstance.EntityType.ReferenceModeRoleConstraint Is Nothing
+                                            Where Not ETInstance.EntityType.IsObjectifyingEntityType And Not ETInstance.EntityType.GetTopmostSupertype.HasPrimaryReferenceScheme
                                             Select ETInstance
 
                 aarEntityTypeInstance = larEntityTypeInstance.ToList
