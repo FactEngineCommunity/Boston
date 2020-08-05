@@ -2350,7 +2350,8 @@ Namespace FBM
 
         End Sub
 
-        Public Sub loadPropertyRelationsForPGSNode(ByRef arPGSNode As PGS.Node)
+        Public Sub loadPropertyRelationsForPGSNode(ByRef arPGSNode As PGS.Node,
+                                                   Optional ByVal abAddToPage As Boolean = False)
 
             Dim lsSQLQuery As String = ""
             Dim lrRecordset As ORMQL.Recordset
@@ -2439,6 +2440,8 @@ Namespace FBM
                             Dim lrRDSRelation As RDS.Relation = Me.Model.RDS.Relation.Find(Function(x) x.Id = lsRelationId)
                             lrRelation.RelationFactType = lrRDSRelation.ResponsibleFactType
 
+                            If abAddToPage Then Call Me.addRDSRelation(lrRDSRelation)
+
                             Dim lrLink As PGS.Link
                             lrLink = New PGS.Link(Me, New FBM.FactInstance, lrNode1, lrNode2, Nothing, Nothing, lrRelation)
                             lrLink.RDSRelation = lrRDSRelation
@@ -2465,7 +2468,8 @@ Namespace FBM
 
         End Sub
 
-        Public Sub loadRelationsForPGSNode(ByRef arPGSNode As PGS.Node)
+        Public Sub loadRelationsForPGSNode(ByRef arPGSNode As PGS.Node,
+                                           Optional ByVal abAddToPage As Boolean = False)
 
             Dim lsSQLQuery As String = ""
             Dim lrRecordset As ORMQL.Recordset
@@ -2542,6 +2546,7 @@ Namespace FBM
                             lasRelationId.Add(lsRelationId)
 
                             Dim lrRDSRelation As RDS.Relation = Me.Model.RDS.Relation.Find(Function(x) x.Id = lsRelationId)
+
                             Dim lrRelation As ERD.Relation
                             If Me.ERDiagram.Relation.FindAll(Function(x) x.Id = lsRelationId).Count = 0 Then
                                 lrRelation = Me.loadCMMLRelation(lrRDSRelation, lrOrigingEREntity, lrDestinationgEREntity)
@@ -2549,6 +2554,8 @@ Namespace FBM
                             Else
                                 lrRelation = Me.ERDiagram.Relation.Find(Function(x) x.Id = lsRelationId)
                             End If
+
+                            If abAddToPage Then Me.addRDSRelation(lrRDSRelation)
 
                             Dim lrLink As PGS.Link
                             lrLink = New PGS.Link(Me, lrFactInstance, lrOrigingEREntity, lrDestinationgEREntity, Nothing, Nothing, lrRelation)

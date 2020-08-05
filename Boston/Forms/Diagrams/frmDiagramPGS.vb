@@ -1144,7 +1144,7 @@ Public Class frmDiagramPGS
                         lo_link.Pen.Width = 0.001
                         lo_link.Locked = True
                         Me.zrPage.Diagram.Links.Add(lo_link)
-                        lrSubtypeEntity.Shape.OutgoingLinks.Add(lo_link)
+                        'lrSubtypeEntity.Shape.OutgoingLinks.Add(lo_link)
                     End If
                 Next
 
@@ -1741,8 +1741,8 @@ Public Class frmDiagramPGS
                 lrNode.RDSTable = lrTable 'IMPORTANT: Leave this at this point in the code.
                 Call Me.zrPage.DropExistingPGSNodeAtPoint(lrNode, loPointF)
 
-                Call Me.zrPage.loadRelationsForPGSNode(lrNode)
-                Call Me.zrPage.loadPropertyRelationsForPGSNode(lrNode)
+                Call Me.zrPage.loadRelationsForPGSNode(lrNode, True)
+                Call Me.zrPage.loadPropertyRelationsForPGSNode(lrNode, True)
             End If
 
         End If
@@ -1794,7 +1794,9 @@ Public Class frmDiagramPGS
 
 
         Dim lo_point As System.Drawing.PointF
-        Dim loNode As DiagramNode
+        Dim loNode As DiagramNode = Nothing
+
+        Me.DiagramView.ContextMenuStrip = ContextMenuStrip_Diagram
 
         lo_point = Me.DiagramView.ClientToDoc(e.Location)
 
@@ -1913,10 +1915,11 @@ Public Class frmDiagramPGS
             End If
 
         ElseIf e.Button = Windows.Forms.MouseButtons.Right Then
-        '------------------------------------------------
-        'Keep, so that ContextMenu is not changed from
-        '  how set in Diagram.NodeSelected
-        '-----------------------------------------------
+            '------------------------------------------------
+            'Keep, so that ContextMenu is not changed from
+            '  how set in Diagram.NodeSelected
+            '-----------------------------------------------
+            If loNode IsNot Nothing Then Me.DiagramView.ContextMenuStrip = Me.ContextMenuStrip_Node
         Else
         '------------------------------------------------
         'User Left-Clicked on the Canvas
