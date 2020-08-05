@@ -70,6 +70,7 @@ Namespace PGS
             Me.Model = arPage.Model
             Me.FactData.Model = arPage.Model
             Me.FactData.Name = asEntityName
+            Me.FactData.Concept = New FBM.Concept(asEntityName)
             Me.FactData.Data = asEntityName
             Me.Name = asEntityName
 

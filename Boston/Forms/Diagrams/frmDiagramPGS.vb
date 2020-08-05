@@ -1380,6 +1380,9 @@ Public Class frmDiagramPGS
                     Else
                         Me.MorphVector(0).EndSize = New Rectangle(0, 0, 20, 10)
                     End If
+
+                    Me.MorphVector(0).VectorSteps = Math.Abs(lrFactTypeInstance.X - lrNode.X) / 2
+
                 ElseIf IsSomething(lrEntityTypeInstance) Then
                     Me.MorphVector(0).EndPoint = New Point(lrEntityTypeInstance.X, lrEntityTypeInstance.Y)
                     If lrEntityTypeInstance.Shape IsNot Nothing Then
@@ -1390,6 +1393,8 @@ Public Class frmDiagramPGS
                     Else
                         Me.MorphVector(0).EndSize = New Rectangle(0, 0, 20, 10)
                     End If
+
+                    Me.MorphVector(0).VectorSteps = Math.Abs(lrEntityTypeInstance.X - lrNode.X) / 3
                 End If
 
             End If
