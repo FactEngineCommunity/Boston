@@ -1261,7 +1261,10 @@ Public Class frmMain
 
     End Function
 
-    Public Function load_PGS_diagram_view(ByRef arPage As FBM.Page, ByVal ao_tree_node As TreeNode, Optional ByVal asSelectModelElementId As String = Nothing) As Object
+    Public Function load_PGS_diagram_view(ByRef arPage As FBM.Page,
+                                          ByVal ao_tree_node As TreeNode,
+                                          Optional ByVal asSelectModelElementId As String = Nothing,
+                                          Optional ByVal abLoadToolboxes As Boolean = True) As Object
 
         Dim child As New frmDiagramPGS
 
@@ -1289,6 +1292,11 @@ Public Class frmMain
         'Setup the 'Page' (i.e. Load the Event Trace Diagram)
         '---------------------------------------------------------------        
         Call child.loadPGSDiagramPage(arPage, ao_tree_node, asSelectModelElementId)
+
+        If abLoadToolboxes Then
+            Call Me.ShowHideToolboxes(True)
+            Call Me.ShowHideMenuOptions()
+        End If
 
         Return child
 
@@ -1965,6 +1973,11 @@ Public Class frmMain
                     lrfrmERDiagram = lrForm
                     lrfrmERDiagram.DiagramView.ZoomFactor = ToolStripComboBox_zoom.SelectedItem.itemdata
                     lrfrmERDiagram.Diagram.Invalidate()
+
+                ElseIf TypeOf (lrForm) Is frmDiagramPGS Then
+                    Dim lrfrmPGSiagram As frmDiagramPGS = lrForm
+                    lrfrmPGSiagram.DiagramView.ZoomFactor = ToolStripComboBox_zoom.SelectedItem.itemdata
+                    lrfrmPGSiagram.Diagram.Invalidate()
                 End If
             End If
 

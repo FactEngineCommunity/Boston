@@ -332,8 +332,6 @@ Public Class frmDiagramPGS
                     End If
                 End If
 
-
-
                 Me.zrPage.ERDiagram.Entity.Add(lrPGSNode)
 
                 lrRecordset.MoveNext()
@@ -360,11 +358,13 @@ Public Class frmDiagramPGS
                 Dim lsRelationId As String = ""
 
                 lrOriginatingNode.Symbol = lrRecordset("Entity").Data
+
                 lsRelationId = lrRecordset("Relation").Data
 
                 lrOriginatingNode = Me.zrPage.ERDiagram.Entity.Find(AddressOf lrOriginatingNode.EqualsBySymbol)
 
-                If lrOriginatingNode.NodeType = pcenumPGSEntityType.Relationship Then
+                If (lrOriginatingNode.NodeType = pcenumPGSEntityType.Relationship) And
+                    (lrOriginatingNode.RDSTable.Arity < 3) Then
 
 
                     'For binary-manyToMany relations, the ORM relationship is actually a PGS relation, rather than a PGS Node.
@@ -458,10 +458,10 @@ Public Class frmDiagramPGS
                     End If
                 Else 'Is Not a PGSRelation
 
-                        '-----------------------------
-                        'Find the Destination Entity
-                        '-----------------------------
-                        Dim lrDestinationNode As New PGS.Node
+                    '-----------------------------
+                    'Find the Destination Entity
+                    '-----------------------------
+                    Dim lrDestinationNode As New PGS.Node
 
                     lsSQLQuery = "SELECT *"
                     lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreRelationHasDestinationEntity.ToString
@@ -618,6 +618,10 @@ Public Class frmDiagramPGS
 
                 lrRecordset.MoveNext()
             End While
+
+            '==================================================================
+            'Subtype Relationships
+            Call Me.mapSubtypeRelationships
 
             If Me.areAllEntitiesAtPoint00() Then
                 Call Me.autoLayout()
@@ -993,14 +997,13 @@ Public Class frmDiagramPGS
                     For Each lrLink In lrShapeNode.OutgoingLinks
                         lrLink.SegmentCount = 2
                         lrLink.SegmentCount = 1
-
-                        lrLink.Tag.setPredicate()
+                        If lrLink.Tag IsNot Nothing Then lrLink.Tag.setPredicate()
                     Next
                     For Each lrLink In lrShapeNode.IncomingLinks
                         lrLink.SegmentCount = 2
                         lrLink.SegmentCount = 1
 
-                        lrLink.Tag.setPredicate()
+                        If lrLink.Tag IsNot Nothing Then lrLink.Tag.setPredicate()
                     Next
                 Case Else
             End Select
@@ -1114,6 +1117,47 @@ Public Class frmDiagramPGS
             lrToolboxForm.zrModel = Me.zrPage.Model
             Call lrToolboxForm.VerbalisePGSNode(lrNode)
         End If
+
+    End Sub
+
+    Public Sub mapSubtypeRelationships()
+
+        Try
+            Dim lrEntity, lrSubtypeEntity As PGS.Node
+
+            For Each lrEntity In Me.zrPage.ERDiagram.Entity
+
+                Dim lrRDSTable = lrEntity.getCorrespondingRDSTable
+
+                For Each lrSubtypeTable In lrRDSTable.getSubtypeTables
+
+                    lrSubtypeEntity = Me.zrPage.ERDiagram.Entity.Find(Function(x) x.Name = lrSubtypeTable.Name)
+
+                    If lrSubtypeEntity IsNot Nothing Then
+                        Dim lo_link As New DiagramLink(Me.zrPage.Diagram, lrSubtypeEntity.Shape, lrEntity.Shape)
+                        lo_link.HeadShape = ArrowHead.Arrow
+                        lo_link.Pen.Color = Color.Gray
+                        lo_link.HeadPen.Color = Color.Gray
+                        lo_link.ShadowColor = Color.White
+                        lo_link.HeadShapeSize = 3
+                        lo_link.Pen.DashStyle = DashStyle.Dash
+                        lo_link.Pen.Width = 0.001
+                        lo_link.Locked = True
+                        Me.zrPage.Diagram.Links.Add(lo_link)
+                        lrSubtypeEntity.Shape.OutgoingLinks.Add(lo_link)
+                    End If
+                Next
+
+            Next
+
+        Catch ex As Exception
+            Dim lsMessage1 As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 
@@ -1927,98 +1971,114 @@ Public Class frmDiagramPGS
 
     Sub resetNodeAndLinkColors()
 
-        Dim liInd As Integer = 0
+        Try
+            Dim liInd As Integer = 0
 
-        DiagramView.SmoothingMode = SmoothingMode.HighQuality
+            DiagramView.SmoothingMode = SmoothingMode.HighQuality
 
-        '------------------------------------------------------------------------------------
-        'Reset the border colors of the ShapeNodes (to what they were before being selected
-        '------------------------------------------------------------------------------------
-        For liInd = 1 To Diagram.Nodes.Count
-            Select Case Diagram.Nodes(liInd - 1).Tag.ConceptType
-                Case Is = pcenumConceptType.PGSNode
-                    Diagram.Nodes(liInd - 1).Pen.Color = Color.DeepSkyBlue
-                Case Else
-                    Diagram.Nodes(liInd - 1).Pen.Color = Color.Black
-            End Select
-        Next
+            '------------------------------------------------------------------------------------
+            'Reset the border colors of the ShapeNodes (to what they were before being selected
+            '------------------------------------------------------------------------------------
+            For liInd = 1 To Diagram.Nodes.Count
+                Select Case Diagram.Nodes(liInd - 1).Tag.ConceptType
+                    Case Is = pcenumConceptType.PGSNode
+                        Diagram.Nodes(liInd - 1).Pen.Color = Color.DeepSkyBlue
+                    Case Else
+                        Diagram.Nodes(liInd - 1).Pen.Color = Color.Black
+                End Select
+            Next
 
-        For liInd = 1 To Diagram.Links.Count
-            Diagram.Links(liInd - 1).Pen.Color = Color.DeepSkyBlue
-        Next
+            Dim lrLink As DiagramLink
+            For Each lrLink In Diagram.Links
+                If lrLink.Tag IsNot Nothing Then
+                    lrLink.Pen.Color = Color.DeepSkyBlue
+                End If
+            Next
+            'For liInd = 1 To Diagram.Links.Count
+            '    Diagram.Links(liInd - 1).Pen.Color = Color.DeepSkyBlue
+            'Next
 
-        '===========================================
-        Dim lrLink As DiagramLink
-        For liInd = 1 To Diagram.Links.Count
+            '===========================================
+            For liInd = 1 To Diagram.Links.Count
 
-            lrLink = Diagram.Links(liInd - 1)
+                lrLink = Diagram.Links(liInd - 1)
 
-            'Reset the text to ""
-            'lrLink.Text = ""            
-            lrLink.TextStyle = LinkTextStyle.Rotate            
-            Dim lrPGSLink As PGS.Link = lrLink.Tag
-            Call lrPGSLink.setPredicate()
+                'Reset the text to ""
+                'lrLink.Text = ""            
+                lrLink.TextStyle = LinkTextStyle.Rotate
+                Dim lrPGSLink As PGS.Link = lrLink.Tag
 
-            Call lrPGSLink.setHeadShapes()
-            '--------------------------------
-            'Disambiguate overlapping links
-            '--------------------------------
-            Dim commonLinks As DiagramLinkCollection = GetCommonLinks(lrLink.Origin, lrLink.Destination)
+                If lrPGSLink IsNot Nothing Then
+                    Call lrPGSLink.setPredicate()
 
-            Dim pt1 As PointF = lrLink.ControlPoints(0)
-            Dim pt2 As PointF = lrLink.ControlPoints(lrLink.ControlPoints.Count - 1)
+                    Call lrPGSLink.setHeadShapes()
+                    '--------------------------------
+                    'Disambiguate overlapping links
+                    '--------------------------------
+                    Dim commonLinks As DiagramLinkCollection = GetCommonLinks(lrLink.Origin, lrLink.Destination)
 
-            If commonLinks.Count > 1 Then
-                For c As Integer = 0 To commonLinks.Count - 1
+                    Dim pt1 As PointF = lrLink.ControlPoints(0)
+                    Dim pt2 As PointF = lrLink.ControlPoints(lrLink.ControlPoints.Count - 1)
 
-                    Dim link As DiagramLink = commonLinks(c)
+                    If commonLinks.Count > 1 Then
+                        For c As Integer = 0 To commonLinks.Count - 1
 
-                    If link.Origin Is link.Destination Then
+                            Dim link As DiagramLink = commonLinks(c)
 
+                            If link.Origin Is link.Destination Then
+
+                            Else
+                                '===================================                        
+                                'If Not link.Tag.HasBeenMoved Then
+                                link.Style = LinkStyle.Bezier
+                                link.SegmentCount = 1 'Keep as 1, because bows () links. 2 makes funny bezier links.
+
+                                Dim cp1 As New PointF(pt1.X + 1 * (pt2.X - pt1.X) / 3, pt1.Y + 1 * (pt2.Y - pt1.Y) / 3)
+                                Dim cp2 As New PointF(pt1.X + 2 * (pt2.X - pt1.X) / 3, pt1.Y + 2 * (pt2.Y - pt1.Y) / 3)
+
+                                Dim angle As Single = 0, radius As Single = 0
+                                CarteseanToPolar(pt1, pt2, angle, radius)
+
+                                Dim pairOffset As Integer = (c / 2 + 1) * 5
+                                'If commonLinks.Count Mod 2 = 0 Then
+                                PolarToCartesean(cp1, If(c Mod 2 = 0, angle - 90, angle + 90), pairOffset, cp1)
+                                PolarToCartesean(cp2, If(c Mod 2 = 0, angle - 90, angle + 90), pairOffset, cp2)
+
+                                If link.ControlPoints(0) = pt1 Then
+                                    link.ControlPoints(1) = cp1
+                                    link.ControlPoints(2) = cp2
+                                Else
+                                    link.ControlPoints(1) = cp2
+                                    link.ControlPoints(2) = cp1
+                                End If
+
+                                'link.Tag.HasBeenMoved = True
+
+                                link.UpdateFromPoints()
+
+                                '===================================
+                            End If
+                        Next
                     Else
-                        '===================================                        
-                        'If Not link.Tag.HasBeenMoved Then
-                        link.Style = LinkStyle.Bezier
-                        link.SegmentCount = 1 'Keep as 1, because bows () links. 2 makes funny bezier links.
-
-                        Dim cp1 As New PointF(pt1.X + 1 * (pt2.X - pt1.X) / 3, pt1.Y + 1 * (pt2.Y - pt1.Y) / 3)
-                        Dim cp2 As New PointF(pt1.X + 2 * (pt2.X - pt1.X) / 3, pt1.Y + 2 * (pt2.Y - pt1.Y) / 3)
-
-                        Dim angle As Single = 0, radius As Single = 0
-                        CarteseanToPolar(pt1, pt2, angle, radius)
-
-                        Dim pairOffset As Integer = (c / 2 + 1) * 5
-                        'If commonLinks.Count Mod 2 = 0 Then
-                        PolarToCartesean(cp1, If(c Mod 2 = 0, angle - 90, angle + 90), pairOffset, cp1)
-                        PolarToCartesean(cp2, If(c Mod 2 = 0, angle - 90, angle + 90), pairOffset, cp2)
-
-                        If link.ControlPoints(0) = pt1 Then
-                            link.ControlPoints(1) = cp1
-                            link.ControlPoints(2) = cp2
-                        Else
-                            link.ControlPoints(1) = cp2
-                            link.ControlPoints(2) = cp1
-                        End If
-
-                        'link.Tag.HasBeenMoved = True
-
-                        link.UpdateFromPoints()
-
-                        '===================================
+                        'lrLink.AutoRoute = True
+                        lrLink.SegmentCount = 2
+                        lrLink.SegmentCount = 1
                     End If
-                Next
-            Else
-                'lrLink.AutoRoute = True
-                lrLink.SegmentCount = 2
-                lrLink.SegmentCount = 1
-            End If
 
+                End If
+            Next
+            '===========================================
 
-        Next
-        '===========================================
+            Me.Diagram.Invalidate()
 
+        Catch ex As Exception
+            Dim lsMessage1 As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
-        Me.Diagram.Invalidate()
+            lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 
@@ -3096,5 +3156,24 @@ Public Class frmDiagramPGS
     Private Sub ToolStripMenuItemEdgeReadingEditor_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItemEdgeReadingEditor.Click
         prApplication.WorkingPage = Me.zrPage
         Call frmMain.loadToolboxORMReadingEditor(Me.zrPage, Me.DockPanel.ActivePane)
+    End Sub
+
+    Private Sub DiagramView_MouseWheel(sender As Object, e As MouseEventArgs) Handles DiagramView.MouseWheel
+
+        Select Case e.Delta
+            Case Is = 0
+                'Do Nothing
+            Case Is < 0
+                If frmMain.ToolStripComboBox_zoom.SelectedIndex > 0 Then
+                    frmMain.ToolStripComboBox_zoom.SelectedIndex -= 1
+                End If
+            Case Is > 0
+                If frmMain.ToolStripComboBox_zoom.SelectedIndex < frmMain.ToolStripComboBox_zoom.Items.Count Then
+                    If frmMain.ToolStripComboBox_zoom.SelectedIndex < frmMain.ToolStripComboBox_zoom.Items.Count - 1 Then
+                        frmMain.ToolStripComboBox_zoom.SelectedIndex += 1
+                    End If
+                End If
+        End Select
+
     End Sub
 End Class

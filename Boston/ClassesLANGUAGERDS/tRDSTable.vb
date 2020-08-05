@@ -40,6 +40,16 @@ Namespace RDS
             End Get
         End Property
 
+        Public ReadOnly Property Arity As Integer
+            Get
+                If Me.FBMModelElement.ConceptType = pcenumConceptType.FactType Then
+                    Return CType(Me.FBMModelElement, FBM.FactType).Arity
+                Else
+                    Return 0
+                End If
+            End Get
+        End Property
+
         Public Event ColumnRemoved(ByVal arColumn As RDS.Column)
         Public Event ColumnAdded(ByRef arColumn As RDS.Column)
         Public Event IndexAdded(ByRef arIndex As RDS.Index)
