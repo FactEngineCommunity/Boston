@@ -654,7 +654,7 @@ Namespace FBM
             Dim liGreaterWidth As Integer = 0
 
             Try
-                If Me.IsObjectifyingEntityType Then
+                If Me.EntityType.IsObjectifyingEntityType Then
                     '--------------------------------------------------------
                     'Objectifying EntityTypes are hidden and not displayed.
                     '--------------------------------------------------------
@@ -1826,10 +1826,13 @@ Namespace FBM
                             Me.ReferenceModeRoleConstraint = Me.EntityType.ReferenceModeRoleConstraint.CloneInstance(Me.Page, True)
                         End If
 
-                        Call Me.HideTheReferenceScheme()
+                        If Me.ReferenceModeShape IsNot Nothing Then
+                            Call Me.HideTheReferenceScheme()
+                        End If
+
 
                     End If
-                End If
+                    End If
 
                 Me.Page.Invalidate()
 

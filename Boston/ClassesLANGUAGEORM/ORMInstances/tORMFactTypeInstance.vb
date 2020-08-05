@@ -363,10 +363,11 @@ Namespace FBM
                                     Call lrLinkFactType.Clone(arPage.Model, abAddToPage, lrLinkFactType.IsMDAModelElement)
                                 Next
 
-                                '  Move Relations that reference this FactType to their respective LinkFactType
-                                If Not abIsMDAmodelElement Then
-                                    Call arPage.Model.moveRelationsOfFactTypeToRespectiveLinkFactTypes(lrFactType)
-                                End If
+                                '20200805-VM-I don't know why this code was here at all. Remove if all okay.
+                                'Move Relations that reference this FactType to their respective LinkFactType
+                                'If Not abIsMDAmodelElement Then
+                                '    Call arPage.Model.moveRelationsOfFactTypeToRespectiveLinkFactTypes(lrFactType)
+                                'End If
                             End If
                         End If
 

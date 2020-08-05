@@ -1042,6 +1042,14 @@ Namespace FBM
                         lrConceptInstance.Y = lrRoleConstraintInstance.Y
 
                         If Me.Model.RoleConstraint.Exists(AddressOf lrRoleConstraintInstance.RoleConstraint.Equals) Then
+
+                            'Make sure the RoleConstraint is in the ModelDictionary
+                            Call Me.Model.AddModelDictionaryEntry(New FBM.DictionaryEntry(Me.Model,
+                                                                                          lrRoleConstraintInstance.RoleConstraint.Id,
+                                                                                          pcenumConceptType.RoleConstraint),
+                                                                                          ,
+                                                                                          True)
+
                             '-----------------------------------------------------------------------------------------------------------------------
                             'Client/Server: Model.Add<ModelElement> would normally drop the ConceptInstance on the Page, but its not being called;
                             '  so we do the Client/Server broadcast processing here.
@@ -1176,6 +1184,14 @@ Namespace FBM
             'Add the RoleConstraint to the Model if it is not already within the Model.
             '----------------------------------------------------------------------------
             If Me.Model.RoleConstraint.Exists(AddressOf arRoleConstraint.Equals) Then
+
+                'Make sure the RoleConstraint is in the ModelDictionary
+                Call Me.Model.AddModelDictionaryEntry(New FBM.DictionaryEntry(Me.Model,
+                                                                              arRoleConstraint.Id,
+                                                                              pcenumConceptType.RoleConstraint),
+                                                                              ,
+                                                                              True)
+
                 '-----------------------------------------------------------------------------------------------------------------------
                 'Client/Server: Model.Add<ModelElement> would normally drop the ConceptInstance on the Page, but its not being called;
                 '  so we do the Client/Server broadcast processing here.
