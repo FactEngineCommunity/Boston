@@ -341,60 +341,62 @@
                 'Get the records
                 Dim lsSQLQuery = lrQueryGraph.generateSQL
 
-                lrRecordset.Query = lsSQLQuery
+                Dim lrTestRecordset = Me.DatabaseManager.GO(lsSQLQuery)
 
-                '==========================================================
-                'Populate the lrRecordset with results from the database
-                'Richmond.WriteToStatusBar("Connecting to database.", True)
-                Dim lrSQLiteConnection = Database.CreateConnection(Me.Model.TargetDatabaseConnectionString)
-                Dim lrSQLiteDataReader = Database.getReaderForSQL(lrSQLiteConnection, lsSQLQuery)
+                'lrRecordset.Query = lsSQLQuery
 
-                Dim larFact As New List(Of FBM.Fact)
-                Dim lrFactType = New FBM.FactType(Me.Model, "DummyFactType", True)
-                Dim lrFact As FBM.Fact
-                'Richmond.WriteToStatusBar("Reading results.", True)
+                ''==========================================================
+                ''Populate the lrRecordset with results from the database
+                ''Richmond.WriteToStatusBar("Connecting to database.", True)
+                'Dim lrSQLiteConnection = Database.CreateConnection(Me.Model.TargetDatabaseConnectionString)
+                'Dim lrSQLiteDataReader = Database.getReaderForSQL(lrSQLiteConnection, lsSQLQuery)
 
-                '=====================================================
-                'Column Names        
-                Dim larProjectColumn = lrQueryGraph.getProjectionColumns
-                Dim lsColumnName As String
+                'Dim larFact As New List(Of FBM.Fact)
+                'Dim lrFactType = New FBM.FactType(Me.Model, "DummyFactType", True)
+                'Dim lrFact As FBM.Fact
+                ''Richmond.WriteToStatusBar("Reading results.", True)
 
-                For Each lrProjectColumn In larProjectColumn
-                    lrRecordset.Columns.Add(lrProjectColumn.Name)
-                    lsColumnName = lrFactType.CreateUniqueRoleName(lrProjectColumn.Name, 0)
-                    Dim lrRole = New FBM.Role(lrFactType, lsColumnName, True, Nothing)
-                    lrFactType.RoleGroup.AddUnique(lrRole)
-                Next
+                ''=====================================================
+                ''Column Names        
+                'Dim larProjectColumn = lrQueryGraph.getProjectionColumns
+                'Dim lsColumnName As String
 
-                While lrSQLiteDataReader.Read()
+                'For Each lrProjectColumn In larProjectColumn
+                '    lrRecordset.Columns.Add(lrProjectColumn.Name)
+                '    lsColumnName = lrFactType.CreateUniqueRoleName(lrProjectColumn.Name, 0)
+                '    Dim lrRole = New FBM.Role(lrFactType, lsColumnName, True, Nothing)
+                '    lrFactType.RoleGroup.AddUnique(lrRole)
+                'Next
 
-                    lrFact = New FBM.Fact(lrFactType, False)
-                    Dim loFieldValue As Object = Nothing
-                    Dim liInd As Integer
-                    For liInd = 0 To lrSQLiteDataReader.FieldCount - 1
-                        Select Case lrSQLiteDataReader.GetFieldType(liInd)
-                            Case Is = GetType(String)
-                                loFieldValue = lrSQLiteDataReader.GetString(liInd)
-                            Case Else
-                                loFieldValue = lrSQLiteDataReader.GetValue(liInd)
-                        End Select
+                'While lrSQLiteDataReader.Read()
 
-                        Try
-                            lrFact.Data.Add(New FBM.FactData(lrFactType.RoleGroup(liInd), New FBM.Concept(loFieldValue), lrFact))
-                            '=====================================================
-                        Catch
-                            Throw New Exception("Tried to add a recordset Column that is not in the Project Columns. Column Index: " & liInd)
-                        End Try
-                    Next
+                '    lrFact = New FBM.Fact(lrFactType, False)
+                '    Dim loFieldValue As Object = Nothing
+                '    Dim liInd As Integer
+                '    For liInd = 0 To lrSQLiteDataReader.FieldCount - 1
+                '        Select Case lrSQLiteDataReader.GetFieldType(liInd)
+                '            Case Is = GetType(String)
+                '                loFieldValue = lrSQLiteDataReader.GetString(liInd)
+                '            Case Else
+                '                loFieldValue = lrSQLiteDataReader.GetValue(liInd)
+                '        End Select
 
-                    larFact.Add(lrFact)
+                '        Try
+                '            lrFact.Data.Add(New FBM.FactData(lrFactType.RoleGroup(liInd), New FBM.Concept(loFieldValue), lrFact))
+                '            '=====================================================
+                '        Catch
+                '            Throw New Exception("Tried to add a recordset Column that is not in the Project Columns. Column Index: " & liInd)
+                '        End Try
+                '    Next
 
-                End While
-                lrRecordset.Facts = larFact
-                lrSQLiteConnection.Close()
+                '    larFact.Add(lrFact)
+
+                'End While
+                'lrRecordset.Facts = larFact
+                'lrSQLiteConnection.Close()
 
                 'Run the SQL against the database
-                Return lrRecordset
+                Return lrTestRecordset
 
             Catch ex As Exception
                 If ex.InnerException Is Nothing Then

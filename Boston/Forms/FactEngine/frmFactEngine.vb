@@ -315,6 +315,7 @@ Public Class frmFactEngine
                 Me.ToolStripStatusLabelRequiresConnectionString.Text = "Model requires a database connection string"
             Else
                 Me.ToolStripStatusLabelRequiresConnectionString.Text = ""
+                Call Me.FEQLProcessor.DatabaseManager.establishConnection(pcenumDatabaseType.SQLite, prApplication.WorkingModel.TargetDatabaseConnectionString)
             End If
         End If
 

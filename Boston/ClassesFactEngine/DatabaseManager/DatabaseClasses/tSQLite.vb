@@ -36,7 +36,7 @@ Namespace FactEngine
             'Column Names   
             '20200805-VM-To Do
             'Dim larProjectColumn = lrQueryGraph.getProjectionColumns
-            'Dim lsColumnName As String
+            Dim lsColumnName As String
 
             'For Each lrProjectColumn In larProjectColumn
             '    lrRecordset.Columns.Add(lrProjectColumn.Name)
@@ -44,6 +44,13 @@ Namespace FactEngine
             '    Dim lrRole = New FBM.Role(lrFactType, lsColumnName, True, Nothing)
             '    lrFactType.RoleGroup.AddUnique(lrRole)
             'Next
+
+            For liFieldInd = 0 To lrSQLiteDataReader.FieldCount - 1
+                lsColumnName = lrFactType.CreateUniqueRoleName(lrSQLiteDataReader.GetName(liFieldInd), 0)
+                Dim lrRole = New FBM.Role(lrFactType, lsColumnName, True, Nothing)
+                lrFactType.RoleGroup.AddUnique(lrRole)
+                lrRecordset.Columns.Add(lsColumnName)
+            Next
 
             While lrSQLiteDataReader.Read()
 
