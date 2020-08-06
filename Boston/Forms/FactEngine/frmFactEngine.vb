@@ -661,7 +661,6 @@ Public Class frmFactEngine
                 Else
                     Select Case Me.FEQLProcessor.getWhichStatementType(Trim(Me.TextBoxInput.Text), True)
                         Case Is = FactEngine.pcenumFEQLStatementType.WHICHSELECTStatement
-
                             Dim lrWHICHSELECTStatement As New FEQL.WHICHSELECTStatement
                             Call Me.FEQLProcessor.GetParseTreeTokensReflection(lrWHICHSELECTStatement, Me.zrTextHighlighter.Tree.Nodes(0))
 
@@ -730,17 +729,22 @@ Public Class frmFactEngine
                                     lrPredicateModelObject = lrFirstModelElement
                                 End If
 
-                                For Each lrFactTypeReading In lrPredicateModelObject.getOutgoingFactTypeReadings(2)
-                                    If lrFactTypeReading.PredicatePart.Count > 1 Then
-                                        Call Me.AddEnterpriseAwareItem(lrFactTypeReading.GetPredicateText, FEQL.TokenType.PREDICATE, , lrFactTypeReading.PredicatePart(1).Role.JoinedORMObject.Id)
-                                    Else
-                                        Call Me.AddEnterpriseAwareItem(lrFactTypeReading.GetPredicateText, FEQL.TokenType.PREDICATE)
-                                    End If
-                                Next
+                                If lrPredicateModelObject IsNot Nothing Then
 
-                                If Me.AutoComplete.Visible = False Then
-                                    Me.showAutoCompleteForm()
+
+                                    For Each lrFactTypeReading In lrPredicateModelObject.getOutgoingFactTypeReadings(2)
+                                        If lrFactTypeReading.PredicatePart.Count > 1 Then
+                                            Call Me.AddEnterpriseAwareItem(lrFactTypeReading.GetPredicateText, FEQL.TokenType.PREDICATE, , lrFactTypeReading.PredicatePart(1).Role.JoinedORMObject.Id)
+                                        Else
+                                            Call Me.AddEnterpriseAwareItem(lrFactTypeReading.GetPredicateText, FEQL.TokenType.PREDICATE)
+                                        End If
+                                    Next
+
+                                    If Me.AutoComplete.Visible = False Then
+                                        Me.showAutoCompleteForm()
+                                    End If
                                 End If
+
                             End If
 
                     End Select

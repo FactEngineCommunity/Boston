@@ -1237,11 +1237,12 @@ Public Class frmDiagramPGS
                                                               lrEntity.Y,
                                                               lrEntity.TableShape.Bounds.Width,
                                                               lrEntity.TableShape.Bounds.Height)
-                    Me.MorphVector(0).EndPoint = New Point(lrEntity.TableShape.Bounds.X - lrPage.DiagramView.ScrollX, lrEntity.TableShape.Bounds.Y - lrPage.DiagramView.ScrollY) ' (lrFactDataInstance.x, lrFactDataInstance.y)
+                    Me.MorphVector(0).EndPoint = New Point(lrEntity.TableShape.Bounds.X - lrPage.DiagramView.ScrollX, lrEntity.TableShape.Bounds.Y - lrPage.DiagramView.ScrollY)
+                    Me.MorphVector(0).VectorSteps = Viev.Greater(15, (Math.Abs(lrEntity.TableShape.Bounds.X - lrShapeNode.Bounds.X) + Math.Abs(lrEntity.TableShape.Bounds.Y - lrShapeNode.Bounds.Y) + 1)) / 3
                 Else
                     Me.MorphVector(0).EndSize = New Rectangle(0, 0, 20, 10)
                     Me.MorphVector(0).EndPoint = New Point(lrFactDataInstance.X, lrFactDataInstance.Y)
-                    'Me.MorphVector(0).EndPoint = New Point(lrFactDataInstance.X - lrPage.DiagramView.ScrollX, lrFactDataInstance.Y - lrPage.DiagramView.ScrollY)
+                    Me.MorphVector(0).VectorSteps = Viev.Greater(15, (Math.Abs(lrFactDataInstance.X - lrShapeNode.Bounds.X) + Math.Abs(lrFactDataInstance.Y - lrShapeNode.Bounds.Y) + 1)) / 3
                 End If
                 '===========================================
                 Me.MorphVector(0).Shape.Font = Me.zrPage.Diagram.Font
@@ -1380,8 +1381,7 @@ Public Class frmDiagramPGS
                     Else
                         Me.MorphVector(0).EndSize = New Rectangle(0, 0, 20, 10)
                     End If
-
-                    Me.MorphVector(0).VectorSteps = Math.Abs(lrFactTypeInstance.X - lrNode.X) / 2
+                    Me.MorphVector(0).VectorSteps = Viev.Greater(15, (Math.Abs(lrFactTypeInstance.X - lrNode.X) + Math.Abs(lrFactTypeInstance.Y - lrNode.Y) + 1)) / 2
 
                 ElseIf IsSomething(lrEntityTypeInstance) Then
                     Me.MorphVector(0).EndPoint = New Point(lrEntityTypeInstance.X, lrEntityTypeInstance.Y)
@@ -1394,7 +1394,7 @@ Public Class frmDiagramPGS
                         Me.MorphVector(0).EndSize = New Rectangle(0, 0, 20, 10)
                     End If
 
-                    Me.MorphVector(0).VectorSteps = Math.Abs(lrEntityTypeInstance.X - lrNode.X) / 3
+                    Me.MorphVector(0).VectorSteps = Viev.Greater(15, (Math.Abs(lrEntityTypeInstance.X - lrNode.X) + Math.Abs(lrEntityTypeInstance.Y - lrNode.Y) + 1)) / 2
                 End If
 
             End If

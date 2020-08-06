@@ -3411,7 +3411,7 @@ Public Class frmDiagramORM
                     loSelectedNode.Selected = True
                     If loSelectedNode.Tag.ConceptType = pcenumConceptType.FactType Then
                         Me.zrPage.SelectedObject.Clear()
-                        Me.zrPage.SelectedObject.Add(loSelectedNode.Tag)
+                        Me.zrPage.SelectedObject.AddUnique(loSelectedNode.Tag)
                         Me.DiagramView.ContextMenuStrip = ContextMenuStrip_FactType
                     End If
                 End If
@@ -3469,7 +3469,7 @@ Public Class frmDiagramORM
                                 '-----------------------------------
                                 'Already selected
                             Else
-                                Me.zrPage.SelectedObject.Add(lrFactTypeInstance)
+                                Me.zrPage.SelectedObject.AddUnique(lrFactTypeInstance)
                             End If
                         Case Else
                             loNode.Selected = True
@@ -4193,20 +4193,20 @@ Public Class frmDiagramORM
 
                 Select Case e.Node.Tag.ConceptType
                     Case Is = pcenumConceptType.EntityType
-                        Me.zrPage.SelectedObject.Add(e.Node.Tag)
+                        Me.zrPage.SelectedObject.AddUnique(e.Node.Tag)
                     Case Is = pcenumConceptType.ValueType
-                        Me.zrPage.SelectedObject.Add(e.Node.Tag)
+                        Me.zrPage.SelectedObject.AddUnique(e.Node.Tag)
                     Case Is = pcenumConceptType.FactType
                         'Not done here, because when a Role is selected, the FactType of the Role is selected also.
                         '  This is so that when a Role is moved, the FactType(Instance) moves also.
                         Call e.Node.Tag.AdjustBorderHeight()
                     Case Is = pcenumConceptType.FactTable
-                        Me.zrPage.SelectedObject.Add(e.Node.Tag)
+                        Me.zrPage.SelectedObject.AddUnique(e.Node.Tag)
                     Case Is = pcenumConceptType.EntityTypeName
                         'N/A
                     Case Is = pcenumConceptType.Role
                         If Not Me.zrPage.SelectedObject.Contains(e.Node.Tag) Then
-                            Me.zrPage.SelectedObject.Add(e.Node.Tag)
+                            Me.zrPage.SelectedObject.AddUnique(e.Node.Tag)
                         End If
                     Case Is = pcenumConceptType.FactTypeName
                         'N/A
@@ -4220,13 +4220,13 @@ Public Class frmDiagramORM
                             'Don't select the object again
                             '-------------------------------
                         Else
-                            Me.zrPage.SelectedObject.Add(lrRoleConstraintInstance)
+                            Me.zrPage.SelectedObject.AddUnique(lrRoleConstraintInstance)
                         End If
                     Case Is = pcenumConceptType.RoleConstraintRole
                         'N/A
                     Case Is = pcenumConceptType.ModelNote
                         If Not Me.zrPage.SelectedObject.Contains(e.Node.Tag) Then
-                            Me.zrPage.SelectedObject.Add(e.Node.Tag)
+                            Me.zrPage.SelectedObject.AddUnique(e.Node.Tag)
                         End If
                     Case Else
                         'N/A
@@ -4234,7 +4234,7 @@ Public Class frmDiagramORM
             ElseIf TypeOf (e.Node) Is TableNode Then
                 Select Case e.Node.Tag.ConceptType
                     Case Is = pcenumConceptType.FactTable
-                        Me.zrPage.SelectedObject.Add(e.Node.Tag)
+                        Me.zrPage.SelectedObject.AddUnique(e.Node.Tag)
                 End Select
 
             End If
@@ -7264,9 +7264,11 @@ Public Class frmDiagramORM
                                                               lrEntity.TableShape.Bounds.Width,
                                                               lrEntity.TableShape.Bounds.Height)
                     Me.MorphVector(0).EndPoint = New Point(lrEntity.TableShape.Bounds.X, lrEntity.TableShape.Bounds.Y) ' (lrFactDataInstance.x, lrFactDataInstance.y)
+                    Me.MorphVector(0).VectorSteps = Viev.Greater(15, (Math.Abs(lrEntity.X - lrShapeNode.Bounds.X) + Math.Abs(lrEntity.Y - lrShapeNode.Bounds.Y) + 1)) / 2
                 Else
                     Me.MorphVector(0).EndSize = New Rectangle(0, 0, 20, 10)
                     Me.MorphVector(0).EndPoint = New Point(lrFactDataInstance.X, lrFactDataInstance.Y)
+                    Me.MorphVector(0).VectorSteps = Viev.Greater(15, (Math.Abs(lrFactDataInstance.X - lrShapeNode.Bounds.X) + Math.Abs(lrFactDataInstance.Y - lrShapeNode.Bounds.Y) + 1)) / 2
                 End If
 
                 '===========================================
@@ -7445,12 +7447,14 @@ Public Class frmDiagramORM
 
                         Me.MorphVector(0).EndSize = New Rectangle(lrPGSLink.Link.Bounds.X, lrPGSLink.Link.Bounds.Y, lrPGSLink.Link.Bounds.Width, Viev.Greater(1, lrPGSLink.Link.Bounds.Height))
                         Me.MorphVector(0).EndPoint = New Point(lrRelation.Link.Link.Bounds.X, lrRelation.Link.Link.bounds.Y)
+                        Me.MorphVector(0).VectorSteps = Viev.Greater(15, (Math.Abs(lrRelation.Link.Link.Bounds.X - lrShapeNode.Bounds.X) + Math.Abs(lrRelation.Link.Link.Bounds.Y - lrShapeNode.Bounds.Y) + 1)) / 3
                     Else
                         Me.MorphVector(0).EndSize = New Rectangle(lrNode.X,
                                                                   lrNode.Y,
                                                                   lrNode.shape.Bounds.Width,
                                                                   lrNode.shape.Bounds.Height)
-                        Me.MorphVector(0).EndPoint = New Point(lrNode.shape.Bounds.X, lrNode.shape.Bounds.Y) ' (lrFactDataInstance.x, lrFactDataInstance.y)
+                        Me.MorphVector(0).EndPoint = New Point(lrNode.Shape.Bounds.X, lrNode.Shape.Bounds.Y) ' (lrFactDataInstance.x, lrFactDataInstance.y)
+                        Me.MorphVector(0).VectorSteps = Viev.Greater(15, (Math.Abs(lrNode.Shape.Bounds.X - lrShapeNode.Bounds.X) + Math.Abs(lrNode.Shape.Bounds.Y - lrShapeNode.Bounds.Y) + 1)) / 3
                     End If
                 Else
                     Me.MorphVector(0).EndSize = New Rectangle(0, 0, 20, 20)

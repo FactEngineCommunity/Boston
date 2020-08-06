@@ -145,7 +145,7 @@ Namespace FactEngine
                                              Select FactType
 
                         If larAltFactType.Count > 1 Then
-                            Throw New Exception("There is more than one Fact Type Reading that is or starts, '" & arBaseNode.FBMModelObject.Id & " " & asPredicate)
+                            Throw New Exception("There is more than one Fact Type Reading that is or starts, '" & arBaseNode.FBMModelObject.Id & " " & asPredicate & "'")
                         Else
                             Me.FBMFactType = larAltFactType.First
                         End If

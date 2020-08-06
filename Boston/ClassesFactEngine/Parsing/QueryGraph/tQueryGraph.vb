@@ -42,7 +42,7 @@
 
                 liInd = 1
                 Dim larProjectionColumn = Me.getProjectionColumns
-                For Each lrProjectColumn In larProjectionColumn
+                For Each lrProjectColumn In larProjectionColumn.FindAll(Function(x) x IsNot Nothing)
                     lsSQLQuery &= lrProjectColumn.Table.Name & "." & lrProjectColumn.Name
                     If liInd < larProjectionColumn.Count Then lsSQLQuery &= ","
                     liInd += 1
@@ -146,9 +146,12 @@
                         Next
                     Else
                         Dim larTargetColumn = lrQueryEdge.BaseNode.FBMModelObject.getCorrespondingRDSTable.getPrimaryKeyColumns
+                        Dim liInd2 = 1
                         For Each lrColumn In larTargetColumn
                             lsSQLQuery &= lrQueryEdge.TargetNode.FBMModelObject.Id & "." & lrColumn.Name
                             lsSQLQuery &= " = " & lrQueryEdge.BaseNode.FBMModelObject.Id & "." & lrColumn.Name
+                            If liInd2 < larTargetColumn.Count Then lsSQLQuery &= vbCrLf & "AND "
+                            liInd2 += 1
                         Next
                     End If
                     lsSQLQuery &= vbCrLf
@@ -165,7 +168,7 @@
                 For Each lrQueryEdge In larConditionalQueryEdges
                     Select Case lrQueryEdge.WhichClauseType
                         Case Is = FactEngine.Constants.pcenumWhichClauseType.IsPredicateNodePropertyIdentification
-                            Dim lrFactType As FBM.FactType
+                            Dim lrFactType As FBM.FactType = Nothing
                             Select Case lrQueryEdge.BaseNode.FBMModelObject.GetType
                                 Case GetType(FBM.FactType)
                                     lrFactType = CType(lrQueryEdge.BaseNode.FBMModelObject, FBM.FactType)
@@ -179,7 +182,8 @@
                                                    Where PredicatePart.PredicatePartText = Trim(lrQueryEdge.Predicate)
                                                    Select PredicatePart
 
-                            Dim lrPredicatePart As FBM.PredicatePart
+                            Dim lrPredicatePart As FBM.PredicatePart = Nothing
+
                             If larPredicatePart.Count = 0 Then
 
                                 larPredicatePart = From FactType In Me.Model.FactType
@@ -190,9 +194,21 @@
                                                    Where PredicatePart.PredicatePartText = lrQueryEdge.Predicate
                                                    Select PredicatePart
 
-
-                                lrPredicatePart = larPredicatePart.First
-                                lrFactType = lrPredicatePart.FactTypeReading.FactType
+                                If larPredicatePart.Count > 0 Then
+                                    lrPredicatePart = larPredicatePart.First
+                                    lrFactType = lrPredicatePart.FactTypeReading.FactType
+                                Else
+                                    If lrFactType.IsObjectified Then
+                                        Dim larFactTypeReading = From FactType In lrFactType.getLinkFactTypes
+                                                                 From FactTypeReading In FactType.FactTypeReading
+                                                                 Where FactTypeReading.PredicatePart(0).Role.JoinedORMObject.Id = lrQueryEdge.BaseNode.FBMModelObject.Id
+                                                                 Where FactTypeReading.PredicatePart(1).Role.JoinedORMObject.Id = lrQueryEdge.TargetNode.FBMModelObject.Id
+                                                                 Select FactTypeReading
+                                        If larFactTypeReading.Count > 0 Then
+                                            lrFactType = larFactTypeReading.First.FactType
+                                        End If
+                                    End If
+                                    End If
                             Else
                                 lrPredicatePart = larPredicatePart.First
                             End If
@@ -289,7 +305,11 @@
                 End If
                 Select Case lrQueryEdge.FBMFactType.RoleGroup(liRoleInd).JoinedORMObject.ConceptType
                     Case Is = pcenumConceptType.ValueType
-                        larColumn.AddUnique(lrQueryEdge.BaseNode.FBMModelObject.getCorrespondingRDSTable.Column.Find(Function(x) x.Role.FactType Is lrQueryEdge.FBMFactType))
+                        Dim lrColumn = lrQueryEdge.BaseNode.FBMModelObject.getCorrespondingRDSTable.Column.Find(Function(x) x.Role.FactType Is lrQueryEdge.FBMFactType)
+                        If lrColumn Is Nothing And lrQueryEdge.FBMFactType.IsLinkFactType Then
+                            lrColumn = lrQueryEdge.BaseNode.FBMModelObject.getCorrespondingRDSTable.Column.Find(Function(x) x.Role.FactType Is lrQueryEdge.FBMFactType.LinkFactTypeRole.FactType)
+                        End If
+                        larColumn.AddUnique(lrColumn)
                     Case Else
                         Dim larEdgeColumn = lrQueryEdge.FBMFactType.RoleGroup(liRoleInd).JoinedORMObject.getCorrespondingRDSTable.getFirstUniquenessConstraintColumns
                         larColumn.AddRange(larEdgeColumn.ToList)

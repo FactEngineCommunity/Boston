@@ -1268,6 +1268,7 @@ Public Class frmDiagramERD
                                                                   lrFactTypeInstance.Shape.Bounds.Height)
                     Else
                         Me.MorphVector(0).EndSize = New Rectangle(0, 0, 20, 10)
+                        Me.MorphVector(0).VectorSteps = Viev.Greater(15, (Math.Abs(lrFactTypeInstance.X - lrShapeNode.Bounds.X) + Math.Abs(lrFactTypeInstance.Y - lrShapeNode.Bounds.Y) + 1)) / 2
                     End If
                 ElseIf IsSomething(lrEntityTypeInstance) Then
                     Me.MorphVector(0).EndPoint = New Point(lrEntityTypeInstance.X, lrEntityTypeInstance.Y)
@@ -1279,6 +1280,7 @@ Public Class frmDiagramERD
                     Else
                         Me.MorphVector(0).EndSize = New Rectangle(0, 0, 20, 10)
                     End If
+                    Me.MorphVector(0).VectorSteps = Viev.Greater(15, (Math.Abs(lrEntityTypeInstance.X - lrShapeNode.Bounds.X) + Math.Abs(lrEntityTypeInstance.Y - lrShapeNode.Bounds.Y) + 1)) / 2
                 End If
 
             End If
@@ -1390,6 +1392,7 @@ Public Class frmDiagramERD
 
                         Me.MorphVector(0).EndSize = New Rectangle(lrPGSLink.Link.Bounds.X, lrPGSLink.Link.Bounds.Y, lrPGSLink.Link.Bounds.Width, Viev.Greater(1, lrPGSLink.Link.Bounds.Height))
                         Me.MorphVector(0).EndPoint = New Point(lrRelation.Link.Link.Bounds.X - lrPage.DiagramView.ScrollX, lrRelation.Link.Link.bounds.Y - lrPage.DiagramView.ScrollY)
+                        Me.MorphVector(0).VectorSteps = Viev.Greater(15, (Math.Abs(lrRelation.Link.Link.Bounds.X - lrShapeNode.Bounds.X) + Math.Abs(lrRelation.Link.Link.Bounds.Y - lrShapeNode.Bounds.Y) + 1)) / 3
                     Else
                         Me.MorphVector(0).EndSize = New Rectangle(0, 0, 20, 20)
                         Me.MorphVector(0).EndPoint = New Point(lrNode.shape.Bounds.X - lrPage.DiagramView.ScrollX, lrNode.shape.Bounds.Y - lrPage.DiagramView.ScrollY) 'lrFactDataInstance.X, lrFactDataInstance.Y)
@@ -1397,6 +1400,7 @@ Public Class frmDiagramERD
                 Else
                     Me.MorphVector(0).EndSize = New Rectangle(0, 0, 20, 20)
                     Me.MorphVector(0).EndPoint = New Point(lrFactDataInstance.X, lrFactDataInstance.Y)
+                    Me.MorphVector(0).VectorSteps = Viev.Greater(15, (Math.Abs(lrFactDataInstance.X - lrShapeNode.Bounds.X) + Math.Abs(lrFactDataInstance.Y - lrShapeNode.Bounds.Y) + 1)) / 3
                 End If
 
                 '===========================================
