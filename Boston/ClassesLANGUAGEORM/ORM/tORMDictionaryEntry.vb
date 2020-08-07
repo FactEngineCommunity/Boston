@@ -17,7 +17,7 @@ Namespace FBM
         '  e.g. If an EntityType is used within an ORM Diagram, this class is used to reflect within which diagram and at which coordinate
         '  the EntityType was displayed within the diagram.
         '--------------------------------------------------------------------------------------------------------------------------
-        <NonSerialized()> _
+
         <XmlIgnore()> _
         Public Model As FBM.Model
 

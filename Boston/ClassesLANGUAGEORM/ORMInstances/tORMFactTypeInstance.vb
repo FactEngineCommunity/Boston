@@ -14,7 +14,6 @@ Namespace FBM
         Implements IEquatable(Of FBM.FactTypeInstance)
         Implements FBM.iPageObject
 
-        <NonSerialized>
         <XmlIgnore()>
         Public WithEvents Page As FBM.Page
 
@@ -2516,7 +2515,7 @@ Namespace FBM
 
         End Sub
 
-        Private Sub _FactType_IUConstraintRemoved(ByRef arFactType As FactType, ByRef arRoleConstraint As FBM.RoleConstraint) Handles _FactType.IUConstraintRemoved
+        Private Sub _FactType_IUConstraintRemoved(ByRef arFactType As FactType, ByVal arRoleConstraint As FBM.RoleConstraint) Handles _FactType.IUConstraintRemoved
 
             Try
 
@@ -2527,9 +2526,7 @@ Namespace FBM
                     Dim lrRoleConstraintInstance As New FBM.RoleConstraintInstance
                     Dim lrRoleConstraintRoleInstance As FBM.RoleConstraintRoleInstance
 
-                    lrRoleConstraintInstance = arRoleConstraint.CloneInstance(Me.Page)
-
-                    lrRoleConstraintInstance = Me.InternalUniquenessConstraint.Find(AddressOf lrRoleConstraintInstance.Equals)
+                    lrRoleConstraintInstance = Me.InternalUniquenessConstraint.Find(Function(x) x.Id = arRoleConstraint.Id)
 
                     '----------------------------------------------------------------------------------------------------
                     'Code Safe: Check to see if the RoleConstraintInstance actually exists against the FactTypeInstance.

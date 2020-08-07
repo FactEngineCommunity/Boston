@@ -4081,6 +4081,7 @@ Public Class frmDiagramORM
                     Dim lrFactTypeInstance As FBM.FactTypeInstance = Me.zrPage.SelectedObject(0)
                     If lrFactTypeInstance.FactType.FactTypeReading.Count = 0 Then
                         Call frmMain.focusFactTypeReadingToolbox()
+                        Me.DiagramView.Focus()
                     End If
             End Select
         End If
@@ -7964,13 +7965,14 @@ Public Class frmDiagramORM
 
                 If lrEntityTypeInstance Is Nothing Then Exit Sub
 
+                Me.zrPage.SelectedObject.Remove(lrEntityTypeInstance)
+
                 For Each lrSubtypeRelationship In lrEntityTypeInstance.EntityType.SubtypeRelationship.ToArray
                     Call lrSubtypeRelationship.RemoveFromModel()
                 Next
 
                 Call lrEntityTypeInstance.EntityType.RemoveFromModel(False, True, True, False)
 
-                Me.zrPage.SelectedObject.Remove(lrEntityTypeInstance)
             End With
 
         Catch ex As Exception

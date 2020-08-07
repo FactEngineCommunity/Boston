@@ -304,7 +304,7 @@ Namespace FBM
         Public Event DerivationTextChanged(ByVal asDerivationText As String)
         Public Event FactTableUpdated()
         Public Event IUConstraintAdded(ByRef arFactType As FBM.FactType, ByRef arRoleConstraint As FBM.RoleConstraint)
-        Public Event IUConstraintRemoved(ByRef arFactType As FBM.FactType, ByRef arRoleConstraint As FBM.RoleConstraint)
+        Public Event IUConstraintRemoved(ByRef arFactType As FBM.FactType, ByVal arRoleConstraint As FBM.RoleConstraint)
         'Because otherwise Copy will try and serialise the frmToolboxORMReadingEditor
         <NonSerialized()> _
         Public Event FactTypeReadingAdded(ByRef arFactTypeReading As FBM.FactTypeReading)

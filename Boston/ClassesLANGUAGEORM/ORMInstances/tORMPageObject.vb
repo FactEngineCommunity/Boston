@@ -7,7 +7,6 @@ Namespace FBM
     Public Class PageObject
         Inherits FBM.ModelObject
 
-        <NonSerialized>
         <XmlIgnore()>
         Public Page As FBM.Page
 
