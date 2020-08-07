@@ -15,6 +15,7 @@
             AndWhichPredicateNodePropertyIdentification = 9 '   E.g. AND WHICH is in (Faculty:IT')
             WhichPredicateThatModelElement = 10 '               E.g. WHICH involves THAT Lecturer
             ThatPredicateWhichModelElement = 11 '               E.g. THAT involves WHICH Room
+            WithClause = 12 '                                   E.g. WITH WHAT Rating (as in "WHICH Person likes WHICH City WITH WHAT Rating"), can also be WITH (Rating:'10') for instance.
 
             '?? below
             'AndThatModelElementPredicateWhichModelElement '    E.g. AND THAT Faculty has WHICH School. Currently unused.Checked.

@@ -109,9 +109,14 @@ Namespace RDS
         '''   e.g. See the TimetableBookings Page of the University Model.
         ''' </summary>
         ''' <remarks></remarks>
-        <XmlIgnore()> _
-        <NonSerialized()> _
+        <XmlIgnore()>
+        <NonSerialized()>
         Public WithEvents ActiveRole As FBM.Role
+
+        ''' <summary>
+        ''' Used when creating SQL etc. When the set of Projection Columns is returned, this Alias is set so that ProjectionColumns refer to the correct Table in the From clause etc.
+        ''' </summary>
+        Public TemporaryAlias As String = Nothing
 
         Public Event ActiveRoleChanged()
         Public Event AddedToPrimaryKey()

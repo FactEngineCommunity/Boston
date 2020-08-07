@@ -18,6 +18,11 @@ Namespace FactEngine
         ''' </summary>
         Public IsProjectColumn As Boolean = False
 
+        ''' <summary>
+        ''' As set when setting the QueryGraph.Nodes aliases
+        ''' </summary>
+        Public [Alias] As String = Nothing
+
         Public WhichClauseType As pcenumWhichClauseType = pcenumWhichClauseType.None
 
         ''' <summary>

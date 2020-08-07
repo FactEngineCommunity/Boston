@@ -477,8 +477,8 @@
             'Get the TargetNode                        
             lrFBMModelObject = Me.Model.GetModelObjectByName(Me.WHICHCLAUSE.MODELELEMENTNAME(0))
             If lrFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & Me.WHICHCLAUSE.MODELELEMENTNAME(0) & "'.")
-            arQueryEdge.TargetNode = New FactEngine.QueryNode(lrFBMModelObject)
-            arQueryGraph.Nodes.AddUnique(arQueryEdge.TargetNode)
+            arQueryEdge.TargetNode = New FactEngine.QueryNode(lrFBMModelObject, arQueryEdge)
+            arQueryGraph.Nodes.Add(arQueryEdge.TargetNode)
 
             ''---------------------------------------------------------
             ''Get the Predicate
@@ -875,6 +875,64 @@
         End Sub
 #End Region
 
+        '12
+#Region "analystWITHClause"
+
+        Private Sub analystWITHClause(ByRef arWHICHCLAUSE As FEQL.WHICHCLAUSE,
+                                      ByRef arQueryGraph As FactEngine.QueryGraph,
+                                      ByRef arQueryEdge As FactEngine.QueryEdge
+                                      )
+
+            'E.g. WITH WHAT Rating (as in "WHICH Person likes WHICH City WITH WHAT Rating"), can also be WITH (Rating:'10') for instance.
+            Dim lrFBMModelObject As FBM.ModelObject
+
+            arQueryEdge.WhichClauseType = FactEngine.Constants.pcenumWhichClauseType.WithClause
+
+            Dim lrFBMObjectifiedFactTypeModelObject = arQueryGraph.QueryEdges(arQueryGraph.QueryEdges.Count - 1).FBMFactType
+
+            If Not lrFBMObjectifiedFactTypeModelObject.IsObjectified Then
+                Throw New Exception("The Model Element, '" & lrFBMObjectifiedFactTypeModelObject.Id & "', is not an Objectified Fact Type.")
+            End If
+
+            arQueryEdge.BaseNode = New FactEngine.QueryNode(lrFBMObjectifiedFactTypeModelObject)
+
+            Call Me.GetParseTreeTokensReflection(Me.WITHCLAUSE, Me.WHICHCLAUSE.WITHCLAUSE)
+
+            'Get the TargetNode                        
+            If Me.WHICHCLAUSE.NODEPROPERTYIDENTIFICATION IsNot Nothing Then
+                Me.NODEPROPERTYIDENTIFICATION = New FEQL.NODEPROPERTYIDENTIFICATION
+                Call Me.GetParseTreeTokensReflection(Me.NODEPROPERTYIDENTIFICATION, Me.WHICHCLAUSE.NODEPROPERTYIDENTIFICATION)
+                lrFBMModelObject = Me.Model.GetModelObjectByName(Me.NODEPROPERTYIDENTIFICATION.MODELELEMENTNAME)
+                If lrFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & Me.NODEPROPERTYIDENTIFICATION.MODELELEMENTNAME & "'.")
+                '---------------------------------------------------------
+                'Set the Identification
+                For Each lsIdentifier In Me.NODEPROPERTYIDENTIFICATION.IDENTIFIER
+                    arQueryEdge.IdentifierList.Add(lsIdentifier)
+                Next
+            Else
+                Dim liModelElementInd = 0
+                If arWHICHCLAUSE.KEYWDTHAT.Count = 2 Then liModelElementInd = 1
+                lrFBMModelObject = Me.Model.GetModelObjectByName(Me.WHICHCLAUSE.MODELELEMENTNAME(liModelElementInd))
+                If lrFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & Me.WHICHCLAUSE.MODELELEMENTNAME(0) & "'.")
+            End If
+
+            arQueryEdge.TargetNode = New FactEngine.QueryNode(lrFBMModelObject)
+
+            If lrFBMModelObject.ConceptType = pcenumConceptType.ValueType Then
+                arQueryEdge.WhichClauseType = FactEngine.Constants.pcenumWhichClauseType.IsPredicateNodePropertyIdentification
+            Else
+                arQueryGraph.Nodes.AddUnique(arQueryEdge.TargetNode)
+            End If
+
+            '-----------------------------------------
+            'Get the relevant FBM.FactType
+            Call arQueryEdge.getAndSetFBMFactType(arQueryEdge.BaseNode,
+                                                  arQueryEdge.TargetNode,
+                                                  arQueryEdge.Predicate)
+
+        End Sub
+#End Region
+
 #Region "getWHICHClauseType"
         Public Function getWHICHClauseType(ByRef arWHICHClause As FEQL.WHICHCLAUSE,
                                            ByRef arWhichClauseNode As FEQL.ParseNode) As FactEngine.pcenumWhichClauseType
@@ -961,6 +1019,11 @@
                 'E.g. "AND is in A School"                
                 Return FactEngine.Constants.pcenumWhichClauseType.AndWhichPredicateNodePropertyIdentification
 
+                '12
+            ElseIf Me.WHICHCLAUSE.WITHCLAUSE IsNot Nothing Then
+
+                'E.g. WITH WHAT Rating (as in "WHICH Person likes WHICH City WITH WHAT Rating"), can also be WITH (Rating:'10') for instance.
+                Return FactEngine.Constants.pcenumWhichClauseType.WithClause
             End If
         End Function
 #End Region

@@ -38,12 +38,15 @@
             Dim larColumn As New List(Of RDS.Column)
 
             Try
+                'Set the Node Aliases. E.g. If Lecturer occurs twice in the FROM clause, then Lecturer, Lecturer2 etc
+                Call Me.setNodeAliases()
+
                 lsSQLQuery = "SELECT "
 
                 liInd = 1
                 Dim larProjectionColumn = Me.getProjectionColumns
                 For Each lrProjectColumn In larProjectionColumn.FindAll(Function(x) x IsNot Nothing)
-                    lsSQLQuery &= lrProjectColumn.Table.Name & "." & lrProjectColumn.Name
+                    lsSQLQuery &= lrProjectColumn.Table.Name & Viev.NullVal(lrProjectColumn.TemporaryAlias, "") & "." & lrProjectColumn.Name
                     If liInd < larProjectionColumn.Count Then lsSQLQuery &= ","
                     liInd += 1
                 Next
@@ -103,9 +106,19 @@
                 liInd = 1
                 Dim larFromNodes = Me.Nodes.FindAll(Function(x) x.FBMModelObject.ConceptType <> pcenumConceptType.ValueType)
                 For Each lrQueryNode In larFromNodes
-                    lsSQLQuery &= lrQueryNode.FBMModelObject.getCorrespondingRDSTable.Name
+                    lsSQLQuery &= lrQueryNode.FBMModelObject.getCorrespondingRDSTable.Name & Viev.NullVal(lrQueryNode.Alias, "")
 
                     If liInd < larFromNodes.Count Then lsSQLQuery &= "," & vbCrLf
+                    liInd += 1
+                Next
+
+                liInd = 1
+                Dim larRDSTableQueryEdge = Me.QueryEdges.FindAll(Function(x) x.FBMFactType.isRDSTable)
+                For Each lrQueryEdge In larRDSTableQueryEdge
+
+                    lsSQLQuery &= vbCrLf & "," & lrQueryEdge.FBMFactType.Id & Viev.NullVal(lrQueryEdge.Alias, "")
+
+                    'If liInd < larRDSTableQueryEdge.Count Then lsSQLQuery &= "," & vbCrLf
                     liInd += 1
                 Next
 
@@ -132,27 +145,36 @@
                         lbAddedAND = True
                     End If
                     lbAddedAND = False
-                    Dim lrOriginTable = lrQueryEdge.BaseNode.FBMModelObject.getCorrespondingRDSTable
-                    Dim larModelObject = New List(Of FBM.ModelObject)
-                    larModelObject.Add(lrQueryEdge.BaseNode.FBMModelObject)
-                    larModelObject.Add(lrQueryEdge.TargetNode.FBMModelObject)
-                    Dim lrRelation = lrOriginTable.getRelationByFBMModelObjects(larModelObject)
 
-                    If lrRelation.OriginTable Is lrOriginTable Then
-                        Dim larTargetColumn = lrQueryEdge.TargetNode.FBMModelObject.getCorrespondingRDSTable.getPrimaryKeyColumns
-                        For Each lrColumn In larTargetColumn
-                            lsSQLQuery &= lrQueryEdge.BaseNode.FBMModelObject.Id & "." & lrColumn.Name
-                            lsSQLQuery &= " = " & lrQueryEdge.TargetNode.FBMModelObject.Id & "." & lrColumn.Name
-                        Next
+                    Dim lrOriginTable As RDS.Table
+                    If lrQueryEdge.FBMFactType.isRDSTable And lrQueryEdge.FBMFactType.Arity = 2 Then
+                        lrOriginTable = lrQueryEdge.FBMFactType.getCorrespondingRDSTable
+
+                        lsSQLQuery &= lrOriginTable.Name & "." & lrQueryEdge.TargetNode.RDSTable.Column.Find(Function(x) x.Role Is lrQueryEdge.FBMFactType.RoleGroup(0)).Name
+                        lsSQLQuery &= vbCrLf & lrOriginTable.Name & "." & lrQueryEdge.TargetNode.RDSTable.Column.Find(Function(x) x.Role Is lrQueryEdge.FBMFactType.RoleGroup(1)).Name
                     Else
-                        Dim larTargetColumn = lrQueryEdge.BaseNode.FBMModelObject.getCorrespondingRDSTable.getPrimaryKeyColumns
-                        Dim liInd2 = 1
-                        For Each lrColumn In larTargetColumn
-                            lsSQLQuery &= lrQueryEdge.TargetNode.FBMModelObject.Id & "." & lrColumn.Name
-                            lsSQLQuery &= " = " & lrQueryEdge.BaseNode.FBMModelObject.Id & "." & lrColumn.Name
-                            If liInd2 < larTargetColumn.Count Then lsSQLQuery &= vbCrLf & "AND "
-                            liInd2 += 1
-                        Next
+                        lrOriginTable = lrQueryEdge.BaseNode.FBMModelObject.getCorrespondingRDSTable
+                        Dim larModelObject = New List(Of FBM.ModelObject)
+                        larModelObject.Add(lrQueryEdge.BaseNode.FBMModelObject)
+                        larModelObject.Add(lrQueryEdge.TargetNode.FBMModelObject)
+                        Dim lrRelation = lrOriginTable.getRelationByFBMModelObjects(larModelObject)
+
+                        If lrRelation.OriginTable Is lrOriginTable Then
+                            Dim larTargetColumn = lrQueryEdge.TargetNode.FBMModelObject.getCorrespondingRDSTable.getPrimaryKeyColumns
+                            For Each lrColumn In larTargetColumn
+                                lsSQLQuery &= lrQueryEdge.BaseNode.FBMModelObject.Id & "." & lrColumn.Name
+                                lsSQLQuery &= " = " & lrQueryEdge.TargetNode.FBMModelObject.Id & "." & lrColumn.Name
+                            Next
+                        Else
+                            Dim larTargetColumn = lrQueryEdge.BaseNode.FBMModelObject.getCorrespondingRDSTable.getPrimaryKeyColumns
+                            Dim liInd2 = 1
+                            For Each lrColumn In larTargetColumn
+                                lsSQLQuery &= lrQueryEdge.TargetNode.FBMModelObject.Id & "." & lrColumn.Name
+                                lsSQLQuery &= " = " & lrQueryEdge.BaseNode.FBMModelObject.Id & "." & lrColumn.Name
+                                If liInd2 < larTargetColumn.Count Then lsSQLQuery &= vbCrLf & "AND "
+                                liInd2 += 1
+                            Next
+                        End If
                     End If
                     lsSQLQuery &= vbCrLf
                     'If liInd < Me.QueryEdges.Count Then
@@ -208,7 +230,7 @@
                                             lrFactType = larFactTypeReading.First.FactType
                                         End If
                                     End If
-                                    End If
+                                End If
                             Else
                                 lrPredicatePart = larPredicatePart.First
                             End If
@@ -287,10 +309,14 @@
                                        Where Column.ActiveRole Is Me.QueryEdges(0).FBMFactType.RoleGroup(1)
                                        Select Column).First
 
+                    larVTColumn = larVTColumn.Clone(Nothing, Nothing)
+                    larVTColumn.TemporaryAlias = Viev.NullVal(Me.HeadNode.QueryEdgeAlias, "") 'Not really required for the first Column/s in the SQL
                     larHeadColumn.Add(larVTColumn)
 
                 Case Else
-                    larHeadColumn = Me.HeadNode.FBMModelObject.getCorrespondingRDSTable.getFirstUniquenessConstraintColumns
+                    For Each lrColumn In Me.HeadNode.FBMModelObject.getCorrespondingRDSTable.getFirstUniquenessConstraintColumns
+                        larHeadColumn.Add(lrColumn.Clone(Nothing, Nothing))
+                    Next
             End Select
 
             larColumn.AddRange(larHeadColumn.ToList)
@@ -307,12 +333,19 @@
                     Case Is = pcenumConceptType.ValueType
                         Dim lrColumn = lrQueryEdge.BaseNode.FBMModelObject.getCorrespondingRDSTable.Column.Find(Function(x) x.Role.FactType Is lrQueryEdge.FBMFactType)
                         If lrColumn Is Nothing And lrQueryEdge.FBMFactType.IsLinkFactType Then
-                            lrColumn = lrQueryEdge.BaseNode.FBMModelObject.getCorrespondingRDSTable.Column.Find(Function(x) x.Role.FactType Is lrQueryEdge.FBMFactType.LinkFactTypeRole.FactType)
+                            lrColumn = lrQueryEdge.BaseNode.FBMModelObject.getCorrespondingRDSTable.Column.Find(Function(x) x.Role.FactType Is lrQueryEdge.FBMFactType.LinkFactTypeRole.FactType).Clone(Nothing, Nothing)
+                            lrColumn.TemporaryAlias = lrQueryEdge.Alias
                         End If
                         larColumn.AddUnique(lrColumn)
                     Case Else
                         Dim larEdgeColumn = lrQueryEdge.FBMFactType.RoleGroup(liRoleInd).JoinedORMObject.getCorrespondingRDSTable.getFirstUniquenessConstraintColumns
-                        larColumn.AddRange(larEdgeColumn.ToList)
+                        Dim lrTempColumn As RDS.Column
+                        For Each lrColumn In larEdgeColumn
+                            lrTempColumn = lrColumn.Clone(Nothing, Nothing)
+                            lrTempColumn.TemporaryAlias = lrQueryEdge.Alias
+                            larColumn.Add(lrTempColumn)
+                        Next
+
                 End Select
 
             Next
@@ -320,6 +353,25 @@
             Return larColumn
 
         End Function
+
+        Private Sub setNodeAliases()
+
+            Dim liInd As Integer = 0
+
+            For liInd = 0 To Me.Nodes.Count - 1
+                If liInd > 0 Then
+                    For liInd2 = 0 To liInd - 1
+                        If Me.Nodes(liInd).Name = Me.Nodes(liInd2).Name Then
+                            Me.Nodes(liInd).Alias = liInd.ToString
+                            If Me.Nodes(liInd).QueryEdge IsNot Nothing Then
+                                Me.Nodes(liInd).QueryEdge.Alias = liInd.ToString
+                            End If
+                        End If
+                    Next
+                End If
+            Next
+
+        End Sub
 
     End Class
 

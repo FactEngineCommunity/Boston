@@ -29,6 +29,50 @@ Namespace FEQL
 
     End Class
 
+    Public Class WITHClause
+
+        Private _KEYWDWITH As String = Nothing
+        Public Property KEYWDWITH As String
+            Get
+                Return Me._KEYWDWITH
+            End Get
+            Set(value As String)
+                Me._KEYWDWITH = value
+            End Set
+        End Property
+
+        Private _KEYWDWHAT As String = Nothing
+        Public Property KEYWDWHAT As String
+            Get
+                Return Me._KEYWDWHAT
+            End Get
+            Set(value As String)
+                Me._KEYWDWHAT = value
+            End Set
+        End Property
+
+        Private _MODELELEMENTNAME As New List(Of String)
+        Public Property MODELELEMENTNAME As List(Of String)
+            Get
+                Return Me._MODELELEMENTNAME
+            End Get
+            Set(value As List(Of String))
+                Me._MODELELEMENTNAME = value
+            End Set
+        End Property
+
+        Private _NODEPROPERTYIDENTIFICATION As Object = Nothing
+        Public Property NODEPROPERTYIDENTIFICATION As Object
+            Get
+                Return Me._NODEPROPERTYIDENTIFICATION
+            End Get
+            Set(value As Object)
+                Me._NODEPROPERTYIDENTIFICATION = value
+            End Set
+        End Property
+
+    End Class
+
     Public Class WHICHSELECTStatement
 
         Private _MODELELEMENTNAME As New List(Of String)
@@ -145,6 +189,16 @@ Namespace FEQL
             End Set
         End Property
 
+        Private _WITHCLAUSE As Object = Nothing 'NB Is used to disambiguate where the THAT is in the WHICHCLAUSE
+        Public Property WITHCLAUSE As Object
+            Get
+                Return Me._WITHCLAUSE
+            End Get
+            Set(value As Object)
+                Me._WITHCLAUSE = value
+            End Set
+        End Property
+
     End Class
 
     Public Class NODEPROPERTYIDENTIFICATION
@@ -188,6 +242,7 @@ Namespace FEQL
         Public WHICHSELECTStatement As New FEQL.WHICHSELECTStatement
         Public WHICHCLAUSE As New FEQL.WHICHCLAUSE
         Public NODEPROPERTYIDENTIFICATION As New FEQL.NODEPROPERTYIDENTIFICATION
+        Public WITHCLAUSE As New FEQL.WITHClause
 
         ''' <summary>
         ''' Parameterless NEw
