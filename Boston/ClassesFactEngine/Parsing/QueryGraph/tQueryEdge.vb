@@ -18,10 +18,22 @@ Namespace FactEngine
         ''' </summary>
         Public IsProjectColumn As Boolean = False
 
+        Private _Alias As String = Nothing
         ''' <summary>
         ''' As set when setting the QueryGraph.Nodes aliases
         ''' </summary>
-        Public [Alias] As String = Nothing
+        Public Property [Alias] As String
+            Get
+                If Me.FBMFactType.isRDSTable Then
+                    Return Nothing
+                Else
+                    Return Me._Alias
+                End If
+            End Get
+            Set(value As String)
+                Me._Alias = value
+            End Set
+        End Property
 
         Public WhichClauseType As pcenumWhichClauseType = pcenumWhichClauseType.None
 

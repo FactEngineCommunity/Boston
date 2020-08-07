@@ -160,7 +160,7 @@
                         Next
 
                         For Each lrColumn In lrQueryEdge.BaseNode.RDSTable.getPrimaryKeyColumns
-                            lsSQLQuery &= vbCrLf & "AND " & lrQueryEdge.BaseNode.Name & Viev.NullVal(lrQueryEdge.BaseNode.Alias, "") & "." & lrColumn.Name & " = "
+                            lsSQLQuery &= vbCrLf & "AND " & lrQueryEdge.BaseNode.Name & Viev.NullVal(lrQueryEdge.TargetNode.Alias, "") & "." & lrColumn.Name & " = "
                             lsSQLQuery &= lrOriginTable.Name & "." & lrOriginTable.Column(1).Name
                         Next
 
@@ -354,7 +354,11 @@
                         Dim lrTempColumn As RDS.Column
                         For Each lrColumn In larEdgeColumn
                             lrTempColumn = lrColumn.Clone(Nothing, Nothing)
-                            lrTempColumn.TemporaryAlias = lrQueryEdge.Alias
+                            If liRoleInd = 1 Then
+                                lrTempColumn.TemporaryAlias = lrQueryEdge.TargetNode.Alias
+                            Else
+                                lrTempColumn.TemporaryAlias = lrQueryEdge.Alias
+                            End If
                             larColumn.Add(lrTempColumn)
                         Next
 

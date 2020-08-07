@@ -680,7 +680,7 @@
             Dim lrFBMModelObject = Me.Model.GetModelObjectByName(Me.WHICHCLAUSE.MODELELEMENTNAME(1))
             If lrFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & Me.WHICHCLAUSE.MODELELEMENTNAME(0) & "'.")
             arQueryEdge.TargetNode = New FactEngine.QueryNode(lrFBMModelObject)
-            arQueryGraph.Nodes.AddUnique(arQueryEdge.TargetNode)
+            arQueryGraph.Nodes.Add(arQueryEdge.TargetNode) 'was addUnique 20200807-VM
 
             ''---------------------------------------------------------
             ''Get the Predicate
@@ -892,14 +892,6 @@
             arQueryEdge.WhichClauseType = FactEngine.Constants.pcenumWhichClauseType.WithClause
             arQueryEdge.IsProjectColumn = True
 
-            Dim lrFBMObjectifiedFactTypeModelObject = arQueryGraph.QueryEdges(arQueryGraph.QueryEdges.Count - 1).FBMFactType
-
-            If Not lrFBMObjectifiedFactTypeModelObject.IsObjectified Then
-                Throw New Exception("The Model Element, '" & lrFBMObjectifiedFactTypeModelObject.Id & "', is not an Objectified Fact Type.")
-            End If
-
-            arQueryEdge.BaseNode = New FactEngine.QueryNode(lrFBMObjectifiedFactTypeModelObject)
-
             Call Me.GetParseTreeTokensReflection(Me.WITHCLAUSE, Me.WHICHCLAUSE.WITHCLAUSE)
 
             'Get the TargetNode                        
@@ -919,6 +911,26 @@
                 lrFBMModelObject = Me.Model.GetModelObjectByName(Me.WHICHCLAUSE.MODELELEMENTNAME(liModelElementInd))
                 If lrFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & Me.WHICHCLAUSE.MODELELEMENTNAME(0) & "'.")
             End If
+
+            Dim lrFBMObjectifiedFactTypeModelObject As FBM.FactType = Nothing
+            lrFBMObjectifiedFactTypeModelObject = arQueryGraph.QueryEdges(arQueryGraph.QueryEdges.Count - 1).FBMFactType
+
+            If Not lrFBMObjectifiedFactTypeModelObject.IsObjectified Then
+                For liInd = arQueryGraph.QueryEdges.Count - 1 To 0 Step -1
+                    If arQueryGraph.QueryEdges(liInd).FBMFactType.IsObjectified Then
+                        lrFBMObjectifiedFactTypeModelObject = arQueryGraph.QueryEdges(liInd).FBMFactType
+                        Exit For
+                    ElseIf liInd = 0 Then
+                        Throw New Exception("Couldn't find an Objectified Fact Type / Property Edge for WITH WHAT Clause for Model Element, '" & lrFBMModelObject.Id & "'.")
+                    End If
+                Next
+            End If
+
+            If Not lrFBMObjectifiedFactTypeModelObject.IsObjectified Then
+                Throw New Exception("The Model Element, '" & lrFBMObjectifiedFactTypeModelObject.Id & "', is not an Objectified Fact Type for WITH WHAT clause for Model Element, '" & lrFBMModelObject.Id & "'.")
+            End If
+
+            arQueryEdge.BaseNode = New FactEngine.QueryNode(lrFBMObjectifiedFactTypeModelObject)
 
             arQueryEdge.TargetNode = New FactEngine.QueryNode(lrFBMModelObject)
 
