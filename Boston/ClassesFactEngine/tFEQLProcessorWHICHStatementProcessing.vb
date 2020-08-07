@@ -325,6 +325,9 @@
                         Case Is = FactEngine.pcenumWhichClauseType.ThatPredicateWhichModelElement '11. E.g. THAT houses WHICH Lecturer
                             Call Me.analyseThatPredicateWhichClause(Me.WHICHCLAUSE, lrQueryGraph, lrQueryEdge, lrPreviousTargetNode)
 
+                        Case Is = FactEngine.pcenumWhichClauseType.WithClause  '12. E.g. WITH WHAT Rating
+                            Call Me.analystWITHClause(Me.WHICHCLAUSE, lrQueryGraph, lrQueryEdge)
+
                     End Select
 
                     '-------------------------------------------------
@@ -887,6 +890,7 @@
             Dim lrFBMModelObject As FBM.ModelObject
 
             arQueryEdge.WhichClauseType = FactEngine.Constants.pcenumWhichClauseType.WithClause
+            arQueryEdge.IsProjectColumn = True
 
             Dim lrFBMObjectifiedFactTypeModelObject = arQueryGraph.QueryEdges(arQueryGraph.QueryEdges.Count - 1).FBMFactType
 
@@ -926,9 +930,13 @@
 
             '-----------------------------------------
             'Get the relevant FBM.FactType
-            Call arQueryEdge.getAndSetFBMFactType(arQueryEdge.BaseNode,
-                                                  arQueryEdge.TargetNode,
-                                                  arQueryEdge.Predicate)
+            '  NB Predicate is nothing because the WITH clause is of the form "WITH WHAT Rating", so need to find the LinkFactType without using a Predicate
+            '20200807-VM-Will need to fix this because might have more than one LinkFactType referencing the same ModelObject. Need to use PreboundReadingText etc and through FactTypeReadings.
+            arQueryEdge.FBMFactType = arQueryEdge.BaseNode.RDSTable.Column.Find(Function(x) x.ActiveRole.JoinedORMObject Is lrFBMModelObject).FactType
+
+            'Call arQueryEdge.getAndSetFBMFactType(arQueryEdge.BaseNode,
+            '                                      arQueryEdge.TargetNode,
+            '                                      arQueryEdge.Predicate)
 
         End Sub
 #End Region
@@ -955,9 +963,16 @@
                     End If
                 End If
             End If
-            '1
-            If arWHICHClause.KEYWDAND Is Nothing And
-               arWHICHClause.NODEPROPERTYIDENTIFICATION IsNot Nothing Then
+
+            '12
+            If Me.WHICHCLAUSE.WITHCLAUSE IsNot Nothing Then
+
+                'E.g. WITH WHAT Rating (as in "WHICH Person likes WHICH City WITH WHAT Rating"), can also be WITH (Rating:'10') for instance.
+                Return FactEngine.Constants.pcenumWhichClauseType.WithClause
+
+                '1
+            ElseIf arWHICHClause.KEYWDAND Is Nothing And
+                   arWHICHClause.NODEPROPERTYIDENTIFICATION IsNot Nothing Then
 
                 'E.g. "WHICH is in (Factulty:'IT') "
                 Return FactEngine.Constants.pcenumWhichClauseType.WhichPredicateNodePropertyIdentification
@@ -1019,11 +1034,6 @@
                 'E.g. "AND is in A School"                
                 Return FactEngine.Constants.pcenumWhichClauseType.AndWhichPredicateNodePropertyIdentification
 
-                '12
-            ElseIf Me.WHICHCLAUSE.WITHCLAUSE IsNot Nothing Then
-
-                'E.g. WITH WHAT Rating (as in "WHICH Person likes WHICH City WITH WHAT Rating"), can also be WITH (Rating:'10') for instance.
-                Return FactEngine.Constants.pcenumWhichClauseType.WithClause
             End If
         End Function
 #End Region

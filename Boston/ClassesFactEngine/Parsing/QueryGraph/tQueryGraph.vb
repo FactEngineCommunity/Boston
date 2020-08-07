@@ -106,7 +106,11 @@
                 liInd = 1
                 Dim larFromNodes = Me.Nodes.FindAll(Function(x) x.FBMModelObject.ConceptType <> pcenumConceptType.ValueType)
                 For Each lrQueryNode In larFromNodes
-                    lsSQLQuery &= lrQueryNode.FBMModelObject.getCorrespondingRDSTable.Name & Viev.NullVal(lrQueryNode.Alias, "")
+                    If lrQueryNode.Alias Is Nothing Then
+                        lsSQLQuery &= lrQueryNode.FBMModelObject.getCorrespondingRDSTable.Name
+                    Else
+                        lsSQLQuery &= lrQueryNode.FBMModelObject.getCorrespondingRDSTable.Name & " " & lrQueryNode.FBMModelObject.getCorrespondingRDSTable.Name & Viev.NullVal(lrQueryNode.Alias, "")
+                    End If
 
                     If liInd < larFromNodes.Count Then lsSQLQuery &= "," & vbCrLf
                     liInd += 1
@@ -150,8 +154,16 @@
                     If lrQueryEdge.FBMFactType.isRDSTable And lrQueryEdge.FBMFactType.Arity = 2 Then
                         lrOriginTable = lrQueryEdge.FBMFactType.getCorrespondingRDSTable
 
-                        lsSQLQuery &= lrOriginTable.Name & "." & lrQueryEdge.TargetNode.RDSTable.Column.Find(Function(x) x.Role Is lrQueryEdge.FBMFactType.RoleGroup(0)).Name
-                        lsSQLQuery &= vbCrLf & lrOriginTable.Name & "." & lrQueryEdge.TargetNode.RDSTable.Column.Find(Function(x) x.Role Is lrQueryEdge.FBMFactType.RoleGroup(1)).Name
+                        For Each lrColumn In lrQueryEdge.BaseNode.RDSTable.getPrimaryKeyColumns
+                            lsSQLQuery &= lrQueryEdge.BaseNode.Name & Viev.NullVal(lrQueryEdge.BaseNode.Alias, "") & "." & lrColumn.Name & " = "
+                            lsSQLQuery &= lrOriginTable.Name & "." & lrOriginTable.Column(0).Name
+                        Next
+
+                        For Each lrColumn In lrQueryEdge.BaseNode.RDSTable.getPrimaryKeyColumns
+                            lsSQLQuery &= vbCrLf & "AND " & lrQueryEdge.BaseNode.Name & Viev.NullVal(lrQueryEdge.BaseNode.Alias, "") & "." & lrColumn.Name & " = "
+                            lsSQLQuery &= lrOriginTable.Name & "." & lrOriginTable.Column(1).Name
+                        Next
+
                     Else
                         lrOriginTable = lrQueryEdge.BaseNode.FBMModelObject.getCorrespondingRDSTable
                         Dim larModelObject = New List(Of FBM.ModelObject)
