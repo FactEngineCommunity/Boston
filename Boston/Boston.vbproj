@@ -1320,7 +1320,7 @@
     <Compile Include="ClassesGeneral\tMyConverter.vb" />
     <Compile Include="ClassesGeneral\tNodeDragItem.vb" />
     <Compile Include="ClassesGeneral\tReferenceFieldValue.vb" />
-    <Compile Include="ClassesGeneral\tRichmond.vb" />
+    <Compile Include="ClassesGeneral\tApplication.vb" />
     <Compile Include="ClassesGeneral\tSpecialDragMode.vb" />
     <Compile Include="ClassesGeneral\tStringCollectionEditor.vb" />
     <Compile Include="ClassesGeneral\tUserAction.vb" />

@@ -15,7 +15,7 @@ Namespace SourcePlugins.Boston
         Inherits UserControl
         Implements PluginInterface.Sources.IManageSource
 
-        Private WithEvents ApplicationLink As tRichmondApplication = prApplication
+        Private WithEvents ApplicationLink As tApplication = prApplication
 
         'Public Event ValueChanged As PluginInterface.Sources.IManageSource.ValueChangedEventHandler
         Public Delegate Sub ValueChangedEventHandler(ByVal value As Object)

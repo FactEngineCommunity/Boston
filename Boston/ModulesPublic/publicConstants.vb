@@ -248,6 +248,8 @@ Public Module publicConstants
         <Description(".Name")> DotUppercaseName
         <Description(".Nr")> DotUppwercaseNr
         <Description(".nr")> DotLowercaseNr
+        <Description(".quantity")> DotLowercaseQuantity
+        <Description(".Quantity")> DotUppercaseQuantity
         <Description(".Title")> DotUppercaseTitle
         <Description(".title")> DotLowercaseTitle
         <Description(".Date")> UppercaseDate

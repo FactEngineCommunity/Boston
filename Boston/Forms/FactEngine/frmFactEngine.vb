@@ -5,7 +5,7 @@ Public Class frmFactEngine
     Public zrScanner As New FEQL.Scanner
     Public zrParser As New FEQL.Parser(Me.zrScanner)
     Public WithEvents zrTextHighlighter As FEQL.TextHighlighter
-    Public WithEvents Application As tRichmondApplication = prApplication
+    Public WithEvents Application As tApplication = prApplication
     Private AutoComplete As frmAutoComplete
     Public zsIntellisenseBuffer As String = ""
 

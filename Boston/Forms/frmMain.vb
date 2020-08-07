@@ -87,7 +87,7 @@ Public Class frmMain
 
             '==============================================================================================================================
             Me.StatusLabelGeneralStatus.Text = "Initialising Application"
-            prApplication = New tRichmondApplication
+            prApplication = New tApplication
             Me.StatusLabelGeneralStatus.Text = "Application Initialised"
 
             prApplication.SoftwareCategory = prSoftwareCategory

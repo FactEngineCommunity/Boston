@@ -1,6 +1,6 @@
 Public Module publicVariables
 
-    Public prApplication As tRichmondApplication
+    Public prApplication As tApplication
     Public pdbConnection As New ADODB.Connection
     Public pdbDatabaseUpgradeConnection As New ADODB.Connection
     Public pdb_OLEDB_connection As New OleDb.OleDbConnection

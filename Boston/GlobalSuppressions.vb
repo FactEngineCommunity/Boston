@@ -5,4 +5,4 @@
 
 <Assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification:="<Pending>", Scope:="member", Target:="~M:Boston.frmCRUDBostonConfiguration.frmCRUDRichmondConfiguration_Load(System.Object,System.EventArgs)")>
 <Assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification:="<Pending>", Scope:="type", Target:="~T:Boston.frmToolboxEnterpriseExplorer")>
-<Assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification:="<Pending>", Scope:="type", Target:="~T:Boston.tRichmondApplication")>
+<Assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification:="<Pending>", Scope:="type", Target:="~T:Boston.tApplication")>

@@ -1,6 +1,6 @@
 Imports System.Reflection
 
-Public Class tRichmondApplication    
+Public Class tApplication
 
     Public ApplicationVersionNr As String = "" 'Set in frmMain.Load
 
