@@ -106,6 +106,7 @@ Namespace TableFact
             Dim lsId As String
 
             Try
+                If arFactType.Id = "CorePropertyIsForRole" Then Debugger.Break()
 
                 lRecordset.ActiveConnection = pdbConnection
                 lRecordset.CursorType = pcOpenStatic
@@ -117,7 +118,7 @@ Namespace TableFact
                 lsSQLQuery &= "    AND f.ModelId = '" & arFactType.Model.ModelId & "'"
                 lsSQLQuery &= "    AND fd.FactSymbol = f.Symbol"
                 lsSQLQuery &= "    AND fd.ModelId = f.ModelId"
-                'lsSQLQuery &= "  ORDER BY f.Symbol"
+                lsSQLQuery &= "  ORDER BY f.Symbol, fd.RoleId"
 
                 lRecordset.Open(lsSQLQuery)
 

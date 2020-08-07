@@ -411,21 +411,11 @@ Namespace FBM
         Public Function GetFactDataByRoleId(ByVal asRoleId As String) As FBM.FactData
 
             Dim lrFactData As FBM.FactData = Nothing
-            Dim larFactData() As FBM.FactData
             Dim liInd As Integer = 0
             Dim lbFoundFactData As Boolean = False
 
             Try
-                'larFactData = Me.Data.ToArray
-                lrFactData = Me.Data.Find(Function(x) x.Role.Id = asRoleId) ' ToArray
-
-                'For liInd = 1 To larFactData.Count
-                '    If larFactData(liInd - 1).Role.Id = asRoleId Then
-                '        lrFactData = larFactData(liInd - 1)
-                '        lbFoundFactData = True
-                '        Exit For
-                '    End If
-                'Next
+                lrFactData = Me.Data.Find(Function(x) x.Role.Id = asRoleId)
 
                 If lrFactData Is Nothing Then 'Not lbFoundFactData Then
                     Throw New Exception("Function called for Fact with no matching Role.")
@@ -436,6 +426,8 @@ Namespace FBM
             Catch ex As Exception
                 Dim lsMessage As String
                 lsMessage = "Error: tFact.GetFactDataByRoleId"
+                lsMessage &= vbCrLf & vbCrLf & "Fact Type: " & Me.FactType.Id
+                lsMessage &= vbCrLf & "Role.Id: " & asRoleId
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
                 prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
@@ -446,31 +438,27 @@ Namespace FBM
 
         Public Function GetFactDataByRoleName(ByVal asRoleName As String) As FBM.FactData
 
+            Dim lsMessage As String
             Dim lrFactData As New FBM.FactData
-            Dim larFactData() As FBM.FactData
-            Dim liInd As Integer = 0
-            Dim lbFoundFactData As Boolean = False
 
             Try
+                lrFactData = Me.Data.Find(Function(x) x.Role.Name = asRoleName)
 
-                larFactData = Me.Data.ToArray
+                If lrFactData Is Nothing Then
+                    lsMessage = "Function called for Fact with no matching Role.Name"
+                    lsMessage &= vbCrLf & vbCrLf & "FactType: " & Me.FactType.Id
+                    lsMessage &= vbCrLf & "Looking for Role with Name: " & asRoleName
+                    lsMessage &= vbCrLf & vbCrLf & "Actual Role Names for FaTType:"
+                    For Each lrRole In Me.FactType.RoleGroup
+                        lsMessage &= vbCrLf & lrRole.Name
+                    Next
 
-                For liInd = 1 To larFactData.Count
-                    If larFactData(liInd - 1).Role.Name = asRoleName Then
-                        lrFactData = larFactData(liInd - 1)
-                        lbFoundFactData = True
-                        Exit For
-                    End If
-                Next
-
-                If Not lbFoundFactData Then
-                    Throw New Exception("Function called for Fact with no matching Role.")
+                    Throw New Exception(lsMessage)
                 End If
 
                 Return lrFactData
 
             Catch ex As Exception
-                Dim lsMessage As String
                 lsMessage = "Error: tFact.GetFactDataByRoleName"
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
                 prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)

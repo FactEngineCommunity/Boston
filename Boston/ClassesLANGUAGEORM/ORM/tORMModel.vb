@@ -1688,6 +1688,16 @@ Namespace FBM
 
         End Sub
 
+        Public Sub checkIfCanCheckForErrors()
+
+            If Me.Loading Or Me.RDSLoading Or Me.Page.FindAll(Function(x) x.Loading).Count > 0 Then
+            Else
+                Me.AllowCheckForErrors = True
+                Dim lrValidator As New Validation.ModelValidator(Me)
+                Call lrValidator.CheckForErrors()
+            End If
+        End Sub
+
 
         ''' <summary>
         ''' Creates a new EntityType for the Model (including a ValueType and FactType for the ReferenceMode of the EntityType)
@@ -4288,9 +4298,9 @@ Namespace FBM
             '-------------------------------------
             'End While
 
-            Me.AllowCheckForErrors = True
-            Dim lrValidator As New Validation.ModelValidator(Me)
-            Call lrValidator.CheckForErrors()
+            'Me.AllowCheckForErrors = True
+            'Dim lrValidator As New Validation.ModelValidator(Me)
+            'Call lrValidator.CheckForErrors()
 
 
             If Not {"English", "Core"}.Contains(Me.ModelId) Then 'No need to modify the English or Core models

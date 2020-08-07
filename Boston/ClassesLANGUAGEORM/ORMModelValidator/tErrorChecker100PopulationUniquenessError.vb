@@ -25,7 +25,6 @@
 
                 If lrFactType.Fact.Count > 1 Then
 
-
                     For Each lrInternalUniquenessConstraint In lrFactType.InternalUniquenessConstraint
                         '---------------------------------------------------------------------------
                         'Find the Count of Facts that have matching FactData for the span of Roles 
@@ -38,11 +37,25 @@
 
                             For Each lrRole In lrInternalUniquenessConstraint.Role
 
-                                Call lrFact.GetFactDataByRoleId(lrRole.Id).ClearModelErrors()
-                                lsDataValue = lrFact.GetFactDataByRoleId(lrRole.Id).Data
-                                lrFactData = New FBM.FactData(New FBM.Role(lrFactType, lrRole.Id, True), New FBM.Concept(lsDataValue))
+                                lrFactData = lrFact.GetFactDataByRoleId(lrRole.Id)
+                                If lrFactData Is Nothing Then
+                                    Dim lsMessage = "No FactData found for Role:"
+                                    lsMessage &= vbCrLf & vbCrLf & "InternalUniquenessConstraint: " & lrInternalUniquenessConstraint.Id
+                                    lsMessage &= vbCrLf & "Role.Id: " & lrRole.Id
+                                    lsMessage &= vbCrLf & vbCrLf & "Fact Type's Roles: " & lrInternalUniquenessConstraint.Id
+                                    For Each lrFTRole In lrFactType.RoleGroup
+                                        lsMessage &= vbCrLf & "Role.Id: " & lrFTRole.Id
+                                    Next
+                                    MsgBox(lsMessage)
+                                    'No point continuing, abort
+                                    Exit Sub
+                                Else
+                                    Call lrFactData.ClearModelErrors()
+                                    lsDataValue = lrFact.GetFactDataByRoleId(lrRole.Id).Data
+                                    lrFactData = New FBM.FactData(New FBM.Role(lrFactType, lrRole.Id, True), New FBM.Concept(lsDataValue))
 
-                                lrFactPredicate.data.Add(lrFactData)
+                                    lrFactPredicate.data.Add(lrFactData)
+                                End If
                             Next
 
                             '--------------------------------------------------------------------
