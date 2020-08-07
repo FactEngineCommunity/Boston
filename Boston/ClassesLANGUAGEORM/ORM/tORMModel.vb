@@ -1613,18 +1613,22 @@ Namespace FBM
         ''' </summary>
         ''' <param name="arDictionaryEntry">The DictionaryEntry being added to the ModelDictionary.</param>
         ''' <param name="abAppendRealisations">Defaults to True. If True the Realisations for the DictionaryEntry is appended with the Concept of the DictionaryEntry</param>
+        ''' <param name="abStraightSave">Adds the DictionaryEntry without checking whether it already exists. Use when have already checked</param>
         ''' <remarks>This function can be used to check if a DictionaryEntry already exists in the ModelDictionary. Set abAppendRealisations to False if you don't wish for the Realisations of the DictionaryEntry to be appended with the Concept of the DictionaryEntry.</remarks>
         Public Function AddModelDictionaryEntry(ByRef arDictionaryEntry As FBM.DictionaryEntry,
                                                 Optional ByVal abAppendRealisations As Boolean = True,
                                                 Optional ByVal abMakeModelDirty As Boolean = True,
-                                                Optional ByVal abCheckForErrors As Boolean = False
-                                                ) As FBM.DictionaryEntry
+                                                Optional ByVal abCheckForErrors As Boolean = False,
+                                                Optional ByVal abStraightSave As Boolean = False) As FBM.DictionaryEntry
 
             Try
                 Dim lrDictionaryEntry As FBM.DictionaryEntry
 
-
-                lrDictionaryEntry = Me.ModelDictionary.Find(AddressOf arDictionaryEntry.Equals)
+                If abStraightSave Then
+                    lrDictionaryEntry = arDictionaryEntry
+                Else
+                    lrDictionaryEntry = Me.ModelDictionary.Find(AddressOf arDictionaryEntry.Equals)
+                End If
 
                 If lrDictionaryEntry IsNot Nothing Then
                     '-------------------------------------------------------------------------------------------------------

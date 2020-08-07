@@ -20,6 +20,13 @@ Namespace FBM
 
         Public ManuallyCreatedJoinPath As Boolean = False 'Set to True if the User holds down the Ctrl key and manually creates the JoinPath
 
+        ''' <summary>
+        ''' Parameterless New
+        ''' </summary>
+        Public Sub New()
+
+        End Sub
+
         Public Sub New(ByRef arRoleConstraint As FBM.RoleConstraint, _
                        ByVal aiSequenceNr As Integer, _
                        Optional ByVal asArgumentId As String = Nothing)

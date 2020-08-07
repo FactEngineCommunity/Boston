@@ -4,6 +4,7 @@ Namespace FBM
 
     Partial Public Class Page
 
+        <NonSerialized>
         Public WithEvents RDSModel As New RDS.Model
 
         Public Sub displayPGSRelationNodeLink(ByRef arOriginatingNode As PGS.Node, ByRef arRelation As RDS.Relation)

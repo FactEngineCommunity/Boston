@@ -14,7 +14,8 @@ Namespace FBM
         Implements IEquatable(Of FBM.FactTypeInstance)
         Implements FBM.iPageObject
 
-        <XmlIgnore()> _
+        <NonSerialized>
+        <XmlIgnore()>
         Public WithEvents Page As FBM.Page
 
         'The FactType for which the FactTypeIstance acts as View/Proxy.
@@ -899,7 +900,7 @@ Namespace FBM
                 End If
             End If
 
-            If IsSomething(Me.FactTable) Then
+            If IsSomething(Me.FactTable) And Me.Page.Language = pcenumLanguage.ORMModel Then
                 Call Me.FactTable.ResortFactTable()
             End If
 
@@ -2301,7 +2302,7 @@ Namespace FBM
             'Update the FactTable within the FactTypeInstance on the
             '  current page
             '-----------------------------------------------------------
-            If Me.Page.Loaded Then
+            If Me.Page.Loaded And Me.Page.Language = pcenumLanguage.ORMModel Then
                 If IsSomething(Me.FactTable.TableShape) And IsSomething(Me.FactTable.FactTypeInstance) Then
                     Call Me.FactTable.ResortFactTable()
                 End If

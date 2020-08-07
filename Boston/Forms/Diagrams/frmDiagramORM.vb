@@ -17,8 +17,8 @@ Imports System.ComponentModel
 Public Class frmDiagramORM
 
     Private zfrmOverview As frmToolboxOverview = New frmToolboxOverview
-
     Public WithEvents zrPage As FBM.Page = Nothing
+
     Public zoTreeNode As TreeNode = Nothing 'The TreeNode within the Enterprise viewer from which the Page was launched
     Public zrSpecialDragMode As New tSpecialDragMode
 

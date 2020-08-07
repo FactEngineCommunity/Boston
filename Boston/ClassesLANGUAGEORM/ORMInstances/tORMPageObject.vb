@@ -7,11 +7,12 @@ Namespace FBM
     Public Class PageObject
         Inherits FBM.ModelObject
 
-        <XmlIgnore()> _
+        <NonSerialized>
+        <XmlIgnore()>
         Public Page As FBM.Page
 
-        <NonSerialized(), _
-        XmlIgnore()> _
+        <NonSerialized>
+        <XmlIgnore()>
         Public Shape As New ShapeNode
 
         Public X As Integer

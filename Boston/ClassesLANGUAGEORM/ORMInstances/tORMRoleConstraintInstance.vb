@@ -60,7 +60,8 @@ Namespace FBM
         Public CreatingArgument As Boolean = False 'NB See also: FBM.RoleContraint.CurrentArgument As FBM.RoleConstraintArgument
         'NB See: frmDiagramORM.Diagram.NodeClicked for when starting the argument by effectively dragging from the RoleConstraint/Instance
 
-        <XmlIgnore()> _
+        <NonSerialized>
+        <XmlIgnore()>
         Public Page As FBM.Page
 
         Public Property X As Integer Implements FBM.iPageObject.X

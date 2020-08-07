@@ -9,6 +9,7 @@ Imports System.Runtime.CompilerServices
 Imports Microsoft.VisualBasic
 Imports System.Configuration
 Imports System.Text
+Imports System.Xml.Serialization
 
 Namespace Richmond
 
@@ -375,6 +376,7 @@ Namespace Richmond
 
             Dim mem As System.IO.MemoryStream = New System.IO.MemoryStream()
             Dim bin As BinaryFormatter = New BinaryFormatter()
+            'Dim bin = New XmlSerializer(obj.GetType)
             Try
 
                 bin.Serialize(mem, obj)
@@ -382,7 +384,7 @@ Namespace Richmond
 
             Catch ex As Exception
 
-                MsgBox("Your object cannot be serialized. The reason is: " & ex.ToString())
+                MsgBox("Your object cannot be serialized. The reason is: " & ex.ToString() & ex.GetType.ToString)
                 Return False
             End Try
         End Function

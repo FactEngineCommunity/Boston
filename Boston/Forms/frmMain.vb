@@ -1961,7 +1961,7 @@ Public Class frmMain
 
             If IsSomething(lrForm) Then
                 If TypeOf (lrForm) Is frmDiagramORM Then
-                    Dim lrfrmORMModel As New frmDiagramORM
+                    Dim lrfrmORMModel As frmDiagramORM
                     lrfrmORMModel = lrForm
                     lrfrmORMModel.DiagramView.ZoomFactor = ToolStripComboBox_zoom.SelectedItem.itemdata
                     lrfrmORMModel.Diagram.Invalidate()

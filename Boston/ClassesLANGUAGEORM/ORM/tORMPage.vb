@@ -55,8 +55,8 @@ Namespace FBM
         <XmlIgnore()> _
         Public Loading As Boolean = False
 
-        <XmlIgnore()> _
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <XmlIgnore()>
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public WithEvents _Model As FBM.Model
         <XmlIgnore()> _
         Public Overridable Property Model() As FBM.Model
@@ -89,9 +89,9 @@ Namespace FBM
         Public FormLoaded As Boolean = False 'TRUE when the form/diagram of the Page is loaded within Richmond (i.e. displayed on the screen).
 
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
-        <NonSerialized()> _
-        <XmlIgnore()> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        <NonSerialized(),
+        XmlIgnore()>
         Public _Form As Object
         <XmlIgnore()> _
         Public Overridable Property Form() As Object
@@ -104,29 +104,29 @@ Namespace FBM
         End Property
 
 
-        <NonSerialized()> _
-        <XmlIgnore()> _
-        <CategoryAttribute("What the"), _
-        Browsable(False), _
-        [ReadOnly](True), _
-        BindableAttribute(False), _
-        DefaultValueAttribute(""), _
-        DesignOnly(True), _
-        DescriptionAttribute("The Mindfusion Diagram object for the Page.")> _
+        <NonSerialized(),
+        XmlIgnore()>
+        <CategoryAttribute("What the"),
+        Browsable(False),
+        [ReadOnly](True),
+        BindableAttribute(False),
+        DefaultValueAttribute(""),
+        DesignOnly(True),
+        DescriptionAttribute("The Mindfusion Diagram object for the Page.")>
         Public WithEvents Diagram As MindFusion.Diagramming.Diagram
 
-        <NonSerialized()> _
-        <XmlIgnore()> _
-        <Browsable(False), _
-        [ReadOnly](False)> _
+        <NonSerialized(),
+        XmlIgnore()>
+        <Browsable(False),
+        [ReadOnly](False)>
         Public DiagramView As MindFusion.Diagramming.WinForms.DiagramView
 
-        <NonSerialized()> _
-        <XmlIgnore()> _
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <NonSerialized(),
+        XmlIgnore()>
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public _SelectedObject As New List(Of Object) 'NB Each SelectedObject will be an 'Instance' type object with X,Y coordinates
 
-        <XmlIgnore()> _
+        <XmlIgnore()>
         <Browsable(False), _
         [ReadOnly](False)> _
         Public Property SelectedObject() As List(Of Object)
@@ -174,17 +174,22 @@ Namespace FBM
         End Property
 
 
-
-        <XmlIgnore()> _
+        <NonSerialized(),
+        XmlIgnore()>
         Public ModelObject As New List(Of FBM.ModelObject)
 
         Public EntityTypeInstance As New List(Of FBM.EntityTypeInstance)
         Public ValueTypeInstance As New List(Of FBM.ValueTypeInstance)
+
         Public FactTypeInstance As New List(Of FBM.FactTypeInstance)
-        <XmlIgnore()> _
+
+        <NonSerialized(),
+        XmlIgnore()>
         Public RoleInstance As New List(Of FBM.RoleInstance)
         Public RoleConstraintInstance As New List(Of FBM.RoleConstraintInstance)
+        <NonSerialized()>
         Public FactInstance As New List(Of FBM.FactInstance)
+        <NonSerialized()>
         Public ValueInstance As New List(Of FBM.FactDataInstance)
         Public ModelNoteInstance As New List(Of FBM.ModelNoteInstance)
 
@@ -215,13 +220,11 @@ Namespace FBM
 
         '----------------------------------------------------------------------------------
 
-        '---------------------------------------------------
-        'Constructor
-        '---------------------------------------------------
+
+        ''' <summary>
+        ''' Parameterless New
+        ''' </summary>
         Public Sub New()
-            '-------------------
-            'Parameterless New
-            '-------------------
         End Sub
 
         Public Sub New(ByRef arModel As FBM.Model, Optional ByVal as_PageId As String = Nothing, Optional ByVal as_page_name As String = Nothing, Optional ByVal aiLanguageId As pcenumLanguage = Nothing)

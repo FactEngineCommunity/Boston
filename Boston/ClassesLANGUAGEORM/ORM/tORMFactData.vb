@@ -146,26 +146,29 @@ Namespace FBM
                         '  DictionaryEntry in the ModelDictionary.
                         '-------------------------------------------------------------------------
                         lrOriginalDictionaryEntry = New FBM.DictionaryEntry(Me.Model, lsOriginalSymbol, pcenumConceptType.Value)
-                        If IsSomething(Me.Model.ModelDictionary.Find(AddressOf lrOriginalDictionaryEntry.Equals)) Then
-                            lrOriginalDictionaryEntry = Me.Model.ModelDictionary.Find(AddressOf lrOriginalDictionaryEntry.Equals)
+                        lrOriginalDictionaryEntry = Me.Model.ModelDictionary.Find(AddressOf lrOriginalDictionaryEntry.Equals)
+                        If lrOriginalDictionaryEntry IsNot Nothing Then ' IsSomething(Me.Model.ModelDictionary.Find(AddressOf lrOriginalDictionaryEntry.Equals)) Then
+                            'lrOriginalDictionaryEntry = Me.Model.ModelDictionary.Find(AddressOf lrOriginalDictionaryEntry.Equals)
                             Me.Model.DeprecateRealisationsForDictionaryEntry(lrOriginalDictionaryEntry, pcenumConceptType.Value)
                         End If
 
-                        Me.Model.AddModelDictionaryEntry(lrNewDictionaryEntry)
+                        Me.Model.AddModelDictionaryEntry(lrNewDictionaryEntry,,,, True)
 
-                        Me.Concept = lrNewDictionaryEntry.Concept                        
-                        Call lrNewDictionaryEntry.Concept.Save()
-                        lrNewDictionaryEntry.Save()
+                        Me.Concept = lrNewDictionaryEntry.Concept
+                        If Me.Model.Loaded Then
+                            Call lrNewDictionaryEntry.Concept.Save()
+                            lrNewDictionaryEntry.Save()
+                        End If
 
                         Me.makeDirty()
 
-                        RaiseEvent ConceptSymbolUpdated()
+                            RaiseEvent ConceptSymbolUpdated()
 
-                        lsDebugMessage = "Setting FactData.Concept.Symbol to new Concep/DictionaryEntry: " & value
-                        'Call prApplication.ThrowErrorMessage(lsDebugMessage, pcenumErrorType.Information)
-                    End If
+                            lsDebugMessage = "Setting FactData.Concept.Symbol to new Concep/DictionaryEntry: " & value
+                            'Call prApplication.ThrowErrorMessage(lsDebugMessage, pcenumErrorType.Information)
+                        End If
 
-                    Call Me.Model.MakeDirty(False, False)
+                        Call Me.Model.MakeDirty(False, False)
 
                 Catch ex As Exception
                     Dim lsMessage1 As String

@@ -43,10 +43,12 @@ Namespace FBM
         <XmlIgnore()> _
         Public NORMAIsUnaryFactTypeValueType As Boolean = False
 
-        <XmlIgnore()> _
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <XmlIgnore()>
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public _DataType As pcenumORMDataType = pcenumORMDataType.DataTypeNotSet
-        <XmlAttribute()> _
+
+
+        <XmlAttribute()>
         <CategoryAttribute("Value Type"), _
         Browsable(True), _
         [ReadOnly](False), _
