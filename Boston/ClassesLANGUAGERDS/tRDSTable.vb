@@ -609,6 +609,25 @@ Namespace RDS
 
         End Sub
 
+        Public Function getColumnByOrdingalPosition(ByVal aiOrdinalPosition As Integer) As RDS.Column
+
+            Try
+
+                Return Me.Column.Find(Function(x) x.OrdinalPosition = aiOrdinalPosition)
+
+            Catch ex As Exception
+                Dim lsMessage1 As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return Nothing
+            End Try
+
+        End Function
+
         Public Function getFirstNonPrimaryKeyColumnOrdinalPosition() As Integer
 
             Try

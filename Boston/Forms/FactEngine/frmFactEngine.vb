@@ -1257,4 +1257,11 @@ Public Class frmFactEngine
         Me.TabPageResults.Show()
 
     End Sub
+
+    Private Sub frmFactEngine_FormClosed(sender As Object, e As FormClosedEventArgs) Handles Me.FormClosed
+
+        frmMain.zfrmFactEngine = Nothing
+
+    End Sub
+
 End Class

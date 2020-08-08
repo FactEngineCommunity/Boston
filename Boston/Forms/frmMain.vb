@@ -1194,7 +1194,12 @@ Public Class frmMain
                 child.Show(DockPanel)
                 Me.zfrmFactEngine = child
             Else
-                Me.zfrmFactEngine.BringToFront()
+                If Not Me.zfrmFactEngine.IsDisposed Then
+                    Me.zfrmFactEngine.BringToFront()
+                Else
+                    Me.zfrmFactEngine = New frmFactEngine
+                    Me.zfrmFactEngine.Show(Me.DockPanel)
+                End If
             End If
 
         Catch ex As Exception

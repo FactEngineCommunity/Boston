@@ -1894,8 +1894,6 @@ Namespace FBM
 
                 Me.Loading = False
 
-                Call Me.Model.checkIfCanCheckForErrors()
-
             Catch ex As Exception
                 Dim lsMessage1 As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()

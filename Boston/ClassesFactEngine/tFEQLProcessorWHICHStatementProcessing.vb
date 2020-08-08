@@ -441,7 +441,7 @@
             arQueryEdge.TargetNode = New FactEngine.QueryNode(lrFBMModelObject)
 
             If lrFBMModelObject.ConceptType = pcenumConceptType.ValueType Then
-                arQueryEdge.WhichClauseType = FactEngine.Constants.pcenumWhichClauseType.IsPredicateNodePropertyIdentification
+                arQueryEdge.WhichClauseSubType = FactEngine.Constants.pcenumWhichClauseType.IsPredicateNodePropertyIdentification
             Else
                 arQueryGraph.Nodes.AddUnique(arQueryEdge.TargetNode)
             End If
@@ -587,7 +587,7 @@
             lrFBMModelObject = Me.Model.GetModelObjectByName(Me.WHICHCLAUSE.MODELELEMENTNAME(0))
             If lrFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & Me.WHICHCLAUSE.MODELELEMENTNAME(0) & "'.")
             arQueryEdge.TargetNode = New FactEngine.QueryNode(lrFBMModelObject)
-            arQueryGraph.Nodes.AddUnique(arQueryEdge.TargetNode)
+            arQueryGraph.Nodes.Add(arQueryEdge.TargetNode) '20200808-VM-Was AddUnique
 
             ''---------------------------------------------------------
             ''Get the Predicate
@@ -743,7 +743,7 @@
             arQueryEdge.TargetNode = New FactEngine.QueryNode(lrFBMModelObject)
 
             If lrFBMModelObject.ConceptType = pcenumConceptType.ValueType Then
-                arQueryEdge.WhichClauseType = FactEngine.Constants.pcenumWhichClauseType.IsPredicateNodePropertyIdentification
+                arQueryEdge.WhichClauseSubType = FactEngine.Constants.pcenumWhichClauseType.IsPredicateNodePropertyIdentification
             Else
                 arQueryGraph.Nodes.AddUnique(arQueryEdge.TargetNode)
             End If
@@ -802,7 +802,7 @@
             arQueryEdge.TargetNode = New FactEngine.QueryNode(lrFBMModelObject)
 
             If lrFBMModelObject.ConceptType = pcenumConceptType.ValueType Then
-                arQueryEdge.WhichClauseType = FactEngine.Constants.pcenumWhichClauseType.IsPredicateNodePropertyIdentification
+                arQueryEdge.WhichClauseSubType = FactEngine.Constants.pcenumWhichClauseType.IsPredicateNodePropertyIdentification
             Else
                 arQueryGraph.Nodes.AddUnique(arQueryEdge.TargetNode)
             End If
@@ -935,7 +935,7 @@
             arQueryEdge.TargetNode = New FactEngine.QueryNode(lrFBMModelObject)
 
             If lrFBMModelObject.ConceptType = pcenumConceptType.ValueType Then
-                arQueryEdge.WhichClauseType = FactEngine.Constants.pcenumWhichClauseType.IsPredicateNodePropertyIdentification
+                arQueryEdge.WhichClauseSubType = FactEngine.Constants.pcenumWhichClauseType.IsPredicateNodePropertyIdentification
             Else
                 arQueryGraph.Nodes.AddUnique(arQueryEdge.TargetNode)
             End If

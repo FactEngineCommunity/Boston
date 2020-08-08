@@ -4337,6 +4337,8 @@ Namespace FBM
 
             End If
 
+            Call Me.checkIfCanCheckForErrors()
+
             Me.Loaded = True
 
             '20180410-VM-ToDo-Test to see if the RDF has been created for the Model.

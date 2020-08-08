@@ -43,6 +43,7 @@
 
                 lsSQLQuery = "SELECT "
 
+#Region "ProjectionColums"
                 liInd = 1
                 Dim larProjectionColumn = Me.getProjectionColumns
                 For Each lrProjectColumn In larProjectionColumn.FindAll(Function(x) x IsNot Nothing)
@@ -100,9 +101,11 @@
                 '    If liInd < Me.getProjectQueryEdges.Count Then lsSQLQuery &= ","
                 '    liInd += 1
                 'Next
+#End Region
 
                 lsSQLQuery &= vbCrLf & "FROM "
 
+#Region "FromClause"
                 liInd = 1
                 Dim larFromNodes = Me.Nodes.FindAll(Function(x) x.FBMModelObject.ConceptType <> pcenumConceptType.ValueType)
                 For Each lrQueryNode In larFromNodes
@@ -118,15 +121,20 @@
 
                 liInd = 1
                 Dim larRDSTableQueryEdge = Me.QueryEdges.FindAll(Function(x) x.FBMFactType.isRDSTable)
+
                 For Each lrQueryEdge In larRDSTableQueryEdge
 
-                    lsSQLQuery &= vbCrLf & "," & lrQueryEdge.FBMFactType.Id & Viev.NullVal(lrQueryEdge.Alias, "")
+                    If Me.Nodes.FindAll(Function(x) x.Name = lrQueryEdge.FBMFactType.Id).Count = 0 Then
+                        lsSQLQuery &= vbCrLf & "," & lrQueryEdge.FBMFactType.Id & Viev.NullVal(lrQueryEdge.Alias, "")
+                    End If
 
                     'If liInd < larRDSTableQueryEdge.Count Then lsSQLQuery &= "," & vbCrLf
                     liInd += 1
                 Next
 
-                'WHERE Conditional
+#End Region
+
+                'WHERE
                 Dim larConditionalQueryEdges As New List(Of FactEngine.QueryEdge)
                 larConditionalQueryEdges = Me.QueryEdges.FindAll(Function(x) x.IdentifierList.Count > 0)
 
@@ -139,9 +147,12 @@
 
                 lsSQLQuery &= vbCrLf & "WHERE "
 
+#Region "WhereClauses"
                 liInd = 1
                 Dim lbAddedAND = False
                 Dim lbIntialWhere = ""
+
+#Region "WhereJoins"
                 For Each lrQueryEdge In larWhereEdges
 
                     If lbAddedAND Or liInd > 1 Then
@@ -156,12 +167,12 @@
 
                         For Each lrColumn In lrQueryEdge.BaseNode.RDSTable.getPrimaryKeyColumns
                             lsSQLQuery &= lrQueryEdge.BaseNode.Name & Viev.NullVal(lrQueryEdge.BaseNode.Alias, "") & "." & lrColumn.Name & " = "
-                            lsSQLQuery &= lrOriginTable.Name & "." & lrOriginTable.Column(0).Name
+                            lsSQLQuery &= lrOriginTable.Name & "." & lrOriginTable.getColumnByOrdingalPosition(1).Name
                         Next
 
                         For Each lrColumn In lrQueryEdge.BaseNode.RDSTable.getPrimaryKeyColumns
                             lsSQLQuery &= vbCrLf & "AND " & lrQueryEdge.BaseNode.Name & Viev.NullVal(lrQueryEdge.TargetNode.Alias, "") & "." & lrColumn.Name & " = "
-                            lsSQLQuery &= lrOriginTable.Name & "." & lrOriginTable.Column(1).Name
+                            lsSQLQuery &= lrOriginTable.Name & "." & lrOriginTable.getColumnByOrdingalPosition(2).Name
                         Next
 
                     Else
@@ -197,36 +208,51 @@
                     lbIntialWhere = Nothing
                 Next
 
+#End Region
                 If Not lbAddedAND And lbIntialWhere Is Nothing And larConditionalQueryEdges.Count > 0 Then lsSQLQuery &= " AND "
 
+#Region "WhereConditionals"
                 For Each lrQueryEdge In larConditionalQueryEdges
-                    Select Case lrQueryEdge.WhichClauseType
+                    Select Case lrQueryEdge.WhichClauseSubType
                         Case Is = FactEngine.Constants.pcenumWhichClauseType.IsPredicateNodePropertyIdentification
                             Dim lrFactType As FBM.FactType = Nothing
                             Select Case lrQueryEdge.BaseNode.FBMModelObject.GetType
                                 Case GetType(FBM.FactType)
-                                    lrFactType = CType(lrQueryEdge.BaseNode.FBMModelObject, FBM.FactType)
+                                    If lrQueryEdge.WhichClauseType = pcenumWhichClauseType.WithClause Then
+                                        lrFactType = lrQueryEdge.FBMFactType
+                                    Else
+                                        lrFactType = CType(lrQueryEdge.BaseNode.FBMModelObject, FBM.FactType)
+                                    End If
+
                                 Case GetType(FBM.EntityType)
                                     lrFactType = lrQueryEdge.FBMFactType
                             End Select
 
+                            Dim larPredicatePart As List(Of FBM.PredicatePart)
+                            If lrQueryEdge.Predicate = "" Then
+                                'Likely a "WITH WHAT Rating" or "WITH (Rating:'8')" as in "WHICH Lecturer likes WHICH Lecturer WITH WHAT RATING"
+                                larPredicatePart = (From FactTypeReading In lrFactType.FactTypeReading
+                                                    Select FactTypeReading.PredicatePart(0)).ToList
+                            Else
+                                larPredicatePart = (From FactTypeReading In lrFactType.FactTypeReading
+                                                    From PredicatePart In FactTypeReading.PredicatePart
+                                                    Where PredicatePart.PredicatePartText = Trim(lrQueryEdge.Predicate)
+                                                    Select PredicatePart).ToList
+                            End If
 
-                            Dim larPredicatePart = From FactTypeReading In lrFactType.FactTypeReading
-                                                   From PredicatePart In FactTypeReading.PredicatePart
-                                                   Where PredicatePart.PredicatePartText = Trim(lrQueryEdge.Predicate)
-                                                   Select PredicatePart
 
                             Dim lrPredicatePart As FBM.PredicatePart = Nothing
 
                             If larPredicatePart.Count = 0 Then
 
-                                larPredicatePart = From FactType In Me.Model.FactType
-                                                   From FactTypeReading In FactType.FactTypeReading
-                                                   From PredicatePart In FactTypeReading.PredicatePart
-                                                   Where FactType.RoleGroup.FindAll(Function(x) x.JoinedORMObject.Id = lrQueryEdge.BaseNode.FBMModelObject.Id _
-                                                  Or x.JoinedORMObject.Id = lrQueryEdge.TargetNode.FBMModelObject.Id).Count = 2
-                                                   Where PredicatePart.PredicatePartText = lrQueryEdge.Predicate
-                                                   Select PredicatePart
+                                larPredicatePart = (From FactType In Me.Model.FactType
+                                                    From FactTypeReading In FactType.FactTypeReading
+                                                    From PredicatePart In FactTypeReading.PredicatePart
+                                                    Where FactType.RoleGroup.FindAll(Function(x) x.JoinedORMObject.Id = lrQueryEdge.BaseNode.FBMModelObject.Id _
+                                                       Or x.JoinedORMObject.Id = lrQueryEdge.TargetNode.FBMModelObject.Id).Count = 2
+                                                    Where PredicatePart.PredicatePartText = lrQueryEdge.Predicate
+                                                    Where lrQueryEdge.Predicate <> ""
+                                                    Select PredicatePart).ToList
 
                                 If larPredicatePart.Count > 0 Then
                                     lrPredicatePart = larPredicatePart.First
@@ -244,15 +270,17 @@
                                     End If
                                 End If
                             Else
-                                lrPredicatePart = larPredicatePart.First
+                                lrPredicatePart = larPredicatePart.First 'For now...need to consider PreboundReadingText/s
                             End If
 
                             Dim lrResponsibleRole As FBM.Role
 
-                            If Not lrPredicatePart.Role.JoinedORMObject Is lrQueryEdge.TargetNode.FBMModelObject Then
+                            If lrPredicatePart.Role.JoinedORMObject Is lrQueryEdge.BaseNode.FBMModelObject Then
+                                'Nothing to do here, because is the Predicate joined to the BaseNode that we want the Table for
+                            ElseIf Not lrPredicatePart.Role.JoinedORMObject Is lrQueryEdge.TargetNode.FBMModelObject Then
 
                                 'lrQueryEdge.Predicate = "is " & lrQueryEdge.Predicate
-
+                                '20200808-VM-Leave this breakpoint here. If hasn't been hit in years, get rid of this ElseIf
                                 lrPredicatePart = (From FactTypeReading In lrFactType.FactTypeReading
                                                    From PredicatePart In FactTypeReading.PredicatePart
                                                    Where PredicatePart.PredicatePartText = Trim(lrQueryEdge.Predicate)
@@ -293,6 +321,8 @@
                     End Select
 
                 Next
+#End Region
+#End Region
 
                 Return lsSQLQuery
             Catch ex As Exception

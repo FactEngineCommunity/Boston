@@ -36,6 +36,7 @@ Namespace FactEngine
         End Property
 
         Public WhichClauseType As pcenumWhichClauseType = pcenumWhichClauseType.None
+        Public WhichClauseSubType As pcenumWhichClauseType = pcenumWhichClauseType.None 'Used predominantly for IsPredicateNodePropertyIdentification so that the main Type is not changed
 
         ''' <summary>
         ''' Paremeterless New
@@ -66,7 +67,7 @@ Namespace FactEngine
                                         ByVal asPredicate As String) As Exception
             Dim lsMessage As String = ""
             Try
-                If Me.WhichClauseType = pcenumWhichClauseType.IsPredicateNodePropertyIdentification Then
+                If Me.WhichClauseSubType = pcenumWhichClauseType.IsPredicateNodePropertyIdentification Then
 
                     Select Case Me.BaseNode.FBMModelObject.GetType
                         Case Is = GetType(FBM.FactType)

@@ -106,7 +106,6 @@ Namespace TableFact
             Dim lsId As String
 
             Try
-                If arFactType.Id = "CorePropertyIsForRole" Then Debugger.Break()
 
                 lRecordset.ActiveConnection = pdbConnection
                 lRecordset.CursorType = pcOpenStatic
