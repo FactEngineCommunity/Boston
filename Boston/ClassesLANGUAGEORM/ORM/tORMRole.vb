@@ -1803,8 +1803,17 @@ Namespace FBM
                 '------------------------------------------------------------
                 'Get the originally joined ModelObject
                 Dim lrOriginallyJoinedModelObject As FBM.ModelObject = Me.JoinedORMObject
-                Dim lrOriginallyJoinedTable = lrOriginallyJoinedModelObject.getCorrespondingRDSTable
-                Dim larOriginalColumn = lrOriginallyJoinedTable.Column.FindAll(Function(x) x.Role Is Me)
+
+                Dim lrOriginallyJoinedTable As RDS.Table = Nothing
+                Dim larOriginalColumn As List(Of RDS.Column)
+
+                If lrOriginallyJoinedModelObject IsNot Nothing Then
+                    lrOriginallyJoinedTable = lrOriginallyJoinedModelObject.getCorrespondingRDSTable
+                    If lrOriginallyJoinedTable IsNot Nothing Then
+                        larOriginalColumn = lrOriginallyJoinedTable.Column.FindAll(Function(x) x.Role Is Me)
+                    End If
+                End If
+
 
                 If arNewJoinedModelObject Is Me.JoinedORMObject Then
                     Exit Sub
@@ -1822,45 +1831,48 @@ Namespace FBM
                         Case Is = pcenumConceptType.FactType
                             Me.JoinsFactType = arNewJoinedModelObject
                     End Select
-                    If Me.HasInternalUniquenessConstraint And (Me.FactType.IsManyTo1BinaryFactType Or Me.FactType.Is1To1BinaryFactType) Then
-                        '=========================================================
-                        'PSEUDOCODE
-                        '  * Create the new Column on the newly joined Table
-                        '  * Get the Original Relation
-                        '  * Remove the OriginalRelation from the Original Table                        
-                        '  * Reassign the Role to the newly joined ModelObject
-                        '  * Create the New Relation and add to New Table
-                        '  * Remove the Original Column
-                        '---------------------------------------------------------
-                        Dim lrNewTable = arNewJoinedModelObject.getCorrespondingRDSTable
 
-                        Dim larCoveredRoles As New List(Of FBM.Role)
-                        Dim larDownstreamActiveRoles = Me.getDownstreamRoleActiveRoles(larCoveredRoles) 'Returns all Roles joined ObjectifiedFactTypes and their Roles' JoinedORMObjects (recursively).
+                    If lrOriginallyJoinedTable IsNot Nothing Then
+#Region "RDS Processing"
+                        If Me.HasInternalUniquenessConstraint And (Me.FactType.IsManyTo1BinaryFactType Or Me.FactType.Is1To1BinaryFactType) Then
+                            '=========================================================
+                            'PSEUDOCODE
+                            '  * Create the new Column on the newly joined Table
+                            '  * Get the Original Relation
+                            '  * Remove the OriginalRelation from the Original Table                        
+                            '  * Reassign the Role to the newly joined ModelObject
+                            '  * Create the New Relation and add to New Table
+                            '  * Remove the Original Column
+                            '---------------------------------------------------------
+                            Dim lrNewTable = arNewJoinedModelObject.getCorrespondingRDSTable
 
-                        'Create the new Column/s in the newly joined Table
-                        Dim lrNewColumn As New RDS.Column
-                        For Each lrActiveRole In larDownstreamActiveRoles
-                            'Dim lrOriginalColumn = larOriginalColumn.Find(Function(x) x.ActiveRole Is lrActiveRole)
-                            lrNewColumn = New RDS.Column(lrNewTable,
+                            Dim larCoveredRoles As New List(Of FBM.Role)
+                            Dim larDownstreamActiveRoles = Me.getDownstreamRoleActiveRoles(larCoveredRoles) 'Returns all Roles joined ObjectifiedFactTypes and their Roles' JoinedORMObjects (recursively).
+
+                            'Create the new Column/s in the newly joined Table
+                            Dim lrNewColumn As New RDS.Column
+                            For Each lrActiveRole In larDownstreamActiveRoles
+                                'Dim lrOriginalColumn = larOriginalColumn.Find(Function(x) x.ActiveRole Is lrActiveRole)
+                                lrNewColumn = New RDS.Column(lrNewTable,
                                                          lrActiveRole.JoinedORMObject.Id,
                                                          Me,
                                                          lrActiveRole,
                                                          Me.Mandatory)
-                            If lrNewTable.Column.Find(Function(x) x.Role.Id = Me.Id) Is Nothing Then
-                                lrNewTable.addColumn(lrNewColumn)
+                                If lrNewTable.Column.Find(Function(x) x.Role.Id = Me.Id) Is Nothing Then
+                                    lrNewTable.addColumn(lrNewColumn)
+                                End If
+                            Next
+
+                            'Remove the Original Relation
+                            If larOriginalColumn(0).Relation.Count > 0 Then
+                                Dim lrRelation = larOriginalColumn(0).Relation(0)
+                                Call Me.Model.RDS.removeRelation(lrRelation)
                             End If
-                        Next
 
-                        'Remove the Original Relation
-                        If larOriginalColumn(0).Relation.Count > 0 Then
-                            Dim lrRelation = larOriginalColumn(0).Relation(0)
-                            Call Me.Model.RDS.removeRelation(lrRelation)
-                        End If
+                            'Reassign the Role
+                            Me.JoinedORMObject = arNewJoinedModelObject
 
-                        'Reassign the Role
-                        Me.JoinedORMObject = arNewJoinedModelObject
-
-                        Select Case arNewJoinedModelObject.ConceptType
+                            Select Case arNewJoinedModelObject.ConceptType
                                 Case Is = pcenumConceptType.EntityType
                                     Me.TypeOfJoin = pcenumRoleJoinType.EntityType
                                     Me.JoinsEntityType = Me.JoinedORMObject
@@ -1878,245 +1890,252 @@ Namespace FBM
                                     Me.JoinsValueType = Nothing
                             End Select
 
-                        Me.makeDirty()
+                            Me.makeDirty()
 
 
-                        'Create a Relation for the reassigned Role
-                        Call Me.Model.generateRelationForReassignedRole(Me)
+                            'Create a Relation for the reassigned Role
+                            Call Me.Model.generateRelationForReassignedRole(Me)
 
-                        'Remove the orginal Column from the Originally Joined Table
-                        For Each lrColumn In larOriginalColumn
-                            Call lrOriginallyJoinedTable.removeColumn(lrColumn)
-                        Next
+                            'Remove the orginal Column from the Originally Joined Table
+                            For Each lrColumn In larOriginalColumn
+                                Call lrOriginallyJoinedTable.removeColumn(lrColumn)
+                            Next
 
-                    Else
-                        '==========================================================================
-                        'RDS - NB See below for RDS Processing propper. Must get the responsible Columns before the move.                    
-                        Dim larColumn As List(Of RDS.Column)
+                        Else
+                            '==========================================================================
+                            'RDS - NB See below for RDS Processing propper. Must get the responsible Columns before the move.                    
+                            Dim larColumn As List(Of RDS.Column)
 
-                        larColumn = Me.getResponsibleColumns()
-                        '======================================
+                            larColumn = Me.getResponsibleColumns()
+                            '======================================
 
-                        Me.JoinedORMObject = arNewJoinedModelObject
+                            Me.JoinedORMObject = arNewJoinedModelObject
 
-                        Select Case arNewJoinedModelObject.ConceptType
-                            Case Is = pcenumConceptType.EntityType
-                                Me.TypeOfJoin = pcenumRoleJoinType.EntityType
-                                Me.JoinsEntityType = Me.JoinedORMObject
-                                Me.JoinsValueType = Nothing
-                                Me.JoinsFactType = Nothing
-                            Case Is = pcenumConceptType.ValueType
-                                Me.TypeOfJoin = pcenumRoleJoinType.ValueType
-                                Me.JoinsValueType = Me.JoinedORMObject
-                                Me.JoinsEntityType = Nothing
-                                Me.JoinsFactType = Nothing
-                            Case Is = pcenumConceptType.FactType
-                                Me.TypeOfJoin = pcenumRoleJoinType.FactType
-                                Me.JoinsFactType = Me.JoinedORMObject
-                                Me.JoinsEntityType = Nothing
-                                Me.JoinsValueType = Nothing
-                        End Select
-
-                        Me.isDirty = True
-
-                        If Me.FactType.IsObjectified Then
-                            'Modify the JoinedORMObject of the appropriate LinkFactType
-                            Dim larLinkFactTypeRole = From FactType In Me.Model.FactType
-                                                      Where FactType.IsLinkFactType = True _
-                                                      And FactType.LinkFactTypeRole Is Me
-                                                      Select FactType.RoleGroup(1)
-
-                            Dim lrLinkFactTypeRole As FBM.Role = larLinkFactTypeRole.First
-
-                            Call lrLinkFactTypeRole.ReassignJoinedModelObject(arNewJoinedModelObject)
-
-                            'Select Case arNewJoinedModelObject.ConceptType
-                            '    Case Is = pcenumConceptType.EntityType
-                            '        lrLinkFactTypeRole.TypeOfJoin = pcenumRoleJoinType.EntityType
-                            '        lrLinkFactTypeRole.JoinsEntityType = lrLinkFactTypeRole.JoinedORMObject
-                            '        lrLinkFactTypeRole.JoinsValueType = Nothing
-                            '        lrLinkFactTypeRole.JoinsFactType = Nothing
-                            '    Case Is = pcenumConceptType.ValueType
-                            '        lrLinkFactTypeRole.TypeOfJoin = pcenumRoleJoinType.ValueType
-                            '        lrLinkFactTypeRole.JoinsValueType = lrLinkFactTypeRole.JoinedORMObject
-                            '        lrLinkFactTypeRole.JoinsEntityType = Nothing
-                            '        lrLinkFactTypeRole.JoinsFactType = Nothing
-                            '    Case Is = pcenumConceptType.FactType
-                            '        lrLinkFactTypeRole.TypeOfJoin = pcenumRoleJoinType.FactType
-                            '        lrLinkFactTypeRole.JoinsFactType = lrLinkFactTypeRole.JoinedORMObject
-                            '        lrLinkFactTypeRole.JoinsEntityType = Nothing
-                            '        lrLinkFactTypeRole.JoinsValueType = Nothing
-                            'End Select
-                        End If
-
-                        If My.Settings.UseClientServer And My.Settings.InitialiseClient And abBroadcastInterfaceEvent Then
-                            Call prDuplexServiceClient.BroadcastToDuplexService(Viev.FBM.Interface.pcenumBroadcastType.RoleReassignJoinedModelObject, Me, Nothing)
-                        End If
-
-                        '==========================================================================
-                        'RDS - NB See Above. Must get the responsible Columns before the move.                    
-
-                        '------------------------------------------------------------
-                        'Relations - Remove existing Relations
-                        If lrOriginallyJoinedModelObject IsNot Nothing Then
-                            Select Case lrOriginallyJoinedModelObject.ConceptType
-                                Case Is = pcenumConceptType.EntityType,
-                                          pcenumConceptType.FactType
-
-                                    Dim larOriginTable = From Column In larColumn
-                                                         Select Column.Table Distinct
-
-                                    For Each lrOriginTable In larOriginTable
-                                        Dim larOriginColumn = From Column In lrOriginTable.Column
-                                                              Where larColumn.Contains(Column)
-                                                              Select Column Distinct
-
-                                        Dim larRelationToRemove As New List(Of RDS.Relation)
-                                        larRelationToRemove = Me.Model.RDS.getRelationsByOriginTableOriginColumns(lrOriginTable, larOriginColumn.ToList)
-
-                                        For Each lrRelation In larRelationToRemove
-                                            Call Me.Model.RDS.removeRelation(lrRelation)
-                                        Next
-                                    Next
+                            Select Case arNewJoinedModelObject.ConceptType
+                                Case Is = pcenumConceptType.EntityType
+                                    Me.TypeOfJoin = pcenumRoleJoinType.EntityType
+                                    Me.JoinsEntityType = Me.JoinedORMObject
+                                    Me.JoinsValueType = Nothing
+                                    Me.JoinsFactType = Nothing
+                                Case Is = pcenumConceptType.ValueType
+                                    Me.TypeOfJoin = pcenumRoleJoinType.ValueType
+                                    Me.JoinsValueType = Me.JoinedORMObject
+                                    Me.JoinsEntityType = Nothing
+                                    Me.JoinsFactType = Nothing
+                                Case Is = pcenumConceptType.FactType
+                                    Me.TypeOfJoin = pcenumRoleJoinType.FactType
+                                    Me.JoinsFactType = Me.JoinedORMObject
+                                    Me.JoinsEntityType = Nothing
+                                    Me.JoinsValueType = Nothing
                             End Select
 
-                            'Remove the existing Column/s
-                            For Each lrColumn In larColumn.ToList
-                                Me.Model.RDS.Table.Find(Function(x) x.Name = lrColumn.Table.Name).removeColumn(lrColumn)
-                            Next
-                        End If
+                            Me.isDirty = True
 
-                        '=======================================================================================================
-                        'Create the New Columns
-                        Dim larTable = From lrColumn In larColumn
-                                       Select lrColumn.Table Distinct
+                            If Me.FactType.IsObjectified Then
+                                'Modify the JoinedORMObject of the appropriate LinkFactType
+                                Dim larLinkFactTypeRole = From FactType In Me.Model.FactType
+                                                          Where FactType.IsLinkFactType = True _
+                                                      And FactType.LinkFactTypeRole Is Me
+                                                          Select FactType.RoleGroup(1)
 
-                        Dim lrNewColumn As RDS.Column
-                        For Each lrTable In larTable
+                                Dim lrLinkFactTypeRole As FBM.Role = larLinkFactTypeRole.First
 
-                            Dim lrResponsibleRole As FBM.Role = larColumn.Find(Function(x) x.Table.Name = lrTable.Name).Role
+                                Call lrLinkFactTypeRole.ReassignJoinedModelObject(arNewJoinedModelObject)
 
-                            Select Case Me.JoinedORMObject.ConceptType
-                                Case Is = pcenumConceptType.ValueType
-                                    If Me.FactType.IsUnaryFactType Then
-                                        Throw New Exception("Can't have a UnaryFactType against a ValueType.")
+                                'Select Case arNewJoinedModelObject.ConceptType
+                                '    Case Is = pcenumConceptType.EntityType
+                                '        lrLinkFactTypeRole.TypeOfJoin = pcenumRoleJoinType.EntityType
+                                '        lrLinkFactTypeRole.JoinsEntityType = lrLinkFactTypeRole.JoinedORMObject
+                                '        lrLinkFactTypeRole.JoinsValueType = Nothing
+                                '        lrLinkFactTypeRole.JoinsFactType = Nothing
+                                '    Case Is = pcenumConceptType.ValueType
+                                '        lrLinkFactTypeRole.TypeOfJoin = pcenumRoleJoinType.ValueType
+                                '        lrLinkFactTypeRole.JoinsValueType = lrLinkFactTypeRole.JoinedORMObject
+                                '        lrLinkFactTypeRole.JoinsEntityType = Nothing
+                                '        lrLinkFactTypeRole.JoinsFactType = Nothing
+                                '    Case Is = pcenumConceptType.FactType
+                                '        lrLinkFactTypeRole.TypeOfJoin = pcenumRoleJoinType.FactType
+                                '        lrLinkFactTypeRole.JoinsFactType = lrLinkFactTypeRole.JoinedORMObject
+                                '        lrLinkFactTypeRole.JoinsEntityType = Nothing
+                                '        lrLinkFactTypeRole.JoinsValueType = Nothing
+                                'End Select
+                            End If
 
-                                    ElseIf Me.FactType.IsManyTo1BinaryFactType Or Me.FactType.Is1To1BinaryFactType Then
-                                        lrNewColumn = lrResponsibleRole.GetCorrespondingUnaryOrBinaryFactTypeColumn(lrTable)
-                                        lrTable.addColumn(lrNewColumn)
+                            If My.Settings.UseClientServer And My.Settings.InitialiseClient And abBroadcastInterfaceEvent Then
+                                Call prDuplexServiceClient.BroadcastToDuplexService(Viev.FBM.Interface.pcenumBroadcastType.RoleReassignJoinedModelObject, Me, Nothing)
+                            End If
 
-                                    ElseIf Me.FactType.HasTotalRoleConstraint Or Me.FactType.HasPartialButMultiRoleConstraint Then
-                                        lrNewColumn = Me.GetCorrespondingFactTypeColumn(lrTable)
-                                        lrNewColumn.Role = lrResponsibleRole
+                            '==========================================================================
+                            'RDS - NB See Above. Must get the responsible Columns before the move.                    
 
-                                        If lrResponsibleRole.isPartOfFactTypesPreferredReferenceScheme Then
-                                            lrNewColumn.IsMandatory = True
-                                            lrNewColumn.ContributesToPrimaryKey = True
-                                        End If
+                            '------------------------------------------------------------
+                            'Relations - Remove existing Relations
+                            If lrOriginallyJoinedModelObject IsNot Nothing Then
+                                Select Case lrOriginallyJoinedModelObject.ConceptType
+                                    Case Is = pcenumConceptType.EntityType,
+                                          pcenumConceptType.FactType
 
-                                        Call lrTable.addColumn(lrNewColumn)
-                                    Else
-                                        Throw New Exception("Don't know how we got here")
-                                    End If
-                                Case Is = pcenumConceptType.EntityType
+                                        Dim larOriginTable = From Column In larColumn
+                                                             Select Column.Table Distinct
 
-                                    Dim lrEntityType As FBM.EntityType = Me.JoinedORMObject
+                                        For Each lrOriginTable In larOriginTable
+                                            Dim larOriginColumn = From Column In lrOriginTable.Column
+                                                                  Where larColumn.Contains(Column)
+                                                                  Select Column Distinct
 
-                                    If lrResponsibleRole.FactType.IsUnaryFactType Then
+                                            Dim larRelationToRemove As New List(Of RDS.Relation)
+                                            larRelationToRemove = Me.Model.RDS.getRelationsByOriginTableOriginColumns(lrOriginTable, larOriginColumn.ToList)
 
-                                        lrNewColumn = lrResponsibleRole.GetCorrespondingUnaryOrBinaryFactTypeColumn(lrTable)
-                                        lrTable.addColumn(lrNewColumn)
-
-                                    ElseIf lrResponsibleRole.FactType.IsManyTo1BinaryFactType _
-                                            Or lrResponsibleRole.FactType.Is1To1BinaryFactType Then
-
-                                        If lrResponsibleRole.FactType.RoleGroup.Contains(Me) Then
-                                            Dim lrRoleConstraint = Me.FactType.InternalUniquenessConstraint.Find(Function(x) x.RoleConstraintRole(0).Role.Id = lrResponsibleRole.Id)
-                                            Call Me.Model.generateAttributesForRoleConstraint(lrRoleConstraint)
-
-                                            '20180805-Removed because created new Column on the wrong Table for 1:1 BinaryFactType reassigned Role.
-                                            'lrNewColumn = lrResponsibleRole.GetCorrespondingUnaryOrBinaryFactTypeColumn(lrTable)
-                                        Else
-                                            lrNewColumn = Me.GetCorrespondingFactTypeColumn(lrTable)
-                                            lrNewColumn.Role = lrResponsibleRole
-
-
-                                            lrNewColumn.ContributesToPrimaryKey = lrResponsibleRole.isPartOfFactTypesPreferredReferenceScheme
-
-                                            lrTable.addColumn(lrNewColumn)
-                                        End If
-
-                                    ElseIf lrResponsibleRole.FactType.HasTotalRoleConstraint Or lrResponsibleRole.FactType.HasPartialButMultiRoleConstraint Then
-
-                                        If lrEntityType.HasCompoundReferenceMode Then
-                                            Dim larNewColumn As New List(Of RDS.Column)
-
-                                            Call lrEntityType.getCompoundReferenceSchemeColumns(lrTable, lrResponsibleRole, larColumn)
-
-                                            For Each lrColumn In larColumn
-                                                lrTable.addColumn(lrColumn)
+                                            For Each lrRelation In larRelationToRemove
+                                                Call Me.Model.RDS.removeRelation(lrRelation)
                                             Next
-                                        Else
+                                        Next
+                                End Select
+
+                                'Remove the existing Column/s
+                                For Each lrColumn In larColumn.ToList
+                                    Me.Model.RDS.Table.Find(Function(x) x.Name = lrColumn.Table.Name).removeColumn(lrColumn)
+                                Next
+                            End If
+
+                            '=======================================================================================================
+                            'Create the New Columns
+                            Dim larTable = From lrColumn In larColumn
+                                           Select lrColumn.Table Distinct
+
+                            Dim lrNewColumn As RDS.Column
+                            For Each lrTable In larTable
+
+                                Dim lrResponsibleRole As FBM.Role = larColumn.Find(Function(x) x.Table.Name = lrTable.Name).Role
+
+                                Select Case Me.JoinedORMObject.ConceptType
+                                    Case Is = pcenumConceptType.ValueType
+                                        If Me.FactType.IsUnaryFactType Then
+                                            Throw New Exception("Can't have a UnaryFactType against a ValueType.")
+
+                                        ElseIf Me.FactType.IsManyTo1BinaryFactType Or Me.FactType.Is1To1BinaryFactType Then
+                                            lrNewColumn = lrResponsibleRole.GetCorrespondingUnaryOrBinaryFactTypeColumn(lrTable)
+                                            lrTable.addColumn(lrNewColumn)
+
+                                        ElseIf Me.FactType.HasTotalRoleConstraint Or Me.FactType.HasPartialButMultiRoleConstraint Then
                                             lrNewColumn = Me.GetCorrespondingFactTypeColumn(lrTable)
                                             lrNewColumn.Role = lrResponsibleRole
 
-                                            If Me.isPartOfFactTypesPreferredReferenceScheme Then
+                                            If lrResponsibleRole.isPartOfFactTypesPreferredReferenceScheme Then
                                                 lrNewColumn.IsMandatory = True
                                                 lrNewColumn.ContributesToPrimaryKey = True
                                             End If
 
                                             Call lrTable.addColumn(lrNewColumn)
+                                        Else
+                                            Throw New Exception("Don't know how we got here")
+                                        End If
+                                    Case Is = pcenumConceptType.EntityType
+
+                                        Dim lrEntityType As FBM.EntityType = Me.JoinedORMObject
+
+                                        If lrResponsibleRole.FactType.IsUnaryFactType Then
+
+                                            lrNewColumn = lrResponsibleRole.GetCorrespondingUnaryOrBinaryFactTypeColumn(lrTable)
+                                            lrTable.addColumn(lrNewColumn)
+
+                                        ElseIf lrResponsibleRole.FactType.IsManyTo1BinaryFactType _
+                                            Or lrResponsibleRole.FactType.Is1To1BinaryFactType Then
+
+                                            If lrResponsibleRole.FactType.RoleGroup.Contains(Me) Then
+                                                Dim lrRoleConstraint = Me.FactType.InternalUniquenessConstraint.Find(Function(x) x.RoleConstraintRole(0).Role.Id = lrResponsibleRole.Id)
+                                                Call Me.Model.generateAttributesForRoleConstraint(lrRoleConstraint)
+
+                                                '20180805-Removed because created new Column on the wrong Table for 1:1 BinaryFactType reassigned Role.
+                                                'lrNewColumn = lrResponsibleRole.GetCorrespondingUnaryOrBinaryFactTypeColumn(lrTable)
+                                            Else
+                                                lrNewColumn = Me.GetCorrespondingFactTypeColumn(lrTable)
+                                                lrNewColumn.Role = lrResponsibleRole
+
+
+                                                lrNewColumn.ContributesToPrimaryKey = lrResponsibleRole.isPartOfFactTypesPreferredReferenceScheme
+
+                                                lrTable.addColumn(lrNewColumn)
+                                            End If
+
+                                        ElseIf lrResponsibleRole.FactType.HasTotalRoleConstraint Or lrResponsibleRole.FactType.HasPartialButMultiRoleConstraint Then
+
+                                            If lrEntityType.HasCompoundReferenceMode Then
+                                                Dim larNewColumn As New List(Of RDS.Column)
+
+                                                Call lrEntityType.getCompoundReferenceSchemeColumns(lrTable, lrResponsibleRole, larColumn)
+
+                                                For Each lrColumn In larColumn
+                                                    lrTable.addColumn(lrColumn)
+                                                Next
+                                            Else
+                                                lrNewColumn = Me.GetCorrespondingFactTypeColumn(lrTable)
+                                                lrNewColumn.Role = lrResponsibleRole
+
+                                                If Me.isPartOfFactTypesPreferredReferenceScheme Then
+                                                    lrNewColumn.IsMandatory = True
+                                                    lrNewColumn.ContributesToPrimaryKey = True
+                                                End If
+
+                                                Call lrTable.addColumn(lrNewColumn)
+                                            End If
+
+                                        ElseIf lrResponsibleRole.FactType.Is1To1BinaryFactType And lrResponsibleRole Is Me Then
+
+                                            Dim lrRoleConstraint = Me.FactType.InternalUniquenessConstraint.Find(Function(x) x.RoleConstraintRole(0).Role.Id = Me.Id)
+                                            Call Me.Model.generateAttributesForRoleConstraint(lrRoleConstraint)
+
                                         End If
 
-                                    ElseIf lrResponsibleRole.FactType.Is1To1BinaryFactType And lrResponsibleRole Is Me Then
+                                    Case Is = pcenumConceptType.FactType
 
-                                        Dim lrRoleConstraint = Me.FactType.InternalUniquenessConstraint.Find(Function(x) x.RoleConstraintRole(0).Role.Id = Me.Id)
-                                        Call Me.Model.generateAttributesForRoleConstraint(lrRoleConstraint)
+                                        Dim larNewColumn As New List(Of RDS.Column)
 
-                                    End If
+                                        larNewColumn = Me.getColumns(lrTable, lrResponsibleRole)
 
-                                Case Is = pcenumConceptType.FactType
+                                        For Each lrNewColumn In larNewColumn
 
-                                    Dim larNewColumn As New List(Of RDS.Column)
+                                            lrNewColumn.ContributesToPrimaryKey = lrResponsibleRole.isPartOfFactTypesPreferredReferenceScheme
+                                            lrNewColumn.IsMandatory = lrResponsibleRole.Mandatory Or lrNewColumn.ContributesToPrimaryKey
 
-                                    larNewColumn = Me.getColumns(lrTable, lrResponsibleRole)
+                                            lrTable.addColumn(lrNewColumn)
+                                        Next
 
-                                    For Each lrNewColumn In larNewColumn
+                                End Select 'Me.JoinedORMObject.ConceptType
 
-                                        lrNewColumn.ContributesToPrimaryKey = lrResponsibleRole.isPartOfFactTypesPreferredReferenceScheme
-                                        lrNewColumn.IsMandatory = lrResponsibleRole.Mandatory Or lrNewColumn.ContributesToPrimaryKey
+                            Next 'Table
 
-                                        lrTable.addColumn(lrNewColumn)
-                                    Next
+                            '===End-Create new Columns===========================================================================
 
-                            End Select 'Me.JoinedORMObject.ConceptType
-
-                        Next 'Table
-
-                        '===End-Create new Columns===========================================================================
-
-                        'RDS-Relationships
-                        If Not Me.FactType.IsLinkFactType Then
-                            Call Me.Model.generateRelationForReassignedRole(Me)
-                        End If
-
-                        '------------------------------------------------------------------------
-                        'Rename the FactType of the Role (me) that has been modified.
-                        Dim lsNewName As String = Me.FactType.MakeNameFromFactTypeReadings()
-                        Dim lsOldName As String = Me.FactType.Id
-                        If lsNewName <> lsOldName Then
-                            If Me.FactType.getRolesReferencingNothingCount = 0 Then
-                                Call Me.FactType.setName(lsNewName, True)
+                            'RDS-Relationships
+                            If Not Me.FactType.IsLinkFactType Then
+                                Call Me.Model.generateRelationForReassignedRole(Me)
                             End If
-                        End If
 
-                        Me.Model.MakeDirty(False, False)
+                            '------------------------------------------------------------------------
+                            'Rename the FactType of the Role (me) that has been modified.
+                            Dim lsNewName As String = Me.FactType.MakeNameFromFactTypeReadings()
+                            Dim lsOldName As String = Me.FactType.Id
+                            If lsNewName <> lsOldName Then
+                                If Me.FactType.getRolesReferencingNothingCount = 0 Then
+                                    Call Me.FactType.setName(lsNewName, True)
+                                End If
+                            End If
 
-                    End If 'Whether a Role in a ManyToOne Binary FactType or is a Role in a Ternary/Greater FactType.
+                            Me.Model.MakeDirty(False, False)
+
+                        End If 'Whether a Role in a ManyToOne Binary FactType or is a Role in a Ternary/Greater FactType.
+#End Region
+                    End If
 
                     RaiseEvent RoleJoinModified(Me.JoinedORMObject)
 
-                    Call Me.Model.Save()
+                    If Me.FactType.RoleGroup.FindAll(Function(x) x.JoinedORMObject Is Nothing).Count > 0 Then
+                        'Likely creating a new binary FactType from the Toolbox, and still has a Role that is unjoined.
+                    Else
+                        Call Me.Model.Save()
+                    End If
+
 
                 End If 'Not joined back to what it originally joined to.
 

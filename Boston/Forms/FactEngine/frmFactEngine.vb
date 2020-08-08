@@ -1209,8 +1209,12 @@ Public Class frmFactEngine
         End If
 
         Me.LabelError.Text = ""
-        Dim lsQuery = Me.TextBoxInput.Text.Replace(vbLf, " ")
-        If Me.TextBoxInput.SelectionLength > 0 Then
+
+        'Get the Query from the SQL/Cypher/etc query textbox
+        Dim lsQuery = Me.TextBoxQuery.Text.Replace(vbLf, " ") 'Leave this here.
+
+        'If the user has highlighted a section of a query to execute, execute that.
+        If Me.TextBoxQuery.SelectionLength > 0 Then
             lsQuery = Me.TextBoxInput.SelectedText
         End If
 
@@ -1221,10 +1225,13 @@ Public Class frmFactEngine
         End If
 
         If lrRecordset.ErrorString IsNot Nothing Then
+            Me.LabelError.Show()
             Me.LabelError.BringToFront()
             Me.LabelError.Text = lrRecordset.ErrorString
             Me.TabControl1.SelectedTab = Me.TabPageResults
         Else
+            Me.TabControl1.SelectedTab = Me.TabPageResults
+            Me.LabelError.Show()
             Select Case lrRecordset.StatementType
                 Case Is = FactEngine.pcenumFEQLStatementType.DESCRIBEStatement
                     Call Me.DesbribeModelElement(lrRecordset.ModelElement)
