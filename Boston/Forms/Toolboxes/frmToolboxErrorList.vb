@@ -1,4 +1,5 @@
 ﻿Imports System.Reflection
+Imports Boston.FBM
 
 Public Class frmToolboxErrorList
 
@@ -149,7 +150,7 @@ Public Class frmToolboxErrorList
                 Case Is = pcenumConceptType.ValueType
                     larPage = prApplication.CMML.get_orm_diagram_pages_for_value_type(lrModelError.ModelObject)
                 Case Is = pcenumConceptType.EntityType
-                    larPage = prApplication.CMML.GetORMDiagramPagesForEntityType(lrModelError.ModelObject)
+                    larPage = prApplication.CMML.getORMDiagramPagesForEntityType(lrModelError.ModelObject)
                 Case Is = pcenumConceptType.FactType
                     larPage = prApplication.CMML.get_orm_diagram_pages_for_FactType(lrModelError.ModelObject)
                 Case Is = pcenumConceptType.RoleConstraint
@@ -169,11 +170,11 @@ Public Class frmToolboxErrorList
                     '  is now added for those hidden Pages.
                     '----------------------------------------------------------
                     Dim lrEnterpriseView As tEnterpriseEnterpriseView
-                    lrEnterpriseView = New tEnterpriseEnterpriseView(pcenumMenuType.pageORMModel, _
-                                                               lrPage, _
-                                                               Me.zrModel.ModelId, _
-                                                               pcenumLanguage.ORMModel, _
-                                                               Nothing, _
+                    lrEnterpriseView = New tEnterpriseEnterpriseView(pcenumMenuType.pageORMModel,
+                                                               lrPage,
+                                                               Me.zrModel.ModelId,
+                                                               pcenumLanguage.ORMModel,
+                                                               Nothing,
                                                                lrPage.PageId)
 
                     lrEnterpriseView = prPageNodes.Find(AddressOf lrEnterpriseView.Equals)
@@ -204,8 +205,14 @@ Public Class frmToolboxErrorList
         prApplication.WorkingPage = lrEnterpriseView.Tag
 
 
-        frmMain.zfrmModelExplorer.TreeView.SelectedNode = lrEnterpriseView.TreeNode        
+        frmMain.zfrmModelExplorer.TreeView.SelectedNode = lrEnterpriseView.TreeNode
         Call frmMain.zfrmModelExplorer.EditPageToolStripMenuItem_Click(sender, e)
+
+    End Sub
+
+    Private Sub zrModel_ModelErrorRemoved(arModelError As ModelError) Handles zrModel.ModelErrorRemoved
+
+        Call Me.UpdateErrorList()
 
     End Sub
 

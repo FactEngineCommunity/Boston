@@ -271,7 +271,7 @@ Namespace FBM
         Public Event ModelErrorsCleared()
         <NonSerialized()> _
         Public Event StructureModified() 'Used, for example, to refresh the ModelDictionary toolbox. Used in leiu of making the model dirty and saving the entire model.
-        <NonSerialized()> _
+        <NonSerialized()>
         Public Event ModelUpdated()
         <NonSerialized()> _
         Public Event ModelErrorsUpdated()
@@ -461,7 +461,7 @@ Namespace FBM
 
                 Me.EntityType.Add(arEntityType)
                 If abMakeModelDirty Then
-                    Me.MakeDirty()
+                    Me.MakeDirty(False, True)
                 End If
 
                 ''=====================================================================================
@@ -2666,6 +2666,8 @@ Namespace FBM
                     Call Me.RDS.removeTable(lrTable)
                 End If
 
+                Call Me.RemoveModelErrorsForModelObject(arEntityType)
+
                 RaiseEvent StructureModified()
 
             Catch ex As Exception
@@ -2713,6 +2715,8 @@ Namespace FBM
                     Call prDuplexServiceClient.BroadcastToDuplexService(Viev.FBM.Interface.pcenumBroadcastType.ModelDeleteValueType, arValueType, Nothing)
                 End If
                 '==========================================================================================================
+
+                Call Me.RemoveModelErrorsForModelObject(arValueType)
 
             Catch ex As Exception
                 Dim lsMessage As String
@@ -2772,6 +2776,8 @@ Namespace FBM
                     Call prDuplexServiceClient.BroadcastToDuplexService(Viev.FBM.Interface.pcenumBroadcastType.ModelDeleteFactType, arFactType, Nothing)
                 End If
                 '==========================================================================================================
+
+                Call Me.RemoveModelErrorsForModelObject(arFactType)
 
                 '==========================================================================================================
                 'RDS                
@@ -2848,6 +2854,8 @@ Namespace FBM
                 If My.Settings.UseClientServer And My.Settings.InitialiseClient And abBroadcastInterfaceEvent Then
                     Call prDuplexServiceClient.BroadcastToDuplexService(Viev.FBM.Interface.pcenumBroadcastType.ModelDeleteRoleConstraint, arRoleConstraint, Nothing)
                 End If
+
+                Call Me.RemoveModelErrorsForModelObject(arRoleConstraint)
 
                 '-------------------------------------------------------------------------------------------------
                 'RDS
@@ -3087,6 +3095,14 @@ Namespace FBM
             End If
 
             RaiseEvent ModelErrorRemoved(arModelError)
+
+        End Sub
+
+        Public Sub RemoveModelErrorsForModelObject(ByVal arModeObject As FBM.ModelObject)
+
+            For Each lrModelError In Me.ModelError.FindAll(Function(x) x.ModelObject.Id = arModeObject.Id)
+                Call Me.RemoveModelError(lrModelError)
+            Next
 
         End Sub
 
@@ -4337,6 +4353,7 @@ Namespace FBM
 
             End If
 
+            Me.AllowCheckForErrors = True
             Call Me.checkIfCanCheckForErrors()
 
             Me.Loaded = True

@@ -4,73 +4,84 @@ Partial Public Class tBrain
 
     Private Sub ProcessENTITYTYPEISIDENTIFIEDBYITSStatement()
 
-        Me.Model = prApplication.WorkingModel
+        Try
+
+            Me.Model = prApplication.WorkingModel
 
 
-        Dim lrEntityType As FBM.EntityType
-        Dim lrEntityTypeInstance As FBM.EntityTypeInstance
+            Dim lrEntityType As FBM.EntityType
+            Dim lrEntityTypeInstance As FBM.EntityTypeInstance
 
-        Me.VAQL.ENTITYTYPEISIDENTIFIEDBYITSStatement.MODELELEMENTNAME = ""
-        Me.VAQL.ENTITYTYPEISIDENTIFIEDBYITSStatement.REFERENCEMODE = ""
+            Me.VAQL.ENTITYTYPEISIDENTIFIEDBYITSStatement.MODELELEMENTNAME = ""
+            Me.VAQL.ENTITYTYPEISIDENTIFIEDBYITSStatement.REFERENCEMODE = ""
 
-        Call Me.VAQL.GetParseTreeTokensReflection(Me.VAQL.ENTITYTYPEISIDENTIFIEDBYITSStatement, Me.VAQLParsetree.Nodes(0))
+            Call Me.VAQL.GetParseTreeTokensReflection(Me.VAQL.ENTITYTYPEISIDENTIFIEDBYITSStatement, Me.VAQLParsetree.Nodes(0))
 
-        Dim lsEntityTypeName As String = Trim(Me.VAQL.ENTITYTYPEISIDENTIFIEDBYITSStatement.MODELELEMENTNAME)
-        Dim lsActualModelElementName As String = ""
+            Dim lsEntityTypeName As String = Trim(Me.VAQL.ENTITYTYPEISIDENTIFIEDBYITSStatement.MODELELEMENTNAME)
+            Dim lsActualModelElementName As String = ""
 
-        If Me.Model.GetConceptTypeByNameFuzzy(lsEntityTypeName, lsActualModelElementName) = pcenumConceptType.EntityType Then
-            '---------------------------------------------------------
-            'Great! The name identified by the user is an EntityType
-            '---------------------------------------------------------
+            If Me.Model.GetConceptTypeByNameFuzzy(lsEntityTypeName, lsActualModelElementName) = pcenumConceptType.EntityType Then
+                '---------------------------------------------------------
+                'Great! The name identified by the user is an EntityType
+                '---------------------------------------------------------
 
-            lsEntityTypeName = lsActualModelElementName
+                lsEntityTypeName = lsActualModelElementName
 
-            Dim lrModelObject = Me.Model.GetModelObjectByName(lsEntityTypeName)
-            lrEntityType = lrModelObject
-        Else
-            If Me.Model.ExistsModelElement(lsEntityTypeName) Then
                 Dim lrModelObject = Me.Model.GetModelObjectByName(lsEntityTypeName)
-                If lrModelObject.GetType IsNot GetType(FBM.EntityType) Then
-                    Me.send_data(lsEntityTypeName & " is not an Entity Type")
-                    Exit Sub
+                lrEntityType = lrModelObject
+            Else
+                If Me.Model.ExistsModelElement(lsEntityTypeName) Then
+                    Dim lrModelObject = Me.Model.GetModelObjectByName(lsEntityTypeName)
+                    If lrModelObject.GetType IsNot GetType(FBM.EntityType) Then
+                        Me.send_data(lsEntityTypeName & " is not an Entity Type")
+                        Exit Sub
+                    End If
                 End If
-            End If
-            lrEntityType = Me.Model.CreateEntityType(lsEntityTypeName, True)
-            lrEntityTypeInstance = Me.Page.DropEntityTypeAtPoint(lrEntityType, New PointF(100, 100))
+                lrEntityType = Me.Model.CreateEntityType(lsEntityTypeName, True)
+                lrEntityTypeInstance = Me.Page.DropEntityTypeAtPoint(lrEntityType, New PointF(100, 100))
 
-            'Call lrEntityTypeInstance.RepellFromNeighbouringPageObjects(1, False)
-            'Call lrEntityTypeInstance.Move(lrEntityTypeInstance.X, lrEntityTypeInstance.Y, True)
-        End If
+                'Call lrEntityTypeInstance.RepellFromNeighbouringPageObjects(1, False)
+                'Call lrEntityTypeInstance.Move(lrEntityTypeInstance.X, lrEntityTypeInstance.Y, True)
+            End If
 
             Dim lsReferenceMode As String = Me.VAQL.ENTITYTYPEISIDENTIFIEDBYITSStatement.REFERENCEMODE
 
-        Dim items As Array
-        items = System.Enum.GetValues(GetType(pcenumReferenceModeEndings))
-        Dim item As pcenumReferenceModeEndings
-        For Each item In items
-            If lsReferenceMode.EndsWith(GetEnumDescription(item)) Then
-                lsReferenceMode = "." & lsReferenceMode
-                Exit For
-            ElseIf lsReferenceMode.EndsWith(GetEnumDescription(item).Trim({"."c})) Then 'See https://msdn.microsoft.com/en-us/library/kxbw3kwc(v=vs.110).aspx
-                lsReferenceMode = "." & lsReferenceMode
-                Exit For
-            End If
-        Next
-
-        Call lrEntityType.SetReferenceMode(lsReferenceMode, False, Nothing, True)
-
-        If lrEntityType.ReferenceModeValueType IsNot Nothing And lrEntityType.ReferenceModeFactType IsNot Nothing Then
-            Call lrEntityType.ReferenceModeValueType.Save()
-            Call lrEntityType.ReferenceModeFactType.Save()
-
-            For Each lrInternalUniquenessConstraint In lrEntityType.ReferenceModeFactType.InternalUniquenessConstraint
-                Call lrInternalUniquenessConstraint.Save()
+            Dim items As Array
+            items = System.Enum.GetValues(GetType(pcenumReferenceModeEndings))
+            Dim item As pcenumReferenceModeEndings
+            For Each item In items
+                If lsReferenceMode.EndsWith(GetEnumDescription(item)) Then
+                    lsReferenceMode = "." & lsReferenceMode
+                    Exit For
+                ElseIf lsReferenceMode.EndsWith(GetEnumDescription(item).Trim({"."c})) Then 'See https://msdn.microsoft.com/en-us/library/kxbw3kwc(v=vs.110).aspx
+                    lsReferenceMode = "." & lsReferenceMode
+                    Exit For
+                End If
             Next
-        End If
 
-        Call lrEntityType.Save()
+            Call lrEntityType.SetReferenceMode(lsReferenceMode, False, Nothing, True)
 
-        Me.send_data("Ok")
+            If lrEntityType.ReferenceModeValueType IsNot Nothing And lrEntityType.ReferenceModeFactType IsNot Nothing Then
+                Call lrEntityType.ReferenceModeValueType.Save()
+                Call lrEntityType.ReferenceModeFactType.Save()
+
+                For Each lrInternalUniquenessConstraint In lrEntityType.ReferenceModeFactType.InternalUniquenessConstraint
+                    Call lrInternalUniquenessConstraint.Save()
+                Next
+            End If
+
+            Call lrEntityType.Save()
+
+            Me.send_data("Ok")
+
+        Catch ex As Exception
+            Dim lsMessage1 As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 
