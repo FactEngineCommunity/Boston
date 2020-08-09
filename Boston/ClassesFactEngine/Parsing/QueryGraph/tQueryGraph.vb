@@ -20,6 +20,8 @@
 
         Public QueryEdges As New List(Of FactEngine.QueryEdge)
 
+        Public Warning As New List(Of String)
+
         'The set of Nodes queried in a WHICH query statement
         Public Nodes As New List(Of FactEngine.QueryNode)
 
@@ -182,15 +184,17 @@
                         larModelObject.Add(lrQueryEdge.TargetNode.FBMModelObject)
                         Dim lrRelation = lrOriginTable.getRelationByFBMModelObjects(larModelObject)
 
+                        Dim liInd2 = 1
                         If lrRelation.OriginTable Is lrOriginTable Then
                             Dim larTargetColumn = lrQueryEdge.TargetNode.FBMModelObject.getCorrespondingRDSTable.getPrimaryKeyColumns
                             For Each lrColumn In larTargetColumn
                                 lsSQLQuery &= lrQueryEdge.BaseNode.FBMModelObject.Id & "." & lrColumn.Name
                                 lsSQLQuery &= " = " & lrQueryEdge.TargetNode.FBMModelObject.Id & "." & lrColumn.Name
+                                If liInd2 < larTargetColumn.Count Then lsSQLQuery &= vbCrLf & "AND "
+                                liInd2 += 1
                             Next
                         Else
                             Dim larTargetColumn = lrQueryEdge.BaseNode.FBMModelObject.getCorrespondingRDSTable.getPrimaryKeyColumns
-                            Dim liInd2 = 1
                             For Each lrColumn In larTargetColumn
                                 lsSQLQuery &= lrQueryEdge.TargetNode.FBMModelObject.Id & "." & lrColumn.Name
                                 lsSQLQuery &= " = " & lrQueryEdge.BaseNode.FBMModelObject.Id & "." & lrColumn.Name

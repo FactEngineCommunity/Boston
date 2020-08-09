@@ -369,6 +369,13 @@ Public Class frmFactEngine
                         Me.LabelError.ForeColor = Color.Black
                         Me.LabelError.Text = ""
 
+                        If lrRecordset.Warning.Count > 0 Then
+                            For Each lsWarning In lrRecordset.Warning
+                                Me.LabelError.Text &= lsWarning & vbCrLf
+                            Next
+                            Me.LabelError.Text &= vbCrLf
+                        End If
+
                         Dim liInd = 0
                         For Each lsColumnName In lrRecordset.Columns
                             liInd += 1
