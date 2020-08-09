@@ -431,6 +431,10 @@ Public Class frmFactEngine
                         Dim lrComboboxItem As tComboboxItem = Me.AutoComplete.ListBox.Items(liIndex)
                         Me.TextBoxInput.Text &= "THAT " & Trim(lrComboboxItem.Text) & " A " & Trim(lrComboboxItem.ItemData)
                     End If
+                    Me.TextBoxInput.SelectionStart = Me.TextBoxInput.Text.Length
+                    Me.TextBoxInput.SelectionLength = 0
+                    e.SuppressKeyPress = True
+                    e.Handled = True
                     Exit Sub
                 Case Is = Keys.Control Or Keys.N
                     If Me.AutoComplete.ListBox.Items.Count > 0 Then
@@ -438,12 +442,16 @@ Public Class frmFactEngine
                         Dim lrComboboxItem As tComboboxItem = Me.AutoComplete.ListBox.Items(liIndex)
                         Me.TextBoxInput.Text &= Trim(lrComboboxItem.Text) & " (" & Trim(lrComboboxItem.ItemData) & ":'"
                     End If
+                    Me.TextBoxInput.SelectionStart = Me.TextBoxInput.Text.Length
+                    Me.TextBoxInput.SelectionLength = 0
                     Exit Sub
                 Case Is = Keys.Control Or Keys.W
                     If Me.AutoComplete.ListBox.Items.Count > 0 Then
                         Dim lrComboboxItem As tComboboxItem = Me.AutoComplete.ListBox.Items(0)
                         Me.TextBoxInput.Text &= Trim(lrComboboxItem.Text) & " WHICH " & Trim(lrComboboxItem.ItemData) & ":'"
                     End If
+                    Me.TextBoxInput.SelectionStart = Me.TextBoxInput.Text.Length
+                    Me.TextBoxInput.SelectionLength = 0
                     Exit Sub
             End Select
 
@@ -470,6 +478,7 @@ Public Class frmFactEngine
                     Call Me.hideAutoComplete()
                     Exit Sub
                 Case Is = Keys.Down ',Keys.Space
+                Case Is = Keys.Left, Keys.Right
                 Case Else
                     Call Me.ProcessAutoComplete(e)
             End Select
@@ -479,14 +488,15 @@ Public Class frmFactEngine
                     Call Me.hideAutoComplete()
                     Call Me.GO()
                 Case Is = Keys.Down
-                    If (Me.AutoComplete.ListBox.Items.Count > 0) Or Me.AutoComplete.Visible Then
+                    If Me.TextBoxInput.GetLineFromCharIndex(Me.TextBoxInput.SelectionStart) < Me.TextBoxInput.Lines.Count - 1 Then
+                    ElseIf (Me.AutoComplete.ListBox.Items.Count > 0) Or Me.AutoComplete.Visible Then
                         e.Handled = True
                         Call Me.showAutoCompleteForm()
                         Me.AutoComplete.ListBox.SelectedIndex = 0
                         Me.AutoComplete.ListBox.Focus()
+                        e.Handled = True
                         Exit Sub
                     End If
-                    e.Handled = True
                 Case Is = Keys.Space
                 Case Is = Keys.Back
                 Case Is = Keys.Left
@@ -533,7 +543,7 @@ Public Class frmFactEngine
                         If liInd > 0 Then
                             Dim lrLastToken = Me.zrTextHighlighter.Tree.Nodes(0).Nodes(0).Nodes(liInd - 1).Token
                             If lrLastToken.Type = FEQL.TokenType.EOF Then
-                                Me.ToolStripStatusLabelGOPrompt.Text = "Valid FEQL Statement"
+                                Me.ToolStripStatusLabelGOPrompt.Text = "Valid FEQL Syntax"
                                 Me.ToolStripStatusLabelGOPrompt.Visible = True
                             Else
                                 Me.ToolStripStatusLabelGOPrompt.Visible = False
@@ -549,7 +559,16 @@ Public Class frmFactEngine
                 Case Is = Keys.A
                 Case Else
                     Select Case e.KeyData
-                        Case Is = Keys.ControlKey
+                        Case Is = Keys.Left Or Keys.Shift
+                        Case Is = Keys.Right Or Keys.Shift
+
+                        Case Is = Keys.ControlKey Or Keys.A
+                            Me.TextBoxInput.SelectionStart = Me.TextBoxInput.Text.Length
+                            Me.TextBoxInput.SelectionLength = 0
+                            e.SuppressKeyPress = True
+                            e.Handled = True
+                            Call Me.setAutoCompletePosition()
+                        Case Is = Keys.ControlKey Or Keys.T
                             Me.TextBoxInput.SelectionStart = Me.TextBoxInput.Text.Length
                             Me.TextBoxInput.SelectionLength = 0
                             e.SuppressKeyPress = True
