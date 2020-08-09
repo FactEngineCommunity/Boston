@@ -492,8 +492,9 @@ Namespace FBM
             Dim larOutgoingFactType = From FactType In Me.Model.FactType
                                       From Role In FactType.RoleGroup
                                       Where Role.JoinedORMObject.Id = Me.Id
-                                      Where Role.HasInternalUniquenessConstraint
                                       Select FactType
+
+            'Where Role.HasInternalUniquenessConstraint
 
             Dim larFactTypeReading = From FactType In larOutgoingFactType
                                      From FactTypeReading In FactType.FactTypeReading

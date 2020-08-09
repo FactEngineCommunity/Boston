@@ -15,6 +15,8 @@ Public Class frmAutoComplete
 
         Call InitializeComponent()
 
+        Me.Owner = New Form
+
     End Sub
 
     Private Sub frmAutoComplete_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
@@ -273,5 +275,17 @@ Public Class frmAutoComplete
         obj.Region = New Region(DGP)
 
     End Sub
+
+    ''' <summary>
+    ''' Stop dialog showing in Alt Tab
+    ''' </summary>
+    ''' <returns></returns>
+    Protected Overrides ReadOnly Property CreateParams As CreateParams
+        Get
+            Dim Params = MyBase.CreateParams
+            Params.ExStyle = Params.ExStyle Or &H80
+            Return Params
+        End Get
+    End Property
 
 End Class

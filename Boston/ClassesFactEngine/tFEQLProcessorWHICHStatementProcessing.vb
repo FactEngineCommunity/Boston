@@ -589,12 +589,6 @@
             arQueryEdge.TargetNode = New FactEngine.QueryNode(lrFBMModelObject)
             arQueryGraph.Nodes.Add(arQueryEdge.TargetNode) '20200808-VM-Was AddUnique
 
-            ''---------------------------------------------------------
-            ''Get the Predicate
-            'For Each lsPredicatePart In Me.WHICHCLAUSE.PREDICATE
-            '    lrQueryEdge.Predicate = Trim(lrQueryEdge.Predicate & " " & lsPredicatePart)
-            'Next
-
             '-----------------------------------------
             'Get the relevant FBM.FactType
             Call arQueryEdge.getAndSetFBMFactType(arQueryEdge.BaseNode,

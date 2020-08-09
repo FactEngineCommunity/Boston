@@ -25,6 +25,8 @@ Namespace FactEngine
 
             Dim lrRecordset As ORMQL.Recordset
 
+            If Me.Connection Is Nothing Then Throw New Exception("The connection to the database has been lost. Close and reopen FactEngine.")
+
             lrRecordset = Me.Connection.GO(asQuery)
 
             Return lrRecordset
