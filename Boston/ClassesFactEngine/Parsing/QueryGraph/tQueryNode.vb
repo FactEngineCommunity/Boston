@@ -58,7 +58,8 @@
         End Sub
 
         Public Shadows Function Equals(other As QueryNode) As Boolean Implements IEquatable(Of QueryNode).Equals
-            Return Me.FBMModelObject.Id = other.FBMModelObject.Id
+
+            Return Me.FBMModelObject.Id = other.FBMModelObject.Id And Me.Alias = other.Alias
         End Function
     End Class
 

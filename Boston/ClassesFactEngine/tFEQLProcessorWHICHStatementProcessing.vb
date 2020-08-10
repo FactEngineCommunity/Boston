@@ -983,15 +983,27 @@
 
             'Set the BaseNode
             Me.MODELELEMENTCLAUSE = New FEQL.MODELELEMENTClause
-            Call Me.GetParseTreeTokensReflection(Me.MODELELEMENTCLAUSE, Me.WHICHCLAUSE.MODELELEMENTCLAUSE(0))
-            arQueryEdge.BaseNode = arQueryGraph.Nodes.Find(Function(x) x.Name = Me.MODELELEMENTCLAUSE.MODELELEMENTNAME)
-            arQueryEdge.BaseNode.Alias = Me.MODELELEMENTCLAUSE.MODELELEMENTSUFFIX
+            Call Me.GetParseTreeTokensReflection(Me.MODELELEMENTCLAUSE, Me.WHICHCLAUSE.MODELELEMENT(0))
+            If Me.MODELELEMENTCLAUSE.MODELELEMENTSUFFIX Is Nothing Then
+                arQueryEdge.BaseNode = arQueryGraph.Nodes.Find(Function(x) x.Name = Me.MODELELEMENTCLAUSE.MODELELEMENTNAME)
+            Else
+                Dim lrFBMModelObject = Me.Model.GetModelObjectByName(Me.MODELELEMENTCLAUSE.MODELELEMENTNAME)
+                arQueryEdge.BaseNode = New FactEngine.QueryNode(lrFBMModelObject, arQueryEdge)
+                arQueryEdge.BaseNode.Alias = Me.MODELELEMENTCLAUSE.MODELELEMENTSUFFIX
+            End If
+            arQueryGraph.Nodes.AddUnique(arQueryEdge.BaseNode)
 
             'Set the TargetNode
             Me.MODELELEMENTCLAUSE = New FEQL.MODELELEMENTClause
-            Call Me.GetParseTreeTokensReflection(Me.MODELELEMENTCLAUSE, Me.WHICHCLAUSE.MODELELEMENTCLAUSE(1))
-            arQueryEdge.TargetNode = arQueryGraph.Nodes.Find(Function(x) x.Name = Me.MODELELEMENTCLAUSE.MODELELEMENTNAME)
-            arQueryEdge.TargetNode.Alias = Me.MODELELEMENTCLAUSE.MODELELEMENTSUFFIX
+            Call Me.GetParseTreeTokensReflection(Me.MODELELEMENTCLAUSE, Me.WHICHCLAUSE.MODELELEMENT(1))
+            If Me.MODELELEMENTCLAUSE.MODELELEMENTSUFFIX Is Nothing Then
+                arQueryEdge.TargetNode = arQueryGraph.Nodes.Find(Function(x) x.Name = Me.MODELELEMENTCLAUSE.MODELELEMENTNAME)
+            Else
+                Dim lrFBMModelObject = Me.Model.GetModelObjectByName(Me.MODELELEMENTCLAUSE.MODELELEMENTNAME)
+                arQueryEdge.TargetNode = New FactEngine.QueryNode(lrFBMModelObject, arQueryEdge)
+                arQueryEdge.TargetNode.Alias = Me.MODELELEMENTCLAUSE.MODELELEMENTSUFFIX
+            End If
+            arQueryGraph.Nodes.AddUnique(arQueryEdge.TargetNode)
 
             If arQueryEdge.BaseNode.Name <> arQueryEdge.TargetNode.Name Then
                 Throw New Exception("Error: IS NOT clauses must reference the same type of Model Element.")

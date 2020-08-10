@@ -204,7 +204,7 @@ Namespace FEQL
         End Property
 
         Private _MODELELEMENT As New List(Of Object)
-        Public Property MODELELEMENTCLAUSE As List(Of Object)
+        Public Property MODELELEMENT As List(Of Object)
             Get
                 Return Me._MODELELEMENT
             End Get
@@ -340,7 +340,7 @@ Namespace FEQL
 
                     If lrType Is GetType(String) Then
                         'ao_object.SetAttributeMember(aoParseTreeNode.Token.Type.ToString, aoParseTreeNode.Token.Text)
-                        piInstance.SetValue(ao_object, aoParseTreeNode.Token.Text)
+                        piInstance.SetValue(ao_object, Trim(aoParseTreeNode.Token.Text))
 
                     ElseIf lrType Is lasListOfString.GetType Then
                         'ao_object.GetAttributeMember(aoParseTreeNode.Token.Type.ToString).Add(aoParseTreeNode.Token.Text)

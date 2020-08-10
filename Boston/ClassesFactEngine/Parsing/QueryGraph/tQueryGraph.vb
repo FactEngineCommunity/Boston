@@ -122,7 +122,8 @@
                 Next
 
                 liInd = 1
-                Dim larRDSTableQueryEdge = Me.QueryEdges.FindAll(Function(x) x.FBMFactType.isRDSTable)
+                Dim larQuerEdgeWithFBMFactType = Me.QueryEdges.FindAll(Function(x) x.FBMFactType IsNot Nothing)
+                Dim larRDSTableQueryEdge = larQuerEdgeWithFBMFactType.FindAll(Function(x) x.FBMFactType.isRDSTable)
 
                 For Each lrQueryEdge In larRDSTableQueryEdge
 
@@ -368,12 +369,15 @@
                                        Select Column).First
 
                     larVTColumn = larVTColumn.Clone(Nothing, Nothing)
-                    larVTColumn.TemporaryAlias = Viev.NullVal(Me.HeadNode.QueryEdgeAlias, "") 'Not really required for the first Column/s in the SQL
+                    larVTColumn.TemporaryAlias = Viev.NullVal(Me.HeadNode.QueryEdgeAlias, "")
                     larHeadColumn.Add(larVTColumn)
 
                 Case Else
+                    Dim lrTempColumn As RDS.Column = Nothing
                     For Each lrColumn In Me.HeadNode.FBMModelObject.getCorrespondingRDSTable.getFirstUniquenessConstraintColumns
-                        larHeadColumn.Add(lrColumn.Clone(Nothing, Nothing))
+                        lrTempColumn = lrColumn.Clone(Nothing, Nothing)
+                        lrTempColumn.TemporaryAlias = Viev.NullVal(Me.HeadNode.Alias, "")
+                        larHeadColumn.Add(lrTempColumn)
                     Next
             End Select
 
@@ -424,10 +428,14 @@
                 If liInd > 0 Then
                     For liInd2 = 0 To liInd - 1
                         If Me.Nodes(liInd).Name = Me.Nodes(liInd2).Name Then
-                            Me.Nodes(liInd).Alias = liInd.ToString
-                            If Me.Nodes(liInd).QueryEdge IsNot Nothing Then
-                                Me.Nodes(liInd).QueryEdge.Alias = liInd.ToString
+                            If Me.Nodes(liInd).Alias Is Nothing And
+                               Me.Nodes(liInd2).Alias IsNot Nothing Then
+                                Me.Nodes(liInd2).Alias = liInd.ToString
+                                If Me.Nodes(liInd2).QueryEdge IsNot Nothing Then
+                                    Me.Nodes(liInd2).QueryEdge.Alias = Me.Nodes(liInd2).Alias
+                                End If
                             End If
+
                         End If
                     Next
                 End If
