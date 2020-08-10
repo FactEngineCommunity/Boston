@@ -59,20 +59,24 @@ Namespace Parser.Meta.Database
                        ) 'SchemaRowIdx was ByRef
 
             '20200702-VM-'SchemaRowIdx was ByRef
+            Try
+                Me.Schema = arSchema
+                Me.Transforms = Transforms
 
-            Me.Schema = arSchema
-            Me.Transforms = Transforms
+                'Set table value and add first column
+                Me.Value = aarSchemaRow(SchemaRowIdx).Name
+                Me.SchemaRowVal = aarSchemaRow(SchemaRowIdx)
 
-            'Set table value and add first column
-            Me.Value = aarSchemaRow(SchemaRowIdx).Name
-            Me.SchemaRowVal = aarSchemaRow(SchemaRowIdx)
+                '20200705-VM-Remove if all seems okay. Moved to below, so that the Relations are loaded.
+                'Me.AddCol(Schema(SchemaRowIdx), Connection)
+                'SchemaRowIdx += 1
 
-            '20200705-VM-Remove if all seems okay. Moved to below, so that the Relations are loaded.
-            'Me.AddCol(Schema(SchemaRowIdx), Connection)
-            'SchemaRowIdx += 1
+                Me.Owner = Owner
+                Me.ConnStr = Owner.GetConnectionString
+            Catch ex As Exception
+                Throw New Parser.Syntax.ExecException(ex.Message, 0)
+            End Try
 
-            Me.Owner = Owner
-            Me.ConnStr = Owner.GetConnectionString
 
             'Add columns
             While SchemaRowIdx < aarSchemaRow.Count
@@ -84,49 +88,58 @@ Namespace Parser.Meta.Database
 
                     'Add Relations            
                     For Each lrRelation In aarSchemaRow(SchemaRowIdx).Relation
-                        Dim lsReferencedTableName As String = ""
 
-                        Dim lsDestinationColumnName As String = ""
+                        Try
+                            Dim lsReferencedTableName As String = ""
 
-                        Dim liInd As Integer = SchemaRowIdx
-                        Dim lsOriginColumnName As String = ""
+                            Dim lsDestinationColumnName As String = ""
 
-                        If lrRelation.DestinationColumns.Count = 1 Then
-                            lsOriginColumnName = lrRelation.OriginColumns(0).Name
-                            lsDestinationColumnName = lrRelation.DestinationColumns(0).Name
-                        Else
-                            Dim lrOriginColumn As RDS.Column = lrRelation.OriginColumns.Find(Function(x) x.Id = aarSchemaRow(liInd).ColumnId)
-                            lsOriginColumnName = lrOriginColumn.Name
-                            Dim lrDestinationColumn As RDS.Column = lrRelation.DestinationColumns.Find(Function(x) x.ActiveRole.Id = lrOriginColumn.ActiveRole.Id)
-                            lsDestinationColumnName = lrDestinationColumn.Name
-                        End If
+                            Dim liInd As Integer = SchemaRowIdx
+                            Dim lsOriginColumnName As String = ""
 
-                        If Me.Relation.Find(Function(x) x.Id = lrRelation.Id) Is Nothing Then
-                            Me.Relation.AddUnique(lrRelation)
-                        End If
+                            If lrRelation.DestinationColumns.Count = 1 Then
+                                lsOriginColumnName = lrRelation.OriginColumns(0).Name
+                                lsDestinationColumnName = lrRelation.DestinationColumns(0).Name
+                            Else
+                                Dim lrOriginColumn As RDS.Column = lrRelation.OriginColumns.Find(Function(x) x.Id = aarSchemaRow(liInd).ColumnId)
+                                lsOriginColumnName = lrOriginColumn.Name
+                                Dim lrDestinationColumn As RDS.Column = lrRelation.DestinationColumns.Find(Function(x) x.ActiveRole.Id = lrOriginColumn.ActiveRole.Id)
+                                lsDestinationColumnName = lrDestinationColumn.Name
+                            End If
 
-                        Me.Relations.Add(New Relation(lrRelation.Id,
-                                                      lrRelation.OriginTable.Name,
-                                                      lsOriginColumnName,
-                                                      lrRelation.DestinationTable.Name,
-                                                      lsDestinationColumnName,
-                                                      lrRelation.OriginColumns.Count))
+                            If Me.Relation.Find(Function(x) x.Id = lrRelation.Id) Is Nothing Then
+                                Me.Relation.AddUnique(lrRelation)
+                            End If
+
+                            Me.Relations.Add(New Relation(lrRelation.Id,
+                                                          lrRelation.OriginTable.Name,
+                                                          lsOriginColumnName,
+                                                          lrRelation.DestinationTable.Name,
+                                                          lsDestinationColumnName,
+                                                          lrRelation.OriginColumns.Count))
+                        Catch ex As Exception
+                            Throw New Parser.Syntax.ExecException(ex.Message, 0)
+                        End Try
                     Next
 
                     '============================
                     'Indexes
                     For Each lrIndex In aarSchemaRow(SchemaRowIdx).Index
 
-                        Dim lrEntityIndex = New Index(lrIndex.Name,
+                        Try
+                            Dim lrEntityIndex = New Index(lrIndex.Name,
                                                       lrIndex.Column,
                                                       Me,
                                                       Nothing,
                                                       Me.Transforms,
                                                       lrIndex.IsPrimaryKey)
 
-                        If Me.Indexes.Find(Function(x) x.GetAttributeValue("name", Nothing, True, False) = lrIndex.Name) Is Nothing Then
-                            Me.Indexes.Add(lrEntityIndex)
-                        End If
+                            If Me.Indexes.Find(Function(x) x.GetAttributeValue("name", Nothing, True, False) = lrIndex.Name) Is Nothing Then
+                                Me.Indexes.Add(lrEntityIndex)
+                            End If
+                        Catch ex As Exception
+                            Throw New Parser.Syntax.ExecException(ex.Message, 0)
+                        End Try
 
                     Next
 

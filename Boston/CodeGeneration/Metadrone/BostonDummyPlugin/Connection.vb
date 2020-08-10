@@ -136,46 +136,50 @@ Namespace SourcePlugins.Boston
                 'NB Tables sorted in Schema.vb in the LoadSchema method
                 For Each lrTable In Me.BostonModel.RDS.Table
                     For Each lrColumn In lrTable.Column.OrderBy(Function(x) x.OrdinalPosition)
-                        sr = New SchemaRow()
-                        sr.Name = lrTable.Name
-                        sr.Type = "TABLE"
-                        sr.Column_Name = lrColumn.Name
-                        sr.Data_Type = lrColumn.getMetamodelDataType.ToString
-                        sr.Ordinal_Position = lrColumn.OrdinalPosition
-                        sr.Length = lrColumn.getMetamodelDataTypeLength
-                        sr.Precision = lrColumn.getMetamodelDataTypePrecision
-                        sr.Scale = 0
-                        sr.Nullable = Not lrColumn.IsMandatory
-                        sr.IsIdentity = lrColumn.ContributesToPrimaryKey
-                        sr.IsTable = True
-                        sr.IsView = False
-                        sr.IsPrimaryKey = lrColumn.ContributesToPrimaryKey
+                        Try
+                            sr = New SchemaRow()
+                            sr.Name = lrTable.Name
+                            sr.Type = "TABLE"
+                            sr.Column_Name = lrColumn.Name
+                            sr.Data_Type = lrColumn.getMetamodelDataType.ToString
+                            sr.Ordinal_Position = lrColumn.OrdinalPosition
+                            sr.Length = lrColumn.getMetamodelDataTypeLength
+                            sr.Precision = lrColumn.getMetamodelDataTypePrecision
+                            sr.Scale = 0
+                            sr.Nullable = Not lrColumn.IsMandatory
+                            sr.IsIdentity = lrColumn.ContributesToPrimaryKey
+                            sr.IsTable = True
+                            sr.IsView = False
+                            sr.IsPrimaryKey = lrColumn.ContributesToPrimaryKey
 
-                        sr.IsForeignKey = lrColumn.isForeignKey
+                            sr.IsForeignKey = lrColumn.isForeignKey
 
-                        'Boston specific fields
-                        sr.ColumnId = lrColumn.Id
-                        sr.IsPGSRelation = lrTable.isPGSRelation
-                        If lrTable.isPGSRelation Then
-                            sr.PGSEdgeName = lrTable.getPGSEdgeName
-                        End If
-                        For Each lrRelation In lrColumn.Relation
-                            sr.Relation.AddUnique(lrRelation)
-                        Next
-
-                        For Each lrIndex In lrTable.Index
-                            sr.Index.AddUnique(lrIndex)
-                        Next
-
-                        'Remove Relations that point to the Table.Column being loaded. Only want Relations that are referenced 'from' the Table.Column
-                        For Each lrRelation In sr.Relation.ToArray
-                            If lrRelation.DestinationTable.Name = lrTable.Name Then
-                                sr.Relation.Remove(lrRelation)
+                            'Boston specific fields
+                            sr.ColumnId = lrColumn.Id
+                            sr.IsPGSRelation = lrTable.isPGSRelation
+                            If lrTable.isPGSRelation Then
+                                sr.PGSEdgeName = lrTable.getPGSEdgeName
                             End If
-                        Next
+                            For Each lrRelation In lrColumn.Relation
+                                sr.Relation.AddUnique(lrRelation)
+                            Next
 
-                        'sr.AllowZeroLength 'Not yet implemented in lrColumn in Boston. Need to add AllowZeroLength to ValueType, which then becomes a RDS.Column
-                        larSchemaRow.Add(sr)
+                            For Each lrIndex In lrTable.Index
+                                sr.Index.AddUnique(lrIndex)
+                            Next
+
+                            'Remove Relations that point to the Table.Column being loaded. Only want Relations that are referenced 'from' the Table.Column
+                            For Each lrRelation In sr.Relation.ToArray
+                                If lrRelation.DestinationTable.Name = lrTable.Name Then
+                                    sr.Relation.Remove(lrRelation)
+                                End If
+                            Next
+
+                            'sr.AllowZeroLength 'Not yet implemented in lrColumn in Boston. Need to add AllowZeroLength to ValueType, which then becomes a RDS.Column
+                            larSchemaRow.Add(sr)
+                        Catch ex As Exception
+                            Throw New Parser.Syntax.ExecException(ex.Message, 0)
+                        End Try
                     Next
                 Next
             Catch ex As Exception

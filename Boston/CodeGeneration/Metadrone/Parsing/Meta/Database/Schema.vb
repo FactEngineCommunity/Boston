@@ -75,25 +75,29 @@ Namespace Parser.Meta.Database
             Dim idx As Integer = 0
             While idx < Schema.Count
                 'Build table/view
-                Dim currIdx As Integer = idx
-                Dim Table As New Table(Schema, Me, Me.Connection, Me.Transforms, idx, Me)
+                Try
+                    Dim currIdx As Integer = idx
+                    Dim Table As New Table(Schema, Me, Me.Connection, Me.Transforms, idx, Me)
 
-                'Add to table collection, if not in ignore list
-                Dim Ignore As Boolean = False
-                For Each ignoreTable In Me.Connection.IgnoreTableNames
-                    If StrEq(Table.Value.ToString, ignoreTable) Then
-                        Ignore = True
-                        Exit For
+                    'Add to table collection, if not in ignore list
+                    Dim Ignore As Boolean = False
+                    For Each ignoreTable In Me.Connection.IgnoreTableNames
+                        If StrEq(Table.Value.ToString, ignoreTable) Then
+                            Ignore = True
+                            Exit For
+                        End If
+                    Next
+                    If Not Ignore Then
+                        ListPos += 1
+                        Table.ListPos = ListPos
+                        Me.Tables.Add(Table)
                     End If
-                Next
-                If Not Ignore Then
-                    ListPos += 1
-                    Table.ListPos = ListPos
-                    Me.Tables.Add(Table)
-                End If
 
-                'Prevent infinite loop
-                If idx = currIdx Then idx += 1
+                    'Prevent infinite loop
+                    If idx = currIdx Then idx += 1
+                Catch ex As Exception
+                    Throw New Parser.Syntax.ExecException(ex.Message, 0)
+                End Try
             End While
 
             Me.FilteredTables = Me.Tables
