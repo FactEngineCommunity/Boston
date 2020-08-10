@@ -29,6 +29,30 @@ Namespace FEQL
 
     End Class
 
+    Public Class MODELELEMENTClause
+
+        Private _MODELELEMENTNAME As String = Nothing
+        Public Property MODELELEMENTNAME As String
+            Get
+                Return Me._MODELELEMENTNAME
+            End Get
+            Set(value As String)
+                Me._MODELELEMENTNAME = value
+            End Set
+        End Property
+
+        Private _MODELELEMENTSUFFIX As String = Nothing
+        Public Property MODELELEMENTSUFFIX As String
+            Get
+                Return Me._MODELELEMENTSUFFIX
+            End Get
+            Set(value As String)
+                Me._MODELELEMENTSUFFIX = value
+            End Set
+        End Property
+
+    End Class
+
     Public Class WITHClause
 
         Private _KEYWDWITH As String = Nothing
@@ -109,6 +133,16 @@ Namespace FEQL
             End Set
         End Property
 
+        Private _KEYWDISNOT As String = Nothing
+        Public Property KEYWDISNOT As String
+            Get
+                Return Me._KEYWDISNOT
+            End Get
+            Set(value As String)
+                Me._KEYWDISNOT = value
+            End Set
+        End Property
+
         Private _KEYWDA As String = Nothing
         Public Property KEYWDA As String
             Get
@@ -166,6 +200,16 @@ Namespace FEQL
             End Get
             Set(value As String)
                 Me._KEYWDWHICH = value
+            End Set
+        End Property
+
+        Private _MODELELEMENT As New List(Of Object)
+        Public Property MODELELEMENTCLAUSE As List(Of Object)
+            Get
+                Return Me._MODELELEMENT
+            End Get
+            Set(value As List(Of Object))
+                Me._MODELELEMENT = value
             End Set
         End Property
 
@@ -241,6 +285,7 @@ Namespace FEQL
         Public ENUMMERATEStatement As New FEQL.ENUMERATEStatement
         Public WHICHSELECTStatement As New FEQL.WHICHSELECTStatement
         Public WHICHCLAUSE As New FEQL.WHICHCLAUSE
+        Public MODELELEMENTCLAUSE As New FEQL.MODELELEMENTClause
         Public NODEPROPERTYIDENTIFICATION As New FEQL.NODEPROPERTYIDENTIFICATION
         Public WITHCLAUSE As New FEQL.WITHClause
 

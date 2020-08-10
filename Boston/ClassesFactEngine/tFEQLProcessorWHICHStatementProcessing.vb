@@ -330,6 +330,9 @@
                         Case Is = FactEngine.pcenumWhichClauseType.WithClause  '12. E.g. WITH WHAT Rating
                             Call Me.analystWITHClause(Me.WHICHCLAUSE, lrQueryGraph, lrQueryEdge)
 
+                        Case Is = FactEngine.pcenumWhichClauseType.ISNOTClause '13. E.g. Person 1 IS NOT Person 2
+                            Call Me.analystISNOTClause(Me.WHICHCLAUSE, lrQueryGraph, lrQueryEdge)
+
                     End Select
 
                     '-------------------------------------------------
@@ -969,6 +972,37 @@
         End Sub
 #End Region
 
+        '13
+#Region "analystISNOTClause"
+
+        Public Sub analystISNOTClause(ByRef arWHICHCLAUSE As FEQL.WHICHCLAUSE,
+                                      ByRef arQueryGraph As FactEngine.QueryGraph,
+                                      ByRef arQueryEdge As FactEngine.QueryEdge)
+
+            arQueryEdge.WhichClauseType = FactEngine.Constants.pcenumWhichClauseType.ISNOTClause
+
+            'Set the BaseNode
+            Me.MODELELEMENTCLAUSE = New FEQL.MODELELEMENTClause
+            Call Me.GetParseTreeTokensReflection(Me.MODELELEMENTCLAUSE, Me.WHICHCLAUSE.MODELELEMENTCLAUSE(0))
+            arQueryEdge.BaseNode = arQueryGraph.Nodes.Find(Function(x) x.Name = Me.MODELELEMENTCLAUSE.MODELELEMENTNAME)
+            arQueryEdge.BaseNode.Alias = Me.MODELELEMENTCLAUSE.MODELELEMENTSUFFIX
+
+            'Set the TargetNode
+            Me.MODELELEMENTCLAUSE = New FEQL.MODELELEMENTClause
+            Call Me.GetParseTreeTokensReflection(Me.MODELELEMENTCLAUSE, Me.WHICHCLAUSE.MODELELEMENTCLAUSE(1))
+            arQueryEdge.TargetNode = arQueryGraph.Nodes.Find(Function(x) x.Name = Me.MODELELEMENTCLAUSE.MODELELEMENTNAME)
+            arQueryEdge.TargetNode.Alias = Me.MODELELEMENTCLAUSE.MODELELEMENTSUFFIX
+
+            If arQueryEdge.BaseNode.Name <> arQueryEdge.TargetNode.Name Then
+                Throw New Exception("Error: IS NOT clauses must reference the same type of Model Element.")
+            End If
+
+            'NB There is no Predicate or FBMFactType for this type of QueryEdge
+
+        End Sub
+
+#End Region
+
 #Region "getWHICHClauseType"
         Public Function getWHICHClauseType(ByRef arWHICHClause As FEQL.WHICHCLAUSE,
                                            ByRef arWhichClauseNode As FEQL.ParseNode) As FactEngine.pcenumWhichClauseType
@@ -992,8 +1026,14 @@
                 End If
             End If
 
-            '12
-            If Me.WHICHCLAUSE.WITHCLAUSE IsNot Nothing Then
+            '13
+            If Me.WHICHCLAUSE.KEYWDISNOT IsNot Nothing Then
+
+                'E.g. Person 1 IS NOT Person 2
+                Return FactEngine.Constants.pcenumWhichClauseType.ISNOTClause
+
+                '12
+            ElseIf Me.WHICHCLAUSE.WITHCLAUSE IsNot Nothing Then
 
                 'E.g. WITH WHAT Rating (as in "WHICH Person likes WHICH City WITH WHAT Rating"), can also be WITH (Rating:'10') for instance.
                 Return FactEngine.Constants.pcenumWhichClauseType.WithClause

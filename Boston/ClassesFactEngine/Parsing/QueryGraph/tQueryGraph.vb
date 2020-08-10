@@ -164,7 +164,19 @@
                     lbAddedAND = False
 
                     Dim lrOriginTable As RDS.Table
-                    If lrQueryEdge.FBMFactType.isRDSTable And lrQueryEdge.FBMFactType.Arity = 2 Then
+
+                    If lrQueryEdge.WhichClauseType = pcenumWhichClauseType.ISNOTClause Then
+                        'E.g. Of the type "Person 1 IS NOT Person 2'
+
+                        lsSQLQuery &= "("
+                        For Each lrColumn In lrQueryEdge.BaseNode.RDSTable.getPrimaryKeyColumns
+                            lsSQLQuery &= lrQueryEdge.BaseNode.Name & Viev.NullVal(lrQueryEdge.BaseNode.Alias, "") & "." & lrColumn.Name & " <> "
+                            lsSQLQuery &= lrQueryEdge.TargetNode.Name & Viev.NullVal(lrQueryEdge.TargetNode.Alias, "") & "." & lrColumn.Name
+                        Next
+                        lsSQLQuery &= ")"
+
+                    ElseIf lrQueryEdge.FBMFactType.isRDSTable And lrQueryEdge.FBMFactType.Arity = 2 Then
+
                         lrOriginTable = lrQueryEdge.FBMFactType.getCorrespondingRDSTable
 
                         For Each lrColumn In lrQueryEdge.BaseNode.RDSTable.getPrimaryKeyColumns
