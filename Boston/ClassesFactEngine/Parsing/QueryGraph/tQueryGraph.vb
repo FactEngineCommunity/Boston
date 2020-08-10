@@ -199,17 +199,31 @@
 
                         Dim liInd2 = 1
                         If lrRelation.OriginTable Is lrOriginTable Then
-                            Dim larTargetColumn = lrQueryEdge.TargetNode.FBMModelObject.getCorrespondingRDSTable.getPrimaryKeyColumns
-                            For Each lrColumn In larTargetColumn
-                                lsSQLQuery &= lrQueryEdge.BaseNode.FBMModelObject.Id & "." & lrColumn.Name
-                                lsSQLQuery &= " = " & lrQueryEdge.TargetNode.FBMModelObject.Id & "." & lrColumn.Name
+                            Dim larOriginColumn As New List(Of RDS.Column)
+                            Dim larTargetColumn As New List(Of RDS.Column)
+                            'was  larTargetColumn = lrQueryEdge.TargetNode.RDSTable.getPrimaryKeyColumns ' FBMModelObject.getCorrespondingRDSTable.getPrimaryKeyColumns
+
+                            For Each lrColumn In lrRelation.OriginColumns
+                                larOriginColumn.Add(lrColumn.Clone(Nothing, Nothing))
+                            Next
+
+                            For Each lrColumn In lrRelation.DestinationColumns
+                                larTargetColumn.Add(lrColumn.Clone(Nothing, Nothing))
+                            Next
+
+                            For Each lrColumn In larOriginColumn
+                                'was
+                                'lsSQLQuery &= lrQueryEdge.BaseNode.FBMModelObject.Id & "." & lrColumn.Name
+                                'lsSQLQuery &= " = " & lrQueryEdge.TargetNode.Name & Viev.NullVal(lrQueryEdge.TargetNode.Alias, "") & "." & lrColumn.Name
+                                lsSQLQuery &= lrColumn.Table.Name & "." & lrColumn.Name
+                                lsSQLQuery &= " = " & larTargetColumn(liInd2 - 1).Table.Name & Viev.NullVal(lrQueryEdge.TargetNode.Alias, "") & "." & larTargetColumn(liInd2 - 1).Name
                                 If liInd2 < larTargetColumn.Count Then lsSQLQuery &= vbCrLf & "AND "
                                 liInd2 += 1
                             Next
                         Else
                             Dim larTargetColumn = lrQueryEdge.BaseNode.FBMModelObject.getCorrespondingRDSTable.getPrimaryKeyColumns
                             For Each lrColumn In larTargetColumn
-                                lsSQLQuery &= lrQueryEdge.TargetNode.FBMModelObject.Id & "." & lrColumn.Name
+                                lsSQLQuery &= lrQueryEdge.TargetNode.Name & Viev.NullVal(lrQueryEdge.TargetNode.Alias, "") & "." & lrColumn.Name
                                 lsSQLQuery &= " = " & lrQueryEdge.BaseNode.FBMModelObject.Id & "." & lrColumn.Name
                                 If liInd2 < larTargetColumn.Count Then lsSQLQuery &= vbCrLf & "AND "
                                 liInd2 += 1

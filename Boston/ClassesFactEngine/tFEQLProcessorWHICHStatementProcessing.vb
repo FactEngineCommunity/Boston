@@ -694,10 +694,19 @@
             End If
 
             'Get the TargetNode                        
+            Me.MODELELEMENTCLAUSE = New FEQL.MODELELEMENTClause
+            Call Me.GetParseTreeTokensReflection(Me.MODELELEMENTCLAUSE, Me.WHICHCLAUSE.MODELELEMENT(1))
             Dim lrFBMModelObject = Me.Model.GetModelObjectByName(Me.WHICHCLAUSE.MODELELEMENTNAME(1))
             If lrFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & Me.WHICHCLAUSE.MODELELEMENTNAME(0) & "'.")
             arQueryEdge.TargetNode = New FactEngine.QueryNode(lrFBMModelObject)
-            arQueryGraph.Nodes.Add(arQueryEdge.TargetNode) 'was addUnique 20200807-VM
+            arQueryEdge.TargetNode.Alias = Me.MODELELEMENTCLAUSE.MODELELEMENTSUFFIX
+
+
+            If arQueryEdge.TargetNode.Alias Is Nothing Then '20200810-VM-May need to revise this
+                arQueryGraph.Nodes.Add(arQueryEdge.TargetNode) 'was simply addUnique 20200807-VM
+            Else
+                arQueryGraph.Nodes.AddUnique(arQueryEdge.TargetNode)
+            End If
 
             ''---------------------------------------------------------
             ''Get the Predicate
