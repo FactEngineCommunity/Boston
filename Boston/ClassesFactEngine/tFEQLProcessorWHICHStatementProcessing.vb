@@ -131,7 +131,7 @@
                            Me.WHICHCLAUSE.KEYWDTHAT.Count = 0 Then
                         'E.g. "AND holds WHICH Position"
 
-                        Call Me.analyseAndPredicateWhichModelElement(Me.WHICHCLAUSE, lrQueryGraph, lrQueryEdge)
+                        Call Me.analyseAndPredicateWhichModelElement(Me.WHICHCLAUSE, lrQueryGraph, lrQueryEdge, lrPreviousTargetNode)
 
                         '7
                     ElseIf Me.WHICHCLAUSE.KEYWDAND IsNot Nothing And
@@ -264,6 +264,8 @@
                 '----------------------------------
                 'Get the Edges for the QueryGraph
                 Dim lrPreviousTargetNode As FactEngine.QueryNode = Nothing
+                Dim lrPreviousTopicNode As FactEngine.QueryNode = Nothing
+
                 For Each loWhichClause In Me.WHICHSELECTStatement.WHICHCLAUSE
 
                     Me.WHICHCLAUSE = New FEQL.WHICHCLAUSE
@@ -308,7 +310,7 @@
                             Call Me.analysePredicateWhichModelElement(Me.WHICHCLAUSE, lrQueryGraph, lrQueryEdge, lrPreviousTargetNode)
 
                         Case Is = FactEngine.pcenumWhichClauseType.AndPredicateWhichModelElement  '               6. E.g. AND has WHICH RoomName
-                            Call Me.analyseAndPredicateWhichModelElement(Me.WHICHCLAUSE, lrQueryGraph, lrQueryEdge)
+                            Call Me.analyseAndPredicateWhichModelElement(Me.WHICHCLAUSE, lrQueryGraph, lrQueryEdge, lrPreviousTopicNode)
 
                         Case Is = FactEngine.pcenumWhichClauseType.AndThatModelElementPredicateWhichModelElement '7. E.g. AND THAT Faculty has FacultyName
                             Call Me.analyseANDTHATWHICHClause(Me.WHICHCLAUSE, lrQueryGraph, lrQueryEdge, lrPreviousTargetNode)
@@ -335,6 +337,7 @@
                     lrQueryGraph.QueryEdges.Add(lrQueryEdge)
 
                     lrPreviousTargetNode = lrQueryEdge.TargetNode
+                    lrPreviousTopicNode = lrQueryEdge.BaseNode
 
                 Next
 
@@ -345,6 +348,7 @@
                 Dim lsSQLQuery = lrQueryGraph.generateSQL
 
                 Dim lrTestRecordset = Me.DatabaseManager.GO(lsSQLQuery)
+                lrTestRecordset.Warning = lrQueryGraph.Warning
 
                 'lrRecordset.Query = lsSQLQuery
 
@@ -609,7 +613,8 @@
 
         Public Sub analyseAndPredicateWhichModelElement(ByRef arWHICHCLAUSE As FEQL.WHICHCLAUSE,
                                                         ByRef arQueryGraph As FactEngine.QueryGraph,
-                                                        ByRef arQueryEdge As FactEngine.QueryEdge)
+                                                        ByRef arQueryEdge As FactEngine.QueryEdge,
+                                                        ByRef arPreviousTopicNode As FactEngine.QueryNode)
 
             Dim lrFBMModelObject As FBM.ModelObject
 
@@ -633,9 +638,24 @@
 
             '-----------------------------------------
             'Get the relevant FBM.FactType
-            Call arQueryEdge.getAndSetFBMFactType(arQueryEdge.BaseNode,
+            Try
+                Call arQueryEdge.getAndSetFBMFactType(arQueryEdge.BaseNode,
                                                   arQueryEdge.TargetNode,
                                                   arQueryEdge.Predicate)
+            Catch
+                'This isn't elegant, but if the previous fails it is because the FactType is not outgoing to the QueryGraph.BaseNode, but may well be for the last Node queried over.
+                '  can raise a warning if we like, such as "Warning: Better to use "AND THAT <PreviousTargetNode> <Predicate> WHICH <TargetNode>"
+                Try
+                    arQueryEdge.BaseNode = arPreviousTopicNode
+                    Call arQueryEdge.getAndSetFBMFactType(arQueryEdge.BaseNode,
+                                                  arQueryEdge.TargetNode,
+                                                  arQueryEdge.Predicate)
+                Catch ex As Exception
+                    Throw New Exception(ex.Message)
+                Finally
+                    arQueryEdge.QueryGraph.Warning.Add("Recommendation: Use 'AND THAT " & arPreviousTopicNode.Name & " " & arQueryEdge.Predicate & " WHICH " & arQueryEdge.TargetNode.Name)
+                End Try
+            End Try
 
         End Sub
 #End Region
@@ -687,6 +707,8 @@
             Call arQueryEdge.getAndSetFBMFactType(arQueryEdge.BaseNode,
                                                   arQueryEdge.TargetNode,
                                                   arQueryEdge.Predicate)
+
+            arPreviousTargetNode = arQueryEdge.BaseNode
 
         End Sub
 

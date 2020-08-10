@@ -9,6 +9,8 @@
 
         Public Query As String = Nothing
 
+        Public Warning As New List(Of String) 'For if there are any Warnings/Recommendations in a QueryGraph in FactEngine.
+
         ''' <summary>
         ''' The type of statement made by the User. E.g. a DESCRIBEStatement.
         ''' </summary>
