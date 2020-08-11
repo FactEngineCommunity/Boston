@@ -42,31 +42,32 @@ Namespace Parser.Meta.Database
             For Each lrRelation In SchemaRow.Relation
 
                 Try
+                    If lrRelation.OriginColumns.FindAll(Function(x) x.Name = Me.Value).Count > 0 Then
+                        For Each lrDestinationColumn In lrRelation.DestinationColumns
 
-                    For Each lrDestinationColumn In lrRelation.DestinationColumns
+                            Dim lsReferencedTableName As String = ""
 
-                        Dim lsReferencedTableName As String = ""
+                            Dim lrOriginColumn As RDS.Column = lrRelation.OriginColumns.Find(Function(x) x.ActiveRole.Id = lrDestinationColumn.ActiveRole.Id) ' SchemaRow.ColumnId)
 
-                        Dim lrOriginColumn As RDS.Column = lrRelation.OriginColumns.Find(Function(x) x.Id = lrDestinationColumn.Id) ' SchemaRow.ColumnId)
+                            If lrOriginColumn Is Nothing Then Continue For
 
-                        If lrOriginColumn Is Nothing Then Continue For
+                            Dim lsDestinationColumnName As String = ""
+                            If lrRelation.DestinationColumns.Count = 1 Then
+                                lsDestinationColumnName = lrRelation.DestinationColumns(0).Name
+                            Else
+                                'Dim lrDestinationColumn As RDS.Column = lrRelation.DestinationColumns.Find(Function(x) x.ActiveRole.Id = lrOriginColumn.ActiveRole.Id)
+                                lsDestinationColumnName = lrDestinationColumn.Name
+                            End If
 
-                        Dim lsDestinationColumnName As String = ""
-                        If lrRelation.DestinationColumns.Count = 1 Then
-                            lsDestinationColumnName = lrRelation.DestinationColumns(0).Name
-                        Else
-                            'Dim lrDestinationColumn As RDS.Column = lrRelation.DestinationColumns.Find(Function(x) x.ActiveRole.Id = lrOriginColumn.ActiveRole.Id)
-                            lsDestinationColumnName = lrDestinationColumn.Name
-                        End If
+                            Me.Relations.Add(New Relation(lrRelation.Id,
+                                                          Me.Owner.GetAttributeValue("Value", Nothing, False, False),
+                                                          Me.Value,
+                                                          lrRelation.DestinationTable.Name,
+                                                          lsDestinationColumnName,
+                                                          lrRelation.OriginColumns.Count))
 
-                        Me.Relations.Add(New Relation(lrRelation.Id,
-                                                      Me.Owner.GetAttributeValue("Value", Nothing, False, False),
-                                                      Me.Value,
-                                                      lrRelation.DestinationTable.Name,
-                                                      lsDestinationColumnName,
-                                                      lrRelation.OriginColumns.Count))
-
-                    Next
+                        Next
+                    End If
                 Catch ex As Exception
                     Throw New Exception("Error setting Relation in Column.New")
                 End Try
@@ -274,79 +275,81 @@ Namespace Parser.Meta.Database
 
             If AttribName Is Nothing Then AttribName = ""
 
-            If AttribName.Length = 0 Or StrEq(AttribName, VARIABLE_ATTRIBUTE_VALUE) Then
-                'return value
-                If Params IsNot Nothing Then Call Me.CheckParamsForPropertyCall(VARIABLE_ATTRIBUTE_VALUE, Params)
-                Dim loReturnObject As Object
-                'Return Me.ReplaceAllList.ApplyReplaces(Me.Value)  Was. Return if things go pear shape.
+            Try
 
-                If Params Is Nothing Then
-                    Return Me.mValue
-                Else
-                    If AttribName = "" Then 'Fixes bug where if a Transform such as column.value = "Date" then column.value = "[Date]" modifies the standard transform function.
+                If AttribName.Length = 0 Or StrEq(AttribName, VARIABLE_ATTRIBUTE_VALUE) Then
+                    'return value
+                    If Params IsNot Nothing Then Call Me.CheckParamsForPropertyCall(VARIABLE_ATTRIBUTE_VALUE, Params)
+                    Dim loReturnObject As Object
+                    'Return Me.ReplaceAllList.ApplyReplaces(Me.Value)  Was. Return if things go pear shape.
+
+                    If Params Is Nothing Then
                         Return Me.mValue
                     Else
-                        loReturnObject = Me.Transforms.GetAttributeValue(Me, Me.Owner, AttribName)
+                        If AttribName = "" Then 'Fixes bug where if a Transform such as column.value = "Date" then column.value = "[Date]" modifies the standard transform function.
+                            Return Me.mValue
+                        Else
+                            loReturnObject = Me.Transforms.GetAttributeValue(Me, Me.Owner, AttribName)
+                        End If
+
+                        Return loReturnObject
                     End If
 
-                    Return loReturnObject
                 End If
 
-            End If
+                If Params Is Nothing Then Params = New List(Of Object)
 
-            If Params Is Nothing Then Params = New List(Of Object)
+                If StrEq(AttribName, VARIABLE_ATTRIBUTE_DATATYPE) And LookTransformsIfNotFound Then
+                    Call Me.CheckParamsForPropertyCall(AttribName, Params)
+                    Try
+                        Return Me.Transforms.GetAttributeValue(Me, Me.Owner, AttribName)
+                    Catch ex As Exception
+                        Return Me.DataType
+                    End Try
 
-            If StrEq(AttribName, VARIABLE_ATTRIBUTE_DATATYPE) And LookTransformsIfNotFound Then
-                Call Me.CheckParamsForPropertyCall(AttribName, Params)
-                Try
-                    Return Me.Transforms.GetAttributeValue(Me, Me.Owner, AttribName)
-                Catch ex As Exception
+                ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_SCHEMAROWVAL) Then
+                    'return listpos               
+                    Return Me.SchemaRowVal
+
+                ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_OWNER) Then
+                    'return listpos               
+                    Return Me.Owner
+
+                ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_DATATYPE) Then
+                    'return provider datatype
+                    Call Me.CheckParamsForPropertyCall(AttribName, Params)
                     Return Me.DataType
-                End Try
 
-            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_SCHEMAROWVAL) Then
-                'return listpos               
-                Return Me.SchemaRowVal
+                ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_SCHEMAROWVAL) Then
+                    'return SchemaRowVal              
+                    Return Me.SchemaRowVal
 
-            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_OWNER) Then
-                'return listpos               
-                Return Me.Owner
+                ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_ISIDENTITY) Then
+                    'return isidentity
+                    Call Me.CheckParamsForPropertyCall(AttribName, Params)
+                    Return Me.IsIdentity
 
-            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_DATATYPE) Then
-                'return provider datatype
-                Call Me.CheckParamsForPropertyCall(AttribName, Params)
-                Return Me.DataType
+                ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_ISPRIMARYKEY) Then
+                    'return isprimarykey
+                    Call Me.CheckParamsForPropertyCall(AttribName, Params)
+                    Return Me.IsPrimaryKey
 
-            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_SCHEMAROWVAL) Then
-                'return SchemaRowVal              
-                Return Me.SchemaRowVal
+                ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_ISFOREIGNKEY) Then
+                    'return isforeignkey
+                    Call Me.CheckParamsForPropertyCall(AttribName, Params)
+                    Return Me.IsForeignKey
 
-            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_ISIDENTITY) Then
-                'return isidentity
-                Call Me.CheckParamsForPropertyCall(AttribName, Params)
-                Return Me.IsIdentity
+                ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_NULLABLE) Then
+                    'return nullable
+                    Call Me.CheckParamsForPropertyCall(AttribName, Params)
+                    Return Me.Nullable
 
-            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_ISPRIMARYKEY) Then
-                'return isprimarykey
-                Call Me.CheckParamsForPropertyCall(AttribName, Params)
-                Return Me.IsPrimaryKey
+                ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_RELATIONS) Then 'Boston specific. Not part of original Metadrone.
+                    'return relation
+                    Call Me.CheckParamsForPropertyCall(AttribName, Params)
+                    Return Me.Relations
 
-            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_ISFOREIGNKEY) Then
-                'return isforeignkey
-                Call Me.CheckParamsForPropertyCall(AttribName, Params)
-                Return Me.IsForeignKey
-
-            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_NULLABLE) Then
-                'return nullable
-                Call Me.CheckParamsForPropertyCall(AttribName, Params)
-                Return Me.Nullable
-
-            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_RELATIONS) Then 'Boston specific. Not part of original Metadrone.
-                'return relation
-                Call Me.CheckParamsForPropertyCall(AttribName, Params)
-                Return Me.Relations
-
-            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_RELATION) Then 'Boston specific. Not part of original Metadrone.
+                ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_RELATION) Then 'Boston specific. Not part of original Metadrone.
                     'return relation
                     Call Me.CheckParamsForPropertyCall(AttribName, Params)
                     Return Me.Relation
@@ -438,13 +441,18 @@ Namespace Parser.Meta.Database
 
                 Else
                     If LookTransformsIfNotFound Then
-                    Return Me.Transforms.GetAttributeValue(Me, Me.Owner, AttribName)
-                Else
-                    'This will avoid stack overflow when called from SourceTransforms
-                    Throw New Exception("Invalid attribute: " & AttribName & ". ")
+                        Return Me.Transforms.GetAttributeValue(Me, Me.Owner, AttribName)
+                    Else
+                        'This will avoid stack overflow when called from SourceTransforms
+                        Throw New Exception("Invalid attribute: " & AttribName & ". ")
+                    End If
+
                 End If
 
-            End If
+            Catch ex As Exception
+                Throw New Exception(ex.Message)
+            End Try
+
         End Function
 
         Private Sub CheckParamsForPropertyCall(ByVal AttribName As String, ByVal Params As List(Of Object))
@@ -459,11 +467,14 @@ Namespace Parser.Meta.Database
 
             Dim liInd As Integer = 0
 
-            For Each lrRelation In Me.Relation
-
-                With CType(Me.Relations(liInd), Relation)
-                    Me.FilteredRelations.Add(.GetCopy)
-                End With
+            For Each lrRelation In Me.Relations
+                Try
+                    With CType(Me.Relations(liInd), Relation)
+                        Me.FilteredRelations.Add(.GetCopy)
+                    End With
+                Catch ex As Exception
+                    Throw New Parser.Syntax.ExecException("Column.InitEntities: " & ex.Message, 0)
+                End Try
                 liInd += 1
             Next
 

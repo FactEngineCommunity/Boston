@@ -122,9 +122,15 @@ Public Class frmCRUDModel
             End If
 
             Try
-                Dim ldbConnection As New ADODB.Connection
-                Call ldbConnection.Open(Trim(Me.TextBoxDatabaseConnectionString.Text))
-
+                Select Case Trim(Me.ComboBoxDatabaseType.SelectedItem)
+                    Case Is = "SQLite"
+                        If Database.SQLiteDatabase.CreateConnection(Me.TextBoxDatabaseConnectionString.Text) Is Nothing Then
+                            Throw New Exception("Can't connect to the database with that connection string.")
+                        End If
+                    Case Is = "MSJet"
+                        Dim ldbConnection As New ADODB.Connection
+                        Call ldbConnection.Open(Trim(Me.TextBoxDatabaseConnectionString.Text))
+                End Select
             Catch ex As Exception
                 asReturnMessage &= "Please fix the Database Connection String and try again." & vbCrLf & vbCrLf & ex.Message
                 Return False
