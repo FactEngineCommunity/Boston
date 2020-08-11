@@ -95,11 +95,68 @@ Public Class frmCRUDModel
 
     End Sub
 
+    Private Function checkDatabaseConnectionString(ByRef asReturnMessage As String) As Boolean
+
+        Dim lsDatabaseLocation, lsDataProvider As String
+
+        Try
+            Dim lrSQLConnectionStringBuilder As System.Data.Common.DbConnectionStringBuilder = Nothing
+
+            Try
+                lrSQLConnectionStringBuilder = New System.Data.Common.DbConnectionStringBuilder(True) With {
+                   .ConnectionString = Trim(Me.TextBoxDatabaseConnectionString.Text)
+                }
+
+                lsDatabaseLocation = lrSQLConnectionStringBuilder("Data Source")
+
+            Catch ex As Exception
+                asReturnMessage = "Please fix the Database Connection String and try again." & vbCrLf & vbCrLf & ex.Message
+                Return False
+            End Try
+
+            If Not System.IO.File.Exists(lsDatabaseLocation) Then
+                asReturnMessage = "The database source of the Database Connection String you provided points to a file that does not exist."
+                asReturnMessage &= vbCrLf & vbCrLf
+                asReturnMessage &= "Please fix the Database Connection String and try again."
+                Return False
+            End If
+
+            Try
+                Dim ldbConnection As New ADODB.Connection
+                Call ldbConnection.Open(Trim(Me.TextBoxDatabaseConnectionString.Text))
+
+            Catch ex As Exception
+                asReturnMessage &= "Please fix the Database Connection String and try again." & vbCrLf & vbCrLf & ex.Message
+                Return False
+            End Try
+
+
+            Return True
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning, ex.StackTrace)
+
+            Return False
+        End Try
+
+    End Function
+
     Private Sub ButtonTestConnection_Click(sender As Object, e As EventArgs) Handles ButtonTestConnection.Click
 
         Try
             Select Case Trim(Me.ComboBoxDatabaseType.SelectedItem)
                 Case Is = "SQLite"
+                    Dim lsReturnMessage As String = Nothing
+                    If Not Me.checkDatabaseConnectionString(lsReturnMessage) Then
+                        MsgBox(lsReturnMessage)
+                        Exit Sub
+                    End If
+
 
                     Me.LabelOpenSuccessfull.Visible = True
                     If Database.SQLiteDatabase.CreateConnection(Me.TextBoxDatabaseConnectionString.Text) Is Nothing Then
