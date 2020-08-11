@@ -61,6 +61,7 @@ Public Class tBrain
 
     'Public EngagementMode As <Unknown> 'The mode of action or 'directive' that the Brain is in...e.g. 'Doing Something' as in a list of Tasks/Processes shown in MS Windows 'Task Manager'
     '                                       Is a set of things that the Brain is 'doing'.
+
     Public SelfTeachingMode As pcenumSelfTeachingMode = pcenumSelfTeachingMode.On
 
     Private Timeout As New Timers.Timer(10)
@@ -1329,7 +1330,6 @@ Public Class tBrain
 
 #Region "STATEMENTPROCESSING"
 
-
     Private Sub ProcessStatementCopyFactType()
         Dim lrFactType As FBM.FactType
         Dim lo_pt As New PointF(10, 10)
@@ -2358,7 +2358,6 @@ Public Class tBrain
         'End If
 
     End Sub
-
 
     Private Sub ProcessFACTTYPEStatement(ByVal asOriginalSentence As String)
 

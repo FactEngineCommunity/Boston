@@ -3362,6 +3362,7 @@ Namespace FBM
             '==============================================================================
             Me.isDirty = True
             Me.Page.IsDirty = True
+            Me.Model.IsDirty = True
 
 
         End Sub

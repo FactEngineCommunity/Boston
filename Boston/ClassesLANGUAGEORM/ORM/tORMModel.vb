@@ -1728,6 +1728,11 @@ Namespace FBM
                 '--------------------------------------------------------------------
                 lrEntityType = New FBM.EntityType(Me, pcenumLanguage.ORMModel, lsNewUniqueName, lsNewUniqueName, Nothing)
 
+                Dim lrDictionaryEntry = New FBM.DictionaryEntry(Me, lsNewUniqueName, pcenumConceptType.EntityType, , , True, True)
+                lrDictionaryEntry = Me.AddModelDictionaryEntry(lrDictionaryEntry)
+                lrDictionaryEntry.isDirty = True
+                lrEntityType.Concept = lrDictionaryEntry.Concept
+
                 '-----------------------------------------
                 'Add the new EntityType to the Model
                 '-----------------------------------------

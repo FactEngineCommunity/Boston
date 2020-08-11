@@ -263,9 +263,16 @@ Namespace TableFactType
                             arFactType.ObjectifyingEntityType.ObjectifiedFactType = arFactType
                         Else
                             lsMessage = "No EntityType found in the Model for Objectifying Entity Type of the FactType"
-                            lsMessage &= vbCrLf & "ModelId: " & arFactType.Model.ModelId
+                            lsMessage &= vbCrLf & vbCrLf & "Creating one. Save the Model after loading."
+
+                            lsMessage &= vbCrLf & vbCrLf & "ModelId: " & arFactType.Model.ModelId
                             lsMessage &= vbCrLf & "FactTypeId: " & arFactType.Id
                             lsMessage &= vbCrLf & "Looking for EntityTypeId: " & lsEntityTypeId
+
+                            Dim lrEntityType = arFactType.Model.CreateEntityType(lsEntityTypeId, True)
+                            lrEntityType.IsObjectifyingEntityType = True
+                            lrEntityType.ObjectifiedFactType = arFactType
+                            arFactType.Model.IsDirty = True
 
                             lREcordset.Close()
                             Throw New Exception(lsMessage)

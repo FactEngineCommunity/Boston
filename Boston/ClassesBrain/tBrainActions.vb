@@ -128,7 +128,7 @@ Partial Public Class tBrain
 
     End Sub
 
-    Private Function ProcessStatementAddFactType() As Boolean
+    Private Function executeStatementAddFactType() As Boolean
 
         Dim lrFactType As FBM.FactType
         Dim lrResolvedWord As Language.WordResolved
@@ -140,7 +140,7 @@ Partial Public Class tBrain
         Try
             Me.Model = prApplication.WorkingModel
 
-            ProcessStatementAddFactType = True
+            executeStatementAddFactType = True
 
             For Each lrResolvedWord In Me.CurrentQuestion.sentence.WordListResolved.FindAll(Function(x) x.Sense = pcenumWordSense.Noun)
                 lrEntityType = New FBM.EntityType(Me.Model, pcenumLanguage.ORMModel, lrResolvedWord.Word, Nothing, True)
@@ -269,7 +269,7 @@ Partial Public Class tBrain
     ''' </summary>
     ''' <returns></returns>
     ''' <remarks></remarks>
-    Private Function ProcessStatementAddFactTypePredetermined(ByRef arQuestion As tQuestion) As Boolean
+    Private Function executeStatementAddFactTypePredetermined(ByRef arQuestion As tQuestion) As Boolean
 
         Dim lrFactType As FBM.FactType
         Dim lsResolvedModelElementName As String
@@ -279,14 +279,14 @@ Partial Public Class tBrain
         Try
             Me.Model = prApplication.WorkingModel
 
-            ProcessStatementAddFactTypePredetermined = True
+            executeStatementAddFactTypePredetermined = True
 
             For Each lsResolvedModelElementName In arQuestion.FocalSymbol
                 lrModelObject = Me.Model.GetModelObjectByName(lsResolvedModelElementName)
                 If IsSomething(lrModelObject) Then
                     larModelObject.Add(lrModelObject)
                 Else
-                    ProcessStatementAddFactTypePredetermined = False
+                    executeStatementAddFactTypePredetermined = False
                     Exit Function
                 End If
             Next
