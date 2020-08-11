@@ -515,7 +515,7 @@ Public Class frmToolboxEnterpriseExplorer
 
     Public Function AddExistingPageToModel(ByRef arPage As FBM.Page,
                                       ByRef arModel As FBM.Model,
-                                      ByVal arTreeNode As TreeNode,
+                                      ByVal arTreeNode As cTreeNode,
                                       Optional ByVal abToolTipNewPage As Boolean = False) As tEnterpriseEnterpriseView
 
         Try
@@ -3990,5 +3990,23 @@ Public Class frmToolboxEnterpriseExplorer
 
     Private Sub FactEngineToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles FactEngineToolStripMenuItem.Click
         Call frmMain.LoadFactEngine()
+    End Sub
+
+    Private Sub HideToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles HideToolStripMenuItem.Click
+        Me.TreeView.SelectedNode.Hidden(False) = True
+    End Sub
+
+    Private Sub UnhideHiddenModelsToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles UnhideHiddenModelsToolStripMenuItem.Click
+        Me.TreeView.SelectedNode.Hidden(False, True) = False
+    End Sub
+
+    Private Sub TreeView_BeforeSelect(sender As Object, e As TreeViewCancelEventArgs) Handles TreeView.BeforeSelect
+        Me.TreeView._SelectedNode = e.Node
+    End Sub
+
+    Private Sub TreeView_NodeMouseClick(sender As Object, e As TreeNodeMouseClickEventArgs) Handles TreeView.NodeMouseClick
+        If e.Button = MouseButtons.Right Then
+            Me.TreeView.SelectedNode = e.Node
+        End If
     End Sub
 End Class

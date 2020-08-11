@@ -385,6 +385,8 @@
     <Compile Include="ClassesGeneral\GroupNotificationBar.vb">
       <SubType>UserControl</SubType>
     </Compile>
+    <Compile Include="ClassesGeneral\HidableTreeView\tTreeNode.vb" />
+    <Compile Include="ClassesGeneral\HidableTreeView\tTreeNodeCollection.vb" />
     <Compile Include="ClassesGeneral\NotificationBarGeneralNotification.Designer.vb">
       <DependentUpon>NotificationBarGeneralNotification.vb</DependentUpon>
     </Compile>

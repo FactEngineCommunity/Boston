@@ -226,8 +226,8 @@ Namespace FBM
 
         Public CoreVersionNumber As String 'the version number of the Core Model injected into the Model, or the version number of the Core Model itself if Me is Core.
 
-        <XmlIgnore()> _
-        Public TargetDatabaseType As String = "" 'e.g. MSAccess, ORACLE, SQL Server, MySQL etc.
+        <XmlIgnore()>
+        Public TargetDatabaseType As pcenumDatabaseType = pcenumDatabaseType.None 'e.g. MSAccess, ORACLE, SQL Server, MySQL etc.
         <XmlIgnore()> _
         Public TargetDatabaseConnectionString As String = "" 'The ConnectionString used to connect to the Target Database.
 

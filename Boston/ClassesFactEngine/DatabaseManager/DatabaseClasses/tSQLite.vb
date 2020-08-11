@@ -26,6 +26,11 @@ Namespace FactEngine
                 'Populate the lrRecordset with results from the database
                 'Richmond.WriteToStatusBar("Connecting to database.", True)
                 Dim lrSQLiteConnection = Database.CreateConnection(Me.DatabaseConnectionString)
+
+                If lrSQLiteConnection Is Nothing Then
+                    Throw New Exception("SQLite Adaptor: Could not create SQLite database connection to execute the query.")
+                End If
+
                 Dim lrSQLiteDataReader = Database.getReaderForSQL(lrSQLiteConnection, asQuery)
 
                 Dim larFact As New List(Of FBM.Fact)

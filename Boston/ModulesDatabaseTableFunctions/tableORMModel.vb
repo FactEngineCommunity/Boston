@@ -24,7 +24,7 @@ Namespace TableModel
                 lsSQLQuery &= " ," & ar_model.IsPhysicalModel
                 lsSQLQuery &= " ," & ar_model.IsNamespace
                 lsSQLQuery &= " ," & ar_model.IsEnterpriseModel
-                lsSQLQuery &= " ,'" & ar_model.TargetDatabaseType & "'"
+                lsSQLQuery &= " ,'" & ar_model.TargetDatabaseType.ToString & "'"
                 lsSQLQuery &= " ,'" & ar_model.TargetDatabaseConnectionString & "'"
                 If ar_model.Namespace Is Nothing Then
                     lsSQLQuery &= " ,''"
@@ -153,7 +153,11 @@ Namespace TableModel
                     arModel.IsNamespace = False
                     arModel.IsEnterpriseModel = True 'By default for this function.
 
-                    arModel.TargetDatabaseType = Viev.NullVal(lREcordset("TargetDatabaseType").Value, "")
+                    Try
+                        arModel.TargetDatabaseType = CType([Enum].Parse(GetType(pcenumDatabaseType), Viev.NullVal(lREcordset("TargetDatabaseType").Value, pcenumDatabaseType.None)), pcenumDatabaseType)
+                    Catch
+                        arModel.TargetDatabaseType = pcenumDatabaseType.None
+                    End Try
                     arModel.TargetDatabaseConnectionString = Viev.NullVal(lREcordset("TargetDatabaseConnectionString").Value, "")
                     arModel.CreatedByUserId = NullVal(lREcordset("CreatedByUserId").Value, "")
 
@@ -220,7 +224,8 @@ Namespace TableModel
                     lrModel.IsNamespace = False
                     lrModel.IsEnterpriseModel = True 'By default for this function.
 
-                    lrModel.TargetDatabaseType = Viev.NullVal(lREcordset("TargetDatabaseType").Value, "")
+                    lrModel.TargetDatabaseType = CType([Enum].Parse(GetType(pcenumDatabaseType), Viev.NullVal(lREcordset("TargetDatabaseType").Value, pcenumDatabaseType.None)), pcenumDatabaseType)
+                    'Viev.NullVal(lREcordset("TargetDatabaseType").Value, "")
                     lrModel.TargetDatabaseConnectionString = Viev.NullVal(lREcordset("TargetDatabaseConnectionString").Value, "")
 
                     lrModel.CreatedByUserId = NullVal(lREcordset("CreatedByUserId").Value, "")
@@ -269,7 +274,7 @@ Namespace TableModel
                 lsSQLQuery &= "       ,IsConceptualModel = " & ar_model.IsConceptualModel
                 lsSQLQuery &= "       ,IsPhysicalModel = " & ar_model.IsPhysicalModel
                 lsSQLQuery &= "       ,IsNamespace = " & ar_model.IsNamespace
-                lsSQLQuery &= "       ,TargetDatabaseType = '" & Trim(ar_model.TargetDatabaseType) & "'"
+                lsSQLQuery &= "       ,TargetDatabaseType = '" & Trim(ar_model.TargetDatabaseType.ToString) & "'"
                 lsSQLQuery &= "       ,TargetDatabaseConnectionString = '" & Trim(ar_model.TargetDatabaseConnectionString) & "'"
                 lsSQLQuery &= "       ,CreatedByUserId = '" & NullVal(ar_model.CreatedByUserId, "") & "'"
                 lsSQLQuery &= "       ,CoreVersionNumber = '" & Trim(ar_model.CoreVersionNumber) & "'"

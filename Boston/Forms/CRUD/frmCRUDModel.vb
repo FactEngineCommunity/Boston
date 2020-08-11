@@ -47,7 +47,7 @@ Public Class frmCRUDModel
 
         If check_fields() Then
 
-            Me.zrModel.TargetDatabaseType = Trim(Me.ComboBoxDatabaseType.SelectedItem)
+            Me.zrModel.TargetDatabaseType = Me.ComboBoxDatabaseType.SelectedItem.Tag
             Me.zrModel.TargetDatabaseConnectionString = Trim(Me.TextBoxDatabaseConnectionString.Text)
 
             Me.zrModel.Save()
@@ -68,29 +68,32 @@ Public Class frmCRUDModel
     Sub LoadDatabaseTypes()
 
         Dim loWorkingClass As New Object
-        Dim llo_strategy_terms As New List(Of Object)
+        Dim larDatabaseType As New List(Of Object)
         Dim liReferenceTableId As Integer = 0
         Dim liInd As Integer = 0
         Dim liNewIndex As Integer = 0
 
-        Me.ComboBoxDatabaseType.Items.Add("Not set")
+        Me.ComboBoxDatabaseType.Items.Add(New tComboboxItem(pcenumDatabaseType.None, pcenumDatabaseType.None.ToString, pcenumDatabaseType.None))
         Me.ComboBoxDatabaseType.SelectedIndex = 0
 
         If pdbConnection.State <> 0 Then
             liReferenceTableId = TableReferenceTable.GetReferenceTableIdByName("DatabaseType")
-            llo_strategy_terms = TableReferenceFieldValue.GetReferenceFieldValueTuples(liReferenceTableId, loWorkingClass)
+            larDatabaseType = TableReferenceFieldValue.GetReferenceFieldValueTuples(liReferenceTableId, loWorkingClass)
 
-            For liInd = 1 To llo_strategy_terms.Count
-                liNewIndex = Me.ComboBoxDatabaseType.Items.Add(llo_strategy_terms(liInd - 1).DatabaseType)
-                If llo_strategy_terms(liInd - 1).DatabaseType = Trim(Me.zrModel.TargetDatabaseType) Then
+            For liInd = 1 To larDatabaseType.Count
+                Dim liDatabaseType = CType([Enum].Parse(GetType(pcenumDatabaseType), Viev.NullVal(larDatabaseType(liInd - 1).DatabaseType, pcenumDatabaseType.None)), pcenumDatabaseType)
+                Dim lrComboboxItem As New tComboboxItem(larDatabaseType(liInd - 1).DatabaseType, larDatabaseType(liInd - 1).DatabaseType, liDatabaseType)
+                liNewIndex = Me.ComboBoxDatabaseType.Items.Add(lrComboboxItem)
+                If larDatabaseType(liInd - 1).DatabaseType = Trim(Me.zrModel.TargetDatabaseType.ToString) Then
                     Me.ComboBoxDatabaseType.SelectedIndex = liNewIndex
                 End If
             Next
         Else
+            Me.ComboBoxDatabaseType.Items.Add(pcenumDatabaseType.SQLite.ToString)
             Me.ComboBoxDatabaseType.Items.Add(pcenumDatabaseType.MSJet.ToString)
             Me.ComboBoxDatabaseType.Items.Add(pcenumDatabaseType.SQLServer.ToString)
 
-            Me.ComboBoxDatabaseType.SelectedIndex = Me.ComboBoxDatabaseType.FindString(Me.zrModel.TargetDatabaseType)
+            Me.ComboBoxDatabaseType.SelectedIndex = Me.ComboBoxDatabaseType.FindString(Me.zrModel.TargetDatabaseType.ToString)
         End If
 
     End Sub
@@ -122,8 +125,8 @@ Public Class frmCRUDModel
             End If
 
             Try
-                Select Case Trim(Me.ComboBoxDatabaseType.SelectedItem)
-                    Case Is = "SQLite"
+                Select Case Me.ComboBoxDatabaseType.SelectedItem.Tag
+                    Case Is = pcenumDatabaseType.SQLite
                         If Database.SQLiteDatabase.CreateConnection(Me.TextBoxDatabaseConnectionString.Text) Is Nothing Then
                             Throw New Exception("Can't connect to the database with that connection string.")
                         End If
@@ -155,8 +158,8 @@ Public Class frmCRUDModel
     Private Sub ButtonTestConnection_Click(sender As Object, e As EventArgs) Handles ButtonTestConnection.Click
 
         Try
-            Select Case Trim(Me.ComboBoxDatabaseType.SelectedItem)
-                Case Is = "SQLite"
+            Select Case Me.ComboBoxDatabaseType.SelectedItem.Tag
+                Case Is = pcenumDatabaseType.SQLite
                     Dim lsReturnMessage As String = Nothing
                     If Not Me.checkDatabaseConnectionString(lsReturnMessage) Then
                         MsgBox(lsReturnMessage)
@@ -173,7 +176,7 @@ Public Class frmCRUDModel
                         Me.LabelOpenSuccessfull.Text = "Success"
                     End If
 
-                Case Else
+                Case Is = pcenumDatabaseType.MSJet, pcenumDatabaseType.SQLServer
 
                     Dim lrODBCConnection As New System.Data.Odbc.OdbcConnection(Me.TextBoxDatabaseConnectionString.Text)
 

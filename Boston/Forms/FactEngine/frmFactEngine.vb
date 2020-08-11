@@ -398,6 +398,12 @@ Public Class frmFactEngine
     Private Sub Application_WorkingModelChanged() Handles Application.WorkingModelChanged
         Call Me.displayModelName()
         Me.FEQLProcessor = New FEQL.Processor(prApplication.WorkingModel)
+
+        Select Case prApplication.WorkingModel.TargetDatabaseType
+            Case Is = pcenumDatabaseType.SQLite
+                Call Me.FEQLProcessor.DatabaseManager.establishConnection(pcenumDatabaseType.SQLite, prApplication.WorkingModel.TargetDatabaseConnectionString)
+        End Select
+
     End Sub
 
     Private Sub TextBoxInput_KeyDown(sender As Object, e As KeyEventArgs) Handles TextBoxInput.KeyDown
