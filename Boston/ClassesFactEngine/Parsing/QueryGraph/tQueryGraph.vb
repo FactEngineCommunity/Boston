@@ -439,26 +439,24 @@
             Dim liInd As Integer = 0
 
             For liInd = 0 To Me.Nodes.Count - 1
-                If liInd > 0 Then
-                    If Me.Nodes.Count - 2 > 0 And (liInd + 1) <= Me.Nodes.Count - 1 Then
-                        For liInd2 = liInd + 1 To Me.Nodes.Count - 2 'liInd - 1
-                            If Me.Nodes(liInd2).Name = Me.Nodes(liInd).Name Then
-                                If Me.Nodes(liInd2).Alias Is Nothing Then 'And
-                                    'Me.Nodes(liInd2).Alias IsNot Nothing Then
-                                    Me.Nodes(liInd2).Alias = liInd.ToString
-                                    If Me.Nodes(liInd2).QueryEdge IsNot Nothing Then
-                                        Me.Nodes(liInd2).QueryEdge.Alias = Me.Nodes(liInd2).Alias
-                                    End If
-                                    'ElseIf liInd2 > 0 And Me.Nodes(liInd2).Alias Is Nothing Then
-                                    '    Me.Nodes(liInd2).Alias = liInd.ToString
-                                    '    If Me.Nodes(liInd2).QueryEdge IsNot Nothing Then
-                                    '        Me.Nodes(liInd2).QueryEdge.Alias = Me.Nodes(liInd2).Alias
-                                    '    End If
+                If Me.Nodes.Count - 1 > 0 And (liInd + 1) <= Me.Nodes.Count - 1 Then
+                    For liInd2 = liInd + 1 To Me.Nodes.Count - 1 'liInd - 1
+                        If Me.Nodes(liInd2).Name = Me.Nodes(liInd).Name Then
+                            If Me.Nodes(liInd2).Alias Is Nothing Then 'And
+                                'Me.Nodes(liInd2).Alias IsNot Nothing Then
+                                Me.Nodes(liInd2).Alias = (liInd + 1).ToString
+                                If Me.Nodes(liInd2).QueryEdge IsNot Nothing Then
+                                    Me.Nodes(liInd2).QueryEdge.Alias = Me.Nodes(liInd2).Alias
                                 End If
-
+                                'ElseIf liInd2 > 0 And Me.Nodes(liInd2).Alias Is Nothing Then
+                                '    Me.Nodes(liInd2).Alias = liInd.ToString
+                                '    If Me.Nodes(liInd2).QueryEdge IsNot Nothing Then
+                                '        Me.Nodes(liInd2).QueryEdge.Alias = Me.Nodes(liInd2).Alias
+                                '    End If
                             End If
-                        Next
-                    End If
+
+                        End If
+                    Next
                 End If
             Next
 
