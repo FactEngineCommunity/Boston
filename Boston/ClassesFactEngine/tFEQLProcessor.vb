@@ -99,6 +99,16 @@ Namespace FEQL
 
     Public Class WHICHSELECTStatement
 
+        Private _MODELELEMENT As New List(Of Object)
+        Public Property MODELELEMENT As List(Of Object)
+            Get
+                Return Me._MODELELEMENT
+            End Get
+            Set(value As List(Of Object))
+                Me._MODELELEMENT = value
+            End Set
+        End Property
+
         Private _MODELELEMENTNAME As New List(Of String)
         Public Property MODELELEMENTNAME As List(Of String)
             Get

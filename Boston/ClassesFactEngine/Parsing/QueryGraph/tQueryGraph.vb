@@ -170,12 +170,17 @@
 
                     Dim lrOriginTable As RDS.Table
 
-                    If lrQueryEdge.WhichClauseType = pcenumWhichClauseType.ISNOTClause Then
-                        'E.g. Of the type "Person 1 IS NOT Person 2'
+                    If lrQueryEdge.WhichClauseType = pcenumWhichClauseType.AndThatIdentityCompatitor Then
+                        'E.g. Of the type "Person 1 IS NOT Person 2" or "Person 1 IS Person 2"
 
                         lsSQLQuery &= "("
                         For Each lrColumn In lrQueryEdge.BaseNode.RDSTable.getPrimaryKeyColumns
-                            lsSQLQuery &= lrQueryEdge.BaseNode.Name & Viev.NullVal(lrQueryEdge.BaseNode.Alias, "") & "." & lrColumn.Name & " <> "
+                            lsSQLQuery &= lrQueryEdge.BaseNode.Name & Viev.NullVal(lrQueryEdge.BaseNode.Alias, "") & "." & lrColumn.Name
+                            If lrQueryEdge.WhichClauseSubType = pcenumWhichClauseType.ISClause Then
+                                lsSQLQuery &= " = "
+                            Else
+                                lsSQLQuery &= " <> "
+                            End If
                             lsSQLQuery &= lrQueryEdge.TargetNode.Name & Viev.NullVal(lrQueryEdge.TargetNode.Alias, "") & "." & lrColumn.Name
                         Next
                         lsSQLQuery &= ")"
@@ -450,7 +455,7 @@
                         If Me.Nodes(liInd2).Name = Me.Nodes(liInd).Name Then
                             If Me.Nodes(liInd2).Alias Is Nothing Then 'And
                                 'Me.Nodes(liInd2).Alias IsNot Nothing Then
-                                Me.Nodes(liInd2).Alias = (liInd + 1).ToString
+                                Me.Nodes(liInd2).Alias = Me.createUniqueNodeAlias(Me.Nodes(liInd2), 1)  'was (liInd + 1).ToString
                                 If Me.Nodes(liInd2).QueryEdge IsNot Nothing Then
                                     Me.Nodes(liInd2).QueryEdge.Alias = Me.Nodes(liInd2).Alias
                                 End If
@@ -467,6 +472,18 @@
             Next
 
         End Sub
+
+        Private Function createUniqueNodeAlias(ByVal arNode As FactEngine.QueryNode, aiAlias As Integer) As String
+
+            Dim lrTrialNode = Me.Nodes.Find(Function(x) x.Name = arNode.Name And x.Alias = aiAlias.ToString)
+
+            If lrTrialNode IsNot Nothing Then
+                Return Me.createUniqueNodeAlias(arNode, aiAlias + 1)
+            End If
+
+            Return aiAlias.ToString
+
+        End Function
 
         Private Sub setQueryEdgeAliases()
 

@@ -256,9 +256,12 @@
 
                 '----------------------------------------
                 'Create the HeadNode for the QueryGraph
+                Me.MODELELEMENTCLAUSE = New FEQL.MODELELEMENTClause
+                Call Me.GetParseTreeTokensReflection(Me.MODELELEMENTCLAUSE, Me.WHICHSELECTStatement.MODELELEMENT(0))
                 Dim lrFBMModelObject As FBM.ModelObject = Me.Model.GetModelObjectByName(Me.WHICHSELECTStatement.MODELELEMENTNAME(0))
                 If lrFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & Me.WHICHSELECTStatement.MODELELEMENTNAME(0) & "'.")
                 lrQueryGraph.HeadNode = New FactEngine.QueryNode(lrFBMModelObject)
+                lrQueryGraph.HeadNode.Alias = Me.MODELELEMENTCLAUSE.MODELELEMENTSUFFIX
                 lrQueryGraph.Nodes.Add(lrQueryGraph.HeadNode)
 
                 '----------------------------------
@@ -333,8 +336,11 @@
                         Case Is = FactEngine.pcenumWhichClauseType.WithClause  '12. E.g. WITH WHAT Rating
                             Call Me.analystWITHClause(Me.WHICHCLAUSE, lrQueryGraph, lrQueryEdge)
 
-                        Case Is = FactEngine.pcenumWhichClauseType.ISNOTClause '13. E.g. Person 1 IS NOT Person 2
+                        Case Is = FactEngine.pcenumWhichClauseType.AndThatIdentityCompatitor  '13. E.g. "Person 1 IS NOT Person 2" or "Person 1 IS Person 2"
                             Call Me.analystISNOTClause(Me.WHICHCLAUSE, lrQueryGraph, lrQueryEdge)
+
+                        Case Else 'CodeSafe
+                            Throw New Exception("Unknown WhichClauseType.")
 
                     End Select
 
@@ -1052,7 +1058,13 @@
                                       ByRef arQueryGraph As FactEngine.QueryGraph,
                                       ByRef arQueryEdge As FactEngine.QueryEdge)
 
-            arQueryEdge.WhichClauseType = FactEngine.Constants.pcenumWhichClauseType.ISNOTClause
+            arQueryEdge.WhichClauseType = FactEngine.Constants.pcenumWhichClauseType.AndThatIdentityCompatitor
+
+            If arWHICHCLAUSE.KEYWDIS IsNot Nothing Then
+                arQueryEdge.WhichClauseSubType = FactEngine.Constants.pcenumWhichClauseType.ISClause
+            ElseIf arWHICHCLAUSE.KEYWDISNOT IsNot Nothing Then
+                arQueryEdge.WhichClauseSubType = FactEngine.Constants.pcenumWhichClauseType.ISNOTClause
+            End If
 
             'Set the BaseNode
             Me.MODELELEMENTCLAUSE = New FEQL.MODELELEMENTClause
@@ -1112,10 +1124,12 @@
             End If
 
             '13
-            If Me.WHICHCLAUSE.KEYWDISNOT IsNot Nothing Then
+            If Me.WHICHCLAUSE.KEYWDTHAT.Count = 1 And
+                (Me.WHICHCLAUSE.KEYWDISNOT IsNot Nothing Or
+                Me.WHICHCLAUSE.KEYWDIS IsNot Nothing) Then
 
                 'E.g. Person 1 IS NOT Person 2
-                Return FactEngine.Constants.pcenumWhichClauseType.ISNOTClause
+                Return FactEngine.Constants.pcenumWhichClauseType.AndThatIdentityCompatitor
 
                 '12
             ElseIf Me.WHICHCLAUSE.WITHCLAUSE IsNot Nothing Then

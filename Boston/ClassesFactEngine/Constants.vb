@@ -17,7 +17,9 @@
             WhichPredicateThatModelElement = 10 '               E.g. WHICH involves THAT Lecturer
             ThatPredicateWhichModelElement = 11 '               E.g. THAT involves WHICH Room
             WithClause = 12 '                                   E.g. WITH WHAT Rating (as in "WHICH Person likes WHICH City WITH WHAT Rating"), can also be WITH (Rating:'10') for instance.
-            ISNOTClause = 13 '                                  E.g. Person 1 IS NOT Person 2
+            AndThatIdentityCompatitor = 13 '                    E.g. "Person 1 IS NOT Person 2" Or "Person 1 IS Person 2"            
+            ISNOTClause = 131 '                                 E.g. Person 1 IS NOT Person 2
+            ISClause = 132 '                                    E.g. Person 1 IS Person 2
 
             '?? below
             'AndThatModelElementPredicateWhichModelElement '    E.g. AND THAT Faculty has WHICH School. Currently unused.Checked.
