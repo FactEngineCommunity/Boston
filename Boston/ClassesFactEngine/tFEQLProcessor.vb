@@ -247,6 +247,16 @@ Namespace FEQL
 
     Public Class NODEPROPERTYIDENTIFICATION
 
+        Private _MODELELEMENT As New Object
+        Public Property MODELELEMENT As Object
+            Get
+                Return Me._MODELELEMENT
+            End Get
+            Set(value As Object)
+                Me._MODELELEMENT = value
+            End Set
+        End Property
+
         Private _MODELELEMENTNAME As String
         Public Property MODELELEMENTNAME As String
             Get

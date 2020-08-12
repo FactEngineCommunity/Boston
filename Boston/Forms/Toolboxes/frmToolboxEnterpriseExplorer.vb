@@ -1323,13 +1323,13 @@ Public Class frmToolboxEnterpriseExplorer
 
     End Sub
 
-    Public Function AddPageToModel(ByRef arModelNode As TreeNode, _
-                                   Optional ByRef arPage As FBM.Page = Nothing, _
-                                   Optional ByVal abLoadPage As Boolean = False, _
+    Public Function AddPageToModel(ByRef arModelNode As cTreeNode,
+                                   Optional ByRef arPage As FBM.Page = Nothing,
+                                   Optional ByVal abLoadPage As Boolean = False,
                                    Optional ByVal abToolTipNewPage As Boolean = False) As tEnterpriseEnterpriseView
 
         Try
-            Dim loNode As TreeNode = Nothing
+            Dim loNode As cTreeNode = Nothing
             Dim lrPage As FBM.Page
             Dim liPageCount As Integer = arModelNode.Nodes.Count 'Me.TreeView.SelectedNode.Nodes.Count
             Dim lsPageName As String = ""
@@ -1383,11 +1383,11 @@ Public Class frmToolboxEnterpriseExplorer
             '------------------------------------        
             loNode = arModelNode.Nodes.Add(lrPage.PageId, lrPage.Name, liNavigationIcon, liNavigationIcon)
 
-            loNode.Tag = New tEnterpriseEnterpriseView(liMenuType, _
-                                             prApplication.WorkingPage, _
-                                             prApplication.WorkingModel.ModelId, _
-                                             lrPage.Language, _
-                                             loNode, _
+            loNode.Tag = New tEnterpriseEnterpriseView(liMenuType,
+                                             prApplication.WorkingPage,
+                                             prApplication.WorkingModel.ModelId,
+                                             lrPage.Language,
+                                             loNode,
                                              lrPage.PageId)
 
             Me.TreeView.SelectedNode = loNode

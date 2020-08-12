@@ -2478,16 +2478,7 @@ Namespace FEQL
             End If
 
              ' Concat Rule
-            tok = m_scanner.Scan(TokenType.MODELELEMENTNAME) ' Terminal Rule: MODELELEMENTNAME
-            n = node.CreateNode(tok, tok.ToString() )
-            node.Token.UpdateRange(tok)
-            node.Nodes.Add(n)
-            If tok.Type <> TokenType.MODELELEMENTNAME Then
-                m_tree.Errors.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.MODELELEMENTNAME.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MODELELEMENTNAME"))
-                Return
-
-            End If
-
+            ParseMODELELEMENT(node) ' NonTerminal Rule: MODELELEMENT
             If m_tree.Errors.Count > 0 Then
                         parent.Token.UpdateRange(node.Token)
                         Exit Sub

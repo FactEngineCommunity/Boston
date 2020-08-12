@@ -3,6 +3,8 @@
 Namespace FactEngine
     Public Class QueryEdge
 
+        Public Id As String = System.Guid.NewGuid.ToString
+
         Public QueryGraph As FactEngine.QueryGraph = Nothing
 
         Public BaseNode As FactEngine.QueryNode = Nothing
@@ -25,7 +27,7 @@ Namespace FactEngine
         Public Property [Alias] As String
             Get
                 If Me.FBMFactType.isRDSTable Then
-                    Return Nothing
+                    Return Me._Alias
                 Else
                     Return Me._Alias
                 End If

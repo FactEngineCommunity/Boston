@@ -443,9 +443,12 @@
             'Get the TargetNode
             Me.NODEPROPERTYIDENTIFICATION = New FEQL.NODEPROPERTYIDENTIFICATION
             Call Me.GetParseTreeTokensReflection(Me.NODEPROPERTYIDENTIFICATION, Me.WHICHCLAUSE.NODEPROPERTYIDENTIFICATION)
+            Me.MODELELEMENTCLAUSE = New FEQL.MODELELEMENTClause
+            Call Me.GetParseTreeTokensReflection(Me.MODELELEMENTCLAUSE, Me.NODEPROPERTYIDENTIFICATION.MODELELEMENT)
             lrFBMModelObject = Me.Model.GetModelObjectByName(Me.NODEPROPERTYIDENTIFICATION.MODELELEMENTNAME)
             If lrFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & Me.NODEPROPERTYIDENTIFICATION.MODELELEMENTNAME & "'.")
             arQueryEdge.TargetNode = New FactEngine.QueryNode(lrFBMModelObject)
+            arQueryEdge.TargetNode.Alias = Me.MODELELEMENTCLAUSE.MODELELEMENTSUFFIX
 
             If lrFBMModelObject.ConceptType = pcenumConceptType.ValueType Then
                 arQueryEdge.WhichClauseSubType = FactEngine.Constants.pcenumWhichClauseType.IsPredicateNodePropertyIdentification
@@ -686,7 +689,12 @@
                    arWHICHCLAUSE.KEYWDWHICH IsNot Nothing Then
                 Dim lrBaseFBMModelObject = Me.Model.GetModelObjectByName(Me.WHICHCLAUSE.MODELELEMENTNAME(0))
                 If lrBaseFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & Me.WHICHCLAUSE.MODELELEMENTNAME(0) & "'.")
+
+                Me.MODELELEMENTCLAUSE = New FEQL.MODELELEMENTClause
+                Call Me.GetParseTreeTokensReflection(Me.MODELELEMENTCLAUSE, Me.WHICHCLAUSE.MODELELEMENT(0))
+
                 arQueryEdge.BaseNode = New FactEngine.QueryNode(lrBaseFBMModelObject)
+                arQueryEdge.BaseNode.Alias = Me.MODELELEMENTCLAUSE.MODELELEMENTSUFFIX
             Else
                 Dim lrBaseFBMModelObject = Me.Model.GetModelObjectByName(Me.WHICHCLAUSE.MODELELEMENTNAME(0))
                 If lrBaseFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & Me.WHICHCLAUSE.MODELELEMENTNAME(0) & "'.")

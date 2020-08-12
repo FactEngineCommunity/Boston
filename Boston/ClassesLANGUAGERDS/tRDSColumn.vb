@@ -199,7 +199,7 @@ Namespace RDS
             If other.ActiveRole Is Nothing Then
                 Return Me.Id = other.Id
             Else
-                Return ((Me.Table.Name = other.Table.Name) And (Me.Name = other.Name)) And (Me.ActiveRole.Id = other.ActiveRole.Id)
+                Return ((Me.Table.Name = other.Table.Name) And (Me.Name = other.Name)) And (Me.ActiveRole.Id = other.ActiveRole.Id) And (Me.TemporaryAlias = other.TemporaryAlias)
             End If
 
 
