@@ -594,9 +594,12 @@
 
 
             'Get the TargetNode                        
+            Me.MODELELEMENTCLAUSE = New FEQL.MODELELEMENTClause
+            Call Me.GetParseTreeTokensReflection(Me.MODELELEMENTCLAUSE, Me.WHICHCLAUSE.MODELELEMENT(0))
             lrFBMModelObject = Me.Model.GetModelObjectByName(Me.WHICHCLAUSE.MODELELEMENTNAME(0))
             If lrFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & Me.WHICHCLAUSE.MODELELEMENTNAME(0) & "'.")
             arQueryEdge.TargetNode = New FactEngine.QueryNode(lrFBMModelObject)
+            arQueryEdge.TargetNode.Alias = Me.MODELELEMENTCLAUSE.MODELELEMENTSUFFIX
             arQueryGraph.Nodes.Add(arQueryEdge.TargetNode) '20200808-VM-Was AddUnique
 
             '-----------------------------------------
@@ -631,9 +634,12 @@
             arQueryEdge.BaseNode = arQueryGraph.HeadNode
 
             'Get the TargetNode                        
+            Me.MODELELEMENTCLAUSE = New FEQL.MODELELEMENTClause
+            Call Me.GetParseTreeTokensReflection(Me.MODELELEMENTCLAUSE, Me.WHICHCLAUSE.MODELELEMENT(0))
             lrFBMModelObject = Me.Model.GetModelObjectByName(Me.WHICHCLAUSE.MODELELEMENTNAME(0))
             If lrFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & Me.WHICHCLAUSE.MODELELEMENTNAME(0) & "'.")
             arQueryEdge.TargetNode = New FactEngine.QueryNode(lrFBMModelObject)
+            arQueryEdge.TargetNode.Alias = Me.MODELELEMENTCLAUSE.MODELELEMENTSUFFIX
             arQueryGraph.Nodes.AddUnique(arQueryEdge.TargetNode)
 
             ''---------------------------------------------------------
