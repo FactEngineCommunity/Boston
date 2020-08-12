@@ -10,6 +10,7 @@
             AndThatModelElementPredicateThatModelElement = 4 '  E.g. AND THAT School is in THAT Faculty
             UnkownPredicateWhichModelElement = 5 '              E.g. has WHICH RoomName
             AndPredicateWhichModelElement = 6 '                 E.g. AND has WHICH RoomName
+            AndModelElementPredicateWhichModelElement = 61 '                 E.g. AND has WHICH RoomName
             AndThatModelElementPredicateWhichModelElement = 7 '     E.g. AND THAT Faculty has FacultyName
             AndThatModelElementPredicateModelElement = 8 'E.g. AND THAT Faculty has FacultyName (as per 7 above)
             AndWhichPredicateNodePropertyIdentification = 9 '   E.g. AND WHICH is in (Faculty:IT')

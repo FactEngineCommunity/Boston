@@ -312,6 +312,9 @@
                         Case Is = FactEngine.pcenumWhichClauseType.AndPredicateWhichModelElement  '               6. E.g. AND has WHICH RoomName
                             Call Me.analyseAndPredicateWhichModelElement(Me.WHICHCLAUSE, lrQueryGraph, lrQueryEdge, lrPreviousTopicNode)
 
+                        Case Is = FactEngine.pcenumWhichClauseType.AndModelElementPredicateWhichModelElement '6.1 E.g. AND Employee 2 reports to WHICH Employee 3
+                            Call Me.analyseANDModelElementWHICHCModelElementlause(Me.WHICHCLAUSE, lrQueryGraph, lrQueryEdge, lrPreviousTargetNode)
+
                         Case Is = FactEngine.pcenumWhichClauseType.AndThatModelElementPredicateWhichModelElement '7. E.g. AND THAT Faculty has FacultyName
                             Call Me.analyseANDTHATWHICHClause(Me.WHICHCLAUSE, lrQueryGraph, lrQueryEdge, lrPreviousTargetNode)
 
@@ -672,6 +675,59 @@
         End Sub
 #End Region
 
+        '6.1
+#Region "analyseANDModelElementWHICHCModelElementlause"
+        '6.1
+        Private Sub analyseANDModelElementWHICHCModelElementlause(ByRef arWHICHCLAUSE As FEQL.WHICHCLAUSE,
+                                                                  ByRef arQueryGraph As FactEngine.QueryGraph,
+                                                                  ByRef arQueryEdge As FactEngine.QueryEdge,
+                                                                  ByRef arPreviousTargetNode As FactEngine.QueryNode)
+
+            'E.g. AND Employee 2 reports to WHICH Employee 3
+
+            arQueryEdge.WhichClauseType = FactEngine.Constants.pcenumWhichClauseType.AndThatModelElementPredicateWhichModelElement
+            If arWHICHCLAUSE.KEYWDA Is Nothing Then
+                arQueryEdge.IsProjectColumn = True
+            End If
+
+            'Set the BaseNode
+
+            Dim lrBaseFBMModelObject = Me.Model.GetModelObjectByName(Me.WHICHCLAUSE.MODELELEMENTNAME(0))
+            If lrBaseFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & Me.WHICHCLAUSE.MODELELEMENTNAME(0) & "'.")
+
+            Me.MODELELEMENTCLAUSE = New FEQL.MODELELEMENTClause
+            Call Me.GetParseTreeTokensReflection(Me.MODELELEMENTCLAUSE, Me.WHICHCLAUSE.MODELELEMENT(0))
+
+            arQueryEdge.BaseNode = New FactEngine.QueryNode(lrBaseFBMModelObject)
+            arQueryEdge.BaseNode.Alias = Me.MODELELEMENTCLAUSE.MODELELEMENTSUFFIX
+
+            'Get the TargetNode                        
+            Me.MODELELEMENTCLAUSE = New FEQL.MODELELEMENTClause
+            Call Me.GetParseTreeTokensReflection(Me.MODELELEMENTCLAUSE, Me.WHICHCLAUSE.MODELELEMENT(1))
+            Dim lrFBMModelObject = Me.Model.GetModelObjectByName(Me.WHICHCLAUSE.MODELELEMENTNAME(1))
+            If lrFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & Me.WHICHCLAUSE.MODELELEMENTNAME(0) & "'.")
+            arQueryEdge.TargetNode = New FactEngine.QueryNode(lrFBMModelObject)
+            arQueryEdge.TargetNode.Alias = Me.MODELELEMENTCLAUSE.MODELELEMENTSUFFIX
+
+            If arQueryEdge.TargetNode.Alias Is Nothing Then '20200810-VM-May need to revise this
+                arQueryGraph.Nodes.Add(arQueryEdge.TargetNode) 'was simply addUnique 20200807-VM
+            Else
+                arQueryGraph.Nodes.AddUnique(arQueryEdge.TargetNode)
+            End If
+
+            '-----------------------------------------
+            'Get the relevant FBM.FactType
+            Call arQueryEdge.getAndSetFBMFactType(arQueryEdge.BaseNode,
+                                                  arQueryEdge.TargetNode,
+                                                  arQueryEdge.Predicate)
+
+            arPreviousTargetNode = arQueryEdge.BaseNode
+
+        End Sub
+
+#End Region
+
+
         '7
 #Region "analyseANDTHATWHICHClause"
         '7
@@ -721,12 +777,6 @@
             Else
                 arQueryGraph.Nodes.AddUnique(arQueryEdge.TargetNode)
             End If
-
-            ''---------------------------------------------------------
-            ''Get the Predicate
-            'For Each lsPredicatePart In Me.WHICHCLAUSE.PREDICATE
-            '    arQueryEdge.Predicate = Trim(arQueryEdge.Predicate & " " & lsPredicatePart)
-            'Next
 
             '-----------------------------------------
             'Get the relevant FBM.FactType
@@ -1108,6 +1158,15 @@
                 'E.g. "is in WHICH Room" in the above example
                 '  NB Also caters for "that is in A SemesterStructure" in "WHICH Room is in A Faculty THAT is in A SemesterStucture"
                 Return FactEngine.Constants.pcenumWhichClauseType.UnkownPredicateWhichModelElement
+
+                '6.1
+            ElseIf Me.WHICHCLAUSE.KEYWDAND IsNot Nothing And
+                   Me.WHICHCLAUSE.KEYWDTHAT.Count = 0 And
+                   Me.WHICHCLAUSE.KEYWDWHICH IsNot Nothing And
+                   Me.WHICHCLAUSE.MODELELEMENT.Count = 2 Then
+
+                'E.g. "AND holds WHICH Position"
+                Return FactEngine.Constants.pcenumWhichClauseType.AndModelElementPredicateWhichModelElement
 
                 '6
             ElseIf Me.WHICHCLAUSE.KEYWDAND IsNot Nothing And
