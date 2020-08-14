@@ -50,9 +50,9 @@ Partial Class frmFactEngine
         Me.ToolStripButtonQueryGO = New System.Windows.Forms.ToolStripButton()
         Me.TabPageGraph = New System.Windows.Forms.TabPage()
         Me.GraphView = New MindFusion.Diagramming.WinForms.DiagramView()
-        Me.Diagram = New MindFusion.Diagramming.Diagram()
         Me.ContextMenuStripGraph = New System.Windows.Forms.ContextMenuStrip(Me.components)
         Me.LayoutToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.Diagram = New MindFusion.Diagramming.Diagram()
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SplitContainer1.Panel1.SuspendLayout()
         Me.SplitContainer1.Panel2.SuspendLayout()
@@ -336,11 +336,6 @@ Partial Class frmFactEngine
         Me.GraphView.TabIndex = 0
         Me.GraphView.Text = "DiagramView1"
         '
-        'Diagram
-        '
-        Me.Diagram.BackBrush = New MindFusion.Drawing.SolidBrush("#FFFFFFFF")
-        Me.Diagram.LinkStyle = MindFusion.Diagramming.LinkStyle.Bezier
-        '
         'ContextMenuStripGraph
         '
         Me.ContextMenuStripGraph.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.LayoutToolStripMenuItem})
@@ -352,6 +347,13 @@ Partial Class frmFactEngine
         Me.LayoutToolStripMenuItem.Name = "LayoutToolStripMenuItem"
         Me.LayoutToolStripMenuItem.Size = New System.Drawing.Size(110, 22)
         Me.LayoutToolStripMenuItem.Text = "&Layout"
+        '
+        'Diagram
+        '
+        Me.Diagram.BackBrush = New MindFusion.Drawing.SolidBrush("#FFFFFFFF")
+        Me.Diagram.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Diagram.LinkStyle = MindFusion.Diagramming.LinkStyle.Bezier
+        Me.Diagram.ShapeBrush = New MindFusion.Drawing.SolidBrush("#FFFFFFFF")
         '
         'frmFactEngine
         '

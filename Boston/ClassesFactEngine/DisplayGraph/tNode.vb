@@ -64,7 +64,7 @@ Namespace FactEngine.DisplayGraph
             'loDroppedNode.ShadowOffsetX = 1
             'loDroppedNode.ShadowOffsetY = 1
             'loDroppedNode.ShadowColor = Color.LightGray
-            loDroppedNode.Pen.Width = 0.5 '0.4
+            loDroppedNode.Pen.Width = 0.3 '0.4
             loDroppedNode.Pen.Color = Color.Navy
             loDroppedNode.ToolTip = Me.Type
 
