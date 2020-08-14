@@ -438,7 +438,29 @@ Public Class frmFactEngine
                             Dim larTupleNode As New List(Of FactEngine.DisplayGraph.Node)
                             Dim liColumnInd = 0
                             Dim lrNodeColumn As RDS.Column
-                            For Each lrRDSColumn In lrRecordset.QueryGraph.ProjectionColumn
+                            Dim larProjectionColumn = lrRecordset.QueryGraph.ProjectionColumn
+
+                            'Set up color numbers
+                            Dim liProjectionColumnInd = 0
+                            Dim liProjectionColumnInd2 As Integer
+                            For liProjectionColumnInd = 0 To larProjectionColumn.Count - 1
+                                If liProjectionColumnInd = 0 Then
+                                    larProjectionColumn(0).ProjectionOrdinalPosition = 1
+                                ElseIf larProjectionColumn(liProjectionColumnInd).ProjectionOrdinalPosition <> 0 Then
+                                    'Don't do anything because has already been set
+                                Else
+                                    Dim liMax = (From ProjectionColumn In larProjectionColumn
+                                                 Select ProjectionColumn.ProjectionOrdinalPosition).Max
+                                    larProjectionColumn(liProjectionColumnInd).ProjectionOrdinalPosition = liMax + 1
+                                End If
+                                For liProjectionColumnInd2 = liProjectionColumnInd + 1 To larProjectionColumn.Count - 1
+                                    If larProjectionColumn(liProjectionColumnInd2).Table.Name = larProjectionColumn(liProjectionColumnInd).Table.Name Then
+                                        larProjectionColumn(liProjectionColumnInd2).ProjectionOrdinalPosition = larProjectionColumn(liProjectionColumnInd).ProjectionOrdinalPosition
+                                    End If
+                                Next
+                            Next
+
+                            For Each lrRDSColumn In larProjectionColumn
 
                                 Dim lrTempGraphNode = larTupleNode.Find(Function(x) x.Type = lrRDSColumn.GraphNodeType And
                                                                                     x.Alias = lrRDSColumn.TemporaryAlias)
@@ -455,11 +477,13 @@ Public Class frmFactEngine
                                                                             lrNodeColumn.TemporaryAlias,
                                                                             New List(Of FactEngine.DisplayGraph.Edge)
                                                                             )
+                                    lrGraphNode.OrdinalPosition = lrNodeColumn.ProjectionOrdinalPosition
                                     larTupleNode.AddUnique(lrGraphNode)
                                 Else
                                     lrNodeColumn = lrRDSColumn.Clone(Nothing, Nothing)
                                     lrNodeColumn.TemporaryData = lrFact.Data(liColumnInd).Data
                                     lrTempGraphNode.Column.AddUnique(lrNodeColumn)
+                                    lrTempGraphNode.OrdinalPosition = lrNodeColumn.ProjectionOrdinalPosition
                                     larTupleNode.AddUnique(lrTempGraphNode)
                                 End If
 
@@ -468,14 +492,12 @@ Public Class frmFactEngine
 
                             For Each lrTupleNode In larTupleNode
                                 lrTupleNode.Name = ""
-                                liInd = 1
                                 For Each lrColumn In lrTupleNode.Column.FindAll(Function(x) x.IsPartOfUniqueIdentifier)
-                                    lrTupleNode.Name &= lrColumn.TemporaryData
-                                    If liInd > 1 Then lrTupleNode.Name &= " "
-                                    liInd += 1
+                                    lrTupleNode.Name &= lrColumn.TemporaryData & " "
                                 Next
+                                lrTupleNode.Name = Trim(lrTupleNode.Name)
                                 Dim lrActualGraphNode = Me.GraphNodes.Find(Function(x) x.Type = lrTupleNode.Type And
-                                                                              x.Name = lrTupleNode.Name)
+                                                                                       x.Name = lrTupleNode.Name)
                                 If lrActualGraphNode Is Nothing Then
                                     Me.GraphNodes.Add(lrTupleNode)
                                 End If

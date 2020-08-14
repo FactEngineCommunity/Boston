@@ -13,6 +13,11 @@ Public Module publicConstants
     Public Const pc_cmd_table As Integer = 2
 
     ''' <summary>
+    ''' FactEngine uses this to set the Color of each Node based on its OrdinalPostion in the ProjectedColumns/Nodes
+    ''' </summary>
+    Public pcColorValues() As Integer = CType([Enum].GetValues(GetType(pcenumColourWheel)), Integer())
+
+    ''' <summary>
     ''' This software can be released in either one of two Software Categories, "Student" or "Professional".
     ''' Features of the software are either enabled or disabled depending on the Software Category assigned to the software.
     ''' NB Currently stored in RichmondApplication class (default is "Professional").

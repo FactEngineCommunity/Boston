@@ -406,7 +406,7 @@
 
                     Case Else
                         Dim lrTempColumn As RDS.Column = Nothing
-                        For Each lrColumn In Me.HeadNode.FBMModelObject.getCorrespondingRDSTable.getFirstUniquenessConstraintColumns
+                        For Each lrColumn In Me.HeadNode.FBMModelObject.getCorrespondingRDSTable.getFirstUniquenessConstraintColumns.OrderBy(Function(x) x.OrdinalPosition)
                             lrTempColumn = lrColumn.Clone(Nothing, Nothing)
                             lrTempColumn.TemporaryAlias = Viev.NullVal(Me.HeadNode.Alias, "")
                             lrTempColumn.GraphNodeType = Me.HeadNode.Name
@@ -436,9 +436,10 @@
                             End If
                             lrColumn.GraphNodeType = lrQueryEdge.BaseNode.Name
                             lrColumn.QueryEdge = lrQueryEdge
+
                             larColumn.AddUnique(lrColumn)
                         Case Else
-                            Dim larEdgeColumn = lrQueryEdge.FBMFactType.RoleGroup(liRoleInd).JoinedORMObject.getCorrespondingRDSTable.getFirstUniquenessConstraintColumns
+                            Dim larEdgeColumn = lrQueryEdge.FBMFactType.RoleGroup(liRoleInd).JoinedORMObject.getCorrespondingRDSTable.getFirstUniquenessConstraintColumns.OrderBy(Function(x) x.OrdinalPosition)
                             Dim lrTempColumn As RDS.Column
                             For Each lrColumn In larEdgeColumn
                                 lrTempColumn = lrColumn.Clone(Nothing, Nothing)

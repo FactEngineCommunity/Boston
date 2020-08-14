@@ -121,6 +121,7 @@ Namespace RDS
         Public TemporaryData As String = Nothing 'E.g. As in 'Peter' for a Node with a PK Column of FirstName and where the Node has FirstName and LastName (at least) Columns
         Public IsPartOfUniqueIdentifier As Boolean = False 'FactEngine specific. True if Column is part of unique Identifier.
         Public QueryEdge As FactEngine.QueryEdge 'The Edge that resulted in the Column, if is not the HeadNode of the Nodes of the QueryGraph
+        Public ProjectionOrdinalPosition As Integer = 0 'The ordinal position of the Column in the set of ProjectionColumns such that the color can be set for the corresponding node in the GraphView of the FactEngine form.
 #End Region
 
         ''' <summary>
@@ -204,6 +205,7 @@ Namespace RDS
                 lrColumn.IsPartOfUniqueIdentifier = .IsPartOfUniqueIdentifier
                 lrColumn.QueryEdge = .QueryEdge
                 lrColumn.TemporaryAlias = .TemporaryAlias
+                lrColumn.ProjectionOrdinalPosition = .ProjectionOrdinalPosition
 
             End With
 

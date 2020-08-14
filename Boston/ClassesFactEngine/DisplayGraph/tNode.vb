@@ -19,6 +19,9 @@ Namespace FactEngine.DisplayGraph
 
         Public Edge As New List(Of FactEngine.DisplayGraph.Edge)
 
+        Public OrdinalPosition As Integer 'To set the color by using Shape.Brush = New MindFusion.Drawing.SolidBrush(Color.FromArgb(Values(lrArgument.SequenceNr Mod 6)))
+        Public Color As Color
+
         Public X As Integer
         Public Y As Integer
 
@@ -57,7 +60,7 @@ Namespace FactEngine.DisplayGraph
             loDroppedNode.HandlesStyle = HandlesStyle.InvisibleMove
             loDroppedNode.AllowOutgoingLinks = True
             loDroppedNode.AllowIncomingLinks = True
-            loDroppedNode.Resize(10, 10)
+            loDroppedNode.Resize(15, 15)
             'loDroppedNode.Tag = New FBM.EntityTypeInstance
             loDroppedNode.Tag = Me
             loDroppedNode.ShadowColor = Color.White
@@ -67,6 +70,8 @@ Namespace FactEngine.DisplayGraph
             loDroppedNode.Pen.Width = 0.3 '0.4
             loDroppedNode.Pen.Color = Color.Navy
             loDroppedNode.ToolTip = Me.Type
+
+            loDroppedNode.Brush = New MindFusion.Drawing.SolidBrush(Color.FromArgb(pcColorValues(Me.OrdinalPosition Mod 6)))
 
             loDroppedNode.Text = Me.Name
 
