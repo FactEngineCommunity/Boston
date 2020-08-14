@@ -559,15 +559,19 @@ Public Class frmFactEngine
 
                             Me.Diagram.Links.Add(lrPGSLink)
                         Next
+
+                        Call Me.autoLayout()
 #End Region
 
                     End If
             End Select
         End If
 
-
-
-        Me.TabPageResults.Show()
+        If Me.TabControl1.SelectedTab.Name = Me.TabPageGraph.Name Then
+        Else
+            Me.TabControl1.SelectedTab = Me.TabPageResults
+            Me.TabPageResults.Show()
+        End If
 
     End Sub
 
