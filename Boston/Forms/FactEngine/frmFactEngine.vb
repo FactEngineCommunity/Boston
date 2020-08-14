@@ -1,4 +1,5 @@
 ﻿Imports System.Reflection
+Imports MindFusion.Diagramming.Layout
 
 Public Class frmFactEngine
 
@@ -15,6 +16,39 @@ Public Class frmFactEngine
     Private TextMarker As FEQL.Controls.TextMarker
 
     Private GraphNodes As New List(Of FactEngine.DisplayGraph.Node)
+
+    Public Sub autoLayout()
+
+        '---------------------------------------------------------------------------------------
+        ' Create the layouter object
+        Dim layout As New MindFusion.Diagramming.Layout.SpringLayout
+
+
+        ' Adjust the attributes of the layouter
+        layout.MultipleGraphsPlacement = MultipleGraphsPlacement.MinimalArea
+        layout.KeepGroupLayout = True
+        layout.NodeDistance = 20
+        layout.RandomSeed = 50
+        layout.MinimizeCrossings = True
+        layout.RepulsionFactor = 10
+        layout.EnableClusters = True
+        layout.IterationCount = 100
+        'layout.GridSize = 20 'Not part of SpringLayout.
+
+        layout.Arrange(Diagram)
+
+        'Dim SecondLayout = New MindFusion.Diagramming.Layout.OrthogonalLayout
+        'SecondLayout.Arrange(Me.Diagram)
+        Dim lrLink As MindFusion.Diagramming.DiagramLink
+
+        Me.Diagram.RouteAllLinks()
+
+        For Each lrLink In Me.Diagram.Links
+            lrLink.Style = MindFusion.Diagramming.LinkStyle.Polyline
+            lrLink.SegmentCount = 1
+        Next
+
+    End Sub
 
     Private Sub AddEnterpriseAwareItem(ByVal asEAItem As String,
                                        Optional ByVal aoTagObject As Object = Nothing,
@@ -431,7 +465,6 @@ Public Class frmFactEngine
                                                                                         lrGraphNode.Shape,
                                                                                         lrTargetGraphNode.Shape)
 
-
                             lrPGSLink.Style = MindFusion.Diagramming.LinkStyle.Polyline
 
                             lrPGSLink.SnapToNodeBorder = True
@@ -446,7 +479,6 @@ Public Class frmFactEngine
                             'Me.Link = lrPGSLink                                
 
                             Me.Diagram.Links.Add(lrPGSLink)
-
 #End Region
 
                         Next
@@ -457,6 +489,8 @@ Public Class frmFactEngine
         Me.TabPageResults.Show()
 
     End Sub
+
+
 
     Private Sub Application_WorkingModelChanged() Handles Application.WorkingModelChanged
         Call Me.displayModelName()
@@ -1363,6 +1397,24 @@ Public Class frmFactEngine
     Private Sub frmFactEngine_FormClosed(sender As Object, e As FormClosedEventArgs) Handles Me.FormClosed
 
         frmMain.zfrmFactEngine = Nothing
+
+    End Sub
+
+    Private Sub LayoutToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles LayoutToolStripMenuItem.Click
+
+        Me.autoLayout()
+
+    End Sub
+
+    Private Sub GraphView_MouseWheel(sender As Object, e As MouseEventArgs) Handles GraphView.MouseWheel
+
+        Select Case e.Delta
+            Case Is = 0
+            Case Is < 0
+                Me.GraphView.ZoomFactor = Viev.Greater(0, Me.GraphView.ZoomFactor - 5)
+            Case Is > 0
+                Me.GraphView.ZoomFactor = Viev.Lesser(100, Me.GraphView.ZoomFactor + 5)
+        End Select
 
     End Sub
 
