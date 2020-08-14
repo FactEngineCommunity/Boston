@@ -483,11 +483,16 @@ Public Class frmFactEngine
                                     lrNodeColumn = lrRDSColumn.Clone(Nothing, Nothing)
                                     lrNodeColumn.TemporaryData = lrFact.Data(liColumnInd).Data
                                     lrTempGraphNode.Column.AddUnique(lrNodeColumn)
-                                    lrTempGraphNode.OrdinalPosition = lrNodeColumn.ProjectionOrdinalPosition
-                                    larTupleNode.AddUnique(lrTempGraphNode)
-                                End If
+                                    Dim lrQueryEdgeAssurityColumn = lrTempGraphNode.Column.Find(AddressOf lrNodeColumn.Equals)
+                                    If lrQueryEdgeAssurityColumn IsNot Nothing Then
+                                        lrQueryEdgeAssurityColumn.QueryEdge = lrNodeColumn.QueryEdge
+                                    End If
 
-                                liColumnInd += 1
+                                    lrTempGraphNode.OrdinalPosition = lrNodeColumn.ProjectionOrdinalPosition
+                                        larTupleNode.AddUnique(lrTempGraphNode)
+                                    End If
+
+                                    liColumnInd += 1
                             Next
 
                             For Each lrTupleNode In larTupleNode

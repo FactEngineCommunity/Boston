@@ -419,6 +419,7 @@
 
                 Dim liRoleInd As Integer
                 'Edge Column/s
+                Dim lrQueryEdge As FactEngine.QueryEdge
                 For Each lrQueryEdge In Me.getProjectQueryEdges()
                     If lrQueryEdge.BaseNode.FBMModelObject.Id = lrQueryEdge.FBMFactType.RoleGroup(0).JoinedORMObject.Id Then
                         liRoleInd = 1 'Other side of a BinaryFactType
@@ -448,9 +449,9 @@
                                 Else
                                     lrTempColumn.TemporaryAlias = lrQueryEdge.Alias
                                 End If
-                                lrColumn.GraphNodeType = lrQueryEdge.TargetNode.Name
-                                lrColumn.IsPartOfUniqueIdentifier = True
-                                lrColumn.QueryEdge = lrQueryEdge
+                                lrTempColumn.GraphNodeType = lrQueryEdge.TargetNode.Name
+                                lrTempColumn.IsPartOfUniqueIdentifier = True
+                                lrTempColumn.QueryEdge = lrQueryEdge
                                 larColumn.Add(lrTempColumn)
                             Next
                     End Select
