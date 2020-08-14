@@ -14,6 +14,8 @@ Public Class frmFactEngine
     Public FEQLProcessor As New FEQL.Processor(prApplication.WorkingModel)
     Private TextMarker As FEQL.Controls.TextMarker
 
+    Private GraphNodes As New List(Of FactEngine.DisplayGraph.Node)
+
     Private Sub AddEnterpriseAwareItem(ByVal asEAItem As String,
                                        Optional ByVal aoTagObject As Object = Nothing,
                                        Optional abSetSelectedIndex As Boolean = False,
@@ -383,9 +385,37 @@ Public Class frmFactEngine
                             If liInd < lrRecordset.Columns.Count Then Me.LabelError.Text &= ","
                         Next
                         Me.LabelError.Text &= vbCrLf & "=======================================" & vbCrLf
-                        For Each lrFact In lrRecordset.Facts
 
+
+                        'For the GraphView
+                        Dim lrTable = New RDS.Table(prApplication.WorkingModel.RDS, "DummyTable", Nothing)
+                        Dim larColumn As New List(Of RDS.Column)
+
+                        For Each lrFact In lrRecordset.Facts
                             Me.LabelError.Text &= lrFact.EnumerateAsBracketedFact(True) & vbCrLf
+
+#Region "GraphView"
+                            Me.GraphNodes.Clear()
+                            Me.Diagram.Nodes.Clear()
+                            larColumn = New List(Of RDS.Column)
+                            larColumn.Add(New RDS.Column(lrTable, lrFact.Data(0).Data, Nothing, New FBM.Role))
+                            Dim lrGraphNode As New FactEngine.DisplayGraph.Node(Me.Diagram,
+                                                                                lrTable,
+                                                                                larColumn,
+                                                                                lrFact.Data(0).Data,
+                                                                                New List(Of FactEngine.DisplayGraph.Link)
+                                                                                )
+
+                            Me.GraphNodes.Add(lrGraphNode)
+                            Call lrGraphNode.DisplayAndAssociate()
+
+                            Dim lrTargetGraphNode = Me.GraphNodes.Find(Function(x) x.Name = lrFact.Data(1).Data)
+
+                            If lrTargetGraphNode IsNot Nothing Then
+
+                            End If
+#End Region
+
                         Next
                     End If
             End Select
