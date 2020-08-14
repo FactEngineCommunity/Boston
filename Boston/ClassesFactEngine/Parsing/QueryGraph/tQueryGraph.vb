@@ -25,6 +25,11 @@
         'The set of Nodes queried in a WHICH query statement
         Public Nodes As New List(Of FactEngine.QueryNode)
 
+        ''' <summary>
+        ''' The list of ProjectionColumns for the Query. Used to find and display Nodes/Links in QueryView in FactEngine form.
+        ''' </summary>
+        Public ProjectionColumn As New List(Of RDS.Column)
+
         Public Sub New(ByRef arFBMModel As FBM.Model)
             Me.Model = arFBMModel
         End Sub
@@ -49,6 +54,7 @@
 #Region "ProjectionColums"
                 liInd = 1
                 Dim larProjectionColumn = Me.getProjectionColumns
+                Me.ProjectionColumn = larProjectionColumn
                 For Each lrProjectColumn In larProjectionColumn.FindAll(Function(x) x IsNot Nothing)
                     lsSQLQuery &= lrProjectColumn.Table.Name & Viev.NullVal(lrProjectColumn.TemporaryAlias, "") & "." & lrProjectColumn.Name
                     If liInd < larProjectionColumn.Count Then lsSQLQuery &= ","
@@ -388,20 +394,23 @@
                 Dim larHeadColumn As New List(Of RDS.Column)
                 Select Case Me.HeadNode.FBMModelObject.ConceptType
                     Case Is = pcenumConceptType.ValueType
-                        Dim larVTColumn = (From Column In Me.QueryEdges(0).TargetNode.FBMModelObject.getCorrespondingRDSTable.Column
-                                           Where Column.Role Is Me.QueryEdges(0).FBMFactType.RoleGroup(0)
-                                           Where Column.ActiveRole Is Me.QueryEdges(0).FBMFactType.RoleGroup(1)
-                                           Select Column).First
+                        Dim lrVTColumn = (From Column In Me.QueryEdges(0).TargetNode.FBMModelObject.getCorrespondingRDSTable.Column
+                                          Where Column.Role Is Me.QueryEdges(0).FBMFactType.RoleGroup(0)
+                                          Where Column.ActiveRole Is Me.QueryEdges(0).FBMFactType.RoleGroup(1)
+                                          Select Column).First
 
-                        larVTColumn = larVTColumn.Clone(Nothing, Nothing)
-                        larVTColumn.TemporaryAlias = Viev.NullVal(Me.HeadNode.QueryEdgeAlias, "")
-                        larHeadColumn.Add(larVTColumn)
+                        lrVTColumn = lrVTColumn.Clone(Nothing, Nothing)
+                        lrVTColumn.TemporaryAlias = Viev.NullVal(Me.HeadNode.QueryEdgeAlias, "")
+                        lrVTColumn.GraphNodeType = Me.HeadNode.Name
+                        larHeadColumn.Add(lrVTColumn)
 
                     Case Else
                         Dim lrTempColumn As RDS.Column = Nothing
                         For Each lrColumn In Me.HeadNode.FBMModelObject.getCorrespondingRDSTable.getFirstUniquenessConstraintColumns
                             lrTempColumn = lrColumn.Clone(Nothing, Nothing)
                             lrTempColumn.TemporaryAlias = Viev.NullVal(Me.HeadNode.Alias, "")
+                            lrTempColumn.GraphNodeType = Me.HeadNode.Name
+                            lrTempColumn.IsPartOfUniqueIdentifier = True
                             larHeadColumn.Add(lrTempColumn)
                         Next
                 End Select
@@ -412,9 +421,9 @@
                 'Edge Column/s
                 For Each lrQueryEdge In Me.getProjectQueryEdges()
                     If lrQueryEdge.BaseNode.FBMModelObject.Id = lrQueryEdge.FBMFactType.RoleGroup(0).JoinedORMObject.Id Then
-                        liRoleInd = 1
+                        liRoleInd = 1 'Other side of a BinaryFactType
                     Else
-                        liRoleInd = 0
+                        liRoleInd = 0 'First Role of a BinaryFactType
                     End If
                     Select Case lrQueryEdge.FBMFactType.RoleGroup(liRoleInd).JoinedORMObject.ConceptType
                         Case Is = pcenumConceptType.ValueType
@@ -425,6 +434,7 @@
                             Else
                                 lrColumn.TemporaryAlias = lrQueryEdge.BaseNode.Alias
                             End If
+                            lrColumn.GraphNodeType = lrQueryEdge.BaseNode.Name
                             larColumn.AddUnique(lrColumn)
                         Case Else
                             Dim larEdgeColumn = lrQueryEdge.FBMFactType.RoleGroup(liRoleInd).JoinedORMObject.getCorrespondingRDSTable.getFirstUniquenessConstraintColumns
@@ -436,9 +446,10 @@
                                 Else
                                     lrTempColumn.TemporaryAlias = lrQueryEdge.Alias
                                 End If
+                                lrColumn.GraphNodeType = lrQueryEdge.TargetNode.Name
+                                lrColumn.IsPartOfUniqueIdentifier = True
                                 larColumn.Add(lrTempColumn)
                             Next
-
                     End Select
 
                 Next

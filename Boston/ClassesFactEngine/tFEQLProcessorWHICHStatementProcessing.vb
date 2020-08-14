@@ -361,6 +361,7 @@
 
                 Dim lrTestRecordset = Me.DatabaseManager.GO(lsSQLQuery)
                 lrTestRecordset.Warning = lrQueryGraph.Warning
+                lrTestRecordset.QueryGraph = lrQueryGraph
 
                 'lrRecordset.Query = lsSQLQuery
 

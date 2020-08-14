@@ -16,6 +16,8 @@
         ''' </summary>
         Public StatementType As FactEngine.pcenumFEQLStatementType = FactEngine.Constants.pcenumFEQLStatementType.None
 
+        Public QueryGraph As FactEngine.QueryGraph
+
         ''' <summary>
         ''' As used in a DESCRIBE Statement, is pushed back to the client to process.
         ''' </summary>

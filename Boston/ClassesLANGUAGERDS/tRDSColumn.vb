@@ -113,10 +113,19 @@ Namespace RDS
         <NonSerialized()>
         Public WithEvents ActiveRole As FBM.Role
 
+#Region "FactEngine secific"
         ''' <summary>
-        ''' Used when creating SQL etc. When the set of Projection Columns is returned, this Alias is set so that ProjectionColumns refer to the correct Table in the From clause etc.
+        ''' Used when creating SQL etc for FactEngine. When the set of Projection Columns is returned, this Alias is set so that ProjectionColumns refer to the correct Table in the From clause etc.
         ''' </summary>
         Public TemporaryAlias As String = Nothing
+        Public TemporaryData As String = Nothing 'E.g. As in 'Peter' for a Node with a PK Column of FirstName and where the Node has FirstName and LastName (at least) Columns
+        Public IsPartOfUniqueIdentifier As Boolean = False 'FactEngine specific. True if Column is part of unique Identifier.
+#End Region
+
+        ''' <summary>
+        ''' FactEngine specific. Used to tell the type of Node for each result in the Query.
+        ''' </summary>
+        Public GraphNodeType As String = ""
 
         Public Event ActiveRoleChanged()
         Public Event AddedToPrimaryKey()
@@ -175,7 +184,8 @@ Namespace RDS
                 lrColumn.Name = .Name
                 lrColumn.Nullable = .Nullable
                 lrColumn.OrdinalPosition = .OrdinalPosition
-                lrColumn.Relation = Nothing
+                lrColumn.Relation = New List(Of RDS.Relation)
+                lrColumn.ContributesToPrimaryKey = .ContributesToPrimaryKey
                 If arOriginTable Is Nothing Then
                     For Each lrRelation In .Relation
                         If arRelation IsNot Nothing Then
@@ -187,6 +197,10 @@ Namespace RDS
                     Next
                 End If
                 lrColumn.Role = .Role
+
+                'FactEngine specific
+                lrColumn.GraphNodeType = .GraphNodeType
+                lrColumn.IsPartOfUniqueIdentifier = .IsPartOfUniqueIdentifier
 
             End With
 

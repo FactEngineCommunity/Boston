@@ -9,7 +9,11 @@ Namespace FactEngine.DisplayGraph
         Public Table As RDS.Table
         Public Column As New List(Of RDS.Column)
 
-        Public Name As String = ""
+        Public Type As String = "" 'E.g. 'Person', 'Lecturer', 'TimetableBooking'. I.e. As in the name of the RDS.Table represented by the Node.
+        Public [Alias] As String = "" 'E.g. As in '1' for 'Person 1' in Projected Columns of the Query.
+        Public Name As String = "Dummy" 'As in the extrapolated Alternate/PrimaryKey value for the Table represented by the Node. E.g. 'Peter Stevens' for alternate key, FirstName, LastName.
+
+        Public Data As New List(Of String) 'E.g. Stores 'Peter' and 'Lecturer' for a Node with a compound reference scheme.
 
         Public Shape As MindFusion.Diagramming.ShapeNode = Nothing
 
@@ -23,20 +27,26 @@ Namespace FactEngine.DisplayGraph
         Public Sub New(ByRef arDiagram As MindFusion.Diagramming.Diagram,
                        ByVal arTable As RDS.Table,
                        ByVal aarColumn As List(Of RDS.Column),
+                       ByVal asType As String,
                        ByVal asName As String,
+                       ByVal asAlias As String,
                        ByVal aarLink As List(Of FactEngine.DisplayGraph.Link)
                        )
 
             Me.Diagram = arDiagram
             Me.Table = arTable
             Me.Column = aarColumn
+            Me.Type = asType
             Me.Name = asName
+            Me.Alias = asAlias
             Me.Link = aarLink
 
         End Sub
 
         Public Shadows Function Equals(other As Node) As Boolean Implements IEquatable(Of Node).Equals
-            Return Me.Name = other.Name
+            Return Me.Type = other.Type And
+                   Me.Alias = other.Alias And
+                   Me.Name = other.Name
         End Function
 
         Public Sub DisplayAndAssociate()
@@ -58,7 +68,8 @@ Namespace FactEngine.DisplayGraph
             'loDroppedNode.ShadowColor = Color.LightGray
             loDroppedNode.Pen.Width = 0.5 '0.4
             loDroppedNode.Pen.Color = Color.Navy
-            loDroppedNode.ToolTip = "Node"
+            loDroppedNode.ToolTip = Me.Type
+
             loDroppedNode.Text = Me.Name
 
             Me.Diagram.Nodes.Add(loDroppedNode)
