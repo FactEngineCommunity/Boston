@@ -70,6 +70,7 @@ Namespace FactEngine.DisplayGraph
             loDroppedNode.Pen.Width = 0.3 '0.4
             loDroppedNode.Pen.Color = Color.Navy
             loDroppedNode.ToolTip = Me.Type
+            loDroppedNode.AllowOutgoingLinks = False
 
             loDroppedNode.Brush = New MindFusion.Drawing.SolidBrush(Color.FromArgb(pcColorValues(Me.OrdinalPosition Mod 6)))
 

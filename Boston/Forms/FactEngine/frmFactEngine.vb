@@ -558,6 +558,7 @@ Public Class frmFactEngine
                             'lrPGSLink.Text = Me.SentData(0)
                             lrPGSLink.HeadPen.Color = Drawing.Color.DeepSkyBlue
                             lrPGSLink.AutoRoute = False
+                            lrPGSLink.Locked = True
 
                             'lrPGSLink.Tag = Me
                             'Me.Link = lrPGSLink                                

@@ -411,6 +411,9 @@
                             lrTempColumn.TemporaryAlias = Viev.NullVal(Me.HeadNode.Alias, "")
                             lrTempColumn.GraphNodeType = Me.HeadNode.Name
                             lrTempColumn.IsPartOfUniqueIdentifier = True
+                            If Me.QueryEdges.Count > 0 Then
+                                lrTempColumn.QueryEdge = Me.QueryEdges(0)
+                            End If
                             larHeadColumn.Add(lrTempColumn)
                         Next
                 End Select
