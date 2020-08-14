@@ -17,9 +17,7 @@ Namespace FactEngine.DisplayGraph
 
         Public Shape As MindFusion.Diagramming.ShapeNode = Nothing
 
-        Public Edge As List(Of FactEngine.DisplayGraph.Link)
-
-        Public Link As New List(Of FactEngine.DisplayGraph.Link)
+        Public Edge As New List(Of FactEngine.DisplayGraph.Edge)
 
         Public X As Integer
         Public Y As Integer
@@ -30,7 +28,7 @@ Namespace FactEngine.DisplayGraph
                        ByVal asType As String,
                        ByVal asName As String,
                        ByVal asAlias As String,
-                       ByVal aarLink As List(Of FactEngine.DisplayGraph.Link)
+                       ByVal aarLink As List(Of FactEngine.DisplayGraph.Edge)
                        )
 
             Me.Diagram = arDiagram
@@ -39,7 +37,7 @@ Namespace FactEngine.DisplayGraph
             Me.Type = asType
             Me.Name = asName
             Me.Alias = asAlias
-            Me.Link = aarLink
+            Me.Edge = aarLink
 
         End Sub
 

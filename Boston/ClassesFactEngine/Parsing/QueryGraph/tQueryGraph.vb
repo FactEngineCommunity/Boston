@@ -435,6 +435,7 @@
                                 lrColumn.TemporaryAlias = lrQueryEdge.BaseNode.Alias
                             End If
                             lrColumn.GraphNodeType = lrQueryEdge.BaseNode.Name
+                            lrColumn.QueryEdge = lrQueryEdge
                             larColumn.AddUnique(lrColumn)
                         Case Else
                             Dim larEdgeColumn = lrQueryEdge.FBMFactType.RoleGroup(liRoleInd).JoinedORMObject.getCorrespondingRDSTable.getFirstUniquenessConstraintColumns
@@ -448,6 +449,7 @@
                                 End If
                                 lrColumn.GraphNodeType = lrQueryEdge.TargetNode.Name
                                 lrColumn.IsPartOfUniqueIdentifier = True
+                                lrColumn.QueryEdge = lrQueryEdge
                                 larColumn.Add(lrTempColumn)
                             Next
                     End Select

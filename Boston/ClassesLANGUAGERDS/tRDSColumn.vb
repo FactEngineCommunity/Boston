@@ -120,6 +120,7 @@ Namespace RDS
         Public TemporaryAlias As String = Nothing
         Public TemporaryData As String = Nothing 'E.g. As in 'Peter' for a Node with a PK Column of FirstName and where the Node has FirstName and LastName (at least) Columns
         Public IsPartOfUniqueIdentifier As Boolean = False 'FactEngine specific. True if Column is part of unique Identifier.
+        Public QueryEdge As FactEngine.QueryEdge 'The Edge that resulted in the Column, if is not the HeadNode of the Nodes of the QueryGraph
 #End Region
 
         ''' <summary>
@@ -201,6 +202,8 @@ Namespace RDS
                 'FactEngine specific
                 lrColumn.GraphNodeType = .GraphNodeType
                 lrColumn.IsPartOfUniqueIdentifier = .IsPartOfUniqueIdentifier
+                lrColumn.QueryEdge = .QueryEdge
+                lrColumn.TemporaryAlias = .TemporaryAlias
 
             End With
 
@@ -218,6 +221,7 @@ Namespace RDS
 
 
         End Function
+
 
         Public Sub addIndex(ByRef arIndex As RDS.Index)
 

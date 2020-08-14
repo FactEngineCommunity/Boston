@@ -350,7 +350,7 @@
     <Compile Include="ClassesFactEngine\DatabaseManager\Interfaces\iDatabaseConnection.vb" />
     <Compile Include="ClassesFactEngine\DatabaseManager\tDatabaseConnection.vb" />
     <Compile Include="ClassesFactEngine\DatabaseManager\tDatabaseManager.vb" />
-    <Compile Include="ClassesFactEngine\DisplayGraph\tLink.vb" />
+    <Compile Include="ClassesFactEngine\DisplayGraph\tEdge.vb" />
     <Compile Include="ClassesFactEngine\DisplayGraph\tNode.vb" />
     <Compile Include="ClassesFactEngine\FEQLParser\TinyPG\tFEQLParser.vb" />
     <Compile Include="ClassesFactEngine\FEQLParser\TinyPG\tFEQLParseTree.vb" />
