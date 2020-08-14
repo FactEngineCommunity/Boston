@@ -390,30 +390,63 @@ Public Class frmFactEngine
                         'For the GraphView
                         Dim lrTable = New RDS.Table(prApplication.WorkingModel.RDS, "DummyTable", Nothing)
                         Dim larColumn As New List(Of RDS.Column)
+                        Me.GraphNodes.Clear()
+                        Me.Diagram.Nodes.Clear()
 
                         For Each lrFact In lrRecordset.Facts
                             Me.LabelError.Text &= lrFact.EnumerateAsBracketedFact(True) & vbCrLf
 
 #Region "GraphView"
-                            Me.GraphNodes.Clear()
-                            Me.Diagram.Nodes.Clear()
                             larColumn = New List(Of RDS.Column)
                             larColumn.Add(New RDS.Column(lrTable, lrFact.Data(0).Data, Nothing, New FBM.Role))
-                            Dim lrGraphNode As New FactEngine.DisplayGraph.Node(Me.Diagram,
+
+                            Dim lrGraphNode = Me.GraphNodes.Find(Function(x) x.Name = lrFact.Data(0).Data)
+                            If lrGraphNode Is Nothing Then
+                                lrGraphNode = New FactEngine.DisplayGraph.Node(Me.Diagram,
                                                                                 lrTable,
                                                                                 larColumn,
                                                                                 lrFact.Data(0).Data,
                                                                                 New List(Of FactEngine.DisplayGraph.Link)
                                                                                 )
 
-                            Me.GraphNodes.Add(lrGraphNode)
-                            Call lrGraphNode.DisplayAndAssociate()
+                                Me.GraphNodes.AddUnique(lrGraphNode)
+                                Call lrGraphNode.DisplayAndAssociate()
+                            End If
 
                             Dim lrTargetGraphNode = Me.GraphNodes.Find(Function(x) x.Name = lrFact.Data(1).Data)
 
-                            If lrTargetGraphNode IsNot Nothing Then
+                            If lrTargetGraphNode Is Nothing Then
+                                lrTargetGraphNode = New FactEngine.DisplayGraph.Node(Me.Diagram,
+                                                                                    lrTable,
+                                                                                    larColumn,
+                                                                                    lrFact.Data(1).Data,
+                                                                                    New List(Of FactEngine.DisplayGraph.Link)
+                                                                                    )
 
+                                Me.GraphNodes.Add(lrTargetGraphNode)
+                                Call lrTargetGraphNode.DisplayAndAssociate()
                             End If
+
+                            Dim lrPGSLink As New MindFusion.Diagramming.DiagramLink(Me.Diagram,
+                                                                                        lrGraphNode.Shape,
+                                                                                        lrTargetGraphNode.Shape)
+
+
+                            lrPGSLink.Style = MindFusion.Diagramming.LinkStyle.Polyline
+
+                            lrPGSLink.SnapToNodeBorder = True
+                            lrPGSLink.ShadowColor = Color.White
+                            lrPGSLink.Brush = New MindFusion.Drawing.SolidBrush(Drawing.Color.DeepSkyBlue)
+                            lrPGSLink.Pen.Color = Drawing.Color.DeepSkyBlue
+                            'lrPGSLink.Text = Me.SentData(0)
+                            lrPGSLink.HeadPen.Color = Drawing.Color.DeepSkyBlue
+                            lrPGSLink.AutoRoute = False
+
+                            'lrPGSLink.Tag = Me
+                            'Me.Link = lrPGSLink                                
+
+                            Me.Diagram.Links.Add(lrPGSLink)
+
 #End Region
 
                         Next

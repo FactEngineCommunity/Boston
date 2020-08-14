@@ -2,6 +2,7 @@
 
 Namespace FactEngine.DisplayGraph
     Public Class Node
+        Implements IEquatable(Of FactEngine.DisplayGraph.Node)
 
         Private Diagram As MindFusion.Diagramming.Diagram = Nothing
 
@@ -33,6 +34,10 @@ Namespace FactEngine.DisplayGraph
             Me.Link = aarLink
 
         End Sub
+
+        Public Shadows Function Equals(other As Node) As Boolean Implements IEquatable(Of Node).Equals
+            Return Me.Name = other.Name
+        End Function
 
         Public Sub DisplayAndAssociate()
 
