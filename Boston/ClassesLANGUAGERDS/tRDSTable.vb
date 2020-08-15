@@ -355,15 +355,42 @@ Namespace RDS
         End Function
 
         Public Function getRelationByFBMModelObjects(ByVal aarFBMModelObject As List(Of FBM.ModelObject),
-                                                     ByVal arFactType As FBM.FactType) As RDS.Relation
+                                                     ByVal arFactType As FBM.FactType,
+                                                     Optional ByRef arQueryEdge As FactEngine.QueryEdge = Nothing) As RDS.Relation
 
-            Dim larRelation = From Relation In Me.getRelations
-                              Where aarFBMModelObject.Contains(Relation.DestinationTable.FBMModelElement)
-                              Where aarFBMModelObject.Contains(Relation.OriginTable.FBMModelElement)
-                              Where Relation.ResponsibleFactType.Id = arFactType.Id
-                              Select Relation
+            Try
+                Dim larRelation = From Relation In Me.getRelations
+                                  Where aarFBMModelObject.Contains(Relation.DestinationTable.FBMModelElement)
+                                  Where aarFBMModelObject.Contains(Relation.OriginTable.FBMModelElement)
+                                  Where Relation.ResponsibleFactType.Id = arFactType.Id
+                                  Select Relation
 
-            Return larRelation.First
+                Return larRelation.First
+
+            Catch
+                Dim lsMessage = "Error trying to find a relation between ModelElements, "
+                Dim liInd = 1
+                For Each lrModelElement In aarFBMModelObject
+                    If liInd > 1 Then lsMessage &= ", "
+                    lsMessage &= "'" & lrModelElement.Id & "'"
+                    liInd += 1
+                Next
+                lsMessage &= ", for FactType: " & arFactType.Id & ","
+                lsMessage &= " with Predicates"
+                liInd = 1
+                For Each lrFactTypeReading In arFactType.FactTypeReading
+                    For Each lrPredicate In lrFactTypeReading.PredicatePart.FindAll(Function(x) x.PredicatePartText <> "")
+                        If liInd > 1 Then lsMessage &= ", "
+                        lsMessage &= "'" & lrPredicate.PredicatePartText & "'"
+                        liInd += 1
+                    Next
+                Next
+                If arQueryEdge IsNot Nothing Then
+                    lsMessage &= ". Are you sure you have the right predicate reading, '" & arQueryEdge.BaseNode.Name & " " & arQueryEdge.Predicate & " " & arQueryEdge.TargetNode.Name & "'?"
+                End If
+
+                Throw New Exception(lsMessage)
+            End Try
 
         End Function
 

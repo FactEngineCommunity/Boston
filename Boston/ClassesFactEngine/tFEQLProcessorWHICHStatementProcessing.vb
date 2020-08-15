@@ -841,7 +841,11 @@
             Else
                 Dim liModelElementInd = 0
                 Me.MODELELEMENTCLAUSE = New FEQL.MODELELEMENTClause
-                Call Me.GetParseTreeTokensReflection(Me.MODELELEMENTCLAUSE, Me.WHICHCLAUSE.MODELELEMENT(1))
+                If Me.WHICHCLAUSE.MODELELEMENT.Count = 1 Then
+                    Call Me.GetParseTreeTokensReflection(Me.MODELELEMENTCLAUSE, Me.WHICHCLAUSE.MODELELEMENT(0))
+                Else
+                    Call Me.GetParseTreeTokensReflection(Me.MODELELEMENTCLAUSE, Me.WHICHCLAUSE.MODELELEMENT(1))
+                End If
                 If arWHICHCLAUSE.KEYWDTHAT.Count = 2 Then liModelElementInd = 1
                 lrFBMModelObject = Me.Model.GetModelObjectByName(Me.WHICHCLAUSE.MODELELEMENTNAME(liModelElementInd))
                 If lrFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & Me.WHICHCLAUSE.MODELELEMENTNAME(0) & "'.")

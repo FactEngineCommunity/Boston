@@ -210,7 +210,7 @@
                         Dim larModelObject = New List(Of FBM.ModelObject)
                         larModelObject.Add(lrQueryEdge.BaseNode.FBMModelObject)
                         larModelObject.Add(lrQueryEdge.TargetNode.FBMModelObject)
-                        Dim lrRelation = lrOriginTable.getRelationByFBMModelObjects(larModelObject, lrQueryEdge.FBMFactType)
+                        Dim lrRelation = lrOriginTable.getRelationByFBMModelObjects(larModelObject, lrQueryEdge.FBMFactType, lrQueryEdge)
 
                         Dim liInd2 = 1
                         If lrRelation.OriginTable Is lrOriginTable Then
