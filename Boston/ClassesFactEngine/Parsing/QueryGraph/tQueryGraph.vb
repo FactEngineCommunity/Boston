@@ -210,7 +210,7 @@
                         Dim larModelObject = New List(Of FBM.ModelObject)
                         larModelObject.Add(lrQueryEdge.BaseNode.FBMModelObject)
                         larModelObject.Add(lrQueryEdge.TargetNode.FBMModelObject)
-                        Dim lrRelation = lrOriginTable.getRelationByFBMModelObjects(larModelObject)
+                        Dim lrRelation = lrOriginTable.getRelationByFBMModelObjects(larModelObject, lrQueryEdge.FBMFactType)
 
                         Dim liInd2 = 1
                         If lrRelation.OriginTable Is lrOriginTable Then
@@ -230,7 +230,7 @@
                                 'was
                                 'lsSQLQuery &= lrQueryEdge.BaseNode.FBMModelObject.Id & "." & lrColumn.Name
                                 'lsSQLQuery &= " = " & lrQueryEdge.TargetNode.Name & Viev.NullVal(lrQueryEdge.TargetNode.Alias, "") & "." & lrColumn.Name
-                                lsSQLQuery &= lrColumn.Table.Name & "." & lrColumn.Name
+                                lsSQLQuery &= lrColumn.Table.Name & Viev.NullVal(lrQueryEdge.BaseNode.Alias, "") & "." & lrColumn.Name
                                 lsSQLQuery &= " = " & larTargetColumn(liInd2 - 1).Table.Name & Viev.NullVal(lrQueryEdge.TargetNode.Alias, "") & "." & larTargetColumn(liInd2 - 1).Name
                                 If liInd2 < larTargetColumn.Count Then lsSQLQuery &= vbCrLf & "AND "
                                 liInd2 += 1

@@ -815,9 +815,12 @@
             If arWHICHCLAUSE.KEYWDTHAT.Count = 1 And CType(arWHICHCLAUSE.WHICHTHATCLAUSE, FEQL.ParseNode).Nodes(0).Token.Type <> TokenType.KEYWDTHAT Then
                 arQueryEdge.BaseNode = arQueryGraph.HeadNode
             Else
+                Me.MODELELEMENTCLAUSE = New FEQL.MODELELEMENTClause
+                Call Me.GetParseTreeTokensReflection(Me.MODELELEMENTCLAUSE, Me.WHICHCLAUSE.MODELELEMENT(0))
                 Dim lrBaseFBMModelObject = Me.Model.GetModelObjectByName(Me.WHICHCLAUSE.MODELELEMENTNAME(0))
                 If lrBaseFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & Me.WHICHCLAUSE.MODELELEMENTNAME(0) & "'.")
                 arQueryEdge.BaseNode = New FactEngine.QueryNode(lrBaseFBMModelObject)
+                arQueryEdge.BaseNode.Alias = Me.MODELELEMENTCLAUSE.MODELELEMENTSUFFIX
             End If
 
 
@@ -837,25 +840,21 @@
                 Next
             Else
                 Dim liModelElementInd = 0
+                Me.MODELELEMENTCLAUSE = New FEQL.MODELELEMENTClause
+                Call Me.GetParseTreeTokensReflection(Me.MODELELEMENTCLAUSE, Me.WHICHCLAUSE.MODELELEMENT(1))
                 If arWHICHCLAUSE.KEYWDTHAT.Count = 2 Then liModelElementInd = 1
                 lrFBMModelObject = Me.Model.GetModelObjectByName(Me.WHICHCLAUSE.MODELELEMENTNAME(liModelElementInd))
                 If lrFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & Me.WHICHCLAUSE.MODELELEMENTNAME(0) & "'.")
             End If
 
             arQueryEdge.TargetNode = New FactEngine.QueryNode(lrFBMModelObject)
+            arQueryEdge.TargetNode.Alias = Me.MODELELEMENTCLAUSE.MODELELEMENTSUFFIX
 
             If lrFBMModelObject.ConceptType = pcenumConceptType.ValueType Then
                 arQueryEdge.WhichClauseSubType = FactEngine.Constants.pcenumWhichClauseType.IsPredicateNodePropertyIdentification
             Else
                 arQueryGraph.Nodes.AddUnique(arQueryEdge.TargetNode)
             End If
-
-
-            ''---------------------------------------------------------
-            ''Get the Predicate
-            'For Each lsPredicatePart In Me.WHICHCLAUSE.PREDICATE
-            '    arQueryEdge.Predicate = Trim(arQueryEdge.Predicate & " " & lsPredicatePart)
-            'Next
 
             '-----------------------------------------
             'Get the relevant FBM.FactType

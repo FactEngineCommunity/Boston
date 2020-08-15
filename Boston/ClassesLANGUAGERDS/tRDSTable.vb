@@ -354,11 +354,13 @@ Namespace RDS
 
         End Function
 
-        Public Function getRelationByFBMModelObjects(ByVal aarFBMModelObject As List(Of FBM.ModelObject)) As RDS.Relation
+        Public Function getRelationByFBMModelObjects(ByVal aarFBMModelObject As List(Of FBM.ModelObject),
+                                                     ByVal arFactType As FBM.FactType) As RDS.Relation
 
             Dim larRelation = From Relation In Me.getRelations
                               Where aarFBMModelObject.Contains(Relation.DestinationTable.FBMModelElement)
                               Where aarFBMModelObject.Contains(Relation.OriginTable.FBMModelElement)
+                              Where Relation.ResponsibleFactType.Id = arFactType.Id
                               Select Relation
 
             Return larRelation.First
