@@ -31,14 +31,14 @@ Namespace FBM
             End Set
         End Property
 
-        <XmlElementAttribute()> _
-        <CategoryAttribute("Name"), _
-         Browsable(True), _
-         [ReadOnly](False), _
-         BindableAttribute(True), _
-         DefaultValueAttribute(""), _
-         DesignOnly(False), _
-         DescriptionAttribute("The name of the Entity Type")> _
+        <XmlElementAttribute()>
+        <CategoryAttribute("Name"),
+         Browsable(True),
+         [ReadOnly](False),
+         BindableAttribute(True),
+         DefaultValueAttribute(""),
+         DesignOnly(False),
+         DescriptionAttribute("The name of the Entity Type")>
         Public Shadows Property Name() As String
             Get
                 Return _Name
@@ -55,6 +55,25 @@ Namespace FBM
                 Me.Symbol = value
             End Set
         End Property
+
+        Private _IsDatabaseReservedWord As Boolean = False
+
+        '<XmlElementAttribute()>
+        '<CategoryAttribute("FactEngine"),
+        ' Browsable(True),
+        ' [ReadOnly](False),
+        ' BindableAttribute(True),
+        ' DefaultValueAttribute("False"),
+        ' DesignOnly(False),
+        ' DescriptionAttribute("True if the Name of the Entity Type is a reserved word in the underlying database.")>
+        'Public Shadows Property IsDatabaseReservedWord As Boolean
+        '    Get
+        '        Return Me._IsDatabaseReservedWord
+        '    End Get
+        '    Set(value As Boolean)
+        '        Me._IsDatabaseReservedWord = value
+        '    End Set
+        'End Property
 
         <XmlIgnore()> _
         Public Shadows ReferenceModeFactType As FBM.FactTypeInstance = Nothing
@@ -1462,6 +1481,8 @@ Namespace FBM
                             End If
                         Case Is = "DerivationText"
                             Call Me.EntityType.SetDerivationText(Me.DerivationText, True)
+                        Case Is = "IsDatabaseReservedWord"
+                            Call Me.EntityType.setIsDatabaseReservedWord(Me.IsDatabaseReservedWord)
                         Case Is = "IsDerived"
                             If Me.IsDerived Then
                                 'Call Me.SetPropertyAttributes(Me, "IsStored", True)
@@ -2486,6 +2507,9 @@ Namespace FBM
 
         End Sub
 
+        Private Sub _EntityType_IsDatabaseReservedWordChanged(abIsDatabaseReservedWord As Boolean) Handles _EntityType.IsDatabaseReservedWordChanged
+            Me.IsDatabaseReservedWord = abIsDatabaseReservedWord
+        End Sub
     End Class
 
 End Namespace

@@ -15,6 +15,18 @@ Namespace RDS
         <XmlAttribute()>
         Public Name As String
 
+        Public ReadOnly Property DatabaseName As String
+            Get
+                If Me.FBMModelElement.IsDatabaseReservedWord Then
+                    Return "[" & Me.FBMModelElement.Id & "]"
+                Else
+                    Return Me.FBMModelElement.Id
+                End If
+
+            End Get
+        End Property
+
+
         <XmlElement()>
         Public Column As New List(Of RDS.Column)
 

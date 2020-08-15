@@ -56,7 +56,7 @@
                 Dim larProjectionColumn = Me.getProjectionColumns
                 Me.ProjectionColumn = larProjectionColumn
                 For Each lrProjectColumn In larProjectionColumn.FindAll(Function(x) x IsNot Nothing)
-                    lsSQLQuery &= lrProjectColumn.Table.Name & Viev.NullVal(lrProjectColumn.TemporaryAlias, "") & "." & lrProjectColumn.Name
+                    lsSQLQuery &= lrProjectColumn.Table.DatabaseName & Viev.NullVal(lrProjectColumn.TemporaryAlias, "") & "." & lrProjectColumn.Name
                     If liInd < larProjectionColumn.Count Then lsSQLQuery &= ","
                     liInd += 1
                 Next
@@ -119,9 +119,10 @@
                 Dim larFromNodes = Me.Nodes.FindAll(Function(x) x.FBMModelObject.ConceptType <> pcenumConceptType.ValueType)
                 For Each lrQueryNode In larFromNodes
                     If lrQueryNode.Alias Is Nothing Then
-                        lsSQLQuery &= lrQueryNode.FBMModelObject.getCorrespondingRDSTable.Name
+                        lsSQLQuery &= lrQueryNode.Name 'FBMModelObject.getCorrespondingRDSTable.Name
                     Else
-                        lsSQLQuery &= lrQueryNode.FBMModelObject.getCorrespondingRDSTable.Name & " " & lrQueryNode.FBMModelObject.getCorrespondingRDSTable.Name & Viev.NullVal(lrQueryNode.Alias, "")
+                        'FBMModelObject.getCorrespondingRDSTable.Name
+                        lsSQLQuery &= lrQueryNode.Name & " " & lrQueryNode.Name & Viev.NullVal(lrQueryNode.Alias, "")
                     End If
 
                     If liInd < larFromNodes.Count Then lsSQLQuery &= "," & vbCrLf
@@ -239,7 +240,7 @@
                             Dim larTargetColumn = lrQueryEdge.BaseNode.FBMModelObject.getCorrespondingRDSTable.getPrimaryKeyColumns
                             For Each lrColumn In larTargetColumn
                                 lsSQLQuery &= lrQueryEdge.TargetNode.Name & Viev.NullVal(lrQueryEdge.TargetNode.Alias, "") & "." & lrColumn.Name
-                                lsSQLQuery &= " = " & lrQueryEdge.BaseNode.FBMModelObject.Id & "." & lrColumn.Name
+                                lsSQLQuery &= " = " & lrQueryEdge.BaseNode.Name & "." & lrColumn.Name
                                 If liInd2 < larTargetColumn.Count Then lsSQLQuery &= vbCrLf & "AND "
                                 liInd2 += 1
                             Next
@@ -294,8 +295,8 @@
                                 larPredicatePart = (From FactType In Me.Model.FactType
                                                     From FactTypeReading In FactType.FactTypeReading
                                                     From PredicatePart In FactTypeReading.PredicatePart
-                                                    Where FactType.RoleGroup.FindAll(Function(x) x.JoinedORMObject.Id = lrQueryEdge.BaseNode.FBMModelObject.Id _
-                                                       Or x.JoinedORMObject.Id = lrQueryEdge.TargetNode.FBMModelObject.Id).Count = 2
+                                                    Where FactType.RoleGroup.FindAll(Function(x) x.JoinedORMObject.Id = lrQueryEdge.BaseNode.Name _
+                                                       Or x.JoinedORMObject.Id = lrQueryEdge.TargetNode.Name).Count = 2
                                                     Where PredicatePart.PredicatePartText = lrQueryEdge.Predicate
                                                     Where lrQueryEdge.Predicate <> ""
                                                     Select PredicatePart).ToList
@@ -307,8 +308,8 @@
                                     If lrFactType.IsObjectified Then
                                         Dim larFactTypeReading = From FactType In lrFactType.getLinkFactTypes
                                                                  From FactTypeReading In FactType.FactTypeReading
-                                                                 Where FactTypeReading.PredicatePart(0).Role.JoinedORMObject.Id = lrQueryEdge.BaseNode.FBMModelObject.Id
-                                                                 Where FactTypeReading.PredicatePart(1).Role.JoinedORMObject.Id = lrQueryEdge.TargetNode.FBMModelObject.Id
+                                                                 Where FactTypeReading.PredicatePart(0).Role.JoinedORMObject.Id = lrQueryEdge.BaseNode.Name
+                                                                 Where FactTypeReading.PredicatePart(1).Role.JoinedORMObject.Id = lrQueryEdge.TargetNode.Name
                                                                  Select FactTypeReading
                                         If larFactTypeReading.Count > 0 Then
                                             lrFactType = larFactTypeReading.First.FactType
@@ -352,7 +353,7 @@
                                             Where Column.ActiveRole.JoinedORMObject Is lrQueryEdge.TargetNode.FBMModelObject
                                             Select Column).First
 
-                            lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") & lrQueryEdge.BaseNode.FBMModelObject.Id & "." & lrColumn.Name & " = '" & lrQueryEdge.IdentifierList(0) & "'" & vbCrLf
+                            lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") & lrQueryEdge.BaseNode.Name & "." & lrColumn.Name & " = '" & lrQueryEdge.IdentifierList(0) & "'" & vbCrLf
                             lbIntialWhere = "AND "
                         Case Else
                             Dim lrTargetTable = lrQueryEdge.TargetNode.FBMModelObject.getCorrespondingRDSTable

@@ -12,6 +12,12 @@
 
         Public ReadOnly Property Name As String
             Get
+                Return Me.FBMModelObject.Id '20200815-Use DatabaseName in the future
+            End Get
+        End Property
+
+        Public ReadOnly Property Id As String
+            Get
                 Return Me.FBMModelObject.Id
             End Get
         End Property

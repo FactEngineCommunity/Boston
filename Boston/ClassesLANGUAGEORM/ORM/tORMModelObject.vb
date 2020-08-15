@@ -38,10 +38,10 @@ Namespace FBM
         <System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)> _
         <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
         Public _Name As String = ""
-        <XmlIgnore()> _
-        <CategoryAttribute("Name"), _
-        DefaultValueAttribute(GetType(String), ""), _
-        DescriptionAttribute("A unique Name for the model object.")> _
+        <XmlIgnore()>
+        <CategoryAttribute("Name"),
+        DefaultValueAttribute(GetType(String), ""),
+        DescriptionAttribute("A unique Name for the model object.")>
         Public Overridable Property Name() As String
             Get
                 Return _Name
@@ -52,6 +52,21 @@ Namespace FBM
                 '------------------------------------------------------
                 _Name = value
             End Set
+        End Property
+
+        ''' <summary>
+        ''' FactEngine specific. Used to change names like 'Order' to '[Order]'. See Me.DatabaseName
+        ''' </summary>
+        Public IsDatabaseReservedWord As Boolean = False
+
+        Public ReadOnly Property DatabaseName As String
+            Get
+                If Me.IsDatabaseReservedWord Then
+                    Return "[" & Me.Id & "]"
+                Else
+                    Return Me.Id
+                End If
+            End Get
         End Property
 
         <XmlAttribute()> _

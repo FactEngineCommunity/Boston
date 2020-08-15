@@ -50,7 +50,6 @@ Namespace FBM
         <XmlIgnore()>
         Public _ReferenceModeFactType As FBM.FactType = Nothing
 
-
         <XmlIgnore()>
         Public Property ReferenceModeFactType() As FBM.FactType
             Get
@@ -248,6 +247,7 @@ Namespace FBM
         Public Event DataTypePrecisionChanged(ByVal aiNewDataTypePrecision As Integer)
         Public Event DataTypeLengthChanged(ByVal aiDataTypeLength As Integer)
         Public Event DerivationTextChanged(ByVal asDerivationText As String)
+        Public Event IsDatabaseReservedWordChanged(ByVal abIsDatabaseReservedWord As Boolean)
         Public Event IsDerivedChanged(ByVal abIsDerived As Boolean)
         Public Event ModelErrorAdded(ByRef arModelError As ModelError) Implements iValidationErrorHandler.ModelErrorAdded
         'Public Event NameChanged(ByVal asNewName As String)
@@ -2621,6 +2621,11 @@ Namespace FBM
             'VM-20180319-Dummy Code to trap the debug stoppoint, to see if removing the above affects anything
             Dim liDummyCodeInd As Integer = 0
 
+        End Sub
+
+        Public Sub setIsDatabaseReservedWord(ByVal abIsDatabaseReservedWord As Boolean)
+            Me.IsDatabaseReservedWord = abIsDatabaseReservedWord
+            RaiseEvent IsDatabaseReservedWordChanged(abIsDatabaseReservedWord)
         End Sub
 
         ''' <summary>
