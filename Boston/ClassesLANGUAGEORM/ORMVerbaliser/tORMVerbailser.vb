@@ -8,36 +8,36 @@ Namespace FBM
         Private SW As New StringWriter
         Public HTW As New HtmlTextWriter(Me.SW)
 
-        Public Head As String = "<head>" & vbCrLf & _
-                       "<title>ORM2 Verbalization</title>" & vbCrLf & _
-                       "<style type=" & Chr(34) & "text/css" & Chr(34) & ">" & vbCrLf & _
-                       "body, table { font-family: Tahoma; font-size: 9pt; color: DarkGreen; font-weight: normal; }" & vbCrLf & _
-                       "body { padding: 0em .1em; }" & vbCrLf & _
-                       "table.hidden, tr.hidden, td.hidden { margin: 0em; padding: 0em; border-collapse: collapse;}" & vbCrLf & _
-                       "td.hidden { vertical-align: top; }" & vbCrLf & _
-                       "table.hidden { display:inline; }" & vbCrLf & _
-                       "a {text-decoration:none; }" & vbCrLf & _
-                       "a:hover {background-color:infobackground; }" & vbCrLf & _
-                       ".heading { color: Black; font-weight: bold; }" & vbCrLf & _
-                       ".objectType { color: Purple; font-weight: normal; }" & vbCrLf & _
-                       ".objectTypeMissing { color: Purple; font-weight: normal; }" & vbCrLf & _
-                       ".referenceMode { color: Brown; font-weight: normal; }" & vbCrLf & _
-                       ".predicateText { color: DarkGreen; font-weight: normal; }" & vbCrLf & _
-                       ".blacktext { color: Black; font-weight: normal; }" & vbCrLf & _
-                       ".quantifier { color: MediumBlue; font-weight: bold; }" & vbCrLf & _
-                       ".quantifierLight { color: Blue; font-weight: normal; }" & vbCrLf & _
-                       ".primaryErrorReport { color: red; font-weight: bolder; }" & vbCrLf & _
-                       ".secondaryErrorReport { color: red; }" & vbCrLf & _
-                       ".verbalization { }" & vbCrLf & _
-                       ".indent { margin.left: 20px; position: relative; }" & vbCrLf & _
-                       ".smallIndent { margin.left: 8px; position: relative;}" & vbCrLf & _
-                       ".listSeparator { color: windowtext; font-weight: 200;}" & vbCrLf & _
-                       ".logicalOperator { color: MediumBlue; font-weight: bold;}" & vbCrLf & _
-                       ".note { color: Black; font-style: italic; font-weight: normal; }" & vbCrLf & _
-                       ".definition { color: Black; font-style: italic; font-weight: normal; }" & vbCrLf & _
-                       ".notAvailable { font-style: italic; }" & vbCrLf & _
-                       ".instance { color: Brown; font-weight: normal; }" & vbCrLf & _
-                       "</style>" & vbCrLf & _
+        Public Head As String = "<head>" & vbCrLf &
+                       "<title>ORM2 Verbalization</title>" & vbCrLf &
+                       "<style type=" & Chr(34) & "text/css" & Chr(34) & ">" & vbCrLf &
+                       "body, table { font-family: Tahoma; font-size: 9pt; color: DarkGreen; font-weight: normal; }" & vbCrLf &
+                       "body { background-color: #F5F5F5; padding: 0em .1em; }" & vbCrLf &
+                       "table.hidden, tr.hidden, td.hidden { margin: 0em; padding: 0em; border-collapse: collapse;}" & vbCrLf &
+                       "td.hidden { vertical-align: top; }" & vbCrLf &
+                       "table.hidden { display:inline; }" & vbCrLf &
+                       "a {text-decoration:none; }" & vbCrLf &
+                       "a:hover {background-color:infobackground; }" & vbCrLf &
+                       ".heading { color: Black; font-weight: bold; }" & vbCrLf &
+                       ".objectType { color: Purple; font-weight: normal; }" & vbCrLf &
+                       ".objectTypeMissing { color: Purple; font-weight: normal; }" & vbCrLf &
+                       ".referenceMode { color: Brown; font-weight: normal; }" & vbCrLf &
+                       ".predicateText { color: DarkGreen; font-weight: normal; }" & vbCrLf &
+                       ".blacktext { color: Black; font-weight: normal; }" & vbCrLf &
+                       ".quantifier { color: MediumBlue; font-weight: bold; }" & vbCrLf &
+                       ".quantifierLight { color: Blue; font-weight: normal; }" & vbCrLf &
+                       ".primaryErrorReport { color: red; font-weight: bolder; }" & vbCrLf &
+                       ".secondaryErrorReport { color: red; }" & vbCrLf &
+                       ".verbalization { }" & vbCrLf &
+                       ".indent { margin.left: 20px; position: relative; }" & vbCrLf &
+                       ".smallIndent { margin.left: 8px; position: relative;}" & vbCrLf &
+                       ".listSeparator { color: windowtext; font-weight: 200;}" & vbCrLf &
+                       ".logicalOperator { color: MediumBlue; font-weight: bold;}" & vbCrLf &
+                       ".note { color: Black; font-style: italic; font-weight: normal; }" & vbCrLf &
+                       ".definition { color: Black; font-style: italic; font-weight: normal; }" & vbCrLf &
+                       ".notAvailable { font-style: italic; }" & vbCrLf &
+                       ".instance { color: Brown; font-weight: normal; }" & vbCrLf &
+                       "</style>" & vbCrLf &
                        "</head>"
 
         Public Sub VerbaliseBlackText(ByVal asText As String)

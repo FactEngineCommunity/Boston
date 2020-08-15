@@ -248,6 +248,7 @@ Public Class frmGlossary
         For Each lrFactType In FactType
 
 
+            lrVerbaliser.VerbaliseQuantifierLight("Each ")
 
             If lrFactType.FactTypeReading.Count = 0 Then
                 lrVerbaliser.VerbaliseModelObject(lrFactType)
@@ -285,6 +286,7 @@ Public Class frmGlossary
             End If
 
             lrVerbaliser.HTW.WriteBreak()
+
         Next
 
         lrVerbaliser.HTW.WriteBreak()
@@ -445,6 +447,7 @@ Public Class frmGlossary
         Call zrFrmORMDiagramViewer.AutoLayout()
         zrFrmORMDiagramViewer.Height = Me.SplitContainer2.Panel2.Height
         zrFrmORMDiagramViewer.Width = Me.SplitContainer2.Panel2.Width
+        zrFrmORMDiagramViewer.DiagramView.ZoomToFit()
 
     End Sub
 

@@ -5152,17 +5152,10 @@ Public Class frmDiagramORMForGlossary
 
         Select Case e.Delta
             Case Is = 0
-                'Do Nothing
             Case Is < 0
-                If frmMain.ToolStripComboBox_zoom.SelectedIndex > 0 Then
-                    frmMain.ToolStripComboBox_zoom.SelectedIndex -= 1
-                End If
+                Me.DiagramView.ZoomFactor = Viev.Greater(0, Me.DiagramView.ZoomFactor - 5)
             Case Is > 0
-                If frmMain.ToolStripComboBox_zoom.SelectedIndex < frmMain.ToolStripComboBox_zoom.Items.Count Then
-                    If frmMain.ToolStripComboBox_zoom.SelectedIndex < frmMain.ToolStripComboBox_zoom.Items.Count - 1 Then
-                        frmMain.ToolStripComboBox_zoom.SelectedIndex += 1
-                    End If
-                End If
+                Me.DiagramView.ZoomFactor = Viev.Lesser(100, Me.DiagramView.ZoomFactor + 5)
         End Select
 
     End Sub
