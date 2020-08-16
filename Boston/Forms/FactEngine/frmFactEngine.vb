@@ -1005,6 +1005,7 @@ Public Class frmFactEngine
                 End If
 
                 Select Case liTokenType
+                    Case Is = FEQL.TokenType.MODELELEMENTSUFFIX
                     Case Is = FEQL.TokenType.BROPEN
                         Me.AutoComplete.Enabled = True
                         Call Me.AddEnterpriseAwareItem("(", liTokenType, True)
@@ -1116,6 +1117,7 @@ Public Class frmFactEngine
                     lsCurrentTokenType = Me.zrTextHighlighter.GetCurrentContext.Token.Type.ToString
                     Me.ToolStripStatusLabelCurrentProduction.Text = lsCurrentTokenType
                     Select Case Me.zrTextHighlighter.GetCurrentContext.Token.Type
+                        Case Is = FEQL.TokenType.MODELELEMENTSUFFIX
                         Case Is = FEQL.TokenType.PREBOUNDREADINGTEXT, FEQL.TokenType.POSTBOUNDREADINGTEXT
                             'Nothing at this stage
                         Case Is = FEQL.TokenType.PREDICATE,
@@ -1205,6 +1207,8 @@ Public Class frmFactEngine
         For Each lrParseError In aarParseErrors
             liTokenType = DirectCast([Enum].Parse(GetType(FEQL.TokenType), lrParseError.ExpectedToken), FEQL.TokenType)
             Select Case liTokenType
+                Case Is = FEQL.TokenType.MODELELEMENTSUFFIX
+                    'Nothing to do here.
                 Case Is = FEQL.TokenType.PREBOUNDREADINGTEXT, FEQL.TokenType.POSTBOUNDREADINGTEXT
                     'Nothing at this stage
                 Case Is = FEQL.TokenType.BROPEN

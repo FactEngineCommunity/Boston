@@ -2193,11 +2193,16 @@ Public Class frmToolboxEnterpriseExplorer
 
         Dim lrPage As New FBM.Page
 
-        lrClipboardPage.Name &= "-Copy"
+        If lrClipboardPage Is Nothing Then
+            MsgBox("There is no Page in the clipboard to Paste.")
+        Else
+            lrClipboardPage.Name &= "-Copy"
 
-        lrPage = lrClipboardPage.Clone(prApplication.WorkingModel, True)
+            lrPage = lrClipboardPage.Clone(prApplication.WorkingModel, True)
 
-        Call Me.AddPageToModel(Me.TreeView.SelectedNode, lrPage)
+            Call Me.AddPageToModel(Me.TreeView.SelectedNode, lrPage)
+        End If
+
 
         Me.Cursor = Cursors.Default
 
