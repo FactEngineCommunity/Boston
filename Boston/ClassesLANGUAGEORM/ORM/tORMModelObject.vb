@@ -84,6 +84,20 @@ Namespace FBM
             End Set
         End Property
 
+        Public Overridable Property IsObjectified() As Boolean
+            Get
+                If Me.ConceptType = pcenumConceptType.FactType Then
+                    Return False
+                Else
+                    Return Nothing
+                End If
+            End Get
+            Set(value As Boolean)
+                'Nothing to do here.
+            End Set
+        End Property
+
+
         <XmlIgnore()> _
         <System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)> _
         <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
@@ -543,6 +557,24 @@ Namespace FBM
         Public Overridable Function HasPrimaryReferenceScheme() As Boolean
 
             If Me.ConceptType = pcenumConceptType.ValueType Then
+                Return False
+            Else
+                Return Nothing
+            End If
+        End Function
+
+        Public Overridable Function IsBinaryFactType() As Boolean
+
+            If Me.ConceptType = pcenumConceptType.FactType Then
+                Return False
+            Else
+                Return Nothing
+            End If
+        End Function
+
+        Public Overridable Function HasTotalRoleConstraint() As Boolean
+
+            If Me.ConceptType = pcenumConceptType.FactType Then
                 Return False
             Else
                 Return Nothing

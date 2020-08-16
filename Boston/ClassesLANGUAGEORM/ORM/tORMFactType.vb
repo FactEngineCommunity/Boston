@@ -42,9 +42,9 @@ Namespace FBM
         Public _IsObjectified As Boolean = False
         <XmlAttribute()> _
         <CategoryAttribute("Fact Type"), _
-        DefaultValueAttribute(False), _
-        DescriptionAttribute("True if the Fact Type is 'Objectified', else False.")> _
-        Public Property IsObjectified() As Boolean
+        DefaultValueAttribute(False),
+        DescriptionAttribute("True if the Fact Type is 'Objectified', else False.")>
+        Public Overrides Property IsObjectified() As Boolean
             Get
                 Return _IsObjectified
             End Get
@@ -2734,7 +2734,7 @@ Namespace FBM
 
         End Function
 
-        Function HasTotalRoleConstraint() As Boolean
+        Public Overrides Function HasTotalRoleConstraint() As Boolean
 
             '------------------------------------------------------------------------
             'RETURNS TRUE if a Total Role Constraint exists within
@@ -2783,7 +2783,7 @@ Namespace FBM
 
         End Function
 
-        Function IsBinaryFactType() As Boolean
+        Public Overrides Function IsBinaryFactType() As Boolean
 
             '--------------------------------------------------
             'RETURNS TRUE if the FactType is a BinaryFactType
