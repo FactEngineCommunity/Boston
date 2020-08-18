@@ -85,6 +85,7 @@ Public Module publicConstants
         SQLServer = 102
         ORACLE = 103
         SQLite = 104
+        MongoDb = 105
     End Enum
 
     Public Enum pcenumDebugMode

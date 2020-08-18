@@ -346,6 +346,7 @@
     <Compile Include="ClassesDatabase\SQLite\Database.vb" />
     <Compile Include="ClassesFactEngine\Constants.vb" />
     <Compile Include="ClassesFactEngine\DatabaseManager\DatabaseClasses\tMSAccess.vb" />
+    <Compile Include="ClassesFactEngine\DatabaseManager\DatabaseClasses\tMongoDb.vb" />
     <Compile Include="ClassesFactEngine\DatabaseManager\DatabaseClasses\tSQLite.vb" />
     <Compile Include="ClassesFactEngine\DatabaseManager\Interfaces\iDatabaseConnection.vb" />
     <Compile Include="ClassesFactEngine\DatabaseManager\tDatabaseConnection.vb" />
