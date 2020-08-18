@@ -480,14 +480,9 @@
                             If Me.Nodes(liInd2).Alias Is Nothing Then 'And
                                 'Me.Nodes(liInd2).Alias IsNot Nothing Then
                                 Me.Nodes(liInd2).Alias = Me.createUniqueNodeAlias(Me.Nodes(liInd2), 1)  'was (liInd + 1).ToString
-                                If Me.Nodes(liInd2).QueryEdge IsNot Nothing Then
-                                    Me.Nodes(liInd2).QueryEdge.Alias = Me.Nodes(liInd2).Alias
-                                End If
-                                'ElseIf liInd2 > 0 And Me.Nodes(liInd2).Alias Is Nothing Then
-                                '    Me.Nodes(liInd2).Alias = liInd.ToString
-                                '    If Me.Nodes(liInd2).QueryEdge IsNot Nothing Then
-                                '        Me.Nodes(liInd2).QueryEdge.Alias = Me.Nodes(liInd2).Alias
-                                '    End If
+                                'If Me.Nodes(liInd2).QueryEdge IsNot Nothing Then
+                                '    Me.Nodes(liInd2).QueryEdge.Alias = Me.Nodes(liInd2).Alias
+                                'End If
                             End If
 
                         End If
