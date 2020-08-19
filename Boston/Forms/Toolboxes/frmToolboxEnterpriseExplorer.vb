@@ -3994,7 +3994,9 @@ Public Class frmToolboxEnterpriseExplorer
     End Sub
 
     Private Sub FactEngineToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles FactEngineToolStripMenuItem.Click
-        Call frmMain.LoadFactEngine()
+        With New WaitCursor
+            Call frmMain.LoadFactEngine()
+        End With
     End Sub
 
     Private Sub HideToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles HideToolStripMenuItem.Click
