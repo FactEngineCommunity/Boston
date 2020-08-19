@@ -2,6 +2,7 @@
 Imports System.Xml.Linq
 Imports System.IO
 Imports System.Reflection
+Imports System.Configuration
 
 Public Class frmCRUDModel
 
@@ -187,6 +188,18 @@ Public Class frmCRUDModel
 
                     Me.LabelOpenSuccessfull.ForeColor = Color.Green
                     Me.LabelOpenSuccessfull.Text = "Success"
+
+                    lrODBCConnection.Close()
+
+                Case Is = pcenumDatabaseType.MongoDb
+                    'Dim connectionString As String = ConfigurationManager.ConnectionStrings("mongosqld --mongo-uri 'mongodb: //university-shard-00-02.8dmfw.azure.mongodb.net:27017,university-shard-00-00.8dmfw.azure.mongodb.net:27017,university-shard-00-01.8dmfw.azure.mongodb.net:27017/?ssl=true&replicaSet=atlas-7kqhl6-shard-0&retryWrites=true&w=majority' --auth - u Viev -p Viev").ConnectionString
+                    Dim lrODBCConnection As New System.Data.Odbc.OdbcConnection(Me.TextBoxDatabaseConnectionString.Text)
+
+                    lrODBCConnection.Open()
+
+                    Me.LabelOpenSuccessfull.ForeColor = Color.Green
+                    Me.LabelOpenSuccessfull.Text = "Success"
+                    Me.LabelOpenSuccessfull.Visible = True
 
                     lrODBCConnection.Close()
 

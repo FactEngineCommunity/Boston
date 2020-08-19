@@ -38,6 +38,9 @@ Namespace FactEngine
             Select Case aiDatabaseType
                 Case Is = pcenumDatabaseType.SQLite
                     Me.Connection = New FactEngine.SQLiteConnection(Me.FBMModel, asDatabaseConnectionString)
+                Case Is = pcenumDatabaseType.MongoDb
+                    Me.Connection = New FactEngine.MongoDbConnection(Me.FBMModel, asDatabaseConnectionString)
+
             End Select
 
         End Sub
