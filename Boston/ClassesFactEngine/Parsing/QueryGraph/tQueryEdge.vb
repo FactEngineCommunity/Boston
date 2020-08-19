@@ -67,6 +67,7 @@ Namespace FactEngine
         Public Function getAndSetFBMFactType(ByRef arBaseNode As FactEngine.QueryNode,
                                         ByRef arTargetNode As FactEngine.QueryNode,
                                         ByVal asPredicate As String) As Exception
+
             Dim lsMessage As String = ""
             Try
                 If Me.WhichClauseSubType = pcenumWhichClauseType.IsPredicateNodePropertyIdentification Then
@@ -157,17 +158,40 @@ Namespace FactEngine
                                                                                                 lrFactTypeReading)
 
                     If Me.FBMFactType Is Nothing Then
-                        Dim larAltFactType = From FactType In Me.QueryGraph.Model.FactType
-                                             From FactTypeReading In FactType.FactTypeReading
-                                             From PredicatePart In FactTypeReading.PredicatePart
-                                             Where PredicatePart.Role.JoinedORMObject.Id = larModelObject(0).Id
-                                             Where PredicatePart.PredicatePartText = asPredicate
-                                             Select FactType
 
-                        If larAltFactType.Count > 1 Then
-                            Throw New Exception("There is more than one Fact Type Reading that is or starts, '" & arBaseNode.FBMModelObject.Id & " " & asPredicate & " " & arTargetNode.Name & "'")
+                        Dim larFactType As New List(Of FBM.FactType)
+
+                        If larModelObject.Count > 1 Then
+
+                            Dim larAltFactTypeReading = From FactType In Me.QueryGraph.Model.FactType
+                                                        From FactTypeReading In FactType.FactTypeReading
+                                                        Where FactTypeReading.PredicatePart.Count = 2
+                                                        Select FactTypeReading
+
+                            Dim larAltFactType = From FactTypeReading In larAltFactTypeReading
+                                                 Where FactTypeReading.PredicatePart(0).Role.JoinedORMObject Is larModelObject(0)
+                                                 Where FactTypeReading.PredicatePart(1).Role.JoinedORMObject Is larModelObject(1)
+                                                 Where FactTypeReading.PredicatePart(0).PredicatePartText = asPredicate
+                                                 Select FactTypeReading.FactType
+
+                            larFactType = larAltFactType.ToList
                         Else
-                            Me.FBMFactType = larAltFactType.First
+                            Dim larAltFactType = From FactType In Me.QueryGraph.Model.FactType
+                                                 From FactTypeReading In FactType.FactTypeReading
+                                                 From PredicatePart In FactTypeReading.PredicatePart
+                                                 Where PredicatePart.Role.JoinedORMObject.Id = larModelObject(0).Id
+                                                 Where PredicatePart.PredicatePartText = asPredicate
+                                                 Select FactType
+
+                            larFactType = larAltFactType.ToList
+                        End If
+
+                        If larFactType.Count > 1 Then
+                            lsMessage = "There is more than one Fact Type Reading that is or starts, '" & arBaseNode.FBMModelObject.Id & " " & asPredicate & " " & arTargetNode.Name & "'"
+                            lsMessage &= "or there is no such Fact Type Reading."
+                            Throw New Exception(lsMessage)
+                        Else
+                            Me.FBMFactType = larFactType.First
                         End If
                     End If
 

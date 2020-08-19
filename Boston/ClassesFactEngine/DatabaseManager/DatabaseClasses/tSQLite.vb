@@ -13,6 +13,15 @@ Namespace FactEngine
         Public Sub New(ByRef arFBMModel As FBM.Model, ByVal asDatabaseConnectionString As String)
             Me.FBMModel = arFBMModel
             Me.DatabaseConnectionString = asDatabaseConnectionString
+            Try
+                Dim lrSQLiteConnection = Database.CreateConnection(Me.DatabaseConnectionString)
+                Me.Connected = True 'Connections are actually made for each Query.
+                lrSQLiteConnection.Close()
+            Catch ex As Exception
+                Me.Connected = False
+                Throw New Exception("Could not connect to the database. Check the Model Configuration's Connection String.")
+            End Try
+
         End Sub
 
         Public Overrides Function GO(asQuery As String) As Recordset Implements iDatabaseConnection.GO
