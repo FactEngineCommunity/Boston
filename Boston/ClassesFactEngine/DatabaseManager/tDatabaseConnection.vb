@@ -1,5 +1,8 @@
 ﻿Namespace FactEngine
     Public Class DatabaseConnection
+
+        Public Connected As Boolean = False
+
         Public Overridable Function GO(ByVal asQuery As String) As ORMQL.Recordset
             Return New ORMQL.Recordset
         End Function

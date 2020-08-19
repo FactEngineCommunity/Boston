@@ -14,11 +14,22 @@ Namespace FactEngine
         Public ODBCConnection As System.Data.Odbc.OdbcConnection
 
         Public Sub New(ByRef arFBMModel As FBM.Model, ByVal asDatabaseConnectionString As String)
-            Me.FBMModel = arFBMModel
-            Me.DatabaseConnectionString = asDatabaseConnectionString
 
-            Me.ODBCConnection = New System.Data.Odbc.OdbcConnection(Me.DatabaseConnectionString)
-            Me.ODBCConnection.Open()
+            Try
+                Me.FBMModel = arFBMModel
+                Me.DatabaseConnectionString = asDatabaseConnectionString
+
+                Me.ODBCConnection = New System.Data.Odbc.OdbcConnection(Me.DatabaseConnectionString)
+                Try
+                    Me.ODBCConnection.Open()
+                    Me.Connected = True
+                Catch
+                    MsgBox("Failed To open the MongoDB database connection.")
+                End Try
+
+            Catch ex As Exception
+
+            End Try
 
         End Sub
 

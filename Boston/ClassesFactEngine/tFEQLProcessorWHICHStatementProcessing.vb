@@ -359,6 +359,10 @@
                 'Get the records
                 Dim lsSQLQuery = lrQueryGraph.generateSQL
 
+                If Me.DatabaseManager.Connection.Connected = False Then
+                    Throw New Exception("The database is not connected.")
+                End If
+
                 Dim lrTestRecordset = Me.DatabaseManager.GO(lsSQLQuery)
                 lrTestRecordset.Warning = lrQueryGraph.Warning
                 lrTestRecordset.QueryGraph = lrQueryGraph

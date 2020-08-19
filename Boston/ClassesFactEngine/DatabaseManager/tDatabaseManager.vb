@@ -7,7 +7,7 @@ Namespace FactEngine
 
         Public FBMModel As FBM.Model
 
-        Private Connection As FactEngine.DatabaseConnection = Nothing
+        Public Connection As FactEngine.DatabaseConnection = Nothing
 
         ''' <summary>
         ''' Parameterless New

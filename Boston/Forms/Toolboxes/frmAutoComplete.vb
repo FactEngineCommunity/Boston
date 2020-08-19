@@ -135,6 +135,10 @@ Public Class frmAutoComplete
                     Call Me.processKeyDown(publicConstantsAutoComplete.pcenumACActionType.WHICH)
                     e.Handled = True
                     Me.zoTextEditor.Focus()
+                Case Is = Keys.M
+                    Call Me.processKeyDown(publicConstantsAutoComplete.pcenumACActionType.MODELELEMENT)
+                    e.Handled = True
+                    Me.zoTextEditor.Focus()
             End Select
 
         Catch ex As Exception
@@ -170,6 +174,8 @@ Public Class frmAutoComplete
                             lsSelectedItem = Me.ListBox.SelectedItem.ToString
                         Case Is = publicConstantsAutoComplete.pcenumACActionType.A
                             lsSelectedItem = Me.ListBox.SelectedItem.ToString & " A " & Trim(Me.ListBox.SelectedItem.ItemData) & " "
+                        Case Is = publicConstantsAutoComplete.pcenumACActionType.ModelElement
+                            lsSelectedItem = Trim(Me.ListBox.SelectedItem.ItemData) & " "
                         Case Is = publicConstantsAutoComplete.pcenumACActionType.NodePropertyIdentification
                             lsSelectedItem = Me.ListBox.SelectedItem.ToString & " (" & Trim(Me.ListBox.SelectedItem.ItemData) & ":'"
                         Case Is = publicConstantsAutoComplete.pcenumACActionType.THAT

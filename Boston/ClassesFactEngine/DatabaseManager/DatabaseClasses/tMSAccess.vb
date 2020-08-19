@@ -41,7 +41,12 @@ Namespace FactEngine
             '------------------------------------------------
             'Open the (database) connection
             '------------------------------------------------
-            Me.DbConnection.Open(Me.DatabaseConnectionString)
+            Try
+                Me.DbConnection.Open(Me.DatabaseConnectionString)
+                Me.Connected = True
+            Catch
+                MsgBox("Failed To open the Microsoft Access database connection.")
+            End Try
 
         End Sub
 

@@ -1,5 +1,6 @@
 ﻿Namespace FactEngine
     Public Interface iDatabaseConnection
+
         Function GO(ByVal asQuery As String) As ORMQL.Recordset
 
     End Interface

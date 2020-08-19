@@ -283,7 +283,6 @@ Start 		 ->
                    ADDFACTSTMT
                   | ASSERTSTMT
 //                | CREATECONCEPTSTMT
-                  | CREATESTMT
 //                | CREATEMODELSTMT
 //                | CREATESTMT
                   | DELETESTMT | DELETEALLSTMT | DELETEFACTSTMT
