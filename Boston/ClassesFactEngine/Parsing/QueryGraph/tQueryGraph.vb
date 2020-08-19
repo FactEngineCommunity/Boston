@@ -152,8 +152,9 @@
                 Dim larConditionalQueryEdges As New List(Of FactEngine.QueryEdge)
                 larConditionalQueryEdges = Me.QueryEdges.FindAll(Function(x) x.IdentifierList.Count > 0)
 
-                Dim larWhereEdges = Me.QueryEdges.FindAll(Function(x) x.TargetNode.FBMModelObject.ConceptType <> pcenumConceptType.ValueType And
-                                                                          x.BaseNode.FBMModelObject.ConceptType <> pcenumConceptType.ValueType)
+                Dim larWhereEdges = Me.QueryEdges.FindAll(Function(x) (x.TargetNode.FBMModelObject.ConceptType <> pcenumConceptType.ValueType And
+                                                                          x.BaseNode.FBMModelObject.ConceptType <> pcenumConceptType.ValueType) Or
+                                                                          x.FBMFactType.isRDSTable)
 
                 If larWhereEdges.Count = 0 And larConditionalQueryEdges.Count = 0 Then
                     Return lsSQLQuery
@@ -201,10 +202,15 @@
                             lsSQLQuery &= lrOriginTable.Name & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrOriginTable.getColumnByOrdingalPosition(1).Name
                         Next
 
-                        For Each lrColumn In lrQueryEdge.BaseNode.RDSTable.getPrimaryKeyColumns
-                            lsSQLQuery &= vbCrLf & "AND " & lrQueryEdge.BaseNode.Name & Viev.NullVal(lrQueryEdge.TargetNode.Alias, "") & "." & lrColumn.Name & " = "
-                            lsSQLQuery &= lrOriginTable.Name & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrOriginTable.getColumnByOrdingalPosition(2).Name
-                        Next
+                        Select Case lrQueryEdge.TargetNode.FBMModelObject.ConceptType
+                            Case = pcenumConceptType.ValueType
+                                'Nothing to do here
+                            Case Else
+                                For Each lrColumn In lrQueryEdge.BaseNode.RDSTable.getPrimaryKeyColumns
+                                    lsSQLQuery &= vbCrLf & "AND " & lrQueryEdge.BaseNode.Name & Viev.NullVal(lrQueryEdge.TargetNode.Alias, "") & "." & lrColumn.Name & " = "
+                                    lsSQLQuery &= lrOriginTable.Name & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrOriginTable.getColumnByOrdingalPosition(2).Name
+                                Next
+                        End Select
 
                     Else
                         lrOriginTable = lrQueryEdge.BaseNode.FBMModelObject.getCorrespondingRDSTable
@@ -436,6 +442,9 @@
                             If lrColumn Is Nothing And lrQueryEdge.FBMFactType.IsLinkFactType Then
                                 lrColumn = lrQueryEdge.BaseNode.FBMModelObject.getCorrespondingRDSTable.Column.Find(Function(x) x.Role.FactType Is lrQueryEdge.FBMFactType.LinkFactTypeRole.FactType).Clone(Nothing, Nothing)
                                 lrColumn.TemporaryAlias = lrQueryEdge.Alias
+                            ElseIf lrColumn Is Nothing And lrQueryEdge.FBMFactType.IsBinaryFactType And lrQueryEdge.FBMFactType.HasTotalRoleConstraint Then
+                                lrColumn = lrQueryEdge.FBMFactType.getCorrespondingRDSTable.Column.Find(Function(x) x.ActiveRole Is lrQueryEdge.FBMFactType.RoleGroup(liRoleInd))
+                                lrColumn.TemporaryAlias = lrQueryEdge.TargetNode.Alias
                             Else
                                 lrColumn.TemporaryAlias = lrQueryEdge.BaseNode.Alias
                             End If

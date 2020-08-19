@@ -1,0 +1,89 @@
+﻿Imports Boston.ORMQL
+Imports System.Data.Odbc
+
+Namespace FactEngine
+
+    Public Class MongoDbConnection
+        Inherits FactEngine.DatabaseConnection
+        Implements FactEngine.iDatabaseConnection
+
+        Private FBMModel As FBM.Model
+
+        Public DatabaseConnectionString As String
+
+        Public ODBCConnection As System.Data.Odbc.OdbcConnection
+
+        Public Sub New(ByRef arFBMModel As FBM.Model, ByVal asDatabaseConnectionString As String)
+            Me.FBMModel = arFBMModel
+            Me.DatabaseConnectionString = asDatabaseConnectionString
+
+            Me.ODBCConnection = New System.Data.Odbc.OdbcConnection(Me.DatabaseConnectionString)
+            Me.ODBCConnection.Open()
+
+        End Sub
+
+        Public Overrides Function GO(asQuery As String) As Recordset Implements iDatabaseConnection.GO
+
+            Dim lrRecordset As New ORMQL.Recordset
+
+            Try
+                lrRecordset.Query = asQuery
+
+                '==========================================================
+                'Populate the lrRecordset with results from the database
+                'Richmond.WriteToStatusBar("Connecting to database.", True)
+
+                Dim adapter As OdbcDataAdapter = New OdbcDataAdapter(asQuery, Me.ODBCConnection)
+                Dim lrDataSet As New DataSet
+
+                adapter.Fill(lrDataSet)
+
+                Dim larFact As New List(Of FBM.Fact)
+                Dim lrFactType = New FBM.FactType(Me.FBMModel, "DummyFactType", True)
+                Dim lrFact As FBM.Fact
+
+                '=====================================================
+                'Column Names   
+                Dim lsColumnName As String
+
+                For Each lrColumn In lrDataSet.Tables(0).Columns
+                    Dim lrRole = New FBM.Role(lrFactType, lrColumn.ToString, True, Nothing)
+                    lrFactType.RoleGroup.AddUnique(lrRole)
+                    lrRecordset.Columns.Add(lrColumn.ToString)
+                Next
+
+                For Each lrRow As DataRow In lrDataSet.Tables(0).Rows
+
+                    lrFact = New FBM.Fact(lrFactType, False)
+                    Dim loFieldValue As Object = Nothing
+                    Dim liInd As Integer
+                    For liInd = 0 To lrRow.ItemArray.Count - 1
+                        loFieldValue = lrRow.Item(liInd).ToString
+
+                        Try
+                            lrFact.Data.Add(New FBM.FactData(lrFactType.RoleGroup(liInd), New FBM.Concept(loFieldValue), lrFact))
+                            '=====================================================
+                        Catch
+                            Throw New Exception("Tried to add a recordset Column that is not in the Project Columns. Column Index: " & liInd)
+                        End Try
+                    Next
+
+                    larFact.Add(lrFact)
+
+                Next
+
+                lrRecordset.Facts = larFact
+
+                'Run the SQL against the database
+                Return lrRecordset
+            Catch ex As Exception
+                lrRecordset.ErrorString = ex.Message
+                Return lrRecordset
+            End Try
+
+        End Function
+
+    End Class
+
+
+End Namespace
