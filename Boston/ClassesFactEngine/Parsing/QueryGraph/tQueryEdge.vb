@@ -190,6 +190,9 @@ Namespace FactEngine
                             lsMessage = "There is more than one Fact Type Reading that is or starts, '" & arBaseNode.FBMModelObject.Id & " " & asPredicate & " " & arTargetNode.Name & "'"
                             lsMessage &= "or there is no such Fact Type Reading."
                             Throw New Exception(lsMessage)
+                        ElseIf larFactType.Count = 0 Then
+                            lsMessage = "There is no Fact Type Reading in the Model, '" & arBaseNode.FBMModelObject.Id & " " & asPredicate & " " & arTargetNode.Name & "'"
+                            Throw New Exception(lsMessage)
                         Else
                             Me.FBMFactType = larFactType.First
                         End If
