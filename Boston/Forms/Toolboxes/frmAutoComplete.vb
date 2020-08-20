@@ -179,7 +179,11 @@ Public Class frmAutoComplete
                         Case Is = publicConstantsAutoComplete.pcenumACActionType.ModelElement
                             lsSelectedItem = Trim(Me.ListBox.SelectedItem.ItemData) & " "
                         Case Is = publicConstantsAutoComplete.pcenumACActionType.NodePropertyIdentification
-                            lsSelectedItem = Me.ListBox.SelectedItem.ToString & " (" & Trim(Me.ListBox.SelectedItem.ItemData) & ":'"
+                            If Me.ListBox.SelectedItem.ItemData.Contains("-") Then
+                                lsSelectedItem = Me.ListBox.SelectedItem.ToString & " " & Me.ListBox.SelectedItem.ItemData.ToString.Split("-").First & "-(" & Me.ListBox.SelectedItem.ItemData.ToString.Split("-").Last & ":'"
+                            Else
+                                lsSelectedItem = Me.ListBox.SelectedItem.ToString & " (" & Trim(Me.ListBox.SelectedItem.ItemData) & ":'"
+                            End If
                         Case Is = publicConstantsAutoComplete.pcenumACActionType.THAT
                             lsSelectedItem = " THAT " & Me.ListBox.SelectedItem.ToString & " A " & Trim(Me.ListBox.SelectedItem.ItemData)
                         Case Is = publicConstantsAutoComplete.pcenumACActionType.WHICH
