@@ -469,6 +469,9 @@ Namespace FEQL
                 Case TokenType.MATCHSELECTSETFACTTYPESTMT
                     Value = EvalMATCHSELECTSETFACTTYPESTMT(tree, paramlist)
                     Exit Select
+                Case TokenType.MATHCLAUSE
+                    Value = EvalMATHCLAUSE(tree, paramlist)
+                    Exit Select
                 Case TokenType.MATCHSELECTSTMT
                     Value = EvalMATCHSELECTSTMT(tree, paramlist)
                     Exit Select
@@ -859,6 +862,10 @@ Namespace FEQL
         End Function
 
         Protected Overridable Function EvalMATCHSELECTSETFACTTYPESTMT(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalMATHCLAUSE(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
             Throw New NotImplementedException()
         End Function
 
