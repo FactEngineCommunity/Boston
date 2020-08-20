@@ -1,0 +1,105 @@
+Fails
+WHICH Lecturer IS in A Timeslot
+
+Should fail because is not in the database yet
+WHICH Lecturer is in A School THAT is headed by WHICH Lecturer 
+
+-------------------------------------------
+WHICH Employee 1 reports to WHICH Employee 2 
+AND Employee 2 reports to THAT Employee 3
+
+WHICH Position is held by A Lecturer AND THAT Lecturer is involved in A TimetableBooking
+ THAT involves A Timeslot THAT involves (Semester:'1')
+ AND THAT Timeslot involves (PeriodNr:'1')
+ AND THAT Lecturer works for (Faculty:'IT')
+ AND THAT Lecturer occupies WHICH Room 
+
+WHICH Lecturer has first-(Name:'Steven')
+
+WHICH Building houses A Room THAT is involved in A TimetableBooking THAT involves A Lecturer THAT works for A Faculty THAT is involved in A TimetableStructure THAT has (PeriodLength:'1') 
+
+WHICH Lecturer is in A School THAT is in A Faculty THAT has A TimetableBooking WHICH involves THAT Lecturer
+WHICH Lecturer is in A School THAT is in A Faculty THAT has A TimetableBooking THAT involves WHICH Room
+
+WHICH Lecturer is in A School THAT is in A Faculty THAT has A TimetableBooking THAT involves THAT Lecturer 
+
+WHICH Lecturer occupies A Room AND THAT Room has WHICH SeatCount
+
+WHICH Lecturer occupies WHICH Room 
+AND holds WHICH Position 
+AND is in WHICH School WHICH is in (Faculty:'IT')        
+AND THAT Lecturer works for THAT Faculty
+
+WHICH Issue 1 depends on A Issue 2
+AND THAT Issue 2 depends on Issue 1 
+AND THAT Issue 1 has assigned WHICH Person 1
+AND THAT Issue 1 was authored by WHICH Person 2 
+
+FEQL
+====
+-------------------------------------------------------
+Same Query different ways.
+WHICH Faculty and (Semester:'1') AND and (WeekNr:'1') has WHICH StartDate
+
+WHICH StartDate is for A SemesterStructure AND THAT SemesterStructure involves (Faculty:'IT') AND THAT SemesterStructure involves (Semester:'1') AND THAT SemesterStructure involves (WeekNr:'1')
+-------------------------------------------------------
+
+WHICH Lecturer is in WHICH School THAT is in (Faculty:'IT') 
+AND works for THAT Faculty 
+
+Best
+WHICH Lecturer works for A Faculty 
+AND THAT Faculty has WHICH TimetableBooking 
+WHICH involves (Room:'A1')
+
+Better
+WHICH Position is held by A Lecturer AND THAT Lecturer is in A School AND THAT School is in A Faculty AND THAT Faculty has A TimetableBooking THAT involves (Room:'A1') 
+
+Better Still
+WHICH Lecturer occupies A Room WHICH is of (RoomStyle:'Study Room') 
+AND THAT Lecturer works for A Faculty AND THAT Faculty is involved in A TimetableStructure THAT is for (Semester:'1')
+AND THAT Faculty has WHICH FacultyName  
+
+Event Better
+WHICH CoreUnit involves (StudentStatus:'PT') AND involves A Semester THAT is involved in A Timeslot THAT is involved in A TimetableBooking THAT involves (Room:'A1') AND THAT Room has WHICH RoomName AND THAT TimetableBooking involves A Lecturer THAT has WHICH EmailAddress AND THAT CoreUnit involves A Unit THAT has WHICH UnitName 
+
+WHICH Lecturer occupies WHICH Room 
+AND holds WHICH Position
+AND is in WHICH School
+AND is in A School WHICH is in (Faculty:'IT') 
+AND THAT Lecturer works for THAT Faculty
+
+WHICH Lecturer works for A Faculty THAT is involved in A SemesterStructure THAT involves (Semester:'1') 
+
+WHICH Lecturer is in A School
+AND holds A Position 
+AND occupies (Room:'A1') 
+AND THAT School is in (Faculty:'IT')
+
+Test this
+WHICH Class involves WHICH ClassType 
+
+WHICH Lecturer is in WHICH School 
+AND THAT School is in (Faculty:'IT') 
+AND works for WHICH Faculty 
+
+SELECT Lecturer.Name,
+       Room.Number,
+       Position.Name,
+       School.Name
+FROM Lecturer,
+     Room,
+     Position,
+     School,
+     Faculty
+WHERE Lecturer.RoomId = Room.RoomId
+  AND Lecturer.PositionId = Position.Id
+  AND Lecturer.SchoolId = School.SchoolId
+  AND School.FacultyId = Faculty.FacultyId
+  AND Faculty.Name = 'IT'
+  AND Lecturer.FacultyId = Faculty.FacultyId
+
+Future
+=======
+
+WHICH Lecturer 1 has first-(Name:'Peter') AND WHICH Lecturer 2 has THAT first-(Name)
