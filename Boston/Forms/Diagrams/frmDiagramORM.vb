@@ -647,6 +647,25 @@ Public Class frmDiagramORM
         prApplication.ChangeWorkingEnvironment(lr_working_environment)
 
         Me.Cursor = Cursors.Default
+        If Me.zrSpecialDragMode.SpecialDragMode = pcenumSpecialDragMode.ORMSubtypeConnector Then
+            If Me.zrPage.SelectedObject.Count > 1 Then
+
+                If Me.zrPage.SelectedObject(0).ConceptType = pcenumConceptType.EntityType And
+                       Me.zrPage.SelectedObject.Last.ConceptType = pcenumConceptType.EntityType And
+                       System.Windows.Forms.Form.MouseButtons = Windows.Forms.MouseButtons.None Then
+
+                    Dim lrEntityType_1 As New FBM.EntityTypeInstance
+                    Dim lrEntityType_2 As New FBM.EntityTypeInstance
+
+                    lrEntityType_1 = Me.zrPage.SelectedObject(0)
+                    lrEntityType_2 = Me.zrPage.SelectedObject.Last
+
+                    Call Me.zrSpecialDragMode.ResetSpecialDragMode()
+                    Call lrEntityType_1.AddSubtypeConstraint(lrEntityType_2)
+
+                End If
+            End If
+        End If
         Me.zrSpecialDragMode.SpecialDragMode = pcenumSpecialDragMode.None
 
     End Sub
@@ -1391,7 +1410,7 @@ Public Class frmDiagramORM
                             Case Is = "Subtype Connector"
 
                                 e.Effect = DragDropEffects.Copy
-                                Me.LabelHelp.Text = "Hint: Release the left Mouse button first, then drag from the child Entity Type to the Parent Entity Type."
+                                Me.LabelHelp.Text = "Hint: Release the left Mouse button first, then drag from the child Entity Type to the Parent Entity Type. Release the mouse and left-click."
 
                                 Call Me.zrSpecialDragMode.SetSpecialDragMode(pcenumSpecialDragMode.ORMSubtypeConnector)
 
@@ -2754,18 +2773,23 @@ Public Class frmDiagramORM
             prApplication.WorkingPage = Me.zrPage
 
             If IsSomething(Diagram.GetNodeAt(lo_point)) Then
-                If Me.zrPage.SelectedObject.Count = 2 Then
-                    If Me.zrPage.SelectedObject(0).ConceptType = pcenumConceptType.EntityType And Me.zrPage.SelectedObject(1).ConceptType = pcenumConceptType.EntityType Then
-                        Dim lrEntityType_1 As New FBM.EntityTypeInstance
-                        Dim lrEntityType_2 As New FBM.EntityTypeInstance
+                '20200820-VM-Moved to DiagramView.Click, so that the user needs to click on the ModelElement they want to use in the subtype.
+                'If Me.zrPage.SelectedObject.Count = 2 Then
 
-                        lrEntityType_1 = Me.zrPage.SelectedObject(0)
-                        lrEntityType_2 = Me.zrPage.SelectedObject(1)
+                '    If Me.zrPage.SelectedObject(0).ConceptType = pcenumConceptType.EntityType And
+                '       Me.zrPage.SelectedObject(1).ConceptType = pcenumConceptType.EntityType And
+                '       System.Windows.Forms.Form.MouseButtons = Windows.Forms.MouseButtons.None Then
 
-                        Call lrEntityType_1.AddSubtypeConstraint(lrEntityType_2)
-                        Call Me.zrSpecialDragMode.ResetSpecialDragMode()
-                    End If
-                End If
+                '        Dim lrEntityType_1 As New FBM.EntityTypeInstance
+                '        Dim lrEntityType_2 As New FBM.EntityTypeInstance
+
+                '        lrEntityType_1 = Me.zrPage.SelectedObject(0)
+                '        lrEntityType_2 = Me.zrPage.SelectedObject(1)
+
+                '        Call lrEntityType_1.AddSubtypeConstraint(lrEntityType_2)
+                '        Call Me.zrSpecialDragMode.ResetSpecialDragMode()
+                '    End If
+                'End If
             Else
                 If System.Windows.Forms.Form.MouseButtons = Windows.Forms.MouseButtons.None Then
                     Me.zrSpecialDragMode.MouseUpCounter += 1
