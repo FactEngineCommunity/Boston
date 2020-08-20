@@ -1227,6 +1227,9 @@ Public Class frmDiagramPGS
                     Me.MorphVector(0).EndSize = New Rectangle(0, 0, 20, 10)
                 End If
 
+                'Start size
+                Me.MorphVector(0).StartSize = New Rectangle(0, 0, Me.MorphVector(0).Shape.Bounds.Width, Me.MorphVector(0).Shape.Bounds.Height)
+
                 '===========================================
                 Dim lrEntity As ERD.Entity
 
@@ -1238,11 +1241,11 @@ Public Class frmDiagramPGS
                                                               lrEntity.TableShape.Bounds.Width,
                                                               lrEntity.TableShape.Bounds.Height)
                     Me.MorphVector(0).EndPoint = New Point(lrEntity.TableShape.Bounds.X - lrPage.DiagramView.ScrollX, lrEntity.TableShape.Bounds.Y - lrPage.DiagramView.ScrollY)
-                    Me.MorphVector(0).VectorSteps = Viev.Greater(15, (Math.Abs(lrEntity.TableShape.Bounds.X - lrShapeNode.Bounds.X) + Math.Abs(lrEntity.TableShape.Bounds.Y - lrShapeNode.Bounds.Y) + 1)) / 3
+                    Me.MorphVector(0).VectorSteps = Viev.Lesser(25, (Math.Abs(lrEntity.TableShape.Bounds.X - lrShapeNode.Bounds.X) + Math.Abs(lrEntity.TableShape.Bounds.Y - lrShapeNode.Bounds.Y) + 1))
                 Else
                     Me.MorphVector(0).EndSize = New Rectangle(0, 0, 20, 10)
                     Me.MorphVector(0).EndPoint = New Point(lrFactDataInstance.X, lrFactDataInstance.Y)
-                    Me.MorphVector(0).VectorSteps = Viev.Greater(15, (Math.Abs(lrFactDataInstance.X - lrShapeNode.Bounds.X) + Math.Abs(lrFactDataInstance.Y - lrShapeNode.Bounds.Y) + 1)) / 3
+                    Me.MorphVector(0).VectorSteps = Viev.Lesser(25, (Math.Abs(lrFactDataInstance.X - lrShapeNode.Bounds.X) + Math.Abs(lrFactDataInstance.Y - lrShapeNode.Bounds.Y) + 1))
                 End If
                 '===========================================
                 Me.MorphVector(0).Shape.Font = Me.zrPage.Diagram.Font
@@ -1381,7 +1384,7 @@ Public Class frmDiagramPGS
                     Else
                         Me.MorphVector(0).EndSize = New Rectangle(0, 0, 20, 10)
                     End If
-                    Me.MorphVector(0).VectorSteps = Viev.Greater(15, (Math.Abs(lrFactTypeInstance.X - lrNode.X) + Math.Abs(lrFactTypeInstance.Y - lrNode.Y) + 1)) / 2
+                    Me.MorphVector(0).VectorSteps = Viev.Lesser(25, (Math.Abs(lrFactTypeInstance.X - lrNode.X) + Math.Abs(lrFactTypeInstance.Y - lrNode.Y) + 1))
 
                 ElseIf IsSomething(lrEntityTypeInstance) Then
                     Me.MorphVector(0).EndPoint = New Point(lrEntityTypeInstance.X, lrEntityTypeInstance.Y)
@@ -1394,7 +1397,7 @@ Public Class frmDiagramPGS
                         Me.MorphVector(0).EndSize = New Rectangle(0, 0, 20, 10)
                     End If
 
-                    Me.MorphVector(0).VectorSteps = Viev.Greater(15, (Math.Abs(lrEntityTypeInstance.X - lrNode.X) + Math.Abs(lrEntityTypeInstance.Y - lrNode.Y) + 1)) / 2
+                    Me.MorphVector(0).VectorSteps = Viev.Lesser(25, (Math.Abs(lrEntityTypeInstance.X - lrNode.X) + Math.Abs(lrEntityTypeInstance.Y - lrNode.Y) + 1))
                 End If
 
             End If
@@ -1438,10 +1441,21 @@ Public Class frmDiagramPGS
             lrPageObject = Me.zrPage.SelectedObject(0).ClonePageObject
 
             Dim lrShapeNode As ShapeNode
+
             lrShapeNode = lrPageObject.Shape.Clone(True)
             lrShapeNode = New ShapeNode(lrPageObject.Shape)
 
+            '=================================================            
+            lrShapeNode.Shape = Shapes.Ellipse
+            lrShapeNode.HandlesStyle = HandlesStyle.InvisibleMove
+            'lrShapeNode.SetRect(lrPageObject.Shape.Bounds, False)
+            lrShapeNode.Font = New System.Drawing.Font("Arial", 10) 'lrShapeNode.Font = Me.zrPage.Diagram.Font
+            lrShapeNode.TextFormat.Alignment = StringAlignment.Center
             lrShapeNode.Text = lrPageObject.Name
+            lrShapeNode.TextFormat = New StringFormat(StringFormatFlags.NoFontFallback)
+            lrShapeNode.TextFormat.Alignment = StringAlignment.Center
+            lrShapeNode.TextFormat.LineAlignment = StringAlignment.Center
+            '=================================================            
 
             Me.MorphVector(0).ModelElementId = Me.zrPage.SelectedObject(0).Id
             Me.MorphVector(0).Shape = lrShapeNode
@@ -1487,6 +1501,9 @@ Public Class frmDiagramPGS
                     Me.MorphVector(0).EndSize = New Rectangle(0, 0, 20, 10)
                 End If
 
+                'Start size
+                Me.MorphVector(0).StartSize = New Rectangle(0, 0, Me.MorphVector(0).Shape.Bounds.Width, Me.MorphVector(0).Shape.Bounds.Height)
+
                 '===========================================
                 Dim lrNode As PGS.Node
 
@@ -1497,7 +1514,8 @@ Public Class frmDiagramPGS
                                                               lrNode.Y,
                                                               lrNode.shape.Bounds.Width,
                                                               lrNode.shape.Bounds.Height)
-                    Me.MorphVector(0).EndPoint = New Point(lrNode.shape.Bounds.X, lrNode.shape.Bounds.Y) ' (lrFactDataInstance.x, lrFactDataInstance.y)
+                    Me.MorphVector(0).EndPoint = New Point(lrNode.Shape.Bounds.X, lrNode.Shape.Bounds.Y) ' (lrFactDataInstance.x, lrFactDataInstance.y)
+                    Me.MorphVector(0).VectorSteps = Viev.Greater(25, (Math.Abs(lrNode.Shape.Bounds.X - lrNode.X) + Math.Abs(lrNode.Shape.Bounds.Y - lrNode.Y) + 1))
                 Else
                     Me.MorphVector(0).EndSize = New Rectangle(0, 0, 20, 20)
                     Me.MorphVector(0).EndPoint = New Point(lrFactDataInstance.X, lrFactDataInstance.Y)
@@ -2926,107 +2944,119 @@ Public Class frmDiagramPGS
         Dim lrPageList As New List(Of FBM.Page)
         Dim lrRelation As New ERD.Relation
 
-        If Me.zrPage.SelectedObject.Count = 0 Then
-            Exit Sub
-        End If
-
-        lrRelation = Me.zrPage.SelectedObject(0)
-
-        '---------------------------------------------------------------------------------------------
-        'Set the initial MorphVector for the selected EntityType. Morphing the EntityType to another 
-        '  shape, and to/into another diagram starts at the MorphVector.
-        '---------------------------------------------------------------------------------------------
-        Me.MorphVector.Clear()
-        Me.MorphVector.Add(New tMorphVector(lrRelation.Link.Link.Bounds.X, lrRelation.Link.Link.Bounds.Y, 0, 0, 40))
-
-        '====================================================
-        '--------------------------------------------------------------
-        'Clear the list of ORMDiagrams that may relate to the EntityType
-        '--------------------------------------------------------------
-        Me.ORMDiagramToolStripMenuItem1.DropDownItems.Clear()
-        Me.ToolStripMenuItemERDDiagram1.DropDownItems.Clear()
-        Me.PGSDiagramToolStripMenuItem1.DropDownItems.Clear()
-
-        Dim loMenuOption As ToolStripItem
-        Dim lrEnterpriseView As tEnterpriseEnterpriseView
-
-        '--------------------------------------------------------------------------------------------------------
-        'Get the ORM Diagrams for the selected Node.
-        If lrRelation.IsPGSRelationNode Then
-            lrPageList = prApplication.CMML.getORMDiagramPagesForModelElementName(lrRelation.Model, lrRelation.ActualPGSNode.Id)
-        Else
-            lrPageList = prApplication.CMML.getORMDiagramPagesForModelElementName(lrRelation.Model, lrRelation.RelationFactType.Id)
-        End If
-
-        For Each lrPage In lrPageList
-            '---------------------------------------------------------------------------------------------------------
-            'Try and find the Page within the EnterpriseView.TreeView
-            '  NB If 'Core' Pages are not shown for the model, they will not be in the TreeView and so a menuOption
-            '  is not added for those hidden Pages.
-            '----------------------------------------------------------
-            lrEnterpriseView = prPageNodes.Find(Function(x) x.PageId = lrPage.PageId)
-
-            If IsSomething(lrEnterpriseView) Then
-                '---------------------------------------------------
-                'Add the Page(Name) to the MenuOption.DropDownItems
-                '---------------------------------------------------
-                loMenuOption = Me.ORMDiagramToolStripMenuItem1.DropDownItems.Add(lrPage.Name, My.Resources.MenuImages.ORM16x16)
-                loMenuOption.Tag = prPageNodes.Find(AddressOf lrEnterpriseView.Equals)
-                AddHandler loMenuOption.Click, AddressOf Me.morphToORMDiagram
+        Try
+            If Me.zrPage.SelectedObject.Count = 0 Then
+                Exit Sub
             End If
-        Next
 
-        '--------------------------------------------------------------------------------------------------------
-        'Get the ER Diagrams for the selected Node.
-        If lrRelation.IsPGSRelationNode Then
-            lrPageList = prApplication.CMML.getERDiagramPagesForModelElementName(lrRelation.Model, lrRelation.ActualPGSNode.Id)
-        Else
-            lrPageList = prApplication.CMML.getERDiagramPagesForModelElementName(lrRelation.Model, lrRelation.RelationFactType.Id)
-        End If
+            lrRelation = Me.zrPage.SelectedObject(0)
 
-        For Each lrPage In lrPageList
-            '---------------------------------------------------------------------------------------------------------
-            'Try and find the Page within the EnterpriseView.TreeView
-            '  NB If 'Core' Pages are not shown for the model, they will not be in the TreeView and so a menuOption
-            '  is not added for those hidden Pages.
-            '----------------------------------------------------------
-            lrEnterpriseView = prPageNodes.Find(Function(x) x.PageId = lrPage.PageId)
+            '---------------------------------------------------------------------------------------------
+            'Set the initial MorphVector for the selected EntityType. Morphing the EntityType to another 
+            '  shape, and to/into another diagram starts at the MorphVector.
+            '---------------------------------------------------------------------------------------------
+            Me.MorphVector.Clear()
+            Me.MorphVector.Add(New tMorphVector(lrRelation.Link.Link.Bounds.X, lrRelation.Link.Link.Bounds.Y, 0, 0, 40))
 
-            If IsSomething(lrEnterpriseView) Then
-                '---------------------------------------------------
-                'Add the Page(Name) to the MenuOption.DropDownItems
-                '---------------------------------------------------
-                loMenuOption = Me.ToolStripMenuItemERDDiagram1.DropDownItems.Add(lrPage.Name, My.Resources.MenuImages.ERD16x16)
-                loMenuOption.Tag = prPageNodes.Find(AddressOf lrEnterpriseView.Equals)
-                AddHandler loMenuOption.Click, AddressOf Me.morphToERDiagram
+            '====================================================
+            '--------------------------------------------------------------
+            'Clear the list of ORMDiagrams that may relate to the EntityType
+            '--------------------------------------------------------------
+            Me.ORMDiagramToolStripMenuItem1.DropDownItems.Clear()
+            Me.ToolStripMenuItemERDDiagram1.DropDownItems.Clear()
+            Me.PGSDiagramToolStripMenuItem1.DropDownItems.Clear()
+
+            Dim loMenuOption As ToolStripItem
+            Dim lrEnterpriseView As tEnterpriseEnterpriseView
+
+            '--------------------------------------------------------------------------------------------------------
+            'Get the ORM Diagrams for the selected Node.
+            If lrRelation.IsPGSRelationNode Then
+                lrPageList = prApplication.CMML.getORMDiagramPagesForModelElementName(lrRelation.Model, lrRelation.ActualPGSNode.Id)
+            Else
+                lrPageList = prApplication.CMML.getORMDiagramPagesForModelElementName(lrRelation.Model, lrRelation.RelationFactType.Id)
             End If
-        Next
 
-        '--------------------------------------------------------------------------------------------------------
-        'Get the PGS Diagrams for the selected Node.
-        If lrRelation.IsPGSRelationNode Then
-            lrPageList = prApplication.CMML.getPGSDiagramPagesForModelElementName(lrRelation.Model, lrRelation.ActualPGSNode.Id)
-        Else
-            lrPageList = prApplication.CMML.getPGSDiagramPagesForModelElementName(lrRelation.Model, lrRelation.RelationFactType.Id)
-        End If
+            For Each lrPage In lrPageList
+                '---------------------------------------------------------------------------------------------------------
+                'Try and find the Page within the EnterpriseView.TreeView
+                '  NB If 'Core' Pages are not shown for the model, they will not be in the TreeView and so a menuOption
+                '  is not added for those hidden Pages.
+                '----------------------------------------------------------
+                lrEnterpriseView = prPageNodes.Find(Function(x) x.PageId = lrPage.PageId)
 
-        For Each lrPage In lrPageList
-            '---------------------------------------------------------------------------------------------------------
-            'Try and find the Page within the EnterpriseView.TreeView
-            '  NB If 'Core' Pages are not shown for the model, they will not be in the TreeView and so a menuOption
-            '  is not added for those hidden Pages.
-            '----------------------------------------------------------
-            lrEnterpriseView = prPageNodes.Find(Function(x) x.PageId = lrPage.PageId)
+                If IsSomething(lrEnterpriseView) Then
+                    '---------------------------------------------------
+                    'Add the Page(Name) to the MenuOption.DropDownItems
+                    '---------------------------------------------------
+                    loMenuOption = Me.ORMDiagramToolStripMenuItem1.DropDownItems.Add(lrPage.Name, My.Resources.MenuImages.ORM16x16)
+                    loMenuOption.Tag = prPageNodes.Find(AddressOf lrEnterpriseView.Equals)
+                    AddHandler loMenuOption.Click, AddressOf Me.morphToORMDiagram
+                End If
+            Next
 
-            If IsSomething(lrEnterpriseView) Then
-                '---------------------------------------------------
-                'Add the Page(Name) to the MenuOption.DropDownItems
-                '---------------------------------------------------
-                loMenuOption = Me.PGSDiagramToolStripMenuItem1.DropDownItems.Add(lrPage.Name, My.Resources.MenuImages.PGS16x16)
-                loMenuOption.Tag = prPageNodes.Find(AddressOf lrEnterpriseView.Equals)
-                AddHandler loMenuOption.Click, AddressOf Me.morphToPGSDiagram
+            '--------------------------------------------------------------------------------------------------------
+            'Get the ER Diagrams for the selected Node.
+            If lrRelation.IsPGSRelationNode Then
+                lrPageList = prApplication.CMML.getERDiagramPagesForModelElementName(lrRelation.Model, lrRelation.ActualPGSNode.Id)
+            Else
+                lrPageList = prApplication.CMML.getERDiagramPagesForModelElementName(lrRelation.Model, lrRelation.RelationFactType.Id)
             End If
-        Next
+
+            For Each lrPage In lrPageList
+                '---------------------------------------------------------------------------------------------------------
+                'Try and find the Page within the EnterpriseView.TreeView
+                '  NB If 'Core' Pages are not shown for the model, they will not be in the TreeView and so a menuOption
+                '  is not added for those hidden Pages.
+                '----------------------------------------------------------
+                lrEnterpriseView = prPageNodes.Find(Function(x) x.PageId = lrPage.PageId)
+
+                If IsSomething(lrEnterpriseView) Then
+                    '---------------------------------------------------
+                    'Add the Page(Name) to the MenuOption.DropDownItems
+                    '---------------------------------------------------
+                    loMenuOption = Me.ToolStripMenuItemERDDiagram1.DropDownItems.Add(lrPage.Name, My.Resources.MenuImages.ERD16x16)
+                    loMenuOption.Tag = prPageNodes.Find(AddressOf lrEnterpriseView.Equals)
+                    AddHandler loMenuOption.Click, AddressOf Me.morphToERDiagram
+                End If
+            Next
+
+            '--------------------------------------------------------------------------------------------------------
+            'Get the PGS Diagrams for the selected Node.
+            If lrRelation.IsPGSRelationNode Then
+                lrPageList = prApplication.CMML.getPGSDiagramPagesForModelElementName(lrRelation.Model, lrRelation.ActualPGSNode.Id)
+            Else
+                lrPageList = prApplication.CMML.getPGSDiagramPagesForModelElementName(lrRelation.Model, lrRelation.RelationFactType.Id)
+            End If
+
+            For Each lrPage In lrPageList
+                '---------------------------------------------------------------------------------------------------------
+                'Try and find the Page within the EnterpriseView.TreeView
+                '  NB If 'Core' Pages are not shown for the model, they will not be in the TreeView and so a menuOption
+                '  is not added for those hidden Pages.
+                '----------------------------------------------------------
+                lrEnterpriseView = prPageNodes.Find(Function(x) x.PageId = lrPage.PageId)
+
+                If IsSomething(lrEnterpriseView) Then
+                    '---------------------------------------------------
+                    'Add the Page(Name) to the MenuOption.DropDownItems
+                    '---------------------------------------------------
+                    loMenuOption = Me.PGSDiagramToolStripMenuItem1.DropDownItems.Add(lrPage.Name, My.Resources.MenuImages.PGS16x16)
+                    loMenuOption.Tag = prPageNodes.Find(AddressOf lrEnterpriseView.Equals)
+                    AddHandler loMenuOption.Click, AddressOf Me.morphToPGSDiagram
+                End If
+            Next
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            Me.Cursor = Cursors.Default
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 

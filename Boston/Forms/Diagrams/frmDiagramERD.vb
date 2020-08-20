@@ -1268,7 +1268,7 @@ Public Class frmDiagramERD
                                                                   lrFactTypeInstance.Shape.Bounds.Height)
                     Else
                         Me.MorphVector(0).EndSize = New Rectangle(0, 0, 20, 10)
-                        Me.MorphVector(0).VectorSteps = Viev.Greater(15, (Math.Abs(lrFactTypeInstance.X - lrShapeNode.Bounds.X) + Math.Abs(lrFactTypeInstance.Y - lrShapeNode.Bounds.Y) + 1)) / 2
+                        Me.MorphVector(0).VectorSteps = Viev.Lesser(25, (Math.Abs(lrFactTypeInstance.X - lrShapeNode.Bounds.X) + Math.Abs(lrFactTypeInstance.Y - lrShapeNode.Bounds.Y) + 1))
                     End If
                 ElseIf IsSomething(lrEntityTypeInstance) Then
                     Me.MorphVector(0).EndPoint = New Point(lrEntityTypeInstance.X, lrEntityTypeInstance.Y)
@@ -1280,7 +1280,7 @@ Public Class frmDiagramERD
                     Else
                         Me.MorphVector(0).EndSize = New Rectangle(0, 0, 20, 10)
                     End If
-                    Me.MorphVector(0).VectorSteps = Viev.Greater(15, (Math.Abs(lrEntityTypeInstance.X - lrShapeNode.Bounds.X) + Math.Abs(lrEntityTypeInstance.Y - lrShapeNode.Bounds.Y) + 1)) / 2
+                    Me.MorphVector(0).VectorSteps = Viev.Lesser(25, (Math.Abs(lrEntityTypeInstance.X - lrShapeNode.Bounds.X) + Math.Abs(lrEntityTypeInstance.Y - lrShapeNode.Bounds.Y) + 1))
                 End If
 
             End If
@@ -1324,6 +1324,7 @@ Public Class frmDiagramERD
             lrShapeNode = lrPageObject.Shape.Clone(True)
             lrShapeNode = New ShapeNode(lrPageObject.Shape)
             lrShapeNode.Shape = Shapes.RoundRect
+            lrShapeNode.SetRect(Me.zrPage.SelectedObject(0).TableShape.Bounds, False)
 
             lrShapeNode.Text = lrPageObject.Name
 

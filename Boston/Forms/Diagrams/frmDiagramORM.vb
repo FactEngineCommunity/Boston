@@ -7128,6 +7128,8 @@ Public Class frmDiagramORM
                 Me.MorphVector(0).EndSize = New Rectangle(0, 0, Me.MorphVector(0).Shape.Bounds.Width, Me.MorphVector(0).Shape.Bounds.Height)
             End If
 
+            Me.MorphVector(0).VectorSteps = Viev.Lesser(25, (Math.Abs(lrEntityTypeInstance.X - lrShapeNode.Bounds.X) + Math.Abs(lrEntityTypeInstance.Y - lrShapeNode.Bounds.Y) + 1))
+
             Me.MorphVector(0).ModelElementId = Me.zrPage.SelectedObject(0).Id
             Me.MorphVector(0).InitialZoomFactor = Me.DiagramView.ZoomFactor
             Me.MorphVector(0).Shape.Image = My.Resources.ORMShapes.Blank
@@ -7279,6 +7281,9 @@ Public Class frmDiagramORM
                     Me.MorphVector(0).EndSize = New Rectangle(0, 0, 20, 10)
                 End If
 
+                'Start size
+                Me.MorphVector(0).StartSize = New Rectangle(0, 0, Me.MorphVector(0).Shape.Bounds.Width, Me.MorphVector(0).Shape.Bounds.Height)
+
                 '===========================================
                 Dim lrEntity As ERD.Entity
                 lrEntity = lrPage.ERDiagram.Entity.Find(Function(x) x.Name = lrPageObject.Name)
@@ -7289,11 +7294,11 @@ Public Class frmDiagramORM
                                                               lrEntity.TableShape.Bounds.Width,
                                                               lrEntity.TableShape.Bounds.Height)
                     Me.MorphVector(0).EndPoint = New Point(lrEntity.TableShape.Bounds.X, lrEntity.TableShape.Bounds.Y) ' (lrFactDataInstance.x, lrFactDataInstance.y)
-                    Me.MorphVector(0).VectorSteps = Viev.Greater(15, (Math.Abs(lrEntity.X - lrShapeNode.Bounds.X) + Math.Abs(lrEntity.Y - lrShapeNode.Bounds.Y) + 1)) / 2
+                    Me.MorphVector(0).VectorSteps = Viev.Lesser(25, (Math.Abs(lrEntity.X - lrShapeNode.Bounds.X) + Math.Abs(lrEntity.Y - lrShapeNode.Bounds.Y) + 1))
                 Else
                     Me.MorphVector(0).EndSize = New Rectangle(0, 0, 20, 10)
                     Me.MorphVector(0).EndPoint = New Point(lrFactDataInstance.X, lrFactDataInstance.Y)
-                    Me.MorphVector(0).VectorSteps = Viev.Greater(15, (Math.Abs(lrFactDataInstance.X - lrShapeNode.Bounds.X) + Math.Abs(lrFactDataInstance.Y - lrShapeNode.Bounds.Y) + 1)) / 2
+                    Me.MorphVector(0).VectorSteps = Viev.Lesser(25, (Math.Abs(lrFactDataInstance.X - lrShapeNode.Bounds.X) + Math.Abs(lrFactDataInstance.Y - lrShapeNode.Bounds.Y) + 1))
                 End If
 
                 '===========================================
@@ -7472,14 +7477,14 @@ Public Class frmDiagramORM
 
                         Me.MorphVector(0).EndSize = New Rectangle(lrPGSLink.Link.Bounds.X, lrPGSLink.Link.Bounds.Y, lrPGSLink.Link.Bounds.Width, Viev.Greater(1, lrPGSLink.Link.Bounds.Height))
                         Me.MorphVector(0).EndPoint = New Point(lrRelation.Link.Link.Bounds.X, lrRelation.Link.Link.bounds.Y)
-                        Me.MorphVector(0).VectorSteps = Viev.Greater(15, (Math.Abs(lrRelation.Link.Link.Bounds.X - lrShapeNode.Bounds.X) + Math.Abs(lrRelation.Link.Link.Bounds.Y - lrShapeNode.Bounds.Y) + 1)) / 3
+                        Me.MorphVector(0).VectorSteps = Viev.Lesser(25, (Math.Abs(lrRelation.Link.Link.Bounds.X - lrShapeNode.Bounds.X) + Math.Abs(lrRelation.Link.Link.Bounds.Y - lrShapeNode.Bounds.Y) + 1))
                     Else
                         Me.MorphVector(0).EndSize = New Rectangle(lrNode.X,
                                                                   lrNode.Y,
                                                                   lrNode.shape.Bounds.Width,
                                                                   lrNode.shape.Bounds.Height)
                         Me.MorphVector(0).EndPoint = New Point(lrNode.Shape.Bounds.X, lrNode.Shape.Bounds.Y) ' (lrFactDataInstance.x, lrFactDataInstance.y)
-                        Me.MorphVector(0).VectorSteps = Viev.Greater(15, (Math.Abs(lrNode.Shape.Bounds.X - lrShapeNode.Bounds.X) + Math.Abs(lrNode.Shape.Bounds.Y - lrShapeNode.Bounds.Y) + 1)) / 3
+                        Me.MorphVector(0).VectorSteps = Viev.Lesser(25, (Math.Abs(lrNode.Shape.Bounds.X - lrShapeNode.Bounds.X) + Math.Abs(lrNode.Shape.Bounds.Y - lrShapeNode.Bounds.Y) + 1))
                     End If
                 Else
                     Me.MorphVector(0).EndSize = New Rectangle(0, 0, 20, 20)

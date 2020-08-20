@@ -152,6 +152,8 @@ Namespace ERD
 
             lrPageObject.Name = Me.Name
             lrPageObject.Shape = New ShapeNode()
+            lrPageObject.X = Me.X
+            lrPageObject.Y = Me.Y
 
             Return lrPageObject
 
