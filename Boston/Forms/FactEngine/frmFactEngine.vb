@@ -905,9 +905,14 @@ Public Class frmFactEngine
                                 If lrModelElement IsNot Nothing Then
                                     Dim larFactTypeReading = lrModelElement.getOutgoingFactTypeReadings(2)
 
-                                    For Each lrFactTypeReading In larFactTypeReading
+                                    If Me.zsIntellisenseBuffer.Length > 0 Then
+                                        larFactTypeReading = larFactTypeReading.FindAll(Function(x) x.PredicatePart(0).PredicatePartText.StartsWith(Me.zsIntellisenseBuffer))
+                                    End If
+
+                                    For Each lrFactTypeReading In larFactTypeReading.OrderBy(Function(x) x.GetPredicateText)
                                         If lrFactTypeReading.PredicatePart.Count > 1 Then
-                                            Call Me.AddEnterpriseAwareItem(lrFactTypeReading.GetPredicateText, FEQL.TokenType.PREDICATE, , lrFactTypeReading.PredicatePart(1).Role.JoinedORMObject.Id)
+                                            Dim lsPreboundReadingText = lrFactTypeReading.PredicatePart(1).PreBoundText
+                                            Call Me.AddEnterpriseAwareItem(lrFactTypeReading.GetPredicateText, FEQL.TokenType.PREDICATE, , lsPreboundReadingText & lrFactTypeReading.PredicatePart(1).Role.JoinedORMObject.Id)
                                         Else
                                             Call Me.AddEnterpriseAwareItem(lrFactTypeReading.GetPredicateText, FEQL.TokenType.PREDICATE)
                                         End If
@@ -966,8 +971,15 @@ Public Class frmFactEngine
 
                                 If lrPredicateModelObject IsNot Nothing Then
 
+                                    Dim larFactTypeReading = lrPredicateModelObject.getOutgoingFactTypeReadings(2)
 
-                                    For Each lrFactTypeReading In lrPredicateModelObject.getOutgoingFactTypeReadings(2)
+                                    If Me.zsIntellisenseBuffer.Length > 0 Then
+                                        larFactTypeReading = larFactTypeReading.FindAll(Function(x) x.PredicatePart(0).PredicatePartText.StartsWith(Me.zsIntellisenseBuffer))
+                                    End If
+
+                                    For Each lrFactTypeReading In larFactTypeReading.OrderBy(Function(x) x.GetPredicateText)
+
+                                        'For Each lrFactTypeReading In lrPredicateModelObject.getOutgoingFactTypeReadings(2)
                                         If lrFactTypeReading.PredicatePart.Count > 1 Then
                                             Call Me.AddEnterpriseAwareItem(lrFactTypeReading.GetPredicateText, FEQL.TokenType.PREDICATE, , lrFactTypeReading.PredicatePart(1).Role.JoinedORMObject.Id)
                                         Else
@@ -1005,6 +1017,7 @@ Public Class frmFactEngine
                 End If
 
                 Select Case liTokenType
+                    Case Is = FEQL.TokenType.EOF
                     Case Is = FEQL.TokenType.MODELELEMENTSUFFIX
                     Case Is = FEQL.TokenType.BROPEN
                         Me.AutoComplete.Enabled = True

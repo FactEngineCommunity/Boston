@@ -159,52 +159,60 @@ Public Class frmCRUDModel
     Private Sub ButtonTestConnection_Click(sender As Object, e As EventArgs) Handles ButtonTestConnection.Click
 
         Try
-            Select Case Me.ComboBoxDatabaseType.SelectedItem.Tag
-                Case Is = pcenumDatabaseType.SQLite
-                    Dim lsReturnMessage As String = Nothing
-                    If Not Me.checkDatabaseConnectionString(lsReturnMessage) Then
-                        MsgBox(lsReturnMessage)
-                        Exit Sub
-                    End If
+            With New WaitCursor
+                Select Case Me.ComboBoxDatabaseType.SelectedItem.Tag
+                    Case Is = pcenumDatabaseType.SQLite
+                        Dim lsReturnMessage As String = Nothing
+                        If Not Me.checkDatabaseConnectionString(lsReturnMessage) Then
+                            MsgBox(lsReturnMessage)
+                            Exit Sub
+                        End If
 
 
-                    Me.LabelOpenSuccessfull.Visible = True
-                    If Database.SQLiteDatabase.CreateConnection(Me.TextBoxDatabaseConnectionString.Text) Is Nothing Then
-                        Me.LabelOpenSuccessfull.ForeColor = Color.Red
-                        Me.LabelOpenSuccessfull.Text = "Fail"
-                    Else
+                        Me.LabelOpenSuccessfull.Visible = True
+                        If Database.SQLiteDatabase.CreateConnection(Me.TextBoxDatabaseConnectionString.Text) Is Nothing Then
+                            Me.LabelOpenSuccessfull.ForeColor = Color.Red
+                            Me.LabelOpenSuccessfull.Text = "Fail"
+                        Else
+                            Me.LabelOpenSuccessfull.ForeColor = Color.Green
+                            Me.LabelOpenSuccessfull.Text = "Success"
+                        End If
+
+                    Case Is = pcenumDatabaseType.MSJet, pcenumDatabaseType.SQLServer
+
+                        Dim lrODBCConnection As New System.Data.Odbc.OdbcConnection(Me.TextBoxDatabaseConnectionString.Text)
+
+                        Me.LabelOpenSuccessfull.Text = "Testing Connection"
+                        Me.LabelOpenSuccessfull.Visible = True
+
+                        lrODBCConnection.Open()
+
                         Me.LabelOpenSuccessfull.ForeColor = Color.Green
                         Me.LabelOpenSuccessfull.Text = "Success"
-                    End If
 
-                Case Is = pcenumDatabaseType.MSJet, pcenumDatabaseType.SQLServer
+                        lrODBCConnection.Close()
 
-                    Dim lrODBCConnection As New System.Data.Odbc.OdbcConnection(Me.TextBoxDatabaseConnectionString.Text)
+                    Case Is = pcenumDatabaseType.MongoDB
+                        'Dim connectionString As String = ConfigurationManager.ConnectionStrings("mongosqld --mongo-uri 'mongodb: //university-shard-00-02.8dmfw.azure.mongodb.net:27017,university-shard-00-00.8dmfw.azure.mongodb.net:27017,university-shard-00-01.8dmfw.azure.mongodb.net:27017/?ssl=true&replicaSet=atlas-7kqhl6-shard-0&retryWrites=true&w=majority' --auth - u Viev -p Viev").ConnectionString
+                        Dim lrODBCConnection As New System.Data.Odbc.OdbcConnection(Me.TextBoxDatabaseConnectionString.Text)
 
-                    Me.LabelOpenSuccessfull.Text = "Testing Connection"
-                    Me.LabelOpenSuccessfull.Visible = True
+                        lrODBCConnection.Open()
 
-                    lrODBCConnection.Open()
+                        Me.LabelOpenSuccessfull.ForeColor = Color.Green
+                        Me.LabelOpenSuccessfull.Text = "Success"
+                        Me.LabelOpenSuccessfull.Visible = True
 
-                    Me.LabelOpenSuccessfull.ForeColor = Color.Green
-                    Me.LabelOpenSuccessfull.Text = "Success"
+                        lrODBCConnection.Close()
 
-                    lrODBCConnection.Close()
+                    Case Else
 
-                Case Is = pcenumDatabaseType.MongoDb
-                    'Dim connectionString As String = ConfigurationManager.ConnectionStrings("mongosqld --mongo-uri 'mongodb: //university-shard-00-02.8dmfw.azure.mongodb.net:27017,university-shard-00-00.8dmfw.azure.mongodb.net:27017,university-shard-00-01.8dmfw.azure.mongodb.net:27017/?ssl=true&replicaSet=atlas-7kqhl6-shard-0&retryWrites=true&w=majority' --auth - u Viev -p Viev").ConnectionString
-                    Dim lrODBCConnection As New System.Data.Odbc.OdbcConnection(Me.TextBoxDatabaseConnectionString.Text)
+                        Me.LabelOpenSuccessfull.ForeColor = Color.Red
+                        Me.LabelOpenSuccessfull.Text = "Unknown database type, '" & prApplication.WorkingModel.TargetDatabaseType.ToString & "'."
+                        Me.LabelOpenSuccessfull.Visible = True
 
-                    lrODBCConnection.Open()
 
-                    Me.LabelOpenSuccessfull.ForeColor = Color.Green
-                    Me.LabelOpenSuccessfull.Text = "Success"
-                    Me.LabelOpenSuccessfull.Visible = True
-
-                    lrODBCConnection.Close()
-
-            End Select
-
+                End Select
+            End With
         Catch ex As Exception
 
             Me.LabelOpenSuccessfull.ForeColor = Color.Red
