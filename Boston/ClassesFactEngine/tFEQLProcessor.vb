@@ -277,6 +277,26 @@ Namespace FEQL
             End Set
         End Property
 
+        Private _PREBOUNDREADINGTEXT As String = Nothing
+        Public Property PREBOUNDREADINGTEXT As String
+            Get
+                Return Me._PREBOUNDREADINGTEXT
+            End Get
+            Set(value As String)
+                Me._PREBOUNDREADINGTEXT = value
+            End Set
+        End Property
+
+        Private _POSTBOUNDREADINGTEXT As String = Nothing
+        Public Property POSTBOUNDREADINGTEXT As String
+            Get
+                Return Me._POSTBOUNDREADINGTEXT
+            End Get
+            Set(value As String)
+                Me._POSTBOUNDREADINGTEXT = value
+            End Set
+        End Property
+
         Private _IDENTIFIER As New List(Of String)
         Public Property IDENTIFIER As List(Of String)
             Get

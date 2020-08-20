@@ -1013,7 +1013,8 @@ Public Class frmFactEngine
                         Me.AutoComplete.Enabled = True
                         Call Me.AddEnterpriseAwareItem(")", liTokenType, True)
                     Case Is = FEQL.TokenType.PREBOUNDREADINGTEXT, FEQL.TokenType.POSTBOUNDREADINGTEXT
-                    'Nothing at this stage
+                        'Nothing at this stage for the actual reading texts
+                        Call Me.PopulateEnterpriseAwareWithObjectTypes()
                     Case Is = FEQL.TokenType._NONE_
                         Me.AutoComplete.Visible = Me.CheckIfCanDisplayEnterpriseAwareBox
                     Case Is = FEQL.TokenType.KEYWDNULL
@@ -1211,6 +1212,8 @@ Public Class frmFactEngine
                     'Nothing to do here.
                 Case Is = FEQL.TokenType.PREBOUNDREADINGTEXT, FEQL.TokenType.POSTBOUNDREADINGTEXT
                     'Nothing at this stage
+                Case Is = FEQL.TokenType.NUMBER, FEQL.TokenType.MATHFUNCTION
+                    'Nothing to do here.
                 Case Is = FEQL.TokenType.BROPEN
                     Call Me.AddEnterpriseAwareItem("(", liTokenType)
                 Case Is = FEQL.TokenType.PREDICATE
@@ -1308,6 +1311,7 @@ Public Class frmFactEngine
                 Me.AutoComplete.Visible = True
                 Me.TextBoxInput.Focus()
             End If
+            Me.AutoComplete.Owner = Me
             Call Me.populateHelpLabel()
         End If
         'Me.AutoComplete.ListBox.Focus()

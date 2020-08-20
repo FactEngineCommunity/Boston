@@ -7,6 +7,8 @@ Namespace FactEngine
 
         Public QueryGraph As FactEngine.QueryGraph = Nothing
 
+        Public WhichClause As FEQL.WHICHCLAUSE
+
         Public BaseNode As FactEngine.QueryNode = Nothing
         Public TargetNode As FactEngine.QueryNode = Nothing
         Public Predicate As String = ""
@@ -46,8 +48,10 @@ Namespace FactEngine
         Public Sub New()
         End Sub
 
-        Public Sub New(ByRef arQueryGraph As FactEngine.QueryGraph)
+        Public Sub New(ByRef arQueryGraph As FactEngine.QueryGraph,
+                       ByVal arWhichClause As FEQL.WHICHCLAUSE)
             Me.QueryGraph = arQueryGraph
+            Me.WhichClause = arWhichClause
         End Sub
 
         ''' <summary>
@@ -93,9 +97,46 @@ Namespace FactEngine
                             '========================================================
 
                             If Me.FBMFactType Is Nothing Then
-                                Me.FBMFactType = Me.BaseNode.FBMModelObject
-                                'Else
-                                '    Throw New Exception("There is not Fact Type, '" & arBaseNode.FBMModelObject.Id & " " & asPredicate & " " & arTargetNode.FBMModelObject.Id & "', in the Model.")
+                                'Thinks its an RDS Table query like "WHICH Lecturer likes WHICH Lecturer"
+                                Dim lrRDSFactType As FBM.FactType
+                                Select Case Me.BaseNode.FBMModelObject.ConceptType
+                                    Case Is = pcenumConceptType.FactType
+                                        lrRDSFactType = CType(Me.BaseNode.FBMModelObject, FBM.FactType)
+                                    Case Else
+                                        Throw New Exception("There is not Fact Type, '" & arBaseNode.FBMModelObject.Id & " " & asPredicate & " " & arTargetNode.FBMModelObject.Id & "', in the Model.")
+                                End Select
+
+                                'Still thinks it is a RDS Table
+                                Dim liCount = (From FactTypeReading In lrRDSFactType.FactTypeReading
+                                               Where FactTypeReading.PredicatePart(0).PredicatePartText = asPredicate
+                                               Where FactTypeReading.PredicatePart(0).Role.JoinedORMObject Is larModelObject(0)
+                                               Where FactTypeReading.PredicatePart(1).Role.JoinedORMObject Is larModelObject(1)
+                                               Select FactTypeReading).Count
+
+                                If liCount = 0 Then
+                                    lsMessage = "There is no Fact Type, '" & arBaseNode.FBMModelObject.Id & " " & asPredicate & " " & arTargetNode.FBMModelObject.Id & "', in the Model."
+
+                                    Dim larLinkFactTypeReading = From LinkFactType In lrRDSFactType.getLinkFactTypes
+                                                                 From FactTypeReading In LinkFactType.FactTypeReading
+                                                                 Where FactTypeReading.PredicatePart(0).Role.JoinedORMObject Is larModelObject(0)
+                                                                 Where FactTypeReading.PredicatePart(1).Role.JoinedORMObject Is larModelObject(1)
+                                                                 Select FactTypeReading
+
+                                    If larLinkFactTypeReading.Count > 0 Then
+                                        lsMessage &= vbCrLf & vbCrLf
+                                        lsMessage &= "Did you mean to create a Which Select Clause based on the following predicate reading:" & vbCrLf
+
+                                        For Each lrFactTypeReading In larLinkFactTypeReading.ToList
+                                            lsMessage &= vbCrLf & vbTab & lrFactTypeReading.GetReadingTextCQL
+                                        Next
+
+                                    End If
+
+                                    Throw New Exception(lsMessage)
+                                Else
+                                    'Is an RDS Table type query
+                                    Me.FBMFactType = Me.BaseNode.FBMModelObject
+                                End If
                             End If
                         Case Else
                             Dim larModelObject As New List(Of FBM.ModelObject)
@@ -117,7 +158,7 @@ Namespace FactEngine
                             For Each lrFactTypeReading In larFactTypeReading
                                 If lrFactTypeReading.PredicatePart(0).Role.JoinedORMObject.Id = larRole(0).JoinedORMObject.Id And
                                    lrFactTypeReading.PredicatePart(1).Role.JoinedORMObject.Id = larRole(1).JoinedORMObject.Id And
-                                   lrFactTypeReading.PredicatePart(0).PredicatePartText = asPredicate Then
+                                   lrFactTypeReading.PredicatePart(1).PreBoundText = Viev.NullVal(arTargetNode.PreboundText, "") Then
                                     larFinalFactTypeReading.Add(lrFactTypeReading)
                                 End If
                             Next

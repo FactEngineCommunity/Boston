@@ -19,6 +19,8 @@ Public Class frmAutoComplete
 
     Private Sub frmAutoComplete_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
 
+        Me.FormBorderStyle = FormBorderStyle.None
+        Me.ShowInTaskbar = False
         Call Me.roundCorners(Me)
         Me.Opacity = 1
 
@@ -259,7 +261,8 @@ Public Class frmAutoComplete
 
     Private Sub roundCorners(obj As Form)
 
-        obj.FormBorderStyle = FormBorderStyle.None
+        'obj.FormBorderStyle = FormBorderStyle.None
+
         obj.BackColor = Color.GhostWhite
 
         Dim DGP As New Drawing2D.GraphicsPath

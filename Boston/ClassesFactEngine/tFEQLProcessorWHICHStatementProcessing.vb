@@ -32,7 +32,7 @@
 
                     '==============================
                     'Create the QueryEdge
-                    Dim lrQueryEdge As New FactEngine.QueryEdge(lrQueryGraph)
+                    Dim lrQueryEdge As New FactEngine.QueryEdge(lrQueryGraph, Me.WHICHCLAUSE)
 
                     '---------------------------------------------------------
                     'Get the Predicate. Every which clause has a Predicate.
@@ -276,7 +276,7 @@
 
                     '==============================
                     'Create the QueryEdge
-                    Dim lrQueryEdge As New FactEngine.QueryEdge(lrQueryGraph)
+                    Dim lrQueryEdge As New FactEngine.QueryEdge(lrQueryGraph, Me.WHICHCLAUSE)
 
                     '---------------------------------------------------------
                     'Get the Predicate. Every which clause has a Predicate.
@@ -321,7 +321,7 @@
                         Case Is = FactEngine.pcenumWhichClauseType.AndThatModelElementPredicateWhichModelElement '7. E.g. AND THAT Faculty has FacultyName
                             Call Me.analyseANDTHATWHICHClause(Me.WHICHCLAUSE, lrQueryGraph, lrQueryEdge, lrPreviousTargetNode)
 
-                        Case Is = FactEngine.pcenumWhichClauseType.AndThatModelElementPredicateModelElement '     8.
+                        Case Is = FactEngine.pcenumWhichClauseType.AndThatModelElementPredicateModelElement '     8. E.g. AND THAT Employee 2 reports to Employee 3. NB Can be ambiguous because could be AND THAT Employee 2 reports to THAT Employee 3
                             Call Me.analyseANDTHATClause(Me.WHICHCLAUSE, lrQueryGraph, lrQueryEdge)
 
                         Case Is = FactEngine.pcenumWhichClauseType.AndWhichPredicateNodePropertyIdentification  ' 9. E.g. AND WHICH is in (Faculty:IT')
@@ -355,6 +355,8 @@
 
                 'Richmond.WriteToStatusBar("Generating SQL", True)
 
+                Call lrQueryGraph.checkNodeAliases
+
                 '==========================================================================
                 'Get the records
                 Dim lsSQLQuery = lrQueryGraph.generateSQL
@@ -367,59 +369,6 @@
                 lrTestRecordset.Warning = lrQueryGraph.Warning
                 lrTestRecordset.QueryGraph = lrQueryGraph
 
-                'lrRecordset.Query = lsSQLQuery
-
-                ''==========================================================
-                ''Populate the lrRecordset with results from the database
-                ''Richmond.WriteToStatusBar("Connecting to database.", True)
-                'Dim lrSQLiteConnection = Database.CreateConnection(Me.Model.TargetDatabaseConnectionString)
-                'Dim lrSQLiteDataReader = Database.getReaderForSQL(lrSQLiteConnection, lsSQLQuery)
-
-                'Dim larFact As New List(Of FBM.Fact)
-                'Dim lrFactType = New FBM.FactType(Me.Model, "DummyFactType", True)
-                'Dim lrFact As FBM.Fact
-                ''Richmond.WriteToStatusBar("Reading results.", True)
-
-                ''=====================================================
-                ''Column Names        
-                'Dim larProjectColumn = lrQueryGraph.getProjectionColumns
-                'Dim lsColumnName As String
-
-                'For Each lrProjectColumn In larProjectColumn
-                '    lrRecordset.Columns.Add(lrProjectColumn.Name)
-                '    lsColumnName = lrFactType.CreateUniqueRoleName(lrProjectColumn.Name, 0)
-                '    Dim lrRole = New FBM.Role(lrFactType, lsColumnName, True, Nothing)
-                '    lrFactType.RoleGroup.AddUnique(lrRole)
-                'Next
-
-                'While lrSQLiteDataReader.Read()
-
-                '    lrFact = New FBM.Fact(lrFactType, False)
-                '    Dim loFieldValue As Object = Nothing
-                '    Dim liInd As Integer
-                '    For liInd = 0 To lrSQLiteDataReader.FieldCount - 1
-                '        Select Case lrSQLiteDataReader.GetFieldType(liInd)
-                '            Case Is = GetType(String)
-                '                loFieldValue = lrSQLiteDataReader.GetString(liInd)
-                '            Case Else
-                '                loFieldValue = lrSQLiteDataReader.GetValue(liInd)
-                '        End Select
-
-                '        Try
-                '            lrFact.Data.Add(New FBM.FactData(lrFactType.RoleGroup(liInd), New FBM.Concept(loFieldValue), lrFact))
-                '            '=====================================================
-                '        Catch
-                '            Throw New Exception("Tried to add a recordset Column that is not in the Project Columns. Column Index: " & liInd)
-                '        End Try
-                '    Next
-
-                '    larFact.Add(lrFact)
-
-                'End While
-                'lrRecordset.Facts = larFact
-                'lrSQLiteConnection.Close()
-
-                'Run the SQL against the database
                 Return lrTestRecordset
 
             Catch ex As Exception
@@ -462,6 +411,8 @@
             lrFBMModelObject = Me.Model.GetModelObjectByName(Me.NODEPROPERTYIDENTIFICATION.MODELELEMENTNAME)
             If lrFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & Me.NODEPROPERTYIDENTIFICATION.MODELELEMENTNAME & "'.")
             arQueryEdge.TargetNode = New FactEngine.QueryNode(lrFBMModelObject)
+            arQueryEdge.TargetNode.PreboundText = Me.NODEPROPERTYIDENTIFICATION.PREBOUNDREADINGTEXT
+            arQueryEdge.TargetNode.PostboundText = Me.NODEPROPERTYIDENTIFICATION.POSTBOUNDREADINGTEXT
             arQueryEdge.TargetNode.Alias = Me.MODELELEMENTCLAUSE.MODELELEMENTSUFFIX
 
             If lrFBMModelObject.ConceptType = pcenumConceptType.ValueType Then
@@ -479,8 +430,8 @@
             '-----------------------------------------
             'Get the relevant FBM.FactType
             Call arQueryEdge.getAndSetFBMFactType(arQueryEdge.BaseNode,
-                                                                  arQueryEdge.TargetNode,
-                                                                  arQueryEdge.Predicate)
+                                                  arQueryEdge.TargetNode,
+                                                  arQueryEdge.Predicate)
 
 
         End Sub
@@ -565,14 +516,21 @@
             arQueryEdge.WhichClauseType = FactEngine.Constants.pcenumWhichClauseType.AndThatModelElementPredicateThatModelElement
 
             'Set the BaseNode
+            Me.MODELELEMENTCLAUSE = New FEQL.MODELELEMENTClause
+            Call Me.GetParseTreeTokensReflection(Me.MODELELEMENTCLAUSE, Me.WHICHCLAUSE.MODELELEMENT(0))
+
             Dim lrBaseFBMModelObject = Me.Model.GetModelObjectByName(Me.WHICHCLAUSE.MODELELEMENTNAME(0))
             If lrBaseFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & Me.WHICHCLAUSE.MODELELEMENTNAME(0) & "'.")
             arQueryEdge.BaseNode = New FactEngine.QueryNode(lrBaseFBMModelObject)
+            arQueryEdge.BaseNode.Alias = Me.MODELELEMENTCLAUSE.MODELELEMENTSUFFIX
 
             'Get the TargetNode                        
+            Me.MODELELEMENTCLAUSE = New FEQL.MODELELEMENTClause
+            Call Me.GetParseTreeTokensReflection(Me.MODELELEMENTCLAUSE, Me.WHICHCLAUSE.MODELELEMENT(1))
             Dim lrTargetFBMModelObject = Me.Model.GetModelObjectByName(Me.WHICHCLAUSE.MODELELEMENTNAME(1))
             If lrTargetFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & Me.WHICHCLAUSE.MODELELEMENTNAME(1) & "'.")
             arQueryEdge.TargetNode = New FactEngine.QueryNode(lrTargetFBMModelObject)
+            arQueryEdge.TargetNode.Alias = Me.MODELELEMENTCLAUSE.MODELELEMENTSUFFIX
             arQueryGraph.Nodes.AddUnique(arQueryEdge.TargetNode)
 
             ''---------------------------------------------------------
@@ -909,6 +867,10 @@
             End If
 
             arQueryEdge.TargetNode = New FactEngine.QueryNode(lrFBMModelObject)
+            If aoNODEPROPERTYIDENTIFICATION IsNot Nothing Then
+                arQueryEdge.TargetNode.PreboundText = Me.NODEPROPERTYIDENTIFICATION.PREBOUNDREADINGTEXT
+                arQueryEdge.TargetNode.PostboundText = Me.NODEPROPERTYIDENTIFICATION.POSTBOUNDREADINGTEXT
+            End If
 
             If lrFBMModelObject.ConceptType = pcenumConceptType.ValueType Then
                 arQueryEdge.WhichClauseSubType = FactEngine.Constants.pcenumWhichClauseType.IsPredicateNodePropertyIdentification
@@ -1172,7 +1134,8 @@
 
                 '4
             ElseIf Me.WHICHCLAUSE.KEYWDAND IsNot Nothing And
-                   Me.WHICHCLAUSE.KEYWDTHAT.Count = 2 Then
+                   Me.WHICHCLAUSE.KEYWDTHAT.Count = 2 And '> 0 And '20200820-VM-Was  = 2
+                   Me.WHICHCLAUSE.KEYWDWHICH Is Nothing Then
 
                 'E.g. "AND THAT Lecturer works for THAT Faculty"
                 Return FactEngine.Constants.pcenumWhichClauseType.AndThatModelElementPredicateThatModelElement
@@ -1216,10 +1179,18 @@
 
                 '9
             ElseIf Me.WHICHCLAUSE.KEYWDAND IsNot Nothing And
-                   Me.WHICHCLAUSE.MODELELEMENTNAME IsNot Nothing Then
+                   Me.WHICHCLAUSE.MODELELEMENTNAME IsNot Nothing And
+                   Me.WHICHCLAUSE.NODEPROPERTYIDENTIFICATION IsNot Nothing Then
 
                 'E.g. "AND is in A School"                
                 Return FactEngine.Constants.pcenumWhichClauseType.AndWhichPredicateNodePropertyIdentification
+
+                '9
+            ElseIf Me.WHICHCLAUSE.KEYWDAND IsNot Nothing And
+                   Me.WHICHCLAUSE.MODELELEMENTNAME IsNot Nothing Then
+
+                'E.g. "AND is in A School"                
+                Return FactEngine.Constants.pcenumWhichClauseType.AndThatModelElementPredicateThatModelElement
 
             End If
         End Function

@@ -501,6 +501,49 @@
 
         End Sub
 
+        Public Sub checkNodeAliases()
+
+            Dim larBaseNodes As New List(Of FactEngine.QueryNode)
+            Dim larQueryNode As New List(Of FactEngine.QueryNode)
+
+            Dim larBaseNode = From QueryEdge In Me.QueryEdges
+                              Select QueryEdge.BaseNode
+
+            larBaseNodes.AddRange(larBaseNode.ToList)
+
+            Dim larWhichTargetNodes = From QueryEdge In Me.QueryEdges
+                                      Where QueryEdge.WhichClause.KEYWDWHICH IsNot Nothing
+                                      Select QueryEdge.TargetNode
+
+            larBaseNodes.AddRange(larWhichTargetNodes.ToList)
+
+            Dim larPropertyNodeTargets = From QueryEdge In Me.QueryEdges
+                                         Where QueryEdge.WhichClause.NODEPROPERTYIDENTIFICATION IsNot Nothing
+                                         Select QueryEdge.TargetNode
+
+            larBaseNodes.AddRange(larPropertyNodeTargets)
+
+            For Each lrQueryEdge In Me.QueryEdges.FindAll(Function(x) Not larBaseNodes.Contains(x.TargetNode))
+
+                Select Case lrQueryEdge.WhichClauseType
+                    Case Is = FactEngine.pcenumWhichClauseType.AndThatModelElementPredicateThatModelElement,
+                              FactEngine.pcenumWhichClauseType.AndThatPredicateThatModelElement
+
+                        Throw New Exception("Model Element, '" & lrQueryEdge.TargetNode.Name & " " & lrQueryEdge.TargetNode.Alias & "', is not referenced in the query.")
+                    Case Is = FactEngine.pcenumWhichClauseType.AndThatModelElementPredicateModelElement
+                        If lrQueryEdge.WhichClause.KEYWDTHAT.Count = 2 Then
+                            Throw New Exception("Model Element, '" & lrQueryEdge.TargetNode.Name & " " & lrQueryEdge.TargetNode.Alias & "', is not referenced in the query.")
+                        ElseIf lrQueryEdge.WhichClause.KEYWDTHAT.Count = 1 Then
+                            If lrQueryEdge.TargetNode.FBMModelObject.ConceptType <> pcenumConceptType.ValueType And
+                                lrQueryEdge.WhichClause.NODEPROPERTYIDENTIFICATION Is Nothing Then
+                                Throw New Exception("Model Element, '" & lrQueryEdge.TargetNode.Name & " " & lrQueryEdge.TargetNode.Alias & "', is not referenced in the query.")
+                            End If
+                        End If
+                End Select
+            Next
+
+        End Sub
+
         Private Function createUniqueNodeAlias(ByVal arNode As FactEngine.QueryNode, aiAlias As Integer) As String
 
             Dim lrTrialNode = Me.Nodes.Find(Function(x) x.Name = arNode.Name And x.Alias = aiAlias.ToString)
