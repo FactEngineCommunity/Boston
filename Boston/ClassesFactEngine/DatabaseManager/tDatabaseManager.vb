@@ -1,4 +1,5 @@
 ﻿Imports Boston.ORMQL
+Imports System.Reflection
 
 Namespace FactEngine
     Public Class DatabaseManager
@@ -33,17 +34,32 @@ Namespace FactEngine
 
         End Function
 
-        Public Sub establishConnection(ByVal aiDatabaseType As pcenumDatabaseType, ByVal asDatabaseConnectionString As String)
+        Public Function establishConnection(ByVal aiDatabaseType As pcenumDatabaseType, ByVal asDatabaseConnectionString As String) As FactEngine.DatabaseConnection
 
-            Select Case aiDatabaseType
-                Case Is = pcenumDatabaseType.SQLite
-                    Me.Connection = New FactEngine.SQLiteConnection(Me.FBMModel, asDatabaseConnectionString)
-                Case Is = pcenumDatabaseType.MongoDb
-                    Me.Connection = New FactEngine.MongoDbConnection(Me.FBMModel, asDatabaseConnectionString)
+            Try
 
-            End Select
+                Select Case aiDatabaseType
+                    Case Is = pcenumDatabaseType.SQLite
+                        Me.Connection = New FactEngine.SQLiteConnection(Me.FBMModel, asDatabaseConnectionString)
+                    Case Is = pcenumDatabaseType.MongoDB
+                        Me.Connection = New FactEngine.MongoDbConnection(Me.FBMModel, asDatabaseConnectionString)
+                End Select
 
-        End Sub
+                Return Me.Connection
+
+            Catch ex As exception
+
+                Dim lsMessage1 As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return Nothing
+            End Try
+
+        End Function
 
     End Class
 

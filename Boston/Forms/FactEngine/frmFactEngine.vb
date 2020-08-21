@@ -598,13 +598,42 @@ Public Class frmFactEngine
 
 
     Private Sub Application_WorkingModelChanged() Handles Application.WorkingModelChanged
-        Call Me.displayModelName()
-        Me.FEQLProcessor = New FEQL.Processor(prApplication.WorkingModel)
 
-        Select Case prApplication.WorkingModel.TargetDatabaseType
-            Case Is = pcenumDatabaseType.SQLite
-                Call Me.FEQLProcessor.DatabaseManager.establishConnection(pcenumDatabaseType.SQLite, prApplication.WorkingModel.TargetDatabaseConnectionString)
-        End Select
+        Try
+            Call Me.displayModelName()
+
+            Me.FEQLProcessor = New FEQL.Processor(prApplication.WorkingModel)
+
+            If prApplication.WorkingModel.TargetDatabaseConnectionString = "" Then
+                Me.LabelError.ForeColor = Color.Orange
+                Me.LabelError.Text = "The Model needs a database connection string."
+                Exit Sub
+            End If
+
+            Try
+                If prApplication.WorkingModel.DatabaseConnection Is Nothing Then
+
+                    prApplication.WorkingModel.DatabaseConnection = Me.FEQLProcessor.DatabaseManager.establishConnection(prApplication.WorkingModel.TargetDatabaseType,
+                                                                                                                     prApplication.WorkingModel.TargetDatabaseConnectionString)
+                ElseIf Not prApplication.WorkingModel.DatabaseConnection.Connected Then
+
+                    prApplication.WorkingModel.DatabaseConnection = Me.FEQLProcessor.DatabaseManager.establishConnection(prApplication.WorkingModel.TargetDatabaseType,
+                                                                                                                     prApplication.WorkingModel.TargetDatabaseConnectionString)
+                End If
+
+            Catch ex As Exception
+                Me.LabelError.ForeColor = Color.Orange
+                Me.LabelError.Text = ex.Message
+            End Try
+
+        Catch ex As Exception
+                Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 

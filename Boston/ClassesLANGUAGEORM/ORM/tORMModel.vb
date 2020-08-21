@@ -228,8 +228,13 @@ Namespace FBM
 
         <XmlIgnore()>
         Public TargetDatabaseType As pcenumDatabaseType = pcenumDatabaseType.None 'e.g. MSAccess, ORACLE, SQL Server, MySQL etc.
-        <XmlIgnore()> _
+        <XmlIgnore()>
         Public TargetDatabaseConnectionString As String = "" 'The ConnectionString used to connect to the Target Database.
+
+        <XmlIgnore()>
+        <NonSerialized()>
+        Public DatabaseConnection As FactEngine.DatabaseConnection = Nothing
+
 
         '------------------------------------------------------
         'The Parser and ParseTree are built into the Model
