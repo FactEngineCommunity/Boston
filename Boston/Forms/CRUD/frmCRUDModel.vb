@@ -24,9 +24,8 @@ Public Class frmCRUDModel
 
         Me.TextBoxDatabaseConnectionString.Text = Me.zrModel.TargetDatabaseConnectionString
 
-        If Not Me.zrModel.IsEmpty Then
-            Me.Button1.Enabled = False
-            Me.Button2.Enabled = False
+        If Me.zrModel.IsEmpty Then
+            Me.Button1.Enabled = True
         End If
 
     End Sub
@@ -234,6 +233,7 @@ Public Class frmCRUDModel
 
             Me.LabelOpenSuccessfull.Text = "Success"
             Me.LabelOpenSuccessfull.Visible = True
+            Me.Invalidate()
 
             'Dim lrODBCTable As System.Data.DataTable
             'lrODBCTable = lrODBCConnection.GetSchema("Restrictions")
@@ -248,6 +248,7 @@ Public Class frmCRUDModel
             Me.ErrorProvider.SetError(Me.ComboBoxSchema, "Select a Schema from which to import Tables.")
 
             Me.Button1.Enabled = False
+            Me.Button2.Enabled = True
 
         Catch ex As Exception
 
@@ -400,8 +401,11 @@ Public Class frmCRUDModel
 
             lrODBCTable = lrODBCConnection.GetSchema("Columns", New String() {Nothing, Me.ComboBoxSchema.SelectedItem, Nothing, Nothing})
 
+            Dim lsTableName As String
+
             For Each lrRow As DataRow In lrODBCTable.Rows
-                lrTable = Me.zrModel.RDS.Table.Find(Function(x) x.Name = Trim(lrRow(lrODBCTable.Columns("TABLE_NAME"))))
+                lsTableName = Trim(lrRow(lrODBCTable.Columns("TABLE_NAME")))
+                lrTable = Me.zrModel.RDS.Table.Find(Function(x) x.Name = lsTableName)
                 If lrTable IsNot Nothing Then
                     lrColumn = New RDS.Column(lrTable, lrRow(lrODBCTable.Columns("COLUMN_NAME")), Nothing, Nothing)
 
@@ -427,6 +431,9 @@ Public Class frmCRUDModel
                     lrColumn.SSDataType = NullVal(lrRow(lrODBCTable.Columns("SQL_DATA_TYPE")), 0)
 
                     lrTable.Column.Add(lrColumn)
+                Else
+                    lrTable = New RDS.Table(Me.zrModel.RDS, lsTableName, Nothing)
+                    Me.zrModel.RDS.addTable(lrTable)
                 End If
             Next
 
@@ -459,8 +466,8 @@ Public Class frmCRUDModel
 
                 For Each lrRow As DataRow In lrODBCTable.Rows
 
-                    If Not lasSchemaName.Contains(lrRow(lrODBCTable.Columns("TABLE_SCHEM"))) Then
-                        lasSchemaName.Add(lrRow(lrODBCTable.Columns("TABLE_SCHEM")))
+                    If Not lasSchemaName.Contains(lrRow.ItemArray(2).ToString) Then '(lrODBCTable.Columns("TABLE_SCHEM"))) Then
+                        lasSchemaName.Add(lrRow.ItemArray(2).ToString) '(lrODBCTable.Columns("TABLE_SCHEM")))
                     End If
                 Next
 
@@ -493,7 +500,7 @@ Public Class frmCRUDModel
             Dim lrPage As FBM.Page
             Dim lrTable As RDS.Table
 
-            Me.zrModel.RDS.TargetDatabaseType = DirectCast(System.[Enum].Parse(GetType(pcenumDatabaseType), Me.ComboBoxDatabaseType.SelectedItem), pcenumDatabaseType)
+            Me.zrModel.RDS.TargetDatabaseType = Me.ComboBoxDatabaseType.SelectedItem.Tag 'DirectCast(System.[Enum].Parse(GetType(pcenumDatabaseType), Me.ComboBoxDatabaseType.SelectedItem), pcenumDatabaseType)
 
             lrODBCConnection.Open()
 
@@ -518,9 +525,9 @@ Public Class frmCRUDModel
                     Next
                 Case Else
                     For Each lrRow As DataRow In lrODBCTable.Rows
-                        If lrRow(lrODBCTable.Columns("TABLE_SCHEM")) = Me.ComboBoxSchema.SelectedItem Then
+                        If lrRow.ItemArray(2) = Me.ComboBoxSchema.SelectedItem Then '(lrODBCTable.Columns("TABLE_SCHEM"))
                             Me.zrModel.RDS.Table.Add(New RDS.Table(Me.zrModel.RDS, lrRow(lrODBCTable.Columns("TABLE_NAME")), Nothing))
-                            lrPage = New FBM.Page(Me.zrModel, Nothing, lrRow(lrODBCTable.Columns("TABLE_NAME")), pcenumLanguage.ORMModel)
+                            lrPage = New FBM.Page(Me.zrModel, Nothing, lrRow.ItemArray(2), pcenumLanguage.ORMModel) '(lrODBCTable.Columns("TABLE_NAME"))
                             frmMain.zfrmModelExplorer.AddPageToModel(Me.zrModel.TreeNode, lrPage, True)
                         End If
                     Next

@@ -4107,27 +4107,23 @@ Namespace FBM
 
             lbEmpty = True
 
-            If Me.EntityType.Count > 0 Then
+            If Me.EntityType.FindAll(Function(x) x.IsMDAModelElement = False).Count > 0 Then
                 lbEmpty = False
             End If
 
-            If Me.ValueType.Count > 0 Then
+            If Me.ValueType.FindAll(Function(x) x.IsMDAModelElement = False).Count > 0 Then
                 lbEmpty = False
             End If
 
-            If Me.FactType.Count > 0 Then
+            If Me.FactType.FindAll(Function(x) x.IsMDAModelElement = False).Count > 0 Then
                 lbEmpty = False
             End If
 
-            If Me.RoleConstraint.Count > 0 Then
+            If Me.RoleConstraint.FindAll(Function(x) x.IsMDAModelElement = False).Count > 0 Then
                 lbEmpty = False
             End If
 
-            If Me.ModelNote.Count > 0 Then
-                lbEmpty = False
-            End If
-
-            If Me.Page.Count > 0 Then
+            If Me.ModelNote.FindAll(Function(x) x.IsMDAModelElement = False).Count > 0 Then
                 lbEmpty = False
             End If
 
