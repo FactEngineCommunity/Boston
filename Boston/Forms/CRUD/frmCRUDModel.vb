@@ -8,6 +8,8 @@ Public Class frmCRUDModel
 
     Public zrModel As FBM.Model
 
+    Private mrODBCConnection As System.Data.Odbc.OdbcConnection
+
     'Sample ConnectionStrings
     '   "Driver={SQL Server};Server=(local);Trusted_Connection=Yes;Database=AdventureWorks;"
     '   "Driver={Microsoft ODBC for Oracle};Server=ORACLE8i7;Persist Security Info=False;Trusted_Connection=Yes"
@@ -227,28 +229,32 @@ Public Class frmCRUDModel
     Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
 
         Try
-            Dim lrODBCConnection As New System.Data.Odbc.OdbcConnection(Me.TextBoxDatabaseConnectionString.Text)
+            Me.mrODBCConnection = New System.Data.Odbc.OdbcConnection(Me.TextBoxDatabaseConnectionString.Text)
 
-            lrODBCConnection.Open()
+            With New WaitCursor
 
-            Me.LabelOpenSuccessfull.Text = "Success"
-            Me.LabelOpenSuccessfull.Visible = True
-            Me.Invalidate()
+                Me.mrODBCConnection.Open()
 
-            'Dim lrODBCTable As System.Data.DataTable
-            'lrODBCTable = lrODBCConnection.GetSchema("Restrictions")
-            'Call Me.DisplayData(lrODBCTable)
+                Me.LabelOpenSuccessfull.Text = "Success"
+                Me.LabelOpenSuccessfull.Visible = True
+                Me.Invalidate()
 
-            Me.zrModel.RDS = New RDS.Model(Me.zrModel)
+                'Dim lrODBCTable As System.Data.DataTable
+                'lrODBCTable = lrODBCConnection.GetSchema("Restrictions")
+                'Call Me.DisplayData(lrODBCTable)
 
-            Call Me.GetDataTypes()
+                Me.zrModel.RDS = New RDS.Model(Me.zrModel)
 
-            Call Me.GetSchemas()
+                Call Me.GetDataTypes()
 
-            Me.ErrorProvider.SetError(Me.ComboBoxSchema, "Select a Schema from which to import Tables.")
+                Call Me.GetSchemas()
 
-            Me.Button1.Enabled = False
-            Me.Button2.Enabled = True
+                Me.ErrorProvider.SetError(Me.ComboBoxSchema, "Select a Schema from which to import Tables.")
+
+                Me.Button1.Enabled = False
+                Me.Button2.Enabled = True
+
+            End With
 
         Catch ex As Exception
 
@@ -271,17 +277,18 @@ Public Class frmCRUDModel
 
     Private Sub GetIndexes()
         Try
-            Dim lrODBCConnection As New System.Data.Odbc.OdbcConnection(Me.TextBoxDatabaseConnectionString.Text)
             Dim lrODBCTable As System.Data.DataTable
             Dim lrTable As RDS.Table
             Dim lrIndex As RDS.Index
 
-            lrODBCConnection.Open()
+            If Not Me.mrODBCConnection.State = ConnectionState.Open Then
+                Me.mrODBCConnection.Open()
+            End If
 
             For Each lrTable In Me.zrModel.RDS.Table
-                lrODBCTable = lrODBCConnection.GetSchema("Indexes", New String() {Nothing, Me.ComboBoxSchema.SelectedItem, lrTable.Name, Nothing})
+                lrODBCTable = Me.mrODBCConnection.GetSchema("Indexes", New String() {Nothing, Me.ComboBoxSchema.SelectedItem, lrTable.Name, Nothing})
 
-                Call Me.DisplayData(lrODBCTable)
+                'Call Me.DisplayData(lrODBCTable)
 
                 For Each lrRow As DataRow In lrODBCTable.Rows
                     lrIndex = lrTable.Index.Find(Function(x) x.Name = lrRow(lrODBCTable.Columns("INDEX_NAME")))
@@ -289,15 +296,17 @@ Public Class frmCRUDModel
                     If lrIndex Is Nothing Then
                         lrIndex = New RDS.Index(lrTable, lrRow(lrODBCTable.Columns("INDEX_NAME")))
                         lrTable.Index.AddUnique(lrIndex)
-                        Me.zrModel.RDS.Index.AddUnique(lrIndex)
-
                         lrIndex.NonUnique = CBool(lrRow(lrODBCTable.Columns("NON_UNIQUE")))
-                        lrIndex.IndexQualifier = lrRow(lrODBCTable.Columns("INDEX_QUALIFIER"))
+                        lrIndex.IndexQualifier = Viev.NullVal(lrRow(lrODBCTable.Columns("INDEX_QUALIFIER")), "")
 
                         Select Case lrRow(lrODBCTable.Columns("TYPE"))
                             Case Is = 1
                                 lrIndex.IsPrimaryKey = True
                         End Select
+
+                        If lrIndex.Name = "PRIMARY" Then
+                            lrIndex.IsPrimaryKey = True
+                        End If
 
                         If Me.zrModel.RDS.TargetDatabaseType = pcenumDatabaseType.MSJet Then
                             If lrIndex.Name = "PrimaryKey" Then
@@ -316,13 +325,14 @@ Public Class frmCRUDModel
                         lrIndex.Cardinality = NullVal(lrRow(lrODBCTable.Columns("CARDINALITY")), 0)
                         lrIndex.Pages = NullVal(lrRow(lrODBCTable.Columns("PAGES")), 0)
                         lrIndex.FilterCondition = NullVal(lrRow(lrODBCTable.Columns("FILTER_CONDITION")), "")
+
+                        Me.zrModel.RDS.Index.AddUnique(lrIndex)
+
                     End If
 
                     lrIndex.Column.Add(lrTable.Column.Find(Function(x) x.Name = lrRow(lrODBCTable.Columns("COLUMN_NAME"))))
                 Next
             Next
-
-            lrODBCConnection.Close()
 
         Catch ex As Exception
             Dim lsMessage As String
@@ -338,12 +348,13 @@ Public Class frmCRUDModel
     Private Sub GetDataTypes()
 
         Try
-            Dim lrODBCConnection As New System.Data.Odbc.OdbcConnection(Me.TextBoxDatabaseConnectionString.Text)
             Dim lrODBCTable As System.Data.DataTable
 
-            lrODBCConnection.Open()
+            If Not Me.mrODBCConnection.State = ConnectionState.Open Then
+                Me.mrODBCConnection.Open()
+            End If
 
-            lrODBCTable = lrODBCConnection.GetSchema("DataTypes")
+            lrODBCTable = Me.mrODBCConnection.GetSchema("DataTypes")
 
             For Each lrRow As DataRow In lrODBCTable.Rows
 
@@ -376,8 +387,6 @@ Public Class frmCRUDModel
                 Me.zrModel.RDS.DataType.Add(lrDataType)
             Next
 
-            lrODBCConnection.Close()
-
         Catch ex As Exception
             Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
@@ -392,14 +401,15 @@ Public Class frmCRUDModel
     Private Sub GetColumns()
 
         Try
-            Dim lrODBCConnection As New System.Data.Odbc.OdbcConnection(Me.TextBoxDatabaseConnectionString.Text)
             Dim lrODBCTable As System.Data.DataTable
             Dim lrTable As RDS.Table
             Dim lrColumn As RDS.Column
 
-            lrODBCConnection.Open()
+            If Not Me.mrODBCConnection.State = ConnectionState.Open Then
+                Me.mrODBCConnection.Open()
+            End If
 
-            lrODBCTable = lrODBCConnection.GetSchema("Columns", New String() {Nothing, Me.ComboBoxSchema.SelectedItem, Nothing, Nothing})
+            lrODBCTable = Me.mrODBCConnection.GetSchema("Columns", New String() {Nothing, Me.ComboBoxSchema.SelectedItem, Nothing, Nothing})
 
             Dim lsTableName As String
 
@@ -437,8 +447,6 @@ Public Class frmCRUDModel
                 End If
             Next
 
-            lrODBCConnection.Close()
-
         Catch ex As Exception
             Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
@@ -453,16 +461,17 @@ Public Class frmCRUDModel
     Private Sub GetSchemas()
 
         Try
-            Dim lrODBCConnection As New System.Data.Odbc.OdbcConnection(Me.TextBoxDatabaseConnectionString.Text)
             Dim lrODBCTable As System.Data.DataTable
             Dim lasSchemaName As New List(Of String)
 
-            lrODBCConnection.Open()
+            If Not Me.mrODBCConnection.State = ConnectionState.Open Then
+                Me.mrODBCConnection.Open()
+            End If
 
-            If lrODBCConnection.DataSource = "ACCESS" Then
+            If Me.mrODBCConnection.DataSource = "ACCESS" Then
                 'Table Schemas don't exist for Access databases.
             Else
-                lrODBCTable = lrODBCConnection.GetSchema("Tables")
+                lrODBCTable = Me.mrODBCConnection.GetSchema("Tables")
 
                 For Each lrRow As DataRow In lrODBCTable.Rows
 
@@ -475,8 +484,6 @@ Public Class frmCRUDModel
                     Me.ComboBoxSchema.Items.Add(lsSchemaName)
                 Next
             End If
-
-            lrODBCConnection.Close()
 
         Catch ex As Exception
             Dim lsMessage As String
@@ -494,154 +501,153 @@ Public Class frmCRUDModel
     Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click
 
         Try
-            Dim lrODBCConnection As New System.Data.Odbc.OdbcConnection(Me.TextBoxDatabaseConnectionString.Text)
             Dim lrODBCTable As System.Data.DataTable
             Dim lasSchemaName As New List(Of String)
             Dim lrPage As FBM.Page
             Dim lrTable As RDS.Table
 
-            Me.zrModel.RDS.TargetDatabaseType = Me.ComboBoxDatabaseType.SelectedItem.Tag 'DirectCast(System.[Enum].Parse(GetType(pcenumDatabaseType), Me.ComboBoxDatabaseType.SelectedItem), pcenumDatabaseType)
+            With New WaitCursor
 
-            lrODBCConnection.Open()
+                Me.zrModel.RDS.TargetDatabaseType = Me.ComboBoxDatabaseType.SelectedItem.Tag 'DirectCast(System.[Enum].Parse(GetType(pcenumDatabaseType), Me.ComboBoxDatabaseType.SelectedItem), pcenumDatabaseType)
 
-            lrODBCTable = lrODBCConnection.GetSchema("Tables")
-
-            Select Case lrODBCConnection.DataSource
-                Case Is = "ACCESS"
-                    For Each lrRow As DataRow In lrODBCTable.Rows
-                        lrTable = New RDS.Table(Me.zrModel.RDS, lrRow(lrODBCTable.Columns("TABLE_NAME")), Nothing)
-                        Select Case lrRow(lrODBCTable.Columns("TABLE_TYPE"))
-                            Case Is = "SYSTEM TABLE"
-                                lrTable.IsSystemTable = True
-                            Case Else
-                                lrTable.IsSystemTable = False
-                        End Select
-
-                        If Not lrTable.IsSystemTable Then
-                            Me.zrModel.RDS.Table.AddUnique(lrTable)
-                            lrPage = New FBM.Page(Me.zrModel, Nothing, lrRow(lrODBCTable.Columns("TABLE_NAME")), pcenumLanguage.ORMModel)
-                            frmMain.zfrmModelExplorer.AddPageToModel(Me.zrModel.TreeNode, lrPage, True)
-                        End If
-                    Next
-                Case Else
-                    For Each lrRow As DataRow In lrODBCTable.Rows
-                        If lrRow.ItemArray(2) = Me.ComboBoxSchema.SelectedItem Then '(lrODBCTable.Columns("TABLE_SCHEM"))
-                            Me.zrModel.RDS.Table.Add(New RDS.Table(Me.zrModel.RDS, lrRow(lrODBCTable.Columns("TABLE_NAME")), Nothing))
-                            lrPage = New FBM.Page(Me.zrModel, Nothing, lrRow.ItemArray(2), pcenumLanguage.ORMModel) '(lrODBCTable.Columns("TABLE_NAME"))
-                            frmMain.zfrmModelExplorer.AddPageToModel(Me.zrModel.TreeNode, lrPage, True)
-                        End If
-                    Next
-            End Select
-
-            '------------------------------------------------------------------------------
-            'Get the Columns for the tables.
-            Call Me.GetColumns()
-
-            '------------------------------------------------------------------------------
-            'Get the Indexes for the tables.
-            Call Me.GetIndexes()
-
-            '------------------------------------------------------------------------------
-            'Create EntityTypes for each Table with a PrimaryKey with one Column.
-            For Each lrTable In Me.zrModel.RDS.Table
-                If lrTable.HasSingleColumnPrimaryKey Then
-                    Dim lrEntityType As FBM.EntityType
-                    lrEntityType = New FBM.EntityType(Me.zrModel, pcenumLanguage.ORMModel, lrTable.Name, lrTable.Name)
-                    Me.zrModel.AddEntityType(lrEntityType, True)
-
-                    Dim lsValueTypeName As String
-                    Dim lsReferenceMode As String = ""
-                    Dim lrPrimaryKeyColumn As RDS.Column
-                    lrPrimaryKeyColumn = lrTable.Index.Find(Function(x) x.IsPrimaryKey = True).Column(0)
-                    lsValueTypeName = lrPrimaryKeyColumn.Name
-
-                    Dim items As Array
-                    items = System.Enum.GetValues(GetType(pcenumReferenceModeEndings))
-                    Dim item As pcenumReferenceModeEndings
-                    For Each item In items
-                        If lsValueTypeName.EndsWith(GetEnumDescription(item).Trim({"."c})) Then 'See https://msdn.microsoft.com/en-us/library/kxbw3kwc(v=vs.110).aspx
-                            lsReferenceMode = GetEnumDescription(item).Trim({"."c})
-                            Exit For
-                        Else
-                            lsReferenceMode = lsValueTypeName
-                        End If
-                    Next
-
-                    '-----------------------------------------------------------------------------
-                    'Create an EntityTypeInstance for the new EntityType and put it on the Page.
-                    lrPage = Me.zrModel.Page.Find(Function(x) x.Name = lrEntityType.Name)
-                    Call lrPage.DropEntityTypeAtPoint(lrEntityType, New PointF(50, 50))
-
-                    lrEntityType.SetReferenceMode(lsReferenceMode, False, lsValueTypeName)
-
-                    '=================================================================================================================
-                    'Create joined FactTypes.
-
-                    Dim lrFactType As FBM.FactType
-                    Dim lrColumn As RDS.Column
-                    Dim larModelObject As New List(Of FBM.ModelObject)
-
-                    For Each lrColumn In lrTable.Column.FindAll(Function(x) x.Name <> lrPrimaryKeyColumn.Name)
-                        larModelObject.Clear()
-                        larModelObject.Add(lrEntityType)
-
-                        Dim lrJoinedModelObject As FBM.ModelObject
-
-                        lrJoinedModelObject = Me.zrModel.FindEntityTypeByValueTypeId(lrColumn.Name)
-                        If lrJoinedModelObject Is Nothing Then
-                            lrJoinedModelObject = Me.zrModel.CreateValueType(lrColumn.Name)
-                        End If
-
-                        larModelObject.Add(lrJoinedModelObject)
-
-                        Dim lrModelObject As FBM.ModelObject
-                        Dim lsFactTypeName As String = ""
-
-                        For Each lrModelObject In larModelObject
-                            lsFactTypeName &= lrModelObject.Name
-                        Next
-                        lrFactType = Me.zrModel.CreateFactType(lsFactTypeName, larModelObject, False)
-
-                        Dim larRole As New List(Of FBM.Role)
-                        Dim lrRole As FBM.Role
-
-                        For Each lrRole In lrFactType.RoleGroup
-                            larRole.Add(lrRole)
-                        Next
-                        Dim lasPredicatePart As New List(Of String)
-                        lasPredicatePart.Add("has")
-                        lasPredicatePart.Add("")
-
-                        Dim lrFactTypeReading As New FBM.FactTypeReading(lrFactType, larRole, lasPredicatePart)
-
-                        Call lrFactType.AddFactTypeReading(lrFactTypeReading, False, False)
-
-                        lrRole = lrFactType.RoleGroup.Find(Function(x) x.JoinedORMObject.Id = lrEntityType.Id)
-                        larRole.Clear()
-                        larRole.Add(lrRole)
-
-                        Dim lrRoleConstraint As FBM.RoleConstraint
-
-                        lrRoleConstraint = Me.zrModel.CreateRoleConstraint(pcenumRoleConstraintType.InternalUniquenessConstraint, _
-                                                                         larRole, _
-                                                                         "InternalUniquenessConstraint", _
-                                                                         1)
-
-                        lrFactType.AddInternalUniquenessConstraint(lrRoleConstraint)
-
-                        Dim lrFactTypeInstance As FBM.FactTypeInstance
-                        lrFactTypeInstance = lrPage.DropFactTypeAtPoint(lrFactType, New PointF(100, 100), False)
-                    Next 'Column
-                    '=================================================================================================================
-
+                If Not Me.mrODBCConnection.State = ConnectionState.Open Then
+                    Me.mrODBCConnection.Open()
                 End If
-            Next
 
+                lrODBCTable = Me.mrODBCConnection.GetSchema("Tables")
 
+                Select Case Me.mrODBCConnection.DataSource
+                    Case Is = "ACCESS"
+                        For Each lrRow As DataRow In lrODBCTable.Rows
+                            lrTable = New RDS.Table(Me.zrModel.RDS, lrRow(lrODBCTable.Columns("TABLE_NAME")), Nothing)
+                            Select Case lrRow(lrODBCTable.Columns("TABLE_TYPE"))
+                                Case Is = "SYSTEM TABLE"
+                                    lrTable.IsSystemTable = True
+                                Case Else
+                                    lrTable.IsSystemTable = False
+                            End Select
 
-            lrODBCConnection.Close()
+                            If Not lrTable.IsSystemTable Then
+                                Me.zrModel.RDS.Table.AddUnique(lrTable)
+                                lrPage = New FBM.Page(Me.zrModel, Nothing, lrRow(lrODBCTable.Columns("TABLE_NAME")), pcenumLanguage.ORMModel)
+                                frmMain.zfrmModelExplorer.AddPageToModel(Me.zrModel.TreeNode, lrPage, True)
+                            End If
+                        Next
+                    Case Else
+                        For Each lrRow As DataRow In lrODBCTable.Rows
+                            If lrRow.ItemArray(2) = Me.ComboBoxSchema.SelectedItem Then '(lrODBCTable.Columns("TABLE_SCHEM"))
+                                Me.zrModel.RDS.Table.Add(New RDS.Table(Me.zrModel.RDS, lrRow(lrODBCTable.Columns("TABLE_NAME")), Nothing))
+                                lrPage = New FBM.Page(Me.zrModel, Nothing, lrRow.ItemArray(2), pcenumLanguage.ORMModel) '(lrODBCTable.Columns("TABLE_NAME"))
+                                frmMain.zfrmModelExplorer.AddPageToModel(Me.zrModel.TreeNode, lrPage, True)
+                            End If
+                        Next
+                End Select
 
-            Me.Button2.Enabled = False
+                '------------------------------------------------------------------------------
+                'Get the Columns for the tables.
+                Call Me.GetColumns()
+
+                '------------------------------------------------------------------------------
+                'Get the Indexes for the tables.
+                Call Me.GetIndexes()
+
+                '------------------------------------------------------------------------------
+                'Create EntityTypes for each Table with a PrimaryKey with one Column.
+                For Each lrTable In Me.zrModel.RDS.Table
+                    If lrTable.hasSingleColumnPrimaryKey Then
+                        Dim lrEntityType As FBM.EntityType
+                        lrEntityType = New FBM.EntityType(Me.zrModel, pcenumLanguage.ORMModel, lrTable.Name, lrTable.Name)
+                        Me.zrModel.AddEntityType(lrEntityType, True)
+
+                        Dim lsValueTypeName As String
+                        Dim lsReferenceMode As String = ""
+                        Dim lrPrimaryKeyColumn As RDS.Column
+                        lrPrimaryKeyColumn = lrTable.Index.Find(Function(x) x.IsPrimaryKey = True).Column(0)
+                        lsValueTypeName = lrPrimaryKeyColumn.Name
+
+                        Dim items As Array
+                        items = System.Enum.GetValues(GetType(pcenumReferenceModeEndings))
+                        Dim item As pcenumReferenceModeEndings
+                        For Each item In items
+                            If lsValueTypeName.EndsWith(GetEnumDescription(item).Trim({"."c})) Then 'See https://msdn.microsoft.com/en-us/library/kxbw3kwc(v=vs.110).aspx
+                                lsReferenceMode = GetEnumDescription(item).Trim({"."c})
+                                Exit For
+                            Else
+                                lsReferenceMode = lsValueTypeName
+                            End If
+                        Next
+
+                        '-----------------------------------------------------------------------------
+                        'Create an EntityTypeInstance for the new EntityType and put it on the Page.
+                        lrPage = Me.zrModel.Page.Find(Function(x) x.Name = lrEntityType.Name)
+                        Call lrPage.DropEntityTypeAtPoint(lrEntityType, New PointF(50, 50))
+
+                        lrEntityType.SetReferenceMode(lsReferenceMode, False, lsValueTypeName)
+
+                        '=================================================================================================================
+                        'Create joined FactTypes.
+
+                        Dim lrFactType As FBM.FactType
+                        Dim lrColumn As RDS.Column
+                        Dim larModelObject As New List(Of FBM.ModelObject)
+
+                        For Each lrColumn In lrTable.Column.FindAll(Function(x) x.Name <> lrPrimaryKeyColumn.Name)
+                            larModelObject.Clear()
+                            larModelObject.Add(lrEntityType)
+
+                            Dim lrJoinedModelObject As FBM.ModelObject
+
+                            lrJoinedModelObject = Me.zrModel.FindEntityTypeByValueTypeId(lrColumn.Name)
+                            If lrJoinedModelObject Is Nothing Then
+                                lrJoinedModelObject = Me.zrModel.CreateValueType(lrColumn.Name)
+                            End If
+
+                            larModelObject.Add(lrJoinedModelObject)
+
+                            Dim lrModelObject As FBM.ModelObject
+                            Dim lsFactTypeName As String = ""
+
+                            For Each lrModelObject In larModelObject
+                                lsFactTypeName &= lrModelObject.Name
+                            Next
+                            lrFactType = Me.zrModel.CreateFactType(lsFactTypeName, larModelObject, False)
+
+                            Dim larRole As New List(Of FBM.Role)
+                            Dim lrRole As FBM.Role
+
+                            For Each lrRole In lrFactType.RoleGroup
+                                larRole.Add(lrRole)
+                            Next
+                            Dim lasPredicatePart As New List(Of String)
+                            lasPredicatePart.Add("has")
+                            lasPredicatePart.Add("")
+
+                            Dim lrFactTypeReading As New FBM.FactTypeReading(lrFactType, larRole, lasPredicatePart)
+
+                            Call lrFactType.AddFactTypeReading(lrFactTypeReading, False, False)
+
+                            lrRole = lrFactType.RoleGroup.Find(Function(x) x.JoinedORMObject.Id = lrEntityType.Id)
+                            larRole.Clear()
+                            larRole.Add(lrRole)
+
+                            Dim lrRoleConstraint As FBM.RoleConstraint
+
+                            lrRoleConstraint = Me.zrModel.CreateRoleConstraint(pcenumRoleConstraintType.InternalUniquenessConstraint,
+                                                                             larRole,
+                                                                             "InternalUniquenessConstraint",
+                                                                             1)
+
+                            lrFactType.AddInternalUniquenessConstraint(lrRoleConstraint)
+
+                            Dim lrFactTypeInstance As FBM.FactTypeInstance
+                            lrFactTypeInstance = lrPage.DropFactTypeAtPoint(lrFactType, New PointF(100, 100), False)
+                        Next 'Column
+                        '=================================================================================================================
+
+                    End If
+                Next
+
+            End With
 
         Catch ex As Exception
             Dim lsMessage As String

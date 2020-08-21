@@ -131,7 +131,6 @@ Partial Class frmCRUDModel
         '
         'Button1
         '
-        Me.Button1.Enabled = False
         Me.Button1.Location = New System.Drawing.Point(14, 29)
         Me.Button1.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.Button1.Name = "Button1"
