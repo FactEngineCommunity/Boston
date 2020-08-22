@@ -4187,7 +4187,7 @@ Namespace FBM
             'Load the ModelDictionary (Concepts for the Model)
             '-------------------------------------------------------
             'Richmond.WriteToStatusBar("Loading the ModelDictionary")
-            prApplication.ThrowErrorMessage("Populating the ModelDictionary", pcenumErrorType.Information)
+
             If TableModelDictionary.GetModelDictionaryCountByModel(Me) > 0 Then
                 Me.ModelDictionary = TableModelDictionary.GetDictionaryEntriesByModel(Me)
             End If

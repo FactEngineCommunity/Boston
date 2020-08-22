@@ -337,7 +337,16 @@
             If lrFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & Me.WHICHCLAUSE.MODELELEMENTNAME(0) & "'.")
             arQueryEdge.TargetNode = New FactEngine.QueryNode(lrFBMModelObject)
             arQueryEdge.TargetNode.Alias = Me.WHICHCLAUSE.NODE(0).MODELELEMENTSUFFIX
+            arQueryEdge.TargetNode.PreboundText = arWHICHCLAUSE.NODE(0).PREBOUNDREADINGTEXT
+            arQueryEdge.TargetNode.PostboundText = arWHICHCLAUSE.NODE(0).POSTBOUNDREADINGTEXT
             arQueryGraph.Nodes.Add(arQueryEdge.TargetNode) '20200808-VM-Was AddUnique
+
+            If arWHICHCLAUSE.MATHCLAUSE IsNot Nothing Then
+                arQueryEdge.TargetNode.MathFunction = Richmond.GetEnumFromDescriptionAttribute(Of pcenumMathFunction)(arWHICHCLAUSE.MATHCLAUSE.MATHFUNCTION)
+                If arWHICHCLAUSE.MATHCLAUSE.NUMBER IsNot Nothing Then
+                    arQueryEdge.TargetNode.MathNumber = CDbl(arWHICHCLAUSE.MATHCLAUSE.NUMBER)
+                End If
+            End If
 
             '-----------------------------------------
             'Get the relevant FBM.FactType

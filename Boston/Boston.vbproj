@@ -1284,6 +1284,7 @@
     <Compile Include="ModulesPublic\CQL\publicFunctions.vb" />
     <Compile Include="ModulesPublic\MyMethodExtensions.vb" />
     <Compile Include="ModulesPublic\publicConstantsAutoComplete.vb" />
+    <Compile Include="ModulesPublic\publicConstantsFactEngine.vb" />
     <Compile Include="ModulesPublic\publicConstantsFBM.vb" />
     <Compile Include="ModulesPublic\PublicConstantsODBC.vb" />
     <Compile Include="ModulesPublic\publicDatabase.vb" />

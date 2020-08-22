@@ -131,6 +131,42 @@ Namespace FEQL
 
     End Class
 
+    Public Class MATHCLAUSE
+
+        Private _MATHFUNCTION As String = Nothing
+        Public Property MATHFUNCTION As String
+            Get
+                Return Me._MATHFUNCTION
+            End Get
+            Set(value As String)
+                Me._MATHFUNCTION = value
+            End Set
+        End Property
+
+        Private _NUMBER As String = Nothing
+
+        Public Property [NUMBER] As String
+            Get
+                Return Me._NUMBER
+            End Get
+            Set(value As String)
+                Me._NUMBER = value
+            End Set
+        End Property
+
+
+        Private _MODELELEMENT As MODELELEMENTClause = Nothing
+        Public Property MODELELEMENT As MODELELEMENTClause
+            Get
+                Return Me._MODELELEMENT
+            End Get
+            Set(value As MODELELEMENTClause)
+                Me._MODELELEMENT = value
+            End Set
+        End Property
+
+    End Class
+
     Public Class WHICHCLAUSE
 
         Private _KEYWDIS As String = Nothing
@@ -262,6 +298,16 @@ Namespace FEQL
             End Get
             Set(value As Object)
                 Me._WITHCLAUSE = value
+            End Set
+        End Property
+
+        Private _MATHCLAUSE As MATHCLAUSE = Nothing
+        Public Property MATHCLAUSE As MATHCLAUSE
+            Get
+                Return Me._MATHCLAUSE
+            End Get
+            Set(value As MATHCLAUSE)
+                Me._MATHCLAUSE = value
             End Set
         End Property
 

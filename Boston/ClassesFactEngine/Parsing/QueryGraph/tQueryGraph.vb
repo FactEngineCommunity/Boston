@@ -149,12 +149,14 @@
 #End Region
 
                 'WHERE
-                Dim larConditionalQueryEdges As New List(Of FactEngine.QueryEdge)
-                larConditionalQueryEdges = Me.QueryEdges.FindAll(Function(x) x.IdentifierList.Count > 0)
-
                 Dim larWhereEdges = Me.QueryEdges.FindAll(Function(x) (x.TargetNode.FBMModelObject.ConceptType <> pcenumConceptType.ValueType And
-                                                                          x.BaseNode.FBMModelObject.ConceptType <> pcenumConceptType.ValueType) Or
-                                                                          x.FBMFactType.isRDSTable)
+                                                                       x.BaseNode.FBMModelObject.ConceptType <> pcenumConceptType.ValueType) Or
+                                                                       x.FBMFactType.isRDSTable
+                                                                       )
+
+                Dim larConditionalQueryEdges As New List(Of FactEngine.QueryEdge)
+                larConditionalQueryEdges = Me.QueryEdges.FindAll(Function(x) x.IdentifierList.Count > 0 Or
+                                                                             x.TargetNode.MathFunction <> pcenumMathFunction.None)
 
                 If larWhereEdges.Count = 0 And larConditionalQueryEdges.Count = 0 Then
                     Return lsSQLQuery
@@ -362,15 +364,35 @@
                             lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") & lrQueryEdge.BaseNode.Name & "." & lrColumn.Name & " = '" & lrQueryEdge.IdentifierList(0) & "'" & vbCrLf
                             lbIntialWhere = "AND "
                         Case Else
-                            Dim lrTargetTable = lrQueryEdge.TargetNode.FBMModelObject.getCorrespondingRDSTable
-                            Dim larIndexColumns = lrTargetTable.getFirstUniquenessConstraintColumns
-                            liInd = 0
-                            For Each lsIdentifier In lrQueryEdge.IdentifierList
-                                lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") & lrTargetTable.Name & Viev.NullVal(lrQueryEdge.TargetNode.Alias, "") & "." & larIndexColumns(liInd).Name & " = '" & lsIdentifier & "'" & vbCrLf
-                                If liInd < lrQueryEdge.IdentifierList.Count - 1 Then lsSQLQuery &= "AND "
-                                liInd += 1
-                            Next
-                            lbIntialWhere = "AND "
+
+                            If lrQueryEdge.TargetNode.MathFunction <> pcenumMathFunction.None Then
+
+                                'Math function
+                                Dim lrTargetTable = lrQueryEdge.BaseNode.FBMModelObject.getCorrespondingRDSTable
+                                Dim lrTargetColumn = lrTargetTable.Column.Find(Function(x) x.FactType Is lrQueryEdge.FBMFactType)
+                                lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") &
+                                              lrTargetTable.Name &
+                                              Viev.NullVal(lrQueryEdge.TargetNode.Alias, "") &
+                                              "." &
+                                              lrTargetColumn.Name
+
+                                lsSQLQuery &= " " & Viev.GetEnumDescription(lrQueryEdge.TargetNode.MathFunction)
+                                lsSQLQuery &= " " & lrQueryEdge.TargetNode.MathNumber.ToString
+
+
+                                lbIntialWhere = "AND "
+                            Else
+                                Dim lrTargetTable = lrQueryEdge.TargetNode.FBMModelObject.getCorrespondingRDSTable
+                                Dim larIndexColumns = lrTargetTable.getFirstUniquenessConstraintColumns
+                                liInd = 0
+                                For Each lsIdentifier In lrQueryEdge.IdentifierList
+                                    lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") & lrTargetTable.Name & Viev.NullVal(lrQueryEdge.TargetNode.Alias, "") & "." & larIndexColumns(liInd).Name & " = '" & lsIdentifier & "'" & vbCrLf
+                                    If liInd < lrQueryEdge.IdentifierList.Count - 1 Then lsSQLQuery &= "AND "
+                                    liInd += 1
+                                Next
+                                lbIntialWhere = "AND "
+                            End If
+
                     End Select
 
                 Next

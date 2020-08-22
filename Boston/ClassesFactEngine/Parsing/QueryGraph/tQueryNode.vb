@@ -47,6 +47,9 @@
             End Get
         End Property
 
+        Public MathFunction As pcenumMathFunction = pcenumMathFunction.None
+        Public MathNumber As Double = 0
+
         ''' <summary>
         ''' Parameterless New
         ''' </summary>
