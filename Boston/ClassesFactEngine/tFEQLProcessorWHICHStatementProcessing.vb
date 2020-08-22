@@ -1,245 +1,6 @@
 ﻿Namespace FEQL
     Partial Public Class Processor
 
-#Region "ProcessWHICHSELECTStatement"
-        Public Function ProcessWHICHSELECTStatement(ByVal asFEQLStatement As String) As ORMQL.Recordset
-
-            Dim lrRecordset As New ORMQL.Recordset
-            lrRecordset.StatementType = FactEngine.Constants.pcenumFEQLStatementType.WHICHSELECTStatement
-
-            Try
-                'Richmond.WriteToStatusBar("Processsing WHICH Statement.", True)
-                Me.WHICHSELECTStatement = New FEQL.WHICHSELECTStatement
-
-                Call Me.GetParseTreeTokensReflection(Me.WHICHSELECTStatement, Me.Parsetree.Nodes(0))
-
-                Dim lrQueryGraph As New FactEngine.QueryGraph(Me.Model)
-
-                '----------------------------------------
-                'Create the HeadNode for the QueryGraph
-                Dim lrFBMModelObject As FBM.ModelObject = Me.Model.GetModelObjectByName(Me.WHICHSELECTStatement.MODELELEMENTNAME(0))
-                If lrFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & Me.WHICHSELECTStatement.MODELELEMENTNAME(0) & "'.")
-                lrQueryGraph.HeadNode = New FactEngine.QueryNode(lrFBMModelObject)
-                lrQueryGraph.Nodes.Add(lrQueryGraph.HeadNode)
-
-                '----------------------------------
-                'Get the Edges for the QueryGraph
-                Dim lrPreviousTargetNode As FactEngine.QueryNode = Nothing
-                For Each loWhichClause In Me.WHICHSELECTStatement.WHICHCLAUSE
-
-                    Me.WHICHCLAUSE = New FEQL.WHICHCLAUSE
-                    Call Me.GetParseTreeTokensReflection(Me.WHICHCLAUSE, loWhichClause)
-
-                    '==============================
-                    'Create the QueryEdge
-                    Dim lrQueryEdge As New FactEngine.QueryEdge(lrQueryGraph, Me.WHICHCLAUSE)
-
-                    '---------------------------------------------------------
-                    'Get the Predicate. Every which clause has a Predicate.
-                    For Each lsPredicatePart In Me.WHICHCLAUSE.PREDICATE
-                        lrQueryEdge.Predicate = Trim(lrQueryEdge.Predicate & " " & lsPredicatePart)
-                    Next
-
-                    '============================================
-                    'Example Fact Engine Query
-                    '--------------------------
-                    'WHICH Lecturer is located in WHICH Room 
-                    'AND holds WHICH Position
-                    'AND is in WHICH School
-                    'AND is in A School WHICH is in (Factulty:'IT') 
-                    'AND THAT Lecturer works for THAT Faculty 
-                    '------------------------------------------
-
-                    'KEYWDAND As String
-                    'KEYWDTHAT As List(Of String)
-                    'PREDICATE As List(Of String)
-                    'KEYWDWHICH As String
-                    'MODELELEMENTNAME As List(Of String)
-                    'NODEPROPERTYIDENTIFICATION As Object
-
-                    'If Me.WHICHCLAUSE.KEYWDIS IsNot Nothing And
-                    '   Me.WHICHCLAUSE.NODEPROPERTYIDENTIFICATION IsNot Nothing Then
-
-                    '    'E.g. 'IS in (Semester:'1') as in when queryinging 'WHICH TimetableBooking IS in (Semester:'1')
-                    '    lrQueryEdge.WhichClauseType = FactEngine.Constants.pcenumWhichClauseType.IsPredicateNodePropertyIdentification
-
-                    '    If lrPreviousTargetNode Is Nothing Then
-                    '        lrQueryEdge.BaseNode = lrQueryGraph.HeadNode
-                    '    Else
-                    '        lrQueryEdge.BaseNode = lrPreviousTargetNode
-                    '    End If
-
-                    '    'Get the TargetNode
-                    '    Me.NODEPROPERTYIDENTIFICATION = New FEQL.NODEPROPERTYIDENTIFICATION
-                    '    Call Me.GetParseTreeTokensReflection(Me.NODEPROPERTYIDENTIFICATION, Me.WHICHCLAUSE.NODEPROPERTYIDENTIFICATION)
-                    '    lrFBMModelObject = Me.Model.GetModelObjectByName(Me.NODEPROPERTYIDENTIFICATION.MODELELEMENTNAME)
-                    '    If lrFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & Me.NODEPROPERTYIDENTIFICATION.MODELELEMENTNAME & "'.")
-                    '    lrQueryEdge.TargetNode = New FactEngine.QueryNode(lrFBMModelObject)
-                    '    'lrQueryGraph.Nodes.AddUnique(lrQueryEdge.TargetNode)
-
-                    '    '---------------------------------------------------------
-                    '    'Set the Identification
-                    '    For Each lsIdentifier In Me.NODEPROPERTYIDENTIFICATION.IDENTIFIER
-                    '        lrQueryEdge.IdentifierList.Add(lsIdentifier)
-                    '    Next
-
-                    '    '---------------------------------------------------------
-                    '    'Get the Predicate
-                    '    For Each lsPredicatePart In Me.WHICHCLAUSE.PREDICATE
-                    '        lrQueryEdge.Predicate = Trim(lrQueryEdge.Predicate & " " & lsPredicatePart)
-                    '    Next
-
-                    'Else
-
-                    '1
-                    If Me.WHICHCLAUSE.KEYWDAND Is Nothing And
-                       Me.WHICHCLAUSE.NODEPROPERTYIDENTIFICATION IsNot Nothing Then
-
-                        Call Me.analyseWhichPredicateNodePropertyIdentification(Me.WHICHCLAUSE, lrQueryGraph, lrQueryEdge, lrPreviousTargetNode)
-
-                        '2
-                    ElseIf Me.WHICHCLAUSE.KEYWDAND Is Nothing And
-                           Me.WHICHCLAUSE.KEYWDWHICH IsNot Nothing Then
-                        'E.G. "holds WHICH Position"  as in WHICH Lecturer holds WHICH Position
-                        Call Me.AnlysePredicateWhichModelElement(Me.WHICHCLAUSE, lrQueryGraph, lrQueryEdge, lrPreviousTargetNode)
-
-                        '3
-                    ElseIf Me.WHICHCLAUSE.KEYWDAND Is Nothing And
-                           Me.WHICHCLAUSE.KEYWDTHAT.Count = 2 Then
-                        'E.g. ...TimetableBooking "THAT involves THAT Lecturer"
-                        'E.g. "AND THAT Lecturer works for THAT Faculty"
-
-                        Call Me.analyseANDThatPredicateThatModelElement(Me.WHICHCLAUSE, lrQueryGraph, lrQueryEdge, lrPreviousTargetNode)
-
-                        '4
-                    ElseIf Me.WHICHCLAUSE.KEYWDAND IsNot Nothing And
-                           Me.WHICHCLAUSE.KEYWDTHAT.Count = 2 Then
-                        'E.g. "AND THAT Lecturer works for THAT Faculty"
-
-                        Call Me.analyseAndThatModelElementPredicateThatModelElement(Me.WHICHCLAUSE, lrQueryGraph, lrQueryEdge, lrPreviousTargetNode)
-
-                        '5
-                    ElseIf Me.WHICHCLAUSE.KEYWDAND Is Nothing Then
-                        'E.g. "is located in WHICH Room" in the above example 'WHICH Lecturer is located in WHICH Room 
-                        '  NB Also caters for "that is in A SemesterStructure" in "WHICH Room is in A Faculty THAT is in A SemesterStucture"
-
-                        Call Me.analysePredicateWhichModelElement(Me.WHICHCLAUSE, lrQueryGraph, lrQueryEdge, lrPreviousTargetNode)
-
-                        '6
-                    ElseIf Me.WHICHCLAUSE.KEYWDAND IsNot Nothing And
-                           Me.WHICHCLAUSE.KEYWDWHICH IsNot Nothing And
-                           Me.WHICHCLAUSE.KEYWDTHAT.Count = 0 Then
-                        'E.g. "AND holds WHICH Position"
-
-                        Call Me.analyseAndPredicateWhichModelElement(Me.WHICHCLAUSE, lrQueryGraph, lrQueryEdge, lrPreviousTargetNode)
-
-                        '7
-                    ElseIf Me.WHICHCLAUSE.KEYWDAND IsNot Nothing And
-                           Me.WHICHCLAUSE.KEYWDTHAT.Count = 1 And
-                           (Me.WHICHCLAUSE.KEYWDWHICH IsNot Nothing Or Me.WHICHCLAUSE.KEYWDA IsNot Nothing) Then
-
-                        Call Me.analyseANDTHATWHICHClause(Me.WHICHCLAUSE, lrQueryGraph, lrQueryEdge, lrPreviousTargetNode)
-
-                        '8
-                    ElseIf Me.WHICHCLAUSE.KEYWDAND IsNot Nothing And
-                           Me.WHICHCLAUSE.KEYWDTHAT.Count = 1 Then
-
-                        Call Me.analyseANDTHATClause(Me.WHICHCLAUSE, lrQueryGraph, lrQueryEdge)
-
-                        '9
-                    ElseIf Me.WHICHCLAUSE.KEYWDAND IsNot Nothing And
-                           Me.WHICHCLAUSE.MODELELEMENTNAME IsNot Nothing Then
-
-                        Call Me.analyseAndPredicateWhichModelElement(Me.WHICHCLAUSE, lrQueryGraph, lrQueryEdge, Me.NODEPROPERTYIDENTIFICATION)
-
-                    Else
-                        Throw New Exception("Unknown WHICH Clause.")
-                    End If
-
-                    '-------------------------------------------------
-                    'Add the QueryEdge to the QueryGraph
-                    lrQueryGraph.QueryEdges.Add(lrQueryEdge)
-
-                    lrPreviousTargetNode = lrQueryEdge.TargetNode
-
-                Next
-
-                'Richmond.WriteToStatusBar("Generating SQL", True)
-
-                '==========================================================================
-                'Get the records
-                Dim lsSQLQuery = lrQueryGraph.generateSQL
-
-                lrRecordset.Query = lsSQLQuery
-
-                '==========================================================
-                'Populate the lrRecordset with results from the database
-                'Richmond.WriteToStatusBar("Connecting to database.", True)
-                Dim lrSQLiteConnection = Database.CreateConnection(Me.Model.TargetDatabaseConnectionString)
-                Dim lrSQLiteDataReader = Database.getReaderForSQL(lrSQLiteConnection, lsSQLQuery)
-
-                Dim larFact As New List(Of FBM.Fact)
-                Dim lrFactType = New FBM.FactType(Me.Model, "DummyFactType", True)
-                Dim lrFact As FBM.Fact
-                'Richmond.WriteToStatusBar("Reading results.", True)
-
-                '=====================================================
-                'Column Names        
-                Dim larProjectColumn = lrQueryGraph.getProjectionColumns
-                Dim lsColumnName As String
-
-                For Each lrProjectColumn In larProjectColumn
-                    lrRecordset.Columns.Add(lrProjectColumn.Name)
-                    lsColumnName = lrFactType.CreateUniqueRoleName(lrProjectColumn.Name, 0)
-                    Dim lrRole = New FBM.Role(lrFactType, lsColumnName, True, Nothing)
-                    lrFactType.RoleGroup.AddUnique(lrRole)
-                Next
-
-                While lrSQLiteDataReader.Read()
-
-                    lrFact = New FBM.Fact(lrFactType, False)
-                    Dim loFieldValue As Object = Nothing
-                    Dim liInd As Integer
-                    For liInd = 0 To lrSQLiteDataReader.FieldCount - 1
-                        Select Case lrSQLiteDataReader.GetFieldType(liInd)
-                            Case Is = GetType(String)
-                                loFieldValue = lrSQLiteDataReader.GetString(liInd)
-                            Case Else
-                                loFieldValue = lrSQLiteDataReader.GetValue(liInd)
-                        End Select
-
-                        Try
-                            lrFact.Data.Add(New FBM.FactData(lrFactType.RoleGroup(liInd), New FBM.Concept(loFieldValue), lrFact))
-                            '=====================================================
-                        Catch
-                            Throw New Exception("Tried to add a recordset Column that is not in the Project Columns. Column Index: " & liInd)
-                        End Try
-                    Next
-
-                    larFact.Add(lrFact)
-
-                End While
-                lrRecordset.Facts = larFact
-                lrSQLiteConnection.Close()
-
-                'Run the SQL against the database
-                Return lrRecordset
-
-            Catch ex As Exception
-                If ex.InnerException Is Nothing Then
-                    lrRecordset.ErrorString = ex.Message
-                Else
-                    lrRecordset.ErrorString = ex.InnerException.Message
-                End If
-
-                Return lrRecordset
-            End Try
-
-        End Function
-
-#End Region
-
-
 #Region "ProcessWHICHSELECTStatementNew"
         Public Function ProcessWHICHSELECTStatementNew(ByVal asFEQLStatement As String) As ORMQL.Recordset
 
@@ -325,7 +86,7 @@
                             Call Me.analyseANDTHATClause(Me.WHICHCLAUSE, lrQueryGraph, lrQueryEdge)
 
                         Case Is = FactEngine.pcenumWhichClauseType.AndWhichPredicateNodePropertyIdentification  ' 9. E.g. AND WHICH is in (Faculty:IT')
-                            Call Me.analyseAndPredicateWhichModelElement(Me.WHICHCLAUSE, lrQueryGraph, lrQueryEdge, Me.NODEPROPERTYIDENTIFICATION)
+                            Call Me.analyseAndPredicateWhichModelElement(Me.WHICHCLAUSE, lrQueryGraph, lrQueryEdge, lrPreviousTargetNode)
 
                         Case Is = FactEngine.pcenumWhichClauseType.WhichPredicateThatModelElement ' 10. E.g. WHICH houses THAT Lecturer
                             Call Me.analyseWhichPredicateThatClause(Me.WHICHCLAUSE, lrQueryGraph, lrQueryEdge, lrPreviousTargetNode)
@@ -404,15 +165,16 @@
             End If
 
             'Get the TargetNode
-            Me.NODEPROPERTYIDENTIFICATION = New FEQL.NODEPROPERTYIDENTIFICATION
-            Call Me.GetParseTreeTokensReflection(Me.NODEPROPERTYIDENTIFICATION, Me.WHICHCLAUSE.NODEPROPERTYIDENTIFICATION)
-            Me.MODELELEMENTCLAUSE = New FEQL.MODELELEMENTClause
-            Call Me.GetParseTreeTokensReflection(Me.MODELELEMENTCLAUSE, Me.NODEPROPERTYIDENTIFICATION.MODELELEMENT)
-            lrFBMModelObject = Me.Model.GetModelObjectByName(Me.NODEPROPERTYIDENTIFICATION.MODELELEMENTNAME)
-            If lrFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & Me.NODEPROPERTYIDENTIFICATION.MODELELEMENTNAME & "'.")
+            'Me.NODEPROPERTYIDENTIFICATION = New FEQL.NODEPROPERTYIDENTIFICATION
+            '20200822-VM-Change back if doesn't work
+            'Call Me.GetParseTreeTokensReflection(Me.NODEPROPERTYIDENTIFICATION, Me.WHICHCLAUSE.NODEPROPERTYIDENTIFICATION)
+            'Me.MODELELEMENTCLAUSE = New FEQL.MODELELEMENTClause
+            'Call Me.GetParseTreeTokensReflection(Me.MODELELEMENTCLAUSE, Me.NODEPROPERTYIDENTIFICATION.MODELELEMENT)
+            lrFBMModelObject = Me.Model.GetModelObjectByName(arWHICHCLAUSE.NODE(0).NODEPROPERTYIDENTIFICATION.MODELELEMENTNAME) '  Me.NODEPROPERTYIDENTIFICATION.MODELELEMENTNAME)
+            If lrFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & arWHICHCLAUSE.NODE(0).NODEPROPERTYIDENTIFICATION.MODELELEMENTNAME & "'.")
             arQueryEdge.TargetNode = New FactEngine.QueryNode(lrFBMModelObject)
-            arQueryEdge.TargetNode.PreboundText = Me.NODEPROPERTYIDENTIFICATION.PREBOUNDREADINGTEXT
-            arQueryEdge.TargetNode.PostboundText = Me.NODEPROPERTYIDENTIFICATION.POSTBOUNDREADINGTEXT
+            arQueryEdge.TargetNode.PreboundText = arWHICHCLAUSE.NODE(0).PREBOUNDREADINGTEXT
+            arQueryEdge.TargetNode.PostboundText = arWHICHCLAUSE.NODE(0).POSTBOUNDREADINGTEXT
             arQueryEdge.TargetNode.Alias = Me.MODELELEMENTCLAUSE.MODELELEMENTSUFFIX
 
             If lrFBMModelObject.ConceptType = pcenumConceptType.ValueType Then
@@ -423,7 +185,7 @@
 
             '---------------------------------------------------------
             'Set the Identification
-            For Each lsIdentifier In Me.NODEPROPERTYIDENTIFICATION.IDENTIFIER
+            For Each lsIdentifier In Me.WHICHCLAUSE.NODE(0).NODEPROPERTYIDENTIFICATION.IDENTIFIER
                 arQueryEdge.IdentifierList.Add(lsIdentifier)
             Next
 
@@ -453,12 +215,12 @@
             arQueryEdge.BaseNode = arQueryGraph.HeadNode
 
             'Get the TargetNode                        
-            Me.MODELELEMENTCLAUSE = New FEQL.MODELELEMENTClause
-            Call Me.GetParseTreeTokensReflection(Me.MODELELEMENTCLAUSE, Me.WHICHCLAUSE.MODELELEMENT(0))
-            lrFBMModelObject = Me.Model.GetModelObjectByName(Me.WHICHCLAUSE.MODELELEMENTNAME(0))
+            'Me.MODELELEMENTCLAUSE = New FEQL.MODELELEMENTClause
+            'Call Me.GetParseTreeTokensReflection(Me.MODELELEMENTCLAUSE, Me.WHICHCLAUSE.MODELELEMENT(0))
+            lrFBMModelObject = Me.Model.GetModelObjectByName(Me.WHICHCLAUSE.NODE(0).MODELELEMENTNAME)
             If lrFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & Me.WHICHCLAUSE.MODELELEMENTNAME(0) & "'.")
             arQueryEdge.TargetNode = New FactEngine.QueryNode(lrFBMModelObject, arQueryEdge)
-            arQueryEdge.TargetNode.Alias = Me.MODELELEMENTCLAUSE.MODELELEMENTSUFFIX
+            arQueryEdge.TargetNode.Alias = Me.WHICHCLAUSE.NODE(0).MODELELEMENTSUFFIX
             arQueryGraph.Nodes.Add(arQueryEdge.TargetNode)
 
             ''---------------------------------------------------------
@@ -525,12 +287,12 @@
             arQueryEdge.BaseNode.Alias = Me.MODELELEMENTCLAUSE.MODELELEMENTSUFFIX
 
             'Get the TargetNode                        
-            Me.MODELELEMENTCLAUSE = New FEQL.MODELELEMENTClause
-            Call Me.GetParseTreeTokensReflection(Me.MODELELEMENTCLAUSE, Me.WHICHCLAUSE.MODELELEMENT(1))
-            Dim lrTargetFBMModelObject = Me.Model.GetModelObjectByName(Me.WHICHCLAUSE.MODELELEMENTNAME(1))
-            If lrTargetFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & Me.WHICHCLAUSE.MODELELEMENTNAME(1) & "'.")
+            'Me.MODELELEMENTCLAUSE = New FEQL.MODELELEMENTClause
+            'Call Me.GetParseTreeTokensReflection(Me.MODELELEMENTCLAUSE, Me.WHICHCLAUSE.MODELELEMENT(1))
+            Dim lrTargetFBMModelObject = Me.Model.GetModelObjectByName(Me.WHICHCLAUSE.NODE(0).MODELELEMENTNAME)
+            If lrTargetFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & Me.WHICHCLAUSE.NODE(0).MODELELEMENTNAME & "'.")
             arQueryEdge.TargetNode = New FactEngine.QueryNode(lrTargetFBMModelObject)
-            arQueryEdge.TargetNode.Alias = Me.MODELELEMENTCLAUSE.MODELELEMENTSUFFIX
+            arQueryEdge.TargetNode.Alias = Me.WHICHCLAUSE.NODE(0).MODELELEMENTSUFFIX
             arQueryGraph.Nodes.AddUnique(arQueryEdge.TargetNode)
 
             ''---------------------------------------------------------
@@ -569,12 +331,12 @@
 
 
             'Get the TargetNode                        
-            Me.MODELELEMENTCLAUSE = New FEQL.MODELELEMENTClause
-            Call Me.GetParseTreeTokensReflection(Me.MODELELEMENTCLAUSE, Me.WHICHCLAUSE.MODELELEMENT(0))
+            'Me.MODELELEMENTCLAUSE = New FEQL.MODELELEMENTClause
+            'Call Me.GetParseTreeTokensReflection(Me.MODELELEMENTCLAUSE, Me.WHICHCLAUSE.MODELELEMENT(0))
             lrFBMModelObject = Me.Model.GetModelObjectByName(Me.WHICHCLAUSE.MODELELEMENTNAME(0))
             If lrFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & Me.WHICHCLAUSE.MODELELEMENTNAME(0) & "'.")
             arQueryEdge.TargetNode = New FactEngine.QueryNode(lrFBMModelObject)
-            arQueryEdge.TargetNode.Alias = Me.MODELELEMENTCLAUSE.MODELELEMENTSUFFIX
+            arQueryEdge.TargetNode.Alias = Me.WHICHCLAUSE.NODE(0).MODELELEMENTSUFFIX
             arQueryGraph.Nodes.Add(arQueryEdge.TargetNode) '20200808-VM-Was AddUnique
 
             '-----------------------------------------
@@ -582,12 +344,6 @@
             Call arQueryEdge.getAndSetFBMFactType(arQueryEdge.BaseNode,
                                                   arQueryEdge.TargetNode,
                                                   arQueryEdge.Predicate)
-
-            'If lrQueryEdge.BaseNode.FBMModelObject.ConceptType = pcenumConceptType.ValueType Then
-            '    Dim lrTempNode = lrQueryEdge.BaseNode
-            '    lrQueryEdge.BaseNode = lrQueryEdge.TargetNode
-            '    lrQueryEdge.TargetNode = lrTempNode
-            'End If
 
         End Sub
 #End Region
@@ -609,12 +365,12 @@
             arQueryEdge.BaseNode = arQueryGraph.HeadNode
 
             'Get the TargetNode                        
-            Me.MODELELEMENTCLAUSE = New FEQL.MODELELEMENTClause
-            Call Me.GetParseTreeTokensReflection(Me.MODELELEMENTCLAUSE, Me.WHICHCLAUSE.MODELELEMENT(0))
-            lrFBMModelObject = Me.Model.GetModelObjectByName(Me.WHICHCLAUSE.MODELELEMENTNAME(0))
-            If lrFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & Me.WHICHCLAUSE.MODELELEMENTNAME(0) & "'.")
+            'Me.MODELELEMENTCLAUSE = New FEQL.MODELELEMENTClause
+            'Call Me.GetParseTreeTokensReflection(Me.MODELELEMENTCLAUSE, Me.WHICHCLAUSE.MODELELEMENT(0))
+            lrFBMModelObject = Me.Model.GetModelObjectByName(Me.WHICHCLAUSE.NODE(0).MODELELEMENTNAME)
+            If lrFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & Me.WHICHCLAUSE.NODE(0).MODELELEMENTNAME & "'.")
             arQueryEdge.TargetNode = New FactEngine.QueryNode(lrFBMModelObject)
-            arQueryEdge.TargetNode.Alias = Me.MODELELEMENTCLAUSE.MODELELEMENTSUFFIX
+            arQueryEdge.TargetNode.Alias = Me.WHICHCLAUSE.NODE(0).MODELELEMENTSUFFIX
             arQueryGraph.Nodes.Add(arQueryEdge.TargetNode) 'Was AddUnique, but WHICH implies that we are talking of a different TargetNode, as where TargeNode has been referenced before
 
             ''---------------------------------------------------------
@@ -736,12 +492,12 @@
             End If
 
             'Get the TargetNode                        
-            Me.MODELELEMENTCLAUSE = New FEQL.MODELELEMENTClause
-            Call Me.GetParseTreeTokensReflection(Me.MODELELEMENTCLAUSE, Me.WHICHCLAUSE.MODELELEMENT(1))
-            Dim lrFBMModelObject = Me.Model.GetModelObjectByName(Me.WHICHCLAUSE.MODELELEMENTNAME(1))
-            If lrFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & Me.WHICHCLAUSE.MODELELEMENTNAME(0) & "'.")
+            'Me.MODELELEMENTCLAUSE = New FEQL.MODELELEMENTClause
+            'Call Me.GetParseTreeTokensReflection(Me.MODELELEMENTCLAUSE, Me.WHICHCLAUSE.MODELELEMENT(1))
+            Dim lrFBMModelObject = Me.Model.GetModelObjectByName(Me.WHICHCLAUSE.NODE(0).MODELELEMENTNAME)
+            If lrFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & Me.WHICHCLAUSE.NODE(0).MODELELEMENTNAME & "'.")
             arQueryEdge.TargetNode = New FactEngine.QueryNode(lrFBMModelObject)
-            arQueryEdge.TargetNode.Alias = Me.MODELELEMENTCLAUSE.MODELELEMENTSUFFIX
+            arQueryEdge.TargetNode.Alias = Me.WHICHCLAUSE.NODE(0).MODELELEMENTSUFFIX
 
 
             If arQueryEdge.TargetNode.Alias Is Nothing Then '20200810-VM-May need to revise this
@@ -791,13 +547,14 @@
 
             'Get the TargetNode                        
             If Me.WHICHCLAUSE.NODEPROPERTYIDENTIFICATION IsNot Nothing Then
-                Me.NODEPROPERTYIDENTIFICATION = New FEQL.NODEPROPERTYIDENTIFICATION
-                Call Me.GetParseTreeTokensReflection(Me.NODEPROPERTYIDENTIFICATION, Me.WHICHCLAUSE.NODEPROPERTYIDENTIFICATION)
-                lrFBMModelObject = Me.Model.GetModelObjectByName(Me.NODEPROPERTYIDENTIFICATION.MODELELEMENTNAME)
-                If lrFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & Me.NODEPROPERTYIDENTIFICATION.MODELELEMENTNAME & "'.")
+                'Me.NODEPROPERTYIDENTIFICATION = New FEQL.NODEPROPERTYIDENTIFICATION
+                '20200822-VM-Change back if doesn't work
+                'Call Me.GetParseTreeTokensReflection(Me.NODEPROPERTYIDENTIFICATION, Me.WHICHCLAUSE.NODEPROPERTYIDENTIFICATION)
+                lrFBMModelObject = Me.Model.GetModelObjectByName(arWHICHCLAUSE.NODE(0).NODEPROPERTYIDENTIFICATION.MODELELEMENTNAME)
+                If lrFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & arWHICHCLAUSE.NODE(0).NODEPROPERTYIDENTIFICATION.MODELELEMENTNAME & "'.")
                 '---------------------------------------------------------
                 'Set the Identification
-                For Each lsIdentifier In Me.NODEPROPERTYIDENTIFICATION.IDENTIFIER
+                For Each lsIdentifier In arWHICHCLAUSE.NODE(0).NODEPROPERTYIDENTIFICATION.IDENTIFIER
                     arQueryEdge.IdentifierList.Add(lsIdentifier)
                 Next
             Else
@@ -806,7 +563,8 @@
                 If Me.WHICHCLAUSE.MODELELEMENT.Count = 1 Then
                     Call Me.GetParseTreeTokensReflection(Me.MODELELEMENTCLAUSE, Me.WHICHCLAUSE.MODELELEMENT(0))
                 Else
-                    Call Me.GetParseTreeTokensReflection(Me.MODELELEMENTCLAUSE, Me.WHICHCLAUSE.MODELELEMENT(1))
+                    Me.MODELELEMENTCLAUSE.MODELELEMENTNAME = Me.WHICHCLAUSE.NODE(0).MODELELEMENTNAME
+                    Me.MODELELEMENTCLAUSE.MODELELEMENTSUFFIX = Me.WHICHCLAUSE.NODE(0).MODELELEMENTSUFFIX
                 End If
                 If arWHICHCLAUSE.KEYWDTHAT.Count = 2 Then liModelElementInd = 1
                 lrFBMModelObject = Me.Model.GetModelObjectByName(Me.WHICHCLAUSE.MODELELEMENTNAME(liModelElementInd))
@@ -852,13 +610,14 @@
 
             'Get the TargetNode                        
             If aoNODEPROPERTYIDENTIFICATION IsNot Nothing Then
-                Me.NODEPROPERTYIDENTIFICATION = New FEQL.NODEPROPERTYIDENTIFICATION
-                Call Me.GetParseTreeTokensReflection(Me.NODEPROPERTYIDENTIFICATION, Me.WHICHCLAUSE.NODEPROPERTYIDENTIFICATION)
-                lrFBMModelObject = Me.Model.GetModelObjectByName(Me.NODEPROPERTYIDENTIFICATION.MODELELEMENTNAME)
-                If lrFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & Me.NODEPROPERTYIDENTIFICATION.MODELELEMENTNAME & "'.")
+                'Me.NODEPROPERTYIDENTIFICATION = New FEQL.NODEPROPERTYIDENTIFICATION
+                '20200822-VM-Change back if doesn't work
+                'Call Me.GetParseTreeTokensReflection(Me.NODEPROPERTYIDENTIFICATION, Me.WHICHCLAUSE.NODEPROPERTYIDENTIFICATION)
+                lrFBMModelObject = Me.Model.GetModelObjectByName(arWHICHCLAUSE.NODE(0).NODEPROPERTYIDENTIFICATION.MODELELEMENTNAME)
+                If lrFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & arWHICHCLAUSE.NODE(0).NODEPROPERTYIDENTIFICATION.MODELELEMENTNAME & "'.")
                 '---------------------------------------------------------
                 'Set the Identification
-                For Each lsIdentifier In Me.NODEPROPERTYIDENTIFICATION.IDENTIFIER
+                For Each lsIdentifier In arWHICHCLAUSE.NODE(0).NODEPROPERTYIDENTIFICATION.IDENTIFIER
                     arQueryEdge.IdentifierList.Add(lsIdentifier)
                 Next
             Else
@@ -868,8 +627,8 @@
 
             arQueryEdge.TargetNode = New FactEngine.QueryNode(lrFBMModelObject)
             If aoNODEPROPERTYIDENTIFICATION IsNot Nothing Then
-                arQueryEdge.TargetNode.PreboundText = Me.NODEPROPERTYIDENTIFICATION.PREBOUNDREADINGTEXT
-                arQueryEdge.TargetNode.PostboundText = Me.NODEPROPERTYIDENTIFICATION.POSTBOUNDREADINGTEXT
+                arQueryEdge.TargetNode.PreboundText = arWHICHCLAUSE.NODE(0).PREBOUNDREADINGTEXT
+                arQueryEdge.TargetNode.PostboundText = arWHICHCLAUSE.NODE(0).POSTBOUNDREADINGTEXT
             End If
 
             If lrFBMModelObject.ConceptType = pcenumConceptType.ValueType Then
@@ -967,13 +726,14 @@
 
             'Get the TargetNode                        
             If Me.WHICHCLAUSE.NODEPROPERTYIDENTIFICATION IsNot Nothing Then
-                Me.NODEPROPERTYIDENTIFICATION = New FEQL.NODEPROPERTYIDENTIFICATION
-                Call Me.GetParseTreeTokensReflection(Me.NODEPROPERTYIDENTIFICATION, Me.WHICHCLAUSE.NODEPROPERTYIDENTIFICATION)
-                lrFBMModelObject = Me.Model.GetModelObjectByName(Me.NODEPROPERTYIDENTIFICATION.MODELELEMENTNAME)
-                If lrFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & Me.NODEPROPERTYIDENTIFICATION.MODELELEMENTNAME & "'.")
+                'Me.NODEPROPERTYIDENTIFICATION = New FEQL.NODEPROPERTYIDENTIFICATION
+                '20200822-VM-Change back if doesn't work
+                'Call Me.GetParseTreeTokensReflection(Me.NODEPROPERTYIDENTIFICATION, Me.WHICHCLAUSE.NODEPROPERTYIDENTIFICATION)
+                lrFBMModelObject = Me.Model.GetModelObjectByName(arWHICHCLAUSE.NODE(0).NODEPROPERTYIDENTIFICATION.MODELELEMENTNAME)
+                If lrFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & arWHICHCLAUSE.NODE(0).NODEPROPERTYIDENTIFICATION.MODELELEMENTNAME & "'.")
                 '---------------------------------------------------------
                 'Set the Identification
-                For Each lsIdentifier In Me.NODEPROPERTYIDENTIFICATION.IDENTIFIER
+                For Each lsIdentifier In arWHICHCLAUSE.NODE(0).NODEPROPERTYIDENTIFICATION.IDENTIFIER
                     arQueryEdge.IdentifierList.Add(lsIdentifier)
                 Next
             Else

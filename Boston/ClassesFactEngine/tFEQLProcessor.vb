@@ -233,6 +233,18 @@ Namespace FEQL
             End Set
         End Property
 
+        Private _NODE As New List(Of NODE)
+
+        Public Property NODE As List(Of NODE)
+            Get
+                Return Me._NODE
+            End Get
+            Set(value As List(Of NODE))
+                Me._NODE = value
+            End Set
+        End Property
+
+
         Private _NODEPROPERTYIDENTIFICATION As Object = Nothing
         Public Property NODEPROPERTYIDENTIFICATION As Object
             Get
@@ -250,6 +262,70 @@ Namespace FEQL
             End Get
             Set(value As Object)
                 Me._WITHCLAUSE = value
+            End Set
+        End Property
+
+    End Class
+
+    Public Class NODE
+
+        Private _MODELELEMENT As MODELELEMENTClause
+        Public Property MODELELEMENT As MODELELEMENTClause
+            Get
+                Return Me._MODELELEMENT
+            End Get
+            Set(value As MODELELEMENTClause)
+                Me._MODELELEMENT = value
+            End Set
+        End Property
+
+        Private _MODELELEMENTNAME As String
+        Public Property MODELELEMENTNAME As String
+            Get
+                Return Me._MODELELEMENTNAME
+            End Get
+            Set(value As String)
+                Me._MODELELEMENTNAME = value
+            End Set
+        End Property
+
+        Private _MODELELEMENTSUFFIX As String = Nothing
+        Public Property MODELELEMENTSUFFIX As String
+            Get
+                Return Me._MODELELEMENTSUFFIX
+            End Get
+            Set(value As String)
+                Me._MODELELEMENTSUFFIX = value
+            End Set
+        End Property
+
+        Private _PREBOUNDREADINGTEXT As String = Nothing
+        Public Property PREBOUNDREADINGTEXT As String
+            Get
+                Return Me._PREBOUNDREADINGTEXT
+            End Get
+            Set(value As String)
+                Me._PREBOUNDREADINGTEXT = value
+            End Set
+        End Property
+
+        Private _POSTBOUNDREADINGTEXT As String = Nothing
+        Public Property POSTBOUNDREADINGTEXT As String
+            Get
+                Return Me._POSTBOUNDREADINGTEXT
+            End Get
+            Set(value As String)
+                Me._POSTBOUNDREADINGTEXT = value
+            End Set
+        End Property
+
+        Private _NODEPROPERTYIDENTIFICATION As NODEPROPERTYIDENTIFICATION
+        Public Property NODEPROPERTYIDENTIFICATION As NODEPROPERTYIDENTIFICATION
+            Get
+                Return Me._NODEPROPERTYIDENTIFICATION
+            End Get
+            Set(value As NODEPROPERTYIDENTIFICATION)
+                Me._NODEPROPERTYIDENTIFICATION = value
             End Set
         End Property
 
@@ -274,26 +350,6 @@ Namespace FEQL
             End Get
             Set(value As String)
                 Me._MODELELEMENTNAME = value
-            End Set
-        End Property
-
-        Private _PREBOUNDREADINGTEXT As String = Nothing
-        Public Property PREBOUNDREADINGTEXT As String
-            Get
-                Return Me._PREBOUNDREADINGTEXT
-            End Get
-            Set(value As String)
-                Me._PREBOUNDREADINGTEXT = value
-            End Set
-        End Property
-
-        Private _POSTBOUNDREADINGTEXT As String = Nothing
-        Public Property POSTBOUNDREADINGTEXT As String
-            Get
-                Return Me._POSTBOUNDREADINGTEXT
-            End Get
-            Set(value As String)
-                Me._POSTBOUNDREADINGTEXT = value
             End Set
         End Property
 
@@ -326,7 +382,7 @@ Namespace FEQL
         Public WHICHSELECTStatement As New FEQL.WHICHSELECTStatement
         Public WHICHCLAUSE As New FEQL.WHICHCLAUSE
         Public MODELELEMENTCLAUSE As New FEQL.MODELELEMENTClause
-        Public NODEPROPERTYIDENTIFICATION As New FEQL.NODEPROPERTYIDENTIFICATION
+        'Public NODEPROPERTYIDENTIFICATION As New FEQL.NODEPROPERTYIDENTIFICATION '20200822-Changed to Node, and Node is automatically retrieved from the ParseNodes.
         Public WITHCLAUSE As New FEQL.WITHClause
 
         ''' <summary>
@@ -374,42 +430,48 @@ Namespace FEQL
                 Dim lasListOfString As New List(Of String)
 
                 If lr_bag.Contains(aoParseTreeNode.Token.Type.ToString) Then
-                    'lrType = ao_object.GetAttributeMember(aoParseTreeNode.Token.Type.ToString).GetType
+
                     lrType = ao_object.GetType.GetProperty(aoParseTreeNode.Token.Type.ToString).PropertyType
                     Dim piInstance As PropertyInfo = ao_object.GetType.GetProperty(aoParseTreeNode.Token.Type.ToString)
 
                     If lrType Is GetType(String) Then
-                        'ao_object.SetAttributeMember(aoParseTreeNode.Token.Type.ToString, aoParseTreeNode.Token.Text)
+
                         piInstance.SetValue(ao_object, Trim(aoParseTreeNode.Token.Text))
 
                     ElseIf lrType Is lasListOfString.GetType Then
-                        'ao_object.GetAttributeMember(aoParseTreeNode.Token.Type.ToString).Add(aoParseTreeNode.Token.Text)
+
 
                         Dim liInstance As Object = ao_object.GetType.GetProperty(aoParseTreeNode.Token.Type.ToString).GetValue(ao_object)
-                        'Dim instance As Object = Activator.CreateInstance(ao_object.GetType.GetProperty(aoParseTreeNode.Token.Type.ToString).PropertyType)
                         Dim list As IList = CType(liInstance, IList)
                         list.Add(aoParseTreeNode.Token.Text)
                         ao_object.GetType.GetProperty(aoParseTreeNode.Token.Type.ToString).SetValue(ao_object, list, Nothing)
 
-                        '==================================
-                        'piInstance.SetValue(ao_object, aoParseTreeNode.Token.Text)
-                        'ElseIf lrType Is GetType(List(Of String)) Then
-                        '    'ao_object.GetAttributeMember(aoParseTreeNode.Token.Type.ToString).Add(aoParseTreeNode)
-                        '    piInstance.SetValue(ao_object, aoParseTreeNode.Token.Text)
                     ElseIf lrType Is GetType(List(Of Object)) Then
 
                         Dim liInstance As Object = ao_object.GetType.GetProperty(aoParseTreeNode.Token.Type.ToString).GetValue(ao_object)
-                        'Dim instance As Object = Activator.CreateInstance(ao_object.GetType.GetProperty(aoParseTreeNode.Token.Type.ToString).PropertyType)
                         Dim list As IList = CType(liInstance, IList)
                         list.Add(aoParseTreeNode)
                         ao_object.GetType.GetProperty(aoParseTreeNode.Token.Type.ToString).SetValue(ao_object, list, Nothing)
 
-                        'ao_object.GetAttributeMember(aoParseTreeNode.Token.Type.ToString).Add(aoParseTreeNode)
-                        'piInstance.SetValue(ao_object, aoParseTreeNode.Token.Text)
                     ElseIf lrType Is GetType(Object) Then
-                        'ao_object.SetAttributeMember(aoParseTreeNode.Token.Type.ToString, aoParseTreeNode)
+
                         piInstance.SetValue(ao_object, aoParseTreeNode)
+
+                    ElseIf lrType.Name = "List`1" Then
+
+                        Dim instance = Activator.CreateInstance(lrType.GenericTypeArguments(0))
+                        Call GetParseTreeTokensReflection(instance, loParseTreeNode)
+                        Dim liInstance As Object = ao_object.GetType.GetProperty(aoParseTreeNode.Token.Type.ToString).GetValue(ao_object)
+                        Dim list As IList = CType(liInstance, IList)
+                        list.Add(instance)
+                        ao_object.GetType.GetProperty(aoParseTreeNode.Token.Type.ToString).SetValue(ao_object, list, Nothing)
+
+                    Else
+                        Dim instance = Activator.CreateInstance(lrType)
+                        Call GetParseTreeTokensReflection(instance, loParseTreeNode)
+                        piInstance.SetValue(ao_object, instance)
                     End If
+
                 End If
 
                 For Each loParseTreeNode In aoParseTreeNode.Nodes.ToArray
