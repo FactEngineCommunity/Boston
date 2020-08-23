@@ -31,7 +31,7 @@ Namespace FBM
         Public WithEvents Concept As FBM.Concept  'New 'The Concept that is related to the ModelObject within the Model/ModelDictionary
 
 
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public ConceptType As pcenumConceptType
 
         <XmlAttribute()> _

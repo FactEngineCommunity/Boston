@@ -3259,7 +3259,7 @@ Namespace FBM
                 '----------------------------------------------
                 ' Save the set of Entities within the ORM Model
                 '----------------------------------------------
-                For Each lrEntityType In Me.EntityType
+                For Each lrEntityType In Me.EntityType.OrderBy(Function(x) x.SubtypeRelationship.Count)
                     Call lrEntityType.Save(abRapidSave)
                 Next
 

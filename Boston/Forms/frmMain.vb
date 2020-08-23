@@ -2228,8 +2228,7 @@ Public Class frmMain
 
                         Dim lrRoleConstraintRoleInstance As FBM.RoleConstraintRoleInstance
 
-                        Dim lrModelObject As New FBM.ModelObject
-                        lrModelObject = prApplication.WorkingPage.SelectedObject(liInd - 1)
+                        Dim lrModelObject = prApplication.WorkingPage.SelectedObject(liInd - 1)
 
                         Select Case lrModelObject.ConceptType
                             Case Is = pcenumConceptType.ValueType
@@ -2304,17 +2303,14 @@ Public Class frmMain
 
                             Case Is = pcenumConceptType.SubtypeConstraint
 
-                                Dim lrSubtypeRelationshipInstance As FBM.SubtypeRelationshipInstance = prApplication.WorkingPage.SelectedObject(liInd - 1)
+                                Dim lrSubtypeRelationshipInstance As FBM.SubtypeRelationshipInstance = lrModelObject
 
-                                lrPage.Model.FactType.AddUnique(lrSubtypeRelationshipInstance.FactType.FactType)
+                                lrSubtypeRelationshipInstance.FactType = Me.CloneFactTypeInstanceToPage(lrSubtypeRelationshipInstance.FactType, lrPage)
 
-                                Dim lrModelElementInstance As FBM.EntityTypeInstance = lrSubtypeRelationshipInstance.EntityType
-                                lrModelElementInstance = lrPage.EntityTypeInstance.Find(Function(x) x.Id = lrModelElementInstance.Id)
-                                lrModelElementInstance.SubtypeRelationship.Add(lrSubtypeRelationshipInstance)
+                                lrSubtypeRelationshipInstance = lrSubtypeRelationshipInstance.Clone(lrPage, True)
 
-                                lrModelElementInstance.EntityType.SubtypeRelationship.AddUnique(lrSubtypeRelationshipInstance.SubtypeRelationship)
-
-
+                                Dim lrModelElementInstance = lrPage.EntityTypeInstance.Find(Function(x) x.Id = lrSubtypeRelationshipInstance.EntityType.Id)
+                                lrModelElementInstance.SubtypeRelationship.AddUnique(lrSubtypeRelationshipInstance)
 
                         End Select
                     Next
@@ -2350,7 +2346,7 @@ Public Class frmMain
 
     End Sub
 
-    Private Sub CloneFactTypeInstanceToPage(ByRef arFactTypeInstance As FBM.FactTypeInstance, ByRef arPage As FBM.Page)
+    Private Function CloneFactTypeInstanceToPage(ByRef arFactTypeInstance As FBM.FactTypeInstance, ByRef arPage As FBM.Page) As FBM.FactTypeInstance
 
         Dim larInternalUniquenessConstraintInstance As New List(Of FBM.RoleConstraintInstance)
         For Each lrInternalUniquenessConstraintInstance In arFactTypeInstance.InternalUniquenessConstraint
@@ -2381,7 +2377,9 @@ Public Class frmMain
             arPage.RoleConstraintInstance.AddUnique(lrInternalUniquenessConstraintInstance)
         Next
 
-    End Sub
+        Return arFactTypeInstance
+
+    End Function
 
     Private Sub PasteToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles PasteToolStripMenuItem.Click
 

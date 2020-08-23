@@ -3,10 +3,14 @@ Imports System.Xml.Serialization
 Imports System.Reflection
 
 Namespace FBM
-    <Serializable()> _
+    <Serializable()>
     Public Class SubtypeRelationshipInstance
-        Inherits FBM.PageObject
+        Inherits FBM.ModelObject
+        Implements FBM.iPageObject
         Implements IEquatable(Of FBM.SubtypeRelationshipInstance)
+
+        <XmlAttribute()>
+        Public Shadows ConceptType As pcenumConceptType = pcenumConceptType.SubtypeConstraint
 
         ''' <summary>
         ''' The EntityType for which the SubTypeIstance (line) acts as View/Proxy.
@@ -23,9 +27,31 @@ Namespace FBM
 
         Public Shadows SubtypeRelationship As New FBM.tSubtypeRelationship
 
-        <NonSerialized(), _
-        XmlIgnore()> _
+        <NonSerialized(),
+        XmlIgnore()>
         Public Link As DiagramLink
+
+        <NonSerialized(),
+        XmlIgnore()>
+        Public Page As FBM.Page
+
+        Public Property X As Integer Implements iPageObject.X
+            Get
+                Throw New NotImplementedException()
+            End Get
+            Set(value As Integer)
+                Throw New NotImplementedException()
+            End Set
+        End Property
+
+        Public Property Y As Integer Implements iPageObject.Y
+            Get
+                Throw New NotImplementedException()
+            End Get
+            Set(value As Integer)
+                Throw New NotImplementedException()
+            End Set
+        End Property
 
         Public Sub New()
 
@@ -33,7 +59,9 @@ Namespace FBM
 
         End Sub
 
-        Public Sub New(ByRef arPage As FBM.Page, ByRef ar_entity_type_instance As FBM.EntityTypeInstance, ByRef ar_parentEntityTypeInstance As FBM.EntityTypeInstance)
+        Public Sub New(ByRef arPage As FBM.Page,
+                       ByRef ar_entity_type_instance As FBM.EntityTypeInstance,
+                       ByRef ar_parentEntityTypeInstance As FBM.EntityTypeInstance)
 
             Call Me.New()
 
@@ -63,6 +91,7 @@ Namespace FBM
             Try
                 With Me
                     lrSubtypeRelationshipInstance.Page = arPage
+                    lrSubtypeRelationshipInstance.Model = arPage.Model
                     lrSubtypeRelationshipInstance.SubtypeRelationship = .SubtypeRelationship.Clone(arPage.Model, abAddToModel)
                     lrSubtypeRelationshipInstance.EntityType = arPage.EntityTypeInstance.Find(AddressOf .EntityType.Equals)
                     lrSubtypeRelationshipInstance.parentEntityType = arPage.EntityTypeInstance.Find(AddressOf .parentEntityType.Equals)
@@ -153,6 +182,49 @@ Namespace FBM
 
         End Sub
 
+        Public Sub MouseDown() Implements iPageObject.MouseDown
+            Throw New NotImplementedException()
+        End Sub
+
+        Public Sub MouseMove() Implements iPageObject.MouseMove
+            Throw New NotImplementedException()
+        End Sub
+
+        Public Sub MouseUp() Implements iPageObject.MouseUp
+            Throw New NotImplementedException()
+        End Sub
+
+        Public Sub NodeDeleting() Implements iPageObject.NodeDeleting
+            Throw New NotImplementedException()
+        End Sub
+
+        Public Sub NodeDeselected() Implements iPageObject.NodeDeselected
+            Throw New NotImplementedException()
+        End Sub
+
+        Public Sub NodeModified() Implements iPageObject.NodeModified
+            Throw New NotImplementedException()
+        End Sub
+
+        Public Sub NodeSelected() Implements iPageObject.NodeSelected
+            Throw New NotImplementedException()
+        End Sub
+
+        Public Sub Move(aiNewX As Integer, aiNewY As Integer, abBroadcastInterfaceEvent As Boolean) Implements iPageObject.Move
+            Throw New NotImplementedException()
+        End Sub
+
+        Public Sub Moved() Implements iPageObject.Moved
+            Throw New NotImplementedException()
+        End Sub
+
+        Public Sub RepellNeighbouringPageObjects(aiDepth As Integer) Implements iPageObject.RepellNeighbouringPageObjects
+            Throw New NotImplementedException()
+        End Sub
+
+        Public Sub SetAppropriateColour() Implements iPageObject.SetAppropriateColour
+            Throw New NotImplementedException()
+        End Sub
     End Class
 
 End Namespace

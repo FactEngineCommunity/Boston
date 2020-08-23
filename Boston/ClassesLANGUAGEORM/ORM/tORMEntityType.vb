@@ -909,6 +909,10 @@ Namespace FBM
                 Me.ReferenceModeFactType.ChangeModel(arTargetModel, abAddToModel)
             End If
 
+            For Each lrSubtypeRelationship In Me.SubtypeRelationship
+                lrSubtypeRelationship.Model = arTargetModel
+            Next
+
             'If Me.ReferenceModeRoleConstraint IsNot Nothing Then
             '            Me.ReferenceModeRoleConstraint.ChangeModel(arTargetModel)
             'End If

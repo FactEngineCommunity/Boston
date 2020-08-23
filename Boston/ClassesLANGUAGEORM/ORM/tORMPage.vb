@@ -193,6 +193,8 @@ Namespace FBM
         Public ValueInstance As New List(Of FBM.FactDataInstance)
         Public ModelNoteInstance As New List(Of FBM.ModelNoteInstance)
 
+        Public SubtypeRelationship As New List(Of FBM.SubtypeRelationshipInstance)
+
         <XmlIgnore()> _
         Public ModelNote As New List(Of FBM.ModelNoteInstance)
 
