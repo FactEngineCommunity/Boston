@@ -28,6 +28,9 @@
         Me.DataGridView.Columns(0).AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
         Me.DataGridView.Columns(1).AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
 
+        For Each lrRow As DataGridViewRow In Me.DataGridView.Rows
+            lrRow.Cells(0).ToolTipText = lrRow.DataBoundItem.Signature
+        Next
 
     End Sub
 

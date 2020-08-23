@@ -1606,6 +1606,8 @@ Namespace FBM
 
             Try
                 Me.RDSLoading = True
+                Dim lsMessage As String
+
                 Dim lsSQLQuery As String = ""
                 Dim lrTable As RDS.Table
                 Dim lrColumn As RDS.Column
@@ -1630,6 +1632,19 @@ Namespace FBM
                     '-----------------------------------------------------
                     'Get the underlying ModelElement
                     lrModelElement = Me.GetModelObjectByName(lrORMRecordset("Element").Data)
+
+                    If lrModelElement Is Nothing Then
+                        'This is dire. Create a dummy FBMEntityType for the Table, and add the EntityType to the Model. 
+                        '  The user can then elect to delete the EntityType/Table if it shouldn't be in the model
+                        Dim lrEntityType = Me.CreateEntityType(lrORMRecordset("Element").Data, True)
+                        lrModelElement = lrEntityType
+
+                        'Let the user know what happened.
+                        lsMessage = "The Table, '" & lrModelElement.Name & "', within the relational model had no corresponding Object-Role Model model element."
+                        lsMessage &= vbCrLf & vbCrLf & "An Entity Type has been created in the model to cater for this. If you no longer need this model element remove it from the model."
+                        Call prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical)
+                    End If
+
 
                     lrTable = New RDS.Table(Me.RDS, lrORMRecordset("Element").Data, lrModelElement)
                     Me.RDS.Table.Add(lrTable)

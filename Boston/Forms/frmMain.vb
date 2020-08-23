@@ -2302,6 +2302,20 @@ Public Class frmMain
                                 lrRoleConstraintInstance = lrRoleConstraintInstance.Clone(lrPage, lrRoleConstraintInstance.RoleConstraint.IsMDAModelElement)
                                 lrPage.RoleConstraintInstance.AddUnique(lrRoleConstraintInstance)
 
+                            Case Is = pcenumConceptType.SubtypeConstraint
+
+                                Dim lrSubtypeRelationshipInstance As FBM.SubtypeRelationshipInstance = prApplication.WorkingPage.SelectedObject(liInd - 1)
+
+                                lrPage.Model.FactType.AddUnique(lrSubtypeRelationshipInstance.FactType.FactType)
+
+                                Dim lrModelElementInstance As FBM.EntityTypeInstance = lrSubtypeRelationshipInstance.EntityType
+                                lrModelElementInstance = lrPage.EntityTypeInstance.Find(Function(x) x.Id = lrModelElementInstance.Id)
+                                lrModelElementInstance.SubtypeRelationship.Add(lrSubtypeRelationshipInstance)
+
+                                lrModelElementInstance.EntityType.SubtypeRelationship.AddUnique(lrSubtypeRelationshipInstance.SubtypeRelationship)
+
+
+
                         End Select
                     Next
 
@@ -2454,7 +2468,7 @@ Public Class frmMain
                     Dim loTuple As New Object
                     lrSignatureResolutionClass.add_attribute(New tAttribute("CopiedModelObjectName", GetType(String)))
                     lrSignatureResolutionClass.add_attribute(New tAttribute("NewModelObjectName", GetType(String)))
-
+                    lrSignatureResolutionClass.add_attribute(New tAttribute("Signature", GetType(String)))
                     '-----------------------------------------------------------------------------------------------
                     'Create a new instance of the frmSignatureResolution to display any (if any) Signature Clashes
                     '-----------------------------------------------------------------------------------------------
@@ -2478,6 +2492,7 @@ Public Class frmMain
                             If Not lrModelObject.getBaseModelObject.EqualsBySignature(lrEncumbentModelObject) Then
 
                                 loTuple.NewModelObjectName = "Signature differs from the encumbent Model Object."
+                                loTuple.Signature = lrModelObject.getBaseModelObject.GetSignature
                                 lbDifferentSignatureFound = True
 
                                 '-----------------------------------------------------------------------------

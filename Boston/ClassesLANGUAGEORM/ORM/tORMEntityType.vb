@@ -1564,7 +1564,7 @@ Namespace FBM
             lsSignature = Me.Id
 
             If IsSomething(Me.ReferenceModeValueType) Then
-                lsSignature &= Me.ReferenceModeValueType.Id & Me.ReferenceModeValueType.DataType
+                lsSignature &= Me.ReferenceModeValueType.Id & Me.ReferenceModeValueType.DataType.ToString
                 lsSignature &= Me.PreferredIdentifierRCId
             End If
 

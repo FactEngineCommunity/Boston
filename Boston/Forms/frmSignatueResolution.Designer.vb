@@ -33,16 +33,16 @@ Partial Class frmSignatueResolution
         '
         Me.LabelPrompt.Location = New System.Drawing.Point(12, 13)
         Me.LabelPrompt.Name = "LabelPrompt"
-        Me.LabelPrompt.Size = New System.Drawing.Size(582, 59)
+        Me.LabelPrompt.Size = New System.Drawing.Size(582, 82)
         Me.LabelPrompt.TabIndex = 0
         Me.LabelPrompt.Text = resources.GetString("LabelPrompt.Text")
         '
         'DataGridView
         '
         Me.DataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        Me.DataGridView.Location = New System.Drawing.Point(12, 75)
+        Me.DataGridView.Location = New System.Drawing.Point(12, 106)
         Me.DataGridView.Name = "DataGridView"
-        Me.DataGridView.Size = New System.Drawing.Size(655, 225)
+        Me.DataGridView.Size = New System.Drawing.Size(655, 194)
         Me.DataGridView.TabIndex = 1
         '
         'ButtonClose

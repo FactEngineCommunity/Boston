@@ -118,9 +118,11 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="LabelPrompt.Text" xml:space="preserve">
-    <value>The following Model Objects already exist in the Model you are pasting to. The existing Model Objects will be kept.
+    <value>The following Model Element/s already exist in the Model you are pasting to. The existing Model Element/s will be kept.
 
-Where the signature of the pasting Model Object differs from the encumbent Model Object in this Model, this is flagged in the table below.
+Where the signature of the pasting Model Object differs from the encumbent Model Element in this Model, this is flagged in the table below.
+
+NB Hover over the Model Element to see its signature.
 </value>
   </data>
 </root>
