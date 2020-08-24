@@ -1138,6 +1138,26 @@ Namespace FBM
                     lrColumn.setName(lrColumn.getAttributeName)
                 Next
 
+                'Find RDS.Relations that reference this EntityType, and set their OriginColumns and DestinationColumns
+
+                Dim larRelation = From Relation In Me.Model.RDS.Relation
+                                  Where Relation.DestinationTable.Name = Me.Id
+                                  Select Relation
+
+                For Each lrRelation In larRelation
+
+                    Dim lrOriginColumn = lrRelation.OriginTable.Column.Find(Function(x) x.ActiveRole Is Me.ReferenceModeFactType.RoleGroup(1))
+                    Dim lrDestinationColumn = Me.getCorrespondingRDSTable.Column.Find(Function(x) x.ActiveRole Is Me.ReferenceModeFactType.RoleGroup(1))
+
+                    lrRelation.OriginColumns.Add(lrOriginColumn)
+                    lrRelation.DestinationColumns.Add(lrDestinationColumn)
+
+                    Call Me.Model.addCMMLColumnToRelationOrigin(lrRelation, lrOriginColumn, 1)
+                    Call Me.Model.addCMMLColumnToRelationDestination(lrRelation, lrDestinationColumn, 1)
+
+                Next
+
+
                 '===================================================================================
                 '20180716-VM-Remove if all okay. lrRoleConstraint.SetIsPreferredIndentifier(True) (above) creates the Index.
                 'RDS - Index for the PK

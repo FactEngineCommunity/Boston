@@ -2,7 +2,7 @@
 
 Namespace TableSubtypeRelationship
 
-    Module Table_parentEntityType
+    Module Table_SubtypeRelationship
 
         Sub add_parentEntityType(ByVal ar_subtype_constraint As FBM.tSubtypeRelationship)
 

@@ -2454,6 +2454,13 @@ Public Class frmMain
                     Exit Sub
                 End If
 
+                If lrPage.CopiedModelId = prApplication.WorkingModel.ModelId And
+                    lrPage.CopiedPageId = prApplication.WorkingPage.PageId Then
+                    MsgBox("You cannot copy and paste to the same Model and Page")
+                    Exit Sub
+                End If
+
+
                 If lrPage.CopiedModelId <> prApplication.WorkingModel.ModelId Then
                     '--------------------------------------------------------
                     'Must merge the Page/ModelObjects into the target Model
@@ -2467,6 +2474,7 @@ Public Class frmMain
                     lrSignatureResolutionClass.add_attribute(New tAttribute("CopiedModelObjectName", GetType(String)))
                     lrSignatureResolutionClass.add_attribute(New tAttribute("NewModelObjectName", GetType(String)))
                     lrSignatureResolutionClass.add_attribute(New tAttribute("Signature", GetType(String)))
+                    lrSignatureResolutionClass.add_attribute(New tAttribute("UseEncumbent", GetType(Boolean)))
                     '-----------------------------------------------------------------------------------------------
                     'Create a new instance of the frmSignatureResolution to display any (if any) Signature Clashes
                     '-----------------------------------------------------------------------------------------------
@@ -2509,17 +2517,79 @@ Public Class frmMain
                             '-----------------------------------------------------------------------
                             'There were Signature Clashes, so display the SignatureResolution form                        
                             lrfrmSignatueResolution.ShowDialog()
+
+                            larSignatureResolutionList = lrfrmSignatueResolution.zarSignatureResolutionList
                         Else
                             lrfrmSignatueResolution.Dispose()
                         End If
 
-                        Dim lsMessage As String = "Resolve the different signatures before pasting to the new Model."
-                        lsMessage.AppendString(vbCrLf & vbCrLf & "i.e. Make sure that the Model Objects that you are pasting are the same as the ones you are trying to override.")
-                        MsgBox(lsMessage)
-                        Exit Sub
+                        If larSignatureResolutionList.FindAll(Function(x) x.UseEncumbent = True).Count = 0 Then
+
+                            Dim lsMessage As String = "Resolve the different signatures before pasting to the new Model."
+                            lsMessage.AppendString(vbCrLf & vbCrLf & "i.e. Make sure that the Model Objects that you are pasting are the same as the ones you are trying to override.")
+                            MsgBox(lsMessage)
+                            Exit Sub
+                        Else
+                            For Each lrTuple In larSignatureResolutionList.FindAll(Function(x) x.UseEncumbent = True)
+
+                                Dim lrModelElement = lrPage.getModelElementById(lrTuple.CopiedModelObjectName)
+                                Dim lrReplaceMentModelElement = prApplication.WorkingPage.getModelElementById(lrTuple.CopiedModelObjectName)
+
+                                lrReplaceMentModelElement = lrModelElement
+
+                                Select Case lrModelElement.ConceptType
+                                    Case Is = pcenumConceptType.EntityType,
+                                              pcenumConceptType.ValueType,
+                                              pcenumConceptType.FactType
+
+                                        Dim larFacType As New List(Of FBM.FactType)
+
+                                        For Each lrFactType In lrPage.FactTypeInstance
+                                            Dim larRole = From Role In lrFactType.RoleGroup
+                                                          Where Role.JoinedORMObject.Id = lrModelElement.Id
+                                                          Select Role
+
+                                            For Each lrRole In larRole
+                                                lrRole.JoinedORMObject = lrModelElement
+                                                Select Case lrRole.TypeOfJoin
+                                                    Case Is = pcenumRoleJoinType.EntityType
+                                                        lrRole.JoinsEntityType = lrModelElement
+                                                    Case Is = pcenumRoleJoinType.ValueType
+                                                        lrRole.JoinsValueType = lrModelElement
+                                                    Case Is = pcenumRoleJoinType.FactType
+                                                        lrRole.JoinsFactType = lrModelElement
+                                                End Select
+                                            Next
+                                        Next
+
+                                        For Each lrFactType In lrPage.Model.FactType
+                                            Dim larRole = From Role In lrFactType.RoleGroup
+                                                          Where Role.JoinedORMObject.Id = lrModelElement.Id
+                                                          Select Role
+
+                                            For Each lrRole In larRole
+                                                Select Case lrRole.TypeOfJoin
+                                                    Case Is = pcenumRoleJoinType.EntityType
+                                                        lrRole.JoinedORMObject = CType(lrModelElement, FBM.EntityTypeInstance).EntityType
+                                                        lrRole.JoinsEntityType = CType(lrModelElement, FBM.EntityTypeInstance).EntityType
+                                                    Case Is = pcenumRoleJoinType.ValueType
+                                                        lrRole.JoinedORMObject = CType(lrModelElement, FBM.ValueTypeInstance).ValueType
+                                                        lrRole.JoinsValueType = CType(lrModelElement, FBM.ValueTypeInstance).ValueType
+                                                    Case Is = pcenumRoleJoinType.FactType
+                                                        lrRole.JoinedORMObject = CType(lrModelElement, FBM.FactTypeInstance).FactType
+                                                        lrRole.JoinsFactType = CType(lrModelElement, FBM.FactTypeInstance).FactType
+                                                End Select
+                                            Next
+                                        Next
+
+                                End Select
+
+                            Next
+                        End If
+
                     End If
 
-                    lrfrmSignatueResolution.Dispose()
+                        lrfrmSignatueResolution.Dispose()
 
                 End If 'Pasting to a different Model.
 
@@ -2550,39 +2620,13 @@ Public Class frmMain
                 Next
 
                 '--------------------------------
-                'Display any Subtype constraints
+                'Display any Subtype Relationships
                 '--------------------------------
-                Dim lrSubtypeConstraint As FBM.SubtypeRelationshipInstance
+                Dim lrSubtypeRelationship As FBM.SubtypeRelationshipInstance
                 For Each lrEntityTypeInstance In prApplication.WorkingPage.EntityTypeInstance
-                    For Each lrSubtypeConstraint In lrEntityTypeInstance.SubtypeRelationship
-                        Call lrSubtypeConstraint.DisplayAndAssociate()
+                    For Each lrSubtypeRelationship In lrEntityTypeInstance.SubtypeRelationship
+                        Call lrSubtypeRelationship.DisplayAndAssociate()
                     Next
-                Next
-
-                lrPage.FactTypeInstance.Sort(AddressOf FBM.FactType.CompareRolesJoiningFactTypesCount)
-                For Each lrFactTypeInstance In lrPage.FactTypeInstance
-                    Dim loPt As New PointF(lrFactTypeInstance.X, lrFactTypeInstance.Y)
-                    lrFactTypeInstance.FactType.Model = prApplication.WorkingModel
-                    lrFactTypeInstance.Model = prApplication.WorkingModel
-                    If prApplication.WorkingPage.FactTypeInstance.Exists(AddressOf lrFactTypeInstance.Equals) Then
-                        If prApplication.WorkingPage.FactTypeInstance.Find(AddressOf lrFactTypeInstance.Equals).IsDisplayedAssociated Then
-                            '---------------------------------------------
-                            'Already on the Page and DisplayedAssociated
-                            '---------------------------------------------
-                        Else
-                            prApplication.WorkingPage.DropFactTypeAtPoint(lrFactTypeInstance.FactType, loPt, True)
-                        End If
-                    Else
-                        prApplication.WorkingPage.DropFactTypeAtPoint(lrFactTypeInstance.FactType, loPt, True)
-                    End If
-                Next
-
-                '-----------------------------------------------------------------
-                'ImpliedFactTypes
-                For Each lrFactType In lrPage.Model.FactType
-                    If Not prApplication.WorkingModel.FactType.Exists(AddressOf lrFactType.Equals) Then
-                        Call lrFactType.ChangeModel(prApplication.WorkingModel, True)
-                    End If
                 Next
 
                 '--------------------------------------------------------------------------------------------------
@@ -2592,32 +2636,82 @@ Public Class frmMain
                     Call lrRoleConstraint.ChangeModel(prApplication.WorkingModel, False)
                 Next
 
-                For Each lrRoleConstraintInstance In lrPage.RoleConstraintInstance
+                'RoleConstraints...change Model and make sure Ids are unique
+                If lrPage.CopiedModelId <> prApplication.WorkingModel.ModelId Then
+                    For Each lrRoleConstraintInstance In lrPage.RoleConstraintInstance
 
-                    Dim loPt As New PointF(lrRoleConstraintInstance.X, lrRoleConstraintInstance.Y)
+                        Call lrRoleConstraintInstance.RoleConstraint.ChangeModel(prApplication.WorkingModel, False)
 
-                    Call lrRoleConstraintInstance.RoleConstraint.ChangeModel(prApplication.WorkingModel, False)
+                        Dim lsUniqueId As String = prApplication.WorkingModel.CreateUniqueRoleConstraintName(lrRoleConstraintInstance.Id, 0)
 
-                    Dim lsUniqueId As String = prApplication.WorkingModel.CreateUniqueRoleConstraintName(lrRoleConstraintInstance.Id, 0)
+                        'Has to be unique in the copied model as well.
+                        If lsUniqueId <> lrRoleConstraintInstance.Id Then
+                            lsUniqueId = lrPage.Model.CreateUniqueRoleConstraintName(lsUniqueId, 0)
+                        End If
 
-                    lrRoleConstraintInstance.Id = lsUniqueId
-                    lrRoleConstraintInstance.Name = lsUniqueId
-                    lrRoleConstraintInstance.Symbol = lsUniqueId
-                    lrRoleConstraintInstance.RoleConstraint.Id = lsUniqueId
-                    lrRoleConstraintInstance.RoleConstraint.Name = lsUniqueId
-                    lrRoleConstraintInstance.RoleConstraint.Symbol = lsUniqueId
+                        lrRoleConstraintInstance.Id = lsUniqueId
+                        lrRoleConstraintInstance.Name = lsUniqueId
+                        lrRoleConstraintInstance.Symbol = lsUniqueId
+                        lrRoleConstraintInstance.RoleConstraint.Id = lsUniqueId
+                        lrRoleConstraintInstance.RoleConstraint.Name = lsUniqueId
+                        lrRoleConstraintInstance.RoleConstraint.Symbol = lsUniqueId
+                    Next
 
-                    If Not prApplication.WorkingPage.RoleConstraintInstance.Exists(AddressOf lrRoleConstraintInstance.Equals) Then
-                        prApplication.WorkingPage.DropRoleConstraintAtPoint(lrRoleConstraintInstance.RoleConstraint, loPt, True)
-                    End If
-                Next
+                    'Make doubly sure have captured all the RoleConstraints, to change Model and have/set unique Id.
+                    For Each lrRoleConstraint In lrPage.Model.RoleConstraint
 
-                For Each lrModelNoteInstance In lrPage.ModelNote
-                    Dim loPt As New PointF(lrModelNoteInstance.X, lrModelNoteInstance.Y)
-                    'prApplication.WorkingPage.DropModelNoteAtPoint(lrModelNoteInstance.ModelNote, loPt)
-                Next
+                        Call lrRoleConstraint.ChangeModel(prApplication.WorkingModel, False)
 
-            End If
+                        Dim lsUniqueId As String = prApplication.WorkingModel.CreateUniqueRoleConstraintName(lrRoleConstraint.Id, 0)
+
+                        lrRoleConstraint.Id = lsUniqueId
+                        lrRoleConstraint.Name = lsUniqueId
+                        lrRoleConstraint.Symbol = lsUniqueId
+                    Next
+                End If
+
+                '-----------------------------------------------------------------
+                'ImpliedFactTypes
+                For Each lrFactType In lrPage.Model.FactType
+                        If Not prApplication.WorkingModel.FactType.Exists(AddressOf lrFactType.Equals) Then
+                            Call lrFactType.ChangeModel(prApplication.WorkingModel, True)
+                        End If
+                    Next
+
+                    lrPage.FactTypeInstance.Sort(AddressOf FBM.FactType.CompareRolesJoiningFactTypesCount)
+                    For Each lrFactTypeInstance In lrPage.FactTypeInstance
+                        Dim loPt As New PointF(lrFactTypeInstance.X, lrFactTypeInstance.Y)
+                        lrFactTypeInstance.FactType.Model = prApplication.WorkingModel
+                        lrFactTypeInstance.Model = prApplication.WorkingModel
+                        If prApplication.WorkingPage.FactTypeInstance.Exists(AddressOf lrFactTypeInstance.Equals) Then
+                            If prApplication.WorkingPage.FactTypeInstance.Find(AddressOf lrFactTypeInstance.Equals).IsDisplayedAssociated Then
+                                '---------------------------------------------
+                                'Already on the Page and DisplayedAssociated
+                                '---------------------------------------------
+                            Else
+                                prApplication.WorkingPage.DropFactTypeAtPoint(lrFactTypeInstance.FactType, loPt, True)
+                            End If
+                        Else
+                            prApplication.WorkingPage.DropFactTypeAtPoint(lrFactTypeInstance.FactType, loPt, True)
+                        End If
+                    Next
+
+                    For Each lrRoleConstraintInstance In lrPage.RoleConstraintInstance
+
+                        Dim loPt As New PointF(lrRoleConstraintInstance.X, lrRoleConstraintInstance.Y)
+
+                        If Not prApplication.WorkingPage.RoleConstraintInstance.Exists(AddressOf lrRoleConstraintInstance.Equals) Then
+                            prApplication.WorkingPage.DropRoleConstraintAtPoint(lrRoleConstraintInstance.RoleConstraint, loPt, True)
+                        End If
+                    Next
+
+
+                    For Each lrModelNoteInstance In lrPage.ModelNote
+                        Dim loPt As New PointF(lrModelNoteInstance.X, lrModelNoteInstance.Y)
+                        'prApplication.WorkingPage.DropModelNoteAtPoint(lrModelNoteInstance.ModelNote, loPt)
+                    Next
+
+                End If
 
         Catch ex As Exception
             Dim lsMessage As String

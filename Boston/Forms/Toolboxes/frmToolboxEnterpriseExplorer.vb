@@ -1533,7 +1533,7 @@ Public Class frmToolboxEnterpriseExplorer
             lrPage = lrCorePage.Clone(lrModel, False, True, False) 'Injects the lrCorePage's Model Elements into the Model. No need to do anything more with the lrCorePage at all.
 
 
-            lrModel.RDFCreated = True
+            lrModel.RDSCreated = True
             '==================================================
 
             '==============================================================================================

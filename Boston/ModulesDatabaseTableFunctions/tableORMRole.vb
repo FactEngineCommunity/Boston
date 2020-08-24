@@ -36,6 +36,7 @@ Namespace TableRole
                 End If
                 lsSQLQuery &= " ," & arRole.TypeOfJoin
                 lsSQLQuery &= " ," & arRole.Mandatory
+                lsSQLQuery &= " ," & arRole.IsArray
                 lsSQLQuery &= ")"
 
                 Call pdbConnection.Execute(lsSQLQuery)
@@ -211,6 +212,7 @@ Namespace TableRole
                         End If
 
                         lrRole.Mandatory = lREcordset("IsMandatory").Value
+                        lrRole.IsArray = lREcordset("IsArray").Value
                         lrRole.isDirty = False
 
                         '--------------------------------------------------
@@ -272,7 +274,8 @@ Namespace TableRole
                 End If
 
                 lsSQLQuery &= "       ,TypeOfJoin = " & arRole.TypeOfJoin
-                lsSQLQuery &= "       ,IsMandatory = " & arRole.Mandatory                
+                lsSQLQuery &= "       ,IsMandatory = " & arRole.Mandatory
+                lsSQLQuery &= "       ,IsArray = " & arRole.IsArray
                 lsSQLQuery &= " WHERE ModelId = '" & Trim(arRole.Model.ModelId) & "'"
                 lsSQLQuery &= "   AND RoleId = '" & Trim(arRole.Id) & "'"
 

@@ -4,6 +4,63 @@ Namespace FBM
 
     Partial Public Class Model 'See also the folder ORMRDS/tORMModel.vb
 
+
+        Public Sub addCMMLColumnToRelationOrigin(ByRef arRelation As RDS.Relation,
+                                                 ByRef arColumn As RDS.Column,
+                                                 ByVal aiOrdinalPosition As Integer)
+
+            Dim lsSQLQuery As String
+            Dim lrFact As FBM.Fact
+
+            lsSQLQuery = "INSERT INTO " & pcenumCMMLRelations.CoreAttributeIsPartOfRelationOrigin.ToString
+            lsSQLQuery &= " (Attribute, Relation)"
+            lsSQLQuery &= " VALUES ("
+            lsSQLQuery &= "'" & arColumn.Id & "'"
+            lsSQLQuery &= ",'" & arRelation.Id & "'"
+            lsSQLQuery &= " )"
+
+            lrFact = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+            lsSQLQuery = "INSERT INTO " & pcenumCMMLRelations.CoreAttributeIsPartOfRelationOriginHasOrdinalPosition.ToString
+            lsSQLQuery &= " (RelationAttribute, OrdinalPosition)"
+            lsSQLQuery &= " VALUES ("
+            lsSQLQuery &= "'" & lrFact.Id & "'"
+            lsSQLQuery &= ",'" & aiOrdinalPosition & "'"
+            lsSQLQuery &= " )"
+
+            Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+
+        End Sub
+
+        Public Sub addCMMLColumnToRelationDestination(ByRef arRelation As RDS.Relation,
+                                                      ByRef arColumn As RDS.Column,
+                                                      ByVal aiOrdinalPosition As Integer)
+
+            Dim lsSQLQuery As String
+            Dim lrFact As FBM.Fact
+
+            lsSQLQuery = "INSERT INTO " & pcenumCMMLRelations.CoreAttributeIsPartOfRelationDestination.ToString
+            lsSQLQuery &= " (Attribute, Relation)"
+            lsSQLQuery &= " VALUES ("
+            lsSQLQuery &= "'" & arColumn.Id & "'"
+            lsSQLQuery &= ",'" & arRelation.Id & "'"
+            lsSQLQuery &= " )"
+
+            lrFact = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+            lsSQLQuery = "INSERT INTO " & pcenumCMMLRelations.CoreAttributeIsPartOfRelationDestinationHasOrdinalPosition.ToString
+            lsSQLQuery &= " (RelationAttribute, OrdinalPosition)"
+            lsSQLQuery &= " VALUES ("
+            lsSQLQuery &= "'" & lrFact.Id & "'"
+            lsSQLQuery &= ",'" & aiOrdinalPosition & "'"
+            lsSQLQuery &= " )"
+
+            Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+
+        End Sub
+
         Public Sub addCMMLIsPGSRelation(ByRef arTable As RDS.Table)
 
             Try

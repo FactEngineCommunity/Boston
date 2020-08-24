@@ -620,6 +620,8 @@ Namespace FBM
             Dim lrDictionaryEntry As FBM.DictionaryEntry
 
             Try
+                If arRoleConstraint.Id = "InternalUniquenessConstraint111" Then Debugger.Break()
+
                 '------------------------------------------------------------------------------------------------
                 'Add a new DictionaryEntry to the ModelDictionary if the DictionaryEntry doesn't already exist.
                 '------------------------------------------------------------------------------------------------                
@@ -684,7 +686,7 @@ Namespace FBM
                     '=====================================================================================
                     'RDS
                     If (Not arRoleConstraint.IsMDAModelElement) _
-                        And Me.RDFCreated Then 'For now, check this...because otherwise RDS may have no Tables.
+                        And Me.RDSCreated Then 'For now, check this...because otherwise RDS may have no Tables.
 
                         If arRoleConstraint.RoleConstraintType = pcenumRoleConstraintType.InternalUniquenessConstraint _
                             And arRoleConstraint.isSubtypeRelationshipFactTypeIUConstraint Then
@@ -858,9 +860,9 @@ Namespace FBM
 
                                 End If
 
-                                ElseIf arRoleConstraint.Role(0).FactType.IsManyTo1BinaryFactType And
-                                   arRoleConstraint.Role(0).HasInternalUniquenessConstraint And
-                                   Not arRoleConstraint.Role(0).FactType.IsLinkFactType Then
+                            ElseIf arRoleConstraint.Role(0).FactType.IsManyTo1BinaryFactType And
+                               arRoleConstraint.Role(0).HasInternalUniquenessConstraint And
+                               Not arRoleConstraint.Role(0).FactType.IsLinkFactType Then
 
                                 Dim lrRoleConstraintRole As FBM.Role = arRoleConstraint.RoleConstraintRole(0).Role
 
@@ -2871,7 +2873,7 @@ Namespace FBM
                 'RDS
                 '=====================================================================================
                 'RDS
-                If (Not arRoleConstraint.IsMDAModelElement) And Me.RDFCreated Then ' ContainsLanguage.Contains(pcenumLanguage.EntityRelationshipDiagram) Then 'For now, check this...because otherwise RDS may have no Tables.
+                If (Not arRoleConstraint.IsMDAModelElement) And Me.RDSCreated Then ' ContainsLanguage.Contains(pcenumLanguage.EntityRelationshipDiagram) Then 'For now, check this...because otherwise RDS may have no Tables.
 
                     If arRoleConstraint.RoleConstraintType = pcenumRoleConstraintType.InternalUniquenessConstraint Then
                         'Only interested in InternalUniquenessConstraints for forming Columns.
@@ -4365,7 +4367,7 @@ Namespace FBM
             Me.Loaded = True
 
             '20180410-VM-ToDo-Test to see if the RDF has been created for the Model.
-            Me.RDFCreated = True 'For now for testing. 
+            Me.RDSCreated = True 'For now for testing. 
 
             Richmond.WriteToStatusBar(".")
 

@@ -5,7 +5,7 @@ Namespace FBM
     Partial Public Class Model
 
 
-        Public RDFCreated As Boolean = False 'True after the RDF has been created for the Model. e.g. Once the first ERD has been created for the Model.
+        Public RDSCreated As Boolean = False 'True after the RDF has been created for the Model. e.g. Once the first ERD has been created for the Model.
 
         ''' <summary>
         ''' Adds the required Core CMML Elements for an ERD Attribute based on the given Role.
@@ -262,7 +262,7 @@ Namespace FBM
                 '  This is so that automatic processing of ERDs can happen if the ORM Model changes.
                 Me.ContainsLanguage.AddUnique(pcenumLanguage.EntityRelationshipDiagram)
 
-                Me.RDFCreated = True
+                Me.RDSCreated = True
 
                 '---------------------------------
                 'Save the new Page to the database

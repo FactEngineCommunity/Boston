@@ -94,6 +94,14 @@ Namespace FBM
         'There is, however, a different perspective, which is that an Entity (e.g. b) is an object in its own right, and is merely associated with a Fact, AND a Role within that Fact/FactType.
         'This perspective allows LamdaCalculus type searching for Facts, knowing only the Role and the Data (tRoleData has a member, 'Fact').
 
+        ''' <summary>
+        ''' FactEngine specific. As in when operating over a MongoDB database. 'Lecturer likes CarType' may have CarType as an array on Lecturer collection.
+        '''   The ODBC driver for MongoDB expects not to join Lecturer and CarType, but rather link Lecturer to Lecturer_CarType (array virtual table in ODBC).
+        '''   Also lets the user know that the collection is an array.
+        ''' </summary>
+        Public IsArray As Boolean = False
+
+
         <XmlIgnore()> _
         Public KLFreeVariableLabel As String = "" 'When generating proofs in KL, a letter from pcenumKLFreeVariable gets assigned to each Role in a FactType.
 
