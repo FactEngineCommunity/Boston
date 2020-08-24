@@ -74,8 +74,8 @@ Public Class frmMain
             prSoftwareCategory = pcenumSoftwareCategory.Professional
             Me.StatusLabelGeneralStatus.Text = "Software Category Set"
 
-            prApplicationApplicationVersionNr = "5.0" '4.5 was released 7th of November, 2019
-            prApplicationDatabaseVersionNr = "1.22"
+            prApplicationApplicationVersionNr = "5.1" '4.5 was released 7th of November, 2019
+            prApplicationDatabaseVersionNr = "1.23"
 
             If Not My.Settings.UseVirtualUI Then
                 ltSplashThread = New Thread(AddressOf Me.LoadSplashScreen)

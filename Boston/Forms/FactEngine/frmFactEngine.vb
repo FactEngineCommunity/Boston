@@ -526,7 +526,7 @@ Public Class frmFactEngine
                                             Dim lrEdge As New FactEngine.DisplayGraph.Edge(lrBaseGraphNode, lrActualGraphNode)
 
                                             If lrBaseGraphNode Is Nothing Then
-                                                Debugger.Break()
+                                                Throw New Exception("frmFactEngine.GO: BaseGraphNode is Nothing.")
                                             End If
                                             lrBaseGraphNode.Edge.Add(lrEdge)
                                         End If
@@ -548,7 +548,7 @@ Public Class frmFactEngine
                             For Each lrEdge In larEdge
 
                                 If lrEdge.BaseNode.Shape Is Nothing Or lrEdge.TargetNode.Shape Is Nothing Then
-                                    Debugger.Break()
+                                    Throw New Exception("frmFactEngine.GO: lrEdge.BaseNode.Shape Is Nothing Or lrEdge.TargetNode.Shape Is Nothing")
                                 End If
                                 Dim lrPGSLink As New MindFusion.Diagramming.DiagramLink(Me.Diagram,
                                                                                         lrEdge.BaseNode.Shape,
