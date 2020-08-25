@@ -540,7 +540,8 @@ Public Class frmToolboxORMReadingEditor
                 'IMPORTANT: Set the name of the FactType based on the FactTypeReadings of the FactType.
                 Dim lsNewName As String = Me.zrFactTypeInstance.FactType.MakeNameFromFactTypeReadings()
                 Dim lsOldName As String = Me.zrFactTypeInstance.FactType.Id
-                If lsNewName <> lsOldName Then
+                Dim lsMessage = "Change the Fact Type's name to, '" & lsNewName & "'?"
+                If lsNewName <> lsOldName And MsgBox(lsMessage) = DialogResult.OK Then
 
                     Call Me.zrFactTypeInstance.FactType.setName(lsNewName, True)
 
@@ -570,45 +571,6 @@ Public Class frmToolboxORMReadingEditor
                 Dim lrSuitableFactTypeReading As FBM.FactTypeReading
                 lrSuitableFactTypeReading = Me.zrFactTypeInstance.FindSuitableFactTypeReading 'Formerly by FactType...ByRoles(larRoles)
 
-                'VM-20180328-Remove this if all seems okay.
-                '----------------------------------------------------------------
-                'Add a FactTypeReadingInstance to the selected FactTypeInstance
-                '----------------------------------------------------------------
-                'Dim lrFactTypeInstance = Me.zrFactTypeInstance
-                'Dim lrFactTypeReadingInstance As FBM.FactTypeReadingInstance = lrFactTypeReading.CloneInstance(lrFactTypeInstance.Page)
-
-                ''---------------------------------------------------------------------------
-                ''The reading may not be suitable for the current RoleGroup sequence/layout
-                ''  so check to see if it is. If it is not, then the reading should not
-                ''  be displayed on the Page.
-                ''---------------------------------------------------------------------------
-                'Dim larRoles As New List(Of FBM.Role)
-                'Dim lrRoleInstance As FBM.RoleInstance
-                'For Each lrRoleInstance In Me.zrFactTypeInstance.RoleGroup
-                '    larRoles.Add(lrRoleInstance.Role)
-                'Next
-
-                'If IsSomething(lrSuitableFactTypeReading) Then
-                '    lrSuitableFactTypeReadingInstance = lrSuitableFactTypeReading.CloneInstance(lrFactTypeInstance.Page)
-                '    If lrSuitableFactTypeReadingInstance.Equals(lrFactTypeReadingInstance) Then
-                '        If IsSomething(Me.zrFactTypeInstance.FactTypeReadingShape.shape) Then
-                '            lrFactTypeReadingInstance.shape = Me.zrFactTypeInstance.FactTypeReadingShape.shape
-                '            Me.zrFactTypeInstance.FactTypeReadingShape = lrFactTypeReadingInstance
-                '            Me.zrFactTypeInstance.FactTypeReadingShape.RefreshShape()
-                '        Else
-                '            Call lrFactTypeReadingInstance.DisplayAndAssociate()
-                '            Me.zrFactTypeInstance.FactTypeReadingShape = lrFactTypeReadingInstance
-                '        End If
-                '    Else
-                '        If IsSomething(Me.zrFactTypeInstance.FactTypeReadingShape.shape) Then
-                '            Me.zrFactTypeInstance.FactTypeReadingShape.RefreshShape()
-                '        End If
-                '    End If
-                'Else
-                '    If IsSomething(Me.zrFactTypeInstance.FactTypeReadingShape.shape) Then
-                '        Me.zrFactTypeInstance.FactTypeReadingShape.shape.Text = ""
-                '    End If
-                'End If
 
                 Me.TextboxReading.Text = ""
             End If
@@ -855,6 +817,8 @@ Public Class frmToolboxORMReadingEditor
 
     Private Sub TextboxReading_KeyPress(sender As Object, e As KeyPressEventArgs) Handles TextboxReading.KeyPress
 
+        'For [Enter] see KeyDown. Calls Me.processFactTypeReading()
+
         '-------------------------------------------------------------------------------------------------------------------
         'Update the IntellisenseBuffer
         '  The IntellisenseBuffer is used to limit the number of options provided in the AutoComplete (Intellisense) form.
@@ -868,6 +832,8 @@ Public Class frmToolboxORMReadingEditor
     End Sub
 
     Private Sub TextboxReading_KeyUp(sender As Object, e As KeyEventArgs) Handles TextboxReading.KeyUp
+
+        'For [Enter] see KeyDown. Calls Me.processFactTypeReading()
 
         If e.KeyCode = Keys.Down Or Trim(Me.TextboxReading.Text) <> "NL:" Then
             Call Me.ProcessAutoComplete(e)
@@ -946,6 +912,8 @@ Public Class frmToolboxORMReadingEditor
     End Sub
 
     Private Sub TextboxReading_KeyDown1(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles TextboxReading.KeyDown
+
+        'For [Enter] see KeyDown. Calls Me.processFactTypeReading()
 
         Try
             Dim lsMessage As String = ""

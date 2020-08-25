@@ -505,6 +505,9 @@ Namespace RDS
 
             Me.Name = asNewName
 
+            'CMML
+            Call Me.Model.Model.changeCMMLAttributeName(Me)
+
             RaiseEvent NameChanged(asNewName)
 
         End Sub

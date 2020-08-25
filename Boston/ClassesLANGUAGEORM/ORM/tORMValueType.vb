@@ -815,18 +815,6 @@ Namespace FBM
                     '------------------------------------------------------
 
                     Call Me.SwitchConcept(New FBM.Concept(asNewName, True), pcenumConceptType.ValueType)
-                    'Dim lrDictionaryEntry As New FBM.DictionaryEntry(Me.Model, Me.Id, pcenumConceptType.ValueType)
-
-                    'If Me.Model.ModelDictionary.Exists(AddressOf lrDictionaryEntry.EqualsBySymbol) Then
-                    '    Call Me.Model.UpdateDictionarySymbol(Me.Id, asNewName, pcenumConceptType.ValueType)
-                    '    Call TableModelDictionary.ModifySymbol(Me.Model, lrDictionaryEntry, asNewName, pcenumConceptType.ValueType)
-                    'Else
-                    '    Dim lsMessage As String = ""
-                    '    lsMessage = "Tried to modify the Name of a ValueType where no Dictionary Entry exists for that ValueType."
-                    '    lsMessage &= vbCrLf & "Original DictionaryEntry.Symbol: " & Me.Id.ToString
-                    '    lsMessage &= vbCrLf & "New DictionaryEntry.Symbol: " & asNewName
-                    '    Throw New System.Exception(lsMessage)
-                    'End If
 
                     '------------------------------------------------------------------------------------------
                     'Update the Model(database) immediately. There is no choice. The reason why

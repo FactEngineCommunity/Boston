@@ -3707,7 +3707,23 @@ Namespace FBM
                     '-------------------------------------------------------
                     'RDS
                     Dim lrFactTypeReading As FBM.FactTypeReading = arFactTypeReading
-                    If Me.Arity = 2 Then
+                    If Me.Arity = 1 Then
+                        'Need to change the name of the corresponding RDS.Column name for the modified FactTypeReading.
+
+                        Try
+                            Dim lrTable = Me.RoleGroup(0).JoinedORMObject.getCorrespondingRDSTable
+                            Dim lrColumn = (From Column In lrTable.Column
+                                            Where Column.Role Is Me.RoleGroup(0)
+                                            Where Column.ActiveRole Is Me.RoleGroup(0)
+                                            Select Column).First
+
+                            lrColumn.setName(Viev.Strings.MakeCapCamelCase(arFactTypeReading.PredicatePart(0).PredicatePartText, True))
+
+                        Catch ex As Exception
+
+                        End Try
+
+                    ElseIf Me.Arity = 2 Then
 
                         Dim larColumn = From Table In Me.Model.RDS.Table
                                         From Column In Table.Column

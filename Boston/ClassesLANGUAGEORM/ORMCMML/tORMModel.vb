@@ -84,6 +84,23 @@ Namespace FBM
 
         End Sub
 
+        ''' <summary>
+        ''' Changes the name of an Attribute in the RDS
+        ''' </summary>
+        ''' <param name="arColumn"></param>
+        Public Sub changeCMMLAttributeName(ByRef arColumn As RDS.Column)
+
+            Dim lsSQLQuery As String
+
+
+            lsSQLQuery = "UPDATE " & pcenumCMMLRelations.CorePropertyHasPropertyName.ToString
+            lsSQLQuery &= " SET PropertyName = '" & arColumn.Name & "'"
+            lsSQLQuery &= " WHERE Property = '" & arColumn.Id & "'"
+
+            Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+        End Sub
+
         Public Sub createCMMLAttribute(ByVal asEntityName As String,
                                        ByVal asAttributeName As String,
                                        ByRef arRole As FBM.Role,

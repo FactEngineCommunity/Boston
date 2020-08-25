@@ -3008,6 +3008,21 @@ Public Class frmDiagramORM
 
                                 lrFactType.AddFactTypeReading(lrFactTypeReading, True, True)
                             End If
+                        ElseIf lrFactType.Arity = 1 Then
+                            'Create a dummy FactTypeReading for the FactType so that a Attribute can be created for the Table in the RDS.
+
+                            Dim lasPredicatePart As New List(Of String)
+                            lasPredicatePart.Add("change predicate")
+                            Dim larRole As New List(Of FBM.Role)
+                            larRole.Add(lrFactType.RoleGroup(0))
+                            Dim lrFactTypeReading As New FBM.FactTypeReading(lrFactType, larRole, lasPredicatePart)
+
+                            lrFactType.FactTypeReading.Add(lrFactTypeReading)
+
+                            'RDS
+                            Dim lrTable = larModelObject(0).getCorrespondingRDSTable
+                            Dim lrColumn As New RDS.Column(lrTable, "change predicate", lrFactType.RoleGroup(0), lrFactType.RoleGroup(0), False)
+                            Call lrTable.addColumn(lrColumn)
 
                         End If
 
