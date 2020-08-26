@@ -113,30 +113,42 @@ Namespace RDS
         End Function
         Public Function getColumnsThatReferenceValueType(ByVal arValueType As FBM.ValueType) As List(Of Column)
 
-            'Direct Columns
-            Dim larDirectColumn = From Table In Me.Table
-                                  From Column In Table.Column
-                                  Where Column.ActiveRole.JoinedORMObject.Id = arValueType.Id
-                                  Select Column Distinct
+            Try
+                'Direct Columns
+                Dim larDirectColumn = From Table In Me.Table
+                                      From Column In Table.Column
+                                      Where Column.ActiveRole.JoinedORMObject.Id = arValueType.Id
+                                      Select Column Distinct
 
-            'Indirect Columns
-            Dim larSimpleReferenceSchemeEntityTypes = From EntityType In Me.Model.EntityType _
-                                                      Where EntityType.ReferenceModeValueType IsNot Nothing _
-                                                      Select EntityType
+                'Indirect Columns
+                Dim larSimpleReferenceSchemeEntityTypes = From EntityType In Me.Model.EntityType
+                                                          Where EntityType.ReferenceModeValueType IsNot Nothing
+                                                          Select EntityType
 
-            Dim larIndirectColumns = From EntityType In larSimpleReferenceSchemeEntityTypes _
-                                     From Table In Me.Table _
-                                     From Column In Table.Column _
-                                     Where Column.ActiveRole.JoinedORMObject.Id = EntityType.Id _
-                                     And EntityType.ReferenceModeValueType.Id = arValueType.Id _
-                                     Select Column Distinct
+                Dim larIndirectColumns = From EntityType In larSimpleReferenceSchemeEntityTypes
+                                         From Table In Me.Table
+                                         From Column In Table.Column
+                                         Where Column.ActiveRole.JoinedORMObject.Id = EntityType.Id _
+                                         And EntityType.ReferenceModeValueType.Id = arValueType.Id
+                                         Select Column Distinct
 
-            Dim larReturnColumn As List(Of RDS.Column)
+                Dim larReturnColumn As List(Of RDS.Column)
 
-            larReturnColumn = larDirectColumn.ToList
-            larReturnColumn.AddRange(larIndirectColumns.ToList)
+                larReturnColumn = larDirectColumn.ToList
+                larReturnColumn.AddRange(larIndirectColumns.ToList)
 
-            Return larReturnColumn
+                Return larReturnColumn
+
+            Catch ex As Exception
+                Dim lsMessage1 As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return New List(Of RDS.Column)
+            End Try
 
         End Function
 

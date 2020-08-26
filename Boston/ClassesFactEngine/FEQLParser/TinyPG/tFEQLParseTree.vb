@@ -415,14 +415,23 @@ Namespace FEQL
                 Case TokenType.DELETEFACTSTMT
                     Value = EvalDELETEFACTSTMT(tree, paramlist)
                     Exit Select
+                Case TokenType.DERIVATIONSUBCLAUSE
+                    Value = EvalDERIVATIONSUBCLAUSE(tree, paramlist)
+                    Exit Select
+                Case TokenType.DERIVATIONCLAUSE
+                    Value = EvalDERIVATIONCLAUSE(tree, paramlist)
+                    Exit Select
                 Case TokenType.DERIVEDFACTTYPESTMT
                     Value = EvalDERIVEDFACTTYPESTMT(tree, paramlist)
+                    Exit Select
+                Case TokenType.DESCRIBESTMT
+                    Value = EvalDESCRIBESTMT(tree, paramlist)
                     Exit Select
                 Case TokenType.ENUMERATESTMT
                     Value = EvalENUMERATESTMT(tree, paramlist)
                     Exit Select
-                Case TokenType.DESCRIBESTMT
-                    Value = EvalDESCRIBESTMT(tree, paramlist)
+                Case TokenType.EXPRESSION
+                    Value = EvalEXPRESSION(tree, paramlist)
                     Exit Select
                 Case TokenType.EXISTSSTMT
                     Value = EvalEXISTSSTMT(tree, paramlist)
@@ -796,7 +805,19 @@ Namespace FEQL
             Throw New NotImplementedException()
         End Function
 
+        Protected Overridable Function EvalDERIVATIONSUBCLAUSE(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalDERIVATIONCLAUSE(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
         Protected Overridable Function EvalDERIVEDFACTTYPESTMT(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalDESCRIBESTMT(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
             Throw New NotImplementedException()
         End Function
 
@@ -804,7 +825,7 @@ Namespace FEQL
             Throw New NotImplementedException()
         End Function
 
-        Protected Overridable Function EvalDESCRIBESTMT(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+        Protected Overridable Function EvalEXPRESSION(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
             Throw New NotImplementedException()
         End Function
 

@@ -411,6 +411,27 @@ Namespace FEQL
 
     End Class
 
+    Public Class FACTTYPEPRODUCTION
+        Private _MODELELEMENTNAME As List(Of String)
+        'Private _PREDICATECLAUSE As List(Of FactEngine.
+        'Private _DERIVATIONCLAUSE
+    End Class
+
+    Public Class DERIVATIONCLAUSE
+        Private _DERIVATIONSUBCLAUSE As List(Of DERIVATIONSUBCLAUSE)
+    End Class
+
+    Public Class DERIVATIONSUBCLAUSE
+
+    End Class
+
+    'VALUETYPEISWRITTENASSTMT 
+    'REFERENCEMODECLAUSE                           
+    'CONSTRAINTMANDATORY
+    'KEYWDISWHERE FACTTYPESTMT(COMMA FACTTYPESTMT)*
+    '(BINARYFACTTYPECLAUSE
+    'BINARYFACTTYPEMANYTOONEDEFINITIONSTMT
+
     Public Class Processor
 
         Public Model As FBM.Model

@@ -85,10 +85,6 @@ Namespace FEQL
             Patterns.Add(TokenType.MATHFUNCTION, regex)
             Tokens.Add(TokenType.MATHFUNCTION)
 
-            regex = new Regex("\*|/", RegexOptions.Compiled)
-            Patterns.Add(TokenType.MULTDIV, regex)
-            Tokens.Add(TokenType.MULTDIV)
-
             regex = new Regex("[aA-zZ]+", RegexOptions.Compiled)
             Patterns.Add(TokenType.MODELNAME, regex)
             Tokens.Add(TokenType.MODELNAME)
@@ -112,10 +108,6 @@ Namespace FEQL
             regex = new Regex("[aA-zZ0-9\s\-]+", RegexOptions.Compiled)
             Patterns.Add(TokenType.PAGENAME, regex)
             Tokens.Add(TokenType.PAGENAME)
-
-            regex = new Regex("(\+|-)", RegexOptions.Compiled)
-            Patterns.Add(TokenType.PLUSMINUS, regex)
-            Tokens.Add(TokenType.PLUSMINUS)
 
             regex = new Regex("[a-z]+\-", RegexOptions.Compiled)
             Patterns.Add(TokenType.PREBOUNDREADINGTEXT, regex)
@@ -145,13 +137,13 @@ Namespace FEQL
             Patterns.Add(TokenType.SINGLEQUOTE, regex)
             Tokens.Add(TokenType.SINGLEQUOTE)
 
-            regex = new Regex("\*", RegexOptions.Compiled)
-            Patterns.Add(TokenType.STAR, regex)
-            Tokens.Add(TokenType.STAR)
-
             regex = new Regex("\s", RegexOptions.Compiled)
             Patterns.Add(TokenType.SPACE, regex)
             Tokens.Add(TokenType.SPACE)
+
+            regex = new Regex("\*", RegexOptions.Compiled)
+            Patterns.Add(TokenType.STAR, regex)
+            Tokens.Add(TokenType.STAR)
 
             regex = new Regex("[aA-zZ0-9]+", RegexOptions.Compiled)
             Patterns.Add(TokenType.USERTABLENAME, regex)
@@ -204,6 +196,10 @@ Namespace FEQL
             regex = new Regex("COMBINATION", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDCOMBINATION, regex)
             Tokens.Add(TokenType.KEYWDCOMBINATION)
+
+            regex = new Regex("COUNT", RegexOptions.Compiled)
+            Patterns.Add(TokenType.KEYWDCOUNT, regex)
+            Tokens.Add(TokenType.KEYWDCOUNT)
 
             regex = new Regex("COUNT\(\*\)", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDCOUNTSTAR, regex)
@@ -645,6 +641,22 @@ Namespace FEQL
             Patterns.Add(TokenType.KEYWDWHICH, regex)
             Tokens.Add(TokenType.KEYWDWHICH)
 
+            regex = new Regex("\+", RegexOptions.Compiled)
+            Patterns.Add(TokenType.PLUS, regex)
+            Tokens.Add(TokenType.PLUS)
+
+            regex = new Regex("-", RegexOptions.Compiled)
+            Patterns.Add(TokenType.MINUS, regex)
+            Tokens.Add(TokenType.MINUS)
+
+            regex = new Regex("/", RegexOptions.Compiled)
+            Patterns.Add(TokenType.DIVIDE, regex)
+            Tokens.Add(TokenType.DIVIDE)
+
+            regex = new Regex("\*", RegexOptions.Compiled)
+            Patterns.Add(TokenType.TIMES, regex)
+            Tokens.Add(TokenType.TIMES)
+
             regex = new Regex("\s+", RegexOptions.Compiled)
             Patterns.Add(TokenType.WHITESPACE, regex)
             Tokens.Add(TokenType.WHITESPACE)
@@ -838,197 +850,203 @@ Namespace FEQL
         DELETEFROMCLAUSE= 66
         DELETEALLSTMT= 67
         DELETEFACTSTMT= 68
-        DERIVEDFACTTYPESTMT= 69
-        ENUMERATESTMT= 70
-        DESCRIBESTMT= 71
-        EXISTSSTMT  = 72
-        EXTERNALUNIQUENESSCONSTRAINTSTMT= 73
-        FACTTYPEISWHERESTMT= 74
-        FACTTYPESTMT= 75
-        FACTTYPEIDENTIFICATION= 76
-        FACTTYPEPARTCLAUSE= 77
-        BINARYFACTTYPECLAUSE= 78
-        FACTTYPEPRODUCTION= 79
-        FACTSTMT    = 80
-        GETSUPERTYPESTMT= 81
-        INMODELSTMT = 82
-        INSERTSTMT  = 83
-        ITISMANDATORYTHATSTMNT= 84
-        LISTSTMT    = 85
-        MATCHFACTTYPESTMT= 86
-        MATCHSELECTSETFACTTYPESTMT= 87
-        MATHCLAUSE  = 88
-        MATCHSELECTSTMT= 89
-        ONPAGESTMT  = 90
-        OPENMODELSTMT= 91
-        SELECTSTMT  = 92
-        SUBTYPESTMT = 93
-        TABLEIDENTIFICATION= 94
-        UPDATESTMT  = 95
-        VALUETYPEISWRITTENASSTMT= 96
-        WHERESTMT   = 97
-        WHICHTHATCLAUSE= 98
-        WHICHCLAUSE = 99
-        WITHCLAUSE  = 100
-        WHICHSELECTSTMT= 101
-        WITHPREDICATESTMT= 102
-        Start       = 103
+        DERIVATIONSUBCLAUSE= 69
+        DERIVATIONCLAUSE= 70
+        DERIVEDFACTTYPESTMT= 71
+        DESCRIBESTMT= 72
+        ENUMERATESTMT= 73
+        EXPRESSION  = 74
+        EXISTSSTMT  = 75
+        EXTERNALUNIQUENESSCONSTRAINTSTMT= 76
+        FACTTYPEISWHERESTMT= 77
+        FACTTYPESTMT= 78
+        FACTTYPEIDENTIFICATION= 79
+        FACTTYPEPARTCLAUSE= 80
+        BINARYFACTTYPECLAUSE= 81
+        FACTTYPEPRODUCTION= 82
+        FACTSTMT    = 83
+        GETSUPERTYPESTMT= 84
+        INMODELSTMT = 85
+        INSERTSTMT  = 86
+        ITISMANDATORYTHATSTMNT= 87
+        LISTSTMT    = 88
+        MATCHFACTTYPESTMT= 89
+        MATCHSELECTSETFACTTYPESTMT= 90
+        MATHCLAUSE  = 91
+        MATCHSELECTSTMT= 92
+        ONPAGESTMT  = 93
+        OPENMODELSTMT= 94
+        SELECTSTMT  = 95
+        SUBTYPESTMT = 96
+        TABLEIDENTIFICATION= 97
+        UPDATESTMT  = 98
+        VALUETYPEISWRITTENASSTMT= 99
+        WHERESTMT   = 100
+        WHICHTHATCLAUSE= 101
+        WHICHCLAUSE = 102
+        WITHCLAUSE  = 103
+        WHICHSELECTSTMT= 104
+        WITHPREDICATESTMT= 105
+        Start       = 106
 
         'Terminal tokens:
-        BROPEN      = 104
-        BRCLOSE     = 105
-        COLON       = 106
-        COLUMNNAMESTR= 107
-        COMMA       = 108
-        CURLYBRACKETCLOSE= 109
-        CURLYBRACKETOPEN= 110
-        DOUBLEQUOTE = 111
-        EOF         = 112
-        EQUALS      = 113
-        FACTTYPENAME= 114
-        IDENTIFIER  = 115
-        MATHFUNCTION= 116
-        MULTDIV     = 117
-        MODELNAME   = 118
-        MODELELEMENTNAME= 119
-        MODELELEMENTSUFFIX= 120
-        MODELID     = 121
-        NUMBER      = 122
-        PAGENAME    = 123
-        PLUSMINUS   = 124
-        PREBOUNDREADINGTEXT= 125
-        POSTBOUNDREADINGTEXT= 126
-        PREDICATE   = 127
-        PREDICATESPACE= 128
-        REFERENCEMODE= 129
-        ROLENAME    = 130
-        SINGLEQUOTE = 131
-        STAR        = 132
+        BROPEN      = 107
+        BRCLOSE     = 108
+        COLON       = 109
+        COLUMNNAMESTR= 110
+        COMMA       = 111
+        CURLYBRACKETCLOSE= 112
+        CURLYBRACKETOPEN= 113
+        DOUBLEQUOTE = 114
+        EOF         = 115
+        EQUALS      = 116
+        FACTTYPENAME= 117
+        IDENTIFIER  = 118
+        MATHFUNCTION= 119
+        MODELNAME   = 120
+        MODELELEMENTNAME= 121
+        MODELELEMENTSUFFIX= 122
+        MODELID     = 123
+        NUMBER      = 124
+        PAGENAME    = 125
+        PREBOUNDREADINGTEXT= 126
+        POSTBOUNDREADINGTEXT= 127
+        PREDICATE   = 128
+        PREDICATESPACE= 129
+        REFERENCEMODE= 130
+        ROLENAME    = 131
+        SINGLEQUOTE = 132
         SPACE       = 133
-        USERTABLENAME= 134
-        WHERECLAUSECOLUMNNAMESTR= 135
-        VALUE       = 136
-        KEYWDA      = 137
-        KEYWDAN     = 138
-        KEYWDAND    = 139
-        KEYWDADD    = 140
-        KEYWDADDFACT= 141
-        KEYWDADDFACTTYPE= 142
-        KEYWDASSERT = 143
-        KEYWDATMOSTONE= 144
-        KEYWDBUTNOTBOTH= 145
-        KEYWDCOMBINATION= 146
-        KEYWDCOUNTSTAR= 147
-        KEYWDCREATE = 148
-        KEYWDCREATECONCEPT= 149
-        KEYWDCREATEENTITYTYPE= 150
-        KEYWDCREATEFACTTYPE= 151
-        KEYWDCREATEMODEL= 152
-        KEYWDCREATEVALUETYPE= 153
-        KEYWDDATATYPELOGICALTRUEFALSE= 154
-        KEYWDDATATYPELOGICALYESNO= 155
-        KEYWDDATATYPEAUTOCOUNTER= 156
-        KEYWDDATATYPEDECIMAL= 157
-        KEYWDDATATYPEFLOATCUSTOMPRECISION= 158
-        KEYWDDATATYPEFLOATDOUBLEPRECISION= 159
-        KEYWDDATATYPEFLOATSINGLEPRECISION= 160
-        KEYWDDATATYPEMONEY= 161
-        KEYWDDATATYPESIGNEDBIGINTEGER= 162
-        KEYWDDATATYPESIGNEDINTEGER= 163
-        KEYWDDATATYPESIGNEDSMALLINTEGER= 164
-        KEYWDDATATYPEUNSIGNEDBIGINTEGER= 165
-        KEYWDDATATYPEUNSIGNEDINTEGER= 166
-        KEYWDDATATYPEUNSIGNEDSMALLINTEGER= 167
-        KEYWDDATATYPEUNSIGNEDTINYINTEGER= 168
-        KEYWDDATATYPEOBJECTID= 169
-        KEYWDDATATYPEROWID= 170
-        KEYWDDATATYPERAWDATAFIXEDLENGTH= 171
-        KEYWDDATATYPERAWDATALARGELENGTH= 172
-        KEYWDDATATYPERAWDATAOLEOBJECT= 173
-        KEYWDDATATYPERAWDATA= 174
-        KEYWDDATATYPERAWDATAVARIABLELENGTH= 175
-        KEYWDDATATYPEAUTOTIMESTAMP= 176
-        KEYWDDATATYPEDATE= 177
-        KEYWDDATATYPEDATETIME= 178
-        KEYWDDATATYPETIME= 179
-        KEYWDDATATYPESTRINGFIXEDLENGTH= 180
-        KEYWDDATATYPESTRINGLARGELENGTH= 181
-        KEYWDDATATYPESTRINGVARIABLELENGTH= 182
-        KEYWDDELETE = 183
-        KEYWDDELETEALL= 184
-        KEYWDDELETEFACT= 185
-        KEYWDDESCRIBE= 186
-        KEYWDDISTINCT= 187
-        KEYWDEACH   = 188
-        KEYWDEITHER = 189
-        KEYWDENTITY = 190
-        KEYWDENTITYTYPE= 191
-        KEYWDENTITYTYPES= 192
-        KEYWDENUMERATE= 193
-        KEYWDEXISTS = 194
-        KEYWDFACT   = 195
-        KEYWDFACTTYPE= 196
-        KEYWDFACTTYPES= 197
-        KEYWDFOR    = 198
-        KEYWDFOREACH= 199
-        KEYWDFROM   = 200
-        KEYWDGET    = 201
-        KEYWDIFANDONLYIF= 202
-        KEYWDIN     = 203
-        KEYWDINSERT = 204
-        KEYWDINTO   = 205
-        KEYWDIS     = 206
-        KEYWDISA    = 207
-        KEYWDISIDENTIFIEDBYITS= 208
-        KEYWDISNOT  = 209
-        KEYWDISWHERE= 210
-        KEYWDISWRITTENAS= 211
-        KEYWDITISMANDATORYTHAT= 212
-        KEYWDJOINING= 213
-        KEYWDINDEX  = 214
-        KEYWDLANGUAGE= 215
-        KEYWDLANGUAGEDFD= 216
-        KEYWDLANGUAGEERD= 217
-        KEYWDLANGUAGEETD= 218
-        KEYWDLANGUAGEORM= 219
-        KEYWDLANGUAGESTD= 220
-        KEYWDLANGUAGEUCD= 221
-        KEYWDLIST   = 222
-        KEYWDMATCH  = 223
-        KEYWDMODEL  = 224
-        KEYWDMODELNOTES= 225
-        KEYWDMODELDICTIONARY= 226
-        KEYWDNULL   = 227
-        KEYWDOBJECT = 228
-        KEYWDOCCURSATLEASTONETIME= 229
-        KEYWDOCCURSATLEASTONETIMEINEACHOF= 230
-        KEYWDOF     = 231
-        KEYWDON     = 232
-        KEYWDONE    = 233
-        KEYWDONPAGE = 234
-        KEYWDOPEN   = 235
-        KEYWDOR     = 236
-        KEYWDPAGE   = 237
-        KEYWDPREDICATE= 238
-        KEYWDRETURN = 239
-        KEYWDROLE   = 240
-        KEYWDSELECT = 241
-        KEYWDRESTRICTEDTO= 242
-        KEYWDROLECONSTRAINTS= 243
-        KEYWDSET    = 244
-        KEYWDSUPERTYPE= 245
-        KEYWDTHAT   = 246
-        KEYWDTO     = 247
-        KEYWDUPDATE = 248
-        KEYWDVALUES = 249
-        KEYWDVALUETYPE= 250
-        KEYWDVALUETYPES= 251
-        KEYWDWHEN   = 252
-        KEYWDWHERE  = 253
-        KEYWDWITH   = 254
-        KEYWDWHAT   = 255
-        KEYWDWHICH  = 256
-        WHITESPACE  = 257
+        STAR        = 134
+        USERTABLENAME= 135
+        WHERECLAUSECOLUMNNAMESTR= 136
+        VALUE       = 137
+        KEYWDA      = 138
+        KEYWDAN     = 139
+        KEYWDAND    = 140
+        KEYWDADD    = 141
+        KEYWDADDFACT= 142
+        KEYWDADDFACTTYPE= 143
+        KEYWDASSERT = 144
+        KEYWDATMOSTONE= 145
+        KEYWDBUTNOTBOTH= 146
+        KEYWDCOMBINATION= 147
+        KEYWDCOUNT  = 148
+        KEYWDCOUNTSTAR= 149
+        KEYWDCREATE = 150
+        KEYWDCREATECONCEPT= 151
+        KEYWDCREATEENTITYTYPE= 152
+        KEYWDCREATEFACTTYPE= 153
+        KEYWDCREATEMODEL= 154
+        KEYWDCREATEVALUETYPE= 155
+        KEYWDDATATYPELOGICALTRUEFALSE= 156
+        KEYWDDATATYPELOGICALYESNO= 157
+        KEYWDDATATYPEAUTOCOUNTER= 158
+        KEYWDDATATYPEDECIMAL= 159
+        KEYWDDATATYPEFLOATCUSTOMPRECISION= 160
+        KEYWDDATATYPEFLOATDOUBLEPRECISION= 161
+        KEYWDDATATYPEFLOATSINGLEPRECISION= 162
+        KEYWDDATATYPEMONEY= 163
+        KEYWDDATATYPESIGNEDBIGINTEGER= 164
+        KEYWDDATATYPESIGNEDINTEGER= 165
+        KEYWDDATATYPESIGNEDSMALLINTEGER= 166
+        KEYWDDATATYPEUNSIGNEDBIGINTEGER= 167
+        KEYWDDATATYPEUNSIGNEDINTEGER= 168
+        KEYWDDATATYPEUNSIGNEDSMALLINTEGER= 169
+        KEYWDDATATYPEUNSIGNEDTINYINTEGER= 170
+        KEYWDDATATYPEOBJECTID= 171
+        KEYWDDATATYPEROWID= 172
+        KEYWDDATATYPERAWDATAFIXEDLENGTH= 173
+        KEYWDDATATYPERAWDATALARGELENGTH= 174
+        KEYWDDATATYPERAWDATAOLEOBJECT= 175
+        KEYWDDATATYPERAWDATA= 176
+        KEYWDDATATYPERAWDATAVARIABLELENGTH= 177
+        KEYWDDATATYPEAUTOTIMESTAMP= 178
+        KEYWDDATATYPEDATE= 179
+        KEYWDDATATYPEDATETIME= 180
+        KEYWDDATATYPETIME= 181
+        KEYWDDATATYPESTRINGFIXEDLENGTH= 182
+        KEYWDDATATYPESTRINGLARGELENGTH= 183
+        KEYWDDATATYPESTRINGVARIABLELENGTH= 184
+        KEYWDDELETE = 185
+        KEYWDDELETEALL= 186
+        KEYWDDELETEFACT= 187
+        KEYWDDESCRIBE= 188
+        KEYWDDISTINCT= 189
+        KEYWDEACH   = 190
+        KEYWDEITHER = 191
+        KEYWDENTITY = 192
+        KEYWDENTITYTYPE= 193
+        KEYWDENTITYTYPES= 194
+        KEYWDENUMERATE= 195
+        KEYWDEXISTS = 196
+        KEYWDFACT   = 197
+        KEYWDFACTTYPE= 198
+        KEYWDFACTTYPES= 199
+        KEYWDFOR    = 200
+        KEYWDFOREACH= 201
+        KEYWDFROM   = 202
+        KEYWDGET    = 203
+        KEYWDIFANDONLYIF= 204
+        KEYWDIN     = 205
+        KEYWDINSERT = 206
+        KEYWDINTO   = 207
+        KEYWDIS     = 208
+        KEYWDISA    = 209
+        KEYWDISIDENTIFIEDBYITS= 210
+        KEYWDISNOT  = 211
+        KEYWDISWHERE= 212
+        KEYWDISWRITTENAS= 213
+        KEYWDITISMANDATORYTHAT= 214
+        KEYWDJOINING= 215
+        KEYWDINDEX  = 216
+        KEYWDLANGUAGE= 217
+        KEYWDLANGUAGEDFD= 218
+        KEYWDLANGUAGEERD= 219
+        KEYWDLANGUAGEETD= 220
+        KEYWDLANGUAGEORM= 221
+        KEYWDLANGUAGESTD= 222
+        KEYWDLANGUAGEUCD= 223
+        KEYWDLIST   = 224
+        KEYWDMATCH  = 225
+        KEYWDMODEL  = 226
+        KEYWDMODELNOTES= 227
+        KEYWDMODELDICTIONARY= 228
+        KEYWDNULL   = 229
+        KEYWDOBJECT = 230
+        KEYWDOCCURSATLEASTONETIME= 231
+        KEYWDOCCURSATLEASTONETIMEINEACHOF= 232
+        KEYWDOF     = 233
+        KEYWDON     = 234
+        KEYWDONE    = 235
+        KEYWDONPAGE = 236
+        KEYWDOPEN   = 237
+        KEYWDOR     = 238
+        KEYWDPAGE   = 239
+        KEYWDPREDICATE= 240
+        KEYWDRETURN = 241
+        KEYWDROLE   = 242
+        KEYWDSELECT = 243
+        KEYWDRESTRICTEDTO= 244
+        KEYWDROLECONSTRAINTS= 245
+        KEYWDSET    = 246
+        KEYWDSUPERTYPE= 247
+        KEYWDTHAT   = 248
+        KEYWDTO     = 249
+        KEYWDUPDATE = 250
+        KEYWDVALUES = 251
+        KEYWDVALUETYPE= 252
+        KEYWDVALUETYPES= 253
+        KEYWDWHEN   = 254
+        KEYWDWHERE  = 255
+        KEYWDWITH   = 256
+        KEYWDWHAT   = 257
+        KEYWDWHICH  = 258
+        PLUS        = 259
+        MINUS       = 260
+        DIVIDE      = 261
+        TIMES       = 262
+        WHITESPACE  = 263
     End Enum
 
     <Serializable()> _

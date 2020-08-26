@@ -3817,6 +3817,17 @@ Public Class frmDiagramORM
                                 Case Else
                                     lrPropertyGridForm.PropertyGrid.SelectedObject = lrRoleConstraintInstance
                             End Select
+
+                        Case Is = pcenumConceptType.FactType
+                            Dim lrFactTypeInstance = CType(lrModelObject, FBM.FactTypeInstance)
+                            Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
+                            Call lrFactTypeInstance.SetPropertyAttributes(Me, "DerivationText", True)
+                            If lrPropertyGridForm.PropertyGrid.SelectedObject IsNot Nothing Then
+                                lrPropertyGridForm.PropertyGrid.SelectedObject = New Object
+                            End If
+                            lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute})
+                            lrPropertyGridForm.PropertyGrid.SelectedObject = lrModelObject
+
                         Case Else
                             Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
                             lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute})
