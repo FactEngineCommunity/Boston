@@ -2532,12 +2532,12 @@ Public Class frmMain
                         Else
                             For Each lrTuple In larSignatureResolutionList.FindAll(Function(x) x.UseEncumbent = True)
 
-                                Dim lrModelElement = lrPage.getModelElementById(lrTuple.CopiedModelObjectName)
-                                Dim lrReplaceMentModelElement = prApplication.WorkingPage.getModelElementById(lrTuple.CopiedModelObjectName)
+                                Dim lrEncumbentModelElement = prApplication.WorkingPage.getModelElementById(lrTuple.CopiedModelObjectName)
+                                Dim lrReplaceMentModelElement = lrPage.getModelElementById(lrTuple.CopiedModelObjectName)
 
-                                lrReplaceMentModelElement = lrModelElement
+                                lrReplaceMentModelElement = lrEncumbentModelElement
 
-                                Select Case lrModelElement.ConceptType
+                                Select Case lrEncumbentModelElement.ConceptType
                                     Case Is = pcenumConceptType.EntityType,
                                               pcenumConceptType.ValueType,
                                               pcenumConceptType.FactType
@@ -2546,38 +2546,38 @@ Public Class frmMain
 
                                         For Each lrFactType In lrPage.FactTypeInstance
                                             Dim larRole = From Role In lrFactType.RoleGroup
-                                                          Where Role.JoinedORMObject.Id = lrModelElement.Id
+                                                          Where Role.JoinedORMObject.Id = lrEncumbentModelElement.Id
                                                           Select Role
 
                                             For Each lrRole In larRole
-                                                lrRole.JoinedORMObject = lrModelElement
+                                                lrRole.JoinedORMObject = lrEncumbentModelElement
                                                 Select Case lrRole.TypeOfJoin
                                                     Case Is = pcenumRoleJoinType.EntityType
-                                                        lrRole.JoinsEntityType = lrModelElement
+                                                        lrRole.JoinsEntityType = lrEncumbentModelElement
                                                     Case Is = pcenumRoleJoinType.ValueType
-                                                        lrRole.JoinsValueType = lrModelElement
+                                                        lrRole.JoinsValueType = lrEncumbentModelElement
                                                     Case Is = pcenumRoleJoinType.FactType
-                                                        lrRole.JoinsFactType = lrModelElement
+                                                        lrRole.JoinsFactType = lrEncumbentModelElement
                                                 End Select
                                             Next
                                         Next
 
                                         For Each lrFactType In lrPage.Model.FactType
                                             Dim larRole = From Role In lrFactType.RoleGroup
-                                                          Where Role.JoinedORMObject.Id = lrModelElement.Id
+                                                          Where Role.JoinedORMObject.Id = lrEncumbentModelElement.Id
                                                           Select Role
 
                                             For Each lrRole In larRole
                                                 Select Case lrRole.TypeOfJoin
                                                     Case Is = pcenumRoleJoinType.EntityType
-                                                        lrRole.JoinedORMObject = CType(lrModelElement, FBM.EntityTypeInstance).EntityType
-                                                        lrRole.JoinsEntityType = CType(lrModelElement, FBM.EntityTypeInstance).EntityType
+                                                        lrRole.JoinedORMObject = CType(lrEncumbentModelElement, FBM.EntityTypeInstance).EntityType
+                                                        lrRole.JoinsEntityType = CType(lrEncumbentModelElement, FBM.EntityTypeInstance).EntityType
                                                     Case Is = pcenumRoleJoinType.ValueType
-                                                        lrRole.JoinedORMObject = CType(lrModelElement, FBM.ValueTypeInstance).ValueType
-                                                        lrRole.JoinsValueType = CType(lrModelElement, FBM.ValueTypeInstance).ValueType
+                                                        lrRole.JoinedORMObject = CType(lrEncumbentModelElement, FBM.ValueTypeInstance).ValueType
+                                                        lrRole.JoinsValueType = CType(lrEncumbentModelElement, FBM.ValueTypeInstance).ValueType
                                                     Case Is = pcenumRoleJoinType.FactType
-                                                        lrRole.JoinedORMObject = CType(lrModelElement, FBM.FactTypeInstance).FactType
-                                                        lrRole.JoinsFactType = CType(lrModelElement, FBM.FactTypeInstance).FactType
+                                                        lrRole.JoinedORMObject = CType(lrEncumbentModelElement, FBM.FactTypeInstance).FactType
+                                                        lrRole.JoinsFactType = CType(lrEncumbentModelElement, FBM.FactTypeInstance).FactType
                                                 End Select
                                             Next
                                         Next
@@ -2673,12 +2673,13 @@ Public Class frmMain
                 '-----------------------------------------------------------------
                 'ImpliedFactTypes
                 For Each lrFactType In lrPage.Model.FactType
-                        If Not prApplication.WorkingModel.FactType.Exists(AddressOf lrFactType.Equals) Then
-                            Call lrFactType.ChangeModel(prApplication.WorkingModel, True)
-                        End If
-                    Next
+                    If Not prApplication.WorkingModel.FactType.Exists(AddressOf lrFactType.Equals) Then
+                        Call lrFactType.ChangeModel(prApplication.WorkingModel, True)
+                    End If
+                Next
 
-                    lrPage.FactTypeInstance.Sort(AddressOf FBM.FactType.CompareRolesJoiningFactTypesCount)
+
+                lrPage.FactTypeInstance.Sort(AddressOf FBM.FactType.CompareRolesJoiningFactTypesCount)
                     For Each lrFactTypeInstance In lrPage.FactTypeInstance
                         Dim loPt As New PointF(lrFactTypeInstance.X, lrFactTypeInstance.Y)
                         lrFactTypeInstance.FactType.Model = prApplication.WorkingModel

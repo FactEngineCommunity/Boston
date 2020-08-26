@@ -620,6 +620,9 @@ Namespace FBM
             Dim lrDictionaryEntry As FBM.DictionaryEntry
 
             Try
+
+                If arRoleConstraint.Role(0).FactType.Id.Contains("Parenting") Then Debugger.Break()
+
                 '------------------------------------------------------------------------------------------------
                 'Add a new DictionaryEntry to the ModelDictionary if the DictionaryEntry doesn't already exist.
                 '------------------------------------------------------------------------------------------------                
