@@ -22,6 +22,7 @@ Partial Class frmCRUDBostonConfiguration
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
+        Me.components = New System.ComponentModel.Container()
         Me.Button_Cancel = New System.Windows.Forms.Button()
         Me.button_okay = New System.Windows.Forms.Button()
         Me.GroupBox_main = New System.Windows.Forms.GroupBox()
@@ -53,6 +54,11 @@ Partial Class frmCRUDBostonConfiguration
         Me.CheckBoxUseRemoteUI = New System.Windows.Forms.CheckBox()
         Me.CheckBoxLoggingOutEndsSession = New System.Windows.Forms.CheckBox()
         Me.CheckBoxEnableClientServer = New System.Windows.Forms.CheckBox()
+        Me.TabPage3 = New System.Windows.Forms.TabPage()
+        Me.GroupBoxFactEngine = New System.Windows.Forms.GroupBox()
+        Me.LabelFactEngineDefaultQueryResultLimit = New System.Windows.Forms.Label()
+        Me.DomainUpDownFactEngineDefaultQueryResultLimit = New System.Windows.Forms.DomainUpDown()
+        Me.ErrorProvider = New System.Windows.Forms.ErrorProvider(Me.components)
         Me.GroupBox_main.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
         Me.TableLayoutPanel1.SuspendLayout()
@@ -63,6 +69,9 @@ Partial Class frmCRUDBostonConfiguration
         Me.TabPage1.SuspendLayout()
         Me.TabPage2.SuspendLayout()
         Me.GroupBox3.SuspendLayout()
+        Me.TabPage3.SuspendLayout()
+        Me.GroupBoxFactEngine.SuspendLayout()
+        CType(Me.ErrorProvider, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'Button_Cancel
@@ -296,6 +305,7 @@ Partial Class frmCRUDBostonConfiguration
         '
         Me.TabControl1.Controls.Add(Me.TabPage1)
         Me.TabControl1.Controls.Add(Me.TabPage2)
+        Me.TabControl1.Controls.Add(Me.TabPage3)
         Me.TabControl1.Location = New System.Drawing.Point(12, 11)
         Me.TabControl1.Name = "TabControl1"
         Me.TabControl1.SelectedIndex = 0
@@ -368,6 +378,55 @@ Partial Class frmCRUDBostonConfiguration
         Me.CheckBoxEnableClientServer.Text = "Enable Boston as a Client:"
         Me.CheckBoxEnableClientServer.UseVisualStyleBackColor = True
         '
+        'TabPage3
+        '
+        Me.TabPage3.Controls.Add(Me.GroupBoxFactEngine)
+        Me.TabPage3.Location = New System.Drawing.Point(4, 22)
+        Me.TabPage3.Name = "TabPage3"
+        Me.TabPage3.Size = New System.Drawing.Size(606, 502)
+        Me.TabPage3.TabIndex = 2
+        Me.TabPage3.Text = "FactEngine"
+        Me.TabPage3.UseVisualStyleBackColor = True
+        '
+        'GroupBoxFactEngine
+        '
+        Me.GroupBoxFactEngine.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.GroupBoxFactEngine.Controls.Add(Me.LabelFactEngineDefaultQueryResultLimit)
+        Me.GroupBoxFactEngine.Controls.Add(Me.DomainUpDownFactEngineDefaultQueryResultLimit)
+        Me.GroupBoxFactEngine.Location = New System.Drawing.Point(6, 6)
+        Me.GroupBoxFactEngine.Name = "GroupBoxFactEngine"
+        Me.GroupBoxFactEngine.Size = New System.Drawing.Size(597, 493)
+        Me.GroupBoxFactEngine.TabIndex = 0
+        Me.GroupBoxFactEngine.TabStop = False
+        '
+        'LabelFactEngineDefaultQueryResultLimit
+        '
+        Me.LabelFactEngineDefaultQueryResultLimit.AutoSize = True
+        Me.LabelFactEngineDefaultQueryResultLimit.Location = New System.Drawing.Point(16, 34)
+        Me.LabelFactEngineDefaultQueryResultLimit.Name = "LabelFactEngineDefaultQueryResultLimit"
+        Me.LabelFactEngineDefaultQueryResultLimit.Size = New System.Drawing.Size(132, 13)
+        Me.LabelFactEngineDefaultQueryResultLimit.TabIndex = 1
+        Me.LabelFactEngineDefaultQueryResultLimit.Text = "Default Query Result Limit:"
+        '
+        'DomainUpDownFactEngineDefaultQueryResultLimit
+        '
+        Me.DomainUpDownFactEngineDefaultQueryResultLimit.Items.Add("10")
+        Me.DomainUpDownFactEngineDefaultQueryResultLimit.Items.Add("100")
+        Me.DomainUpDownFactEngineDefaultQueryResultLimit.Items.Add("1000")
+        Me.DomainUpDownFactEngineDefaultQueryResultLimit.Items.Add("10000")
+        Me.DomainUpDownFactEngineDefaultQueryResultLimit.Items.Add("Infinite")
+        Me.DomainUpDownFactEngineDefaultQueryResultLimit.Location = New System.Drawing.Point(154, 32)
+        Me.DomainUpDownFactEngineDefaultQueryResultLimit.Name = "DomainUpDownFactEngineDefaultQueryResultLimit"
+        Me.DomainUpDownFactEngineDefaultQueryResultLimit.Size = New System.Drawing.Size(120, 20)
+        Me.DomainUpDownFactEngineDefaultQueryResultLimit.TabIndex = 0
+        Me.DomainUpDownFactEngineDefaultQueryResultLimit.Text = "DomainUpDown1"
+        '
+        'ErrorProvider
+        '
+        Me.ErrorProvider.ContainerControl = Me
+        '
         'frmCRUDBostonConfiguration
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -396,6 +455,10 @@ Partial Class frmCRUDBostonConfiguration
         Me.TabPage2.ResumeLayout(False)
         Me.GroupBox3.ResumeLayout(False)
         Me.GroupBox3.PerformLayout()
+        Me.TabPage3.ResumeLayout(False)
+        Me.GroupBoxFactEngine.ResumeLayout(False)
+        Me.GroupBoxFactEngine.PerformLayout()
+        CType(Me.ErrorProvider, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
 
     End Sub
@@ -430,4 +493,9 @@ Partial Class frmCRUDBostonConfiguration
     Friend WithEvents CheckBoxEnableClientServer As System.Windows.Forms.CheckBox
     Friend WithEvents CheckBoxLoggingOutEndsSession As System.Windows.Forms.CheckBox
     Friend WithEvents CheckBoxUseRemoteUI As System.Windows.Forms.CheckBox
+    Friend WithEvents TabPage3 As TabPage
+    Friend WithEvents GroupBoxFactEngine As GroupBox
+    Friend WithEvents DomainUpDownFactEngineDefaultQueryResultLimit As DomainUpDown
+    Friend WithEvents LabelFactEngineDefaultQueryResultLimit As Label
+    Friend WithEvents ErrorProvider As ErrorProvider
 End Class

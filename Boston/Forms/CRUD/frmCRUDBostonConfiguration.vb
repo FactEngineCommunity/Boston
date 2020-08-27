@@ -3,6 +3,7 @@ Imports System.Xml.Linq
 Imports System.IO
 Imports System.Reflection
 Imports System.Data.Common
+Imports System.ComponentModel
 
 Public Class frmCRUDBostonConfiguration
 
@@ -62,6 +63,12 @@ Public Class frmCRUDBostonConfiguration
         Me.CheckBoxEnableClientServer.Checked = My.Settings.UseClientServer
         Me.CheckBoxUseRemoteUI.Checked = My.Settings.UseVirtualUI
 
+        If My.Settings.FactEngineDefaultQueryResultLimit = 0 Then
+            Me.DomainUpDownFactEngineDefaultQueryResultLimit.Text = "Infinite"
+        Else
+            Me.DomainUpDownFactEngineDefaultQueryResultLimit.Text = My.Settings.FactEngineDefaultQueryResultLimit
+        End If
+
     End Sub
 
     Private Sub frmCRUDRichmondConfiguration_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
@@ -82,6 +89,14 @@ Public Class frmCRUDBostonConfiguration
 
         Dim lsReturnString As String = ""
 
+        If Not Me.ErrorProvider.IsValid Then
+            Dim lrInvalidControl As Control = Me.ErrorProvider.getInvalidControl
+            lrInvalidControl.Show()
+            lrInvalidControl.Focus()
+            Me.ErrorProvider.SetError(Me.button_okay, "Invalid value in one field. Check each tab for errors.")
+            Exit Sub
+        End If
+
         If check_fields(lsReturnString) Then
 
             My.Settings.DebugMode = ComboBoxDebugMode.SelectedItem
@@ -95,10 +110,22 @@ Public Class frmCRUDBostonConfiguration
             My.Settings.LoggingOutEndsSession = Me.CheckBoxLoggingOutEndsSession.Checked
             My.Settings.UseVirtualUI = Me.CheckBoxUseRemoteUI.Checked
 
+            Try
+                If Me.DomainUpDownFactEngineDefaultQueryResultLimit.Text = "Infinite" Then
+                    My.Settings.FactEngineDefaultQueryResultLimit = 0
+                Else
+                    My.Settings.FactEngineDefaultQueryResultLimit = CInt(Me.DomainUpDownFactEngineDefaultQueryResultLimit.Text)
+                End If
+            Catch ex As Exception
+
+            End Try
+
             My.Settings.Save()
             Me.Hide()
             Me.Close()
             Me.Dispose()
+
+            Call prApplication.triggerConfigurationChanged()
         Else
             MsgBox(lsReturnString)
         End If
@@ -312,11 +339,28 @@ Public Class frmCRUDBostonConfiguration
             If MsgBox(lsMessage, MsgBoxStyle.YesNo + MsgBoxStyle.Exclamation) = MsgBoxResult.No Then
 
                 CheckBoxThrowInformationDebugMessagesToScreen.Checked = False
-
             End If
-
         End If
 
+
+    End Sub
+
+    Private Sub DomainUpDownFactEngineDefaultQueryResultLimit_Validating(sender As Object, e As CancelEventArgs) Handles DomainUpDownFactEngineDefaultQueryResultLimit.Validating
+
+        Try
+            Me.ErrorProvider.SetError(Me.DomainUpDownFactEngineDefaultQueryResultLimit, "")
+            Me.ErrorProvider.SetError(Me.button_okay, "")
+            If Me.DomainUpDownFactEngineDefaultQueryResultLimit.Text = "Infinite" Then
+            Else
+                Dim liDummyInt = CInt(Me.DomainUpDownFactEngineDefaultQueryResultLimit.Text)
+
+                If liDummyInt < 0 Then Throw New Exception("Dummy Exception")
+            End If
+        Catch
+            Me.ErrorProvider.SetError(Me.DomainUpDownFactEngineDefaultQueryResultLimit, "Invalid limit. Enter an integer or 'Infinite'")
+            Me.TabPage3.Show()
+            Me.TabControl1.SelectedTab = Me.TabPage3
+        End Try
 
     End Sub
 

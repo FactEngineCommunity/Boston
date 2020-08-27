@@ -10,9 +10,14 @@ Namespace FactEngine
 
         Public DatabaseConnectionString As String
 
-        Public Sub New(ByRef arFBMModel As FBM.Model, ByVal asDatabaseConnectionString As String)
+        Public Sub New(ByRef arFBMModel As FBM.Model,
+                       ByVal asDatabaseConnectionString As String,
+                       ByVal aiDefaultQueryLimit As Integer)
+
             Me.FBMModel = arFBMModel
             Me.DatabaseConnectionString = asDatabaseConnectionString
+            Me.DefaultQueryLimit = aiDefaultQueryLimit
+
             Try
                 Dim lrSQLiteConnection = Database.CreateConnection(Me.DatabaseConnectionString)
                 Me.Connected = True 'Connections are actually made for each Query.
@@ -90,7 +95,13 @@ Namespace FactEngine
 
                     larFact.Add(lrFact)
 
+                    If larFact.Count = Me.DefaultQueryLimit Then
+                        lrRecordset.Warning.Add("Query limit of " & Me.DefaultQueryLimit.ToString & " reached.")
+                        Exit While
+                    End If
+
                 End While
+
                 lrRecordset.Facts = larFact
                 lrSQLiteConnection.Close()
 

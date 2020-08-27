@@ -258,6 +258,7 @@ Namespace PGS
                             End If
                         Else
                             Me.Link.BaseShape = ArrowHead.PointerArrow
+                            Me.Link.BaseShapeSize = 2
                             Me.Link.HeadShape = ArrowHead.PointerArrow
                         End If
 
@@ -310,6 +311,8 @@ Namespace PGS
 
                         lsPredicate = lrFactTypeReading.PredicatePart(0).PredicatePartText
                     Else
+                        lrFactTypeReading = lrFactType.FactTypeReading(0)
+                        lsPredicate = lrFactTypeReading.PredicatePart(0).PredicatePartText
                         '20200714-VM-Not yet implemented.
                     End If
 

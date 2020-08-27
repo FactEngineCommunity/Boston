@@ -62,6 +62,7 @@ Public Class tApplication
 
     Public Event ModelAdded(ByRef arModel As FBM.Model)
     Public Event WorkingModelChanged()
+    Public Event ConfigurationChanged()
 
     Public Sub New()
 
@@ -469,6 +470,10 @@ Public Class tApplication
     Private Sub WorkingModel_MadeDirty(abGlobalBroadcast As Boolean) Handles WorkingModel.MadeDirty
 
         frmMain.ToolStripButton_Save.Enabled = True
+    End Sub
+
+    Public Sub triggerConfigurationChanged()
+        RaiseEvent ConfigurationChanged()
     End Sub
 
     Private Sub WorkingModel_Saved() Handles WorkingModel.Saved

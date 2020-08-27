@@ -13,11 +13,14 @@ Namespace FactEngine
 
         Public ODBCConnection As System.Data.Odbc.OdbcConnection
 
-        Public Sub New(ByRef arFBMModel As FBM.Model, ByVal asDatabaseConnectionString As String)
+        Public Sub New(ByRef arFBMModel As FBM.Model,
+                       ByVal asDatabaseConnectionString As String,
+                       ByVal aiDefaultQueryLimit As Integer)
 
             Try
                 Me.FBMModel = arFBMModel
                 Me.DatabaseConnectionString = asDatabaseConnectionString
+                Me.DefaultQueryLimit = aiDefaultQueryLimit
 
                 Me.ODBCConnection = New System.Data.Odbc.OdbcConnection(Me.DatabaseConnectionString)
                 Try
@@ -80,6 +83,11 @@ Namespace FactEngine
                     Next
 
                     larFact.Add(lrFact)
+
+                    If larFact.Count = Me.DefaultQueryLimit Then
+                        lrRecordset.Warning.Add("Query limit of " & Me.DefaultQueryLimit.ToString & " reached.")
+                        Exit For
+                    End If
 
                 Next
 

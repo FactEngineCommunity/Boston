@@ -361,7 +361,16 @@ Public Class frmFactEngine
 
     Private Sub ToolStripButtonGO_Click(sender As Object, e As EventArgs) Handles ToolStripButtonGO.Click
 
-        Call Me.GO()
+        Try
+            Call Me.GO()
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 
@@ -440,6 +449,9 @@ Public Class frmFactEngine
                                 Dim larTupleNode As New List(Of FactEngine.DisplayGraph.Node)
                                 Dim liColumnInd = 0
                                 Dim lrNodeColumn As RDS.Column
+
+                                If lrRecordset.QueryGraph Is Nothing Then Exit For
+
                                 Dim larProjectionColumn = lrRecordset.QueryGraph.ProjectionColumn
 
                                 'Set up color numbers
@@ -1570,6 +1582,22 @@ Public Class frmFactEngine
             Case Is > 0
                 Me.GraphView.ZoomFactor = Viev.Lesser(100, Me.GraphView.ZoomFactor + 5)
         End Select
+
+    End Sub
+
+    Private Sub Application_ConfigurationChanged() Handles Application.ConfigurationChanged
+
+        Try
+            If Me.FEQLProcessor.DatabaseManager.Connection IsNot Nothing Then
+                Me.FEQLProcessor.DatabaseManager.Connection.DefaultQueryLimit = My.Settings.FactEngineDefaultQueryResultLimit
+            End If
+        Catch ex As Exception
+            Me.LabelError.Show()
+            Me.LabelError.BringToFront()
+            Me.LabelError.Text = ex.Message
+            Me.TabControl1.SelectedTab = Me.TabPageResults
+        End Try
+
 
     End Sub
 
