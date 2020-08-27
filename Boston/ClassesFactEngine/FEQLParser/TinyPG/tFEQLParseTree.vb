@@ -463,6 +463,9 @@ Namespace FEQL
                 Case TokenType.GETSUPERTYPESTMT
                     Value = EvalGETSUPERTYPESTMT(tree, paramlist)
                     Exit Select
+                Case TokenType.INDIVIDUALIDENTIFIER
+                    Value = EvalINDIVIDUALIDENTIFIER(tree, paramlist)
+                    Exit Select
                 Case TokenType.INMODELSTMT
                     Value = EvalINMODELSTMT(tree, paramlist)
                     Exit Select
@@ -866,6 +869,10 @@ Namespace FEQL
         End Function
 
         Protected Overridable Function EvalGETSUPERTYPESTMT(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalINDIVIDUALIDENTIFIER(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
             Throw New NotImplementedException()
         End Function
 

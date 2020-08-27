@@ -56,7 +56,12 @@
                 Dim larProjectionColumn = Me.getProjectionColumns
                 Me.ProjectionColumn = larProjectionColumn
                 For Each lrProjectColumn In larProjectionColumn.FindAll(Function(x) x IsNot Nothing)
-                    lsSQLQuery &= lrProjectColumn.Table.DatabaseName & Viev.NullVal(lrProjectColumn.TemporaryAlias, "") & "." & lrProjectColumn.Name
+
+                    If lrProjectColumn.Role.FactType.IsDerived Then
+                        lsSQLQuery &= lrProjectColumn.Role.FactType.Id & Viev.NullVal(lrProjectColumn.TemporaryAlias, "") & "." & lrProjectColumn.Name
+                    Else
+                        lsSQLQuery &= lrProjectColumn.Table.DatabaseName & Viev.NullVal(lrProjectColumn.TemporaryAlias, "") & "." & lrProjectColumn.Name
+                    End If
                     If liInd < larProjectionColumn.Count Then lsSQLQuery &= ","
                     liInd += 1
                 Next
@@ -133,6 +138,7 @@
                 Dim larQuerEdgeWithFBMFactType = Me.QueryEdges.FindAll(Function(x) x.FBMFactType IsNot Nothing)
                 Dim larRDSTableQueryEdge = larQuerEdgeWithFBMFactType.FindAll(Function(x) x.FBMFactType.isRDSTable)
 
+                'RDS Tables
                 For Each lrQueryEdge In larRDSTableQueryEdge
 
                     If Me.Nodes.FindAll(Function(x) x.Name = lrQueryEdge.FBMFactType.Id).Count = 0 Then
@@ -144,6 +150,13 @@
 
                     'If liInd < larRDSTableQueryEdge.Count Then lsSQLQuery &= "," & vbCrLf
                     liInd += 1
+                Next
+
+                'Derived FactTypes
+                For Each lrQueryEdge In Me.QueryEdges.FindAll(Function(x) x.FBMFactType.IsDerived)
+
+                    lsSQLQuery &= vbCrLf & ","
+                    lsSQLQuery &= " " & lrQueryEdge.FBMFactType.Id & Viev.NullVal(lrQueryEdge.Alias, "")
                 Next
 
 #End Region

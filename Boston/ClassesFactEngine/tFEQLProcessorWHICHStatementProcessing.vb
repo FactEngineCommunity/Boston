@@ -112,6 +112,14 @@
                     lrPreviousTargetNode = lrQueryEdge.TargetNode
                     lrPreviousTopicNode = lrQueryEdge.BaseNode
 
+                    'Derivation Clauses
+                    If lrQueryEdge.FBMFactType.IsDerived Then
+                        Dim lrDerivationClause = New FEQL.DERIVATIONCLAUSE
+
+                        Dim lrParseTree = Me.Parser.Parse(lrQueryEdge.FBMFactType.DerivationText)
+                        Call Me.GetParseTreeTokensReflection(lrDerivationClause, lrParseTree.Nodes(0).Nodes(0))
+                    End If
+
                 Next
 
                 'Richmond.WriteToStatusBar("Generating SQL", True)

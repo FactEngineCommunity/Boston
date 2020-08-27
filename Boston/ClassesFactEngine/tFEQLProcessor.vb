@@ -411,17 +411,154 @@ Namespace FEQL
 
     End Class
 
+    Public Class PREDICATECLAUSE
+
+        Private _PREDICATE As New List(Of String)
+        Public Property PREDICATE As List(Of String)
+            Get
+                Return Me._PREDICATE
+            End Get
+            Set(value As List(Of String))
+                Me._PREDICATE = value
+            End Set
+        End Property
+
+    End Class
+
     Public Class FACTTYPEPRODUCTION
-        Private _MODELELEMENTNAME As List(Of String)
-        'Private _PREDICATECLAUSE As List(Of FactEngine.
+        Private _MODELELEMENT As New List(Of Object)
+        Public Property MODELELEMENT As List(Of Object)
+            Get
+                Return Me._MODELELEMENT
+            End Get
+            Set(value As List(Of Object))
+                Me._MODELELEMENT = value
+            End Set
+        End Property
+
+        Private _MODELELEMENTNAME As New List(Of String)
+        Public Property MODELELEMENTNAME As List(Of String)
+            Get
+                Return Me._MODELELEMENTNAME
+            End Get
+            Set(value As List(Of String))
+                Me._MODELELEMENTNAME = value
+            End Set
+        End Property
+
+        Private _PREDICATECLAUSE As List(Of FEQL.PREDICATECLAUSE)
+        Public Property PREDICATECLAUSE As List(Of FEQL.PREDICATECLAUSE)
+            Get
+                Return Me._PREDICATECLAUSE
+            End Get
+            Set(value As List(Of FEQL.PREDICATECLAUSE))
+                Me._PREDICATECLAUSE = value
+            End Set
+        End Property
+
         'Private _DERIVATIONCLAUSE
     End Class
 
     Public Class DERIVATIONCLAUSE
-        Private _DERIVATIONSUBCLAUSE As List(Of DERIVATIONSUBCLAUSE)
+
+        Private _KEYWDISWHERE As String = Nothing
+        Public Property KEYWDISWHERE As String
+            Get
+                Return Me._KEYWDISWHERE
+            End Get
+            Set(value As String)
+                Me._KEYWDISWHERE = value
+            End Set
+        End Property
+
+        Private _DERIVATIONSUBCLAUSE As New List(Of DERIVATIONSUBCLAUSE)
+
+        Public Property DERIVATIONSUBCLAUSE As List(Of DERIVATIONSUBCLAUSE)
+            Get
+                Return Me._DERIVATIONSUBCLAUSE
+            End Get
+            Set(value As List(Of DERIVATIONSUBCLAUSE))
+                Me._DERIVATIONSUBCLAUSE = value
+            End Set
+        End Property
+
     End Class
 
     Public Class DERIVATIONSUBCLAUSE
+
+        Private _MODELELEMENTNAME As New List(Of String)
+        Public Property MODELELEMENTNAME As List(Of String)
+            Get
+                Return Me._MODELELEMENTNAME
+            End Get
+            Set(value As List(Of String))
+                Me._MODELELEMENTNAME = value
+            End Set
+        End Property
+
+        Private _PREDICATECLAUSE As New List(Of FEQL.PREDICATECLAUSE)
+        Public Property PREDICATECLAUSE As List(Of FEQL.PREDICATECLAUSE)
+            Get
+                Return Me._PREDICATECLAUSE
+            End Get
+            Set(value As List(Of FEQL.PREDICATECLAUSE))
+                Me._PREDICATECLAUSE = value
+            End Set
+        End Property
+
+        Private _KEYWDCOUNT As String = Nothing
+        Public Property KEYWDCOUNT As String
+            Get
+                Return Me._KEYWDCOUNT
+            End Get
+            Set(value As String)
+                Me._KEYWDCOUNT = value
+            End Set
+        End Property
+
+        Private _EXPRESSION As New List(Of FEQL.EXPRESSION)
+        Public Property EXPRESSION As List(Of FEQL.EXPRESSION)
+            Get
+                Return Me._EXPRESSION
+            End Get
+            Set(value As List(Of FEQL.EXPRESSION))
+                Me._EXPRESSION = value
+            End Set
+        End Property
+
+        Private _MATHCLAUSE As New List(Of FEQL.MATHCLAUSE)
+        Public Property MATHCLAUSE As List(Of MATHCLAUSE)
+            Get
+                Return Me._MATHCLAUSE
+            End Get
+            Set(value As List(Of MATHCLAUSE))
+                Me._MATHCLAUSE = value
+            End Set
+        End Property
+
+    End Class
+
+    Public Class EXPRESSION
+
+        Private _EXPRESSIONSYMBOL As String
+        Public Property EXPRESSIONSYMBOL As String
+            Get
+                Return Me._EXPRESSIONSYMBOL
+            End Get
+            Set(value As String)
+                Me._EXPRESSIONSYMBOL = value
+            End Set
+        End Property
+
+        Private _MODELELEMENTNAME As New List(Of String)
+        Public Property MODELELEMENTNAME As List(Of String)
+            Get
+                Return Me._MODELELEMENTNAME
+            End Get
+            Set(value As List(Of String))
+                Me._MODELELEMENTNAME = value
+            End Set
+        End Property
 
     End Class
 

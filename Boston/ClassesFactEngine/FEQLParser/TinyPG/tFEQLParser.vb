@@ -5907,69 +5907,12 @@ Namespace FEQL
             End If
 
              ' Concat Rule
-            tok = m_scanner.LookAhead(TokenType.PLUS, TokenType.MINUS, TokenType.TIMES, TokenType.DIVIDE, TokenType.PREDICATE) ' ZeroOrMore Rule
-            While tok.Type = TokenType.PLUS Or tok.Type = TokenType.MINUS Or tok.Type = TokenType.TIMES Or tok.Type = TokenType.DIVIDE Or tok.Type = TokenType.PREDICATE
-                tok = m_scanner.LookAhead(TokenType.PLUS, TokenType.MINUS, TokenType.TIMES, TokenType.DIVIDE, TokenType.PREDICATE) ' Choice Rule
+            tok = m_scanner.LookAhead(TokenType.EXPRESSIONSYMBOL, TokenType.PREDICATE) ' ZeroOrMore Rule
+            While tok.Type = TokenType.EXPRESSIONSYMBOL Or tok.Type = TokenType.PREDICATE
+                tok = m_scanner.LookAhead(TokenType.EXPRESSIONSYMBOL, TokenType.PREDICATE) ' Choice Rule
                 Select Case tok.Type
                  ' Choice Rule
-                    Case TokenType.PLUS
-
-                         ' Concat Rule
-                        ParseEXPRESSION(node) ' NonTerminal Rule: EXPRESSION
-            If m_tree.Errors.Count > 0 Then
-                                    parent.Token.UpdateRange(node.Token)
-                                    Exit Sub
-            End If
-
-                         ' Concat Rule
-                        ParseMATHCLAUSE(node) ' NonTerminal Rule: MATHCLAUSE
-            If m_tree.Errors.Count > 0 Then
-                                    parent.Token.UpdateRange(node.Token)
-                                    Exit Sub
-            End If
-            If m_tree.Errors.Count > 0 Then
-                                    parent.Token.UpdateRange(node.Token)
-                                    Exit Sub
-            End If
-                    Case TokenType.MINUS
-
-                         ' Concat Rule
-                        ParseEXPRESSION(node) ' NonTerminal Rule: EXPRESSION
-            If m_tree.Errors.Count > 0 Then
-                                    parent.Token.UpdateRange(node.Token)
-                                    Exit Sub
-            End If
-
-                         ' Concat Rule
-                        ParseMATHCLAUSE(node) ' NonTerminal Rule: MATHCLAUSE
-            If m_tree.Errors.Count > 0 Then
-                                    parent.Token.UpdateRange(node.Token)
-                                    Exit Sub
-            End If
-            If m_tree.Errors.Count > 0 Then
-                                    parent.Token.UpdateRange(node.Token)
-                                    Exit Sub
-            End If
-                    Case TokenType.TIMES
-
-                         ' Concat Rule
-                        ParseEXPRESSION(node) ' NonTerminal Rule: EXPRESSION
-            If m_tree.Errors.Count > 0 Then
-                                    parent.Token.UpdateRange(node.Token)
-                                    Exit Sub
-            End If
-
-                         ' Concat Rule
-                        ParseMATHCLAUSE(node) ' NonTerminal Rule: MATHCLAUSE
-            If m_tree.Errors.Count > 0 Then
-                                    parent.Token.UpdateRange(node.Token)
-                                    Exit Sub
-            End If
-            If m_tree.Errors.Count > 0 Then
-                                    parent.Token.UpdateRange(node.Token)
-                                    Exit Sub
-            End If
-                    Case TokenType.DIVIDE
+                    Case TokenType.EXPRESSIONSYMBOL
 
                          ' Concat Rule
                         ParseEXPRESSION(node) ' NonTerminal Rule: EXPRESSION
@@ -6044,11 +5987,8 @@ Namespace FEQL
                     Case Else
                     If m_tree.Errors.Count = 0 Then
                     m_tree.Optionals.Clear
-                    m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PLUS.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "PLUS"))
-                    m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PLUS.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MINUS"))
-                    m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PLUS.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "TIMES"))
-                    m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PLUS.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "DIVIDE"))
-                    m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PLUS.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "PREDICATE"))
+                    m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.EXPRESSIONSYMBOL.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "EXPRESSIONSYMBOL"))
+                    m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.EXPRESSIONSYMBOL.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "PREDICATE"))
                     End If
                         m_tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found.", &H0002, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos))
                         Exit Select
@@ -6057,7 +5997,7 @@ Namespace FEQL
                             parent.Token.UpdateRange(node.Token)
                             Exit Sub
             End If
-            tok = m_scanner.LookAhead(TokenType.PLUS, TokenType.MINUS, TokenType.TIMES, TokenType.DIVIDE, TokenType.PREDICATE) ' ZeroOrMore Rule
+            tok = m_scanner.LookAhead(TokenType.EXPRESSIONSYMBOL, TokenType.PREDICATE) ' ZeroOrMore Rule
             End While
             If m_tree.Errors.Count > 0 Then
                         parent.Token.UpdateRange(node.Token)
@@ -6508,80 +6448,16 @@ Namespace FEQL
 
 
              ' Concat Rule
-            tok = m_scanner.LookAhead(TokenType.PLUS, TokenType.MINUS, TokenType.TIMES, TokenType.DIVIDE) ' Choice Rule
-            Select Case tok.Type
-             ' Choice Rule
-                Case TokenType.PLUS
-                    tok = m_scanner.Scan(TokenType.PLUS) ' Terminal Rule: PLUS
-                    n = node.CreateNode(tok, tok.ToString() )
-                    node.Token.UpdateRange(tok)
-                    node.Nodes.Add(n)
-                    If tok.Type <> TokenType.PLUS Then
-                        m_tree.Errors.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PLUS.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "PLUS"))
-                        Return
+            tok = m_scanner.Scan(TokenType.EXPRESSIONSYMBOL) ' Terminal Rule: EXPRESSIONSYMBOL
+            n = node.CreateNode(tok, tok.ToString() )
+            node.Token.UpdateRange(tok)
+            node.Nodes.Add(n)
+            If tok.Type <> TokenType.EXPRESSIONSYMBOL Then
+                m_tree.Errors.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.EXPRESSIONSYMBOL.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "EXPRESSIONSYMBOL"))
+                Return
 
-                    End If
-
-            If m_tree.Errors.Count > 0 Then
-                                parent.Token.UpdateRange(node.Token)
-                                Exit Sub
             End If
-                Case TokenType.MINUS
-                    tok = m_scanner.Scan(TokenType.MINUS) ' Terminal Rule: MINUS
-                    n = node.CreateNode(tok, tok.ToString() )
-                    node.Token.UpdateRange(tok)
-                    node.Nodes.Add(n)
-                    If tok.Type <> TokenType.MINUS Then
-                        m_tree.Errors.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.MINUS.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MINUS"))
-                        Return
 
-                    End If
-
-            If m_tree.Errors.Count > 0 Then
-                                parent.Token.UpdateRange(node.Token)
-                                Exit Sub
-            End If
-                Case TokenType.TIMES
-                    tok = m_scanner.Scan(TokenType.TIMES) ' Terminal Rule: TIMES
-                    n = node.CreateNode(tok, tok.ToString() )
-                    node.Token.UpdateRange(tok)
-                    node.Nodes.Add(n)
-                    If tok.Type <> TokenType.TIMES Then
-                        m_tree.Errors.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.TIMES.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "TIMES"))
-                        Return
-
-                    End If
-
-            If m_tree.Errors.Count > 0 Then
-                                parent.Token.UpdateRange(node.Token)
-                                Exit Sub
-            End If
-                Case TokenType.DIVIDE
-                    tok = m_scanner.Scan(TokenType.DIVIDE) ' Terminal Rule: DIVIDE
-                    n = node.CreateNode(tok, tok.ToString() )
-                    node.Token.UpdateRange(tok)
-                    node.Nodes.Add(n)
-                    If tok.Type <> TokenType.DIVIDE Then
-                        m_tree.Errors.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.DIVIDE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "DIVIDE"))
-                        Return
-
-                    End If
-
-            If m_tree.Errors.Count > 0 Then
-                                parent.Token.UpdateRange(node.Token)
-                                Exit Sub
-            End If
-                Case Else
-                If m_tree.Errors.Count = 0 Then
-                m_tree.Optionals.Clear
-                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PLUS.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "PLUS"))
-                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PLUS.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MINUS"))
-                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PLUS.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "TIMES"))
-                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PLUS.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "DIVIDE"))
-                End If
-                    m_tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found.", &H0002, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos))
-                    Exit Select
-            End Select ' Choice Rule
             If m_tree.Errors.Count > 0 Then
                         parent.Token.UpdateRange(node.Token)
                         Exit Sub
@@ -7618,6 +7494,56 @@ Namespace FEQL
             m_tree.Optionals.Clear()
             End If
         End Sub ' NonTerminalSymbol: GETSUPERTYPESTMT
+
+        Private Sub ParseINDIVIDUALIDENTIFIER(ByVal parent As ParseNode) ' NonTerminalSymbol: INDIVIDUALIDENTIFIER
+            Dim tok As Token
+            Dim n As ParseNode
+            Dim node As ParseNode = parent.CreateNode(m_scanner.GetToken(TokenType.INDIVIDUALIDENTIFIER), "INDIVIDUALIDENTIFIER")
+            parent.Nodes.Add(node)
+
+            tok = m_scanner.LookAhead(TokenType.NUMBER, TokenType.SINGLEQUOTE) ' Choice Rule
+            Select Case tok.Type
+             ' Choice Rule
+                Case TokenType.NUMBER
+                    tok = m_scanner.Scan(TokenType.NUMBER) ' Terminal Rule: NUMBER
+                    n = node.CreateNode(tok, tok.ToString() )
+                    node.Token.UpdateRange(tok)
+                    node.Nodes.Add(n)
+                    If tok.Type <> TokenType.NUMBER Then
+                        m_tree.Errors.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.NUMBER.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "NUMBER"))
+                        Return
+
+                    End If
+
+            If m_tree.Errors.Count > 0 Then
+                                parent.Token.UpdateRange(node.Token)
+                                Exit Sub
+            End If
+                Case TokenType.SINGLEQUOTE
+                    ParseQUOTEDIDENTIFIER(node) ' NonTerminal Rule: QUOTEDIDENTIFIER
+            If m_tree.Errors.Count > 0 Then
+                                parent.Token.UpdateRange(node.Token)
+                                Exit Sub
+            End If
+                Case Else
+                If m_tree.Errors.Count = 0 Then
+                m_tree.Optionals.Clear
+                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.NUMBER.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "NUMBER"))
+                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.NUMBER.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "SINGLEQUOTE"))
+                End If
+                    m_tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found.", &H0002, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos))
+                    Exit Select
+            End Select ' Choice Rule
+            If m_tree.Errors.Count > 0 Then
+                        parent.Token.UpdateRange(node.Token)
+                        Exit Sub
+            End If
+
+            parent.Token.UpdateRange(node.Token)
+            If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
+            m_tree.Optionals.Clear()
+            End If
+        End Sub ' NonTerminalSymbol: INDIVIDUALIDENTIFIER
 
         Private Sub ParseINMODELSTMT(ByVal parent As ParseNode) ' NonTerminalSymbol: INMODELSTMT
             Dim tok As Token
@@ -9707,9 +9633,9 @@ Namespace FEQL
             End If
 
              ' Concat Rule
-            tok = m_scanner.LookAhead(TokenType.KEYWDWITH, TokenType.KEYWDIS, TokenType.PREDICATE, TokenType.KEYWDTHAT, TokenType.PREBOUNDREADINGTEXT, TokenType.MODELELEMENTNAME, TokenType.KEYWDWHICH, TokenType.KEYWDAN, TokenType.KEYWDA, TokenType.BROPEN) ' Option Rule
-            If tok.Type = TokenType.KEYWDWITH Or tok.Type = TokenType.KEYWDIS Or tok.Type = TokenType.PREDICATE Or tok.Type = TokenType.KEYWDTHAT Or tok.Type = TokenType.PREBOUNDREADINGTEXT Or tok.Type = TokenType.MODELELEMENTNAME Or tok.Type = TokenType.KEYWDWHICH Or tok.Type = TokenType.KEYWDAN Or tok.Type = TokenType.KEYWDA Or tok.Type = TokenType.BROPEN Then
-                tok = m_scanner.LookAhead(TokenType.KEYWDWITH, TokenType.KEYWDIS, TokenType.PREDICATE, TokenType.KEYWDTHAT, TokenType.PREBOUNDREADINGTEXT, TokenType.MODELELEMENTNAME, TokenType.KEYWDWHICH, TokenType.KEYWDAN, TokenType.KEYWDA, TokenType.BROPEN) ' Choice Rule
+            tok = m_scanner.LookAhead(TokenType.KEYWDWITH, TokenType.KEYWDIS, TokenType.PREDICATE, TokenType.KEYWDTHAT, TokenType.PREBOUNDREADINGTEXT, TokenType.MODELELEMENTNAME, TokenType.KEYWDWHICH, TokenType.KEYWDAN, TokenType.KEYWDA, TokenType.NUMBER, TokenType.SINGLEQUOTE, TokenType.BROPEN) ' Option Rule
+            If tok.Type = TokenType.KEYWDWITH Or tok.Type = TokenType.KEYWDIS Or tok.Type = TokenType.PREDICATE Or tok.Type = TokenType.KEYWDTHAT Or tok.Type = TokenType.PREBOUNDREADINGTEXT Or tok.Type = TokenType.MODELELEMENTNAME Or tok.Type = TokenType.KEYWDWHICH Or tok.Type = TokenType.KEYWDAN Or tok.Type = TokenType.KEYWDA Or tok.Type = TokenType.NUMBER Or tok.Type = TokenType.SINGLEQUOTE Or tok.Type = TokenType.BROPEN Then
+                tok = m_scanner.LookAhead(TokenType.KEYWDWITH, TokenType.KEYWDIS, TokenType.PREDICATE, TokenType.KEYWDTHAT, TokenType.PREBOUNDREADINGTEXT, TokenType.MODELELEMENTNAME, TokenType.KEYWDWHICH, TokenType.KEYWDAN, TokenType.KEYWDA, TokenType.NUMBER, TokenType.SINGLEQUOTE, TokenType.BROPEN) ' Choice Rule
                 Select Case tok.Type
                  ' Choice Rule
                     Case TokenType.KEYWDWITH
@@ -9826,22 +9752,98 @@ Namespace FEQL
             End If
 
                          ' Concat Rule
-                        ParseNODE(node) ' NonTerminal Rule: NODE
+                        tok = m_scanner.LookAhead(TokenType.NUMBER, TokenType.SINGLEQUOTE, TokenType.PREBOUNDREADINGTEXT, TokenType.MODELELEMENTNAME, TokenType.BROPEN) ' Choice Rule
+                        Select Case tok.Type
+                         ' Choice Rule
+                            Case TokenType.NUMBER
+                                ParseINDIVIDUALIDENTIFIER(node) ' NonTerminal Rule: INDIVIDUALIDENTIFIER
+            If m_tree.Errors.Count > 0 Then
+                                            parent.Token.UpdateRange(node.Token)
+                                            Exit Sub
+            End If
+                            Case TokenType.SINGLEQUOTE
+                                ParseINDIVIDUALIDENTIFIER(node) ' NonTerminal Rule: INDIVIDUALIDENTIFIER
+            If m_tree.Errors.Count > 0 Then
+                                            parent.Token.UpdateRange(node.Token)
+                                            Exit Sub
+            End If
+                            Case TokenType.PREBOUNDREADINGTEXT
+                                ParseNODE(node) ' NonTerminal Rule: NODE
+            If m_tree.Errors.Count > 0 Then
+                                            parent.Token.UpdateRange(node.Token)
+                                            Exit Sub
+            End If
+                            Case TokenType.MODELELEMENTNAME
+                                ParseNODE(node) ' NonTerminal Rule: NODE
+            If m_tree.Errors.Count > 0 Then
+                                            parent.Token.UpdateRange(node.Token)
+                                            Exit Sub
+            End If
+                            Case TokenType.BROPEN
+                                ParseNODE(node) ' NonTerminal Rule: NODE
+            If m_tree.Errors.Count > 0 Then
+                                            parent.Token.UpdateRange(node.Token)
+                                            Exit Sub
+            End If
+                            Case Else
+                            If m_tree.Errors.Count = 0 Then
+                            m_tree.Optionals.Clear
+                            m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.NUMBER.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "NUMBER"))
+                            m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.NUMBER.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "SINGLEQUOTE"))
+                            m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.NUMBER.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "PREBOUNDREADINGTEXT"))
+                            m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.NUMBER.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MODELELEMENTNAME"))
+                            m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.NUMBER.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "BROPEN"))
+                            End If
+                                m_tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found.", &H0002, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos))
+                                Exit Select
+                        End Select ' Choice Rule
             If m_tree.Errors.Count > 0 Then
                                     parent.Token.UpdateRange(node.Token)
                                     Exit Sub
             End If
 
                          ' Concat Rule
-                        tok = m_scanner.LookAhead(TokenType.MATHFUNCTION) ' Option Rule
-                        If tok.Type = TokenType.MATHFUNCTION Then
-                            ParseMATHCLAUSE(node) ' NonTerminal Rule: MATHCLAUSE
+                        tok = m_scanner.LookAhead(TokenType.FOLLOWINGREADINGTEXT, TokenType.MATHFUNCTION) ' Option Rule
+                        If tok.Type = TokenType.FOLLOWINGREADINGTEXT Or tok.Type = TokenType.MATHFUNCTION Then
+                            tok = m_scanner.LookAhead(TokenType.FOLLOWINGREADINGTEXT, TokenType.MATHFUNCTION) ' Choice Rule
+                            Select Case tok.Type
+                             ' Choice Rule
+                                Case TokenType.FOLLOWINGREADINGTEXT
+                                    tok = m_scanner.Scan(TokenType.FOLLOWINGREADINGTEXT) ' Terminal Rule: FOLLOWINGREADINGTEXT
+                                    n = node.CreateNode(tok, tok.ToString() )
+                                    node.Token.UpdateRange(tok)
+                                    node.Nodes.Add(n)
+                                    If tok.Type <> TokenType.FOLLOWINGREADINGTEXT Then
+                                        m_tree.Errors.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.FOLLOWINGREADINGTEXT.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "FOLLOWINGREADINGTEXT"))
+                                        Return
+
+                                    End If
+
+            If m_tree.Errors.Count > 0 Then
+                                                parent.Token.UpdateRange(node.Token)
+                                                Exit Sub
+            End If
+                                Case TokenType.MATHFUNCTION
+                                    ParseMATHCLAUSE(node) ' NonTerminal Rule: MATHCLAUSE
+            If m_tree.Errors.Count > 0 Then
+                                                parent.Token.UpdateRange(node.Token)
+                                                Exit Sub
+            End If
+                                Case Else
+                                If m_tree.Errors.Count = 0 Then
+                                m_tree.Optionals.Clear
+                                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.FOLLOWINGREADINGTEXT.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "FOLLOWINGREADINGTEXT"))
+                                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.FOLLOWINGREADINGTEXT.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MATHFUNCTION"))
+                                End If
+                                    m_tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found.", &H0002, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos))
+                                    Exit Select
+                            End Select ' Choice Rule
             If m_tree.Errors.Count > 0 Then
                                         parent.Token.UpdateRange(node.Token)
                                         Exit Sub
             End If
                         Else
-                                                    m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.MATHFUNCTION.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MATHFUNCTION"))
+                                                    m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.FOLLOWINGREADINGTEXT.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "FOLLOWINGREADINGTEXT"))
                         End If
             If m_tree.Errors.Count > 0 Then
                                     parent.Token.UpdateRange(node.Token)
@@ -9959,22 +9961,98 @@ Namespace FEQL
             End If
 
                          ' Concat Rule
-                        ParseNODE(node) ' NonTerminal Rule: NODE
+                        tok = m_scanner.LookAhead(TokenType.NUMBER, TokenType.SINGLEQUOTE, TokenType.PREBOUNDREADINGTEXT, TokenType.MODELELEMENTNAME, TokenType.BROPEN) ' Choice Rule
+                        Select Case tok.Type
+                         ' Choice Rule
+                            Case TokenType.NUMBER
+                                ParseINDIVIDUALIDENTIFIER(node) ' NonTerminal Rule: INDIVIDUALIDENTIFIER
+            If m_tree.Errors.Count > 0 Then
+                                            parent.Token.UpdateRange(node.Token)
+                                            Exit Sub
+            End If
+                            Case TokenType.SINGLEQUOTE
+                                ParseINDIVIDUALIDENTIFIER(node) ' NonTerminal Rule: INDIVIDUALIDENTIFIER
+            If m_tree.Errors.Count > 0 Then
+                                            parent.Token.UpdateRange(node.Token)
+                                            Exit Sub
+            End If
+                            Case TokenType.PREBOUNDREADINGTEXT
+                                ParseNODE(node) ' NonTerminal Rule: NODE
+            If m_tree.Errors.Count > 0 Then
+                                            parent.Token.UpdateRange(node.Token)
+                                            Exit Sub
+            End If
+                            Case TokenType.MODELELEMENTNAME
+                                ParseNODE(node) ' NonTerminal Rule: NODE
+            If m_tree.Errors.Count > 0 Then
+                                            parent.Token.UpdateRange(node.Token)
+                                            Exit Sub
+            End If
+                            Case TokenType.BROPEN
+                                ParseNODE(node) ' NonTerminal Rule: NODE
+            If m_tree.Errors.Count > 0 Then
+                                            parent.Token.UpdateRange(node.Token)
+                                            Exit Sub
+            End If
+                            Case Else
+                            If m_tree.Errors.Count = 0 Then
+                            m_tree.Optionals.Clear
+                            m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.NUMBER.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "NUMBER"))
+                            m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.NUMBER.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "SINGLEQUOTE"))
+                            m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.NUMBER.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "PREBOUNDREADINGTEXT"))
+                            m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.NUMBER.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MODELELEMENTNAME"))
+                            m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.NUMBER.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "BROPEN"))
+                            End If
+                                m_tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found.", &H0002, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos))
+                                Exit Select
+                        End Select ' Choice Rule
             If m_tree.Errors.Count > 0 Then
                                     parent.Token.UpdateRange(node.Token)
                                     Exit Sub
             End If
 
                          ' Concat Rule
-                        tok = m_scanner.LookAhead(TokenType.MATHFUNCTION) ' Option Rule
-                        If tok.Type = TokenType.MATHFUNCTION Then
-                            ParseMATHCLAUSE(node) ' NonTerminal Rule: MATHCLAUSE
+                        tok = m_scanner.LookAhead(TokenType.FOLLOWINGREADINGTEXT, TokenType.MATHFUNCTION) ' Option Rule
+                        If tok.Type = TokenType.FOLLOWINGREADINGTEXT Or tok.Type = TokenType.MATHFUNCTION Then
+                            tok = m_scanner.LookAhead(TokenType.FOLLOWINGREADINGTEXT, TokenType.MATHFUNCTION) ' Choice Rule
+                            Select Case tok.Type
+                             ' Choice Rule
+                                Case TokenType.FOLLOWINGREADINGTEXT
+                                    tok = m_scanner.Scan(TokenType.FOLLOWINGREADINGTEXT) ' Terminal Rule: FOLLOWINGREADINGTEXT
+                                    n = node.CreateNode(tok, tok.ToString() )
+                                    node.Token.UpdateRange(tok)
+                                    node.Nodes.Add(n)
+                                    If tok.Type <> TokenType.FOLLOWINGREADINGTEXT Then
+                                        m_tree.Errors.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.FOLLOWINGREADINGTEXT.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "FOLLOWINGREADINGTEXT"))
+                                        Return
+
+                                    End If
+
+            If m_tree.Errors.Count > 0 Then
+                                                parent.Token.UpdateRange(node.Token)
+                                                Exit Sub
+            End If
+                                Case TokenType.MATHFUNCTION
+                                    ParseMATHCLAUSE(node) ' NonTerminal Rule: MATHCLAUSE
+            If m_tree.Errors.Count > 0 Then
+                                                parent.Token.UpdateRange(node.Token)
+                                                Exit Sub
+            End If
+                                Case Else
+                                If m_tree.Errors.Count = 0 Then
+                                m_tree.Optionals.Clear
+                                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.FOLLOWINGREADINGTEXT.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "FOLLOWINGREADINGTEXT"))
+                                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.FOLLOWINGREADINGTEXT.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MATHFUNCTION"))
+                                End If
+                                    m_tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found.", &H0002, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos))
+                                    Exit Select
+                            End Select ' Choice Rule
             If m_tree.Errors.Count > 0 Then
                                         parent.Token.UpdateRange(node.Token)
                                         Exit Sub
             End If
                         Else
-                                                    m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.MATHFUNCTION.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MATHFUNCTION"))
+                                                    m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.FOLLOWINGREADINGTEXT.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "FOLLOWINGREADINGTEXT"))
                         End If
             If m_tree.Errors.Count > 0 Then
                                     parent.Token.UpdateRange(node.Token)
@@ -10092,22 +10170,98 @@ Namespace FEQL
             End If
 
                          ' Concat Rule
-                        ParseNODE(node) ' NonTerminal Rule: NODE
+                        tok = m_scanner.LookAhead(TokenType.NUMBER, TokenType.SINGLEQUOTE, TokenType.PREBOUNDREADINGTEXT, TokenType.MODELELEMENTNAME, TokenType.BROPEN) ' Choice Rule
+                        Select Case tok.Type
+                         ' Choice Rule
+                            Case TokenType.NUMBER
+                                ParseINDIVIDUALIDENTIFIER(node) ' NonTerminal Rule: INDIVIDUALIDENTIFIER
+            If m_tree.Errors.Count > 0 Then
+                                            parent.Token.UpdateRange(node.Token)
+                                            Exit Sub
+            End If
+                            Case TokenType.SINGLEQUOTE
+                                ParseINDIVIDUALIDENTIFIER(node) ' NonTerminal Rule: INDIVIDUALIDENTIFIER
+            If m_tree.Errors.Count > 0 Then
+                                            parent.Token.UpdateRange(node.Token)
+                                            Exit Sub
+            End If
+                            Case TokenType.PREBOUNDREADINGTEXT
+                                ParseNODE(node) ' NonTerminal Rule: NODE
+            If m_tree.Errors.Count > 0 Then
+                                            parent.Token.UpdateRange(node.Token)
+                                            Exit Sub
+            End If
+                            Case TokenType.MODELELEMENTNAME
+                                ParseNODE(node) ' NonTerminal Rule: NODE
+            If m_tree.Errors.Count > 0 Then
+                                            parent.Token.UpdateRange(node.Token)
+                                            Exit Sub
+            End If
+                            Case TokenType.BROPEN
+                                ParseNODE(node) ' NonTerminal Rule: NODE
+            If m_tree.Errors.Count > 0 Then
+                                            parent.Token.UpdateRange(node.Token)
+                                            Exit Sub
+            End If
+                            Case Else
+                            If m_tree.Errors.Count = 0 Then
+                            m_tree.Optionals.Clear
+                            m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.NUMBER.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "NUMBER"))
+                            m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.NUMBER.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "SINGLEQUOTE"))
+                            m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.NUMBER.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "PREBOUNDREADINGTEXT"))
+                            m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.NUMBER.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MODELELEMENTNAME"))
+                            m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.NUMBER.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "BROPEN"))
+                            End If
+                                m_tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found.", &H0002, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos))
+                                Exit Select
+                        End Select ' Choice Rule
             If m_tree.Errors.Count > 0 Then
                                     parent.Token.UpdateRange(node.Token)
                                     Exit Sub
             End If
 
                          ' Concat Rule
-                        tok = m_scanner.LookAhead(TokenType.MATHFUNCTION) ' Option Rule
-                        If tok.Type = TokenType.MATHFUNCTION Then
-                            ParseMATHCLAUSE(node) ' NonTerminal Rule: MATHCLAUSE
+                        tok = m_scanner.LookAhead(TokenType.FOLLOWINGREADINGTEXT, TokenType.MATHFUNCTION) ' Option Rule
+                        If tok.Type = TokenType.FOLLOWINGREADINGTEXT Or tok.Type = TokenType.MATHFUNCTION Then
+                            tok = m_scanner.LookAhead(TokenType.FOLLOWINGREADINGTEXT, TokenType.MATHFUNCTION) ' Choice Rule
+                            Select Case tok.Type
+                             ' Choice Rule
+                                Case TokenType.FOLLOWINGREADINGTEXT
+                                    tok = m_scanner.Scan(TokenType.FOLLOWINGREADINGTEXT) ' Terminal Rule: FOLLOWINGREADINGTEXT
+                                    n = node.CreateNode(tok, tok.ToString() )
+                                    node.Token.UpdateRange(tok)
+                                    node.Nodes.Add(n)
+                                    If tok.Type <> TokenType.FOLLOWINGREADINGTEXT Then
+                                        m_tree.Errors.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.FOLLOWINGREADINGTEXT.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "FOLLOWINGREADINGTEXT"))
+                                        Return
+
+                                    End If
+
+            If m_tree.Errors.Count > 0 Then
+                                                parent.Token.UpdateRange(node.Token)
+                                                Exit Sub
+            End If
+                                Case TokenType.MATHFUNCTION
+                                    ParseMATHCLAUSE(node) ' NonTerminal Rule: MATHCLAUSE
+            If m_tree.Errors.Count > 0 Then
+                                                parent.Token.UpdateRange(node.Token)
+                                                Exit Sub
+            End If
+                                Case Else
+                                If m_tree.Errors.Count = 0 Then
+                                m_tree.Optionals.Clear
+                                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.FOLLOWINGREADINGTEXT.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "FOLLOWINGREADINGTEXT"))
+                                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.FOLLOWINGREADINGTEXT.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MATHFUNCTION"))
+                                End If
+                                    m_tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found.", &H0002, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos))
+                                    Exit Select
+                            End Select ' Choice Rule
             If m_tree.Errors.Count > 0 Then
                                         parent.Token.UpdateRange(node.Token)
                                         Exit Sub
             End If
                         Else
-                                                    m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.MATHFUNCTION.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MATHFUNCTION"))
+                                                    m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.FOLLOWINGREADINGTEXT.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "FOLLOWINGREADINGTEXT"))
                         End If
             If m_tree.Errors.Count > 0 Then
                                     parent.Token.UpdateRange(node.Token)
@@ -10225,22 +10379,98 @@ Namespace FEQL
             End If
 
                          ' Concat Rule
-                        ParseNODE(node) ' NonTerminal Rule: NODE
+                        tok = m_scanner.LookAhead(TokenType.NUMBER, TokenType.SINGLEQUOTE, TokenType.PREBOUNDREADINGTEXT, TokenType.MODELELEMENTNAME, TokenType.BROPEN) ' Choice Rule
+                        Select Case tok.Type
+                         ' Choice Rule
+                            Case TokenType.NUMBER
+                                ParseINDIVIDUALIDENTIFIER(node) ' NonTerminal Rule: INDIVIDUALIDENTIFIER
+            If m_tree.Errors.Count > 0 Then
+                                            parent.Token.UpdateRange(node.Token)
+                                            Exit Sub
+            End If
+                            Case TokenType.SINGLEQUOTE
+                                ParseINDIVIDUALIDENTIFIER(node) ' NonTerminal Rule: INDIVIDUALIDENTIFIER
+            If m_tree.Errors.Count > 0 Then
+                                            parent.Token.UpdateRange(node.Token)
+                                            Exit Sub
+            End If
+                            Case TokenType.PREBOUNDREADINGTEXT
+                                ParseNODE(node) ' NonTerminal Rule: NODE
+            If m_tree.Errors.Count > 0 Then
+                                            parent.Token.UpdateRange(node.Token)
+                                            Exit Sub
+            End If
+                            Case TokenType.MODELELEMENTNAME
+                                ParseNODE(node) ' NonTerminal Rule: NODE
+            If m_tree.Errors.Count > 0 Then
+                                            parent.Token.UpdateRange(node.Token)
+                                            Exit Sub
+            End If
+                            Case TokenType.BROPEN
+                                ParseNODE(node) ' NonTerminal Rule: NODE
+            If m_tree.Errors.Count > 0 Then
+                                            parent.Token.UpdateRange(node.Token)
+                                            Exit Sub
+            End If
+                            Case Else
+                            If m_tree.Errors.Count = 0 Then
+                            m_tree.Optionals.Clear
+                            m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.NUMBER.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "NUMBER"))
+                            m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.NUMBER.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "SINGLEQUOTE"))
+                            m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.NUMBER.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "PREBOUNDREADINGTEXT"))
+                            m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.NUMBER.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MODELELEMENTNAME"))
+                            m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.NUMBER.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "BROPEN"))
+                            End If
+                                m_tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found.", &H0002, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos))
+                                Exit Select
+                        End Select ' Choice Rule
             If m_tree.Errors.Count > 0 Then
                                     parent.Token.UpdateRange(node.Token)
                                     Exit Sub
             End If
 
                          ' Concat Rule
-                        tok = m_scanner.LookAhead(TokenType.MATHFUNCTION) ' Option Rule
-                        If tok.Type = TokenType.MATHFUNCTION Then
-                            ParseMATHCLAUSE(node) ' NonTerminal Rule: MATHCLAUSE
+                        tok = m_scanner.LookAhead(TokenType.FOLLOWINGREADINGTEXT, TokenType.MATHFUNCTION) ' Option Rule
+                        If tok.Type = TokenType.FOLLOWINGREADINGTEXT Or tok.Type = TokenType.MATHFUNCTION Then
+                            tok = m_scanner.LookAhead(TokenType.FOLLOWINGREADINGTEXT, TokenType.MATHFUNCTION) ' Choice Rule
+                            Select Case tok.Type
+                             ' Choice Rule
+                                Case TokenType.FOLLOWINGREADINGTEXT
+                                    tok = m_scanner.Scan(TokenType.FOLLOWINGREADINGTEXT) ' Terminal Rule: FOLLOWINGREADINGTEXT
+                                    n = node.CreateNode(tok, tok.ToString() )
+                                    node.Token.UpdateRange(tok)
+                                    node.Nodes.Add(n)
+                                    If tok.Type <> TokenType.FOLLOWINGREADINGTEXT Then
+                                        m_tree.Errors.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.FOLLOWINGREADINGTEXT.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "FOLLOWINGREADINGTEXT"))
+                                        Return
+
+                                    End If
+
+            If m_tree.Errors.Count > 0 Then
+                                                parent.Token.UpdateRange(node.Token)
+                                                Exit Sub
+            End If
+                                Case TokenType.MATHFUNCTION
+                                    ParseMATHCLAUSE(node) ' NonTerminal Rule: MATHCLAUSE
+            If m_tree.Errors.Count > 0 Then
+                                                parent.Token.UpdateRange(node.Token)
+                                                Exit Sub
+            End If
+                                Case Else
+                                If m_tree.Errors.Count = 0 Then
+                                m_tree.Optionals.Clear
+                                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.FOLLOWINGREADINGTEXT.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "FOLLOWINGREADINGTEXT"))
+                                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.FOLLOWINGREADINGTEXT.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MATHFUNCTION"))
+                                End If
+                                    m_tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found.", &H0002, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos))
+                                    Exit Select
+                            End Select ' Choice Rule
             If m_tree.Errors.Count > 0 Then
                                         parent.Token.UpdateRange(node.Token)
                                         Exit Sub
             End If
                         Else
-                                                    m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.MATHFUNCTION.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MATHFUNCTION"))
+                                                    m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.FOLLOWINGREADINGTEXT.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "FOLLOWINGREADINGTEXT"))
                         End If
             If m_tree.Errors.Count > 0 Then
                                     parent.Token.UpdateRange(node.Token)
@@ -10358,22 +10588,98 @@ Namespace FEQL
             End If
 
                          ' Concat Rule
-                        ParseNODE(node) ' NonTerminal Rule: NODE
+                        tok = m_scanner.LookAhead(TokenType.NUMBER, TokenType.SINGLEQUOTE, TokenType.PREBOUNDREADINGTEXT, TokenType.MODELELEMENTNAME, TokenType.BROPEN) ' Choice Rule
+                        Select Case tok.Type
+                         ' Choice Rule
+                            Case TokenType.NUMBER
+                                ParseINDIVIDUALIDENTIFIER(node) ' NonTerminal Rule: INDIVIDUALIDENTIFIER
+            If m_tree.Errors.Count > 0 Then
+                                            parent.Token.UpdateRange(node.Token)
+                                            Exit Sub
+            End If
+                            Case TokenType.SINGLEQUOTE
+                                ParseINDIVIDUALIDENTIFIER(node) ' NonTerminal Rule: INDIVIDUALIDENTIFIER
+            If m_tree.Errors.Count > 0 Then
+                                            parent.Token.UpdateRange(node.Token)
+                                            Exit Sub
+            End If
+                            Case TokenType.PREBOUNDREADINGTEXT
+                                ParseNODE(node) ' NonTerminal Rule: NODE
+            If m_tree.Errors.Count > 0 Then
+                                            parent.Token.UpdateRange(node.Token)
+                                            Exit Sub
+            End If
+                            Case TokenType.MODELELEMENTNAME
+                                ParseNODE(node) ' NonTerminal Rule: NODE
+            If m_tree.Errors.Count > 0 Then
+                                            parent.Token.UpdateRange(node.Token)
+                                            Exit Sub
+            End If
+                            Case TokenType.BROPEN
+                                ParseNODE(node) ' NonTerminal Rule: NODE
+            If m_tree.Errors.Count > 0 Then
+                                            parent.Token.UpdateRange(node.Token)
+                                            Exit Sub
+            End If
+                            Case Else
+                            If m_tree.Errors.Count = 0 Then
+                            m_tree.Optionals.Clear
+                            m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.NUMBER.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "NUMBER"))
+                            m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.NUMBER.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "SINGLEQUOTE"))
+                            m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.NUMBER.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "PREBOUNDREADINGTEXT"))
+                            m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.NUMBER.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MODELELEMENTNAME"))
+                            m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.NUMBER.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "BROPEN"))
+                            End If
+                                m_tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found.", &H0002, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos))
+                                Exit Select
+                        End Select ' Choice Rule
             If m_tree.Errors.Count > 0 Then
                                     parent.Token.UpdateRange(node.Token)
                                     Exit Sub
             End If
 
                          ' Concat Rule
-                        tok = m_scanner.LookAhead(TokenType.MATHFUNCTION) ' Option Rule
-                        If tok.Type = TokenType.MATHFUNCTION Then
-                            ParseMATHCLAUSE(node) ' NonTerminal Rule: MATHCLAUSE
+                        tok = m_scanner.LookAhead(TokenType.FOLLOWINGREADINGTEXT, TokenType.MATHFUNCTION) ' Option Rule
+                        If tok.Type = TokenType.FOLLOWINGREADINGTEXT Or tok.Type = TokenType.MATHFUNCTION Then
+                            tok = m_scanner.LookAhead(TokenType.FOLLOWINGREADINGTEXT, TokenType.MATHFUNCTION) ' Choice Rule
+                            Select Case tok.Type
+                             ' Choice Rule
+                                Case TokenType.FOLLOWINGREADINGTEXT
+                                    tok = m_scanner.Scan(TokenType.FOLLOWINGREADINGTEXT) ' Terminal Rule: FOLLOWINGREADINGTEXT
+                                    n = node.CreateNode(tok, tok.ToString() )
+                                    node.Token.UpdateRange(tok)
+                                    node.Nodes.Add(n)
+                                    If tok.Type <> TokenType.FOLLOWINGREADINGTEXT Then
+                                        m_tree.Errors.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.FOLLOWINGREADINGTEXT.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "FOLLOWINGREADINGTEXT"))
+                                        Return
+
+                                    End If
+
+            If m_tree.Errors.Count > 0 Then
+                                                parent.Token.UpdateRange(node.Token)
+                                                Exit Sub
+            End If
+                                Case TokenType.MATHFUNCTION
+                                    ParseMATHCLAUSE(node) ' NonTerminal Rule: MATHCLAUSE
+            If m_tree.Errors.Count > 0 Then
+                                                parent.Token.UpdateRange(node.Token)
+                                                Exit Sub
+            End If
+                                Case Else
+                                If m_tree.Errors.Count = 0 Then
+                                m_tree.Optionals.Clear
+                                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.FOLLOWINGREADINGTEXT.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "FOLLOWINGREADINGTEXT"))
+                                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.FOLLOWINGREADINGTEXT.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MATHFUNCTION"))
+                                End If
+                                    m_tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found.", &H0002, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos))
+                                    Exit Select
+                            End Select ' Choice Rule
             If m_tree.Errors.Count > 0 Then
                                         parent.Token.UpdateRange(node.Token)
                                         Exit Sub
             End If
                         Else
-                                                    m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.MATHFUNCTION.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MATHFUNCTION"))
+                                                    m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.FOLLOWINGREADINGTEXT.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "FOLLOWINGREADINGTEXT"))
                         End If
             If m_tree.Errors.Count > 0 Then
                                     parent.Token.UpdateRange(node.Token)
@@ -10491,22 +10797,98 @@ Namespace FEQL
             End If
 
                          ' Concat Rule
-                        ParseNODE(node) ' NonTerminal Rule: NODE
+                        tok = m_scanner.LookAhead(TokenType.NUMBER, TokenType.SINGLEQUOTE, TokenType.PREBOUNDREADINGTEXT, TokenType.MODELELEMENTNAME, TokenType.BROPEN) ' Choice Rule
+                        Select Case tok.Type
+                         ' Choice Rule
+                            Case TokenType.NUMBER
+                                ParseINDIVIDUALIDENTIFIER(node) ' NonTerminal Rule: INDIVIDUALIDENTIFIER
+            If m_tree.Errors.Count > 0 Then
+                                            parent.Token.UpdateRange(node.Token)
+                                            Exit Sub
+            End If
+                            Case TokenType.SINGLEQUOTE
+                                ParseINDIVIDUALIDENTIFIER(node) ' NonTerminal Rule: INDIVIDUALIDENTIFIER
+            If m_tree.Errors.Count > 0 Then
+                                            parent.Token.UpdateRange(node.Token)
+                                            Exit Sub
+            End If
+                            Case TokenType.PREBOUNDREADINGTEXT
+                                ParseNODE(node) ' NonTerminal Rule: NODE
+            If m_tree.Errors.Count > 0 Then
+                                            parent.Token.UpdateRange(node.Token)
+                                            Exit Sub
+            End If
+                            Case TokenType.MODELELEMENTNAME
+                                ParseNODE(node) ' NonTerminal Rule: NODE
+            If m_tree.Errors.Count > 0 Then
+                                            parent.Token.UpdateRange(node.Token)
+                                            Exit Sub
+            End If
+                            Case TokenType.BROPEN
+                                ParseNODE(node) ' NonTerminal Rule: NODE
+            If m_tree.Errors.Count > 0 Then
+                                            parent.Token.UpdateRange(node.Token)
+                                            Exit Sub
+            End If
+                            Case Else
+                            If m_tree.Errors.Count = 0 Then
+                            m_tree.Optionals.Clear
+                            m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.NUMBER.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "NUMBER"))
+                            m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.NUMBER.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "SINGLEQUOTE"))
+                            m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.NUMBER.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "PREBOUNDREADINGTEXT"))
+                            m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.NUMBER.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MODELELEMENTNAME"))
+                            m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.NUMBER.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "BROPEN"))
+                            End If
+                                m_tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found.", &H0002, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos))
+                                Exit Select
+                        End Select ' Choice Rule
             If m_tree.Errors.Count > 0 Then
                                     parent.Token.UpdateRange(node.Token)
                                     Exit Sub
             End If
 
                          ' Concat Rule
-                        tok = m_scanner.LookAhead(TokenType.MATHFUNCTION) ' Option Rule
-                        If tok.Type = TokenType.MATHFUNCTION Then
-                            ParseMATHCLAUSE(node) ' NonTerminal Rule: MATHCLAUSE
+                        tok = m_scanner.LookAhead(TokenType.FOLLOWINGREADINGTEXT, TokenType.MATHFUNCTION) ' Option Rule
+                        If tok.Type = TokenType.FOLLOWINGREADINGTEXT Or tok.Type = TokenType.MATHFUNCTION Then
+                            tok = m_scanner.LookAhead(TokenType.FOLLOWINGREADINGTEXT, TokenType.MATHFUNCTION) ' Choice Rule
+                            Select Case tok.Type
+                             ' Choice Rule
+                                Case TokenType.FOLLOWINGREADINGTEXT
+                                    tok = m_scanner.Scan(TokenType.FOLLOWINGREADINGTEXT) ' Terminal Rule: FOLLOWINGREADINGTEXT
+                                    n = node.CreateNode(tok, tok.ToString() )
+                                    node.Token.UpdateRange(tok)
+                                    node.Nodes.Add(n)
+                                    If tok.Type <> TokenType.FOLLOWINGREADINGTEXT Then
+                                        m_tree.Errors.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.FOLLOWINGREADINGTEXT.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "FOLLOWINGREADINGTEXT"))
+                                        Return
+
+                                    End If
+
+            If m_tree.Errors.Count > 0 Then
+                                                parent.Token.UpdateRange(node.Token)
+                                                Exit Sub
+            End If
+                                Case TokenType.MATHFUNCTION
+                                    ParseMATHCLAUSE(node) ' NonTerminal Rule: MATHCLAUSE
+            If m_tree.Errors.Count > 0 Then
+                                                parent.Token.UpdateRange(node.Token)
+                                                Exit Sub
+            End If
+                                Case Else
+                                If m_tree.Errors.Count = 0 Then
+                                m_tree.Optionals.Clear
+                                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.FOLLOWINGREADINGTEXT.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "FOLLOWINGREADINGTEXT"))
+                                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.FOLLOWINGREADINGTEXT.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MATHFUNCTION"))
+                                End If
+                                    m_tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found.", &H0002, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos))
+                                    Exit Select
+                            End Select ' Choice Rule
             If m_tree.Errors.Count > 0 Then
                                         parent.Token.UpdateRange(node.Token)
                                         Exit Sub
             End If
                         Else
-                                                    m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.MATHFUNCTION.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MATHFUNCTION"))
+                                                    m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.FOLLOWINGREADINGTEXT.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "FOLLOWINGREADINGTEXT"))
                         End If
             If m_tree.Errors.Count > 0 Then
                                     parent.Token.UpdateRange(node.Token)
@@ -10624,22 +11006,98 @@ Namespace FEQL
             End If
 
                          ' Concat Rule
-                        ParseNODE(node) ' NonTerminal Rule: NODE
+                        tok = m_scanner.LookAhead(TokenType.NUMBER, TokenType.SINGLEQUOTE, TokenType.PREBOUNDREADINGTEXT, TokenType.MODELELEMENTNAME, TokenType.BROPEN) ' Choice Rule
+                        Select Case tok.Type
+                         ' Choice Rule
+                            Case TokenType.NUMBER
+                                ParseINDIVIDUALIDENTIFIER(node) ' NonTerminal Rule: INDIVIDUALIDENTIFIER
+            If m_tree.Errors.Count > 0 Then
+                                            parent.Token.UpdateRange(node.Token)
+                                            Exit Sub
+            End If
+                            Case TokenType.SINGLEQUOTE
+                                ParseINDIVIDUALIDENTIFIER(node) ' NonTerminal Rule: INDIVIDUALIDENTIFIER
+            If m_tree.Errors.Count > 0 Then
+                                            parent.Token.UpdateRange(node.Token)
+                                            Exit Sub
+            End If
+                            Case TokenType.PREBOUNDREADINGTEXT
+                                ParseNODE(node) ' NonTerminal Rule: NODE
+            If m_tree.Errors.Count > 0 Then
+                                            parent.Token.UpdateRange(node.Token)
+                                            Exit Sub
+            End If
+                            Case TokenType.MODELELEMENTNAME
+                                ParseNODE(node) ' NonTerminal Rule: NODE
+            If m_tree.Errors.Count > 0 Then
+                                            parent.Token.UpdateRange(node.Token)
+                                            Exit Sub
+            End If
+                            Case TokenType.BROPEN
+                                ParseNODE(node) ' NonTerminal Rule: NODE
+            If m_tree.Errors.Count > 0 Then
+                                            parent.Token.UpdateRange(node.Token)
+                                            Exit Sub
+            End If
+                            Case Else
+                            If m_tree.Errors.Count = 0 Then
+                            m_tree.Optionals.Clear
+                            m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.NUMBER.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "NUMBER"))
+                            m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.NUMBER.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "SINGLEQUOTE"))
+                            m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.NUMBER.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "PREBOUNDREADINGTEXT"))
+                            m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.NUMBER.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MODELELEMENTNAME"))
+                            m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.NUMBER.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "BROPEN"))
+                            End If
+                                m_tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found.", &H0002, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos))
+                                Exit Select
+                        End Select ' Choice Rule
             If m_tree.Errors.Count > 0 Then
                                     parent.Token.UpdateRange(node.Token)
                                     Exit Sub
             End If
 
                          ' Concat Rule
-                        tok = m_scanner.LookAhead(TokenType.MATHFUNCTION) ' Option Rule
-                        If tok.Type = TokenType.MATHFUNCTION Then
-                            ParseMATHCLAUSE(node) ' NonTerminal Rule: MATHCLAUSE
+                        tok = m_scanner.LookAhead(TokenType.FOLLOWINGREADINGTEXT, TokenType.MATHFUNCTION) ' Option Rule
+                        If tok.Type = TokenType.FOLLOWINGREADINGTEXT Or tok.Type = TokenType.MATHFUNCTION Then
+                            tok = m_scanner.LookAhead(TokenType.FOLLOWINGREADINGTEXT, TokenType.MATHFUNCTION) ' Choice Rule
+                            Select Case tok.Type
+                             ' Choice Rule
+                                Case TokenType.FOLLOWINGREADINGTEXT
+                                    tok = m_scanner.Scan(TokenType.FOLLOWINGREADINGTEXT) ' Terminal Rule: FOLLOWINGREADINGTEXT
+                                    n = node.CreateNode(tok, tok.ToString() )
+                                    node.Token.UpdateRange(tok)
+                                    node.Nodes.Add(n)
+                                    If tok.Type <> TokenType.FOLLOWINGREADINGTEXT Then
+                                        m_tree.Errors.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.FOLLOWINGREADINGTEXT.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "FOLLOWINGREADINGTEXT"))
+                                        Return
+
+                                    End If
+
+            If m_tree.Errors.Count > 0 Then
+                                                parent.Token.UpdateRange(node.Token)
+                                                Exit Sub
+            End If
+                                Case TokenType.MATHFUNCTION
+                                    ParseMATHCLAUSE(node) ' NonTerminal Rule: MATHCLAUSE
+            If m_tree.Errors.Count > 0 Then
+                                                parent.Token.UpdateRange(node.Token)
+                                                Exit Sub
+            End If
+                                Case Else
+                                If m_tree.Errors.Count = 0 Then
+                                m_tree.Optionals.Clear
+                                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.FOLLOWINGREADINGTEXT.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "FOLLOWINGREADINGTEXT"))
+                                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.FOLLOWINGREADINGTEXT.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MATHFUNCTION"))
+                                End If
+                                    m_tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found.", &H0002, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos))
+                                    Exit Select
+                            End Select ' Choice Rule
             If m_tree.Errors.Count > 0 Then
                                         parent.Token.UpdateRange(node.Token)
                                         Exit Sub
             End If
                         Else
-                                                    m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.MATHFUNCTION.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MATHFUNCTION"))
+                                                    m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.FOLLOWINGREADINGTEXT.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "FOLLOWINGREADINGTEXT"))
                         End If
             If m_tree.Errors.Count > 0 Then
                                     parent.Token.UpdateRange(node.Token)
@@ -10757,22 +11215,516 @@ Namespace FEQL
             End If
 
                          ' Concat Rule
-                        ParseNODE(node) ' NonTerminal Rule: NODE
+                        tok = m_scanner.LookAhead(TokenType.NUMBER, TokenType.SINGLEQUOTE, TokenType.PREBOUNDREADINGTEXT, TokenType.MODELELEMENTNAME, TokenType.BROPEN) ' Choice Rule
+                        Select Case tok.Type
+                         ' Choice Rule
+                            Case TokenType.NUMBER
+                                ParseINDIVIDUALIDENTIFIER(node) ' NonTerminal Rule: INDIVIDUALIDENTIFIER
+            If m_tree.Errors.Count > 0 Then
+                                            parent.Token.UpdateRange(node.Token)
+                                            Exit Sub
+            End If
+                            Case TokenType.SINGLEQUOTE
+                                ParseINDIVIDUALIDENTIFIER(node) ' NonTerminal Rule: INDIVIDUALIDENTIFIER
+            If m_tree.Errors.Count > 0 Then
+                                            parent.Token.UpdateRange(node.Token)
+                                            Exit Sub
+            End If
+                            Case TokenType.PREBOUNDREADINGTEXT
+                                ParseNODE(node) ' NonTerminal Rule: NODE
+            If m_tree.Errors.Count > 0 Then
+                                            parent.Token.UpdateRange(node.Token)
+                                            Exit Sub
+            End If
+                            Case TokenType.MODELELEMENTNAME
+                                ParseNODE(node) ' NonTerminal Rule: NODE
+            If m_tree.Errors.Count > 0 Then
+                                            parent.Token.UpdateRange(node.Token)
+                                            Exit Sub
+            End If
+                            Case TokenType.BROPEN
+                                ParseNODE(node) ' NonTerminal Rule: NODE
+            If m_tree.Errors.Count > 0 Then
+                                            parent.Token.UpdateRange(node.Token)
+                                            Exit Sub
+            End If
+                            Case Else
+                            If m_tree.Errors.Count = 0 Then
+                            m_tree.Optionals.Clear
+                            m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.NUMBER.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "NUMBER"))
+                            m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.NUMBER.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "SINGLEQUOTE"))
+                            m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.NUMBER.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "PREBOUNDREADINGTEXT"))
+                            m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.NUMBER.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MODELELEMENTNAME"))
+                            m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.NUMBER.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "BROPEN"))
+                            End If
+                                m_tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found.", &H0002, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos))
+                                Exit Select
+                        End Select ' Choice Rule
             If m_tree.Errors.Count > 0 Then
                                     parent.Token.UpdateRange(node.Token)
                                     Exit Sub
             End If
 
                          ' Concat Rule
-                        tok = m_scanner.LookAhead(TokenType.MATHFUNCTION) ' Option Rule
-                        If tok.Type = TokenType.MATHFUNCTION Then
-                            ParseMATHCLAUSE(node) ' NonTerminal Rule: MATHCLAUSE
+                        tok = m_scanner.LookAhead(TokenType.FOLLOWINGREADINGTEXT, TokenType.MATHFUNCTION) ' Option Rule
+                        If tok.Type = TokenType.FOLLOWINGREADINGTEXT Or tok.Type = TokenType.MATHFUNCTION Then
+                            tok = m_scanner.LookAhead(TokenType.FOLLOWINGREADINGTEXT, TokenType.MATHFUNCTION) ' Choice Rule
+                            Select Case tok.Type
+                             ' Choice Rule
+                                Case TokenType.FOLLOWINGREADINGTEXT
+                                    tok = m_scanner.Scan(TokenType.FOLLOWINGREADINGTEXT) ' Terminal Rule: FOLLOWINGREADINGTEXT
+                                    n = node.CreateNode(tok, tok.ToString() )
+                                    node.Token.UpdateRange(tok)
+                                    node.Nodes.Add(n)
+                                    If tok.Type <> TokenType.FOLLOWINGREADINGTEXT Then
+                                        m_tree.Errors.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.FOLLOWINGREADINGTEXT.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "FOLLOWINGREADINGTEXT"))
+                                        Return
+
+                                    End If
+
+            If m_tree.Errors.Count > 0 Then
+                                                parent.Token.UpdateRange(node.Token)
+                                                Exit Sub
+            End If
+                                Case TokenType.MATHFUNCTION
+                                    ParseMATHCLAUSE(node) ' NonTerminal Rule: MATHCLAUSE
+            If m_tree.Errors.Count > 0 Then
+                                                parent.Token.UpdateRange(node.Token)
+                                                Exit Sub
+            End If
+                                Case Else
+                                If m_tree.Errors.Count = 0 Then
+                                m_tree.Optionals.Clear
+                                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.FOLLOWINGREADINGTEXT.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "FOLLOWINGREADINGTEXT"))
+                                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.FOLLOWINGREADINGTEXT.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MATHFUNCTION"))
+                                End If
+                                    m_tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found.", &H0002, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos))
+                                    Exit Select
+                            End Select ' Choice Rule
             If m_tree.Errors.Count > 0 Then
                                         parent.Token.UpdateRange(node.Token)
                                         Exit Sub
             End If
                         Else
-                                                    m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.MATHFUNCTION.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MATHFUNCTION"))
+                                                    m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.FOLLOWINGREADINGTEXT.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "FOLLOWINGREADINGTEXT"))
+                        End If
+            If m_tree.Errors.Count > 0 Then
+                                    parent.Token.UpdateRange(node.Token)
+                                    Exit Sub
+            End If
+            If m_tree.Errors.Count > 0 Then
+                                    parent.Token.UpdateRange(node.Token)
+                                    Exit Sub
+            End If
+                    Case TokenType.NUMBER
+
+                         ' Concat Rule
+                        tok = m_scanner.LookAhead(TokenType.KEYWDIS, TokenType.PREDICATE, TokenType.KEYWDTHAT, TokenType.PREBOUNDREADINGTEXT, TokenType.MODELELEMENTNAME) ' Option Rule
+                        If tok.Type = TokenType.KEYWDIS Or tok.Type = TokenType.PREDICATE Or tok.Type = TokenType.KEYWDTHAT Or tok.Type = TokenType.PREBOUNDREADINGTEXT Or tok.Type = TokenType.MODELELEMENTNAME Then
+                            ParseWHICHTHATCLAUSE(node) ' NonTerminal Rule: WHICHTHATCLAUSE
+            If m_tree.Errors.Count > 0 Then
+                                        parent.Token.UpdateRange(node.Token)
+                                        Exit Sub
+            End If
+                        Else
+                                                    m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDIS.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDIS"))
+                        End If
+            If m_tree.Errors.Count > 0 Then
+                                    parent.Token.UpdateRange(node.Token)
+                                    Exit Sub
+            End If
+
+                         ' Concat Rule
+                        tok = m_scanner.LookAhead(TokenType.KEYWDWHICH, TokenType.KEYWDTHAT, TokenType.KEYWDAN, TokenType.KEYWDA) ' Option Rule
+                        If tok.Type = TokenType.KEYWDWHICH Or tok.Type = TokenType.KEYWDTHAT Or tok.Type = TokenType.KEYWDAN Or tok.Type = TokenType.KEYWDA Then
+                            tok = m_scanner.LookAhead(TokenType.KEYWDWHICH, TokenType.KEYWDTHAT, TokenType.KEYWDAN, TokenType.KEYWDA) ' Choice Rule
+                            Select Case tok.Type
+                             ' Choice Rule
+                                Case TokenType.KEYWDWHICH
+                                    tok = m_scanner.Scan(TokenType.KEYWDWHICH) ' Terminal Rule: KEYWDWHICH
+                                    n = node.CreateNode(tok, tok.ToString() )
+                                    node.Token.UpdateRange(tok)
+                                    node.Nodes.Add(n)
+                                    If tok.Type <> TokenType.KEYWDWHICH Then
+                                        m_tree.Errors.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDWHICH.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDWHICH"))
+                                        Return
+
+                                    End If
+
+            If m_tree.Errors.Count > 0 Then
+                                                parent.Token.UpdateRange(node.Token)
+                                                Exit Sub
+            End If
+                                Case TokenType.KEYWDTHAT
+                                    tok = m_scanner.Scan(TokenType.KEYWDTHAT) ' Terminal Rule: KEYWDTHAT
+                                    n = node.CreateNode(tok, tok.ToString() )
+                                    node.Token.UpdateRange(tok)
+                                    node.Nodes.Add(n)
+                                    If tok.Type <> TokenType.KEYWDTHAT Then
+                                        m_tree.Errors.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDTHAT.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDTHAT"))
+                                        Return
+
+                                    End If
+
+            If m_tree.Errors.Count > 0 Then
+                                                parent.Token.UpdateRange(node.Token)
+                                                Exit Sub
+            End If
+                                Case TokenType.KEYWDAN
+                                    tok = m_scanner.Scan(TokenType.KEYWDAN) ' Terminal Rule: KEYWDAN
+                                    n = node.CreateNode(tok, tok.ToString() )
+                                    node.Token.UpdateRange(tok)
+                                    node.Nodes.Add(n)
+                                    If tok.Type <> TokenType.KEYWDAN Then
+                                        m_tree.Errors.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDAN.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDAN"))
+                                        Return
+
+                                    End If
+
+            If m_tree.Errors.Count > 0 Then
+                                                parent.Token.UpdateRange(node.Token)
+                                                Exit Sub
+            End If
+                                Case TokenType.KEYWDA
+                                    tok = m_scanner.Scan(TokenType.KEYWDA) ' Terminal Rule: KEYWDA
+                                    n = node.CreateNode(tok, tok.ToString() )
+                                    node.Token.UpdateRange(tok)
+                                    node.Nodes.Add(n)
+                                    If tok.Type <> TokenType.KEYWDA Then
+                                        m_tree.Errors.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDA.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDA"))
+                                        Return
+
+                                    End If
+
+            If m_tree.Errors.Count > 0 Then
+                                                parent.Token.UpdateRange(node.Token)
+                                                Exit Sub
+            End If
+                                Case Else
+                                If m_tree.Errors.Count = 0 Then
+                                m_tree.Optionals.Clear
+                                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDWHICH.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDWHICH"))
+                                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDWHICH.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDTHAT"))
+                                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDWHICH.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDAN"))
+                                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDWHICH.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDA"))
+                                End If
+                                    m_tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found.", &H0002, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos))
+                                    Exit Select
+                            End Select ' Choice Rule
+            If m_tree.Errors.Count > 0 Then
+                                        parent.Token.UpdateRange(node.Token)
+                                        Exit Sub
+            End If
+                        Else
+                                                    m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDWHICH.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDWHICH"))
+                        End If
+            If m_tree.Errors.Count > 0 Then
+                                    parent.Token.UpdateRange(node.Token)
+                                    Exit Sub
+            End If
+
+                         ' Concat Rule
+                        tok = m_scanner.LookAhead(TokenType.NUMBER, TokenType.SINGLEQUOTE, TokenType.PREBOUNDREADINGTEXT, TokenType.MODELELEMENTNAME, TokenType.BROPEN) ' Choice Rule
+                        Select Case tok.Type
+                         ' Choice Rule
+                            Case TokenType.NUMBER
+                                ParseINDIVIDUALIDENTIFIER(node) ' NonTerminal Rule: INDIVIDUALIDENTIFIER
+            If m_tree.Errors.Count > 0 Then
+                                            parent.Token.UpdateRange(node.Token)
+                                            Exit Sub
+            End If
+                            Case TokenType.SINGLEQUOTE
+                                ParseINDIVIDUALIDENTIFIER(node) ' NonTerminal Rule: INDIVIDUALIDENTIFIER
+            If m_tree.Errors.Count > 0 Then
+                                            parent.Token.UpdateRange(node.Token)
+                                            Exit Sub
+            End If
+                            Case TokenType.PREBOUNDREADINGTEXT
+                                ParseNODE(node) ' NonTerminal Rule: NODE
+            If m_tree.Errors.Count > 0 Then
+                                            parent.Token.UpdateRange(node.Token)
+                                            Exit Sub
+            End If
+                            Case TokenType.MODELELEMENTNAME
+                                ParseNODE(node) ' NonTerminal Rule: NODE
+            If m_tree.Errors.Count > 0 Then
+                                            parent.Token.UpdateRange(node.Token)
+                                            Exit Sub
+            End If
+                            Case TokenType.BROPEN
+                                ParseNODE(node) ' NonTerminal Rule: NODE
+            If m_tree.Errors.Count > 0 Then
+                                            parent.Token.UpdateRange(node.Token)
+                                            Exit Sub
+            End If
+                            Case Else
+                            If m_tree.Errors.Count = 0 Then
+                            m_tree.Optionals.Clear
+                            m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.NUMBER.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "NUMBER"))
+                            m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.NUMBER.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "SINGLEQUOTE"))
+                            m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.NUMBER.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "PREBOUNDREADINGTEXT"))
+                            m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.NUMBER.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MODELELEMENTNAME"))
+                            m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.NUMBER.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "BROPEN"))
+                            End If
+                                m_tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found.", &H0002, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos))
+                                Exit Select
+                        End Select ' Choice Rule
+            If m_tree.Errors.Count > 0 Then
+                                    parent.Token.UpdateRange(node.Token)
+                                    Exit Sub
+            End If
+
+                         ' Concat Rule
+                        tok = m_scanner.LookAhead(TokenType.FOLLOWINGREADINGTEXT, TokenType.MATHFUNCTION) ' Option Rule
+                        If tok.Type = TokenType.FOLLOWINGREADINGTEXT Or tok.Type = TokenType.MATHFUNCTION Then
+                            tok = m_scanner.LookAhead(TokenType.FOLLOWINGREADINGTEXT, TokenType.MATHFUNCTION) ' Choice Rule
+                            Select Case tok.Type
+                             ' Choice Rule
+                                Case TokenType.FOLLOWINGREADINGTEXT
+                                    tok = m_scanner.Scan(TokenType.FOLLOWINGREADINGTEXT) ' Terminal Rule: FOLLOWINGREADINGTEXT
+                                    n = node.CreateNode(tok, tok.ToString() )
+                                    node.Token.UpdateRange(tok)
+                                    node.Nodes.Add(n)
+                                    If tok.Type <> TokenType.FOLLOWINGREADINGTEXT Then
+                                        m_tree.Errors.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.FOLLOWINGREADINGTEXT.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "FOLLOWINGREADINGTEXT"))
+                                        Return
+
+                                    End If
+
+            If m_tree.Errors.Count > 0 Then
+                                                parent.Token.UpdateRange(node.Token)
+                                                Exit Sub
+            End If
+                                Case TokenType.MATHFUNCTION
+                                    ParseMATHCLAUSE(node) ' NonTerminal Rule: MATHCLAUSE
+            If m_tree.Errors.Count > 0 Then
+                                                parent.Token.UpdateRange(node.Token)
+                                                Exit Sub
+            End If
+                                Case Else
+                                If m_tree.Errors.Count = 0 Then
+                                m_tree.Optionals.Clear
+                                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.FOLLOWINGREADINGTEXT.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "FOLLOWINGREADINGTEXT"))
+                                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.FOLLOWINGREADINGTEXT.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MATHFUNCTION"))
+                                End If
+                                    m_tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found.", &H0002, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos))
+                                    Exit Select
+                            End Select ' Choice Rule
+            If m_tree.Errors.Count > 0 Then
+                                        parent.Token.UpdateRange(node.Token)
+                                        Exit Sub
+            End If
+                        Else
+                                                    m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.FOLLOWINGREADINGTEXT.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "FOLLOWINGREADINGTEXT"))
+                        End If
+            If m_tree.Errors.Count > 0 Then
+                                    parent.Token.UpdateRange(node.Token)
+                                    Exit Sub
+            End If
+            If m_tree.Errors.Count > 0 Then
+                                    parent.Token.UpdateRange(node.Token)
+                                    Exit Sub
+            End If
+                    Case TokenType.SINGLEQUOTE
+
+                         ' Concat Rule
+                        tok = m_scanner.LookAhead(TokenType.KEYWDIS, TokenType.PREDICATE, TokenType.KEYWDTHAT, TokenType.PREBOUNDREADINGTEXT, TokenType.MODELELEMENTNAME) ' Option Rule
+                        If tok.Type = TokenType.KEYWDIS Or tok.Type = TokenType.PREDICATE Or tok.Type = TokenType.KEYWDTHAT Or tok.Type = TokenType.PREBOUNDREADINGTEXT Or tok.Type = TokenType.MODELELEMENTNAME Then
+                            ParseWHICHTHATCLAUSE(node) ' NonTerminal Rule: WHICHTHATCLAUSE
+            If m_tree.Errors.Count > 0 Then
+                                        parent.Token.UpdateRange(node.Token)
+                                        Exit Sub
+            End If
+                        Else
+                                                    m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDIS.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDIS"))
+                        End If
+            If m_tree.Errors.Count > 0 Then
+                                    parent.Token.UpdateRange(node.Token)
+                                    Exit Sub
+            End If
+
+                         ' Concat Rule
+                        tok = m_scanner.LookAhead(TokenType.KEYWDWHICH, TokenType.KEYWDTHAT, TokenType.KEYWDAN, TokenType.KEYWDA) ' Option Rule
+                        If tok.Type = TokenType.KEYWDWHICH Or tok.Type = TokenType.KEYWDTHAT Or tok.Type = TokenType.KEYWDAN Or tok.Type = TokenType.KEYWDA Then
+                            tok = m_scanner.LookAhead(TokenType.KEYWDWHICH, TokenType.KEYWDTHAT, TokenType.KEYWDAN, TokenType.KEYWDA) ' Choice Rule
+                            Select Case tok.Type
+                             ' Choice Rule
+                                Case TokenType.KEYWDWHICH
+                                    tok = m_scanner.Scan(TokenType.KEYWDWHICH) ' Terminal Rule: KEYWDWHICH
+                                    n = node.CreateNode(tok, tok.ToString() )
+                                    node.Token.UpdateRange(tok)
+                                    node.Nodes.Add(n)
+                                    If tok.Type <> TokenType.KEYWDWHICH Then
+                                        m_tree.Errors.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDWHICH.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDWHICH"))
+                                        Return
+
+                                    End If
+
+            If m_tree.Errors.Count > 0 Then
+                                                parent.Token.UpdateRange(node.Token)
+                                                Exit Sub
+            End If
+                                Case TokenType.KEYWDTHAT
+                                    tok = m_scanner.Scan(TokenType.KEYWDTHAT) ' Terminal Rule: KEYWDTHAT
+                                    n = node.CreateNode(tok, tok.ToString() )
+                                    node.Token.UpdateRange(tok)
+                                    node.Nodes.Add(n)
+                                    If tok.Type <> TokenType.KEYWDTHAT Then
+                                        m_tree.Errors.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDTHAT.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDTHAT"))
+                                        Return
+
+                                    End If
+
+            If m_tree.Errors.Count > 0 Then
+                                                parent.Token.UpdateRange(node.Token)
+                                                Exit Sub
+            End If
+                                Case TokenType.KEYWDAN
+                                    tok = m_scanner.Scan(TokenType.KEYWDAN) ' Terminal Rule: KEYWDAN
+                                    n = node.CreateNode(tok, tok.ToString() )
+                                    node.Token.UpdateRange(tok)
+                                    node.Nodes.Add(n)
+                                    If tok.Type <> TokenType.KEYWDAN Then
+                                        m_tree.Errors.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDAN.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDAN"))
+                                        Return
+
+                                    End If
+
+            If m_tree.Errors.Count > 0 Then
+                                                parent.Token.UpdateRange(node.Token)
+                                                Exit Sub
+            End If
+                                Case TokenType.KEYWDA
+                                    tok = m_scanner.Scan(TokenType.KEYWDA) ' Terminal Rule: KEYWDA
+                                    n = node.CreateNode(tok, tok.ToString() )
+                                    node.Token.UpdateRange(tok)
+                                    node.Nodes.Add(n)
+                                    If tok.Type <> TokenType.KEYWDA Then
+                                        m_tree.Errors.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDA.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDA"))
+                                        Return
+
+                                    End If
+
+            If m_tree.Errors.Count > 0 Then
+                                                parent.Token.UpdateRange(node.Token)
+                                                Exit Sub
+            End If
+                                Case Else
+                                If m_tree.Errors.Count = 0 Then
+                                m_tree.Optionals.Clear
+                                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDWHICH.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDWHICH"))
+                                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDWHICH.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDTHAT"))
+                                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDWHICH.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDAN"))
+                                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDWHICH.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDA"))
+                                End If
+                                    m_tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found.", &H0002, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos))
+                                    Exit Select
+                            End Select ' Choice Rule
+            If m_tree.Errors.Count > 0 Then
+                                        parent.Token.UpdateRange(node.Token)
+                                        Exit Sub
+            End If
+                        Else
+                                                    m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDWHICH.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDWHICH"))
+                        End If
+            If m_tree.Errors.Count > 0 Then
+                                    parent.Token.UpdateRange(node.Token)
+                                    Exit Sub
+            End If
+
+                         ' Concat Rule
+                        tok = m_scanner.LookAhead(TokenType.NUMBER, TokenType.SINGLEQUOTE, TokenType.PREBOUNDREADINGTEXT, TokenType.MODELELEMENTNAME, TokenType.BROPEN) ' Choice Rule
+                        Select Case tok.Type
+                         ' Choice Rule
+                            Case TokenType.NUMBER
+                                ParseINDIVIDUALIDENTIFIER(node) ' NonTerminal Rule: INDIVIDUALIDENTIFIER
+            If m_tree.Errors.Count > 0 Then
+                                            parent.Token.UpdateRange(node.Token)
+                                            Exit Sub
+            End If
+                            Case TokenType.SINGLEQUOTE
+                                ParseINDIVIDUALIDENTIFIER(node) ' NonTerminal Rule: INDIVIDUALIDENTIFIER
+            If m_tree.Errors.Count > 0 Then
+                                            parent.Token.UpdateRange(node.Token)
+                                            Exit Sub
+            End If
+                            Case TokenType.PREBOUNDREADINGTEXT
+                                ParseNODE(node) ' NonTerminal Rule: NODE
+            If m_tree.Errors.Count > 0 Then
+                                            parent.Token.UpdateRange(node.Token)
+                                            Exit Sub
+            End If
+                            Case TokenType.MODELELEMENTNAME
+                                ParseNODE(node) ' NonTerminal Rule: NODE
+            If m_tree.Errors.Count > 0 Then
+                                            parent.Token.UpdateRange(node.Token)
+                                            Exit Sub
+            End If
+                            Case TokenType.BROPEN
+                                ParseNODE(node) ' NonTerminal Rule: NODE
+            If m_tree.Errors.Count > 0 Then
+                                            parent.Token.UpdateRange(node.Token)
+                                            Exit Sub
+            End If
+                            Case Else
+                            If m_tree.Errors.Count = 0 Then
+                            m_tree.Optionals.Clear
+                            m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.NUMBER.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "NUMBER"))
+                            m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.NUMBER.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "SINGLEQUOTE"))
+                            m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.NUMBER.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "PREBOUNDREADINGTEXT"))
+                            m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.NUMBER.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MODELELEMENTNAME"))
+                            m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.NUMBER.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "BROPEN"))
+                            End If
+                                m_tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found.", &H0002, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos))
+                                Exit Select
+                        End Select ' Choice Rule
+            If m_tree.Errors.Count > 0 Then
+                                    parent.Token.UpdateRange(node.Token)
+                                    Exit Sub
+            End If
+
+                         ' Concat Rule
+                        tok = m_scanner.LookAhead(TokenType.FOLLOWINGREADINGTEXT, TokenType.MATHFUNCTION) ' Option Rule
+                        If tok.Type = TokenType.FOLLOWINGREADINGTEXT Or tok.Type = TokenType.MATHFUNCTION Then
+                            tok = m_scanner.LookAhead(TokenType.FOLLOWINGREADINGTEXT, TokenType.MATHFUNCTION) ' Choice Rule
+                            Select Case tok.Type
+                             ' Choice Rule
+                                Case TokenType.FOLLOWINGREADINGTEXT
+                                    tok = m_scanner.Scan(TokenType.FOLLOWINGREADINGTEXT) ' Terminal Rule: FOLLOWINGREADINGTEXT
+                                    n = node.CreateNode(tok, tok.ToString() )
+                                    node.Token.UpdateRange(tok)
+                                    node.Nodes.Add(n)
+                                    If tok.Type <> TokenType.FOLLOWINGREADINGTEXT Then
+                                        m_tree.Errors.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.FOLLOWINGREADINGTEXT.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "FOLLOWINGREADINGTEXT"))
+                                        Return
+
+                                    End If
+
+            If m_tree.Errors.Count > 0 Then
+                                                parent.Token.UpdateRange(node.Token)
+                                                Exit Sub
+            End If
+                                Case TokenType.MATHFUNCTION
+                                    ParseMATHCLAUSE(node) ' NonTerminal Rule: MATHCLAUSE
+            If m_tree.Errors.Count > 0 Then
+                                                parent.Token.UpdateRange(node.Token)
+                                                Exit Sub
+            End If
+                                Case Else
+                                If m_tree.Errors.Count = 0 Then
+                                m_tree.Optionals.Clear
+                                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.FOLLOWINGREADINGTEXT.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "FOLLOWINGREADINGTEXT"))
+                                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.FOLLOWINGREADINGTEXT.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MATHFUNCTION"))
+                                End If
+                                    m_tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found.", &H0002, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos))
+                                    Exit Select
+                            End Select ' Choice Rule
+            If m_tree.Errors.Count > 0 Then
+                                        parent.Token.UpdateRange(node.Token)
+                                        Exit Sub
+            End If
+                        Else
+                                                    m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.FOLLOWINGREADINGTEXT.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "FOLLOWINGREADINGTEXT"))
                         End If
             If m_tree.Errors.Count > 0 Then
                                     parent.Token.UpdateRange(node.Token)
@@ -10890,22 +11842,98 @@ Namespace FEQL
             End If
 
                          ' Concat Rule
-                        ParseNODE(node) ' NonTerminal Rule: NODE
+                        tok = m_scanner.LookAhead(TokenType.NUMBER, TokenType.SINGLEQUOTE, TokenType.PREBOUNDREADINGTEXT, TokenType.MODELELEMENTNAME, TokenType.BROPEN) ' Choice Rule
+                        Select Case tok.Type
+                         ' Choice Rule
+                            Case TokenType.NUMBER
+                                ParseINDIVIDUALIDENTIFIER(node) ' NonTerminal Rule: INDIVIDUALIDENTIFIER
+            If m_tree.Errors.Count > 0 Then
+                                            parent.Token.UpdateRange(node.Token)
+                                            Exit Sub
+            End If
+                            Case TokenType.SINGLEQUOTE
+                                ParseINDIVIDUALIDENTIFIER(node) ' NonTerminal Rule: INDIVIDUALIDENTIFIER
+            If m_tree.Errors.Count > 0 Then
+                                            parent.Token.UpdateRange(node.Token)
+                                            Exit Sub
+            End If
+                            Case TokenType.PREBOUNDREADINGTEXT
+                                ParseNODE(node) ' NonTerminal Rule: NODE
+            If m_tree.Errors.Count > 0 Then
+                                            parent.Token.UpdateRange(node.Token)
+                                            Exit Sub
+            End If
+                            Case TokenType.MODELELEMENTNAME
+                                ParseNODE(node) ' NonTerminal Rule: NODE
+            If m_tree.Errors.Count > 0 Then
+                                            parent.Token.UpdateRange(node.Token)
+                                            Exit Sub
+            End If
+                            Case TokenType.BROPEN
+                                ParseNODE(node) ' NonTerminal Rule: NODE
+            If m_tree.Errors.Count > 0 Then
+                                            parent.Token.UpdateRange(node.Token)
+                                            Exit Sub
+            End If
+                            Case Else
+                            If m_tree.Errors.Count = 0 Then
+                            m_tree.Optionals.Clear
+                            m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.NUMBER.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "NUMBER"))
+                            m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.NUMBER.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "SINGLEQUOTE"))
+                            m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.NUMBER.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "PREBOUNDREADINGTEXT"))
+                            m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.NUMBER.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MODELELEMENTNAME"))
+                            m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.NUMBER.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "BROPEN"))
+                            End If
+                                m_tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found.", &H0002, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos))
+                                Exit Select
+                        End Select ' Choice Rule
             If m_tree.Errors.Count > 0 Then
                                     parent.Token.UpdateRange(node.Token)
                                     Exit Sub
             End If
 
                          ' Concat Rule
-                        tok = m_scanner.LookAhead(TokenType.MATHFUNCTION) ' Option Rule
-                        If tok.Type = TokenType.MATHFUNCTION Then
-                            ParseMATHCLAUSE(node) ' NonTerminal Rule: MATHCLAUSE
+                        tok = m_scanner.LookAhead(TokenType.FOLLOWINGREADINGTEXT, TokenType.MATHFUNCTION) ' Option Rule
+                        If tok.Type = TokenType.FOLLOWINGREADINGTEXT Or tok.Type = TokenType.MATHFUNCTION Then
+                            tok = m_scanner.LookAhead(TokenType.FOLLOWINGREADINGTEXT, TokenType.MATHFUNCTION) ' Choice Rule
+                            Select Case tok.Type
+                             ' Choice Rule
+                                Case TokenType.FOLLOWINGREADINGTEXT
+                                    tok = m_scanner.Scan(TokenType.FOLLOWINGREADINGTEXT) ' Terminal Rule: FOLLOWINGREADINGTEXT
+                                    n = node.CreateNode(tok, tok.ToString() )
+                                    node.Token.UpdateRange(tok)
+                                    node.Nodes.Add(n)
+                                    If tok.Type <> TokenType.FOLLOWINGREADINGTEXT Then
+                                        m_tree.Errors.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.FOLLOWINGREADINGTEXT.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "FOLLOWINGREADINGTEXT"))
+                                        Return
+
+                                    End If
+
+            If m_tree.Errors.Count > 0 Then
+                                                parent.Token.UpdateRange(node.Token)
+                                                Exit Sub
+            End If
+                                Case TokenType.MATHFUNCTION
+                                    ParseMATHCLAUSE(node) ' NonTerminal Rule: MATHCLAUSE
+            If m_tree.Errors.Count > 0 Then
+                                                parent.Token.UpdateRange(node.Token)
+                                                Exit Sub
+            End If
+                                Case Else
+                                If m_tree.Errors.Count = 0 Then
+                                m_tree.Optionals.Clear
+                                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.FOLLOWINGREADINGTEXT.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "FOLLOWINGREADINGTEXT"))
+                                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.FOLLOWINGREADINGTEXT.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MATHFUNCTION"))
+                                End If
+                                    m_tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found.", &H0002, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos))
+                                    Exit Select
+                            End Select ' Choice Rule
             If m_tree.Errors.Count > 0 Then
                                         parent.Token.UpdateRange(node.Token)
                                         Exit Sub
             End If
                         Else
-                                                    m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.MATHFUNCTION.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MATHFUNCTION"))
+                                                    m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.FOLLOWINGREADINGTEXT.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "FOLLOWINGREADINGTEXT"))
                         End If
             If m_tree.Errors.Count > 0 Then
                                     parent.Token.UpdateRange(node.Token)
@@ -10927,6 +11955,8 @@ Namespace FEQL
                     m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDWITH.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDWHICH"))
                     m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDWITH.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDAN"))
                     m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDWITH.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDA"))
+                    m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDWITH.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "NUMBER"))
+                    m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDWITH.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "SINGLEQUOTE"))
                     m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDWITH.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "BROPEN"))
                     End If
                         m_tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found.", &H0002, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos))
@@ -11112,14 +12142,14 @@ Namespace FEQL
             End If
 
              ' Concat Rule
-            tok = m_scanner.LookAhead(TokenType.KEYWDAND, TokenType.KEYWDWHICH, TokenType.KEYWDWITH, TokenType.KEYWDIS, TokenType.PREDICATE, TokenType.KEYWDTHAT, TokenType.PREBOUNDREADINGTEXT, TokenType.MODELELEMENTNAME, TokenType.KEYWDAN, TokenType.KEYWDA, TokenType.BROPEN) ' ZeroOrMore Rule
-            While tok.Type = TokenType.KEYWDAND Or tok.Type = TokenType.KEYWDWHICH Or tok.Type = TokenType.KEYWDWITH Or tok.Type = TokenType.KEYWDIS Or tok.Type = TokenType.PREDICATE Or tok.Type = TokenType.KEYWDTHAT Or tok.Type = TokenType.PREBOUNDREADINGTEXT Or tok.Type = TokenType.MODELELEMENTNAME Or tok.Type = TokenType.KEYWDAN Or tok.Type = TokenType.KEYWDA Or tok.Type = TokenType.BROPEN
+            tok = m_scanner.LookAhead(TokenType.KEYWDAND, TokenType.KEYWDWHICH, TokenType.KEYWDWITH, TokenType.KEYWDIS, TokenType.PREDICATE, TokenType.KEYWDTHAT, TokenType.PREBOUNDREADINGTEXT, TokenType.MODELELEMENTNAME, TokenType.KEYWDAN, TokenType.KEYWDA, TokenType.NUMBER, TokenType.SINGLEQUOTE, TokenType.BROPEN) ' ZeroOrMore Rule
+            While tok.Type = TokenType.KEYWDAND Or tok.Type = TokenType.KEYWDWHICH Or tok.Type = TokenType.KEYWDWITH Or tok.Type = TokenType.KEYWDIS Or tok.Type = TokenType.PREDICATE Or tok.Type = TokenType.KEYWDTHAT Or tok.Type = TokenType.PREBOUNDREADINGTEXT Or tok.Type = TokenType.MODELELEMENTNAME Or tok.Type = TokenType.KEYWDAN Or tok.Type = TokenType.KEYWDA Or tok.Type = TokenType.NUMBER Or tok.Type = TokenType.SINGLEQUOTE Or tok.Type = TokenType.BROPEN
                 ParseWHICHCLAUSE(node) ' NonTerminal Rule: WHICHCLAUSE
             If m_tree.Errors.Count > 0 Then
                             parent.Token.UpdateRange(node.Token)
                             Exit Sub
             End If
-            tok = m_scanner.LookAhead(TokenType.KEYWDAND, TokenType.KEYWDWHICH, TokenType.KEYWDWITH, TokenType.KEYWDIS, TokenType.PREDICATE, TokenType.KEYWDTHAT, TokenType.PREBOUNDREADINGTEXT, TokenType.MODELELEMENTNAME, TokenType.KEYWDAN, TokenType.KEYWDA, TokenType.BROPEN) ' ZeroOrMore Rule
+            tok = m_scanner.LookAhead(TokenType.KEYWDAND, TokenType.KEYWDWHICH, TokenType.KEYWDWITH, TokenType.KEYWDIS, TokenType.PREDICATE, TokenType.KEYWDTHAT, TokenType.PREBOUNDREADINGTEXT, TokenType.MODELELEMENTNAME, TokenType.KEYWDAN, TokenType.KEYWDA, TokenType.NUMBER, TokenType.SINGLEQUOTE, TokenType.BROPEN) ' ZeroOrMore Rule
             End While
             If m_tree.Errors.Count > 0 Then
                         parent.Token.UpdateRange(node.Token)
