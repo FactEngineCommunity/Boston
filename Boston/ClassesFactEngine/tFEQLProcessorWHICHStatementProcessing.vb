@@ -590,6 +590,10 @@
 
             arQueryEdge.TargetNode = New FactEngine.QueryNode(lrFBMModelObject)
             arQueryEdge.TargetNode.Alias = Me.MODELELEMENTCLAUSE.MODELELEMENTSUFFIX
+            If arWHICHCLAUSE.NODE.Count > 0 Then
+                arQueryEdge.TargetNode.PreboundText = arWHICHCLAUSE.NODE(0).PREBOUNDREADINGTEXT
+                arQueryEdge.TargetNode.PostboundText = arWHICHCLAUSE.NODE(0).POSTBOUNDREADINGTEXT
+            End If
 
             If lrFBMModelObject.ConceptType = pcenumConceptType.ValueType Then
                 arQueryEdge.WhichClauseSubType = FactEngine.Constants.pcenumWhichClauseType.IsPredicateNodePropertyIdentification
