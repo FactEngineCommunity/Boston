@@ -108,10 +108,10 @@ elseif column.datatype = "TemporalAutoTimestamp"
 elseif column.datatype = "TemporalDate"
 	set column.datatype = "DATETIME"
 	
-elseif column.datatype = "TemporalDateTime"
+elseif column.datatype = "TemporalDateAndTime"
 	set column.datatype = "DATETIME"
 	
-elseif column.datatype = "TemportalTime"
+elseif column.datatype = "TemporalTime"
 	set column.datatype = "DATETIME"
 	
 elseif column.datatype = "TextFixedLength"
