@@ -1387,7 +1387,7 @@ Public Class frmDiagramERD
 
                     If lrNode.NodeType = pcenumPGSEntityType.Relationship Then
                         Dim lrRelation As ERD.Relation
-                        lrRelation = lrPage.ERDiagram.Relation.Find(Function(x) x.ActualPGSNode.Id = lrPageObject.Name)
+                        lrRelation = lrPage.ERDiagram.Relation.FindAll(Function(x) x.ActualPGSNode IsNot Nothing).Find(Function(x) x.ActualPGSNode.Id = lrPageObject.Name)
 
                         Dim lrPGSLink As PGS.Link = lrRelation.Link
 
@@ -1430,6 +1430,8 @@ Public Class frmDiagramERD
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
             prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+
+            Me.DiagramView.BringToFront()
         End Try
 
     End Sub
