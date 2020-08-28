@@ -87,6 +87,31 @@ Namespace ERD
 
         End Sub
 
+        Public Function ClonePageObject() As FBM.PageObject
+
+            Dim lrPageObject As New FBM.PageObject
+
+            Select Case Me.RelationFactType.IsLinkFactType
+                Case = True
+                    lrPageObject.Name = Me.RelationFactType.RoleGroup(0).JoinedORMObject.Id
+                Case Else
+                    lrPageObject.Name = Me.RelationFactType.Id
+            End Select
+
+            lrPageObject.Shape = New MindFusion.Diagramming.ShapeNode
+            Select Case Me.OriginEntity.GetType
+                Case = GetType(PGS.Node)
+                    lrPageObject.X = CType(Me.OriginEntity, PGS.Node).X
+                    lrPageObject.Y = CType(Me.OriginEntity, PGS.Node).Y
+                Case Else
+                    lrPageObject.X = Me.OriginEntity.X
+                    lrPageObject.Y = Me.OriginEntity.Y
+            End Select
+
+            Return lrPageObject
+
+        End Function
+
         Public Shadows Function Equals(other As Relation) As Boolean Implements IEquatable(Of Relation).Equals
             If Me.Id = other.Id Then Return True
         End Function

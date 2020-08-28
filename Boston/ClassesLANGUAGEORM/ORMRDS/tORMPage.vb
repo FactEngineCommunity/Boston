@@ -7,7 +7,8 @@ Namespace FBM
         <NonSerialized>
         Public WithEvents RDSModel As New RDS.Model
 
-        Public Sub displayPGSRelationNodeLink(ByRef arOriginatingNode As PGS.Node, ByRef arRelation As RDS.Relation)
+        Public Sub displayPGSRelationNodeLink(ByRef arOriginatingNode As PGS.Node,
+                                              ByRef arRelation As RDS.Relation)
 
             Dim lsSQLQuery As String
             Dim lrRecordset, lrRecordset1 As ORMQL.Recordset

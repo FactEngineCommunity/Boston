@@ -342,7 +342,6 @@ Public Class frmCRUDBostonConfiguration
             End If
         End If
 
-
     End Sub
 
     Private Sub DomainUpDownFactEngineDefaultQueryResultLimit_Validating(sender As Object, e As CancelEventArgs) Handles DomainUpDownFactEngineDefaultQueryResultLimit.Validating

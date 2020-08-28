@@ -2418,6 +2418,7 @@ Namespace FBM
 
                             Dim lrFactDataInstance As FBM.FactDataInstance = lrRecordset("Element")
                             lrOriginatingNode = lrFactDataInstance.ClonePGSNode(Me)
+                            lrOriginatingNode.RDSTable = lrTable
 
                             Me.ERDiagram.Entity.Add(lrOriginatingNode)
 

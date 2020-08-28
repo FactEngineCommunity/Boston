@@ -1181,10 +1181,13 @@ Public Class frmDiagramPGS
             lrShapeNode = lrPageObject.Shape.Clone(True)
             lrShapeNode = New ShapeNode(lrPageObject.Shape)
             lrShapeNode.Shape = Shapes.Ellipse
-
             lrShapeNode.Text = lrPageObject.Name
 
-            Me.MorphVector(0).ModelElementId = Me.zrPage.SelectedObject(0).id
+            If Me.zrPage.SelectedObject(0).GetType Is GetType(Boston.ERD.Relation) Then
+                lrShapeNode.SetRect(New RectangleF(New PointF(lrPageObject.X, lrPageObject.Y), New SizeF(20, 20)), False)
+            End If
+
+            Me.MorphVector(0).ModelElementId = lrPageObject.Name 'Me.zrPage.SelectedObject(0).id
             Me.MorphVector(0).Shape = lrShapeNode
             Me.HiddenDiagram.Invalidate()
 
@@ -1274,6 +1277,8 @@ Public Class frmDiagramPGS
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
             prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+
+            Me.DiagramView.BringToFront()
         End Try
 
     End Sub
@@ -1722,6 +1727,8 @@ Public Class frmDiagramPGS
             Dim loPoint As Point = Me.DiagramView.PointToClient(New Point(e.X, e.Y))
             Dim loPointF As PointF = Me.DiagramView.ClientToDoc(New Point(loPoint.X, loPoint.Y))
 
+            Dim lrNode As PGS.Node
+
             If loDraggedNode.Tag.GetType Is GetType(RDS.Table) Then
 
                 Dim lrTable As RDS.Table
@@ -1729,6 +1736,7 @@ Public Class frmDiagramPGS
 
                 Dim lrClashNode = Me.zrPage.ERDiagram.Entity.Find(Function(x) x.Name = lrTable.Name)
                 If lrClashNode IsNot Nothing Then
+                    lrNode = lrClashNode
                     'The Node is already on the Page.
                     lsMessage = "This Page already contains a Node with the name, '" & lrTable.Name & "'."
                     If lrClashNode.getCorrespondingRDSTable.isPGSRelation Then
@@ -1738,14 +1746,13 @@ Public Class frmDiagramPGS
                     Exit Sub
                 End If
 
+
                 '------------------
                 'Load the Entity.
                 '==================================================================================================================
                 Dim lsSQLQuery As String = ""
                 Dim lrRecordset As ORMQL.Recordset
                 Dim lrFactInstance As FBM.FactInstance
-
-                Dim lrNode As PGS.Node
 
                 lsSQLQuery = "SELECT *"
                 lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreElementHasElementType.ToString
@@ -1764,8 +1771,34 @@ Public Class frmDiagramPGS
                 lrNode.RDSTable = lrTable 'IMPORTANT: Leave this at this point in the code.
                 Call Me.zrPage.DropExistingPGSNodeAtPoint(lrNode, loPointF)
 
-                Call Me.zrPage.loadRelationsForPGSNode(lrNode, True)
-                Call Me.zrPage.loadPropertyRelationsForPGSNode(lrNode, True)
+                If lrNode.RDSTable.isPGSRelation And lrNode.RDSTable.Arity < 3 Then
+                    'Need to load the relation for the joined Nodes, not the PGSRelation.
+                    'E.g. If 'Person likes Person WITH Rating'...then need to load that relation
+
+                    Dim lrFactType As FBM.FactType = lrNode.RDSTable.FBMModelElement
+
+                    Dim larDestinationModelObjects = lrFactType.getDesinationModelObjects
+
+                    Dim lrRDSRelation = Me.zrPage.Model.RDS.Relation.Find(Function(x) x.OriginTable.Name = lrNode.Name And
+                                                                                      x.DestinationTable.Name = larDestinationModelObjects(1).Id)
+
+                    Dim lbAllFound As Boolean = True
+                    For Each lrModelObject In larDestinationModelObjects
+                        If Me.ERDiagram.Entity.Find(Function(x) x.Name = lrModelObject.Id) Is Nothing Then
+                            lbAllFound = False
+                        End If
+                    Next
+
+                    If lbAllFound Then
+                        If lrNode.NodeType = pcenumPGSEntityType.Relationship Then
+                            Call Me.zrPage.displayPGSRelationNodeLink(lrNode, lrRDSRelation)
+                        End If
+                    End If
+                Else
+                    Call Me.zrPage.loadRelationsForPGSNode(lrNode, True)
+                    Call Me.zrPage.loadPropertyRelationsForPGSNode(lrNode, True)
+                End If
+
             End If
 
         End If
@@ -3077,7 +3110,8 @@ Public Class frmDiagramPGS
 
         If IsSomething(Diagram.GetLinkAt(lo_point, 2)) Then
             Dim lrPGSRelation As PGS.Link = Diagram.GetLinkAt(lo_point, 2).Tag
-            lrPGSRelation.Link.Text = ""
+            Call lrPGSRelation.setPredicate()
+            'lrPGSRelation.Link.Text = ""
         End If
 
     End Sub

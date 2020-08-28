@@ -150,7 +150,7 @@ Namespace FBM
 
         <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public Shadows _X As Integer
-        Public Property X() As Integer
+        Public Overridable Property X() As Integer
             Get
                 Return Me._X
             End Get
@@ -164,14 +164,14 @@ Namespace FBM
 
         <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
         Public _Y As Integer
-        Public Property Y() As Integer
+        Public Overridable Property Y() As Integer
             Get
                 Return Me._Y
             End Get
             Set(ByVal value As Integer)
                 Me._Y = value
                 If IsSomething(Me.FactDataInstance) Then
-                    Me.FactDataInstance._y = value
+                    Me.FactDataInstance._Y = value
                 End If
             End Set
         End Property
