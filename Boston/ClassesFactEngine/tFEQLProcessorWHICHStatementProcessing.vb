@@ -130,8 +130,14 @@
                 'Get the records
                 Dim lsSQLQuery = lrQueryGraph.generateSQL
 
-                If Me.DatabaseManager.Connection.Connected = False Then
-                    Throw New Exception("The database is not connected.")
+                If Me.DatabaseManager.Connection Is Nothing Then
+                    'Try and establish a connection
+                    Call Me.DatabaseManager.establishConnection(prApplication.WorkingModel.TargetDatabaseType, prApplication.WorkingModel.TargetDatabaseConnectionString)
+                    If Me.DatabaseManager.Connection Is Nothing Then
+                        Throw New Exception("No database connection has been established.")
+                    End If
+                ElseIf Me.DatabaseManager.Connection.Connected = False Then
+                        Throw New Exception("The database is not connected.")
                 End If
 
                 Dim lrTestRecordset = Me.DatabaseManager.GO(lsSQLQuery)
