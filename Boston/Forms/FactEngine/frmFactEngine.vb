@@ -1507,7 +1507,7 @@ Public Class frmFactEngine
         Me.LabelError.Text = ""
 
         'Get the Query from the SQL/Cypher/etc query textbox
-        Dim lsQuery = Me.TextBoxQuery.Text.Replace(vbLf, " ") 'Leave this here.
+        Dim lsQuery = Me.TextBoxQuery.Text '.Replace(vbLf, " ") 'Leave this here.
 
         'If the user has highlighted a section of a query to execute, execute that.
         If Me.TextBoxQuery.SelectionLength > 0 Then
