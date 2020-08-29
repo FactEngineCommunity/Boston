@@ -15,6 +15,20 @@ Namespace FEQL
 
     End Class
 
+    Public Class SHOWStatement
+
+        Private _MODELELEMENTNAME As String = Nothing
+        Public Property MODELELEMENTNAME As String
+            Get
+                Return Me._MODELELEMENTNAME
+            End Get
+            Set(value As String)
+                Me._MODELELEMENTNAME = value
+            End Set
+        End Property
+
+    End Class
+
     Public Class ENUMERATEStatement
 
         Private _MODELELEMENTNAME As String = Nothing
@@ -583,6 +597,7 @@ Namespace FEQL
 
         Public DESCRIBEStatement As New FEQL.DESCRIBEStatement
         Public ENUMMERATEStatement As New FEQL.ENUMERATEStatement
+        Public SHOWStatement As New FEQL.SHOWStatement
         Public WHICHSELECTStatement As New FEQL.WHICHSELECTStatement
         Public WHICHCLAUSE As New FEQL.WHICHCLAUSE
         Public MODELELEMENTCLAUSE As New FEQL.MODELELEMENTClause
@@ -723,6 +738,11 @@ Namespace FEQL
 
                             '=============================================================
                             Return Me.ProcessDESCRIBEStatement(asFEQLStatement)
+
+                        Case Is = "SHOWSTMT"
+
+                            '=============================================================
+                            Return Me.ProcessSHOWStatement(asFEQLStatement)
 
                         Case Is = "DELETEFACTSTMT"
                             '20200727-VM-Just here as an example.

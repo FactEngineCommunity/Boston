@@ -423,6 +423,10 @@ Public Class frmFactEngine
                 Select Case lrRecordset.StatementType
                     Case Is = FactEngine.pcenumFEQLStatementType.DESCRIBEStatement
                         Call Me.DesbribeModelElement(lrRecordset.ModelElement)
+
+                    Case Is = FactEngine.pcenumFEQLStatementType.SHOWStatement
+                        Call Me.ShowModelElement(lrRecordset.ModelElement)
+
                     Case Else
 
                         Me.LabelError.Text = ""
@@ -1668,6 +1672,14 @@ Public Class frmFactEngine
     Private Sub ORMVerbalisationViewToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ORMVerbalisationViewToolStripMenuItem.Click
 
         Call frmMain.loadToolboxORMVerbalisationForm(prApplication.WorkingModel, Me.DockPanel.ActivePane)
+
+    End Sub
+
+    Private Sub ShowModelElement(ByRef arModelElement As FBM.ModelObject)
+
+        Dim lrDiagramSpyPage As New FBM.DiagramSpyPage(prApplication.WorkingModel, "123", "Diagram Spy", pcenumLanguage.ORMModel)
+
+        Call frmMain.LoadDiagramSpy(lrDiagramSpyPage, arModelElement)
 
     End Sub
 

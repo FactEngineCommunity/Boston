@@ -30,6 +30,7 @@
             None
             DESCRIBEStatement
             ENUMERATEStatement
+            SHOWStatement
             WHICHSELECTStatement
         End Enum
 
