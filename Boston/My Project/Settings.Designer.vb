@@ -581,6 +581,30 @@ Namespace My
                 Me("FactEngineDefaultQueryResultLimit") = value
             End Set
         End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("True")>  _
+        Public Property FactEngineUseAIIndentificationQueries() As Boolean
+            Get
+                Return CType(Me("FactEngineUseAIIndentificationQueries"),Boolean)
+            End Get
+            Set
+                Me("FactEngineUseAIIndentificationQueries") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("True")>  _
+        Public Property FactEngineShowDatabaseLogoInModelExplorer() As Boolean
+            Get
+                Return CType(Me("FactEngineShowDatabaseLogoInModelExplorer"),Boolean)
+            End Get
+            Set
+                Me("FactEngineShowDatabaseLogoInModelExplorer") = value
+            End Set
+        End Property
     End Class
 End Namespace
 

@@ -203,6 +203,10 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.ImageList.Images.SetKeyName(3, "PagePGS16x16.png")
         Me.ImageList.Images.SetKeyName(4, "ERD-16-16.png")
         Me.ImageList.Images.SetKeyName(5, "StateTransitionDiagram-16x16.png")
+        Me.ImageList.Images.SetKeyName(6, "MongoDB.png")
+        Me.ImageList.Images.SetKeyName(7, "MSAccessLogo.png")
+        Me.ImageList.Images.SetKeyName(8, "SQLiteLogo.png")
+        Me.ImageList.Images.SetKeyName(9, "SQLServerLogo.png")
         '
         'CircularProgressBar
         '
@@ -288,7 +292,7 @@ Partial Class frmToolboxEnterpriseExplorer
         '
         Me.ContextMenuStrip_ORMModel.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ViewModelDictionaryToolStripMenuItem, Me.ViewGlossaryToolStripMenuItem, Me.GenerateDocumentationToolStripMenuItem, Me.CodeGenerationToolStripMenuItem, Me.FactEngineToolStripMenuItem, Me.ToolStripSeparator7, Me.AddPageToolStripMenuItem1, Me.ToolStripMenuItemPastePage, Me.ToolStripMenuItemLanguage, Me.ToolStripSeparator1, Me.EmptyModelToolStripMenuItem, Me.HideToolStripMenuItem, Me.RenameToolStripMenuItem, Me.DeleteModelToolStripMenuItem, Me.ToolStripSeparator3, Me.ToolStripMenuItemModelConfiguration, Me.ToolStripSeparator5, Me.ImportExportToolStripMenuItem})
         Me.ContextMenuStrip_ORMModel.Name = "ContextMenuStrip_ORMModel"
-        Me.ContextMenuStrip_ORMModel.Size = New System.Drawing.Size(208, 358)
+        Me.ContextMenuStrip_ORMModel.Size = New System.Drawing.Size(208, 336)
         '
         'ViewModelDictionaryToolStripMenuItem
         '
@@ -458,7 +462,7 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.ToolStripMenuItem12.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.FromORMCMMLFileToolStripMenuItem})
         Me.ToolStripMenuItem12.Image = Global.Boston.My.Resources.MenuImages.Import16x16
         Me.ToolStripMenuItem12.Name = "ToolStripMenuItem12"
-        Me.ToolStripMenuItem12.Size = New System.Drawing.Size(180, 22)
+        Me.ToolStripMenuItem12.Size = New System.Drawing.Size(110, 22)
         Me.ToolStripMenuItem12.Text = "&Import"
         Me.ToolStripMenuItem12.Visible = False
         '
@@ -474,7 +478,7 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.ExportToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ExportTestingToolStripMenuItem, Me.TocqlFileToolStripMenuItem})
         Me.ExportToolStripMenuItem.Image = Global.Boston.My.Resources.MenuImages.Export16x16
         Me.ExportToolStripMenuItem.Name = "ExportToolStripMenuItem"
-        Me.ExportToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
+        Me.ExportToolStripMenuItem.Size = New System.Drawing.Size(110, 22)
         Me.ExportToolStripMenuItem.Text = "&Export"
         '
         'ExportTestingToolStripMenuItem

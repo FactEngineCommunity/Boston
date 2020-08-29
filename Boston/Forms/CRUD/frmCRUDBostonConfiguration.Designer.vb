@@ -59,6 +59,7 @@ Partial Class frmCRUDBostonConfiguration
         Me.LabelFactEngineDefaultQueryResultLimit = New System.Windows.Forms.Label()
         Me.DomainUpDownFactEngineDefaultQueryResultLimit = New System.Windows.Forms.DomainUpDown()
         Me.ErrorProvider = New System.Windows.Forms.ErrorProvider(Me.components)
+        Me.CheckBoxFactEngineShowDatabaseLogoModelExplorer = New System.Windows.Forms.CheckBox()
         Me.GroupBox_main.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
         Me.TableLayoutPanel1.SuspendLayout()
@@ -393,6 +394,7 @@ Partial Class frmCRUDBostonConfiguration
         Me.GroupBoxFactEngine.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
             Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.GroupBoxFactEngine.Controls.Add(Me.CheckBoxFactEngineShowDatabaseLogoModelExplorer)
         Me.GroupBoxFactEngine.Controls.Add(Me.LabelFactEngineDefaultQueryResultLimit)
         Me.GroupBoxFactEngine.Controls.Add(Me.DomainUpDownFactEngineDefaultQueryResultLimit)
         Me.GroupBoxFactEngine.Location = New System.Drawing.Point(6, 6)
@@ -426,6 +428,16 @@ Partial Class frmCRUDBostonConfiguration
         'ErrorProvider
         '
         Me.ErrorProvider.ContainerControl = Me
+        '
+        'CheckBoxFactEngineShowDatabaseLogoModelExplorer
+        '
+        Me.CheckBoxFactEngineShowDatabaseLogoModelExplorer.AutoSize = True
+        Me.CheckBoxFactEngineShowDatabaseLogoModelExplorer.Location = New System.Drawing.Point(19, 67)
+        Me.CheckBoxFactEngineShowDatabaseLogoModelExplorer.Name = "CheckBoxFactEngineShowDatabaseLogoModelExplorer"
+        Me.CheckBoxFactEngineShowDatabaseLogoModelExplorer.Size = New System.Drawing.Size(225, 17)
+        Me.CheckBoxFactEngineShowDatabaseLogoModelExplorer.TabIndex = 2
+        Me.CheckBoxFactEngineShowDatabaseLogoModelExplorer.Text = "&Show database logo in the Model Explorer"
+        Me.CheckBoxFactEngineShowDatabaseLogoModelExplorer.UseVisualStyleBackColor = True
         '
         'frmCRUDBostonConfiguration
         '
@@ -498,4 +510,5 @@ Partial Class frmCRUDBostonConfiguration
     Friend WithEvents DomainUpDownFactEngineDefaultQueryResultLimit As DomainUpDown
     Friend WithEvents LabelFactEngineDefaultQueryResultLimit As Label
     Friend WithEvents ErrorProvider As ErrorProvider
+    Friend WithEvents CheckBoxFactEngineShowDatabaseLogoModelExplorer As CheckBox
 End Class

@@ -69,6 +69,8 @@ Public Class frmCRUDBostonConfiguration
             Me.DomainUpDownFactEngineDefaultQueryResultLimit.Text = My.Settings.FactEngineDefaultQueryResultLimit
         End If
 
+        Me.CheckBoxFactEngineShowDatabaseLogoModelExplorer.Checked = My.Settings.FactEngineShowDatabaseLogoInModelExplorer
+
     End Sub
 
     Private Sub frmCRUDRichmondConfiguration_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
@@ -109,6 +111,7 @@ Public Class frmCRUDBostonConfiguration
             My.Settings.UseClientServer = Me.CheckBoxEnableClientServer.Checked
             My.Settings.LoggingOutEndsSession = Me.CheckBoxLoggingOutEndsSession.Checked
             My.Settings.UseVirtualUI = Me.CheckBoxUseRemoteUI.Checked
+            My.Settings.FactEngineShowDatabaseLogoInModelExplorer = Me.CheckBoxFactEngineShowDatabaseLogoModelExplorer.Checked
 
             Try
                 If Me.DomainUpDownFactEngineDefaultQueryResultLimit.Text = "Infinite" Then

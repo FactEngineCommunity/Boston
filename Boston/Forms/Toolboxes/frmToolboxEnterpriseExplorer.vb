@@ -227,6 +227,24 @@ Public Class frmToolboxEnterpriseExplorer
                                                    arModel.ModelId,
                                                    pcenumLanguage.ORMModel,
                                                    loNode)
+
+        If My.Settings.FactEngineShowDatabaseLogoInModelExplorer Then
+            Select Case arModel.TargetDatabaseType
+                Case Is = pcenumDatabaseType.MongoDB
+                    loNode.ImageIndex = 6
+                    loNode.SelectedImageIndex = 6
+                Case Is = pcenumDatabaseType.SQLServer
+                    loNode.ImageIndex = 9
+                    loNode.SelectedImageIndex = 9
+                Case Is = pcenumDatabaseType.MSJet
+                    loNode.ImageIndex = 7
+                    loNode.SelectedImageIndex = 7
+                Case Is = pcenumDatabaseType.SQLite
+                    loNode.ImageIndex = 8
+                    loNode.SelectedImageIndex = 8
+            End Select
+        End If
+
         loNode.Tag.Tag = arModel
 
         arModel.TreeNode = New TreeNode
