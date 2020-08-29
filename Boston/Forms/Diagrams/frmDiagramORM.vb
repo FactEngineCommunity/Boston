@@ -1796,6 +1796,7 @@ Public Class frmDiagramORM
         '-------------------------------------------------------
         'ORM Verbalisation
         '-------------------------------------------------------
+        If Me.zrPage Is Nothing Then Exit Sub
         If (Me.zrPage.SelectedObject.Count = 1) And Me.zrPage.IsInvalidated Then
             lrModelObject = Me.zrPage.SelectedObject(0)
             Dim lrToolboxForm As frmToolboxORMVerbalisation
@@ -6257,12 +6258,7 @@ Public Class frmDiagramORM
                 liDegrees = 320
             End If
 
-
-
-
             'For Each lrLink In lrCentralEntityTypeInstance.Shape.IncomingLinks
-
-
             'If lrLink.Tag.ConceptType = pcenumConceptType.Role Then
 
             For Each lrFactTypeInstance In Me.zrPage.GetModelElementsJoinedFactTypes(lrCentralEntityTypeInstance)
@@ -6400,6 +6396,23 @@ Public Class frmDiagramORM
             For Each lrFactTypeInstance In Me.zrPage.FactTypeInstance
                 Call lrFactTypeInstance.SetSuitableFactTypeReading()
             Next
+
+            '---------------------
+            'Put the diagram (all visible Shapes) in a nice Top Left position.
+            Dim liLeftmostShapeX = (From Shape In Me.Diagram.Nodes
+                                    Where Shape.Visible = True
+                                    Select Shape.Bounds.X).Min
+
+            Dim liTopmostShapeY = (From Shape In Me.Diagram.Nodes
+                                   Where Shape.Visible = True
+                                   Select Shape.Bounds.Y).Min
+
+            For Each ModelElement In Me.zrPage.GetAllPageObjects
+                ModelElement.Move(ModelElement.X - Viev.Greater(liLeftmostShapeX - 10, 0),
+                                  ModelElement.Y - Viev.Greater(liTopmostShapeY - 10, 0),
+                                  False)
+            Next
+            '---------------------
 
             For Each lrModelElement In Me.zrPage.GetAllPageObjects
                 lrModelElement.HasBeenMoved = False

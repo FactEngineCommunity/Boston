@@ -236,80 +236,96 @@ Public Class frmFactEngine
 
         Me.LabelError.Text = ""
 
-        If arModelElement Is Nothing Then
-            Me.LabelError.ForeColor = Color.Orange
-            Me.LabelError.Text = "No Model Element found."
-        Else
-            Me.LabelError.ForeColor = Color.Black
-            Me.LabelError.Text = ""
+        Try
+            If arModelElement Is Nothing Then
+                Me.LabelError.ForeColor = Color.Orange
+                Me.LabelError.Text = "No Model Element found."
+            Else
+                Me.LabelError.ForeColor = Color.Black
+                Me.LabelError.Text = ""
 
-            Select Case arModelElement.ConceptType
-                Case Is = pcenumConceptType.ValueType
+                Select Case arModelElement.ConceptType
+                    Case Is = pcenumConceptType.ValueType
 
-                    Dim lsString = String.Format("{0,6}{1,-" & 20 - arModelElement.Id.Length & "}{2}", arModelElement.Id, " ", CType(arModelElement, FBM.ValueType).DataType.ToString)
-                    Me.LabelError.Text &= lsString
-                    Dim lrValueType = CType(arModelElement, FBM.ValueType)
-                    If lrValueType.DataTypeLength <> 0 Then
-                        Me.LabelError.Text &= "(" & lrValueType.DataTypeLength.ToString
-                        If lrValueType.DataTypePrecision <> 0 Then
-                            Me.LabelError.Text &= "," & lrValueType.DataTypePrecision.ToString & ")"
-                        Else
-                            Me.LabelError.Text &= ")"
+                        Dim lsString = String.Format("{0,6}{1,-" & 20 - arModelElement.Id.Length & "}{2}", arModelElement.Id, " ", CType(arModelElement, FBM.ValueType).DataType.ToString)
+                        Me.LabelError.Text &= lsString
+                        Dim lrValueType = CType(arModelElement, FBM.ValueType)
+                        If lrValueType.DataTypeLength <> 0 Then
+                            Me.LabelError.Text &= "(" & lrValueType.DataTypeLength.ToString
+                            If lrValueType.DataTypePrecision <> 0 Then
+                                Me.LabelError.Text &= "," & lrValueType.DataTypePrecision.ToString & ")"
+                            Else
+                                Me.LabelError.Text &= ")"
+                            End If
                         End If
-                    End If
 
-                Case Is = pcenumConceptType.EntityType,
+                    Case Is = pcenumConceptType.EntityType,
                               pcenumConceptType.FactType
 
-                    Dim lrTable = arModelElement.getCorrespondingRDSTable
+                        Dim lrTable = arModelElement.getCorrespondingRDSTable
 
-                    Me.LabelError.Text &= lrTable.Name
-                    Me.LabelError.Text &= vbCrLf & vbCrLf
-                    For Each lrCOlumn In lrTable.Column
-                        Dim lsString = String.Format("{0,6}{1,-" & 20 - lrCOlumn.Name.Length & "}{2}", lrCOlumn.Name, " ", lrCOlumn.getMetamodelDataType.ToString)
-                        Me.LabelError.Text &= lsString & vbCrLf
-                    Next
+                        Me.LabelError.Text &= lrTable.Name
+                        Me.LabelError.Text &= vbCrLf & vbCrLf
+                        For Each lrCOlumn In lrTable.Column
+                            Dim lsString = String.Format("{0,6}{1,-" & 20 - lrCOlumn.Name.Length & "}{2}", lrCOlumn.Name, " ", lrCOlumn.getMetamodelDataType.ToString)
+                            Me.LabelError.Text &= lsString & vbCrLf
+                        Next
 
-                    Me.LabelError.Text &= vbCrLf & vbCrLf
-                    Me.LabelError.Text &= "Relations" & vbCrLf & vbCrLf
+                        Me.LabelError.Text &= vbCrLf & vbCrLf
+                        Me.LabelError.Text &= "Relations" & vbCrLf & vbCrLf
 
-                    For Each lrRelation In lrTable.getOutgoingRelations
+                        For Each lrRelation In lrTable.getOutgoingRelations
 
-                        Dim lrFactType = lrRelation.ResponsibleFactType
+                            Dim lrFactType = lrRelation.ResponsibleFactType
 
-                        Dim lrFactTypeReading = lrFactType.getOutgoingFactTypeReadingForTabe(lrTable)
-                        Me.LabelError.Text &= lrFactTypeReading.GetReadingTextCQL & vbCrLf
+                            Dim lrFactTypeReading = lrFactType.getOutgoingFactTypeReadingForTabe(lrTable)
+                            Me.LabelError.Text &= lrFactTypeReading.GetReadingTextCQL & vbCrLf
 
-                    Next
-            End Select
-
-            'Verbalisation
-            Dim lrToolboxForm As frmToolboxORMVerbalisation
-            lrToolboxForm = prApplication.GetToolboxForm(frmToolboxORMVerbalisation.Name)
-            If IsSomething(lrToolboxForm) Then
-                lrToolboxForm.zrModel = prApplication.WorkingModel
-                Call lrToolboxForm.verbaliseModelElement(arModelElement)
-            End If
-
-            'Properties
-            Dim lrPropertyGridForm As frmToolboxProperties
-            lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
-            Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
-            lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute})
-            If IsSomething(lrPropertyGridForm) Then
-                Dim lrModelElementInstance As FBM.ModelObject
-                Dim lrPage As New FBM.Page
-                Select Case arModelElement.ConceptType
-                    Case Is = pcenumConceptType.EntityType
-                        lrModelElementInstance = CType(arModelElement, FBM.EntityType).CloneInstance(lrPage, False)
+                        Next
                 End Select
-                lrPropertyGridForm.PropertyGrid.SelectedObject = lrModelElementInstance
-                lrPropertyGridForm.BringToFront()
-                lrPropertyGridForm.Show()
+
+                'Verbalisation
+                Dim lrToolboxForm As frmToolboxORMVerbalisation
+                lrToolboxForm = prApplication.GetToolboxForm(frmToolboxORMVerbalisation.Name)
+                If IsSomething(lrToolboxForm) Then
+                    lrToolboxForm.zrModel = prApplication.WorkingModel
+                    Call lrToolboxForm.verbaliseModelElement(arModelElement)
+                End If
+
+                'Properties
+                Dim lrPropertyGridForm As frmToolboxProperties
+                lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
+                Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
+                lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute})
+                If IsSomething(lrPropertyGridForm) Then
+                    Dim lrModelElementInstance As FBM.ModelObject = Nothing
+                    Dim lrPage As New FBM.Page
+                    Select Case arModelElement.ConceptType
+                        Case Is = pcenumConceptType.EntityType
+                            lrModelElementInstance = CType(arModelElement, FBM.EntityType).CloneInstance(lrPage, False)
+                        Case Is = pcenumConceptType.ValueType
+                            lrModelElementInstance = CType(arModelElement, FBM.ValueType).CloneInstance(lrPage, False)
+                        Case Is = pcenumConceptType.FactType
+                            lrModelElementInstance = CType(arModelElement, FBM.FactType).CloneInstance(lrPage, False)
+                        Case Is = pcenumConceptType.RoleConstraint
+                            lrModelElementInstance = CType(arModelElement, FBM.RoleConstraint).CloneInstance(lrPage, False)
+                    End Select
+                    If lrModelElementInstance IsNot Nothing Then
+                        lrPropertyGridForm.PropertyGrid.SelectedObject = lrModelElementInstance
+                        lrPropertyGridForm.BringToFront()
+                        lrPropertyGridForm.Show()
+                    End If
+                End If
+
             End If
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
-        End If
-
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
     End Sub
 
 
