@@ -2782,6 +2782,7 @@
     <None Include="Images\Splash\shutterstock_218779708.jpg" />
     <None Include="Images\MenuImages\Undo16x16.jpg" />
     <None Include="Images\MenuImages\Up16x16.png" />
+    <None Include="Images\MenuImages\VirtualAnalyst16x16.png" />
     <Content Include="Images\Splash\Splash.png" />
     <Content Include="Images\Splash\Splash.png" />
     <None Include="Images\Viev\VievLogoMedium.jpg" />

@@ -243,27 +243,45 @@ Public Class frmFactEngine
             Me.LabelError.ForeColor = Color.Black
             Me.LabelError.Text = ""
 
-            Dim lrTable = arModelElement.getCorrespondingRDSTable
+            Select Case arModelElement.ConceptType
+                Case Is = pcenumConceptType.ValueType
 
-            Me.LabelError.Text &= lrTable.Name
-            Me.LabelError.Text &= vbCrLf & vbCrLf
-            For Each lrCOlumn In lrTable.Column
-                Dim lsString = String.Format("{0,6}{1,-" & 20 - lrCOlumn.Name.Length & "}{2}", lrCOlumn.Name, " ", lrCOlumn.getMetamodelDataType.ToString)
-                Me.LabelError.Text &= lsString & vbCrLf
-            Next
+                    Dim lsString = String.Format("{0,6}{1,-" & 20 - arModelElement.Id.Length & "}{2}", arModelElement.Id, " ", CType(arModelElement, FBM.ValueType).DataType.ToString)
+                    Me.LabelError.Text &= lsString
+                    Dim lrValueType = CType(arModelElement, FBM.ValueType)
+                    If lrValueType.DataTypeLength <> 0 Then
+                        Me.LabelError.Text &= "(" & lrValueType.DataTypeLength.ToString
+                        If lrValueType.DataTypePrecision <> 0 Then
+                            Me.LabelError.Text &= "," & lrValueType.DataTypePrecision.ToString & ")"
+                        Else
+                            Me.LabelError.Text &= ")"
+                        End If
+                    End If
 
-            Me.LabelError.Text &= vbCrLf & vbCrLf
-            Me.LabelError.Text &= "Relations" & vbCrLf & vbCrLf
+                Case Is = pcenumConceptType.EntityType,
+                              pcenumConceptType.FactType
 
-            For Each lrRelation In lrTable.getOutgoingRelations
+                    Dim lrTable = arModelElement.getCorrespondingRDSTable
 
-                Dim lrFactType = lrRelation.ResponsibleFactType
+                    Me.LabelError.Text &= lrTable.Name
+                    Me.LabelError.Text &= vbCrLf & vbCrLf
+                    For Each lrCOlumn In lrTable.Column
+                        Dim lsString = String.Format("{0,6}{1,-" & 20 - lrCOlumn.Name.Length & "}{2}", lrCOlumn.Name, " ", lrCOlumn.getMetamodelDataType.ToString)
+                        Me.LabelError.Text &= lsString & vbCrLf
+                    Next
 
-                Dim lrFactTypeReading = lrFactType.getOutgoingFactTypeReadingForTabe(lrTable)
-                Me.LabelError.Text &= lrFactTypeReading.GetReadingTextCQL & vbCrLf
+                    Me.LabelError.Text &= vbCrLf & vbCrLf
+                    Me.LabelError.Text &= "Relations" & vbCrLf & vbCrLf
 
-            Next
+                    For Each lrRelation In lrTable.getOutgoingRelations
 
+                        Dim lrFactType = lrRelation.ResponsibleFactType
+
+                        Dim lrFactTypeReading = lrFactType.getOutgoingFactTypeReadingForTabe(lrTable)
+                        Me.LabelError.Text &= lrFactTypeReading.GetReadingTextCQL & vbCrLf
+
+                    Next
+            End Select
         End If
 
     End Sub
@@ -1610,4 +1628,47 @@ Public Class frmFactEngine
         frmMain.Cursor = Cursors.Default
 
     End Sub
+
+    Private Sub ModelDictionaryToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ModelDictionaryToolStripMenuItem.Click
+
+        Call frmMain.LoadToolboxModelDictionary(True)
+
+    End Sub
+
+    Private Sub PropertiesToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles PropertiesToolStripMenuItem.Click
+
+        Call frmMain.LoadToolboxPropertyWindow(Me.DockPanel.ActivePane)
+
+        Dim lrPropertyGridForm As frmToolboxProperties
+
+        If IsSomething(prApplication.GetToolboxForm(frmToolboxProperties.Name)) Then
+            lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
+            lrPropertyGridForm.PropertyGrid.HiddenAttributes = Nothing
+            'If Me.Diagram.Selection.Items.Count > 0 Then
+            '    lrPropertyGridForm.PropertyGrid.SelectedObject = Me.Diagram.Selection.Items(0).Tag
+            'Else
+            '    lrPropertyGridForm.PropertyGrid.SelectedObject = Me.zrPage
+            'End If
+        End If
+
+    End Sub
+
+    Private Sub ErrorListToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ErrorListToolStripMenuItem.Click
+
+        Call frmMain.loadToolboxErrorListForm(Me.DockPanel.ActivePane)
+
+    End Sub
+
+    Private Sub ToolStripMenuItem8_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItem8.Click
+
+        Call frmMain.loadToolboxORMReadingEditor(Nothing, Me.DockPanel.ActivePane)
+
+    End Sub
+
+    Private Sub ORMVerbalisationViewToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ORMVerbalisationViewToolStripMenuItem.Click
+
+        Call frmMain.loadToolboxORMVerbalisationForm(prApplication.WorkingModel, Me.DockPanel.ActivePane)
+
+    End Sub
+
 End Class

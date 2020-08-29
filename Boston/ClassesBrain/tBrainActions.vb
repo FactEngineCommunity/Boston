@@ -38,13 +38,16 @@ Partial Public Class tBrain
                     End If
                 End If
                 lrEntityType = Me.Model.CreateEntityType(lsEntityTypeName, True)
-                lrEntityTypeInstance = Me.Page.DropEntityTypeAtPoint(lrEntityType, New PointF(100, 100))
+
+                If Me.Page IsNot Nothing Then
+                    lrEntityTypeInstance = Me.Page.DropEntityTypeAtPoint(lrEntityType, New PointF(100, 100))
+                End If
 
                 'Call lrEntityTypeInstance.RepellFromNeighbouringPageObjects(1, False)
                 'Call lrEntityTypeInstance.Move(lrEntityTypeInstance.X, lrEntityTypeInstance.Y, True)
             End If
 
-            Dim lsReferenceMode As String = Me.VAQL.ENTITYTYPEISIDENTIFIEDBYITSStatement.REFERENCEMODE
+                Dim lsReferenceMode As String = Me.VAQL.ENTITYTYPEISIDENTIFIEDBYITSStatement.REFERENCEMODE
 
             Dim items As Array
             items = System.Enum.GetValues(GetType(pcenumReferenceModeEndings))
@@ -113,15 +116,17 @@ Partial Public Class tBrain
 
         Dim lrEntityType As FBM.EntityType
 
-        lrEntityType = Me.Model.CreateEntityType(lsEntityTypeName, False)
+        lrEntityType = Me.Model.CreateEntityType(lsEntityTypeName, True)
 
-        lrEnityTypeInstance = Me.Page.DropEntityTypeAtPoint(lrEntityType, New PointF(100, 10)) 'VM-20180329-Me.Page.Form.CreateEntityType(lsEntityTypeName, True)
+        If Me.Page IsNot Nothing Then
+            lrEnityTypeInstance = Me.Page.DropEntityTypeAtPoint(lrEntityType, New PointF(100, 10)) 'VM-20180329-Me.Page.Form.CreateEntityType(lsEntityTypeName, True)
 
-        Call lrEnityTypeInstance.RepellFromNeighbouringPageObjects(1, False)
-        Call lrEnityTypeInstance.Move(lrEnityTypeInstance.X, lrEnityTypeInstance.Y, True)
+            Call lrEnityTypeInstance.RepellFromNeighbouringPageObjects(1, False)
+            Call lrEnityTypeInstance.Move(lrEnityTypeInstance.X, lrEnityTypeInstance.Y, True)
 
-        If Me.AutoLayoutOn Then
-            Me.Page.Form.AutoLayout()
+            If Me.AutoLayoutOn Then
+                Me.Page.Form.AutoLayout()
+            End If
         End If
 
         Me.Timeout.Start()
@@ -182,11 +187,9 @@ Partial Public Class tBrain
             '==========================================================================
             'Adding the FactType to the Model is done in the 'DropFactTypeAtPoint' stage, 
             '  which also broadcasts the event if in Client/Server mode. The below just creates the FactType ready for adding to the Model.
-            lrFactType = Me.Model.CreateFactType(lsFactTypeName, larModelObject, False, False, , , False, )
-
+            lrFactType = Me.Model.CreateFactType(lsFactTypeName, larModelObject, False, True, , , False, )
 
             Dim larRole As New List(Of FBM.Role)
-            Dim lrRole As FBM.Role
 
             For Each lrRole In lrFactType.RoleGroup
                 larRole.Add(lrRole)
@@ -228,9 +231,7 @@ Partial Public Class tBrain
             If Me.Page Is Nothing Then
                 Me.Model.AddFactType(lrFactType, True, True, Nothing)
             Else
-
                 lrFactTypeInstance = Me.Page.DropFactTypeAtPoint(lrFactType, loPointF, False, False, True)
-
 
                 Call lrFactTypeInstance.RepellFromNeighbouringPageObjects(1, False)
 
@@ -303,7 +304,7 @@ Partial Public Class tBrain
                 lsFactTypeName &= lrModelObject.Name
             Next
 
-            lrFactType = Me.Model.CreateFactType(lsFactTypeName, larModelObject, False, False, , , True,  )
+            lrFactType = Me.Model.CreateFactType(lsFactTypeName, larModelObject, False, True, , , True,  )
 
             Dim lrRole As FBM.Role
             Dim larRole As New List(Of FBM.Role)
@@ -359,29 +360,31 @@ Partial Public Class tBrain
             End If
             '===========================
 
-            Dim lrFactTypeInstance As FBM.FactTypeInstance
-            Dim loPointF As PointF
+            If Me.Page IsNot Nothing Then
+                Dim lrFactTypeInstance As FBM.FactTypeInstance
+                Dim loPointF As PointF
 
-            Dim lbAllObjectsOnPage As Boolean = True
-            For Each lrRole In lrFactType.RoleGroup
-                If Not Me.Page.ContainsModelElement(lrRole.JoinedORMObject) Then
-                    lbAllObjectsOnPage = False
+                Dim lbAllObjectsOnPage As Boolean = True
+                For Each lrRole In lrFactType.RoleGroup
+                    If Not Me.Page.ContainsModelElement(lrRole.JoinedORMObject) Then
+                        lbAllObjectsOnPage = False
+                    End If
+                Next
+
+                If lbAllObjectsOnPage Then
+                    loPointF = Me.Page.GetMidPointOfModelObjects(lrFactType.GetModelObjects)
+                Else
+                    loPointF = New PointF(100, 100)
                 End If
-            Next
 
-            If lbAllObjectsOnPage Then
-                loPointF = Me.Page.GetMidPointOfModelObjects(lrFactType.GetModelObjects)
-            Else
-                loPointF = New PointF(100, 100)
-            End If
+                lrFactTypeInstance = Me.Page.DropFactTypeAtPoint(lrFactType, loPointF, False, False)
 
-            lrFactTypeInstance = Me.Page.DropFactTypeAtPoint(lrFactType, loPointF, False, False)
+                Call lrFactTypeInstance.RepellFromNeighbouringPageObjects(1, False)
+                Call lrFactTypeInstance.Move(lrFactTypeInstance.X, lrFactTypeInstance.Y, True)
 
-            Call lrFactTypeInstance.RepellFromNeighbouringPageObjects(1, False)
-            Call lrFactTypeInstance.Move(lrFactTypeInstance.X, lrFactTypeInstance.Y, True)
-
-            If Me.AutoLayoutOn Then
-                Me.Page.Form.AutoLayout()
+                If Me.AutoLayoutOn Then
+                    Me.Page.Form.AutoLayout()
+                End If
             End If
 
         Catch ex As Exception
@@ -425,11 +428,14 @@ Partial Public Class tBrain
 
             Call lrFactType.AddFactTypeReading(lrFactTypeReading, False, True)
 
-            Dim lrFactTypeInstance As New FBM.FactTypeInstance
-            lrFactTypeInstance = lrFactType.CloneInstance(Me.Page, False)
-            lrFactTypeInstance = Me.Page.FactTypeInstance.Find(AddressOf lrFactTypeInstance.Equals)
+            If Me.Page IsNot Nothing Then
 
-            Call lrFactTypeInstance.SetSuitableFactTypeReading()
+                Dim lrFactTypeInstance As New FBM.FactTypeInstance
+                lrFactTypeInstance = lrFactType.CloneInstance(Me.Page, False)
+                lrFactTypeInstance = Me.Page.FactTypeInstance.Find(AddressOf lrFactTypeInstance.Equals)
+
+                Call lrFactTypeInstance.SetSuitableFactTypeReading()
+            End If
 
         Catch ex As Exception
             Dim lsMessage As String
@@ -515,13 +521,15 @@ Partial Public Class tBrain
             'Have already checked to see wither it is okay to create the EntityType above.
             Dim lrEntityType = Me.Model.CreateEntityType(Trim(lsEntityTypeName), True)
 
-            Dim lrEnityTypeInstance = Me.Page.DropEntityTypeAtPoint(lrEntityType, New PointF(100, 10)) 'VM-20180329-Me.Page.Form.CreateEntityType(lsEntityTypeName, True)
+            If Me.Page IsNot Nothing Then
+                Dim lrEnityTypeInstance = Me.Page.DropEntityTypeAtPoint(lrEntityType, New PointF(100, 10)) 'VM-20180329-Me.Page.Form.CreateEntityType(lsEntityTypeName, True)
 
-            Call lrEnityTypeInstance.RepellFromNeighbouringPageObjects(1, False)
-            Call lrEnityTypeInstance.Move(lrEnityTypeInstance.X, lrEnityTypeInstance.Y, True)
+                Call lrEnityTypeInstance.RepellFromNeighbouringPageObjects(1, False)
+                Call lrEnityTypeInstance.Move(lrEnityTypeInstance.X, lrEnityTypeInstance.Y, True)
 
-            If Me.AutoLayoutOn Then
-                Me.Page.Form.AutoLayout()
+                If Me.AutoLayoutOn Then
+                    Me.Page.Form.AutoLayout()
+                End If
             End If
 
             Me.send_data("Ok")
@@ -598,16 +606,20 @@ Partial Public Class tBrain
             Me.Timeout.Stop()
 
             Dim lrValueType As FBM.ValueType
-            lrValueType = Me.Model.CreateValueType(lsValueTypeName, False, liDataType, liDataTypeLength, liDataTypePrecision)
+            lrValueType = Me.Model.CreateValueType(lsValueTypeName, True, liDataType, liDataTypeLength, liDataTypePrecision)
 
-            lrValueTypeInstance = Me.Page.DropValueTypeAtPoint(lrValueType, New PointF(100, 100))
-            Call lrValueTypeInstance.RepellFromNeighbouringPageObjects(1, False)
-            Call lrValueTypeInstance.Move(lrValueTypeInstance.X, lrValueTypeInstance.Y, True)
+            If Me.Page IsNot Nothing Then
 
-            If Me.AutoLayoutOn Then
-                Me.Page.Form.AutoLayout()
+                lrValueTypeInstance = Me.Page.DropValueTypeAtPoint(lrValueType, New PointF(100, 100))
+                Call lrValueTypeInstance.RepellFromNeighbouringPageObjects(1, False)
+                Call lrValueTypeInstance.Move(lrValueTypeInstance.X, lrValueTypeInstance.Y, True)
+
+                If Me.AutoLayoutOn Then
+                    Me.Page.Form.AutoLayout()
+                End If
             End If
             Me.Timeout.Start()
+
         End If
 
     End Sub

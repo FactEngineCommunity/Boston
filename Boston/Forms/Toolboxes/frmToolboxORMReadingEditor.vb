@@ -106,6 +106,8 @@ Public Class frmToolboxORMReadingEditor
 
             Me.DataGrid_Readings.AllowUserToDeleteRows = True
 
+            If Me.zrPage Is Nothing Then Exit Sub
+
             If Me.zrPage.SelectedObject.Count > 0 Then
 
                 Me.LabelFactTypeReadingEditor.Text = "Fact Type Reading Editor: Write a Fact Type Reading such as '"

@@ -28,11 +28,11 @@ Partial Class frmFactEngine
         Me.TextBoxInput = New System.Windows.Forms.RichTextBox()
         Me.ContextMenuStripFactEngine = New System.Windows.Forms.ContextMenuStrip(Me.components)
         Me.ToolStripMenuItemHelpTips = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ViewToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.LabelHelp = New System.Windows.Forms.Label()
         Me.ContextMenuStripHelpLabel = New System.Windows.Forms.ContextMenuStrip(Me.components)
         Me.HideToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStrip1 = New System.Windows.Forms.ToolStrip()
-        Me.ToolStripButtonGO = New System.Windows.Forms.ToolStripButton()
         Me.StatusStrip2 = New System.Windows.Forms.StatusStrip()
         Me.ToolStripStatusLabelWorkingModelName = New System.Windows.Forms.ToolStripStatusLabel()
         Me.ToolStripStatusLabelLookingFor = New System.Windows.Forms.ToolStripStatusLabel()
@@ -47,14 +47,19 @@ Partial Class frmFactEngine
         Me.TabPageQuery = New System.Windows.Forms.TabPage()
         Me.TextBoxQuery = New System.Windows.Forms.TextBox()
         Me.ToolStrip3 = New System.Windows.Forms.ToolStrip()
-        Me.ToolStripButtonQueryGO = New System.Windows.Forms.ToolStripButton()
         Me.TabPageGraph = New System.Windows.Forms.TabPage()
         Me.GraphView = New MindFusion.Diagramming.WinForms.DiagramView()
         Me.ContextMenuStripGraph = New System.Windows.Forms.ContextMenuStrip(Me.components)
         Me.LayoutToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.Diagram = New MindFusion.Diagramming.Diagram()
-        Me.ViewToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.PropertiesToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ModelDictionaryToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ErrorListToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripMenuItem8 = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ORMVerbalisationViewToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.VirtualAnalystToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripButtonGO = New System.Windows.Forms.ToolStripButton()
+        Me.ToolStripButtonQueryGO = New System.Windows.Forms.ToolStripButton()
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SplitContainer1.Panel1.SuspendLayout()
         Me.SplitContainer1.Panel2.SuspendLayout()
@@ -102,9 +107,9 @@ Partial Class frmFactEngine
         Me.TextBoxInput.Dock = System.Windows.Forms.DockStyle.Fill
         Me.TextBoxInput.Font = New System.Drawing.Font("Tahoma", 10.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.TextBoxInput.ForeColor = System.Drawing.Color.Wheat
-        Me.TextBoxInput.Location = New System.Drawing.Point(0, 33)
+        Me.TextBoxInput.Location = New System.Drawing.Point(0, 38)
         Me.TextBoxInput.Name = "TextBoxInput"
-        Me.TextBoxInput.Size = New System.Drawing.Size(1239, 202)
+        Me.TextBoxInput.Size = New System.Drawing.Size(1239, 197)
         Me.TextBoxInput.TabIndex = 2
         Me.TextBoxInput.TabStop = False
         Me.TextBoxInput.Text = ""
@@ -114,15 +119,22 @@ Partial Class frmFactEngine
         Me.ContextMenuStripFactEngine.ImageScalingSize = New System.Drawing.Size(24, 24)
         Me.ContextMenuStripFactEngine.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItemHelpTips, Me.ViewToolStripMenuItem})
         Me.ContextMenuStripFactEngine.Name = "ContextMenuStripFactEngine"
-        Me.ContextMenuStripFactEngine.Size = New System.Drawing.Size(241, 101)
+        Me.ContextMenuStripFactEngine.Size = New System.Drawing.Size(159, 68)
         '
         'ToolStripMenuItemHelpTips
         '
         Me.ToolStripMenuItemHelpTips.Checked = True
         Me.ToolStripMenuItemHelpTips.CheckState = System.Windows.Forms.CheckState.Checked
         Me.ToolStripMenuItemHelpTips.Name = "ToolStripMenuItemHelpTips"
-        Me.ToolStripMenuItemHelpTips.Size = New System.Drawing.Size(240, 32)
+        Me.ToolStripMenuItemHelpTips.Size = New System.Drawing.Size(158, 32)
         Me.ToolStripMenuItemHelpTips.Text = "&Help Tips"
+        '
+        'ViewToolStripMenuItem
+        '
+        Me.ViewToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.PropertiesToolStripMenuItem, Me.ModelDictionaryToolStripMenuItem, Me.ErrorListToolStripMenuItem, Me.ToolStripMenuItem8, Me.ORMVerbalisationViewToolStripMenuItem, Me.VirtualAnalystToolStripMenuItem})
+        Me.ViewToolStripMenuItem.Name = "ViewToolStripMenuItem"
+        Me.ViewToolStripMenuItem.Size = New System.Drawing.Size(158, 32)
+        Me.ViewToolStripMenuItem.Text = "&View"
         '
         'LabelHelp
         '
@@ -156,18 +168,9 @@ Partial Class frmFactEngine
         Me.ToolStrip1.Location = New System.Drawing.Point(0, 0)
         Me.ToolStrip1.Name = "ToolStrip1"
         Me.ToolStrip1.Padding = New System.Windows.Forms.Padding(0, 0, 3, 0)
-        Me.ToolStrip1.Size = New System.Drawing.Size(1239, 33)
+        Me.ToolStrip1.Size = New System.Drawing.Size(1239, 38)
         Me.ToolStrip1.TabIndex = 3
         Me.ToolStrip1.Text = "ToolStrip1"
-        '
-        'ToolStripButtonGO
-        '
-        Me.ToolStripButtonGO.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        Me.ToolStripButtonGO.Image = Global.Boston.My.Resources.MenuImagesMain.GO16x16
-        Me.ToolStripButtonGO.ImageTransparentColor = System.Drawing.Color.Magenta
-        Me.ToolStripButtonGO.Name = "ToolStripButtonGO"
-        Me.ToolStripButtonGO.Size = New System.Drawing.Size(34, 28)
-        Me.ToolStripButtonGO.Text = "ToolStripButton1"
         '
         'StatusStrip2
         '
@@ -239,7 +242,7 @@ Partial Class frmFactEngine
         Me.TabPageResults.Controls.Add(Me.ToolStrip2)
         Me.TabPageResults.Location = New System.Drawing.Point(4, 29)
         Me.TabPageResults.Name = "TabPageResults"
-        Me.TabPageResults.Padding = New System.Windows.Forms.Padding(3, 3, 3, 3)
+        Me.TabPageResults.Padding = New System.Windows.Forms.Padding(3)
         Me.TabPageResults.Size = New System.Drawing.Size(1231, 301)
         Me.TabPageResults.TabIndex = 0
         Me.TabPageResults.Text = "Results"
@@ -249,11 +252,11 @@ Partial Class frmFactEngine
         '
         Me.LabelError.BackColor = System.Drawing.SystemColors.Control
         Me.LabelError.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.LabelError.Location = New System.Drawing.Point(3, 28)
+        Me.LabelError.Location = New System.Drawing.Point(3, 41)
         Me.LabelError.Multiline = True
         Me.LabelError.Name = "LabelError"
         Me.LabelError.ScrollBars = System.Windows.Forms.ScrollBars.Vertical
-        Me.LabelError.Size = New System.Drawing.Size(1225, 270)
+        Me.LabelError.Size = New System.Drawing.Size(1225, 257)
         Me.LabelError.TabIndex = 1
         '
         'ToolStrip2
@@ -262,7 +265,7 @@ Partial Class frmFactEngine
         Me.ToolStrip2.Location = New System.Drawing.Point(3, 3)
         Me.ToolStrip2.Name = "ToolStrip2"
         Me.ToolStrip2.Padding = New System.Windows.Forms.Padding(0, 0, 3, 0)
-        Me.ToolStrip2.Size = New System.Drawing.Size(1225, 25)
+        Me.ToolStrip2.Size = New System.Drawing.Size(1225, 38)
         Me.ToolStrip2.TabIndex = 2
         Me.ToolStrip2.Text = "ToolStrip2"
         '
@@ -272,7 +275,7 @@ Partial Class frmFactEngine
         Me.TabPageQuery.Controls.Add(Me.ToolStrip3)
         Me.TabPageQuery.Location = New System.Drawing.Point(4, 29)
         Me.TabPageQuery.Name = "TabPageQuery"
-        Me.TabPageQuery.Padding = New System.Windows.Forms.Padding(3, 3, 3, 3)
+        Me.TabPageQuery.Padding = New System.Windows.Forms.Padding(3)
         Me.TabPageQuery.Size = New System.Drawing.Size(1231, 301)
         Me.TabPageQuery.TabIndex = 1
         Me.TabPageQuery.Text = "Query"
@@ -297,15 +300,6 @@ Partial Class frmFactEngine
         Me.ToolStrip3.Size = New System.Drawing.Size(1225, 33)
         Me.ToolStrip3.TabIndex = 3
         Me.ToolStrip3.Text = "ToolStrip3"
-        '
-        'ToolStripButtonQueryGO
-        '
-        Me.ToolStripButtonQueryGO.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        Me.ToolStripButtonQueryGO.Image = Global.Boston.My.Resources.MenuImagesMain.GO16x16
-        Me.ToolStripButtonQueryGO.ImageTransparentColor = System.Drawing.Color.Magenta
-        Me.ToolStripButtonQueryGO.Name = "ToolStripButtonQueryGO"
-        Me.ToolStripButtonQueryGO.Size = New System.Drawing.Size(34, 28)
-        Me.ToolStripButtonQueryGO.Text = "ToolStripButton1"
         '
         'TabPageGraph
         '
@@ -357,18 +351,65 @@ Partial Class frmFactEngine
         Me.Diagram.LinkStyle = MindFusion.Diagramming.LinkStyle.Bezier
         Me.Diagram.ShapeBrush = New MindFusion.Drawing.SolidBrush("#FFFFFFFF")
         '
-        'ViewToolStripMenuItem
+        'PropertiesToolStripMenuItem
         '
-        Me.ViewToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.VirtualAnalystToolStripMenuItem})
-        Me.ViewToolStripMenuItem.Name = "ViewToolStripMenuItem"
-        Me.ViewToolStripMenuItem.Size = New System.Drawing.Size(240, 32)
-        Me.ViewToolStripMenuItem.Text = "&View"
+        Me.PropertiesToolStripMenuItem.Image = Global.Boston.My.Resources.MenuImages.Properties216x16
+        Me.PropertiesToolStripMenuItem.Name = "PropertiesToolStripMenuItem"
+        Me.PropertiesToolStripMenuItem.Size = New System.Drawing.Size(308, 34)
+        Me.PropertiesToolStripMenuItem.Text = "&Properties"
+        '
+        'ModelDictionaryToolStripMenuItem
+        '
+        Me.ModelDictionaryToolStripMenuItem.Image = Global.Boston.My.Resources.MenuImages.dictionary16x16
+        Me.ModelDictionaryToolStripMenuItem.Name = "ModelDictionaryToolStripMenuItem"
+        Me.ModelDictionaryToolStripMenuItem.Size = New System.Drawing.Size(308, 34)
+        Me.ModelDictionaryToolStripMenuItem.Text = "Model &Dictionary"
+        '
+        'ErrorListToolStripMenuItem
+        '
+        Me.ErrorListToolStripMenuItem.Image = Global.Boston.My.Resources.MenuImages.ErrorList
+        Me.ErrorListToolStripMenuItem.Name = "ErrorListToolStripMenuItem"
+        Me.ErrorListToolStripMenuItem.Size = New System.Drawing.Size(308, 34)
+        Me.ErrorListToolStripMenuItem.Text = "&Error List"
+        '
+        'ToolStripMenuItem8
+        '
+        Me.ToolStripMenuItem8.Image = Global.Boston.My.Resources.MenuImages.FactTypeReading16x16
+        Me.ToolStripMenuItem8.Name = "ToolStripMenuItem8"
+        Me.ToolStripMenuItem8.Size = New System.Drawing.Size(308, 34)
+        Me.ToolStripMenuItem8.Text = "Fact Type &Reading Editor"
+        '
+        'ORMVerbalisationViewToolStripMenuItem
+        '
+        Me.ORMVerbalisationViewToolStripMenuItem.Image = CType(resources.GetObject("ORMVerbalisationViewToolStripMenuItem.Image"), System.Drawing.Image)
+        Me.ORMVerbalisationViewToolStripMenuItem.Name = "ORMVerbalisationViewToolStripMenuItem"
+        Me.ORMVerbalisationViewToolStripMenuItem.Size = New System.Drawing.Size(308, 34)
+        Me.ORMVerbalisationViewToolStripMenuItem.Text = "ORM &Verbalisation View"
         '
         'VirtualAnalystToolStripMenuItem
         '
+        Me.VirtualAnalystToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.VirtualAnalyst16x16
         Me.VirtualAnalystToolStripMenuItem.Name = "VirtualAnalystToolStripMenuItem"
-        Me.VirtualAnalystToolStripMenuItem.Size = New System.Drawing.Size(270, 34)
+        Me.VirtualAnalystToolStripMenuItem.Size = New System.Drawing.Size(308, 34)
         Me.VirtualAnalystToolStripMenuItem.Text = "Virtual Analyst"
+        '
+        'ToolStripButtonGO
+        '
+        Me.ToolStripButtonGO.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.ToolStripButtonGO.Image = Global.Boston.My.Resources.MenuImagesMain.GO16x16
+        Me.ToolStripButtonGO.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ToolStripButtonGO.Name = "ToolStripButtonGO"
+        Me.ToolStripButtonGO.Size = New System.Drawing.Size(34, 33)
+        Me.ToolStripButtonGO.Text = "ToolStripButton1"
+        '
+        'ToolStripButtonQueryGO
+        '
+        Me.ToolStripButtonQueryGO.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.ToolStripButtonQueryGO.Image = Global.Boston.My.Resources.MenuImagesMain.GO16x16
+        Me.ToolStripButtonQueryGO.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ToolStripButtonQueryGO.Name = "ToolStripButtonQueryGO"
+        Me.ToolStripButtonQueryGO.Size = New System.Drawing.Size(34, 28)
+        Me.ToolStripButtonQueryGO.Text = "ToolStripButton1"
         '
         'frmFactEngine
         '
@@ -434,4 +475,9 @@ Partial Class frmFactEngine
     Friend WithEvents LayoutToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents ViewToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents VirtualAnalystToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ModelDictionaryToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ErrorListToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ToolStripMenuItem8 As ToolStripMenuItem
+    Friend WithEvents ORMVerbalisationViewToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents PropertiesToolStripMenuItem As ToolStripMenuItem
 End Class
