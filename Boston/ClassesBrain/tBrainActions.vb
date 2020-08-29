@@ -225,30 +225,36 @@ Partial Public Class tBrain
                 Call lrFactType.setName(lrFactType.MakeNameFromFactTypeReadings, False)
             End If
 
-            lrFactTypeInstance = Me.Page.DropFactTypeAtPoint(lrFactType, loPointF, False, False, True)
+            If Me.Page Is Nothing Then
+                Me.Model.AddFactType(lrFactType, True, True, Nothing)
+            Else
+
+                lrFactTypeInstance = Me.Page.DropFactTypeAtPoint(lrFactType, loPointF, False, False, True)
 
 
-            Call lrFactTypeInstance.RepellFromNeighbouringPageObjects(1, False)
+                Call lrFactTypeInstance.RepellFromNeighbouringPageObjects(1, False)
 
-            Dim loPoint As New PointF(100, 100)
-            If lrFactTypeInstance.Arity = 2 Then
-                Dim lrFirstModelObject, lrSecondModelObject As Object
+                Dim loPoint As New PointF(100, 100)
+                If lrFactTypeInstance.Arity = 2 Then
+                    Dim lrFirstModelObject, lrSecondModelObject As Object
 
-                lrFirstModelObject = lrFactTypeInstance.RoleGroup(0).JoinedORMObject
-                lrSecondModelObject = lrFactTypeInstance.RoleGroup(1).JoinedORMObject
+                    lrFirstModelObject = lrFactTypeInstance.RoleGroup(0).JoinedORMObject
+                    lrSecondModelObject = lrFactTypeInstance.RoleGroup(1).JoinedORMObject
 
-                loPoint.X = (lrFirstModelObject.X + lrSecondModelObject.X) / 2
-                loPoint.Y = (lrFirstModelObject.y + lrSecondModelObject.Y) / 2
+                    loPoint.X = (lrFirstModelObject.X + lrSecondModelObject.X) / 2
+                    loPoint.Y = (lrFirstModelObject.y + lrSecondModelObject.Y) / 2
 
-                lrFactTypeInstance.Move(loPoint.X, loPoint.Y, True)
+                    lrFactTypeInstance.Move(loPoint.X, loPoint.Y, True)
+                End If
+
+                If Me.AutoLayoutOn Then
+                    Me.Page.Form.AutoLayout()
+                End If
+
+                Call lrFactTypeInstance.RepellFromNeighbouringPageObjects(1, False)
+                Call lrFactTypeInstance.Move(lrFactTypeInstance.X, lrFactTypeInstance.Y, True)
+
             End If
-
-            If Me.AutoLayoutOn Then
-                Me.Page.Form.AutoLayout()
-            End If
-
-            Call lrFactTypeInstance.RepellFromNeighbouringPageObjects(1, False)
-            Call lrFactTypeInstance.Move(lrFactTypeInstance.X, lrFactTypeInstance.Y, True)
 
             Me.OutputChannel.Focus()
 
@@ -465,13 +471,18 @@ Partial Public Class tBrain
 
         lrValueType = Me.Model.CreateValueType(lsValueTypeName, False)
 
-        lrValueTypeInstance = Me.Page.DropValueTypeAtPoint(lrValueType, New PointF(100, 100)) 'VM-20181329-Remove this commented-out code, if all okay. Me.Page.Form.CreateValueType(lsValueTypeName, True)
+        If Me.Page IsNot Nothing Then
 
-        Call lrValueTypeInstance.RepellFromNeighbouringPageObjects(1, False)
-        Call lrValueTypeInstance.Move(lrValueTypeInstance.X, lrValueTypeInstance.Y, True)
+            lrValueTypeInstance = Me.Page.DropValueTypeAtPoint(lrValueType, New PointF(100, 100)) 'VM-20181329-Remove this commented-out code, if all okay. Me.Page.Form.CreateValueType(lsValueTypeName, True)
 
-        If Me.AutoLayoutOn Then
-            Me.Page.Form.AutoLayout()
+            Call lrValueTypeInstance.RepellFromNeighbouringPageObjects(1, False)
+            Call lrValueTypeInstance.Move(lrValueTypeInstance.X, lrValueTypeInstance.Y, True)
+
+            If Me.AutoLayoutOn Then
+                Me.Page.Form.AutoLayout()
+            End If
+        Else
+            Me.Model.AddValueType(lrValueType, True, True, Nothing)
         End If
         Me.Timeout.Start()
 

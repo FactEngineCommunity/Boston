@@ -1601,4 +1601,13 @@ Public Class frmFactEngine
 
     End Sub
 
+    Private Sub VirtualAnalystToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles VirtualAnalystToolStripMenuItem.Click
+
+        prApplication.WorkingPage = Nothing
+
+        frmMain.Cursor = Cursors.WaitCursor
+        Call frmMain.loadToolboxRichmondBrainBox(Nothing, Me.DockPanel.ActivePane)
+        frmMain.Cursor = Cursors.Default
+
+    End Sub
 End Class

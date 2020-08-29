@@ -139,7 +139,11 @@ Public Class frmToolboxBrainBox
     Public Sub setup(ByRef arPage As FBM.Page)
 
         prApplication.Brain.Page = arPage
-        prApplication.Brain.Model = arPage.Model
+
+        If arPage IsNot Nothing Then
+            prApplication.Brain.Model = arPage.Model
+        End If
+
         Me.TextBoxInput.Focus()
 
     End Sub
