@@ -2312,6 +2312,17 @@ Public Class frmToolboxORMVerbalisation
 
     End Sub
 
+    Public Sub verbaliseModelElement(ByRef arModelElement As FBM.ModelObject)
+
+        Select Case arModelElement.ConceptType
+            Case Is = pcenumConceptType.EntityType
+                Call Me.VerbaliseEntityType(CType(arModelElement, FBM.EntityType))
+            Case Is = pcenumConceptType.ValueType
+                Call Me.VerbaliseValueType(CType(arModelElement, FBM.ValueType))
+        End Select
+
+    End Sub
+
     Public Sub VerbalisePage(ByRef arPage As FBM.Page)
 
         Dim lrVerbaliser As New FBM.ORMVerbailser

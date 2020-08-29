@@ -282,6 +282,32 @@ Public Class frmFactEngine
 
                     Next
             End Select
+
+            'Verbalisation
+            Dim lrToolboxForm As frmToolboxORMVerbalisation
+            lrToolboxForm = prApplication.GetToolboxForm(frmToolboxORMVerbalisation.Name)
+            If IsSomething(lrToolboxForm) Then
+                lrToolboxForm.zrModel = prApplication.WorkingModel
+                Call lrToolboxForm.verbaliseModelElement(arModelElement)
+            End If
+
+            'Properties
+            Dim lrPropertyGridForm As frmToolboxProperties
+            lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
+            Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
+            lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute})
+            If IsSomething(lrPropertyGridForm) Then
+                Dim lrModelElementInstance As FBM.ModelObject
+                Dim lrPage As New FBM.Page
+                Select Case arModelElement.ConceptType
+                    Case Is = pcenumConceptType.EntityType
+                        lrModelElementInstance = CType(arModelElement, FBM.EntityType).CloneInstance(lrPage, False)
+                End Select
+                lrPropertyGridForm.PropertyGrid.SelectedObject = lrModelElementInstance
+                lrPropertyGridForm.BringToFront()
+                lrPropertyGridForm.Show()
+            End If
+
         End If
 
     End Sub
