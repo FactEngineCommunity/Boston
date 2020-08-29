@@ -198,19 +198,6 @@ Partial Public Class tBrain
             Dim lrFactTypeInstance As FBM.FactTypeInstance
             Dim loPointF As PointF
 
-            Dim lbAllObjectsOnPage As Boolean = True
-            For Each lrRole In lrFactType.RoleGroup
-                If Not Me.Page.ContainsModelElement(lrRole.JoinedORMObject) Then
-                    lbAllObjectsOnPage = False
-                End If
-            Next
-
-            If lbAllObjectsOnPage Then
-                loPointF = Me.Page.GetMidPointOfModelObjects(lrFactType.GetModelObjects)
-            Else
-                loPointF = New PointF(100, 100)
-            End If
-
             Dim lrFactTypeReading As New FBM.FactTypeReading(lrFactType, larRole, Me.CurrentQuestion.sentence)
             lrFactTypeReading.IsPreferred = True
 
@@ -231,6 +218,19 @@ Partial Public Class tBrain
             If Me.Page Is Nothing Then
                 Me.Model.AddFactType(lrFactType, True, True, Nothing)
             Else
+                Dim lbAllObjectsOnPage As Boolean = True
+                For Each lrRole In lrFactType.RoleGroup
+                    If Not Me.Page.ContainsModelElement(lrRole.JoinedORMObject) Then
+                        lbAllObjectsOnPage = False
+                    End If
+                Next
+
+                If lbAllObjectsOnPage Then
+                    loPointF = Me.Page.GetMidPointOfModelObjects(lrFactType.GetModelObjects)
+                Else
+                    loPointF = New PointF(100, 100)
+                End If
+
                 lrFactTypeInstance = Me.Page.DropFactTypeAtPoint(lrFactType, loPointF, False, False, True)
 
                 Call lrFactTypeInstance.RepellFromNeighbouringPageObjects(1, False)

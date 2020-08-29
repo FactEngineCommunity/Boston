@@ -19,8 +19,8 @@ Public Class tBrain
     <XmlIgnore()> _
     Public Model As FBM.Model
 
-    <NonSerialized(), _
-    XmlIgnore()> _
+    <NonSerialized(),
+    XmlIgnore()>
     Public Page As FBM.Page
 
     Private Thread As Thread
@@ -255,7 +255,9 @@ Public Class tBrain
 
             Do
             Loop Until Me.SAPI.WaitUntilDone(Viev.Strings.CountWords(asTextToSpeak) * 1) '-1&
-            Me.Page.Form.Briana.StopTalking()
+            If Me.Page IsNot Nothing Then
+                Me.Page.Form.Briana.StopTalking()
+            End If
 
         Catch ex As Exception
             Dim lsMessage As String
@@ -275,12 +277,14 @@ Public Class tBrain
         Dim lsString As String = ""
 
         If Not ab_is_echo And Not Me.QuietMode Then
-            If Viev.Strings.CountWords(asData) = 1 Then
-                Me.Page.Form.Briana.SetTimerInterval(540)
-            Else
-                Me.Page.Form.Briana.SetTimerInterval(130)
+            If Me.Page IsNot Nothing Then
+                If Viev.Strings.CountWords(asData) = 1 Then
+                    Me.Page.Form.Briana.SetTimerInterval(540)
+                Else
+                    Me.Page.Form.Briana.SetTimerInterval(130)
+                End If
             End If
-            Me.Page.Form.Briana.Talk()
+
             Me.Thread = New Thread(AddressOf Me.Speak)
             Me.Thread.IsBackground = True
             Me.Thread.Start(asData)
