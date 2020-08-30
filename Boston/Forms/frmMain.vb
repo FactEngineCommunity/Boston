@@ -1620,6 +1620,8 @@ Public Class frmMain
                     'Add the PropertyGrid form to the DockPanel
                     '--------------------------------------------------                
                     'child.Show(DockPanel, WeifenLuo.WinFormsUI.Docking.DockState.DockRight)
+                Else
+                    child.Show(DockPanel, WeifenLuo.WinFormsUI.Docking.DockState.DockRight)
                 End If
                 prApplication.RightToolboxForms.Add(child)
             End If

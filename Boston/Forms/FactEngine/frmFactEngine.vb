@@ -295,28 +295,29 @@ Public Class frmFactEngine
                 'Properties
                 Dim lrPropertyGridForm As frmToolboxProperties
                 lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
-                Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
-                lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute})
-                If IsSomething(lrPropertyGridForm) Then
-                    Dim lrModelElementInstance As FBM.ModelObject = Nothing
-                    Dim lrPage As New FBM.Page
-                    Select Case arModelElement.ConceptType
-                        Case Is = pcenumConceptType.EntityType
-                            lrModelElementInstance = CType(arModelElement, FBM.EntityType).CloneInstance(lrPage, False)
-                        Case Is = pcenumConceptType.ValueType
-                            lrModelElementInstance = CType(arModelElement, FBM.ValueType).CloneInstance(lrPage, False)
-                        Case Is = pcenumConceptType.FactType
-                            lrModelElementInstance = CType(arModelElement, FBM.FactType).CloneInstance(lrPage, False)
-                        Case Is = pcenumConceptType.RoleConstraint
-                            lrModelElementInstance = CType(arModelElement, FBM.RoleConstraint).CloneInstance(lrPage, False)
-                    End Select
-                    If lrModelElementInstance IsNot Nothing Then
-                        lrPropertyGridForm.PropertyGrid.SelectedObject = lrModelElementInstance
-                        lrPropertyGridForm.BringToFront()
-                        lrPropertyGridForm.Show()
+                If lrPropertyGridForm IsNot Nothing Then
+                    Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
+                    lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute})
+                    If IsSomething(lrPropertyGridForm) Then
+                        Dim lrModelElementInstance As FBM.ModelObject = Nothing
+                        Dim lrPage As New FBM.Page
+                        Select Case arModelElement.ConceptType
+                            Case Is = pcenumConceptType.EntityType
+                                lrModelElementInstance = CType(arModelElement, FBM.EntityType).CloneInstance(lrPage, False)
+                            Case Is = pcenumConceptType.ValueType
+                                lrModelElementInstance = CType(arModelElement, FBM.ValueType).CloneInstance(lrPage, False)
+                            Case Is = pcenumConceptType.FactType
+                                lrModelElementInstance = CType(arModelElement, FBM.FactType).CloneInstance(lrPage, False)
+                            Case Is = pcenumConceptType.RoleConstraint
+                                lrModelElementInstance = CType(arModelElement, FBM.RoleConstraint).CloneInstance(lrPage, False)
+                        End Select
+                        If lrModelElementInstance IsNot Nothing Then
+                            lrPropertyGridForm.PropertyGrid.SelectedObject = lrModelElementInstance
+                            lrPropertyGridForm.BringToFront()
+                            lrPropertyGridForm.Show()
+                        End If
                     End If
                 End If
-
             End If
         Catch ex As Exception
             Dim lsMessage As String
@@ -1673,11 +1674,15 @@ Public Class frmFactEngine
         Call frmMain.loadToolboxRichmondBrainBox(Nothing, Me.DockPanel.ActivePane)
         frmMain.Cursor = Cursors.Default
 
+        Me.TextBoxInput.Focus()
+
     End Sub
 
     Private Sub ModelDictionaryToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ModelDictionaryToolStripMenuItem.Click
 
         Call frmMain.LoadToolboxModelDictionary(True)
+
+        Me.TextBoxInput.Focus()
 
     End Sub
 
@@ -1697,11 +1702,15 @@ Public Class frmFactEngine
             'End If
         End If
 
+        Me.TextBoxInput.Focus()
+
     End Sub
 
     Private Sub ErrorListToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ErrorListToolStripMenuItem.Click
 
         Call frmMain.loadToolboxErrorListForm(Me.DockPanel.ActivePane)
+
+        Me.TextBoxInput.Focus()
 
     End Sub
 
@@ -1709,11 +1718,15 @@ Public Class frmFactEngine
 
         Call frmMain.loadToolboxORMReadingEditor(Nothing, Me.DockPanel.ActivePane)
 
+        Me.TextBoxInput.Focus()
+
     End Sub
 
     Private Sub ORMVerbalisationViewToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ORMVerbalisationViewToolStripMenuItem.Click
 
         Call frmMain.loadToolboxORMVerbalisationForm(prApplication.WorkingModel, Me.DockPanel.ActivePane)
+
+        Me.TextBoxInput.Focus()
 
     End Sub
 
