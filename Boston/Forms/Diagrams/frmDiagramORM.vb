@@ -3481,7 +3481,8 @@ Public Class frmDiagramORM
                 End If
                 loNode = Diagram.GetNodeAt(lo_point)
 
-                If Control.ModifierKeys And Keys.Control Then
+                If (Control.ModifierKeys And Keys.Control) Or
+                    Me.zrSpecialDragMode.SpecialDragMode = pcenumSpecialDragMode.ORMSubtypeConnector Then
                     '------------------------------------
                     'Use is holding down the CtrlKey so
                     '  enforce the selection of the object
