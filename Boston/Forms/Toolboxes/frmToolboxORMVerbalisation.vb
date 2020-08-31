@@ -2847,16 +2847,24 @@ Public Class frmToolboxORMVerbalisation
 
                     If arAttribute.Column.Role.JoinedORMObject.ConceptType = pcenumConceptType.EntityType Then
                         Dim lrEntityType As FBM.EntityType = arAttribute.Column.Role.JoinedORMObject
-                        If lrEntityType.HasSimpleReferenceScheme Then
+                        Dim lrTopmostSupertype As FBM.EntityType = lrEntityType.GetTopmostSupertype
 
-                            If lrEntityType.ReferenceModeRoleConstraint.RoleConstraintRole(0).Role Is arAttribute.Column.ActiveRole Then
+                        If lrTopmostSupertype.HasSimpleReferenceScheme Then
 
+                            If lrTopmostSupertype.ReferenceModeRoleConstraint Is Nothing Then
                                 lrVerbaliser.HTW.WriteBreak()
-                                lrVerbaliser.HTW.WriteBreak()
-                                lrVerbaliser.VerbaliseQuantifier("This association with ")
-                                lrVerbaliser.VerbaliseModelObject(lrEntityType.ReferenceModeValueType)
-                                lrVerbaliser.VerbaliseQuantifier(" provides the preferred reference scheme for ")
-                                lrVerbaliser.VerbaliseModelObject(lrEntityType)
+                                lrVerbaliser.VerbaliseError("Error: Entity Type, '" & lrEntityType.Id & ", has no Reference Mode Role Constraint.")
+                            Else
+
+                                If lrTopmostSupertype.ReferenceModeRoleConstraint.RoleConstraintRole(0).Role Is arAttribute.Column.ActiveRole Then
+
+                                    lrVerbaliser.HTW.WriteBreak()
+                                    lrVerbaliser.HTW.WriteBreak()
+                                    lrVerbaliser.VerbaliseQuantifier("This association with ")
+                                    lrVerbaliser.VerbaliseModelObject(lrEntityType.ReferenceModeValueType)
+                                    lrVerbaliser.VerbaliseQuantifier(" provides the preferred reference scheme for ")
+                                    lrVerbaliser.VerbaliseModelObject(lrEntityType)
+                                End If
                             End If
 
                         End If
@@ -2901,18 +2909,24 @@ Public Class frmToolboxORMVerbalisation
             Dim liCounter As Integer = 0
             Dim lrResponsibleModelObject As FBM.ModelObject = Nothing
             If arAttribute.Column.getMetamodelValueContraintValues(lrResponsibleModelObject).Count > 0 Then
-                lrVerbaliser.VerbaliseQuantifier("Possible Values for ")
-                lrVerbaliser.VerbaliseModelObject(lrResponsibleModelObject)
-                lrVerbaliser.VerbaliseQuantifier(" are {")
-                For Each lsString In arAttribute.Column.getMetamodelValueContraintValues(lrResponsibleModelObject)
-                    liCounter += 1
-                    If liCounter = 1 Then
-                        lrVerbaliser.HTW.Write("'" & lsString & "'")
-                    Else
-                        lrVerbaliser.HTW.Write(", '" & lsString & "'")
-                    End If
-                Next
-                lrVerbaliser.VerbaliseQuantifier("}")
+
+                If lrResponsibleModelObject Is Nothing Then
+                    lrVerbaliser.VerbaliseError("Error: Column has no Active Role.")
+                Else
+
+                    lrVerbaliser.VerbaliseQuantifier("Possible Values for ")
+                    lrVerbaliser.VerbaliseModelObject(lrResponsibleModelObject)
+                    lrVerbaliser.VerbaliseQuantifier(" are {")
+                    For Each lsString In arAttribute.Column.getMetamodelValueContraintValues(lrResponsibleModelObject)
+                        liCounter += 1
+                        If liCounter = 1 Then
+                            lrVerbaliser.HTW.Write("'" & lsString & "'")
+                        Else
+                            lrVerbaliser.HTW.Write(", '" & lsString & "'")
+                        End If
+                    Next
+                    lrVerbaliser.VerbaliseQuantifier("}")
+                End If
             Else
                 lrVerbaliser.VerbaliseQuantifier("There are no Value Constraints for this Attribute.")
             End If

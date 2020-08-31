@@ -283,6 +283,8 @@ Namespace RDS
         Public Function getMetamodelDataType() As pcenumORMDataType
 
             Try
+                If Me.ActiveRole Is Nothing Then Return pcenumORMDataType.DataTypeNotSet
+
                 'Get it using the FactType of the Function.
                 If Me.ActiveRole.FactType.IsUnaryFactType Then
                     Return pcenumORMDataType.Boolean
@@ -312,6 +314,7 @@ Namespace RDS
         Public Function getMetamodelValueContraintValues(ByRef arModelObject As FBM.ModelObject) As StringCollection
 
             Try
+                If Me.ActiveRole Is Nothing Then Return New StringCollection()
                 'Get it using the FactType of the Function.
                 If Me.ActiveRole.FactType.IsUnaryFactType Then
                     Return New StringCollection
