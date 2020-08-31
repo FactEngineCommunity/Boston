@@ -202,6 +202,13 @@ Namespace FBM
         <XmlElement()>
         Public SubtypeRelationship As New List(Of FBM.tSubtypeRelationship)
 
+        Public ReadOnly Property isSubtype As Boolean
+            Get
+                Return Me.SubtypeRelationship.Count > 0
+            End Get
+        End Property
+
+
         ''' <summary>
         ''' Only used (at this stage) for generating CQL Temporarily populated.
         ''' </summary>

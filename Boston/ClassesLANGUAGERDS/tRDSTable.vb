@@ -62,6 +62,12 @@ Namespace RDS
             End Get
         End Property
 
+        Public ReadOnly Property isSubtype() As Boolean
+            Get
+                Return Me.FBMModelElement.isSubtype
+            End Get
+        End Property
+
         Public Event ColumnRemoved(ByVal arColumn As RDS.Column)
         Public Event ColumnAdded(ByRef arColumn As RDS.Column)
         Public Event IndexAdded(ByRef arIndex As RDS.Index)
@@ -102,6 +108,26 @@ Namespace RDS
             Return String.Compare(x.Name, y.Name)
 
         End Function
+
+        Public Sub absorbSupertypeColumns()
+
+            If Me.isSubtype = False Then Exit Sub
+
+            If Me.isAbsorbed Then Exit Sub
+
+            For Each lrTable In Me.getSupertypeTables
+                For Each lrColumn In lrTable.Column
+                    Dim lrNewColumn = lrColumn.Clone(Me, Nothing)
+                    lrNewColumn.Relation.AddRange(lrColumn.Relation)
+
+                    Dim lrExistingColumn = Me.Column.Find(Function(x) x.Role Is lrNewColumn.Role And x.ActiveRole Is lrNewColumn.ActiveRole)
+                    If lrExistingColumn Is Nothing Then
+                        Call Me.addColumn(lrNewColumn)
+                    End If
+                Next
+            Next
+
+        End Sub
 
         Public Sub addColumn(ByRef arColumn As RDS.Column)
 
@@ -418,6 +444,24 @@ Namespace RDS
             Next
 
             Return larSubtypeTable
+
+        End Function
+
+        Public Function getSupertypeTables(Optional ByRef aarSupertypeTable As List(Of RDS.Table) = Nothing) As List(Of RDS.Table)
+
+            Dim larSupertypeTable As New List(Of RDS.Table)
+
+            For Each lrSubtypeRelationship In Me.FBMModelElement.SubtypeRelationship
+                Dim lrSupertypeTable = lrSubtypeRelationship.parentEntityType.getCorrespondingRDSTable
+                larSupertypeTable.Add(lrSupertypeTable)
+                Call lrSupertypeTable.getSupertypeTables(larSupertypeTable)
+            Next
+
+            If aarSupertypeTable IsNot Nothing Then
+                larSupertypeTable.AddRange(aarSupertypeTable)
+            End If
+
+            Return larSupertypeTable
 
         End Function
 

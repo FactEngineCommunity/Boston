@@ -1273,7 +1273,9 @@ Namespace FBM
             '=========================================================================
             'Manage Subtype Primary Reference Schemes.
             '  * Need to pull the Primary Reference Scheme from the Supertype if this EntityType is not absorbed.
-            Call Me.getRDSPrimaryReferenceSchemeFromSupertypeIfNecessary
+            Call Me.getRDSPrimaryReferenceSchemeFromSupertypeIfNecessary()
+
+            Call Me.getCorrespondingRDSTable.absorbSupertypeColumns()
 
             Call Me.Model.MakeDirty()
 
