@@ -1775,6 +1775,8 @@ Public Class frmDiagramPGS
                     'Need to load the relation for the joined Nodes, not the PGSRelation.
                     'E.g. If 'Person likes Person WITH Rating'...then need to load that relation
 
+                    Call Me.zrPage.loadRelationsForPGSNode(lrNode, True)
+
                     Dim lrFactType As FBM.FactType = lrNode.RDSTable.FBMModelElement
 
                     Dim larDestinationModelObjects = lrFactType.getDesinationModelObjects
@@ -2631,7 +2633,14 @@ Public Class frmDiagramPGS
             Dim lrFactTypeInstance As FBM.FactTypeInstance = Nothing
 
             If IsSomething(lrPGSLink.Relation.RelationFactType) Then
-                lrFactTypeInstance = lrPGSLink.Relation.RelationFactType.CloneInstance(New FBM.Page(Me.zrPage.Model), False)
+                If lrPGSLink.Relation.IsPGSRelationNode Then
+                    If lrPGSLink.Relation.RelationFactType.IsLinkFactType Then
+                        Dim lrFactType = lrPGSLink.Relation.RelationFactType.RoleGroup(0).JoinedORMObject
+                        lrFactTypeInstance = lrFactType.CloneInstance(New FBM.Page(Me.zrPage.Model), False)
+                    End If
+                Else
+                    lrFactTypeInstance = lrPGSLink.Relation.RelationFactType.CloneInstance(New FBM.Page(Me.zrPage.Model), False)
+                End If
 
                 lrORMReadingEditor.zrPage = Me.zrPage
                 lrORMReadingEditor.zrFactTypeInstance = lrFactTypeInstance

@@ -893,9 +893,13 @@ Namespace FBM
         End Sub
 
         Public Overrides Sub makeDirty()
-            Me.Fact.FactType.isDirty = True
-            Me.Fact.isDirty = True
             Me.isDirty = True
+            If Me.Fact IsNot Nothing Then
+                Me.Fact.isDirty = True
+                If Me.Fact.FactType IsNot Nothing Then
+                    Me.Fact.FactType.isDirty = True
+                End If
+            End If
         End Sub
         Public Shadows Sub setData(ByVal asData As String, Optional ByRef arConcept As FBM.Concept = Nothing)
 
