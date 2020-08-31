@@ -284,6 +284,8 @@ Namespace PGS
         Public Sub setPredicate()
 
             Try
+                If Me.Link.Visible = False Then Exit Sub
+
                 If Me.Relation.IsPGSRelationNode Or Me.RDSRelation.ResponsibleFactType.isRDSTable Then
                     '=================================================================
                     'Origin/Destination Predicates
@@ -311,8 +313,12 @@ Namespace PGS
 
                         lsPredicate = lrFactTypeReading.PredicatePart(0).PredicatePartText
                     Else
+                        If lrFactType.FactTypeReading.Count = 2 Then
+                            lrFactTypeReading = lrFactType.FactTypeReading(1)
+                            lsPredicate &= lrFactTypeReading.PredicatePart(0).PredicatePartText & " / "
+                        End If
                         lrFactTypeReading = lrFactType.FactTypeReading(0)
-                        lsPredicate = lrFactTypeReading.PredicatePart(0).PredicatePartText
+                        lsPredicate &= lrFactTypeReading.PredicatePart(0).PredicatePartText
                         '20200714-VM-Not yet implemented.
                     End If
 

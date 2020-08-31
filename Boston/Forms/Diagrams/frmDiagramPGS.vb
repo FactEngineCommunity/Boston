@@ -1786,14 +1786,18 @@ Public Class frmDiagramPGS
 
                     Dim lbAllFound As Boolean = True
                     For Each lrModelObject In larDestinationModelObjects
-                        If Me.ERDiagram.Entity.Find(Function(x) x.Name = lrModelObject.Id) Is Nothing Then
+                        If Me.zrPage.ERDiagram.Entity.Find(Function(x) x.Name = lrModelObject.Id) Is Nothing Then
                             lbAllFound = False
                         End If
                     Next
 
                     If lbAllFound Then
-                        If lrNode.NodeType = pcenumPGSEntityType.Relationship Then
+                        If lrNode.RDSTable.isPGSRelation Then
                             Call Me.zrPage.displayPGSRelationNodeLink(lrNode, lrRDSRelation)
+                            lrNode.Shape.Visible = False
+                            For Each lrEdge As MindFusion.Diagramming.DiagramLink In lrNode.Shape.OutgoingLinks
+                                lrEdge.Visible = False
+                            Next
                         End If
                     End If
                 Else
@@ -1866,6 +1870,18 @@ Public Class frmDiagramPGS
         prApplication.WorkingPage = Me.zrPage
 
         loNode = Diagram.GetNodeAt(lo_point)
+
+        If ModifierKeys = Keys.Control And My.Settings.SuperuserMode Then
+            For Each lrPGSRelationNode In Me.zrPage.ERDiagram.Entity.FindAll(Function(x) x.getCorrespondingRDSTable.isPGSRelation)
+                lrPGSRelationNode.Shape.Visible = True
+                If Not Me.zrPage.Diagram.Nodes.Contains(lrPGSRelationNode.Shape) Then
+                    Me.zrPage.Diagram.Nodes.Add(lrPGSRelationNode.Shape)
+                    'Make sure the Shape has a Tag
+                    lrPGSRelationNode.Shape.Tag = lrPGSRelationNode
+                End If
+                Me.zrPage.Diagram.Invalidate()
+            Next
+        End If
 
         If IsSomething(loNode) And (e.Button = Windows.Forms.MouseButtons.Left) Then
 
@@ -2637,6 +2653,8 @@ Public Class frmDiagramPGS
                     If lrPGSLink.Relation.RelationFactType.IsLinkFactType Then
                         Dim lrFactType = lrPGSLink.Relation.RelationFactType.RoleGroup(0).JoinedORMObject
                         lrFactTypeInstance = lrFactType.CloneInstance(New FBM.Page(Me.zrPage.Model), False)
+                    Else
+                        lrFactTypeInstance = lrPGSLink.Relation.RelationFactType.CloneInstance(New FBM.Page(Me.zrPage.Model), False)
                     End If
                 Else
                     lrFactTypeInstance = lrPGSLink.Relation.RelationFactType.CloneInstance(New FBM.Page(Me.zrPage.Model), False)
