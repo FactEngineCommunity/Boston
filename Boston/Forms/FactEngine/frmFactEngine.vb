@@ -452,7 +452,21 @@ Public Class frmFactEngine
                 lsQuery = Me.TextBoxInput.SelectedText
             End If
 
-            lrRecordset = Me.FEQLProcessor.ProcessFEQLStatement(lsQuery)
+            Dim lrFEQLTokenType As FEQL.TokenType = Nothing
+            Dim lrFEQLParseTree As FEQL.ParseTree = Nothing
+            lrRecordset = Me.FEQLProcessor.ProcessFEQLStatement(lsQuery, lrFEQLTokenType, lrFEQLParseTree)
+
+            If lrRecordset Is Nothing Then
+                'Make sure the VirtualAnalyst is open
+                Call Me.loadVirtualAnalyst()
+
+                'Pass the FEQL Statement to the Brain.
+                Select Case lrFEQLTokenType
+                    Case Is = FEQL.TokenType.VALUETYPEISWRITTENASSTMT
+                        Call prApplication.Brain.ProcessFEQLStatement(lsQuery)
+                End Select
+                Exit Sub
+            End If
 
             If lrRecordset.Query IsNot Nothing Then
                 Me.TextBoxQuery.Text = lrRecordset.Query
@@ -608,7 +622,7 @@ Public Class frmFactEngine
                                             lrBaseGraphNode.Edge.Add(lrEdge)
                                         End If
                                     End If
-                                        liInd += 1
+                                    liInd += 1
                                 Next
 
 
@@ -672,7 +686,13 @@ Public Class frmFactEngine
 
     End Sub
 
-
+    Private Sub loadVirtualAnalyst()
+        prApplication.WorkingPage = Nothing
+        frmMain.Cursor = Cursors.WaitCursor
+        Call frmMain.loadToolboxRichmondBrainBox(Nothing, Me.DockPanel.ActivePane)
+        frmMain.Cursor = Cursors.Default
+        Me.TextBoxInput.Focus()
+    End Sub
 
     Private Sub Application_WorkingModelChanged() Handles Application.WorkingModelChanged
 

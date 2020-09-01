@@ -3379,6 +3379,27 @@ Public Class tBrain
 
     End Sub
 
+    ''' <summary>
+    ''' Used to call VAQL Statements from the FactEngine form. This is so that Knowledge Language statements can be made in the FactEngine.
+    ''' </summary>
+    ''' <param name="asFEQLStatement"></param>
+    Public Sub ProcessFEQLStatement(ByVal asFEQLStatement As String)
+
+        Dim loTokenType As VAQL.TokenType
+        Call Me.VAQL.ProcessVAQLStatement(asFEQLStatement, loTokenType, Me.VAQLParsetree)
+        If Me.ProcessVAQLStatement(asFEQLStatement, loTokenType) Then
+            '----------------------------------------------------------------------------------------------
+            'Start the TimeOut so that the Brain can repeatedly address the Sentence until it is resolved
+            '----------------------------------------------------------------------------------------------
+            If Me.Question.Count > 0 Then
+                Me.Timeout.Start() 'Threading jumps to HOUSEKEEPING.OutOfTimeout
+            End If
+            Exit Sub
+        End If
+
+    End Sub
+
+
     Private Sub ProcessNaturalLanguage()
 
         Me.Timeout.Stop()

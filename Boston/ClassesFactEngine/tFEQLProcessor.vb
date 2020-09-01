@@ -707,7 +707,44 @@ Namespace FEQL
 
         End Sub
 
-        Public Function ProcessFEQLStatement(ByVal asFEQLStatement As String) As ORMQL.Recordset
+        Public Function ParseTreeContainsTokenType(ByVal aoParseTree As FEQL.ParseTree, ByVal aoTokenType As FEQL.TokenType) As Boolean
+
+            Dim loParseNode As FEQL.ParseNode
+
+            ParseTreeContainsTokenType = False
+
+            For Each loParseNode In aoParseTree.Nodes
+                If Me.ParseNodeContainsTokenType(loParseNode, aoTokenType) = True Then
+                    ParseTreeContainsTokenType = True
+                    Exit For
+                End If
+            Next
+
+        End Function
+
+        Public Function ParseNodeContainsTokenType(ByVal aoParseNode As FEQL.ParseNode, ByVal aoTokenType As FEQL.TokenType) As Boolean
+
+            Dim loParseNode As FEQL.ParseNode
+
+            ParseNodeContainsTokenType = False
+
+            If aoParseNode.Token.Type = aoTokenType Then
+                Return True
+            Else
+                For Each loParseNode In aoParseNode.Nodes
+                    If Me.ParseNodeContainsTokenType(loParseNode, aoTokenType) = True Then
+                        ParseNodeContainsTokenType = True
+                        Exit For
+                    End If
+                Next
+            End If
+
+        End Function
+
+        Public Function ProcessFEQLStatement(ByVal asFEQLStatement As String,
+                                             ByRef aoTokenType As FEQL.TokenType,
+                                             ByRef aoParseTree As FEQL.ParseTree
+                                             ) As ORMQL.Recordset
 
             Dim lrFact As New FBM.Fact
 
@@ -717,6 +754,12 @@ Namespace FEQL
                 '---------------------------
                 SyncLock Me.Parsetree
                     Me.Parsetree = Me.Parser.Parse(asFEQLStatement)
+
+                    If Me.ParseTreeContainsTokenType(Me.Parsetree, FEQL.TokenType.VALUETYPEISWRITTENASSTMT) Then ' VALUETYPEISWRITTENASCLAUSE
+                        aoTokenType = FEQL.TokenType.VALUETYPEISWRITTENASSTMT
+                        aoParseTree = Me.Parsetree
+                        Return Nothing
+                    End If
 
                     Select Case Me.Parsetree.Nodes(0).Nodes(0).Text
                         Case Is = "WHICHSELECTSTMT"
