@@ -286,6 +286,13 @@ Namespace PGS
             Try
                 If Me.Link.Visible = False Then Exit Sub
 
+                '20200902-VM-This should not happen, but if it does then at least get the predicate from the Reltation.
+                ' NB Has happened on a ternary FactType that is not Objectified.
+                If Me.RDSRelation.ResponsibleFactType Is Nothing Then
+                    Me.Link.Text = Me.Relation.DestinationPredicate
+                    Exit Sub
+                End If
+
                 If Me.Relation.IsPGSRelationNode Or Me.RDSRelation.ResponsibleFactType.isRDSTable Then
                     '=================================================================
                     'Origin/Destination Predicates
