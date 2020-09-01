@@ -527,113 +527,119 @@ Namespace VAQL
                     Case TokenType.KEYWDATMOSTONE:
                         sb.Append("{{\cf14 ")
                         Exit Select
-                    Case TokenType.KEYWDDATATYPELOGICALTRUEFALSE:
+                    Case TokenType.KEYWDISA:
                         sb.Append("{{\cf15 ")
                         Exit Select
-                    Case TokenType.KEYWDDATATYPELOGICALYESNO:
+                    Case TokenType.KEYWDISWHERE:
                         sb.Append("{{\cf16 ")
                         Exit Select
-                    Case TokenType.KEYWDDATATYPEAUTOCOUNTER:
+                    Case TokenType.KEYWDDATATYPELOGICALTRUEFALSE:
                         sb.Append("{{\cf17 ")
                         Exit Select
-                    Case TokenType.KEYWDDATATYPEDECIMAL:
+                    Case TokenType.KEYWDDATATYPELOGICALYESNO:
                         sb.Append("{{\cf18 ")
                         Exit Select
-                    Case TokenType.KEYWDDATATYPEFLOATCUSTOMPRECISION:
+                    Case TokenType.KEYWDDATATYPEAUTOCOUNTER:
                         sb.Append("{{\cf19 ")
                         Exit Select
-                    Case TokenType.KEYWDDATATYPEFLOATDOUBLEPRECISION:
+                    Case TokenType.KEYWDDATATYPEDECIMAL:
                         sb.Append("{{\cf20 ")
                         Exit Select
-                    Case TokenType.KEYWDDATATYPEFLOATSINGLEPRECISION:
+                    Case TokenType.KEYWDDATATYPEFLOATCUSTOMPRECISION:
                         sb.Append("{{\cf21 ")
                         Exit Select
-                    Case TokenType.KEYWDDATATYPEMONEY:
+                    Case TokenType.KEYWDDATATYPEFLOATDOUBLEPRECISION:
                         sb.Append("{{\cf22 ")
                         Exit Select
-                    Case TokenType.KEYWDDATATYPESIGNEDBIGINTEGER:
+                    Case TokenType.KEYWDDATATYPEFLOATSINGLEPRECISION:
                         sb.Append("{{\cf23 ")
                         Exit Select
-                    Case TokenType.KEYWDDATATYPESIGNEDINTEGER:
+                    Case TokenType.KEYWDDATATYPEMONEY:
                         sb.Append("{{\cf24 ")
                         Exit Select
-                    Case TokenType.KEYWDDATATYPESIGNEDSMALLINTEGER:
+                    Case TokenType.KEYWDDATATYPESIGNEDBIGINTEGER:
                         sb.Append("{{\cf25 ")
                         Exit Select
-                    Case TokenType.KEYWDDATATYPEUNSIGNEDBIGINTEGER:
+                    Case TokenType.KEYWDDATATYPESIGNEDINTEGER:
                         sb.Append("{{\cf26 ")
                         Exit Select
-                    Case TokenType.KEYWDDATATYPEUNSIGNEDINTEGER:
+                    Case TokenType.KEYWDDATATYPESIGNEDSMALLINTEGER:
                         sb.Append("{{\cf27 ")
                         Exit Select
-                    Case TokenType.KEYWDDATATYPEUNSIGNEDSMALLINTEGER:
+                    Case TokenType.KEYWDDATATYPEUNSIGNEDBIGINTEGER:
                         sb.Append("{{\cf28 ")
                         Exit Select
-                    Case TokenType.KEYWDDATATYPEUNSIGNEDTINYINTEGER:
+                    Case TokenType.KEYWDDATATYPEUNSIGNEDINTEGER:
                         sb.Append("{{\cf29 ")
                         Exit Select
-                    Case TokenType.KEYWDDATATYPEOBJECTID:
+                    Case TokenType.KEYWDDATATYPEUNSIGNEDSMALLINTEGER:
                         sb.Append("{{\cf30 ")
                         Exit Select
-                    Case TokenType.KEYWDDATATYPEROWID:
+                    Case TokenType.KEYWDDATATYPEUNSIGNEDTINYINTEGER:
                         sb.Append("{{\cf31 ")
                         Exit Select
-                    Case TokenType.KEYWDDATATYPERAWDATAFIXEDLENGTH:
+                    Case TokenType.KEYWDDATATYPEOBJECTID:
                         sb.Append("{{\cf32 ")
                         Exit Select
-                    Case TokenType.KEYWDDATATYPERAWDATALARGELENGTH:
+                    Case TokenType.KEYWDDATATYPEROWID:
                         sb.Append("{{\cf33 ")
                         Exit Select
-                    Case TokenType.KEYWDDATATYPERAWDATAOLEOBJECT:
+                    Case TokenType.KEYWDDATATYPERAWDATAFIXEDLENGTH:
                         sb.Append("{{\cf34 ")
                         Exit Select
-                    Case TokenType.KEYWDDATATYPERAWDATA:
+                    Case TokenType.KEYWDDATATYPERAWDATALARGELENGTH:
                         sb.Append("{{\cf35 ")
                         Exit Select
-                    Case TokenType.KEYWDDATATYPERAWDATAVARIABLELENGTH:
+                    Case TokenType.KEYWDDATATYPERAWDATAOLEOBJECT:
                         sb.Append("{{\cf36 ")
                         Exit Select
-                    Case TokenType.KEYWDDATATYPEAUTOTIMESTAMP:
+                    Case TokenType.KEYWDDATATYPERAWDATA:
                         sb.Append("{{\cf37 ")
                         Exit Select
-                    Case TokenType.KEYWDDATATYPEDATE:
+                    Case TokenType.KEYWDDATATYPERAWDATAVARIABLELENGTH:
                         sb.Append("{{\cf38 ")
                         Exit Select
-                    Case TokenType.KEYWDDATATYPEDATETIME:
+                    Case TokenType.KEYWDDATATYPEAUTOTIMESTAMP:
                         sb.Append("{{\cf39 ")
                         Exit Select
-                    Case TokenType.KEYWDDATATYPETIME:
+                    Case TokenType.KEYWDDATATYPEDATE:
                         sb.Append("{{\cf40 ")
                         Exit Select
-                    Case TokenType.KEYWDDATATYPESTRINGFIXEDLENGTH:
+                    Case TokenType.KEYWDDATATYPEDATETIME:
                         sb.Append("{{\cf41 ")
                         Exit Select
-                    Case TokenType.KEYWDDATATYPESTRINGLARGELENGTH:
+                    Case TokenType.KEYWDDATATYPETIME:
                         sb.Append("{{\cf42 ")
                         Exit Select
-                    Case TokenType.KEYWDDATATYPESTRINGVARIABLELENGTH:
+                    Case TokenType.KEYWDDATATYPESTRINGFIXEDLENGTH:
                         sb.Append("{{\cf43 ")
                         Exit Select
-                    Case TokenType.KEYWDISACONCEPT:
+                    Case TokenType.KEYWDDATATYPESTRINGLARGELENGTH:
                         sb.Append("{{\cf44 ")
                         Exit Select
-                    Case TokenType.KEYWDISANENTITYTYPE:
+                    Case TokenType.KEYWDDATATYPESTRINGVARIABLELENGTH:
                         sb.Append("{{\cf45 ")
                         Exit Select
-                    Case TokenType.KEYWDISIDENTIFIEDBYITS:
+                    Case TokenType.KEYWDISACONCEPT:
                         sb.Append("{{\cf46 ")
                         Exit Select
-                    Case TokenType.KEYWDISWRITTENAS:
+                    Case TokenType.KEYWDISANENTITYTYPE:
                         sb.Append("{{\cf47 ")
                         Exit Select
-                    Case TokenType.KEYWDNL:
+                    Case TokenType.KEYWDISIDENTIFIEDBYITS:
                         sb.Append("{{\cf48 ")
                         Exit Select
-                    Case TokenType.KEYWDONE:
+                    Case TokenType.KEYWDISWRITTENAS:
                         sb.Append("{{\cf49 ")
                         Exit Select
-                    Case TokenType.KEYWDREADING:
+                    Case TokenType.KEYWDNL:
                         sb.Append("{{\cf50 ")
+                        Exit Select
+                    Case TokenType.KEYWDONE:
+                        sb.Append("{{\cf51 ")
+                        Exit Select
+                    Case TokenType.KEYWDREADING:
+                        sb.Append("{{\cf52 ")
                         Exit Select
 
             Case Else
@@ -644,7 +650,7 @@ Namespace VAQL
 
     ' define the color palette to be used here
     Private Sub AddRtfHeader(ByVal sb As StringBuilder)
-        sb.Insert(0, "{\rtf1\ansi\deff0{\fonttbl{\f0\fnil\fcharset0 Tahoma;}}{\colortbl;\red0\green191\blue255;\red0\green191\blue255;\red153\green0\blue0;\red76\green153\blue0;\red153\green76\blue0;\red153\green76\blue0;\red153\green0\blue153;\red76\green153\blue0;\red153\green76\blue0;\red153\green0\blue0;\red0\green0\blue255;\red153\green0\blue153;\red153\green0\blue0;\red0\green0\blue255;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue102;\red0\green0\blue255;\red0\green0\blue255;}\viewkind4\uc1\pard\lang1033\f0\fs20")
+        sb.Insert(0, "{\rtf1\ansi\deff0{\fonttbl{\f0\fnil\fcharset0 Tahoma;}}{\colortbl;\red0\green191\blue255;\red0\green191\blue255;\red153\green0\blue0;\red76\green153\blue0;\red153\green76\blue0;\red153\green76\blue0;\red153\green0\blue153;\red76\green153\blue0;\red153\green76\blue0;\red153\green0\blue0;\red0\green0\blue255;\red153\green0\blue153;\red153\green0\blue0;\red0\green0\blue255;\red135\green207\blue243;\red135\green207\blue243;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue102;\red0\green0\blue255;\red0\green0\blue255;}\viewkind4\uc1\pard\lang1033\f0\fs20")
     End Sub
 
     Private Sub AddRtfEnd(ByVal sb As StringBuilder)

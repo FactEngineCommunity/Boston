@@ -262,6 +262,12 @@ Namespace VAQL
                 Case TokenType.VALUETYPEISWRITTENASCLAUSE
                     Value = EvalVALUETYPEISWRITTENASCLAUSE(tree, paramlist)
                     Exit Select
+                Case TokenType.FACTTYPEIDENTIFICATION
+                    Value = EvalFACTTYPEIDENTIFICATION(tree, paramlist)
+                    Exit Select
+                Case TokenType.FACTTYPESTMT
+                    Value = EvalFACTTYPESTMT(tree, paramlist)
+                    Exit Select
                 Case TokenType.FACTREADINGSTMT
                     Value = EvalFACTREADINGSTMT(tree, paramlist)
                     Exit Select
@@ -343,6 +349,14 @@ Namespace VAQL
         End Function
 
         Protected Overridable Function EvalVALUETYPEISWRITTENASCLAUSE(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalFACTTYPEIDENTIFICATION(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalFACTTYPESTMT(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
             Throw New NotImplementedException()
         End Function
 
