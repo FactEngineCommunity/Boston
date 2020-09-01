@@ -11,7 +11,7 @@ Namespace VAQL
         Private m_scanner As Scanner
         Private m_tree As ParseTree
 
-        Public Sub New(ByVal scanner As Scanner)
+        Public Sub New(ByRef scanner As Scanner)
             m_scanner = scanner
         End Sub
 
@@ -1145,6 +1145,33 @@ Namespace VAQL
             End If
         End Sub ' NonTerminalSymbol: ISACONCEPTCLAUSE
 
+        Private Sub ParseISANENTITYTYPECLAUSE(ByVal parent As ParseNode) ' NonTerminalSymbol: ISANENTITYTYPECLAUSE
+            Dim tok As Token
+            Dim n As ParseNode
+            Dim node As ParseNode = parent.CreateNode(m_scanner.GetToken(TokenType.ISANENTITYTYPECLAUSE), "ISANENTITYTYPECLAUSE")
+            parent.Nodes.Add(node)
+
+            tok = m_scanner.Scan(TokenType.KEYWDISANENTITYTYPE) ' Terminal Rule: KEYWDISANENTITYTYPE
+            n = node.CreateNode(tok, tok.ToString() )
+            node.Token.UpdateRange(tok)
+            node.Nodes.Add(n)
+            If tok.Type <> TokenType.KEYWDISANENTITYTYPE Then
+                m_tree.Errors.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDISANENTITYTYPE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDISANENTITYTYPE"))
+                Return
+
+            End If
+
+            If m_tree.Errors.Count > 0 Then
+                        parent.Token.UpdateRange(node.Token)
+                        Exit Sub
+            End If
+
+            parent.Token.UpdateRange(node.Token)
+            If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
+            m_tree.Optionals.Clear()
+            End If
+        End Sub ' NonTerminalSymbol: ISANENTITYTYPECLAUSE
+
         Private Sub ParseMODELELEMENT(ByVal parent As ParseNode) ' NonTerminalSymbol: MODELELEMENT
             Dim tok As Token
             Dim n As ParseNode
@@ -1706,11 +1733,17 @@ Namespace VAQL
             End If
 
              ' Concat Rule
-            tok = m_scanner.LookAhead(TokenType.KEYWDISACONCEPT, TokenType.PREDICATEPART, TokenType.UNARYPREDICATEPART, TokenType.KEYWDISIDENTIFIEDBYITS, TokenType.KEYWDISWRITTENAS) ' Choice Rule
+            tok = m_scanner.LookAhead(TokenType.KEYWDISACONCEPT, TokenType.KEYWDISANENTITYTYPE, TokenType.PREDICATEPART, TokenType.UNARYPREDICATEPART, TokenType.KEYWDISIDENTIFIEDBYITS, TokenType.KEYWDISWRITTENAS) ' Choice Rule
             Select Case tok.Type
              ' Choice Rule
                 Case TokenType.KEYWDISACONCEPT
                     ParseISACONCEPTCLAUSE(node) ' NonTerminal Rule: ISACONCEPTCLAUSE
+            If m_tree.Errors.Count > 0 Then
+                                parent.Token.UpdateRange(node.Token)
+                                Exit Sub
+            End If
+                Case TokenType.KEYWDISANENTITYTYPE
+                    ParseISANENTITYTYPECLAUSE(node) ' NonTerminal Rule: ISANENTITYTYPECLAUSE
             If m_tree.Errors.Count > 0 Then
                                 parent.Token.UpdateRange(node.Token)
                                 Exit Sub
@@ -1743,6 +1776,7 @@ Namespace VAQL
                 If m_tree.Errors.Count = 0 Then
                 m_tree.Optionals.Clear
                 m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDISACONCEPT.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDISACONCEPT"))
+                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDISACONCEPT.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDISANENTITYTYPE"))
                 m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDISACONCEPT.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "PREDICATEPART"))
                 m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDISACONCEPT.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "UNARYPREDICATEPART"))
                 m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDISACONCEPT.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDISIDENTIFIEDBYITS"))

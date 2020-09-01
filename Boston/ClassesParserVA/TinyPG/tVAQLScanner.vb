@@ -97,7 +97,7 @@ Namespace VAQL
             Patterns.Add(TokenType.MODELNAME, regex)
             Tokens.Add(TokenType.MODELNAME)
 
-            regex = new Regex("(([A-Z][a-z]+)+[\s]?)+", RegexOptions.Compiled)
+            regex = new Regex("(([A-Z][a-z]+)+[_|\s]?)+", RegexOptions.Compiled)
             Patterns.Add(TokenType.MODELELEMENTNAME, regex)
             Tokens.Add(TokenType.MODELELEMENTNAME)
 

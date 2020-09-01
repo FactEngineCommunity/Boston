@@ -759,6 +759,10 @@ Namespace FEQL
                         aoTokenType = FEQL.TokenType.VALUETYPEISWRITTENASSTMT
                         aoParseTree = Me.Parsetree
                         Return Nothing
+                    ElseIf Me.ParseTreeContainsTokenType(Me.Parsetree, FEQL.TokenType.KEYWDISIDENTIFIEDBYITS) Then
+                        aoTokenType = FEQL.TokenType.KEYWDISIDENTIFIEDBYITS
+                        aoParseTree = Me.Parsetree
+                        Return Nothing
                     End If
 
                     Select Case Me.Parsetree.Nodes(0).Nodes(0).Text

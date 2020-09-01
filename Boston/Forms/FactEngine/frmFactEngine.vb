@@ -440,11 +440,11 @@ Public Class frmFactEngine
         Try
             Dim lrRecordset As New ORMQL.Recordset
 
-            If prApplication.WorkingModel.TargetDatabaseConnectionString = "" Then
-                Me.LabelError.ForeColor = Color.Orange
-                Me.LabelError.Text = "The Model needs a database connection string."
-                Exit Sub
-            End If
+            'If prApplication.WorkingModel.TargetDatabaseConnectionString = "" Then
+            '    Me.LabelError.ForeColor = Color.Orange
+            '    Me.LabelError.Text = "The Model needs a database connection string."
+            '    Exit Sub
+            'End If
 
             Me.LabelError.Text = ""
             Dim lsQuery = Me.TextBoxInput.Text.Replace(vbLf, " ")
@@ -456,6 +456,7 @@ Public Class frmFactEngine
             Dim lrFEQLParseTree As FEQL.ParseTree = Nothing
             lrRecordset = Me.FEQLProcessor.ProcessFEQLStatement(lsQuery, lrFEQLTokenType, lrFEQLParseTree)
 
+            '====================================================
             If lrRecordset Is Nothing Then
                 'Make sure the VirtualAnalyst is open
                 Call Me.loadVirtualAnalyst()
@@ -464,9 +465,12 @@ Public Class frmFactEngine
                 Select Case lrFEQLTokenType
                     Case Is = FEQL.TokenType.VALUETYPEISWRITTENASSTMT
                         Call prApplication.Brain.ProcessFEQLStatement(lsQuery)
+                    Case Is = FEQL.TokenType.KEYWDISIDENTIFIEDBYITS
+                        Call prApplication.Brain.ProcessFEQLStatement(lsQuery)
                 End Select
                 Exit Sub
             End If
+            '=====================================================
 
             If lrRecordset.Query IsNot Nothing Then
                 Me.TextBoxQuery.Text = lrRecordset.Query
