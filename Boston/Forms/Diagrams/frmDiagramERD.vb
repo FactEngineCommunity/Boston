@@ -2206,6 +2206,10 @@ Public Class frmDiagramERD
             lrERDLink.Link.Origin.Tag.ResetAttributeCellColours()
             lrERDLink.Link.Destination.Tag.ResetAttributeCellColours()
 
+            'CodeSafe: Exit the sub if the ERDLink has no RDSRelation
+            '20200902-This obviously should not be the case, but it is a worse customer experience if null/nothing exceptions are thrown.
+            If lrERDLink.Relation.RDSRelation Is Nothing Then Exit Sub
+
             '-----------------------------------------------------------------------------------
             'Highlight the Attributes of the Relation
             Dim lrAttribute As ERD.Attribute
@@ -2713,6 +2717,10 @@ Public Class frmDiagramERD
             If e.Link.GetType Is GetType(MindFusion.Diagramming.DiagramLink) Then Exit Sub
 
             lrERDLink = e.Link.Tag
+
+            'CodeSafe: Exit the sub if the lrERDLink has no RDSRelation.
+            '20200902:VM: This is obviously not a good situation, but it is a worse customer/user experience if NULL/Nothing exceptions are thrown.
+            If lrERDLink.Relation.RDSRelation Is Nothing Then Exit Sub
 
             '-----------------------------------------------------------------------------------
             'Highlight the Attributes of the Relation
