@@ -377,6 +377,7 @@ Public Class frmCRUDEditUser
         If Me.ListBoxIncludedInGroups.SelectedIndex = -1 Then Exit Sub
 
         Me.ListBoxProjectsInGroup.Items.Clear()
+        Me.ListBoxWhosInTheGroup.Items.Clear()
 
         Dim lrGroup As ClientServer.Group = Me.ListBoxIncludedInGroups.SelectedItem.Tag
 
@@ -387,6 +388,12 @@ Public Class frmCRUDEditUser
         For Each lrProject In larProject
             lrComboboxItem = New tComboboxItem(lrProject.Id, lrProject.Name, lrProject)
             Me.ListBoxProjectsInGroup.Items.Add(lrComboboxItem)
+        Next
+
+        Dim larUser = tableClientServerGroupUser.GetUsersForGroup(lrGroup)
+        For Each lrUser As ClientServer.User In larUser
+            lrComboboxItem = New tComboboxItem(lrUser.Id, lrUser.FullName, lrUser)
+            Me.ListBoxWhosInTheGroup.Items.Add(lrComboboxItem)
         Next
 
     End Sub
