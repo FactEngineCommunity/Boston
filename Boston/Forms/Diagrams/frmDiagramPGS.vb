@@ -1037,7 +1037,8 @@ Public Class frmDiagramPGS
         End If
 
         If Not TypeOf (e.Node) Is TableNode Then
-            If Me.PropertyTableNode Is Nothing And (Control.ModifierKeys = Keys.Control Or Control.ModifierKeys = Keys.ControlKey) Then
+            If Me.PropertyTableNode Is Nothing And
+                ((Control.ModifierKeys = Keys.Control) Or (Control.ModifierKeys = Keys.ControlKey)) Then
                 Me.PropertyTableNode = Me.zrPage.Diagram.Factory.CreateTableNode(e.Node.Bounds.X, e.Node.Bounds.Y + 25, 30, 20, 1, 0)
                 Me.PropertyTableNode.EnableStyledText = True
                 Me.PropertyTableNode.Caption = "<B>" & " " & lrNode.Name & " "
@@ -1871,7 +1872,7 @@ Public Class frmDiagramPGS
 
         loNode = Diagram.GetNodeAt(lo_point)
 
-        If ModifierKeys = Keys.Control And My.Settings.SuperuserMode Then
+        If (ModifierKeys = (Keys.Control Or Keys.ShiftKey)) And My.Settings.SuperuserMode Then
             For Each lrPGSRelationNode In Me.zrPage.ERDiagram.Entity.FindAll(Function(x) x.getCorrespondingRDSTable.isPGSRelation)
                 lrPGSRelationNode.Shape.Visible = True
                 If Not Me.zrPage.Diagram.Nodes.Contains(lrPGSRelationNode.Shape) Then
