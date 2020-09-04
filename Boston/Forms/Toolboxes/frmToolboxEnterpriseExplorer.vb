@@ -2505,7 +2505,7 @@ Public Class frmToolboxEnterpriseExplorer
                 loStreamWriter.Close()
 
                 If My.Settings.UseClientServer And My.Settings.UseVirtualUI Then
-                    liThinfinity.DownloadFile(lsFileLocationName)
+                    prThinfinity.DownloadFile(lsFileLocationName)
                 End If
 
                 Dim lsMessage As String = ""
@@ -3769,7 +3769,7 @@ Public Class frmToolboxEnterpriseExplorer
                 'loStreamWriter.Close()
 
                 If My.Settings.UseClientServer And My.Settings.UseVirtualUI Then
-                    liThinfinity.DownloadFile(lsFileLocationName)
+                    prThinfinity.DownloadFile(lsFileLocationName)
                 End If
 
                 Dim lsMessage As String = ""

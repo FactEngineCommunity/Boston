@@ -34,13 +34,13 @@
         Private Sub MyApplication_Startup(ByVal sender As Object, ByVal e As Microsoft.VisualBasic.ApplicationServices.StartupEventArgs) Handles Me.Startup
 
             If My.Settings.UseVirtualUI Then
-                Call liThinfinity.Start(15)
-                liThinfinity.AllowExecute("vbc.exe")
+                Call prThinfinity.Start(15)
+                prThinfinity.AllowExecute("vbc.exe")
                 'liThinfinity.DevMode = False
 
                 If My.Settings.UseWindowsAuthenticationVirtualUI Then
                     Dim lrUser As New ClientServer.User
-                    Dim lasUsername() As String = liThinfinity.BrowserInfo.Username.Split("\")
+                    Dim lasUsername() As String = prThinfinity.BrowserInfo.Username.Split("\")
                     lrUser.Username = lasUsername(1)
                     prUser = lrUser
                 End If

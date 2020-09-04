@@ -20,6 +20,6 @@ Public Module publicVariables
     Public prApplicationApplicationVersionNr As String
     Public prApplicationDatabaseVersionNr As String
 
-    Public liThinfinity As New Cybele.Thinfinity.VirtualUI
+    Public prThinfinity As New Cybele.Thinfinity.VirtualUI
 
 End Module

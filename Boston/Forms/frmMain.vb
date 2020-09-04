@@ -74,7 +74,7 @@ Public Class frmMain
             prSoftwareCategory = pcenumSoftwareCategory.Professional
             Me.StatusLabelGeneralStatus.Text = "Software Category Set"
 
-            prApplicationApplicationVersionNr = "5.1" '4.5 was released 7th of November, 2019
+            prApplicationApplicationVersionNr = "5.2" '4.5 was released 7th of November, 2019
             prApplicationDatabaseVersionNr = "1.23"
 
             If Not My.Settings.UseVirtualUI Then
@@ -522,6 +522,7 @@ Public Class frmMain
             If My.Settings.UseClientServer Then
                 Me.ToolStripMenuItemRecentNodes.Visible = False
                 Me.ToolStripSeparator10.Visible = False
+                Me.ToolStripSeparator5.Visible = False
             ElseIf Not My.Settings.UseClientServer Then
                 Me.ToolStripMenuItemUser.Visible = False
                 Me.ToolStripMenuItemProject.Visible = False
@@ -702,7 +703,7 @@ Public Class frmMain
             lrLogEntry.User = prApplication.User
             lrLogEntry.LogType = pcenumLogType.LogOut
             If My.Settings.UseVirtualUI Then
-                lrLogEntry.IPAddress = liThinfinity.BrowserInfo.IPAddress
+                lrLogEntry.IPAddress = prThinfinity.BrowserInfo.IPAddress
             Else
                 lrLogEntry.IPAddress = "NOTHING"
             End If
@@ -3214,6 +3215,8 @@ Public Class frmMain
     End Sub
 
     Private Sub InitializeClient()
+        '20200903-VM-Tested on VM on Azure. Works fine. No configuration required. Just run the BostonServer on the VM first.
+        'The 'Server: Connected' message can be seen in the bottom left corner of the Main form in the status bar.
 
         Try
             If prDuplexServiceClient IsNot Nothing Then
@@ -3614,11 +3617,25 @@ Public Class frmMain
             lrLogEntry.DateTime = Now
             lrLogEntry.LogType = pcenumLogType.LogIn
             lrLogEntry.User = arUser
+
             If My.Settings.UseVirtualUI Then
-                lrLogEntry.IPAddress = liThinfinity.BrowserInfo.IPAddress
+                If prThinfinity.BrowserInfo Is Nothing Then
+                    Dim lsMessage = "Friendly message: 'UseVirtualUI' is configured to 'True', but it seems that you are not running Boston through a browser."
+                    lsMessage &= vbCrLf & vbCrLf & "If you are running Boston through a browser, please contact Viev."
+                    MsgBox(lsMessage)
+                Else
+                    Try
+                        lrLogEntry.IPAddress = prThinfinity.BrowserInfo.IPAddress
+                    Catch ex As Exception
+                        Dim lsMessage = "Friendly message: 'UseVirtualUI' is configured to 'True', but it seems that you are not running Boston through a browser."
+                        lsMessage &= vbCrLf & vbCrLf & "If you are running Boston through a browser, please contact Viev."
+                        MsgBox(lsMessage)
+                    End Try
+                End If
             Else
                 lrLogEntry.IPAddress = "NOTHING"
             End If
+
             Call tableClientServerLog.AddLogEntry(lrLogEntry)
 
             '-------------------------------------

@@ -496,46 +496,56 @@ Partial Public Class tBrain
 
     Private Sub ProcessISANENTITYTYPECLAUSE()
 
-        With New WaitCursor
-            Me.Model = prApplication.WorkingModel
+        Try
+            With New WaitCursor
+                Me.Model = prApplication.WorkingModel
 
-            Me.VAQL.ISANENTITYTYPEStatement.KEYWDISANENTITYTYPE = ""
-            Me.VAQL.ISANENTITYTYPEStatement.MODELELEMENTNAME = ""
+                Me.VAQL.ISANENTITYTYPEStatement.KEYWDISANENTITYTYPE = ""
+                Me.VAQL.ISANENTITYTYPEStatement.MODELELEMENTNAME = ""
 
-            Call Me.VAQL.GetParseTreeTokensReflection(Me.VAQL.ISANENTITYTYPEStatement, Me.VAQLParsetree.Nodes(0))
+                Call Me.VAQL.GetParseTreeTokensReflection(Me.VAQL.ISANENTITYTYPEStatement, Me.VAQLParsetree.Nodes(0))
 
-            Me.Timeout.Stop()
+                Me.Timeout.Stop()
 
-            Dim lsEntityTypeName = Trim(Viev.Strings.MakeCapCamelCase(Me.VAQL.ISANENTITYTYPEStatement.MODELELEMENTNAME))
+                Dim lsEntityTypeName = Trim(Viev.Strings.MakeCapCamelCase(Me.VAQL.ISANENTITYTYPEStatement.MODELELEMENTNAME))
 
-            If Me.Model.ExistsModelElement(lsEntityTypeName) Then
-                Me.send_data("There is already a Model Element with the name, '" & lsEntityTypeName & "'. Try another name")
-                Exit Sub
-            End If
-
-            If Me.Model.ModelDictionary.Find(Function(x) x.Symbol = lsEntityTypeName And x.isEntityType) IsNot Nothing Then
-                Me.send_data("I know.")
-                Exit Sub
-            End If
-
-            'Have already checked to see wither it is okay to create the EntityType above.
-            Dim lrEntityType = Me.Model.CreateEntityType(Trim(lsEntityTypeName), True)
-
-            If Me.Page IsNot Nothing Then
-                Dim lrEnityTypeInstance = Me.Page.DropEntityTypeAtPoint(lrEntityType, New PointF(100, 10)) 'VM-20180329-Me.Page.Form.CreateEntityType(lsEntityTypeName, True)
-
-                Call lrEnityTypeInstance.RepellFromNeighbouringPageObjects(1, False)
-                Call lrEnityTypeInstance.Move(lrEnityTypeInstance.X, lrEnityTypeInstance.Y, True)
-
-                If Me.AutoLayoutOn Then
-                    Me.Page.Form.AutoLayout()
+                If Me.Model.ExistsModelElement(lsEntityTypeName) Then
+                    Me.send_data("There is already a Model Element with the name, '" & lsEntityTypeName & "'. Try another name")
+                    Exit Sub
                 End If
-            End If
 
-            Me.send_data("Ok")
+                If Me.Model.ModelDictionary.Find(Function(x) x.Symbol = lsEntityTypeName And x.isEntityType) IsNot Nothing Then
+                    Me.send_data("I know.")
+                    Exit Sub
+                End If
 
-            Me.Timeout.Start()
-        End With
+                'Have already checked to see wither it is okay to create the EntityType above.
+                Dim lrEntityType = Me.Model.CreateEntityType(Trim(lsEntityTypeName), True)
+
+                If Me.Page IsNot Nothing Then
+                    Dim lrEnityTypeInstance = Me.Page.DropEntityTypeAtPoint(lrEntityType, New PointF(100, 10)) 'VM-20180329-Me.Page.Form.CreateEntityType(lsEntityTypeName, True)
+
+                    Call lrEnityTypeInstance.RepellFromNeighbouringPageObjects(1, False)
+                    Call lrEnityTypeInstance.Move(lrEnityTypeInstance.X, lrEnityTypeInstance.Y, True)
+
+                    If Me.AutoLayoutOn Then
+                        Me.Page.Form.AutoLayout()
+                    End If
+                End If
+
+                Me.send_data("Ok")
+
+                Me.Timeout.Start()
+            End With
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 

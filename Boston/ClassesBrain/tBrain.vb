@@ -3386,50 +3386,10 @@ Public Class tBrain
     Public Sub ProcessFEQLStatement(ByVal asFEQLStatement As String)
 
         Dim loTokenType As VAQL.TokenType
-        Call Me.VAQL.ProcessVAQLStatement(asFEQLStatement, loTokenType, Me.VAQLParsetree)
-        If Me.ProcessVAQLStatement(asFEQLStatement, loTokenType) Then
-            '----------------------------------------------------------------------------------------------
-            'Start the TimeOut so that the Brain can repeatedly address the Sentence until it is resolved
-            '----------------------------------------------------------------------------------------------
-            If Me.Question.Count > 0 Then
-                Me.Timeout.Start() 'Threading jumps to HOUSEKEEPING.OutOfTimeout
-            End If
-            Exit Sub
-        End If
 
-    End Sub
-
-
-    Private Sub ProcessNaturalLanguage()
-
-        Me.Timeout.Stop()
-
-        If Me.InputBuffer = "" Then
-            Exit Sub
-        End If
-
-        '==============================================================================
-        'AIML - At this stage, do AIML processing first
-        '  - If the user input is recognised by the AIML bot, then the Me.InputBuffer stores
-        '  (effectively a statement) what is in the "think.set" element of the corresponding section of the .aiml file.
-        '  The .aiml file for Boston is stored in the \SVN\Boston\AIML delelopment directory.
-        '----------------------------------------------
-        Dim myRequest As New Request(Me.InputBuffer, Me.User, Me.SentenceAnalyser)
-        Dim myResult As Result = Me.SentenceAnalyser.Chat(myRequest)
-        If myResult.Output <> "" Then
-            If myResult.user.Topic = "easteregg" Then
-                Me.send_data(myResult.Output)
-                Exit Sub
-            Else
-                Me.InputBuffer = myResult.user.Topic
-            End If
-        End If
-        '==============================================================================
-
-        If Me.IsVAQLStatement("NL: " & Me.InputBuffer) Then
-            Dim loTokenType As VAQL.TokenType
-            Call Me.VAQL.ProcessVAQLStatement(Me.InputBuffer, loTokenType, Me.VAQLParsetree)
-            If Me.ProcessVAQLStatement(Me.InputBuffer, loTokenType) Then
+        Try
+            Call Me.VAQL.ProcessVAQLStatement(asFEQLStatement, loTokenType, Me.VAQLParsetree)
+            If Me.ProcessVAQLStatement(asFEQLStatement, loTokenType) Then
                 '----------------------------------------------------------------------------------------------
                 'Start the TimeOut so that the Brain can repeatedly address the Sentence until it is resolved
                 '----------------------------------------------------------------------------------------------
@@ -3438,190 +3398,252 @@ Public Class tBrain
                 End If
                 Exit Sub
             End If
-        End If
 
-        '----------------------------------------------------------------------------------------------------------
-        'Check that no "Special Characters" appear in the "Sentence"....because the Brain doesn't understand them.
-        '----------------------------------------------------------------------------------------------------------
-        Dim loRegularExpression As Regex = New Regex("^[a-zA-Z0-9 ()]*$")
-        If (loRegularExpression.IsMatch(Me.InputBuffer)) Then
-            '----------------------------------------------------------------
-            'Great, the sentence doesn't contain characters like '/*-+@&$#%
-            '----------------------------------------------------------------
-        Else
-            Dim lsMessage As String = ""
-            lsMessage = "Oops. I don't understand characters like '/*-+@&$#% in a sentence."
-            Me.send_data(lsMessage)
-            Exit Sub
-        End If
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
-        '-------------------------------------------------------------------------------------------------------------------
-        'Check that no "Special Characters" appear in the "Sentence"....because the Brain doesn't understand them.
-        '  NB IMPORTANT: Second pass because this time we want to exclude characters like "(" and ")" which may 
-        '  have come from a mistyped VAQL Statement (i.e. that was not picked up in the code above).
-        '  i.e. At this stage we're handing over to regular language processing that expects no special characters at all.
-        '-------------------------------------------------------------------------------------------------------------------
-        loRegularExpression = New Regex("^[a-zA-Z0-9 ]*$")
-        If (loRegularExpression.IsMatch(Me.InputBuffer)) Then
-            '----------------------------------------------------------------
-            'Great, the sentence doesn't contain characters like '/*-+@&$#%
-            '----------------------------------------------------------------
-        Else
-            Dim lsMessage As String = ""
-            lsMessage = "Oops. That's not a valid VAQL statement or a sentence that I can understand."
-            Me.send_data(lsMessage)
-            Exit Sub
-        End If
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
-        Dim lsOriginalSentence As String = Me.InputBuffer
-        Me.InputBuffer = LCase(Me.InputBuffer)
+    End Sub
 
-        '----------------------------------------------------
-        'Clear sentence of FullStops etc
-        '----------------------------------------------------        
-        Call Me.CleanSentence(Me.InputBuffer)
 
-        '----------------------------------------------------------------------------------------------------------
-        'Break the Sentence down into Tokens, and where each sentence is a space separated set of Tokens/Symbols.
-        '  Stored in Me.InputSymbols.
-        '----------------------------------------------------------------------------------------------------------
-        Call Me.TokeniseInputBuffer()
+    Private Sub ProcessNaturalLanguage()
 
-        '============================================================================================================
-        'A Sentence can be one of the following
-        '   Directive (including reserved Commands)
-        '   Statement e.g. "All boys are good"
-        '   Question  e.g. "What time is it"
-        '   Salutation e.g. "Hello"
-        '   Fairwell   e.g. "Goodbye"
-        '   Responses to Questions asked by the Brain   e.g. "Yes", "No"
-        '   VAQL or ORMQL  (i.e. Parsable sentences of a query language for direct processing by the Brain)
-        '   Unknown   All Sentences in the Brain start with an 'Unknown' SentenceType
-        '
-        ' The following code eliminates
-        '       'Directives' (including 'Reserved Commands') 
-        '       'Salutations'
-        ' before(processing) 'Questions' and 'Statements' or 'Responses to Questions asked by the Brain'
-        '============================================================================================================
+        Try
 
-        '----------------------------------------------------
-        'Inject the sentense into the Sentence queue/list
-        '  if it isn't a reserved Command.
-        '----------------------------------------------------
-        If Me.CheckCommand(Me.InputBuffer) Then
-            '-------------------------------------------------
-            'The user issued a reserved Command to the Brain
-            '-------------------------------------------------
-            Exit Sub
-        ElseIf Me.CheckDirective Then
-            '-------------------------------------------------
-            'A Directive has been sent to the Brain
-            '-------------------------------------------------
-            Exit Sub
-        ElseIf CheckSalutation(Me.InputBuffer) Then
-            '-------------------------------------------------
-            'A Salutation has been sent to the Brain
-            '-------------------------------------------------
-            Exit Sub
-        ElseIf CheckFarewell(Me.InputBuffer) Then
-            '-------------------------------------------------
-            'A Fairwell has been sent to the Brain
-            '-------------------------------------------------
-            Exit Sub
-        ElseIf CheckThankYou(Me.InputBuffer) Then
-            '-------------------------------------------------
-            'User has thanked the Brain.
-            '-------------------------------------------------
-            Exit Sub
-        ElseIf CheckAskingForHelp(Me.InputBuffer) Then
-            '-------------------------------------------------
-            'User has asked the Brain for Help.
-            '-------------------------------------------------
-            Exit Sub
-        Else
-            '---------------------------------------------------------------------------
-            'The sentence must be a
-            '       "Question" or a
-            '       "Statement" or a
-            '       "A Response to a Question asked by the Brain"
-            ' for further processing
-            '---------------------------------------------------------------------------
-            Me.CurrentSentence = New Language.Sentence(Me.InputBuffer, lsOriginalSentence)
-            Me.Sentence.Insert(0, Me.CurrentSentence)
-        End If
+            Me.Timeout.Stop()
 
-        If IsSomething(Me.CurrentSentence) Then
-
-            '------------------------------------------------------
-            'Questions asked by the user have precedence over the
-            '  computer, so check if the user has a question
-            '------------------------------------------------------
-            Call Me.CheckQuestion(Me.CurrentSentence.Sentence)
-
-            '---------------------------------------------------------------------------------------------------------
-            'Check if the Sentence is a Statement
-            '  Particularly if the sentence is of a format that will allow a FactType to be created for the Sentence
-            '  NB Language.AnalyseSentence does part of speech tagging 
-            '---------------------------------------------------------------------------------------------------------
-            Call Language.AnalyseSentence(Me.CurrentSentence, Me.Model)
-
-            Call Me.ProcessCurrentSentence()
-            If Me.CurrentSentence.AreAllWordsResolved Then
-                Call Language.ResolveSentence(Me.CurrentSentence)
+            If Me.InputBuffer = "" Then
+                Exit Sub
             End If
 
-            If Me.CurrentSentence.POStaggingResolved Then
-                '--------------------------------------------------------------------------------
-                'Populates Me.CurrentSentence.ModelElement and Me.CurrentSentence.PredicatePart 
-                '  if the sentence is a Fact Type declaration (i.e. a valid Fact Type Reading).
-                '--------------------------------------------------------------------------------
-                Call Me.ValidateIfCurrentSentenceIsAFactType()
+            '==============================================================================
+            'AIML - At this stage, do AIML processing first
+            '  - If the user input is recognised by the AIML bot, then the Me.InputBuffer stores
+            '  (effectively a statement) what is in the "think.set" element of the corresponding section of the .aiml file.
+            '  The .aiml file for Boston is stored in the \SVN\Boston\AIML delelopment directory.
+            '----------------------------------------------
+            Dim myRequest As New Request(Me.InputBuffer, Me.User, Me.SentenceAnalyser)
+            Dim myResult As Result = Me.SentenceAnalyser.Chat(myRequest)
+            If myResult.Output <> "" Then
+                If myResult.user.Topic = "easteregg" Then
+                    Me.send_data(myResult.Output)
+                    Exit Sub
+                Else
+                    Me.InputBuffer = myResult.user.Topic
+                End If
+            End If
+            '==============================================================================
+
+            If Me.IsVAQLStatement("NL: " & Me.InputBuffer) Then
+                Dim loTokenType As VAQL.TokenType
+                Call Me.VAQL.ProcessVAQLStatement(Me.InputBuffer, loTokenType, Me.VAQLParsetree)
+                If Me.ProcessVAQLStatement(Me.InputBuffer, loTokenType) Then
+                    '----------------------------------------------------------------------------------------------
+                    'Start the TimeOut so that the Brain can repeatedly address the Sentence until it is resolved
+                    '----------------------------------------------------------------------------------------------
+                    If Me.Question.Count > 0 Then
+                        Me.Timeout.Start() 'Threading jumps to HOUSEKEEPING.OutOfTimeout
+                    End If
+                    Exit Sub
+                End If
             End If
 
-            '------------------------------------------------------
-            'Check to see if the Brain is expecting a response to 
-            '  a question
-            '------------------------------------------------------
-            If Me.AwaitingQuestionResponse Then
-                Call Me.ResponceChecking()
+            '----------------------------------------------------------------------------------------------------------
+            'Check that no "Special Characters" appear in the "Sentence"....because the Brain doesn't understand them.
+            '----------------------------------------------------------------------------------------------------------
+            Dim loRegularExpression As Regex = New Regex("^[a-zA-Z0-9 ()]*$")
+            If (loRegularExpression.IsMatch(Me.InputBuffer)) Then
+                '----------------------------------------------------------------
+                'Great, the sentence doesn't contain characters like '/*-+@&$#%
+                '----------------------------------------------------------------
             Else
-                '--------------------------------
-                'Brain is not awaiting response
-                '-------------------------------------------------------------------------------
-                'Process the Sentence and keep on processing the sentence until it is resolved
-                '  or the user tells the Brain to forget the sentence.
-                '  The OutOfTimeOut method will do this.
-                '-------------------------------------------------------------------------------
-            End If 'Awaiting response
-
-            '------------------------------------------------------------------------------------
-            'A response to a question could abort the current sentence.
-            '------------------------------------------------------------
-            If Me.CurrentSentence Is Nothing Then
-                Exit Sub
-            End If
-
-            If Not Me.CurrentSentence.SentenceType.Contains(pcenumSentenceType.Response) And _
-                Me.CurrentSentence.POStaggingResolved And _
-                (Me.CurrentSentence.ModelElement.Count = 0 Or Me.CurrentSentence.PredicatePart.Count = 0) Then
-                '--------------------------------------------------------------------------
-                'The Sentence is obviously not a Fact Type.
-                '--------------------------------------------
                 Dim lsMessage As String = ""
-                lsMessage = "Sorry, I don't know what you are talking about."
+                lsMessage = "Oops. I don't understand characters like '/*-+@&$#% in a sentence."
                 Me.send_data(lsMessage)
-                Me.CurrentSentence.ResolutionType = pcenumSentenceResolutionType.Unresolved
-                Me.Sentence.Add(Me.CurrentSentence)
-                Me.CurrentSentence = Nothing
                 Exit Sub
             End If
 
-            '----------------------------------------------------------------------------------------------
-            'Start the TimeOut so that the Brain can repeatedly address the Sentence until it is resolved
-            '----------------------------------------------------------------------------------------------
-            Me.Timeout.Start() 'Threading jumps to HOUSEKEEPING.OutOfTimeout
+            '-------------------------------------------------------------------------------------------------------------------
+            'Check that no "Special Characters" appear in the "Sentence"....because the Brain doesn't understand them.
+            '  NB IMPORTANT: Second pass because this time we want to exclude characters like "(" and ")" which may 
+            '  have come from a mistyped VAQL Statement (i.e. that was not picked up in the code above).
+            '  i.e. At this stage we're handing over to regular language processing that expects no special characters at all.
+            '-------------------------------------------------------------------------------------------------------------------
+            loRegularExpression = New Regex("^[a-zA-Z0-9 ]*$")
+            If (loRegularExpression.IsMatch(Me.InputBuffer)) Then
+                '----------------------------------------------------------------
+                'Great, the sentence doesn't contain characters like '/*-+@&$#%
+                '----------------------------------------------------------------
+            Else
+                Dim lsMessage As String = ""
+                lsMessage = "Oops. That's not a valid VAQL statement or a sentence that I can understand."
+                Me.send_data(lsMessage)
+                Exit Sub
+            End If
 
-        End If
+            Dim lsOriginalSentence As String = Me.InputBuffer
+            Me.InputBuffer = LCase(Me.InputBuffer)
+
+            '----------------------------------------------------
+            'Clear sentence of FullStops etc
+            '----------------------------------------------------        
+            Call Me.CleanSentence(Me.InputBuffer)
+
+            '----------------------------------------------------------------------------------------------------------
+            'Break the Sentence down into Tokens, and where each sentence is a space separated set of Tokens/Symbols.
+            '  Stored in Me.InputSymbols.
+            '----------------------------------------------------------------------------------------------------------
+            Call Me.TokeniseInputBuffer()
+
+            '============================================================================================================
+            'A Sentence can be one of the following
+            '   Directive (including reserved Commands)
+            '   Statement e.g. "All boys are good"
+            '   Question  e.g. "What time is it"
+            '   Salutation e.g. "Hello"
+            '   Fairwell   e.g. "Goodbye"
+            '   Responses to Questions asked by the Brain   e.g. "Yes", "No"
+            '   VAQL or ORMQL  (i.e. Parsable sentences of a query language for direct processing by the Brain)
+            '   Unknown   All Sentences in the Brain start with an 'Unknown' SentenceType
+            '
+            ' The following code eliminates
+            '       'Directives' (including 'Reserved Commands') 
+            '       'Salutations'
+            ' before(processing) 'Questions' and 'Statements' or 'Responses to Questions asked by the Brain'
+            '============================================================================================================
+
+            '----------------------------------------------------
+            'Inject the sentense into the Sentence queue/list
+            '  if it isn't a reserved Command.
+            '----------------------------------------------------
+            If Me.CheckCommand(Me.InputBuffer) Then
+                '-------------------------------------------------
+                'The user issued a reserved Command to the Brain
+                '-------------------------------------------------
+                Exit Sub
+            ElseIf Me.CheckDirective Then
+                '-------------------------------------------------
+                'A Directive has been sent to the Brain
+                '-------------------------------------------------
+                Exit Sub
+            ElseIf CheckSalutation(Me.InputBuffer) Then
+                '-------------------------------------------------
+                'A Salutation has been sent to the Brain
+                '-------------------------------------------------
+                Exit Sub
+            ElseIf CheckFarewell(Me.InputBuffer) Then
+                '-------------------------------------------------
+                'A Fairwell has been sent to the Brain
+                '-------------------------------------------------
+                Exit Sub
+            ElseIf CheckThankYou(Me.InputBuffer) Then
+                '-------------------------------------------------
+                'User has thanked the Brain.
+                '-------------------------------------------------
+                Exit Sub
+            ElseIf CheckAskingForHelp(Me.InputBuffer) Then
+                '-------------------------------------------------
+                'User has asked the Brain for Help.
+                '-------------------------------------------------
+                Exit Sub
+            Else
+                '---------------------------------------------------------------------------
+                'The sentence must be a
+                '       "Question" or a
+                '       "Statement" or a
+                '       "A Response to a Question asked by the Brain"
+                ' for further processing
+                '---------------------------------------------------------------------------
+                Me.CurrentSentence = New Language.Sentence(Me.InputBuffer, lsOriginalSentence)
+                Me.Sentence.Insert(0, Me.CurrentSentence)
+            End If
+
+            If IsSomething(Me.CurrentSentence) Then
+
+                '------------------------------------------------------
+                'Questions asked by the user have precedence over the
+                '  computer, so check if the user has a question
+                '------------------------------------------------------
+                Call Me.CheckQuestion(Me.CurrentSentence.Sentence)
+
+                '---------------------------------------------------------------------------------------------------------
+                'Check if the Sentence is a Statement
+                '  Particularly if the sentence is of a format that will allow a FactType to be created for the Sentence
+                '  NB Language.AnalyseSentence does part of speech tagging 
+                '---------------------------------------------------------------------------------------------------------
+                Call Language.AnalyseSentence(Me.CurrentSentence, Me.Model)
+
+                Call Me.ProcessCurrentSentence()
+                If Me.CurrentSentence.AreAllWordsResolved Then
+                    Call Language.ResolveSentence(Me.CurrentSentence)
+                End If
+
+                If Me.CurrentSentence.POStaggingResolved Then
+                    '--------------------------------------------------------------------------------
+                    'Populates Me.CurrentSentence.ModelElement and Me.CurrentSentence.PredicatePart 
+                    '  if the sentence is a Fact Type declaration (i.e. a valid Fact Type Reading).
+                    '--------------------------------------------------------------------------------
+                    Call Me.ValidateIfCurrentSentenceIsAFactType()
+                End If
+
+                '------------------------------------------------------
+                'Check to see if the Brain is expecting a response to 
+                '  a question
+                '------------------------------------------------------
+                If Me.AwaitingQuestionResponse Then
+                    Call Me.ResponceChecking()
+                Else
+                    '--------------------------------
+                    'Brain is not awaiting response
+                    '-------------------------------------------------------------------------------
+                    'Process the Sentence and keep on processing the sentence until it is resolved
+                    '  or the user tells the Brain to forget the sentence.
+                    '  The OutOfTimeOut method will do this.
+                    '-------------------------------------------------------------------------------
+                End If 'Awaiting response
+
+                '------------------------------------------------------------------------------------
+                'A response to a question could abort the current sentence.
+                '------------------------------------------------------------
+                If Me.CurrentSentence Is Nothing Then
+                    Exit Sub
+                End If
+
+                If Not Me.CurrentSentence.SentenceType.Contains(pcenumSentenceType.Response) And
+                    Me.CurrentSentence.POStaggingResolved And
+                    (Me.CurrentSentence.ModelElement.Count = 0 Or Me.CurrentSentence.PredicatePart.Count = 0) Then
+                    '--------------------------------------------------------------------------
+                    'The Sentence is obviously not a Fact Type.
+                    '--------------------------------------------
+                    Dim lsMessage As String = ""
+                    lsMessage = "Sorry, I don't know what you are talking about."
+                    Me.send_data(lsMessage)
+                    Me.CurrentSentence.ResolutionType = pcenumSentenceResolutionType.Unresolved
+                    Me.Sentence.Add(Me.CurrentSentence)
+                    Me.CurrentSentence = Nothing
+                    Exit Sub
+                End If
+
+                '----------------------------------------------------------------------------------------------
+                'Start the TimeOut so that the Brain can repeatedly address the Sentence until it is resolved
+                '----------------------------------------------------------------------------------------------
+                Me.Timeout.Start() 'Threading jumps to HOUSEKEEPING.OutOfTimeout
+
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 
