@@ -1359,6 +1359,8 @@ Public Class frmFactEngine
                     'Nothing at this stage
                 Case Is = FEQL.TokenType.NUMBER, FEQL.TokenType.MATHFUNCTION
                     'Nothing to do here.
+                Case Is = FEQL.TokenType.FOLLOWINGREADINGTEXT
+                    'Nothing to do here.
                 Case Is = FEQL.TokenType.BROPEN
                     Call Me.AddEnterpriseAwareItem("(", liTokenType)
                 Case Is = FEQL.TokenType.PREDICATE

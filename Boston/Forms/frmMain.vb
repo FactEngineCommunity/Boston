@@ -512,6 +512,7 @@ Public Class frmMain
                     Me.ToolStripMenuItemProject.Visible = True
                 Else
                     Me.ToolStripMenuItemOpenLogFile.Visible = False
+                    Me.ToolStripMenuItemTestClientServer.Visible = False
                 End If
             End If
 

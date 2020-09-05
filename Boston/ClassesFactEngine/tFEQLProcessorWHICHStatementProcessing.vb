@@ -384,8 +384,19 @@
             arQueryEdge.WhichClauseType = FactEngine.Constants.pcenumWhichClauseType.AndPredicateWhichModelElement
             arQueryEdge.IsProjectColumn = True
 
-            'Set the BaseNode
-            arQueryEdge.BaseNode = arQueryGraph.HeadNode
+            'Set the BaseNode            
+            If arWHICHCLAUSE.MODELELEMENTNAME.Count = 2 Then
+                Me.MODELELEMENTCLAUSE = New FEQL.MODELELEMENTClause
+                Call Me.GetParseTreeTokensReflection(Me.MODELELEMENTCLAUSE, Me.WHICHCLAUSE.MODELELEMENT(0))
+                lrFBMModelObject = Me.Model.GetModelObjectByName(Me.MODELELEMENTCLAUSE.MODELELEMENTNAME)
+                If lrFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & Me.WHICHCLAUSE.NODE(0).MODELELEMENTNAME & "'.")
+                Dim lrQueryNode = New FactEngine.QueryNode(lrFBMModelObject)
+                lrQueryNode.Alias = Me.MODELELEMENTCLAUSE.MODELELEMENTSUFFIX
+                arQueryGraph.Nodes.AddUnique(lrQueryNode)
+                arQueryEdge.BaseNode = lrQueryNode
+            Else
+                arQueryEdge.BaseNode = arQueryGraph.HeadNode
+            End If
 
             'Get the TargetNode                        
             'Me.MODELELEMENTCLAUSE = New FEQL.MODELELEMENTClause
@@ -599,6 +610,7 @@
             If arWHICHCLAUSE.NODE.Count > 0 Then
                 arQueryEdge.TargetNode.PreboundText = arWHICHCLAUSE.NODE(0).PREBOUNDREADINGTEXT
                 arQueryEdge.TargetNode.PostboundText = arWHICHCLAUSE.NODE(0).POSTBOUNDREADINGTEXT
+                arQueryEdge.TargetNode.Alias = arWHICHCLAUSE.NODE(0).MODELELEMENTSUFFIX
             End If
 
             If lrFBMModelObject.ConceptType = pcenumConceptType.ValueType Then

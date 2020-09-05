@@ -213,6 +213,9 @@
                         lrOriginTable = lrQueryEdge.FBMFactType.getCorrespondingRDSTable
 
                         Dim larRelation = lrOriginTable.getRelations
+
+                        larRelation = larRelation.FindAll(Function(x) (x.DestinationTable.Name = lrQueryEdge.BaseNode.Name) Or
+                                                                       (x.DestinationTable.Name = lrQueryEdge.TargetNode.Name))
                         Dim liTempInd = 0
                         Dim liRelationCounter = 1
                         For Each lrRelation In larRelation
@@ -418,7 +421,7 @@
                                             Where Column.ActiveRole.JoinedORMObject Is lrQueryEdge.TargetNode.FBMModelObject
                                             Select Column).First
 
-                            lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") & lrQueryEdge.BaseNode.Name & "." & lrColumn.Name & " = '" & lrQueryEdge.IdentifierList(0) & "'" & vbCrLf
+                            lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") & lrQueryEdge.BaseNode.Name & Viev.NullVal(lrQueryEdge.BaseNode.Alias, "") & "." & lrColumn.Name & " = '" & lrQueryEdge.IdentifierList(0) & "'" & vbCrLf
                             lbIntialWhere = "AND "
                         Case Else
 
