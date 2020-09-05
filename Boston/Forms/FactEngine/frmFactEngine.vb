@@ -1776,7 +1776,7 @@ Public Class frmFactEngine
             Me.TextBoxInput.ForeColor = Color.Wheat
         Else
             Me.TextBoxInput.BackColor = Color.FromArgb(255, 255, 255)
-            Me.TextBoxInput.ForeColor = Color.Tan
+            Me.TextBoxInput.ForeColor = Color.Sienna
         End If
 
     End Sub
@@ -1788,7 +1788,7 @@ Public Class frmFactEngine
 
         If Me.ToolStripMenuItemLightBackground.Checked Then
             Me.TextBoxInput.BackColor = Color.FromArgb(255, 255, 255)
-            Me.TextBoxInput.ForeColor = Color.Tan
+            Me.TextBoxInput.ForeColor = Color.Sienna
         Else
             Me.TextBoxInput.BackColor = Color.FromArgb(64, 64, 64)
             Me.TextBoxInput.ForeColor = Color.Wheat

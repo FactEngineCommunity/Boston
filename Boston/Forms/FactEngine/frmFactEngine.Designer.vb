@@ -110,9 +110,9 @@ Partial Class frmFactEngine
         Me.TextBoxInput.Dock = System.Windows.Forms.DockStyle.Fill
         Me.TextBoxInput.Font = New System.Drawing.Font("Tahoma", 10.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.TextBoxInput.ForeColor = System.Drawing.Color.Wheat
-        Me.TextBoxInput.Location = New System.Drawing.Point(0, 33)
+        Me.TextBoxInput.Location = New System.Drawing.Point(0, 38)
         Me.TextBoxInput.Name = "TextBoxInput"
-        Me.TextBoxInput.Size = New System.Drawing.Size(1239, 202)
+        Me.TextBoxInput.Size = New System.Drawing.Size(1239, 197)
         Me.TextBoxInput.TabIndex = 2
         Me.TextBoxInput.TabStop = False
         Me.TextBoxInput.Text = ""
@@ -232,7 +232,7 @@ Partial Class frmFactEngine
         Me.ToolStrip1.Location = New System.Drawing.Point(0, 0)
         Me.ToolStrip1.Name = "ToolStrip1"
         Me.ToolStrip1.Padding = New System.Windows.Forms.Padding(0, 0, 3, 0)
-        Me.ToolStrip1.Size = New System.Drawing.Size(1239, 33)
+        Me.ToolStrip1.Size = New System.Drawing.Size(1239, 38)
         Me.ToolStrip1.TabIndex = 3
         Me.ToolStrip1.Text = "ToolStrip1"
         '
@@ -325,11 +325,11 @@ Partial Class frmFactEngine
         '
         Me.LabelError.BackColor = System.Drawing.SystemColors.Control
         Me.LabelError.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.LabelError.Location = New System.Drawing.Point(3, 28)
+        Me.LabelError.Location = New System.Drawing.Point(3, 41)
         Me.LabelError.Multiline = True
         Me.LabelError.Name = "LabelError"
         Me.LabelError.ScrollBars = System.Windows.Forms.ScrollBars.Vertical
-        Me.LabelError.Size = New System.Drawing.Size(1225, 270)
+        Me.LabelError.Size = New System.Drawing.Size(1225, 257)
         Me.LabelError.TabIndex = 1
         '
         'ToolStrip2
@@ -338,7 +338,7 @@ Partial Class frmFactEngine
         Me.ToolStrip2.Location = New System.Drawing.Point(3, 3)
         Me.ToolStrip2.Name = "ToolStrip2"
         Me.ToolStrip2.Padding = New System.Windows.Forms.Padding(0, 0, 3, 0)
-        Me.ToolStrip2.Size = New System.Drawing.Size(1225, 25)
+        Me.ToolStrip2.Size = New System.Drawing.Size(1225, 38)
         Me.ToolStrip2.TabIndex = 2
         Me.ToolStrip2.Text = "ToolStrip2"
         '
