@@ -1766,4 +1766,33 @@ Public Class frmFactEngine
 
     End Sub
 
+    Private Sub ToolStripMenuItemDarkBackground_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItemDarkBackground.Click
+
+        Me.ToolStripMenuItemDarkBackground.Checked = Not Me.ToolStripMenuItemDarkBackground.Checked
+        Me.ToolStripMenuItemLightBackground.Checked = Not Me.ToolStripMenuItemDarkBackground.Checked
+
+        If Me.ToolStripMenuItemDarkBackground.Checked Then
+            Me.TextBoxInput.BackColor = Color.FromArgb(64, 64, 64)
+            Me.TextBoxInput.ForeColor = Color.Wheat
+        Else
+            Me.TextBoxInput.BackColor = Color.FromArgb(255, 255, 255)
+            Me.TextBoxInput.ForeColor = Color.Tan
+        End If
+
+    End Sub
+
+    Private Sub ToolStripMenuItemLightBackground_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItemLightBackground.Click
+
+        Me.ToolStripMenuItemLightBackground.Checked = Not Me.ToolStripMenuItemLightBackground.Checked
+        Me.ToolStripMenuItemDarkBackground.Checked = Not Me.ToolStripMenuItemLightBackground.Checked
+
+        If Me.ToolStripMenuItemLightBackground.Checked Then
+            Me.TextBoxInput.BackColor = Color.FromArgb(255, 255, 255)
+            Me.TextBoxInput.ForeColor = Color.Tan
+        Else
+            Me.TextBoxInput.BackColor = Color.FromArgb(64, 64, 64)
+            Me.TextBoxInput.ForeColor = Color.Wheat
+        End If
+
+    End Sub
 End Class
