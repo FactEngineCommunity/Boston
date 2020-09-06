@@ -438,248 +438,250 @@ Public Class frmFactEngine
     Private Sub GO()
 
         Try
-            Dim lrRecordset As New ORMQL.Recordset
+            With New WaitCursor
+                Dim lrRecordset As New ORMQL.Recordset
 
-            'If prApplication.WorkingModel.TargetDatabaseConnectionString = "" Then
-            '    Me.LabelError.ForeColor = Color.Orange
-            '    Me.LabelError.Text = "The Model needs a database connection string."
-            '    Exit Sub
-            'End If
+                'If prApplication.WorkingModel.TargetDatabaseConnectionString = "" Then
+                '    Me.LabelError.ForeColor = Color.Orange
+                '    Me.LabelError.Text = "The Model needs a database connection string."
+                '    Exit Sub
+                'End If
 
-            Me.LabelError.Text = ""
-            Dim lsQuery = Me.TextBoxInput.Text.Replace(vbLf, " ")
-            If Me.TextBoxInput.SelectionLength > 0 Then
-                lsQuery = Me.TextBoxInput.SelectedText
-            End If
+                Me.LabelError.Text = ""
+                Dim lsQuery = Me.TextBoxInput.Text.Replace(vbLf, " ")
+                If Me.TextBoxInput.SelectionLength > 0 Then
+                    lsQuery = Me.TextBoxInput.SelectedText
+                End If
 
-            Dim lrFEQLTokenType As FEQL.TokenType = Nothing
-            Dim lrFEQLParseTree As FEQL.ParseTree = Nothing
-            lrRecordset = Me.FEQLProcessor.ProcessFEQLStatement(lsQuery, lrFEQLTokenType, lrFEQLParseTree)
+                Dim lrFEQLTokenType As FEQL.TokenType = Nothing
+                Dim lrFEQLParseTree As FEQL.ParseTree = Nothing
+                lrRecordset = Me.FEQLProcessor.ProcessFEQLStatement(lsQuery, lrFEQLTokenType, lrFEQLParseTree)
 
-            '====================================================
-            If lrRecordset Is Nothing Then
-                'Make sure the VirtualAnalyst is open
-                Call Me.loadVirtualAnalyst()
+                '====================================================
+                If lrRecordset Is Nothing Then
+                    'Make sure the VirtualAnalyst is open
+                    Call Me.loadVirtualAnalyst()
 
-                'Pass the FEQL Statement to the Brain.
-                Select Case lrFEQLTokenType
-                    Case Is = FEQL.TokenType.VALUETYPEISWRITTENASSTMT
-                        Call prApplication.Brain.ProcessFEQLStatement(lsQuery)
-                    Case Is = FEQL.TokenType.KEYWDISIDENTIFIEDBYITS
-                        Call prApplication.Brain.ProcessFEQLStatement(lsQuery)
-                    Case Is = FEQL.TokenType.KEYWDISWHERE
-                        Call prApplication.Brain.ProcessFEQLStatement(lsQuery)
-                End Select
-                Exit Sub
-            End If
-            '=====================================================
+                    'Pass the FEQL Statement to the Brain.
+                    Select Case lrFEQLTokenType
+                        Case Is = FEQL.TokenType.VALUETYPEISWRITTENASSTMT
+                            Call prApplication.Brain.ProcessFEQLStatement(lsQuery)
+                        Case Is = FEQL.TokenType.KEYWDISIDENTIFIEDBYITS
+                            Call prApplication.Brain.ProcessFEQLStatement(lsQuery)
+                        Case Is = FEQL.TokenType.KEYWDISWHERE
+                            Call prApplication.Brain.ProcessFEQLStatement(lsQuery)
+                    End Select
+                    Exit Sub
+                End If
+                '=====================================================
 
-            If lrRecordset.Query IsNot Nothing Then
-                Me.TextBoxQuery.Text = lrRecordset.Query
-            End If
+                If lrRecordset.Query IsNot Nothing Then
+                    Me.TextBoxQuery.Text = lrRecordset.Query
+                End If
 
-            If lrRecordset.ErrorString IsNot Nothing Then
-                Me.LabelError.BringToFront()
-                Me.LabelError.Text = lrRecordset.ErrorString
-                Me.TabControl1.SelectedTab = Me.TabPageResults
-            Else
-                Select Case lrRecordset.StatementType
-                    Case Is = FactEngine.pcenumFEQLStatementType.DESCRIBEStatement
-                        Call Me.DesbribeModelElement(lrRecordset.ModelElement)
+                If lrRecordset.ErrorString IsNot Nothing Then
+                    Me.LabelError.BringToFront()
+                    Me.LabelError.Text = lrRecordset.ErrorString
+                    Me.TabControl1.SelectedTab = Me.TabPageResults
+                Else
+                    Select Case lrRecordset.StatementType
+                        Case Is = FactEngine.pcenumFEQLStatementType.DESCRIBEStatement
+                            Call Me.DesbribeModelElement(lrRecordset.ModelElement)
 
-                    Case Is = FactEngine.pcenumFEQLStatementType.SHOWStatement
-                        Call Me.ShowModelElement(lrRecordset.ModelElement)
+                        Case Is = FactEngine.pcenumFEQLStatementType.SHOWStatement
+                            Call Me.ShowModelElement(lrRecordset.ModelElement)
 
-                    Case Else
+                        Case Else
 
-                        Me.LabelError.Text = ""
-
-                        If lrRecordset.Facts.Count = 0 Then
-                            Me.LabelError.ForeColor = Color.Orange
-                            Me.LabelError.Text = "No results returned"
-                        Else
-                            Me.LabelError.ForeColor = Color.Black
                             Me.LabelError.Text = ""
 
-                            If lrRecordset.Warning.Count > 0 Then
-                                For Each lsWarning In lrRecordset.Warning
-                                    Me.LabelError.Text &= lsWarning & vbCrLf
+                            If lrRecordset.Facts.Count = 0 Then
+                                Me.LabelError.ForeColor = Color.Orange
+                                Me.LabelError.Text = "No results returned"
+                            Else
+                                Me.LabelError.ForeColor = Color.Black
+                                Me.LabelError.Text = ""
+
+                                If lrRecordset.Warning.Count > 0 Then
+                                    For Each lsWarning In lrRecordset.Warning
+                                        Me.LabelError.Text &= lsWarning & vbCrLf
+                                    Next
+                                    Me.LabelError.Text &= vbCrLf
+                                End If
+
+                                Dim liInd = 0
+                                For Each lsColumnName In lrRecordset.Columns
+                                    liInd += 1
+                                    Me.LabelError.Text &= " " & lsColumnName & " "
+                                    If liInd < lrRecordset.Columns.Count Then Me.LabelError.Text &= ","
                                 Next
-                                Me.LabelError.Text &= vbCrLf
-                            End If
-
-                            Dim liInd = 0
-                            For Each lsColumnName In lrRecordset.Columns
-                                liInd += 1
-                                Me.LabelError.Text &= " " & lsColumnName & " "
-                                If liInd < lrRecordset.Columns.Count Then Me.LabelError.Text &= ","
-                            Next
-                            Me.LabelError.Text &= vbCrLf & "=======================================" & vbCrLf
+                                Me.LabelError.Text &= vbCrLf & "=======================================" & vbCrLf
 
 
 
-                            'For the GraphView
-                            Dim lrTable = New RDS.Table(prApplication.WorkingModel.RDS, "DummyTable", Nothing)
-                            Dim larColumn As New List(Of RDS.Column)
-                            Me.GraphNodes.Clear()
-                            Me.Diagram.Nodes.Clear()
+                                'For the GraphView
+                                Dim lrTable = New RDS.Table(prApplication.WorkingModel.RDS, "DummyTable", Nothing)
+                                Dim larColumn As New List(Of RDS.Column)
+                                Me.GraphNodes.Clear()
+                                Me.Diagram.Nodes.Clear()
 
-                            For Each lrFact In lrRecordset.Facts
-                                Me.LabelError.Text &= lrFact.EnumerateAsBracketedFact(True) & vbCrLf
-                            Next
+                                For Each lrFact In lrRecordset.Facts
+                                    Me.LabelError.Text &= lrFact.EnumerateAsBracketedFact(True) & vbCrLf
+                                Next
 
 #Region "GraphView"
-                            For Each lrFact In lrRecordset.Facts
+                                For Each lrFact In lrRecordset.Facts
 
-                                Dim larTupleNode As New List(Of FactEngine.DisplayGraph.Node)
-                                Dim liColumnInd = 0
-                                Dim lrNodeColumn As RDS.Column
+                                    Dim larTupleNode As New List(Of FactEngine.DisplayGraph.Node)
+                                    Dim liColumnInd = 0
+                                    Dim lrNodeColumn As RDS.Column
 
-                                If lrRecordset.QueryGraph Is Nothing Then Exit For
+                                    If lrRecordset.QueryGraph Is Nothing Then Exit For
 
-                                Dim larProjectionColumn = lrRecordset.QueryGraph.ProjectionColumn
+                                    Dim larProjectionColumn = lrRecordset.QueryGraph.ProjectionColumn
 
-                                'Set up color numbers
-                                Dim liProjectionColumnInd = 0
-                                Dim liProjectionColumnInd2 As Integer
-                                For liProjectionColumnInd = 0 To larProjectionColumn.Count - 1
-                                    If liProjectionColumnInd = 0 Then
-                                        larProjectionColumn(0).ProjectionOrdinalPosition = 1
-                                    ElseIf larProjectionColumn(liProjectionColumnInd).ProjectionOrdinalPosition <> 0 Then
-                                        'Don't do anything because has already been set
-                                    Else
-                                        Dim liMax = (From ProjectionColumn In larProjectionColumn
-                                                     Select ProjectionColumn.ProjectionOrdinalPosition).Max
-                                        larProjectionColumn(liProjectionColumnInd).ProjectionOrdinalPosition = liMax + 1
-                                    End If
-                                    For liProjectionColumnInd2 = liProjectionColumnInd + 1 To larProjectionColumn.Count - 1
-                                        If larProjectionColumn(liProjectionColumnInd2).Table.Name = larProjectionColumn(liProjectionColumnInd).Table.Name Then
-                                            larProjectionColumn(liProjectionColumnInd2).ProjectionOrdinalPosition = larProjectionColumn(liProjectionColumnInd).ProjectionOrdinalPosition
+                                    'Set up color numbers
+                                    Dim liProjectionColumnInd = 0
+                                    Dim liProjectionColumnInd2 As Integer
+                                    For liProjectionColumnInd = 0 To larProjectionColumn.Count - 1
+                                        If liProjectionColumnInd = 0 Then
+                                            larProjectionColumn(0).ProjectionOrdinalPosition = 1
+                                        ElseIf larProjectionColumn(liProjectionColumnInd).ProjectionOrdinalPosition <> 0 Then
+                                            'Don't do anything because has already been set
+                                        Else
+                                            Dim liMax = (From ProjectionColumn In larProjectionColumn
+                                                         Select ProjectionColumn.ProjectionOrdinalPosition).Max
+                                            larProjectionColumn(liProjectionColumnInd).ProjectionOrdinalPosition = liMax + 1
                                         End If
-                                    Next
-                                Next
-
-                                For Each lrRDSColumn In larProjectionColumn
-
-                                    Dim lrTempGraphNode = larTupleNode.Find(Function(x) x.Type = lrRDSColumn.GraphNodeType And
-                                                                                    x.Alias = lrRDSColumn.TemporaryAlias)
-                                    If lrTempGraphNode Is Nothing Then
-                                        larColumn = New List(Of RDS.Column)
-                                        lrNodeColumn = lrRDSColumn.Clone(Nothing, Nothing)
-                                        lrNodeColumn.TemporaryData = lrFact.Data(liColumnInd).Data
-                                        larColumn.Add(lrNodeColumn)
-                                        Dim lrGraphNode = New FactEngine.DisplayGraph.Node(Me.Diagram,
-                                                                            lrTable,
-                                                                            larColumn,
-                                                                            lrNodeColumn.GraphNodeType,
-                                                                            lrNodeColumn.TemporaryData,
-                                                                            lrNodeColumn.TemporaryAlias,
-                                                                            New List(Of FactEngine.DisplayGraph.Edge)
-                                                                            )
-                                        lrGraphNode.OrdinalPosition = lrNodeColumn.ProjectionOrdinalPosition
-                                        larTupleNode.AddUnique(lrGraphNode)
-                                    Else
-                                        lrNodeColumn = lrRDSColumn.Clone(Nothing, Nothing)
-                                        lrNodeColumn.TemporaryData = lrFact.Data(liColumnInd).Data
-                                        lrTempGraphNode.Column.AddUnique(lrNodeColumn)
-                                        Dim lrQueryEdgeAssurityColumn = lrTempGraphNode.Column.Find(AddressOf lrNodeColumn.Equals)
-                                        If lrQueryEdgeAssurityColumn IsNot Nothing Then
-                                            lrQueryEdgeAssurityColumn.QueryEdge = lrNodeColumn.QueryEdge
-                                        End If
-
-                                        lrTempGraphNode.OrdinalPosition = lrNodeColumn.ProjectionOrdinalPosition
-                                        larTupleNode.AddUnique(lrTempGraphNode)
-                                    End If
-
-                                    liColumnInd += 1
-                                Next
-
-                                For Each lrTupleNode In larTupleNode
-                                    lrTupleNode.Name = ""
-                                    For Each lrColumn In lrTupleNode.Column.FindAll(Function(x) x.IsPartOfUniqueIdentifier)
-                                        lrTupleNode.Name &= lrColumn.TemporaryData & " "
-                                    Next
-                                    lrTupleNode.Name = Trim(lrTupleNode.Name)
-                                    Dim lrActualGraphNode = Me.GraphNodes.Find(Function(x) x.Type = lrTupleNode.Type And
-                                                                                       x.Name = lrTupleNode.Name)
-                                    If lrActualGraphNode Is Nothing Then
-                                        Me.GraphNodes.Add(lrTupleNode)
-                                    End If
-                                Next
-
-                                liInd = 1
-                                For Each lrTupleNode In larTupleNode.ToArray
-                                    Dim lrActualGraphNode = Me.GraphNodes.Find(Function(x) x.Type = lrTupleNode.Type And
-                                                                                       x.Name = lrTupleNode.Name)
-
-                                    'Edge/s based on the TupleNode Column's QueryEdge
-                                    If liInd > 1 And lrActualGraphNode.Column(0).QueryEdge IsNot Nothing Then
-                                        Dim lrBaseTupleNode = larTupleNode.Find(Function(x) x.Type = lrActualGraphNode.Column(0).QueryEdge.BaseNode.Name And
-                                                                                        x.Alias = lrActualGraphNode.Column(0).QueryEdge.BaseNode.Alias)
-
-                                        If lrBaseTupleNode IsNot Nothing Then
-                                            Dim lrBaseGraphNode = Me.GraphNodes.Find(Function(x) x.Type = lrBaseTupleNode.Type And
-                                                                                         x.Name = lrBaseTupleNode.Name)
-                                            Dim lrEdge As New FactEngine.DisplayGraph.Edge(lrBaseGraphNode, lrActualGraphNode)
-
-                                            If lrBaseGraphNode Is Nothing Then
-                                                Throw New Exception("frmFactEngine.GO: BaseGraphNode is Nothing.")
+                                        For liProjectionColumnInd2 = liProjectionColumnInd + 1 To larProjectionColumn.Count - 1
+                                            If larProjectionColumn(liProjectionColumnInd2).Table.Name = larProjectionColumn(liProjectionColumnInd).Table.Name Then
+                                                larProjectionColumn(liProjectionColumnInd2).ProjectionOrdinalPosition = larProjectionColumn(liProjectionColumnInd).ProjectionOrdinalPosition
                                             End If
-                                            lrBaseGraphNode.Edge.Add(lrEdge)
+                                        Next
+                                    Next
+
+                                    For Each lrRDSColumn In larProjectionColumn
+
+                                        Dim lrTempGraphNode = larTupleNode.Find(Function(x) x.Type = lrRDSColumn.GraphNodeType And
+                                                                                        x.Alias = lrRDSColumn.TemporaryAlias)
+                                        If lrTempGraphNode Is Nothing Then
+                                            larColumn = New List(Of RDS.Column)
+                                            lrNodeColumn = lrRDSColumn.Clone(Nothing, Nothing)
+                                            lrNodeColumn.TemporaryData = lrFact.Data(liColumnInd).Data
+                                            larColumn.Add(lrNodeColumn)
+                                            Dim lrGraphNode = New FactEngine.DisplayGraph.Node(Me.Diagram,
+                                                                                lrTable,
+                                                                                larColumn,
+                                                                                lrNodeColumn.GraphNodeType,
+                                                                                lrNodeColumn.TemporaryData,
+                                                                                lrNodeColumn.TemporaryAlias,
+                                                                                New List(Of FactEngine.DisplayGraph.Edge)
+                                                                                )
+                                            lrGraphNode.OrdinalPosition = lrNodeColumn.ProjectionOrdinalPosition
+                                            larTupleNode.AddUnique(lrGraphNode)
+                                        Else
+                                            lrNodeColumn = lrRDSColumn.Clone(Nothing, Nothing)
+                                            lrNodeColumn.TemporaryData = lrFact.Data(liColumnInd).Data
+                                            lrTempGraphNode.Column.AddUnique(lrNodeColumn)
+                                            Dim lrQueryEdgeAssurityColumn = lrTempGraphNode.Column.Find(AddressOf lrNodeColumn.Equals)
+                                            If lrQueryEdgeAssurityColumn IsNot Nothing Then
+                                                lrQueryEdgeAssurityColumn.QueryEdge = lrNodeColumn.QueryEdge
+                                            End If
+
+                                            lrTempGraphNode.OrdinalPosition = lrNodeColumn.ProjectionOrdinalPosition
+                                            larTupleNode.AddUnique(lrTempGraphNode)
                                         End If
-                                    End If
-                                    liInd += 1
+
+                                        liColumnInd += 1
+                                    Next
+
+                                    For Each lrTupleNode In larTupleNode
+                                        lrTupleNode.Name = ""
+                                        For Each lrColumn In lrTupleNode.Column.FindAll(Function(x) x.IsPartOfUniqueIdentifier)
+                                            lrTupleNode.Name &= lrColumn.TemporaryData & " "
+                                        Next
+                                        lrTupleNode.Name = Trim(lrTupleNode.Name)
+                                        Dim lrActualGraphNode = Me.GraphNodes.Find(Function(x) x.Type = lrTupleNode.Type And
+                                                                                           x.Name = lrTupleNode.Name)
+                                        If lrActualGraphNode Is Nothing Then
+                                            Me.GraphNodes.Add(lrTupleNode)
+                                        End If
+                                    Next
+
+                                    liInd = 1
+                                    For Each lrTupleNode In larTupleNode.ToArray
+                                        Dim lrActualGraphNode = Me.GraphNodes.Find(Function(x) x.Type = lrTupleNode.Type And
+                                                                                           x.Name = lrTupleNode.Name)
+
+                                        'Edge/s based on the TupleNode Column's QueryEdge
+                                        If liInd > 1 And lrActualGraphNode.Column(0).QueryEdge IsNot Nothing Then
+                                            Dim lrBaseTupleNode = larTupleNode.Find(Function(x) x.Type = lrActualGraphNode.Column(0).QueryEdge.BaseNode.Name And
+                                                                                            x.Alias = lrActualGraphNode.Column(0).QueryEdge.BaseNode.Alias)
+
+                                            If lrBaseTupleNode IsNot Nothing Then
+                                                Dim lrBaseGraphNode = Me.GraphNodes.Find(Function(x) x.Type = lrBaseTupleNode.Type And
+                                                                                             x.Name = lrBaseTupleNode.Name)
+                                                Dim lrEdge As New FactEngine.DisplayGraph.Edge(lrBaseGraphNode, lrActualGraphNode)
+
+                                                If lrBaseGraphNode Is Nothing Then
+                                                    Throw New Exception("frmFactEngine.GO: BaseGraphNode is Nothing.")
+                                                End If
+                                                lrBaseGraphNode.Edge.Add(lrEdge)
+                                            End If
+                                        End If
+                                        liInd += 1
+                                    Next
+
+
                                 Next
 
+                                For Each lrNode In Me.GraphNodes
+                                    Call lrNode.DisplayAndAssociate()
+                                Next
 
-                            Next
+                                Dim larEdge = From Node In Me.GraphNodes
+                                              From Edge In Node.Edge
+                                              Select Edge
 
-                            For Each lrNode In Me.GraphNodes
-                                Call lrNode.DisplayAndAssociate()
-                            Next
+                                For Each lrEdge In larEdge
 
-                            Dim larEdge = From Node In Me.GraphNodes
-                                          From Edge In Node.Edge
-                                          Select Edge
+                                    If lrEdge.BaseNode.Shape Is Nothing Or lrEdge.TargetNode.Shape Is Nothing Then
+                                        Throw New Exception("frmFactEngine.GO: lrEdge.BaseNode.Shape Is Nothing Or lrEdge.TargetNode.Shape Is Nothing")
+                                    End If
+                                    Dim lrPGSLink As New MindFusion.Diagramming.DiagramLink(Me.Diagram,
+                                                                                            lrEdge.BaseNode.Shape,
+                                                                                            lrEdge.TargetNode.Shape)
 
-                            For Each lrEdge In larEdge
+                                    lrPGSLink.Style = MindFusion.Diagramming.LinkStyle.Polyline
 
-                                If lrEdge.BaseNode.Shape Is Nothing Or lrEdge.TargetNode.Shape Is Nothing Then
-                                    Throw New Exception("frmFactEngine.GO: lrEdge.BaseNode.Shape Is Nothing Or lrEdge.TargetNode.Shape Is Nothing")
-                                End If
-                                Dim lrPGSLink As New MindFusion.Diagramming.DiagramLink(Me.Diagram,
-                                                                                        lrEdge.BaseNode.Shape,
-                                                                                        lrEdge.TargetNode.Shape)
+                                    lrPGSLink.SnapToNodeBorder = True
+                                    lrPGSLink.ShadowColor = Color.White
+                                    lrPGSLink.Brush = New MindFusion.Drawing.SolidBrush(Drawing.Color.DeepSkyBlue)
+                                    lrPGSLink.Pen.Color = Drawing.Color.DeepSkyBlue
+                                    'lrPGSLink.Text = Me.SentData(0)
+                                    lrPGSLink.HeadPen.Color = Drawing.Color.DeepSkyBlue
+                                    lrPGSLink.AutoRoute = False
+                                    lrPGSLink.Locked = True
 
-                                lrPGSLink.Style = MindFusion.Diagramming.LinkStyle.Polyline
+                                    'lrPGSLink.Tag = Me
+                                    'Me.Link = lrPGSLink                                
 
-                                lrPGSLink.SnapToNodeBorder = True
-                                lrPGSLink.ShadowColor = Color.White
-                                lrPGSLink.Brush = New MindFusion.Drawing.SolidBrush(Drawing.Color.DeepSkyBlue)
-                                lrPGSLink.Pen.Color = Drawing.Color.DeepSkyBlue
-                                'lrPGSLink.Text = Me.SentData(0)
-                                lrPGSLink.HeadPen.Color = Drawing.Color.DeepSkyBlue
-                                lrPGSLink.AutoRoute = False
-                                lrPGSLink.Locked = True
+                                    Me.Diagram.Links.Add(lrPGSLink)
+                                Next
 
-                                'lrPGSLink.Tag = Me
-                                'Me.Link = lrPGSLink                                
-
-                                Me.Diagram.Links.Add(lrPGSLink)
-                            Next
-
-                            Call Me.autoLayout()
+                                Call Me.autoLayout()
 #End Region
 
-                        End If
-                End Select
-            End If
+                            End If
+                    End Select
+                End If
 
-            If Me.TabControl1.SelectedTab.Name = Me.TabPageGraph.Name Then
-            Else
-                Me.TabControl1.SelectedTab = Me.TabPageResults
-                Me.TabPageResults.Show()
-            End If
+                If Me.TabControl1.SelectedTab.Name = Me.TabPageGraph.Name Then
+                Else
+                    Me.TabControl1.SelectedTab = Me.TabPageResults
+                    Me.TabPageResults.Show()
+                End If
+            End With
 
         Catch ex As Exception
             Dim lsMessage As String

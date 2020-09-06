@@ -3895,6 +3895,14 @@ Public Class frmToolboxEnterpriseExplorer
 
     Private Sub ContextMenuStrip_ORMModel_Opening(sender As Object, e As System.ComponentModel.CancelEventArgs) Handles ContextMenuStrip_ORMModel.Opening
 
+        If prApplication.User IsNot Nothing Then 'Is nothing if not using Client/Server.
+            If prApplication.User.IsSuperuser Or prApplication.User.Function.Contains(pcenumFunction.FullPermission) Then
+                Me.ToolStripMenuItemModelConfiguration.Enabled = True
+            Else
+                Me.ToolStripMenuItemModelConfiguration.Enabled = False
+            End If
+        End If
+
     End Sub
 
     Private Sub TreeView_DragLeave(sender As Object, e As EventArgs) Handles TreeView.DragLeave

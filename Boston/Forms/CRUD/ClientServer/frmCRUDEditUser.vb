@@ -35,7 +35,12 @@ Public Class frmCRUDEditUser
             Me.LabelPromptAvailableRoles.Visible = False
         End If
 
-        If Not Me.zrUser.Function.Contains(pcenumFunction.RemoveRoleFromUser) Then
+        If Me.zrUser.Function.Contains(pcenumFunction.RemoveRoleFromUser) _
+            Or Me.zrUser.Function.Contains(pcenumFunction.FullPermission) _
+            Or prApplication.User.IsSuperuser Then
+            Me.ButtonExcludeRole.Visible = True
+            Me.ButtonExcludeRole.Enabled = True
+        Else
             Me.ButtonExcludeRole.Visible = False
         End If
 
