@@ -267,7 +267,7 @@ Public Class frmAutoComplete
 
         'obj.FormBorderStyle = FormBorderStyle.None
 
-        obj.BackColor = Color.GhostWhite
+        obj.BackColor = Me.BackColor 'Color.GhostWhite
 
         Dim DGP As New Drawing2D.GraphicsPath
         DGP.StartFigure()

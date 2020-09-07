@@ -17,6 +17,8 @@ Public Class frmFactEngine
 
     Private GraphNodes As New List(Of FactEngine.DisplayGraph.Node)
 
+    Private miDefaultForeColour As Color = Color.Wheat
+
     Public Sub autoLayout()
 
         '---------------------------------------------------------------------------------------
@@ -268,19 +270,47 @@ Public Class frmFactEngine
                         Me.LabelError.Text &= vbCrLf & vbCrLf
                         For Each lrCOlumn In lrTable.Column
                             Dim lsString = String.Format("{0,6}{1,-" & 20 - lrCOlumn.Name.Length & "}{2}", lrCOlumn.Name, " ", lrCOlumn.getMetamodelDataType.ToString)
-                            Me.LabelError.Text &= lsString & vbCrLf
+                            Me.LabelError.Text &= lsString
+                            If lrCOlumn.getMetamodelDataTypeLength <> 0 Then
+                                Me.LabelError.Text &= "(" & lrCOlumn.getMetamodelDataTypeLength.ToString
+                                If lrCOlumn.getMetamodelDataTypePrecision <> 0 Then
+                                    Me.LabelError.Text &= "," & lrCOlumn.getMetamodelDataTypePrecision.ToString & ")"
+                                Else
+                                    Me.LabelError.Text &= ")"
+                                End If
+                            End If
+                            Me.LabelError.Text &= vbCrLf
                         Next
 
                         Me.LabelError.Text &= vbCrLf & vbCrLf
                         Me.LabelError.Text &= "Relations" & vbCrLf & vbCrLf
 
-                        For Each lrRelation In lrTable.getOutgoingRelations
+                        Dim larRelation As New List(Of RDS.Relation)
+
+                        larRelation.AddRange(lrTable.getOutgoingRelations)
+                        For Each lrRelation In lrTable.getIncomingRelations
+                            larRelation.AddUnique(lrRelation)
+                        Next
+
+                        For Each lrRelation In larRelation
 
                             Dim lrFactType = lrRelation.ResponsibleFactType
-
-                            Dim lrFactTypeReading = lrFactType.getOutgoingFactTypeReadingForTabe(lrTable)
-                            Me.LabelError.Text &= lrFactTypeReading.GetReadingTextCQL & vbCrLf
-
+                            Dim lrFactTypeReading As FBM.FactTypeReading
+                            If lrRelation.OriginTable Is lrTable Then
+                                lrFactTypeReading = lrFactType.getOutgoingFactTypeReadingForTabe(lrTable)
+                                If lrFactTypeReading IsNot Nothing Then
+                                    Me.LabelError.Text &= lrFactTypeReading.GetReadingTextCQL & vbCrLf
+                                Else
+                                    Me.LabelError.Text &= lrFactType.Id & "(requires a Fact Type Reading)"
+                                End If
+                            Else
+                                lrFactTypeReading = lrFactType.FactTypeReading.First
+                                If lrFactTypeReading IsNot Nothing Then
+                                    Me.LabelError.Text &= lrFactTypeReading.GetReadingTextCQL & vbCrLf
+                                Else
+                                    Me.LabelError.Text &= lrFactType.Id & "(requires a Fact Type Reading)"
+                                End If
+                            End If
                         Next
                 End Select
 
@@ -394,6 +424,9 @@ Public Class frmFactEngine
 
         Me.AutoComplete = New frmAutoComplete(Me.TextBoxInput)
         Me.AutoComplete.Owner = Me
+
+        Me.TextBoxInput.AllowDrop = True
+
         '-------------------------------------------------------
         'Setup the Text Highlighter
         '----------------------------
@@ -745,7 +778,7 @@ Public Class frmFactEngine
     Private Sub TextBoxInput_KeyDown(sender As Object, e As KeyEventArgs) Handles TextBoxInput.KeyDown
 
         Try
-            If Me.TextBoxInput.SelectionColor = Color.Black Then Me.TextBoxInput.SelectionColor = Color.Wheat
+            If Me.TextBoxInput.SelectionColor = Color.Black Then Me.TextBoxInput.SelectionColor = Me.miDefaultForeColour
 
             Select Case e.KeyCode
                 Case Is = Keys.Home, Keys.End
@@ -873,7 +906,7 @@ Public Class frmFactEngine
                           Keys.Enter,
                           Keys.Back,
                           Keys.Up
-                    Me.TextBoxInput.SelectionColor = Color.Wheat
+                    Me.TextBoxInput.SelectionColor = Me.ForeColor
             End Select
 
             Dim ctrlV As Boolean = e.Modifiers = Keys.Control AndAlso e.KeyCode = Keys.V
@@ -883,7 +916,7 @@ Public Class frmFactEngine
                 Exit Sub
             End If
 
-            If Me.TextBoxInput.SelectionColor = Color.Black Then Me.TextBoxInput.SelectionColor = Color.Wheat
+            If Me.TextBoxInput.SelectionColor = Color.Black Then Me.TextBoxInput.SelectionColor = Me.ForeColor
 
             If Me.zrTextHighlighter.Tree.Nodes.Count > 0 Then
                 If Me.zrTextHighlighter.Tree.Nodes(0).Nodes.Count > 0 Then
@@ -1712,6 +1745,9 @@ Public Class frmFactEngine
 
         Call frmMain.LoadToolboxModelDictionary(True)
 
+        Dim lrFrmModelDictionary = CType(prApplication.GetToolboxForm(frmToolboxModelDictionary.Name), frmToolboxModelDictionary)
+        Call lrFrmModelDictionary.LoadToolboxModelDictionary(pcenumLanguage.EntityRelationshipDiagram, True)
+
         Me.TextBoxInput.Focus()
 
     End Sub
@@ -1776,9 +1812,13 @@ Public Class frmFactEngine
         If Me.ToolStripMenuItemDarkBackground.Checked Then
             Me.TextBoxInput.BackColor = Color.FromArgb(64, 64, 64)
             Me.TextBoxInput.ForeColor = Color.Wheat
+            Me.miDefaultForeColour = Color.Wheat
+            Me.AutoComplete.BackColor = Color.GhostWhite
         Else
             Me.TextBoxInput.BackColor = Color.FromArgb(255, 255, 255)
             Me.TextBoxInput.ForeColor = Color.Sienna
+            Me.miDefaultForeColour = Color.Sienna
+            Me.AutoComplete.BackColor = Color.LightGray
         End If
 
     End Sub
@@ -1791,10 +1831,109 @@ Public Class frmFactEngine
         If Me.ToolStripMenuItemLightBackground.Checked Then
             Me.TextBoxInput.BackColor = Color.FromArgb(255, 255, 255)
             Me.TextBoxInput.ForeColor = Color.Sienna
+            Me.miDefaultForeColour = Color.Sienna
+            Me.AutoComplete.BackColor = Color.LightGray
         Else
             Me.TextBoxInput.BackColor = Color.FromArgb(64, 64, 64)
             Me.TextBoxInput.ForeColor = Color.Wheat
+            Me.miDefaultForeColour = Color.Wheat
+            Me.AutoComplete.BackColor = Color.GhostWhite
         End If
 
     End Sub
+
+    Private Sub TextBoxInput_DragDrop(sender As Object, e As DragEventArgs) Handles TextBoxInput.DragDrop
+
+        Dim lsMessage As String
+
+        Try
+            If e.Data.GetDataPresent(tShapeNodeDragItem.DraggedItemObjectType) Then
+
+                '------------------------------------------------------------------------------------------------------------------------------------
+                'Make sure the current page points to the Diagram on this form. The reason is that the user may be viewing the Page as an ORM Model
+                '------------------------------------------------------------------------------------------------------------------------------------
+                Dim loDraggedNode As tShapeNodeDragItem = e.Data.GetData(tShapeNodeDragItem.DraggedItemObjectType)
+
+                If loDraggedNode.Tag.GetType Is GetType(RDS.Table) Then
+
+                    Dim lrTable As RDS.Table
+                    lrTable = loDraggedNode.Tag
+
+                    '==================================================================================================================
+                    Dim lsSQLQuery As String = ""
+                    Dim lrRecordset As ORMQL.Recordset
+
+
+                    lsSQLQuery = "SELECT *"
+                    lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreElementHasElementType.ToString
+                    lsSQLQuery &= " WHERE Element = '" & lrTable.Name & "'"
+
+                    lrRecordset = prApplication.WorkingModel.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                    If lrRecordset.EOF Then
+                        lsMessage = "The Entity, '" & lrTable.Name & "', does not seem to have any Attributes at this stage. Make sure that the corresponding Model Element in your Object-Role Model at least has a Primary Reference Scheme."
+                        lsMessage &= vbCrLf & vbCrLf & "Entities in Entity-Relationship Diagrams in Boston have their Attributes created by the relative relations of the corresponding Model Element in your Object-Role Model."
+
+                        MsgBox(lsMessage)
+                        Exit Sub
+                    Else
+                        With New WaitCursor
+                            Dim lrModelElement = prApplication.WorkingModel.GetModelObjectByName(lrTable.Name)
+                            Call Me.DesbribeModelElement(lrModelElement)
+
+                        End With
+
+                    End If
+                End If
+            End If
+
+        Catch ex As Exception
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+
+
+    End Sub
+
+    Private Sub TextBoxInput_DragOver(sender As Object, e As DragEventArgs) Handles TextBoxInput.DragOver
+
+        If e.Data.GetDataPresent(tShapeNodeDragItem.DraggedItemObjectType) Then
+
+            Dim lrDraggedNode As tShapeNodeDragItem = e.Data.GetData(tShapeNodeDragItem.DraggedItemObjectType)
+
+            '-----------------------------------------------------------------------
+            'Get the Object being dragged (if there is one).
+            '  If the user is dragging from the ModelDictionary form, 
+            '  then the DragItem will have a Tag of the ModelObject being dragged.
+            '-----------------------------------------------------------------------
+            Dim lrModelOject As Object
+            lrModelOject = lrDraggedNode.Tag
+
+            If Not (TypeOf (lrModelOject) Is MindFusion.Diagramming.Shape) Then
+                e.Effect = DragDropEffects.Copy
+            ElseIf lrDraggedNode.Index >= 0 Then
+                Dim lrToolboxForm As frmToolbox
+                lrToolboxForm = prApplication.GetToolboxForm(frmToolbox.Name)
+                If (lrDraggedNode.Index < lrToolboxForm.ShapeListBox.ShapeCount) Then
+                    Select Case lrDraggedNode.Tag.Id
+                        Case Is = "Entity"
+                            e.Effect = DragDropEffects.Copy
+                        Case Else
+                            e.Effect = DragDropEffects.None
+                    End Select
+                End If
+            End If
+        End If
+    End Sub
+
+    Private Sub frmFactEngine_Enter(sender As Object, e As EventArgs) Handles Me.Enter
+
+        prApplication.WorkingPage = Nothing
+
+    End Sub
+
 End Class
