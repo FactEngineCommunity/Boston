@@ -496,6 +496,9 @@ Namespace FEQL
                 Case TokenType.OPENMODELSTMT
                     Value = EvalOPENMODELSTMT(tree, paramlist)
                     Exit Select
+                Case TokenType.PREDICATENODEPROPERTYIDENTIFICATION
+                    Value = EvalPREDICATENODEPROPERTYIDENTIFICATION(tree, paramlist)
+                    Exit Select
                 Case TokenType.SELECTSTMT
                     Value = EvalSELECTSTMT(tree, paramlist)
                     Exit Select
@@ -916,6 +919,10 @@ Namespace FEQL
         End Function
 
         Protected Overridable Function EvalOPENMODELSTMT(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalPREDICATENODEPROPERTYIDENTIFICATION(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
             Throw New NotImplementedException()
         End Function
 
