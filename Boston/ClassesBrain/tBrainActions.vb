@@ -604,13 +604,31 @@ Partial Public Class tBrain
             lrValueType = Me.Model.GetModelObjectByName(lsActualModelElementName)
             liInitialDataType = lrValueType.DataType
 
+            Dim lsInitialDataType = liInitialDataType.ToString
+            If lrValueType.DataTypeLength > 0 Then
+                lsInitialDataType &= "(" & lrValueType.DataTypeLength.ToString
+                If lrValueType.DataTypePrecision > 0 Then
+                    lsInitialDataType &= "," & lrValueType.DataTypePrecision.ToString
+                End If
+                lsInitialDataType &= ")"
+            End If
+
             Call lrValueType.SetDataType(liDataType, liDataTypeLength, liDataTypePrecision, True)
+
+            Dim lsNewDataType = liDataType.ToString
+            If liDataTypeLength > 0 Then
+                lsNewDataType &= "(" & liDataTypeLength.ToString
+                If liDataTypePrecision > 0 Then
+                    lsNewDataType &= "," & liDataTypePrecision.ToString
+                End If
+                lsNewDataType &= ")"
+            End If
 
             If Me.AutoLayoutOn Then
                 Me.Page.Form.AutoLayout()
             End If
 
-            Me.send_data("Thank you. I changed the DataType of Value Type, '" & lsActualModelElementName & "' from " & liInitialDataType.ToString & " to " & liDataType.ToString & ".", False)
+            Me.send_data("Thank you. I changed the DataType of Value Type, '" & lsActualModelElementName & "' from " & lsInitialDataType & " to " & lsNewDataType & ".", False)
         Else
 
             Me.Timeout.Stop()

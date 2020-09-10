@@ -100,8 +100,9 @@ Public Module publicConstants
         Warning
     End Enum
 
-    <Serializable()> _
+    <Serializable()>
     Public Enum pcenumRoleJoinType 'NB Stored as Integer within the database.
+        None = 0
         EntityType = 1
         ValueType = 2
         FactType = 3

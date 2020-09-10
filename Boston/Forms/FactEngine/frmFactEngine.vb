@@ -503,6 +503,8 @@ Public Class frmFactEngine
                             Call prApplication.Brain.ProcessFEQLStatement(lsQuery)
                         Case Is = FEQL.TokenType.KEYWDISWHERE
                             Call prApplication.Brain.ProcessFEQLStatement(lsQuery)
+                        Case Is = FEQL.TokenType.FACTTYPEPRODUCTION
+                            Call prApplication.Brain.ProcessFEQLStatement(lsQuery)
                     End Select
                     Exit Sub
                 End If

@@ -72,15 +72,55 @@ Namespace FBM
         <XmlIgnore()> _
         Public SequenceNr As Integer 'The position withn the FactType/RoleGroup
 
-        <XmlAttribute()> _
-        Public TypeOfJoin As pcenumRoleJoinType
+        <XmlAttribute()>
+        Public ReadOnly Property TypeOfJoin As pcenumRoleJoinType
+            Get
+                If Me.JoinedORMObject Is Nothing Then
+                    Return pcenumRoleJoinType.None
+                End If
+                Select Case Me.JoinedORMObject.ConceptType
+                    Case Is = pcenumConceptType.ValueType
+                        Return pcenumRoleJoinType.ValueType
+                    Case Is = pcenumConceptType.EntityType
+                        Return pcenumRoleJoinType.EntityType
+                    Case Is = pcenumConceptType.FactType
+                        Return pcenumRoleJoinType.FactType
+                End Select
+            End Get
+        End Property
 
-        <XmlIgnore()> _
-        Public JoinsEntityType As FBM.EntityType
-        <XmlIgnore()> _
-        Public JoinsValueType As FBM.ValueType
-        <XmlIgnore()> _
-        Public JoinsFactType As FBM.FactType
+        <XmlIgnore()>
+        Public ReadOnly Property JoinsEntityType As FBM.EntityType
+            Get
+                If Me.TypeOfJoin = pcenumRoleJoinType.EntityType Then
+                    Return CType(Me.JoinedORMObject, FBM.EntityType)
+                Else
+                    Return Nothing
+                End If
+            End Get
+        End Property
+
+        <XmlIgnore()>
+        Public ReadOnly Property JoinsValueType As FBM.ValueType
+            Get
+                If Me.TypeOfJoin = pcenumRoleJoinType.ValueType Then
+                    Return CType(Me.JoinedORMObject, FBM.ValueType)
+                Else
+                    Return Nothing
+                End If
+            End Get
+        End Property
+
+        <XmlIgnore()>
+        Public ReadOnly Property JoinsFactType As FBM.FactType
+            Get
+                If Me.TypeOfJoin = pcenumRoleJoinType.FactType Then
+                    Return CType(Me.JoinedORMObject, FBM.FactType)
+                Else
+                    Return Nothing
+                End If
+            End Get
+        End Property
 
         <XmlIgnore()> _
         Public WithEvents JoinedORMObject As New FBM.ModelObject 'WithEvents
@@ -133,20 +173,6 @@ Namespace FBM
 
             Me.JoinedORMObject = arJoinedModelObject
 
-            If arJoinedModelObject IsNot Nothing Then
-                Select Case arJoinedModelObject.ConceptType
-                    Case Is = pcenumConceptType.EntityType
-                        Me.TypeOfJoin = pcenumRoleJoinType.EntityType
-                        Me.JoinsEntityType = arJoinedModelObject
-                    Case Is = pcenumConceptType.ValueType
-                        Me.TypeOfJoin = pcenumRoleJoinType.ValueType
-                        Me.JoinsValueType = arJoinedModelObject
-                    Case Is = pcenumConceptType.FactType
-                        Me.TypeOfJoin = pcenumRoleJoinType.FactType
-                        Me.JoinsFactType = arJoinedModelObject
-                End Select
-            End If
-
         End Sub
 
         Sub New(ByRef arFactType As FBM.FactType, ByRef arJoinedObject As Object)
@@ -157,20 +183,6 @@ Namespace FBM
             Me.Model = arFactType.Model
 
             Me.JoinedORMObject = arJoinedObject
-
-            If IsSomething(arJoinedObject) Then
-                Select Case arJoinedObject.ConceptType
-                    Case Is = pcenumConceptType.EntityType
-                        Me.TypeOfJoin = pcenumRoleJoinType.EntityType
-                        Me.JoinsEntityType = arJoinedObject
-                    Case Is = pcenumConceptType.ValueType
-                        Me.TypeOfJoin = pcenumRoleJoinType.ValueType
-                        Me.JoinsValueType = arJoinedObject
-                    Case Is = pcenumConceptType.FactType
-                        Me.TypeOfJoin = pcenumRoleJoinType.FactType
-                        Me.JoinsFactType = arJoinedObject
-                End Select
-            End If
 
             '----------------------------------------------------------
             'Add the Role to the RoleGroup of the FactType of the Role
@@ -325,7 +337,6 @@ Namespace FBM
                         lrRole.Symbol = .Symbol
                         lrRole.ConceptType = .ConceptType
                         lrRole.Deontic = .Deontic
-                        lrRole.TypeOfJoin = .TypeOfJoin
                         lrRole.SequenceNr = .SequenceNr
                         lrRole.Mandatory = .Mandatory
                         lrRole.isDirty = True
@@ -352,46 +363,46 @@ Namespace FBM
                         Select Case .TypeOfJoin
                             Case pcenumRoleJoinType.EntityType
                                 If arModel.EntityType.Exists(AddressOf lrRole.JoinedORMObject.Equals) Then
-                                    lrRole.JoinsEntityType = arModel.EntityType.Find(AddressOf lrRole.JoinedORMObject.Equals)
-                                    lrRole.JoinedORMObject = .JoinsEntityType                                    
+                                    'lrRole.JoinsEntityType = arModel.EntityType.Find(AddressOf lrRole.JoinedORMObject.Equals)
+                                    lrRole.JoinedORMObject = arModel.EntityType.Find(AddressOf lrRole.JoinedORMObject.Equals)
                                 ElseIf arModel.ModelId = .Model.ModelId Then
                                     arModel.AddEntityType(lrRole.JoinedORMObject)
-                                    lrRole.JoinsEntityType = .JoinedORMObject
-                                    lrRole.JoinedORMObject = lrRole.JoinsEntityType
+                                    'lrRole.JoinsEntityType = .JoinedORMObject
+                                    lrRole.JoinedORMObject = .JoinedORMObject
                                 Else
                                     Dim lrEntityType As FBM.EntityType = .JoinedORMObject
                                     lrEntityType = lrEntityType.Clone(arModel, True, lrEntityType.IsMDAModelElement)
-                                    lrRole.JoinsEntityType = lrEntityType
-                                    lrRole.JoinedORMObject = lrRole.JoinsEntityType
+                                    'lrRole.JoinsEntityType = lrEntityType
+                                    lrRole.JoinedORMObject = lrEntityType
                                 End If                                
                             Case pcenumRoleJoinType.ValueType                                                                
-                                If arModel.ValueType.Exists(AddressOf lrRole.JoinedORMObject.Equals) Then                                
-                                    lrRole.JoinsValueType = arModel.ValueType.Find(AddressOf lrRole.JoinedORMObject.Equals)
-                                    lrRole.JoinedORMObject = lrRole.JoinsValueType
+                                If arModel.ValueType.Exists(AddressOf lrRole.JoinedORMObject.Equals) Then
+                                    'lrRole.JoinsValueType = arModel.ValueType.Find(AddressOf lrRole.JoinedORMObject.Equals)
+                                    lrRole.JoinedORMObject = arModel.ValueType.Find(AddressOf lrRole.JoinedORMObject.Equals)
                                 ElseIf arModel.ModelId = .Model.ModelId Then
                                     arModel.AddValueType(.JoinedORMObject)
-                                    lrRole.JoinsValueType = .JoinedORMObject
-                                    lrRole.JoinedORMObject = lrRole.JoinsValueType
+                                    'lrRole.JoinsValueType = .JoinedORMObject
+                                    lrRole.JoinedORMObject = .JoinedORMObject
                                 Else
                                     'Cloning to a new Model.
                                     Dim lrValueType As FBM.ValueType = .JoinedORMObject
                                     lrValueType = lrValueType.Clone(arModel, True, lrValueType.IsMDAModelElement)
-                                    lrRole.JoinsValueType = lrValueType
-                                    lrRole.JoinedORMObject = lrRole.JoinsValueType
+                                    'lrRole.JoinsValueType = lrValueType
+                                    lrRole.JoinedORMObject = lrValueType
                                 End If
                             Case pcenumRoleJoinType.FactType
                                 If arModel.FactType.Exists(AddressOf .JoinedORMObject.Equals) Then
-                                    lrRole.JoinsFactType = arModel.FactType.Find(AddressOf .JoinedORMObject.Equals)
-                                    lrRole.JoinedORMObject = lrRole.JoinsFactType
+                                    'lrRole.JoinsFactType = arModel.FactType.Find(AddressOf .JoinedORMObject.Equals)
+                                    lrRole.JoinedORMObject = arModel.FactType.Find(AddressOf .JoinedORMObject.Equals)
                                 ElseIf arModel.ModelId = .Model.ModelId Then
                                     arModel.AddFactType(.JoinedORMObject)
-                                    lrRole.JoinsFactType = .JoinedORMObject
-                                    lrRole.JoinedORMObject = lrRole.JoinsFactType
+                                    'lrRole.JoinsFactType = .JoinedORMObject
+                                    lrRole.JoinedORMObject = .JoinedORMObject
                                 Else
                                     Dim lrFactType As FBM.FactType = lrRole.JoinedORMObject
                                     lrFactType = lrFactType.Clone(arModel, True, lrFactType.IsMDAModelElement)
-                                    lrRole.JoinsFactType = lrFactType
-                                    lrRole.JoinedORMObject = lrRole.JoinsFactType
+                                    'lrRole.JoinsFactType = lrFactType
+                                    lrRole.JoinedORMObject = lrFactType
                                 End If
                         End Select
                     End With
@@ -446,7 +457,6 @@ Namespace FBM
                         Throw New ApplicationException("Error: No FactTypeInstance exists for Role with Role.Id: " & lrRoleInstance.Id & ", and for Role.FactType.Id: " & .FactType.Id)
                     End If
                     lrRoleInstance.Deontic = .Deontic
-                    lrRoleInstance.TypeOfJoin = .TypeOfJoin
                     lrRoleInstance.Mandatory = .Mandatory
                     lrRoleInstance.SequenceNr = .SequenceNr
 
@@ -457,11 +467,9 @@ Namespace FBM
                             'lrEntityTypeInstance = New FBM.EntityTypeInstance
                             lrEntityTypeInstance = arPage.EntityTypeInstance.Find(AddressOf .JoinedORMObject.EqualsByName)
                             'lrRoleInstance.JoinsEntityType = New FBM.EntityTypeInstance
-                            lrRoleInstance.JoinsEntityType = lrEntityTypeInstance
                             lrRoleInstance.JoinedORMObject = lrEntityTypeInstance
-                            If lrRoleInstance.JoinsEntityType Is Nothing Then
-                                lrRoleInstance.JoinedORMObject = Nothing
-                                lrRoleInstance.JoinsEntityType = .JoinedORMObject.CloneEntityTypeInstance(arPage)
+                            If lrRoleInstance.JoinedORMObject Is Nothing Then
+                                lrRoleInstance.JoinedORMObject = .JoinedORMObject.CloneEntityTypeInstance(arPage)
                                 lsMessage = "Error: No EntityTypeInstance found for:"
                                 lsMessage &= vbCrLf & " Role with Role.Id: " & lrRoleInstance.Id & ", and"
                                 lsMessage &= vbCrLf & " for Role.FactType.Id: " & .FactType.Id
@@ -474,11 +482,9 @@ Namespace FBM
                                 End If
                             End If
                         Case Is = pcenumRoleJoinType.ValueType
-                            lrRoleInstance.JoinsValueType = arPage.ValueTypeInstance.Find(AddressOf .JoinedORMObject.EqualsByName)
-                            lrRoleInstance.JoinedORMObject = lrRoleInstance.JoinsValueType
-                            If lrRoleInstance.JoinsValueType Is Nothing Then
-                                lrRoleInstance.JoinedORMObject = Nothing
-                                lrRoleInstance.JoinsValueType = .JoinedORMObject.CloneInstance(arPage)
+                            lrRoleInstance.JoinedORMObject = arPage.ValueTypeInstance.Find(AddressOf .JoinedORMObject.EqualsByName)
+                            If lrRoleInstance.JoinedORMObject Is Nothing Then
+                                lrRoleInstance.JoinedORMObject = .JoinedORMObject.CloneInstance(arPage)
                                 lsMessage = "Error: No ValueTypeInstance found for "
                                 lsMessage &= vbCrLf & " Role with Role.Id: " & lrRoleInstance.Id & ", and"
                                 lsMessage &= vbCrLf & " for Role.FactType.Id: " & .FactType.Id
@@ -492,11 +498,9 @@ Namespace FBM
                                 End If
                             End If
                         Case Is = pcenumRoleJoinType.FactType
-                            lrRoleInstance.JoinsFactType = arPage.FactTypeInstance.Find(AddressOf .JoinedORMObject.EqualsByName)
-                            lrRoleInstance.JoinedORMObject = lrRoleInstance.JoinsFactType
-                            If lrRoleInstance.JoinsFactType Is Nothing Then
-                                lrRoleInstance.JoinedORMObject = Nothing
-                                lrRoleInstance.JoinsFactType = .JoinedORMObject.CloneInstance(arPage, abAddToPage)
+                            lrRoleInstance.JoinedORMObject = arPage.FactTypeInstance.Find(AddressOf .JoinedORMObject.EqualsByName)
+                            If lrRoleInstance.JoinedORMObject Is Nothing Then
+                                lrRoleInstance.JoinedORMObject = .JoinedORMObject.CloneInstance(arPage, abAddToPage)
 
                                 lsMessage = "Error: No FactTypeInstance found for "
                                 lsMessage &= vbCrLf & " Role with Role.Id: " & lrRoleInstance.Id & ", and"
@@ -1831,14 +1835,6 @@ Namespace FBM
                     '  to a ModelObject that is a table. I.e. Linked to an EntityType or an Objectified Fact Type
                     '===================================
                     Me.JoinedORMObject = arNewJoinedModelObject
-                    Select Case Me.JoinedORMObject.ConceptType
-                        Case Is = pcenumConceptType.ValueType
-                            Me.JoinsValueType = arNewJoinedModelObject
-                        Case Is = pcenumConceptType.EntityType
-                            Me.JoinsEntityType = arNewJoinedModelObject
-                        Case Is = pcenumConceptType.FactType
-                            Me.JoinsFactType = arNewJoinedModelObject
-                    End Select
 
                     If lrOriginallyJoinedTable IsNot Nothing Then
 #Region "RDS Processing"
@@ -1880,24 +1876,6 @@ Namespace FBM
                             'Reassign the Role
                             Me.JoinedORMObject = arNewJoinedModelObject
 
-                            Select Case arNewJoinedModelObject.ConceptType
-                                Case Is = pcenumConceptType.EntityType
-                                    Me.TypeOfJoin = pcenumRoleJoinType.EntityType
-                                    Me.JoinsEntityType = Me.JoinedORMObject
-                                    Me.JoinsValueType = Nothing
-                                    Me.JoinsFactType = Nothing
-                                Case Is = pcenumConceptType.ValueType
-                                    Me.TypeOfJoin = pcenumRoleJoinType.ValueType
-                                    Me.JoinsValueType = Me.JoinedORMObject
-                                    Me.JoinsEntityType = Nothing
-                                    Me.JoinsFactType = Nothing
-                                Case Is = pcenumConceptType.FactType
-                                    Me.TypeOfJoin = pcenumRoleJoinType.FactType
-                                    Me.JoinsFactType = Me.JoinedORMObject
-                                    Me.JoinsEntityType = Nothing
-                                    Me.JoinsValueType = Nothing
-                            End Select
-
                             Me.makeDirty()
 
 
@@ -1918,24 +1896,6 @@ Namespace FBM
                             '======================================
 
                             Me.JoinedORMObject = arNewJoinedModelObject
-
-                            Select Case arNewJoinedModelObject.ConceptType
-                                Case Is = pcenumConceptType.EntityType
-                                    Me.TypeOfJoin = pcenumRoleJoinType.EntityType
-                                    Me.JoinsEntityType = Me.JoinedORMObject
-                                    Me.JoinsValueType = Nothing
-                                    Me.JoinsFactType = Nothing
-                                Case Is = pcenumConceptType.ValueType
-                                    Me.TypeOfJoin = pcenumRoleJoinType.ValueType
-                                    Me.JoinsValueType = Me.JoinedORMObject
-                                    Me.JoinsEntityType = Nothing
-                                    Me.JoinsFactType = Nothing
-                                Case Is = pcenumConceptType.FactType
-                                    Me.TypeOfJoin = pcenumRoleJoinType.FactType
-                                    Me.JoinsFactType = Me.JoinedORMObject
-                                    Me.JoinsEntityType = Nothing
-                                    Me.JoinsValueType = Nothing
-                            End Select
 
                             Me.isDirty = True
 

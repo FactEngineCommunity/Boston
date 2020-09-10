@@ -216,4 +216,10 @@ Public Class frmToolboxErrorList
 
     End Sub
 
+    Private Sub ButtonRefresh_Click(sender As Object, e As EventArgs) Handles ButtonRefresh.Click
+
+        Call Me.zrModel.checkForErrors()
+
+    End Sub
+
 End Class

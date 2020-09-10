@@ -146,30 +146,26 @@ Namespace TableRole
                         lrRole.SequenceNr = lREcordset("SequenceNr").Value
                         lrRole.FactType = arFactType
                         prApplication.ThrowErrorMessage("GetRolesForModelFactType: Loading Role: '" & lrRole.Id & "' for FactType: '" & lrRole.FactType.Id & "' for Model: '" & lrRole.Model.ModelId & "'", pcenumErrorType.Information)
-                        lrRole.TypeOfJoin = lREcordset("TypeOfJoin").Value
-                        Select Case lrRole.TypeOfJoin
+                        Select Case lREcordset("TypeOfJoin").Value
                             Case Is = pcenumRoleJoinType.EntityType
                                 lsId = Trim(Viev.NullVal(lREcordset("JoinsEntityTypeId").Value, ""))
-                                lrRole.JoinsEntityType = arFactType.Model.EntityType.Find(Function(x) x.Id = lsId)
-                                lrRole.JoinedORMObject = lrRole.JoinsEntityType
+                                lrRole.JoinedORMObject = arFactType.Model.EntityType.Find(Function(x) x.Id = lsId)
                             Case Is = pcenumRoleJoinType.ValueType
                                 lsId = Trim(Viev.NullVal(lREcordset("JoinsValueTypeId").Value, ""))
-                                lrRole.JoinsValueType = arFactType.Model.ValueType.Find(Function(x) x.Id = lsId)
-                                lrRole.JoinedORMObject = lrRole.JoinsValueType
+                                lrRole.JoinedORMObject = arFactType.Model.ValueType.Find(Function(x) x.Id = lsId)
                             Case Is = pcenumRoleJoinType.FactType
                                 lsId = Trim(Viev.NullVal(lREcordset("JoinsNestedFactTypeId").Value, ""))
-                                lrRole.JoinsFactType = arFactType.Model.FactType.Find(Function(x) x.Id = lsId)
+                                lrRole.JoinedORMObject = arFactType.Model.FactType.Find(Function(x) x.Id = lsId)
                                 '202020514-VM-Original pattern for the above as well
                                 'Dim lrFactType As New FBM.FactType
                                 'lrRole.JoinsFactType = New FBM.FactType
                                 'lrRole.JoinsFactType.Id = Trim(Viev.NullVal(lREcordset("JoinsNestedFactTypeId").Value, ""))
                                 'lrFactType.Id = lrRole.JoinsFactType.Id
                                 'lrRole.JoinsFactType = arFactType.Model.FactType.Find(AddressOf lrFactType.Equals)
-                                If lrRole.JoinsFactType Is Nothing Then
-                                    lrRole.JoinsFactType = New FBM.FactType(lrRole.Model, Trim(Viev.NullVal(lREcordset("JoinsNestedFactTypeId").Value, "")), True)
+                                If lrRole.JoinedORMObject Is Nothing Then
+                                    lrRole.JoinedORMObject = New FBM.FactType(lrRole.Model, Trim(Viev.NullVal(lREcordset("JoinsNestedFactTypeId").Value, "")), True)
                                     TableFactType.GetFactTypeDetailsByModel(lrRole.JoinsFactType, True)
                                 End If
-                                lrRole.JoinedORMObject = lrRole.JoinsFactType
                         End Select
 
                         If (lrRole.JoinedORMObject Is Nothing) And Not (lrRole.TypeOfJoin = pcenumRoleJoinType.FactType) Then

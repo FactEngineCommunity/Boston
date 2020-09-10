@@ -1143,24 +1143,15 @@ Namespace XMLModel12
                 lrRole.JoinedORMObject.Id = lrXMLRole.JoinedObjectTypeId
 
                 If IsSomething(arFactType.Model.EntityType.Find(AddressOf lrRole.JoinedORMObject.Equals)) Then
-                    lrRole.JoinsEntityType = New FBM.EntityType
-                    lrRole.JoinsEntityType = arFactType.Model.EntityType.Find(AddressOf lrRole.JoinedORMObject.Equals)
-                    lrRole.JoinedORMObject = lrRole.JoinsEntityType
-                    lrRole.TypeOfJoin = pcenumRoleJoinType.EntityType
+                    lrRole.JoinedORMObject = arFactType.Model.EntityType.Find(AddressOf lrRole.JoinedORMObject.Equals)
                 ElseIf IsSomething(arFactType.Model.ValueType.Find(AddressOf lrRole.JoinedORMObject.Equals)) Then
-                    lrRole.JoinsValueType = New FBM.ValueType
-                    lrRole.JoinsValueType = arFactType.Model.ValueType.Find(AddressOf lrRole.JoinedORMObject.Equals)
-                    lrRole.JoinedORMObject = lrRole.JoinsValueType
-                    lrRole.TypeOfJoin = pcenumRoleJoinType.ValueType
+                    lrRole.JoinedORMObject = arFactType.Model.ValueType.Find(AddressOf lrRole.JoinedORMObject.Equals)
                 Else
-                    lrRole.JoinsFactType = New FBM.FactType
-                    lrRole.JoinsFactType = arFactType.Model.FactType.Find(AddressOf lrRole.JoinedORMObject.Equals)
-                    If lrRole.JoinsFactType Is Nothing Then
-                        lrRole.JoinsFactType = New FBM.FactType(lrRole.Model, lrXMLRole.JoinedObjectTypeId, True)
+                    lrRole.JoinedORMObject = arFactType.Model.FactType.Find(AddressOf lrRole.JoinedORMObject.Equals)
+                    If lrRole.JoinedORMObject Is Nothing Then
+                        lrRole.JoinedORMObject = New FBM.FactType(lrRole.Model, lrXMLRole.JoinedObjectTypeId, True)
                         Me.GetFactTypeDetails(lrRole.JoinsFactType)
                     End If
-                    lrRole.JoinedORMObject = lrRole.JoinsFactType
-                    lrRole.TypeOfJoin = pcenumRoleJoinType.FactType
                 End If
 
                 '--------------------------------------------------

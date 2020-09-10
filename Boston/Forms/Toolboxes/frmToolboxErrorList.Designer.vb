@@ -35,6 +35,7 @@ Partial Class frmToolboxErrorList
         Me.ContextMenuStripHelp = New System.Windows.Forms.ContextMenuStrip(Me.components)
         Me.HelpToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItemShowInDiagram = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ButtonRefresh = New System.Windows.Forms.Button()
         CType(Me.DataGrid_ErrorList, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.ContextMenuStripHelp.SuspendLayout()
         Me.SuspendLayout()
@@ -59,7 +60,7 @@ Partial Class frmToolboxErrorList
         '
         Me.ContextMenuStripHelp.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.HelpToolStripMenuItem, Me.ToolStripMenuItemShowInDiagram})
         Me.ContextMenuStripHelp.Name = "ContextMenuStripHelp"
-        Me.ContextMenuStripHelp.Size = New System.Drawing.Size(174, 70)
+        Me.ContextMenuStripHelp.Size = New System.Drawing.Size(174, 48)
         '
         'HelpToolStripMenuItem
         '
@@ -73,11 +74,21 @@ Partial Class frmToolboxErrorList
         Me.ToolStripMenuItemShowInDiagram.Size = New System.Drawing.Size(173, 22)
         Me.ToolStripMenuItemShowInDiagram.Text = "&Show in Diagram..."
         '
+        'ButtonRefresh
+        '
+        Me.ButtonRefresh.Image = Global.Boston.My.Resources.Resources.Refresh_16x16
+        Me.ButtonRefresh.Location = New System.Drawing.Point(2, 0)
+        Me.ButtonRefresh.Name = "ButtonRefresh"
+        Me.ButtonRefresh.Size = New System.Drawing.Size(24, 23)
+        Me.ButtonRefresh.TabIndex = 2
+        Me.ButtonRefresh.UseVisualStyleBackColor = True
+        '
         'frmToolboxErrorList
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(754, 217)
+        Me.Controls.Add(Me.ButtonRefresh)
         Me.Controls.Add(Me.DataGrid_ErrorList)
         Me.Name = "frmToolboxErrorList"
         Me.TabText = "Error List"
@@ -91,4 +102,5 @@ Partial Class frmToolboxErrorList
     Friend WithEvents ContextMenuStripHelp As System.Windows.Forms.ContextMenuStrip
     Friend WithEvents HelpToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents ToolStripMenuItemShowInDiagram As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents ButtonRefresh As Button
 End Class

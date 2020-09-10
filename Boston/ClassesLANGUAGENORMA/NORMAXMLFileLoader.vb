@@ -245,17 +245,12 @@ Namespace NORMA
                                 '--------------------------------
                                 lrRole = New FBM.Role
                                 lrRole = lrFactType.RoleGroup.Find(AddressOf lrRole.Equals)
-                                lrRole.TypeOfJoin = pcenumRoleJoinType.EntityType
                                 lrRole.JoinedORMObject = lrJoinedEntityType
-                                lrRole.JoinsEntityType = lrJoinedEntityType
-                                lrRole.JoinsFactType = Nothing
-                                lrRole.JoinsValueType = Nothing
                             Else
                                 lrRole = New FBM.Role
                                 lrRole = lrFactType.CreateRole(lrJoinedEntityType)
                                 lrRole.Id = lsNORMARoleId
                                 lrRole.Name = lrRoleXElement.Attribute("Name").Value
-                                lrRole.TypeOfJoin = pcenumRoleJoinType.EntityType
                                 lrRole.Mandatory = Convert.ToBoolean(lrRoleXElement.Attribute("_IsMandatory").Value)
                             End If
                         ElseIf IsSomething(lrValueType) Then
@@ -268,17 +263,12 @@ Namespace NORMA
                                 '--------------------------------
                                 lrRole = New FBM.Role
                                 lrRole = lrFactType.RoleGroup.Find(AddressOf lrRole.Equals)
-                                lrRole.TypeOfJoin = pcenumRoleJoinType.ValueType
                                 lrRole.JoinedORMObject = lrValueType
-                                lrRole.JoinsEntityType = Nothing
-                                lrRole.JoinsFactType = Nothing
-                                lrRole.JoinsValueType = lrValueType
                             Else
                                 lrRole = New FBM.Role
                                 lrRole = lrFactType.CreateRole(lrValueType)
                                 lrRole.Id = lsNORMARoleId
                                 lrRole.Name = lrRoleXElement.Attribute("Name").Value
-                                lrRole.TypeOfJoin = pcenumRoleJoinType.ValueType
                                 lrRole.Mandatory = Convert.ToBoolean(lrRoleXElement.Attribute("_IsMandatory").Value)
                                 If lrValueType.NORMAIsUnaryFactTypeValueType Then
                                     lrRole.NORMALinksToUnaryFactTypeValueType = True
@@ -294,11 +284,7 @@ Namespace NORMA
                                 '--------------------------------
                                 lrRole = New FBM.Role
                                 lrRole = lrFactType.RoleGroup.Find(AddressOf lrRole.Equals)
-                                lrRole.TypeOfJoin = pcenumRoleJoinType.FactType
                                 lrRole.JoinedORMObject = lrJoinedFactType
-                                lrRole.JoinsEntityType = Nothing
-                                lrRole.JoinsFactType = lrJoinedFactType
-                                lrRole.JoinsValueType = Nothing
                             Else
                                 lrRole = New FBM.Role
                                 lrRole = lrFactType.CreateRole(lrJoinedFactType)
@@ -493,17 +479,12 @@ Namespace NORMA
                                 '--------------------------------
                                 lrRole = New FBM.Role
                                 lrRole = lrFactType.RoleGroup.Find(AddressOf lrRole.Equals)
-                                lrRole.TypeOfJoin = pcenumRoleJoinType.EntityType
                                 lrRole.JoinedORMObject = lrJoinedEntityType
-                                lrRole.JoinsEntityType = lrJoinedEntityType
-                                lrRole.JoinsFactType = Nothing
-                                lrRole.JoinsValueType = Nothing
                             Else
                                 lrRole = New FBM.Role
                                 lrRole = lrFactType.CreateRole(lrJoinedEntityType)
                                 lrRole.Id = lsNORMARoleId
                                 lrRole.Name = lrRoleXElement.Attribute("Name").Value
-                                lrRole.TypeOfJoin = pcenumRoleJoinType.EntityType
                                 lrRole.Mandatory = Convert.ToBoolean(lrRoleXElement.Attribute("_IsMandatory").Value)
                             End If
                         ElseIf IsSomething(lrValueType) Then
@@ -516,17 +497,12 @@ Namespace NORMA
                                 '--------------------------------
                                 lrRole = New FBM.Role
                                 lrRole = lrFactType.RoleGroup.Find(AddressOf lrRole.Equals)
-                                lrRole.TypeOfJoin = pcenumRoleJoinType.ValueType
                                 lrRole.JoinedORMObject = lrValueType
-                                lrRole.JoinsEntityType = Nothing
-                                lrRole.JoinsFactType = Nothing
-                                lrRole.JoinsValueType = lrValueType
                             Else
                                 lrRole = New FBM.Role
                                 lrRole = lrFactType.CreateRole(lrValueType)
                                 lrRole.Id = lsNORMARoleId
                                 lrRole.Name = lrRoleXElement.Attribute("Name").Value
-                                lrRole.TypeOfJoin = pcenumRoleJoinType.ValueType
                                 lrRole.Mandatory = Convert.ToBoolean(lrRoleXElement.Attribute("_IsMandatory").Value)
                                 If lrValueType.NORMAIsUnaryFactTypeValueType Then
                                     lrRole.NORMALinksToUnaryFactTypeValueType = True
@@ -542,11 +518,7 @@ Namespace NORMA
                                 '--------------------------------
                                 lrRole = New FBM.Role
                                 lrRole = lrFactType.RoleGroup.Find(AddressOf lrRole.Equals)
-                                lrRole.TypeOfJoin = pcenumRoleJoinType.FactType
                                 lrRole.JoinedORMObject = lrJoinedFactType
-                                lrRole.JoinsEntityType = Nothing
-                                lrRole.JoinsFactType = lrJoinedFactType
-                                lrRole.JoinsValueType = Nothing
                             Else
                                 lrRole = New FBM.Role
                                 lrRole = lrFactType.CreateRole(lrJoinedFactType)
@@ -608,11 +580,7 @@ Namespace NORMA
                         lrJoinedFactType.Id = lrRoleXElement.<orm:RolePlayer>(0).Attribute("ref").Value
                         lrJoinedFactType = arModel.FactType.Find(AddressOf lrJoinedFactType.Equals)
 
-                        lrRole.TypeOfJoin = pcenumRoleJoinType.FactType
                         lrRole.JoinedORMObject = lrJoinedFactType
-                        lrRole.JoinsEntityType = Nothing
-                        lrRole.JoinsFactType = lrJoinedFactType
-                        lrRole.JoinsValueType = Nothing
 
                     Next 'Seach in NORMAXMLDOC
                 Next 'Role
@@ -1757,11 +1725,7 @@ Namespace NORMA
                         lrJoinedFactTypeInstance.Id = lrRoleInstance.JoinsFactType.Id
                         lrJoinedFactTypeInstance = lrPage.FactTypeInstance.Find(AddressOf lrJoinedFactTypeInstance.Equals)
 
-                        lrRoleInstance.TypeOfJoin = pcenumRoleJoinType.FactType
                         lrRoleInstance.JoinedORMObject = lrJoinedFactTypeInstance
-                        lrRoleInstance.JoinsEntityType = Nothing
-                        lrRoleInstance.JoinsFactType = lrJoinedFactTypeInstance
-                        lrRoleInstance.JoinsValueType = Nothing
 
                         'MsgBox("Aha found one")
 

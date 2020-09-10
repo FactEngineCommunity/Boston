@@ -27,12 +27,26 @@ Namespace FBM
 
         Public Shadows JoinedORMObject As New FBM.ModelObject 'WithEvents
 
-        <XmlIgnore()> _
-        Public Shadows JoinsEntityType As FBM.EntityTypeInstance
-        <XmlIgnore()> _
-        Public Shadows JoinsValueType As FBM.ValueTypeInstance
-        <XmlIgnore()> _
-        Public Shadows JoinsFactType As FBM.FactTypeInstance
+        <XmlIgnore()>
+        Public Shadows ReadOnly Property JoinsEntityType As FBM.EntityTypeInstance
+            Get
+                Return CType(Me.JoinedORMObject, FBM.EntityTypeInstance)
+            End Get
+        End Property
+
+        <XmlIgnore()>
+        Public Shadows ReadOnly Property JoinsValueType As FBM.ValueTypeInstance
+            Get
+                Return CType(Me.JoinedORMObject, FBM.ValueTypeInstance)
+            End Get
+        End Property
+
+        <XmlIgnore()>
+        Public Shadows ReadOnly Property JoinsFactType As FBM.FactTypeInstance
+            Get
+                Return CType(Me.JoinedORMObject, FBM.FactTypeInstance)
+            End Get
+        End Property
 
         <XmlIgnore()> _
         Public Shadows FactType As FBM.FactTypeInstance 'The FactTypeInstance (including 'ShapeNode') to which this RoleInstance is associated.    
@@ -149,18 +163,6 @@ Namespace FBM
             Me.JoinedORMObject = ar_joined_object
             Me.SequenceNr = Me.FactType.FactType.Arity 'The arity of the FactType of the FactTypeInstance
 
-            Select Case ar_joined_object.ConceptType
-                Case Is = pcenumConceptType.EntityType
-                    Me.TypeOfJoin = pcenumRoleJoinType.EntityType
-                    Me.JoinsEntityType = ar_joined_object
-                Case Is = pcenumConceptType.ValueType
-                    Me.TypeOfJoin = pcenumRoleJoinType.ValueType
-                    Me.JoinsValueType = ar_joined_object
-                Case Is = pcenumConceptType.FactType
-                    Me.TypeOfJoin = pcenumRoleJoinType.FactType
-                    Me.JoinsFactType = ar_joined_object
-            End Select
-
             '----------------------------------------------------------
             'Add the Role to the RoleGroup of the FactType of the Role
             '----------------------------------------------------------
@@ -187,25 +189,20 @@ Namespace FBM
                     lrRoleInstance.Role = New FBM.Role
                     lrRoleInstance.Role = arPage.Model.Role.Find(AddressOf .Role.Equals)
 
-                    lrRoleInstance.TypeOfJoin = .TypeOfJoin
-
                     Select Case .TypeOfJoin
                         Case Is = pcenumRoleJoinType.EntityType
                             Dim lrEntityTypeInstance As FBM.EntityTypeInstance = .JoinedORMObject
                             lrEntityTypeInstance = lrEntityTypeInstance.Clone(arPage, True, lrEntityTypeInstance.EntityType.IsMDAModelElement, True)
                             arPage.EntityTypeInstance.AddUnique(lrEntityTypeInstance)
-                            lrRoleInstance.JoinsEntityType = lrEntityTypeInstance 'arPage.EntityTypeInstance.Find(AddressOf .JoinedORMObject.Equals)
-                            lrRoleInstance.JoinedORMObject = lrRoleInstance.JoinsEntityType
+                            lrRoleInstance.JoinedORMObject = lrEntityTypeInstance 'arPage.EntityTypeInstance.Find(AddressOf .JoinedORMObject.Equals)
                         Case Is = pcenumRoleJoinType.ValueType
                             Dim lrValueTypeInstance As FBM.ValueTypeInstance = .JoinedORMObject
                             lrValueTypeInstance = lrValueTypeInstance.Clone(arPage, lrValueTypeInstance.ValueType.IsMDAModelElement, True)
                             arPage.ValueTypeInstance.AddUnique(lrValueTypeInstance)
-                            lrRoleInstance.JoinsValueType = lrValueTypeInstance 'arPage.ValueTypeInstance.Find(AddressOf .JoinedORMObject.Equals)
-                            lrRoleInstance.JoinedORMObject = lrRoleInstance.JoinsValueType
+                            lrRoleInstance.JoinedORMObject = lrValueTypeInstance 'arPage.ValueTypeInstance.Find(AddressOf .JoinedORMObject.Equals)
                         Case Is = pcenumRoleJoinType.FactType
                             If arPage.FactTypeInstance.Exists(AddressOf .JoinedORMObject.Equals) Then
-                                lrRoleInstance.JoinsFactType = arPage.FactTypeInstance.Find(AddressOf .JoinedORMObject.Equals)
-                                lrRoleInstance.JoinedORMObject = lrRoleInstance.JoinsFactType
+                                lrRoleInstance.JoinedORMObject = arPage.FactTypeInstance.Find(AddressOf .JoinedORMObject.Equals)
                             Else
                                 Dim lrJoinedFactTypeInstance As New FBM.FactTypeInstance
                                 lrJoinedFactTypeInstance = .JoinedORMObject
@@ -213,8 +210,7 @@ Namespace FBM
                                 If Not arPage.FactTypeInstance.Exists(AddressOf lrJoinedFactTypeInstance.Equals) Then
                                     arPage.FactTypeInstance.AddUnique(lrJoinedFactTypeInstance)
                                 End If
-                                lrRoleInstance.JoinsFactType = lrJoinedFactTypeInstance
-                                lrRoleInstance.JoinedORMObject = lrRoleInstance.JoinsFactType
+                                lrRoleInstance.JoinedORMObject = lrJoinedFactTypeInstance
                             End If
                     End Select
 
@@ -563,7 +559,6 @@ Namespace FBM
                         Me.JoinedORMObject = Me.Page.ValueTypeInstance.Find(Function(x) x.Id = Me.JoinsValueType.Id)
                     Case Is = pcenumRoleJoinType.FactType
                         Me.JoinedORMObject = Me.Page.FactTypeInstance.Find(Function(x) x.Id = Me.JoinedORMObject.Id)
-                        Me.JoinsFactType = Me.JoinedORMObject
                         If Me.JoinsFactType.IsDisplayedAssociated Then
                             '------------------------------------------------------------------------------
                             'That's good, the joined FactTypeInstance is already Displayed and Associated
@@ -1148,22 +1143,10 @@ Namespace FBM
                             End If
                         End If
 
-                        Me.JoinsEntityType = Me.JoinedORMObject
-                        Me.JoinsValueType = Nothing
-                        Me.JoinsFactType = Nothing
-                        Me.TypeOfJoin = pcenumRoleJoinType.EntityType
                     Case Is = pcenumConceptType.ValueType
-                            Me.JoinedORMObject = Me.Page.ValueTypeInstance.Find(AddressOf arModelObject.Equals)
-                            Me.JoinsValueType = Me.JoinedORMObject
-                            Me.JoinsEntityType = Nothing
-                            Me.JoinsFactType = Nothing
-                            Me.TypeOfJoin = pcenumRoleJoinType.ValueType
+                        Me.JoinedORMObject = Me.Page.ValueTypeInstance.Find(AddressOf arModelObject.Equals)
                     Case Is = pcenumConceptType.FactType
-                            Me.JoinedORMObject = Me.Page.FactTypeInstance.Find(AddressOf arModelObject.Equals)
-                            Me.JoinsFactType = Me.JoinedORMObject
-                            Me.JoinsValueType = Nothing
-                            Me.JoinsEntityType = Nothing
-                            Me.TypeOfJoin = pcenumRoleJoinType.FactType
+                        Me.JoinedORMObject = Me.Page.FactTypeInstance.Find(AddressOf arModelObject.Equals)
                 End Select
 
                 Call Me.ResetLink()

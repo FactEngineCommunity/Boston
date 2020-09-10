@@ -947,24 +947,24 @@ Namespace XMLModelv081
                 lrRole.JoinedORMObject.Id = lrXMLRole.JoinedObjectTypeId
 
                 If IsSomething(arFactType.Model.EntityType.Find(AddressOf lrRole.JoinedORMObject.Equals)) Then
-                    lrRole.JoinsEntityType = New FBM.EntityType
-                    lrRole.JoinsEntityType = arFactType.Model.EntityType.Find(AddressOf lrRole.JoinedORMObject.Equals)
-                    lrRole.JoinedORMObject = lrRole.JoinsEntityType
-                    lrRole.TypeOfJoin = pcenumRoleJoinType.EntityType
+                    'lrRole.JoinsEntityType = New FBM.EntityType
+                    'lrRole.JoinsEntityType = arFactType.Model.EntityType.Find(AddressOf lrRole.JoinedORMObject.Equals)
+                    lrRole.JoinedORMObject = arFactType.Model.EntityType.Find(AddressOf lrRole.JoinedORMObject.Equals)
+                    'lrRole.TypeOfJoin = pcenumRoleJoinType.EntityType
                 ElseIf IsSomething(arFactType.Model.ValueType.Find(AddressOf lrRole.JoinedORMObject.Equals)) Then
-                    lrRole.JoinsValueType = New FBM.ValueType
-                    lrRole.JoinsValueType = arFactType.Model.ValueType.Find(AddressOf lrRole.JoinedORMObject.Equals)
-                    lrRole.JoinedORMObject = lrRole.JoinsValueType
-                    lrRole.TypeOfJoin = pcenumRoleJoinType.ValueType
+                    'lrRole.JoinsValueType = New FBM.ValueType
+                    'lrRole.JoinsValueType = arFactType.Model.ValueType.Find(AddressOf lrRole.JoinedORMObject.Equals)
+                    lrRole.JoinedORMObject = arFactType.Model.ValueType.Find(AddressOf lrRole.JoinedORMObject.Equals)
+                    'lrRole.TypeOfJoin = pcenumRoleJoinType.ValueType
                 Else
-                    lrRole.JoinsFactType = New FBM.FactType
-                    lrRole.JoinsFactType = arFactType.Model.FactType.Find(AddressOf lrRole.JoinedORMObject.Equals)
-                    If lrRole.JoinsFactType Is Nothing Then
-                        lrRole.JoinsFactType = New FBM.FactType(lrRole.Model, lrXMLRole.JoinedObjectTypeId, True)
+                    'lrRole.JoinsFactType = New FBM.FactType
+                    lrRole.JoinedORMObject = arFactType.Model.FactType.Find(AddressOf lrRole.JoinedORMObject.Equals)
+                    If lrRole.JoinedORMObject Is Nothing Then
+                        lrRole.JoinedORMObject = New FBM.FactType(lrRole.Model, lrXMLRole.JoinedObjectTypeId, True)
                         Me.GetFactTypeDetails(lrRole.JoinsFactType)
                     End If
-                    lrRole.JoinedORMObject = lrRole.JoinsFactType
-                    lrRole.TypeOfJoin = pcenumRoleJoinType.FactType
+                    'lrRole.JoinedORMObject = arFactType.Model.FactType.Find(AddressOf lrRole.JoinedORMObject.Equals)
+                    'lrRole.TypeOfJoin = pcenumRoleJoinType.FactType
                 End If
 
                 '--------------------------------------------------

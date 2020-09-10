@@ -2555,14 +2555,6 @@ Public Class frmMain
 
                                             For Each lrRole In larRole
                                                 lrRole.JoinedORMObject = lrEncumbentModelElement
-                                                Select Case lrRole.TypeOfJoin
-                                                    Case Is = pcenumRoleJoinType.EntityType
-                                                        lrRole.JoinsEntityType = lrEncumbentModelElement
-                                                    Case Is = pcenumRoleJoinType.ValueType
-                                                        lrRole.JoinsValueType = lrEncumbentModelElement
-                                                    Case Is = pcenumRoleJoinType.FactType
-                                                        lrRole.JoinsFactType = lrEncumbentModelElement
-                                                End Select
                                             Next
                                         Next
 
@@ -2575,13 +2567,10 @@ Public Class frmMain
                                                 Select Case lrRole.TypeOfJoin
                                                     Case Is = pcenumRoleJoinType.EntityType
                                                         lrRole.JoinedORMObject = CType(lrEncumbentModelElement, FBM.EntityTypeInstance).EntityType
-                                                        lrRole.JoinsEntityType = CType(lrEncumbentModelElement, FBM.EntityTypeInstance).EntityType
                                                     Case Is = pcenumRoleJoinType.ValueType
                                                         lrRole.JoinedORMObject = CType(lrEncumbentModelElement, FBM.ValueTypeInstance).ValueType
-                                                        lrRole.JoinsValueType = CType(lrEncumbentModelElement, FBM.ValueTypeInstance).ValueType
                                                     Case Is = pcenumRoleJoinType.FactType
                                                         lrRole.JoinedORMObject = CType(lrEncumbentModelElement, FBM.FactTypeInstance).FactType
-                                                        lrRole.JoinsFactType = CType(lrEncumbentModelElement, FBM.FactTypeInstance).FactType
                                                 End Select
                                             Next
                                         Next

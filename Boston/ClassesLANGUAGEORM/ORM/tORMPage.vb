@@ -1843,13 +1843,10 @@ Namespace FBM
                     Select Case lrRoleInstance.Role.TypeOfJoin
                         Case Is = pcenumRoleJoinType.ValueType
                             lrRoleInstance.JoinedORMObject = Me.ValueTypeInstance.Find(Function(x) x.Id = lrRoleInstance.Role.JoinedORMObject.Id)
-                            lrRoleInstance.JoinsValueType = lrRoleInstance.JoinedORMObject
                         Case Is = pcenumRoleJoinType.EntityType
                             lrRoleInstance.JoinedORMObject = Me.EntityTypeInstance.Find(Function(x) x.Id = lrRoleInstance.Role.JoinedORMObject.Id)
-                            lrRoleInstance.JoinsEntityType = lrRoleInstance.JoinedORMObject
                         Case Is = pcenumRoleJoinType.FactType
                             lrRoleInstance.JoinedORMObject = Me.FactTypeInstance.Find(Function(x) x.Id = lrRoleInstance.Role.JoinedORMObject.Id)
-                            lrRoleInstance.JoinsFactType = lrRoleInstance.JoinedORMObject
                     End Select
                 Next
                 '====================================================================================================================
