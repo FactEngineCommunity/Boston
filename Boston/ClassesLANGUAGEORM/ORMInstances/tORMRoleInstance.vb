@@ -27,24 +27,53 @@ Namespace FBM
 
         Public Shadows JoinedORMObject As New FBM.ModelObject 'WithEvents
 
+        <XmlAttribute()>
+        Public Shadows ReadOnly Property TypeOfJoin As pcenumRoleJoinType
+            Get
+                If Me.JoinedORMObject Is Nothing Then
+                    Return pcenumRoleJoinType.None
+                End If
+                Select Case Me.JoinedORMObject.ConceptType
+                    Case Is = pcenumConceptType.ValueType
+                        Return pcenumRoleJoinType.ValueType
+                    Case Is = pcenumConceptType.EntityType
+                        Return pcenumRoleJoinType.EntityType
+                    Case Is = pcenumConceptType.FactType
+                        Return pcenumRoleJoinType.FactType
+                End Select
+            End Get
+        End Property
+
         <XmlIgnore()>
         Public Shadows ReadOnly Property JoinsEntityType As FBM.EntityTypeInstance
             Get
-                Return CType(Me.JoinedORMObject, FBM.EntityTypeInstance)
+                If Me.TypeOfJoin = pcenumRoleJoinType.EntityType Then
+                    Return CType(Me.JoinedORMObject, FBM.EntityTypeInstance)
+                Else
+                    Return Nothing
+                End If
             End Get
         End Property
 
         <XmlIgnore()>
         Public Shadows ReadOnly Property JoinsValueType As FBM.ValueTypeInstance
             Get
-                Return CType(Me.JoinedORMObject, FBM.ValueTypeInstance)
+                If Me.TypeOfJoin = pcenumRoleJoinType.ValueType Then
+                    Return CType(Me.JoinedORMObject, FBM.ValueTypeInstance)
+                Else
+                    Return Nothing
+                End If
             End Get
         End Property
 
         <XmlIgnore()>
         Public Shadows ReadOnly Property JoinsFactType As FBM.FactTypeInstance
             Get
-                Return CType(Me.JoinedORMObject, FBM.FactTypeInstance)
+                If Me.TypeOfJoin = pcenumRoleJoinType.FactType Then
+                    Return CType(Me.JoinedORMObject, FBM.FactTypeInstance)
+                Else
+                    Return Nothing
+                End If
             End Get
         End Property
 

@@ -10771,4 +10771,43 @@ Public Class frmDiagramORM
 
     End Sub
 
+    Private Sub ContextMenuStrip_Role_Opening(sender As Object, e As CancelEventArgs) Handles ContextMenuStrip_Role.Opening
+
+
+        If Me.zrPage.SelectedObject.Count > 0 Then
+            If Me.zrPage.SelectedObject(0).ConceptType = pcenumConceptType.Role Then
+
+                Dim lrRoleInstance = CType(Me.zrPage.SelectedObject(0), FBM.RoleInstance)
+
+                Me.ToolStripMenuItemShowLinkFactType.Enabled = lrRoleInstance.Role.FactType.IsObjectified
+
+            End If
+        End If
+
+    End Sub
+
+    Private Sub ToolStripMenuItemShowLinkFactType_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItemShowLinkFactType.Click
+
+        If Me.zrPage.SelectedObject.Count > 0 Then
+            If Me.zrPage.SelectedObject(0).ConceptType = pcenumConceptType.Role Then
+
+                Dim lrRoleInstance = CType(Me.zrPage.SelectedObject(0), FBM.RoleInstance)
+
+                Dim lrLinkFactType = lrRoleInstance.Role.FactType.getLinkFactTypes.Find(Function(x) x.LinkFactTypeRole Is lrRoleInstance.Role)
+                Dim lrObject As Object = lrRoleInstance.JoinedORMObject
+                Dim liXMultiplier = 1
+                Dim liYMultiplier = 1
+                If lrObject.X > lrRoleInstance.FactType.X Then liXMultiplier = -1
+                If lrObject.Y > lrRoleInstance.FactType.Y Then liYMultiplier = -1
+
+                Dim lrPointF = New PointF(lrObject.X + (((Math.Abs(lrRoleInstance.FactType.X - lrObject.X) + 1) / 2) * liXMultiplier),
+                                          lrObject.Y + (((Math.Abs(lrRoleInstance.FactType.Y - lrObject.Y) + 1) / 2) * liYMultiplier)
+                                          )
+                Call Me.zrPage.DropFactTypeAtPoint(lrLinkFactType, lrPointF, False)
+
+            End If
+        End If
+
+
+    End Sub
 End Class

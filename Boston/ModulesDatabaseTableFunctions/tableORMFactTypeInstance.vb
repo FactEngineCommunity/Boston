@@ -441,14 +441,14 @@ Namespace TableFactTypeInstance
                         For Each lrRoleInstance In lrFactTypeInstance.RoleGroup.FindAll(Function(p) p.TypeOfJoin = pcenumRoleJoinType.FactType And p.JoinedORMObject Is Nothing)
                             lrRoleInstance.JoinedORMObject = Nothing
                             lrRoleInstance.JoinedORMObject = arPage.FactTypeInstance.Find(Function(x) x.Id = lrRoleInstance.Role.JoinsFactType.Id)
-                            If lrRoleInstance.JoinsFactType Is Nothing Then
+                            If lrRoleInstance.JoinedORMObject Is Nothing Then
                                 '-------------------------------------------------------------------
                                 'Try and load the FactType if it is in the Model.
                                 lrFactTypeInstance = arPage.DropFactTypeAtPoint(lrRoleInstance.Role.JoinsFactType, New PointF(0, 0), False, False, True)
                                 lrRoleInstance.JoinedORMObject = lrFactTypeInstance
                                 GetFactTypeInstancesByPage.Add(lrFactTypeInstance)
                             End If
-                            If lrRoleInstance.JoinsFactType Is Nothing Then
+                            If lrRoleInstance.JoinedORMObject Is Nothing Then
                                 Throw New Exception("GetFactTypeInstancesByPage: Cannot find FactTypeInstance for RoleId: " & lrRoleInstance.Id & ", PageName: " & arPage.Name)
                             End If
                         Next
