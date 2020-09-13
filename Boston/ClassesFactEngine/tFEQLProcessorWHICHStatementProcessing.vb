@@ -95,7 +95,7 @@
                             Call Me.analyseThatPredicateWhichClause(Me.WHICHCLAUSE, lrQueryGraph, lrQueryEdge, lrPreviousTargetNode)
 
                         Case Is = FactEngine.pcenumWhichClauseType.WithClause  '12. E.g. WITH WHAT Rating
-                            Call Me.analystWITHClause(Me.WHICHCLAUSE, lrQueryGraph, lrQueryEdge)
+                            Call Me.analystWITHClause(Me.WHICHCLAUSE, lrQueryGraph, lrQueryEdge, lrPreviousTargetNode)
 
                         Case Is = FactEngine.pcenumWhichClauseType.AndThatIdentityCompatitor  '13. E.g. "Person 1 IS NOT Person 2" or "Person 1 IS Person 2"
                             Call Me.analystISNOTClause(Me.WHICHCLAUSE, lrQueryGraph, lrQueryEdge)
@@ -755,7 +755,8 @@
 
         Private Sub analystWITHClause(ByRef arWHICHCLAUSE As FEQL.WHICHCLAUSE,
                                       ByRef arQueryGraph As FactEngine.QueryGraph,
-                                      ByRef arQueryEdge As FactEngine.QueryEdge
+                                      ByRef arQueryEdge As FactEngine.QueryEdge,
+                                      ByRef arPreviousTargetNode As FactEngine.QueryNode
                                       )
 
             'E.g. WITH WHAT Rating (as in "WHICH Person likes WHICH City WITH WHAT Rating"), can also be WITH (Rating:'10') for instance.
@@ -785,25 +786,36 @@
                 If lrFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & Me.WHICHCLAUSE.MODELELEMENTNAME(0) & "'.")
             End If
 
-            Dim lrFBMObjectifiedFactTypeModelObject As FBM.FactType = Nothing
-            lrFBMObjectifiedFactTypeModelObject = arQueryGraph.QueryEdges(arQueryGraph.QueryEdges.Count - 1).FBMFactType
+            Dim lrBaseObject As FBM.ModelObject = Nothing
+            lrBaseObject = arQueryGraph.QueryEdges(arQueryGraph.QueryEdges.Count - 1).FBMFactType
 
-            If Not lrFBMObjectifiedFactTypeModelObject.IsObjectified Then
+            If Not lrBaseObject.IsObjectified Then
                 For liInd = arQueryGraph.QueryEdges.Count - 1 To 0 Step -1
                     If arQueryGraph.QueryEdges(liInd).FBMFactType.IsObjectified Then
-                        lrFBMObjectifiedFactTypeModelObject = arQueryGraph.QueryEdges(liInd).FBMFactType
+                        lrBaseObject = arQueryGraph.QueryEdges(liInd).FBMFactType
                         Exit For
                     ElseIf liInd = 0 Then
-                        Throw New Exception("Couldn't find an Objectified Fact Type / Property Edge for WITH WHAT Clause for Model Element, '" & lrFBMModelObject.Id & "'.")
+                        Select Case arPreviousTargetNode.FBMModelObject.ConceptType
+                            Case Is = pcenumConceptType.ValueType
+                                Dim lsMessage = "WITH WHAT clauses cannot be used for Value Types. Make sure the previous target model element is an Entity Type or an Objectified Fact Type."
+                                lsMessage &= " For 'WITH WHAT " & lrFBMModelObject.Id & "'"
+                                Throw New Exception(lsMessage)
+                            Case Is = pcenumConceptType.EntityType
+                                lrBaseObject = arPreviousTargetNode.FBMModelObject
+                            Case Is = pcenumConceptType.FactType
+                                Throw New Exception("Couldn't find an Objectified Fact Type / Property Edge for WITH WHAT Clause for Model Element, '" & lrFBMModelObject.Id & "'.")
+                        End Select
                     End If
                 Next
             End If
 
-            If Not lrFBMObjectifiedFactTypeModelObject.IsObjectified Then
-                Throw New Exception("The Model Element, '" & lrFBMObjectifiedFactTypeModelObject.Id & "', is not an Objectified Fact Type for WITH WHAT clause for Model Element, '" & lrFBMModelObject.Id & "'.")
+            If lrBaseObject.ConceptType = pcenumConceptType.FactType Then
+                If Not lrBaseObject.IsObjectified Then
+                    Throw New Exception("The Model Element, '" & lrBaseObject.Id & "', is not an Objectified Fact Type for WITH WHAT clause for Model Element, '" & lrFBMModelObject.Id & "'.")
+                End If
             End If
 
-            arQueryEdge.BaseNode = New FactEngine.QueryNode(lrFBMObjectifiedFactTypeModelObject)
+            arQueryEdge.BaseNode = New FactEngine.QueryNode(lrBaseObject)
 
             arQueryEdge.TargetNode = New FactEngine.QueryNode(lrFBMModelObject)
 
