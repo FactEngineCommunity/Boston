@@ -447,11 +447,19 @@ Namespace RDS
 
         End Function
 
-        Public Function getSupertypeTables(Optional ByRef aarSupertypeTable As List(Of RDS.Table) = Nothing) As List(Of RDS.Table)
+        Public Function getSupertypeTables(Optional ByRef aarSupertypeTable As List(Of RDS.Table) = Nothing, Optional arSubtypeRelationship As FBM.tSubtypeRelationship = Nothing) As List(Of RDS.Table)
 
             Dim larSupertypeTable As New List(Of RDS.Table)
 
-            For Each lrSubtypeRelationship In Me.FBMModelElement.SubtypeRelationship
+            Dim larSubtypeRelationship As New List(Of FBM.tSubtypeRelationship)
+
+            If arSubtypeRelationship Is Nothing Then
+                larSubtypeRelationship = Me.FBMModelElement.SubtypeRelationship
+            Else
+                larSubtypeRelationship.Add(arSubtypeRelationship)
+            End If
+
+            For Each lrSubtypeRelationship In larSubtypeRelationship
                 Dim lrSupertypeTable = lrSubtypeRelationship.parentEntityType.getCorrespondingRDSTable
                 larSupertypeTable.Add(lrSupertypeTable)
                 Call lrSupertypeTable.getSupertypeTables(larSupertypeTable)
@@ -979,6 +987,29 @@ Namespace RDS
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
                 prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
             End Try
+        End Sub
+
+        Public Sub removeSupertypeColumns(ByRef arSubtypeRelationship As FBM.tSubtypeRelationship)
+
+            Try
+                For Each lrTable In Me.getSupertypeTables(Nothing, arSubtypeRelationship)
+                    For Each lrSupertypeColumn In lrTable.Column
+                        Dim lrColumn = Me.Column.Find(AddressOf lrSupertypeColumn.EqualsByRoleActiveRole)
+                        If lrColumn IsNot Nothing Then
+                            Call Me.removeColumn(lrColumn)
+                        End If
+                    Next
+                Next
+
+            Catch ex As Exception
+                Dim lsMessage1 As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
         End Sub
         Public Sub setIsPGSRelation(ByVal abIsPGSRelation As Boolean)
 

@@ -224,6 +224,17 @@ Namespace RDS
 
         End Function
 
+        Public Function EqualsByRoleActiveRole(other As Column) As Boolean
+
+            If other.ActiveRole Is Nothing Then
+                Return Me.Role.Id = other.Role.Id
+            Else
+                Return (Me.Role.Id = other.Role.Id) And (Me.ActiveRole.Id = other.ActiveRole.Id)
+            End If
+
+
+        End Function
+
 
         Public Sub addIndex(ByRef arIndex As RDS.Index)
 

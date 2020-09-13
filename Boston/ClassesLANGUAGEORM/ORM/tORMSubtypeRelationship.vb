@@ -8,8 +8,15 @@ Namespace FBM
         Implements iObjectRelationalMap(Of FBM.tSubtypeRelationship)
         Implements IEquatable(Of FBM.tSubtypeRelationship)
 
-        <NonSerialized()> _
-        Public Shadows ConceptType As pcenumConceptType = pcenumConceptType.SubtypeConstraint
+        <XmlIgnore()>
+        Public Overrides Property ConceptType As pcenumConceptType
+            Get
+                Return pcenumConceptType.SubtypeConstraint
+            End Get
+            Set(value As pcenumConceptType)
+                'Nothing to do here.
+            End Set
+        End Property
 
         <XmlIgnore()> _
         Public EntityType As New FBM.ModelObject 'The EntityType for which the SubtypeConstraint is applicable
@@ -133,6 +140,7 @@ Namespace FBM
             Call Me.FactType.RemoveFromModel(True, False, True, True)
             Call Me.Delete()
 
+            'RDS
             Dim lrTable = CType(Me.EntityType, FBM.EntityType).getCorrespondingRDSTable
 
             If lrTable.getPrimaryKeyColumns.Count > 0 Then
@@ -141,6 +149,8 @@ Namespace FBM
                     Call lrTable.removeExistingPrimaryKeyColumnsAndIndex(True)
                 End If
             End If
+
+            Call lrTable.removeSupertypeColumns(Me)
 
         End Sub
 

@@ -2226,8 +2226,8 @@ Public Class frmDiagramORM
             Exit Sub
         End If
 
-        Select Case lrPageObject.ConceptType
-            Case Is = pcenumConceptType.RoleConstraintRole
+        Select Case lrPageObject.GetType
+            Case GetType(FBM.RoleConstraintRole)
                 Dim lrRoleConstraint As FBM.RoleConstraint
                 Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
                 Dim lrRoleConstraintRoleInstance As FBM.RoleConstraintRoleInstance
@@ -2257,7 +2257,7 @@ Public Class frmDiagramORM
 
                     Call TableRoleConstraintRole.DeleteRoleConstraintRole(lrRoleConstraintRole)
                 End If
-            Case Is = pcenumConceptType.SubtypeConstraint
+            Case GetType(FBM.SubtypeRelationshipInstance)
                 If MsgBox("Remove the Subtype from the Model?", MsgBoxStyle.YesNo) = MsgBoxResult.Yes Then
 
                     Dim lrSubtypeInstance As FBM.SubtypeRelationshipInstance = e.Link.Tag

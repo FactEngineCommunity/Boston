@@ -30,9 +30,19 @@ Namespace FBM
         BindableAttribute(False)>
         Public WithEvents Concept As FBM.Concept  'New 'The Concept that is related to the ModelObject within the Model/ModelDictionary
 
+        <XmlIgnore()>
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Private _ConceptType As pcenumConceptType
 
         <XmlAttribute()>
-        Public ConceptType As pcenumConceptType
+        Public Overridable Property ConceptType As pcenumConceptType
+            Get
+                Return Me._ConceptType
+            End Get
+            Set(value As pcenumConceptType)
+                Me._ConceptType = value
+            End Set
+        End Property
 
         <XmlAttribute()> _
         <System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)> _
