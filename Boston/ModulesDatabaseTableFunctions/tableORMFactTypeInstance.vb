@@ -17,22 +17,6 @@ Namespace TableFactTypeInstance
 
             TableConceptInstance.AddConceptInstance(lrConceptInstance)
 
-            'Dim lsSQLQuery As String = ""
-
-            'lsSQLQuery = "INSERT INTO ModelConceptInstance"
-            'lsSQLQuery &= " VALUES ("
-            'lsSQLQuery &= " '" & Trim(arFactTypeInstance.Model.ModelId) & "'"
-            'lsSQLQuery &= " ,'" & Trim(arFactTypeInstance.Page.PageId) & "'"
-            'lsSQLQuery &= " ,'" & Trim(arFactTypeInstance.Id) & "'"
-            'lsSQLQuery &= " ,'" & pcenumConceptType.FactType.ToString & "'"
-            'lsSQLQuery &= " ," & arFactTypeInstance.x
-            'lsSQLQuery &= " ," & arFactTypeInstance.y
-            'lsSQLQuery &= " ," & arFactTypeInstance.FactTypeOrientation
-            'lsSQLQuery &= " , TRUE"
-            'lsSQLQuery &= ")"
-
-            'Call pdbConnection.Execute(lsSQLQuery)
-
         End Sub
 
         Public Sub DeleteFactTypeInstance(ByVal arFactTypeInstance As FBM.FactTypeInstance)
@@ -481,7 +465,8 @@ Namespace TableFactTypeInstance
             Try
                 lsSQLQuery = " UPDATE ModelConceptInstance"
                 lsSQLQuery &= "   SET Symbol = '" & Replace(Trim(as_new_key), "'", "`") & "'"
-                lsSQLQuery &= " WHERE Symbol = '" & Replace(arFactTypeInstance.Id, "'", "`") & "'"
+                lsSQLQuery &= " WHERE PageId = '" & Trim(arFactTypeInstance.Page.PageId) & "'"
+                lsSQLQuery &= "   AND Symbol = '" & Replace(arFactTypeInstance.Id, "'", "`") & "'"
                 lsSQLQuery &= "   AND ConceptType = '" & pcenumConceptType.FactType.ToString & "'"
 
                 pdbConnection.BeginTrans()
@@ -503,7 +488,6 @@ Namespace TableFactTypeInstance
             Dim lsSQLQuery As String = ""
 
             Try
-
                 lsSQLQuery = " UPDATE ModelConceptInstance"
                 lsSQLQuery &= "   SET Orientation = " & arFactTypeInstance.FactTypeOrientation
                 lsSQLQuery &= "       ,x = " & arFactTypeInstance.X
