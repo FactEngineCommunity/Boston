@@ -1208,7 +1208,12 @@ Namespace FBM
 
                 End Select
 
-                Return Me.Model.CreateUniqueFactTypeName(lsName, 0, True)
+                If lsName = Me.Id Then
+                    Return Me.Id
+                Else
+                    Return Me.Model.CreateUniqueFactTypeName(lsName, 0, True)
+                End If
+
 
             Catch ex As Exception
                 Dim lsMessage1 As String
