@@ -783,6 +783,7 @@ Namespace FBM
                                         End If
 
                                         lrColumn = lrRole.GetCorrespondingUnaryOrBinaryFactTypeColumn(lrTable)
+                                        lrColumn.FactType = lrRole.FactType
 
                                         If lrRole.Mandatory Then
                                             lrColumn.IsMandatory = True

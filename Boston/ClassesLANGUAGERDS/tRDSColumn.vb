@@ -113,6 +113,48 @@ Namespace RDS
         <NonSerialized()>
         Public WithEvents ActiveRole As FBM.Role
 
+        Public ReadOnly Property DataTypeIsNumeric As Boolean
+            Get
+                Select Case Me.getMetamodelDataType
+                    Case Is = pcenumORMDataType.NumericAutoCounter,
+                              pcenumORMDataType.NumericDecimal,
+                              pcenumORMDataType.NumericFloatCustomPrecision,
+                              pcenumORMDataType.NumericFlotDoublePrecision,
+                              pcenumORMDataType.NumericFloatSinglePrecision,
+                              pcenumORMDataType.NumericMoney,
+                              pcenumORMDataType.NumericSignedBigInteger,
+                              pcenumORMDataType.NumericSignedInteger,
+                              pcenumORMDataType.NumericSignedSmallInteger,
+                              pcenumORMDataType.NumericUnsignedBigInteger,
+                              pcenumORMDataType.NumericUnsignedInteger,
+                              pcenumORMDataType.NumericUnsignedSmallInteger,
+                              pcenumORMDataType.NumericUnsignedTinyInteger
+
+                        Return True
+
+                    Case Else
+                        Return False
+
+                End Select
+            End Get
+        End Property
+
+        Public ReadOnly Property DataTypeIsText As Boolean
+            Get
+                Select Case Me.getMetamodelDataType
+                    Case Is = pcenumORMDataType.TextFixedLength,
+                              pcenumORMDataType.TextLargeLength,
+                              pcenumORMDataType.TextVariableLength
+
+                        Return True
+
+                    Case Else
+                        Return False
+
+                End Select
+            End Get
+        End Property
+
 #Region "FactEngine secific"
         ''' <summary>
         ''' Used when creating SQL etc for FactEngine. When the set of Projection Columns is returned, this Alias is set so that ProjectionColumns refer to the correct Table in the From clause etc.

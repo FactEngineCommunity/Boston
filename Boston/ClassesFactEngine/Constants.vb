@@ -28,6 +28,7 @@
 
         Public Enum pcenumFEQLStatementType
             None
+            CREATEStatement
             DESCRIBEStatement
             ENUMERATEStatement
             SHOWStatement
