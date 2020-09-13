@@ -1,6 +1,55 @@
 ﻿Imports System.Reflection
 
 Namespace FEQL
+
+    Public Class CREATEStatement
+
+        Private _NODEPROPERTYIDENTIFICATION As New List(Of FEQL.NODEPROPERTYIDENTIFICATION)
+        Public Property NODEPROPERTYIDENTIFICATION As List(Of FEQL.NODEPROPERTYIDENTIFICATION)
+            Get
+                Return Me._NODEPROPERTYIDENTIFICATION
+            End Get
+            Set(value As List(Of FEQL.NODEPROPERTYIDENTIFICATION))
+                Me._NODEPROPERTYIDENTIFICATION = value
+            End Set
+        End Property
+
+        Private _PREDICATENODEPROPERTYIDENTIFICATION As New List(Of FEQL.PREDICATENODEPROPERTYIDENTIFICATION)
+        Public Property PREDICATENODEPROPERTYIDENTIFICATION As List(Of FEQL.PREDICATENODEPROPERTYIDENTIFICATION)
+            Get
+                Return Me._PREDICATENODEPROPERTYIDENTIFICATION
+            End Get
+            Set(value As List(Of FEQL.PREDICATENODEPROPERTYIDENTIFICATION))
+                Me._PREDICATENODEPROPERTYIDENTIFICATION = value
+            End Set
+        End Property
+
+    End Class
+
+    Public Class PREDICATENODEPROPERTYIDENTIFICATION
+
+        Private _PREDICATECLAUSE As FEQL.PREDICATECLAUSE
+        Public Property PREDICATECLAUSE As FEQL.PREDICATECLAUSE
+            Get
+                Return Me._PREDICATECLAUSE
+            End Get
+            Set(value As FEQL.PREDICATECLAUSE)
+                Me._PREDICATECLAUSE = value
+            End Set
+        End Property
+
+        Private _NODEPROPERTYIDENTIFICATION As NODEPROPERTYIDENTIFICATION
+        Public Property NODEPROPERTYIDENTIFICATION As NODEPROPERTYIDENTIFICATION
+            Get
+                Return Me._NODEPROPERTYIDENTIFICATION
+            End Get
+            Set(value As NODEPROPERTYIDENTIFICATION)
+                Me._NODEPROPERTYIDENTIFICATION = value
+            End Set
+        End Property
+
+    End Class
+
     Public Class DESCRIBEStatement
 
         Private _MODELELEMENTNAME As String = Nothing
@@ -595,6 +644,7 @@ Namespace FEQL
         Private Parser As New FEQL.Parser(New FEQL.Scanner) 'Used to parse Text input into the Brain; especially for ORMQL.
         Private Parsetree As New FEQL.ParseTree 'Used with the Parser, is populated during the parsing of text input into the Brain; especially ORMQL
 
+        Public CREATEStatement As New FEQL.CREATEStatement
         Public DESCRIBEStatement As New FEQL.DESCRIBEStatement
         Public ENUMMERATEStatement As New FEQL.ENUMERATEStatement
         Public SHOWStatement As New FEQL.SHOWStatement
@@ -774,6 +824,11 @@ Namespace FEQL
                     End If
 
                     Select Case Me.Parsetree.Nodes(0).Nodes(0).Text
+                        Case Is = "CREATESTMT"
+
+                            Return Me.ProcessCREATEStatement(asFEQLStatement)
+
+
                         Case Is = "WHICHSELECTSTMT"
 
                             '=============================================================

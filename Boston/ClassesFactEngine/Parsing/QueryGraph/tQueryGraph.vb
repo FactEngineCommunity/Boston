@@ -34,6 +34,10 @@
             Me.Model = arFBMModel
         End Sub
 
+        Public Function generateCREATESQL() As String
+
+        End Function
+
         ''' <summary>
         ''' Generates SQL to run against the database for this QueryGraph
         ''' </summary>
