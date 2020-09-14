@@ -34,6 +34,18 @@ Namespace FactEngine
 
         End Function
 
+        Public Function GONonQuery(ByVal asQuery As String) As ORMQL.Recordset
+
+            Dim lrRecordset As ORMQL.Recordset
+
+            If Me.Connection Is Nothing Then Throw New Exception("The connection to the database has been lost. Close and reopen FactEngine.")
+
+            lrRecordset = Me.Connection.GONonQuery(asQuery)
+
+            Return lrRecordset
+
+        End Function
+
         Public Function establishConnection(ByVal aiDatabaseType As pcenumDatabaseType, ByVal asDatabaseConnectionString As String) As FactEngine.DatabaseConnection
 
             Try

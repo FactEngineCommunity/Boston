@@ -114,6 +114,45 @@ Namespace FactEngine
 
         End Function
 
+        Public Overrides Function GONonQuery(ByVal asSQLQuery As String) As Recordset Implements iDatabaseConnection.GONonQuery
+
+            Dim result As Integer = -1
+
+            Dim lrRecordset As New ORMQL.Recordset
+
+            Try
+                lrRecordset.Query = asSQLQuery
+
+                Dim lrSQLiteConnection = Database.CreateConnection(Me.DatabaseConnectionString)
+
+                If lrSQLiteConnection Is Nothing Then
+                    Throw New Exception("SQLite Adaptor: Could not create SQLite database connection to execute the query.")
+                End If
+
+
+                Using cmd As New System.Data.SQLite.SQLiteCommand(lrSQLiteConnection)
+                    cmd.CommandText = asSQLQuery
+                    cmd.Prepare()
+
+                    Try
+                        result = cmd.ExecuteNonQuery()
+                    Catch SQLiteException As System.Data.SQLite.SQLiteException
+                        Throw New Exception(SQLiteException.Message)
+                    End Try
+                End Using
+
+                lrSQLiteConnection.Close()
+
+                Return lrRecordset
+
+            Catch ex As Exception
+                lrRecordset.ErrorString = ex.Message
+                Return lrRecordset
+            End Try
+
+        End Function
+
+
     End Class
 
 

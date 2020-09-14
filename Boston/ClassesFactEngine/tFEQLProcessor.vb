@@ -442,6 +442,16 @@ Namespace FEQL
 
     Public Class NODEPROPERTYIDENTIFICATION
 
+        Private _COLON As String = Nothing
+        Public Property COLON As String
+            Get
+                Return Me._COLON
+            End Get
+            Set(value As String)
+                Me._COLON = value
+            End Set
+        End Property
+
         Private _MODELELEMENT As New Object
         Public Property MODELELEMENT As Object
             Get

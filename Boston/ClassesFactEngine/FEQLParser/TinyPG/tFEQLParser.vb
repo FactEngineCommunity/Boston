@@ -2631,14 +2631,14 @@ Namespace FEQL
             End If
 
              ' Concat Rule
-            tok = m_scanner.LookAhead(TokenType.COLON) ' ZeroOrMore Rule
-            While tok.Type = TokenType.COLON
+            tok = m_scanner.LookAhead(TokenType.COLON, TokenType.CARRET) ' ZeroOrMore Rule
+            While tok.Type = TokenType.COLON Or tok.Type = TokenType.CARRET
                 ParseQUOTEDIDENTIFIERLIST(node) ' NonTerminal Rule: QUOTEDIDENTIFIERLIST
             If m_tree.Errors.Count > 0 Then
                             parent.Token.UpdateRange(node.Token)
                             Exit Sub
             End If
-            tok = m_scanner.LookAhead(TokenType.COLON) ' ZeroOrMore Rule
+            tok = m_scanner.LookAhead(TokenType.COLON, TokenType.CARRET) ' ZeroOrMore Rule
             End While
             If m_tree.Errors.Count > 0 Then
                         parent.Token.UpdateRange(node.Token)
@@ -2851,16 +2851,48 @@ Namespace FEQL
 
 
              ' Concat Rule
-            tok = m_scanner.Scan(TokenType.COLON) ' Terminal Rule: COLON
-            n = node.CreateNode(tok, tok.ToString() )
-            node.Token.UpdateRange(tok)
-            node.Nodes.Add(n)
-            If tok.Type <> TokenType.COLON Then
-                m_tree.Errors.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.COLON.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "COLON"))
-                Return
+            tok = m_scanner.LookAhead(TokenType.COLON, TokenType.CARRET) ' Choice Rule
+            Select Case tok.Type
+             ' Choice Rule
+                Case TokenType.COLON
+                    tok = m_scanner.Scan(TokenType.COLON) ' Terminal Rule: COLON
+                    n = node.CreateNode(tok, tok.ToString() )
+                    node.Token.UpdateRange(tok)
+                    node.Nodes.Add(n)
+                    If tok.Type <> TokenType.COLON Then
+                        m_tree.Errors.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.COLON.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "COLON"))
+                        Return
 
+                    End If
+
+            If m_tree.Errors.Count > 0 Then
+                                parent.Token.UpdateRange(node.Token)
+                                Exit Sub
             End If
+                Case TokenType.CARRET
+                    tok = m_scanner.Scan(TokenType.CARRET) ' Terminal Rule: CARRET
+                    n = node.CreateNode(tok, tok.ToString() )
+                    node.Token.UpdateRange(tok)
+                    node.Nodes.Add(n)
+                    If tok.Type <> TokenType.CARRET Then
+                        m_tree.Errors.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.CARRET.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "CARRET"))
+                        Return
 
+                    End If
+
+            If m_tree.Errors.Count > 0 Then
+                                parent.Token.UpdateRange(node.Token)
+                                Exit Sub
+            End If
+                Case Else
+                If m_tree.Errors.Count = 0 Then
+                m_tree.Optionals.Clear
+                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.COLON.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "COLON"))
+                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.COLON.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "CARRET"))
+                End If
+                    m_tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found.", &H0002, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos))
+                    Exit Select
+            End Select ' Choice Rule
             If m_tree.Errors.Count > 0 Then
                         parent.Token.UpdateRange(node.Token)
                         Exit Sub

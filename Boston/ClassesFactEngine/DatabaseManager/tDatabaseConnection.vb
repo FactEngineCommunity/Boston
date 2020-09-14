@@ -9,6 +9,10 @@
             Return New ORMQL.Recordset
         End Function
 
+        Public Overridable Function GONonQuery(ByVal asQuery As String) As ORMQL.Recordset
+            Return New ORMQL.Recordset
+        End Function
+
     End Class
 
 End Namespace

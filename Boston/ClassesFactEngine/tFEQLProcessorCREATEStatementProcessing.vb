@@ -25,7 +25,12 @@
                     Dim lrPKColumn = lrTable.getPrimaryKeyColumns(0)
                     If lrPKColumn.getMetamodelDataType = pcenumORMDataType.NumericAutoCounter Then
                         Dim lrInsertColumn As New RDS.Column(lrInsertTable, lrPKColumn.Name, Nothing, Nothing)
-                        lrInsertColumn.TemporaryData = "1"
+                        If Me.CREATEStatement.NODEPROPERTYIDENTIFICATION(0).COLON Is Nothing Then
+                            lrInsertColumn.TemporaryData = Me.CREATEStatement.NODEPROPERTYIDENTIFICATION(0).IDENTIFIER(0)
+                        Else
+                            lrInsertColumn.TemporaryData = "1"
+                        End If
+
                         larInsertColumn.Add(lrInsertColumn)
                     Else
                         Dim lrInsertColumn As New RDS.Column(lrInsertTable, lrPKColumn.Name, Nothing, Nothing)
@@ -69,9 +74,65 @@
                                                           lrQueryEdge.TargetNode,
                                                           lrQueryEdge.Predicate)
 
-                    Dim lrInsertColumn = lrTable.Column.Find(Function(x) x.FactType Is lrQueryEdge.FBMFactType).Clone(Nothing, Nothing)
-                    lrInsertColumn.TemporaryData = lrPredicateNodePropertyIndentification.NODEPROPERTYIDENTIFICATION.IDENTIFIER(0)
-                    larInsertColumn.Add(lrInsertColumn)
+
+
+                    Dim lrInsertColumn As RDS.Column
+
+                    If lrQueryEdge.FBMFactType.IsManyTo1BinaryFactType Then
+                        Select Case lrQueryEdge.FBMFactType.RoleGroup(1).JoinedORMObject.GetType
+                            Case GetType(FBM.EntityType)
+                                'Need to get the value of the PrimaryKey of row for the Table/EntityType based on the UniqueIndex value supplied by the user
+                                Dim lrTargetTable = lrQueryEdge.TargetNode.FBMModelObject.getCorrespondingRDSTable
+                                Dim larUniqueIndexColumn = lrTargetTable.getFirstUniquenessConstraintColumns
+
+                                Dim lsSQLQuery As String = "SELECT "
+                                liInd = 0
+                                For Each lrPrimaryIndexColumn In lrTargetTable.getPrimaryKeyColumns
+                                    If liInd > 0 Then lsSQLQuery &= ", "
+                                    lsSQLQuery &= lrPrimaryIndexColumn.Name
+                                    liInd += 1
+                                Next
+                                lsSQLQuery &= " FROM " & lrTargetTable.Name
+                                lsSQLQuery &= " WHERE "
+
+                                'CodeSafe
+                                If larUniqueIndexColumn.Count <> lrPredicateNodePropertyIndentification.NODEPROPERTYIDENTIFICATION.IDENTIFIER.Count Then
+                                    Throw New Exception("The primary unique index for model element, '" & lrTargetTable.Name & "', has " & larUniqueIndexColumn.Count.ToString & " columns, rather than the " & lrPredicateNodePropertyIndentification.NODEPROPERTYIDENTIFICATION.IDENTIFIER.Count.ToString & " for which values are provided.")
+                                End If
+
+                                Dim lsSelectValues = ""
+                                liInd = 0
+                                For Each lrUniqueIndexColumn In larUniqueIndexColumn
+                                    If liInd > 0 Then lsSQLQuery &= " AND "
+                                    lsSQLQuery &= lrUniqueIndexColumn.Name & " = "
+                                    Dim lsSelectValue = ""
+                                    If lrUniqueIndexColumn.DataTypeIsText Then lsSelectValue &= "'"
+                                    lsSelectValue &= lrPredicateNodePropertyIndentification.NODEPROPERTYIDENTIFICATION.IDENTIFIER(liInd)
+                                    If lrUniqueIndexColumn.DataTypeIsText Then lsSelectValue &= "'"
+                                    If liInd > 0 Then lsSelectValue &= ", "
+                                    lsSelectValues &= lsSelectValue
+
+                                    lsSQLQuery &= lsSelectValue
+                                    liInd += 1
+                                Next
+
+                                Dim lrInterimRecordset = Me.DatabaseManager.Connection.GO(lsSQLQuery)
+
+                                If lrInterimRecordset.CurrentFact Is Nothing Then
+                                    Throw New Exception("Could not find a row in " & lrTargetTable.Name & " for value/s " & lsSelectValues)
+                                End If
+
+                                For Each lrPrimaryIndexColumn In lrTargetTable.getPrimaryKeyColumns
+                                    lrInsertColumn = lrTable.Column.Find(Function(x) x.Role Is lrQueryEdge.FBMFactType.RoleGroup(0)).Clone(Nothing, Nothing)
+                                    lrInsertColumn.TemporaryData = lrInterimRecordset.CurrentFact.Data(0).Data
+                                    larInsertColumn.Add(lrInsertColumn)
+                                Next
+                            Case GetType(FBM.ValueType)
+                                lrInsertColumn = lrTable.Column.Find(Function(x) x.FactType Is lrQueryEdge.FBMFactType).Clone(Nothing, Nothing)
+                                lrInsertColumn.TemporaryData = lrPredicateNodePropertyIndentification.NODEPROPERTYIDENTIFICATION.IDENTIFIER(0)
+                                larInsertColumn.Add(lrInsertColumn)
+                        End Select
+                    End If
                 Next
 
 
@@ -96,8 +157,10 @@
                 Next
                 lsInsertStatement &= vbCrLf & ")"
 
-                lrRecordset.ErrorString = lsInsertStatement
-                Return lrRecordset
+                Return Me.DatabaseManager.Connection.GONonQuery(lsInsertStatement)
+
+                'lrRecordset.ErrorString = lsInsertStatement
+                'Return lrRecordset
 
             Catch ex As Exception
                 If ex.InnerException Is Nothing Then

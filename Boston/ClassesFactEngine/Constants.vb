@@ -31,6 +31,7 @@
             CREATEStatement
             DESCRIBEStatement
             ENUMERATEStatement
+            GenericSelectStatement
             SHOWStatement
             WHICHSELECTStatement
         End Enum

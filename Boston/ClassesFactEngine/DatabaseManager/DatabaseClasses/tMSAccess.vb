@@ -120,6 +120,9 @@ Namespace FactEngine
 
         End Function
 
+        Private Function iDatabaseConnection_GONonQuery(asQuery As String) As Recordset Implements iDatabaseConnection.GONonQuery
+            Throw New NotImplementedException()
+        End Function
     End Class
 
 
