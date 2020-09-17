@@ -711,7 +711,8 @@ Public Class frmToolboxEnterpriseExplorer
                             lr_model.IsDirty = True
                             loObject.tag = lr_model
                         Case Is = pcenumMenuType.pageORMModel,
-                                  pcenumMenuType.pageERD
+                                  pcenumMenuType.pageERD,
+                                  pcenumMenuType.pagePGSDiagram
                             Dim lr_page As New FBM.Page(loObject.tag.Model)
                             lr_page = loObject.tag
                             lr_page.IsDirty = True
