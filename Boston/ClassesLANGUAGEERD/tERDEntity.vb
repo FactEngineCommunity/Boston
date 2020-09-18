@@ -44,6 +44,12 @@ Namespace ERD
 
         Public PrimaryKey As New List(Of ERD.Attribute)
 
+        Public Overrides ReadOnly Property isSubtype As Boolean
+            Get
+                Return Me.RDSTable.isSubtype
+            End Get
+        End Property
+
         Public DisplayRDSData As Boolean = False
 
         Public Shadows TableShape As ERD.TableNode

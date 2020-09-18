@@ -212,7 +212,7 @@ Namespace FBM
         <XmlElement()>
         Public SubtypeRelationship As New List(Of FBM.tSubtypeRelationship)
 
-        Public ReadOnly Property isSubtype As Boolean
+        Public Overridable ReadOnly Property isSubtype As Boolean
             Get
                 Return Me.SubtypeRelationship.Count > 0
             End Get

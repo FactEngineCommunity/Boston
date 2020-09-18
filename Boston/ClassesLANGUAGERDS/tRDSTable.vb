@@ -109,6 +109,32 @@ Namespace RDS
 
         End Function
 
+        Public Sub absorbSubtypeColumns(ByRef arSubtypeTable As RDS.Table)
+
+            Try
+                If Not arSubtypeTable.isAbsorbed Then Throw New Exception("The Table, '" & arSubtypeTable.Name & "', is not absorbed.")
+
+                For Each lrColumn In arSubtypeTable.Column
+                    Dim lrClonedColumn = lrColumn.Clone(Me, Nothing)
+                    Me.Column.Add(lrClonedColumn)
+                Next
+
+                For Each lrTable In arSubtypeTable.getSubtypeTables.FindAll(Function(x) x.isAbsorbed)
+                    'Recursive call to get all Columns from absorbed subtype Tables.
+                    Call Me.absorbSubtypeColumns(lrTable)
+                Next
+
+            Catch ex As Exception
+                Dim lsMessage1 As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
         Public Sub absorbSupertypeColumns()
 
             If Me.isSubtype = False Then Exit Sub
@@ -432,7 +458,10 @@ Namespace RDS
 
         End Function
 
-
+        ''' <summary>
+        ''' Non recursive, single layer return of subtype Tables.
+        ''' </summary>
+        ''' <returns></returns>
         Public Function getSubtypeTables() As List(Of RDS.Table)
 
             Dim larSubtypeTable As New List(Of RDS.Table)

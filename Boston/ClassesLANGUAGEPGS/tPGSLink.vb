@@ -232,7 +232,8 @@ Namespace PGS
                         Dim lrFactType As FBM.FactType
                         If Me.RDSRelation.ResponsibleFactType.LinkFactTypeRole Is Nothing Then
                             lrFactType = Me.RDSRelation.ResponsibleFactType
-                        ElseIf Me.RDSRelation.ResponsibleFactType.LinkFactTypeRole.FactType.Arity = 2 Then
+                        ElseIf Me.RDSRelation.ResponsibleFactType.LinkFactTypeRole.FactType.Arity = 2 And Me.getCorrespondingRDSTable.isPGSRelation Then
+                            'Must be binary and a PGS Relation
                             lrFactType = Me.RDSRelation.ResponsibleFactType.LinkFactTypeRole.FactType
                         Else
                             lrFactType = Me.RDSRelation.ResponsibleFactType

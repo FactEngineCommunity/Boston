@@ -2678,6 +2678,16 @@ Public Class frmToolboxORMVerbalisation
         lrVerbaliser.HTW.WriteBreak()
         lrVerbaliser.HTW.WriteBreak()
 
+        If arEntity.isSubtype Then
+            lrVerbaliser.VerbaliseModelObject(arEntity.RDSTable.FBMModelElement)
+            For Each lrSupertypeTable In arEntity.RDSTable.getSupertypeTables
+                lrVerbaliser.VerbaliseQuantifier(" is a kind of ")
+                lrVerbaliser.VerbaliseModelObject(lrSupertypeTable.FBMModelElement)
+                lrVerbaliser.HTW.WriteBreak()
+            Next
+            lrVerbaliser.HTW.WriteBreak()
+        End If
+
         lrVerbaliser.VerbaliseHeading("Constraints:")
         lrVerbaliser.HTW.WriteBreak()
         lrVerbaliser.HTW.WriteBreak()
@@ -2691,9 +2701,9 @@ Public Class frmToolboxORMVerbalisation
                 lrVerbaliser.VerbalisePredicateText(lrIndex.Name & " ")
 
                 If lrIndex.IsPrimaryKey Then
-                    lrVerbaliser.VerbaliseQuantifierLight("is a Primary Key over Columns, ")
+                    lrVerbaliser.VerbaliseQuantifierLight("is a Primary Key over Column/s, ")
                 Else
-                    lrVerbaliser.VerbaliseQuantifierLight("is a Unique Key over Columns, ")
+                    lrVerbaliser.VerbaliseQuantifierLight("is a Unique Key over Column/s, ")
                 End If
 
                 lrVerbaliser.VerbaliseBlackText("(")

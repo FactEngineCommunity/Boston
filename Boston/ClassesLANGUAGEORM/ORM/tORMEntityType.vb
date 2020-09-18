@@ -1209,16 +1209,16 @@ Namespace FBM
         End Sub
 
 
-        Public Function CreateSubtypeRelationship(ByVal ar_parentEntityType As FBM.EntityType) As FBM.tSubtypeRelationship
+        Public Function CreateSubtypeRelationship(ByVal arParentEntityType As FBM.EntityType) As FBM.tSubtypeRelationship
 
-            Dim lrSubtypeConstraint As New FBM.tSubtypeRelationship
+            Dim lrSubtypeRelationship As New FBM.tSubtypeRelationship
 
-            lrSubtypeConstraint.Model = Me.Model
-            lrSubtypeConstraint.EntityType = Me
-            lrSubtypeConstraint.parentEntityType = ar_parentEntityType
+            lrSubtypeRelationship.Model = Me.Model
+            lrSubtypeRelationship.EntityType = Me
+            lrSubtypeRelationship.parentEntityType = arParentEntityType
 
-            Me.parentModelObjectList.Add(ar_parentEntityType)
-            ar_parentEntityType.childModelObjectList.Add(Me)
+            Me.parentModelObjectList.Add(arParentEntityType)
+            arParentEntityType.childModelObjectList.Add(Me)
 
             '---------------------------------------------
             'Create a FactType for the SubtypeConstraint
@@ -1227,25 +1227,25 @@ Namespace FBM
             Dim larModelObject As New List(Of FBM.ModelObject)
             Dim larRole As New List(Of FBM.Role)
 
-            lsFactTypeName = Viev.Strings.RemoveWhiteSpace(Me.Name & "IsSubtypeOf" & ar_parentEntityType.Name)
+            lsFactTypeName = Viev.Strings.RemoveWhiteSpace(Me.Name & "IsSubtypeOf" & arParentEntityType.Name)
             larModelObject.Add(Me)
-            larModelObject.Add(ar_parentEntityType)
+            larModelObject.Add(arParentEntityType)
 
-            lrSubtypeConstraint.FactType = Me.Model.CreateFactType(lsFactTypeName, larModelObject, False, False)
-            lrSubtypeConstraint.FactType.IsSubtypeRelationshipFactType = True
+            lrSubtypeRelationship.FactType = Me.Model.CreateFactType(lsFactTypeName, larModelObject, False, False)
+            lrSubtypeRelationship.FactType.IsSubtypeRelationshipFactType = True
 
-            lrSubtypeConstraint.FactType.RoleGroup(0).Name = "Subtype"
-            lrSubtypeConstraint.FactType.RoleGroup(1).Name = "Supertype"
+            lrSubtypeRelationship.FactType.RoleGroup(0).Name = "Subtype"
+            lrSubtypeRelationship.FactType.RoleGroup(1).Name = "Supertype"
 
-            lrSubtypeConstraint.FactType.RoleGroup(0).Mandatory = True
-
-            larRole.Clear()
-            larRole.Add(lrSubtypeConstraint.FactType.RoleGroup(0))
-            lrSubtypeConstraint.FactType.CreateInternalUniquenessConstraint(larRole, False, False, True, True, ar_parentEntityType.GetTopmostSupertype)
+            lrSubtypeRelationship.FactType.RoleGroup(0).Mandatory = True
 
             larRole.Clear()
-            larRole.Add(lrSubtypeConstraint.FactType.RoleGroup(1))
-            lrSubtypeConstraint.FactType.CreateInternalUniquenessConstraint(larRole, False, False, True)
+            larRole.Add(lrSubtypeRelationship.FactType.RoleGroup(0))
+            lrSubtypeRelationship.FactType.CreateInternalUniquenessConstraint(larRole, False, False, True, True, arParentEntityType.GetTopmostSupertype)
+
+            larRole.Clear()
+            larRole.Add(lrSubtypeRelationship.FactType.RoleGroup(1))
+            lrSubtypeRelationship.FactType.CreateInternalUniquenessConstraint(larRole, False, False, True)
 
             Dim lrFactTypeReading As FBM.FactTypeReading
             Dim lasPredicatePart As New List(Of String)
@@ -1253,33 +1253,40 @@ Namespace FBM
             lasPredicatePart.Add("")
 
             larRole.Clear()
-            larRole.Add(lrSubtypeConstraint.FactType.RoleGroup(0))
-            larRole.Add(lrSubtypeConstraint.FactType.RoleGroup(1))
-            lrFactTypeReading = New FBM.FactTypeReading(lrSubtypeConstraint.FactType, larRole, lasPredicatePart)
-            lrSubtypeConstraint.FactType.FactTypeReading.Add(lrFactTypeReading)
+            larRole.Add(lrSubtypeRelationship.FactType.RoleGroup(0))
+            larRole.Add(lrSubtypeRelationship.FactType.RoleGroup(1))
+            lrFactTypeReading = New FBM.FactTypeReading(lrSubtypeRelationship.FactType, larRole, lasPredicatePart)
+            lrSubtypeRelationship.FactType.FactTypeReading.Add(lrFactTypeReading)
 
             larRole.Clear()
-            larRole.Add(lrSubtypeConstraint.FactType.RoleGroup(1))
-            larRole.Add(lrSubtypeConstraint.FactType.RoleGroup(0))
-            lrFactTypeReading = New FBM.FactTypeReading(lrSubtypeConstraint.FactType, larRole, lasPredicatePart)
-            lrSubtypeConstraint.FactType.FactTypeReading.Add(lrFactTypeReading)
+            larRole.Add(lrSubtypeRelationship.FactType.RoleGroup(1))
+            larRole.Add(lrSubtypeRelationship.FactType.RoleGroup(0))
+            lrFactTypeReading = New FBM.FactTypeReading(lrSubtypeRelationship.FactType, larRole, lasPredicatePart)
+            lrSubtypeRelationship.FactType.FactTypeReading.Add(lrFactTypeReading)
 
-            Me.SubtypeRelationship.Add(lrSubtypeConstraint)
+            Me.SubtypeRelationship.Add(lrSubtypeRelationship)
 
-            Call Me.getCorrespondingRDSTable.triggerSubtypeRelationshipAdded
+            Call Me.getCorrespondingRDSTable.triggerSubtypeRelationshipAdded()
 
-            RaiseEvent SubtypeRelationshipAdded(lrSubtypeConstraint)
+            RaiseEvent SubtypeRelationshipAdded(lrSubtypeRelationship)
 
             '=========================================================================
+            'RDS
             'Manage Subtype Primary Reference Schemes.
             '  * Need to pull the Primary Reference Scheme from the Supertype if this EntityType is not absorbed.
             Call Me.getRDSPrimaryReferenceSchemeFromSupertypeIfNecessary()
 
-            Call Me.getCorrespondingRDSTable.absorbSupertypeColumns()
+            If Me.IsAbsorbed Then
+                Call Me.getCorrespondingRDSTable.absorbSupertypeColumns()
+            Else
+                'Supertype needs to get Columns from this subtype
+                Dim lrSupertypeTable = arParentEntityType.GetTopmostNonAbsorbedSupertype.getCorrespondingRDSTable
+                Call lrSupertypeTable.absorbSubtypeColumns(Me.getCorrespondingRDSTable)
+            End If
 
             Call Me.Model.MakeDirty()
 
-            Return lrSubtypeConstraint
+            Return lrSubtypeRelationship
 
         End Function
 
