@@ -1,0 +1,9 @@
+<head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">  
+  <title>Boston Generated Glossary</title>
+  <meta name="description" content="Boston">
+  <meta name="keywords" content="boston,conceptual modelling,semantic modelling,model driven engineering">
+  <link rel="shortcut icon" href="http://www.viev.com/favicon.ico" type="image/x-icon">
+  <link rel="icon" href="http://www.viev.com/favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="./Files/screen.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="./Files/print.css" media="print" type="text/css">
+</head>

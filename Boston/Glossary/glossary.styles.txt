@@ -1,0 +1,119 @@
+<style media="screen" type="text/css">
+ul {
+  margin: 1px 0px 0px 2em;
+  -webkit-margin-before: 0px;
+  -webkit-margin-after: 0px;
+  -webkit-padding-start: 0px;
+  padding: 2px;
+}
+
+span {
+  font-family: "Arial", sans-serif;
+}
+
+
+.keywordconstraint {
+  color: #000;
+  background: #A9D3E5;
+}
+.keyword {
+  color: #0000CC;
+}
+.term, .concept {
+  color: #6A0072;
+}
+.vocabulary, .object_type {
+  color: #6A0072;
+}
+.linking, .copula {
+  color: #0E5400;
+}
+.literal, .value {
+  color: #FF990E;
+}
+
+dd {
+  margin-bottom: 0.5em;
+}
+
+.glossary-sidebar {
+  display: block;
+  margin: 0;
+  padding: 2 10px;
+  border-left: solid #DDD 3px;
+  background: #FCFCFC;
+  float: left;
+  width: 280px;
+  height: 95%;
+  border: 0.5px;
+  border-color: black;
+  border-style: solid;
+}
+
+.glossary-toc {
+  overflow: auto;
+  height: 88%;
+  margin: 0;
+  padding: 19 3px;
+  list-style: none;
+  font-family: Menlo, Consolas, Monaco, "Lucida Console", monospace;
+}
+
+.glossary-doc {
+  display: block;
+  background: #FFF;
+  border-right: solid #EEE 3px;
+  font: 300 14px/1.4 "Myriad Pro", "Helvetica Neue", Helvetica, "Arial Unicode MS", Arial, sans-serif;
+  height: 95%;
+  margin: 0;
+  overflow: auto;
+  padding: 0 30px;
+
+  left: 0px;
+  left: 240px;
+
+  border: 0.5px;
+  border-color: black;
+  border-style: solid;
+}
+
+.glossary-toc li {
+  margin-left: 20px;
+  text-indent: -10px;
+}
+
+.glossary-doc dl {
+  margin-bottom: 1600px;
+}
+
+.glossary-doc dd {
+  margin-bottom: 30px;
+}
+
+.glossary-constraint {
+  background: #EDC;
+}
+
+.value {
+  display: inline;
+}
+
+.keyword,
+.glossary-facttype,
+.glossary-reading {
+  display: inline;  
+}
+.glossary-constraint { display: inline; }
+.glossary-facttype, .glossary-constraint { display: block; }
+.glossary-doc.hide-alternates .glossary-alternates { display: none; }
+.glossary-doc.hide-constraints .glossary-constraints { display: none; }
+.glossary-doc.hide-examples .glossary-example { display: none; }
+</style>
+<style media="print" type="text/css">
+.keyword { color: #0000CC; font-style: italic; display: inline; }
+.vocabulary, .object_type { color: #A072C9; font-weight: bold; }
+.copula { color: #0E5400; }
+.value { color: #FF990E; display: inline; }
+.glossary-toc { display: none; }
+.glossary-facttype, .glossary-reading { display: inline; }
+</style>

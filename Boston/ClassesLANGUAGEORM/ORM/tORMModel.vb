@@ -4179,6 +4179,9 @@ Namespace FBM
                         Optional ByVal abUseThreading As Boolean = True,
                         Optional ByRef aoBackgroundWorker As System.ComponentModel.BackgroundWorker = Nothing)
 
+            'CodeSafe
+            If Me.Loading Or Me.Loaded Then Exit Sub
+
             Me.Loading = True
             '-------------------------------------------------------
             'Loads an ORM model from the database

@@ -824,7 +824,7 @@ Public Class frmDiagramERD
                 '  is not added for those hidden Pages.
                 '----------------------------------------------------------
                 Dim lrEnterpriseView As tEnterpriseEnterpriseView
-                lrEnterpriseView = prPageNodes.Find(Function(x) x.PageId = lrPage.PageId)
+                lrEnterpriseView = prPageNodes.Find(Function(x) x.ModelId = lrEntity.Model.ModelId And x.PageId = lrPage.PageId)
 
                 If IsSomething(lrEnterpriseView) Then
                     '---------------------------------------------------

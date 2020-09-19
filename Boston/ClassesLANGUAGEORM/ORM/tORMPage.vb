@@ -1788,6 +1788,9 @@ Namespace FBM
             Dim liInd As Integer = 0
 
             Try
+                'CodeSafe
+                If Me.Loading Or Me.Loaded Then Exit Sub
+
                 Me.Loading = True
                 '------------------------------------
                 'Get ValueTypes

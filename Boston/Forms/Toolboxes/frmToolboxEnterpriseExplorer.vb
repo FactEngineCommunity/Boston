@@ -1036,17 +1036,19 @@ Public Class frmToolboxEnterpriseExplorer
                                 Me.Cursor = Cursors.WaitCursor
                                 If lrPage.Model.Loaded Then
                                     'Model is already loaded for Page, so do nothing
-                                Else
+                                ElseIf Not lrPage.Loading Then
                                     '----------------------------------------------------------------------------------------------
                                     'Load, because the user may have clicked/selected a Page, before clicking/selecting the Model
                                     '  and the Model for the Page is not already loaded. The Page load would otherwise fail.
                                     '  NB Loads all Pages within the Model so that 'Morphing' works. Morphing from one Page to the 
                                     '  next requires that all Pages within the Model are loaded (uses LiNQ queries).
                                     '----------------------------------------------------------------------------------------------
-                                    lrPage.Model.Load(True, False)
-                                    Richmond.WriteToStatusBar(lrPage.Model.Name & " - Model Loaded")
+                                    If Not lrPage.Model.Loading Then
+                                        lrPage.Model.Load(True, False)
+                                        Richmond.WriteToStatusBar(lrPage.Model.Name & " - Model Loaded")
+                                    End If
                                 End If
-                                Me.Cursor = Cursors.Default
+                                    Me.Cursor = Cursors.Default
                             End If
 
                             lsMessage = "- Double-Click on the Page to edit on the canvas."
@@ -2895,7 +2897,11 @@ Public Class frmToolboxEnterpriseExplorer
             lrEnterpriseView = Me.TreeView.SelectedNode.Tag
             lrPage = lrEnterpriseView.Tag 'prApplication.WorkingPage 
 
-            If lrPage.Loaded = False Then
+            If lrPage.Loaded = False And Not lrPage.Loading Then
+                Dim lsMessage = "Boston needs to load the selected page." & vbCrLf
+                lsMessage &= vbCrLf & "Working Model: " & prApplication.WorkingModel.ModelId
+                lsMessage &= vbCrLf & "Loading Page Model: " & lrPage.Model.ModelId
+                MsgBox(lsMessage)
                 lrPage.Load(False)
             End If
 
@@ -3393,6 +3399,9 @@ Public Class frmToolboxEnterpriseExplorer
         Try
             If (Not Me.ComboBoxProject.SelectedIndex = -1) _
                 And Not Me.zbLoadingProjects Then
+
+                'Clear the Page Nodes
+                prPageNodes.Clear()
 
                 Me.ComboBoxNamespace.Items.Clear()
                 Call Me.removeAllModelsFromTreeView()

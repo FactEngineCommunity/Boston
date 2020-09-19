@@ -1,0 +1,23 @@
+<script type="text/javascript">
+function toggle_class(e, c) {
+if (!e) return;
+var n = e.className;
+var i = n.indexOf(c);
+if (i == -1) {
+e.className = n+' '+c;
+} else {
+e.className = n.slice(0, i)+n.slice(i+c.length);
+}
+if (document.location.toString().indexOf('#') >= 0)
+document.location = document.location; // Re-scroll to the current fragment
+}
+function toggle_constraints() {
+toggle_class(document.getElementById('glossary-doc'), 'hide-constraints');
+}
+function toggle_alternates() {
+toggle_class(document.getElementById('glossary-doc'), 'hide-alternates');
+}
+function toggle_examples() {
+toggle_class(document.getElementById('glossary-doc'), 'hide-examples');
+}
+</script>
