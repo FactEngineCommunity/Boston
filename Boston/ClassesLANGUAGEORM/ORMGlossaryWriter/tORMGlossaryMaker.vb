@@ -58,7 +58,8 @@ Namespace FBM
 
             'Create the index
             Me.HTW.Write("<ol class=" & Chr(34) & " glossary-toc" & Chr(34) & ">")
-            For Each lrModelObject In prApplication.WorkingModel.getModelObjects()
+            Dim larModelObject = prApplication.WorkingModel.getModelObjects().OrderBy(Function(x) x.Id)
+            For Each lrModelObject In larModelObject
                 Call Me.addIndexEntry(lrModelObject)
             Next
             Me.HTW.Write("</ol>") 'Index llist
@@ -77,14 +78,20 @@ Namespace FBM
             Me.HTW.Write("Glossary")
             Me.HTW.RenderEndTag() 'H1
 
-            For Each lrModelObject In prApplication.WorkingModel.getModelObjects()
+            For Each lrModelObject In larModelObject
                 Select Case lrModelObject.GetType
                     Case GetType(FBM.ValueType)
                         Call Me.addValueTypeTerm(lrModelObject)
                     Case GetType(FBM.EntityType)
                         Call Me.addEntityTypeTerm(lrModelObject)
+                    Case GetType(FBM.FactType)
+                        Call Me.addFactTypeEntry(CType(lrModelObject, FBM.FactType))
                 End Select
-                Me.HTW.WriteBreak()
+
+                For Each lrFactTypeReading In lrModelObject.getOutgoingFactTypeReadings
+                    Call Me.addFactTypeReadingEntry(lrFactTypeReading)
+                Next
+
                 Me.HTW.WriteBreak()
             Next
 
@@ -105,7 +112,7 @@ Namespace FBM
         ''' <param name="arModelObject"></param>
         Public Sub addIndexEntry(ByRef arModelObject As FBM.ModelObject)
 
-            Dim lsIndexEntry = "<li><a href=" & Chr(34) & "./ Index.html#" & Trim(arModelObject.Id) & Chr(34) & " class=" & Chr(34) & "object_type" & Chr(34) & ">" & arModelObject.Id & "</a></li>"
+            Dim lsIndexEntry = "<li><a href=" & Chr(34) & "./Index.html#" & Trim(arModelObject.Id) & Chr(34) & " class=" & Chr(34) & "object_type" & Chr(34) & ">" & arModelObject.Id & "</a></li>"
 
             Me.HTW.Write(vbCrLf)
             Me.HTW.Write(lsIndexEntry)
@@ -163,6 +170,81 @@ Namespace FBM
             End If
 
             Me.HTW.RenderEndTag() 'DT
+
+        End Sub
+
+        Public Sub addFactTypeEntry(ByRef arFactType As FBM.FactType)
+
+
+            '  <dt><a name="ABN" class="object_type">ABN</a> <span class="keyword">is written as </span><a href="./index.html#String" class="object_type">String</a></dt>
+            Me.HTW.RenderBeginTag(HtmlTextWriterTag.Dt)
+
+            Me.HTW.AddAttribute(HtmlTextWriterAttribute.Name, arFactType.Id)
+            Me.HTW.AddAttribute(HtmlTextWriterAttribute.Class, "object_type")
+            Me.HTW.RenderBeginTag(HtmlTextWriterTag.A)
+            Me.HTW.Write(arFactType.Id)
+            Me.HTW.RenderEndTag() 'A (ModelObject)
+
+            Me.HTW.Write(" is where ")
+
+            If arFactType.FactTypeReading.Count > 0 Then
+
+
+                For Each lrPredicatePart In arFactType.FactTypeReading(0).PredicatePart
+
+                    Me.HTW.AddAttribute(HtmlTextWriterAttribute.Class, "object_type")
+                    Me.HTW.RenderBeginTag(HtmlTextWriterTag.A)
+                    Me.HTW.Write(lrPredicatePart.Role.JoinedORMObject.Id)
+                    Me.HTW.RenderEndTag() 'A (ModelObject1)
+
+                    If lrPredicatePart.PredicatePartText <> "" Then
+                        Me.HTW.Write(" " & lrPredicatePart.PredicatePartText & " ")
+                    End If
+
+                Next
+            End If
+
+            Me.HTW.RenderEndTag() 'DT
+
+
+        End Sub
+
+        Public Sub addFactTypeReadingEntry(ByRef arFactTypeReading As FBM.FactTypeReading)
+
+            '  <dd>
+            ' <div Class="glossary-facttype"><div class="glossary-reading"><span class="copula"><a href="./index.html#ABN" class="object_type">ABN</a>
+            ' Is of <a href="./index.html#Company" class="object_type">Company</a></span>
+            '</div><div class="glossary-alternates">(alternatively: <div Class="glossary-reading"><span class="copula"><a href="./index.html#Company" class="object_type">Company</a> has <a href="./index.html#ABN" class="object_type">ABN</a></span></div>)</div></div>
+            '<ul Class="glossary-constraints">
+            '<div Class="glossary-constraint"><span class="copula"><a href="./index.html#Company" class="object_type">Company</a> has <span class="keyword">one</span> <a href="./index.html#ABN" class="object_type">ABN</a></span></div>
+            '<div Class="glossary-constraint"><span class="copula"><a href="./index.html#ABN" class="object_type">ABN</a> Is of <span class="keyword">at most one</span> <a href="./index.html#Company" class="object_type">Company</a></span></div>
+            '</ul>
+            ' </dd>
+
+            Me.HTW.RenderBeginTag(HtmlTextWriterTag.Dd)
+
+            Me.HTW.AddAttribute(HtmlTextWriterAttribute.Class, "glossary-facttype")
+            Me.HTW.RenderBeginTag(HtmlTextWriterTag.Div)
+
+            Me.HTW.AddAttribute(HtmlTextWriterAttribute.Class, "glossary-reading")
+            Me.HTW.RenderBeginTag(HtmlTextWriterTag.Div)
+
+            For Each lrPredicatePart In arFactTypeReading.PredicatePart
+
+                Me.HTW.AddAttribute(HtmlTextWriterAttribute.Class, "object_type")
+                Me.HTW.RenderBeginTag(HtmlTextWriterTag.A)
+                Me.HTW.Write(lrPredicatePart.Role.JoinedORMObject.Id)
+                Me.HTW.RenderEndTag() 'A (ModelObject1)
+
+                If lrPredicatePart.PredicatePartText <> "" Then
+                    Me.HTW.Write(" " & lrPredicatePart.PredicatePartText & " ")
+                End If
+
+            Next
+
+            Me.HTW.RenderEndTag() 'Div glossary-reading
+            Me.HTW.RenderEndTag() 'Div glossary-facttype
+            Me.HTW.RenderEndTag() 'DD
 
         End Sub
 

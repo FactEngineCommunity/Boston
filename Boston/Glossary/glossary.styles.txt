@@ -87,7 +87,7 @@ dd {
 }
 
 .glossary-doc dd {
-  margin-bottom: 30px;
+  margin-bottom: 0px;
 }
 
 .glossary-constraint {
