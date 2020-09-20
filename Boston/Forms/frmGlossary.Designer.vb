@@ -30,6 +30,7 @@ Partial Class frmGlossary
         Me.ListBox1 = New System.Windows.Forms.ListBox()
         Me.SplitContainer2 = New System.Windows.Forms.SplitContainer()
         Me.WebBrowser = New System.Windows.Forms.WebBrowser()
+        Me.ButtonGenerateHTMLGlossary = New System.Windows.Forms.Button()
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SplitContainer1.Panel1.SuspendLayout()
         Me.SplitContainer1.Panel2.SuspendLayout()
@@ -48,6 +49,7 @@ Partial Class frmGlossary
         '
         'SplitContainer1.Panel1
         '
+        Me.SplitContainer1.Panel1.Controls.Add(Me.ButtonGenerateHTMLGlossary)
         Me.SplitContainer1.Panel1.Controls.Add(Me.CheckBoxShowGeneralConcepts)
         Me.SplitContainer1.Panel1.Controls.Add(Me.LabelModelName)
         Me.SplitContainer1.Panel1.Controls.Add(Me.LabelPromptModel)
@@ -105,7 +107,7 @@ Partial Class frmGlossary
         Me.ListBox1.FormattingEnabled = True
         Me.ListBox1.Location = New System.Drawing.Point(12, 95)
         Me.ListBox1.Name = "ListBox1"
-        Me.ListBox1.Size = New System.Drawing.Size(262, 459)
+        Me.ListBox1.Size = New System.Drawing.Size(262, 433)
         Me.ListBox1.Sorted = True
         Me.ListBox1.TabIndex = 0
         '
@@ -131,6 +133,16 @@ Partial Class frmGlossary
         Me.WebBrowser.Name = "WebBrowser"
         Me.WebBrowser.Size = New System.Drawing.Size(591, 358)
         Me.WebBrowser.TabIndex = 2
+        '
+        'ButtonGenerateHTMLGlossary
+        '
+        Me.ButtonGenerateHTMLGlossary.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.ButtonGenerateHTMLGlossary.Location = New System.Drawing.Point(12, 534)
+        Me.ButtonGenerateHTMLGlossary.Name = "ButtonGenerateHTMLGlossary"
+        Me.ButtonGenerateHTMLGlossary.Size = New System.Drawing.Size(141, 23)
+        Me.ButtonGenerateHTMLGlossary.TabIndex = 5
+        Me.ButtonGenerateHTMLGlossary.Text = "Generate &HTML Glossary"
+        Me.ButtonGenerateHTMLGlossary.UseVisualStyleBackColor = True
         '
         'frmGlossary
         '
@@ -160,4 +172,5 @@ Partial Class frmGlossary
     Friend WithEvents LabelModelName As System.Windows.Forms.Label
     Friend WithEvents LabelPromptModel As System.Windows.Forms.Label
     Friend WithEvents CheckBoxShowGeneralConcepts As System.Windows.Forms.CheckBox
+    Friend WithEvents ButtonGenerateHTMLGlossary As Button
 End Class

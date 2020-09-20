@@ -550,6 +550,20 @@ Namespace Richmond
             Return Nothing
         End Function
 
+        Public Function ReadEmbeddedRessourceToString(assembly As Assembly, searchPattern As String) As String
+
+            Dim resourceName = assembly.GetManifestResourceNames().FirstOrDefault(Function(x) x.Contains(searchPattern))
+            Using stream = assembly.GetManifestResourceStream(resourceName)
+                If stream IsNot Nothing Then
+                    Using reader = New StreamReader(stream, Encoding.Default)
+                        Return reader.ReadToEnd()
+                    End Using
+                End If
+            End Using
+            Return String.Empty
+
+        End Function
+
 
     End Module
 End Namespace

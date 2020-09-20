@@ -1,0 +1,5 @@
+<div class="glossary-controls">
+  <input type="button" onclick="toggle_constraints()" value="Constraints" class="glossary-toggle-constraint">
+  <input type="button" onclick="toggle_alternates()" value="Alternates" class="glossary-toggle-alternates">
+  <input type="button" onclick="toggle_examples()" value="Examples" class="glossary-toggle-examples">
+</div>

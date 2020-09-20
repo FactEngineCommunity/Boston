@@ -1015,4 +1015,21 @@ Public Class frmGlossary
 
     End Sub
 
+    Private Sub ButtonGenerateHTMLGlossary_Click(sender As Object, e As EventArgs) Handles ButtonGenerateHTMLGlossary.Click
+
+        Dim loSaveFileDialog = New SaveFileDialog
+        Dim lrGlossaryMaker As New FBM.ORMGlossaryMaker
+
+        loSaveFileDialog.Filter = "HTML File (*.html)|*.html"
+
+        If loSaveFileDialog.ShowDialog = Windows.Forms.DialogResult.OK Then
+
+            MsgBox(lrGlossaryMaker.Create)
+
+        End If
+
+
+
+    End Sub
+
 End Class
