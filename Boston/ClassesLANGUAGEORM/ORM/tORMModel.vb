@@ -3771,6 +3771,24 @@ Namespace FBM
 
         End Function
 
+        ''' <summary>
+        ''' Returns a list of all the ValueTypes, EntitTypes and FactTypes in the Model
+        ''' </summary>
+        ''' <returns></returns>
+        Public Function getModelObjects() As List(Of FBM.ModelObject)
+
+            Dim larModelObject As New List(Of FBM.ModelObject)
+
+            larModelObject.AddRange(Me.ValueType)
+            larModelObject.AddRange(Me.EntityType)
+            larModelObject.AddRange(Me.FactType)
+
+            larModelObject.OrderBy(Function(x) x.Id)
+
+            Return larModelObject
+
+        End Function
+
         ''' <summary>        
         '''ORMQL Mode. Gets the tokens from the Parse Tree.
         '''Walks the ParseTree and finds the tokens as per the Properties/Fields of the ao_object passed to the procedure.
