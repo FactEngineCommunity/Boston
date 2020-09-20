@@ -1,5 +1,5 @@
 ﻿Imports System.Reflection
-
+Imports System.IO
 Public Class frmGlossary
 
     Public WithEvents zrModel As FBM.Model
@@ -1020,11 +1020,23 @@ Public Class frmGlossary
         Dim loSaveFileDialog = New SaveFileDialog
         Dim lrGlossaryMaker As New FBM.ORMGlossaryMaker
 
+        loSaveFileDialog.OverwritePrompt = True
         loSaveFileDialog.Filter = "HTML File (*.html)|*.html"
 
         If loSaveFileDialog.ShowDialog = Windows.Forms.DialogResult.OK Then
 
-            MsgBox(lrGlossaryMaker.Create)
+            Dim lsFileLocationName = loSaveFileDialog.FileName
+
+            Dim lsGlossaryHTML = lrGlossaryMaker.Create
+
+            Dim loStreamWriter As StreamWriter
+            loStreamWriter = My.Computer.FileSystem.OpenTextFileWriter(lsFileLocationName, False)
+            loStreamWriter.WriteLine(lsGlossaryHTML)
+            loStreamWriter.Close()
+
+            Me.WebBrowser.Navigate(lsFileLocationName)
+
+            'MsgBox(lsGlossaryHTML)
 
         End If
 
