@@ -253,9 +253,15 @@ Public Class frmGlossary
             If lrFactType.FactTypeReading.Count = 0 Then
                 lrVerbaliser.VerbaliseModelObject(lrFactType)
             Else
-                Call lrFactType.FactTypeReading(0).GetReadingText(lrVerbaliser, True)
+                Dim larFactTypeReading = lrFactType.getOutgoingFactTypeReading(arEntityType)
+                If larFactTypeReading Is Nothing Then
+                    Call lrFactType.FactTypeReading(0).GetReadingText(lrVerbaliser, True)
+                Else
+                    larFactTypeReading.GetReadingText(lrVerbaliser, True)
+                End If
+
                 lrVerbaliser.HTW.Write(" (")
-                lrVerbaliser.VerbaliseModelObjectLight(lrFactType)
+                lrVerbaliser.VerbaliseModelObjectLightGray(lrFactType)
                 lrVerbaliser.HTW.Write(") ")
                 '=======================================================================================
                 If lrFactType.IsBinaryFactType Then

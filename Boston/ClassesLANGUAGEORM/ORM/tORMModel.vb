@@ -3780,7 +3780,7 @@ Namespace FBM
             Dim larModelObject As New List(Of FBM.ModelObject)
 
             larModelObject.AddRange(Me.ValueType.FindAll(Function(x) Not x.IsMDAModelElement))
-            larModelObject.AddRange(Me.EntityType.FindAll(Function(x) Not x.IsMDAModelElement))
+            larModelObject.AddRange(Me.EntityType.FindAll(Function(x) Not x.IsMDAModelElement And Not x.IsObjectifyingEntityType))
             larModelObject.AddRange(Me.FactType.FindAll(Function(x) (Not x.IsMDAModelElement) And x.IsObjectified))
 
             larModelObject.OrderBy(Function(x) x.Id)

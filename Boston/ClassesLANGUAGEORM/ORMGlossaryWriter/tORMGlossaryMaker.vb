@@ -28,10 +28,10 @@ Namespace FBM
             Me.HTW.Write(vbCrLf)
 
             'Overall body below header
-            Me.HTW.AddAttribute("postition", "absolute")
-            Me.HTW.AddAttribute("top", "60px")
-            Me.HTW.AddAttribute("bottom", "7px")
-            Me.HTW.AddAttribute("width", "100%")
+            Me.HTW.AddStyleAttribute("postition", "absolute")
+            Me.HTW.AddStyleAttribute("top", "60px")
+            Me.HTW.AddStyleAttribute("bottom", "7px")
+            Me.HTW.AddStyleAttribute("width", "100%")
             Me.HTW.RenderBeginTag(HtmlTextWriterTag.Div)
 
             'Navcontainer
@@ -57,7 +57,7 @@ Namespace FBM
             Me.HTW.Write(vbCrLf)
 
             'Create the index
-            Me.HTW.Write("<ol class=" & Chr(34) & " glossary-toc" & Chr(34) & ">")
+            Me.HTW.Write("<ol class=" & Chr(34) & "glossary-toc" & Chr(34) & ">")
             Dim larModelObject = prApplication.WorkingModel.getModelObjects().OrderBy(Function(x) x.Id)
             For Each lrModelObject In larModelObject
                 Call Me.addIndexEntry(lrModelObject)
@@ -141,6 +141,7 @@ Namespace FBM
             Me.HTW.RenderEndTag() 'A (DataType)
 
             Me.HTW.RenderEndTag() 'DT
+            Me.HTW.WriteBreak()
 
         End Sub
 

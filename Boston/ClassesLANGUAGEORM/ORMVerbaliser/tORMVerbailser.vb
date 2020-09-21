@@ -20,6 +20,7 @@ Namespace FBM
                        "a:hover {background-color:infobackground; }" & vbCrLf &
                        ".heading { color: Black; font-weight: bold; }" & vbCrLf &
                        ".objectType { color: Purple; font-weight: normal; }" & vbCrLf &
+                       ".objectTypeLight { color: LightGray; font-weight: normal; }" & vbCrLf &
                        ".objectTypeMissing { color: Purple; font-weight: normal; }" & vbCrLf &
                        ".referenceMode { color: Brown; font-weight: normal; }" & vbCrLf &
                        ".predicateText { color: DarkGreen; font-weight: normal; }" & vbCrLf &
@@ -116,6 +117,16 @@ Namespace FBM
         Public Sub VerbaliseModelObjectLight(ByRef arModelObject As FBM.ModelObject)
 
             Me.HTW.AddAttribute(HtmlTextWriterAttribute.Class, "quantifierLight")
+            Me.HTW.AddAttribute(HtmlTextWriterAttribute.Href, "elementid:" & arModelObject.Id)
+            Me.HTW.RenderBeginTag(HtmlTextWriterTag.A)
+            Me.HTW.Write(arModelObject.Id)
+            Me.HTW.RenderEndTag()
+
+        End Sub
+
+        Public Sub VerbaliseModelObjectLightGray(ByRef arModelObject As FBM.ModelObject)
+
+            Me.HTW.AddAttribute(HtmlTextWriterAttribute.Class, "objectTypeLight")
             Me.HTW.AddAttribute(HtmlTextWriterAttribute.Href, "elementid:" & arModelObject.Id)
             Me.HTW.RenderBeginTag(HtmlTextWriterTag.A)
             Me.HTW.Write(arModelObject.Id)

@@ -90,6 +90,10 @@ dd {
   margin-bottom: 0px;
 }
 
+.glossary-doc dt {
+  margin-bottom: 4px;
+}
+
 .glossary-constraint {
   background: #EDC;
 }
