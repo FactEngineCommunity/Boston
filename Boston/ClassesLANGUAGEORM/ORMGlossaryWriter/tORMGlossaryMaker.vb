@@ -39,9 +39,9 @@ Namespace FBM
             Me.HTW.AddStyleAttribute("top", "14px")
             Me.HTW.RenderBeginTag(HtmlTextWriterTag.Div)
 
-            Me.HTW.Write(vbCrLf)
-            Me.HTW.Write(Richmond.publicFunctions.ReadEmbeddedRessourceToString(Assembly.GetExecutingAssembly, "glossary.homelabellink.txt"))
-            Me.HTW.Write(vbCrLf)
+            'Me.HTW.Write(vbCrLf)
+            'Me.HTW.Write(Richmond.publicFunctions.ReadEmbeddedRessourceToString(Assembly.GetExecutingAssembly, "glossary.homelabellink.txt"))
+            'Me.HTW.Write(vbCrLf)
 
             Me.HTW.RenderEndTag() 'navcontainer
 
@@ -52,9 +52,9 @@ Namespace FBM
             'LeftSidebar
             Me.HTW.Write("<div class=" & Chr(34) & " glossary-sidebar" & Chr(34) & ">")
             'Index controls
-            Me.HTW.Write(vbCrLf)
-            Me.HTW.Write(Richmond.publicFunctions.ReadEmbeddedRessourceToString(Assembly.GetExecutingAssembly, "glossary.div.controls.txt"))
-            Me.HTW.Write(vbCrLf)
+            'Me.HTW.Write(vbCrLf)
+            'Me.HTW.Write(Richmond.publicFunctions.ReadEmbeddedRessourceToString(Assembly.GetExecutingAssembly, "glossary.div.controls.txt"))
+            'Me.HTW.Write(vbCrLf)
 
             'Create the index
             Me.HTW.Write("<ol class=" & Chr(34) & "glossary-toc" & Chr(34) & ">")
@@ -75,7 +75,7 @@ Namespace FBM
 
             'Heading
             Me.HTW.RenderBeginTag(HtmlTextWriterTag.H1)
-            Me.HTW.Write("Glossary")
+            Me.HTW.Write("Glossary for the " & prApplication.WorkingModel.Name & " model")
             Me.HTW.RenderEndTag() 'H1
 
             For Each lrModelObject In larModelObject

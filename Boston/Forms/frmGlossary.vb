@@ -1,5 +1,6 @@
 ﻿Imports System.Reflection
 Imports System.IO
+Imports System.Web.UI
 Public Class frmGlossary
 
     Public WithEvents zrModel As FBM.Model
@@ -247,22 +248,26 @@ Public Class frmGlossary
 
         For Each lrFactType In FactType
 
-
-            lrVerbaliser.VerbaliseQuantifierLight("Each ")
+            lrVerbaliser.HTW.AddAttribute(HtmlTextWriterAttribute.class, "FTR")
+            lrVerbaliser.HTW.RenderBeginTag(HtmlTextWriterTag.Div)
 
             If lrFactType.FactTypeReading.Count = 0 Then
                 lrVerbaliser.VerbaliseModelObject(lrFactType)
             Else
-                Dim larFactTypeReading = lrFactType.getOutgoingFactTypeReading(arEntityType)
-                If larFactTypeReading Is Nothing Then
+                Dim lrFactTypeReading = lrFactType.getOutgoingFactTypeReading(arEntityType)
+
+                If lrFactTypeReading Is Nothing Then
                     Call lrFactType.FactTypeReading(0).GetReadingText(lrVerbaliser, True)
                 Else
-                    larFactTypeReading.GetReadingText(lrVerbaliser, True)
+                    If lrFactTypeReading.PredicatePart(0).Role.Mandatory Then
+                        lrVerbaliser.VerbaliseQuantifierLight("Each ")
+                    End If
+                    lrFactTypeReading.GetReadingText(lrVerbaliser, True)
                 End If
 
-                lrVerbaliser.HTW.Write(" (")
+                lrVerbaliser.VerbaliseTextLightGray(" (")
                 lrVerbaliser.VerbaliseModelObjectLightGray(lrFactType)
-                lrVerbaliser.HTW.Write(") ")
+                lrVerbaliser.VerbaliseTextLightGray(") ")
                 '=======================================================================================
                 If lrFactType.IsBinaryFactType Then
                     If lrFactType.Is1To1BinaryFactType Then
@@ -278,19 +283,20 @@ Public Class frmGlossary
                         Else
                             lrVerbaliser.HTW.WriteBreak()
                             lrVerbaliser.VerbaliseIndent()
-                            lrFactType.FactTypeReading(1).GetReadingText(lrVerbaliser, True)
+                            lrFactType.getNotOutgoingFactTypeReadings(arEntityType)(0).GetReadingText(lrVerbaliser, True)
                         End If
                     Else
                         If lrFactType.FactTypeReading.Count > 1 Then
                             lrVerbaliser.HTW.WriteBreak()
                             lrVerbaliser.VerbaliseIndent()
-                            lrFactType.FactTypeReading(1).GetReadingText(lrVerbaliser, True)
+                            lrFactType.getNotOutgoingFactTypeReadings(arEntityType)(0).GetReadingText(lrVerbaliser, True)
                         End If
                     End If
                 End If
                 '=======================================================================================                
             End If
 
+            lrVerbaliser.HTW.RenderEndTag()
             lrVerbaliser.HTW.WriteBreak()
 
         Next

@@ -2999,6 +2999,21 @@ Namespace FBM
 
         End Function
 
+        Public Function getNotOutgoingFactTypeReadings(ByVal arModelObject As FBM.ModelObject) As List(Of FBM.FactTypeReading)
+
+            Dim larFactTypeReading = From FactTypeReading In Me.FactTypeReading
+                                     Where FactTypeReading.PredicatePart(0).Role.JoinedORMObject.Id <> arModelObject.Id
+                                     Select FactTypeReading
+
+            If larFactTypeReading.Count = 0 Then
+                Return Nothing
+            Else
+                Return larFactTypeReading.ToList
+            End If
+
+        End Function
+
+
         Public Function getOutgoingFactTypeReading(ByVal arModelObject As FBM.ModelObject) As FBM.FactTypeReading
 
             Dim larFactTypeReading = From FactTypeReading In Me.FactTypeReading

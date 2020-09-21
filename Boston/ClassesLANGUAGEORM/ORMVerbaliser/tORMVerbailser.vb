@@ -13,20 +13,22 @@ Namespace FBM
                        "<style type=" & Chr(34) & "text/css" & Chr(34) & ">" & vbCrLf &
                        "body, table { font-family: Tahoma; font-size: 9pt; color: DarkGreen; font-weight: normal; }" & vbCrLf &
                        "body { background-color: #F5F5F5; padding: 0em .1em; }" & vbCrLf &
+                       "FTR { padding: 9; }" & vbCrLf &
                        "table.hidden, tr.hidden, td.hidden { margin: 0em; padding: 0em; border-collapse: collapse;}" & vbCrLf &
                        "td.hidden { vertical-align: top; }" & vbCrLf &
                        "table.hidden { display:inline; }" & vbCrLf &
                        "a {text-decoration:none; }" & vbCrLf &
                        "a:hover {background-color:infobackground; }" & vbCrLf &
                        ".heading { color: Black; font-weight: bold; }" & vbCrLf &
-                       ".objectType { color: Purple; font-weight: normal; }" & vbCrLf &
-                       ".objectTypeLight { color: LightGray; font-weight: normal; }" & vbCrLf &
+                       ".objectType { color: Purple; font-weight: normal; margin-bottom: 16px;}" & vbCrLf &
+                       ".objectTypeLight { color: #D5D5D5;; font-weight: normal; }" & vbCrLf &
                        ".objectTypeMissing { color: Purple; font-weight: normal; }" & vbCrLf &
                        ".referenceMode { color: Brown; font-weight: normal; }" & vbCrLf &
                        ".predicateText { color: DarkGreen; font-weight: normal; }" & vbCrLf &
                        ".blacktext { color: Black; font-weight: normal; }" & vbCrLf &
                        ".quantifier { color: MediumBlue; font-weight: bold; }" & vbCrLf &
                        ".quantifierLight { color: Blue; font-weight: normal; }" & vbCrLf &
+                       ".textLightGray { color: LightGray; font-weight: normal; }" & vbCrLf &
                        ".primaryErrorReport { color: red; font-weight: bolder; }" & vbCrLf &
                        ".secondaryErrorReport { color: red; }" & vbCrLf &
                        ".verbalization { }" & vbCrLf &
@@ -100,6 +102,15 @@ Namespace FBM
             Me.HTW.AddAttribute(HtmlTextWriterAttribute.Class, "quantifierLight")
             Me.HTW.RenderBeginTag(HtmlTextWriterTag.Span)
             Me.HTW.Write(asQuantifier)
+            Me.HTW.RenderEndTag()
+
+        End Sub
+
+        Public Sub VerbaliseTextLightGray(ByVal asText As String)
+
+            Me.HTW.AddAttribute(HtmlTextWriterAttribute.Class, "textLightGray")
+            Me.HTW.RenderBeginTag(HtmlTextWriterTag.Span)
+            Me.HTW.Write(asText)
             Me.HTW.RenderEndTag()
 
         End Sub
