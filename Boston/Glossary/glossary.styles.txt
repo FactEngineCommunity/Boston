@@ -16,20 +16,21 @@ span {
   color: #000;
   background: #A9D3E5;
 }
-.keyword {
+.predicate {
   color: #0000CC;
 }
-.term, .concept {
+
+.concept {
   color: #6A0072;
 }
-.vocabulary, .object_type {
+
+.object_type {
   color: #6A0072;
+  text-decoration: none;
 }
-.linking, .copula {
+
+.predicate {
   color: #0E5400;
-}
-.literal, .value {
-  color: #FF990E;
 }
 
 dd {
@@ -50,7 +51,9 @@ dd {
   border-style: solid;
 }
 
-.glossary-toc {
+.heading { color: #2181de; font-weight: bold; }
+
+.glossary-index {
   overflow: auto;
   height: 88%;
   margin: 0;
@@ -59,7 +62,12 @@ dd {
   font-family: Menlo, Consolas, Monaco, "Lucida Console", monospace;
 }
 
-.glossary-doc {
+.glossary-index li {
+  margin-left: 20px;
+  text-indent: -10px;
+}
+
+.glossary {
   display: block;
   background: #FFF;
   border-right: solid #EEE 3px;
@@ -77,47 +85,47 @@ dd {
   border-style: solid;
 }
 
-.glossary-toc li {
-  margin-left: 20px;
-  text-indent: -10px;
-}
-
-.glossary-doc dl {
-  margin-bottom: 1600px;
-}
-
-.glossary-doc dd {
-  margin-bottom: 0px;
-}
-
-.glossary-doc dt {
+.glossary dt {
   margin-bottom: 4px;
 }
 
+.glossary dd {
+  margin-bottom: 0px;
+}
+
+.glossary dl {
+  margin-bottom: 1600px;
+}
+
+
 .glossary-constraint {
   background: #EDC;
+}
+
+.glossary-example {
+  color: #d89127;
 }
 
 .value {
   display: inline;
 }
 
-.keyword,
+.predicate,
 .glossary-facttype,
 .glossary-reading {
   display: inline;  
 }
+
 .glossary-constraint { display: inline; }
+
 .glossary-facttype, .glossary-constraint { display: block; }
-.glossary-doc.hide-alternates .glossary-alternates { display: none; }
-.glossary-doc.hide-constraints .glossary-constraints { display: none; }
-.glossary-doc.hide-examples .glossary-example { display: none; }
+
 </style>
+
 <style media="print" type="text/css">
-.keyword { color: #0000CC; font-style: italic; display: inline; }
+.predicate { color: #0000CC; font-style: italic; display: inline; }
 .vocabulary, .object_type { color: #A072C9; font-weight: bold; }
-.copula { color: #0E5400; }
 .value { color: #FF990E; display: inline; }
-.glossary-toc { display: none; }
+.glossary-index { display: none; }
 .glossary-facttype, .glossary-reading { display: inline; }
 </style>

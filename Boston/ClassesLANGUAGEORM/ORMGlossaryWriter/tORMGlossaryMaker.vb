@@ -57,7 +57,7 @@ Namespace FBM
             'Me.HTW.Write(vbCrLf)
 
             'Create the index
-            Me.HTW.Write("<ol class=" & Chr(34) & "glossary-toc" & Chr(34) & ">")
+            Me.HTW.Write("<ol class=" & Chr(34) & "glossary-index" & Chr(34) & ">")
             Dim larModelObject = prApplication.WorkingModel.getModelObjects().OrderBy(Function(x) x.Id)
             For Each lrModelObject In larModelObject
                 Call Me.addIndexEntry(lrModelObject)
@@ -68,8 +68,8 @@ Namespace FBM
             '=============================================
             'Glossary
             Me.HTW.Write(vbCrLf)
-            Me.HTW.AddAttribute("Class", "glossary-doc hide-constraints hide-alternates hide-examples")
-            Me.HTW.AddAttribute("id", "glossary-doc")
+            Me.HTW.AddAttribute("Class", "glossary")
+            Me.HTW.AddAttribute("id", "glossary")
             Me.HTW.RenderBeginTag(HtmlTextWriterTag.Div)
             Me.HTW.RenderBeginTag(HtmlTextWriterTag.Dl)
 
@@ -130,7 +130,7 @@ Namespace FBM
             Me.HTW.Write(arModelObject.Id)
             Me.HTW.RenderEndTag() 'A (ModelObject)
 
-            Me.HTW.AddAttribute(HtmlTextWriterAttribute.Class, "keyword")
+            Me.HTW.AddAttribute(HtmlTextWriterAttribute.Class, "predicate")
             Me.HTW.RenderBeginTag(HtmlTextWriterTag.Span)
             Me.HTW.Write(" is written as ")
             Me.HTW.RenderEndTag() 'SPAN (is written as)
@@ -139,6 +139,22 @@ Namespace FBM
             Me.HTW.RenderBeginTag(HtmlTextWriterTag.A)
             Me.HTW.Write(CType(arModelObject, FBM.ValueType).DataType.ToString)
             Me.HTW.RenderEndTag() 'A (DataType)
+
+            Dim liInd = 0
+            For Each lsInstance In arModelObject.Instance
+                If liInd = 0 Then
+                    Me.HTW.WriteBreak()
+                    Me.HTW.WriteBreak()
+                    Call Me.VerbaliseHeading("Example/s")
+                    Me.HTW.WriteBreak()
+                End If
+                Me.HTW.AddAttribute(HtmlTextWriterAttribute.Class, "glossary-example")
+                Me.HTW.RenderBeginTag(HtmlTextWriterTag.Dd)
+                Call Me.VerbaliseIndent()
+                Me.HTW.Write(lsInstance)
+                Me.HTW.RenderEndTag() 'DD
+                liInd += 1
+            Next
 
             Me.HTW.RenderEndTag() 'DT
             Me.HTW.WriteBreak()
@@ -158,7 +174,7 @@ Namespace FBM
             Me.HTW.Write(arModelObject.Id)
             Me.HTW.RenderEndTag() 'A (ModelObject)
 
-            Me.HTW.AddAttribute(HtmlTextWriterAttribute.Class, "keyword")
+            Me.HTW.AddAttribute(HtmlTextWriterAttribute.Class, "predicate")
             Me.HTW.RenderBeginTag(HtmlTextWriterTag.Span)
             Me.HTW.Write(" is identified by its ")
             Me.HTW.RenderEndTag() 'SPAN (is written as)
@@ -177,7 +193,8 @@ Namespace FBM
         Public Sub addFactTypeEntry(ByRef arFactType As FBM.FactType)
 
 
-            '  <dt><a name="ABN" class="object_type">ABN</a> <span class="keyword">is written as </span><a href="./index.html#String" class="object_type">String</a></dt>
+            '  <dt><a name="ABN" class="object_type">ABN</a> <span class="predicate">is written as </span>
+            '<a href = "./index.html#String" Class="object_type">String</a></dt>
             Me.HTW.RenderBeginTag(HtmlTextWriterTag.Dt)
 
             Me.HTW.AddAttribute(HtmlTextWriterAttribute.Name, arFactType.Id)
@@ -193,6 +210,7 @@ Namespace FBM
 
                 For Each lrPredicatePart In arFactType.FactTypeReading(0).PredicatePart
 
+                    Me.HTW.AddAttribute(HtmlTextWriterAttribute.Href, "./Index.html#" & lrPredicatePart.Role.JoinedORMObject.Id)
                     Me.HTW.AddAttribute(HtmlTextWriterAttribute.Class, "object_type")
                     Me.HTW.RenderBeginTag(HtmlTextWriterTag.A)
                     Me.HTW.Write(lrPredicatePart.Role.JoinedORMObject.Id)
@@ -232,6 +250,7 @@ Namespace FBM
 
             For Each lrPredicatePart In arFactTypeReading.PredicatePart
 
+                Me.HTW.AddAttribute(HtmlTextWriterAttribute.Href, "./Index.html#" & lrPredicatePart.Role.JoinedORMObject.Id)
                 Me.HTW.AddAttribute(HtmlTextWriterAttribute.Class, "object_type")
                 Me.HTW.RenderBeginTag(HtmlTextWriterTag.A)
                 Me.HTW.Write(lrPredicatePart.Role.JoinedORMObject.Id)
@@ -243,8 +262,21 @@ Namespace FBM
 
             Next
 
+            If arFactTypeReading.PredicatePart.Count > 2 Then
+                Call Me.VerbaliseHeading(" is defined as a ")
+
+                Me.HTW.AddAttribute(HtmlTextWriterAttribute.Href, "./Index.html#" & arFactTypeReading.FactType.Id)
+                Me.HTW.AddAttribute(HtmlTextWriterAttribute.Class, "object_type")
+                Me.HTW.RenderBeginTag(HtmlTextWriterTag.A)
+                Me.HTW.Write(arFactTypeReading.FactType.Id)
+                Me.HTW.RenderEndTag() 'A (ModelObject1)
+
+            End If
+
+
             Me.HTW.RenderEndTag() 'Div glossary-reading
             Me.HTW.RenderEndTag() 'Div glossary-facttype
+
             Me.HTW.RenderEndTag() 'DD
 
         End Sub
@@ -365,6 +397,7 @@ Namespace FBM
             Me.HTW.RenderBeginTag(HtmlTextWriterTag.Body)
 
         End Sub
+
 
     End Class
 

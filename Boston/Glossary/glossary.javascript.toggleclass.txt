@@ -12,12 +12,12 @@ if (document.location.toString().indexOf('#') >= 0)
 document.location = document.location; // Re-scroll to the current fragment
 }
 function toggle_constraints() {
-toggle_class(document.getElementById('glossary-doc'), 'hide-constraints');
+toggle_class(document.getElementById('glossary'), 'hide-constraints');
 }
 function toggle_alternates() {
-toggle_class(document.getElementById('glossary-doc'), 'hide-alternates');
+toggle_class(document.getElementById('glossary'), 'hide-alternates');
 }
 function toggle_examples() {
-toggle_class(document.getElementById('glossary-doc'), 'hide-examples');
+toggle_class(document.getElementById('glossary'), 'hide-examples');
 }
 </script>
