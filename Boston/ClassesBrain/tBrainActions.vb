@@ -552,6 +552,11 @@ Partial Public Class tBrain
     Private Sub ProcessISWHEREStatement()
 
         Try
+            Dim lrPlan As New Brain.Plan 'The Plan formulated to create the FactType.
+            Dim lrStep As Brain.Step 'For Steps added to the Plan.
+            Dim lrQuestion As tQuestion
+
+
             Me.Model = prApplication.WorkingModel
 
             Me.VAQL.ISWHEREStatement = New VAQL.IsWhereStatement
@@ -560,8 +565,25 @@ Partial Public Class tBrain
 
             Me.Timeout.Stop()
 
+            'Check to see if the FactTypeName already exists
+            Dim lsFactTypeName = Me.VAQL.ISWHEREStatement.MODELELEMENT(0).MODELELEMENTNAME
 
-            Me.send_data("Ok")
+            If Me.Model.ExistsModelElement(lsFactTypeName) Then
+                If Array.IndexOf({pcenumConceptType.ValueType,
+                                      pcenumConceptType.EntityType,
+                                      pcenumConceptType.FactType},
+                                  Me.Model.GetModelObjectByName(lsFactTypeName).ConceptType) >= 0 Then
+                    '-----------------------------------------------------------------------------
+                    'A ObjectType already exists within the Model for the name lsModelObjectName
+                    '-----------------------------------------------------------------------------
+                    Me.send_data("A Model Element already exists in the Model with the name, '" & lsFactTypeName & "'.")
+                Else
+
+                End If
+            Else
+
+                Me.send_data("Ok")
+            End If
 
             Me.Timeout.Start()
 
