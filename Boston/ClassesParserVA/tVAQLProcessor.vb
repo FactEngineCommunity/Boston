@@ -170,6 +170,26 @@ Namespace VAQL
             End Set
         End Property
 
+        Public Function makeSentence() As String
+
+            Dim lsSentence As String = ""
+
+            Dim liInd = 0
+            For Each lrModelElement In Me.MODELELEMENT
+                lsSentence &= lrModelElement.MODELELEMENTNAME & " "
+
+                If liInd < Me.MODELELEMENT.Count - 1 Then
+                    For Each lsPredicatePart In Me.PREDICATECLAUSE(liInd).PREDICATEPART
+                        lsSentence &= lsPredicatePart
+                    Next
+                End If
+                liInd += 1
+            Next
+
+            Return Trim(lsSentence)
+
+        End Function
+
     End Class
 
     Public Class PredicateClause

@@ -591,26 +591,31 @@ Partial Public Class tBrain
 
                     Call Me.createPlanStepForModelElement(lrModelElement.MODELELEMENTNAME, lrPlan)
 
+                    Dim lrWordResolved = New Language.WordResolved(lrModelElement.MODELELEMENTNAME, pcenumWordSense.Noun)
+                    lrSentence.WordListResolved.Add(lrWordResolved)
+
+                    lrPredicatePart = New Language.PredicatePart
+                    lrPredicatePart.PreboundText = Trim(lrModelElement.PREBOUNDREADINGTEXT)
+                    lrPredicatePart.PostboundText = Trim(lrModelElement.POSTBOUNDREADINGTEXT)
+                    lrPredicatePart.ObjectName = lrModelElement.MODELELEMENTNAME
+
                     If liInd < lrFactTypeStatement.MODELELEMENT.Count Then
-
-                        lrPredicatePart.PreboundText = Trim(lrModelElement.PREBOUNDREADINGTEXT)
-                        lrPredicatePart.PostboundText = Trim(lrModelElement.POSTBOUNDREADINGTEXT)
-                        lrPredicatePart.ObjectName = lrModelElement.MODELELEMENTNAME
-
                         For Each lsPredicatePartText In lrFactTypeStatement.PREDICATECLAUSE(liInd - 1).PREDICATEPART
-                            lrPredicatePart.PredicatePartText &= " " & lsPredicatePartText
+                            lrPredicatePart.PredicatePartText &= lsPredicatePartText
                             lrPredicatePart.PredicatePartText = LTrim(lrPredicatePart.PredicatePartText)
                         Next
-
-                        lrSentence.PredicatePart.Add(lrPredicatePart)
-
                     End If
+
+                    lrSentence.PredicatePart.Add(lrPredicatePart)
 
                     liInd += 1
                 Next
 
                 lrSentence.FrontText = lrFactTypeStatement.FRONTREADINGTEXT
                 lrSentence.FollowingText = lrFactTypeStatement.FOLLOWINGREADINGTEXT
+
+                lrSentence.Sentence = lrFactTypeStatement.makeSentence
+                lrSentence.OriginalSentence = lrFactTypeStatement.makeSentence
 
                 lrStep = New Brain.Step(pcenumActionType.CreateFactType, True, pcenumActionType.None)
                 lrPlan.AddStep(lrStep)
@@ -619,11 +624,43 @@ Partial Public Class tBrain
                 'Additional FactTypeReadings/Sentences
                 Dim larAdditionalSentence As New List(Of Language.Sentence)
                 If Me.VAQL.ISWHEREStatement.FACTTYPESTMT.Count > 1 Then
+
+                    For liFactTypeStatement = 1 To Me.VAQL.ISWHEREStatement.FACTTYPESTMT.Count - 1
+
+                        Dim lrAdditionalSentence = New Language.Sentence("", "")
+
+                        lrFactTypeStatement = Me.VAQL.ISWHEREStatement.FACTTYPESTMT(liFactTypeStatement)
+
+                        liInd = 1
+                        For Each lrModelElement In lrFactTypeStatement.MODELELEMENT
+
+                            If liInd < lrFactTypeStatement.MODELELEMENT.Count Then
+                                lrPredicatePart = New Language.PredicatePart
+                                lrPredicatePart.PreboundText = Trim(lrModelElement.PREBOUNDREADINGTEXT)
+                                lrPredicatePart.PostboundText = Trim(lrModelElement.POSTBOUNDREADINGTEXT)
+                                lrPredicatePart.ObjectName = lrModelElement.MODELELEMENTNAME
+
+                                For Each lsPredicatePartText In lrFactTypeStatement.PREDICATECLAUSE(liInd - 1).PREDICATEPART
+                                    lrPredicatePart.PredicatePartText &= lsPredicatePartText
+                                    lrPredicatePart.PredicatePartText = LTrim(lrPredicatePart.PredicatePartText)
+                                Next
+
+                                lrAdditionalSentence.PredicatePart.Add(lrPredicatePart)
+
+                            End If
+
+                            liInd += 1
+                        Next
+
+                        larAdditionalSentence.Add(lrAdditionalSentence)
+                    Next
                 Else
                     larAdditionalSentence = Nothing
                 End If
 
-                lrQuestion = New tQuestion("Would you like me to create a Fact Type for '" & Trim(asOriginalSentence) & "'?",
+
+
+                lrQuestion = New tQuestion("Would you like me to create a Fact Type for '" & Trim(lrSentence.Sentence) & "'?",
                                             pcenumQuestionType.CreateFactType,
                                             True,
                                             Nothing,
