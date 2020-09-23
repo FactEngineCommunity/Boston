@@ -50,7 +50,17 @@ Namespace Language
                     lasOriginalWord = Split(Me.OriginalSentence, " ", -1, CompareMethod.Text)
                 End If
 
+                Dim charsToRemove As String() = {"@", ",", ".", ";", "'"}
+
+                'Could use string clean = Regex.Replace(dirty, "[^A-Za-z0-9 ]", "");
+
                 For Each lsWord In lasWord
+
+                    'Remove offending characters
+                    For Each c In charsToRemove
+                        lsWord = lsWord.Replace(c, String.Empty)
+                    Next
+
                     Me.WordList.Add(lsWord)
                     Me.WordListQualification.Add(New Language.WordQualification(lsWord))
                     Me.WordListQualification(liInd).OriginalWord = lasOriginalWord(liInd)

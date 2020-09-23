@@ -340,52 +340,54 @@ Public Class frmGlossary
 
         Dim lsSelectedString As String = ""
 
-        If Me.ListBox1.SelectedIndex >= 0 Then
-            lsSelectedString = ListBox1.GetItemText(ListBox1.SelectedItem)
-        End If
-
-        Dim lrModelObject As FBM.ModelObject
-
-        If lsSelectedString <> "" Then
-            lrModelObject = Me.zrModel.GetModelObjectByName(lsSelectedString)
-            Select Case zrModel.GetConceptTypeByNameFuzzy(lsSelectedString, lsSelectedString)
-                Case Is = pcenumConceptType.EntityType
-                    Dim lrEntityType As FBM.EntityType
-                    lrEntityType = Me.zrModel.GetModelObjectByName(lsSelectedString)
-                    Call Me.VerbaliseEntityType(lrEntityType)
-
-                Case Is = pcenumConceptType.ValueType
-                    Dim lrValueType As FBM.ValueType
-                    lrValueType = Me.zrModel.GetModelObjectByName(lsSelectedString)
-                    Call Me.VerbaliseValueType(lrValueType)
-
-                Case Is = pcenumConceptType.FactType
-                    Dim lrFactType As FBM.FactType
-                    lrFactType = Me.zrModel.GetModelObjectByName(lsSelectedString)
-                    Call Me.VerbaliseFactType(lrFactType)
-                Case Is = pcenumConceptType.GeneralConcept
-                    Call Me.VerbaliseGeneralConcept(Me.zrModel.ModelDictionary.Find(Function(x) LCase(x.Symbol) = LCase(lsSelectedString)))
-            End Select
-
-            '-----------------------------------------------
-            If lrModelObject Is Nothing Then
-                '-----------------------------------------------------------------
-                'Clear the ORMDiagramView
-                Me.zrFrmORMDiagramViewer.clear_diagram()
-
-                '==============================================================
-                Dim lrPropertyGridForm As frmToolboxProperties
-                lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
-                If IsSomething(lrPropertyGridForm) Then
-                    Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
-                    lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute, loMiscFilterAttribute})
-                    lrPropertyGridForm.PropertyGrid.SelectedObject = Me.zrModel.ModelDictionary.Find(Function(x) LCase(x.Symbol) = LCase(lsSelectedString))
-                End If
-            Else
-                Call Me.DisplayORMDiagramViewForModelObject(lrModelObject)
+        With New WaitCursor
+            If Me.ListBox1.SelectedIndex >= 0 Then
+                lsSelectedString = ListBox1.GetItemText(ListBox1.SelectedItem)
             End If
 
-        End If
+            Dim lrModelObject As FBM.ModelObject
+
+            If lsSelectedString <> "" Then
+                lrModelObject = Me.zrModel.GetModelObjectByName(lsSelectedString)
+                Select Case zrModel.GetConceptTypeByNameFuzzy(lsSelectedString, lsSelectedString)
+                    Case Is = pcenumConceptType.EntityType
+                        Dim lrEntityType As FBM.EntityType
+                        lrEntityType = Me.zrModel.GetModelObjectByName(lsSelectedString)
+                        Call Me.VerbaliseEntityType(lrEntityType)
+
+                    Case Is = pcenumConceptType.ValueType
+                        Dim lrValueType As FBM.ValueType
+                        lrValueType = Me.zrModel.GetModelObjectByName(lsSelectedString)
+                        Call Me.VerbaliseValueType(lrValueType)
+
+                    Case Is = pcenumConceptType.FactType
+                        Dim lrFactType As FBM.FactType
+                        lrFactType = Me.zrModel.GetModelObjectByName(lsSelectedString)
+                        Call Me.VerbaliseFactType(lrFactType)
+                    Case Is = pcenumConceptType.GeneralConcept
+                        Call Me.VerbaliseGeneralConcept(Me.zrModel.ModelDictionary.Find(Function(x) LCase(x.Symbol) = LCase(lsSelectedString)))
+                End Select
+
+                '-----------------------------------------------
+                If lrModelObject Is Nothing Then
+                    '-----------------------------------------------------------------
+                    'Clear the ORMDiagramView
+                    Me.zrFrmORMDiagramViewer.clear_diagram()
+
+                    '==============================================================
+                    Dim lrPropertyGridForm As frmToolboxProperties
+                    lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
+                    If IsSomething(lrPropertyGridForm) Then
+                        Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
+                        lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute, loMiscFilterAttribute})
+                        lrPropertyGridForm.PropertyGrid.SelectedObject = Me.zrModel.ModelDictionary.Find(Function(x) LCase(x.Symbol) = LCase(lsSelectedString))
+                    End If
+                Else
+                    Call Me.DisplayORMDiagramViewForModelObject(lrModelObject)
+                End If
+
+            End If
+        End With
 
     End Sub
 

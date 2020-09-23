@@ -273,7 +273,6 @@ Namespace FBM
 
             End If
 
-
             Me.HTW.RenderEndTag() 'Div glossary-reading
             Me.HTW.RenderEndTag() 'Div glossary-facttype
 

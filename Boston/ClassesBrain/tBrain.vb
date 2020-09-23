@@ -1856,6 +1856,9 @@ Public Class tBrain
             Case Is = Boston.VAQL.TokenType.KEYWDISACONCEPT
                 Call Me.ProcessISACONCEPTStatement()
                 Return True
+            Case Is = Boston.VAQL.TokenType.KEYWDISWHERE
+                Call Me.ProcessISWHEREStatement()
+                Return True
         End Select
 
     End Function
@@ -3441,7 +3444,11 @@ Public Class tBrain
 
             If Me.IsVAQLStatement("NL: " & Me.InputBuffer) Then
                 Dim loTokenType As VAQL.TokenType
+
+                'Determine if is a valid VAQL Statement.
                 Call Me.VAQL.ProcessVAQLStatement(Me.InputBuffer, loTokenType, Me.VAQLParsetree)
+
+                'Process the VAQL Statement based on the primary TokenType returned (above)
                 If Me.ProcessVAQLStatement(Me.InputBuffer, loTokenType) Then
                     '----------------------------------------------------------------------------------------------
                     'Start the TimeOut so that the Brain can repeatedly address the Sentence until it is resolved
@@ -3456,7 +3463,7 @@ Public Class tBrain
             '----------------------------------------------------------------------------------------------------------
             'Check that no "Special Characters" appear in the "Sentence"....because the Brain doesn't understand them.
             '----------------------------------------------------------------------------------------------------------
-            Dim loRegularExpression As Regex = New Regex("^[a-zA-Z0-9 ()]*$")
+            Dim loRegularExpression As Regex = New Regex("^[a-zA-Z0-9 (),]*$")
             If (loRegularExpression.IsMatch(Me.InputBuffer)) Then
                 '----------------------------------------------------------------
                 'Great, the sentence doesn't contain characters like '/*-+@&$#%
@@ -3474,7 +3481,7 @@ Public Class tBrain
             '  have come from a mistyped VAQL Statement (i.e. that was not picked up in the code above).
             '  i.e. At this stage we're handing over to regular language processing that expects no special characters at all.
             '-------------------------------------------------------------------------------------------------------------------
-            loRegularExpression = New Regex("^[a-zA-Z0-9 ]*$")
+            loRegularExpression = New Regex("^[a-zA-Z0-9 ,]*$")
             If (loRegularExpression.IsMatch(Me.InputBuffer)) Then
                 '----------------------------------------------------------------
                 'Great, the sentence doesn't contain characters like '/*-+@&$#%

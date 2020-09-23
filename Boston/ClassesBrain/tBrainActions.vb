@@ -549,6 +549,33 @@ Partial Public Class tBrain
 
     End Sub
 
+    Private Sub ProcessISWHEREStatement()
+
+        Try
+            Me.Model = prApplication.WorkingModel
+
+            Me.VAQL.ISWHEREStatement = New VAQL.IsWhereStatement
+
+            Call Me.VAQL.GetParseTreeTokensReflection(Me.VAQL.ISWHEREStatement, Me.VAQLParsetree.Nodes(0))
+
+            Me.Timeout.Stop()
+
+
+            Me.send_data("Ok")
+
+            Me.Timeout.Start()
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
     Private Sub ProcessVALUETYPEISWRITTENASStatement()
 
         Me.Model = prApplication.WorkingModel

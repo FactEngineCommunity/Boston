@@ -49,6 +49,30 @@ Namespace VAQL
         End Property
     End Class
 
+    Public Class IsWhereStatement
+
+        Private _MODELELEMENT As New List(Of VAQL.ModelElementClause)
+        Public Property MODELELEMENT As List(Of VAQL.ModelElementClause)
+            Get
+                Return Me._MODELELEMENT
+            End Get
+            Set(value As List(Of VAQL.ModelElementClause))
+                Me._MODELELEMENT = value
+            End Set
+        End Property
+
+        Private _FACTTYPESTMT As New List(Of VAQL.FactTypeStatement)
+        Public Property FACTTYPESTMT As List(Of VAQL.FactTypeStatement)
+            Get
+                Return Me._FACTTYPESTMT
+            End Get
+            Set(value As List(Of VAQL.FactTypeStatement))
+                Me._FACTTYPESTMT = value
+            End Set
+        End Property
+
+    End Class
+
     Public Class FactTypeReadingStatement
 
         Private _FRONTREADINGTEXT As String
@@ -100,6 +124,45 @@ Namespace VAQL
                 Me._FOLLOWINGREADINGTEXT = value
             End Set
         End Property
+
+    End Class
+
+    Public Class FactTypeStatement
+
+        Private _MODELELEMENT As New List(Of VAQL.ModelElementClause)
+        Public Property MODELELEMENT As List(Of VAQL.ModelElementClause)
+            Get
+                Return Me._MODELELEMENT
+            End Get
+            Set(value As List(Of VAQL.ModelElementClause))
+                Me._MODELELEMENT = value
+            End Set
+        End Property
+
+        Private _PREDICATECLAUSE As New List(Of VAQL.PredicateClause)
+        Public Property PREDICATECLAUSE As List(Of VAQL.PredicateClause)
+            Get
+                Return Me._PREDICATECLAUSE
+            End Get
+            Set(value As List(Of VAQL.PredicateClause))
+                Me._PREDICATECLAUSE = value
+            End Set
+        End Property
+
+    End Class
+
+    Public Class PredicateClause
+
+        Private _PREDICATEPART As New List(Of String)
+        Public Property PREDICATEPART As List(Of String)
+            Get
+                Return Me._PREDICATEPART
+            End Get
+            Set(value As List(Of String))
+                Me._PREDICATEPART = value
+            End Set
+        End Property
+
 
     End Class
 
@@ -298,6 +361,7 @@ Namespace VAQL
 
         Public ISACONCEPTStatement As New VAQL.IsAConceptStatement
         Public ISANENTITYTYPEStatement As New VAQL.IsAnEntityTypeStatement
+        Public ISWHEREStatement As New VAQL.IsWhereStatement
         Public ATMOSTONEStatement As New VAQL.AtMostOneStatement
         Public PREDICATEPARTClause As New VAQL.PredicatePartClause
         Public VALUETYPEISWRITTENASStatement As New VAQL.ValueTypeIsWrittenAsStatement
@@ -511,46 +575,52 @@ Namespace VAQL
                 Dim lasListOfString As New List(Of String)
 
                 If lr_bag.Contains(aoParseTreeNode.Token.Type.ToString) Then
-                    'lrType = ao_object.GetAttributeMember(aoParseTreeNode.Token.Type.ToString).GetType
+
                     lrType = ao_object.GetType.GetProperty(aoParseTreeNode.Token.Type.ToString).PropertyType
                     Dim piInstance As PropertyInfo = ao_object.GetType.GetProperty(aoParseTreeNode.Token.Type.ToString)
 
                     If lrType Is GetType(String) Then
-                        'ao_object.SetAttributeMember(aoParseTreeNode.Token.Type.ToString, aoParseTreeNode.Token.Text)
-                        piInstance.SetValue(ao_object, aoParseTreeNode.Token.Text)
+
+                        piInstance.SetValue(ao_object, Trim(aoParseTreeNode.Token.Text))
 
                     ElseIf lrType Is lasListOfString.GetType Then
-                        'ao_object.GetAttributeMember(aoParseTreeNode.Token.Type.ToString).Add(aoParseTreeNode.Token.Text)
+
 
                         Dim liInstance As Object = ao_object.GetType.GetProperty(aoParseTreeNode.Token.Type.ToString).GetValue(ao_object)
-                        'Dim instance As Object = Activator.CreateInstance(ao_object.GetType.GetProperty(aoParseTreeNode.Token.Type.ToString).PropertyType)
                         Dim list As IList = CType(liInstance, IList)
                         list.Add(aoParseTreeNode.Token.Text)
                         ao_object.GetType.GetProperty(aoParseTreeNode.Token.Type.ToString).SetValue(ao_object, list, Nothing)
 
-                        '==================================
-                        'piInstance.SetValue(ao_object, aoParseTreeNode.Token.Text)
-                        'ElseIf lrType Is GetType(List(Of String)) Then
-                        '    'ao_object.GetAttributeMember(aoParseTreeNode.Token.Type.ToString).Add(aoParseTreeNode)
-                        '    piInstance.SetValue(ao_object, aoParseTreeNode.Token.Text)
                     ElseIf lrType Is GetType(List(Of Object)) Then
 
                         Dim liInstance As Object = ao_object.GetType.GetProperty(aoParseTreeNode.Token.Type.ToString).GetValue(ao_object)
-                        'Dim instance As Object = Activator.CreateInstance(ao_object.GetType.GetProperty(aoParseTreeNode.Token.Type.ToString).PropertyType)
                         Dim list As IList = CType(liInstance, IList)
                         list.Add(aoParseTreeNode)
                         ao_object.GetType.GetProperty(aoParseTreeNode.Token.Type.ToString).SetValue(ao_object, list, Nothing)
 
-                        'ao_object.GetAttributeMember(aoParseTreeNode.Token.Type.ToString).Add(aoParseTreeNode)
-                        'piInstance.SetValue(ao_object, aoParseTreeNode.Token.Text)
                     ElseIf lrType Is GetType(Object) Then
-                        'ao_object.SetAttributeMember(aoParseTreeNode.Token.Type.ToString, aoParseTreeNode)
+
                         piInstance.SetValue(ao_object, aoParseTreeNode)
+
+                    ElseIf lrType.Name = "List`1" Then
+
+                        Dim instance = Activator.CreateInstance(lrType.GenericTypeArguments(0))
+                        Call GetParseTreeTokensReflection(instance, loParseTreeNode)
+                        Dim liInstance As Object = ao_object.GetType.GetProperty(aoParseTreeNode.Token.Type.ToString).GetValue(ao_object)
+                        Dim list As IList = CType(liInstance, IList)
+                        list.Add(instance)
+                        ao_object.GetType.GetProperty(aoParseTreeNode.Token.Type.ToString).SetValue(ao_object, list, Nothing)
+
+                    Else
+                        Dim instance = Activator.CreateInstance(lrType)
+                        Call GetParseTreeTokensReflection(instance, loParseTreeNode)
+                        piInstance.SetValue(ao_object, instance)
                     End If
+
                 End If
 
                 For Each loParseTreeNode In aoParseTreeNode.Nodes.ToArray
-                    Call Me.GetParseTreeTokensReflection(ao_object, loParseTreeNode)
+                    Call GetParseTreeTokensReflection(ao_object, loParseTreeNode)
                 Next
 
             Catch ex As Exception
@@ -562,6 +632,94 @@ Namespace VAQL
             End Try
 
         End Sub
+
+
+        'Public Sub GetParseTreeTokensReflection(ByRef ao_object As Object, ByRef aoParseTreeNode As VAQL.ParseNode)
+
+        '    '-------------------------------
+        '    'NB IMPORTANT: The TokenTypes in the ParseTree must be the same as established in aoObject (as hardcoded here in Richmond).
+        '    'i.e. Richmond (the software) and the Parser (to the outside word) are linked.
+        '    'If the Tokens in the Parser do not match the HardCoded tokens then Richmond will not be able to retrieve the tokens
+        '    ' from the ParseText input from the user.
+        '    'This isn't the falt of the user, this is a fault of using the ParserGenerator (TinyPG in Richmond's case) to set-up the Tokens.
+        '    'i.e. The person setting up the Parser in TinyPG need be aware that 'Tokens' in TinyPG (when defining the ORMQL) need be the same
+        '    ' as the Tokens in Richmond and as Richmond expects.
+        '    'i.e. Establishing a Parser in TinyPG is actually a form of 'coding' (hard-coding), and where Richmond ostensibly has 2 parsers,
+        '    '  VB.Net and TinyPG.
+        '    '---------------------
+        '    'Parameters
+        '    'ao_object is of runtime generated type DynamicCollection.Entity
+        '    '----------------------------------------------------------------------
+
+        '    Dim loPropertyInfo() As System.Reflection.PropertyInfo = ao_object.GetType().GetProperties
+        '    Dim loProperty As PropertyInfo
+        '    Dim lr_bag As New Stack
+        '    Dim loParseTreeNode As VAQL.ParseNode
+        '    Dim lrType As Type
+        '    Try
+        '        '--------------------------------------
+        '        'Retrieve the list of required Tokens
+        '        '--------------------------------------
+        '        For Each loProperty In loPropertyInfo
+        '            lr_bag.Push(loProperty.Name)
+        '        Next
+
+        '        loParseTreeNode = aoParseTreeNode
+
+        '        Dim lasListOfString As New List(Of String)
+
+        '        If lr_bag.Contains(aoParseTreeNode.Token.Type.ToString) Then
+        '            'lrType = ao_object.GetAttributeMember(aoParseTreeNode.Token.Type.ToString).GetType
+        '            lrType = ao_object.GetType.GetProperty(aoParseTreeNode.Token.Type.ToString).PropertyType
+        '            Dim piInstance As PropertyInfo = ao_object.GetType.GetProperty(aoParseTreeNode.Token.Type.ToString)
+
+        '            If lrType Is GetType(String) Then
+        '                'ao_object.SetAttributeMember(aoParseTreeNode.Token.Type.ToString, aoParseTreeNode.Token.Text)
+        '                piInstance.SetValue(ao_object, aoParseTreeNode.Token.Text)
+
+        '            ElseIf lrType Is lasListOfString.GetType Then
+        '                'ao_object.GetAttributeMember(aoParseTreeNode.Token.Type.ToString).Add(aoParseTreeNode.Token.Text)
+
+        '                Dim liInstance As Object = ao_object.GetType.GetProperty(aoParseTreeNode.Token.Type.ToString).GetValue(ao_object)
+        '                'Dim instance As Object = Activator.CreateInstance(ao_object.GetType.GetProperty(aoParseTreeNode.Token.Type.ToString).PropertyType)
+        '                Dim list As IList = CType(liInstance, IList)
+        '                list.Add(aoParseTreeNode.Token.Text)
+        '                ao_object.GetType.GetProperty(aoParseTreeNode.Token.Type.ToString).SetValue(ao_object, list, Nothing)
+
+        '                '==================================
+        '                'piInstance.SetValue(ao_object, aoParseTreeNode.Token.Text)
+        '                'ElseIf lrType Is GetType(List(Of String)) Then
+        '                '    'ao_object.GetAttributeMember(aoParseTreeNode.Token.Type.ToString).Add(aoParseTreeNode)
+        '                '    piInstance.SetValue(ao_object, aoParseTreeNode.Token.Text)
+        '            ElseIf lrType Is GetType(List(Of Object)) Then
+
+        '                Dim liInstance As Object = ao_object.GetType.GetProperty(aoParseTreeNode.Token.Type.ToString).GetValue(ao_object)
+        '                'Dim instance As Object = Activator.CreateInstance(ao_object.GetType.GetProperty(aoParseTreeNode.Token.Type.ToString).PropertyType)
+        '                Dim list As IList = CType(liInstance, IList)
+        '                list.Add(aoParseTreeNode)
+        '                ao_object.GetType.GetProperty(aoParseTreeNode.Token.Type.ToString).SetValue(ao_object, list, Nothing)
+
+        '                'ao_object.GetAttributeMember(aoParseTreeNode.Token.Type.ToString).Add(aoParseTreeNode)
+        '                'piInstance.SetValue(ao_object, aoParseTreeNode.Token.Text)
+        '            ElseIf lrType Is GetType(Object) Then
+        '                'ao_object.SetAttributeMember(aoParseTreeNode.Token.Type.ToString, aoParseTreeNode)
+        '                piInstance.SetValue(ao_object, aoParseTreeNode)
+        '            End If
+        '        End If
+
+        '        For Each loParseTreeNode In aoParseTreeNode.Nodes.ToArray
+        '            Call Me.GetParseTreeTokensReflection(ao_object, loParseTreeNode)
+        '        Next
+
+        '    Catch ex As Exception
+        '        Dim lsMessage As String
+        '        Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+        '        lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+        '        lsMessage &= vbCrLf & vbCrLf & ex.Message
+        '        prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        '    End Try
+
+        'End Sub
 
 
         Public Function ParseTreeContainsTokenType(ByVal aoParseTree As VAQL.ParseTree, ByVal aoTokenType As VAQL.TokenType) As Boolean
@@ -647,6 +805,10 @@ Namespace VAQL
                         aoParseTree = Me.Parsetree
                     ElseIf Me.ParseTreeContainsTokenType(Me.Parsetree, TokenType.KEYWDISANENTITYTYPE) Then
                         aoTokenType = TokenType.KEYWDISANENTITYTYPE
+                        aoParseTree = Me.Parsetree
+                    ElseIf Me.ParseTreeContainsTokenType(Me.Parsetree, TokenType.KEYWDISWHERE) And
+                           Me.ParseTreeContainsTokenType(Me.Parsetree, TokenType.FACTTYPESTMT) Then
+                        aoTokenType = TokenType.KEYWDISWHERE
                         aoParseTree = Me.Parsetree
                     End If
 
