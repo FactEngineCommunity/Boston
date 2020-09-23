@@ -37,15 +37,16 @@
     Public FocalSymbol As New List(Of String)
 
 
-    Public Sub New(ByVal asQuestion As String, _
-                   ByVal aiQuestionType As pcenumQuestionType, _
-                   ByVal abExpectingYesNoResponse As Boolean, _
-                   Optional ByVal aasSymbol As List(Of String) = Nothing, _
-                   Optional ByVal arSentence As Language.Sentence = Nothing, _
-                   Optional ByVal aoObjectType As FBM.ModelObject = Nothing, _
-                   Optional ByRef arPlan As Brain.Plan = Nothing, _
-                   Optional ByRef arStep As Brain.Step = Nothing, _
-                   Optional ByVal asGeneralText As String = "")
+    Public Sub New(ByVal asQuestion As String,
+                   ByVal aiQuestionType As pcenumQuestionType,
+                   ByVal abExpectingYesNoResponse As Boolean,
+                   Optional ByVal aasSymbol As List(Of String) = Nothing,
+                   Optional ByVal arSentence As Language.Sentence = Nothing,
+                   Optional ByVal aoObjectType As FBM.ModelObject = Nothing,
+                   Optional ByRef arPlan As Brain.Plan = Nothing,
+                   Optional ByRef arStep As Brain.Step = Nothing,
+                   Optional ByVal asGeneralText As String = "",
+                   Optional ByVal aarAdditionalSentence As List(Of Language.Sentence) = Nothing)
 
         Dim lsString As String = ""
 

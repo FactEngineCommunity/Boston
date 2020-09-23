@@ -1857,7 +1857,7 @@ Public Class tBrain
                 Call Me.ProcessISACONCEPTStatement()
                 Return True
             Case Is = Boston.VAQL.TokenType.KEYWDISWHERE
-                Call Me.ProcessISWHEREStatement()
+                Call Me.ProcessISWHEREStatement(asOriginalSentence)
                 Return True
         End Select
 

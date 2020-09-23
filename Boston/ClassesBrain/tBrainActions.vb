@@ -549,13 +549,14 @@ Partial Public Class tBrain
 
     End Sub
 
-    Private Sub ProcessISWHEREStatement()
+    Private Sub ProcessISWHEREStatement(ByVal asOriginalSentence As String)
 
         Try
             Dim lrPlan As New Brain.Plan 'The Plan formulated to create the FactType.
             Dim lrStep As Brain.Step 'For Steps added to the Plan.
+            Dim lrPredicatePart As New Language.PredicatePart
             Dim lrQuestion As tQuestion
-
+            Dim lrSentence = New Language.Sentence(asOriginalSentence, asOriginalSentence)
 
             Me.Model = prApplication.WorkingModel
 
@@ -581,11 +582,159 @@ Partial Public Class tBrain
 
                 End If
             Else
+                'Get the ModelElements for the overall FactType. Only need to get them for the first FactTypeStatement.
+                '  NB Subsequent FactTypeStatements in the ISWHERE Statement must have matching ModelElementNames.
+
+                Dim lrFactTypeStatement = Me.VAQL.ISWHEREStatement.FACTTYPESTMT(0)
+                Dim liInd = 1
+                For Each lrModelElement In lrFactTypeStatement.MODELELEMENT
+
+                    Call Me.createPlanStepForModelElement(lrModelElement.MODELELEMENTNAME, lrPlan)
+
+                    If liInd < lrFactTypeStatement.MODELELEMENT.Count Then
+
+                        lrPredicatePart.PreboundText = Trim(lrModelElement.PREBOUNDREADINGTEXT)
+                        lrPredicatePart.PostboundText = Trim(lrModelElement.POSTBOUNDREADINGTEXT)
+                        lrPredicatePart.ObjectName = lrModelElement.MODELELEMENTNAME
+
+                        For Each lsPredicatePartText In lrFactTypeStatement.PREDICATECLAUSE(liInd - 1).PREDICATEPART
+                            lrPredicatePart.PredicatePartText &= " " & lsPredicatePartText
+                            lrPredicatePart.PredicatePartText = LTrim(lrPredicatePart.PredicatePartText)
+                        Next
+
+                        lrSentence.PredicatePart.Add(lrPredicatePart)
+
+                    End If
+
+                    liInd += 1
+                Next
+
+                lrSentence.FrontText = lrFactTypeStatement.FRONTREADINGTEXT
+                lrSentence.FollowingText = lrFactTypeStatement.FOLLOWINGREADINGTEXT
+
+                lrStep = New Brain.Step(pcenumActionType.CreateFactType, True, pcenumActionType.None)
+                lrPlan.AddStep(lrStep)
+
+                '===========================================================
+                'Additional FactTypeReadings/Sentences
+                Dim larAdditionalSentence As New List(Of Language.Sentence)
+                If Me.VAQL.ISWHEREStatement.FACTTYPESTMT.Count > 1 Then
+                Else
+                    larAdditionalSentence = Nothing
+                End If
+
+                lrQuestion = New tQuestion("Would you like me to create a Fact Type for '" & Trim(asOriginalSentence) & "'?",
+                                            pcenumQuestionType.CreateFactType,
+                                            True,
+                                            Nothing,
+                                            lrSentence,
+                                            Nothing,
+                                            lrPlan,
+                                            lrStep,
+                                            ,
+                                            larAdditionalSentence)
+
+                If Not Me.QuestionHasBeenRaised(lrQuestion) Then
+                    Me.AddQuestion(lrQuestion)
+                End If
 
                 Me.send_data("Ok")
             End If
 
             Me.Timeout.Start()
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
+    Public Sub createPlanStepForModelElement(ByVal asModelObjectName As String, ByRef arPlan As Brain.Plan)
+
+        Dim lrQuestion As tQuestion
+        Dim lrStep As Brain.Step 'For Steps added to the Plan.
+
+        Try
+            Dim lbProceedToCreateObjectTypeQuestion As Boolean = False
+
+            If Me.Model.ExistsModelElement(asModelObjectName) Then
+                If Array.IndexOf({pcenumConceptType.ValueType,
+                                      pcenumConceptType.EntityType,
+                                      pcenumConceptType.FactType},
+                                  Me.Model.GetModelObjectByName(asModelObjectName).ConceptType) >= 0 Then
+                    '-----------------------------------------------------------------------------
+                    'A ObjectType already exists within the Model for the name lsModelObjectName
+                    '-----------------------------------------------------------------------------
+                Else
+                    lbProceedToCreateObjectTypeQuestion = True
+                End If
+            Else
+                lbProceedToCreateObjectTypeQuestion = True
+            End If
+
+            If lbProceedToCreateObjectTypeQuestion Then
+
+                Dim lbIsLikelyValueType As Boolean = False
+                Dim items As Array
+                items = System.Enum.GetValues(GetType(pcenumReferenceModeEndings))
+                Dim item As pcenumReferenceModeEndings
+                For Each item In items
+                    If asModelObjectName.EndsWith(GetEnumDescription(item)) Then
+                        lbIsLikelyValueType = True
+                        Exit For
+                    ElseIf asModelObjectName.EndsWith(GetEnumDescription(item).Trim({"."c})) Then 'See https://msdn.microsoft.com/en-us/library/kxbw3kwc(v=vs.110).aspx
+                        lbIsLikelyValueType = True
+                        Exit For
+                    End If
+                Next
+
+                If lbIsLikelyValueType Then
+                    lrStep = New Brain.Step(pcenumActionType.CreateValueType, True, pcenumActionType.None)
+                    arPlan.AddStep(lrStep)
+
+                    Dim lasSymbol As New List(Of String)
+                    lasSymbol.Add(asModelObjectName)
+
+                    lrQuestion = New tQuestion("Would you like me to create an Value Type for '" & asModelObjectName & "'?",
+                                                         pcenumQuestionType.CreateValueType,
+                                                         True,
+                                                         lasSymbol,
+                                                         Nothing,
+                                                         Nothing,
+                                                         arPlan,
+                                                         lrStep)
+                Else
+                    lrStep = New Brain.Step(pcenumActionType.CreateEntityType, True, pcenumActionType.CreateValueType)
+                    arPlan.AddStep(lrStep)
+
+                    Dim lasSymbol As New List(Of String)
+                    lasSymbol.Add(asModelObjectName)
+
+                    lrQuestion = New tQuestion("Would you like me to create an Entity Type for '" & asModelObjectName & "'? (Answer 'No' and I'll ask you if you want a Value Type)",
+                                                         pcenumQuestionType.CreateEntityType,
+                                                         True,
+                                                         lasSymbol,
+                                                         Nothing,
+                                                         Nothing,
+                                                         arPlan,
+                                                         lrStep)
+                End If
+
+
+                If Me.QuestionHasBeenRaised(lrQuestion) Then
+                    '------------------------------------------------------------
+                    'Great, already asked the question and am awaiting responce
+                    '------------------------------------------------------------
+                Else
+                    Me.AddQuestion(lrQuestion)
+                End If
+
+            End If
 
         Catch ex As Exception
             Dim lsMessage As String

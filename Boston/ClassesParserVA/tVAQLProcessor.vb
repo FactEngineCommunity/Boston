@@ -129,6 +129,17 @@ Namespace VAQL
 
     Public Class FactTypeStatement
 
+        Private _FRONTREADINGTEXT As String
+        Public Property FRONTREADINGTEXT As String
+            Get
+                Return Me._FRONTREADINGTEXT
+            End Get
+            Set(value As String)
+                Me._FRONTREADINGTEXT = value
+            End Set
+        End Property
+
+
         Private _MODELELEMENT As New List(Of VAQL.ModelElementClause)
         Public Property MODELELEMENT As List(Of VAQL.ModelElementClause)
             Get
@@ -146,6 +157,16 @@ Namespace VAQL
             End Get
             Set(value As List(Of VAQL.PredicateClause))
                 Me._PREDICATECLAUSE = value
+            End Set
+        End Property
+
+        Private _FOLLOWINGREADINGTEXT As String
+        Public Property FOLLOWINGREADINGTEXT As String
+            Get
+                Return Me._FOLLOWINGREADINGTEXT
+            End Get
+            Set(value As String)
+                Me._FOLLOWINGREADINGTEXT = value
             End Set
         End Property
 
