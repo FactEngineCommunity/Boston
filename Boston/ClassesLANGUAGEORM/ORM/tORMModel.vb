@@ -2656,7 +2656,7 @@ Namespace FBM
                     Call TableModelDictionary.UpdateModelDictionaryEntry(lrDictionaryEntry)
                 Else
                     lrDictionaryEntry = Me.ModelDictionary.Find(AddressOf lrDictionaryEntry.Equals)
-                    If lrDictionaryEntry.Realisations.Count = 1 Then
+                    If lrDictionaryEntry.Realisations.Count <= 1 Then
                         Me.RemoveDictionaryEntry(lrDictionaryEntry, abDoDatabaseProcessing)
                     Else
                         Dim lrConcept As New FBM.Concept(arEntityType.Id)
@@ -2715,7 +2715,7 @@ Namespace FBM
                     Call TableModelDictionary.UpdateModelDictionaryEntry(lrDictionaryEntry)
                 Else
                     lrDictionaryEntry = Me.ModelDictionary.Find(AddressOf lrDictionaryEntry.Equals)
-                    If lrDictionaryEntry.Realisations.Count = 1 Then
+                    If lrDictionaryEntry.Realisations.Count <= 1 Then
                         Me.RemoveDictionaryEntry(lrDictionaryEntry, abBroadcastInterfaceEvent)
                     Else
                         Dim lrConcept As New FBM.Concept(arValueType.Id)
@@ -2767,9 +2767,9 @@ Namespace FBM
                         Throw New Exception("No dictionary entry exists for the FactType with FactType.Id: '" & arFactType.Id & "'")
                     End If
 
-                    If lrDictionaryEntry.Realisations.Count = 1 Then
+                    If lrDictionaryEntry.Realisations.Count <= 1 Then
                         Me.RemoveDictionaryEntry(lrDictionaryEntry, abDoDatabaseProcessing)
-                    Else                        
+                    Else
                         lrDictionaryEntry.removeConceptType(pcenumConceptType.FactType)
                     End If
                 End If
@@ -2853,7 +2853,7 @@ Namespace FBM
                     Call TableModelDictionary.UpdateModelDictionaryEntry(lrDictionaryEntry)
                 Else
                     lrDictionaryEntry = Me.AddModelDictionaryEntry(lrDictionaryEntry, False, False)
-                    If lrDictionaryEntry.Realisations.Count = 1 Then
+                    If lrDictionaryEntry.Realisations.Count <= 1 Then
                         Me.RemoveDictionaryEntry(lrDictionaryEntry, abBroadcastInterfaceEvent)
                     Else
                         Dim lrConcept As New FBM.Concept(arRoleConstraint.Id)
@@ -3138,7 +3138,7 @@ Namespace FBM
                 Call TableModelDictionary.UpdateModelDictionaryEntry(lrDictionaryEntry)
             Else
                 lrDictionaryEntry = Me.ModelDictionary.Find(AddressOf lrDictionaryEntry.Equals)
-                If lrDictionaryEntry.Realisations.Count = 1 Then
+                If lrDictionaryEntry.Realisations.Count <= 1 Then
                     Me.RemoveDictionaryEntry(lrDictionaryEntry, abDoDatabaseProcessing)
                 Else
                     Dim lrConcept As New FBM.Concept(arModelNote.Id)

@@ -605,6 +605,12 @@ Namespace FBM
 
             Me.Realisations.RemoveAll(Function(x) x = aiConceptType)
 
+            '20200924-VM-Wasn't in here, but probably should be
+            'If Me.Realisations.Count = 0 Then
+            '    Call TableModelDictionary.DeleteModelDictionaryEntry(Me)
+            '    Me.Model.ModelDictionary.Remove(Me)
+            'End If
+
             Me.isDirty = True
 
         End Sub
