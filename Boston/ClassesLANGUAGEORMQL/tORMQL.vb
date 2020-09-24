@@ -335,7 +335,6 @@ Namespace ORMQL
                 Me._COMPARISON = value
             End Set
         End Property
-
     End Class
 
     Public Class UpdateStatement
@@ -978,11 +977,8 @@ Namespace ORMQL
                 'Dim lrWhereClauseTree As Object = prApplication.ORMQL.WhereClauseTree
                 'lrWhereClauseTree.COMPARISON.Clear()
 
-                '=============================================================
-                Dim lrWhereClauseTree As ORMQL.WhereClauseTree
-                lrWhereClauseTree = prApplication.ORMQL.WhereClauseTree
-
-                lrWhereClauseTree.COMPARISON.Clear()
+                '=============================================================                
+                Dim lrWhereClauseTree = New ORMQL.WhereClauseTree
 
                 '----------------------------------
                 'Get the Tokens from the ParseTree
@@ -1020,6 +1016,7 @@ Namespace ORMQL
                     '-------------------------------------
                     'The ORMQL Statement has a WHERESTMT
                     '-------------------------------------
+                    lrWhereClauseTree.COMPARISON.Clear()
                     Call Me.GetParseTreeTokensReflection(lrWhereClauseTree, lrselectStatement.WHERESTMT) 'Me.parsetree.Nodes(0))
 
                     '-----------------------------------------------------------------------------

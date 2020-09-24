@@ -564,6 +564,7 @@ Partial Public Class tBrain
     Private Sub ProcessISWHEREStatement(ByVal asOriginalSentence As String)
 
         Try
+            Dim lsMessage As String = ""
             Dim lrPlan As New Brain.Plan 'The Plan formulated to create the FactType.
             Dim lrStep As Brain.Step 'For Steps added to the Plan.
             Dim lrPredicatePart As New Language.PredicatePart
@@ -575,6 +576,22 @@ Partial Public Class tBrain
             Me.VAQL.ISWHEREStatement = New VAQL.IsWhereStatement
 
             Call Me.VAQL.GetParseTreeTokensReflection(Me.VAQL.ISWHEREStatement, Me.VAQLParsetree.Nodes(0))
+
+            '===================================================================
+            'Validate the IS WHERE Statement
+            If Me.VAQL.ISWHEREStatement.FACTTYPESTMT.Count > 1 Then
+                For liInd = 1 To Me.VAQL.ISWHEREStatement.FACTTYPESTMT.Count - 1
+                    If Me.VAQL.ISWHEREStatement.FACTTYPESTMT(liInd).MODELELEMENT.Count <> Me.VAQL.ISWHEREStatement.FACTTYPESTMT(0).MODELELEMENT.Count Then
+
+                        lsMessage = "That is an incorrect IS WHERE statement. Each Fact Type Reading must have the same number of Model Elements."
+                        Me.send_data(lsMessage)
+                        lsMessage = "'" & Me.VAQL.ISWHEREStatement.FACTTYPESTMT(liInd).makeSentence & "' does not have the same number of Model Elements as '" & Me.VAQL.ISWHEREStatement.FACTTYPESTMT(0).makeSentence & "'."
+                        Me.send_data(lsMessage)
+                        Exit Sub
+                    End If
+                Next
+            End If
+            '===================================================================
 
             Me.Timeout.Stop()
 
