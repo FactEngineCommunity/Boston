@@ -34,6 +34,12 @@
     'e.g. The user says something/types in something to the computer (as a Sentence), 
     'and the tBrain askes a Question about a word in the Sentence, or the entire Sentence
 
+    ''' <summary>
+    ''' Used if a reciprocal/reverse FactTypeReading needs to be made for a FactType. E.g. Contains one entry for a Binary Fact Type.
+    ''' </summary>
+    Public AdditionalSentence As List(Of Language.Sentence)
+
+
     Public FocalSymbol As New List(Of String)
 
 
@@ -96,6 +102,8 @@
         End If
 
         Me.GeneralText = asGeneralText
+
+        Me.AdditionalSentence = aarAdditionalSentence
 
     End Sub
 

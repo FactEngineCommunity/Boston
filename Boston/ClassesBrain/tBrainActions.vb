@@ -211,6 +211,18 @@ Partial Public Class tBrain
 
             Call lrFactType.AddFactTypeReading(lrFactTypeReading, False, True)
 
+            'Additional FactTypeReadings
+            For Each lrSentence In Me.CurrentQuestion.AdditionalSentence
+
+                larRole = New List(Of FBM.Role)
+                For Each lrPredicatePart In lrSentence.PredicatePart
+                    Dim lrPredicateRole = lrFactType.RoleGroup.Find(Function(x) x.JoinedORMObject.Id = lrPredicatePart.ObjectName)
+                    larRole.Add(lrPredicateRole)
+                Next
+                lrFactTypeReading = New FBM.FactTypeReading(lrFactType, larRole, lrSentence)
+                Call lrFactType.AddFactTypeReading(lrFactTypeReading, False, True)
+            Next
+
             If lrFactType.MakeNameFromFactTypeReadings <> lrFactType.Id Then
                 Call lrFactType.setName(lrFactType.MakeNameFromFactTypeReadings, False)
             End If
@@ -634,20 +646,18 @@ Partial Public Class tBrain
                         liInd = 1
                         For Each lrModelElement In lrFactTypeStatement.MODELELEMENT
 
-                            If liInd < lrFactTypeStatement.MODELELEMENT.Count Then
-                                lrPredicatePart = New Language.PredicatePart
-                                lrPredicatePart.PreboundText = Trim(lrModelElement.PREBOUNDREADINGTEXT)
-                                lrPredicatePart.PostboundText = Trim(lrModelElement.POSTBOUNDREADINGTEXT)
-                                lrPredicatePart.ObjectName = lrModelElement.MODELELEMENTNAME
+                            lrPredicatePart = New Language.PredicatePart
+                            lrPredicatePart.PreboundText = Trim(lrModelElement.PREBOUNDREADINGTEXT)
+                            lrPredicatePart.PostboundText = Trim(lrModelElement.POSTBOUNDREADINGTEXT)
+                            lrPredicatePart.ObjectName = lrModelElement.MODELELEMENTNAME
 
+                            If liInd < lrFactTypeStatement.MODELELEMENT.Count Then
                                 For Each lsPredicatePartText In lrFactTypeStatement.PREDICATECLAUSE(liInd - 1).PREDICATEPART
                                     lrPredicatePart.PredicatePartText &= lsPredicatePartText
                                     lrPredicatePart.PredicatePartText = LTrim(lrPredicatePart.PredicatePartText)
                                 Next
-
-                                lrAdditionalSentence.PredicatePart.Add(lrPredicatePart)
-
                             End If
+                            lrAdditionalSentence.PredicatePart.Add(lrPredicatePart)
 
                             liInd += 1
                         Next
