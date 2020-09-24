@@ -212,16 +212,18 @@ Partial Public Class tBrain
             Call lrFactType.AddFactTypeReading(lrFactTypeReading, False, True)
 
             'Additional FactTypeReadings
-            For Each lrSentence In Me.CurrentQuestion.AdditionalSentence
+            If Me.CurrentQuestion.AdditionalSentence IsNot Nothing Then
+                For Each lrSentence In Me.CurrentQuestion.AdditionalSentence
 
-                larRole = New List(Of FBM.Role)
-                For Each lrPredicatePart In lrSentence.PredicatePart
-                    Dim lrPredicateRole = lrFactType.RoleGroup.Find(Function(x) x.JoinedORMObject.Id = lrPredicatePart.ObjectName)
-                    larRole.Add(lrPredicateRole)
+                    larRole = New List(Of FBM.Role)
+                    For Each lrPredicatePart In lrSentence.PredicatePart
+                        Dim lrPredicateRole = lrFactType.RoleGroup.Find(Function(x) x.JoinedORMObject.Id = lrPredicatePart.ObjectName)
+                        larRole.Add(lrPredicateRole)
+                    Next
+                    lrFactTypeReading = New FBM.FactTypeReading(lrFactType, larRole, lrSentence)
+                    Call lrFactType.AddFactTypeReading(lrFactTypeReading, False, True)
                 Next
-                lrFactTypeReading = New FBM.FactTypeReading(lrFactType, larRole, lrSentence)
-                Call lrFactType.AddFactTypeReading(lrFactTypeReading, False, True)
-            Next
+            End If
 
             If lrFactType.MakeNameFromFactTypeReadings <> lrFactType.Id Then
                 Call lrFactType.setName(lrFactType.MakeNameFromFactTypeReadings, False)

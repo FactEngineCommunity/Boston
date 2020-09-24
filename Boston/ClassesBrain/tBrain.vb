@@ -155,7 +155,7 @@ Public Class tBrain
             Me.CommandList.Add("setmode nl")
             Me.CommandList.Add("what is your plan")
             Me.CommandList.Add("drop that plan")
-            Me.CommandList.Add("abort you current plan")
+            Me.CommandList.Add("abort your current plan")
             Me.CommandList.Add("describe your current plan")
             Me.CommandList.Add("layout")
 
@@ -248,6 +248,12 @@ Public Class tBrain
     Private Sub Speak(ByVal asTextToSpeak As String)
 
         Try
+            If Me.Page IsNot Nothing Then
+                If Me.Page.Form.GetType Is GetType(frmDiagramORM) Then
+                    Me.Page.Form.Briana.Talk
+                End If
+            End If
+
             Me.SAPI.Rate = 2
             Me.SAPI.Volume = 100
             'Me.SAPI = CreateObject("SAPI.spvoice")        
@@ -255,8 +261,11 @@ Public Class tBrain
 
             Do
             Loop Until Me.SAPI.WaitUntilDone(Viev.Strings.CountWords(asTextToSpeak) * 1) '-1&
+
             If Me.Page IsNot Nothing Then
-                Me.Page.Form.Briana.StopTalking()
+                If Me.Page.Form.GetType Is GetType(frmDiagramORM) Then
+                    Me.Page.Form.Briana.StopTalking()
+                End If
             End If
 
         Catch ex As Exception
@@ -278,10 +287,12 @@ Public Class tBrain
 
         If Not ab_is_echo And Not Me.QuietMode Then
             If Me.Page IsNot Nothing Then
-                If Viev.Strings.CountWords(asData) = 1 Then
-                    Me.Page.Form.Briana.SetTimerInterval(540)
-                Else
-                    Me.Page.Form.Briana.SetTimerInterval(130)
+                If Me.Page.Form.GetType Is GetType(frmDiagramORM) Then
+                    If Viev.Strings.CountWords(asData) = 1 Then
+                        Me.Page.Form.Briana.SetTimerInterval(540)
+                    Else
+                        Me.Page.Form.Briana.SetTimerInterval(80)
+                    End If
                 End If
             End If
 
@@ -598,24 +609,24 @@ Public Class tBrain
         End If
 
         If Me.CheckCommandStatus(Me.InputBuffer) Then
-            Me.send_data("Boston Brain Status:")
-            Me.send_data("SelfTeachingMode: " & Me.SelfTeachingMode.ToString)
-            Me.send_data("Number of Boston's Questions in Queue:" & Me.Question.Count)
-            Me.send_data("Number of Sentence's:" & Me.Sentence.Count)
-            Me.send_data("Number of Directives: " & Me.Directive.Count)
-            Me.send_data("Number of Outstanding Sentences: " & Me.OutstandingSentences.Count)
-            Me.send_data("Boston can ask questions:" & Me.AskQuestions)
-            Me.send_data("Boston will press for a response to questions:" & Me.PressForAnswer)
-            Me.send_data("Boston is in thinking mode: " & Me.Timeout.Enabled.ToString)
-            Me.send_data("Boston is waiting for a response: " & Me.AwaitingQuestionResponse.ToString)
+            Me.send_data("Boston Brain Status:", False, True)
+            Me.send_data("SelfTeachingMode: " & Me.SelfTeachingMode.ToString, False, True)
+            Me.send_data("Number of Boston's Questions in Queue:" & Me.Question.Count, False, True)
+            Me.send_data("Number of Sentence's:" & Me.Sentence.Count, False, True)
+            Me.send_data("Number of Directives: " & Me.Directive.Count, False, True)
+            Me.send_data("Number of Outstanding Sentences: " & Me.OutstandingSentences.Count, False, True)
+            Me.send_data("Boston can ask questions:" & Me.AskQuestions, False, True)
+            Me.send_data("Boston will press for a response to questions:" & Me.PressForAnswer, False, True)
+            Me.send_data("Boston is in thinking mode: " & Me.Timeout.Enabled.ToString, False, True)
+            Me.send_data("Boston is waiting for a response: " & Me.AwaitingQuestionResponse.ToString, False, True)
             If IsSomething(Me.CurrentSentence) Then
-                Me.send_data("Current Sentence: " & Me.CurrentSentence.Sentence)
+                Me.send_data("Current Sentence: " & Me.CurrentSentence.Sentence, False, True)
             End If
             If IsSomething(Me.CurrentQuestion) Then
-                Me.send_data("Current Question: " & Me.CurrentQuestion.Question)
+                Me.send_data("Current Question: " & Me.CurrentQuestion.Question, False, True)
             End If
             If IsSomething(Me.CurrentPlan) Then
-                Me.send_data("Current Plan: " & Me.CurrentPlan.GetUltimateGoal.ToString)
+                Me.send_data("Current Plan: " & Me.CurrentPlan.GetUltimateGoal.ToString, False, True)
             End If
             CheckCommand = True
         End If
@@ -1014,7 +1025,7 @@ Public Class tBrain
 
     Private Function CheckCommandDropThatPlan(ByVal asString) As Boolean
 
-        Return asString = "drop that plan"
+        Return {"drop that plan", "abort"}.Contains(asString)
 
     End Function
 
@@ -1167,6 +1178,8 @@ Public Class tBrain
 
             Me.HistoryPlan.Add(Me.CurrentPlan)
             Me.CurrentPlan = Nothing
+        Else
+            Call Me.send_data("I don't have a plan to abort.")
         End If
 
     End Sub
@@ -2646,6 +2659,7 @@ Public Class tBrain
             Me.OutputBuffer = Me.Question(0).Question
             Me.AwaitingQuestionResponse = True
             Me.CurrentQuestion = Me.Question(0)
+            Me.CurrentPlan = Me.CurrentQuestion.Plan
             Me.OutputChannel.BeginInvoke(New SendDataDelegate(AddressOf Me.send_data), Me.OutputBuffer)
         Else
             'Me.OutputBuffer = "I don't have any questions at this time"
