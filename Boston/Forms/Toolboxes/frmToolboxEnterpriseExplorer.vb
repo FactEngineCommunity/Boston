@@ -828,7 +828,7 @@ Public Class frmToolboxEnterpriseExplorer
                                 Case Is = pcenumMenuType.menuBoston
                                     Me.TreeView.ContextMenuStrip = ContextMenuStrip_ORMModels
                                 Case Is = pcenumMenuType.modelORMModel
-                                    Me.TreeView.ContextMenuStrip = ContextMenuStrip_ORMModel                                
+                                    Me.TreeView.ContextMenuStrip = ContextMenuStrip_ORMModel
                                 Case Is = pcenumMenuType.pageORMModel
                                     Me.TreeView.ContextMenuStrip = ContextMenuStrip_Page
                                 Case Is = pcenumMenuType.pageERD
@@ -845,6 +845,17 @@ Public Class frmToolboxEnterpriseExplorer
                         Me.TreeView.ContextMenuStrip = Nothing
                     End If
                 ElseIf e.Button = Windows.Forms.MouseButtons.Left Then
+                    Me.TreeView.SelectedNode = Me.TreeView.GetNodeAt(e.Location)
+                    If IsSomething(Me.TreeView.SelectedNode) Then
+                        If IsSomething(Me.TreeView.SelectedNode.Tag) Then
+                            loObject = Me.TreeView.SelectedNode.Tag
+
+                            '------------------------------------------------------
+                            'Establish the WorkingEnvironment for the SelectedNode
+                            '------------------------------------------------------
+                            Call Me.SetWorkingEnvironmentForObject(loObject)
+                        End If
+                    End If
                     '-------------------
                     'See 'AfterSelect'
                     '-------------------

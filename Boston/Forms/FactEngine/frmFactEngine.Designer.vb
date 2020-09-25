@@ -85,7 +85,6 @@ Partial Class frmFactEngine
         '
         Me.SplitContainer1.Dock = System.Windows.Forms.DockStyle.Fill
         Me.SplitContainer1.Location = New System.Drawing.Point(0, 0)
-        Me.SplitContainer1.Margin = New System.Windows.Forms.Padding(2)
         Me.SplitContainer1.Name = "SplitContainer1"
         Me.SplitContainer1.Orientation = System.Windows.Forms.Orientation.Horizontal
         '
@@ -100,9 +99,9 @@ Partial Class frmFactEngine
         'SplitContainer1.Panel2
         '
         Me.SplitContainer1.Panel2.Controls.Add(Me.TabControl1)
-        Me.SplitContainer1.Size = New System.Drawing.Size(826, 479)
-        Me.SplitContainer1.SplitterDistance = 258
-        Me.SplitContainer1.SplitterWidth = 3
+        Me.SplitContainer1.Size = New System.Drawing.Size(1239, 737)
+        Me.SplitContainer1.SplitterDistance = 396
+        Me.SplitContainer1.SplitterWidth = 5
         Me.SplitContainer1.TabIndex = 0
         '
         'TextBoxInput
@@ -113,10 +112,9 @@ Partial Class frmFactEngine
         Me.TextBoxInput.Dock = System.Windows.Forms.DockStyle.Fill
         Me.TextBoxInput.Font = New System.Drawing.Font("Tahoma", 10.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.TextBoxInput.ForeColor = System.Drawing.Color.Wheat
-        Me.TextBoxInput.Location = New System.Drawing.Point(0, 31)
-        Me.TextBoxInput.Margin = New System.Windows.Forms.Padding(2)
+        Me.TextBoxInput.Location = New System.Drawing.Point(0, 33)
         Me.TextBoxInput.Name = "TextBoxInput"
-        Me.TextBoxInput.Size = New System.Drawing.Size(826, 112)
+        Me.TextBoxInput.Size = New System.Drawing.Size(1239, 200)
         Me.TextBoxInput.TabIndex = 2
         Me.TextBoxInput.TabStop = False
         Me.TextBoxInput.Text = ""
@@ -126,7 +124,7 @@ Partial Class frmFactEngine
         Me.ContextMenuStripFactEngine.ImageScalingSize = New System.Drawing.Size(24, 24)
         Me.ContextMenuStripFactEngine.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ViewToolStripMenuItem, Me.ToolStripSeparator1, Me.BackgroundColourToolStripMenuItem, Me.ToolStripMenuItemHelpTips})
         Me.ContextMenuStripFactEngine.Name = "ContextMenuStripFactEngine"
-        Me.ContextMenuStripFactEngine.Size = New System.Drawing.Size(178, 84)
+        Me.ContextMenuStripFactEngine.Size = New System.Drawing.Size(241, 137)
         '
         'ViewToolStripMenuItem
         '
@@ -134,7 +132,7 @@ Partial Class frmFactEngine
         Me.ViewToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.PropertiesToolStripMenuItem, Me.ModelDictionaryToolStripMenuItem, Me.ErrorListToolStripMenuItem, Me.ToolStripMenuItem8, Me.ORMVerbalisationViewToolStripMenuItem, Me.VirtualAnalystToolStripMenuItem})
         Me.ViewToolStripMenuItem.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None
         Me.ViewToolStripMenuItem.Name = "ViewToolStripMenuItem"
-        Me.ViewToolStripMenuItem.Size = New System.Drawing.Size(185, 30)
+        Me.ViewToolStripMenuItem.Size = New System.Drawing.Size(240, 30)
         Me.ViewToolStripMenuItem.Text = "&View"
         '
         'PropertiesToolStripMenuItem
@@ -142,7 +140,7 @@ Partial Class frmFactEngine
         Me.PropertiesToolStripMenuItem.Image = Global.Boston.My.Resources.MenuImages.Properties216x16
         Me.PropertiesToolStripMenuItem.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None
         Me.PropertiesToolStripMenuItem.Name = "PropertiesToolStripMenuItem"
-        Me.PropertiesToolStripMenuItem.Size = New System.Drawing.Size(203, 22)
+        Me.PropertiesToolStripMenuItem.Size = New System.Drawing.Size(308, 34)
         Me.PropertiesToolStripMenuItem.Text = "&Properties"
         '
         'ModelDictionaryToolStripMenuItem
@@ -150,7 +148,7 @@ Partial Class frmFactEngine
         Me.ModelDictionaryToolStripMenuItem.Image = Global.Boston.My.Resources.MenuImages.dictionary16x16
         Me.ModelDictionaryToolStripMenuItem.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None
         Me.ModelDictionaryToolStripMenuItem.Name = "ModelDictionaryToolStripMenuItem"
-        Me.ModelDictionaryToolStripMenuItem.Size = New System.Drawing.Size(203, 22)
+        Me.ModelDictionaryToolStripMenuItem.Size = New System.Drawing.Size(308, 34)
         Me.ModelDictionaryToolStripMenuItem.Text = "Model &Dictionary"
         '
         'ErrorListToolStripMenuItem
@@ -158,7 +156,7 @@ Partial Class frmFactEngine
         Me.ErrorListToolStripMenuItem.Image = Global.Boston.My.Resources.MenuImages.ErrorList
         Me.ErrorListToolStripMenuItem.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None
         Me.ErrorListToolStripMenuItem.Name = "ErrorListToolStripMenuItem"
-        Me.ErrorListToolStripMenuItem.Size = New System.Drawing.Size(203, 22)
+        Me.ErrorListToolStripMenuItem.Size = New System.Drawing.Size(308, 34)
         Me.ErrorListToolStripMenuItem.Text = "&Error List"
         '
         'ToolStripMenuItem8
@@ -166,7 +164,7 @@ Partial Class frmFactEngine
         Me.ToolStripMenuItem8.Image = Global.Boston.My.Resources.MenuImages.FactTypeReading16x16
         Me.ToolStripMenuItem8.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None
         Me.ToolStripMenuItem8.Name = "ToolStripMenuItem8"
-        Me.ToolStripMenuItem8.Size = New System.Drawing.Size(203, 22)
+        Me.ToolStripMenuItem8.Size = New System.Drawing.Size(308, 34)
         Me.ToolStripMenuItem8.Text = "Fact Type &Reading Editor"
         '
         'ORMVerbalisationViewToolStripMenuItem
@@ -174,7 +172,7 @@ Partial Class frmFactEngine
         Me.ORMVerbalisationViewToolStripMenuItem.Image = CType(resources.GetObject("ORMVerbalisationViewToolStripMenuItem.Image"), System.Drawing.Image)
         Me.ORMVerbalisationViewToolStripMenuItem.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None
         Me.ORMVerbalisationViewToolStripMenuItem.Name = "ORMVerbalisationViewToolStripMenuItem"
-        Me.ORMVerbalisationViewToolStripMenuItem.Size = New System.Drawing.Size(203, 22)
+        Me.ORMVerbalisationViewToolStripMenuItem.Size = New System.Drawing.Size(308, 34)
         Me.ORMVerbalisationViewToolStripMenuItem.Text = "ORM &Verbalisation View"
         '
         'VirtualAnalystToolStripMenuItem
@@ -182,32 +180,32 @@ Partial Class frmFactEngine
         Me.VirtualAnalystToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.VirtualAnalyst16x16
         Me.VirtualAnalystToolStripMenuItem.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None
         Me.VirtualAnalystToolStripMenuItem.Name = "VirtualAnalystToolStripMenuItem"
-        Me.VirtualAnalystToolStripMenuItem.Size = New System.Drawing.Size(203, 22)
+        Me.VirtualAnalystToolStripMenuItem.Size = New System.Drawing.Size(308, 34)
         Me.VirtualAnalystToolStripMenuItem.Text = "Virtual Analyst"
         '
         'ToolStripSeparator1
         '
         Me.ToolStripSeparator1.Name = "ToolStripSeparator1"
-        Me.ToolStripSeparator1.Size = New System.Drawing.Size(174, 6)
+        Me.ToolStripSeparator1.Size = New System.Drawing.Size(237, 6)
         '
         'BackgroundColourToolStripMenuItem
         '
         Me.BackgroundColourToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItemLightBackground, Me.ToolStripMenuItemDarkBackground})
         Me.BackgroundColourToolStripMenuItem.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None
         Me.BackgroundColourToolStripMenuItem.Name = "BackgroundColourToolStripMenuItem"
-        Me.BackgroundColourToolStripMenuItem.Size = New System.Drawing.Size(177, 22)
+        Me.BackgroundColourToolStripMenuItem.Size = New System.Drawing.Size(240, 32)
         Me.BackgroundColourToolStripMenuItem.Text = "&Background Colour"
         '
         'ToolStripMenuItemLightBackground
         '
         Me.ToolStripMenuItemLightBackground.Name = "ToolStripMenuItemLightBackground"
-        Me.ToolStripMenuItemLightBackground.Size = New System.Drawing.Size(101, 22)
+        Me.ToolStripMenuItemLightBackground.Size = New System.Drawing.Size(270, 34)
         Me.ToolStripMenuItemLightBackground.Text = "&Light"
         '
         'ToolStripMenuItemDarkBackground
         '
         Me.ToolStripMenuItemDarkBackground.Name = "ToolStripMenuItemDarkBackground"
-        Me.ToolStripMenuItemDarkBackground.Size = New System.Drawing.Size(101, 22)
+        Me.ToolStripMenuItemDarkBackground.Size = New System.Drawing.Size(270, 34)
         Me.ToolStripMenuItemDarkBackground.Text = "&Dark"
         '
         'ToolStripMenuItemHelpTips
@@ -217,7 +215,7 @@ Partial Class frmFactEngine
         Me.ToolStripMenuItemHelpTips.Image = Global.Boston.My.Resources.Resources.HelpTips16x16
         Me.ToolStripMenuItemHelpTips.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None
         Me.ToolStripMenuItemHelpTips.Name = "ToolStripMenuItemHelpTips"
-        Me.ToolStripMenuItemHelpTips.Size = New System.Drawing.Size(177, 22)
+        Me.ToolStripMenuItemHelpTips.Size = New System.Drawing.Size(240, 32)
         Me.ToolStripMenuItemHelpTips.Text = "&Help Tips"
         '
         'LabelHelp
@@ -226,9 +224,10 @@ Partial Class frmFactEngine
         Me.LabelHelp.ContextMenuStrip = Me.ContextMenuStripHelpLabel
         Me.LabelHelp.Dock = System.Windows.Forms.DockStyle.Bottom
         Me.LabelHelp.ForeColor = System.Drawing.Color.DarkGray
-        Me.LabelHelp.Location = New System.Drawing.Point(0, 143)
+        Me.LabelHelp.Location = New System.Drawing.Point(0, 233)
+        Me.LabelHelp.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.LabelHelp.Name = "LabelHelp"
-        Me.LabelHelp.Size = New System.Drawing.Size(826, 71)
+        Me.LabelHelp.Size = New System.Drawing.Size(1239, 109)
         Me.LabelHelp.TabIndex = 12
         '
         'ContextMenuStripHelpLabel
@@ -236,12 +235,12 @@ Partial Class frmFactEngine
         Me.ContextMenuStripHelpLabel.ImageScalingSize = New System.Drawing.Size(24, 24)
         Me.ContextMenuStripHelpLabel.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.HideToolStripMenuItem})
         Me.ContextMenuStripHelpLabel.Name = "ContextMenuStripHelpLabel"
-        Me.ContextMenuStripHelpLabel.Size = New System.Drawing.Size(100, 26)
+        Me.ContextMenuStripHelpLabel.Size = New System.Drawing.Size(122, 36)
         '
         'HideToolStripMenuItem
         '
         Me.HideToolStripMenuItem.Name = "HideToolStripMenuItem"
-        Me.HideToolStripMenuItem.Size = New System.Drawing.Size(99, 22)
+        Me.HideToolStripMenuItem.Size = New System.Drawing.Size(121, 32)
         Me.HideToolStripMenuItem.Text = "&Hide"
         '
         'ToolStrip1
@@ -250,8 +249,8 @@ Partial Class frmFactEngine
         Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButtonGO})
         Me.ToolStrip1.Location = New System.Drawing.Point(0, 0)
         Me.ToolStrip1.Name = "ToolStrip1"
-        Me.ToolStrip1.Padding = New System.Windows.Forms.Padding(0, 0, 2, 0)
-        Me.ToolStrip1.Size = New System.Drawing.Size(826, 31)
+        Me.ToolStrip1.Padding = New System.Windows.Forms.Padding(0, 0, 3, 0)
+        Me.ToolStrip1.Size = New System.Drawing.Size(1239, 33)
         Me.ToolStrip1.TabIndex = 3
         Me.ToolStrip1.Text = "ToolStrip1"
         '
@@ -261,58 +260,58 @@ Partial Class frmFactEngine
         Me.ToolStripButtonGO.Image = Global.Boston.My.Resources.MenuImagesMain.GO16x16
         Me.ToolStripButtonGO.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ToolStripButtonGO.Name = "ToolStripButtonGO"
-        Me.ToolStripButtonGO.Size = New System.Drawing.Size(28, 28)
+        Me.ToolStripButtonGO.Size = New System.Drawing.Size(34, 28)
         Me.ToolStripButtonGO.Text = "ToolStripButton1"
         '
         'StatusStrip2
         '
         Me.StatusStrip2.ImageScalingSize = New System.Drawing.Size(24, 24)
         Me.StatusStrip2.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripStatusLabelWorkingModelName, Me.ToolStripStatusLabelLookingFor, Me.ToolStripStatusLabelCurrentProduction, Me.ToolStripStatusLabelRequiresConnectionString, Me.ToolStripStatusLabelGOPrompt})
-        Me.StatusStrip2.Location = New System.Drawing.Point(0, 214)
+        Me.StatusStrip2.Location = New System.Drawing.Point(0, 342)
         Me.StatusStrip2.Name = "StatusStrip2"
-        Me.StatusStrip2.Padding = New System.Windows.Forms.Padding(1, 0, 9, 0)
-        Me.StatusStrip2.Size = New System.Drawing.Size(826, 22)
+        Me.StatusStrip2.Padding = New System.Windows.Forms.Padding(2, 0, 14, 0)
+        Me.StatusStrip2.Size = New System.Drawing.Size(1239, 32)
         Me.StatusStrip2.TabIndex = 1
         Me.StatusStrip2.Text = "StatusStrip2"
         '
         'ToolStripStatusLabelWorkingModelName
         '
         Me.ToolStripStatusLabelWorkingModelName.Name = "ToolStripStatusLabelWorkingModelName"
-        Me.ToolStripStatusLabelWorkingModelName.Size = New System.Drawing.Size(118, 17)
+        Me.ToolStripStatusLabelWorkingModelName.Size = New System.Drawing.Size(177, 25)
         Me.ToolStripStatusLabelWorkingModelName.Text = "WorkingModelName"
         '
         'ToolStripStatusLabelLookingFor
         '
         Me.ToolStripStatusLabelLookingFor.Name = "ToolStripStatusLabelLookingFor"
-        Me.ToolStripStatusLabelLookingFor.Size = New System.Drawing.Size(62, 17)
+        Me.ToolStripStatusLabelLookingFor.Size = New System.Drawing.Size(92, 25)
         Me.ToolStripStatusLabelLookingFor.Text = "Expecting:"
         '
         'ToolStripStatusLabelCurrentProduction
         '
         Me.ToolStripStatusLabelCurrentProduction.Name = "ToolStripStatusLabelCurrentProduction"
-        Me.ToolStripStatusLabelCurrentProduction.Size = New System.Drawing.Size(106, 17)
+        Me.ToolStripStatusLabelCurrentProduction.Size = New System.Drawing.Size(157, 25)
         Me.ToolStripStatusLabelCurrentProduction.Text = "CurrentProduction"
         '
         'ToolStripStatusLabelRequiresConnectionString
         '
         Me.ToolStripStatusLabelRequiresConnectionString.Name = "ToolStripStatusLabelRequiresConnectionString"
-        Me.ToolStripStatusLabelRequiresConnectionString.Size = New System.Drawing.Size(145, 17)
+        Me.ToolStripStatusLabelRequiresConnectionString.Size = New System.Drawing.Size(215, 25)
         Me.ToolStripStatusLabelRequiresConnectionString.Text = "RequiresConnectionString"
         '
         'ToolStripStatusLabelGOPrompt
         '
         Me.ToolStripStatusLabelGOPrompt.Name = "ToolStripStatusLabelGOPrompt"
-        Me.ToolStripStatusLabelGOPrompt.Size = New System.Drawing.Size(64, 17)
+        Me.ToolStripStatusLabelGOPrompt.Size = New System.Drawing.Size(98, 25)
         Me.ToolStripStatusLabelGOPrompt.Text = "GOPrompt"
         Me.ToolStripStatusLabelGOPrompt.Visible = False
         '
         'StatusStrip1
         '
         Me.StatusStrip1.ImageScalingSize = New System.Drawing.Size(24, 24)
-        Me.StatusStrip1.Location = New System.Drawing.Point(0, 236)
+        Me.StatusStrip1.Location = New System.Drawing.Point(0, 374)
         Me.StatusStrip1.Name = "StatusStrip1"
-        Me.StatusStrip1.Padding = New System.Windows.Forms.Padding(1, 0, 9, 0)
-        Me.StatusStrip1.Size = New System.Drawing.Size(826, 22)
+        Me.StatusStrip1.Padding = New System.Windows.Forms.Padding(2, 0, 14, 0)
+        Me.StatusStrip1.Size = New System.Drawing.Size(1239, 22)
         Me.StatusStrip1.TabIndex = 0
         Me.StatusStrip1.Text = "StatusStrip1"
         '
@@ -323,21 +322,19 @@ Partial Class frmFactEngine
         Me.TabControl1.Controls.Add(Me.TabPageGraph)
         Me.TabControl1.Dock = System.Windows.Forms.DockStyle.Fill
         Me.TabControl1.Location = New System.Drawing.Point(0, 0)
-        Me.TabControl1.Margin = New System.Windows.Forms.Padding(2)
         Me.TabControl1.Name = "TabControl1"
         Me.TabControl1.SelectedIndex = 0
-        Me.TabControl1.Size = New System.Drawing.Size(826, 218)
+        Me.TabControl1.Size = New System.Drawing.Size(1239, 336)
         Me.TabControl1.TabIndex = 2
         '
         'TabPageResults
         '
         Me.TabPageResults.Controls.Add(Me.LabelError)
         Me.TabPageResults.Controls.Add(Me.ToolStrip2)
-        Me.TabPageResults.Location = New System.Drawing.Point(4, 22)
-        Me.TabPageResults.Margin = New System.Windows.Forms.Padding(2)
+        Me.TabPageResults.Location = New System.Drawing.Point(4, 29)
         Me.TabPageResults.Name = "TabPageResults"
-        Me.TabPageResults.Padding = New System.Windows.Forms.Padding(2)
-        Me.TabPageResults.Size = New System.Drawing.Size(818, 192)
+        Me.TabPageResults.Padding = New System.Windows.Forms.Padding(3, 3, 3, 3)
+        Me.TabPageResults.Size = New System.Drawing.Size(1231, 303)
         Me.TabPageResults.TabIndex = 0
         Me.TabPageResults.Text = "Results"
         Me.TabPageResults.UseVisualStyleBackColor = True
@@ -346,21 +343,20 @@ Partial Class frmFactEngine
         '
         Me.LabelError.BackColor = System.Drawing.SystemColors.Control
         Me.LabelError.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.LabelError.Location = New System.Drawing.Point(2, 27)
-        Me.LabelError.Margin = New System.Windows.Forms.Padding(2)
+        Me.LabelError.Location = New System.Drawing.Point(3, 28)
         Me.LabelError.Multiline = True
         Me.LabelError.Name = "LabelError"
         Me.LabelError.ScrollBars = System.Windows.Forms.ScrollBars.Vertical
-        Me.LabelError.Size = New System.Drawing.Size(814, 163)
+        Me.LabelError.Size = New System.Drawing.Size(1225, 272)
         Me.LabelError.TabIndex = 1
         '
         'ToolStrip2
         '
         Me.ToolStrip2.ImageScalingSize = New System.Drawing.Size(24, 24)
-        Me.ToolStrip2.Location = New System.Drawing.Point(2, 2)
+        Me.ToolStrip2.Location = New System.Drawing.Point(3, 3)
         Me.ToolStrip2.Name = "ToolStrip2"
-        Me.ToolStrip2.Padding = New System.Windows.Forms.Padding(0, 0, 2, 0)
-        Me.ToolStrip2.Size = New System.Drawing.Size(814, 25)
+        Me.ToolStrip2.Padding = New System.Windows.Forms.Padding(0, 0, 3, 0)
+        Me.ToolStrip2.Size = New System.Drawing.Size(1225, 25)
         Me.ToolStrip2.TabIndex = 2
         Me.ToolStrip2.Text = "ToolStrip2"
         '
@@ -368,11 +364,10 @@ Partial Class frmFactEngine
         '
         Me.TabPageQuery.Controls.Add(Me.TextBoxQuery)
         Me.TabPageQuery.Controls.Add(Me.ToolStrip3)
-        Me.TabPageQuery.Location = New System.Drawing.Point(4, 22)
-        Me.TabPageQuery.Margin = New System.Windows.Forms.Padding(2)
+        Me.TabPageQuery.Location = New System.Drawing.Point(4, 29)
         Me.TabPageQuery.Name = "TabPageQuery"
-        Me.TabPageQuery.Padding = New System.Windows.Forms.Padding(2)
-        Me.TabPageQuery.Size = New System.Drawing.Size(818, 192)
+        Me.TabPageQuery.Padding = New System.Windows.Forms.Padding(3, 3, 3, 3)
+        Me.TabPageQuery.Size = New System.Drawing.Size(1231, 302)
         Me.TabPageQuery.TabIndex = 1
         Me.TabPageQuery.Text = "Query"
         Me.TabPageQuery.UseVisualStyleBackColor = True
@@ -380,21 +375,20 @@ Partial Class frmFactEngine
         'TextBoxQuery
         '
         Me.TextBoxQuery.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.TextBoxQuery.Location = New System.Drawing.Point(2, 33)
-        Me.TextBoxQuery.Margin = New System.Windows.Forms.Padding(2)
+        Me.TextBoxQuery.Location = New System.Drawing.Point(3, 36)
         Me.TextBoxQuery.Multiline = True
         Me.TextBoxQuery.Name = "TextBoxQuery"
-        Me.TextBoxQuery.Size = New System.Drawing.Size(814, 157)
+        Me.TextBoxQuery.Size = New System.Drawing.Size(1225, 263)
         Me.TextBoxQuery.TabIndex = 2
         '
         'ToolStrip3
         '
         Me.ToolStrip3.ImageScalingSize = New System.Drawing.Size(24, 24)
         Me.ToolStrip3.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButtonQueryGO})
-        Me.ToolStrip3.Location = New System.Drawing.Point(2, 2)
+        Me.ToolStrip3.Location = New System.Drawing.Point(3, 3)
         Me.ToolStrip3.Name = "ToolStrip3"
-        Me.ToolStrip3.Padding = New System.Windows.Forms.Padding(0, 0, 2, 0)
-        Me.ToolStrip3.Size = New System.Drawing.Size(814, 31)
+        Me.ToolStrip3.Padding = New System.Windows.Forms.Padding(0, 0, 3, 0)
+        Me.ToolStrip3.Size = New System.Drawing.Size(1225, 33)
         Me.ToolStrip3.TabIndex = 3
         Me.ToolStrip3.Text = "ToolStrip3"
         '
@@ -404,15 +398,16 @@ Partial Class frmFactEngine
         Me.ToolStripButtonQueryGO.Image = Global.Boston.My.Resources.MenuImagesMain.GO16x16
         Me.ToolStripButtonQueryGO.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ToolStripButtonQueryGO.Name = "ToolStripButtonQueryGO"
-        Me.ToolStripButtonQueryGO.Size = New System.Drawing.Size(28, 28)
+        Me.ToolStripButtonQueryGO.Size = New System.Drawing.Size(34, 28)
         Me.ToolStripButtonQueryGO.Text = "ToolStripButton1"
         '
         'TabPageGraph
         '
         Me.TabPageGraph.Controls.Add(Me.GraphView)
-        Me.TabPageGraph.Location = New System.Drawing.Point(4, 22)
+        Me.TabPageGraph.Location = New System.Drawing.Point(4, 29)
+        Me.TabPageGraph.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.TabPageGraph.Name = "TabPageGraph"
-        Me.TabPageGraph.Size = New System.Drawing.Size(818, 192)
+        Me.TabPageGraph.Size = New System.Drawing.Size(1231, 302)
         Me.TabPageGraph.TabIndex = 2
         Me.TabPageGraph.Text = "Graph"
         Me.TabPageGraph.UseVisualStyleBackColor = True
@@ -427,11 +422,12 @@ Partial Class frmFactEngine
         Me.GraphView.Diagram = Me.Diagram
         Me.GraphView.Dock = System.Windows.Forms.DockStyle.Fill
         Me.GraphView.Location = New System.Drawing.Point(0, 0)
+        Me.GraphView.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.GraphView.MiddleButtonActions = MindFusion.Diagramming.MouseButtonActions.None
         Me.GraphView.ModificationStart = MindFusion.Diagramming.ModificationStart.SelectedOnly
         Me.GraphView.Name = "GraphView"
         Me.GraphView.RightButtonActions = MindFusion.Diagramming.MouseButtonActions.Cancel
-        Me.GraphView.Size = New System.Drawing.Size(818, 192)
+        Me.GraphView.Size = New System.Drawing.Size(1231, 302)
         Me.GraphView.TabIndex = 0
         Me.GraphView.Text = "DiagramView1"
         '
@@ -440,12 +436,12 @@ Partial Class frmFactEngine
         Me.ContextMenuStripGraph.ImageScalingSize = New System.Drawing.Size(24, 24)
         Me.ContextMenuStripGraph.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.LayoutToolStripMenuItem})
         Me.ContextMenuStripGraph.Name = "ContextMenuStripGraph"
-        Me.ContextMenuStripGraph.Size = New System.Drawing.Size(111, 26)
+        Me.ContextMenuStripGraph.Size = New System.Drawing.Size(138, 36)
         '
         'LayoutToolStripMenuItem
         '
         Me.LayoutToolStripMenuItem.Name = "LayoutToolStripMenuItem"
-        Me.LayoutToolStripMenuItem.Size = New System.Drawing.Size(110, 22)
+        Me.LayoutToolStripMenuItem.Size = New System.Drawing.Size(137, 32)
         Me.LayoutToolStripMenuItem.Text = "&Layout"
         '
         'Diagram
@@ -458,12 +454,11 @@ Partial Class frmFactEngine
         'frmFactEngine
         '
         Me.AllowDrop = True
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(826, 479)
+        Me.ClientSize = New System.Drawing.Size(1239, 737)
         Me.Controls.Add(Me.SplitContainer1)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
-        Me.Margin = New System.Windows.Forms.Padding(2)
         Me.Name = "frmFactEngine"
         Me.Text = "Fact Engine"
         Me.SplitContainer1.Panel1.ResumeLayout(False)

@@ -6421,6 +6421,10 @@ Public Class frmDiagramORM
 
             Call Me.ResetNodeAndLinkColors()
 
+            For Each lrEntityTypeInstance In Me.zrPage.EntityTypeInstance
+                lrEntityTypeInstance.Shape.Move(lrEntityTypeInstance.X, lrEntityTypeInstance.Y)
+            Next
+
         Catch ex As Exception
             Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()

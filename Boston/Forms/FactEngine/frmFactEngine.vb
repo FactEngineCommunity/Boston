@@ -19,12 +19,13 @@ Public Class frmFactEngine
 
     Private miDefaultForeColour As Color = Color.Wheat
 
+    Private mrModel As FBM.Model
+
     Public Sub autoLayout()
 
         '---------------------------------------------------------------------------------------
         ' Create the layouter object
         Dim layout As New MindFusion.Diagramming.Layout.SpringLayout
-
 
         ' Adjust the attributes of the layouter
         layout.MultipleGraphsPlacement = MultipleGraphsPlacement.MinimalArea
@@ -752,6 +753,8 @@ Public Class frmFactEngine
 
         Try
             Call Me.displayModelName()
+
+            Me.mrModel = prApplication.WorkingModel
 
             Me.FEQLProcessor = New FEQL.Processor(prApplication.WorkingModel)
 
@@ -1855,6 +1858,11 @@ Public Class frmFactEngine
     End Sub
 
     Private Sub ShowModelElement(ByRef arModelElement As FBM.ModelObject)
+
+        If prApplication.WorkingModel Is Nothing Then
+            MsgBox("Select a Model in the Model Explorer. There is currently no Model selected.")
+            Exit Sub
+        End If
 
         Dim lrDiagramSpyPage As New FBM.DiagramSpyPage(prApplication.WorkingModel, "123", "Diagram Spy", pcenumLanguage.ORMModel)
 
