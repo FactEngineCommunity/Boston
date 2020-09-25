@@ -149,6 +149,10 @@ Namespace FBM
 
                 lo_Diagram = Me.Shape.Parent
 
+                If lo_Diagram Is Nothing Then
+                    Exit Sub
+                End If
+
                 'Dim myFont As New Font(lo_Diagram.Font.FontFamily, lo_Diagram.Font.Size, FontStyle.Regular, GraphicsUnit.Pixel)
 
                 If Me.RoleInstance.Name = "" Then

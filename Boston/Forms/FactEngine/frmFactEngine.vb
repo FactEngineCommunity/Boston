@@ -267,6 +267,11 @@ Public Class frmFactEngine
 
                         Dim lrTable = arModelElement.getCorrespondingRDSTable
 
+                        If lrTable Is Nothing Then
+                            Me.LabelError.Text &= arModelElement.Id & " does not manifest as a Table or Node within the model. " & arModelElement.Id & " is a/n " & arModelElement.ConceptType.ToString & "."
+                            Exit Sub
+                        End If
+
                         Me.LabelError.Text &= lrTable.Name
                         Me.LabelError.Text &= vbCrLf & vbCrLf
                         For Each lrCOlumn In lrTable.Column
