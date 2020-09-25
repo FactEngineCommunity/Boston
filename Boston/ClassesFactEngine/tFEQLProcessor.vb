@@ -262,6 +262,16 @@ Namespace FEQL
             End Set
         End Property
 
+        Private _KEYWDAN As String = Nothing
+        Public Property KEYWDAN As String
+            Get
+                Return Me._KEYWDAN
+            End Get
+            Set(value As String)
+                Me._KEYWDAN = value
+            End Set
+        End Property
+
         Private _KEYWDAND As String = Nothing
         Public Property KEYWDAND As String
             Get

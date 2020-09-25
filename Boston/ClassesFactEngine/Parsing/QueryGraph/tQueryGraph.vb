@@ -609,6 +609,13 @@
 
             larBaseNodes.AddRange(larPropertyNodeTargets)
 
+            Dim larAANTargetNodes = From QueryEdge In Me.QueryEdges
+                                    Where QueryEdge.WhichClause.KEYWDA IsNot Nothing Or QueryEdge.WhichClause.KEYWDAN IsNot Nothing
+                                    Select QueryEdge.TargetNode
+
+            larBaseNodes.AddRange(larAANTargetNodes)
+
+
             For Each lrQueryEdge In Me.QueryEdges.FindAll(Function(x) Not larBaseNodes.Contains(x.TargetNode))
 
                 Select Case lrQueryEdge.WhichClauseType
