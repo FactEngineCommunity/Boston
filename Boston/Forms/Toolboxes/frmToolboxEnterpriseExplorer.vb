@@ -1386,6 +1386,7 @@ Public Class frmToolboxEnterpriseExplorer
             Else
                 lsPageName = "New Model Page " & (liPageCount + 1).ToString
                 lrPage = New FBM.Page(prApplication.WorkingModel, Nothing, lsPageName, pcenumLanguage.ORMModel) 'Creates a new page for the model.
+                lrPage.Loaded = True
             End If
 
             Select Case lrPage.Language

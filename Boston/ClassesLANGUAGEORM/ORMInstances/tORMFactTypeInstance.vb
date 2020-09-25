@@ -805,6 +805,8 @@ Namespace FBM
                 Me.Shape.Move(Me.X, Me.Y)
                 Call Me.Shape.ZBottom()
 
+                Me.FactTypeReadingShape.Shape.Move(((Me.Shape.Bounds.Width / 2) + Me.Shape.Bounds.X) - (Me.FactTypeReadingShape.Shape.Bounds.Width / 2), (Me.Shape.Bounds.Y + Me.Shape.Bounds.Height) - 6) 'FactTypeReadingShape.Shape.Bounds.Y)
+
                 For Each lrRoleInstance In Me.RoleGroup
                     lrRoleInstance.Shape.AttachTo(Me.Shape, AttachToNode.MiddleLeft)
                 Next

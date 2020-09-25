@@ -612,6 +612,7 @@ Namespace FBM
                     lo_link.Locked = False ' was originally True
                     lo_link.Tag = Me
                     Me.Link = lo_link
+                    Me.Shape.OutgoingLinks.Add(lo_link)
                     If Me.FactType.isPreferredReferenceMode Then
                         Me.Link.Visible = False
                     Else
