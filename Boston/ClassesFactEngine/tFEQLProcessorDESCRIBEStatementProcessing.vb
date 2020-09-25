@@ -45,7 +45,7 @@
                 '----------------------------------------
                 'Create the HeadNode for the QueryGraph
                 Dim lrFBMModelObject As FBM.ModelObject = Me.Model.GetModelObjectByName(Me.SHOWStatement.MODELELEMENTNAME)
-                If lrFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & Me.DESCRIBEStatement.MODELELEMENTNAME & "'.")
+                If lrFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & Me.SHOWStatement.MODELELEMENTNAME & "'.")
 
                 lrRecordset.ModelElement = lrFBMModelObject
 

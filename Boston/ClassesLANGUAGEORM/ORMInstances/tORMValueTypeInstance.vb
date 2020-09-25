@@ -908,9 +908,13 @@ Namespace FBM
                     End If
                 End If
 
-                Call Me.Model.MakeDirty(True)
+                If Me.Model IsNot Nothing Then
+                    Call Me.Model.MakeDirty(True)
+                End If
 
-                Call Me.Page.Form.ResetPropertiesGridToolbox(Me)
+                If Me.Page.Form IsNot Nothing Then
+                    Call Me.Page.Form.ResetPropertiesGridToolbox(Me)
+                End If
 
             Catch ex As Exception
                 Dim lsMessage1 As String

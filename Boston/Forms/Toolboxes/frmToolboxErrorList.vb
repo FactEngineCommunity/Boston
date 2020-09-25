@@ -222,4 +222,56 @@ Public Class frmToolboxErrorList
 
     End Sub
 
+    Private Sub DataGrid_ErrorList_CellClick(sender As Object, e As DataGridViewCellEventArgs) Handles DataGrid_ErrorList.CellClick
+
+        Dim lrModelError As FBM.ModelError = Nothing
+
+        If Me.DataGrid_ErrorList.SelectedRows.Count = 1 Then
+            ziSelectedErrorNumber = Me.DataGrid_ErrorList.Rows(Me.DataGrid_ErrorList.SelectedRows(0).Index).Cells(0).Value
+            lrModelError = Me.zrModel.ModelError(Me.DataGrid_ErrorList.SelectedRows(0).Index)
+        ElseIf Me.DataGrid_ErrorList.SelectedCells.Count = 1 Then
+            ziSelectedErrorNumber = Me.DataGrid_ErrorList.Rows(Me.DataGrid_ErrorList.SelectedCells(0).RowIndex).Cells(0).Value
+            lrModelError = Me.zrModel.ModelError(Me.DataGrid_ErrorList.SelectedCells(0).RowIndex)
+        Else
+            ziSelectedErrorNumber = 0
+        End If
+
+        '==========================================================================================================
+        If lrModelError IsNot Nothing Then
+
+            Dim larPage As New List(Of FBM.Page)
+
+
+            Dim lrPropertyGridForm As frmToolboxProperties
+            lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
+            If lrPropertyGridForm IsNot Nothing Then
+                Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
+                lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute})
+                If IsSomething(lrPropertyGridForm) Then
+                    Dim lrModelElementInstance As FBM.ModelObject = Nothing
+                    Dim lrPage As New FBM.Page
+                    Select Case lrModelError.ModelObject.ConceptType
+                        Case Is = pcenumConceptType.EntityType
+                            lrModelElementInstance = CType(lrModelError.ModelObject, FBM.EntityType).CloneInstance(lrPage, False)
+                        Case Is = pcenumConceptType.ValueType
+                            lrModelElementInstance = CType(lrModelError.ModelObject, FBM.ValueType).CloneInstance(lrPage, False)
+                        Case Is = pcenumConceptType.FactType
+                            lrModelElementInstance = CType(lrModelError.ModelObject, FBM.FactType).CloneInstance(lrPage, False)
+                        Case Is = pcenumConceptType.RoleConstraint
+                            lrModelElementInstance = CType(lrModelError.ModelObject, FBM.RoleConstraint).CloneInstance(lrPage, False)
+                    End Select
+                    If lrModelElementInstance IsNot Nothing Then
+                        lrPropertyGridForm.PropertyGrid.SelectedObject = lrModelElementInstance
+                        lrPropertyGridForm.BringToFront()
+                        lrPropertyGridForm.Show()
+                    End If
+                End If
+            End If
+
+        End If
+        '==========================================================================================================
+
+
+    End Sub
+
 End Class

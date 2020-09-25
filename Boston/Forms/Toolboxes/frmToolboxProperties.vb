@@ -95,7 +95,9 @@ Public Class frmToolboxProperties
                     '----------------
                 Case Else
                     Try
-                        Call PropertyGrid.SelectedObject.RefreshShape()
+                        If PropertyGrid.SelectedObject.Page IsNot Nothing Then
+                            Call PropertyGrid.SelectedObject.RefreshShape()
+                        End If
                     Catch ex As Exception
 
                     End Try

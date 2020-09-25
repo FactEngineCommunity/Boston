@@ -51,45 +51,50 @@ Partial Class frmToolboxErrorList
         Me.DataGrid_ErrorList.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.DataGrid_ErrorList.ContextMenuStrip = Me.ContextMenuStripHelp
         Me.DataGrid_ErrorList.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically
-        Me.DataGrid_ErrorList.Location = New System.Drawing.Point(0, 26)
+        Me.DataGrid_ErrorList.Location = New System.Drawing.Point(0, 40)
+        Me.DataGrid_ErrorList.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.DataGrid_ErrorList.Name = "DataGrid_ErrorList"
-        Me.DataGrid_ErrorList.Size = New System.Drawing.Size(755, 190)
+        Me.DataGrid_ErrorList.RowHeadersWidth = 62
+        Me.DataGrid_ErrorList.Size = New System.Drawing.Size(1132, 292)
         Me.DataGrid_ErrorList.TabIndex = 1
         '
         'ContextMenuStripHelp
         '
+        Me.ContextMenuStripHelp.ImageScalingSize = New System.Drawing.Size(24, 24)
         Me.ContextMenuStripHelp.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.HelpToolStripMenuItem, Me.ToolStripMenuItemShowInDiagram})
         Me.ContextMenuStripHelp.Name = "ContextMenuStripHelp"
-        Me.ContextMenuStripHelp.Size = New System.Drawing.Size(174, 48)
+        Me.ContextMenuStripHelp.Size = New System.Drawing.Size(241, 101)
         '
         'HelpToolStripMenuItem
         '
         Me.HelpToolStripMenuItem.Name = "HelpToolStripMenuItem"
-        Me.HelpToolStripMenuItem.Size = New System.Drawing.Size(173, 22)
+        Me.HelpToolStripMenuItem.Size = New System.Drawing.Size(240, 32)
         Me.HelpToolStripMenuItem.Text = "&Help"
         '
         'ToolStripMenuItemShowInDiagram
         '
         Me.ToolStripMenuItemShowInDiagram.Name = "ToolStripMenuItemShowInDiagram"
-        Me.ToolStripMenuItemShowInDiagram.Size = New System.Drawing.Size(173, 22)
+        Me.ToolStripMenuItemShowInDiagram.Size = New System.Drawing.Size(240, 32)
         Me.ToolStripMenuItemShowInDiagram.Text = "&Show in Diagram..."
         '
         'ButtonRefresh
         '
         Me.ButtonRefresh.Image = Global.Boston.My.Resources.Resources.Refresh_16x16
-        Me.ButtonRefresh.Location = New System.Drawing.Point(2, 0)
+        Me.ButtonRefresh.Location = New System.Drawing.Point(3, 0)
+        Me.ButtonRefresh.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.ButtonRefresh.Name = "ButtonRefresh"
-        Me.ButtonRefresh.Size = New System.Drawing.Size(24, 23)
+        Me.ButtonRefresh.Size = New System.Drawing.Size(36, 35)
         Me.ButtonRefresh.TabIndex = 2
         Me.ButtonRefresh.UseVisualStyleBackColor = True
         '
         'frmToolboxErrorList
         '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(754, 217)
+        Me.ClientSize = New System.Drawing.Size(1131, 334)
         Me.Controls.Add(Me.ButtonRefresh)
         Me.Controls.Add(Me.DataGrid_ErrorList)
+        Me.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.Name = "frmToolboxErrorList"
         Me.TabText = "Error List"
         Me.Text = "Error List"
