@@ -995,4 +995,13 @@ Public Class frmToolboxModelDictionary
 
     End Sub
 
+    Private Sub ButtonRefresh_Click(sender As Object, e As EventArgs) Handles ButtonRefresh.Click
+
+        If IsSomething(prApplication.WorkingPage) Then
+            Call Me.LoadToolboxModelDictionary(prApplication.WorkingPage.Language, True)
+        Else
+            Call Me.LoadToolboxModelDictionary(pcenumLanguage.ORMModel, True)
+        End If
+
+    End Sub
 End Class

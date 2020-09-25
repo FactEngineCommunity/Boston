@@ -495,16 +495,27 @@ Public Class frmFactEngine
                     'Make sure the VirtualAnalyst is open
                     Call Me.loadVirtualAnalyst()
 
+                    Me.LabelError.BringToFront()
+                    Me.TabControl1.SelectedTab = Me.TabPageResults
+
                     'Pass the FEQL Statement to the Brain.
                     Select Case lrFEQLTokenType
                         Case Is = FEQL.TokenType.VALUETYPEISWRITTENASSTMT
                             Call prApplication.Brain.ProcessFEQLStatement(lsQuery)
+                            Me.LabelError.Text = "See the Virtual Analyst toolbox for results/required actions."
+
                         Case Is = FEQL.TokenType.KEYWDISIDENTIFIEDBYITS
                             Call prApplication.Brain.ProcessFEQLStatement(lsQuery)
+                            Me.LabelError.Text = "See the Virtual Analyst toolbox for results/required actions."
+
                         Case Is = FEQL.TokenType.KEYWDISWHERE
                             Call prApplication.Brain.ProcessFEQLStatement(lsQuery)
+                            Me.LabelError.Text = "See the Virtual Analyst toolbox for results/required actions."
+
                         Case Is = FEQL.TokenType.FACTTYPEPRODUCTION
                             Call prApplication.Brain.ProcessFEQLStatement(lsQuery)
+                            Me.LabelError.Text = "See the Virtual Analyst toolbox for results/required actions."
+
                     End Select
                     Exit Sub
                 End If

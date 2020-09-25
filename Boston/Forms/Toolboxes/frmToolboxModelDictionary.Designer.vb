@@ -40,6 +40,7 @@ Partial Class frmToolboxModelDictionary
         Me.ToolStripStatusLabelRealisationsCount = New System.Windows.Forms.ToolStripStatusLabel()
         Me.ToolStripStatusLabelPromptModelElementTypeCount = New System.Windows.Forms.ToolStripStatusLabel()
         Me.ToolStripStatusLabelModelElementTypeCount = New System.Windows.Forms.ToolStripStatusLabel()
+        Me.ButtonRefresh = New System.Windows.Forms.Button()
         Me.GroupBox_Main.SuspendLayout()
         Me.ContextMenuStrip1.SuspendLayout()
         Me.StatusStrip1.SuspendLayout()
@@ -51,6 +52,7 @@ Partial Class frmToolboxModelDictionary
             Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.GroupBox_Main.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
+        Me.GroupBox_Main.Controls.Add(Me.ButtonRefresh)
         Me.GroupBox_Main.Controls.Add(Me.CheckBoxShowModelDictionary)
         Me.GroupBox_Main.Controls.Add(Me.CheckBoxShowCoreModelElements)
         Me.GroupBox_Main.Controls.Add(Me.LabelModelName)
@@ -59,7 +61,7 @@ Partial Class frmToolboxModelDictionary
         Me.GroupBox_Main.ForeColor = System.Drawing.Color.Black
         Me.GroupBox_Main.Location = New System.Drawing.Point(12, 12)
         Me.GroupBox_Main.Name = "GroupBox_Main"
-        Me.GroupBox_Main.Size = New System.Drawing.Size(345, 456)
+        Me.GroupBox_Main.Size = New System.Drawing.Size(346, 456)
         Me.GroupBox_Main.TabIndex = 0
         Me.GroupBox_Main.TabStop = False
         Me.GroupBox_Main.Text = "Model Dictionary:"
@@ -114,7 +116,7 @@ Partial Class frmToolboxModelDictionary
         Me.TreeView1.Location = New System.Drawing.Point(3, 49)
         Me.TreeView1.Name = "TreeView1"
         Me.TreeView1.SelectedImageIndex = 0
-        Me.TreeView1.Size = New System.Drawing.Size(336, 401)
+        Me.TreeView1.Size = New System.Drawing.Size(337, 401)
         Me.TreeView1.TabIndex = 1
         '
         'ImageList
@@ -169,7 +171,7 @@ Partial Class frmToolboxModelDictionary
         Me.StatusStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripStatusLabelPromptRealisationsCount, Me.ToolStripStatusLabelRealisationsCount, Me.ToolStripStatusLabelPromptModelElementTypeCount, Me.ToolStripStatusLabelModelElementTypeCount})
         Me.StatusStrip1.Location = New System.Drawing.Point(0, 471)
         Me.StatusStrip1.Name = "StatusStrip1"
-        Me.StatusStrip1.Size = New System.Drawing.Size(369, 22)
+        Me.StatusStrip1.Size = New System.Drawing.Size(370, 22)
         Me.StatusStrip1.TabIndex = 1
         Me.StatusStrip1.Text = "StatusStrip1"
         '
@@ -188,7 +190,7 @@ Partial Class frmToolboxModelDictionary
         'ToolStripStatusLabelPromptModelElementTypeCount
         '
         Me.ToolStripStatusLabelPromptModelElementTypeCount.Name = "ToolStripStatusLabelPromptModelElementTypeCount"
-        Me.ToolStripStatusLabelPromptModelElementTypeCount.Size = New System.Drawing.Size(157, 17)
+        Me.ToolStripStatusLabelPromptModelElementTypeCount.Size = New System.Drawing.Size(156, 17)
         Me.ToolStripStatusLabelPromptModelElementTypeCount.Text = "Model Element Type Count :"
         '
         'ToolStripStatusLabelModelElementTypeCount
@@ -197,11 +199,21 @@ Partial Class frmToolboxModelDictionary
         Me.ToolStripStatusLabelModelElementTypeCount.Size = New System.Drawing.Size(13, 17)
         Me.ToolStripStatusLabelModelElementTypeCount.Text = "0"
         '
+        'ButtonRefresh
+        '
+        Me.ButtonRefresh.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.ButtonRefresh.Image = Global.Boston.My.Resources.Resources.Refresh_16x16
+        Me.ButtonRefresh.Location = New System.Drawing.Point(316, 25)
+        Me.ButtonRefresh.Name = "ButtonRefresh"
+        Me.ButtonRefresh.Size = New System.Drawing.Size(24, 23)
+        Me.ButtonRefresh.TabIndex = 6
+        Me.ButtonRefresh.UseVisualStyleBackColor = True
+        '
         'frmToolboxModelDictionary
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(369, 493)
+        Me.ClientSize = New System.Drawing.Size(370, 493)
         Me.Controls.Add(Me.StatusStrip1)
         Me.Controls.Add(Me.GroupBox_Main)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
@@ -232,4 +244,5 @@ Partial Class frmToolboxModelDictionary
     Friend WithEvents ToolStripStatusLabelModelElementTypeCount As System.Windows.Forms.ToolStripStatusLabel
     Friend WithEvents CheckBoxShowCoreModelElements As System.Windows.Forms.CheckBox
     Friend WithEvents CheckBoxShowModelDictionary As System.Windows.Forms.CheckBox
+    Friend WithEvents ButtonRefresh As Button
 End Class
