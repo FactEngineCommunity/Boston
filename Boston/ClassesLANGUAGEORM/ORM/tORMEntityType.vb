@@ -861,16 +861,21 @@ Namespace FBM
                 Dim lrParentEntityType As FBM.EntityType
                 Dim lr_parentEntityTypeInstance As FBM.EntityTypeInstance
                 Dim lsId As String
-                For Each lrParentEntityType In Me.parentModelObjectList
-                    '----------------------------------------------------------------------
-                    'The ParentEntityType is at least part of the model under review
-                    '  i.e. If currently looking at an ORM model...is within the ORM model
-                    '----------------------------------------------------------------------
-                    lsId = Trim(lrParentEntityType.Id)
-                    lr_parentEntityTypeInstance = arPage.EntityTypeInstance.Find(Function(x) x.Id = Trim(lrParentEntityType.Id))
-                    Dim lr_sub_type_constraint As New FBM.SubtypeRelationshipInstance(arPage, lrEntityTypeInstance, lr_parentEntityTypeInstance)
-                    lrEntityTypeInstance.SubtypeRelationship.Add(lr_sub_type_constraint)
+
+                For Each lrSubtypeRelationship In Me.SubtypeRelationship
+                    lrEntityTypeInstance.SubtypeRelationship.Add(lrSubtypeRelationship.CloneInstance(arPage, False))
                 Next
+
+                'For Each lrParentEntityType In Me.parentModelObjectList
+                '    '----------------------------------------------------------------------
+                '    'The ParentEntityType is at least part of the model under review
+                '    '  i.e. If currently looking at an ORM model...is within the ORM model
+                '    '----------------------------------------------------------------------
+                '    lsId = Trim(lrParentEntityType.Id)
+                '    lr_parentEntityTypeInstance = arPage.EntityTypeInstance.Find(Function(x) x.Id = Trim(lrParentEntityType.Id))
+                '    Dim lr_sub_type_constraint As New FBM.SubtypeRelationshipInstance(arPage, lrEntityTypeInstance, lr_parentEntityTypeInstance)
+                '    lrEntityTypeInstance.SubtypeRelationship.Add(lr_sub_type_constraint)
+                'Next
 
             Catch ex As Exception
                 Dim lsMessage As String
@@ -1211,82 +1216,95 @@ Namespace FBM
 
         Public Function CreateSubtypeRelationship(ByVal arParentEntityType As FBM.EntityType) As FBM.tSubtypeRelationship
 
-            Dim lrSubtypeRelationship As New FBM.tSubtypeRelationship
+            Try
 
-            lrSubtypeRelationship.Model = Me.Model
-            lrSubtypeRelationship.EntityType = Me
-            lrSubtypeRelationship.parentEntityType = arParentEntityType
+                Dim lrSubtypeRelationship As New FBM.tSubtypeRelationship
 
-            Me.parentModelObjectList.Add(arParentEntityType)
-            arParentEntityType.childModelObjectList.Add(Me)
+                lrSubtypeRelationship.Model = Me.Model
+                lrSubtypeRelationship.EntityType = Me
+                lrSubtypeRelationship.parentEntityType = arParentEntityType
 
-            '---------------------------------------------
-            'Create a FactType for the SubtypeConstraint
-            '---------------------------------------------
-            Dim lsFactTypeName As String = ""
-            Dim larModelObject As New List(Of FBM.ModelObject)
-            Dim larRole As New List(Of FBM.Role)
+                Me.parentModelObjectList.Add(arParentEntityType)
+                arParentEntityType.childModelObjectList.Add(Me)
 
-            lsFactTypeName = Viev.Strings.RemoveWhiteSpace(Me.Name & "IsSubtypeOf" & arParentEntityType.Name)
-            larModelObject.Add(Me)
-            larModelObject.Add(arParentEntityType)
+                '---------------------------------------------
+                'Create a FactType for the SubtypeConstraint
+                '---------------------------------------------
+                Dim lsFactTypeName As String = ""
+                Dim larModelObject As New List(Of FBM.ModelObject)
+                Dim larRole As New List(Of FBM.Role)
 
-            lrSubtypeRelationship.FactType = Me.Model.CreateFactType(lsFactTypeName, larModelObject, False, False)
-            lrSubtypeRelationship.FactType.IsSubtypeRelationshipFactType = True
+                lsFactTypeName = Viev.Strings.RemoveWhiteSpace(Me.Name & "IsSubtypeOf" & arParentEntityType.Name)
+                larModelObject.Add(Me)
+                larModelObject.Add(arParentEntityType)
 
-            lrSubtypeRelationship.FactType.RoleGroup(0).Name = "Subtype"
-            lrSubtypeRelationship.FactType.RoleGroup(1).Name = "Supertype"
+                lrSubtypeRelationship.FactType = Me.Model.CreateFactType(lsFactTypeName, larModelObject, False, False)
+                lrSubtypeRelationship.FactType.IsSubtypeRelationshipFactType = True
 
-            lrSubtypeRelationship.FactType.RoleGroup(0).Mandatory = True
+                lrSubtypeRelationship.FactType.RoleGroup(0).Name = "Subtype"
+                lrSubtypeRelationship.FactType.RoleGroup(1).Name = "Supertype"
 
-            larRole.Clear()
-            larRole.Add(lrSubtypeRelationship.FactType.RoleGroup(0))
-            lrSubtypeRelationship.FactType.CreateInternalUniquenessConstraint(larRole, False, False, True, True, arParentEntityType.GetTopmostSupertype)
+                lrSubtypeRelationship.FactType.RoleGroup(0).Mandatory = True
 
-            larRole.Clear()
-            larRole.Add(lrSubtypeRelationship.FactType.RoleGroup(1))
-            lrSubtypeRelationship.FactType.CreateInternalUniquenessConstraint(larRole, False, False, True)
+                larRole.Clear()
+                larRole.Add(lrSubtypeRelationship.FactType.RoleGroup(0))
+                lrSubtypeRelationship.FactType.CreateInternalUniquenessConstraint(larRole, False, False, True, True, arParentEntityType.GetTopmostSupertype)
 
-            Dim lrFactTypeReading As FBM.FactTypeReading
-            Dim lasPredicatePart As New List(Of String)
-            lasPredicatePart.Add("is")
-            lasPredicatePart.Add("")
+                larRole.Clear()
+                larRole.Add(lrSubtypeRelationship.FactType.RoleGroup(1))
+                lrSubtypeRelationship.FactType.CreateInternalUniquenessConstraint(larRole, False, False, True)
 
-            larRole.Clear()
-            larRole.Add(lrSubtypeRelationship.FactType.RoleGroup(0))
-            larRole.Add(lrSubtypeRelationship.FactType.RoleGroup(1))
-            lrFactTypeReading = New FBM.FactTypeReading(lrSubtypeRelationship.FactType, larRole, lasPredicatePart)
-            lrSubtypeRelationship.FactType.FactTypeReading.Add(lrFactTypeReading)
+                Dim lrFactTypeReading As FBM.FactTypeReading
+                Dim lasPredicatePart As New List(Of String)
+                lasPredicatePart.Add("is")
+                lasPredicatePart.Add("")
 
-            larRole.Clear()
-            larRole.Add(lrSubtypeRelationship.FactType.RoleGroup(1))
-            larRole.Add(lrSubtypeRelationship.FactType.RoleGroup(0))
-            lrFactTypeReading = New FBM.FactTypeReading(lrSubtypeRelationship.FactType, larRole, lasPredicatePart)
-            lrSubtypeRelationship.FactType.FactTypeReading.Add(lrFactTypeReading)
+                larRole.Clear()
+                larRole.Add(lrSubtypeRelationship.FactType.RoleGroup(0))
+                larRole.Add(lrSubtypeRelationship.FactType.RoleGroup(1))
+                lrFactTypeReading = New FBM.FactTypeReading(lrSubtypeRelationship.FactType, larRole, lasPredicatePart)
+                lrSubtypeRelationship.FactType.FactTypeReading.Add(lrFactTypeReading)
 
-            Me.SubtypeRelationship.Add(lrSubtypeRelationship)
+                larRole.Clear()
+                larRole.Add(lrSubtypeRelationship.FactType.RoleGroup(1))
+                larRole.Add(lrSubtypeRelationship.FactType.RoleGroup(0))
+                lrFactTypeReading = New FBM.FactTypeReading(lrSubtypeRelationship.FactType, larRole, lasPredicatePart)
+                lrSubtypeRelationship.FactType.FactTypeReading.Add(lrFactTypeReading)
 
-            Call Me.getCorrespondingRDSTable.triggerSubtypeRelationshipAdded()
+                Me.SubtypeRelationship.Add(lrSubtypeRelationship)
 
-            RaiseEvent SubtypeRelationshipAdded(lrSubtypeRelationship)
+                Call Me.getCorrespondingRDSTable.triggerSubtypeRelationshipAdded()
 
-            '=========================================================================
-            'RDS
-            'Manage Subtype Primary Reference Schemes.
-            '  * Need to pull the Primary Reference Scheme from the Supertype if this EntityType is not absorbed.
-            Call Me.getRDSPrimaryReferenceSchemeFromSupertypeIfNecessary()
+                RaiseEvent SubtypeRelationshipAdded(lrSubtypeRelationship)
 
-            If Me.IsAbsorbed Then
-                Call Me.getCorrespondingRDSTable.absorbSupertypeColumns()
-            Else
-                'Supertype needs to get Columns from this subtype
-                Dim lrSupertypeTable = arParentEntityType.GetTopmostNonAbsorbedSupertype.getCorrespondingRDSTable
-                Call lrSupertypeTable.absorbSubtypeColumns(Me.getCorrespondingRDSTable)
-            End If
+                '=========================================================================
+                'RDS
+                'Manage Subtype Primary Reference Schemes.
+                '  * Need to pull the Primary Reference Scheme from the Supertype if this EntityType is not absorbed.
+                Call Me.getRDSPrimaryReferenceSchemeFromSupertypeIfNecessary()
 
-            Call Me.Model.MakeDirty()
+                If Me.IsAbsorbed Then
+                    Call Me.getCorrespondingRDSTable.absorbSupertypeColumns()
+                Else
+                    'Supertype needs to get Columns from this subtype
+                    Dim lrSupertypeTable = arParentEntityType.GetTopmostNonAbsorbedSupertype.getCorrespondingRDSTable
+                    Call lrSupertypeTable.absorbSubtypeColumns(Me.getCorrespondingRDSTable)
+                End If
 
-            Return lrSubtypeRelationship
+                Call Me.Model.MakeDirty()
+
+                Return lrSubtypeRelationship
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return Nothing
+            End Try
 
         End Function
 

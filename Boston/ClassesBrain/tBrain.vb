@@ -1366,19 +1366,31 @@ Public Class tBrain
 
     Private Sub ProcessStatementCreateSubtypeRelationship()
 
-        Dim lrEntityType1, lrEntityType2 As New FBM.EntityType
-        lrEntityType1.Id = Me.CurrentQuestion.ModelObject(0).Id
-        lrEntityType2.Id = Me.CurrentQuestion.ModelObject(1).Id
+        Try
 
-        lrEntityType1 = Me.Model.EntityType.Find(AddressOf lrEntityType1.Equals)
-        lrEntityType2 = Me.Model.EntityType.Find(AddressOf lrEntityType2.Equals)
+            Dim lrEntityType1, lrEntityType2 As New FBM.EntityType
 
-        If IsSomething(lrEntityType1) And IsSomething(lrEntityType2) Then
-            '----------------------------------------
-            'Create a Model level SubtypeConstraint
-            '----------------------------------------
-            Call lrEntityType1.CreateSubtypeRelationship(lrEntityType2)
-        End If
+            lrEntityType1.Id = Trim(Me.CurrentQuestion.FocalSymbol(0))
+            lrEntityType2.Id = Trim(Me.CurrentQuestion.FocalSymbol(1))
+
+            lrEntityType1 = Me.Model.EntityType.Find(AddressOf lrEntityType1.Equals)
+            lrEntityType2 = Me.Model.EntityType.Find(AddressOf lrEntityType2.Equals)
+
+            If IsSomething(lrEntityType1) And IsSomething(lrEntityType2) Then
+                '----------------------------------------
+                'Create a Model level SubtypeConstraint
+                '----------------------------------------
+                Call lrEntityType1.CreateSubtypeRelationship(lrEntityType2)
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 #End Region

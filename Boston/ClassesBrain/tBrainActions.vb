@@ -763,11 +763,14 @@ Partial Public Class tBrain
 
             Dim lrSentence As New Language.Sentence(asOriginalSentence, asOriginalSentence)
 
+            Dim lasSymbol As New List(Of String)
+            lasSymbol.Add(Me.VAQL.ISAKINDOFStatement.MODELELEMENTNAME(0))
+            lasSymbol.Add(Me.VAQL.ISAKINDOFStatement.MODELELEMENTNAME(1))
 
             Dim lrQuestion = New tQuestion("Would you like me to create the subtype relationship between " & Me.VAQL.ISAKINDOFStatement.MODELELEMENTNAME(0) & " and " & Me.VAQL.ISAKINDOFStatement.MODELELEMENTNAME(1) & "'?",
                                            pcenumQuestionType.CreateSubtypeRelationship,
                                            True,
-                                           Nothing,
+                                           lasSymbol,
                                            lrSentence,
                                            Nothing,
                                            lrPlan,

@@ -96,7 +96,7 @@ Namespace FBM
                     lrFactTypeInstance.Id = .FactType.Id
                     lrFactTypeInstance = arPage.FactTypeInstance.Find(AddressOf lrFactTypeInstance.Equals)
                     If lrFactTypeInstance Is Nothing Then
-                        lrFactTypeInstance = .FactType.CloneInstance(arPage, True)
+                        lrFactTypeInstance = .FactType.CloneInstance(arPage, abAddToPage)
                     End If
                     lrSubtypeConstraintInstance.FactType = lrFactTypeInstance
                     lrSubtypeConstraintInstance.FactType.SubtypeConstraintInstance = lrSubtypeConstraintInstance
