@@ -11,7 +11,7 @@ Namespace FTR
         Private m_scanner As Scanner
         Private m_tree As ParseTree
 
-        Public Sub New(ByVal scanner As Scanner)
+        Public Sub New(ByRef scanner As Scanner)
             m_scanner = scanner
         End Sub
 
@@ -33,6 +33,7 @@ Namespace FTR
 
         Private Sub ParseBINARYPREDICATECLAUSE(ByVal parent As ParseNode) ' NonTerminalSymbol: BINARYPREDICATECLAUSE
             Dim tok As Token
+            Dim n As ParseNode
             Dim node As ParseNode = parent.CreateNode(m_scanner.GetToken(TokenType.BINARYPREDICATECLAUSE), "BINARYPREDICATECLAUSE")
             parent.Nodes.Add(node)
 

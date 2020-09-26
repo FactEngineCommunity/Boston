@@ -336,13 +336,13 @@ Namespace VAQL
         ''' this method is not used internally. 
         ''' </summary>
         Public Sub HighlightText()
-        SyncLock treelock
-            textChanged = True
-            currentText = Trim(Textbox.Text)
-        End SyncLock
-    End Sub
+            SyncLock treelock
+                textChanged = True
+                currentText = Trim(Textbox.Text)
+            End SyncLock
+        End Sub
 
-    Private Sub HighlightTextInternal()
+        Private Sub HighlightTextInternal()
         ' highlight the text (used internally only)
         Lock()
 

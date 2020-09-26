@@ -6,7 +6,7 @@ Namespace FBM
 
         Public Function IsAcceptableObjectTypeName(ByVal asCandidateObjectTypeName As String) As Boolean
 
-            Dim loRegularExpression = New Regex("^[a-zA-Z0-9_]*$")
+            Dim loRegularExpression = New Regex("^[a-zA-Z0-9_ ]*$")
             If loRegularExpression.IsMatch(asCandidateObjectTypeName) Then
                 Return True
             Else
