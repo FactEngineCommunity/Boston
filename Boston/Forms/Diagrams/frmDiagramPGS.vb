@@ -50,31 +50,7 @@ Public Class frmDiagramPGS
 
             layout.Arrange(Diagram)
 
-            For Each lrNode As ShapeNode In Me.Diagram.Nodes
-
-                Dim commonLinks As DiagramLinkCollection = getOutgoingLinksWithSameOriginAndDestination(lrNode, lrNode)
-
-                Dim liDegrees As Double = 10
-                For Each lrLink As DiagramLink In commonLinks
-                    Dim lrNewPointF As PointF
-
-                    Dim liRadius As Integer = lrNode.Bounds.Width / 2
-                    Dim liCircleCentreX, liCircleCentreY As Integer
-                    liCircleCentreX = lrNode.Bounds.X + (lrNode.Bounds.Width / 2)
-                    liCircleCentreY = lrNode.Bounds.Y + (lrNode.Bounds.Height / 2)
-
-                    lrNewPointF = Me.getPointOnCircle(liCircleCentreX, liCircleCentreY, liRadius, liDegrees)
-
-                    lrLink.ControlPoints(0) = lrNewPointF
-                    lrLink.ControlPoints(1) = Me.getPointOnCircle(liCircleCentreX, liCircleCentreY, liRadius + 15, liDegrees - 0.3)
-                    lrLink.ControlPoints(2) = Me.getPointOnCircle(liCircleCentreX, liCircleCentreY, liRadius + 15, liDegrees + 0.3)
-                    lrLink.ControlPoints(lrLink.ControlPoints.Count - 1) = lrNewPointF
-
-                    Call lrLink.UpdateFromPoints()
-
-                    liDegrees += 20
-                Next
-            Next
+            Call Me.layoutSelfJoiningLinks()
 
             Me.Diagram.Invalidate()
 
@@ -86,6 +62,37 @@ Public Class frmDiagramPGS
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
             prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
         End Try
+
+    End Sub
+
+    Private Sub layoutSelfJoiningLinks()
+
+        For Each lrNode As ShapeNode In Me.Diagram.Nodes
+
+            Dim commonLinks As DiagramLinkCollection = getOutgoingLinksWithSameOriginAndDestination(lrNode, lrNode)
+
+            Dim liDegrees As Double = 10
+            For Each lrLink As DiagramLink In commonLinks
+                Dim lrNewPointF As PointF
+
+                Dim liRadius As Integer = lrNode.Bounds.Width / 2
+                Dim liCircleCentreX, liCircleCentreY As Integer
+                liCircleCentreX = lrNode.Bounds.X + (lrNode.Bounds.Width / 2)
+                liCircleCentreY = lrNode.Bounds.Y + (lrNode.Bounds.Height / 2)
+
+                lrNewPointF = Me.getPointOnCircle(liCircleCentreX, liCircleCentreY, liRadius, liDegrees)
+
+                lrLink.ControlPoints(0) = lrNewPointF
+                lrLink.ControlPoints(1) = Me.getPointOnCircle(liCircleCentreX, liCircleCentreY, liRadius + 15, liDegrees - 0.3)
+                lrLink.ControlPoints(2) = Me.getPointOnCircle(liCircleCentreX, liCircleCentreY, liRadius + 15, liDegrees + 0.3)
+                lrLink.ControlPoints(lrLink.ControlPoints.Count - 1) = lrNewPointF
+
+                Call lrLink.UpdateFromPoints()
+
+                liDegrees += 20
+            Next
+        Next
+
 
     End Sub
 
@@ -633,6 +640,8 @@ Public Class frmDiagramPGS
                     lrNode.shape.Selected = True
                 End If
             End If
+
+            Call Me.layoutSelfJoiningLinks()
 
             Call Me.resetNodeAndLinkColors()
 

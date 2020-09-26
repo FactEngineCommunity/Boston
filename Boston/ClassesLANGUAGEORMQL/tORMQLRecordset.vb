@@ -53,6 +53,8 @@
             End Set
         End Property
 
+        Public NumberOfRowsUpdated As Integer = 0
+
         ''' <summary>
         ''' Parameterless New
         ''' </summary>

@@ -1733,6 +1733,23 @@ Namespace FBM
                     'Indexes                    
                     Call Me.loadIndexesForTable(lrTable)
 
+                    Dim larNullActiveRoles = From Column In lrTable.Column
+                                             Where Column.ActiveRole Is Nothing
+                                             Select Column
+
+                    If larNullActiveRoles.Count > 0 Then
+                        'CodeSafe
+                        For Each lrColumn In larNullActiveRoles
+                            If lrColumn.Role.FactType.Id = lrColumn.Table.Name And
+                                lrColumn.Role.FactType.IsObjectified Then
+                                If lrColumn.Role.JoinedORMObject.ConceptType = pcenumConceptType.ValueType Then
+                                    lrColumn.ActiveRole = lrColumn.Role
+                                    Call Me.updateORSetCMMLPropertyActiveRole(lrColumn)
+                                End If
+                            End If
+                        Next
+                    End If
+
                     '================================
                     'CodeSafe
                     For Each lrColumn In lrTable.Column

@@ -1270,6 +1270,8 @@ Namespace ORMQL
 
                 lrFactType = Me.Model.FactType.Find(Function(x) x.Id = lrupdateStatement.USERTABLENAME)
 
+                Dim liNumberOfRowsUpdated = 0
+
                 'Where Clause
                 For Each lrFact In lrFactType.Fact.FindAll(Function(x) x.Data.Find(Function(y) y.Role.Name = lrupdateStatement.COLUMNNAMESTR(1)).Data = lrupdateStatement.VALUE(1))
                     lrFact = lrFactType.Fact.Find(Function(x) x.Data.Find(Function(y) y.Role.Name = lrupdateStatement.COLUMNNAMESTR(1)).Data = lrupdateStatement.VALUE(1))
@@ -1283,10 +1285,17 @@ Namespace ORMQL
                         lrFactData.isDirty = True
                         lrFactType.isDirty = True
                         Me.Model.IsDirty = True
+
+                        liNumberOfRowsUpdated += 1
                     End If
                 Next
 
-                Return True
+                Dim lrORMQlREcordset As New ORMQL.Recordset
+
+                lrORMQlREcordset.NumberOfRowsUpdated = liNumberOfRowsUpdated
+
+                Return lrORMQlREcordset
+
 
             Catch ex As Exception
                 Dim lsMessage1 As String

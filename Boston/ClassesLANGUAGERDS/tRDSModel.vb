@@ -115,8 +115,12 @@ Namespace RDS
 
             Try
                 'Direct Columns
-                Dim larDirectColumn = From Table In Me.Table
-                                      From Column In Table.Column
+                Dim larNonNullActiveColumns = From Table In Me.Table
+                                              From Column In Table.Column
+                                              Where Column.ActiveRole IsNot Nothing
+                                              Select Column
+
+                Dim larDirectColumn = From Column In larNonNullActiveColumns
                                       Where Column.ActiveRole.JoinedORMObject.Id = arValueType.Id
                                       Select Column Distinct
 
@@ -126,8 +130,7 @@ Namespace RDS
                                                           Select EntityType
 
                 Dim larIndirectColumns = From EntityType In larSimpleReferenceSchemeEntityTypes
-                                         From Table In Me.Table
-                                         From Column In Table.Column
+                                         From Column In larNonNullActiveColumns
                                          Where Column.ActiveRole.JoinedORMObject.Id = EntityType.Id _
                                          And EntityType.ReferenceModeValueType.Id = arValueType.Id
                                          Select Column Distinct
