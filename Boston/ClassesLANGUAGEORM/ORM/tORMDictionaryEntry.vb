@@ -615,5 +615,15 @@ Namespace FBM
 
         End Sub
 
+        Public Function representsModelObject() As Boolean
+
+            If Me.isValueType Or Me.isEntityType Or Me.isFactType Or Me.isRoleConstraint Then
+                Return True
+            Else
+                Return False
+            End If
+
+        End Function
+
     End Class
 End Namespace

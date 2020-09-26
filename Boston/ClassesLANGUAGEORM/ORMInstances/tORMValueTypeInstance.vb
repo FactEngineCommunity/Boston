@@ -22,7 +22,9 @@ Namespace FBM
             End Get
             Set(ByVal value As FBM.ValueType)
                 Me._ValueType = value
-                Me.Concept = value.Concept
+                If value IsNot Nothing Then
+                    Me.Concept = value.Concept
+                End If
             End Set
         End Property
 

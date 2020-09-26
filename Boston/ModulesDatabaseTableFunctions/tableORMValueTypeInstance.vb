@@ -79,12 +79,24 @@ Namespace TableValueTypeInstance
                         lrValueTypeInstance.Model = lrPage.Model
                         lrValueTypeInstance.Page = lrPage
                         lrValueTypeInstance.Id = lREcordset("ValueTypeId").Value
-                        lrValueTypeInstance.ValueType.Id = lrValueTypeInstance.Id
+
                         lrValueTypeInstance.ValueType = lrPage.Model.ValueType.Find(Function(x) x.Id = lrValueTypeInstance.Id)
 
-                        '-------------------------------------------------------------------------------------------
-                        'CodeSafe: Remove the ValueTypeInstance if it references a ValueType that no longer exists
+                        'CodeSafe
                         If lrValueTypeInstance.ValueType Is Nothing Then
+                            prApplication.ThrowErrorMessage("The Value Type Instance, '" & lrValueTypeInstance.Id & "', on Page, '" & lrPage.Name & "', has no corresponding Value Type in the model. Boston will try and fix this.", pcenumErrorType.Critical)
+
+                            lrValueTypeInstance.ValueType = lrPage.Model.ValueType.Find(Function(x) LCase(x.Id) = LCase(lrValueTypeInstance.Id))
+
+                            If lrValueTypeInstance.ValueType IsNot Nothing Then
+                                Call TableConceptInstance.ModifyKey(lrValueTypeInstance, lrValueTypeInstance.ValueType.Id)
+                            End If
+                        End If
+
+
+                            '-------------------------------------------------------------------------------------------
+                            'CodeSafe: Remove the ValueTypeInstance if it references a ValueType that no longer exists
+                            If lrValueTypeInstance.ValueType Is Nothing Then
                             Call TableValueTypeInstance.DeleteValueTypeInstance(lrValueTypeInstance)
                         Else
                             lrValueTypeInstance.DataType = CType([Enum].Parse(GetType(pcenumORMDataType), Trim(lREcordset("DataType").Value)), pcenumORMDataType)

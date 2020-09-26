@@ -828,6 +828,7 @@ Namespace FBM
                     End If
 
                     Me.Id = asNewName
+                    Me.Name = asNewName
                     Call TableValueType.UpdateValueType(Me) 'Sets the new Name, because Id is the same as Name and the database's Name hasn't been updated yet.
 
                     '-------------------------------------------------------

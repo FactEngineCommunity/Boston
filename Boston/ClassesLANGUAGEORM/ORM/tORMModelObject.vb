@@ -802,6 +802,10 @@ Namespace FBM
 
                         Me.Concept = lrNewDictionaryEntry.Concept
 
+                        If (lrNewDictionaryEntry.Realisations.Count = 0) Then
+                            Call TableModelDictionary.ModifySymbol(Me.Model, lrOriginalDictionaryEntry, arNewConcept.Symbol, Me.ConceptType)
+                        End If
+
                         lrNewDictionaryEntry.AddConceptType(Me.ConceptType)
                     Else
                         '--------------------------------------------------------------------------------------------------
