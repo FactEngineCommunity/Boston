@@ -37,19 +37,19 @@ Namespace FBM
 
         Public Property X As Integer Implements iPageObject.X
             Get
-                Throw New NotImplementedException()
+                'Throw New NotImplementedException()
             End Get
             Set(value As Integer)
-                Throw New NotImplementedException()
+                'Throw New NotImplementedException()
             End Set
         End Property
 
         Public Property Y As Integer Implements iPageObject.Y
             Get
-                Throw New NotImplementedException()
+                'Throw New NotImplementedException()
             End Get
             Set(value As Integer)
-                Throw New NotImplementedException()
+                'Throw New NotImplementedException()
             End Set
         End Property
 

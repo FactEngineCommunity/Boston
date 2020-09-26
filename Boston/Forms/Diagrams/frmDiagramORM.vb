@@ -5515,34 +5515,37 @@ Public Class frmDiagramORM
                     loORMObject.x = loORMObject.TableShape.bounds.x
                     loORMObject.y = loORMObject.TableShape.bounds.y
                 Case Else
-                    loORMObject.x = loORMObject.shape.bounds.x
-                    loORMObject.y = loORMObject.shape.bounds.y
+                    Try
+                        loORMObject.x = loORMObject.shape.bounds.x
+                        loORMObject.y = loORMObject.shape.bounds.y
 
-                    If loORMObject.ConceptType = pcenumConceptType.Role Then
-                        lrFactTypeInstance = loORMObject.FactType
-                        lrFactTypeInstance.X = lrFactTypeInstance.Shape.Bounds.X
-                        lrFactTypeInstance.Y = lrFactTypeInstance.Shape.Bounds.Y
-                    End If
+                        If loORMObject.ConceptType = pcenumConceptType.Role Then
+                            lrFactTypeInstance = loORMObject.FactType
+                            lrFactTypeInstance.X = lrFactTypeInstance.Shape.Bounds.X
+                            lrFactTypeInstance.Y = lrFactTypeInstance.Shape.Bounds.Y
+                        End If
 
-                    '==============================================================================
-                    'Broadcast the moving of the Object
-                    Dim lrModel As New Viev.FBM.Interface.Model
-                    Dim lrPage As New Viev.FBM.Interface.Page()
+                        '==============================================================================
+                        'Broadcast the moving of the Object
+                        Dim lrModel As New Viev.FBM.Interface.Model
+                        Dim lrPage As New Viev.FBM.Interface.Page()
 
-                    lrModel.ModelId = Me.zrPage.Model.ModelId
-                    lrPage.Id = Me.zrPage.PageId
-                    lrPage.ConceptInstance = New Viev.FBM.Interface.ConceptInstance
-                    lrPage.ConceptInstance.X = loORMObject.Shape.Bounds.X
-                    lrPage.ConceptInstance.Y = loORMObject.Shape.Bounds.Y
-                    lrPage.ConceptInstance.ModelElementId = loORMObject.Id
-                    lrModel.Page = lrPage
+                        lrModel.ModelId = Me.zrPage.Model.ModelId
+                        lrPage.Id = Me.zrPage.PageId
+                        lrPage.ConceptInstance = New Viev.FBM.Interface.ConceptInstance
+                        lrPage.ConceptInstance.X = loORMObject.Shape.Bounds.X
+                        lrPage.ConceptInstance.Y = loORMObject.Shape.Bounds.Y
+                        lrPage.ConceptInstance.ModelElementId = loORMObject.Id
+                        lrModel.Page = lrPage
 
-                    If My.Settings.UseClientServer And My.Settings.InitialiseClient Then
-                        Dim lrBroadcast As New Viev.FBM.Interface.Broadcast
-                        lrBroadcast.Model = lrModel
-                        Call prDuplexServiceClient.SendBroadcast([Interface].pcenumBroadcastType.PageMovePageObject, lrBroadcast)
-                    End If
-                    '==============================================================================
+                        If My.Settings.UseClientServer And My.Settings.InitialiseClient Then
+                            Dim lrBroadcast As New Viev.FBM.Interface.Broadcast
+                            lrBroadcast.Model = lrModel
+                            Call prDuplexServiceClient.SendBroadcast([Interface].pcenumBroadcastType.PageMovePageObject, lrBroadcast)
+                        End If
+                        '==============================================================================
+                    Catch ex As Exception
+                    End Try
             End Select
 
             lrUserAction.PostActionModelObject = New Boston.tUndoRedoObject(loORMObject.X, loORMObject.Y) 'loORMObject.Clone(Me.zrPage)

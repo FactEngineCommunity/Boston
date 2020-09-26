@@ -805,15 +805,19 @@ Namespace FBM
                 Me.Shape.Move(Me.X, Me.Y)
                 Call Me.Shape.ZBottom()
 
-                Me.FactTypeReadingShape.Shape.Move(((Me.Shape.Bounds.Width / 2) + Me.Shape.Bounds.X) - (Me.FactTypeReadingShape.Shape.Bounds.Width / 2), (Me.Shape.Bounds.Y + Me.Shape.Bounds.Height) - 6) 'FactTypeReadingShape.Shape.Bounds.Y)
+                If Me.FactTypeReadingShape.Shape IsNot Nothing Then
+                    Me.FactTypeReadingShape.Shape.Move(((Me.Shape.Bounds.Width / 2) + Me.Shape.Bounds.X) - (Me.FactTypeReadingShape.Shape.Bounds.Width / 2), (Me.Shape.Bounds.Y + Me.Shape.Bounds.Height) - 6) 'FactTypeReadingShape.Shape.Bounds.Y)
+                End If
 
                 For Each lrRoleInstance In Me.RoleGroup
                     lrRoleInstance.Shape.AttachTo(Me.Shape, AttachToNode.MiddleLeft)
                 Next
 
                 If Me.FactTypeName IsNot Nothing Then
-                    If Me.FactTypeName.Shape.Bounds.Y.isBetween(Me.Y - 3, Me.Y + 3) Then
-                        Me.FactTypeName.Shape.Move(Me.FactTypeName.Shape.Bounds.X, Me.Y - 8)
+                    If Me.FactTypeName.Shape IsNot Nothing Then
+                        If Me.FactTypeName.Shape.Bounds.Y.isBetween(Me.Y - 3, Me.Y + 3) Then
+                            Me.FactTypeName.Shape.Move(Me.FactTypeName.Shape.Bounds.X, Me.Y - 8)
+                        End If
                     End If
                 End If
 
