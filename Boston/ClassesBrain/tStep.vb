@@ -31,10 +31,11 @@
         Public AlternateActionType As pcenumActionType
 
 
-        Public Sub New(ByVal arActionType As pcenumActionType, _
-                       ByVal arAbortPlanIfStepIsAborted As Boolean, _
-                       ByVal aiAlternateActionType As pcenumActionType, _
-                       ByVal ParamArray aaiFactTypeAttributes As pcenumStepFactTypeAttributes() _
+        Public Sub New(ByVal arActionType As pcenumActionType,
+                       ByVal arAbortPlanIfStepIsAborted As Boolean,
+                       ByVal aiAlternateActionType As pcenumActionType,
+                       ByRef aarModelObject As List(Of FBM.ModelObject),
+                       ByVal ParamArray aaiFactTypeAttributes As pcenumStepFactTypeAttributes()
                        )
 
             Me.ActionType = arActionType

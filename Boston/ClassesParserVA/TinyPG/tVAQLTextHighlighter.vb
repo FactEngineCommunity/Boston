@@ -623,23 +623,26 @@ Namespace VAQL
                     Case TokenType.KEYWDISACONCEPT:
                         sb.Append("{{\cf46 ")
                         Exit Select
-                    Case TokenType.KEYWDISANENTITYTYPE:
+                    Case TokenType.KEYWDISAKINDOF:
                         sb.Append("{{\cf47 ")
                         Exit Select
-                    Case TokenType.KEYWDISIDENTIFIEDBYITS:
+                    Case TokenType.KEYWDISANENTITYTYPE:
                         sb.Append("{{\cf48 ")
                         Exit Select
-                    Case TokenType.KEYWDISWRITTENAS:
+                    Case TokenType.KEYWDISIDENTIFIEDBYITS:
                         sb.Append("{{\cf49 ")
                         Exit Select
-                    Case TokenType.KEYWDNL:
+                    Case TokenType.KEYWDISWRITTENAS:
                         sb.Append("{{\cf50 ")
                         Exit Select
-                    Case TokenType.KEYWDONE:
+                    Case TokenType.KEYWDNL:
                         sb.Append("{{\cf51 ")
                         Exit Select
-                    Case TokenType.KEYWDREADING:
+                    Case TokenType.KEYWDONE:
                         sb.Append("{{\cf52 ")
+                        Exit Select
+                    Case TokenType.KEYWDREADING:
+                        sb.Append("{{\cf53 ")
                         Exit Select
 
             Case Else
@@ -650,7 +653,7 @@ Namespace VAQL
 
     ' define the color palette to be used here
     Private Sub AddRtfHeader(ByVal sb As StringBuilder)
-        sb.Insert(0, "{\rtf1\ansi\deff0{\fonttbl{\f0\fnil\fcharset0 Tahoma;}}{\colortbl;\red0\green191\blue255;\red0\green191\blue255;\red153\green0\blue0;\red76\green153\blue0;\red153\green76\blue0;\red153\green76\blue0;\red153\green0\blue153;\red76\green153\blue0;\red153\green76\blue0;\red153\green0\blue0;\red0\green0\blue255;\red153\green0\blue153;\red153\green0\blue0;\red0\green0\blue255;\red135\green207\blue243;\red135\green207\blue243;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue102;\red0\green0\blue255;\red0\green0\blue255;}\viewkind4\uc1\pard\lang1033\f0\fs20")
+        sb.Insert(0, "{\rtf1\ansi\deff0{\fonttbl{\f0\fnil\fcharset0 Tahoma;}}{\colortbl;\red0\green191\blue255;\red0\green191\blue255;\red153\green0\blue0;\red76\green153\blue0;\red153\green76\blue0;\red153\green76\blue0;\red153\green0\blue153;\red76\green153\blue0;\red153\green76\blue0;\red153\green0\blue0;\red0\green0\blue255;\red153\green0\blue153;\red153\green0\blue0;\red0\green0\blue255;\red135\green207\blue243;\red135\green207\blue243;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue102;\red0\green0\blue255;\red0\green0\blue255;}\viewkind4\uc1\pard\lang1033\f0\fs20")
     End Sub
 
     Private Sub AddRtfEnd(ByVal sb As StringBuilder)

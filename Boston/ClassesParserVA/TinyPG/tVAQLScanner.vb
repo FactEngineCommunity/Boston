@@ -301,6 +301,10 @@ Namespace VAQL
             Patterns.Add(TokenType.KEYWDISACONCEPT, regex)
             Tokens.Add(TokenType.KEYWDISACONCEPT)
 
+            regex = new Regex("IS A KIND OF", RegexOptions.Compiled)
+            Patterns.Add(TokenType.KEYWDISAKINDOF, regex)
+            Tokens.Add(TokenType.KEYWDISAKINDOF)
+
             regex = new Regex("IS AN ENTITY TYPE", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDISANENTITYTYPE, regex)
             Tokens.Add(TokenType.KEYWDISANENTITYTYPE)
@@ -542,13 +546,14 @@ Namespace VAQL
         KEYWDDATATYPESTRINGLARGELENGTH= 88
         KEYWDDATATYPESTRINGVARIABLELENGTH= 89
         KEYWDISACONCEPT= 90
-        KEYWDISANENTITYTYPE= 91
-        KEYWDISIDENTIFIEDBYITS= 92
-        KEYWDISWRITTENAS= 93
-        KEYWDNL     = 94
-        KEYWDONE    = 95
-        KEYWDREADING= 96
-        WHITESPACE  = 97
+        KEYWDISAKINDOF= 91
+        KEYWDISANENTITYTYPE= 92
+        KEYWDISIDENTIFIEDBYITS= 93
+        KEYWDISWRITTENAS= 94
+        KEYWDNL     = 95
+        KEYWDONE    = 96
+        KEYWDREADING= 97
+        WHITESPACE  = 98
     End Enum
 
     <Serializable()> _

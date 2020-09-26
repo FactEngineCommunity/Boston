@@ -505,6 +505,9 @@ Namespace FEQL
                 Case TokenType.SHOWSTMT
                     Value = EvalSHOWSTMT(tree, paramlist)
                     Exit Select
+                Case TokenType.SUBTYPECLAUSE
+                    Value = EvalSUBTYPECLAUSE(tree, paramlist)
+                    Exit Select
                 Case TokenType.SUBTYPESTMT
                     Value = EvalSUBTYPESTMT(tree, paramlist)
                     Exit Select
@@ -931,6 +934,10 @@ Namespace FEQL
         End Function
 
         Protected Overridable Function EvalSHOWSTMT(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalSUBTYPECLAUSE(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
             Throw New NotImplementedException()
         End Function
 

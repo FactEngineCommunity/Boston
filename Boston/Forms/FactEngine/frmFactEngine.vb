@@ -522,6 +522,10 @@ Public Class frmFactEngine
                             Call prApplication.Brain.ProcessFEQLStatement(lsQuery)
                             Me.LabelError.Text = "See the Virtual Analyst toolbox for results/required actions."
 
+                        Case Is = FEQL.TokenType.KEYWDISAKINDOF
+                            Call prApplication.Brain.ProcessFEQLStatement(lsQuery)
+                            Me.LabelError.Text = "See the Virtual Analyst toolbox for results/required actions."
+
                     End Select
                     Exit Sub
                 End If

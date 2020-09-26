@@ -1280,7 +1280,7 @@ Public Class tBrain
                         QuestionIsResolved = True
                     End If
                 Case Is = pcenumQuestionType.CreateEntityType
-                    If Me.Model.ExistsModelElement(arQuestion.EntityType(0).Name) Then
+                    If Me.Model.ExistsModelElement(arQuestion.ModelObject(0).Name) Then
                         QuestionIsResolved = True
                     End If
             End Select
@@ -1364,10 +1364,11 @@ Public Class tBrain
         End If
     End Sub
 
-    Private Sub ProcessStatementCreateSubtypeConstraint()
+    Private Sub ProcessStatementCreateSubtypeRelationship()
+
         Dim lrEntityType1, lrEntityType2 As New FBM.EntityType
-        lrEntityType1.Id = Me.CurrentQuestion.EntityType(0).Id
-        lrEntityType2.Id = Me.CurrentQuestion.EntityType(1).Id
+        lrEntityType1.Id = Me.CurrentQuestion.ModelObject(0).Id
+        lrEntityType2.Id = Me.CurrentQuestion.ModelObject(1).Id
 
         lrEntityType1 = Me.Model.EntityType.Find(AddressOf lrEntityType1.Equals)
         lrEntityType2 = Me.Model.EntityType.Find(AddressOf lrEntityType2.Equals)
@@ -1378,6 +1379,7 @@ Public Class tBrain
             '----------------------------------------
             Call lrEntityType1.CreateSubtypeRelationship(lrEntityType2)
         End If
+
     End Sub
 #End Region
 
@@ -1872,6 +1874,9 @@ Public Class tBrain
             Case Is = Boston.VAQL.TokenType.KEYWDISWHERE
                 Call Me.ProcessISWHEREStatement(asOriginalSentence)
                 Return True
+            Case Is = Boston.VAQL.TokenType.KEYWDISAKINDOF
+                Call Me.ProcessISAKINDOFStatement(asOriginalSentence)
+                Return True
         End Select
 
     End Function
@@ -1892,12 +1897,13 @@ Public Class tBrain
         Dim lrSecondStep As Brain.Step
         Dim lrThirdStep As Brain.Step
 
-        lrFirstStep = New Brain.Step(pcenumActionType.FindOrCreateEntityTypeORFactType, True, pcenumActionType.None)
-        lrSecondStep = New Brain.Step(pcenumActionType.FindOrCreateModelElement, True, pcenumActionType.None)
-        lrThirdStep = New Brain.Step(pcenumActionType.CreateFactType, _
-                                     True, _
-                                     pcenumActionType.None, _
-                                     pcenumStepFactTypeAttributes.BinaryFactType, _
+        lrFirstStep = New Brain.Step(pcenumActionType.FindOrCreateEntityTypeORFactType, True, pcenumActionType.None, Nothing)
+        lrSecondStep = New Brain.Step(pcenumActionType.FindOrCreateModelElement, True, pcenumActionType.None, Nothing)
+        lrThirdStep = New Brain.Step(pcenumActionType.CreateFactType,
+                                     True,
+                                     pcenumActionType.None,
+                                     Nothing,
+                                     pcenumStepFactTypeAttributes.BinaryFactType,
                                      pcenumStepFactTypeAttributes.ManyToOne)
 
         lrPlan.AddStep(lrFirstStep)
@@ -1936,7 +1942,7 @@ Public Class tBrain
                                                  lrFirstStep)
 
                 Dim lrEntityType As New FBM.EntityType(Me.Model, pcenumLanguage.ORMModel, lsModelElementName, Nothing, True)
-                lrQuestion.EntityType.Add(lrEntityType)
+                lrQuestion.ModelObject.Add(lrEntityType)
 
                 If Me.QuestionHasBeenRaised(lrQuestion) Then
                     '------------------------------------------------------------
@@ -2145,7 +2151,7 @@ Public Class tBrain
                     Next
 
                     If lbIsLikelyValueType Then
-                        lrStep = New Brain.Step(pcenumActionType.CreateValueType, True, pcenumActionType.None)
+                        lrStep = New Brain.Step(pcenumActionType.CreateValueType, True, pcenumActionType.None, Nothing)
                         lrPlan.AddStep(lrStep)
 
                         Dim lasSymbol As New List(Of String)
@@ -2160,7 +2166,7 @@ Public Class tBrain
                                                          lrPlan,
                                                          lrStep)
                     Else
-                        lrStep = New Brain.Step(pcenumActionType.CreateEntityType, True, pcenumActionType.CreateValueType)
+                        lrStep = New Brain.Step(pcenumActionType.CreateEntityType, True, pcenumActionType.CreateValueType, Nothing)
                         lrPlan.AddStep(lrStep)
 
                         Dim lasSymbol As New List(Of String)
@@ -2221,6 +2227,7 @@ Public Class tBrain
             lrStep = New Brain.Step(pcenumActionType.CreateFactType,
                                     True,
                                     pcenumActionType.None,
+                                    Nothing,
                                     pcenumStepFactTypeAttributes.BinaryFactType,
                                     pcenumStepFactTypeAttributes.ManyToOne,
                                     pcenumStepFactTypeAttributes.MandatoryFirstRole)
@@ -2464,7 +2471,7 @@ Public Class tBrain
                     Next
 
                     If lbIsLikelyValueType Then
-                        lrStep = New Brain.Step(pcenumActionType.CreateValueType, True, pcenumActionType.None)
+                        lrStep = New Brain.Step(pcenumActionType.CreateValueType, True, pcenumActionType.None, Nothing)
                         lrPlan.AddStep(lrStep)
 
                         Dim lasSymbol As New List(Of String)
@@ -2479,7 +2486,7 @@ Public Class tBrain
                                                          lrPlan, _
                                                          lrStep)
                     Else
-                        lrStep = New Brain.Step(pcenumActionType.CreateEntityType, True, pcenumActionType.CreateValueType)
+                        lrStep = New Brain.Step(pcenumActionType.CreateEntityType, True, pcenumActionType.CreateValueType, Nothing)
                         lrPlan.AddStep(lrStep)
 
                         Dim lasSymbol As New List(Of String)
@@ -2538,7 +2545,7 @@ Public Class tBrain
             Next 'ModelElement
 
 
-            lrStep = New Brain.Step(pcenumActionType.CreateFactType, True, pcenumActionType.None)
+            lrStep = New Brain.Step(pcenumActionType.CreateFactType, True, pcenumActionType.None, Nothing)
             lrPlan.AddStep(lrStep)
 
             lrQuestion = New tQuestion("Would you like me to create a Fact Type for '" & Trim(asOriginalSentence) & "'?", _
@@ -2892,9 +2899,9 @@ Public Class tBrain
         Dim lasSymbol As New List(Of String)
 
         Me.CurrentPlan = New Brain.Plan
-        Dim lrFirstStep As New Brain.Step(pcenumActionType.CreateEntityType, True, pcenumActionType.None)
-        Dim lrSecondStep As New Brain.Step(pcenumActionType.CreateEntityType, True, pcenumActionType.None)
-        Dim lrThirdStep As New Brain.Step(pcenumActionType.CreateSubtypeRelationship, True, pcenumActionType.None)
+        Dim lrFirstStep As New Brain.Step(pcenumActionType.CreateEntityType, True, pcenumActionType.None, Nothing)
+        Dim lrSecondStep As New Brain.Step(pcenumActionType.CreateEntityType, True, pcenumActionType.None, Nothing)
+        Dim lrThirdStep As New Brain.Step(pcenumActionType.CreateSubtypeRelationship, True, pcenumActionType.None, Nothing)
         Me.CurrentPlan.AddStep(lrFirstStep)
         Me.CurrentPlan.AddStep(lrSecondStep)
         Me.CurrentPlan.AddStep(lrThirdStep)
@@ -2952,13 +2959,13 @@ Public Class tBrain
         lasSymbol.Add(Me.CurrentSentence.WordListResolved(0).Word)
         lasSymbol.Add(Me.CurrentSentence.WordListResolved(3).Word)
 
-        lrQuestion = New tQuestion(lsQuestion, _
-                                   pcenumQuestionType.CreateSubtypeConstraint, _
-                                   True, _
-                                   lasSymbol, _
-                                   Me.CurrentSentence, _
-                                   Nothing, _
-                                   Me.CurrentPlan, _
+        lrQuestion = New tQuestion(lsQuestion,
+                                   pcenumQuestionType.CreateSubtypeRelationship,
+                                   True,
+                                   lasSymbol,
+                                   Me.CurrentSentence,
+                                   Nothing,
+                                   Me.CurrentPlan,
                                    lrThirdStep)
 
         If Me.QuestionHasBeenRaised(lrQuestion) Then
@@ -2978,7 +2985,7 @@ Public Class tBrain
         Dim lrPlan As New Brain.Plan
         Dim lrStep As Brain.Step
 
-        lrStep = New Brain.Step(pcenumActionType.ForgetStatementAbortion, True, pcenumActionType.None)
+        lrStep = New Brain.Step(pcenumActionType.ForgetStatementAbortion, True, pcenumActionType.None, Nothing)
         lrPlan.AddStep(lrStep)
 
         lsQuestion = "Would you like me to process the sentence, '" & arSentence.Sentence & "' again?"
@@ -3033,7 +3040,7 @@ Public Class tBrain
                     Dim lasSymbol As New List(Of String)
                     lasSymbol.Add(lrResolvedWord.Word)
 
-                    lrStep = New Brain.Step(pcenumActionType.CreateEntityType, True, pcenumActionType.CreateValueType)
+                    lrStep = New Brain.Step(pcenumActionType.CreateEntityType, True, pcenumActionType.CreateValueType, Nothing)
                     lrPlan.AddStep(lrStep)
 
                     lrQuestion = New tQuestion("Would you like me to create an Entity Type for '" & lrResolvedWord.Word & "'? (Answer 'No' and I'll ask you if you want a Value Type)",
@@ -3058,7 +3065,7 @@ Public Class tBrain
             End If
         Next
 
-        lrStep = New Brain.Step(pcenumActionType.CreateFactType, True, pcenumActionType.None)
+        lrStep = New Brain.Step(pcenumActionType.CreateFactType, True, pcenumActionType.None, Nothing)
         lrPlan.AddStep(lrStep)
 
         Dim lsEnumeratedFactTypeReading As String
@@ -3087,7 +3094,7 @@ Public Class tBrain
         Dim lrStep As Brain.Step
 
         lrPlan = New Brain.Plan
-        lrStep = New Brain.Step(pcenumActionType.CreateFactTypeReading, True, pcenumActionType.None)
+        lrStep = New Brain.Step(pcenumActionType.CreateFactTypeReading, True, pcenumActionType.None, Nothing)
 
         lrQuestion = New tQuestion("Would you like me to create a Fact Type Reading for '" & arSentence.Sentence & "'?", _
                                  pcenumQuestionType.CreateFactTypeReading, _
@@ -3116,7 +3123,7 @@ Public Class tBrain
         lasSymbol.Add(arEntityType.Name)
 
         Dim lrPlan As New Brain.Plan
-        Dim lrStep As New Brain.Step(pcenumActionType.CreateEntityType, True, pcenumActionType.None)
+        Dim lrStep As New Brain.Step(pcenumActionType.CreateEntityType, True, pcenumActionType.None, Nothing)
         lrPlan.AddStep(lrStep)
 
         lrQuestion = New tQuestion("Would you like me to create an Entity Type for '" & arEntityType.Name & "'? (Answer 'No' and I'll ask you if you want a Value Type)",
@@ -3128,7 +3135,7 @@ Public Class tBrain
                                          lrPlan,
                                          lrStep)
 
-        lrQuestion.EntityType.Add(arEntityType)
+        lrQuestion.ModelObject.Add(arEntityType)
 
         If Me.QuestionHasBeenRaised(lrQuestion) Then
             '------------------------------------------------------------
@@ -3153,7 +3160,7 @@ Public Class tBrain
         Dim lrQuestion As tQuestion
         Dim lasSymbol As New List(Of String)
         Dim lrPlan As New Brain.Plan
-        Dim lrStep As New Brain.Step(pcenumActionType.CreateValueType, True, pcenumActionType.None)
+        Dim lrStep As New Brain.Step(pcenumActionType.CreateValueType, True, pcenumActionType.None, Nothing)
 
         If arOriginalPlan Is Nothing Then
             lrPlan.AddStep(lrStep)

@@ -99,8 +99,8 @@ Partial Public Class tBrain
 
         Me.Timeout.Stop()
 
-        lsOldEntityTypeName = Me.CurrentQuestion.EntityType(0).Id
-        lsEntityTypeName = Viev.Strings.MakeCapCamelCase(Me.CurrentQuestion.EntityType(0).Id)
+        lsOldEntityTypeName = Me.CurrentQuestion.ModelObject(0).Id
+        lsEntityTypeName = Viev.Strings.MakeCapCamelCase(Me.CurrentQuestion.ModelObject(0).Id)
 
         If IsSomething(Me.CurrentQuestion.sentence) Then
             Me.CurrentQuestion.sentence.Sentence = Me.CurrentQuestion.sentence.Sentence.Replace(lsOldEntityTypeName, lsEntityTypeName)
@@ -648,7 +648,7 @@ Partial Public Class tBrain
                 lrSentence.Sentence = lrFactTypeStatement.makeSentence
                 lrSentence.OriginalSentence = lrFactTypeStatement.makeSentence
 
-                lrStep = New Brain.Step(pcenumActionType.CreateFactType, True, pcenumActionType.None)
+                lrStep = New Brain.Step(pcenumActionType.CreateFactType, True, pcenumActionType.None, Nothing)
                 lrPlan.AddStep(lrStep)
 
                 '===========================================================
@@ -720,7 +720,85 @@ Partial Public Class tBrain
 
     End Sub
 
-    Public Sub createPlanStepForModelElement(ByVal asModelObjectName As String, ByRef arPlan As Brain.Plan)
+    Private Sub ProcessISAKINDOFStatement(ByVal asOriginalSentence As String)
+
+        Try
+            Dim lsMessage As String = ""
+            Dim lrPlan As New Brain.Plan 'The Plan formulated to create the SubtypeRelationship.
+
+            Me.Model = prApplication.WorkingModel
+
+            Me.VAQL.ISAKINDOFStatement = New VAQL.IsAKindOfStatement
+
+            Call Me.VAQL.GetParseTreeTokensReflection(Me.VAQL.ISAKINDOFStatement, Me.VAQLParsetree.Nodes(0))
+
+
+            For Each lsModelElementName In Me.VAQL.ISAKINDOFStatement.MODELELEMENTNAME
+
+                If Me.Model.ExistsModelElement(lsModelElementName) Then
+                    If Array.IndexOf({pcenumConceptType.EntityType},
+                                      Me.Model.GetModelObjectByName(lsModelElementName).ConceptType) >= 0 Then
+                        '-----------------------------------------------------------------------------
+                        'A ObjectType already exists within the Model for the name lsModelElementName
+                        '-----------------------------------------------------------------------------                        
+                        Me.send_data("A Model Element already exists in the Model with the name, '" & lsModelElementName & "' of type " & Me.Model.GetModelObjectByName(lsModelElementName).ConceptType.ToString & ".")
+                    End If
+                Else
+                    Call Me.createPlanStepForModelElement(lsModelElementName, lrPlan, True)
+                End If
+            Next
+
+            Dim larModelObject As New List(Of FBM.ModelObject)
+            Dim lrModelObject1 = Me.Model.GetModelObjectByName(Me.VAQL.ISAKINDOFStatement.MODELELEMENTNAME(0))
+            Dim lrModelObject2 = Me.Model.GetModelObjectByName(Me.VAQL.ISAKINDOFStatement.MODELELEMENTNAME(1))
+            larModelObject.Add(lrModelObject1)
+            larModelObject.Add(lrModelObject2)
+
+            Dim lrStep As New Brain.Step(pcenumActionType.CreateSubtypeRelationship,
+                                         True,
+                                         pcenumActionType.None,
+                                         larModelObject,
+                                         pcenumStepFactTypeAttributes.None
+                                         )
+
+            Dim lrSentence As New Language.Sentence(asOriginalSentence, asOriginalSentence)
+
+
+            Dim lrQuestion = New tQuestion("Would you like me to create the subtype relationship between " & Me.VAQL.ISAKINDOFStatement.MODELELEMENTNAME(0) & " and " & Me.VAQL.ISAKINDOFStatement.MODELELEMENTNAME(1) & "'?",
+                                           pcenumQuestionType.CreateSubtypeRelationship,
+                                           True,
+                                           Nothing,
+                                           lrSentence,
+                                           Nothing,
+                                           lrPlan,
+                                           lrStep,
+                                           ,
+                                           Nothing)
+
+            lrQuestion.ModelObject = larModelObject
+
+            If Not Me.QuestionHasBeenRaised(lrQuestion) Then
+                Me.AddQuestion(lrQuestion)
+            End If
+
+            Me.send_data("Ok.")
+
+            Me.Timeout.Start()
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
+    Public Sub createPlanStepForModelElement(ByVal asModelObjectName As String,
+                                             ByRef arPlan As Brain.Plan,
+                                             Optional ByVal abEntityTypeOnly As Boolean = False)
 
         Dim lrQuestion As tQuestion
         Dim lrStep As Brain.Step 'For Steps added to the Plan.
@@ -759,8 +837,8 @@ Partial Public Class tBrain
                     End If
                 Next
 
-                If lbIsLikelyValueType Then
-                    lrStep = New Brain.Step(pcenumActionType.CreateValueType, True, pcenumActionType.None)
+                If lbIsLikelyValueType And Not abEntityTypeOnly Then
+                    lrStep = New Brain.Step(pcenumActionType.CreateValueType, True, pcenumActionType.None, Nothing)
                     arPlan.AddStep(lrStep)
 
                     Dim lasSymbol As New List(Of String)
@@ -775,7 +853,7 @@ Partial Public Class tBrain
                                                          arPlan,
                                                          lrStep)
                 Else
-                    lrStep = New Brain.Step(pcenumActionType.CreateEntityType, True, pcenumActionType.CreateValueType)
+                    lrStep = New Brain.Step(pcenumActionType.CreateEntityType, True, pcenumActionType.CreateValueType, Nothing)
                     arPlan.AddStep(lrStep)
 
                     Dim lasSymbol As New List(Of String)

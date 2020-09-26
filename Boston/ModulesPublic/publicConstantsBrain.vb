@@ -74,7 +74,7 @@
         CreateFactType
         CreateFactTypePredetermined
         CreateFactTypeReading
-        CreateSubtypeConstraint
+        CreateSubtypeRelationship
         CreateValueType
         ForgetAskedToAbortPlan 'i.e. If a user restates an aborted Sentence/Plan, the Brain asks if the user wants to forget that it was asked to abort that Sentence/Plan.
         OpenHelpFile
@@ -99,6 +99,7 @@
     End Enum
 
     Public Enum pcenumStepFactTypeAttributes
+        None
         BinaryFactType
         ManyToOne
         MandatoryFirstRole

@@ -7278,7 +7278,7 @@ Namespace FEQL
             End If
 
              ' Concat Rule
-            tok = m_scanner.LookAhead(TokenType.KEYWDISWRITTENAS, TokenType.KEYWDISIDENTIFIEDBYITS, TokenType.KEYWDISA, TokenType.KEYWDISWHERE, TokenType.PREDICATE) ' Choice Rule
+            tok = m_scanner.LookAhead(TokenType.KEYWDISWRITTENAS, TokenType.KEYWDISIDENTIFIEDBYITS, TokenType.KEYWDISWHERE, TokenType.PREDICATE, TokenType.KEYWDISAKINDOF) ' Choice Rule
             Select Case tok.Type
              ' Choice Rule
                 Case TokenType.KEYWDISWRITTENAS
@@ -7289,12 +7289,6 @@ Namespace FEQL
             End If
                 Case TokenType.KEYWDISIDENTIFIEDBYITS
                     ParseREFERENCEMODECLAUSE(node) ' NonTerminal Rule: REFERENCEMODECLAUSE
-            If m_tree.Errors.Count > 0 Then
-                                parent.Token.UpdateRange(node.Token)
-                                Exit Sub
-            End If
-                Case TokenType.KEYWDISA
-                    ParseCONSTRAINTMANDATORY(node) ' NonTerminal Rule: CONSTRAINTMANDATORY
             If m_tree.Errors.Count > 0 Then
                                 parent.Token.UpdateRange(node.Token)
                                 Exit Sub
@@ -7490,14 +7484,20 @@ Namespace FEQL
                                 parent.Token.UpdateRange(node.Token)
                                 Exit Sub
             End If
+                Case TokenType.KEYWDISAKINDOF
+                    ParseSUBTYPECLAUSE(node) ' NonTerminal Rule: SUBTYPECLAUSE
+            If m_tree.Errors.Count > 0 Then
+                                parent.Token.UpdateRange(node.Token)
+                                Exit Sub
+            End If
                 Case Else
                 If m_tree.Errors.Count = 0 Then
                 m_tree.Optionals.Clear
                 m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDISWRITTENAS.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDISWRITTENAS"))
                 m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDISWRITTENAS.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDISIDENTIFIEDBYITS"))
-                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDISWRITTENAS.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDISA"))
                 m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDISWRITTENAS.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDISWHERE"))
                 m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDISWRITTENAS.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "PREDICATE"))
+                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDISWRITTENAS.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDISAKINDOF"))
                 End If
                     m_tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found.", &H0002, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos))
                     Exit Select
@@ -8642,6 +8642,55 @@ Namespace FEQL
             m_tree.Optionals.Clear()
             End If
         End Sub ' NonTerminalSymbol: SHOWSTMT
+
+        Private Sub ParseSUBTYPECLAUSE(ByVal parent As ParseNode) ' NonTerminalSymbol: SUBTYPECLAUSE
+            Dim tok As Token
+            Dim n As ParseNode
+            Dim node As ParseNode = parent.CreateNode(m_scanner.GetToken(TokenType.SUBTYPECLAUSE), "SUBTYPECLAUSE")
+            parent.Nodes.Add(node)
+
+
+             ' Concat Rule
+            tok = m_scanner.Scan(TokenType.KEYWDISAKINDOF) ' Terminal Rule: KEYWDISAKINDOF
+            n = node.CreateNode(tok, tok.ToString() )
+            node.Token.UpdateRange(tok)
+            node.Nodes.Add(n)
+            If tok.Type <> TokenType.KEYWDISAKINDOF Then
+                m_tree.Errors.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDISAKINDOF.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDISAKINDOF"))
+                Return
+
+            End If
+
+            If m_tree.Errors.Count > 0 Then
+                        parent.Token.UpdateRange(node.Token)
+                        Exit Sub
+            End If
+
+             ' Concat Rule
+            tok = m_scanner.Scan(TokenType.MODELELEMENTNAME) ' Terminal Rule: MODELELEMENTNAME
+            n = node.CreateNode(tok, tok.ToString() )
+            node.Token.UpdateRange(tok)
+            node.Nodes.Add(n)
+            If tok.Type <> TokenType.MODELELEMENTNAME Then
+                m_tree.Errors.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.MODELELEMENTNAME.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MODELELEMENTNAME"))
+                Return
+
+            End If
+
+            If m_tree.Errors.Count > 0 Then
+                        parent.Token.UpdateRange(node.Token)
+                        Exit Sub
+            End If
+            If m_tree.Errors.Count > 0 Then
+                        parent.Token.UpdateRange(node.Token)
+                        Exit Sub
+            End If
+
+            parent.Token.UpdateRange(node.Token)
+            If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
+            m_tree.Optionals.Clear()
+            End If
+        End Sub ' NonTerminalSymbol: SUBTYPECLAUSE
 
         Private Sub ParseSUBTYPESTMT(ByVal parent As ParseNode) ' NonTerminalSymbol: SUBTYPESTMT
             Dim tok As Token

@@ -50,8 +50,8 @@ Partial Public Class tBrain
                                 Call Me.OutstandingSentences.Remove(Me.CurrentQuestion.sentence)
                             End If
 
-                        Case Is = pcenumQuestionType.CreateSubtypeConstraint
-                            Call Me.ProcessStatementCreateSubtypeConstraint()
+                        Case Is = pcenumQuestionType.CreateSubtypeRelationship
+                            Call Me.ProcessStatementCreateSubtypeRelationship()
 
                         Case Is = pcenumQuestionType.CheckWordTypeVerb
                             Dim lsORMQLQuery As String = ""
@@ -105,7 +105,7 @@ Partial Public Class tBrain
 
                             If Me.CurrentQuestion.PlanStep.AlternateActionType <> pcenumActionType.None Then
                                 If Me.CurrentQuestion.PlanStep.AlternateActionType = pcenumActionType.CreateValueType Then
-                                    Dim lrValueType As New FBM.ValueType(Me.Model, pcenumLanguage.ORMModel, Me.CurrentQuestion.EntityType(0).Id, True)
+                                    Dim lrValueType As New FBM.ValueType(Me.Model, pcenumLanguage.ORMModel, Me.CurrentQuestion.ModelObject(0).Id, True)
                                     Me.CurrentQuestion.PlanStep.StepStatus = pcenumBrainPlanStepStatus.Unresolved
                                     Me.CurrentQuestion.PlanStep.AlternateActionType = pcenumActionType.None
                                     Call Me.AskQuestionCreateValueType(lrValueType, Me.CurrentQuestion.sentence, True, Me.CurrentQuestion.Plan)
@@ -131,7 +131,7 @@ Partial Public Class tBrain
                                 Call Me.AbortCurrentPlan(True)
                             End If
 
-                        Case Is = pcenumQuestionType.CreateSubtypeConstraint
+                        Case Is = pcenumQuestionType.CreateSubtypeRelationship
                             Me.CurrentQuestion.sentence.ResolutionType = pcenumSentenceResolutionType.AbortedByUser
                             Call Me.ProcessedSentences.Add(Me.CurrentQuestion.sentence)
                             Call Me.OutstandingSentences.Remove(Me.CurrentQuestion.sentence)

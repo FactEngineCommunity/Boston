@@ -49,6 +49,20 @@ Namespace VAQL
         End Property
     End Class
 
+    Public Class IsAKindOfStatement
+
+        Private _MODELELEMENTNAME As New List(Of String)
+        Public Property MODELELEMENTNAME As List(Of String)
+            Get
+                Return Me._MODELELEMENTNAME
+            End Get
+            Set(value As List(Of String))
+                Me._MODELELEMENTNAME = value
+            End Set
+        End Property
+
+    End Class
+
     Public Class IsWhereStatement
 
         Private _MODELELEMENT As New List(Of VAQL.ModelElementClause)
@@ -402,6 +416,7 @@ Namespace VAQL
 
         Public ISACONCEPTStatement As New VAQL.IsAConceptStatement
         Public ISANENTITYTYPEStatement As New VAQL.IsAnEntityTypeStatement
+        Public ISAKINDOFStatement As New VAQL.IsAKindOfStatement
         Public ISWHEREStatement As New VAQL.IsWhereStatement
         Public ATMOSTONEStatement As New VAQL.AtMostOneStatement
         Public PREDICATEPARTClause As New VAQL.PredicatePartClause
@@ -817,6 +832,10 @@ Namespace VAQL
                     If Me.ParseTreeContainsTokenType(Me.Parsetree, TokenType.VALUETYPEISWRITTENASCLAUSE) Then
                         aoTokenType = TokenType.VALUETYPEISWRITTENASCLAUSE
                         aoParseTree = Me.Parsetree
+                    ElseIf Me.ParseTreeContainsTokenType(Me.Parsetree, TokenType.KEYWDISAKINDOF) Then
+                        aoTokenType = TokenType.KEYWDISAKINDOF
+                        aoParseTree = Me.Parsetree
+
                     ElseIf Me.ParseTreeContainsTokenType(Me.Parsetree, TokenType.ENTITYTYPEISIDENTIFIEDBYITSCLAUSE) Then
                         aoTokenType = TokenType.ENTITYTYPEISIDENTIFIEDBYITSCLAUSE
                         aoParseTree = Me.Parsetree

@@ -5,7 +5,7 @@
     Public Question As String = ""
     Public ExpectingYesNoResponse As Boolean = False
     Public Symbol As New List(Of String)
-    Public EntityType As New List(Of FBM.EntityType)
+    Public ModelObject As New List(Of FBM.ModelObject)
     Public ValueType As New List(Of FBM.ValueType)
     Public QuestionType As pcenumQuestionType
     Public ObjectType As New FBM.ModelObject
@@ -72,7 +72,7 @@
             Me.Symbol.Add(lsString)
         Next
 
-        Me.EntityType = New List(Of FBM.EntityType)
+        Me.ModelObject = New List(Of FBM.ModelObject)
 
         If IsSomething(aasSymbol) Then
             For Each lsString In aasSymbol
@@ -84,7 +84,7 @@
                     Case Is = pcenumQuestionType.CreateEntityType
                         Dim lrDummyEntityType As New FBM.EntityType(Nothing, pcenumLanguage.ORMModel, lsString, Nothing, True)
                         lrDummyEntityType.Id = lsString
-                        Me.EntityType.Add(lrDummyEntityType)
+                        Me.ModelObject.Add(lrDummyEntityType)
                 End Select
             Next
         End If

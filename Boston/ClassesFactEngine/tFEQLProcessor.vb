@@ -837,6 +837,10 @@ Namespace FEQL
                         aoTokenType = FEQL.TokenType.KEYWDISWHERE
                         aoParseTree = Me.Parsetree
                         Return Nothing
+                    ElseIf Me.ParseTreeContainsTokenType(Me.Parsetree, FEQL.TokenType.KEYWDISAKINDOF) Then
+                        aoTokenType = FEQL.TokenType.KEYWDISAKINDOF
+                        aoParseTree = Me.Parsetree
+                        Return Nothing
                     ElseIf Me.ParseTreeContainsTokenType(Me.Parsetree, FEQL.TokenType.FACTTYPEPRODUCTION) Then
                         aoTokenType = FEQL.TokenType.FACTTYPEPRODUCTION
                         aoParseTree = Me.Parsetree
