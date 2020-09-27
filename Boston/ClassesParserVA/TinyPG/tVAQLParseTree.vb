@@ -238,6 +238,9 @@ Namespace VAQL
                 Case TokenType.ENTITYTYPEISIDENTIFIEDBYITSCLAUSE
                     Value = EvalENTITYTYPEISIDENTIFIEDBYITSCLAUSE(tree, paramlist)
                     Exit Select
+                Case TokenType.ENTITYTYPEIDENTIFIEDBYITSCLAUSE
+                    Value = EvalENTITYTYPEIDENTIFIEDBYITSCLAUSE(tree, paramlist)
+                    Exit Select
                 Case TokenType.FACTTYPECLAUSE
                     Value = EvalFACTTYPECLAUSE(tree, paramlist)
                     Exit Select
@@ -253,6 +256,9 @@ Namespace VAQL
                 Case TokenType.MODELELEMENT
                     Value = EvalMODELELEMENT(tree, paramlist)
                     Exit Select
+                Case TokenType.MODELELEMENTTYPE
+                    Value = EvalMODELELEMENTTYPE(tree, paramlist)
+                    Exit Select
                 Case TokenType.PREDICATECLAUSE
                     Value = EvalPREDICATECLAUSE(tree, paramlist)
                     Exit Select
@@ -261,6 +267,9 @@ Namespace VAQL
                     Exit Select
                 Case TokenType.VALUETYPEISWRITTENASCLAUSE
                     Value = EvalVALUETYPEISWRITTENASCLAUSE(tree, paramlist)
+                    Exit Select
+                Case TokenType.VALUETYPEWRITTENASCLAUSE
+                    Value = EvalVALUETYPEWRITTENASCLAUSE(tree, paramlist)
                     Exit Select
                 Case TokenType.FACTTYPEIDENTIFICATION
                     Value = EvalFACTTYPEIDENTIFICATION(tree, paramlist)
@@ -320,6 +329,10 @@ Namespace VAQL
             Throw New NotImplementedException()
         End Function
 
+        Protected Overridable Function EvalENTITYTYPEIDENTIFIEDBYITSCLAUSE(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
         Protected Overridable Function EvalFACTTYPECLAUSE(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
             Throw New NotImplementedException()
         End Function
@@ -340,6 +353,10 @@ Namespace VAQL
             Throw New NotImplementedException()
         End Function
 
+        Protected Overridable Function EvalMODELELEMENTTYPE(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
         Protected Overridable Function EvalPREDICATECLAUSE(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
             Throw New NotImplementedException()
         End Function
@@ -349,6 +366,10 @@ Namespace VAQL
         End Function
 
         Protected Overridable Function EvalVALUETYPEISWRITTENASCLAUSE(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalVALUETYPEWRITTENASCLAUSE(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
             Throw New NotImplementedException()
         End Function
 

@@ -164,6 +164,16 @@ Namespace VAQL
             End Set
         End Property
 
+        Private _MODELELEMENTTYPE As New List(Of VAQL.ModelElementTypeClause)
+        Public Property MODELELEMENTTYPE As List(Of VAQL.ModelElementTypeClause)
+            Get
+                Return Me._MODELELEMENTTYPE
+            End Get
+            Set(value As List(Of VAQL.ModelElementTypeClause))
+                Me._MODELELEMENTTYPE = value
+            End Set
+        End Property
+
         Private _PREDICATECLAUSE As New List(Of VAQL.PredicateClause)
         Public Property PREDICATECLAUSE As List(Of VAQL.PredicateClause)
             Get
@@ -252,6 +262,40 @@ Namespace VAQL
                 Me._POSTBOUNDREADINGTEXT = value
             End Set
         End Property
+    End Class
+
+    Public Class ModelElementTypeClause
+
+        Private _MODELELEMENT As VAQL.ModelElementClause
+        Public Property MODELELEMENT As VAQL.ModelElementClause
+            Get
+                Return Me._MODELELEMENT
+            End Get
+            Set(value As VAQL.ModelElementClause)
+                Me._MODELELEMENT = value
+            End Set
+        End Property
+
+        Private _KEYWDIDENTIFIEDBYITS As String
+        Public Property KEYWDIDENTIFIEDBYITS As String
+            Get
+                Return Me._KEYWDIDENTIFIEDBYITS
+            End Get
+            Set(value As String)
+                Me._KEYWDIDENTIFIEDBYITS = value
+            End Set
+        End Property
+
+        Private _REFERENCEMODE As String
+        Public Property REFERENCEMODE As String
+            Get
+                Return Me._REFERENCEMODE
+            End Get
+            Set(value As String)
+                Me._REFERENCEMODE = value
+            End Set
+        End Property
+
     End Class
 
     Public Class EntityTypeIsIdentifiedByItsStatement
@@ -424,6 +468,8 @@ Namespace VAQL
         Public ENTITYTYPEISIDENTIFIEDBYITSStatement As New VAQL.EntityTypeIsIdentifiedByItsStatement
         Public FACTTYPEREADINGStatement As New VAQL.FactTypeReadingStatement
         Public MODELELEMENTClause As New VAQL.ModelElementClause
+        Public MODELELEMENTTYPEClause As New VAQL.ModelElementTypeClause
+
 
         Public Sub New()
 
