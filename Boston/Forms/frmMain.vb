@@ -2601,26 +2601,6 @@ Public Class frmMain
                     End If
                 Next
 
-                lrPage.EntityTypeInstance.Sort(AddressOf FBM.EntityType.CompareSubtypeConstraintExistance)
-                For Each lrEntityTypeInstance In lrPage.EntityTypeInstance.ToArray
-                    Dim loPt As New PointF(lrEntityTypeInstance.X, lrEntityTypeInstance.Y)
-                    lrEntityTypeInstance.EntityType.ChangeModel(prApplication.WorkingModel, False)
-                    If prApplication.WorkingPage.EntityTypeInstance.FindAll(Function(x) x.Id = lrEntityTypeInstance.Id).Count = 0 Then
-                        'The EntityType doesn't already exist on the Page.
-                        prApplication.WorkingPage.DropEntityTypeAtPoint(lrEntityTypeInstance.EntityType, loPt, True)
-                    End If
-                Next
-
-                '--------------------------------
-                'Display any Subtype Relationships
-                '--------------------------------
-                Dim lrSubtypeRelationship As FBM.SubtypeRelationshipInstance
-                For Each lrEntityTypeInstance In prApplication.WorkingPage.EntityTypeInstance
-                    For Each lrSubtypeRelationship In lrEntityTypeInstance.SubtypeRelationship
-                        Call lrSubtypeRelationship.DisplayAndAssociate()
-                    Next
-                Next
-
                 '--------------------------------------------------------------------------------------------------
                 'CodeSafe: Some RoleConstraints are within copied FactTypes (as InternalUniquenessConstraints)
                 '  and not at the Page level.
@@ -2661,6 +2641,28 @@ Public Class frmMain
                         lrRoleConstraint.Symbol = lsUniqueId
                     Next
                 End If
+
+
+
+                lrPage.EntityTypeInstance.Sort(AddressOf FBM.EntityType.CompareSubtypeConstraintExistance)
+                For Each lrEntityTypeInstance In lrPage.EntityTypeInstance.ToArray
+                    Dim loPt As New PointF(lrEntityTypeInstance.X, lrEntityTypeInstance.Y)
+                    lrEntityTypeInstance.EntityType.ChangeModel(prApplication.WorkingModel, False)
+                    If prApplication.WorkingPage.EntityTypeInstance.FindAll(Function(x) x.Id = lrEntityTypeInstance.Id).Count = 0 Then
+                        'The EntityType doesn't already exist on the Page.
+                        prApplication.WorkingPage.DropEntityTypeAtPoint(lrEntityTypeInstance.EntityType, loPt, True)
+                    End If
+                Next
+
+                '--------------------------------
+                'Display any Subtype Relationships
+                '--------------------------------
+                Dim lrSubtypeRelationship As FBM.SubtypeRelationshipInstance
+                For Each lrEntityTypeInstance In prApplication.WorkingPage.EntityTypeInstance
+                    For Each lrSubtypeRelationship In lrEntityTypeInstance.SubtypeRelationship
+                        Call lrSubtypeRelationship.DisplayAndAssociate()
+                    Next
+                Next
 
                 '-----------------------------------------------------------------
                 'ImpliedFactTypes
