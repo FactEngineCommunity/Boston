@@ -791,6 +791,11 @@ Namespace FBM
 
                         If IsSomething(lrOriginalDictionaryEntry) Then
                             Call Me.Model.DeprecateRealisationsForDictionaryEntry(lrOriginalDictionaryEntry, aiConceptType)
+
+                            If (lrNewDictionaryEntry.Realisations.Count = 0) Then
+                                Call TableModelDictionary.ModifySymbol(Me.Model, lrOriginalDictionaryEntry, arNewConcept.Symbol, Me.ConceptType)
+                            End If
+
                         Else
                             '----------------------------------------------------------------------------------------------------------------------------------
                             'Throw a warning message but do not interupt programme flow.
@@ -801,10 +806,6 @@ Namespace FBM
                         End If
 
                         Me.Concept = lrNewDictionaryEntry.Concept
-
-                        If (lrNewDictionaryEntry.Realisations.Count = 0) Then
-                            Call TableModelDictionary.ModifySymbol(Me.Model, lrOriginalDictionaryEntry, arNewConcept.Symbol, Me.ConceptType)
-                        End If
 
                         lrNewDictionaryEntry.AddConceptType(Me.ConceptType)
                     Else

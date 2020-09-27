@@ -1384,7 +1384,7 @@ Namespace FBM
                 lrRoleConstraintInstance.CardinalityRangeType = .CardinalityRangeType
 
                 If abAddToPage Then
-                    arPage.RoleConstraintInstance.Add(lrRoleConstraintInstance)
+                    arPage.RoleConstraintInstance.AddUnique(lrRoleConstraintInstance)
                 End If
 
                 '-------------------------------------------------------------------------
@@ -1435,7 +1435,7 @@ Namespace FBM
                 lrRoleConstraintInstance.CardinalityRangeType = .CardinalityRangeType
 
                 If abAddToPage Then
-                    arPage.RoleConstraintInstance.Add(lrRoleConstraintInstance)
+                    arPage.RoleConstraintInstance.AddUnique(lrRoleConstraintInstance)
                 End If
 
                 '-------------------------------------------------------------------------

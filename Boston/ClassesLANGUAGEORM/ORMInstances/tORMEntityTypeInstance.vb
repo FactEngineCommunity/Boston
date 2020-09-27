@@ -456,11 +456,10 @@ Namespace FBM
                             lrEntityTypeInstance.ReferenceModeFactType = .ReferenceModeFactType.Clone(arPage,
                                                                                                       True,
                                                                                                       .ReferenceModeFactType.FactType.IsMDAModelElement)
-                        End If
 
-                        If .ReferenceModeRoleConstraint IsNot Nothing Then
-                            lrEntityTypeInstance.ReferenceModeRoleConstraint = .ReferenceModeRoleConstraint.Clone(arPage,
-                                                                                                                  .ReferenceModeRoleConstraint.RoleConstraint.IsMDAModelElement)
+                            For Each lrRoleConstraintInstance In .ReferenceModeFactType.InternalUniquenessConstraint
+                                Call lrRoleConstraintInstance.Clone(arPage, lrRoleConstraintInstance.IsMDAModelElement, True)
+                            Next
                         End If
 
                         lrEntityTypeInstance.OutgoingLink = New List(Of DiagramLink)

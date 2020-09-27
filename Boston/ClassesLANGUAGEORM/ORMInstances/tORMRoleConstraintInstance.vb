@@ -10,18 +10,19 @@ Namespace FBM
     Public Class RoleConstraintInstance
         Inherits FBM.RoleConstraint
         Implements FBM.iPageObject
+        Implements IEquatable(Of FBM.RoleConstraintInstance)
 
-        <XmlIgnore()> _
+        <XmlIgnore()>
         Public WithEvents RoleConstraint As FBM.RoleConstraint
 
 
-        <CategoryAttribute("Constraint Type"), _
-        Browsable(True), _
-        [ReadOnly](True), _
-        BindableAttribute(True), _
-        DefaultValueAttribute(""), _
-        DesignOnly(False), _
-        DescriptionAttribute("The type of Role Constraint")> _
+        <CategoryAttribute("Constraint Type"),
+        Browsable(True),
+        [ReadOnly](True),
+        BindableAttribute(True),
+        DefaultValueAttribute(""),
+        DesignOnly(False),
+        DescriptionAttribute("The type of Role Constraint")>
         Public Overrides Property RoleConstraintType() As pcenumRoleConstraintType
             Get
                 Return Me._RoleConstraintType
@@ -31,13 +32,13 @@ Namespace FBM
             End Set
         End Property
 
-        <System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)> _
-        <XmlIgnore()> _
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>
+        <XmlIgnore()>
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public _IsDeontic As Boolean = False
-        <CategoryAttribute("Modality"), _
-        DefaultValueAttribute(False), _
-        DescriptionAttribute("The Modality of the Role Constraint.")> _
+        <CategoryAttribute("Modality"),
+        DefaultValueAttribute(False),
+        DescriptionAttribute("The Modality of the Role Constraint.")>
         Public Shadows Property IsDeontic() As Boolean
             Get
                 Return Me._IsDeontic
@@ -47,10 +48,10 @@ Namespace FBM
             End Set
         End Property
 
-        <XmlIgnore()> _
+        <XmlIgnore()>
         Public Shadows Role As New List(Of FBM.RoleInstance)
 
-        <XmlIgnore()> _
+        <XmlIgnore()>
         Public Shadows RoleConstraintRole As New List(Of FBM.RoleConstraintRoleInstance)
 
         ''' <summary>
@@ -70,8 +71,8 @@ Namespace FBM
         Public Height As Integer
         Public Width As Integer
 
-        <NonSerialized()> _
-        <XmlIgnore()> _
+        <NonSerialized()>
+        <XmlIgnore()>
         Public Shape As New FBM.RoleConstraintShape
 
         Public Sub New()
@@ -96,14 +97,14 @@ Namespace FBM
 
         Public Sub New(ByVal aiRoleConstraintType As pcenumRoleConstraintType)
 
-            Me.new()
+            Me.New()
             Me.RoleConstraint = New FBM.RoleConstraint
             Select Case aiRoleConstraintType
-                Case Is = pcenumRoleConstraintType.ExclusiveORConstraint, _
-                          pcenumRoleConstraintType.ExternalUniquenessConstraint, _
-                          pcenumRoleConstraintType.ExclusionConstraint, _
-                          pcenumRoleConstraintType.FrequencyConstraint, _
-                          pcenumRoleConstraintType.InclusiveORConstraint, _
+                Case Is = pcenumRoleConstraintType.ExclusiveORConstraint,
+                          pcenumRoleConstraintType.ExternalUniquenessConstraint,
+                          pcenumRoleConstraintType.ExclusionConstraint,
+                          pcenumRoleConstraintType.FrequencyConstraint,
+                          pcenumRoleConstraintType.InclusiveORConstraint,
                           pcenumRoleConstraintType.SubsetConstraint
 
                     Me.RoleConstraintType = aiRoleConstraintType
@@ -115,8 +116,9 @@ Namespace FBM
 
         End Sub
 
-        Public Overloads Function Clone(ByRef arPage As FBM.Page, _
-                                        Optional ByVal abIsMDAModelElement As Boolean = False) As Object
+        Public Overloads Function Clone(ByRef arPage As FBM.Page,
+                                        Optional ByVal abIsMDAModelElement As Boolean = False,
+                                        Optional abAddToPage As Boolean = False) As Object
 
             Dim lrRoleConstraintInstance As New FBM.RoleConstraintInstance
             Dim lrRoleConstraintRoleInstance As FBM.RoleConstraintRoleInstance
@@ -167,6 +169,10 @@ Namespace FBM
 
                     lrRoleConstraintInstance.X = .X
                     lrRoleConstraintInstance.Y = .Y
+
+                    If abAddToPage Then
+                        arPage.RoleConstraintInstance.AddUnique(lrRoleConstraintInstance)
+                    End If
                 End With
 
                 Return lrRoleConstraintInstance
@@ -264,7 +270,7 @@ Namespace FBM
                     lrRoleConstraintInstance.Y = .Y
 
                     If abAddToPage Then
-                        arPage.RoleConstraintInstance.Add(lrRoleConstraintInstance)
+                        arPage.RoleConstraintInstance.AddUnique(lrRoleConstraintInstance)
                     End If
 
                     '-------------------------------------------------------------------------
@@ -451,8 +457,8 @@ Namespace FBM
                 For Each lrRoleConstraintRole In Me.RoleConstraint.RoleConstraintRole
                     lrRoleInstance = Me.Page.RoleInstance.Find(Function(x) x.Id = lrRoleConstraintRole.Role.Id)
                     If lrRoleInstance IsNot Nothing And lrRoleConstraintRole.RoleConstraintArgument IsNot Nothing Then
-                        lrRoleInstance.Shape.Text = lrRoleConstraintRole.RoleConstraintArgument.SequenceNr.ToString & _
-                        "." & _
+                        lrRoleInstance.Shape.Text = lrRoleConstraintRole.RoleConstraintArgument.SequenceNr.ToString &
+                        "." &
                         lrRoleConstraintRole.ArgumentSequenceNr.ToString
                     End If
                 Next
@@ -463,7 +469,7 @@ Namespace FBM
                     If lrArgument.JoinPath IsNot Nothing Then
                         For Each lrRole In lrArgument.JoinPath.RolePath
                             lrRoleInstance = Me.Page.RoleInstance.Find(Function(x) x.Id = lrRole.Id)
-                            If lrRoleInstance IsNot Nothing Then                                
+                            If lrRoleInstance IsNot Nothing Then
                                 lrRoleInstance.Shape.Brush = New MindFusion.Drawing.SolidBrush(Color.FromArgb(Values(lrArgument.SequenceNr Mod 6)))
                             End If
                         Next
@@ -476,7 +482,7 @@ Namespace FBM
                 If Me.CurrentArgument.JoinPath IsNot Nothing Then
                     For Each lrRole In Me.CurrentArgument.JoinPath.RolePath
                         lrRoleInstance = Me.Page.RoleInstance.Find(Function(x) x.Id = lrRole.Id)
-                        If lrRoleInstance IsNot Nothing Then                            
+                        If lrRoleInstance IsNot Nothing Then
                             lrRoleInstance.Shape.Brush = New MindFusion.Drawing.SolidBrush(Color.FromArgb(Values(Me.CurrentArgument.SequenceNr Mod 6)))
                         End If
                     Next
@@ -637,7 +643,7 @@ Namespace FBM
                         loDroppedNode = New FBM.RoleConstraintShape(Me.Page.Diagram, Me)
                         loDroppedNode.Move(Me.X, Me.Y)
                         Me.Page.Diagram.Nodes.Add(loDroppedNode)
-                        loDroppedNode.Pen = New MindFusion.Drawing.Pen(Color.White)                        
+                        loDroppedNode.Pen = New MindFusion.Drawing.Pen(Color.White)
                         loDroppedNode.HandlesStyle = HandlesStyle.Invisible
                         loDroppedNode.EnabledHandles = AdjustmentHandles.Move
                         loDroppedNode.Shape = MindFusion.Diagramming.Shapes.Ellipse
@@ -828,50 +834,50 @@ Namespace FBM
                     Dim loDroppedShapeNode As New ShapeNode
                     Dim lrShape As MindFusion.Diagramming.Shape
                     If Me.IsDeontic Then
-                        lrShape = New Shape( _
+                        lrShape = New Shape(
                                        New ElementTemplate() _
-                                       { _
-                                            New LineTemplate(23, 0, 100, 0) _
-                                       }, _
+                                       {
+                                            New LineTemplate(23, 0, 100, 0)
+                                       },
                                        New ElementTemplate() _
-                                       { _
-                                            New ArcTemplate(0, -23, 23, 48, 0, 360) _
-                                       }, _
+                                       {
+                                            New ArcTemplate(0, -23, 23, 48, 0, 360)
+                                       },
                                         Nothing, FillMode.Winding, "test")
                     ElseIf Me.IsPreferredIdentifier Then
                         '-------------------------------------
                         'For preferred uniqueness constraint
                         '-------------------------------------
-                        lrShape = New Shape( _
+                        lrShape = New Shape(
                                         New ElementTemplate() _
-                                        { _
-                                            New LineTemplate(0, 0, 100, 0), _
-                                            New LineTemplate(100, 0, 100, 100), _
-                                            New LineTemplate(100, 100, 0, 100), _
-                                            New LineTemplate(0, 100, 0, 0) _
-                                        }, _
+                                        {
+                                            New LineTemplate(0, 0, 100, 0),
+                                            New LineTemplate(100, 0, 100, 100),
+                                            New LineTemplate(100, 100, 0, 100),
+                                            New LineTemplate(0, 100, 0, 0)
+                                        },
                                             New ElementTemplate() _
-                                        { _
-                                            New LineTemplate(0, 40, 100, 40), _
-                                            New LineTemplate(0, 70, 100, 70) _
-                                        }, _
+                                        {
+                                            New LineTemplate(0, 40, 100, 40),
+                                            New LineTemplate(0, 70, 100, 70)
+                                        },
                                             Nothing, System.Drawing.Drawing2D.FillMode.Winding, "test")
 
                         lrShape.Decorations(0).Color = Color.Purple
                         lrShape.Decorations(1).Color = Color.Purple
                     Else
-                        lrShape = New Shape( _
+                        lrShape = New Shape(
                                     New ElementTemplate() _
-                                    { _
-                                        New LineTemplate(0, 0, 100, 0), _
-                                        New LineTemplate(100, 0, 100, 100), _
-                                        New LineTemplate(100, 100, 0, 100), _
-                                        New LineTemplate(0, 100, 0, 0) _
-                                    }, _
+                                    {
+                                        New LineTemplate(0, 0, 100, 0),
+                                        New LineTemplate(100, 0, 100, 100),
+                                        New LineTemplate(100, 100, 0, 100),
+                                        New LineTemplate(0, 100, 0, 0)
+                                    },
                                     New ElementTemplate() _
-                                    { _
-                                        New LineTemplate(0, 50, 100, 50) _
-                                    }, _
+                                    {
+                                        New LineTemplate(0, 50, 100, 50)
+                                    },
                                     Nothing, System.Drawing.Drawing2D.FillMode.Winding, "test")
 
                         lrShape.Decorations(0).Color = Color.Purple
@@ -1001,13 +1007,13 @@ Namespace FBM
                         Case Is = "LongDescription"
                             Call Me.RoleConstraint.SetLongDescription(Me.LongDescription)
                             Me.Model.ModelDictionary.Find(Function(x) LCase(x.Symbol) = LCase(Me.Id)).LongDescription = Me.LongDescription
-                        Case Is = "IsPreferredIdentifier"                            
+                        Case Is = "IsPreferredIdentifier"
                             If Me.IsPreferredIdentifier Then
                                 Select Case Me.RoleConstraintType
                                     Case Is = pcenumRoleConstraintType.InternalUniquenessConstraint
-                                        If Me.RoleConstraintRole.Count = 1 And _
+                                        If Me.RoleConstraintRole.Count = 1 And
                                            Me.RoleConstraint.IsEachRoleFactTypeBinary Then
-                                            If Me.RoleConstraintRole(0).Role.JoinedORMObject.ConceptType = pcenumConceptType.ValueType And _
+                                            If Me.RoleConstraintRole(0).Role.JoinedORMObject.ConceptType = pcenumConceptType.ValueType And
                                                Me.RoleConstraint.RoleConstraintRole(0).Role.FactType.GetOtherRoleOfBinaryFactType(Me.RoleConstraint.RoleConstraintRole(0).Role.Id).JoinedORMObject.ConceptType = pcenumConceptType.EntityType Then
                                                 '-------------------------------------------------------------------------------------------------------------------------------------------------------------
                                                 'Is a Internal Uniqueness RoleConstraint over an appropriate FactType to make the FactType/ValueType combination the ReferenceMode scheme for the EntityType
@@ -1040,7 +1046,7 @@ Namespace FBM
                                             End If
                                         End If
                                     Case Is = pcenumRoleConstraintType.ExternalUniquenessConstraint
-                                        If Me.RoleConstraintRole.Count > 1 And _
+                                        If Me.RoleConstraintRole.Count > 1 And
                                             Me.RoleConstraint.IsEachRoleFactTypeBinary Then
                                             If Me.DoesEachRoleFactTypeOppositeRoleJoinSameModelObject Then
                                                 '------------------------------------------------------------
@@ -1088,7 +1094,7 @@ Namespace FBM
                                     Case Is = pcenumRoleConstraintType.InternalUniquenessConstraint
                                     Case Is = pcenumRoleConstraintType.ExternalUniquenessConstraint
                                         Me.Shape.Image = My.Resources.ORMShapes.externalUniqueness
-                                        If Me.RoleConstraintRole.Count > 1 And _
+                                        If Me.RoleConstraintRole.Count > 1 And
                                            Me.RoleConstraint.IsEachRoleFactTypeBinary Then
                                             If Me.DoesEachRoleFactTypeOppositeRoleJoinSameModelObject Then
                                                 '------------------------------------------------------------
@@ -1231,15 +1237,15 @@ Namespace FBM
 
 
                         If Me.IsDeontic Then
-                            Me.RoleConstraintRole(0).Shape.Shape = New Shape( _
+                            Me.RoleConstraintRole(0).Shape.Shape = New Shape(
                                                                    New ElementTemplate() _
-                                                                   { _
-                                                                        New LineTemplate(23, 0, 100, 0) _
-                                                                   }, _
+                                                                   {
+                                                                        New LineTemplate(23, 0, 100, 0)
+                                                                   },
                                                                    New ElementTemplate() _
-                                                                   { _
-                                                                        New ArcTemplate(0, -23, 23, 48, 0, 360) _
-                                                                   }, _
+                                                                   {
+                                                                        New ArcTemplate(0, -23, 23, 48, 0, 360)
+                                                                   },
                                                                     Nothing, FillMode.Winding, "test")
                         ElseIf Me.IsPreferredIdentifier Then
                             '-------------------------------------
@@ -1252,19 +1258,19 @@ Namespace FBM
 
                             'Me.RoleConstraintRole(0).Shape.SetRect(loRectangle, False)
 
-                            Dim lrShape As Shape = New Shape( _
+                            Dim lrShape As Shape = New Shape(
                                                                 New ElementTemplate() _
-                                                                     { _
-                                                                        New LineTemplate(0, 0, 100, 0), _
-                                                                        New LineTemplate(100, 0, 100, 100), _
-                                                                        New LineTemplate(100, 100, 0, 100), _
-                                                                        New LineTemplate(0, 100, 0, 0) _
-                                                                    }, _
+                                                                     {
+                                                                        New LineTemplate(0, 0, 100, 0),
+                                                                        New LineTemplate(100, 0, 100, 100),
+                                                                        New LineTemplate(100, 100, 0, 100),
+                                                                        New LineTemplate(0, 100, 0, 0)
+                                                                    },
                                                                         New ElementTemplate() _
-                                                                    { _
-                                                                        New LineTemplate(0, 40, 100, 40), _
-                                                                        New LineTemplate(0, 70, 100, 70) _
-                                                                    }, _
+                                                                    {
+                                                                        New LineTemplate(0, 40, 100, 40),
+                                                                        New LineTemplate(0, 70, 100, 70)
+                                                                    },
                                                                     Nothing, System.Drawing.Drawing2D.FillMode.Winding, "test")
 
                             lrShape.Decorations(0).Color = Color.Purple
@@ -1274,22 +1280,22 @@ Namespace FBM
                                 lrRoleConstraintRole.Shape.Shape = lrShape
                             Next
                         Else
-                            Dim loRectangle As New Rectangle(Me.RoleConstraintRole(0).Shape.Bounds.X, _
-                                                             Me.RoleConstraintRole(0).Shape.Bounds.Y, _
+                            Dim loRectangle As New Rectangle(Me.RoleConstraintRole(0).Shape.Bounds.X,
+                                                             Me.RoleConstraintRole(0).Shape.Bounds.Y,
                                                              Me.RoleConstraintRole(0).Shape.Bounds.Width, 3)
                             'Me.RoleConstraintRole(0).Shape.SetRect(loRectangle, False)
-                            Dim lrShape As Shape = New Shape( _
+                            Dim lrShape As Shape = New Shape(
                                         New ElementTemplate() _
-                                        { _
-                                            New LineTemplate(0, 0, 100, 0), _
-                                            New LineTemplate(100, 0, 100, 100), _
-                                            New LineTemplate(100, 100, 0, 100), _
-                                            New LineTemplate(0, 100, 0, 0) _
-                                        }, _
+                                        {
+                                            New LineTemplate(0, 0, 100, 0),
+                                            New LineTemplate(100, 0, 100, 100),
+                                            New LineTemplate(100, 100, 0, 100),
+                                            New LineTemplate(0, 100, 0, 0)
+                                        },
                                         New ElementTemplate() _
-                                        { _
-                                            New LineTemplate(0, 50, 100, 50) _
-                                        }, _
+                                        {
+                                            New LineTemplate(0, 50, 100, 50)
+                                        },
                                         Nothing, System.Drawing.Drawing2D.FillMode.Winding, "test")
                             lrShape.Decorations(0).Color = Color.Purple
 
@@ -1303,12 +1309,12 @@ Namespace FBM
                 If Me.IsDeontic Then
                     Dim lrRoleConstraintRoleInstance As FBM.RoleConstraintRoleInstance
                     Select Case Me.RoleConstraintType
-                        Case Is = pcenumRoleConstraintType.ExternalUniquenessConstraint, _
-                                  pcenumRoleConstraintType.EqualityConstraint, _
-                                  pcenumRoleConstraintType.ExclusionConstraint, _
-                                  pcenumRoleConstraintType.ExclusiveORConstraint, _
-                                  pcenumRoleConstraintType.InclusiveORConstraint, _
-                                  pcenumRoleConstraintType.RingConstraint, _
+                        Case Is = pcenumRoleConstraintType.ExternalUniquenessConstraint,
+                                  pcenumRoleConstraintType.EqualityConstraint,
+                                  pcenumRoleConstraintType.ExclusionConstraint,
+                                  pcenumRoleConstraintType.ExclusiveORConstraint,
+                                  pcenumRoleConstraintType.InclusiveORConstraint,
+                                  pcenumRoleConstraintType.RingConstraint,
                                   pcenumRoleConstraintType.SubsetConstraint
 
                             For Each lrRoleConstraintRoleInstance In Me.RoleConstraintRole
@@ -1320,12 +1326,12 @@ Namespace FBM
                 Else
                     Dim lrRoleConstraintRoleInstance As FBM.RoleConstraintRoleInstance
                     Select Case Me.RoleConstraintType
-                        Case Is = pcenumRoleConstraintType.ExternalUniquenessConstraint, _
-                                  pcenumRoleConstraintType.EqualityConstraint, _
-                                  pcenumRoleConstraintType.ExclusionConstraint, _
-                                  pcenumRoleConstraintType.ExclusiveORConstraint, _
-                                  pcenumRoleConstraintType.InclusiveORConstraint, _
-                                  pcenumRoleConstraintType.RingConstraint, _
+                        Case Is = pcenumRoleConstraintType.ExternalUniquenessConstraint,
+                                  pcenumRoleConstraintType.EqualityConstraint,
+                                  pcenumRoleConstraintType.ExclusionConstraint,
+                                  pcenumRoleConstraintType.ExclusiveORConstraint,
+                                  pcenumRoleConstraintType.InclusiveORConstraint,
+                                  pcenumRoleConstraintType.RingConstraint,
                                   pcenumRoleConstraintType.SubsetConstraint
 
                             For Each lrRoleConstraintRoleInstance In Me.RoleConstraintRole
@@ -1528,7 +1534,7 @@ Namespace FBM
 
         End Sub
 
-        Private Sub RoleConstraint_RoleConstraintRoleAdded(ByRef arRoleConstraintRole As RoleConstraintRole, _
+        Private Sub RoleConstraint_RoleConstraintRoleAdded(ByRef arRoleConstraintRole As RoleConstraintRole,
                                                            ByRef arSubtypeConstraintInstance As FBM.SubtypeRelationshipInstance) Handles RoleConstraint.RoleConstraintRoleAdded
 
             Try
@@ -1685,6 +1691,9 @@ Namespace FBM
 
         End Sub
 
+        Public Overloads Function Equals(other As RoleConstraintInstance) As Boolean Implements IEquatable(Of RoleConstraintInstance).Equals
+            Return Me.Id = other.Id
+        End Function
     End Class
 
 End Namespace

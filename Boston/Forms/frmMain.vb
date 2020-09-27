@@ -2227,7 +2227,6 @@ Public Class frmMain
                         End If
                     Next
 
-
                     For liInd = 1 To prApplication.WorkingPage.SelectedObject.Count
 
                         Dim lrRoleConstraintRoleInstance As FBM.RoleConstraintRoleInstance
@@ -2280,7 +2279,7 @@ Public Class frmMain
                                     'The RoleConstraintInstance is already on the Page
                                     '---------------------------------------------------
                                 Else
-                                    lrPage.RoleConstraintInstance.Add(lrRoleConstraintRoleInstance.RoleConstraint)
+                                    lrPage.RoleConstraintInstance.AddUnique(lrRoleConstraintRoleInstance.RoleConstraint)
                                 End If
 
                                 If lrPage.FactTypeInstance.Exists(AddressOf lrRoleConstraintRoleInstance.Role.FactType.Equals) Then
