@@ -1328,6 +1328,7 @@ Namespace FBM
                             Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
                             For Each lrRoleConstraintInstance In Me.ReferenceModeFactType.InternalUniquenessConstraint
                                 TableRoleConstraintInstance.DeleteRoleConstraintInstance(lrRoleConstraintInstance)
+                                Me.Page.RoleConstraintInstance.Remove(lrRoleConstraintInstance)
                             Next
                             Call TableFactTableInstance.DeleteFactTableInstance(Me.ReferenceModeFactType.FactTable)
                             Call TableFactTypeName.DeleteFactTypeNameInstance(Me.ReferenceModeFactType.FactTypeName)

@@ -4422,7 +4422,33 @@ Public Class frmDiagramORM
                 Select Case e.Node.Tag.ConceptType
                     Case Is = pcenumConceptType.EntityType
 
+                        Dim lrEntityTypeInstance As FBM.EntityTypeInstance = e.Node.Tag
+                        If lrEntityTypeInstance.EntityType.ModelError.Count > 0 Then
+                            'Show the ValueType in the PropertyGrid
+                            Dim lrPropertyGridForm As frmToolboxProperties
+                            lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
+                            If lrPropertyGridForm IsNot Nothing Then
+                                If IsSomething(lrPropertyGridForm) Then
+                                    lrPropertyGridForm.BringToFront()
+                                    lrPropertyGridForm.Show()
+                                End If
+                            End If
+                        End If
+
                     Case Is = pcenumConceptType.ValueType
+
+                        Dim lrValueTypeInstance As FBM.ValueTypeInstance = e.Node.Tag
+                        If lrValueTypeInstance.ValueType.ModelError.Count > 0 Then
+                            'Show the ValueType in the PropertyGrid
+                            Dim lrPropertyGridForm As frmToolboxProperties
+                            lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
+                            If lrPropertyGridForm IsNot Nothing Then
+                                If IsSomething(lrPropertyGridForm) Then
+                                    lrPropertyGridForm.BringToFront()
+                                    lrPropertyGridForm.Show()
+                                End If
+                            End If
+                        End If
 
                     Case Is = pcenumConceptType.FactType
                         Dim lrFactTypeInstance As FBM.FactTypeInstance
