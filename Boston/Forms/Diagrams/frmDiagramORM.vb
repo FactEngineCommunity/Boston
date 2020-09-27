@@ -4430,7 +4430,6 @@ Public Class frmDiagramORM
                             If lrPropertyGridForm IsNot Nothing Then
                                 If IsSomething(lrPropertyGridForm) Then
                                     lrPropertyGridForm.BringToFront()
-                                    lrPropertyGridForm.Show()
                                 End If
                             End If
                         End If
@@ -4445,7 +4444,6 @@ Public Class frmDiagramORM
                             If lrPropertyGridForm IsNot Nothing Then
                                 If IsSomething(lrPropertyGridForm) Then
                                     lrPropertyGridForm.BringToFront()
-                                    lrPropertyGridForm.Show()
                                 End If
                             End If
                         End If

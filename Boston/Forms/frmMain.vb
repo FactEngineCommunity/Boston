@@ -1851,68 +1851,78 @@ Public Class frmMain
 
     Private Sub ToolStripButton_Save_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripButton_Save.Click
 
-        If IsSomething(zfrmModelExplorer) Then
-            Select Case zfrmModelExplorer.TreeView.SelectedNode.Tag.MenuType
-                Case Is = pcenumMenuType.modelORMModel
-                    Dim lrModel As FBM.Model
-                    lrModel = zfrmModelExplorer.TreeView.SelectedNode.Tag.Tag
-                    If lrModel.IsDirty Or lrModel.hasADirtyPage Then
-                        Me.Cursor = Cursors.WaitCursor
-                        Richmond.WriteToStatusBar("Saving Model: '" & lrModel.Name & "'", True)
-                        Call lrModel.Save()
-                        Richmond.WriteToStatusBar("Saved Model: '" & lrModel.Name & "'")
-                        Me.Cursor = Cursors.Default
+        Try
+            If IsSomething(zfrmModelExplorer) Then
+                Select Case zfrmModelExplorer.TreeView.SelectedNode.Tag.MenuType
+                    Case Is = pcenumMenuType.modelORMModel
+                        Dim lrModel As FBM.Model
+                        lrModel = zfrmModelExplorer.TreeView.SelectedNode.Tag.Tag
+                        If lrModel.IsDirty Or lrModel.hasADirtyPage Then
+                            Me.Cursor = Cursors.WaitCursor
+                            Richmond.WriteToStatusBar("Saving Model: '" & lrModel.Name & "'", True)
+                            Call lrModel.Save()
+                            Richmond.WriteToStatusBar("Saved Model: '" & lrModel.Name & "'")
+                            Me.Cursor = Cursors.Default
 
-                        If My.Settings.UseClientServer And My.Settings.InitialiseClient Then
-                            Dim lrInterfaceModel As New Viev.FBM.Interface.Model
-                            lrInterfaceModel.ModelId = lrModel.ModelId
-                            Dim lrBroadcast As New Viev.FBM.Interface.Broadcast
-                            lrBroadcast.Model = lrInterfaceModel
-                            Call prDuplexServiceClient.SendBroadcast(Viev.FBM.Interface.pcenumBroadcastType.ModelSaved, lrBroadcast)
+                            If My.Settings.UseClientServer And My.Settings.InitialiseClient Then
+                                Dim lrInterfaceModel As New Viev.FBM.Interface.Model
+                                lrInterfaceModel.ModelId = lrModel.ModelId
+                                Dim lrBroadcast As New Viev.FBM.Interface.Broadcast
+                                lrBroadcast.Model = lrInterfaceModel
+                                Call prDuplexServiceClient.SendBroadcast(Viev.FBM.Interface.pcenumBroadcastType.ModelSaved, lrBroadcast)
+                            End If
                         End If
-                    End If
 
-                Case Is = pcenumMenuType.pageORMModel
-                    Dim lrPage As FBM.Page
-                    lrPage = zfrmModelExplorer.TreeView.SelectedNode.Tag.Tag
-                    If lrPage.IsDirty Or lrPage.Model.IsDirty Then
-                        Me.Cursor = Cursors.WaitCursor
-                        Richmond.WriteToStatusBar("Saving Model: '" & lrPage.Model.Name & "'", True)
-                        Call lrPage.Save()
-                        Richmond.WriteToStatusBar("Saved Model: '" & lrPage.Model.Name & "'", True)
-                        Me.Cursor = Cursors.Default
+                    Case Is = pcenumMenuType.pageORMModel
+                        Dim lrPage As FBM.Page
+                        lrPage = zfrmModelExplorer.TreeView.SelectedNode.Tag.Tag
+                        If lrPage.IsDirty Or lrPage.Model.IsDirty Then
+                            Me.Cursor = Cursors.WaitCursor
+                            Richmond.WriteToStatusBar("Saving Model: '" & lrPage.Model.Name & "'", True)
+                            Call lrPage.Save()
+                            Richmond.WriteToStatusBar("Saved Model: '" & lrPage.Model.Name & "'", True)
+                            Me.Cursor = Cursors.Default
 
-                        If My.Settings.UseClientServer And My.Settings.InitialiseClient Then
-                            Dim lrInterfaceModel As New Viev.FBM.Interface.Model
-                            lrInterfaceModel.ModelId = lrPage.Model.ModelId
-                            Dim lrBroadcast As New Viev.FBM.Interface.Broadcast
-                            lrBroadcast.Model = lrInterfaceModel
-                            Call prDuplexServiceClient.SendBroadcast(Viev.FBM.Interface.pcenumBroadcastType.ModelSaved, lrBroadcast)
+                            If My.Settings.UseClientServer And My.Settings.InitialiseClient Then
+                                Dim lrInterfaceModel As New Viev.FBM.Interface.Model
+                                lrInterfaceModel.ModelId = lrPage.Model.ModelId
+                                Dim lrBroadcast As New Viev.FBM.Interface.Broadcast
+                                lrBroadcast.Model = lrInterfaceModel
+                                Call prDuplexServiceClient.SendBroadcast(Viev.FBM.Interface.pcenumBroadcastType.ModelSaved, lrBroadcast)
+                            End If
                         End If
-                    End If
-                Case Else
-                    '-----------------------------------------------------
-                    'Save the current 'WorkingPage' back to the database
-                    '-----------------------------------------------------
-                    If IsSomething(prApplication.WorkingPage) Then
-                        Me.Cursor = Cursors.WaitCursor
-                        Richmond.WriteToStatusBar("Saving Model: '" & prApplication.WorkingPage.Model.Name & "'", True)
-                        Call prApplication.WorkingPage.Save()
-                        Richmond.WriteToStatusBar("Saved Model: '" & prApplication.WorkingPage.Model.Name & "'", True)
-                        Me.Cursor = Cursors.Default
+                    Case Else
+                        '-----------------------------------------------------
+                        'Save the current 'WorkingPage' back to the database
+                        '-----------------------------------------------------
+                        If IsSomething(prApplication.WorkingPage) Then
+                            Me.Cursor = Cursors.WaitCursor
+                            Richmond.WriteToStatusBar("Saving Model: '" & prApplication.WorkingPage.Model.Name & "'", True)
+                            Call prApplication.WorkingPage.Save()
+                            Richmond.WriteToStatusBar("Saved Model: '" & prApplication.WorkingPage.Model.Name & "'", True)
+                            Me.Cursor = Cursors.Default
 
-                        If My.Settings.UseClientServer And My.Settings.InitialiseClient Then
-                            Dim lrInterfaceModel As New Viev.FBM.Interface.Model
-                            lrInterfaceModel.ModelId = prApplication.WorkingPage.Model.ModelId
-                            Dim lrBroadcast As New Viev.FBM.Interface.Broadcast
-                            lrBroadcast.Model = lrInterfaceModel
-                            Call prDuplexServiceClient.SendBroadcast(Viev.FBM.Interface.pcenumBroadcastType.ModelSaved, lrBroadcast)
+                            If My.Settings.UseClientServer And My.Settings.InitialiseClient Then
+                                Dim lrInterfaceModel As New Viev.FBM.Interface.Model
+                                lrInterfaceModel.ModelId = prApplication.WorkingPage.Model.ModelId
+                                Dim lrBroadcast As New Viev.FBM.Interface.Broadcast
+                                lrBroadcast.Model = lrInterfaceModel
+                                Call prDuplexServiceClient.SendBroadcast(Viev.FBM.Interface.pcenumBroadcastType.ModelSaved, lrBroadcast)
+                            End If
                         End If
-                    End If
-            End Select
-        End If
+                End Select
+            End If
 
-        Me.ToolStripButton_Save.Enabled = False
+            Me.ToolStripButton_Save.Enabled = False
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 
