@@ -790,11 +790,14 @@ Namespace FBM
                         lrOriginalDictionaryEntry = Me.Model.ModelDictionary.Find(AddressOf lrOriginalDictionaryEntry.Equals)
 
                         If IsSomething(lrOriginalDictionaryEntry) Then
+
                             Call Me.Model.DeprecateRealisationsForDictionaryEntry(lrOriginalDictionaryEntry, aiConceptType)
 
-                            If (lrNewDictionaryEntry.Realisations.Count = 0) Then
-                                Call TableModelDictionary.ModifySymbol(Me.Model, lrOriginalDictionaryEntry, arNewConcept.Symbol, Me.ConceptType)
-                            End If
+                            '20200928-VM-Not sure how this works
+                            'Dim laiConceptType = {pcenumConceptType.ValueType, pcenumConceptType.EntityType, pcenumConceptType.FactType}
+                            'If (lrNewDictionaryEntry.Realisations.Count = 0) Then
+                            '    Call TableModelDictionary.ModifySymbol(Me.Model, lrOriginalDictionaryEntry, arNewConcept.Symbol, Me.ConceptType)
+                            'End If
 
                         Else
                             '----------------------------------------------------------------------------------------------------------------------------------

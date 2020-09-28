@@ -225,7 +225,9 @@ Namespace FBM
             End If
 
             For Each lrPredicatePart In Me.PredicatePart
-                If lrPredicatePart.PredicatePartText <> other.PredicatePart(liInd).PredicatePartText Then
+                If (lrPredicatePart.PredicatePartText <> other.PredicatePart(liInd).PredicatePartText) Or
+                     (lrPredicatePart.PreBoundText <> other.PredicatePart(liInd).PreBoundText) Or
+                     (lrPredicatePart.PostBoundText <> other.PredicatePart(liInd).PostBoundText) Then
                     Return False
                 End If
                 liInd += 1
