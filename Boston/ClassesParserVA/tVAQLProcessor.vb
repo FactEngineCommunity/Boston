@@ -266,6 +266,7 @@ Namespace VAQL
 
     Public Class ModelElementTypeClause
 
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _MODELELEMENT As VAQL.ModelElementClause
         Public Property MODELELEMENT As VAQL.ModelElementClause
             Get
@@ -276,6 +277,18 @@ Namespace VAQL
             End Set
         End Property
 
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Private _KEYWDWRITTENAS As String
+        Public Property KEYWDWRITTENAS As String
+            Get
+                Return Me._KEYWDWRITTENAS
+            End Get
+            Set(value As String)
+                Me._KEYWDWRITTENAS = value
+            End Set
+        End Property
+
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _KEYWDIDENTIFIEDBYITS As String
         Public Property KEYWDIDENTIFIEDBYITS As String
             Get
@@ -286,6 +299,18 @@ Namespace VAQL
             End Set
         End Property
 
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Private _VALUETYPEWRITTENASCLAUSE As New VAQL.ValueTypeWrittenAsClause
+        Public Property VALUETYPEWRITTENASCLAUSE As VAQL.ValueTypeWrittenAsClause
+            Get
+                Return Me._VALUETYPEWRITTENASCLAUSE
+            End Get
+            Set(value As VAQL.ValueTypeWrittenAsClause)
+                Me._VALUETYPEWRITTENASCLAUSE = value
+            End Set
+        End Property
+
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _REFERENCEMODE As String
         Public Property REFERENCEMODE As String
             Get
@@ -320,6 +345,51 @@ Namespace VAQL
             End Set
         End Property
     End Class
+
+    Public Class ValueTypeWrittenAsClause
+
+        Private _DATATYPE As Object
+        Public Property DATATYPE As Object
+            Get
+                Return Me._DATATYPE
+            End Get
+            Set(value As Object)
+                Me._DATATYPE = value
+            End Set
+        End Property
+
+        Private _DATATYPELENGTH As Object
+        Public Property DATATYPELENGTH As Object
+            Get
+                Return Me._DATATYPELENGTH
+            End Get
+            Set(value As Object)
+                Me._DATATYPELENGTH = value
+            End Set
+        End Property
+
+        Private _DATATYPEPRECISION As Object
+        Public Property DATATYPEPRECISION As Object
+            Get
+                Return Me._DATATYPEPRECISION
+            End Get
+            Set(value As Object)
+                Me._DATATYPEPRECISION = value
+            End Set
+        End Property
+
+        Private _NUMBER As String
+        Public Property NUMBER As String
+            Get
+                Return Me._NUMBER
+            End Get
+            Set(value As String)
+                Me._NUMBER = value
+            End Set
+        End Property
+
+    End Class
+
 
     Public Class ValueTypeIsWrittenAsStatement
 
@@ -397,6 +467,16 @@ Namespace VAQL
             End Set
         End Property
 
+        Private _MODELELEMENTTYPE As New List(Of VAQL.ModelElementTypeClause)
+        Public Property MODELELEMENTTYPE As List(Of VAQL.ModelElementTypeClause)
+            Get
+                Return Me._MODELELEMENTTYPE
+            End Get
+            Set(value As List(Of VAQL.ModelElementTypeClause))
+                Me._MODELELEMENTTYPE = value
+            End Set
+        End Property
+
         Private _MODELELEMENTNAME As List(Of String)
         Public Property MODELELEMENTNAME As List(Of String)
             Get
@@ -464,11 +544,12 @@ Namespace VAQL
         Public ISWHEREStatement As New VAQL.IsWhereStatement
         Public ATMOSTONEStatement As New VAQL.AtMostOneStatement
         Public PREDICATEPARTClause As New VAQL.PredicatePartClause
-        Public VALUETYPEISWRITTENASStatement As New VAQL.ValueTypeIsWrittenAsStatement
         Public ENTITYTYPEISIDENTIFIEDBYITSStatement As New VAQL.EntityTypeIsIdentifiedByItsStatement
         Public FACTTYPEREADINGStatement As New VAQL.FactTypeReadingStatement
         Public MODELELEMENTClause As New VAQL.ModelElementClause
         Public MODELELEMENTTYPEClause As New VAQL.ModelElementTypeClause
+        Public VALUETYPEISWRITTENASStatement As New VAQL.ValueTypeIsWrittenAsStatement
+        Public VALUETYPEWRITTENASClause As New VAQL.ValueTypeWrittenAsClause
 
 
         Public Sub New()

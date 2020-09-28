@@ -2162,6 +2162,27 @@ Public Class tBrain
                         End If
                     Next
 
+                    Dim lsDataTypeName As String = ""
+                    Dim liDataTypeLength As Integer = 0
+                    Dim liDataTypePrecision As Integer = 0
+
+                    If VAQL.ATMOSTONEStatement.MODELELEMENTTYPE(VAQL.ATMOSTONEStatement.MODELELEMENTTYPE.Count - 1).KEYWDWRITTENAS IsNot Nothing Then
+
+                        VAQL.VALUETYPEWRITTENASClause = VAQL.ATMOSTONEStatement.MODELELEMENTTYPE(VAQL.ATMOSTONEStatement.MODELELEMENTTYPE.Count - 1).VALUETYPEWRITTENASCLAUSE
+
+                        If Me.VAQL.VALUETYPEWRITTENASClause.DATATYPE IsNot Nothing Then
+                            lsDataTypeName = Me.VAQL.VALUETYPEWRITTENASClause.DATATYPE.Nodes(0).Token.Text
+                        ElseIf Me.VAQL.VALUETYPEWRITTENASClause.DATATYPELENGTH IsNot Nothing Then
+                            lsDataTypeName = Me.VAQL.VALUETYPEWRITTENASClause.DATATYPELENGTH.Nodes(0).Token.Text
+                            liDataTypeLength = CInt(Me.VAQL.VALUETYPEWRITTENASClause.NUMBER)
+                        ElseIf Me.VAQL.VALUETYPEWRITTENASClause.DATATYPEPRECISION IsNot Nothing Then
+                            lsDataTypeName = Me.VAQL.VALUETYPEWRITTENASClause.DATATYPEPRECISION.Nodes(0).Token.Text
+                            liDataTypePrecision = CInt(Me.VAQL.VALUETYPEWRITTENASClause.NUMBER)
+                        End If
+
+                        lbIsLikelyValueType = True
+                    End If
+
                     If lbIsLikelyValueType Then
                         lrStep = New Brain.Step(pcenumActionType.CreateValueType, True, pcenumActionType.None, Nothing)
                         lrPlan.AddStep(lrStep)
