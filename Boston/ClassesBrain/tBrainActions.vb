@@ -473,23 +473,32 @@ Partial Public Class tBrain
 
         Me.Model = prApplication.WorkingModel
 
-        lsOldValueTypeName = Me.CurrentQuestion.ValueType(0).Id
-        lsValueTypeName = Viev.Strings.MakeCapCamelCase(Me.CurrentQuestion.ValueType(0).Id)
-
-        If Me.CurrentQuestion.sentence IsNot Nothing Then
-            Me.CurrentQuestion.sentence.Sentence = Me.CurrentQuestion.sentence.Sentence.Replace(lsOldValueTypeName, lsValueTypeName)
-            Me.CurrentQuestion.sentence.ResetSentence()
-
-            Call Language.AnalyseSentence(Me.CurrentQuestion.sentence, Me.Model)
-            Call Language.ProcessSentence(Me.CurrentQuestion.sentence)
-            If Me.CurrentQuestion.sentence.AreAllWordsResolved Then
-                Call Language.ResolveSentence(Me.CurrentQuestion.sentence)
-            End If
-        End If
-
         Dim lrValueType As FBM.ValueType
 
-        lrValueType = Me.Model.CreateValueType(lsValueTypeName, False)
+        If Me.CurrentQuestion.ObjectType IsNot Nothing Then
+
+            lrValueType = Me.CurrentQuestion.ObjectType
+
+        Else
+
+
+            lsOldValueTypeName = Me.CurrentQuestion.ValueType(0).Id
+            lsValueTypeName = Viev.Strings.MakeCapCamelCase(Me.CurrentQuestion.ValueType(0).Id)
+
+            If Me.CurrentQuestion.sentence IsNot Nothing Then
+                Me.CurrentQuestion.sentence.Sentence = Me.CurrentQuestion.sentence.Sentence.Replace(lsOldValueTypeName, lsValueTypeName)
+                Me.CurrentQuestion.sentence.ResetSentence()
+
+                Call Language.AnalyseSentence(Me.CurrentQuestion.sentence, Me.Model)
+                Call Language.ProcessSentence(Me.CurrentQuestion.sentence)
+                If Me.CurrentQuestion.sentence.AreAllWordsResolved Then
+                    Call Language.ResolveSentence(Me.CurrentQuestion.sentence)
+                End If
+            End If
+
+            lrValueType = Me.Model.CreateValueType(lsValueTypeName, False)
+
+        End If
 
         If Me.Page IsNot Nothing Then
 
@@ -504,6 +513,7 @@ Partial Public Class tBrain
         Else
             Me.Model.AddValueType(lrValueType, True, True, Nothing)
         End If
+
         Me.Timeout.Start()
 
     End Sub

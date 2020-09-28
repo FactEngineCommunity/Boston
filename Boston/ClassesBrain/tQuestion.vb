@@ -65,7 +65,7 @@
                 Me.ObjectType = New FBM.FactType
                 Me.ObjectType = aoObjectType
             Case Else
-
+                Me.ObjectType = aoObjectType
         End Select
 
         For Each lsString In Me.Question.Split

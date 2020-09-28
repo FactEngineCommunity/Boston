@@ -320,6 +320,8 @@ Namespace FBM
                     lrValueType.ValueConstraint = .ValueConstraint
                     lrValueType.PrimativeType = .PrimativeType
                     lrValueType.DataType = .DataType
+                    lrValueType.DataTypeLength = .DataTypeLength
+                    lrValueType.DataTypePrecision = .DataTypePrecision
 
                     If abAddToModel Then
                         arModel.AddValueType(lrValueType)

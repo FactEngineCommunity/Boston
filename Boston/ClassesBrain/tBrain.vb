@@ -2162,9 +2162,11 @@ Public Class tBrain
                         End If
                     Next
 
+                    Dim lrValueType As FBM.ValueType = Nothing
                     Dim lsDataTypeName As String = ""
                     Dim liDataTypeLength As Integer = 0
                     Dim liDataTypePrecision As Integer = 0
+                    Dim liDataType As pcenumORMDataType = pcenumORMDataType.DataTypeNotSet
 
                     If VAQL.ATMOSTONEStatement.MODELELEMENTTYPE(VAQL.ATMOSTONEStatement.MODELELEMENTTYPE.Count - 1).KEYWDWRITTENAS IsNot Nothing Then
 
@@ -2179,6 +2181,21 @@ Public Class tBrain
                             lsDataTypeName = Me.VAQL.VALUETYPEWRITTENASClause.DATATYPEPRECISION.Nodes(0).Token.Text
                             liDataTypePrecision = CInt(Me.VAQL.VALUETYPEWRITTENASClause.NUMBER)
                         End If
+
+                        lsDataTypeName = DataTypeAttribute.Get(GetType(pcenumORMDataType), lsDataTypeName)
+                        If lsDataTypeName Is Nothing Then
+                            Me.send_data("That's not a valid Data Type.")
+                            Exit Sub
+                        End If
+
+                        Try
+                            liDataType = DirectCast([Enum].Parse(GetType(pcenumORMDataType), lsDataTypeName), pcenumORMDataType)
+                        Catch ex As Exception
+                            Me.send_data("That's not a valid Data Type.")
+                            Exit Sub
+                        End Try
+
+                        lrValueType = Me.Model.CreateValueType(lsModelObjectName, False, liDataType, liDataTypeLength, liDataTypePrecision)
 
                         lbIsLikelyValueType = True
                     End If
@@ -2195,7 +2212,7 @@ Public Class tBrain
                                                          True,
                                                          lasSymbol,
                                                          Nothing,
-                                                         Nothing,
+                                                         lrValueType,
                                                          lrPlan,
                                                          lrStep)
                     Else
