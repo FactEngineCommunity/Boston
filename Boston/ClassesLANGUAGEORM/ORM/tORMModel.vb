@@ -621,8 +621,6 @@ Namespace FBM
 
             Try
 
-                If arRoleConstraint.Role(0).FactType.Id.Contains("Parenting") Then Debugger.Break()
-
                 '------------------------------------------------------------------------------------------------
                 'Add a new DictionaryEntry to the ModelDictionary if the DictionaryEntry doesn't already exist.
                 '------------------------------------------------------------------------------------------------                
@@ -2328,7 +2326,7 @@ Namespace FBM
                 If IsSomething(asRoleConstraintName) Then
                     lrRoleConstraint = New FBM.RoleConstraint(Me, asRoleConstraintName, True, aiRoleConstraintType, aarRole, True)
                 Else
-                    lrRoleConstraint = New FBM.RoleConstraint(Me, aiRoleConstraintType, True, aiRoleConstraintType, aarRole, True)
+                    lrRoleConstraint = New FBM.RoleConstraint(Me, aiRoleConstraintType.ToString, True, aiRoleConstraintType, aarRole, True)
                 End If
 
                 If IsSomething(aiLevelNr) Then

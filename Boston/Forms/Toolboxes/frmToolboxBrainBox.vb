@@ -319,6 +319,8 @@ Public Class frmToolboxBrainBox
                 e.Handled = True
             Case Is = Keys.Enter 'Enter
 
+                Me.AutoComplete.Hide()
+
                 '--------------------------------------------
                 'Firstly, strip away the ThoughtMode prompt
                 '--------------------------------------------
