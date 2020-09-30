@@ -9932,6 +9932,8 @@ Public Class frmDiagramORM
         Me.Diagram.Nodes.Clear()
         Me.Diagram.Invalidate()
 
+        Me.zrPage.ClearFast(True)
+
         prApplication.WorkingModel = arModelObject.Model
 
         Dim lrDiagramSpyPage As New FBM.DiagramSpyPage(arModelObject.Model, "123", "Diagram Spy", pcenumLanguage.ORMModel)

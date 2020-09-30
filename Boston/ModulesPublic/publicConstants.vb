@@ -265,6 +265,16 @@ Public Module publicConstants
         <Description(".time")> DotLowercaseTime
     End Enum
 
+    Public Enum pcenumValueTypeCandidates
+        <Description("Value")> Value
+        <Description("Number")> Number
+        <Description("Status")> Status
+        <Description("Year")> Year
+        <Description("Month")> Month
+        <Description("Reason")> Reason
+        <Description("Quantity")> Quantity
+    End Enum
+
     <Serializable()> _
     Public Enum pcenumRoleConstraintType
         CardinalityConstraint

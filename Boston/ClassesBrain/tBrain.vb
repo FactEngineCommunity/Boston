@@ -2151,12 +2151,21 @@ Public Class tBrain
                     Dim lbIsLikelyValueType As Boolean = False
                     Dim items As Array
                     items = System.Enum.GetValues(GetType(pcenumReferenceModeEndings))
-                    Dim item As pcenumReferenceModeEndings
+                    '20201001-VM-Remove if all okay.
+                    'Dim item As pcenumReferenceModeEndings
                     For Each item In items
                         If lsModelObjectName.EndsWith(GetEnumDescription(item)) Then
                             lbIsLikelyValueType = True
                             Exit For
                         ElseIf lsModelObjectName.EndsWith(GetEnumDescription(item).Trim({"."c})) Then 'See https://msdn.microsoft.com/en-us/library/kxbw3kwc(v=vs.110).aspx
+                            lbIsLikelyValueType = True
+                            Exit For
+                        End If
+                    Next
+
+                    items = System.Enum.GetValues(GetType(pcenumValueTypeCandidates))
+                    For Each item In items
+                        If lsModelObjectName.EndsWith(GetEnumDescription(item)) Then
                             lbIsLikelyValueType = True
                             Exit For
                         End If
