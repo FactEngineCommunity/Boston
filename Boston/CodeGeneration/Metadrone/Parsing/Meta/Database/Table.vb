@@ -346,16 +346,20 @@ Namespace Parser.Meta.Database
             Dim larEntity As New List(Of IEntity)
             Dim liInd As Integer
             Try
+
                 larEntity = Me.Schema.GetEntities(Syntax.SyntaxNode.ExecForEntities.OBJECT_TABLE)
 
                 If Me.ListPos = larEntity.Count - 1 Then Return False
 
-
                 For liInd = Me.ListPos To larEntity.Count - 2
                     For Each lrRelation In Me.Relation
                         Dim lrComparisonTable As Table = CType(larEntity(liInd + 1), Table)
+
                         If lrRelation.DestinationTable.Name = lrComparisonTable.Value Then
-                            Return True
+                            If lrComparisonTable.Relation.Find(Function(x) x.DestinationTable.Name = Me.Value) Is Nothing Then
+                                'Tables don't reference themselves in a loop
+                                Return True
+                            End If
                         End If
                     Next
                 Next

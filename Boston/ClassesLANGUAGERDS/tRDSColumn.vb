@@ -119,7 +119,7 @@ Namespace RDS
                     Case Is = pcenumORMDataType.NumericAutoCounter,
                               pcenumORMDataType.NumericDecimal,
                               pcenumORMDataType.NumericFloatCustomPrecision,
-                              pcenumORMDataType.NumericFlotDoublePrecision,
+                              pcenumORMDataType.NumericFloatDoublePrecision,
                               pcenumORMDataType.NumericFloatSinglePrecision,
                               pcenumORMDataType.NumericMoney,
                               pcenumORMDataType.NumericSignedBigInteger,

@@ -33,17 +33,17 @@ Public Module publicORMFunctions
                 'Code Safe: Not generally handled in this function, but return a value just the same
                 '-------------------------------------------------------------------------------------
                 lsFactData = GenerateRandomInteger(1, 1000).ToString
-            Case Is = pcenumORMDataType.NumericDecimal, _
-                      pcenumORMDataType.NumericFloatCustomPrecision, _
-                      pcenumORMDataType.NumericFloatSinglePrecision, _
-                      pcenumORMDataType.NumericFlotDoublePrecision, _
-                      pcenumORMDataType.NumericMoney, _
-                      pcenumORMDataType.NumericSignedBigInteger, _
-                      pcenumORMDataType.NumericSignedInteger, _
-                      pcenumORMDataType.NumericSignedSmallInteger, _
-                      pcenumORMDataType.NumericUnsignedBigInteger, _
-                      pcenumORMDataType.NumericUnsignedInteger, _
-                      pcenumORMDataType.NumericUnsignedSmallInteger, _
+            Case Is = pcenumORMDataType.NumericDecimal,
+                      pcenumORMDataType.NumericFloatCustomPrecision,
+                      pcenumORMDataType.NumericFloatSinglePrecision,
+                      pcenumORMDataType.NumericFloatDoublePrecision,
+                      pcenumORMDataType.NumericMoney,
+                      pcenumORMDataType.NumericSignedBigInteger,
+                      pcenumORMDataType.NumericSignedInteger,
+                      pcenumORMDataType.NumericSignedSmallInteger,
+                      pcenumORMDataType.NumericUnsignedBigInteger,
+                      pcenumORMDataType.NumericUnsignedInteger,
+                      pcenumORMDataType.NumericUnsignedSmallInteger,
                       pcenumORMDataType.NumericUnsignedTinyInteger
                 lsFactData = GenerateRandomInteger(1, 1000).ToString
             Case Is = pcenumORMDataType.OtherObjectID

@@ -82,7 +82,7 @@ Public Module publicFBMConstants
         <DataType("AutoCounter")> <Description("Numeric: Auto Counter")> NumericAutoCounter
         <DataType("Decimal")> <Description("Numeric: Decimal")> NumericDecimal
         <DataType("FloatCustomPrecision")> <Description("Numeric: Float (Custom Precision)")> NumericFloatCustomPrecision
-        <DataType("FloatDoublePrecision")> <Description("Numeric: Float (Double Precision)")> NumericFlotDoublePrecision
+        <DataType("FloatDoublePrecision")> <Description("Numeric: Float (Double Precision)")> NumericFloatDoublePrecision
         <DataType("FloatSinglePrecistion")> <Description("Numeric: Float (Single Precision)")> NumericFloatSinglePrecision
         <DataType("Money")> <Description("Numeric: Money")> NumericMoney
         <DataType("SignedBigInteger")> <Description("Numeric: Signed Big Integer")> NumericSignedBigInteger
