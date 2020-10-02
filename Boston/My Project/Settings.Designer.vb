@@ -605,6 +605,18 @@ Namespace My
                 Me("FactEngineShowDatabaseLogoInModelExplorer") = value
             End Set
         End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("True")>  _
+        Public Property ERDViewHideUnknowPredicates() As Boolean
+            Get
+                Return CType(Me("ERDViewHideUnknowPredicates"),Boolean)
+            End Get
+            Set
+                Me("ERDViewHideUnknowPredicates") = value
+            End Set
+        End Property
     End Class
 End Namespace
 

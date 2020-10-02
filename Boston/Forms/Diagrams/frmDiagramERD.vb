@@ -555,7 +555,16 @@ Public Class frmDiagramERD
 
                     lrRecordset1 = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
                     If Not lrRecordset1.EOF Then
-                        lrRelation.OriginPredicate = lrRecordset1("Predicate").Data
+                        Try
+                            lrRelation.OriginPredicate = lrRecordset1("Predicate").Data
+                        Catch ex As Exception
+                            Dim lsMessage As String
+                            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                            lsMessage &= vbCrLf & vbCrLf & ex.Message
+                            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                        End Try
                     End If
 
 

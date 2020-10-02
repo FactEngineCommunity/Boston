@@ -56,10 +56,13 @@ Partial Class frmCRUDBostonConfiguration
         Me.CheckBoxEnableClientServer = New System.Windows.Forms.CheckBox()
         Me.TabPage3 = New System.Windows.Forms.TabPage()
         Me.GroupBoxFactEngine = New System.Windows.Forms.GroupBox()
+        Me.CheckBoxFactEngineShowDatabaseLogoModelExplorer = New System.Windows.Forms.CheckBox()
         Me.LabelFactEngineDefaultQueryResultLimit = New System.Windows.Forms.Label()
         Me.DomainUpDownFactEngineDefaultQueryResultLimit = New System.Windows.Forms.DomainUpDown()
         Me.ErrorProvider = New System.Windows.Forms.ErrorProvider(Me.components)
-        Me.CheckBoxFactEngineShowDatabaseLogoModelExplorer = New System.Windows.Forms.CheckBox()
+        Me.TabPage4 = New System.Windows.Forms.TabPage()
+        Me.GroupBoxERDiagrams = New System.Windows.Forms.GroupBox()
+        Me.CheckBoxHideUnknownPredicates = New System.Windows.Forms.CheckBox()
         Me.GroupBox_main.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
         Me.TableLayoutPanel1.SuspendLayout()
@@ -73,6 +76,8 @@ Partial Class frmCRUDBostonConfiguration
         Me.TabPage3.SuspendLayout()
         Me.GroupBoxFactEngine.SuspendLayout()
         CType(Me.ErrorProvider, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.TabPage4.SuspendLayout()
+        Me.GroupBoxERDiagrams.SuspendLayout()
         Me.SuspendLayout()
         '
         'Button_Cancel
@@ -307,6 +312,7 @@ Partial Class frmCRUDBostonConfiguration
         Me.TabControl1.Controls.Add(Me.TabPage1)
         Me.TabControl1.Controls.Add(Me.TabPage2)
         Me.TabControl1.Controls.Add(Me.TabPage3)
+        Me.TabControl1.Controls.Add(Me.TabPage4)
         Me.TabControl1.Location = New System.Drawing.Point(12, 11)
         Me.TabControl1.Name = "TabControl1"
         Me.TabControl1.SelectedIndex = 0
@@ -403,6 +409,16 @@ Partial Class frmCRUDBostonConfiguration
         Me.GroupBoxFactEngine.TabIndex = 0
         Me.GroupBoxFactEngine.TabStop = False
         '
+        'CheckBoxFactEngineShowDatabaseLogoModelExplorer
+        '
+        Me.CheckBoxFactEngineShowDatabaseLogoModelExplorer.AutoSize = True
+        Me.CheckBoxFactEngineShowDatabaseLogoModelExplorer.Location = New System.Drawing.Point(19, 67)
+        Me.CheckBoxFactEngineShowDatabaseLogoModelExplorer.Name = "CheckBoxFactEngineShowDatabaseLogoModelExplorer"
+        Me.CheckBoxFactEngineShowDatabaseLogoModelExplorer.Size = New System.Drawing.Size(225, 17)
+        Me.CheckBoxFactEngineShowDatabaseLogoModelExplorer.TabIndex = 2
+        Me.CheckBoxFactEngineShowDatabaseLogoModelExplorer.Text = "&Show database logo in the Model Explorer"
+        Me.CheckBoxFactEngineShowDatabaseLogoModelExplorer.UseVisualStyleBackColor = True
+        '
         'LabelFactEngineDefaultQueryResultLimit
         '
         Me.LabelFactEngineDefaultQueryResultLimit.AutoSize = True
@@ -429,15 +445,37 @@ Partial Class frmCRUDBostonConfiguration
         '
         Me.ErrorProvider.ContainerControl = Me
         '
-        'CheckBoxFactEngineShowDatabaseLogoModelExplorer
+        'TabPage4
         '
-        Me.CheckBoxFactEngineShowDatabaseLogoModelExplorer.AutoSize = True
-        Me.CheckBoxFactEngineShowDatabaseLogoModelExplorer.Location = New System.Drawing.Point(19, 67)
-        Me.CheckBoxFactEngineShowDatabaseLogoModelExplorer.Name = "CheckBoxFactEngineShowDatabaseLogoModelExplorer"
-        Me.CheckBoxFactEngineShowDatabaseLogoModelExplorer.Size = New System.Drawing.Size(225, 17)
-        Me.CheckBoxFactEngineShowDatabaseLogoModelExplorer.TabIndex = 2
-        Me.CheckBoxFactEngineShowDatabaseLogoModelExplorer.Text = "&Show database logo in the Model Explorer"
-        Me.CheckBoxFactEngineShowDatabaseLogoModelExplorer.UseVisualStyleBackColor = True
+        Me.TabPage4.Controls.Add(Me.GroupBoxERDiagrams)
+        Me.TabPage4.Location = New System.Drawing.Point(4, 22)
+        Me.TabPage4.Name = "TabPage4"
+        Me.TabPage4.Size = New System.Drawing.Size(606, 502)
+        Me.TabPage4.TabIndex = 3
+        Me.TabPage4.Text = "ER Diagrams"
+        Me.TabPage4.UseVisualStyleBackColor = True
+        '
+        'GroupBoxERDiagrams
+        '
+        Me.GroupBoxERDiagrams.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.GroupBoxERDiagrams.Controls.Add(Me.CheckBoxHideUnknownPredicates)
+        Me.GroupBoxERDiagrams.Location = New System.Drawing.Point(3, 6)
+        Me.GroupBoxERDiagrams.Name = "GroupBoxERDiagrams"
+        Me.GroupBoxERDiagrams.Size = New System.Drawing.Size(600, 493)
+        Me.GroupBoxERDiagrams.TabIndex = 0
+        Me.GroupBoxERDiagrams.TabStop = False
+        '
+        'CheckBoxHideUnknownPredicates
+        '
+        Me.CheckBoxHideUnknownPredicates.AutoSize = True
+        Me.CheckBoxHideUnknownPredicates.Location = New System.Drawing.Point(17, 19)
+        Me.CheckBoxHideUnknownPredicates.Name = "CheckBoxHideUnknownPredicates"
+        Me.CheckBoxHideUnknownPredicates.Size = New System.Drawing.Size(150, 17)
+        Me.CheckBoxHideUnknownPredicates.TabIndex = 0
+        Me.CheckBoxHideUnknownPredicates.Text = "Hide Unknown Predicates"
+        Me.CheckBoxHideUnknownPredicates.UseVisualStyleBackColor = True
         '
         'frmCRUDBostonConfiguration
         '
@@ -471,6 +509,9 @@ Partial Class frmCRUDBostonConfiguration
         Me.GroupBoxFactEngine.ResumeLayout(False)
         Me.GroupBoxFactEngine.PerformLayout()
         CType(Me.ErrorProvider, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.TabPage4.ResumeLayout(False)
+        Me.GroupBoxERDiagrams.ResumeLayout(False)
+        Me.GroupBoxERDiagrams.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub
@@ -511,4 +552,7 @@ Partial Class frmCRUDBostonConfiguration
     Friend WithEvents LabelFactEngineDefaultQueryResultLimit As Label
     Friend WithEvents ErrorProvider As ErrorProvider
     Friend WithEvents CheckBoxFactEngineShowDatabaseLogoModelExplorer As CheckBox
+    Friend WithEvents TabPage4 As TabPage
+    Friend WithEvents GroupBoxERDiagrams As GroupBox
+    Friend WithEvents CheckBoxHideUnknownPredicates As CheckBox
 End Class

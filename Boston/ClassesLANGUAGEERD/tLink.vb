@@ -167,6 +167,9 @@ Namespace ERD
             Dim drawFormat As New System.Drawing.StringFormat
             Dim StringSize As New SizeF
 
+            If My.Settings.ERDViewHideUnknowPredicates And lsOriginPredicate = "unknown predicate" Then
+                lsOriginPredicate = ""
+            End If
             StringSize = graphics.MeasureString(lsOriginPredicate, drawFont, 1000, System.Drawing.StringFormat.GenericDefault)
 
             liLastIndex = Me.ControlPoints.Count - 1
@@ -198,6 +201,9 @@ Namespace ERD
             '--------------
             '2nd Predicate
             '--------------
+            If My.Settings.ERDViewHideUnknowPredicates And lsDestinationPredicate = "unknown predicate" Then
+                lsDestinationPredicate = ""
+            End If
             StringSize = graphics.MeasureString(lsDestinationPredicate, drawFont, 1000, System.Drawing.StringFormat.GenericDefault)
             If Me.ControlPoints(Me.ControlPoints.Count - 2).X < Me.ControlPoints(Me.ControlPoints.Count - 1).X Then
                 x = Me.ControlPoints(Me.ControlPoints.Count - 1).X - (StringSize.Width + 1)

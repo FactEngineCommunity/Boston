@@ -71,6 +71,9 @@ Public Class frmCRUDBostonConfiguration
 
         Me.CheckBoxFactEngineShowDatabaseLogoModelExplorer.Checked = My.Settings.FactEngineShowDatabaseLogoInModelExplorer
 
+        'ER Diagrams
+        Me.CheckBoxHideUnknownPredicates.Checked = My.Settings.ERDViewHideUnknowPredicates
+
     End Sub
 
     Private Sub frmCRUDRichmondConfiguration_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
@@ -112,6 +115,7 @@ Public Class frmCRUDBostonConfiguration
             My.Settings.LoggingOutEndsSession = Me.CheckBoxLoggingOutEndsSession.Checked
             My.Settings.UseVirtualUI = Me.CheckBoxUseRemoteUI.Checked
             My.Settings.FactEngineShowDatabaseLogoInModelExplorer = Me.CheckBoxFactEngineShowDatabaseLogoModelExplorer.Checked
+            My.Settings.ERDViewHideUnknowPredicates = Me.CheckBoxHideUnknownPredicates.Checked
 
             Try
                 If Me.DomainUpDownFactEngineDefaultQueryResultLimit.Text = "Infinite" Then
