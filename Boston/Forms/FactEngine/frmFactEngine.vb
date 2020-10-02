@@ -1213,16 +1213,22 @@ Public Class frmFactEngine
                         Next
                         lsSQLQuery &= vbCrLf & "FROM " & lrModelElement.Id
                         lsSQLQuery &= vbCrLf & "LIMIT 20"
-                        Dim lrRecordset = Me.FEQLProcessor.DatabaseManager.GO(lsSQLQuery)
-                        For Each lrFact In lrRecordset.Facts
-                            Dim lsString As String = ""
-                            liInd = 0
-                            For Each lrData In lrFact.Data
-                                If liInd > 0 Then lsString &= ","
-                                lsString &= lrData.Data
+                        Dim lrRecordset As ORMQL.Recordset
+                        Try
+                            lrRecordset = Me.FEQLProcessor.DatabaseManager.GO(lsSQLQuery)
+
+                            For Each lrFact In lrRecordset.Facts
+                                Dim lsString As String = ""
+                                liInd = 0
+                                For Each lrData In lrFact.Data
+                                    If liInd > 0 Then lsString &= ","
+                                    lsString &= lrData.Data
+                                Next
+                                Call Me.AddEnterpriseAwareItem(lsString)
                             Next
-                            Call Me.AddEnterpriseAwareItem(lsString)
-                        Next
+                        Catch ex As Exception
+                            Me.LabelError.Text = ex.Message
+                        End Try
 
                         Call Me.showAutoCompleteForm()
                         Exit Sub
