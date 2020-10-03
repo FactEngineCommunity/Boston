@@ -217,7 +217,7 @@ Public Class frmCRUDModel
         Catch ex As Exception
 
             Me.LabelOpenSuccessfull.ForeColor = Color.Red
-            Me.LabelOpenSuccessfull.Text = "Fail"
+            Me.LabelOpenSuccessfull.Text = "Fail: " & ex.Message
             Me.LabelOpenSuccessfull.Visible = True
 
         End Try

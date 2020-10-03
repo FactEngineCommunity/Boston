@@ -59,10 +59,11 @@ Partial Class frmCRUDBostonConfiguration
         Me.CheckBoxFactEngineShowDatabaseLogoModelExplorer = New System.Windows.Forms.CheckBox()
         Me.LabelFactEngineDefaultQueryResultLimit = New System.Windows.Forms.Label()
         Me.DomainUpDownFactEngineDefaultQueryResultLimit = New System.Windows.Forms.DomainUpDown()
-        Me.ErrorProvider = New System.Windows.Forms.ErrorProvider(Me.components)
         Me.TabPage4 = New System.Windows.Forms.TabPage()
         Me.GroupBoxERDiagrams = New System.Windows.Forms.GroupBox()
         Me.CheckBoxHideUnknownPredicates = New System.Windows.Forms.CheckBox()
+        Me.ErrorProvider = New System.Windows.Forms.ErrorProvider(Me.components)
+        Me.CheckBoxFactEngineUseReferenceModeOnlyForSimpleReferenceSchemes = New System.Windows.Forms.CheckBox()
         Me.GroupBox_main.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
         Me.TableLayoutPanel1.SuspendLayout()
@@ -75,9 +76,9 @@ Partial Class frmCRUDBostonConfiguration
         Me.GroupBox3.SuspendLayout()
         Me.TabPage3.SuspendLayout()
         Me.GroupBoxFactEngine.SuspendLayout()
-        CType(Me.ErrorProvider, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.TabPage4.SuspendLayout()
         Me.GroupBoxERDiagrams.SuspendLayout()
+        CType(Me.ErrorProvider, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'Button_Cancel
@@ -400,6 +401,7 @@ Partial Class frmCRUDBostonConfiguration
         Me.GroupBoxFactEngine.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
             Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.GroupBoxFactEngine.Controls.Add(Me.CheckBoxFactEngineUseReferenceModeOnlyForSimpleReferenceSchemes)
         Me.GroupBoxFactEngine.Controls.Add(Me.CheckBoxFactEngineShowDatabaseLogoModelExplorer)
         Me.GroupBoxFactEngine.Controls.Add(Me.LabelFactEngineDefaultQueryResultLimit)
         Me.GroupBoxFactEngine.Controls.Add(Me.DomainUpDownFactEngineDefaultQueryResultLimit)
@@ -441,10 +443,6 @@ Partial Class frmCRUDBostonConfiguration
         Me.DomainUpDownFactEngineDefaultQueryResultLimit.TabIndex = 0
         Me.DomainUpDownFactEngineDefaultQueryResultLimit.Text = "DomainUpDown1"
         '
-        'ErrorProvider
-        '
-        Me.ErrorProvider.ContainerControl = Me
-        '
         'TabPage4
         '
         Me.TabPage4.Controls.Add(Me.GroupBoxERDiagrams)
@@ -477,6 +475,20 @@ Partial Class frmCRUDBostonConfiguration
         Me.CheckBoxHideUnknownPredicates.Text = "Hide Unknown Predicates"
         Me.CheckBoxHideUnknownPredicates.UseVisualStyleBackColor = True
         '
+        'ErrorProvider
+        '
+        Me.ErrorProvider.ContainerControl = Me
+        '
+        'CheckBoxFactEngineUseReferenceModeOnlyForSimpleReferenceSchemes
+        '
+        Me.CheckBoxFactEngineUseReferenceModeOnlyForSimpleReferenceSchemes.AutoSize = True
+        Me.CheckBoxFactEngineUseReferenceModeOnlyForSimpleReferenceSchemes.Location = New System.Drawing.Point(19, 90)
+        Me.CheckBoxFactEngineUseReferenceModeOnlyForSimpleReferenceSchemes.Name = "CheckBoxFactEngineUseReferenceModeOnlyForSimpleReferenceSchemes"
+        Me.CheckBoxFactEngineUseReferenceModeOnlyForSimpleReferenceSchemes.Size = New System.Drawing.Size(290, 17)
+        Me.CheckBoxFactEngineUseReferenceModeOnlyForSimpleReferenceSchemes.TabIndex = 3
+        Me.CheckBoxFactEngineUseReferenceModeOnlyForSimpleReferenceSchemes.Text = "Use Reference Mode only for simple reference schemes"
+        Me.CheckBoxFactEngineUseReferenceModeOnlyForSimpleReferenceSchemes.UseVisualStyleBackColor = True
+        '
         'frmCRUDBostonConfiguration
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -508,10 +520,10 @@ Partial Class frmCRUDBostonConfiguration
         Me.TabPage3.ResumeLayout(False)
         Me.GroupBoxFactEngine.ResumeLayout(False)
         Me.GroupBoxFactEngine.PerformLayout()
-        CType(Me.ErrorProvider, System.ComponentModel.ISupportInitialize).EndInit()
         Me.TabPage4.ResumeLayout(False)
         Me.GroupBoxERDiagrams.ResumeLayout(False)
         Me.GroupBoxERDiagrams.PerformLayout()
+        CType(Me.ErrorProvider, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
 
     End Sub
@@ -555,4 +567,5 @@ Partial Class frmCRUDBostonConfiguration
     Friend WithEvents TabPage4 As TabPage
     Friend WithEvents GroupBoxERDiagrams As GroupBox
     Friend WithEvents CheckBoxHideUnknownPredicates As CheckBox
+    Friend WithEvents CheckBoxFactEngineUseReferenceModeOnlyForSimpleReferenceSchemes As CheckBox
 End Class

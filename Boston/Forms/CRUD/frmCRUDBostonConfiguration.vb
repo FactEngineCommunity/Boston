@@ -69,10 +69,14 @@ Public Class frmCRUDBostonConfiguration
             Me.DomainUpDownFactEngineDefaultQueryResultLimit.Text = My.Settings.FactEngineDefaultQueryResultLimit
         End If
 
+        'FactEngine
         Me.CheckBoxFactEngineShowDatabaseLogoModelExplorer.Checked = My.Settings.FactEngineShowDatabaseLogoInModelExplorer
+        Me.CheckBoxFactEngineUseReferenceModeOnlyForSimpleReferenceSchemes.Checked = My.Settings.FactEngineUseReferenceModeOnlyForSimpleReferenceSchemes
+
 
         'ER Diagrams
         Me.CheckBoxHideUnknownPredicates.Checked = My.Settings.ERDViewHideUnknowPredicates
+
 
     End Sub
 
@@ -116,6 +120,7 @@ Public Class frmCRUDBostonConfiguration
             My.Settings.UseVirtualUI = Me.CheckBoxUseRemoteUI.Checked
             My.Settings.FactEngineShowDatabaseLogoInModelExplorer = Me.CheckBoxFactEngineShowDatabaseLogoModelExplorer.Checked
             My.Settings.ERDViewHideUnknowPredicates = Me.CheckBoxHideUnknownPredicates.Checked
+            My.Settings.FactEngineUseReferenceModeOnlyForSimpleReferenceSchemes = Me.CheckBoxFactEngineUseReferenceModeOnlyForSimpleReferenceSchemes.Checked
 
             Try
                 If Me.DomainUpDownFactEngineDefaultQueryResultLimit.Text = "Infinite" Then
