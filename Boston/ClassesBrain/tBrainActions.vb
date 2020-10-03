@@ -10,7 +10,7 @@ Partial Public Class tBrain
 
 
             Dim lrEntityType As FBM.EntityType
-            Dim lrEntityTypeInstance As FBM.EntityTypeInstance
+            Dim lrEntityTypeInstance As FBM.EntityTypeInstance = Nothing
 
             Me.VAQL.ENTITYTYPEISIDENTIFIEDBYITSStatement.MODELELEMENTNAME = ""
             Me.VAQL.ENTITYTYPEISIDENTIFIEDBYITSStatement.REFERENCEMODE = ""
@@ -47,7 +47,7 @@ Partial Public Class tBrain
                 'Call lrEntityTypeInstance.Move(lrEntityTypeInstance.X, lrEntityTypeInstance.Y, True)
             End If
 
-                Dim lsReferenceMode As String = Me.VAQL.ENTITYTYPEISIDENTIFIEDBYITSStatement.REFERENCEMODE
+            Dim lsReferenceMode As String = Me.VAQL.ENTITYTYPEISIDENTIFIEDBYITSStatement.REFERENCEMODE
 
             Dim items As Array
             items = System.Enum.GetValues(GetType(pcenumReferenceModeEndings))
@@ -64,7 +64,45 @@ Partial Public Class tBrain
 
             Call lrEntityType.SetReferenceMode(lsReferenceMode, False, Nothing, True)
 
+            'Check if the DataType of the ReferenceModeValueType has been specified
+            Dim lsDataTypeName As String = ""
+            Dim liDataTypeLength As Integer = 0
+            Dim liDataTypePrecision As Integer = 0
+            Dim liDataType As pcenumORMDataType = pcenumORMDataType.DataTypeNotSet
+
             If lrEntityType.ReferenceModeValueType IsNot Nothing And lrEntityType.ReferenceModeFactType IsNot Nothing Then
+
+                If Me.VAQL.ENTITYTYPEISIDENTIFIEDBYITSStatement.KEYWDWRITTENAS IsNot Nothing Then
+
+                    Me.VAQL.VALUETYPEWRITTENASClause = Me.VAQL.ENTITYTYPEISIDENTIFIEDBYITSStatement.VALUETYPEWRITTENASCLAUSE
+
+                    If Me.VAQL.VALUETYPEWRITTENASClause.DATATYPE IsNot Nothing Then
+                        lsDataTypeName = Me.VAQL.VALUETYPEWRITTENASClause.DATATYPE.Nodes(0).Token.Text
+                    ElseIf Me.VAQL.VALUETYPEWRITTENASClause.DATATYPELENGTH IsNot Nothing Then
+                        lsDataTypeName = Me.VAQL.VALUETYPEWRITTENASClause.DATATYPELENGTH.Nodes(0).Token.Text
+                        liDataTypeLength = CInt(Me.VAQL.VALUETYPEWRITTENASClause.NUMBER)
+                    ElseIf Me.VAQL.VALUETYPEWRITTENASClause.DATATYPEPRECISION IsNot Nothing Then
+                        lsDataTypeName = Me.VAQL.VALUETYPEWRITTENASClause.DATATYPEPRECISION.Nodes(0).Token.Text
+                        liDataTypePrecision = CInt(Me.VAQL.VALUETYPEWRITTENASClause.NUMBER)
+                    End If
+
+                    lsDataTypeName = DataTypeAttribute.Get(GetType(pcenumORMDataType), lsDataTypeName)
+                    If lsDataTypeName Is Nothing Then
+                        Me.send_data("That's not a valid Data Type.")
+                        Exit Sub
+                    End If
+
+                    Try
+                        liDataType = DirectCast([Enum].Parse(GetType(pcenumORMDataType), lsDataTypeName), pcenumORMDataType)
+                    Catch ex As Exception
+                        Me.send_data("That's not a valid Data Type.")
+                        Exit Sub
+                    End Try
+
+                    Call lrEntityType.ReferenceModeValueType.SetDataType(liDataType, liDataTypeLength, liDataTypePrecision, True)
+
+                End If
+
                 Call lrEntityType.ReferenceModeValueType.Save()
                 Call lrEntityType.ReferenceModeFactType.Save()
 
@@ -75,7 +113,14 @@ Partial Public Class tBrain
 
             Call lrEntityType.Save()
 
-            Me.send_data("Ok")
+
+            If Me.Page IsNot Nothing Then
+                If Me.Page.Form.GetType = GetType(frmDiagramORM) And lrEntityTypeInstance IsNot Nothing Then
+                    Call lrEntityTypeInstance.SetAppropriateColour()
+                End If
+            End If
+
+                Me.send_data("Ok")
 
         Catch ex As Exception
             Dim lsMessage1 As String

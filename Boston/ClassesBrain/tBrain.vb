@@ -28,7 +28,6 @@ Public Class tBrain
     'Dim synth = New SpeechSynthesizer
     'synth.Speak("Works in any .NET language")
 
-
     '-------------------------------------
     'Input
     '-------------------------------------

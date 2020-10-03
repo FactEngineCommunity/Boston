@@ -325,6 +325,7 @@ Namespace VAQL
 
     Public Class EntityTypeIsIdentifiedByItsStatement
 
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _MODELELEMENTNAME As String
         Public Property MODELELEMENTNAME As String
             Get
@@ -335,6 +336,7 @@ Namespace VAQL
             End Set
         End Property
 
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _REFERENCEMODE As String
         Public Property REFERENCEMODE As String
             Get
@@ -344,6 +346,31 @@ Namespace VAQL
                 Me._REFERENCEMODE = value
             End Set
         End Property
+
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Private _KEYWDWRITTENAS As String = Nothing
+        Public Property KEYWDWRITTENAS As String
+            Get
+                Return Me._KEYWDWRITTENAS
+            End Get
+            Set(value As String)
+                Me._KEYWDWRITTENAS = value
+            End Set
+        End Property
+
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Private _VALUETYPEWRITTENASCLAUSE As New VAQL.ValueTypeWrittenAsClause
+        Public Property VALUETYPEWRITTENASCLAUSE As VAQL.ValueTypeWrittenAsClause
+            Get
+                Return Me._VALUETYPEWRITTENASCLAUSE
+            End Get
+            Set(value As VAQL.ValueTypeWrittenAsClause)
+                Me._VALUETYPEWRITTENASCLAUSE = value
+            End Set
+        End Property
+
+
+
     End Class
 
     Public Class ValueTypeWrittenAsClause
@@ -389,7 +416,6 @@ Namespace VAQL
         End Property
 
     End Class
-
 
     Public Class ValueTypeIsWrittenAsStatement
 
