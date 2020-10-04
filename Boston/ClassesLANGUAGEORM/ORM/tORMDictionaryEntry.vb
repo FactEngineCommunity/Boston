@@ -586,7 +586,7 @@ Namespace FBM
 
         End Sub
 
-        Public Sub removeConceptType(ByVal aiConceptType As pcenumConceptType)
+        Public Sub removeConceptType(ByVal aiConceptType As pcenumConceptType, Optional abRemoveDictionaryEntryIfNoRealisations As Boolean = False)
 
             Select Case aiConceptType
                 Case Is = pcenumConceptType.ValueType
@@ -605,13 +605,17 @@ Namespace FBM
 
             Me.Realisations.RemoveAll(Function(x) x = aiConceptType)
 
-            '20200924-VM-Wasn't in here, but probably should be
-            'If Me.Realisations.Count = 0 Then
-            '    Call TableModelDictionary.DeleteModelDictionaryEntry(Me)
-            '    Me.Model.ModelDictionary.Remove(Me)
-            'End If
+            '2021004-VM-Added the following. Particularly for when removing ETs, VTs, RCs and FTs from the Model.
+            If abRemoveDictionaryEntryIfNoRealisations Then
+                If Me.Realisations.Count = 0 Then
+                    Call TableModelDictionary.DeleteModelDictionaryEntry(Me)
+                    Me.Model.ModelDictionary.Remove(Me)
+                End If
+            End If
 
-            Me.isDirty = True
+
+
+                Me.isDirty = True
 
         End Sub
 

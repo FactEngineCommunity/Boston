@@ -2249,11 +2249,13 @@ Namespace FBM
 
             CreateUniqueValueTypeName = lsTrialValueTypeName
 
-            If Me.ValueType.Exists(AddressOf lrValueType.EqualsByName) Or _
-               TableValueType.ExistsValueType(lrValueType) Or _
-               Me.ExistsModelElement(lsTrialValueTypeName) Or _
-               Me.ModelDictionary.Exists(AddressOf lrDictionaryEntry.EqualsBySymbol) Then
+
+            If Me.ValueType.Exists(AddressOf lrValueType.EqualsByName) Or
+               TableValueType.ExistsValueType(lrValueType) Or
+               Me.ExistsModelElement(lsTrialValueTypeName) Then
                 CreateUniqueValueTypeName = Me.CreateUniqueValueTypeName(asRootValueTypeName, aiCounter + 1)
+            ElseIf Me.ModelDictionary.find(Function(x) x.Symbol = lrDictionaryEntry.Symbol And x.isValue) IsNot Nothing Then
+                Return lsTrialValueTypeName
             Else
                 Return lsTrialValueTypeName
             End If
@@ -2709,7 +2711,7 @@ Namespace FBM
                     '  uses the Dictionary entry
                     '----------------------------------------------------------------------------------------------
                     lrDictionaryEntry = Me.ModelDictionary.Find(AddressOf lrDictionaryEntry.Equals)
-                    lrDictionaryEntry.removeConceptType(pcenumConceptType.ValueType)
+                    lrDictionaryEntry.removeConceptType(pcenumConceptType.ValueType, True)
                     Call TableModelDictionary.UpdateModelDictionaryEntry(lrDictionaryEntry)
                 Else
                     lrDictionaryEntry = Me.ModelDictionary.Find(AddressOf lrDictionaryEntry.Equals)

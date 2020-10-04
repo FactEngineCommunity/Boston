@@ -804,7 +804,6 @@ Public Class frmToolboxEnterpriseExplorer
         Dim loObject As New Object
 
         Try
-
             If IsSomething(Me.TreeView.SelectedNode) Then
 
                 If e.Button = Windows.Forms.MouseButtons.Right Then
@@ -853,7 +852,9 @@ Public Class frmToolboxEnterpriseExplorer
                             '------------------------------------------------------
                             'Establish the WorkingEnvironment for the SelectedNode
                             '------------------------------------------------------
-                            Call Me.SetWorkingEnvironmentForObject(loObject)
+                            With New WaitCursor
+                                Call Me.SetWorkingEnvironmentForObject(loObject)
+                            End With
                         End If
                     End If
                     '-------------------
@@ -1055,11 +1056,14 @@ Public Class frmToolboxEnterpriseExplorer
                                     '  next requires that all Pages within the Model are loaded (uses LiNQ queries).
                                     '----------------------------------------------------------------------------------------------
                                     If Not lrPage.Model.Loading Then
-                                        lrPage.Model.Load(True, False)
-                                        Richmond.WriteToStatusBar(lrPage.Model.Name & " - Model Loaded")
+                                        With New WaitCursor
+                                            lrPage.Model.Load(True, False)
+                                            Richmond.WriteToStatusBar(lrPage.Model.Name & " - Model Loaded")
+                                        End With
                                     End If
                                 End If
-                                    Me.Cursor = Cursors.Default
+
+                                Me.Cursor = Cursors.Default
                             End If
 
                             lsMessage = "- Double-Click on the Page to edit on the canvas."
@@ -2910,11 +2914,9 @@ Public Class frmToolboxEnterpriseExplorer
             lrPage = lrEnterpriseView.Tag 'prApplication.WorkingPage 
 
             If lrPage.Loaded = False And Not lrPage.Loading Then
-                Dim lsMessage = "Boston needs to load the selected page." & vbCrLf
-                lsMessage &= vbCrLf & "Working Model: " & prApplication.WorkingModel.ModelId
-                lsMessage &= vbCrLf & "Loading Page Model: " & lrPage.Model.ModelId
-                MsgBox(lsMessage)
-                lrPage.Load(False)
+                With New WaitCursor
+                    lrPage.Load(False)
+                End With
             End If
 
             If lrPage.Loading Or ((lrPage.Language <> pcenumLanguage.ORMModel) And lrPage.Model.RDSLoading) Then
@@ -3067,41 +3069,43 @@ Public Class frmToolboxEnterpriseExplorer
 
         Dim lrEnterpriseView As New tEnterpriseEnterpriseView
 
-        If IsSomething(Me.TreeView.SelectedNode) Then
+        With New WaitCursor
+            If IsSomething(Me.TreeView.SelectedNode) Then
 
-            lrEnterpriseView = Me.TreeView.SelectedNode.Tag
+                lrEnterpriseView = Me.TreeView.SelectedNode.Tag
 
-            '--------------------------------------------------------------
-            'The Zero Level Node ("Boston") has no Tag.
-            If lrEnterpriseView.Tag Is Nothing Then Exit Sub
+                '--------------------------------------------------------------
+                'The Zero Level Node ("Boston") has no Tag.
+                If lrEnterpriseView.Tag Is Nothing Then Exit Sub
 
-            If lrEnterpriseView.Tag.GetType Is GetType(FBM.Page) Then
+                If lrEnterpriseView.Tag.GetType Is GetType(FBM.Page) Then
 
-                '==================================================================================
-                'Only open the Page if the User has the correct Permissions for the Poject
-                If My.Settings.UseClientServer Then
-                    If prApplication.User.ProjectPermission.FindAll(Function(x) x.Permission = pcenumPermission.NoRights).Count > 0 Then
-                        '-------------------------------------------------------------------
-                        'User has no Permission to Create/Read/Alter the Page, so don't load it
-                        Dim lfrmFlashCard As New frmFlashCard
-                        lfrmFlashCard.ziIntervalMilliseconds = 3500
-                        lfrmFlashCard.zsText = "You do not have Permission to Create, Read or Alter Models within this Project."
-                        Dim liDialogResult As DialogResult = lfrmFlashCard.ShowDialog(Me)
+                    '==================================================================================
+                    'Only open the Page if the User has the correct Permissions for the Poject
+                    If My.Settings.UseClientServer Then
+                        If prApplication.User.ProjectPermission.FindAll(Function(x) x.Permission = pcenumPermission.NoRights).Count > 0 Then
+                            '-------------------------------------------------------------------
+                            'User has no Permission to Create/Read/Alter the Page, so don't load it
+                            Dim lfrmFlashCard As New frmFlashCard
+                            lfrmFlashCard.ziIntervalMilliseconds = 3500
+                            lfrmFlashCard.zsText = "You do not have Permission to Create, Read or Alter Models within this Project."
+                            Dim liDialogResult As DialogResult = lfrmFlashCard.ShowDialog(Me)
 
-                        Exit Sub
+                            Exit Sub
+                        End If
                     End If
+
+                    If IsSomething(frmMain.zfrmStartup) Then
+                        frmMain.zfrmStartup.Close()
+                        frmMain.zfrmStartup = Nothing
+                    End If
+
+                    frmMain.Cursor = Cursors.WaitCursor
+                    Call Me.LoadSelectedPage()
                 End If
 
-                If IsSomething(frmMain.zfrmStartup) Then
-                    frmMain.zfrmStartup.Close()
-                    frmMain.zfrmStartup = Nothing
-                End If
-
-                frmMain.Cursor = Cursors.WaitCursor
-                Call Me.LoadSelectedPage()
             End If
-
-        End If
+        End With
 
     End Sub
 
