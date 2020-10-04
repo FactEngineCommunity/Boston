@@ -91,6 +91,22 @@ Public Class frmFactEngine
 
     End Sub
 
+    Private Sub clearGraphView()
+
+        Try
+            Me.GraphNodes.Clear()
+            Me.Diagram.Nodes.Clear()
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
     Private Function AddFactTypePredicatePartsToEnterpriseAware() As Boolean
 
         Dim lasPredicatePart As New List(Of String)
@@ -1702,66 +1718,79 @@ Public Class frmFactEngine
 
         Dim lrRecordset As New ORMQL.Recordset
 
-        If prApplication.WorkingModel.TargetDatabaseConnectionString = "" Then
-            Me.LabelError.ForeColor = Color.Orange
-            Me.LabelError.Text = "The Model needs a database connection string."
-            Exit Sub
-        End If
+        Try
+            'Clear the Graph View because there is not enough information to create a graph.
+            Call Me.clearGraphView()
 
-        Me.LabelError.Text = ""
+            If prApplication.WorkingModel.TargetDatabaseConnectionString = "" Then
+                Me.LabelError.ForeColor = Color.Orange
+                Me.LabelError.Text = "The Model needs a database connection string."
+                Exit Sub
+            End If
 
-        'Get the Query from the SQL/Cypher/etc query textbox
-        Dim lsQuery = Me.TextBoxQuery.Text '.Replace(vbLf, " ") 'Leave this here.
+            Me.LabelError.Text = ""
 
-        'If the user has highlighted a section of a query to execute, execute that.
-        If Me.TextBoxQuery.SelectionLength > 0 Then
-            lsQuery = Me.TextBoxInput.SelectedText
-        End If
+            'Get the Query from the SQL/Cypher/etc query textbox
+            Dim lsQuery = Me.TextBoxQuery.Text '.Replace(vbLf, " ") 'Leave this here.
 
-        lrRecordset = Me.FEQLProcessor.DatabaseManager.GO(lsQuery)
+            'If the user has highlighted a section of a query to execute, execute that.
+            If Me.TextBoxQuery.SelectionLength > 0 Then
+                lsQuery = Me.TextBoxInput.SelectedText
+            End If
 
-        If lrRecordset.Query IsNot Nothing Then
-            Me.TextBoxQuery.Text = lrRecordset.Query
-        End If
+            lrRecordset = Me.FEQLProcessor.DatabaseManager.GO(lsQuery)
 
-        If lrRecordset.ErrorString IsNot Nothing Then
-            Me.LabelError.Show()
-            Me.LabelError.BringToFront()
-            Me.LabelError.Text = lrRecordset.ErrorString
-            Me.TabControl1.SelectedTab = Me.TabPageResults
-        Else
-            Me.TabControl1.SelectedTab = Me.TabPageResults
-            Me.LabelError.Show()
-            Select Case lrRecordset.StatementType
-                Case Is = FactEngine.pcenumFEQLStatementType.DESCRIBEStatement
-                    Call Me.DesbribeModelElement(lrRecordset.ModelElement)
-                Case Else
+            If lrRecordset.Query IsNot Nothing Then
+                Me.TextBoxQuery.Text = lrRecordset.Query
+            End If
 
-                    Me.LabelError.Text = ""
+            If lrRecordset.ErrorString IsNot Nothing Then
+                Me.LabelError.Show()
+                Me.LabelError.BringToFront()
+                Me.LabelError.Text = lrRecordset.ErrorString
+                Me.TabControl1.SelectedTab = Me.TabPageResults
+            Else
+                Me.TabControl1.SelectedTab = Me.TabPageResults
+                Me.LabelError.Show()
+                Select Case lrRecordset.StatementType
+                    Case Is = FactEngine.pcenumFEQLStatementType.DESCRIBEStatement
+                        Call Me.DesbribeModelElement(lrRecordset.ModelElement)
+                    Case Else
 
-                    If lrRecordset.Facts.Count = 0 Then
-                        Me.LabelError.ForeColor = Color.Orange
-                        Me.LabelError.Text = "No results returned"
-                    Else
-                        Me.LabelError.ForeColor = Color.Black
                         Me.LabelError.Text = ""
 
-                        Dim liInd = 0
-                        For Each lsColumnName In lrRecordset.Columns
-                            liInd += 1
-                            Me.LabelError.Text &= " " & lsColumnName & " "
-                            If liInd < lrRecordset.Columns.Count Then Me.LabelError.Text &= ","
-                        Next
-                        Me.LabelError.Text &= vbCrLf & "=======================================" & vbCrLf
-                        For Each lrFact In lrRecordset.Facts
+                        If lrRecordset.Facts.Count = 0 Then
+                            Me.LabelError.ForeColor = Color.Orange
+                            Me.LabelError.Text = "No results returned"
+                        Else
+                            Me.LabelError.ForeColor = Color.Black
+                            Me.LabelError.Text = ""
 
-                            Me.LabelError.Text &= lrFact.EnumerateAsBracketedFact(True) & vbCrLf
-                        Next
-                    End If
-            End Select
-        End If
+                            Dim liInd = 0
+                            For Each lsColumnName In lrRecordset.Columns
+                                liInd += 1
+                                Me.LabelError.Text &= " " & lsColumnName & " "
+                                If liInd < lrRecordset.Columns.Count Then Me.LabelError.Text &= ","
+                            Next
+                            Me.LabelError.Text &= vbCrLf & "=======================================" & vbCrLf
+                            For Each lrFact In lrRecordset.Facts
 
-        Me.TabPageResults.Show()
+                                Me.LabelError.Text &= lrFact.EnumerateAsBracketedFact(True) & vbCrLf
+                            Next
+                        End If
+                End Select
+            End If
+
+            Me.TabPageResults.Show()
+
+        Catch ex As Exception
+            Dim lsMessage As String
+        Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+        lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+        lsMessage &= vbCrLf & vbCrLf & ex.Message
+        prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 
