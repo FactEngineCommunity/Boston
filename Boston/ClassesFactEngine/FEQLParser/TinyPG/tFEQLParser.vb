@@ -6483,6 +6483,71 @@ Namespace FEQL
             End If
         End Sub ' NonTerminalSymbol: DESCRIBESTMT
 
+        Private Sub ParseENTITYTYPEISIDENTIFIEDBYITSCLAUSE(ByVal parent As ParseNode) ' NonTerminalSymbol: ENTITYTYPEISIDENTIFIEDBYITSCLAUSE
+            Dim tok As Token
+            Dim n As ParseNode
+            Dim node As ParseNode = parent.CreateNode(m_scanner.GetToken(TokenType.ENTITYTYPEISIDENTIFIEDBYITSCLAUSE), "ENTITYTYPEISIDENTIFIEDBYITSCLAUSE")
+            parent.Nodes.Add(node)
+
+
+             ' Concat Rule
+            tok = m_scanner.Scan(TokenType.KEYWDISIDENTIFIEDBYITS) ' Terminal Rule: KEYWDISIDENTIFIEDBYITS
+            n = node.CreateNode(tok, tok.ToString() )
+            node.Token.UpdateRange(tok)
+            node.Nodes.Add(n)
+            If tok.Type <> TokenType.KEYWDISIDENTIFIEDBYITS Then
+                m_tree.Errors.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDISIDENTIFIEDBYITS.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDISIDENTIFIEDBYITS"))
+                Return
+
+            End If
+
+            If m_tree.Errors.Count > 0 Then
+                        parent.Token.UpdateRange(node.Token)
+                        Exit Sub
+            End If
+
+             ' Concat Rule
+            tok = m_scanner.Scan(TokenType.REFERENCEMODE) ' Terminal Rule: REFERENCEMODE
+            n = node.CreateNode(tok, tok.ToString() )
+            node.Token.UpdateRange(tok)
+            node.Nodes.Add(n)
+            If tok.Type <> TokenType.REFERENCEMODE Then
+                m_tree.Errors.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.REFERENCEMODE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "REFERENCEMODE"))
+                Return
+
+            End If
+
+            If m_tree.Errors.Count > 0 Then
+                        parent.Token.UpdateRange(node.Token)
+                        Exit Sub
+            End If
+
+             ' Concat Rule
+            tok = m_scanner.LookAhead(TokenType.KEYWDWRITTENAS) ' Option Rule
+            If tok.Type = TokenType.KEYWDWRITTENAS Then
+                ParseWRITTENASCLAUSE(node) ' NonTerminal Rule: WRITTENASCLAUSE
+            If m_tree.Errors.Count > 0 Then
+                            parent.Token.UpdateRange(node.Token)
+                            Exit Sub
+            End If
+            Else
+                            m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDWRITTENAS.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDWRITTENAS"))
+            End If
+            If m_tree.Errors.Count > 0 Then
+                        parent.Token.UpdateRange(node.Token)
+                        Exit Sub
+            End If
+            If m_tree.Errors.Count > 0 Then
+                        parent.Token.UpdateRange(node.Token)
+                        Exit Sub
+            End If
+
+            parent.Token.UpdateRange(node.Token)
+            If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
+            m_tree.Optionals.Clear()
+            End If
+        End Sub ' NonTerminalSymbol: ENTITYTYPEISIDENTIFIEDBYITSCLAUSE
+
         Private Sub ParseENUMERATESTMT(ByVal parent As ParseNode) ' NonTerminalSymbol: ENUMERATESTMT
             Dim tok As Token
             Dim n As ParseNode
@@ -7288,6 +7353,12 @@ Namespace FEQL
                                 Exit Sub
             End If
                 Case TokenType.KEYWDISIDENTIFIEDBYITS
+                    ParseENTITYTYPEISIDENTIFIEDBYITSCLAUSE(node) ' NonTerminal Rule: ENTITYTYPEISIDENTIFIEDBYITSCLAUSE
+            If m_tree.Errors.Count > 0 Then
+                                parent.Token.UpdateRange(node.Token)
+                                Exit Sub
+            End If
+                Case TokenType.KEYWDISIDENTIFIEDBYITS
                     ParseREFERENCEMODECLAUSE(node) ' NonTerminal Rule: REFERENCEMODECLAUSE
             If m_tree.Errors.Count > 0 Then
                                 parent.Token.UpdateRange(node.Token)
@@ -7494,6 +7565,7 @@ Namespace FEQL
                 If m_tree.Errors.Count = 0 Then
                 m_tree.Optionals.Clear
                 m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDISWRITTENAS.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDISWRITTENAS"))
+                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDISWRITTENAS.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDISIDENTIFIEDBYITS"))
                 m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDISWRITTENAS.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDISIDENTIFIEDBYITS"))
                 m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDISWRITTENAS.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDISWHERE"))
                 m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDISWRITTENAS.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "PREDICATE"))
@@ -12930,6 +13002,258 @@ Namespace FEQL
             m_tree.Optionals.Clear()
             End If
         End Sub ' NonTerminalSymbol: WITHPREDICATESTMT
+
+        Private Sub ParseWRITTENASCLAUSE(ByVal parent As ParseNode) ' NonTerminalSymbol: WRITTENASCLAUSE
+            Dim tok As Token
+            Dim n As ParseNode
+            Dim node As ParseNode = parent.CreateNode(m_scanner.GetToken(TokenType.WRITTENASCLAUSE), "WRITTENASCLAUSE")
+            parent.Nodes.Add(node)
+
+
+             ' Concat Rule
+            tok = m_scanner.Scan(TokenType.KEYWDWRITTENAS) ' Terminal Rule: KEYWDWRITTENAS
+            n = node.CreateNode(tok, tok.ToString() )
+            node.Token.UpdateRange(tok)
+            node.Nodes.Add(n)
+            If tok.Type <> TokenType.KEYWDWRITTENAS Then
+                m_tree.Errors.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDWRITTENAS.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDWRITTENAS"))
+                Return
+
+            End If
+
+            If m_tree.Errors.Count > 0 Then
+                        parent.Token.UpdateRange(node.Token)
+                        Exit Sub
+            End If
+
+             ' Concat Rule
+            tok = m_scanner.LookAhead(TokenType.KEYWDDATATYPELOGICALTRUEFALSE, TokenType.KEYWDDATATYPELOGICALYESNO, TokenType.KEYWDDATATYPEAUTOCOUNTER, TokenType.KEYWDDATATYPEFLOATDOUBLEPRECISION, TokenType.KEYWDDATATYPEFLOATSINGLEPRECISION, TokenType.KEYWDDATATYPESIGNEDBIGINTEGER, TokenType.KEYWDDATATYPESIGNEDINTEGER, TokenType.KEYWDDATATYPESIGNEDSMALLINTEGER, TokenType.KEYWDDATATYPEUNSIGNEDBIGINTEGER, TokenType.KEYWDDATATYPEUNSIGNEDINTEGER, TokenType.KEYWDDATATYPEUNSIGNEDSMALLINTEGER, TokenType.KEYWDDATATYPEUNSIGNEDTINYINTEGER, TokenType.KEYWDDATATYPEOBJECTID, TokenType.KEYWDDATATYPEROWID, TokenType.KEYWDDATATYPERAWDATAOLEOBJECT, TokenType.KEYWDDATATYPERAWDATA, TokenType.KEYWDDATATYPEAUTOTIMESTAMP, TokenType.KEYWDDATATYPEDATE, TokenType.KEYWDDATATYPEDATETIME, TokenType.KEYWDDATATYPETIME, TokenType.KEYWDDATATYPERAWDATAFIXEDLENGTH, TokenType.KEYWDDATATYPERAWDATALARGELENGTH, TokenType.KEYWDDATATYPERAWDATAVARIABLELENGTH, TokenType.KEYWDDATATYPESTRINGFIXEDLENGTH, TokenType.KEYWDDATATYPESTRINGLARGELENGTH, TokenType.KEYWDDATATYPESTRINGVARIABLELENGTH, TokenType.KEYWDDATATYPEFLOATCUSTOMPRECISION, TokenType.KEYWDDATATYPEDECIMAL, TokenType.KEYWDDATATYPEMONEY) ' Choice Rule
+            Select Case tok.Type
+             ' Choice Rule
+                Case TokenType.KEYWDDATATYPELOGICALTRUEFALSE
+                    ParseDATATYPE(node) ' NonTerminal Rule: DATATYPE
+            If m_tree.Errors.Count > 0 Then
+                                parent.Token.UpdateRange(node.Token)
+                                Exit Sub
+            End If
+                Case TokenType.KEYWDDATATYPELOGICALYESNO
+                    ParseDATATYPE(node) ' NonTerminal Rule: DATATYPE
+            If m_tree.Errors.Count > 0 Then
+                                parent.Token.UpdateRange(node.Token)
+                                Exit Sub
+            End If
+                Case TokenType.KEYWDDATATYPEAUTOCOUNTER
+                    ParseDATATYPE(node) ' NonTerminal Rule: DATATYPE
+            If m_tree.Errors.Count > 0 Then
+                                parent.Token.UpdateRange(node.Token)
+                                Exit Sub
+            End If
+                Case TokenType.KEYWDDATATYPEFLOATDOUBLEPRECISION
+                    ParseDATATYPE(node) ' NonTerminal Rule: DATATYPE
+            If m_tree.Errors.Count > 0 Then
+                                parent.Token.UpdateRange(node.Token)
+                                Exit Sub
+            End If
+                Case TokenType.KEYWDDATATYPEFLOATSINGLEPRECISION
+                    ParseDATATYPE(node) ' NonTerminal Rule: DATATYPE
+            If m_tree.Errors.Count > 0 Then
+                                parent.Token.UpdateRange(node.Token)
+                                Exit Sub
+            End If
+                Case TokenType.KEYWDDATATYPESIGNEDBIGINTEGER
+                    ParseDATATYPE(node) ' NonTerminal Rule: DATATYPE
+            If m_tree.Errors.Count > 0 Then
+                                parent.Token.UpdateRange(node.Token)
+                                Exit Sub
+            End If
+                Case TokenType.KEYWDDATATYPESIGNEDINTEGER
+                    ParseDATATYPE(node) ' NonTerminal Rule: DATATYPE
+            If m_tree.Errors.Count > 0 Then
+                                parent.Token.UpdateRange(node.Token)
+                                Exit Sub
+            End If
+                Case TokenType.KEYWDDATATYPESIGNEDSMALLINTEGER
+                    ParseDATATYPE(node) ' NonTerminal Rule: DATATYPE
+            If m_tree.Errors.Count > 0 Then
+                                parent.Token.UpdateRange(node.Token)
+                                Exit Sub
+            End If
+                Case TokenType.KEYWDDATATYPEUNSIGNEDBIGINTEGER
+                    ParseDATATYPE(node) ' NonTerminal Rule: DATATYPE
+            If m_tree.Errors.Count > 0 Then
+                                parent.Token.UpdateRange(node.Token)
+                                Exit Sub
+            End If
+                Case TokenType.KEYWDDATATYPEUNSIGNEDINTEGER
+                    ParseDATATYPE(node) ' NonTerminal Rule: DATATYPE
+            If m_tree.Errors.Count > 0 Then
+                                parent.Token.UpdateRange(node.Token)
+                                Exit Sub
+            End If
+                Case TokenType.KEYWDDATATYPEUNSIGNEDSMALLINTEGER
+                    ParseDATATYPE(node) ' NonTerminal Rule: DATATYPE
+            If m_tree.Errors.Count > 0 Then
+                                parent.Token.UpdateRange(node.Token)
+                                Exit Sub
+            End If
+                Case TokenType.KEYWDDATATYPEUNSIGNEDTINYINTEGER
+                    ParseDATATYPE(node) ' NonTerminal Rule: DATATYPE
+            If m_tree.Errors.Count > 0 Then
+                                parent.Token.UpdateRange(node.Token)
+                                Exit Sub
+            End If
+                Case TokenType.KEYWDDATATYPEOBJECTID
+                    ParseDATATYPE(node) ' NonTerminal Rule: DATATYPE
+            If m_tree.Errors.Count > 0 Then
+                                parent.Token.UpdateRange(node.Token)
+                                Exit Sub
+            End If
+                Case TokenType.KEYWDDATATYPEROWID
+                    ParseDATATYPE(node) ' NonTerminal Rule: DATATYPE
+            If m_tree.Errors.Count > 0 Then
+                                parent.Token.UpdateRange(node.Token)
+                                Exit Sub
+            End If
+                Case TokenType.KEYWDDATATYPERAWDATAOLEOBJECT
+                    ParseDATATYPE(node) ' NonTerminal Rule: DATATYPE
+            If m_tree.Errors.Count > 0 Then
+                                parent.Token.UpdateRange(node.Token)
+                                Exit Sub
+            End If
+                Case TokenType.KEYWDDATATYPERAWDATA
+                    ParseDATATYPE(node) ' NonTerminal Rule: DATATYPE
+            If m_tree.Errors.Count > 0 Then
+                                parent.Token.UpdateRange(node.Token)
+                                Exit Sub
+            End If
+                Case TokenType.KEYWDDATATYPEAUTOTIMESTAMP
+                    ParseDATATYPE(node) ' NonTerminal Rule: DATATYPE
+            If m_tree.Errors.Count > 0 Then
+                                parent.Token.UpdateRange(node.Token)
+                                Exit Sub
+            End If
+                Case TokenType.KEYWDDATATYPEDATE
+                    ParseDATATYPE(node) ' NonTerminal Rule: DATATYPE
+            If m_tree.Errors.Count > 0 Then
+                                parent.Token.UpdateRange(node.Token)
+                                Exit Sub
+            End If
+                Case TokenType.KEYWDDATATYPEDATETIME
+                    ParseDATATYPE(node) ' NonTerminal Rule: DATATYPE
+            If m_tree.Errors.Count > 0 Then
+                                parent.Token.UpdateRange(node.Token)
+                                Exit Sub
+            End If
+                Case TokenType.KEYWDDATATYPETIME
+                    ParseDATATYPE(node) ' NonTerminal Rule: DATATYPE
+            If m_tree.Errors.Count > 0 Then
+                                parent.Token.UpdateRange(node.Token)
+                                Exit Sub
+            End If
+                Case TokenType.KEYWDDATATYPERAWDATAFIXEDLENGTH
+                    ParseDATATYPELENGTH(node) ' NonTerminal Rule: DATATYPELENGTH
+            If m_tree.Errors.Count > 0 Then
+                                parent.Token.UpdateRange(node.Token)
+                                Exit Sub
+            End If
+                Case TokenType.KEYWDDATATYPERAWDATALARGELENGTH
+                    ParseDATATYPELENGTH(node) ' NonTerminal Rule: DATATYPELENGTH
+            If m_tree.Errors.Count > 0 Then
+                                parent.Token.UpdateRange(node.Token)
+                                Exit Sub
+            End If
+                Case TokenType.KEYWDDATATYPERAWDATAVARIABLELENGTH
+                    ParseDATATYPELENGTH(node) ' NonTerminal Rule: DATATYPELENGTH
+            If m_tree.Errors.Count > 0 Then
+                                parent.Token.UpdateRange(node.Token)
+                                Exit Sub
+            End If
+                Case TokenType.KEYWDDATATYPESTRINGFIXEDLENGTH
+                    ParseDATATYPELENGTH(node) ' NonTerminal Rule: DATATYPELENGTH
+            If m_tree.Errors.Count > 0 Then
+                                parent.Token.UpdateRange(node.Token)
+                                Exit Sub
+            End If
+                Case TokenType.KEYWDDATATYPESTRINGLARGELENGTH
+                    ParseDATATYPELENGTH(node) ' NonTerminal Rule: DATATYPELENGTH
+            If m_tree.Errors.Count > 0 Then
+                                parent.Token.UpdateRange(node.Token)
+                                Exit Sub
+            End If
+                Case TokenType.KEYWDDATATYPESTRINGVARIABLELENGTH
+                    ParseDATATYPELENGTH(node) ' NonTerminal Rule: DATATYPELENGTH
+            If m_tree.Errors.Count > 0 Then
+                                parent.Token.UpdateRange(node.Token)
+                                Exit Sub
+            End If
+                Case TokenType.KEYWDDATATYPEFLOATCUSTOMPRECISION
+                    ParseDATATYPEPRECISION(node) ' NonTerminal Rule: DATATYPEPRECISION
+            If m_tree.Errors.Count > 0 Then
+                                parent.Token.UpdateRange(node.Token)
+                                Exit Sub
+            End If
+                Case TokenType.KEYWDDATATYPEDECIMAL
+                    ParseDATATYPEPRECISION(node) ' NonTerminal Rule: DATATYPEPRECISION
+            If m_tree.Errors.Count > 0 Then
+                                parent.Token.UpdateRange(node.Token)
+                                Exit Sub
+            End If
+                Case TokenType.KEYWDDATATYPEMONEY
+                    ParseDATATYPEPRECISION(node) ' NonTerminal Rule: DATATYPEPRECISION
+            If m_tree.Errors.Count > 0 Then
+                                parent.Token.UpdateRange(node.Token)
+                                Exit Sub
+            End If
+                Case Else
+                If m_tree.Errors.Count = 0 Then
+                m_tree.Optionals.Clear
+                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDDATATYPELOGICALTRUEFALSE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDDATATYPELOGICALTRUEFALSE"))
+                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDDATATYPELOGICALTRUEFALSE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDDATATYPELOGICALYESNO"))
+                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDDATATYPELOGICALTRUEFALSE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDDATATYPEAUTOCOUNTER"))
+                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDDATATYPELOGICALTRUEFALSE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDDATATYPEFLOATDOUBLEPRECISION"))
+                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDDATATYPELOGICALTRUEFALSE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDDATATYPEFLOATSINGLEPRECISION"))
+                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDDATATYPELOGICALTRUEFALSE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDDATATYPESIGNEDBIGINTEGER"))
+                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDDATATYPELOGICALTRUEFALSE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDDATATYPESIGNEDINTEGER"))
+                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDDATATYPELOGICALTRUEFALSE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDDATATYPESIGNEDSMALLINTEGER"))
+                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDDATATYPELOGICALTRUEFALSE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDDATATYPEUNSIGNEDBIGINTEGER"))
+                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDDATATYPELOGICALTRUEFALSE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDDATATYPEUNSIGNEDINTEGER"))
+                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDDATATYPELOGICALTRUEFALSE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDDATATYPEUNSIGNEDSMALLINTEGER"))
+                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDDATATYPELOGICALTRUEFALSE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDDATATYPEUNSIGNEDTINYINTEGER"))
+                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDDATATYPELOGICALTRUEFALSE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDDATATYPEOBJECTID"))
+                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDDATATYPELOGICALTRUEFALSE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDDATATYPEROWID"))
+                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDDATATYPELOGICALTRUEFALSE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDDATATYPERAWDATAOLEOBJECT"))
+                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDDATATYPELOGICALTRUEFALSE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDDATATYPERAWDATA"))
+                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDDATATYPELOGICALTRUEFALSE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDDATATYPEAUTOTIMESTAMP"))
+                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDDATATYPELOGICALTRUEFALSE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDDATATYPEDATE"))
+                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDDATATYPELOGICALTRUEFALSE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDDATATYPEDATETIME"))
+                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDDATATYPELOGICALTRUEFALSE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDDATATYPETIME"))
+                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDDATATYPELOGICALTRUEFALSE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDDATATYPERAWDATAFIXEDLENGTH"))
+                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDDATATYPELOGICALTRUEFALSE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDDATATYPERAWDATALARGELENGTH"))
+                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDDATATYPELOGICALTRUEFALSE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDDATATYPERAWDATAVARIABLELENGTH"))
+                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDDATATYPELOGICALTRUEFALSE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDDATATYPESTRINGFIXEDLENGTH"))
+                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDDATATYPELOGICALTRUEFALSE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDDATATYPESTRINGLARGELENGTH"))
+                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDDATATYPELOGICALTRUEFALSE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDDATATYPESTRINGVARIABLELENGTH"))
+                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDDATATYPELOGICALTRUEFALSE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDDATATYPEFLOATCUSTOMPRECISION"))
+                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDDATATYPELOGICALTRUEFALSE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDDATATYPEDECIMAL"))
+                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDDATATYPELOGICALTRUEFALSE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDDATATYPEMONEY"))
+                End If
+                    m_tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found.", &H0002, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos))
+                    Exit Select
+            End Select ' Choice Rule
+            If m_tree.Errors.Count > 0 Then
+                        parent.Token.UpdateRange(node.Token)
+                        Exit Sub
+            End If
+            If m_tree.Errors.Count > 0 Then
+                        parent.Token.UpdateRange(node.Token)
+                        Exit Sub
+            End If
+
+            parent.Token.UpdateRange(node.Token)
+            If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
+            m_tree.Optionals.Clear()
+            End If
+        End Sub ' NonTerminalSymbol: WRITTENASCLAUSE
 
         Private Sub ParseStart(ByVal parent As ParseNode) ' NonTerminalSymbol: Start
             Dim tok As Token

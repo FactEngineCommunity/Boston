@@ -427,6 +427,9 @@ Namespace FEQL
                 Case TokenType.DESCRIBESTMT
                     Value = EvalDESCRIBESTMT(tree, paramlist)
                     Exit Select
+                Case TokenType.ENTITYTYPEISIDENTIFIEDBYITSCLAUSE
+                    Value = EvalENTITYTYPEISIDENTIFIEDBYITSCLAUSE(tree, paramlist)
+                    Exit Select
                 Case TokenType.ENUMERATESTMT
                     Value = EvalENUMERATESTMT(tree, paramlist)
                     Exit Select
@@ -537,6 +540,9 @@ Namespace FEQL
                     Exit Select
                 Case TokenType.WITHPREDICATESTMT
                     Value = EvalWITHPREDICATESTMT(tree, paramlist)
+                    Exit Select
+                Case TokenType.WRITTENASCLAUSE
+                    Value = EvalWRITTENASCLAUSE(tree, paramlist)
                     Exit Select
                 Case TokenType.Start
                     Value = EvalStart(tree, paramlist)
@@ -833,6 +839,10 @@ Namespace FEQL
             Throw New NotImplementedException()
         End Function
 
+        Protected Overridable Function EvalENTITYTYPEISIDENTIFIEDBYITSCLAUSE(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
         Protected Overridable Function EvalENUMERATESTMT(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
             Throw New NotImplementedException()
         End Function
@@ -978,6 +988,10 @@ Namespace FEQL
         End Function
 
         Protected Overridable Function EvalWITHPREDICATESTMT(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalWRITTENASCLAUSE(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
             Throw New NotImplementedException()
         End Function
 

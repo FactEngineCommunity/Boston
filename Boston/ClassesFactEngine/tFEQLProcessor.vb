@@ -26,6 +26,65 @@ Namespace FEQL
 
     End Class
 
+    Public Class EntityTypeIsIdentifiedByItsStatement
+
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Private _KEYWDISIDENTIFIEDBYITS As String = Nothing
+        Public Property KEYWDISIDENTIFIEDBYITS As String
+            Get
+                Return Me._KEYWDISIDENTIFIEDBYITS
+            End Get
+            Set(value As String)
+                Me._KEYWDISIDENTIFIEDBYITS = value
+            End Set
+        End Property
+
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Private _MODELELEMENTNAME As String
+        Public Property MODELELEMENTNAME As String
+            Get
+                Return Me._MODELELEMENTNAME
+            End Get
+            Set(value As String)
+                Me._MODELELEMENTNAME = value
+            End Set
+        End Property
+
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Private _REFERENCEMODE As String
+        Public Property REFERENCEMODE As String
+            Get
+                Return Me._REFERENCEMODE
+            End Get
+            Set(value As String)
+                Me._REFERENCEMODE = value
+            End Set
+        End Property
+
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Private _KEYWDWRITTENAS As String = Nothing
+        Public Property KEYWDWRITTENAS As String
+            Get
+                Return Me._KEYWDWRITTENAS
+            End Get
+            Set(value As String)
+                Me._KEYWDWRITTENAS = value
+            End Set
+        End Property
+
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Private _VALUETYPEWRITTENASCLAUSE As New FEQL.ValueTypeWrittenAsClause
+        Public Property VALUETYPEWRITTENASCLAUSE As FEQL.ValueTypeWrittenAsClause
+            Get
+                Return Me._VALUETYPEWRITTENASCLAUSE
+            End Get
+            Set(value As FEQL.ValueTypeWrittenAsClause)
+                Me._VALUETYPEWRITTENASCLAUSE = value
+            End Set
+        End Property
+
+    End Class
+
     Public Class PREDICATENODEPROPERTYIDENTIFICATION
 
         Private _PREDICATECLAUSE As FEQL.PREDICATECLAUSE
@@ -225,6 +284,50 @@ Namespace FEQL
             End Get
             Set(value As MODELELEMENTClause)
                 Me._MODELELEMENT = value
+            End Set
+        End Property
+
+    End Class
+
+    Public Class ValueTypeWrittenAsClause
+
+        Private _DATATYPE As Object
+        Public Property DATATYPE As Object
+            Get
+                Return Me._DATATYPE
+            End Get
+            Set(value As Object)
+                Me._DATATYPE = value
+            End Set
+        End Property
+
+        Private _DATATYPELENGTH As Object
+        Public Property DATATYPELENGTH As Object
+            Get
+                Return Me._DATATYPELENGTH
+            End Get
+            Set(value As Object)
+                Me._DATATYPELENGTH = value
+            End Set
+        End Property
+
+        Private _DATATYPEPRECISION As Object
+        Public Property DATATYPEPRECISION As Object
+            Get
+                Return Me._DATATYPEPRECISION
+            End Get
+            Set(value As Object)
+                Me._DATATYPEPRECISION = value
+            End Set
+        End Property
+
+        Private _NUMBER As String
+        Public Property NUMBER As String
+            Get
+                Return Me._NUMBER
+            End Get
+            Set(value As String)
+                Me._NUMBER = value
             End Set
         End Property
 
