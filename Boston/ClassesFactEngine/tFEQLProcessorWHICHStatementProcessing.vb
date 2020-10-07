@@ -405,13 +405,26 @@
             If lrFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & Me.WHICHCLAUSE.NODE(0).MODELELEMENTNAME & "'.")
             arQueryEdge.TargetNode = New FactEngine.QueryNode(lrFBMModelObject)
             arQueryEdge.TargetNode.Alias = Me.WHICHCLAUSE.NODE(0).MODELELEMENTSUFFIX
+            arQueryEdge.TargetNode.PreboundText = arWHICHCLAUSE.NODE(0).PREBOUNDREADINGTEXT
+            arQueryEdge.TargetNode.PostboundText = arWHICHCLAUSE.NODE(0).POSTBOUNDREADINGTEXT
             arQueryGraph.Nodes.Add(arQueryEdge.TargetNode) 'Was AddUnique, but WHICH implies that we are talking of a different TargetNode, as where TargeNode has been referenced before
 
-            ''---------------------------------------------------------
-            ''Get the Predicate
-            'For Each lsPredicatePart In Me.WHICHCLAUSE.PREDICATE
-            '    lrQueryEdge.Predicate = Trim(lrQueryEdge.Predicate & " " & lsPredicatePart)
-            'Next
+            '---------------------------------------------------------
+            'Set the Identification if there is any
+            If Me.WHICHCLAUSE.NODE(0).NODEPROPERTYIDENTIFICATION IsNot Nothing Then
+                For Each lsIdentifier In Me.WHICHCLAUSE.NODE(0).NODEPROPERTYIDENTIFICATION.IDENTIFIER
+                    arQueryEdge.IdentifierList.Add(lsIdentifier)
+                Next
+            End If
+
+            '==========================================================================
+            '20201007-VM-Maybe ned the following
+            'If lrFBMModelObject.ConceptType = pcenumConceptType.ValueType Then
+            '    arQueryEdge.WhichClauseSubType = FactEngine.Constants.pcenumWhichClauseType.IsPredicateNodePropertyIdentification
+            'Else
+            '    arQueryGraph.Nodes.AddUnique(arQueryEdge.TargetNode)
+            'End If
+            '==========================================================================
 
             '-----------------------------------------
             'Get the relevant FBM.FactType

@@ -318,7 +318,7 @@
                             Next
                         End If
                     End If
-                    lsSQLQuery &= vbCrLf
+                    If Not lsSQLQuery.EndsWith(vbCrLf) Then lsSQLQuery &= vbCrLf
                     'If liInd < Me.QueryEdges.Count Then
                     '    lbAddedAND = True
                     'End If
