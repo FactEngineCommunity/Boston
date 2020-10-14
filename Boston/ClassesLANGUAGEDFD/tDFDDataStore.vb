@@ -125,17 +125,18 @@ Namespace DFD
 
         End Sub
 
-        Public Sub RefreshShape(Optional ByVal aoChangedPropertyItem As PropertyValueChangedEventArgs = Nothing)
+        Public Sub RefreshShape(Optional ByVal aoChangedPropertyItem As PropertyValueChangedEventArgs = Nothing,
+                                Optional ByVal asSelectedGridItemLabel As String = "")
 
             Dim StringSize As New SizeF
 
             StringSize = Me.Page.Diagram.MeasureString(Trim(Me.Name) & "__", Me.Page.Diagram.Font, 1000, System.Drawing.StringFormat.GenericDefault)
-            Me.shape.Resize(StringSize.Width, 5)
+            Me.Shape.Resize(StringSize.Width, 5)
 
 
-            Me.shape.Text = Me.Name
+            Me.Shape.Text = Me.Name
 
-            Call Me.SetName(Me.Name)
+            Call Me.setName(Me.Name)
 
         End Sub
 

@@ -74,7 +74,7 @@ Public Class frmMain
             prSoftwareCategory = pcenumSoftwareCategory.Professional
             Me.StatusLabelGeneralStatus.Text = "Software Category Set"
 
-            prApplicationApplicationVersionNr = "5.2" '4.5 was released 7th of November, 2019
+            prApplicationApplicationVersionNr = "5.3" '4.5 was released 7th of November, 2019
             prApplicationDatabaseVersionNr = "1.24"
 
             If Not My.Settings.UseVirtualUI Then

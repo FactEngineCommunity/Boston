@@ -529,7 +529,8 @@ Namespace FBM
 
         End Sub
 
-        Public Sub RefreshShape(Optional ByVal aoChangedPropertyItem As PropertyValueChangedEventArgs = Nothing)
+        Public Sub RefreshShape(Optional ByVal aoChangedPropertyItem As PropertyValueChangedEventArgs = Nothing,
+                                Optional ByVal asSelectedGridItemLabel As String = "")
 
             Me.Model.MakeDirty(True, False)
 

@@ -199,7 +199,8 @@ Namespace ERD
 
         End Function
 
-        Public Sub RefreshShape(Optional ByVal aoChangedPropertyItem As PropertyValueChangedEventArgs = Nothing)
+        Public Sub RefreshShape(Optional ByVal aoChangedPropertyItem As PropertyValueChangedEventArgs = Nothing,
+                                Optional ByVal asSelectedGridItemLabel As String = "")
 
             Try
                 Dim lsPartOfPrimaryKey As String = ""

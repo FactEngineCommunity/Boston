@@ -192,6 +192,59 @@ Namespace FBM
         ''' <remarks></remarks>
         Public Instance As New List(Of String)
 
+        <XmlIgnore()>
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Private _Instances As New Viev.Strings.StringCollection
+
+        '<XmlIgnore()> _
+        <CategoryAttribute("Instances"),
+         Browsable(True),
+         [ReadOnly](False),
+         DescriptionAttribute("A list of sample Values for this Model Element."),
+         Editor(GetType(tStringCollectionEditor), GetType(System.Drawing.Design.UITypeEditor))>
+        Public Property Instances As Viev.Strings.StringCollection 'StringCollection 
+            '   DefaultValueAttribute(""), _
+            '   BindableAttribute(True), _
+            '   DesignOnly(False), _
+            Get
+                Dim lrStringCollection As New Viev.Strings.StringCollection
+                lrStringCollection.AddRange(Me.Instance.ToArray)
+                Return lrStringCollection
+            End Get
+            Set(ByVal Value As Viev.Strings.StringCollection)
+                Me.Instance = Value.Cast(Of String).ToList
+                '----------------------------------------------------
+                'Update the set of Concepts/Symbols/Values
+                '  within the 'value_constraint' for this ValueType.
+                '----------------------------------------------------
+                'Dim lsString As String
+                'For Each lsString In Me._ValueConstraintList
+                '    Dim lrConcept As New FBM.Concept(lsString)
+                '    If Me._ValueConstraint.Contains(lrConcept) Then
+                '        '-------------------------------------------------
+                '        'Nothing to do, because the Concept/Symbol/Value
+                '        '  already exists for the 'value_constraint'
+                '        '  for this ValueType.
+                '        '-------------------------------------------------
+                '    Else
+                '        '-------------------------------------------
+                '        'Add the Concept/Symbol/Value to the Model
+                '        '-----------------------------------------
+                '        Dim lrModelDictionaryEntry As New FBM.DictionaryEntry(Me.Model, lrConcept.Symbol, pcenumConceptType.Value)
+                '        Me.Model.AddModelDictionaryEntry(lrModelDictionaryEntry)
+                '        '-----------------------------------------
+                '        'Add the Concept/Symbol/Value to the
+                '        '  'value_constraint' for this ValueType
+                '        '-----------------------------------------
+                '        Me._ValueConstraint.Add(lrConcept)
+                '    End If
+                'Next
+            End Set
+        End Property
+
+
+
+
         ''' <summary>
         ''' Used for hiding or showing property elements.
         ''' </summary>

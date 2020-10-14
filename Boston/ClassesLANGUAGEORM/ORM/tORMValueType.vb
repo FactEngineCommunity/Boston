@@ -108,11 +108,11 @@ Namespace FBM
         <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
         Public _ValueConstraintList As New Viev.Strings.StringCollection
         '<XmlIgnore()> _
-        <CategoryAttribute("Value Type"), _
-         Browsable(True), _
-         [ReadOnly](False), _
-         DescriptionAttribute("The List of Values that Objects of this Entity Type may take."), _
-         Editor(GetType(tStringCollectionEditor), GetType(System.Drawing.Design.UITypeEditor))> _
+        <CategoryAttribute("Value Type"),
+         Browsable(True),
+         [ReadOnly](False),
+         DescriptionAttribute("The List of Values that Objects of this Value Type may take."),
+         Editor(GetType(tStringCollectionEditor), GetType(System.Drawing.Design.UITypeEditor))>
         Public Property ValueConstraint() As Viev.Strings.StringCollection 'StringCollection 
             '   DefaultValueAttribute(""), _
             '   BindableAttribute(True), _
@@ -964,6 +964,29 @@ Namespace FBM
             Me.Model.MakeDirty(False, False)
 
             RaiseEvent IsIndependentChanged(abNewIsIndependent)
+
+        End Sub
+
+        Public Sub setInstance(ByVal asOldValue As String, ByVal asNewValue As String)
+
+            Try
+
+                If Me.Instance.IndexOf(asOldValue) >= 0 Then
+
+                    Me.Instance.Item(Me.Instance.IndexOf(asOldValue)) = asNewValue
+
+                ElseIf Not Me.Instance.Contains(asNewValue) Then
+                    Me.Instance.Add(asNewValue)
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
         End Sub
 

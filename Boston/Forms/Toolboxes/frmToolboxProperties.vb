@@ -60,7 +60,7 @@ Public Class frmToolboxProperties
                 '  you'd get a ghost image of frmToolboxProperties/Me.zrSelectedObject and the 
                 '  ValueConstraint action would happen on the wrong ValueConstraint. e.g. It'd add a ValueConstraint to two VTs at once.
                 If lrPropertyGridForm.zrSelectedObject IsNot Nothing Then
-                    Call lrPropertyGridForm.zrSelectedObject.RefreshShape(e)
+                    Call lrPropertyGridForm.zrSelectedObject.RefreshShape(e, Me.PropertyGrid.SelectedGridItem.Label)
                 End If
             End If
         End If
@@ -109,7 +109,7 @@ Public Class frmToolboxProperties
     Private Sub PropertyGrid_PropertyValueChanged(ByVal s As Object, ByVal e As System.Windows.Forms.PropertyValueChangedEventArgs) Handles PropertyGrid.PropertyValueChanged
 
         Try
-            Call PropertyGrid.SelectedObject.RefreshShape(e)
+            Call PropertyGrid.SelectedObject.RefreshShape(e, Me.PropertyGrid.SelectedGridItem.Label)
         Catch ex As Exception
             Dim lsMessage As String
             lsMessage = "Error: frmToolboxProperties.PropertyGrid_PropertyValueChanged: "

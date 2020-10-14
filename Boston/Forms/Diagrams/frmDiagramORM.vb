@@ -3740,6 +3740,7 @@ Public Class frmDiagramORM
                             lrEntityTypeInstance = lrModelObject
                             Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
                             lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute})
+                            lrPropertyGridForm.zrSelectedObject = lrEntityTypeInstance
                             If lrEntityTypeInstance.EntityType.HasSimpleReferenceScheme Then
                                 Call lrEntityTypeInstance.SetPropertyAttributes(Me, "DataType", True)
                                 Select Case lrEntityTypeInstance.DataType
@@ -3771,6 +3772,7 @@ Public Class frmDiagramORM
                             Dim lrEntityTypeName As FBM.EntityTypeName
                             lrEntityTypeName = lrModelObject
                             Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
+                            Dim loMiscFilterAttribute2 As Attribute = New System.ComponentModel.CategoryAttribute("Instances")
                             If lrEntityTypeName.EntityTypeInstance.EntityType.HasSimpleReferenceScheme Then
                                 Call lrEntityTypeName.EntityTypeInstance.SetPropertyAttributes(Me, "DataType", True)
                                 Select Case lrEntityTypeName.EntityTypeInstance.DataType
@@ -3796,21 +3798,23 @@ Public Class frmDiagramORM
                                 Call lrEntityTypeName.EntityTypeInstance.SetPropertyAttributes(Me, "DataTypeLength", False)
                                 Call lrEntityTypeName.EntityTypeInstance.SetPropertyAttributes(Me, "DataType", False)
                             End If
-                            lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute})
+                            lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute, loMiscFilterAttribute2})
                             lrPropertyGridForm.PropertyGrid.SelectedObject = lrEntityTypeName.EntityTypeInstance
                             lrPropertyGridForm.PropertyGrid.Refresh()
                         Case Is = pcenumConceptType.RoleConstraintRole
                             Dim lrRoleConstraintRoleInstance As FBM.RoleConstraintRoleInstance
                             lrRoleConstraintRoleInstance = lrModelObject
                             Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
-                            lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute})
+                            Dim loMiscFilterAttribute2 As Attribute = New System.ComponentModel.CategoryAttribute("Instances")
+                            lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute, loMiscFilterAttribute2})
                             lrPropertyGridForm.PropertyGrid.SelectedObject = lrRoleConstraintRoleInstance.RoleConstraint
                         Case Is = pcenumConceptType.RoleConstraint
                             Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
                             lrRoleConstraintInstance = lrModelObject
 
                             Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
-                            lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute})
+                            Dim loMiscFilterAttribute2 As Attribute = New System.ComponentModel.CategoryAttribute("Instances")
+                            lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute, loMiscFilterAttribute2})
                             Select Case lrRoleConstraintInstance.RoleConstraintType
                                 Case Is = pcenumRoleConstraintType.FrequencyConstraint
                                     Dim lrFrequencyConstraintInstance As FBM.FrequencyConstraint
@@ -3823,16 +3827,18 @@ Public Class frmDiagramORM
                         Case Is = pcenumConceptType.FactType
                             Dim lrFactTypeInstance = CType(lrModelObject, FBM.FactTypeInstance)
                             Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
+                            Dim loMiscFilterAttribute2 As Attribute = New System.ComponentModel.CategoryAttribute("Instances")
                             Call lrFactTypeInstance.SetPropertyAttributes(Me, "DerivationText", True)
                             If lrPropertyGridForm.PropertyGrid.SelectedObject IsNot Nothing Then
                                 lrPropertyGridForm.PropertyGrid.SelectedObject = New Object
                             End If
-                            lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute})
+                            lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute, loMiscFilterAttribute2})
                             lrPropertyGridForm.PropertyGrid.SelectedObject = lrModelObject
 
                         Case Else
                             Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
-                            lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute})
+                            Dim loMiscFilterAttribute2 As Attribute = New System.ComponentModel.CategoryAttribute("Instances")
+                            lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute, loMiscFilterAttribute2})
                             lrPropertyGridForm.PropertyGrid.SelectedObject = lrModelObject
                     End Select
 
@@ -4217,6 +4223,7 @@ Public Class frmDiagramORM
         '--------------------------------------------------------------------------------
         'NB IMPORTANT: lrPropertyGridForm: performed in ORMDiagram.MouseDown. Management of which object is displayed in the PropertyGrid
         'NB Nodes clicked on receive the NodeMouseDown event before this one. 
+        'NB PropertyGrid is called in DiagramView.MouseDown
         '--------------------------------------------------------------------------------
         Try
 

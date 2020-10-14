@@ -19,8 +19,8 @@ Namespace FBM
 
         <XmlIgnore()> _
         Private WithEvents _EntityType As New FBM.EntityType 'The EntityType for which the EntityTypeIstance acts as View/Proxy.
-        <XmlIgnore()> _
-        <Browsable(False)> _
+        <XmlIgnore()>
+        <Browsable(False)>
         Public Property EntityType() As FBM.EntityType
             Get
                 Return Me._EntityType
@@ -28,6 +28,15 @@ Namespace FBM
             Set(ByVal value As FBM.EntityType)
                 Me._EntityType = value
                 Me.Concept = value.Concept
+            End Set
+        End Property
+
+        Public Overloads Property Instances As Viev.Strings.StringCollection
+            Get
+                Return Me.EntityType.Instances
+            End Get
+            Set(value As Viev.Strings.StringCollection)
+                Me.EntityType.Instances = value
             End Set
         End Property
 
@@ -1436,7 +1445,8 @@ Namespace FBM
         End Sub
 
 
-        Public Sub RefreshShape(Optional ByVal aoChangedPropertyItem As PropertyValueChangedEventArgs = Nothing)
+        Public Sub RefreshShape(Optional ByVal aoChangedPropertyItem As PropertyValueChangedEventArgs = Nothing,
+                                Optional ByVal asSelectedGridItemLabel As String = "")
 
             Dim loRectangle As Rectangle
             Dim loEntityWidth As New SizeF
@@ -1451,16 +1461,16 @@ Namespace FBM
                     Select Case aoChangedPropertyItem.ChangedItem.PropertyDescriptor.Name
                         Case Is = "DataType"
                             Select Case Me._DataType
-                                Case Is = pcenumORMDataType.NumericFloatCustomPrecision, _
-                                          pcenumORMDataType.NumericDecimal, _
+                                Case Is = pcenumORMDataType.NumericFloatCustomPrecision,
+                                          pcenumORMDataType.NumericDecimal,
                                           pcenumORMDataType.NumericMoney
                                     Call Me.SetPropertyAttributes(Me, "DataTypePrecision", True)
                                     Call Me.SetPropertyAttributes(Me, "DataTypeLength", False)
-                                Case Is = pcenumORMDataType.RawDataFixedLength, _
-                                          pcenumORMDataType.RawDataLargeLength, _
-                                          pcenumORMDataType.RawDataVariableLength, _
-                                          pcenumORMDataType.TextFixedLength, _
-                                          pcenumORMDataType.TextLargeLength, _
+                                Case Is = pcenumORMDataType.RawDataFixedLength,
+                                          pcenumORMDataType.RawDataLargeLength,
+                                          pcenumORMDataType.RawDataVariableLength,
+                                          pcenumORMDataType.TextFixedLength,
+                                          pcenumORMDataType.TextLargeLength,
                                           pcenumORMDataType.TextVariableLength
                                     Call Me.SetPropertyAttributes(Me, "DataTypeLength", True)
                                     Call Me.SetPropertyAttributes(Me, "DataTypePrecision", False)
@@ -1511,10 +1521,10 @@ Namespace FBM
                             Call Me.Page.Form.EnableSaveButton()
                         Case Is = "ExpandReferenceMode" 'The name of the Property on the EntityType class related to this EntityTypeInstance
 
-                            Dim larFactTypeInstance = From FactTypeInstance In Me.Page.FactTypeInstance _
-                                                      From Role In FactTypeInstance.FactType.RoleGroup _
+                            Dim larFactTypeInstance = From FactTypeInstance In Me.Page.FactTypeInstance
+                                                      From Role In FactTypeInstance.FactType.RoleGroup
                                                       Where Role.JoinedORMObject.Id = Me.Id _
-                                                      And FactTypeInstance.isPreferredReferenceMode = True _
+                                                      And FactTypeInstance.isPreferredReferenceMode = True
                                                       Select FactTypeInstance Distinct
 
                             If IsSomething(larFactTypeInstance) Then
@@ -1673,7 +1683,7 @@ Namespace FBM
                             Me.ReferenceModeShape.SetRect(loRectangle, False)
                             Me.ReferenceModeShape.Visible = True
                             Me.ReferenceModeShape.Text = "(" & Me.ReferenceMode & ")"
-                            Me.ReferenceModeShape.Move(Me.X + (liGreaterWidth / 2) - (Me.ReferenceModeShape.Bounds.Width / 2), _
+                            Me.ReferenceModeShape.Move(Me.X + (liGreaterWidth / 2) - (Me.ReferenceModeShape.Bounds.Width / 2),
                                                        Me.Y + 6)
                         Else
                             loRectangle = New Rectangle(Me.X, Me.Y, loEntityWidth.Width, 8)

@@ -47,18 +47,27 @@ Namespace FBM
 
         <XmlIgnore()> _
         Public Shadows _ValueConstraint As New FBM.ValueConstraintInstance(Me)
-        <XmlIgnore()> _
-        <CategoryAttribute("Value Type"), _
-        Browsable(True), _
-        [ReadOnly](False), _
-        DescriptionAttribute("The List of Values that Objects of this Value Type may take."), _
-        Editor(GetType(tStringCollectionEditor), GetType(System.Drawing.Design.UITypeEditor))> _
+        <XmlIgnore()>
+        <CategoryAttribute("Value Type"),
+        Browsable(True),
+        [ReadOnly](False),
+        DescriptionAttribute("The List of Values that Objects of this Value Type may take."),
+        Editor(GetType(tStringCollectionEditor), GetType(System.Drawing.Design.UITypeEditor))>
         Public Shadows Property ValueConstraint() As Viev.Strings.StringCollection  'NB This is what is edited in the PropertyGrid
             Get
                 Return Me._ValueConstraintList
             End Get
             Set(ByVal Value As Viev.Strings.StringCollection)
-                Me._ValueConstraintList = Value                
+                Me._ValueConstraintList = Value
+            End Set
+        End Property
+
+        Public Overloads Property Instances As Viev.Strings.StringCollection
+            Get
+                Return Me.ValueType.Instances
+            End Get
+            Set(value As Viev.Strings.StringCollection)
+                Me.ValueType.Instances = value
             End Set
         End Property
 
@@ -770,7 +779,8 @@ Namespace FBM
 
         End Sub
 
-        Public Sub RefreshShape(Optional ByVal aoChangedPropertyItem As PropertyValueChangedEventArgs = Nothing)
+        Public Sub RefreshShape(Optional ByVal aoChangedPropertyItem As PropertyValueChangedEventArgs = Nothing,
+                                Optional ByVal asSelectedGridItemLabel As String = "")
 
 
             Try
@@ -830,7 +840,12 @@ Namespace FBM
                             End With
                         Case Is = "Value"
                             With New WaitCursor
-                                Call Me.ValueType.ModifyValueConstraint(aoChangedPropertyItem.OldValue, aoChangedPropertyItem.ChangedItem.Value.ToString)
+                                Select Case asSelectedGridItemLabel
+                                    Case Is = "Instances"
+                                        Call Me.ValueType.setInstance(aoChangedPropertyItem.OldValue, aoChangedPropertyItem.ChangedItem.Value.ToString)
+                                    Case Else
+                                        Call Me.ValueType.ModifyValueConstraint(aoChangedPropertyItem.OldValue, aoChangedPropertyItem.ChangedItem.Value.ToString)
+                                End Select
                             End With
                         Case Is = "Name"
                             If Me.ValueType.Name = Me.Name Then
