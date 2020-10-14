@@ -796,7 +796,18 @@ Namespace FBM
         End Sub
 
         Public Sub SetLongDescription(ByVal asLongDescription As String)
+
             Me.LongDescription = asLongDescription
+
+            Dim lrDictionaryEntry = Me.Model.ModelDictionary.Find(Function(x) x.Symbol = Me.Id)
+
+            If lrDictionaryEntry IsNot Nothing Then
+                lrDictionaryEntry.LongDescription = asLongDescription
+                lrDictionaryEntry.isDirty = True
+                Call lrDictionaryEntry.Save()
+            End If
+
+
             RaiseEvent LongDescriptionChanged(asLongDescription)
 
             Me.isDirty = True
@@ -809,6 +820,15 @@ Namespace FBM
 
         Public Sub SetShortDescription(ByVal asShortDescription As String)
             Me.ShortDescription = asShortDescription
+
+            Dim lrDictionaryEntry = Me.Model.ModelDictionary.Find(Function(x) x.Symbol = Me.Id)
+
+            If lrDictionaryEntry IsNot Nothing Then
+                lrDictionaryEntry.ShortDescription = asShortDescription
+                lrDictionaryEntry.isDirty = True
+                Call lrDictionaryEntry.Save()
+            End If
+
             RaiseEvent ShortDescriptionChanged(asShortDescription)
 
             Me.isDirty = True

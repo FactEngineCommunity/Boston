@@ -11,6 +11,7 @@ Namespace FBM
     <Serializable()> _
     Public Class DictionaryEntry
         Implements IEquatable(Of DictionaryEntry)
+        Implements Relational.iObjectRelationalMap(Of DictionaryEntry)
 
         '--------------------------------------------------------------------------------------------------------------------------
         'This class is predominantly used to store instance (usage) of a Symbol within a diagram (e.g. ORMDiagram, UseCaseDiagram).
@@ -18,17 +19,17 @@ Namespace FBM
         '  the EntityType was displayed within the diagram.
         '--------------------------------------------------------------------------------------------------------------------------
 
-        <XmlIgnore()> _
+        <XmlIgnore()>
         Public Model As FBM.Model
 
         ''' <summary>
         ''' Me.Symbol cannot be linked to for WithEvents in FactData instances, so need an instance of a Concept from which 'Public WithEvents Concept as FBM.Concept' can be declared in FactData/Instance
         ''' </summary>
         ''' <remarks></remarks>
-        <XmlIgnore()> _
+        <XmlIgnore()>
         Public WithEvents Concept As FBM.Concept
 
-        <XmlIgnore()> _
+        <XmlIgnore()>
         Public Realisations As New List(Of pcenumConceptType) '(Of FBM.Concept)
 
         ''' <summary>
@@ -37,31 +38,31 @@ Namespace FBM
         ''' Used to check if a DictionaryEnty should be removed from the Model.ModelDictionary and the database.         
         ''' </summary>
         ''' <remarks></remarks>
-        <XmlIgnore()> _
+        <XmlIgnore()>
         Public ConceptType As pcenumConceptType
 
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Symbol As String = ""
 
-        <CategoryAttribute("Description (Informal)"), _
-                [ReadOnly](True)> _
+        <CategoryAttribute("Description (Informal)"),
+                [ReadOnly](True)>
         Public ReadOnly Property Term As String
             Get
                 Return Me.Symbol
             End Get
         End Property
 
-        <XmlIgnore()> _
+        <XmlIgnore()>
         Public _ShortDescription As String = ""
-        <XmlElement()> _
-        <CategoryAttribute("Description (Informal)"), _
-             Browsable(True), _
-             [ReadOnly](False), _
-             BindableAttribute(True), _
-             DefaultValueAttribute(""), _
-             DesignOnly(False), _
-             DescriptionAttribute("Enter a description."), _
-             Editor(GetType(System.ComponentModel.Design.MultilineStringEditor), GetType(System.Drawing.Design.UITypeEditor))> _
+        <XmlElement()>
+        <CategoryAttribute("Description (Informal)"),
+             Browsable(True),
+             [ReadOnly](False),
+             BindableAttribute(True),
+             DefaultValueAttribute(""),
+             DesignOnly(False),
+             DescriptionAttribute("Enter a description."),
+             Editor(GetType(System.ComponentModel.Design.MultilineStringEditor), GetType(System.Drawing.Design.UITypeEditor))>
         Public Property ShortDescription As String
             Get
                 Return Me._ShortDescription
@@ -71,17 +72,17 @@ Namespace FBM
             End Set
         End Property
 
-        <XmlIgnore()> _
+        <XmlIgnore()>
         Public _LongDescription As String = ""
-        <XmlElement()> _
-        <CategoryAttribute("Description (Informal)"), _
-             Browsable(True), _
-             [ReadOnly](False), _
-             BindableAttribute(True), _
-             DefaultValueAttribute(""), _
-             DesignOnly(False), _
-             DescriptionAttribute("Enter a description."), _
-             Editor(GetType(System.ComponentModel.Design.MultilineStringEditor), GetType(System.Drawing.Design.UITypeEditor))> _
+        <XmlElement()>
+        <CategoryAttribute("Description (Informal)"),
+             Browsable(True),
+             [ReadOnly](False),
+             BindableAttribute(True),
+             DefaultValueAttribute(""),
+             DesignOnly(False),
+             DescriptionAttribute("Enter a description."),
+             Editor(GetType(System.ComponentModel.Design.MultilineStringEditor), GetType(System.Drawing.Design.UITypeEditor))>
         Public Property LongDescription As String
             Get
                 Return Me._LongDescription
@@ -91,31 +92,31 @@ Namespace FBM
             End Set
         End Property
 
-        <XmlIgnore()> _
+        <XmlIgnore()>
         Public KLIdentityLetter As String = ""
 
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public isEntityType As Boolean = False
 
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public isGeneralConcept As Boolean = False
 
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public isValueType As Boolean = False
 
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public isFactType As Boolean = False
 
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public isFact As Boolean = False
 
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public isValue As Boolean = False
 
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public isRoleConstraint As Boolean = False
 
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public isModelNote As Boolean = False
 
         <XmlIgnore()>
@@ -277,72 +278,72 @@ Namespace FBM
             If (Me.Symbol = other.Symbol) Then
                 Select Case Me.ConceptType
                     Case Is = pcenumConceptType.EntityType
-                        If other.isValueType Or _
-                           other.isFactType Or _
-                           other.isRoleConstraint Or _
-                           other.isModelNote Or _
-                           other.isFact Or _
-                           other.isValue Or _
+                        If other.isValueType Or
+                           other.isFactType Or
+                           other.isRoleConstraint Or
+                           other.isModelNote Or
+                           other.isFact Or
+                           other.isValue Or
                            other.isGeneralConcept Then
                             Return True
                         End If
                     Case Is = pcenumConceptType.ValueType
-                        If other.isEntityType Or _
-                           other.isFactType Or _
-                           other.isRoleConstraint Or _
-                           other.isModelNote Or _
-                           other.isFact Or _
-                           other.isValue Or _
+                        If other.isEntityType Or
+                           other.isFactType Or
+                           other.isRoleConstraint Or
+                           other.isModelNote Or
+                           other.isFact Or
+                           other.isValue Or
                            other.isGeneralConcept Then
                             Return True
                         End If
                     Case Is = pcenumConceptType.FactType
-                        If other.isEntityType Or _
-                           other.isValueType Or _
-                           other.isRoleConstraint Or _
-                           other.isModelNote Or _
-                           other.isFact Or _
-                           other.isValue Or _
+                        If other.isEntityType Or
+                           other.isValueType Or
+                           other.isRoleConstraint Or
+                           other.isModelNote Or
+                           other.isFact Or
+                           other.isValue Or
                            other.isGeneralConcept Then
                             Return True
                         End If
                     Case Is = pcenumConceptType.RoleConstraint
-                        If other.isEntityType Or _
-                           other.isValueType Or _
-                           other.isFactType Or _
-                           other.isModelNote Or _
-                           other.isFact Or _
-                           other.isValue Or _
+                        If other.isEntityType Or
+                           other.isValueType Or
+                           other.isFactType Or
+                           other.isModelNote Or
+                           other.isFact Or
+                           other.isValue Or
                            other.isGeneralConcept Then
                             Return True
                         End If
                     Case Is = pcenumConceptType.ModelNote
-                        If other.isEntityType Or _
-                           other.isValueType Or _
-                           other.isFactType Or _
-                           other.isRoleConstraint Or _
-                           other.isFact Or _
-                           other.isValue Or _
+                        If other.isEntityType Or
+                           other.isValueType Or
+                           other.isFactType Or
+                           other.isRoleConstraint Or
+                           other.isFact Or
+                           other.isValue Or
                            other.isGeneralConcept Then
                             Return True
                         End If
                     Case Is = pcenumConceptType.Fact
-                        If other.isEntityType Or _
-                           other.isValueType Or _
-                           other.isFactType Or _
-                           other.isRoleConstraint Or _
-                           other.isModelNote Or _
-                           other.isValue Or _
+                        If other.isEntityType Or
+                           other.isValueType Or
+                           other.isFactType Or
+                           other.isRoleConstraint Or
+                           other.isModelNote Or
+                           other.isValue Or
                            other.isGeneralConcept Then
                             Return True
                         End If
                     Case Is = pcenumConceptType.Value
-                        If other.isEntityType Or _
-                           other.isValueType Or _
-                           other.isFactType Or _
-                           other.isRoleConstraint Or _
-                           other.isModelNote Or _
-                           other.isFact Or _
+                        If other.isEntityType Or
+                           other.isValueType Or
+                           other.isFactType Or
+                           other.isRoleConstraint Or
+                           other.isModelNote Or
+                           other.isFact Or
                            other.isGeneralConcept Then
                             Return True
                         End If
@@ -537,7 +538,7 @@ Namespace FBM
         End Sub
 
 
-        Public Overridable Overloads Sub Save(Optional ByRef abRapidSave As Boolean = False)
+        Public Overridable Overloads Sub Save(Optional ByRef abRapidSave As Boolean = False) Implements iObjectRelationalMap(Of DictionaryEntry).Save
 
             '-------------------------------------------
             'Saves the DictionaryEntry to the database
@@ -557,7 +558,7 @@ Namespace FBM
                     '---------------------------------------------------------
                     'Make sure an entry exists in the MetaModelConcept table
                     '---------------------------------------------------------
-                    Dim lrConcept As New FBM.Concept(Me.Symbol, True)                    
+                    Dim lrConcept As New FBM.Concept(Me.Symbol, True)
                     lrConcept.Save()
                     Call TableModelDictionary.AddModelDictionaryEntry(Me)
                 End If
@@ -616,7 +617,7 @@ Namespace FBM
 
 
 
-                Me.isDirty = True
+            Me.isDirty = True
 
         End Sub
 
@@ -628,6 +629,18 @@ Namespace FBM
                 Return False
             End If
 
+        End Function
+
+        Public Sub Create() Implements iObjectRelationalMap(Of DictionaryEntry).Create
+            Throw New NotImplementedException()
+        End Sub
+
+        Public Sub Delete() Implements iObjectRelationalMap(Of DictionaryEntry).Delete
+            Throw New NotImplementedException()
+        End Sub
+
+        Public Function Load() As DictionaryEntry Implements iObjectRelationalMap(Of DictionaryEntry).Load
+            Throw New NotImplementedException()
         End Function
 
     End Class
