@@ -5488,6 +5488,19 @@ Public Class frmDiagramORM
             End Select
         End If
 
+        'Setup the Descriptions toolbox
+        Dim lrModelElementDescriptionsEditor As frmToolboxDescriptions
+        lrModelElementDescriptionsEditor = prApplication.GetToolboxForm(frmToolboxDescriptions.Name)
+
+        If IsSomething(lrModelElementDescriptionsEditor) Then
+            Select Case Me.zrPage.SelectedObject.Count
+                Case Is = 0
+                    Call lrModelElementDescriptionsEditor.setDescriptions(Nothing)
+                Case Else
+                    Call lrModelElementDescriptionsEditor.setDescriptions(Me.zrPage.SelectedObject(0))
+            End Select
+        End If
+
         Select Case Me.zrPage.SelectedObject.Count
             Case Is = 0
                 '------------------------

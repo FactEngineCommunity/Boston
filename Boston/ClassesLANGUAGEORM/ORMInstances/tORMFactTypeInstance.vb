@@ -2100,7 +2100,8 @@ Namespace FBM
 
         End Sub
 
-        Overloads Sub RefreshShape(Optional ByVal aoChangedPropertyItem As PropertyValueChangedEventArgs = Nothing)
+        Overloads Sub RefreshShape(Optional ByVal aoChangedPropertyItem As PropertyValueChangedEventArgs = Nothing,
+                                Optional ByVal asSelectedGridItemLabel As String = "")
             '------------------------------------------------
             'Called by the Properties form when the value
             '  of an attribute is changed.

@@ -23,6 +23,7 @@ Partial Class frmToolboxBrainBox
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container()
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmToolboxBrainBox))
         Me.TextBox_Output = New System.Windows.Forms.RichTextBox()
         Me.SplitContainer1 = New System.Windows.Forms.SplitContainer()
         Me.TextBoxInput = New System.Windows.Forms.RichTextBox()
@@ -158,6 +159,7 @@ Partial Class frmToolboxBrainBox
         Me.ClientSize = New System.Drawing.Size(562, 224)
         Me.Controls.Add(Me.StatusStrip1)
         Me.Controls.Add(Me.SplitContainer1)
+        Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.Name = "frmToolboxBrainBox"
         Me.TabText = "Virtual Analyst"
         Me.Text = "Virtual Analyst"

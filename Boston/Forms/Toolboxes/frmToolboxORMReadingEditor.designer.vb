@@ -23,6 +23,7 @@ Partial Class frmToolboxORMReadingEditor
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container()
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmToolboxORMReadingEditor))
         Me.TextboxReading = New System.Windows.Forms.RichTextBox()
         Me.ContextMenuStrip_MoveTerms = New System.Windows.Forms.ContextMenuStrip(Me.components)
         Me.MoveLeftToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
@@ -150,7 +151,7 @@ Partial Class frmToolboxORMReadingEditor
         '
         Me.ContextMenuStripIsPreferredForPredicate.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItemIsPreferredForPredicate})
         Me.ContextMenuStripIsPreferredForPredicate.Name = "ContextMenuStripIsPreferredForPredicate"
-        Me.ContextMenuStripIsPreferredForPredicate.Size = New System.Drawing.Size(204, 48)
+        Me.ContextMenuStripIsPreferredForPredicate.Size = New System.Drawing.Size(204, 26)
         '
         'ToolStripMenuItemIsPreferredForPredicate
         '
@@ -170,6 +171,7 @@ Partial Class frmToolboxORMReadingEditor
         Me.Controls.Add(Me.TextboxReading)
         Me.Controls.Add(Me.DataGrid_Readings)
         Me.Controls.Add(Me.Button3)
+        Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.Name = "frmToolboxORMReadingEditor"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.TabText = "ORM Reading Editor"
