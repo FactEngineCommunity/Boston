@@ -185,15 +185,22 @@ Namespace FactEngine
                 Else
 
                     Dim larModelObject As New List(Of FBM.ModelObject)
-                    larModelObject.Add(arBaseNode.FBMModelObject)
-                    larModelObject.Add(arTargetNode.FBMModelObject)
-                    Dim lasPredicatePart As New List(Of String)
-                    lasPredicatePart.Add(asPredicate)
-                    lasPredicatePart.Add("")
                     Dim larRole As New List(Of FBM.Role)
                     Dim lrDummyFactType As New FBM.FactType
+                    Dim lasPredicatePart As New List(Of String)
+
+                    larModelObject.Add(arBaseNode.FBMModelObject)
+
+                    lasPredicatePart.Add(asPredicate)
+
                     larRole.Add(New FBM.Role(lrDummyFactType, larModelObject(0)))
-                    larRole.Add(New FBM.Role(lrDummyFactType, larModelObject(1)))
+
+                    If arTargetNode IsNot Nothing Then
+                        larModelObject.Add(arTargetNode.FBMModelObject)
+                        lasPredicatePart.Add("")
+                        larRole.Add(New FBM.Role(lrDummyFactType, larModelObject(1)))
+                    End If
+
                     Dim lrFactTypeReading As New FBM.FactTypeReading(lrDummyFactType, larRole, lasPredicatePart)
                     Me.FBMFactType = Me.QueryGraph.Model.getFactTypeByModelObjectsFactTypeReading(larModelObject,
                                                                                                 lrFactTypeReading)

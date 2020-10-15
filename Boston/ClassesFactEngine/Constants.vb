@@ -20,6 +20,7 @@
             AndThatIdentityCompatitor = 13 '                    E.g. "Person 1 IS NOT Person 2" Or "Person 1 IS Person 2"            
             ISNOTClause = 131 '                                 E.g. Person 1 IS NOT Person 2
             ISClause = 132 '                                    E.g. Person 1 IS Person 2
+            BooleanPredicate = 14 '                             E.g. Protein is ensyme
 
             '?? below
             'AndThatModelElementPredicateWhichModelElement '    E.g. AND THAT Faculty has WHICH School. Currently unused.Checked.

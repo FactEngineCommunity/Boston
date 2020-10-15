@@ -70,6 +70,7 @@
                     liInd += 1
                 Next
 
+                '20201015-VM-If all seems fine, remove the following.
                 'Select Case (Me.HeadNode.FBMModelObject).GetType
                 '    Case GetType(FBM.ValueType)
                 '        'lsSQLQuery &= Me.HeadNode. Me.HeadNode.FBMModelObject.Id
@@ -166,14 +167,21 @@
 #End Region
 
                 'WHERE
-                Dim larWhereEdges = Me.QueryEdges.FindAll(Function(x) (x.TargetNode.FBMModelObject.ConceptType <> pcenumConceptType.ValueType And
+                Dim larEdgesWithTargetNode = From QueryEdge In Me.QueryEdges
+                                             Where QueryEdge.TargetNode IsNot Nothing
+                                             Select QueryEdge
+
+                Dim larWhereEdges = larEdgesWithTargetNode.ToList.FindAll(Function(x) (x.TargetNode.FBMModelObject.ConceptType <> pcenumConceptType.ValueType And
                                                                        x.BaseNode.FBMModelObject.ConceptType <> pcenumConceptType.ValueType) Or
                                                                        x.FBMFactType.isRDSTable
                                                                        )
 
                 Dim larConditionalQueryEdges As New List(Of FactEngine.QueryEdge)
-                larConditionalQueryEdges = Me.QueryEdges.FindAll(Function(x) x.IdentifierList.Count > 0 Or
+                larConditionalQueryEdges = larEdgesWithTargetNode.ToList.FindAll(Function(x) x.IdentifierList.Count > 0 Or
                                                                              x.TargetNode.MathFunction <> pcenumMathFunction.None)
+
+                'BooleanPredicate edges. E.g. Protein is enzyme
+                larConditionalQueryEdges.AddRange(Me.QueryEdges.FindAll(Function(x) x.TargetNode Is Nothing))
 
                 If larWhereEdges.Count = 0 And larConditionalQueryEdges.Count = 0 Then
                     Return lsSQLQuery
@@ -429,34 +437,48 @@
                             lbIntialWhere = "AND "
                         Case Else
 
-                            If lrQueryEdge.TargetNode.MathFunction <> pcenumMathFunction.None Then
+                            Select Case lrQueryEdge.WhichClauseType
+                                Case Is = pcenumWhichClauseType.BooleanPredicate
 
-                                'Math function
-                                Dim lrTargetTable = lrQueryEdge.BaseNode.FBMModelObject.getCorrespondingRDSTable
-                                Dim lrTargetColumn = lrTargetTable.Column.Find(Function(x) x.FactType Is lrQueryEdge.FBMFactType)
-                                lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") &
+                                    lsSQLQuery &= lrQueryEdge.BaseNode.Name & "."
+
+                                    Dim lrTargetTable = lrQueryEdge.BaseNode.FBMModelObject.getCorrespondingRDSTable
+                                    Dim lrTargetColumn = lrTargetTable.Column.Find(Function(x) x.FactType Is lrQueryEdge.FBMFactType)
+
+                                    lsSQLQuery &= lrTargetColumn.Name & " = True"
+
+                                Case Else
+
+
+
+                                    If lrQueryEdge.TargetNode.MathFunction <> pcenumMathFunction.None Then
+
+                                        'Math function
+                                        Dim lrTargetTable = lrQueryEdge.BaseNode.FBMModelObject.getCorrespondingRDSTable
+                                        Dim lrTargetColumn = lrTargetTable.Column.Find(Function(x) x.FactType Is lrQueryEdge.FBMFactType)
+                                        lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") &
                                               lrTargetTable.Name &
                                               Viev.NullVal(lrQueryEdge.TargetNode.Alias, "") &
                                               "." &
                                               lrTargetColumn.Name
 
-                                lsSQLQuery &= " " & Viev.GetEnumDescription(lrQueryEdge.TargetNode.MathFunction)
-                                lsSQLQuery &= " " & lrQueryEdge.TargetNode.MathNumber.ToString
+                                        lsSQLQuery &= " " & Viev.GetEnumDescription(lrQueryEdge.TargetNode.MathFunction)
+                                        lsSQLQuery &= " " & lrQueryEdge.TargetNode.MathNumber.ToString
 
 
-                                lbIntialWhere = "AND "
-                            Else
-                                Dim lrTargetTable = lrQueryEdge.TargetNode.FBMModelObject.getCorrespondingRDSTable
-                                Dim larIndexColumns = lrTargetTable.getFirstUniquenessConstraintColumns
-                                liInd = 0
-                                For Each lsIdentifier In lrQueryEdge.IdentifierList
-                                    lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") & lrTargetTable.Name & Viev.NullVal(lrQueryEdge.TargetNode.Alias, "") & "." & larIndexColumns(liInd).Name & " = '" & lsIdentifier & "'" & vbCrLf
-                                    If liInd < lrQueryEdge.IdentifierList.Count - 1 Then lsSQLQuery &= "AND "
-                                    liInd += 1
-                                Next
-                                lbIntialWhere = "AND "
-                            End If
-
+                                        lbIntialWhere = "AND "
+                                    Else
+                                        Dim lrTargetTable = lrQueryEdge.TargetNode.FBMModelObject.getCorrespondingRDSTable
+                                        Dim larIndexColumns = lrTargetTable.getFirstUniquenessConstraintColumns
+                                        liInd = 0
+                                        For Each lsIdentifier In lrQueryEdge.IdentifierList
+                                            lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") & lrTargetTable.Name & Viev.NullVal(lrQueryEdge.TargetNode.Alias, "") & "." & larIndexColumns(liInd).Name & " = '" & lsIdentifier & "'" & vbCrLf
+                                            If liInd < lrQueryEdge.IdentifierList.Count - 1 Then lsSQLQuery &= "AND "
+                                            liInd += 1
+                                        Next
+                                        lbIntialWhere = "AND "
+                                    End If
+                            End Select
                     End Select
 
                 Next

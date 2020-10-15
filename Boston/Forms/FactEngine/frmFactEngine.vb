@@ -1155,17 +1155,19 @@ Public Class frmFactEngine
                                 Else
                                     Me.AutoComplete.ListBox.Items.Clear()
                                     Dim lrPredicatePart = larPredicatePart.First
-                                    If Me.TextBoxInput.Text.Trim.Split(" ").Last <> lrPredicatePart.FactTypeReading.PredicatePart(1).Role.JoinedORMObject.Id Then
-                                        Call Me.AddEnterpriseAwareItem(lrPredicatePart.FactTypeReading.PredicatePart(1).Role.JoinedORMObject.Id, FEQL.TokenType.MODELELEMENTNAME, False)
-                                        If Me.AutoComplete.Visible = False Then
-                                            Me.showAutoCompleteForm()
-                                            Exit Sub
+                                    If lrPredicatePart.FactTypeReading.PredicatePart.Count > 1 Then
+                                        If Me.TextBoxInput.Text.Trim.Split(" ").Last <> lrPredicatePart.FactTypeReading.PredicatePart(1).Role.JoinedORMObject.Id Then
+                                            Call Me.AddEnterpriseAwareItem(lrPredicatePart.FactTypeReading.PredicatePart(1).Role.JoinedORMObject.Id, FEQL.TokenType.MODELELEMENTNAME, False)
+                                            If Me.AutoComplete.Visible = False Then
+                                                Me.showAutoCompleteForm()
+                                                Exit Sub
+                                            End If
                                         End If
                                     End If
                                 End If
 
-                                'Predicates
-                                Dim lrPredicateModelObject As FBM.ModelObject
+                                    'Predicates
+                                    Dim lrPredicateModelObject As FBM.ModelObject
                                 If lrLastWhichClause.KEYWDAND IsNot Nothing And lrLastWhichClause.KEYWDTHAT.Count = 1 Then
                                     lrModelElement = prApplication.WorkingModel.GetModelObjectByName(lrLastModelElementNameParseNode.Token.Text)
                                 End If
@@ -1220,6 +1222,14 @@ Public Class frmFactEngine
                     If (Me.zrTextHighlighter.GetCurrentContext.Token.Type = FEQL.TokenType.IDENTIFIER) Or
                         laiExpectedToken.Contains(FEQL.TokenType.IDENTIFIER) Then
                         lrModelElement = prApplication.WorkingModel.GetModelObjectByName(lrLastModelElementNameParseNode.Token.Text)
+
+                        If lrModelElement.ConceptType = pcenumConceptType.ValueType Then
+                            If CType(lrModelElement, FBM.ValueType).ValueConstraint.Count > 0 Then
+                                For Each lsValue In CType(lrModelElement, FBM.ValueType).ValueConstraint
+                                    Call Me.AddEnterpriseAwareItem(lsValue)
+                                Next
+                            End If
+                        End If
                         Dim lsSQLQuery = "SELECT "
                         Dim liInd = 0
                         For Each lrColumn In lrModelElement.getCorrespondingRDSTable.getFirstUniquenessConstraintColumns

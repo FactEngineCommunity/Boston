@@ -100,6 +100,9 @@
                         Case Is = FactEngine.pcenumWhichClauseType.AndThatIdentityCompatitor  '13. E.g. "Person 1 IS NOT Person 2" or "Person 1 IS Person 2"
                             Call Me.analystISNOTClause(Me.WHICHCLAUSE, lrQueryGraph, lrQueryEdge)
 
+                        Case Is = FactEngine.pcenumWhichClauseType.BooleanPredicate  '14. E.g. Protein is enzyme
+                            Call Me.analystBooleanPredicateClause(Me.WHICHCLAUSE, lrQueryGraph, lrQueryEdge, lrPreviousTargetNode)
+
                         Case Else 'CodeSafe
                             Throw New Exception("Unknown WhichClauseType.")
 
@@ -900,11 +903,53 @@
 
 #End Region
 
+        '14
+#Region "analystBooleanPredicateClause"
+
+        Public Sub analystBooleanPredicateClause(ByRef arWHICHCLAUSE As FEQL.WHICHCLAUSE,
+                                                 ByRef arQueryGraph As FactEngine.QueryGraph,
+                                                 ByRef arQueryEdge As FactEngine.QueryEdge,
+                                                 ByRef arPreviousTargetNode As FactEngine.QueryNode)
+
+            'E.g. Protein is enzyme
+
+            arQueryEdge.WhichClauseType = FactEngine.Constants.pcenumWhichClauseType.BooleanPredicate
+
+            '------------------------------------------------------
+            'Set the BaseNode
+            arQueryEdge.BaseNode = arQueryGraph.HeadNode
+            If arPreviousTargetNode IsNot Nothing Then
+                arQueryEdge.BaseNode = arPreviousTargetNode
+            End If
+
+            '------------------------------------------------------
+            'No need to set the TargetNode, because there is none.
+            arQueryEdge.TargetNode = Nothing
+
+            '-----------------------------------------
+            'Get the relevant FBM.FactType
+            Call arQueryEdge.getAndSetFBMFactType(arQueryEdge.BaseNode,
+                                                  arQueryEdge.TargetNode,
+                                                  arQueryEdge.Predicate)
+
+        End Sub
+
+#End Region
+
 #Region "getWHICHClauseType"
         Public Function getWHICHClauseType(ByRef arWHICHClause As FEQL.WHICHCLAUSE,
                                            ByRef arWhichClauseNode As FEQL.ParseNode) As FactEngine.pcenumWhichClauseType
 
             'Preparsing
+            '14
+            If arWHICHClause.PREDICATE.Count > 0 And
+               arWHICHClause.MODELELEMENTNAME.Count = 0 And
+               arWHICHClause.NODE.Count = 0 And
+               arWHICHClause.MODELELEMENT.Count = 0 Then
+                '14
+                Return FactEngine.Constants.pcenumWhichClauseType.BooleanPredicate
+            End If
+
             If arWhichClauseNode.Nodes.Count >= 3 Then
                 If Me.WHICHCLAUSE.KEYWDAND Is Nothing And
                    arWhichClauseNode.Nodes(0).Token.Type = FEQL.TokenType.KEYWDWHICH And
