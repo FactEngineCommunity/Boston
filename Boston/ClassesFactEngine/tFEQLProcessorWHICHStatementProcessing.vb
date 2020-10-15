@@ -4,6 +4,7 @@
 #Region "ProcessWHICHSELECTStatementNew"
         Public Function ProcessWHICHSELECTStatementNew(ByVal asFEQLStatement As String) As ORMQL.Recordset
 
+            Dim lsSQLQuery As String = ""
             Dim lrRecordset As New ORMQL.Recordset
             lrRecordset.StatementType = FactEngine.Constants.pcenumFEQLStatementType.WHICHSELECTStatement
 
@@ -131,7 +132,7 @@
 
                 '==========================================================================
                 'Get the records
-                Dim lsSQLQuery = lrQueryGraph.generateSQL
+                lsSQLQuery = lrQueryGraph.generateSQL
 
                 If Me.DatabaseManager.Connection Is Nothing Then
                     'Try and establish a connection
@@ -152,6 +153,7 @@
             Catch ex As Exception
                 If ex.InnerException Is Nothing Then
                     lrRecordset.ErrorString = ex.Message
+                    lrRecordset.Query = lsSQLQuery
                 Else
                     lrRecordset.ErrorString = ex.InnerException.Message
                 End If

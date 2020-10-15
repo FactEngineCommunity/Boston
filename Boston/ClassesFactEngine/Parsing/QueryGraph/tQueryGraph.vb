@@ -440,7 +440,7 @@
                             Select Case lrQueryEdge.WhichClauseType
                                 Case Is = pcenumWhichClauseType.BooleanPredicate
 
-                                    lsSQLQuery &= lrQueryEdge.BaseNode.Name & "."
+                                    lsSQLQuery &= "AND " & lrQueryEdge.BaseNode.Name & "."
 
                                     Dim lrTargetTable = lrQueryEdge.BaseNode.FBMModelObject.getCorrespondingRDSTable
                                     Dim lrTargetColumn = lrTargetTable.Column.Find(Function(x) x.FactType Is lrQueryEdge.FBMFactType)

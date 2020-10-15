@@ -1085,6 +1085,8 @@ Public Class frmDiagramORM
                             '---------------------------------------------------------------
                             'Check to see if the Role was dropped onto another ModelObject
                             '---------------------------------------------------------------
+                            lrFactType = Nothing
+
                             If liDropTarget = pcenumShapeDropTarget.OtherShapeObject Then
                                 '------------------------------------------------------
                                 'Get the ShapeNode that the ShapeNode was dropped onto
@@ -1102,10 +1104,17 @@ Public Class frmDiagramORM
                                     'Set the FactType of the Role to the FactType of the ShapeNode/Role that the ShapeNode/Role was dropped onto
                                     '------------------------------------------------------------------------------------------------------------
                                     loDropTargetNode = loDropTargetNode.Tag.FactType.Shape
-                                    Call Me.DropRoleAtPoint(loPt, liDropTarget, loDropTargetNode)
+                                    lrFactType = Me.DropRoleAtPoint(loPt, liDropTarget, loDropTargetNode)
                                 End If
                             Else
-                                Call Me.DropRoleAtPoint(loPt, liDropTarget, Nothing)
+                                lrFactType = Me.DropRoleAtPoint(loPt, liDropTarget, Nothing)
+                            End If
+
+                            '===========================================================================
+                            'RDS
+                            'Create a Column (Boolean) for the Role for the corresponding RDS.Table
+                            If lrFactType.RoleGroup.Count = 1 Then
+                                Call Me.zrPage.Model.createColumnForUnaryFactType(lrFactType)
                             End If
 
                             '-------------------------------------------------------------------------------
@@ -1207,7 +1216,7 @@ Public Class frmDiagramORM
 
     End Function
 
-    Private Sub DropRoleAtPoint(ByVal aoPt As PointF, ByVal aiDropTarget As pcenumShapeDropTarget, ByRef aoDropTargetNode As ShapeNode)
+    Private Function DropRoleAtPoint(ByVal aoPt As PointF, ByVal aiDropTarget As pcenumShapeDropTarget, ByRef aoDropTargetNode As ShapeNode) As FBM.FactType
 
         Dim lrRole As New FBM.Role
         Dim lrRoleInstance As New FBM.RoleInstance
@@ -1265,7 +1274,7 @@ Public Class frmDiagramORM
             If IsSomething(aoDropTargetNode) Then
                 lrRoleInstanceForm.zbExtendingExistingFactType = True
             End If
-            If lrRoleInstanceForm.ShowDialog(lrRole, Me.zrPage) = Windows.Forms.DialogResult.OK Then
+            If lrRoleInstanceForm.showdialog(lrRole, Me.zrPage) = Windows.Forms.DialogResult.OK Then
                 '-------------------------------------------------------------
                 'The user successfully entered the details for the new Role.
                 '-------------------------------------------------------------
@@ -1278,7 +1287,7 @@ Public Class frmDiagramORM
                         'The FactType.Name already exists within the database
                         '  so create a new FactType.Name
                         '-----------------------------------------------------------
-                        lrFactType.SetName(Me.zrPage.Model.CreateUniqueFactTypeName(Viev.Strings.RemoveWhiteSpace(lrFactType.Name), 0))
+                        lrFactType.setName(Me.zrPage.Model.CreateUniqueFactTypeName(Viev.Strings.RemoveWhiteSpace(lrFactType.Name), 0))
                     End If
 
                     '----------------------------------------------
@@ -1328,6 +1337,22 @@ Public Class frmDiagramORM
                     'lrRoleInstance.FactType.SortRoleGroup()
                 End If 'Dropped on existing Role
 
+                If lrFactType.RoleGroup.Count > 1 And
+                   lrFactType.InternalUniquenessConstraint.Count = 0 Then
+                    'Must remove any exiting RDS.Columns from any table linked to the FactType,
+                    '  because was likely a UnaryFactType that is now binary and has no RoleConstraint warranting a column, etc.
+                    Dim larColumn = From Table In Me.zrPage.Model.RDS.Table
+                                    From Column In Table.Column
+                                    Where Column.FactType Is lrFactType
+                                    Select Column
+
+                    For Each lrColumn In larColumn.ToArray
+                        Dim lrTable = lrColumn.Table
+                        Call lrTable.removeColumn(lrColumn)
+                    Next
+
+                End If
+
                 Call Me.zrPage.MakeDirty()
 
             Else
@@ -1340,6 +1365,8 @@ Public Class frmDiagramORM
 
             End If 'RoleForm closed with [OK]
 
+            Return lrFactType
+
         Catch ex As Exception
             Dim lsMessage As String
             lsMessage = "Error: frmDiagramORM.DropRoleAtPoint"
@@ -1348,7 +1375,7 @@ Public Class frmDiagramORM
         End Try
 
 
-    End Sub
+    End Function
 
     Private Sub ORMDiagramView_DragOver(ByVal sender As Object, ByVal e As System.Windows.Forms.DragEventArgs) Handles DiagramView.DragOver
 

@@ -274,6 +274,11 @@ Partial Public Class tBrain
                 Call lrFactType.setName(lrFactType.MakeNameFromFactTypeReadings, False)
             End If
 
+            'Create a Column for unary FactTypes. Is an exception because does not have a RoleConstraint
+            If lrFactType.RoleGroup.Count = 1 Then
+                Call Me.Model.createColumnForUnaryFactType(lrFactType)
+            End If
+
             If Me.Page Is Nothing Then
                 Me.Model.AddFactType(lrFactType, True, True, Nothing)
             Else

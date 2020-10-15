@@ -1137,6 +1137,20 @@ Namespace FBM
 
                     End If
 
+                ElseIf Me.IsUnaryFactType Then
+
+                    Dim larColumn = From Table In Me.Model.RDS.Table
+                                    From Column In Table.Column
+                                    Where Column.FactType Is Me
+                                    Select Column
+
+                    If larColumn.Count > 0 Then
+
+                        Dim lrColumn = larColumn.First
+
+                        Call lrColumn.setName(Viev.Strings.MakeCapCamelCase(arFactTypeReading.PredicatePart(0).PredicatePartText, True))
+                    End If
+
                 End If
 
                 RaiseEvent FactTypeReadingAdded(arFactTypeReading)

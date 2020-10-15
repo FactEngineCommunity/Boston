@@ -182,7 +182,11 @@ Public Class frmAutoComplete
                             If Me.ListBox.SelectedItem.ItemData.Contains("-") Then
                                 lsSelectedItem = Me.ListBox.SelectedItem.ToString & " " & Me.ListBox.SelectedItem.ItemData.ToString.Split("-").First & "-(" & Me.ListBox.SelectedItem.ItemData.ToString.Split("-").Last & ":'"
                             Else
-                                lsSelectedItem = Me.ListBox.SelectedItem.ToString & " (" & Trim(Me.ListBox.SelectedItem.ItemData) & ":'"
+                                If Me.ListBox.SelectedItem.ToString = Me.ListBox.SelectedItem.ItemData Then
+                                    lsSelectedItem = "(" & Trim(Me.ListBox.SelectedItem.ItemData) & ":'"
+                                Else
+                                    lsSelectedItem = Me.ListBox.SelectedItem.ToString & " (" & Trim(Me.ListBox.SelectedItem.ItemData) & ":'"
+                                End If
                             End If
                         Case Is = publicConstantsAutoComplete.pcenumACActionType.THAT
                             lsSelectedItem = " THAT " & Me.ListBox.SelectedItem.ToString & " A " & Trim(Me.ListBox.SelectedItem.ItemData)

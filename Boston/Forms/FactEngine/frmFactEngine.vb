@@ -1157,7 +1157,7 @@ Public Class frmFactEngine
                                     Dim lrPredicatePart = larPredicatePart.First
                                     If lrPredicatePart.FactTypeReading.PredicatePart.Count > 1 Then
                                         If Me.TextBoxInput.Text.Trim.Split(" ").Last <> lrPredicatePart.FactTypeReading.PredicatePart(1).Role.JoinedORMObject.Id Then
-                                            Call Me.AddEnterpriseAwareItem(lrPredicatePart.FactTypeReading.PredicatePart(1).Role.JoinedORMObject.Id, FEQL.TokenType.MODELELEMENTNAME, False)
+                                            Call Me.AddEnterpriseAwareItem(lrPredicatePart.FactTypeReading.PredicatePart(1).Role.JoinedORMObject.Id, FEQL.TokenType.MODELELEMENTNAME, False, lrPredicatePart.FactTypeReading.PredicatePart(1).Role.JoinedORMObject.Id)
                                             If Me.AutoComplete.Visible = False Then
                                                 Me.showAutoCompleteForm()
                                                 Exit Sub
@@ -1226,7 +1226,7 @@ Public Class frmFactEngine
                         If lrModelElement.ConceptType = pcenumConceptType.ValueType Then
                             If CType(lrModelElement, FBM.ValueType).ValueConstraint.Count > 0 Then
                                 For Each lsValue In CType(lrModelElement, FBM.ValueType).ValueConstraint
-                                    Call Me.AddEnterpriseAwareItem(lsValue)
+                                    Call Me.AddEnterpriseAwareItem(lsValue,,,, True)
                                 Next
                             End If
                         End If

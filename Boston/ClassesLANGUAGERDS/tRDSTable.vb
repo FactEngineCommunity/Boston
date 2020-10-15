@@ -784,6 +784,13 @@ Namespace RDS
 
         End Sub
 
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <param name="arColumn">Use 'Nothing' if adding new column, rather than renaming column.</param>
+        ''' <param name="asColumnName">The trial column name</param>
+        ''' <param name="aiStartingInd">Start with 0. Recusion adds 1 each iteration. 0 is not added to the asColumnName</param>
+        ''' <returns></returns>
         Public Function createUniqueColumnName(ByVal arColumn As RDS.Column, ByVal asColumnName As String, ByVal aiStartingInd As Integer) As String
 
             Dim lsUniqueColumnName As String = ""

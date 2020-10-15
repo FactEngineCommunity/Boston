@@ -550,6 +550,45 @@ Namespace FBM
 
         End Sub
 
+        Public Sub createColumnForUnaryFactType(ByRef arFactType As FBM.FactType)
+
+            Try
+                'RDS
+                If arFactType.Arity = 1 Then
+                    'Unary FactType, so add boolean Column to the corresponding RDS Table.
+
+                    Dim lrFactType = arFactType
+
+                    Dim lrTable As RDS.Table = Me.RDS.Table.Find(Function(x) x.Name = lrFactType.RoleGroup(0).JoinedORMObject.Id)
+
+                    Dim lsColumnName = "DummyFactTypeReadingRequired"
+
+                    If lrFactType.FactTypeReading.Count > 0 Then
+                        lsColumnName = Viev.Strings.MakeCapCamelCase(lrFactType.FactTypeReading(0).PredicatePart(0).PredicatePartText, True)
+                    End If
+
+                    lsColumnName = lrTable.createUniqueColumnName(Nothing, lsColumnName, 0)
+
+                    Dim lrColumn As New RDS.Column(lrTable, lsColumnName, arFactType.RoleGroup(0), arFactType.RoleGroup(0), False)
+                    lrColumn.FactType = arFactType
+
+                    Call lrTable.addColumn(lrColumn)
+
+                Else
+                    Throw New Exception("FactType is not Unary")
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage1 As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
 
 
         Public Function CreateUniqueEntityName(ByVal asEntityName As String, Optional ByVal aiStartingInd As Integer = 0) As String
