@@ -1047,10 +1047,20 @@ Public Class frmFactEngine
 
                 Call Me.GetMODELELEMENTParseNodes(Me.zrTextHighlighter.Tree.Nodes(0), larModelElementNameParseNode)
 
+                Dim larModelMatch As New List(Of ModelMatch)
                 For Each lrParseNode In larModelElementNameParseNode
                     lrModelElement = prApplication.WorkingModel.GetModelObjectByName(lrParseNode.Token.Text)
                     If lrModelElement Is Nothing Then
                         Me.TextMarker.AddWord(lrParseNode.Token.StartPos, lrParseNode.Token.Length, Color.Red, "Uknown Model Element")
+
+                        For Each lrModel In prApplication.getModelsByModelElementName(lrParseNode.Token.Text)
+                            Dim lrModelMatch = New ModelMatch(lrModel, lrParseNode.Token.Text)
+                            If larModelMatch.Contains(lrModelMatch) Then
+                                larModelMatch.Find(Function(x) x.Model Is lrModelMatch.Model).addKeyWord(lrParseNode.Token.Text)
+                            Else
+                                larModelMatch.Add(lrModelMatch)
+                            End If
+                        Next
                     End If
                 Next
 
@@ -1065,10 +1075,40 @@ Public Class frmFactEngine
                     Next
                     If Not prApplication.WorkingModel.existsPredicatePart(Trim(lsPredicatePartText)) Then
                         Me.TextMarker.AddWord(lrParseNode.Token.StartPos, lrParseNode.Token.Length, Color.Red, "Uknown Predicate")
+
+                        For Each lrModel In prApplication.getModelsByPredicatePartText(lsPredicatePartText)
+                            Dim lrModelMatch = New ModelMatch(lrModel, lrParseNode.Token.Text)
+                            If larModelMatch.Contains(lrModelMatch) Then
+                                larModelMatch.Find(Function(x) x.Model Is lrModelMatch.Model).addKeyWord(lsPredicatePartText)
+                            Else
+                                larModelMatch.Add(lrModelMatch)
+                            End If
+                        Next
                     End If
                 Next
 
                 Me.TextMarker.MarkWords()
+
+                If larModelMatch.Count > 0 Then
+                    Me.LabelError.Text = "Are you wanting any of the following models:" & vbCrLf & vbCrLf
+                    For Each lrModelMatch In larModelMatch.OrderByDescending(Function(x) x.HitCount)
+                        Dim lsKeyWordMatches As String = ""
+                        Dim liInd = 0
+                        For Each lsKeyWord In lrModelMatch.KeyWords
+                            If liInd > 0 Then lsKeyWordMatches &= ","
+                            lsKeyWordMatches &= lsKeyWord
+                            liInd += 1
+                        Next
+                        For Each lsKeyWord In lrModelMatch.KeyWords
+
+                        Next
+                        Me.LabelError.Text &= lrModelMatch.Model.Name & " " & lrModelMatch.HitCount & " {" & lsKeyWordMatches & "}"
+                        Me.LabelError.Text &= vbCrLf
+                    Next
+                Else
+                    Me.LabelError.Text = ""
+                End If
+
             End If
             '=======================================
 
