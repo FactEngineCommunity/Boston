@@ -221,6 +221,16 @@ Namespace FEQL
 
     Public Class WHICHSELECTStatement
 
+        Private _NODE As New List(Of FEQL.NODE)
+        Public Property NODE As List(Of FEQL.NODE)
+            Get
+                Return Me._NODE
+            End Get
+            Set(value As List(Of FEQL.NODE))
+                Me._NODE = value
+            End Set
+        End Property
+
         Private _MODELELEMENT As New List(Of Object)
         Public Property MODELELEMENT As List(Of Object)
             Get
@@ -954,6 +964,16 @@ Namespace FEQL
                         Case Is = "CREATESTMT"
 
                             Return Me.ProcessCREATEStatement(asFEQLStatement)
+
+                        Case Is = "DIDSELECTSTMT"
+
+                            '=============================================================
+                            Return Me.ProcessWHICHSELECTStatementNew(asFEQLStatement)
+
+                            '----------------------------------------------------------------------------------
+                            'Exit the sub because have found what the User was trying to do, and have done it 
+                            '----------------------------------------------------------------------------------
+                            Exit Function
 
 
                         Case Is = "WHICHSELECTSTMT"

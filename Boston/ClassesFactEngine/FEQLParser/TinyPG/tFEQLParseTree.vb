@@ -427,6 +427,9 @@ Namespace FEQL
                 Case TokenType.DESCRIBESTMT
                     Value = EvalDESCRIBESTMT(tree, paramlist)
                     Exit Select
+                Case TokenType.DIDSELECTSTMT
+                    Value = EvalDIDSELECTSTMT(tree, paramlist)
+                    Exit Select
                 Case TokenType.ENTITYTYPEISIDENTIFIEDBYITSCLAUSE
                     Value = EvalENTITYTYPEISIDENTIFIEDBYITSCLAUSE(tree, paramlist)
                     Exit Select
@@ -836,6 +839,10 @@ Namespace FEQL
         End Function
 
         Protected Overridable Function EvalDESCRIBESTMT(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalDIDSELECTSTMT(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
             Throw New NotImplementedException()
         End Function
 
