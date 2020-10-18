@@ -17,6 +17,8 @@ Namespace FactEngine
 
         Public FBMFactType As FBM.FactType = Nothing
 
+        Public IsReciprocal As Boolean = False 'E.g. WHICH "Person was armed by WHICH Person 2", rather than "WHICH Person armed Person 2" and where the latter is the primary FactTypeReading predicate.
+
         ''' <summary>
         ''' TRUE if is the project of a select/project
         ''' </summary>

@@ -31,6 +31,7 @@
             None
             CREATEStatement
             DESCRIBEStatement
+            DIDStatement
             ENUMERATEStatement
             GenericSelectStatement
             SHOWStatement

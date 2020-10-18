@@ -22,11 +22,15 @@
             End Get
         End Property
 
+        Public IdentifierList As New List(Of String)
+
         Public ReadOnly Property RDSTable As RDS.Table
             Get
                 Return Me.FBMModelObject.getCorrespondingRDSTable
             End Get
         End Property
+
+        Public HasIdentifier As Boolean = False
 
         Public [Alias] As String = Nothing
 

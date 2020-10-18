@@ -286,10 +286,19 @@
                         'End Select
 
                     Else
-                        lrOriginTable = lrQueryEdge.BaseNode.FBMModelObject.getCorrespondingRDSTable
+                        Dim lrBaseNode, lrTargetNode As FactEngine.QueryNode
+                        If lrQueryEdge.IsReciprocal Then
+                            lrBaseNode = lrQueryEdge.TargetNode
+                            lrTargetNode = lrQueryEdge.BaseNode
+                        Else
+                            lrBaseNode = lrQueryEdge.BaseNode
+                            lrTargetNode = lrQueryEdge.TargetNode
+                        End If
+
+                        lrOriginTable = lrBaseNode.FBMModelObject.getCorrespondingRDSTable
                         Dim larModelObject = New List(Of FBM.ModelObject)
-                        larModelObject.Add(lrQueryEdge.BaseNode.FBMModelObject)
-                        larModelObject.Add(lrQueryEdge.TargetNode.FBMModelObject)
+                        larModelObject.Add(lrBaseNode.FBMModelObject)
+                        larModelObject.Add(lrTargetNode.FBMModelObject)
                         Dim lrRelation = lrOriginTable.getRelationByFBMModelObjects(larModelObject, lrQueryEdge.FBMFactType, lrQueryEdge)
 
                         Dim liInd2 = 1
@@ -310,8 +319,8 @@
                                 'was
                                 'lsSQLQuery &= lrQueryEdge.BaseNode.FBMModelObject.Id & "." & lrColumn.Name
                                 'lsSQLQuery &= " = " & lrQueryEdge.TargetNode.Name & Viev.NullVal(lrQueryEdge.TargetNode.Alias, "") & "." & lrColumn.Name
-                                lsSQLQuery &= lrColumn.Table.Name & Viev.NullVal(lrQueryEdge.BaseNode.Alias, "") & "." & lrColumn.Name
-                                lsSQLQuery &= " = " & larTargetColumn(liInd2 - 1).Table.Name & Viev.NullVal(lrQueryEdge.TargetNode.Alias, "") & "." & larTargetColumn(liInd2 - 1).Name
+                                lsSQLQuery &= lrColumn.Table.Name & Viev.NullVal(lrBaseNode.Alias, "") & "." & lrColumn.Name
+                                lsSQLQuery &= " = " & larTargetColumn(liInd2 - 1).Table.Name & Viev.NullVal(lrTargetNode.Alias, "") & "." & larTargetColumn(liInd2 - 1).Name
                                 If liInd2 < larTargetColumn.Count Then lsSQLQuery &= vbCrLf & "AND "
                                 liInd2 += 1
                             Next
@@ -336,9 +345,26 @@
                 Next
 
 #End Region
-                If Not lbAddedAND And lbIntialWhere Is Nothing And larConditionalQueryEdges.Count > 0 Then lsSQLQuery &= " AND "
+                If (Not lbAddedAND And lbIntialWhere Is Nothing And
+                    larConditionalQueryEdges.Count > 0) Or
+                    Me.HeadNode.HasIdentifier Then
+                    lsSQLQuery &= "AND "
+                    lbIntialWhere = Nothing
+                End If
 
 #Region "WhereConditionals"
+                If Me.HeadNode.HasIdentifier Then
+                    Dim lrTargetTable = Me.HeadNode.RDSTable
+                    liInd = 0
+                    For Each lrColumn In Me.HeadNode.RDSTable.getFirstUniquenessConstraintColumns
+                        lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") & lrTargetTable.Name & Viev.NullVal(Me.HeadNode.Alias, "") & "." & lrColumn.Name & " = '" & Me.HeadNode.IdentifierList(liInd) & "'" & vbCrLf
+                        If liInd < Me.HeadNode.IdentifierList.Count - 1 Then lsSQLQuery &= "AND "
+                        liInd += 1
+                    Next
+                    lbIntialWhere = "AND "
+                End If
+
+
                 For Each lrQueryEdge In larConditionalQueryEdges
                     Select Case lrQueryEdge.WhichClauseSubType
                         Case Is = FactEngine.Constants.pcenumWhichClauseType.IsPredicateNodePropertyIdentification
@@ -440,7 +466,7 @@
                             Select Case lrQueryEdge.WhichClauseType
                                 Case Is = pcenumWhichClauseType.BooleanPredicate
 
-                                    lsSQLQuery &= "AND " & lrQueryEdge.BaseNode.Name & "."
+                                    lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") & lrQueryEdge.BaseNode.Name & "."
 
                                     Dim lrTargetTable = lrQueryEdge.BaseNode.FBMModelObject.getCorrespondingRDSTable
                                     Dim lrTargetColumn = lrTargetTable.Column.Find(Function(x) x.FactType Is lrQueryEdge.FBMFactType)
@@ -468,11 +494,23 @@
 
                                         lbIntialWhere = "AND "
                                     Else
-                                        Dim lrTargetTable = lrQueryEdge.TargetNode.FBMModelObject.getCorrespondingRDSTable
+                                        Dim lrTargetTable As RDS.Table = Nothing
+                                        Dim lsAlias As String = ""
+
+                                        'Check for reciprocal reading. As in WHICH Person was armed by (Person 2:'David') rather than WHICH Person armed (Person 2:'Saul')
+                                        If lrQueryEdge.TargetNode.HasIdentifier Then
+                                            lrTargetTable = lrQueryEdge.TargetNode.FBMModelObject.getCorrespondingRDSTable
+                                            lsAlias = Viev.NullVal(lrQueryEdge.TargetNode.Alias, "")
+                                        Else
+                                            lrTargetTable = lrQueryEdge.BaseNode.FBMModelObject.getCorrespondingRDSTable
+                                            lsAlias = Viev.NullVal(lrQueryEdge.BaseNode.Alias, "")
+                                        End If
+
                                         Dim larIndexColumns = lrTargetTable.getFirstUniquenessConstraintColumns
+
                                         liInd = 0
                                         For Each lsIdentifier In lrQueryEdge.IdentifierList
-                                            lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") & lrTargetTable.Name & Viev.NullVal(lrQueryEdge.TargetNode.Alias, "") & "." & larIndexColumns(liInd).Name & " = '" & lsIdentifier & "'" & vbCrLf
+                                            lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") & lrTargetTable.Name & lsAlias & "." & larIndexColumns(liInd).Name & " = '" & lsIdentifier & "'" & vbCrLf
                                             If liInd < lrQueryEdge.IdentifierList.Count - 1 Then lsSQLQuery &= "AND "
                                             liInd += 1
                                         Next
@@ -504,6 +542,8 @@
             Dim larColumn As New List(Of RDS.Column)
 
             Try
+
+
 
                 'Head Column/s
                 Dim larHeadColumn As New List(Of RDS.Column)

@@ -19,12 +19,23 @@
                 '----------------------------------------
                 'Create the HeadNode for the QueryGraph
                 Me.MODELELEMENTCLAUSE = New FEQL.MODELELEMENTClause
+
                 'Call Me.GetParseTreeTokensReflection(Me.MODELELEMENTCLAUSE, Me.WHICHSELECTStatement.MODELELEMENT(0)) '
                 Dim lrFBMModelObject As FBM.ModelObject = Me.Model.GetModelObjectByName(Me.WHICHSELECTStatement.NODE(0).MODELELEMENTNAME) 'MODELELEMENTNAME
                 If lrFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & Me.WHICHSELECTStatement.MODELELEMENTNAME(0) & "'.")
                 lrQueryGraph.HeadNode = New FactEngine.QueryNode(lrFBMModelObject)
                 lrQueryGraph.HeadNode.Alias = Me.MODELELEMENTCLAUSE.MODELELEMENTSUFFIX
+
+                If Me.WHICHSELECTStatement.NODE(0).NODEPROPERTYIDENTIFICATION IsNot Nothing Then
+                    lrQueryGraph.HeadNode.HasIdentifier = True
+                    For Each lsIdentifier In Me.WHICHSELECTStatement.NODE(0).NODEPROPERTYIDENTIFICATION.IDENTIFIER
+                        lrQueryGraph.HeadNode.IdentifierList.Add(lsIdentifier)
+                    Next
+                End If
+
                 lrQueryGraph.Nodes.Add(lrQueryGraph.HeadNode)
+
+
 
                 '----------------------------------
                 'Get the Edges for the QueryGraph
@@ -128,7 +139,7 @@
 
                 'Richmond.WriteToStatusBar("Generating SQL", True)
 
-                Call lrQueryGraph.checkNodeAliases
+                Call lrQueryGraph.checkNodeAliases()
 
                 '==========================================================================
                 'Get the records
@@ -141,12 +152,16 @@
                         Throw New Exception("No database connection has been established.")
                     End If
                 ElseIf Me.DatabaseManager.Connection.Connected = False Then
-                        Throw New Exception("The database is not connected.")
+                    Throw New Exception("The database is not connected.")
                 End If
 
                 Dim lrTestRecordset = Me.DatabaseManager.GO(lsSQLQuery)
                 lrTestRecordset.Warning = lrQueryGraph.Warning
                 lrTestRecordset.QueryGraph = lrQueryGraph
+
+                If Me.ParseTreeContainsTokenType(Me.Parsetree, FEQL.TokenType.KEYWDDID) Then
+                    lrTestRecordset.StatementType = FactEngine.Constants.pcenumFEQLStatementType.DIDStatement
+                End If
 
                 Return lrTestRecordset
 
@@ -206,6 +221,7 @@
             'Set the Identification
             For Each lsIdentifier In Me.WHICHCLAUSE.NODE(0).NODEPROPERTYIDENTIFICATION.IDENTIFIER
                 arQueryEdge.IdentifierList.Add(lsIdentifier)
+                arQueryEdge.TargetNode.HasIdentifier = True
             Next
 
             '-----------------------------------------
@@ -213,6 +229,15 @@
             Call arQueryEdge.getAndSetFBMFactType(arQueryEdge.BaseNode,
                                                   arQueryEdge.TargetNode,
                                                   arQueryEdge.Predicate)
+
+            If Not arQueryEdge.FBMFactType.getPrimaryFactTypeReading.PredicatePart(0).PredicatePartText = arQueryEdge.Predicate Then
+                '    'Switch the Base and Target nodes
+                '    Dim lrTempQueryNode As New FactEngine.QueryNode
+                '    lrTempQueryNode = arQueryEdge.BaseNode
+                '    arQueryEdge.BaseNode = arQueryEdge.TargetNode
+                '    arQueryEdge.TargetNode = lrTempQueryNode
+                arQueryEdge.IsReciprocal = True
+            End If
 
 
         End Sub
@@ -254,6 +279,15 @@
                                                   arQueryEdge.TargetNode,
                                                   arQueryEdge.Predicate)
 
+            If Not arQueryEdge.FBMFactType.getPrimaryFactTypeReading.PredicatePart(0).PredicatePartText = arQueryEdge.Predicate Then
+                '    'Switch the Base and Target nodes
+                '    Dim lrTempQueryNode As New FactEngine.QueryNode
+                '    lrTempQueryNode = arQueryEdge.BaseNode
+                '    arQueryEdge.BaseNode = arQueryEdge.TargetNode
+                '    arQueryEdge.TargetNode = lrTempQueryNode
+                '    arQueryGraph.HeadNode = arQueryEdge.BaseNode
+                arQueryEdge.IsReciprocal = True
+            End If
 
         End Sub
 #End Region
@@ -372,6 +406,11 @@
             Call arQueryEdge.getAndSetFBMFactType(arQueryEdge.BaseNode,
                                                   arQueryEdge.TargetNode,
                                                   arQueryEdge.Predicate)
+
+            If Not arQueryEdge.FBMFactType.getPrimaryFactTypeReading.PredicatePart(0).PredicatePartText = arQueryEdge.Predicate Then
+                arQueryEdge.IsReciprocal = True
+            End If
+
 
         End Sub
 #End Region

@@ -2555,6 +2555,28 @@ Namespace FBM
 
         End Function
 
+        Public Function getPrimaryFactTypeReading() As FBM.FactTypeReading
+
+            Try
+                Dim larFactTypeReading = From FactTypeReading In Me.FactTypeReading
+                                         Where FactTypeReading.IsPreferred
+                                         Select FactTypeReading
+
+                Return larFactTypeReading.First
+
+            Catch ex As Exception
+                Dim lsMessage1 As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return Nothing
+            End Try
+
+        End Function
+
         ''' <summary>
         ''' Returns the Role object within the RoleGroup of the FactType, given the RoleId of the Role.
         ''' </summary>

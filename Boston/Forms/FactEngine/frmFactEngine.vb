@@ -567,12 +567,21 @@ Public Class frmFactEngine
 
                             Me.LabelError.Text = ""
 
+                            If lrRecordset.StatementType = FactEngine.pcenumFEQLStatementType.DIDStatement Then
+                                If lrRecordset.Facts.Count = 0 Then
+
+                                    Me.LabelError.Text &= "I don't know." & vbCrLf & vbCrLf
+                                Else
+                                    Me.LabelError.Text &= "Yes." & vbCrLf & vbCrLf
+                                End If
+                            End If
+
                             If lrRecordset.Facts.Count = 0 Then
                                 Me.LabelError.ForeColor = Color.Orange
-                                Me.LabelError.Text = "No results returned"
+                                Me.LabelError.Text &= "No results returned"
                             Else
                                 Me.LabelError.ForeColor = Color.Black
-                                Me.LabelError.Text = ""
+                                Me.LabelError.Text &= ""
 
                                 If lrRecordset.Warning.Count > 0 Then
                                     For Each lsWarning In lrRecordset.Warning
