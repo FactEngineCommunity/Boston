@@ -1206,7 +1206,12 @@ Public Class frmFactEngine
                                     Dim lrPredicatePart = larPredicatePart.First
                                     If lrPredicatePart.FactTypeReading.PredicatePart.Count > 1 Then
                                         If Me.TextBoxInput.Text.Trim.Split(" ").Last <> lrPredicatePart.FactTypeReading.PredicatePart(1).Role.JoinedORMObject.Id Then
-                                            Call Me.AddEnterpriseAwareItem(lrPredicatePart.FactTypeReading.PredicatePart(1).Role.JoinedORMObject.Id, FEQL.TokenType.MODELELEMENTNAME, False, lrPredicatePart.FactTypeReading.PredicatePart(1).Role.JoinedORMObject.Id)
+                                            Dim lsPreboundPart As String = ""
+                                            If lrPredicatePart.FactTypeReading.PredicatePart(1).PreBoundText <> "" Then
+                                                lsPreboundPart = lrPredicatePart.FactTypeReading.PredicatePart(1).PreBoundText & "-"
+                                            End If
+                                            Dim lsFullModelElementReference = lsPreboundPart & lrPredicatePart.FactTypeReading.PredicatePart(1).Role.JoinedORMObject.Id
+                                            Call Me.AddEnterpriseAwareItem(lsFullModelElementReference, FEQL.TokenType.MODELELEMENTNAME, False, lrPredicatePart.FactTypeReading.PredicatePart(1).Role.JoinedORMObject.Id)
                                             If Me.AutoComplete.Visible = False Then
                                                 Me.showAutoCompleteForm()
                                                 Exit Sub

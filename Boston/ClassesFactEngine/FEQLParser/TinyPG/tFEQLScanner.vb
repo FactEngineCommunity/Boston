@@ -169,527 +169,527 @@ Namespace FEQL
             Patterns.Add(TokenType.VALUE, regex)
             Tokens.Add(TokenType.VALUE)
 
-            regex = new Regex("A", RegexOptions.Compiled)
+            regex = New Regex("A ", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDA, regex)
             Tokens.Add(TokenType.KEYWDA)
 
-            regex = new Regex("AN", RegexOptions.Compiled)
+            regex = New Regex("AN ", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDAN, regex)
             Tokens.Add(TokenType.KEYWDAN)
 
-            regex = new Regex("AND", RegexOptions.Compiled)
+            regex = New Regex("AND", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDAND, regex)
             Tokens.Add(TokenType.KEYWDAND)
 
-            regex = new Regex("ADD", RegexOptions.Compiled)
+            regex = New Regex("ADD", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDADD, regex)
             Tokens.Add(TokenType.KEYWDADD)
 
-            regex = new Regex("ADD FACT", RegexOptions.Compiled)
+            regex = New Regex("ADD FACT", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDADDFACT, regex)
             Tokens.Add(TokenType.KEYWDADDFACT)
 
-            regex = new Regex("ADD FACTTYPE", RegexOptions.Compiled)
+            regex = New Regex("ADD FACTTYPE", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDADDFACTTYPE, regex)
             Tokens.Add(TokenType.KEYWDADDFACTTYPE)
 
-            regex = new Regex("ASSERT", RegexOptions.Compiled)
+            regex = New Regex("ASSERT", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDASSERT, regex)
             Tokens.Add(TokenType.KEYWDASSERT)
 
-            regex = new Regex("AT MOST ONE", RegexOptions.Compiled)
+            regex = New Regex("AT MOST ONE", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDATMOSTONE, regex)
             Tokens.Add(TokenType.KEYWDATMOSTONE)
 
-            regex = new Regex("BUT NOT BOTH", RegexOptions.Compiled)
+            regex = New Regex("BUT NOT BOTH", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDBUTNOTBOTH, regex)
             Tokens.Add(TokenType.KEYWDBUTNOTBOTH)
 
-            regex = new Regex("COMBINATION", RegexOptions.Compiled)
+            regex = New Regex("COMBINATION", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDCOMBINATION, regex)
             Tokens.Add(TokenType.KEYWDCOMBINATION)
 
-            regex = new Regex("COUNT", RegexOptions.Compiled)
+            regex = New Regex("COUNT", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDCOUNT, regex)
             Tokens.Add(TokenType.KEYWDCOUNT)
 
-            regex = new Regex("COUNT\(\*\)", RegexOptions.Compiled)
+            regex = New Regex("COUNT\(\*\)", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDCOUNTSTAR, regex)
             Tokens.Add(TokenType.KEYWDCOUNTSTAR)
 
-            regex = new Regex("CREATE", RegexOptions.Compiled)
+            regex = New Regex("CREATE", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDCREATE, regex)
             Tokens.Add(TokenType.KEYWDCREATE)
 
-            regex = new Regex("CREATE CONCEPT", RegexOptions.Compiled)
+            regex = New Regex("CREATE CONCEPT", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDCREATECONCEPT, regex)
             Tokens.Add(TokenType.KEYWDCREATECONCEPT)
 
-            regex = new Regex("CREATE ENTITYTTYPE", RegexOptions.Compiled)
+            regex = New Regex("CREATE ENTITYTTYPE", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDCREATEENTITYTYPE, regex)
             Tokens.Add(TokenType.KEYWDCREATEENTITYTYPE)
 
-            regex = new Regex("CREATE FACTTYPE", RegexOptions.Compiled)
+            regex = New Regex("CREATE FACTTYPE", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDCREATEFACTTYPE, regex)
             Tokens.Add(TokenType.KEYWDCREATEFACTTYPE)
 
-            regex = new Regex("CREATE MODEL", RegexOptions.Compiled)
+            regex = New Regex("CREATE MODEL", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDCREATEMODEL, regex)
             Tokens.Add(TokenType.KEYWDCREATEMODEL)
 
-            regex = new Regex("CREATE VALUETYPE", RegexOptions.Compiled)
+            regex = New Regex("CREATE VALUETYPE", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDCREATEVALUETYPE, regex)
             Tokens.Add(TokenType.KEYWDCREATEVALUETYPE)
 
-            regex = new Regex("LogicalTrueFalse", RegexOptions.Compiled)
+            regex = New Regex("LogicalTrueFalse", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDDATATYPELOGICALTRUEFALSE, regex)
             Tokens.Add(TokenType.KEYWDDATATYPELOGICALTRUEFALSE)
 
-            regex = new Regex("LogicalYesNo", RegexOptions.Compiled)
+            regex = New Regex("LogicalYesNo", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDDATATYPELOGICALYESNO, regex)
             Tokens.Add(TokenType.KEYWDDATATYPELOGICALYESNO)
 
-            regex = new Regex("AutoCounter", RegexOptions.Compiled)
+            regex = New Regex("AutoCounter", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDDATATYPEAUTOCOUNTER, regex)
             Tokens.Add(TokenType.KEYWDDATATYPEAUTOCOUNTER)
 
-            regex = new Regex("Decimal", RegexOptions.Compiled)
+            regex = New Regex("Decimal", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDDATATYPEDECIMAL, regex)
             Tokens.Add(TokenType.KEYWDDATATYPEDECIMAL)
 
-            regex = new Regex("FloatCustomPrecision", RegexOptions.Compiled)
+            regex = New Regex("FloatCustomPrecision", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDDATATYPEFLOATCUSTOMPRECISION, regex)
             Tokens.Add(TokenType.KEYWDDATATYPEFLOATCUSTOMPRECISION)
 
-            regex = new Regex("FloatDoublePrecision", RegexOptions.Compiled)
+            regex = New Regex("FloatDoublePrecision", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDDATATYPEFLOATDOUBLEPRECISION, regex)
             Tokens.Add(TokenType.KEYWDDATATYPEFLOATDOUBLEPRECISION)
 
-            regex = new Regex("FloatSinglePrecistion", RegexOptions.Compiled)
+            regex = New Regex("FloatSinglePrecistion", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDDATATYPEFLOATSINGLEPRECISION, regex)
             Tokens.Add(TokenType.KEYWDDATATYPEFLOATSINGLEPRECISION)
 
-            regex = new Regex("Money", RegexOptions.Compiled)
+            regex = New Regex("Money", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDDATATYPEMONEY, regex)
             Tokens.Add(TokenType.KEYWDDATATYPEMONEY)
 
-            regex = new Regex("SignedBigInteger", RegexOptions.Compiled)
+            regex = New Regex("SignedBigInteger", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDDATATYPESIGNEDBIGINTEGER, regex)
             Tokens.Add(TokenType.KEYWDDATATYPESIGNEDBIGINTEGER)
 
-            regex = new Regex("SignedInteger", RegexOptions.Compiled)
+            regex = New Regex("SignedInteger", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDDATATYPESIGNEDINTEGER, regex)
             Tokens.Add(TokenType.KEYWDDATATYPESIGNEDINTEGER)
 
-            regex = new Regex("SignedSmallInteger", RegexOptions.Compiled)
+            regex = New Regex("SignedSmallInteger", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDDATATYPESIGNEDSMALLINTEGER, regex)
             Tokens.Add(TokenType.KEYWDDATATYPESIGNEDSMALLINTEGER)
 
-            regex = new Regex("UnsignedBigInteger", RegexOptions.Compiled)
+            regex = New Regex("UnsignedBigInteger", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDDATATYPEUNSIGNEDBIGINTEGER, regex)
             Tokens.Add(TokenType.KEYWDDATATYPEUNSIGNEDBIGINTEGER)
 
-            regex = new Regex("UnsignedInteger", RegexOptions.Compiled)
+            regex = New Regex("UnsignedInteger", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDDATATYPEUNSIGNEDINTEGER, regex)
             Tokens.Add(TokenType.KEYWDDATATYPEUNSIGNEDINTEGER)
 
-            regex = new Regex("UnsignedSmallInteger", RegexOptions.Compiled)
+            regex = New Regex("UnsignedSmallInteger", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDDATATYPEUNSIGNEDSMALLINTEGER, regex)
             Tokens.Add(TokenType.KEYWDDATATYPEUNSIGNEDSMALLINTEGER)
 
-            regex = new Regex("UnsignedTinyInteger", RegexOptions.Compiled)
+            regex = New Regex("UnsignedTinyInteger", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDDATATYPEUNSIGNEDTINYINTEGER, regex)
             Tokens.Add(TokenType.KEYWDDATATYPEUNSIGNEDTINYINTEGER)
 
-            regex = new Regex("ObjectID", RegexOptions.Compiled)
+            regex = New Regex("ObjectID", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDDATATYPEOBJECTID, regex)
             Tokens.Add(TokenType.KEYWDDATATYPEOBJECTID)
 
-            regex = new Regex("RowID", RegexOptions.Compiled)
+            regex = New Regex("RowID", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDDATATYPEROWID, regex)
             Tokens.Add(TokenType.KEYWDDATATYPEROWID)
 
-            regex = new Regex("RawDataFixedLength", RegexOptions.Compiled)
+            regex = New Regex("RawDataFixedLength", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDDATATYPERAWDATAFIXEDLENGTH, regex)
             Tokens.Add(TokenType.KEYWDDATATYPERAWDATAFIXEDLENGTH)
 
-            regex = new Regex("RawDataLargeLength", RegexOptions.Compiled)
+            regex = New Regex("RawDataLargeLength", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDDATATYPERAWDATALARGELENGTH, regex)
             Tokens.Add(TokenType.KEYWDDATATYPERAWDATALARGELENGTH)
 
-            regex = new Regex("RawDataOLEObject", RegexOptions.Compiled)
+            regex = New Regex("RawDataOLEObject", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDDATATYPERAWDATAOLEOBJECT, regex)
             Tokens.Add(TokenType.KEYWDDATATYPERAWDATAOLEOBJECT)
 
-            regex = new Regex("RawDataPicture", RegexOptions.Compiled)
+            regex = New Regex("RawDataPicture", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDDATATYPERAWDATA, regex)
             Tokens.Add(TokenType.KEYWDDATATYPERAWDATA)
 
-            regex = new Regex("VariableLength", RegexOptions.Compiled)
+            regex = New Regex("VariableLength", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDDATATYPERAWDATAVARIABLELENGTH, regex)
             Tokens.Add(TokenType.KEYWDDATATYPERAWDATAVARIABLELENGTH)
 
-            regex = new Regex("AutoTimestamp", RegexOptions.Compiled)
+            regex = New Regex("AutoTimestamp", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDDATATYPEAUTOTIMESTAMP, regex)
             Tokens.Add(TokenType.KEYWDDATATYPEAUTOTIMESTAMP)
 
-            regex = new Regex("Date", RegexOptions.Compiled)
+            regex = New Regex("Date", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDDATATYPEDATE, regex)
             Tokens.Add(TokenType.KEYWDDATATYPEDATE)
 
-            regex = new Regex("DateTime", RegexOptions.Compiled)
+            regex = New Regex("DateTime", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDDATATYPEDATETIME, regex)
             Tokens.Add(TokenType.KEYWDDATATYPEDATETIME)
 
-            regex = new Regex("Time", RegexOptions.Compiled)
+            regex = New Regex("Time", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDDATATYPETIME, regex)
             Tokens.Add(TokenType.KEYWDDATATYPETIME)
 
-            regex = new Regex("StringFixedLength", RegexOptions.Compiled)
+            regex = New Regex("StringFixedLength", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDDATATYPESTRINGFIXEDLENGTH, regex)
             Tokens.Add(TokenType.KEYWDDATATYPESTRINGFIXEDLENGTH)
 
-            regex = new Regex("StringLargeLength", RegexOptions.Compiled)
+            regex = New Regex("StringLargeLength", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDDATATYPESTRINGLARGELENGTH, regex)
             Tokens.Add(TokenType.KEYWDDATATYPESTRINGLARGELENGTH)
 
-            regex = new Regex("StringVariableLength", RegexOptions.Compiled)
+            regex = New Regex("StringVariableLength", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDDATATYPESTRINGVARIABLELENGTH, regex)
             Tokens.Add(TokenType.KEYWDDATATYPESTRINGVARIABLELENGTH)
 
-            regex = new Regex("DELETE", RegexOptions.Compiled)
+            regex = New Regex("DELETE", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDDELETE, regex)
             Tokens.Add(TokenType.KEYWDDELETE)
 
-            regex = new Regex("DELETE ALL", RegexOptions.Compiled)
+            regex = New Regex("DELETE ALL", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDDELETEALL, regex)
             Tokens.Add(TokenType.KEYWDDELETEALL)
 
-            regex = new Regex("DELETE FACT", RegexOptions.Compiled)
+            regex = New Regex("DELETE FACT", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDDELETEFACT, regex)
             Tokens.Add(TokenType.KEYWDDELETEFACT)
 
-            regex = new Regex("DESCRIBE", RegexOptions.Compiled)
+            regex = New Regex("DESCRIBE", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDDESCRIBE, regex)
             Tokens.Add(TokenType.KEYWDDESCRIBE)
 
-            regex = new Regex("DID", RegexOptions.Compiled)
+            regex = New Regex("DID", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDDID, regex)
             Tokens.Add(TokenType.KEYWDDID)
 
-            regex = new Regex("DISTINCT", RegexOptions.Compiled)
+            regex = New Regex("DISTINCT", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDDISTINCT, regex)
             Tokens.Add(TokenType.KEYWDDISTINCT)
 
-            regex = new Regex("EACH", RegexOptions.Compiled)
+            regex = New Regex("EACH", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDEACH, regex)
             Tokens.Add(TokenType.KEYWDEACH)
 
-            regex = new Regex("EITHER", RegexOptions.Compiled)
+            regex = New Regex("EITHER", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDEITHER, regex)
             Tokens.Add(TokenType.KEYWDEITHER)
 
-            regex = new Regex("ENTITY", RegexOptions.Compiled)
+            regex = New Regex("ENTITY", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDENTITY, regex)
             Tokens.Add(TokenType.KEYWDENTITY)
 
-            regex = new Regex("ENTITYTYPE", RegexOptions.Compiled)
+            regex = New Regex("ENTITYTYPE", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDENTITYTYPE, regex)
             Tokens.Add(TokenType.KEYWDENTITYTYPE)
 
-            regex = new Regex("ENTITYTYPES", RegexOptions.Compiled)
+            regex = New Regex("ENTITYTYPES", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDENTITYTYPES, regex)
             Tokens.Add(TokenType.KEYWDENTITYTYPES)
 
-            regex = new Regex("ENUMERATE", RegexOptions.Compiled)
+            regex = New Regex("ENUMERATE", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDENUMERATE, regex)
             Tokens.Add(TokenType.KEYWDENUMERATE)
 
-            regex = new Regex("EXISTS", RegexOptions.Compiled)
+            regex = New Regex("EXISTS", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDEXISTS, regex)
             Tokens.Add(TokenType.KEYWDEXISTS)
 
-            regex = new Regex("FACT", RegexOptions.Compiled)
+            regex = New Regex("FACT", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDFACT, regex)
             Tokens.Add(TokenType.KEYWDFACT)
 
-            regex = new Regex("FACTTYPE", RegexOptions.Compiled)
+            regex = New Regex("FACTTYPE", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDFACTTYPE, regex)
             Tokens.Add(TokenType.KEYWDFACTTYPE)
 
-            regex = new Regex("FACTTYPES", RegexOptions.Compiled)
+            regex = New Regex("FACTTYPES", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDFACTTYPES, regex)
             Tokens.Add(TokenType.KEYWDFACTTYPES)
 
-            regex = new Regex("FOR", RegexOptions.Compiled)
+            regex = New Regex("FOR", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDFOR, regex)
             Tokens.Add(TokenType.KEYWDFOR)
 
-            regex = new Regex("FOR EACH", RegexOptions.Compiled)
+            regex = New Regex("FOR EACH", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDFOREACH, regex)
             Tokens.Add(TokenType.KEYWDFOREACH)
 
-            regex = new Regex("FROM", RegexOptions.Compiled)
+            regex = New Regex("FROM", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDFROM, regex)
             Tokens.Add(TokenType.KEYWDFROM)
 
-            regex = new Regex("GET", RegexOptions.Compiled)
+            regex = New Regex("GET", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDGET, regex)
             Tokens.Add(TokenType.KEYWDGET)
 
-            regex = new Regex("IF AND ONLY IF", RegexOptions.Compiled)
+            regex = New Regex("IF AND ONLY IF", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDIFANDONLYIF, regex)
             Tokens.Add(TokenType.KEYWDIFANDONLYIF)
 
-            regex = new Regex("IN", RegexOptions.Compiled)
+            regex = New Regex("IN", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDIN, regex)
             Tokens.Add(TokenType.KEYWDIN)
 
-            regex = new Regex("INSERT", RegexOptions.Compiled)
+            regex = New Regex("INSERT", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDINSERT, regex)
             Tokens.Add(TokenType.KEYWDINSERT)
 
-            regex = new Regex("INTO", RegexOptions.Compiled)
+            regex = New Regex("INTO", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDINTO, regex)
             Tokens.Add(TokenType.KEYWDINTO)
 
-            regex = new Regex("IS", RegexOptions.Compiled)
+            regex = New Regex("IS", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDIS, regex)
             Tokens.Add(TokenType.KEYWDIS)
 
-            regex = new Regex("IS A", RegexOptions.Compiled)
+            regex = New Regex("IS A", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDISA, regex)
             Tokens.Add(TokenType.KEYWDISA)
 
-            regex = new Regex("IS A KIND OF", RegexOptions.Compiled)
+            regex = New Regex("IS A KIND OF", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDISAKINDOF, regex)
             Tokens.Add(TokenType.KEYWDISAKINDOF)
 
-            regex = new Regex("IS IDENTIFIED BY ITS", RegexOptions.Compiled)
+            regex = New Regex("IS IDENTIFIED BY ITS", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDISIDENTIFIEDBYITS, regex)
             Tokens.Add(TokenType.KEYWDISIDENTIFIEDBYITS)
 
-            regex = new Regex("IS NOT", RegexOptions.Compiled)
+            regex = New Regex("IS NOT", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDISNOT, regex)
             Tokens.Add(TokenType.KEYWDISNOT)
 
-            regex = new Regex("IS WHERE", RegexOptions.Compiled)
+            regex = New Regex("IS WHERE", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDISWHERE, regex)
             Tokens.Add(TokenType.KEYWDISWHERE)
 
-            regex = new Regex("IS WRITTEN AS", RegexOptions.Compiled)
+            regex = New Regex("IS WRITTEN AS", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDISWRITTENAS, regex)
             Tokens.Add(TokenType.KEYWDISWRITTENAS)
 
-            regex = new Regex("IT IS MANDATORY THAT", RegexOptions.Compiled)
+            regex = New Regex("IT IS MANDATORY THAT", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDITISMANDATORYTHAT, regex)
             Tokens.Add(TokenType.KEYWDITISMANDATORYTHAT)
 
-            regex = new Regex("JOINING", RegexOptions.Compiled)
+            regex = New Regex("JOINING", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDJOINING, regex)
             Tokens.Add(TokenType.KEYWDJOINING)
 
-            regex = new Regex("INDEX", RegexOptions.Compiled)
+            regex = New Regex("INDEX", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDINDEX, regex)
             Tokens.Add(TokenType.KEYWDINDEX)
 
-            regex = new Regex("LANGUAGE", RegexOptions.Compiled)
+            regex = New Regex("LANGUAGE", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDLANGUAGE, regex)
             Tokens.Add(TokenType.KEYWDLANGUAGE)
 
-            regex = new Regex("DFD", RegexOptions.Compiled)
+            regex = New Regex("DFD", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDLANGUAGEDFD, regex)
             Tokens.Add(TokenType.KEYWDLANGUAGEDFD)
 
-            regex = new Regex("ERD", RegexOptions.Compiled)
+            regex = New Regex("ERD", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDLANGUAGEERD, regex)
             Tokens.Add(TokenType.KEYWDLANGUAGEERD)
 
-            regex = new Regex("ETD", RegexOptions.Compiled)
+            regex = New Regex("ETD", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDLANGUAGEETD, regex)
             Tokens.Add(TokenType.KEYWDLANGUAGEETD)
 
-            regex = new Regex("ORM", RegexOptions.Compiled)
+            regex = New Regex("ORM", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDLANGUAGEORM, regex)
             Tokens.Add(TokenType.KEYWDLANGUAGEORM)
 
-            regex = new Regex("STD", RegexOptions.Compiled)
+            regex = New Regex("STD", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDLANGUAGESTD, regex)
             Tokens.Add(TokenType.KEYWDLANGUAGESTD)
 
-            regex = new Regex("UCD", RegexOptions.Compiled)
+            regex = New Regex("UCD", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDLANGUAGEUCD, regex)
             Tokens.Add(TokenType.KEYWDLANGUAGEUCD)
 
-            regex = new Regex("LIST", RegexOptions.Compiled)
+            regex = New Regex("LIST", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDLIST, regex)
             Tokens.Add(TokenType.KEYWDLIST)
 
-            regex = new Regex("MATCH", RegexOptions.Compiled)
+            regex = New Regex("MATCH", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDMATCH, regex)
             Tokens.Add(TokenType.KEYWDMATCH)
 
-            regex = new Regex("MODEL", RegexOptions.Compiled)
+            regex = New Regex("MODEL", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDMODEL, regex)
             Tokens.Add(TokenType.KEYWDMODEL)
 
-            regex = new Regex("MODELNOTES", RegexOptions.Compiled)
+            regex = New Regex("MODELNOTES", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDMODELNOTES, regex)
             Tokens.Add(TokenType.KEYWDMODELNOTES)
 
-            regex = new Regex("MODEL.DICTIONARY", RegexOptions.Compiled)
+            regex = New Regex("MODEL.DICTIONARY", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDMODELDICTIONARY, regex)
             Tokens.Add(TokenType.KEYWDMODELDICTIONARY)
 
-            regex = new Regex("", RegexOptions.Compiled)
+            regex = New Regex("", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDNULL, regex)
             Tokens.Add(TokenType.KEYWDNULL)
 
-            regex = new Regex("OBJECT", RegexOptions.Compiled)
+            regex = New Regex("OBJECT", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDOBJECT, regex)
             Tokens.Add(TokenType.KEYWDOBJECT)
 
-            regex = new Regex("OCCURS AT LEAST ONE TIME IN EITHER", RegexOptions.Compiled)
+            regex = New Regex("OCCURS AT LEAST ONE TIME IN EITHER", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDOCCURSATLEASTONETIME, regex)
             Tokens.Add(TokenType.KEYWDOCCURSATLEASTONETIME)
 
-            regex = new Regex("OCCURS AT LEAST ONE TIME IN EACH OF", RegexOptions.Compiled)
+            regex = New Regex("OCCURS AT LEAST ONE TIME IN EACH OF", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDOCCURSATLEASTONETIMEINEACHOF, regex)
             Tokens.Add(TokenType.KEYWDOCCURSATLEASTONETIMEINEACHOF)
 
-            regex = new Regex("OF", RegexOptions.Compiled)
+            regex = New Regex("OF", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDOF, regex)
             Tokens.Add(TokenType.KEYWDOF)
 
-            regex = new Regex("ON", RegexOptions.Compiled)
+            regex = New Regex("ON", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDON, regex)
             Tokens.Add(TokenType.KEYWDON)
 
-            regex = new Regex("ONE", RegexOptions.Compiled)
+            regex = New Regex("ONE", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDONE, regex)
             Tokens.Add(TokenType.KEYWDONE)
 
-            regex = new Regex("ON PAGE", RegexOptions.Compiled)
+            regex = New Regex("ON PAGE", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDONPAGE, regex)
             Tokens.Add(TokenType.KEYWDONPAGE)
 
-            regex = new Regex("OPEN", RegexOptions.Compiled)
+            regex = New Regex("OPEN", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDOPEN, regex)
             Tokens.Add(TokenType.KEYWDOPEN)
 
-            regex = new Regex("OR", RegexOptions.Compiled)
+            regex = New Regex("OR", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDOR, regex)
             Tokens.Add(TokenType.KEYWDOR)
 
-            regex = new Regex("PAGE", RegexOptions.Compiled)
+            regex = New Regex("PAGE", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDPAGE, regex)
             Tokens.Add(TokenType.KEYWDPAGE)
 
-            regex = new Regex("PREDICATE", RegexOptions.Compiled)
+            regex = New Regex("PREDICATE", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDPREDICATE, regex)
             Tokens.Add(TokenType.KEYWDPREDICATE)
 
-            regex = new Regex("RETURN", RegexOptions.Compiled)
+            regex = New Regex("RETURN", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDRETURN, regex)
             Tokens.Add(TokenType.KEYWDRETURN)
 
-            regex = new Regex("ROLE", RegexOptions.Compiled)
+            regex = New Regex("ROLE", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDROLE, regex)
             Tokens.Add(TokenType.KEYWDROLE)
 
-            regex = new Regex("SELECT", RegexOptions.Compiled)
+            regex = New Regex("SELECT", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDSELECT, regex)
             Tokens.Add(TokenType.KEYWDSELECT)
 
-            regex = new Regex("RESTRICTED TO", RegexOptions.Compiled)
+            regex = New Regex("RESTRICTED TO", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDRESTRICTEDTO, regex)
             Tokens.Add(TokenType.KEYWDRESTRICTEDTO)
 
-            regex = new Regex("ROLECONSTRAINTS", RegexOptions.Compiled)
+            regex = New Regex("ROLECONSTRAINTS", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDROLECONSTRAINTS, regex)
             Tokens.Add(TokenType.KEYWDROLECONSTRAINTS)
 
-            regex = new Regex("SET", RegexOptions.Compiled)
+            regex = New Regex("SET", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDSET, regex)
             Tokens.Add(TokenType.KEYWDSET)
 
-            regex = new Regex("SHOW", RegexOptions.Compiled)
+            regex = New Regex("SHOW", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDSHOW, regex)
             Tokens.Add(TokenType.KEYWDSHOW)
 
-            regex = new Regex("SUPERTYPE", RegexOptions.Compiled)
+            regex = New Regex("SUPERTYPE", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDSUPERTYPE, regex)
             Tokens.Add(TokenType.KEYWDSUPERTYPE)
 
-            regex = new Regex("THAT", RegexOptions.Compiled)
+            regex = New Regex("THAT", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDTHAT, regex)
             Tokens.Add(TokenType.KEYWDTHAT)
 
-            regex = new Regex("TO", RegexOptions.Compiled)
+            regex = New Regex("TO", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDTO, regex)
             Tokens.Add(TokenType.KEYWDTO)
 
-            regex = new Regex("UPDATE", RegexOptions.Compiled)
+            regex = New Regex("UPDATE", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDUPDATE, regex)
             Tokens.Add(TokenType.KEYWDUPDATE)
 
-            regex = new Regex("VALUES", RegexOptions.Compiled)
+            regex = New Regex("VALUES", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDVALUES, regex)
             Tokens.Add(TokenType.KEYWDVALUES)
 
-            regex = new Regex("VALUETYPE", RegexOptions.Compiled)
+            regex = New Regex("VALUETYPE", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDVALUETYPE, regex)
             Tokens.Add(TokenType.KEYWDVALUETYPE)
 
-            regex = new Regex("VALUETYPES", RegexOptions.Compiled)
+            regex = New Regex("VALUETYPES", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDVALUETYPES, regex)
             Tokens.Add(TokenType.KEYWDVALUETYPES)
 
-            regex = new Regex("WHEN", RegexOptions.Compiled)
+            regex = New Regex("WHEN", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDWHEN, regex)
             Tokens.Add(TokenType.KEYWDWHEN)
 
-            regex = new Regex("WHERE", RegexOptions.Compiled)
+            regex = New Regex("WHERE", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDWHERE, regex)
             Tokens.Add(TokenType.KEYWDWHERE)
 
-            regex = new Regex("WITH", RegexOptions.Compiled)
+            regex = New Regex("WITH", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDWITH, regex)
             Tokens.Add(TokenType.KEYWDWITH)
 
-            regex = new Regex("WHAT", RegexOptions.Compiled)
+            regex = New Regex("WHAT", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDWHAT, regex)
             Tokens.Add(TokenType.KEYWDWHAT)
 
-            regex = new Regex("WHICH", RegexOptions.Compiled)
+            regex = New Regex("WHICH", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDWHICH, regex)
             Tokens.Add(TokenType.KEYWDWHICH)
 
-            regex = new Regex("WRITTEN AS", RegexOptions.Compiled)
+            regex = New Regex("WRITTEN AS", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDWRITTENAS, regex)
             Tokens.Add(TokenType.KEYWDWRITTENAS)
 
-            regex = new Regex("\+", RegexOptions.Compiled)
+            regex = New Regex("\+", RegexOptions.Compiled)
             Patterns.Add(TokenType.PLUS, regex)
             Tokens.Add(TokenType.PLUS)
 
-            regex = new Regex("-", RegexOptions.Compiled)
+            regex = New Regex("-", RegexOptions.Compiled)
             Patterns.Add(TokenType.MINUS, regex)
             Tokens.Add(TokenType.MINUS)
 
-            regex = new Regex("/", RegexOptions.Compiled)
+            regex = New Regex("/", RegexOptions.Compiled)
             Patterns.Add(TokenType.DIVIDE, regex)
             Tokens.Add(TokenType.DIVIDE)
 
-            regex = new Regex("\*", RegexOptions.Compiled)
+            regex = New Regex("\*", RegexOptions.Compiled)
             Patterns.Add(TokenType.TIMES, regex)
             Tokens.Add(TokenType.TIMES)
 
-            regex = new Regex("(\+|-|/|\*)", RegexOptions.Compiled)
+            regex = New Regex("(\+|-|/|\*)", RegexOptions.Compiled)
             Patterns.Add(TokenType.EXPRESSIONSYMBOL, regex)
             Tokens.Add(TokenType.EXPRESSIONSYMBOL)
 
-            regex = new Regex("\s+", RegexOptions.Compiled)
+            regex = New Regex("\s+", RegexOptions.Compiled)
             Patterns.Add(TokenType.WHITESPACE, regex)
             Tokens.Add(TokenType.WHITESPACE)
 
