@@ -80,7 +80,12 @@ Namespace FactEngine
                     For liInd = 0 To lrSQLiteDataReader.FieldCount - 1
                         Select Case lrSQLiteDataReader.GetFieldType(liInd)
                             Case Is = GetType(String)
-                                loFieldValue = lrSQLiteDataReader.GetString(liInd)
+                                If Not Viev.NullVal(lrSQLiteDataReader.GetFieldValue(Of Object)(liInd), "") = "" Then
+                                    loFieldValue = lrSQLiteDataReader.GetString(liInd)
+                                Else
+                                    loFieldValue = ""
+                                End If
+
                             Case Else
                                 loFieldValue = lrSQLiteDataReader.GetValue(liInd)
                         End Select

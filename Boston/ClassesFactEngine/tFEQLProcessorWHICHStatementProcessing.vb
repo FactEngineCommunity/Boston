@@ -459,6 +459,7 @@
                 For Each lsIdentifier In Me.WHICHCLAUSE.NODE(0).NODEPROPERTYIDENTIFICATION.IDENTIFIER
                     arQueryEdge.IdentifierList.Add(lsIdentifier)
                 Next
+                arQueryEdge.TargetNode.HasIdentifier = True
             End If
 
             '==========================================================================

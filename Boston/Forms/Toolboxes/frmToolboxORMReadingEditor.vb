@@ -487,6 +487,11 @@ Public Class frmToolboxORMReadingEditor
 
             Dim lbFactTypeReadingSuccessfullyCreated As Boolean = False
             Dim lrFactTypeReading As New FBM.FactTypeReading(Me.zrFactTypeInstance.FactType)
+
+            If Me.zrFactTypeInstance.FactType.FactTypeReading.Count = 0 Then
+                lrFactTypeReading.IsPreferred = True
+            End If
+
             If Me.GetPredicatePartsFromReadingUsingParser(Trim(Me.TextboxReading.Text), lrFactTypeReading) Then
                 '-------------------------------------------------
                 'All good. The reading text parsed successfully.

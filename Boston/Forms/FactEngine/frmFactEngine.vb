@@ -1243,9 +1243,13 @@ Public Class frmFactEngine
 
                                     For Each lrFactTypeReading In larFactTypeReading.OrderBy(Function(x) x.GetPredicateText)
 
+                                        Dim lsPreboundReadingText = ""
                                         'For Each lrFactTypeReading In lrPredicateModelObject.getOutgoingFactTypeReadings(2)
                                         If lrFactTypeReading.PredicatePart.Count > 1 Then
-                                            Call Me.AddEnterpriseAwareItem(lrFactTypeReading.GetPredicateText, FEQL.TokenType.PREDICATE, , lrFactTypeReading.PredicatePart(1).Role.JoinedORMObject.Id)
+                                            If lrFactTypeReading.PredicatePart(1).PreBoundText <> "" Then
+                                                lsPreboundReadingText = lrFactTypeReading.PredicatePart(1).PreBoundText
+                                            End If
+                                            Call Me.AddEnterpriseAwareItem(lrFactTypeReading.GetPredicateText, FEQL.TokenType.PREDICATE, , lsPreboundReadingText & lrFactTypeReading.PredicatePart(1).Role.JoinedORMObject.Id)
                                         Else
                                             Call Me.AddEnterpriseAwareItem(lrFactTypeReading.GetPredicateText, FEQL.TokenType.PREDICATE)
                                         End If
@@ -1517,8 +1521,9 @@ Public Class frmFactEngine
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
-            lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            lsMessage &= vbCrLf & vbCrLf & ex.Message & vbCrLf & vbCrLf & ex.StackTrace
+
+            Me.LabelError.Text = lsMessage
         End Try
 
     End Sub

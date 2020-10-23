@@ -56,7 +56,7 @@ Namespace My
         
         <Global.System.Configuration.UserScopedSettingAttribute(),  _
          Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("1.23")>  _
+         Global.System.Configuration.DefaultSettingValueAttribute("1.25")>  _
         Public Property DatabaseVersionNumber() As String
             Get
                 Return CType(Me("DatabaseVersionNumber"),String)
@@ -332,7 +332,7 @@ Namespace My
         
         <Global.System.Configuration.UserScopedSettingAttribute(),  _
          Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("False")>  _
+         Global.System.Configuration.DefaultSettingValueAttribute("True")>  _
         Public Property SuperuserMode() As Boolean
             Get
                 Return CType(Me("SuperuserMode"),Boolean)

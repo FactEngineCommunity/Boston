@@ -2562,7 +2562,12 @@ Namespace FBM
                                          Where FactTypeReading.IsPreferred
                                          Select FactTypeReading
 
-                Return larFactTypeReading.First
+                If larFactTypeReading.Count = 0 Then
+                    Return Me.FactTypeReading(1)
+                Else
+                    Return larFactTypeReading.First
+                End If
+
 
             Catch ex As Exception
                 Dim lsMessage1 As String

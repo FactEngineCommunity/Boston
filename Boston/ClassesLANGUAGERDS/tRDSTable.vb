@@ -194,6 +194,13 @@ Namespace RDS
                     End If
                 End If
 
+                'NonAbsorbed Subtypes
+                For Each lrTable In Me.getSubtypeTables.FindAll(Function(x) x.isAbsorbed = False)
+
+                    Call lrTable.addColumn(arColumn)
+
+                Next
+
                 '------------------------------------------------------------------------------
                 'CMML Code
                 Call Me.Model.Model.createCMMLAttribute(Me.Name, arColumn.Name, arColumn.Role, arColumn)

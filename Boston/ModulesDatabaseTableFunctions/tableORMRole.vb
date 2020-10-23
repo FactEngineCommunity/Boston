@@ -19,24 +19,25 @@ Namespace TableRole
                 lsSQLQuery &= " ," & arRole.part_of_key
                 lsSQLQuery &= " ," & arRole.FactType.Arity
                 lsSQLQuery &= " ," & arRole.SequenceNr
-                If IsSomething(arRole.JoinsEntityType) Then
-                    lsSQLQuery &= "       ,'" & Replace(Viev.NullVal(arRole.JoinsEntityType.Id, ""), "'", "`") & "'"
-                Else
-                    lsSQLQuery &= "       ,''"
-                End If
-                If IsSomething(arRole.JoinsValueType) Then
-                    lsSQLQuery &= "       ,'" & Replace(Viev.NullVal(arRole.JoinsValueType.Id, ""), "'", "`") & "'"
-                Else
-                    lsSQLQuery &= "       ,''"
-                End If
-                If IsSomething(arRole.JoinsFactType) Then
-                    lsSQLQuery &= "       ,'" & Replace(Viev.NullVal(arRole.JoinsFactType.Id, ""), "'", "`") & "'"
-                Else
-                    lsSQLQuery &= "       ,''"
-                End If
+                'If IsSomething(arRole.JoinsEntityType) Then
+                '    lsSQLQuery &= "       ,'" & Replace(Viev.NullVal(arRole.JoinsEntityType.Id, ""), "'", "`") & "'"
+                'Else
+                '    lsSQLQuery &= "       ,''"
+                'End If
+                'If IsSomething(arRole.JoinsValueType) Then
+                '    lsSQLQuery &= "       ,'" & Replace(Viev.NullVal(arRole.JoinsValueType.Id, ""), "'", "`") & "'"
+                'Else
+                '    lsSQLQuery &= "       ,''"
+                'End If
+                'If IsSomething(arRole.JoinsFactType) Then
+                '    lsSQLQuery &= "       ,'" & Replace(Viev.NullVal(arRole.JoinsFactType.Id, ""), "'", "`") & "'"
+                'Else
+                '    lsSQLQuery &= "       ,''"
+                'End If
                 lsSQLQuery &= " ," & arRole.TypeOfJoin
                 lsSQLQuery &= " ," & arRole.Mandatory
                 lsSQLQuery &= " ," & arRole.IsArray
+                lsSQLQuery &= " ,'" & arRole.JoinedORMObject.Id & "'"
                 lsSQLQuery &= ")"
 
                 Call pdbConnection.Execute(lsSQLQuery)
@@ -146,15 +147,15 @@ Namespace TableRole
                         lrRole.SequenceNr = lREcordset("SequenceNr").Value
                         lrRole.FactType = arFactType
                         prApplication.ThrowErrorMessage("GetRolesForModelFactType: Loading Role: '" & lrRole.Id & "' for FactType: '" & lrRole.FactType.Id & "' for Model: '" & lrRole.Model.ModelId & "'", pcenumErrorType.Information)
+
+                        lsId = Trim(Viev.NullVal(lREcordset("JoinsModelElementId").Value, ""))
+
                         Select Case lREcordset("TypeOfJoin").Value
                             Case Is = pcenumRoleJoinType.EntityType
-                                lsId = Trim(Viev.NullVal(lREcordset("JoinsEntityTypeId").Value, ""))
                                 lrRole.JoinedORMObject = arFactType.Model.EntityType.Find(Function(x) x.Id = lsId)
                             Case Is = pcenumRoleJoinType.ValueType
-                                lsId = Trim(Viev.NullVal(lREcordset("JoinsValueTypeId").Value, ""))
                                 lrRole.JoinedORMObject = arFactType.Model.ValueType.Find(Function(x) x.Id = lsId)
                             Case Is = pcenumRoleJoinType.FactType
-                                lsId = Trim(Viev.NullVal(lREcordset("JoinsNestedFactTypeId").Value, ""))
                                 lrRole.JoinedORMObject = arFactType.Model.FactType.Find(Function(x) x.Id = lsId)
                                 '202020514-VM-Original pattern for the above as well
                                 'Dim lrFactType As New FBM.FactType
@@ -163,7 +164,7 @@ Namespace TableRole
                                 'lrFactType.Id = lrRole.JoinsFactType.Id
                                 'lrRole.JoinsFactType = arFactType.Model.FactType.Find(AddressOf lrFactType.Equals)
                                 If lrRole.JoinedORMObject Is Nothing Then
-                                    lrRole.JoinedORMObject = New FBM.FactType(lrRole.Model, Trim(Viev.NullVal(lREcordset("JoinsNestedFactTypeId").Value, "")), True)
+                                    lrRole.JoinedORMObject = New FBM.FactType(lrRole.Model, lsId, True) ' Trim(Viev.NullVal(lREcordset("JoinsNestedFactTypeId").Value, "")), True)
                                     TableFactType.GetFactTypeDetailsByModel(lrRole.JoinsFactType, True)
                                 End If
                         End Select
@@ -171,17 +172,21 @@ Namespace TableRole
                         If (lrRole.JoinedORMObject Is Nothing) And Not (lrRole.TypeOfJoin = pcenumRoleJoinType.FactType) Then
                             Dim lsMissingId As String = ""
                             lsMessage = "No ModelObject (" & lrRole.TypeOfJoin.ToString & ") with Id: '"
-                            Select Case lrRole.TypeOfJoin
-                                Case Is = pcenumRoleJoinType.EntityType
-                                    lsMissingId = Trim(Viev.NullVal(lREcordset("JoinsEntityTypeId").Value, ""))
-                                    lsMessage &= lsMissingId
-                                Case Is = pcenumRoleJoinType.ValueType
-                                    lsMissingId = Trim(Viev.NullVal(lREcordset("JoinsValueTypeId").Value, ""))
-                                    lsMessage &= lsMissingId
-                                Case Is = pcenumRoleJoinType.FactType
-                                    lsMissingId = Trim(Viev.NullVal(lREcordset("JoinsNestedFactTypeId").Value, ""))
-                                    lsMessage &= lsMissingId
-                            End Select
+                            'Select Case lrRole.TypeOfJoin
+                            '    Case Is = pcenumRoleJoinType.EntityType
+                            '        lsMissingId = Trim(Viev.NullVal(lREcordset("JoinsEntityTypeId").Value, ""))
+                            '        lsMessage &= lsMissingId
+                            '    Case Is = pcenumRoleJoinType.ValueType
+                            '        lsMissingId = Trim(Viev.NullVal(lREcordset("JoinsValueTypeId").Value, ""))
+                            '        lsMessage &= lsMissingId
+                            '    Case Is = pcenumRoleJoinType.FactType
+                            '        lsMissingId = Trim(Viev.NullVal(lREcordset("JoinsNestedFactTypeId").Value, ""))
+                            '        lsMessage &= lsMissingId
+                            'End Select
+
+                            lsMissingId = Trim(Viev.NullVal(lREcordset("JoinsModelelementId").Value, ""))
+                            lsMessage &= lsMissingId
+
                             lsMessage &= "', exists in the Model"
                             lsMessage &= vbCrLf & "Model.Id: " & arFactType.Model.ModelId
                             lsMessage &= vbCrLf & "FactType.Id: " & arFactType.Id
@@ -253,21 +258,24 @@ Namespace TableRole
                 lsSQLQuery &= "       ,PartOfKey = " & arRole.part_of_key
                 lsSQLQuery &= "       ,Cardinality = " & arRole.FactType.Arity
                 lsSQLQuery &= "       ,SequenceNr = " & arRole.SequenceNr
-                If IsSomething(arRole.JoinsEntityType) Then
-                    lsSQLQuery &= "       ,JoinsEntityTypeId = '" & Viev.NullVal(arRole.JoinsEntityType.Id, "") & "'"
-                Else
-                    lsSQLQuery &= "       ,JoinsEntityTypeId = ''"
-                End If
-                If IsSomething(arRole.JoinsValueType) Then
-                    lsSQLQuery &= "       ,JoinsValueTypeId = '" & Viev.NullVal(arRole.JoinsValueType.Id, "") & "'"
-                Else
-                    lsSQLQuery &= "       ,JoinsValueTypeId = ''"
-                End If
-                If IsSomething(arRole.JoinsFactType) Then
-                    lsSQLQuery &= "       ,JoinsNestedFactTypeId = '" & Viev.NullVal(arRole.JoinsFactType.Id, "") & "'"
-                Else
-                    lsSQLQuery &= "       ,JoinsNestedFactTypeId = ''"
-                End If
+
+                lsSQLQuery &= "       ,JoinsModelElementId = '" & arRole.JoinedORMObject.Id & "'"
+
+                'If IsSomething(arRole.JoinsEntityType) Then
+                '    lsSQLQuery &= "       ,JoinsEntityTypeId = '" & Viev.NullVal(arRole.JoinsEntityType.Id, "") & "'"
+                'Else
+                '    lsSQLQuery &= "       ,JoinsEntityTypeId = ''"
+                'End If
+                'If IsSomething(arRole.JoinsValueType) Then
+                '    lsSQLQuery &= "       ,JoinsValueTypeId = '" & Viev.NullVal(arRole.JoinsValueType.Id, "") & "'"
+                'Else
+                '    lsSQLQuery &= "       ,JoinsValueTypeId = ''"
+                'End If
+                'If IsSomething(arRole.JoinsFactType) Then
+                '    lsSQLQuery &= "       ,JoinsNestedFactTypeId = '" & Viev.NullVal(arRole.JoinsFactType.Id, "") & "'"
+                'Else
+                '    lsSQLQuery &= "       ,JoinsNestedFactTypeId = ''"
+                'End If
 
                 lsSQLQuery &= "       ,TypeOfJoin = " & arRole.TypeOfJoin
                 lsSQLQuery &= "       ,IsMandatory = " & arRole.Mandatory
