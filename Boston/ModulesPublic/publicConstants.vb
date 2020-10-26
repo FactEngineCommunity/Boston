@@ -303,6 +303,7 @@ Public Module publicConstants
         SymmetricIrreflexive
         SymmetricIntransitive
         PurelyReflexive
+        Transitive
         DeonticIrreflexive
         DeonticAssymmetric
         DeonticIntransitive

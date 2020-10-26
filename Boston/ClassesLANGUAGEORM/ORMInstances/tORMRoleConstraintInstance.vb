@@ -713,9 +713,9 @@ Namespace FBM
                                     Case Is = pcenumRingConstraintType.DeonticSymmetricIrreflexive
                                         loDroppedNode.Image = My.Resources.ORMShapes.deontic_symmetric_irreflexive
                                     Case Is = pcenumRingConstraintType.Intransitive
-                                        loDroppedNode.Image = My.Resources.ORMShapes.deontic_intransitive
+                                        loDroppedNode.Image = My.Resources.ORMShapes.intransitive
                                     Case Is = pcenumRingConstraintType.Irreflexive
-                                        loDroppedNode.Image = My.Resources.ORMShapes.deontic_irreflexive
+                                        loDroppedNode.Image = My.Resources.ORMShapes.irreflexive
                                     Case Is = pcenumRingConstraintType.PurelyReflexive
                                         loDroppedNode.Image = My.Resources.ORMShapes.purely_reflexive
                                     Case Is = pcenumRingConstraintType.Symmetric
@@ -724,6 +724,8 @@ Namespace FBM
                                         loDroppedNode.Image = My.Resources.ORMShapes.symmetric_intransitive
                                     Case Is = pcenumRingConstraintType.SymmetricIrreflexive
                                         loDroppedNode.Image = My.Resources.ORMShapes.symmetric_irreflexive
+                                    Case Is = pcenumRingConstraintType.Transitive
+                                        loDroppedNode.Image = My.Resources.ORMShapes.transative
                                 End Select
                                 loDroppedNode.ToolTip = "Ring Constraint"
                             Case Is = pcenumRoleConstraintType.SubsetConstraint
@@ -1169,6 +1171,10 @@ Namespace FBM
                                 End If
                             End If
                             Call Me.RoleConstraint.SetIsDeontic(Me.IsDeontic)
+                        Case Is = "RingConstraintType"
+
+                            Call Me.RoleConstraint.SetRingConstraintType(Me.RingConstraintType)
+
                     End Select
 
                     If IsSomething(Me.Page.Form) Then
@@ -1220,6 +1226,56 @@ Namespace FBM
                                 Me.Shape.Image = My.Resources.ORMShapes.deontic_inclusive_or
                             Case Else
                                 Me.Shape.Image = My.Resources.ORMShapes.inclusive_or
+                        End Select
+
+                    Case Is = pcenumRoleConstraintType.RingConstraint
+                        Select Case Me.RingConstraintType
+                            Case Is = pcenumRingConstraintType.AcyclicIntransitive
+                                Me.Shape.Image = My.Resources.ORMShapes.acyclic_intransitive
+                            Case Is = pcenumRingConstraintType.Acyclic
+                                Me.Shape.Image = My.Resources.ORMShapes.acyclic
+                            Case Is = pcenumRingConstraintType.Antisymmetric
+                                Me.Shape.Image = My.Resources.ORMShapes.Antisymmetric
+                            Case Is = pcenumRingConstraintType.Asymmetric
+                                Me.Shape.Image = My.Resources.ORMShapes.Asymmetric
+                            Case Is = pcenumRingConstraintType.AsymmetricIntransitive
+                                Me.Shape.Image = My.Resources.ORMShapes.asymmetric_intransitive
+                            Case Is = pcenumRingConstraintType.DeonticAcyclic
+                                Me.Shape.Image = My.Resources.ORMShapes.deontic_acyclic
+                            Case Is = pcenumRingConstraintType.DeonticAcyclicIntransitive
+                                Me.Shape.Image = My.Resources.ORMShapes.deontic_acyclic_intransitive
+                            Case Is = pcenumRingConstraintType.DeonticAntisymmetric
+                                Me.Shape.Image = My.Resources.ORMShapes.deontic_antisymmetric
+                            Case Is = pcenumRingConstraintType.DeonticAssymmetric
+                                Me.Shape.Image = My.Resources.ORMShapes.deontic_asymmetric
+                            Case Is = pcenumRingConstraintType.DeonticAssymmetricIntransitive
+                                Me.Shape.Image = My.Resources.ORMShapes.deontic_asymmetric_intransitive
+                            Case Is = pcenumRingConstraintType.DeonticIntransitive
+                                Me.Shape.Image = My.Resources.ORMShapes.deontic_intransitive
+                            Case Is = pcenumRingConstraintType.DeonticIrreflexive
+                                Me.Shape.Image = My.Resources.ORMShapes.deontic_irreflexive
+                            Case Is = pcenumRingConstraintType.DeonticPurelyReflexive
+                                Me.Shape.Image = My.Resources.ORMShapes.deontic_purely_reflexive
+                            Case Is = pcenumRingConstraintType.DeonticSymmetric
+                                Me.Shape.Image = My.Resources.ORMShapes.deontic_symmetric
+                            Case Is = pcenumRingConstraintType.DeonticSymmetricIntransitive
+                                Me.Shape.Image = My.Resources.ORMShapes.deontic_symmetric_intransitive
+                            Case Is = pcenumRingConstraintType.DeonticSymmetricIrreflexive
+                                Me.Shape.Image = My.Resources.ORMShapes.deontic_symmetric_irreflexive
+                            Case Is = pcenumRingConstraintType.Intransitive
+                                Me.Shape.Image = My.Resources.ORMShapes.intransitive
+                            Case Is = pcenumRingConstraintType.Irreflexive
+                                Me.Shape.Image = My.Resources.ORMShapes.irreflexive
+                            Case Is = pcenumRingConstraintType.PurelyReflexive
+                                Me.Shape.Image = My.Resources.ORMShapes.purely_reflexive
+                            Case Is = pcenumRingConstraintType.Symmetric
+                                Me.Shape.Image = My.Resources.ORMShapes.symmetric
+                            Case Is = pcenumRingConstraintType.SymmetricIntransitive
+                                Me.Shape.Image = My.Resources.ORMShapes.symmetric_intransitive
+                            Case Is = pcenumRingConstraintType.SymmetricIrreflexive
+                                Me.Shape.Image = My.Resources.ORMShapes.symmetric_irreflexive
+                            Case Is = pcenumRingConstraintType.Transitive
+                                Me.Shape.Image = My.Resources.ORMShapes.transative
                         End Select
 
                     Case Is = pcenumRoleConstraintType.InternalUniquenessConstraint
