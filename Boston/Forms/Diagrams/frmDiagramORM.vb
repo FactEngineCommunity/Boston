@@ -5573,7 +5573,7 @@ Public Class frmDiagramORM
 
         Dim lsCommonTransaction As String = System.Guid.NewGuid.ToString
 
-        For Each loORMObject In Me.zrPage.SelectedObject
+        For Each loORMObject In Me.zrPage.SelectedObject.ToArray
 
             Dim lrUserAction As New tUserAction(loORMObject, pcenumUserAction.MoveModelObject, Me.zrPage, lsCommonTransaction)
             lrUserAction.PreActionModelObject = New Boston.tUndoRedoObject(loORMObject.X, loORMObject.Y) 'loORMObject.Clone(Me.zrPage)
