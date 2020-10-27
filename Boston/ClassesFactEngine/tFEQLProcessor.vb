@@ -682,6 +682,16 @@ Namespace FEQL
 
     Public Class DERIVATIONSUBCLAUSE
 
+        Private _MODELELEMENT As New List(Of MODELELEMENTClause)
+        Public Property MODELELEMENT As List(Of MODELELEMENTClause)
+            Get
+                Return Me._MODELELEMENT
+            End Get
+            Set(value As List(Of MODELELEMENTClause))
+                Me._MODELELEMENT = value
+            End Set
+        End Property
+
         Private _MODELELEMENTNAME As New List(Of String)
         Public Property MODELELEMENTNAME As List(Of String)
             Get
@@ -845,7 +855,7 @@ Namespace FEQL
 
                         Dim liInstance As Object = ao_object.GetType.GetProperty(aoParseTreeNode.Token.Type.ToString).GetValue(ao_object)
                         Dim list As IList = CType(liInstance, IList)
-                        list.Add(aoParseTreeNode.Token.Text)
+                        list.Add(Trim(aoParseTreeNode.Token.Text))
                         ao_object.GetType.GetProperty(aoParseTreeNode.Token.Type.ToString).SetValue(ao_object, list, Nothing)
 
                     ElseIf lrType Is GetType(List(Of Object)) Then

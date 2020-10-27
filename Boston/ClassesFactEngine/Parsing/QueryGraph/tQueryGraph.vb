@@ -141,7 +141,7 @@
 
                 liInd = 1
                 Dim larQuerEdgeWithFBMFactType = Me.QueryEdges.FindAll(Function(x) x.FBMFactType IsNot Nothing)
-                Dim larRDSTableQueryEdge = larQuerEdgeWithFBMFactType.FindAll(Function(x) x.FBMFactType.isRDSTable)
+                Dim larRDSTableQueryEdge = larQuerEdgeWithFBMFactType.FindAll(Function(x) x.FBMFactType.isRDSTable And Not x.FBMFactType.IsDerived)
 
                 'RDS Tables
                 For Each lrQueryEdge In larRDSTableQueryEdge
@@ -162,6 +162,11 @@
 
                     lsSQLQuery &= vbCrLf & ","
                     lsSQLQuery &= " " & lrQueryEdge.FBMFactType.Id & Viev.NullVal(lrQueryEdge.Alias, "")
+
+                    Dim lrDerivationProcessor As New FEQL.Processor(prApplication.WorkingModel)
+
+                    Call lrDerivationProcessor.processDerivationText(lrQueryEdge.FBMFactType.DerivationText, lrQueryEdge.FBMFactType)
+
                 Next
 
 #End Region
