@@ -682,6 +682,8 @@ Namespace FEQL
 
     Public Class DERIVATIONSUBCLAUSE
 
+        Public FBMFactType As FBM.FactType = Nothing
+
         Private _MODELELEMENT As New List(Of MODELELEMENTClause)
         Public Property MODELELEMENT As List(Of MODELELEMENTClause)
             Get
@@ -741,6 +743,18 @@ Namespace FEQL
                 Me._MATHCLAUSE = value
             End Set
         End Property
+
+        Public Function isFactTypeOnly() As Boolean
+
+            isFactTypeOnly = True
+
+            If Me.KEYWDCOUNT IsNot Nothing Or
+               Me.EXPRESSION.Count > 0 Or
+               Me.MATHCLAUSE.Count > 0 Then
+                isFactTypeOnly = False
+            End If
+
+        End Function
 
     End Class
 
