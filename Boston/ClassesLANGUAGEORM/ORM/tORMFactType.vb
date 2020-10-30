@@ -2780,6 +2780,43 @@ Namespace FBM
 
         End Function
 
+
+        ''' <summary>
+        ''' TRUE if the FactType is binary and has an associated Transitive Ring Constraint, else FALSE
+        ''' </summary>
+        ''' <returns></returns>
+        Public Function hasTransitiveRingConstraint() As Boolean
+
+            Try
+                '20201030-VM-May have 3 Roles, but use 2 for now.
+                If Me.Arity <> 2 Then Return False
+
+                Dim larBinaryRoleConstraint = From RoleConstraint In Me.Model.RoleConstraint
+                                              Where RoleConstraint.RoleConstraintRole.Count = 2
+                                              Select RoleConstraint
+
+                Dim larTransitiveRingConstraint = From RoleConstraint In larBinaryRoleConstraint
+                                                  Where RoleConstraint.RoleConstraintRole(0).Role.FactType Is Me
+                                                  Where RoleConstraint.RoleConstraintRole(1).Role.FactType Is Me
+                                                  Where RoleConstraint.RoleConstraintType = pcenumRoleConstraintType.RingConstraint
+                                                  Where RoleConstraint.RingConstraintType = pcenumRingConstraintType.Transitive
+                                                  Select RoleConstraint
+
+                Return larTransitiveRingConstraint.Count > 0
+
+            Catch ex As Exception
+                Dim lsMessage1 As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return False
+            End Try
+
+        End Function
+
         Public Overrides Function HasTotalRoleConstraint() As Boolean
 
             '------------------------------------------------------------------------

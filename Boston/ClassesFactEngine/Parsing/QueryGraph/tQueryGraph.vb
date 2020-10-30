@@ -161,11 +161,11 @@
                 For Each lrQueryEdge In Me.QueryEdges.FindAll(Function(x) x.FBMFactType.IsDerived)
 
                     lsSQLQuery &= vbCrLf & ","
-                    lsSQLQuery &= " " & lrQueryEdge.FBMFactType.Id & Viev.NullVal(lrQueryEdge.Alias, "")
+                    'lsSQLQuery &= " " & lrQueryEdge.FBMFactType.Id & Viev.NullVal(lrQueryEdge.Alias, "")
 
                     Dim lrDerivationProcessor As New FEQL.Processor(prApplication.WorkingModel)
 
-                    Call lrDerivationProcessor.processDerivationText(lrQueryEdge.FBMFactType.DerivationText, lrQueryEdge.FBMFactType)
+                    lsSQLQuery &= lrDerivationProcessor.processDerivationText(lrQueryEdge.FBMFactType.DerivationText, lrQueryEdge.FBMFactType)
 
                 Next
 

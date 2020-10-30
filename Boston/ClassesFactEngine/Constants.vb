@@ -38,6 +38,11 @@
             WHICHSELECTStatement
         End Enum
 
+        Public Enum pcenumFEQLDerivationType
+            None
+            TransitiveRingConstraintJoin
+        End Enum
+
 
     End Module
 
