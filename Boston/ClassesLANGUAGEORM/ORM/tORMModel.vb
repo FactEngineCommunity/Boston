@@ -1788,7 +1788,8 @@ Namespace FBM
         ''' <param name="aarModelObject"></param>
         ''' <param name="arFactTypeReading"></param>
         ''' <returns></returns>
-        Public Function getFactTypeByModelObjectsFactTypeReading(ByVal aarModelObject As List(Of FBM.ModelObject), ByVal arFactTypeReading As FBM.FactTypeReading) As FBM.FactType
+        Public Function getFactTypeByModelObjectsFactTypeReading(ByVal aarModelObject As List(Of FBM.ModelObject),
+                                                                 ByVal arFactTypeReading As FBM.FactTypeReading) As FBM.FactType
 
             Try
                 '------------------------------------------------------
@@ -1831,6 +1832,85 @@ Namespace FBM
             End Try
 
         End Function
+
+        Public Function getFactTypeByPartialMatchModelObjectsFactTypeReading(ByVal aarModelObject As List(Of FBM.ModelObject),
+                                                                             ByVal arFactTypeReading As FBM.FactTypeReading,
+                                                                             Optional ByVal abReturnPartialMatchIfFound As Boolean = False) As List(Of FBM.FactType)
+
+            Try
+                '------------------------------------------------------
+                'Check to see if the ModelObjects are in the FactType
+                Dim larFactType = From FactType In Me.FactType
+                                  Where FactType.RoleGroup.Count = aarModelObject.Count
+                                  From Role In FactType.RoleGroup
+                                  From ModelObject In aarModelObject
+                                  Where Role.JoinedORMObject.Id = ModelObject.Id
+                                  Select FactType Distinct
+
+                If larFactType.Count = 0 Then
+                    Return Nothing
+                Else
+                    Dim larFTRFactType = From FactType In larFactType
+                                         From FactTypeReading In FactType.FactTypeReading
+                                         Where arFactTypeReading.EqualsByRoleJoinedModelObjectSequence(FactTypeReading)
+                                         Where arFactTypeReading.EqualsByPredicatePartText(FactTypeReading)
+                                         Select FactType
+
+
+                    If larFTRFactType.Count = 0 Then
+
+                        'Try and find partial match. E.g. TernaryFactType where FactTypeReading matches 1 of the PredicateParts
+                        'Used for QueryEdges in the FactEngine and only where arFactTypeReading is for BinaryFactType
+                        If arFactTypeReading.PredicatePart.Count = 2 Then
+
+                            larFactType = From FactType In Me.FactType
+                                          Where FactType.RoleGroup.Count > aarModelObject.Count
+                                          Where FactType.RoleGroup.FindAll(Function(x) aarModelObject.Contains(x.JoinedORMObject)).Count = aarModelObject.Count
+                                          Select FactType Distinct
+
+
+                            'larFactType = From FactType In Me.FactType
+                            '              Where FactType.RoleGroup.Count > aarModelObject.Count
+                            '              From Role In FactType.RoleGroup
+                            '              Where aarModelObject.Contains(Role.JoinedORMObject)
+                            '              Where FactType.RoleGroup.FindAll(Function(x) aarModelObject.Contains(Role.JoinedORMObject)).Count = aarModelObject.Count
+                            '              Select FactType Distinct
+
+                            larFTRFactType = From FactType In larFactType
+                                             From FactTypeReading In FactType.FactTypeReading
+                                             Where arFactTypeReading.EqualsPartiallyByRoleJoinedModelObjectSequence(FactTypeReading)
+                                             Where arFactTypeReading.EqualsPartiallyByPredicatePartText(FactTypeReading)
+                                             Select FactType Distinct
+
+                            If larFTRFactType.Count = 0 Then
+                                Return Nothing
+                            Else
+                                Return larFTRFactType.ToList
+                            End If
+
+                        Else
+                            Return Nothing
+                        End If
+                    Else
+                        Return larFTRFactType.ToList
+                    End If
+                End If
+
+                Return Nothing
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return Nothing
+            End Try
+
+        End Function
+
 
         ''' <summary>
         ''' Creates a random fact for the specified FactType.

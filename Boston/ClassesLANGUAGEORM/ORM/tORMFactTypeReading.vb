@@ -237,6 +237,32 @@ Namespace FBM
 
         End Function
 
+        ''' <summary>
+        ''' Used in FactEngine queries, to find FTRs for partial matches within a larger FT.Arity and FTR.
+        ''' E.g. "Person visited (Country:'China')" within a larger ternary FT
+        ''' "Person visited (Country:'China') within the last 10 months"
+        ''' </summary>
+        ''' <param name="other"></param>
+        ''' <returns></returns>
+        Public Function EqualsPartiallyByPredicatePartText(ByVal other As FBM.FactTypeReading) As Boolean
+
+            Dim liInd As Integer = 0
+
+            For Each lrPredicatePart In other.PredicatePart
+                If (lrPredicatePart.PredicatePartText = other.PredicatePart(liInd).PredicatePartText) And
+                     (lrPredicatePart.PreBoundText = other.PredicatePart(liInd).PreBoundText) Or
+                     (lrPredicatePart.PostBoundText = other.PredicatePart(liInd).PostBoundText) Then
+                    'Only need one match for this to function to return True.
+                    Return True
+                End If
+                liInd += 1
+            Next
+
+            Return False
+
+        End Function
+
+
         Public Function EqualsByRoleJoinedModelObjectSequence(ByVal other As FBM.FactTypeReading) As Boolean
 
             Dim liInd As Integer = 0
@@ -254,6 +280,44 @@ Namespace FBM
             Next
 
             Return True
+
+        End Function
+
+        ''' <summary>
+        ''' For QueryEdges in FactEngine queries where the QueryEdge is part of a larger FactType.
+        ''' E.g. Where the FactType is ternary, but the QueryEdge is binary and where all QueryEdges are binary.
+        ''' </summary>
+        ''' <param name="other"></param>
+        ''' <returns></returns>
+        Public Function EqualsPartiallyByRoleJoinedModelObjectSequence(ByVal other As FBM.FactTypeReading) As Boolean
+
+            Dim liInd As Integer = 0
+            Dim lrRole As FBM.Role
+
+            Dim liMatchPosition = 0
+            Dim liFirstMatchPosition = -1
+
+            For Each lrRole In other.RoleList
+
+                If lrRole.JoinedORMObject Is other.RoleList(liInd).JoinedORMObject Then
+                    liMatchPosition += 1
+                    If liFirstMatchPosition = -1 Then
+                        liFirstMatchPosition = liMatchPosition
+                    End If
+                End If
+
+                If liMatchPosition > 1 Then
+                    If liMatchPosition = liFirstMatchPosition + 1 Then
+                        Return True
+                    Else
+                        Return False
+                    End If
+                End If
+
+                liInd += 1
+            Next
+
+            Return False
 
         End Function
 

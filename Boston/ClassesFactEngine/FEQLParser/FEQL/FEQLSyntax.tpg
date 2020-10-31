@@ -19,7 +19,7 @@ DOUBLEQUOTE   -> @"""";
 EOF           -> @"^$";
 EQUALS        -> "=";
 FACTTYPENAME -> @"[aA-zZ]+";
-[Color(0, 191, 255)] FOLLOWINGREADINGTEXT -> @"([a-z]+[\s]?)+$";
+[Color(227, 143, 247)] FOLLOWINGREADINGTEXT -> @"([a-z]+[\s]?)+$";
 [Color(216, 127, 178)]	IDENTIFIER -> @"[aA-zZ0-9 \-]+";
 [Color(216, 127, 178)]	MATHFUNCTION -> @"<=|<|=|>=|>";
 MODELNAME     -> @"[aA-zZ]+";

@@ -127,13 +127,13 @@
                     lrPreviousTargetNode = lrQueryEdge.TargetNode
                     lrPreviousTopicNode = lrQueryEdge.BaseNode
 
-                    'Derivation Clauses
-                    If lrQueryEdge.FBMFactType.IsDerived Then
-                        Dim lrDerivationClause = New FEQL.DERIVATIONCLAUSE
+                    ''Derivation Clauses
+                    'If lrQueryEdge.FBMFactType.IsDerived Then
+                    '    Dim lrDerivationClause = New FEQL.DERIVATIONCLAUSE
 
-                        Dim lrParseTree = Me.Parser.Parse(lrQueryEdge.FBMFactType.DerivationText)
-                        Call Me.GetParseTreeTokensReflection(lrDerivationClause, lrParseTree.Nodes(0).Nodes(0))
-                    End If
+                    '    Dim lrParseTree = Me.Parser.Parse(lrQueryEdge.FBMFactType.DerivationText)
+                    '    Call Me.GetParseTreeTokensReflection(lrDerivationClause, lrParseTree.Nodes(0).Nodes(0))
+                    'End If
 
                 Next
 
@@ -230,13 +230,17 @@
                                                   arQueryEdge.TargetNode,
                                                   arQueryEdge.Predicate)
 
-            If Not arQueryEdge.FBMFactType.getPrimaryFactTypeReading.PredicatePart(0).PredicatePartText = arQueryEdge.Predicate Then
-                '    'Switch the Base and Target nodes
-                '    Dim lrTempQueryNode As New FactEngine.QueryNode
-                '    lrTempQueryNode = arQueryEdge.BaseNode
-                '    arQueryEdge.BaseNode = arQueryEdge.TargetNode
-                '    arQueryEdge.TargetNode = lrTempQueryNode
-                arQueryEdge.IsReciprocal = True
+            If arQueryEdge.FBMFactType IsNot Nothing Then
+                If arQueryEdge.FBMFactType.Arity = 2 Then
+                    If Not arQueryEdge.FBMFactType.getPrimaryFactTypeReading.PredicatePart(0).PredicatePartText = arQueryEdge.Predicate Then
+                        '    'Switch the Base and Target nodes
+                        '    Dim lrTempQueryNode As New FactEngine.QueryNode
+                        '    lrTempQueryNode = arQueryEdge.BaseNode
+                        '    arQueryEdge.BaseNode = arQueryEdge.TargetNode
+                        '    arQueryEdge.TargetNode = lrTempQueryNode
+                        arQueryEdge.IsReciprocal = True
+                    End If
+                End If
             End If
 
 
