@@ -40,6 +40,7 @@
 
         Public Enum pcenumFEQLDerivationType
             None
+            Count
             TransitiveRingConstraintJoin
         End Enum
 

@@ -231,6 +231,19 @@ Namespace FEQL
             End Set
         End Property
 
+        ''' <summary>
+        ''' If the WHICHSELECTSTMT begins with a NodePropertyIdentification, then is populated.
+        ''' </summary>
+        Private _NODEPROPERTYIDENTIFICATION As NODEPROPERTYIDENTIFICATION = Nothing
+        Public Property NODEPROPERTYIDENTIFICATION As NODEPROPERTYIDENTIFICATION
+            Get
+                Return Me._NODEPROPERTYIDENTIFICATION
+            End Get
+            Set(value As NODEPROPERTYIDENTIFICATION)
+                Me._NODEPROPERTYIDENTIFICATION = value
+            End Set
+        End Property
+
         Private _MODELELEMENT As New List(Of Object)
         Public Property MODELELEMENT As List(Of Object)
             Get
@@ -667,6 +680,16 @@ Namespace FEQL
             End Set
         End Property
 
+        Private _KEYWDCOUNT As String = Nothing
+        Public Property KEYWDCOUNT As String
+            Get
+                Return Me._KEYWDCOUNT
+            End Get
+            Set(value As String)
+                Me._KEYWDCOUNT = value
+            End Set
+        End Property
+
         Private _DERIVATIONSUBCLAUSE As New List(Of DERIVATIONSUBCLAUSE)
 
         Public Property DERIVATIONSUBCLAUSE As List(Of DERIVATIONSUBCLAUSE)
@@ -752,6 +775,11 @@ Namespace FEQL
                Me.EXPRESSION.Count > 0 Or
                Me.MATHCLAUSE.Count > 0 Then
                 isFactTypeOnly = False
+            End If
+
+            'for now
+            If Me.KEYWDCOUNT IsNot Nothing Then
+                isFactTypeOnly = True
             End If
 
         End Function

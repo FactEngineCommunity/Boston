@@ -80,6 +80,10 @@
 
                         Return Me.getTransitiveRingConstraintJoinSQL(lrDerivationClause, arFactType)
 
+                    Case Is = FactEngine.pcenumFEQLDerivationType.Count
+
+                        Return Me.getCountDerivationSQL(lrDerivationClause, arFactType)
+
                 End Select
 
                 Return ""
@@ -90,8 +94,31 @@
 
         End Function
 
+        Private Function getCountDerivationSQL(ByRef arDerivationClause As FEQL.DERIVATIONCLAUSE,
+                                               ByRef arFactType As FBM.FactType) As String
+
+            Dim lsSQL As String = ""
+
+            '(SELECT O2.Order_Nr, Count(*) As Arity 
+            'From OrderItem O2,
+            'Group By O2.Order_Nr) As OrderArity
+
+            lsSQL = "(" & vbCrLf
+
+            Dim lsBaseTableName = arDerivationClause.DERIVATIONSUBCLAUSE(0).MODELELEMENTNAME(0)
+            Dim lrColumn = arDerivationClause.DERIVATIONSUBCLAUSE(0).FBMFactType.getCorrespondingRDSTable.Column.Find(Function(x) x.Role.JoinedORMObject.Id = lsBaseTableName)
+
+            lsSQL &= "SELECT " & lrColumn.Name
+            lsSQL &= ", COUNT(*) AS " & arFactType.RoleGroup(1).JoinedORMObject.Id & vbCrLf
+            lsSQL &= "FROM " & arDerivationClause.DERIVATIONSUBCLAUSE(0).FBMFactType.getCorrespondingRDSTable.Name & vbCrLf
+            lsSQL &= "GROUP BY " & lrColumn.Name
+            lsSQL &= ") AS " & arFactType.Name
+            Return lsSQL
+
+        End Function
+
         Private Function getTransitiveRingConstraintJoinSQL(ByRef arDerivationClause As FEQL.DERIVATIONCLAUSE,
-                                                            ByRef arFactType As FBM.FactType)
+                                                            ByRef arFactType As FBM.FactType) As String
 
             ''(
             ''With RECURSIVE my_tree As (
@@ -190,6 +217,11 @@
                arDerivationClause.DERIVATIONSUBCLAUSE(0).FBMFactType.hasTransitiveRingConstraint Then
 
                 Return FactEngine.pcenumFEQLDerivationType.TransitiveRingConstraintJoin
+
+            ElseIf arDerivationClause.DERIVATIONSUBCLAUSE.Count = 1 And
+                   arDerivationClause.KEYWDCOUNT IsNot Nothing Then
+
+                Return FactEngine.pcenumFEQLDerivationType.Count
 
             End If
 

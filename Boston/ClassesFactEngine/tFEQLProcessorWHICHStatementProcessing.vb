@@ -21,7 +21,13 @@
                 Me.MODELELEMENTCLAUSE = New FEQL.MODELELEMENTClause
 
                 'Call Me.GetParseTreeTokensReflection(Me.MODELELEMENTCLAUSE, Me.WHICHSELECTStatement.MODELELEMENT(0)) '
-                Dim lrFBMModelObject As FBM.ModelObject = Me.Model.GetModelObjectByName(Me.WHICHSELECTStatement.NODE(0).MODELELEMENTNAME) 'MODELELEMENTNAME
+                Dim lrFBMModelObject As FBM.ModelObject
+                If Me.WHICHSELECTStatement.NODEPROPERTYIDENTIFICATION IsNot Nothing Then
+                    lrFBMModelObject = Me.Model.GetModelObjectByName(Me.WHICHSELECTStatement.NODEPROPERTYIDENTIFICATION.MODELELEMENTNAME) 'MODELELEMENTNAME
+                Else
+                    lrFBMModelObject = Me.Model.GetModelObjectByName(Me.WHICHSELECTStatement.NODE(0).MODELELEMENTNAME) 'MODELELEMENTNAME
+                End If
+
                 If lrFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & Me.WHICHSELECTStatement.MODELELEMENTNAME(0) & "'.")
                 lrQueryGraph.HeadNode = New FactEngine.QueryNode(lrFBMModelObject)
                 lrQueryGraph.HeadNode.Alias = Me.MODELELEMENTCLAUSE.MODELELEMENTSUFFIX
