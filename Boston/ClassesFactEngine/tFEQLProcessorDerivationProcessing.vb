@@ -81,7 +81,7 @@
                         Return Me.getTransitiveRingConstraintJoinSQL(lrDerivationClause, arFactType)
 
                     Case Is = FactEngine.pcenumFEQLDerivationType.Count
-
+                        arFactType.DerivationType = FactEngine.Constants.pcenumFEQLDerivationType.Count
                         Return Me.getCountDerivationSQL(lrDerivationClause, arFactType)
 
                 End Select
@@ -221,6 +221,7 @@
             ElseIf arDerivationClause.DERIVATIONSUBCLAUSE.Count = 1 And
                    arDerivationClause.KEYWDCOUNT IsNot Nothing Then
 
+                arDerivationClause.DERIVATIONSUBCLAUSE(0).FBMFactType.DerivationType = FactEngine.Constants.pcenumFEQLDerivationType.Count
                 Return FactEngine.pcenumFEQLDerivationType.Count
 
             End If

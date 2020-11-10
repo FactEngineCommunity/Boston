@@ -62,9 +62,9 @@
                 For Each lrProjectColumn In larProjectionColumn.FindAll(Function(x) x IsNot Nothing)
 
                     If lrProjectColumn.Role.FactType.IsDerived Then
-                        lsSQLQuery &= lrProjectColumn.Role.FactType.Id & Viev.NullVal(lrProjectColumn.TemporaryAlias, "") & "." & lrProjectColumn.Name
+                        lsSQLQuery &= "[" & lrProjectColumn.Role.FactType.Id & Viev.NullVal(lrProjectColumn.TemporaryAlias, "") & "]." & lrProjectColumn.Name
                     Else
-                        lsSQLQuery &= lrProjectColumn.Table.DatabaseName & Viev.NullVal(lrProjectColumn.TemporaryAlias, "") & "." & lrProjectColumn.Name
+                        lsSQLQuery &= "[" & lrProjectColumn.Table.DatabaseName & Viev.NullVal(lrProjectColumn.TemporaryAlias, "") & "]." & lrProjectColumn.Name
                     End If
                     If liInd < larProjectionColumn.Count Then lsSQLQuery &= ","
                     liInd += 1
@@ -158,12 +158,10 @@
                 Next
 
                 'Derived FactTypes
+                Dim lrDerivationProcessor As New FEQL.Processor(prApplication.WorkingModel)
                 For Each lrQueryEdge In Me.QueryEdges.FindAll(Function(x) x.FBMFactType.IsDerived)
 
                     lsSQLQuery &= vbCrLf & ","
-                    'lsSQLQuery &= " " & lrQueryEdge.FBMFactType.Id & Viev.NullVal(lrQueryEdge.Alias, "")
-
-                    Dim lrDerivationProcessor As New FEQL.Processor(prApplication.WorkingModel)
 
                     lsSQLQuery &= lrDerivationProcessor.processDerivationText(lrQueryEdge.FBMFactType.DerivationText, lrQueryEdge.FBMFactType)
 
@@ -176,10 +174,15 @@
                                              Where QueryEdge.TargetNode IsNot Nothing
                                              Select QueryEdge
 
+                'WhereEdges are Where joins, rather than ConditionalQueryEdges which test for values by identifiers.
                 Dim larWhereEdges = larEdgesWithTargetNode.ToList.FindAll(Function(x) (x.TargetNode.FBMModelObject.ConceptType <> pcenumConceptType.ValueType And
                                                                        x.BaseNode.FBMModelObject.ConceptType <> pcenumConceptType.ValueType) Or
                                                                        x.FBMFactType.isRDSTable
                                                                        )
+
+                'Add special DerivedFactType WhereEdges
+                larWhereEdges.AddRange(Me.QueryEdges.FindAll(Function(x) x.FBMFactType.DerivationType = pcenumFEQLDerivationType.Count))
+
 
                 Dim larConditionalQueryEdges As New List(Of FactEngine.QueryEdge)
                 larConditionalQueryEdges = larEdgesWithTargetNode.ToList.FindAll(Function(x) x.IdentifierList.Count > 0 Or
@@ -188,7 +191,7 @@
                 'BooleanPredicate edges. E.g. Protein is enzyme
                 larConditionalQueryEdges.AddRange(Me.QueryEdges.FindAll(Function(x) x.TargetNode Is Nothing))
 
-                If larWhereEdges.Count = 0 And larConditionalQueryEdges.Count = 0 Then
+                If larWhereEdges.Count = 0 And larConditionalQueryEdges.Count = 0 And (Not Me.HeadNode.HasIdentifier) Then
                     Return lsSQLQuery
                 End If
 
@@ -289,6 +292,13 @@
                         '            lsSQLQuery &= lrOriginTable.Name & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrTargetColumn.Name 'lrOriginTable.getColumnByOrdingalPosition(2).Name
                         '        Next
                         'End Select
+                    ElseIf lrQueryEdge.FBMFactType.DerivationType = pcenumFEQLDerivationType.Count Then
+
+                        Dim lrBaseNode, lrTargetNode As FactEngine.QueryNode
+                        lrBaseNode = lrQueryEdge.BaseNode
+                        lrTargetNode = New FactEngine.QueryNode(lrQueryEdge.FBMFactType, lrQueryEdge)
+
+                        lsSQLQuery &= lrBaseNode.Name & "." & lrBaseNode.RDSTable.getPrimaryKeyColumns.First.Name & " = " & lrTargetNode.Name & "." & lrBaseNode.RDSTable.getPrimaryKeyColumns.First.Name
 
                     Else
                         Dim lrBaseNode, lrTargetNode As FactEngine.QueryNode
@@ -362,7 +372,7 @@
                     Dim lrTargetTable = Me.HeadNode.RDSTable
                     liInd = 0
                     For Each lrColumn In Me.HeadNode.RDSTable.getFirstUniquenessConstraintColumns
-                        lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") & lrTargetTable.Name & Viev.NullVal(Me.HeadNode.Alias, "") & "." & lrColumn.Name & " = '" & Me.HeadNode.IdentifierList(liInd) & "'" & vbCrLf
+                        lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") & "[" & lrTargetTable.Name & Viev.NullVal(Me.HeadNode.Alias, "") & "]." & lrColumn.Name & " = '" & Me.HeadNode.IdentifierList(liInd) & "'" & vbCrLf
                         If liInd < Me.HeadNode.IdentifierList.Count - 1 Then lsSQLQuery &= "AND "
                         liInd += 1
                     Next

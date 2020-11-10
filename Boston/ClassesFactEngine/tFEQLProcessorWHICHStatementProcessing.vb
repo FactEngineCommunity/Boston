@@ -32,6 +32,13 @@
                 lrQueryGraph.HeadNode = New FactEngine.QueryNode(lrFBMModelObject)
                 lrQueryGraph.HeadNode.Alias = Me.MODELELEMENTCLAUSE.MODELELEMENTSUFFIX
 
+                If Me.WHICHSELECTStatement.NODEPROPERTYIDENTIFICATION IsNot Nothing Then
+                    For Each lsIdentifier In Me.WHICHSELECTStatement.NODEPROPERTYIDENTIFICATION.IDENTIFIER
+                        lrQueryGraph.HeadNode.IdentifierList.Add(lsIdentifier)
+                    Next
+                    lrQueryGraph.HeadNode.HasIdentifier = True
+                End If
+
                 If Me.WHICHSELECTStatement.NODE(0).NODEPROPERTYIDENTIFICATION IsNot Nothing Then
                     lrQueryGraph.HeadNode.HasIdentifier = True
                     For Each lsIdentifier In Me.WHICHSELECTStatement.NODE(0).NODEPROPERTYIDENTIFICATION.IDENTIFIER

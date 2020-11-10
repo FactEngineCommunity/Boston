@@ -221,10 +221,10 @@ Namespace FBM
         <XmlIgnore()> _
         <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
         Public _IsDerived As Boolean = False
-        <XmlAttribute()> _
-        <CategoryAttribute("Fact Type"), _
-        DefaultValueAttribute(False), _
-        DescriptionAttribute("True if the Fact Type is derived.")> _
+        <XmlAttribute()>
+        <CategoryAttribute("Fact Type"),
+        DefaultValueAttribute(False),
+        DescriptionAttribute("True if the Fact Type is derived.")>
         Public Property IsDerived As Boolean
             Get
                 Return Me._IsDerived
@@ -233,6 +233,12 @@ Namespace FBM
                 Me._IsDerived = value
             End Set
         End Property
+
+        ''' <summary>
+        ''' Only set by the FactEngine FEQL Processor at query time, so that FBM objects are not coupled to the FactEngine.
+        ''' </summary>
+        Public DerivationType As FactEngine.pcenumFEQLDerivationType = FactEngine.Constants.pcenumFEQLDerivationType.None
+
 
         <XmlIgnore()> _
         <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
