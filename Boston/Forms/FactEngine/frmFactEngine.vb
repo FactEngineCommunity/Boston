@@ -1051,7 +1051,7 @@ Public Class frmFactEngine
             Dim larParseNode As New List(Of FEQL.ParseNode)
             Dim lrModelElement As FBM.ModelObject
 
-            If Me.TextBoxInput.Text.Length > 10 Then 'was 21            
+            If Me.TextBoxInput.Text.Length > 5 Then 'was 10            
                 Me.TextMarker.Clear()
 
                 Call Me.GetMODELELEMENTParseNodes(Me.zrTextHighlighter.Tree.Nodes(0), larModelElementNameParseNode)
@@ -1134,13 +1134,26 @@ Public Class frmFactEngine
 
             End If
 
+            Dim laiExpectedToken As New List(Of FEQL.TokenType)
+            If Me.zrTextHighlighter.Tree.Errors.Count > 0 Then
+                If Me.zrTextHighlighter.Tree.Errors(0).ExpectedToken <> "" Then
+                    laiExpectedToken.Add(DirectCast([Enum].Parse(GetType(FEQL.TokenType), Me.zrTextHighlighter.Tree.Errors(0).ExpectedToken), FEQL.TokenType))
+                End If
+
+                For Each lrParseError In Me.zrTextHighlighter.Tree.Optionals
+                    laiExpectedToken.Add(DirectCast([Enum].Parse(GetType(FEQL.TokenType), lrParseError.ExpectedToken), FEQL.TokenType))
+                Next
+            End If
+
+            Dim lrLastModelElementNameParseNode As FEQL.ParseNode
+
             '============================================================================================
             'Do ultrasmart checking. Finds the last ModelElementName and the last PredicateClause
             '  and if a FactTypeReading is being attempted to be made, finds the next ModelElementName
             If larModelElementNameParseNode.Count > 0 Or larModelPredicateClauseParseNode.Count > 0 Then
 
                 Dim lrFirstModelElementNameParseNode = larModelElementNameParseNode(0)
-                Dim lrLastModelElementNameParseNode = larModelElementNameParseNode(larModelElementNameParseNode.Count - 1)
+                lrLastModelElementNameParseNode = larModelElementNameParseNode(larModelElementNameParseNode.Count - 1)
                 'Dim lrLastPredicateClauseParseNode = larModelPredicateClauseParseNode(larModelPredicateClauseParseNode.Count - 1)
 
                 Dim lrFirstModelElement = prApplication.WorkingModel.GetModelObjectByName(lrFirstModelElementNameParseNode.Token.Text)
@@ -1265,20 +1278,21 @@ Public Class frmFactEngine
                     End Select
 
 
-                    Dim laiExpectedToken As New List(Of FEQL.TokenType)
-                    If Me.zrTextHighlighter.Tree.Errors.Count > 0 Then
-                        If Me.zrTextHighlighter.Tree.Errors(0).ExpectedToken <> "" Then
-                            laiExpectedToken.Add(DirectCast([Enum].Parse(GetType(FEQL.TokenType), Me.zrTextHighlighter.Tree.Errors(0).ExpectedToken), FEQL.TokenType))
-                        End If
+                    'Dim laiExpectedToken As New List(Of FEQL.TokenType)
+                    'If Me.zrTextHighlighter.Tree.Errors.Count > 0 Then
+                    '    If Me.zrTextHighlighter.Tree.Errors(0).ExpectedToken <> "" Then
+                    '        laiExpectedToken.Add(DirectCast([Enum].Parse(GetType(FEQL.TokenType), Me.zrTextHighlighter.Tree.Errors(0).ExpectedToken), FEQL.TokenType))
+                    '    End If
 
-                        For Each lrParseError In Me.zrTextHighlighter.Tree.Optionals
-                            laiExpectedToken.Add(DirectCast([Enum].Parse(GetType(FEQL.TokenType), lrParseError.ExpectedToken), FEQL.TokenType))
-                        Next
-                    End If
+                    '    For Each lrParseError In Me.zrTextHighlighter.Tree.Optionals
+                    '        laiExpectedToken.Add(DirectCast([Enum].Parse(GetType(FEQL.TokenType), lrParseError.ExpectedToken), FEQL.TokenType))
+                    '    Next
+                    'End If
 
 
                     If (Me.zrTextHighlighter.GetCurrentContext.Token.Type = FEQL.TokenType.IDENTIFIER) Or
                         laiExpectedToken.Contains(FEQL.TokenType.IDENTIFIER) Then
+
                         lrModelElement = prApplication.WorkingModel.GetModelObjectByName(lrLastModelElementNameParseNode.Token.Text)
 
                         If lrModelElement.ConceptType = pcenumConceptType.ValueType Then
@@ -1296,6 +1310,16 @@ Public Class frmFactEngine
                             liInd += 1
                         Next
                         lsSQLQuery &= vbCrLf & "FROM " & lrModelElement.Id
+                        If Me.zrTextHighlighter.GetCurrentContext.Token.Type = FEQL.TokenType.IDENTIFIER Then
+                            Try
+                                If lrModelElement.getCorrespondingRDSTable.getFirstUniquenessConstraintColumns.Count > 0 Then
+                                    Dim lsDatabaseWildcardOperator = Database.gerLikeWildcardOperator(prApplication.WorkingModel.TargetDatabaseType)
+                                    lsSQLQuery &= vbCrLf & "WHERE " & lrModelElement.getCorrespondingRDSTable.getFirstUniquenessConstraintColumns(0).Name & " LIKE '" & Me.zrTextHighlighter.GetCurrentContext.Token.Text & lsDatabaseWildcardOperator & "'"
+                                End If
+                            Catch ex As Exception
+                                'Do nothing. Just don't add anything to the SQL.
+                            End Try
+                        End If
                         lsSQLQuery &= vbCrLf & "LIMIT 20"
                         Dim lrRecordset As ORMQL.Recordset
                         Try
@@ -1322,6 +1346,63 @@ Public Class frmFactEngine
 
             End If
 
+#Region "Identifier"
+            If larModelElementNameParseNode.Count > 0 Then
+
+                lrLastModelElementNameParseNode = larModelElementNameParseNode(larModelElementNameParseNode.Count - 1)
+
+                If (Me.zrTextHighlighter.GetCurrentContext.Token.Type = FEQL.TokenType.IDENTIFIER) Or
+                        laiExpectedToken.Contains(FEQL.TokenType.IDENTIFIER) Then
+                    lrModelElement = prApplication.WorkingModel.GetModelObjectByName(lrLastModelElementNameParseNode.Token.Text)
+
+                    If lrModelElement.ConceptType = pcenumConceptType.ValueType Then
+                        If CType(lrModelElement, FBM.ValueType).ValueConstraint.Count > 0 Then
+                            For Each lsValue In CType(lrModelElement, FBM.ValueType).ValueConstraint
+                                Call Me.AddEnterpriseAwareItem(lsValue,,,, True)
+                            Next
+                        End If
+                    End If
+                    Dim lsSQLQuery = "SELECT "
+                    Dim liInd = 0
+                    For Each lrColumn In lrModelElement.getCorrespondingRDSTable.getFirstUniquenessConstraintColumns
+                        If liInd > 0 Then lsSQLQuery &= " ,"
+                        lsSQLQuery &= lrColumn.Name
+                        liInd += 1
+                    Next
+                    lsSQLQuery &= vbCrLf & "FROM " & lrModelElement.Id
+                    If Me.zrTextHighlighter.GetCurrentContext.Token.Type = FEQL.TokenType.IDENTIFIER Then
+                        Try
+                            If lrModelElement.getCorrespondingRDSTable.getFirstUniquenessConstraintColumns.Count > 0 Then
+                                Dim lsDatabaseWildcardOperator = Database.gerLikeWildcardOperator(prApplication.WorkingModel.TargetDatabaseType)
+                                lsSQLQuery &= vbCrLf & "WHERE " & lrModelElement.getCorrespondingRDSTable.getFirstUniquenessConstraintColumns(0).Name & " LIKE '" & Me.zrTextHighlighter.GetCurrentContext.Token.Text & lsDatabaseWildcardOperator & "'"
+                            End If
+                        Catch ex As Exception
+                            'Do nothing. Just don't add anything to the SQL.
+                        End Try
+                    End If
+                    lsSQLQuery &= vbCrLf & "LIMIT 20"
+                    Dim lrRecordset As ORMQL.Recordset
+                    Try
+                        lrRecordset = Me.FEQLProcessor.DatabaseManager.GO(lsSQLQuery)
+
+                        For Each lrFact In lrRecordset.Facts
+                            Dim lsString As String = ""
+                            liInd = 0
+                            For Each lrData In lrFact.Data
+                                If liInd > 0 Then lsString &= ","
+                                lsString &= lrData.Data
+                            Next
+                            Call Me.AddEnterpriseAwareItem(lsString)
+                        Next
+                    Catch ex As Exception
+                        Me.LabelError.Text = ex.Message
+                    End Try
+
+                    Call Me.showAutoCompleteForm()
+                    Exit Sub
+                End If
+            End If
+#End Region
 
 
             '============================================================================================

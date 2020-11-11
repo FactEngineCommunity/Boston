@@ -25,6 +25,22 @@ Namespace Database
         End Function
 
         ''' <summary>
+        ''' Returns the wildcard operator for a database type. I.e. e.g. * or %
+        ''' </summary>
+        ''' <param name="aiDatabaseType"></param>
+        ''' <returns></returns>
+        Public Function gerLikeWildcardOperator(ByVal aiDatabaseType As pcenumDatabaseType) As String
+
+            Select Case aiDatabaseType
+                Case Is = pcenumDatabaseType.MSJet
+                    Return "*"
+                Case Else
+                    Return "%"
+            End Select
+
+        End Function
+
+        ''' <summary>
         ''' RETURNS TRUE if SuccessfulImplementation
         '''  ELSE FALSE if NOT SuccessfulImplementation
         '''             OR No RequiredUpgrade exists
