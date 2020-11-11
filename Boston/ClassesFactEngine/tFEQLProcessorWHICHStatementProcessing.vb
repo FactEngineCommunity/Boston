@@ -259,7 +259,13 @@
                         '    lrTempQueryNode = arQueryEdge.BaseNode
                         '    arQueryEdge.BaseNode = arQueryEdge.TargetNode
                         '    arQueryEdge.TargetNode = lrTempQueryNode
-                        arQueryEdge.IsReciprocal = True
+                        If arQueryEdge.FBMFactType.IsManyTo1BinaryFactType Then
+                            If arQueryEdge.BaseNode.Name <> arQueryEdge.FBMFactType.RoleGroup(0).JoinedORMObject.Id Then
+                                arQueryEdge.IsReciprocal = True
+                            ElseIf arQueryEdge.BaseNode.Name = arQueryEdge.TargetNode.Name Then
+                                arQueryEdge.IsReciprocal = True
+                            End If
+                        End If
                     End If
                 End If
             End If
@@ -311,7 +317,9 @@
                 '    arQueryEdge.BaseNode = arQueryEdge.TargetNode
                 '    arQueryEdge.TargetNode = lrTempQueryNode
                 '    arQueryGraph.HeadNode = arQueryEdge.BaseNode
-                arQueryEdge.IsReciprocal = True
+                If arQueryEdge.FBMFactType.IsManyTo1BinaryFactType And arQueryEdge.BaseNode.Name <> arQueryEdge.FBMFactType.RoleGroup(0).JoinedORMObject.Id Then
+                    arQueryEdge.IsReciprocal = True
+                End If
             End If
 
         End Sub
@@ -436,7 +444,9 @@
                                                   arQueryEdge.Predicate)
 
             If Not arQueryEdge.FBMFactType.getPrimaryFactTypeReading.PredicatePart(0).PredicatePartText = arQueryEdge.Predicate Then
-                arQueryEdge.IsReciprocal = True
+                If arQueryEdge.FBMFactType.IsManyTo1BinaryFactType And arQueryEdge.BaseNode.Name <> arQueryEdge.FBMFactType.RoleGroup(0).JoinedORMObject.Id Then
+                    arQueryEdge.IsReciprocal = True
+                End If
             End If
 
 
@@ -693,6 +703,7 @@
 
             arQueryEdge.TargetNode = New FactEngine.QueryNode(lrFBMModelObject)
             arQueryEdge.TargetNode.Alias = Me.MODELELEMENTCLAUSE.MODELELEMENTSUFFIX
+            If arQueryEdge.IdentifierList.Count > 0 Then arQueryEdge.TargetNode.HasIdentifier = True
             If arWHICHCLAUSE.NODE.Count > 0 Then
                 arQueryEdge.TargetNode.PreboundText = arWHICHCLAUSE.NODE(0).PREBOUNDREADINGTEXT
                 arQueryEdge.TargetNode.PostboundText = arWHICHCLAUSE.NODE(0).POSTBOUNDREADINGTEXT

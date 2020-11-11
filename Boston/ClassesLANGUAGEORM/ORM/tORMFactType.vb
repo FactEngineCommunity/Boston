@@ -2569,7 +2569,7 @@ Namespace FBM
                                          Select FactTypeReading
 
                 If larFactTypeReading.Count = 0 Then
-                    Return Me.FactTypeReading(1)
+                    Return Me.FactTypeReading(0)
                 Else
                     Return larFactTypeReading.First
                 End If

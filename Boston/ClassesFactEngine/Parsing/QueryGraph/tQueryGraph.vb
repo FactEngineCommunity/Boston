@@ -513,7 +513,7 @@
                                         Dim lsAlias As String = ""
 
                                         'Check for reciprocal reading. As in WHICH Person was armed by (Person 2:'David') rather than WHICH Person armed (Person 2:'Saul')
-                                        If Not lrQueryEdge.IsReciprocal Then 'was lrQueryEdge.TargetNode.HasIdentifier
+                                        If lrQueryEdge.TargetNode.HasIdentifier Then
                                             lrTargetTable = lrQueryEdge.TargetNode.FBMModelObject.getCorrespondingRDSTable
                                             lsAlias = Viev.NullVal(lrQueryEdge.TargetNode.Alias, "")
                                         Else
