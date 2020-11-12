@@ -22,11 +22,11 @@
 
                 'Call Me.GetParseTreeTokensReflection(Me.MODELELEMENTCLAUSE, Me.WHICHSELECTStatement.MODELELEMENT(0)) '
                 Dim lrFBMModelObject As FBM.ModelObject
-                If Me.WHICHSELECTStatement.NODEPROPERTYIDENTIFICATION IsNot Nothing Then
-                    If Me.WHICHSELECTStatement.NODEPROPERTYIDENTIFICATION.MODELELEMENTNAME = Me.WHICHSELECTStatement.MODELELEMENTNAME(0) Then
-                        lrFBMModelObject = Me.Model.GetModelObjectByName(Me.WHICHSELECTStatement.NODEPROPERTYIDENTIFICATION.MODELELEMENTNAME) 'MODELELEMENTNAME
+                If Me.Parsetree.Nodes(0).Nodes(0).Nodes(0).Token.Type = TokenType.NODEPROPERTYIDENTIFICATION Then
+                    If Me.WHICHSELECTStatement.NODEPROPERTYIDENTIFICATION(0).MODELELEMENTNAME = Me.WHICHSELECTStatement.MODELELEMENTNAME(0) Then
+                        lrFBMModelObject = Me.Model.GetModelObjectByName(Me.WHICHSELECTStatement.NODEPROPERTYIDENTIFICATION(0).MODELELEMENTNAME) 'MODELELEMENTNAME
                     Else
-                        lrFBMModelObject = Me.Model.GetModelObjectByName(Me.WHICHSELECTStatement.NODE(0).MODELELEMENTNAME)
+                        lrFBMModelObject = Me.Model.GetModelObjectByName(Me.WHICHSELECTStatement.MODELELEMENTNAME(0))
                     End If
                 Else
                     lrFBMModelObject = Me.Model.GetModelObjectByName(Me.WHICHSELECTStatement.NODE(0).MODELELEMENTNAME) 'MODELELEMENTNAME
@@ -36,16 +36,16 @@
                 lrQueryGraph.HeadNode = New FactEngine.QueryNode(lrFBMModelObject)
                 lrQueryGraph.HeadNode.Alias = Me.WHICHSELECTStatement.NODE(0).MODELELEMENTSUFFIX
 
-                If Me.WHICHSELECTStatement.NODEPROPERTYIDENTIFICATION IsNot Nothing Then
+                If Me.WHICHSELECTStatement.NODEPROPERTYIDENTIFICATION.Count > 0 Then
                     If Me.WHICHSELECTStatement.NODE.Count <> Me.WHICHSELECTStatement.MODELELEMENTNAME.Count Then
                         If Me.Parsetree.Nodes(0).Nodes(0).Nodes(0).Token.Type = TokenType.NODEPROPERTYIDENTIFICATION Then
-                            For Each lsIdentifier In Me.WHICHSELECTStatement.NODEPROPERTYIDENTIFICATION.IDENTIFIER
+                            For Each lsIdentifier In Me.WHICHSELECTStatement.NODEPROPERTYIDENTIFICATION(0).IDENTIFIER
                                 lrQueryGraph.HeadNode.IdentifierList.Add(lsIdentifier)
                             Next
                             lrQueryGraph.HeadNode.HasIdentifier = True
                         End If
                     End If
-                    End If
+                End If
 
                 If Me.WHICHSELECTStatement.NODE(0).NODEPROPERTYIDENTIFICATION IsNot Nothing Then
                     lrQueryGraph.HeadNode.HasIdentifier = True
@@ -408,10 +408,10 @@
             arQueryEdge.IsProjectColumn = True
 
             'Set the BaseNode
-            If Me.WHICHCLAUSE.KEYWDTHAT.Count = 1 And
+            If (arPreviousTargetNode IsNot Nothing) And Me.WHICHCLAUSE.KEYWDTHAT.Count = 1 And
                                (Me.WHICHCLAUSE.KEYWDWHICH IsNot Nothing Or Me.WHICHCLAUSE.KEYWDA IsNot Nothing) Then
                 arQueryEdge.BaseNode = arPreviousTargetNode
-            ElseIf Me.WHICHCLAUSE.KEYWDTHAT.Count = 1 And
+            ElseIf (arPreviousTargetNode IsNot Nothing) And Me.WHICHCLAUSE.KEYWDTHAT.Count = 1 And
                                (Me.WHICHCLAUSE.KEYWDWHICH Is Nothing And Me.WHICHCLAUSE.KEYWDA Is Nothing) Then
                 arQueryEdge.BaseNode = arPreviousTargetNode
             Else

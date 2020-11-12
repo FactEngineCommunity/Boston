@@ -1289,58 +1289,59 @@ Public Class frmFactEngine
                     '    Next
                     'End If
 
+                    '=========================================================================
+                    'If (Me.zrTextHighlighter.GetCurrentContext.Token.Type = FEQL.TokenType.IDENTIFIER) Or
+                    '    laiExpectedToken.Contains(FEQL.TokenType.IDENTIFIER) Then
 
-                    If (Me.zrTextHighlighter.GetCurrentContext.Token.Type = FEQL.TokenType.IDENTIFIER) Or
-                        laiExpectedToken.Contains(FEQL.TokenType.IDENTIFIER) Then
+                    '    lrModelElement = prApplication.WorkingModel.GetModelObjectByName(lrLastModelElementNameParseNode.Token.Text)
 
-                        lrModelElement = prApplication.WorkingModel.GetModelObjectByName(lrLastModelElementNameParseNode.Token.Text)
+                    '    If lrModelElement.ConceptType = pcenumConceptType.ValueType Then
+                    '        If CType(lrModelElement, FBM.ValueType).ValueConstraint.Count > 0 Then
+                    '            For Each lsValue In CType(lrModelElement, FBM.ValueType).ValueConstraint
+                    '                Call Me.AddEnterpriseAwareItem(lsValue,,,, True)
+                    '            Next
+                    '        End If
+                    '    End If
+                    '    Dim lsSQLQuery = "SELECT "
+                    '    Dim liInd = 0
+                    '    For Each lrColumn In lrModelElement.getCorrespondingRDSTable.getFirstUniquenessConstraintColumns
+                    '        If liInd > 0 Then lsSQLQuery &= " ,"
+                    '        lsSQLQuery &= lrColumn.Name
+                    '        liInd += 1
+                    '    Next
+                    '    lsSQLQuery &= vbCrLf & "FROM " & lrModelElement.Id
+                    '    If Me.zrTextHighlighter.GetCurrentContext.Token.Type = FEQL.TokenType.IDENTIFIER Then
+                    '        Try
+                    '            If lrModelElement.getCorrespondingRDSTable.getFirstUniquenessConstraintColumns.Count > 0 Then
+                    '                Dim lsDatabaseWildcardOperator = Database.gerLikeWildcardOperator(prApplication.WorkingModel.TargetDatabaseType)
+                    '                lsSQLQuery &= vbCrLf & "WHERE " & lrModelElement.getCorrespondingRDSTable.getFirstUniquenessConstraintColumns(0).Name & " LIKE '" & Me.zrTextHighlighter.GetCurrentContext.Token.Text & lsDatabaseWildcardOperator & "'"
+                    '            End If
+                    '        Catch ex As Exception
+                    '            'Do nothing. Just don't add anything to the SQL.
+                    '        End Try
+                    '    End If
+                    '    lsSQLQuery &= vbCrLf & "LIMIT 20"
+                    '    Dim lrRecordset As ORMQL.Recordset
+                    '    Try
+                    '        lrRecordset = Me.FEQLProcessor.DatabaseManager.GO(lsSQLQuery)
 
-                        If lrModelElement.ConceptType = pcenumConceptType.ValueType Then
-                            If CType(lrModelElement, FBM.ValueType).ValueConstraint.Count > 0 Then
-                                For Each lsValue In CType(lrModelElement, FBM.ValueType).ValueConstraint
-                                    Call Me.AddEnterpriseAwareItem(lsValue,,,, True)
-                                Next
-                            End If
-                        End If
-                        Dim lsSQLQuery = "SELECT "
-                        Dim liInd = 0
-                        For Each lrColumn In lrModelElement.getCorrespondingRDSTable.getFirstUniquenessConstraintColumns
-                            If liInd > 0 Then lsSQLQuery &= " ,"
-                            lsSQLQuery &= lrColumn.Name
-                            liInd += 1
-                        Next
-                        lsSQLQuery &= vbCrLf & "FROM " & lrModelElement.Id
-                        If Me.zrTextHighlighter.GetCurrentContext.Token.Type = FEQL.TokenType.IDENTIFIER Then
-                            Try
-                                If lrModelElement.getCorrespondingRDSTable.getFirstUniquenessConstraintColumns.Count > 0 Then
-                                    Dim lsDatabaseWildcardOperator = Database.gerLikeWildcardOperator(prApplication.WorkingModel.TargetDatabaseType)
-                                    lsSQLQuery &= vbCrLf & "WHERE " & lrModelElement.getCorrespondingRDSTable.getFirstUniquenessConstraintColumns(0).Name & " LIKE '" & Me.zrTextHighlighter.GetCurrentContext.Token.Text & lsDatabaseWildcardOperator & "'"
-                                End If
-                            Catch ex As Exception
-                                'Do nothing. Just don't add anything to the SQL.
-                            End Try
-                        End If
-                        lsSQLQuery &= vbCrLf & "LIMIT 20"
-                        Dim lrRecordset As ORMQL.Recordset
-                        Try
-                            lrRecordset = Me.FEQLProcessor.DatabaseManager.GO(lsSQLQuery)
+                    '        For Each lrFact In lrRecordset.Facts
+                    '            Dim lsString As String = ""
+                    '            liInd = 0
+                    '            For Each lrData In lrFact.Data
+                    '                If liInd > 0 Then lsString &= ","
+                    '                lsString &= lrData.Data
+                    '            Next
+                    '            Call Me.AddEnterpriseAwareItem(lsString)
+                    '        Next
+                    '    Catch ex As Exception
+                    '        Me.LabelError.Text = ex.Message
+                    '    End Try
 
-                            For Each lrFact In lrRecordset.Facts
-                                Dim lsString As String = ""
-                                liInd = 0
-                                For Each lrData In lrFact.Data
-                                    If liInd > 0 Then lsString &= ","
-                                    lsString &= lrData.Data
-                                Next
-                                Call Me.AddEnterpriseAwareItem(lsString)
-                            Next
-                        Catch ex As Exception
-                            Me.LabelError.Text = ex.Message
-                        End Try
-
-                        Call Me.showAutoCompleteForm()
-                        Exit Sub
-                    End If
+                    '    Call Me.showAutoCompleteForm()
+                    '    Exit Sub
+                    'End If
+                    '=========================================================================
 
                 End If
 
@@ -1391,6 +1392,7 @@ Public Class frmFactEngine
                             For Each lrData In lrFact.Data
                                 If liInd > 0 Then lsString &= ","
                                 lsString &= lrData.Data
+                                liInd += 1
                             Next
                             Call Me.AddEnterpriseAwareItem(lsString)
                         Next

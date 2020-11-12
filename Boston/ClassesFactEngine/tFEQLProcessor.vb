@@ -234,12 +234,12 @@ Namespace FEQL
         ''' <summary>
         ''' If the WHICHSELECTSTMT begins with a NodePropertyIdentification, then is populated.
         ''' </summary>
-        Private _NODEPROPERTYIDENTIFICATION As NODEPROPERTYIDENTIFICATION = Nothing
-        Public Property NODEPROPERTYIDENTIFICATION As NODEPROPERTYIDENTIFICATION
+        Private _NODEPROPERTYIDENTIFICATION As New List(Of NODEPROPERTYIDENTIFICATION)
+        Public Property NODEPROPERTYIDENTIFICATION As List(Of NODEPROPERTYIDENTIFICATION)
             Get
                 Return Me._NODEPROPERTYIDENTIFICATION
             End Get
-            Set(value As NODEPROPERTYIDENTIFICATION)
+            Set(value As List(Of NODEPROPERTYIDENTIFICATION))
                 Me._NODEPROPERTYIDENTIFICATION = value
             End Set
         End Property

@@ -226,8 +226,20 @@ Public Class frmAutoComplete
                 End If
 
                 Me.zoTextEditor.SelectionProtected = False
-                Me.zoTextEditor.SelectionStart = Me.zoTextEditor.Text.Length
-                Me.zoTextEditor.AppendText(lsSelectedItem) 'Text.AppendString
+
+                '20201112-VM-Changing to insert at selected position
+
+                If (Me.zoTextEditor.SelectionStart <> 0) And (Me.zoTextEditor.SelectionStart = Me.zoTextEditor.Text.Length) Then
+                    Me.zoTextEditor.SelectionStart = Me.zoTextEditor.Text.Length
+                    Me.zoTextEditor.AppendText(lsSelectedItem)
+                ElseIf Me.zoTextEditor.SelectionStart = 0 Then
+                    Me.zoTextEditor.SelectionStart = Me.zoTextEditor.Text.Length
+                    Me.zoTextEditor.AppendText(lsSelectedItem)
+                Else
+                    Me.zoTextEditor.SelectionLength = 0
+                    Me.zoTextEditor.SelectedText = lsSelectedItem
+                End If
+
                 Me.zoTextEditor.SelectionColor = Me.zoTextEditor.ForeColor
 
                 Me.Hide()
