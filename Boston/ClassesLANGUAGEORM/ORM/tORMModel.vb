@@ -685,6 +685,7 @@ Namespace FBM
                     '=====================================================================================
                     'RDS
                     If (Not arRoleConstraint.IsMDAModelElement) _
+                        And Not (arRoleConstraint.RoleConstraintType = pcenumRoleConstraintType.InternalUniquenessConstraint And arRoleConstraint.Role(0).FactType.IsDerived) _
                         And Me.RDSCreated Then 'For now, check this...because otherwise RDS may have no Tables.
 
                         If arRoleConstraint.RoleConstraintType = pcenumRoleConstraintType.InternalUniquenessConstraint _
