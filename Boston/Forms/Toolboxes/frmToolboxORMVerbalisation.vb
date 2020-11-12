@@ -1946,23 +1946,33 @@ Public Class frmToolboxORMVerbalisation
 
     Public Sub VerbaliseFact(ByVal arFact As FBM.Fact)
 
-        Dim liInd As Integer = 0
+        Try
+            Dim liInd As Integer = 0
 
-        Dim lrVerbaliser As New FBM.ORMVerbailser
-        Call lrVerbaliser.Reset()
+            Dim lrVerbaliser As New FBM.ORMVerbailser
+            Call lrVerbaliser.Reset()
 
-        lrVerbaliser.VerbaliseQuantifier("Fact with Fact.Id: '" & arFact.Id & "' is a Fact of FactType: '")
-        lrVerbaliser.VerbaliseModelObject(arFact.FactType)
-        lrVerbaliser.VerbaliseQuantifier("'")
-        lrVerbaliser.HTW.WriteBreak()
-        lrVerbaliser.HTW.WriteBreak()
+            lrVerbaliser.VerbaliseQuantifier("Fact with Fact.Id: '" & arFact.Id & "' is a Fact of FactType: '")
+            lrVerbaliser.VerbaliseModelObject(arFact.FactType)
+            lrVerbaliser.VerbaliseQuantifier("'")
+            lrVerbaliser.HTW.WriteBreak()
+            lrVerbaliser.HTW.WriteBreak()
 
-        lrVerbaliser.VerbaliseQuantifier("Fact Reading:")
-        lrVerbaliser.HTW.WriteBreak()
-        lrVerbaliser.HTW.WriteBreak()
-        lrVerbaliser.HTW.Write(arFact.GetReading)
+            lrVerbaliser.VerbaliseQuantifier("Fact Reading:")
+            lrVerbaliser.HTW.WriteBreak()
+            lrVerbaliser.HTW.WriteBreak()
+            lrVerbaliser.HTW.Write(arFact.GetReading)
 
-        Me.WebBrowser.DocumentText = lrVerbaliser.Verbalise
+            Me.WebBrowser.DocumentText = lrVerbaliser.Verbalise
+
+        Catch ex As Exception
+            Dim lsMessage1 As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 

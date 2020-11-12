@@ -1285,10 +1285,12 @@ Namespace FBM
 
                 If Me.IsAbsorbed Then
                     Call Me.getCorrespondingRDSTable.absorbSupertypeColumns()
-                Else
                     'Supertype needs to get Columns from this subtype
                     Dim lrSupertypeTable = arParentEntityType.GetTopmostNonAbsorbedSupertype.getCorrespondingRDSTable
                     Call lrSupertypeTable.absorbSubtypeColumns(Me.getCorrespondingRDSTable)
+                Else 'Not Absorbed
+
+
                 End If
 
                 Call Me.Model.MakeDirty()

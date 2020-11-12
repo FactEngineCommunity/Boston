@@ -1727,7 +1727,12 @@ Public Class frmDiagramORM
                 If lrFactTable.FactTypeInstance.Fact.Count > 0 Then
                     lrFactDataInstance = lrFactTable.TableShape.Item(0, lrFactTable.SelectedRow - 1).Tag
                     lrFact = lrFactDataInstance.Fact.Fact
-                    Call lrToolboxForm.VerbaliseFact(lrFact)
+                    Try
+                        Call lrToolboxForm.VerbaliseFact(lrFact)
+                    Catch ex As Exception
+
+                    End Try
+
                 End If
             End If
 

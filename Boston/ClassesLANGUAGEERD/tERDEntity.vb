@@ -459,13 +459,14 @@ Namespace ERD
 
                 lsSQLQuery = "SELECT *"
                 lsSQLQuery &= " FROM CoreERDAttribute"
-                lsSQLQuery &= " ON PAGE '" & Me.Page.Name & "'"
+                'lsSQLQuery &= " ON PAGE '" & Me.Page.Name & "'"
                 lsSQLQuery &= " WHERE ModelObject = '" & Me.RDSTable.Name & "'"
                 lsSQLQuery &= "   AND Attribute = '" & arColumn.Id & "'"
 
                 lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
-                lrFactDataInstance = lrRecordset("Attribute")
+                lrFactDataInstance = lrRecordset("Attribute").CloneInstance(Me.Page)
+
                 lrERAttribute = lrFactDataInstance.CloneAttribute(Me.Page)
                 lrERAttribute.Id = arColumn.Id
                 lrERAttribute.Column = arColumn
