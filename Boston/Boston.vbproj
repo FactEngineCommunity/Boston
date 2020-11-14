@@ -428,6 +428,12 @@
     <Compile Include="ClassesGeneral\tStack.vb" />
     <Compile Include="ClassesGeneral\tTube.vb" />
     <Compile Include="ClassesGeneral\tUndoRedoObject.vb" />
+    <Compile Include="ClassesGeneral\DateTimePicker.Designer.vb">
+      <DependentUpon>DateTimePicker.vb</DependentUpon>
+    </Compile>
+    <Compile Include="ClassesGeneral\DateTimePicker.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
     <Compile Include="ClassesGeneral\UserInviter.Designer.vb">
       <DependentUpon>UserInviter.vb</DependentUpon>
     </Compile>
@@ -1707,6 +1713,9 @@
     <EmbeddedResource Include="ClassesGeneral\tRichtextEditingControl.resx">
       <DependentUpon>tRichtextEditingControl.vb</DependentUpon>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ClassesGeneral\DateTimePicker.resx">
+      <DependentUpon>DateTimePicker.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="ClassesGeneral\UserInviter.resx">
       <DependentUpon>UserInviter.vb</DependentUpon>

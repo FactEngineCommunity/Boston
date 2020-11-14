@@ -2,6 +2,8 @@
 
 Public Class frmAutoComplete
 
+    'NB There is a DateTimePicker hidden under the listbox    
+
     Private zoTextEditor As RichTextBox
     Public OpacityValue As Single = 0.8
     Public TransparencyColour As System.Drawing.Color = Color.White
@@ -18,6 +20,10 @@ Public Class frmAutoComplete
     End Sub
 
     Private Sub frmAutoComplete_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
+
+        'Hide the DateTimePicker. Calling code must display
+        Me.DateTimePicker.Visible = False
+        Me.DateTimePicker.SendToBack()
 
         Me.FormBorderStyle = FormBorderStyle.None
         Me.ShowInTaskbar = False
@@ -138,10 +144,16 @@ Public Class frmAutoComplete
                     e.Handled = True
                     Me.zoTextEditor.Focus()
                 Case Is = Keys.M
-                    Call Me.processKeyDown(publicConstantsAutoComplete.pcenumACActionType.MODELELEMENT)
+                    Call Me.processKeyDown(publicConstantsAutoComplete.pcenumACActionType.ModelElement)
                     e.Handled = True
                     Me.zoTextEditor.Focus()
             End Select
+
+            '========================================================
+            'DateTimePicker
+            'Just to be sure...hide and send to back.
+            Me.DateTimePicker.Visible = False
+            Me.DateTimePicker.SendToBack()
 
         Catch ex As Exception
             Dim lsMessage1 As String
@@ -304,6 +316,37 @@ Public Class frmAutoComplete
         DGP.CloseFigure()
 
         obj.Region = New Region(DGP)
+
+    End Sub
+
+    Private Sub DateTimePicker_DateSelected(adDate As Date) Handles DateTimePicker.DateSelected
+
+        Me.zoTextEditor.SelectionProtected = False
+
+        '20201112-VM-Changing to insert at selected position
+
+        If (Me.zoTextEditor.SelectionStart <> 0) And (Me.zoTextEditor.SelectionStart = Me.zoTextEditor.Text.Length) Then
+            Me.zoTextEditor.SelectionStart = Me.zoTextEditor.Text.Length
+            Me.zoTextEditor.AppendText(adDate.ToString("yyyy-MM-dd"))
+        ElseIf Me.zoTextEditor.SelectionStart = 0 Then
+            Me.zoTextEditor.SelectionStart = Me.zoTextEditor.Text.Length
+            Me.zoTextEditor.AppendText(adDate.ToString("yyyy-MM-dd"))
+        Else
+            Me.zoTextEditor.SelectionLength = 0
+            Me.zoTextEditor.SelectedText = adDate.ToString("yyyy-MM-dd")
+        End If
+
+        Me.zoTextEditor.SelectionColor = Me.zoTextEditor.ForeColor
+
+        Me.Hide()
+
+        Me.zoTextEditor.Focus()
+
+        'Hide the DateTimePicker
+        Me.DateTimePicker.Visible = False
+        Me.DateTimePicker.SendToBack()
+        Me.ListBox.BringToFront()
+        Me.Invalidate()
 
     End Sub
 

@@ -1354,15 +1354,26 @@ Public Class frmFactEngine
 
                 If (Me.zrTextHighlighter.GetCurrentContext.Token.Type = FEQL.TokenType.IDENTIFIER) Or
                         laiExpectedToken.Contains(FEQL.TokenType.IDENTIFIER) Then
+
                     lrModelElement = prApplication.WorkingModel.GetModelObjectByName(lrLastModelElementNameParseNode.Token.Text)
 
                     If lrModelElement.ConceptType = pcenumConceptType.ValueType Then
+
+                        If CType(lrModelElement, FBM.ValueType).DataType = pcenumORMDataType.TemporalDate Then
+                            Me.AutoComplete.ListBox.Items.Clear()
+                            Call Me.showAutoCompleteForm()
+                            Me.AutoComplete.DateTimePicker.BringToFront()
+                            Me.AutoComplete.DateTimePicker.Visible = True
+                            Exit Sub
+                        End If
+
                         If CType(lrModelElement, FBM.ValueType).ValueConstraint.Count > 0 Then
                             For Each lsValue In CType(lrModelElement, FBM.ValueType).ValueConstraint
                                 Call Me.AddEnterpriseAwareItem(lsValue,,,, True)
                             Next
                         End If
                     End If
+
                     Dim lsSQLQuery = "SELECT "
                     Dim liInd = 0
                     For Each lrColumn In lrModelElement.getCorrespondingRDSTable.getFirstUniquenessConstraintColumns
@@ -1730,6 +1741,11 @@ Public Class frmFactEngine
     End Sub
 
     Private Sub showAutoCompleteForm()
+
+        Me.AutoComplete.DateTimePicker.Visible = False
+        Me.AutoComplete.DateTimePicker.SendToBack()
+        Me.AutoComplete.ListBox.BringToFront()
+
         If Me.AutoComplete.ListBox.Items.Count > 0 Then
             Me.AutoComplete.zsIntellisenseBuffer = Me.zsIntellisenseBuffer
             Me.AutoComplete.zrCallingForm = Me

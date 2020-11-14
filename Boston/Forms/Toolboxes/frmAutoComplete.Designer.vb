@@ -1,9 +1,9 @@
-﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
+﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()>
 Partial Class frmAutoComplete
     Inherits System.Windows.Forms.Form
 
     'Form overrides dispose to clean up the component list.
-    <System.Diagnostics.DebuggerNonUserCode()> _
+    <System.Diagnostics.DebuggerNonUserCode()>
     Protected Overrides Sub Dispose(ByVal disposing As Boolean)
         Try
             If disposing AndAlso components IsNot Nothing Then
@@ -24,6 +24,7 @@ Partial Class frmAutoComplete
     Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmAutoComplete))
         Me.ListBox = New System.Windows.Forms.ListBox()
+        Me.DateTimePicker = New Boston.DateTimePicker()
         Me.SuspendLayout()
         '
         'ListBox
@@ -34,10 +35,17 @@ Partial Class frmAutoComplete
         Me.ListBox.FormattingEnabled = True
         Me.ListBox.ItemHeight = 20
         Me.ListBox.Location = New System.Drawing.Point(12, 10)
-        Me.ListBox.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.ListBox.Margin = New System.Windows.Forms.Padding(2)
         Me.ListBox.Name = "ListBox"
         Me.ListBox.Size = New System.Drawing.Size(217, 100)
         Me.ListBox.TabIndex = 1
+        '
+        'DateTimePicker
+        '
+        Me.DateTimePicker.Location = New System.Drawing.Point(18, 12)
+        Me.DateTimePicker.Name = "DateTimePicker"
+        Me.DateTimePicker.Size = New System.Drawing.Size(207, 56)
+        Me.DateTimePicker.TabIndex = 2
         '
         'frmAutoComplete
         '
@@ -46,6 +54,7 @@ Partial Class frmAutoComplete
         Me.BackColor = System.Drawing.Color.GhostWhite
         Me.ClientSize = New System.Drawing.Size(241, 140)
         Me.ControlBox = False
+        Me.Controls.Add(Me.DateTimePicker)
         Me.Controls.Add(Me.ListBox)
         Me.ForeColor = System.Drawing.Color.Transparent
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None
@@ -55,4 +64,5 @@ Partial Class frmAutoComplete
 
     End Sub
     Friend WithEvents ListBox As ListBox
+    Friend WithEvents DateTimePicker As DateTimePicker
 End Class

@@ -361,7 +361,7 @@
 
 #End Region
                 If (Not lbAddedAND And lbIntialWhere Is Nothing And
-                    larConditionalQueryEdges.Count > 0) Or
+                    (larConditionalQueryEdges.Count > 0 And larWhereEdges.Count > 0)) Or
                     (Me.HeadNode.HasIdentifier And larWhereEdges.Count > 0) Then
                     lsSQLQuery &= "AND "
                     lbIntialWhere = Nothing
