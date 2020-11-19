@@ -29,6 +29,18 @@ Namespace Richmond
 
         End Function
 
+        Public Function returnIfTrue(ByVal abBoolValue As Boolean,
+                                     ByVal asReturnString As String,
+                                     ByVal asAlternateString As String) As String
+
+            If abBoolValue Then
+                Return asReturnString
+            Else
+                Return asAlternateString
+            End If
+
+        End Function
+
         Public Function OpenDatabase() As Boolean
 
             Dim lsMessage As String = ""
