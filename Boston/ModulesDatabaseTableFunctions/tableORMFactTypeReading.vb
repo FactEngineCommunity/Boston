@@ -134,6 +134,7 @@ Namespace TableFactTypeReading
                         lrFactTypeReading.PredicatePart = tableORMPredicatePart.GetPredicatePartsByFactTypeReading(lrFactTypeReading)
 
                         '------------------------------------------------------------------------------------
+                        '20201228-VM-Can remove the below. Happy with the database model the way it is, and never adopted the FBMWG's recommendations. The Boston model is sound and is at new Boston model.
                         '20161110-VM-New code for FactTypeReadingRole collection goes here.
                         '  NB Eventually, the code above (retrieving the PredicatePart collection) will be 
                         '  removed once the migration to the new database model is complete.
@@ -147,8 +148,31 @@ Namespace TableFactTypeReading
                         '-------------------------------------------------------------------------------------------------
                         'lrFactTypeReading.FactTypeReadingRole = TableORMFactTypeReadingRole.GetFactTypeReadingRolesByFactTypeReading(lrFactTypeReading)
 
+                        '=============================================================================
+                        'CodeSafe/Organic Self Healing
+                        If lrFactTypeReading.PredicatePart.FindAll(Function(x) x.Role Is Nothing).Count > 0 Then
+                            'Something has gone wrong and there is a PredicatePart with a Role that is not in the database.
+                            Dim larNullRolePredicateParts = lrFactTypeReading.PredicatePart.FindAll(Function(x) x.Role Is Nothing)
+                            If lrFactTypeReading.PredicatePart.Count > arFactType.Arity Then
+                                'Remove the PredicateParts that have NULL/Nothing Roles
+                                For Each lrPredicatePart In larNullRolePredicateParts
+                                    lrFactTypeReading.PredicatePart.Remove(lrPredicatePart)
+                                Next
+                            End If
 
-                        If Not IsSomething(lrFactTypeReading.PredicatePart) Then
+                            'Find a Role for the PredicateParts that have Roles that are Nothing
+                            For Each lrRole In arFactType.RoleGroup
+                                If lrFactTypeReading.PredicatePart.FindAll(Function(x) x.Role IsNot Nothing).Find(Function(x) x.Role.Id = lrRole.Id) Is Nothing Then
+                                    Dim lrPredicatePart = larNullRolePredicateParts.Find(Function(x) x.Role Is Nothing)
+                                    lrPredicatePart.Role = lrRole
+                                    lrPredicatePart.makeDirty()
+                                End If
+                            Next
+                            arFactType.makeDirty()
+                            lrFactTypeReading.makeDirty()
+                        End If
+
+                        If lrFactTypeReading.PredicatePart Is Nothing Then
                             lsMessage = "Error: TableFactTypeReading.GetFactTypeReadingsForFactType: "
                             lsMessage &= vbCrLf & "No PredicateParts found for:"
                             lsMessage &= vbCrLf & "FactType.Id: '" & arFactType.Id & "'"
