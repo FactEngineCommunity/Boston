@@ -169,14 +169,14 @@ Namespace FBM
             End Set
         End Property
 
-        <XmlIgnore()> _
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
-        Public _IsAbsorbed As Boolean = False
+        <XmlIgnore()>
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Public Shadows _IsAbsorbed As Boolean = False
         <XmlAttribute()> _
         <CategoryAttribute("Entity Type"), _
-        DefaultValueAttribute(False), _
-        DescriptionAttribute("True if the Entity Type is absorbed by a SuperType.")> _
-        Public Property IsAbsorbed As Boolean
+        DefaultValueAttribute(False),
+        DescriptionAttribute("True if the Entity Type is absorbed by a SuperType.")>
+        Public Overloads Property IsAbsorbed As Boolean
             Get
                 Return Me._IsAbsorbed
             End Get
@@ -639,7 +639,7 @@ Namespace FBM
                     Throw New Exception("Entity Type does not have a Compound Reference Scheme")
                 End If
 
-                Dim lrActiveRole As FBM.Role
+                Dim lrActiveRole As FBM.Role = Nothing
                 Dim lsColumnName As String = ""
                 Dim larRole As List(Of FBM.Role)
                 Dim lrFactTypeReading As FBM.FactTypeReading
@@ -852,7 +852,6 @@ Namespace FBM
                     End If
 
                     If IsSomething(.ReferenceModeRoleConstraint) Then
-                        Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
                         lrEntityTypeInstance.ReferenceModeRoleConstraint = arPage.RoleConstraintInstance.Find(Function(x) x.Id = .ReferenceModeRoleConstraint.Id)
                     End If
 
@@ -1762,7 +1761,7 @@ Namespace FBM
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Function IsSubtype() As Boolean
+        Public Shadows Function IsSubtype() As Boolean
 
             Return Me.parentModelObjectList.Count > 0
 

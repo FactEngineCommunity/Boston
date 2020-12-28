@@ -54,8 +54,6 @@
             plugin.AssemblyVersion = asm.GetName.Version.ToString.Trim
             plugin.Path = Path
 
-            Dim objPlugin As Object
-
             'Create and return class instance
             'Boston plugin code.not metadrone code
             'objPlugin = asm.CreateInstance("PluginInterface.Sources.IConnection")

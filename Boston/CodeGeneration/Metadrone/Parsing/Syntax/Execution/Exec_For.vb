@@ -26,7 +26,7 @@ Namespace Parser.Syntax
         Public Event ConsoleOut(ByVal Message As String)
         Public Event ConsoleClear()
 
-        Public Sub New(ByVal ExecNode As SyntaxNode, ByVal BasePath As String, ByVal PreviewMode As Boolean, _
+        Public Sub New(ByVal ExecNode As SyntaxNode, ByVal BasePath As String, ByVal PreviewMode As Boolean,
                        ByVal TemplateContext As String, ByVal ScopeDepth As Integer)
             Me.ExecNode = ExecNode
             Me.BasePath = BasePath
@@ -54,7 +54,7 @@ Namespace Parser.Syntax
                     'Relation loop
                     Return Me.Process_Index()
 
-                Case SyntaxNode.ExecForEntities.OBJECT_COLUMN, SyntaxNode.ExecForEntities.OBJECT_IDCOLUMN, _
+                Case SyntaxNode.ExecForEntities.OBJECT_COLUMN, SyntaxNode.ExecForEntities.OBJECT_IDCOLUMN,
                      SyntaxNode.ExecForEntities.OBJECT_PKCOLUMN, SyntaxNode.ExecForEntities.OBJECT_FKCOLUMN
                     'Column loop
                     Return Me.Process_Column()
@@ -63,7 +63,7 @@ Namespace Parser.Syntax
                     'Routine loop
                     Return Me.Process_Routine()
 
-                Case SyntaxNode.ExecForEntities.OBJECT_PARAMETER, SyntaxNode.ExecForEntities.OBJECT_INPARAMETER, _
+                Case SyntaxNode.ExecForEntities.OBJECT_PARAMETER, SyntaxNode.ExecForEntities.OBJECT_INPARAMETER,
                      SyntaxNode.ExecForEntities.OBJECT_OUTPARAMETER, SyntaxNode.ExecForEntities.OBJECT_INOUTPARAMETER
                     'Parameter loop
                     Return Me.Process_Parameter()

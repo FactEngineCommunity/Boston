@@ -30,6 +30,8 @@ Namespace Parser.Syntax
         Public Const VARIABLE_ATTRIBUTE_RELATION As String = "relation" 'Boston specific. Not part of original Metadrone.
         Public Const VARIABLE_ATTRIBUTE_INDEX As String = "index" 'Boston specific. Not part of original Metadrone.
         Public Const VARIABLE_ATTRIBUTE_ALLOWZEROLENGTH As String = "allowzerolength" 'Boston specific. Not part of original Metadrone.
+        Public Const VARIABLE_ATTRIBUTE_SHORTDESCRIPTION As String = "shortdescription" 'Boston specific. Not part of original Metadrone. The ShortDescription of the JoinedORMObject of the ActiveRole of the Column.
+        Public Const VARIABLE_ATTRIBUTE_PREDICATE As String = "predicate" 'Boston specific. Not part of original Metadrone.
         Public Const VARIABLE_ATTRIBUTE_LENGTH As String = "length"
         Public Const VARIABLE_ATTRIBUTE_PRECISION As String = "precision"
         Public Const VARIABLE_ATTRIBUTE_SCALE As String = "scale"
@@ -238,6 +240,8 @@ Namespace Parser.Syntax
         Friend Shared DOCO_VARIABLE_ATTRIBUTE_RELATION As String = "Set of Relations relating to the Column." 'Boston specific. Not part of original Metadrone.
         Friend Shared DOCO_VARIABLE_ATTRIBUTE_INDEX As String = "Set of Relations relating to the Column." 'Boston specific. Not part of original Metadrone.
         Friend Shared DOCO_VARIABLE_ATTRIBUTE_ALLOWZEROLENGTH As String = "Field allows zero length." 'Boston specific. Not part of original Metadrone.
+        Friend Shared DOCO_VARIABLE_ATTRIBUTE_SHORTDESCRIPTION As String = "Short Description of the Model Element for the field." 'Boston specific. Not part of original Metadrone.
+        Friend Shared DOCO_VARIABLE_ATTRIBUTE_PREDICATE As String = "A predicate for the Field." 'Boston specific. Not part of original Metadrone.
         Friend Shared DOCO_VARIABLE_ATTRIBUTE_LENGTH As String = "Length of field."
         Friend Shared DOCO_VARIABLE_ATTRIBUTE_PRECISION As String = "Precision of field."
         Friend Shared DOCO_VARIABLE_ATTRIBUTE_SCALE As String = "Scale of field."
@@ -367,6 +371,8 @@ Namespace Parser.Syntax
             If StrEq(value, VARIABLE_ATTRIBUTE_RELATION) Then Return True 'Boston specific. Not part of original Metadrone.
             If StrEq(value, VARIABLE_ATTRIBUTE_INDEX) Then Return True 'Boston specific. Not part of original Metadrone.
             If StrEq(value, VARIABLE_ATTRIBUTE_ALLOWZEROLENGTH) Then Return True 'Boston specific. Not part of original Metadrone.
+            If StrEq(value, VARIABLE_ATTRIBUTE_SHORTDESCRIPTION) Then Return True 'Boston specific. Not part of original Metadrone. ShortDescription of the JoinedORMObject for the ActiveRole of the Column for a field.
+            If StrEq(value, VARIABLE_ATTRIBUTE_PREDICATE) Then Return True 'Boston specific. Not part of original Metadrone.
             If StrEq(value, VARIABLE_ATTRIBUTE_LENGTH) Then Return True
             If StrEq(value, VARIABLE_ATTRIBUTE_PRECISION) Then Return True
             If StrEq(value, VARIABLE_ATTRIBUTE_SCALE) Then Return True

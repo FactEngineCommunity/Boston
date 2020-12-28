@@ -22,8 +22,8 @@ Namespace Parser.Meta.Database
         Friend ListCount As Int64 = -1
         Friend ListPos As Int64 = -1
 
-        Public Sub New(ByVal Value As Object, ByVal SchemaRow As SchemaRow, _
-                       ByVal Owner As IEntity, ByVal Connection As IConnection, _
+        Public Sub New(ByVal Value As Object, ByVal SchemaRow As SchemaRow,
+                       ByVal Owner As IEntity, ByVal Connection As IConnection,
                        ByVal Transforms As Syntax.SourceTransforms)
             Me.Value = Value
             Me.SchemaRowVal = SchemaRow
@@ -57,6 +57,24 @@ Namespace Parser.Meta.Database
             End Get
             Set(ByVal value As Boolean)
                 Me.SchemaRowVal.AllowZeroLength = value
+            End Set
+        End Property
+
+        Public Property ShortDescription() As String 'Boston specific. Not part of original Metadrone. The ShortDescription of the JoinedORMObject for the ActiveRole of the Column
+            Get
+                Return Me.SchemaRowVal.ShortDescription
+            End Get
+            Set(ByVal value As String)
+                Me.SchemaRowVal.ShortDescription = value
+            End Set
+        End Property
+
+        Public Property Predicate() As String 'Boston specific. Not part of original Metadrone. A predicate for the Column, from the FactType for the Column and as per ActiveRole/Role of the Column.
+            Get
+                Return Me.SchemaRowVal.Predicate
+            End Get
+            Set(ByVal value As String)
+                Me.SchemaRowVal.Predicate = value
             End Set
         End Property
 
@@ -175,6 +193,14 @@ Namespace Parser.Meta.Database
                 'set allowZeroLength
                 Me.AllowZeroLength = Conv.ToBoolean(value)
 
+            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_SHORTDESCRIPTION) Then 'Boston specific. Not part of original Metadrone.
+                'set allowZeroLength
+                Me.ShortDescription = Conv.ToString(value)
+
+            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_PREDICATE) Then 'Boston specific. Not part of original Metadrone.
+                'set Predicate
+                Me.Predicate = Conv.ToString(value)
+
             ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_LENGTH) Then
                 'set length
                 Me.Length = Conv.ToInteger(value)
@@ -210,7 +236,7 @@ Namespace Parser.Meta.Database
             End If
         End Sub
 
-        Public Function GetAttributeValue(ByVal AttribName As String, ByVal Params As List(Of Object), _
+        Public Function GetAttributeValue(ByVal AttribName As String, ByVal Params As List(Of Object),
                                           ByVal LookTransformsIfNotFound As Boolean, ByRef ExitBlock As Boolean) As Object Implements IEntity.GetAttributeValue
             If Params Is Nothing Then Params = New List(Of Object)
             If AttribName Is Nothing Then AttribName = ""
@@ -253,6 +279,16 @@ Namespace Parser.Meta.Database
                 'return allowZeroLength
                 Call Me.CheckParamsForPropertyCall(AttribName, Params)
                 Return Me.AllowZeroLength
+
+            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_SHORTDESCRIPTION) Then 'Boston specific. Not part of original Metadrone.
+                'return ShortDescription
+                Call Me.CheckParamsForPropertyCall(AttribName, Params)
+                Return Me.ShortDescription
+
+            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_PREDICATE) Then 'Boston specific. Not part of original Metadrone.
+                'return Predicate
+                Call Me.CheckParamsForPropertyCall(AttribName, Params)
+                Return Me.Predicate
 
             ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_LENGTH) Then
                 'return length

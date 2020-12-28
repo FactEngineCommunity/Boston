@@ -31,6 +31,8 @@
         Private ColumnIdField As String
         Private AllowZeroLengthField As Boolean
         Private IsPGSRelationField As Boolean
+        Private ShortDescriptionField As String
+        Private PredicateField As String
         Private PGSEdgeNameField As String
         Private RelationField As New List(Of RDS.Relation)  'Boston specific. The Relation to which the Column belongs if this SchemaRow record is for a Column
         Private IndexField As New List(Of RDS.Index)  'Boston specific. The Relation to which the Column belongs if this SchemaRow record is for a Column
@@ -64,6 +66,8 @@
                 .ColumnId = Me.ColumnId
                 .AllowZeroLength = Me.AllowZeroLength
                 .Relation = Me.Relation
+                .ShortDescription = Me.ShortDescription
+                .Predicate = Me.Predicate
             End With
             Return schema
         End Function
@@ -132,6 +136,19 @@
         End Property
 
         ''' <summary>
+        ''' Boston specific. From FBMModelElement of the Column
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property ShortDescription() As String
+            Get
+                Return Me.ShortDescriptionField
+            End Get
+            Set(ByVal value As String)
+                Me.ShortDescriptionField = value
+            End Set
+        End Property
+
+        ''' <summary>
         ''' Boston specific. From DataType of ValueType
         ''' </summary>
         ''' <returns></returns>
@@ -141,6 +158,19 @@
             End Get
             Set(ByVal value As Boolean)
                 Me.AllowZeroLengthField = value
+            End Set
+        End Property
+
+        ''' <summary>
+        ''' Boston specific. From the FactType for the Column and as per the ActiveRole/Role of the Column.
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property Predicate() As String
+            Get
+                Return Me.PredicateField
+            End Get
+            Set(ByVal value As String)
+                Me.PredicateField = value
             End Set
         End Property
 

@@ -58,7 +58,6 @@ Namespace FactEngine
 
                 '=====================================================
                 'Column Names   
-                Dim lsColumnName As String
 
                 For Each lrColumn In lrDataSet.Tables(0).Columns
                     Dim lrRole = New FBM.Role(lrFactType, lrColumn.ToString, True, Nothing)

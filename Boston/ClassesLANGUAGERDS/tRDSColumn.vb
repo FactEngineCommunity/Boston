@@ -486,6 +486,36 @@ Namespace RDS
 
         End Function
 
+        ''' <summary>
+        ''' Simple Attributes are the result of a Binary Many-to-One FactType
+        ''' </summary>
+        ''' <returns></returns>
+        Public Function isSimpleAttribute() As Boolean
+
+            Try
+                If Me.FactType.IsManyTo1BinaryFactType Then
+                    Return True
+                ElseIf Me.FactType.Is1To1BinaryFactType Then
+                    Return True
+                ElseIf Me.isForeignKey Then
+                    Return False
+                End If
+
+                Return False
+
+            Catch ex As Exception
+                Dim lsMessage1 As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return False
+            End Try
+
+        End Function
+
         Public Sub moveToOrdinalPosition(ByVal aiOrdinalPosition As Integer)
 
             Try

@@ -21,13 +21,13 @@
         Function GetSchema() As List(Of SchemaRow)
         Function GetTables() As List(Of String)
         Function GetRoutineSchema() As List(Of SchemaRow)
-        Function GetRoutineColumnSchema(ByVal RoutineName As String, ByVal RoutineType As String, _
+        Function GetRoutineColumnSchema(ByVal RoutineName As String, ByVal RoutineType As String,
                                         ByVal IsProcedure As Boolean, ByVal ParamList As List(Of String)) As List(Of SchemaRow)
 
-        Function CreateCopy(ByVal Name As String, ByVal Connectionstring As String, _
-                            ByVal SchemaQuery As String, ByVal TableSchemaQuery As String, _
-                            ByVal ColumnSchemaQuery As String, ByVal TableNamePlaceHolder As String, _
-                            ByVal RoutineSchemaQuery As String, ByVal Transformations As String, _
+        Function CreateCopy(ByVal Name As String, ByVal Connectionstring As String,
+                            ByVal SchemaQuery As String, ByVal TableSchemaQuery As String,
+                            ByVal ColumnSchemaQuery As String, ByVal TableNamePlaceHolder As String,
+                            ByVal RoutineSchemaQuery As String, ByVal Transformations As String,
                             ByVal IgnoreTableNames As List(Of String)) As IConnection
 
         Sub RunScriptFile(ByVal ScriptFile As String)

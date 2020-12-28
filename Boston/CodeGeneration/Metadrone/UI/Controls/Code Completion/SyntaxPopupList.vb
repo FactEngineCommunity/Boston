@@ -393,6 +393,8 @@ Namespace UI
 
                             Me.AddListItem(VARIABLE_ATTRIBUTE_RELATION, DOCO_VARIABLE_ATTRIBUTE_RELATION, Nothing, SyntaxPopupListItem.Icons.PROPERTY) 'Boston specific. Not part of original Metadrone.
                             Me.AddListItem(VARIABLE_ATTRIBUTE_ALLOWZEROLENGTH, DOCO_VARIABLE_ATTRIBUTE_ALLOWZEROLENGTH, Nothing, SyntaxPopupListItem.Icons.PROPERTY) 'Boston specific. Not part of original Metadrone.
+                            Me.AddListItem(VARIABLE_ATTRIBUTE_SHORTDESCRIPTION, DOCO_VARIABLE_ATTRIBUTE_SHORTDESCRIPTION, Nothing, SyntaxPopupListItem.Icons.PROPERTY) 'Boston specific. Not part of original Metadrone.
+                            Me.AddListItem(VARIABLE_ATTRIBUTE_PREDICATE, DOCO_VARIABLE_ATTRIBUTE_PREDICATE, Nothing, SyntaxPopupListItem.Icons.PROPERTY) 'Boston specific. Not part of original Metadrone.
                             Me.AddListItem(VARIABLE_ATTRIBUTE_DATATYPE, DOCO_VARIABLE_ATTRIBUTE_DATATYPE, Nothing, SyntaxPopupListItem.Icons.PROPERTY)
                             Me.AddListItem(VARIABLE_ATTRIBUTE_LENGTH, DOCO_VARIABLE_ATTRIBUTE_LENGTH, Nothing, SyntaxPopupListItem.Icons.PROPERTY)
                             Me.AddListItem(VARIABLE_ATTRIBUTE_PRECISION, DOCO_VARIABLE_ATTRIBUTE_PRECISION, Nothing, SyntaxPopupListItem.Icons.PROPERTY)
@@ -433,6 +435,8 @@ Namespace UI
 
                             Me.AddListItem(VARIABLE_ATTRIBUTE_RELATION, DOCO_VARIABLE_ATTRIBUTE_RELATION, Nothing, SyntaxPopupListItem.Icons.PROPERTY) 'Boston specific. Not part of original Metadrone.
                             Me.AddListItem(VARIABLE_ATTRIBUTE_ALLOWZEROLENGTH, DOCO_VARIABLE_ATTRIBUTE_ALLOWZEROLENGTH, Nothing, SyntaxPopupListItem.Icons.PROPERTY) 'Boston specific. Not part of original Metadrone.
+                            Me.AddListItem(VARIABLE_ATTRIBUTE_SHORTDESCRIPTION, DOCO_VARIABLE_ATTRIBUTE_SHORTDESCRIPTION, Nothing, SyntaxPopupListItem.Icons.PROPERTY) 'Boston specific. Not part of original Metadrone.
+                            Me.AddListItem(VARIABLE_ATTRIBUTE_PREDICATE, DOCO_VARIABLE_ATTRIBUTE_PREDICATE, Nothing, SyntaxPopupListItem.Icons.PROPERTY) 'Boston specific. Not part of original Metadrone.
                             Me.AddListItem(VARIABLE_ATTRIBUTE_DATATYPE, DOCO_VARIABLE_ATTRIBUTE_DATATYPE, Nothing, SyntaxPopupListItem.Icons.PROPERTY)
                             Me.AddListItem(VARIABLE_ATTRIBUTE_LENGTH, DOCO_VARIABLE_ATTRIBUTE_LENGTH, Nothing, SyntaxPopupListItem.Icons.PROPERTY)
                             Me.AddListItem(VARIABLE_ATTRIBUTE_PRECISION, DOCO_VARIABLE_ATTRIBUTE_PRECISION, Nothing, SyntaxPopupListItem.Icons.PROPERTY)

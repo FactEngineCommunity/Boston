@@ -154,8 +154,37 @@ Namespace SourcePlugins.Boston
 
                             sr.IsForeignKey = lrColumn.isForeignKey
 
+                            '=======================
                             'Boston specific fields
                             sr.ColumnId = lrColumn.Id
+                            sr.ShortDescription = lrColumn.ActiveRole.JoinedORMObject.ShortDescription
+
+
+                            'Predicate for the Column
+                            sr.Predicate = ""
+                            If lrColumn.isSimpleAttribute Then
+                                Try
+                                    Dim lrFactTypeReading = From FactTypeReading In lrColumn.FactType.FactTypeReading
+                                                            Where FactTypeReading.PredicatePart(0).Role.JoinedORMObject.Id = lrColumn.Table.Name
+                                                            Select FactTypeReading
+
+                                    If lrFactTypeReading.Count > 0 Then
+                                        sr.Predicate = lrFactTypeReading.First.PredicatePart(0).PredicatePartText
+                                    Else
+                                        sr.Predicate = ""
+                                    End If
+                                Catch ex As Exception
+                                    sr.Predicate = ""
+                                End Try
+                            Else
+                                Try
+                                    sr.Predicate = lrColumn.Relation(0).DestinationPredicate
+                                Catch ex As Exception
+                                    sr.Predicate = ""
+                                End Try
+
+                            End If
+
                             sr.IsPGSRelation = lrTable.isPGSRelation
                             If lrTable.isPGSRelation Then
                                 sr.PGSEdgeName = lrTable.getPGSEdgeName

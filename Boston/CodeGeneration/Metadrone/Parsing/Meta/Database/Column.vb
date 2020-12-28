@@ -114,6 +114,32 @@ Namespace Parser.Meta.Database
             End Set
         End Property
 
+        ''' <summary>
+        ''' Boston specific. Not originally part of Metadrone.
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property ShortDescription() As String
+            Get
+                Return Me.SchemaRowVal.ShortDescription
+            End Get
+            Set(ByVal value As String)
+                Me.SchemaRowVal.ShortDescription = value
+            End Set
+        End Property
+
+        ''' <summary>
+        ''' Boston specific. Not originally part of Metadrone.
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property Predicate() As String
+            Get
+                Return Me.SchemaRowVal.Predicate
+            End Get
+            Set(ByVal value As String)
+                Me.SchemaRowVal.Predicate = value
+            End Set
+        End Property
+
         Public Property Value() As Object
             Get
                 Return Me.mValue
@@ -234,6 +260,14 @@ Namespace Parser.Meta.Database
             ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_ALLOWZEROLENGTH) Then
                 'set allowZeroLength
                 Me.AllowZeroLength = Conv.ToBoolean(value)
+
+            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_SHORTDESCRIPTION) Then 'Boston Specific
+                'set ShortDescription
+                Me.ShortDescription = Conv.ToString(value)
+
+            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_PREDICATE) Then 'Boston Specific
+                'set Predicate
+                Me.Predicate = Conv.ToString(value)
 
             ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_LENGTH) Then
                 'set length
@@ -358,6 +392,16 @@ Namespace Parser.Meta.Database
                     'return allowZeroLength
                     Call Me.CheckParamsForPropertyCall(AttribName, Params)
                     Return Me.AllowZeroLength
+
+                ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_SHORTDESCRIPTION) Then 'Boston specific. Not part of original Metadrone.
+                    'return allowZeroLength
+                    Call Me.CheckParamsForPropertyCall(AttribName, Params)
+                    Return Me.ShortDescription
+
+                ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_PREDICATE) Then 'Boston specific. Not part of original Metadrone.
+                    'return Predicate
+                    Call Me.CheckParamsForPropertyCall(AttribName, Params)
+                    Return Me.Predicate
 
                 ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_LENGTH) Then
                     'return length
