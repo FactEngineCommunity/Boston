@@ -188,7 +188,6 @@ Namespace TableModelDictionary
         Public Function GetDictionaryEntriesByModel(ByVal ar_model As FBM.Model) As List(Of FBM.DictionaryEntry)
 
             Dim lrDictionaryEntry As FBM.DictionaryEntry
-            Dim liConceptType As pcenumConceptType
             Dim lsSQLQuery As String = ""
             Dim lREcordset As New ADODB.Recordset
 

@@ -858,10 +858,6 @@ Namespace FBM
 
                 End With
 
-                Dim lrParentEntityType As FBM.EntityType
-                Dim lr_parentEntityTypeInstance As FBM.EntityTypeInstance
-                Dim lsId As String
-
                 For Each lrSubtypeRelationship In Me.SubtypeRelationship
                     lrEntityTypeInstance.SubtypeRelationship.Add(lrSubtypeRelationship.CloneInstance(arPage, False))
                 Next

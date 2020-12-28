@@ -117,8 +117,6 @@ Namespace FBM
                                                   Optional ByVal abDoDatabaseProcessing As Boolean = True,
                                                   Optional ByVal abIncludeSubtypeRelationshipFactTypes As Boolean = True) As Boolean
 
-            Dim lsMessage As String
-
             Try
                 RemoveFromModel = True
 

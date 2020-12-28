@@ -492,9 +492,10 @@ Namespace FBM
         Public Sub AddPredicatePart(ByRef arPredicatePart As FBM.PredicatePart)
 
             arPredicatePart.isDirty = True
-            arPredicatePart.SequenceNr = Me.PredicatePart.Count
+            arPredicatePart.SequenceNr = Me.PredicatePart.Count + 1
 
-            Call Me.Model.MakeDirty(False, False)
+            Me.makeDirty()
+            Me.FactType.makeDirty()
 
             Me.PredicatePart.Add(arPredicatePart)
 
@@ -1488,10 +1489,9 @@ Namespace FBM
                 Dim liSequenceNrBeingRemoved As Integer = lrPredicatePart.SequenceNr
 
                 '--------------------------------------------------------------
-                'Remove the last PredicatePart for the FTR from the database.
-                '--------------------------------------------------------------
-                lrPredicatePart.SequenceNr = Me.PredicatePart.Count
-                Call tableORMPredicatePart.DeletePredicatePart(lrPredicatePart)
+                'Remove the PredicatePart (by Role) for the FTR from the database.
+                '--------------------------------------------------------------                
+                Call tableORMPredicatePart.DeletePredicatePartByRole(lrPredicatePart)
 
                 Me.PredicatePart.Remove(lrPredicatePart)
 
