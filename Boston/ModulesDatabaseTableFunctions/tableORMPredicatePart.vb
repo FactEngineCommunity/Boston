@@ -138,7 +138,9 @@ Public Module tableORMPredicatePart
                     lrPredicatePart.PredicatePartText = Trim(lREcordset("PredicatePartText").Value)
                     lrPredicatePart.isDirty = False
 
+
                     GetPredicatePartsByFactTypeReading.Add(lrPredicatePart)
+
                     lREcordset.MoveNext()
                 End While
             Else

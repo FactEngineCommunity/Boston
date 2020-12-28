@@ -22,7 +22,9 @@ Namespace FBM
         <XmlAttribute()> _
         Public ReadOnly Property RoleId() As String
             Get
-                If Me.Role.Id Is Nothing Then
+                If Me.Role Is Nothing Then
+                    Return Nothing
+                ElseIf Me.Role.Id Is Nothing Then
                     Return Nothing
                 Else
                     Return Me.Role.Id
