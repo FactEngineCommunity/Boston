@@ -138,42 +138,52 @@ Public Class frmDiagramORM
             Dim lsNewInstance = lsNewValue
             Dim lsOldInstance = lrFactDataInstance.Data
 
-            Dim liUsingOldFactDataCount = Aggregate FactType In Me.zrPage.Model.FactType
-                                From Fact In FactType.Fact
-                                From FactData In Fact.Data
-                                Where FactData.Data = lsOldInstance _
-                                And Not (FactData Is lrFactDataInstance.FactData)
-                                Into Count()
+            '2021018-VM-Removed the below because was problematic and incomplete.
+            'Dim liUsingOldFactDataCount = Aggregate FactType In Me.zrPage.Model.FactType
+            '                    From Fact In FactType.Fact
+            '                    From FactData In Fact.Data
+            '                    Where FactData.Data = lsOldInstance _
+            '                    And Not (FactData Is lrFactDataInstance.FactData)
+            '                    Into Count()
 
-            lrDictionaryEntry = Me.zrPage.Model.ModelDictionary.Find(AddressOf lrDictionaryEntry.Equals)
+            'lrDictionaryEntry = Me.zrPage.Model.ModelDictionary.Find(AddressOf lrDictionaryEntry.Equals)
 
-            If liUsingOldFactDataCount > 0 Then
-                '------------------------------------------------------------------------------------------
-                'The FactData.Concept is already linked to other FactData.Concept instance in other Facts
-                '------------------------------------------------------------------------------------------
-                lsMessage = "Other Facts use the old Value ('" & lsOldInstance & "') in Sample Populations."
-                lsMessage &= vbCrLf & vbCrLf
-                lsMessage &= "Do you wish to change all instances of that Value accross all Facts that use that Value?"
-                lsMessage &= vbCrLf & vbCrLf
-                lsMessage &= "Or would you like to change only this Value instance, '" & lrFactDataInstance.Data & "' to '" & Me.ComboBoxEntityType.Text & "'?"
-                lsMessage &= vbCrLf & vbCrLf
-                lsMessage &= "Click [Yes] to change all Value instances, or [No] to change only this one instance."
+            'If liUsingOldFactDataCount > 0 Then
+            '    '------------------------------------------------------------------------------------------
+            '    'The FactData.Concept is already linked to other FactData.Concept instance in other Facts
+            '    '------------------------------------------------------------------------------------------
+            '    lsMessage = "Other Facts use the old Value ('" & lsOldInstance & "') in Sample Populations."
+            '    lsMessage &= vbCrLf & vbCrLf
+            '    lsMessage &= "Do you wish to change all instances of that Value accross all Facts that use that Value?"
+            '    lsMessage &= vbCrLf & vbCrLf
+            '    lsMessage &= "Or would you like to change only this Value instance, '" & lrFactDataInstance.Data & "' to '" & Me.ComboBoxEntityType.Text & "'?"
+            '    lsMessage &= vbCrLf & vbCrLf
+            '    lsMessage &= "Click [Yes] to change all Value instances, or [No] to change only this one instance."
 
-                If MsgBox(lsMessage, MsgBoxStyle.YesNo) = MsgBoxResult.Yes Then
-                    lrFactDataInstance.FactData.Data = lsNewValue
-                    lrFactDataInstance.Data = lrFactDataInstance.FactData.Data
-                Else
-                    lrDictionaryEntry = New FBM.DictionaryEntry(Me.zrPage.Model, lsNewValue, pcenumConceptType.Value)
-                    Call Me.zrPage.Model.AddModelDictionaryEntry(lrDictionaryEntry)
-                    lrFactDataInstance.FactData.SwitchConcept(lrDictionaryEntry.Concept, pcenumConceptType.Value)
-                    lrFactDataInstance.SwitchConcept(lsNewInstance)
-                End If
-            Else
-                lrDictionaryEntry = New FBM.DictionaryEntry(Me.zrPage.Model, lsNewValue, pcenumConceptType.Value)
-                Call Me.zrPage.Model.AddModelDictionaryEntry(lrDictionaryEntry)
-                lrFactDataInstance.FactData.SwitchConcept(lrDictionaryEntry.Concept, pcenumConceptType.Value)
-                lrFactDataInstance.SwitchConcept(lsNewInstance)
-            End If
+            '    If MsgBox(lsMessage, MsgBoxStyle.YesNo) = MsgBoxResult.Yes Then
+            '        lrFactDataInstance.FactData.Data = lsNewValue
+            '        lrFactDataInstance.Data = lrFactDataInstance.FactData.Data
+            '    Else
+            '        lrDictionaryEntry = New FBM.DictionaryEntry(Me.zrPage.Model, lsNewValue, pcenumConceptType.Value)
+            '        Call Me.zrPage.Model.AddModelDictionaryEntry(lrDictionaryEntry)
+            '        lrFactDataInstance.FactData.SwitchConcept(lrDictionaryEntry.Concept, pcenumConceptType.Value)
+            '        lrFactDataInstance.SwitchConcept(lsNewInstance)
+            '    End If
+            'Else
+            '    lrDictionaryEntry = New FBM.DictionaryEntry(Me.zrPage.Model, lsNewValue, pcenumConceptType.Value)
+            '    Call Me.zrPage.Model.AddModelDictionaryEntry(lrDictionaryEntry)
+            '    lrFactDataInstance.FactData.SwitchConcept(lrDictionaryEntry.Concept, pcenumConceptType.Value)
+            '    lrFactDataInstance.SwitchConcept(lsNewInstance)
+            'End If
+
+            'New code. 2021018-VM-Removed the above because was problematic and incomplete.
+            lrDictionaryEntry = New FBM.DictionaryEntry(Me.zrPage.Model, lsNewValue, pcenumConceptType.Value)
+            Call Me.zrPage.Model.AddModelDictionaryEntry(lrDictionaryEntry)
+            lrFactDataInstance.FactData.SwitchConcept(lrDictionaryEntry.Concept, pcenumConceptType.Value)
+            lrFactDataInstance.SwitchConcept(lsNewInstance)
+
+            lrFactDataInstance.makeDirty()
+
 
             lrFactDataInstance.Cell.Text = Me.ComboBoxEntityType.Text
 
@@ -6848,13 +6858,14 @@ Public Class frmDiagramORM
                                             lasData.Add(lsPrimaryKeyData)
                                             lasData.Add(lsPrimaryKeyData)
 
-                                            lrFact = Me.zrPage.Model.CreateFact(lrEntityType.ReferenceModeFactType, lasData)
+                                            lrFact = Me.zrPage.Model.CreateFact(lrEntityType.ReferenceModeFactType, lasData, True)
 
                                             Dim lrEntityTypeInstance As FBM.EntityTypeInstance = lrFactTypeInstance.RoleGroup.Find(Function(x) x.JoinedORMObject.Id = lrEntityType.Id).JoinedORMObject
 
                                             lrEntityTypeInstance.ReferenceModeFactType.FactType.AddFact(lrFact)
 
-                                            lrFactInstance = lrFact.CloneInstance(Me.zrPage)
+                                            lrFactInstance = lrFact.CloneInstance(Me.zrPage, False, True)
+
                                             lrEntityTypeInstance.ReferenceModeFactType.Fact.Add(lrFactInstance)
                                             lrEntityTypeInstance.ReferenceModeFactType.FactTable.ResortFactTable()
                                         End If

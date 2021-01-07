@@ -901,6 +901,7 @@ Namespace FBM
                 End If
             End If
         End Sub
+
         Public Shadows Sub setData(ByVal asData As String, Optional ByRef arConcept As FBM.Concept = Nothing)
 
             Me.Symbol = asData

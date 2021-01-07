@@ -684,8 +684,14 @@ Namespace FBM
 
                     '=====================================================================================
                     'RDS
+                    Dim lbRoleConstraintFactTypeIsDerived As Boolean = False
+                    If arRoleConstraint.Role.Count > 0 Then
+                        If arRoleConstraint.Role(0).FactType.IsDerived Then lbRoleConstraintFactTypeIsDerived = True
+                    End If
+
+
                     If (Not arRoleConstraint.IsMDAModelElement) _
-                        And Not (arRoleConstraint.RoleConstraintType = pcenumRoleConstraintType.InternalUniquenessConstraint And arRoleConstraint.Role(0).FactType.IsDerived) _
+                        And Not (arRoleConstraint.RoleConstraintType = pcenumRoleConstraintType.InternalUniquenessConstraint And lbRoleConstraintFactTypeIsDerived) _
                         And Me.RDSCreated Then 'For now, check this...because otherwise RDS may have no Tables.
 
                         If arRoleConstraint.RoleConstraintType = pcenumRoleConstraintType.InternalUniquenessConstraint _
@@ -1919,7 +1925,7 @@ Namespace FBM
         ''' <param name="arFactType">The FactType for which a random Fact will be created.</param>
         ''' <returns>A Fact with random FactData.</returns>
         ''' <remarks></remarks>
-        Public Function CreateFact(ByRef arFactType As FBM.FactType, Optional ByVal aasData As List(Of String) = Nothing) As FBM.Fact
+        Public Function CreateFact(ByRef arFactType As FBM.FactType, Optional ByVal aasData As List(Of String) = Nothing, Optional ByVal abMakeDirty As Boolean = False) As FBM.Fact
 
             Dim lsMessage As String = ""
             Dim lrRole As FBM.Role
@@ -1930,6 +1936,7 @@ Namespace FBM
             Try
 
                 lrFact = New FBM.Fact(arFactType)
+                lrFact.isDirty = abMakeDirty
 
                 Call Me.AddModelDictionaryEntry(New FBM.DictionaryEntry(Me, lrFact.Id, pcenumConceptType.Fact))
 
@@ -1988,7 +1995,7 @@ Namespace FBM
                                 Select Case lrRole.TypeOfJoin
                                     Case Is = pcenumRoleJoinType.ValueType
                                         lrValueType = lrRole.JoinedORMObject
-                                        If (lrValueType.Instance.Count = 0) Or _
+                                        If (lrValueType.Instance.Count = 0) Or
                                             lrValueType.Instance.FindAll(Function(x) Integer.TryParse(Regex.Replace(x, "[^\d]", ""), liDummyInteger)).Count = 0 Then
                                             liHighestInteger = 1
                                         Else
@@ -1996,7 +2003,7 @@ Namespace FBM
                                         End If
                                     Case Is = pcenumRoleJoinType.EntityType
                                         lrEntityType = lrRole.JoinedORMObject
-                                        If (lrEntityType.Instance.Count = 0) Or _
+                                        If (lrEntityType.Instance.Count = 0) Or
                                         lrEntityType.Instance.FindAll(Function(x) Integer.TryParse(Regex.Replace(x, "[^\d]", ""), liDummyInteger)).Count = 0 Then
                                             liHighestInteger = 1
                                         Else
@@ -2017,6 +2024,7 @@ Namespace FBM
                     lrDictionaryEntry = Me.AddModelDictionaryEntry(New FBM.DictionaryEntry(Me, lrConcept.Symbol, pcenumConceptType.Value))
 
                     lrFactData = New FBM.FactData(lrRole, lrDictionaryEntry.Concept, lrFact)
+                    lrFactData.isDirty = abMakeDirty
                     lrFact.Data.Add(lrFactData)
 
                     If Not lrRole.JoinedORMObject.Instance.Exists(Function(x) x = lrFactData.Data) Then
@@ -2029,7 +2037,7 @@ Namespace FBM
                                 lrEnityType = lrRole.JoinedORMObject
                                 lrEnityType.AddDataInstance(lrFactData.Data)
 
-                            Case Is = pcenumConceptType.ValueType, _
+                            Case Is = pcenumConceptType.ValueType,
                                       pcenumConceptType.FactType
                                 lrRole.JoinedORMObject.Instance.Add(lrFactData.Data)
                         End Select
