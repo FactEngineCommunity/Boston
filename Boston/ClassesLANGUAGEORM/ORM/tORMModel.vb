@@ -224,6 +224,12 @@ Namespace FBM
         <XmlIgnore()>
         Public RDS As New RDS.Model(Me)
 
+        ''' <summary>
+        ''' The State Transition Model for Value Type / Value Type Constraints for the Model.
+        ''' </summary>
+        <XmlIgnore()>
+        Public STM As New FBM.STM.Model
+
         Public CoreVersionNumber As String 'the version number of the Core Model injected into the Model, or the version number of the Core Model itself if Me is Core.
 
         <XmlIgnore()>

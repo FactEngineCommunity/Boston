@@ -1,5 +1,5 @@
 ﻿
-Namespace FBM.STD
+Namespace FBM.STM
 
     ''' <summary>
     ''' NB Each State is actually a ValueConstraint on the ValueType, but are stored redundently within the STDModel attribute of a ValueType.
@@ -7,6 +7,8 @@ Namespace FBM.STD
     Public Class State
 
         Public Name As String = ""
+
+        Public ValueType As FBM.ValueType = Nothing
 
     End Class
 

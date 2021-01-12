@@ -15,6 +15,15 @@ Public Enum pcenumCMMLRelations
         CoreIsERTable
 
         '---------------------------------------------
+        'STDs (State Transition Diagrams)
+        '---------------------------------------------
+        CoreValueTypeIsSubtypeStateControlled
+        CoreStateTransitionIsForValueType
+        CoreValueTypeHasStartCoreElementState
+        CoreValueTypeHasFinishCoreElementState
+        CoreStateTransition
+
+        '---------------------------------------------
         'DFDs (Data Flow Diagrams
         '---------------------------------------------
         CoreActorIsReceivingParty
@@ -66,8 +75,6 @@ Public Enum pcenumCMMLRelations
         CorePropertyIsForRole
         CorePropertyHasActiveRole
         CoreRelationIsForFactType
-        CoreStateTransition
-        CoreStateTransitionIsForValueType
 
         '---------------------------------------
         'Binary Relations - UML Class Diagrams 
@@ -103,8 +110,7 @@ Public Enum pcenumCMMLRelations
         CorePropertyHasMultiplicity
         CorePropertyHasPropertyName
         CorePropertyIsDerived
-        CoreValueTypeHasFinishCoreElementState
-        CoreValueTypeHasStartCoreElementState
+
     End Enum
 
     Enum pcenumCMMLIndexDirection

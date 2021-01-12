@@ -466,7 +466,9 @@
     <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.7\tXMLModelSubtypeRelationship.vb" />
     <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.7\tXMLModelValueType.vb" />
     <Compile Include="ClassesLANGUAGEORM\ORMGlossaryWriter\tORMGlossaryMaker.vb" />
+    <Compile Include="ClassesLANGUAGEORM\ORMSTD\tSTDModel.vb" />
     <Compile Include="ClassesLANGUAGEORM\ORMSTD\tSTDState.vb" />
+    <Compile Include="ClassesLANGUAGEORM\ORMSTD\tSTDStateTransition.vb" />
     <Compile Include="ClassesLANGUAGESTD\tCMMLEndStateIndicator.vb" />
     <Compile Include="ClassesLANGUAGESTD\tCMMLStartStateIndicator.vb" />
     <Compile Include="ClassesLANGUAGEDFD\tDFDDataStore.vb" />

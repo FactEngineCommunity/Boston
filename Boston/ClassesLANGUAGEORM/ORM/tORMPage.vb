@@ -869,6 +869,9 @@ Namespace FBM
             Dim lrFactType As New FBM.FactType
             Dim lrDroppedFactTypeInstance As New FBM.FactTypeInstance 'Used if arFactType is actually a FactTypeInstance (see Copy/Paste functions)
 
+            'Return failsafe
+            DropFactTypeAtPoint = Nothing
+
             lrFactType = arFactType
             'CodeSafe: Check to see if the FactType is already on the Page
             If Me.FactTypeInstance.Find(Function(x) x.Id = lrFactType.Id) IsNot Nothing Then Exit Function

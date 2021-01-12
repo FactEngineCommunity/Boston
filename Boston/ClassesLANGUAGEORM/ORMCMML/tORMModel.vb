@@ -84,6 +84,35 @@ Namespace FBM
 
         End Sub
 
+        Public Sub addCMMLStateTransition(ByRef arStateTransition As FBM.STM.StateTransition)
+
+            Try
+
+                Dim lsSQLQuery As String
+                Dim lrFact As FBM.Fact
+
+                lsSQLQuery = "INSERT INTO " & pcenumCMMLRelations.CoreStateTransition.ToString
+                lsSQLQuery &= " (Concept1, Concept2, Event)"
+                lsSQLQuery &= " VALUES ("
+                lsSQLQuery &= "'" & arStateTransition.FromState.Name & "'"
+                lsSQLQuery &= ",'" & arStateTransition.ToState.Name & "'"
+                lsSQLQuery &= ",'" & arStateTransition.Event & "'"
+                lsSQLQuery &= " )"
+
+                lrFact = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+            Catch ex As Exception
+                Dim lsMessage1 As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+
+        End Sub
+
         ''' <summary>
         ''' Changes the name of an Attribute in the RDS
         ''' </summary>
