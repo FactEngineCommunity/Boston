@@ -319,7 +319,7 @@ Namespace FBM
             With Me
                 lrStateTransition.Model = .Model
                 lrStateTransition.Page = arPage
-                lrStateTransition.Name = .Concept.Symbol
+                lrStateTransition.Name = asEventName 'was .Concept.Symbol  [20210112-VM-wasn't working]
                 lrStateTransition.Fact = Me.Fact
                 lrStateTransition.FactInstance = Me
                 lrStateTransition.Concept = .Concept

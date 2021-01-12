@@ -165,18 +165,22 @@ Public Class frmStateTransitionDiagram
 
             Dim lnode_dragged_node As tShapeNodeDragItem = e.Data.GetData(tShapeNodeDragItem.DraggedItemObjectType)
 
+            Dim lrToolboxForm As frmToolbox
+            lrToolboxForm = prApplication.GetToolboxForm(frmToolbox.Name)
+
             If lnode_dragged_node.Index >= 0 Then
-                If lnode_dragged_node.Index < frmMain.zfrm_toolbox.ShapeListBox.ShapeCount Then
+                If lnode_dragged_node.Index < lrToolboxForm.ShapeListBox.ShapeCount Then
                     Dim p As Point = Me.StateTransitionDiagramView.PointToClient(New Point(e.X, e.Y))
                     Dim pt As PointF = Me.StateTransitionDiagramView.ClientToDoc(New Point(p.X, p.Y))
 
-                    Select Case frmMain.zfrm_toolbox.ShapeListBox.Shapes(lnode_dragged_node.Index).Id
-                        Case Is = "Actor"
+                    Select Case lrToolboxForm.ShapeListBox.Shapes(lnode_dragged_node.Index).Id
+                        Case Is = "State"
                             Dim lr_state As New CMML.State
                             lr_state.Name = "Storeman"
-                            Call drop_state_at_point(lr_state, pt)
-                        Case Is = "Process"
-                            Dim lr_process As New CMML.Process(Me.zrPage, System.Guid.NewGuid.ToString)
+                            Call Me.dropStateAtPoint(lr_state, pt)
+                        Case Is = "Start"
+                            Dim lrStart As New CMML.StartStateIndicator()
+
                     End Select
                 End If
             End If
@@ -534,11 +538,13 @@ Public Class frmStateTransitionDiagram
         Else
             If e.Data.GetDataPresent(tShapeNodeDragItem.DraggedItemObjectType) Then
                 Dim lnode_dragged_node As tShapeNodeDragItem = e.Data.GetData(tShapeNodeDragItem.DraggedItemObjectType)
-                If lnode_dragged_node.Index = 1 Then
-                    'Is Process and should be dropped only within the SystemBoundary (ContainerNode)
-                    e.Effect = DragDropEffects.None
-                    Exit Sub
-                End If
+
+                Select Case lnode_dragged_node.Tag.Id
+                    Case = "Start", "State"
+                    Case Else
+                        e.Effect = DragDropEffects.None
+                        Exit Sub
+                End Select
             End If
         End If
 
@@ -561,9 +567,9 @@ Public Class frmStateTransitionDiagram
 
     End Sub
 
-    Sub drop_state_at_point(ByVal ar_state As CMML.State, ByVal ao_pt As PointF)
+    Sub dropStateAtPoint(ByVal ar_state As CMML.State, ByVal ao_pt As PointF)
 
-        Dim lr_state_instance As New CMML.State
+        Dim lrStateInstance As New CMML.State
         Dim loDroppedNode As ShapeNode
 
 
@@ -579,14 +585,14 @@ Public Class frmStateTransitionDiagram
         loDroppedNode.Tag = New CMML.tActor
         loDroppedNode.Resize(10, 15)
 
-        lr_state_instance.Model = prApplication.WorkingModel
-        lr_state_instance.LongDescription = ar_state.LongDescription
-        lr_state_instance.ShortDescription = ar_state.ShortDescription
-        lr_state_instance.Name = ar_state.Name
-        lr_state_instance.Shape = loDroppedNode
-        lr_state_instance.Symbol = ar_state.Concept.Symbol
-        lr_state_instance.X = loDroppedNode.Bounds.X
-        lr_state_instance.Y = loDroppedNode.Bounds.Y
+        lrStateInstance.Model = prApplication.WorkingModel
+        lrStateInstance.LongDescription = ar_state.LongDescription
+        lrStateInstance.ShortDescription = ar_state.ShortDescription
+        lrStateInstance.Name = ar_state.Name
+        lrStateInstance.Shape = loDroppedNode
+        'lrStateInstance.Symbol = ar_state.Concept.Symbol
+        lrStateInstance.X = loDroppedNode.Bounds.X
+        lrStateInstance.Y = loDroppedNode.Bounds.Y
 
         If Not Me.StateTransitionDiagram.State.Exists(AddressOf ar_state.Equals) Then
             '--------------------------------------------------
@@ -596,8 +602,8 @@ Public Class frmStateTransitionDiagram
             Me.StateTransitionDiagram.State.Add(ar_state)
         End If
 
-        Me.StateTransitionDiagram.State.Add(lr_state_instance)
-        loDroppedNode.Tag = lr_state_instance
+        Me.StateTransitionDiagram.State.Add(lrStateInstance)
+        loDroppedNode.Tag = lrStateInstance
         loDroppedNode.Visible = True
 
     End Sub

@@ -292,7 +292,7 @@ Partial Class frmToolboxEnterpriseExplorer
         '
         Me.ContextMenuStrip_ORMModel.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ViewModelDictionaryToolStripMenuItem, Me.ViewGlossaryToolStripMenuItem, Me.GenerateDocumentationToolStripMenuItem, Me.CodeGenerationToolStripMenuItem, Me.FactEngineToolStripMenuItem, Me.ToolStripSeparator7, Me.AddPageToolStripMenuItem1, Me.ToolStripMenuItemPastePage, Me.ToolStripMenuItemLanguage, Me.ToolStripSeparator1, Me.EmptyModelToolStripMenuItem, Me.HideToolStripMenuItem, Me.RenameToolStripMenuItem, Me.DeleteModelToolStripMenuItem, Me.ToolStripSeparator3, Me.ToolStripMenuItemModelConfiguration, Me.ToolStripSeparator5, Me.ImportExportToolStripMenuItem})
         Me.ContextMenuStrip_ORMModel.Name = "ContextMenuStrip_ORMModel"
-        Me.ContextMenuStrip_ORMModel.Size = New System.Drawing.Size(208, 336)
+        Me.ContextMenuStrip_ORMModel.Size = New System.Drawing.Size(208, 358)
         '
         'ViewModelDictionaryToolStripMenuItem
         '
@@ -397,7 +397,7 @@ Partial Class frmToolboxEnterpriseExplorer
         'AddSTDPageToolStripMenuItem
         '
         Me.AddSTDPageToolStripMenuItem.Name = "AddSTDPageToolStripMenuItem"
-        Me.AddSTDPageToolStripMenuItem.Size = New System.Drawing.Size(148, 22)
+        Me.AddSTDPageToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
         Me.AddSTDPageToolStripMenuItem.Text = "&Add STD Page"
         '
         'ToolStripSeparator1
