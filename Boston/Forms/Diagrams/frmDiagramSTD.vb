@@ -179,8 +179,8 @@ Public Class frmStateTransitionDiagram
                             lr_state.Name = "Storeman"
                             Call Me.dropStateAtPoint(lr_state, pt)
                         Case Is = "Start"
-                            Dim lrStart As New CMML.StartStateIndicator()
-
+                            Dim lrStartIndicator As New CMML.StartStateIndicator()
+                            Call Me.dropStartIndicatorAtPoint(lrStartIndicator, pt)
                     End Select
                 End If
             End If
@@ -605,6 +605,46 @@ Public Class frmStateTransitionDiagram
         Me.StateTransitionDiagram.State.Add(lrStateInstance)
         loDroppedNode.Tag = lrStateInstance
         loDroppedNode.Visible = True
+
+    End Sub
+
+    Sub dropStartIndicatorAtPoint(ByVal arStartIndicator As CMML.StartStateIndicator, ByVal aoPtf As PointF)
+
+        Dim lrStartIndicator As New CMML.StartStateIndicator
+        Dim loDroppedNode As ShapeNode
+
+
+        loDroppedNode = Diagram.Factory.CreateShapeNode(aoPtf.X, aoPtf.Y, 8, 8)
+        loDroppedNode.Shape = Shapes.Ellipse
+        loDroppedNode.HandlesStyle = HandlesStyle.MoveOnly
+        loDroppedNode.ToolTip = "Start Indicator"
+        loDroppedNode.Visible = True
+        loDroppedNode.Image = Nothing
+        loDroppedNode.Pen.Color = Color.Black
+        loDroppedNode.Brush = New MindFusion.Drawing.SolidBrush(Color.Black)
+        loDroppedNode.ShadowColor = Color.White
+
+        loDroppedNode.Tag = New CMML.StartStateIndicator
+        loDroppedNode.Resize(8, 8)
+
+        lrStartIndicator.Model = prApplication.WorkingModel
+        lrStartIndicator.LongDescription = arStartIndicator.LongDescription
+        lrStartIndicator.ShortDescription = arStartIndicator.ShortDescription
+        lrStartIndicator.Shape = loDroppedNode
+        lrStartIndicator.X = loDroppedNode.Bounds.X
+        lrStartIndicator.Y = loDroppedNode.Bounds.Y
+
+        'If Not Me.StateTransitionDiagram.State.Exists(AddressOf ar_state.Equals) Then
+        '--------------------------------------------------
+        'The State is not already within the ORMModel
+        '  so add it.
+        '--------------------------------------------------
+        '   Me.StateTransitionDiagram.State.Add(ar_state)
+        'End If
+        'Me.StateTransitionDiagram.Stat.Add(lrStartIndicator )
+
+        loDroppedNode.Tag = lrStartIndicator
+
 
     End Sub
 
