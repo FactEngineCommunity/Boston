@@ -4901,7 +4901,7 @@ Public Class frmDiagramORM
                             loLink.Text = lsEventName
                             Me.zrPage.Diagram.Links.Add(loLink)
 
-                            Dim lrStateTransition As New CMML.StateTransition
+                            Dim lrStateTransition As New STD.StateTransition
                             loLink.Tag = lrStateTransition
                         End If
 

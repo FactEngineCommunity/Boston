@@ -2,7 +2,7 @@
 Imports MindFusion.Diagramming
 Imports MindFusion.Drawing
 
-Namespace CMML
+Namespace STD
 
     Public Class StartStateIndicator
         Inherits FBM.FactInstance
@@ -10,7 +10,7 @@ Namespace CMML
 
         Public Shadows ConceptType As pcenumConceptType = pcenumConceptType.StartStateIndicator
 
-        Public State As CMML.State 'The State to which this StartStateIndicator links.
+        Public State As STD.State 'The State to which this StartStateIndicator links.
 
         Public Link As DiagramLink
 

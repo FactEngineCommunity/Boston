@@ -220,6 +220,17 @@ Namespace FBM
             End Set
         End Property
 
+        <NonSerialized()>
+        Private _STDiagram As New STD.Diagram
+        Public Overridable Property STDiagram As STD.Diagram
+            Get
+                Return Me._STDiagram
+            End Get
+            Set(value As STD.Diagram)
+                Me._STDiagram = value
+            End Set
+        End Property
+
         '----------------------------------------------------------------------------------
 
 

@@ -228,7 +228,7 @@ Namespace FBM
         ''' The State Transition Model for Value Type / Value Type Constraints for the Model.
         ''' </summary>
         <XmlIgnore()>
-        Public STM As New FBM.STM.Model
+        Public STM As New FBM.STM.Model(Me)
 
         Public CoreVersionNumber As String 'the version number of the Core Model injected into the Model, or the version number of the Core Model itself if Me is Core.
 

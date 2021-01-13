@@ -2,7 +2,7 @@
 Imports MindFusion.Diagramming
 Imports MindFusion.Drawing
 
-Namespace CMML
+Namespace STD
 
     Public Class EndStateIndicator
         Inherits FBM.FactInstance
@@ -10,7 +10,7 @@ Namespace CMML
 
         Public Shadows ConceptType As pcenumConceptType = pcenumConceptType.EndStateIndicator
 
-        Public State As CMML.State 'The State from which this EndStateIndicator comes from/terminates.
+        Public State As STD.State 'The State from which this EndStateIndicator comes from/terminates.
 
         Public Link As DiagramLink
 

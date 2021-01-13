@@ -1,11 +1,16 @@
-﻿Public Class tStateTransitionDiagram
+﻿
+Namespace STD
 
-    Public ValueTypeId As String
-    Public State As New List(Of CMML.State)
-    Public StateTransition As New List(Of CMML.StateTransition)
+    Public Class Diagram
 
-    Public Process As New List(Of CMML.Process)
-    Public StateTransitionRelation As FBM.FactTypeInstance
-    Public StateTransitionValueType As FBM.FactTypeInstance
+        Public ValueType As FBM.ValueType = Nothing
+        Public State As New List(Of STD.State)
+        Public StateTransition As New List(Of STD.StateTransition)
 
-End Class
+        Public Process As New List(Of CMML.Process)
+        Public StateTransitionRelation As FBM.FactTypeInstance
+        Public StateTransitionValueType As FBM.FactTypeInstance
+
+    End Class
+
+End Namespace

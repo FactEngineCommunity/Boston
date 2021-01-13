@@ -241,7 +241,7 @@ Namespace FBM
         ''' </summary>
         ''' <param name="arPage"></param>
         ''' <returns></returns>
-        Public Function CloneStartStateIndicator(ByRef arPage As FBM.Page, Optional ByRef arState As CMML.State = Nothing) As CMML.StartStateIndicator
+        Public Function CloneStartStateIndicator(ByRef arPage As FBM.Page, Optional ByRef arState As STD.State = Nothing) As STD.StartStateIndicator
 
             '------------------------------------------------------------------
             'As in 'Start Status Indicator' within a State Transition Diagram
@@ -252,7 +252,7 @@ Namespace FBM
                     Throw New Exception("Called CloneStartStateIndicator for the wrong type of FactType and Fact.")
                 End If
 
-                Dim lrStartStateIndicator As New CMML.StartStateIndicator
+                Dim lrStartStateIndicator As New STD.StartStateIndicator
 
                 With Me
                     lrStartStateIndicator.Model = .Model
@@ -288,12 +288,12 @@ Namespace FBM
         ''' </summary>
         ''' <param name="arPage"></param>
         ''' <returns></returns>
-        Public Function CloneEndStateIndicator(ByRef arPage As FBM.Page, Optional ByRef arState As CMML.State = Nothing) As CMML.EndStateIndicator
+        Public Function CloneEndStateIndicator(ByRef arPage As FBM.Page, Optional ByRef arState As STD.State = Nothing) As STD.EndStateIndicator
 
             '------------------------------------------------------------------
             'As in 'Start Status Indicator' within a State Transition Diagram
             '------------------------------------------------------------------
-            Dim lrEndStateIndicator As New CMML.EndStateIndicator
+            Dim lrEndStateIndicator As New STD.EndStateIndicator
 
             With Me
                 lrEndStateIndicator.Model = .Model
@@ -312,9 +312,9 @@ Namespace FBM
 
         End Function
 
-        Public Function CloneStateTransition(ByRef arPage As FBM.Page, ByRef arFromState As CMML.State, ByRef arToState As CMML.State, ByVal asEventName As String)
+        Public Function CloneStateTransition(ByRef arPage As FBM.Page, ByRef arFromState As STD.State, ByRef arToState As STD.State, ByVal asEventName As String)
 
-            Dim lrStateTransition As New CMML.StateTransition
+            Dim lrStateTransition As New STD.StateTransition
 
             With Me
                 lrStateTransition.Model = .Model

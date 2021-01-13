@@ -331,7 +331,7 @@ Public Class tCMML
 
     End Function
 
-    Public Function get_orm_diagram_pages_for_state(ByVal arState As CMML.State) As List(Of FBM.Page)
+    Public Function get_orm_diagram_pages_for_state(ByVal arState As STD.State) As List(Of FBM.Page)
 
         get_orm_diagram_pages_for_state = New List(Of FBM.Page)
 

@@ -3,7 +3,7 @@ Imports System.Xml.Serialization
 Imports MindFusion.Diagramming
 Imports System.Reflection
 
-Namespace CMML
+Namespace STD
 
     <Serializable()>
     Public Class State
@@ -16,7 +16,7 @@ Namespace CMML
         '  In the StateTransitionDiagram MetaModel, that FactType is called: 'StateTransitionRelation'.
         '--------------------------------------------------------------------------------------------------------
         Inherits FBM.FactDataInstance
-        Implements IEquatable(Of CMML.State)
+        Implements IEquatable(Of STD.State)
 
         <XmlAttribute()>
         Public Shadows ConceptType As pcenumConceptType = pcenumConceptType.State
@@ -33,6 +33,8 @@ Namespace CMML
                 Me._Name = Value
             End Set
         End Property
+
+        Public ValueType As FBM.ValueType = Nothing
 
         Public Process As List(Of CMML.Process)
 
@@ -67,7 +69,7 @@ Namespace CMML
                 loDroppedNode.Text = Me.Data
                 loDroppedNode.Transparent = False
 
-                loDroppedNode.Tag = New CMML.State
+                loDroppedNode.Tag = New STD.State
                 loDroppedNode.Tag = Me
                 Me.Shape = loDroppedNode
 

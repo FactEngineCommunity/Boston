@@ -84,6 +84,41 @@ Namespace FBM
 
         End Sub
 
+        ''' <summary>
+        ''' For the STM (State Transition Model), for Value Type/Value Constraints within the Model.
+        ''' </summary>
+        ''' <param name="arStartState">The State for a ValueType that is a start of a STM.</param>
+        Public Sub addCMMLStartState(ByRef arStartState As FBM.STM.State)
+
+            Try
+
+                Dim lsSQLQuery As String
+                Dim lrFact As FBM.Fact
+
+                lsSQLQuery = "INSERT INTO " & pcenumCMMLRelations.CoreValueTypeHasStartCoreElementState.ToString
+                lsSQLQuery &= " (ValueType, CoreElement)"
+                lsSQLQuery &= " VALUES ("
+                lsSQLQuery &= "'" & arStartState.ValueType.Id & "'"
+                lsSQLQuery &= ",'" & arStartState.Name & "'"
+                lsSQLQuery &= " )"
+
+                lrFact = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+            Catch ex As Exception
+                Dim lsMessage1 As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
+        ''' <summary>
+        ''' For the STM (State Transition Model), for Value Type/Value Constraints within the Model.
+        ''' </summary>
+        ''' <param name="arStateTransition"></param>
         Public Sub addCMMLStateTransition(ByRef arStateTransition As FBM.STM.StateTransition)
 
             Try
@@ -101,6 +136,18 @@ Namespace FBM
 
                 lrFact = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
+                arStateTransition.Id = lrFact.Id
+
+                'NB StateTransition (below) is the Fact.Id of the Fact that is the StateTransition.
+                lsSQLQuery = "INSERT INTO " & pcenumCMMLRelations.CoreStateTransitionIsForValueType.ToString
+                lsSQLQuery &= " (ValueType, StateTransition)"
+                lsSQLQuery &= " VALUES ("
+                lsSQLQuery &= "'" & arStateTransition.ValueType.Id & "'"
+                lsSQLQuery &= ",'" & lrFact.Id & "'"
+                lsSQLQuery &= " )"
+
+                lrFact = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
             Catch ex As Exception
                 Dim lsMessage1 As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
@@ -110,8 +157,40 @@ Namespace FBM
                 prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
+        End Sub
+
+
+        ''' <summary>
+        ''' For the STM (State Transition Model), for Value Type/Value Constraints within the Model.
+        ''' </summary>
+        ''' <param name="arStopState">The State for a ValueType that is a Stop of a STM.</param>
+        Public Sub addCMMLStopState(ByRef arStopState As FBM.STM.State)
+
+            Try
+
+                Dim lsSQLQuery As String
+                Dim lrFact As FBM.Fact
+
+                lsSQLQuery = "INSERT INTO " & pcenumCMMLRelations.CoreValueTypeHasFinishCoreElementState.ToString
+                lsSQLQuery &= " (ValueType, CoreElement)"
+                lsSQLQuery &= " VALUES ("
+                lsSQLQuery &= "'" & arStopState.ValueType.Id & "'"
+                lsSQLQuery &= ",'" & arStopState.Name & "'"
+                lsSQLQuery &= " )"
+
+                lrFact = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+            Catch ex As Exception
+                Dim lsMessage1 As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
         End Sub
+
 
         ''' <summary>
         ''' Changes the name of an Attribute in the RDS
@@ -915,6 +994,91 @@ Namespace FBM
             lsSQLQuery = "REMOVE INSTANCE '" & arRelation.Id & "' FROM CoreElement"
 
             Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+        End Sub
+
+        ''' <summary>
+        ''' For the State Transition Model (STM) of the FBM Model...for ValueType/ValueConstraint state transitions
+        ''' </summary>
+        ''' <param name="arStartState"></param>
+        Public Sub removeCMMLStartState(ByRef arStartState As FBM.STM.State)
+
+            Try
+                Dim lsSQLQuery As String = ""
+
+                lsSQLQuery = "DELETE FROM " & pcenumCMMLRelations.CoreValueTypeHasStartCoreElementState.ToString
+                lsSQLQuery &= " WHERE ValueType = '" & arStartState.ValueType.Id & "'"
+                lsSQLQuery &= " AND CoreElement = '" & arStartState.Name & "'"
+
+                Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+            Catch ex As Exception
+                Dim lsMessage1 As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
+        ''' <summary>
+        ''' For the State Transition Model (STM) of the FBM Model...for ValueType/ValueConstraint state transitions
+        ''' </summary>
+        ''' <param name="arStateTransition">The StateTransition to be removed from the STM within the FBM.</param>
+        Public Sub removeCMMLStateTransition(ByRef arStateTransition As FBM.STM.StateTransition)
+
+            Try
+                Dim lsSQLQuery As String = ""
+
+                lsSQLQuery = "DELETE FROM " & pcenumCMMLRelations.CoreStateTransition.ToString
+                lsSQLQuery &= " WHERE Concept1 = '" & arStateTransition.FromState.Name & "'"
+                lsSQLQuery &= " AND Concept2 = '" & arStateTransition.ToState.Name & "'"
+                lsSQLQuery &= " AND Event = '" & arStateTransition.Event & "'"
+
+                Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                lsSQLQuery = "DELETE FROM " & pcenumCMMLRelations.CoreStateTransitionIsForValueType.ToString
+                lsSQLQuery &= " WHERE ValueType = '" & arStateTransition.ValueType.Id & "'"
+                lsSQLQuery &= " AND StateTransition = '" & arStateTransition.Id & "'"
+
+                Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+            Catch ex As Exception
+                Dim lsMessage1 As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
+        ''' <summary>
+        ''' For the State Transition Model (STM) of the FBM Model...for ValueType/ValueConstraint state transitions
+        ''' </summary>
+        ''' <param name="arStopState">The StopState being removed from the State Transition Model.</param>
+        Public Sub removeCMMLStopState(ByRef arStopState As FBM.STM.State)
+
+            Try
+                Dim lsSQLQuery As String = ""
+
+                lsSQLQuery = "DELETE FROM " & pcenumCMMLRelations.CoreValueTypeHasFinishCoreElementState.ToString
+                lsSQLQuery &= " WHERE ValueType = '" & arStopState.ValueType.Id & "'"
+                lsSQLQuery &= " AND CoreElement = '" & arStopState.Name & "'"
+
+                Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+            Catch ex As Exception
+                Dim lsMessage1 As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
         End Sub
 

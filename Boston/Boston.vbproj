@@ -1636,11 +1636,6 @@
     <Compile Include="ModulesPublic\publicConstantsBrain.vb" />
     <Compile Include="ModulesPublic\publicFunctions.vb" />
     <Compile Include="ModulesPublic\publicVariables.vb" />
-    <Compile Include="MenuImagesMain.Designer.vb">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>MenuImagesMain.resx</DependentUpon>
-    </Compile>
     <Compile Include="Resources\DatabaseLogos.Designer.vb">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -1650,6 +1645,11 @@
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>MenuImages.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Resources\MenuImagesMain.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>MenuImagesMain.resx</DependentUpon>
     </Compile>
     <Compile Include="Resources\ORMShapes.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -2044,9 +2044,10 @@
       <CustomToolNamespace>My.Resources</CustomToolNamespace>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="MenuImagesMain.resx">
+    <EmbeddedResource Include="Resources\MenuImagesMain.resx">
       <CustomToolNamespace>My.Resources</CustomToolNamespace>
       <Generator>ResXFileCodeGenerator</Generator>
+      <SubType>Designer</SubType>
       <LastGenOutput>MenuImagesMain.Designer.vb</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Include="Resources\DatabaseLogos.resx">

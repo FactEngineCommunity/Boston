@@ -2,13 +2,12 @@
 Imports MindFusion.Diagramming
 
 
-
-Namespace CMML
+Namespace STD
     Public Class StateTransition
         Inherits FBM.FactInstance
 
-        Public FromState As CMML.State
-        Public ToState As CMML.State
+        Public FromState As STD.State
+        Public ToState As STD.State
 
         Public EventName As String = ""
 
@@ -20,7 +19,7 @@ Namespace CMML
 
         End Sub
 
-        Public Sub New(ByRef arFromState As CMML.State, ByRef arToState As CMML.State, ByVal asEventName As String)
+        Public Sub New(ByRef arFromState As STD.State, ByRef arToState As STD.State, ByVal asEventName As String)
 
             Me.FromState = arFromState
             Me.ToState = arToState

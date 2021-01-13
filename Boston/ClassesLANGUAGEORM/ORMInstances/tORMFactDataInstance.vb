@@ -925,14 +925,14 @@ Namespace FBM
 
         End Sub
 
-        Public Function CloneState(ByRef arPage As FBM.Page) As CMML.State
+        Public Function CloneState(ByRef arPage As FBM.Page) As STD.State
             '--------------------------------------------
             'Clones a FactDataInstance as a "State".
             '
             'States are 'Values' of 'ValueTypes'
             '  for models like a StateTransitionDiagram.
             '--------------------------------------------
-            Dim lr_state As New CMML.State
+            Dim lr_state As New STD.State
 
             With Me
                 lr_state.Model = .Model
