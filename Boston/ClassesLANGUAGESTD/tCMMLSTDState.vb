@@ -36,7 +36,7 @@ Namespace STD
 
         Public ValueType As FBM.ValueType = Nothing
 
-        Public Process As List(Of CMML.Process)
+        Public STMState As FBM.STM.State = Nothing
 
         Public Overloads Function Equals(other As State) As Boolean Implements IEquatable(Of State).Equals
 

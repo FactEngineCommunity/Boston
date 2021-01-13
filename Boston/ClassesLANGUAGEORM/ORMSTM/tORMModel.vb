@@ -32,7 +32,7 @@ Namespace FBM
                 While Not lrORMRecordset.EOF
 
                     lsSQLQuery = "SELECT *"
-                    lsSQLQuery &= "  FROM " & pcenumCMMLRelations.CoreStateTransitionIsForValueType.ToString
+                    lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreStateTransitionIsForValueType.ToString
                     lsSQLQuery &= " WHERE StateTransition = '" & lrORMRecordset.CurrentFact.Id & "'"
 
                     lrORMRecordset2 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
@@ -42,10 +42,12 @@ Namespace FBM
                     lrFromState = New STM.State
                     lrFromState.ValueType = lrValueType
                     lrFromState.Name = lrORMRecordset("Concept1").Data
+                    lrFromState.Model = Me
 
                     lrToState = New STM.State
                     lrToState.ValueType = lrValueType
                     lrToState.Name = lrORMRecordset("Concept2").Data
+                    lrToState.Model = Me
 
                     Me.STM.State.AddUnique(lrFromState)
                     Me.STM.State.AddUnique(lrToState)
@@ -71,7 +73,7 @@ Namespace FBM
 
                     lrValueType = Me.ValueType.Find(Function(x) x.Id = lrORMRecordset("ValueType").Data)
 
-                    lrState = New STM.State(lrValueType, lrORMRecordset("CoreElement").Data)
+                    lrState = New STM.State(Me, lrValueType, lrORMRecordset("CoreElement").Data)
 
                     Me.STM.State.Find(AddressOf lrState.Equals).IsStart = True
 
@@ -89,7 +91,7 @@ Namespace FBM
 
                     lrValueType = Me.ValueType.Find(Function(x) x.Id = lrORMRecordset("ValueType").Data)
 
-                    lrState = New STM.State(lrValueType, lrORMRecordset("CoreElement").Data)
+                    lrState = New STM.State(Me, lrValueType, lrORMRecordset("CoreElement").Data)
 
                     Me.STM.State.Find(AddressOf lrState.Equals).IsStop = True
 

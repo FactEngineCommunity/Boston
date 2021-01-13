@@ -88,7 +88,7 @@ Namespace FBM
         ''' For the STM (State Transition Model), for Value Type/Value Constraints within the Model.
         ''' </summary>
         ''' <param name="arStartState">The State for a ValueType that is a start of a STM.</param>
-        Public Sub addCMMLStartState(ByRef arStartState As FBM.STM.State)
+        Public Function addCMMLStartState(ByRef arStartState As FBM.STM.State) As FBM.Fact
 
             Try
 
@@ -102,7 +102,7 @@ Namespace FBM
                 lsSQLQuery &= ",'" & arStartState.Name & "'"
                 lsSQLQuery &= " )"
 
-                lrFact = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                Return Me.ORMQL.ProcessORMQLStatement(lsSQLQuery) 'As Fact
 
             Catch ex As Exception
                 Dim lsMessage1 As String
@@ -113,7 +113,7 @@ Namespace FBM
                 prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
-        End Sub
+        End Function
 
         ''' <summary>
         ''' For the STM (State Transition Model), for Value Type/Value Constraints within the Model.

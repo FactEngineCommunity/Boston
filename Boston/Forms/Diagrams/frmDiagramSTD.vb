@@ -288,7 +288,10 @@ Public Class frmStateTransitionDiagram
                 lrFromState = lrFactDataInstance.CloneState(arPage)
                 lrFromState.X = lrFactDataInstance.X
                 lrFromState.Y = lrFactDataInstance.Y
+                lrFromState.StateName = lrRecordset("Concept1").Data
                 lrFromState.ValueType = Me.zrPage.STDiagram.ValueType
+
+                lrFromState.STMState = Me.zrPage.Model.STM.State.Find(Function(x) x.ValueType.Id = lrFromState.ValueType.Id And x.Name = lrFromState.StateName)
 
                 Dim LoadedCount = Aggregate Node In Me.Diagram.Nodes
                                   Where Node.GetType.ToString = GetType(MindFusion.Diagramming.ShapeNode).ToString _
@@ -307,7 +310,10 @@ Public Class frmStateTransitionDiagram
                 lrToState = lrFactDataInstance.CloneState(arPage)
                 lrToState.X = lrFactDataInstance.X
                 lrToState.Y = lrFactDataInstance.Y
+                lrToState.StateName = lrRecordset("Concept2").Name
                 lrToState.ValueType = Me.zrPage.STDiagram.ValueType
+
+                lrToState.STMState = Me.zrPage.Model.STM.State.Find(Function(x) x.ValueType.Id = lrToState.ValueType.Id And x.Name = lrToState.StateName)
 
                 Dim LoadedCount2 = Aggregate Node In Me.Diagram.Nodes
                                    Where Node.GetType.ToString = GetType(MindFusion.Diagramming.ShapeNode).ToString _
@@ -677,10 +683,10 @@ Public Class frmStateTransitionDiagram
         Dim loObject As Object = e.Link.Destination
         Dim lo_dummy_object As New MindFusion.Diagramming.DummyNode(Me.Diagram)
         Dim lrFact As New FBM.Fact
-        Dim lrFactInstance As New FBM.FactInstance
+        Dim lrFactInstance As FBM.FactInstance
         Dim loFirstEntity As New Object
         Dim loSecondEntity As New Object
-
+        Dim lsSQLQuery As String = ""
 
         Me.Cursor = Cursors.WaitCursor
 
@@ -694,8 +700,15 @@ Public Class frmStateTransitionDiagram
         If (loFirstEntity.ConceptType = pcenumConceptType.StartStateIndicator) And (loSecondEntity.ConceptType = pcenumConceptType.State) Then
 
             Debugger.Break()
-            Dim lrStartState As FBM.STM.State = loSecondEntity
-            Me.zrPage.Model.STM.addStartState(lrStartState)
+            Dim lrStartState As STD.State = loSecondEntity
+
+            lrFact = lrStartState.STMState.makeStartState
+
+            lsSQLQuery = "ADD FACT '" & lrFact.Id & "'"
+            lsSQLQuery &= " TO " & pcenumCMMLRelations.CoreValueTypeHasStartCoreElementState.ToString
+            lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
+
+            lrFactInstance = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
         ElseIf (loFirstEntity.ConceptType = pcenumConceptType.State) And (loSecondEntity.ConceptType = pcenumConceptType.State) Then
             '    lrTypeOfRelation = pcenumCMMLRelations.ActorToProcessParticipationRelation

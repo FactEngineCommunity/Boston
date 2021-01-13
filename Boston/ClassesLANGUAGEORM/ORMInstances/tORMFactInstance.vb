@@ -257,7 +257,7 @@ Namespace FBM
                 With Me
                     lrStartStateIndicator.Model = .Model
                     lrStartStateIndicator.Page = arPage
-                    lrStartStateIndicator.Name = .Concept.Symbol
+                    'lrStartStateIndicator.Name = .Concept.Symbol '20200113-VM-Not really needed.
                     lrStartStateIndicator.Fact = Me.Fact
                     lrStartStateIndicator.FactInstance = Me
                     lrStartStateIndicator.Concept = .Concept

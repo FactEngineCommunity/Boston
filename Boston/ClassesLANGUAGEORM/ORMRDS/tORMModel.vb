@@ -1651,7 +1651,7 @@ Namespace FBM
 
                     'PGS Relation
                     lsSQLQuery = " SELECT COUNT(*)"
-                    lsSQLQuery &= "  FROM " & pcenumCMMLRelations.CoreIsPGSRelation.ToString
+                    lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreIsPGSRelation.ToString
                     lsSQLQuery &= " WHERE IsPGSRelation = '" & lrTable.Name & "'"
 
                     lrORMRecordset3 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
@@ -1763,6 +1763,11 @@ Namespace FBM
                 '==========================================================================================================
                 'Relations                
                 Call Me.populateRDSRelationsFromCoreMDAElements()
+
+                '==========================================================
+                'State Transition Model
+                '  NB Is called from within this thread so as to not clash on the ORMQL Parser.
+                Call Me.PopulateSTMStructureFromCoreMDAElements()
 
                 Me.RDSLoading = False
 

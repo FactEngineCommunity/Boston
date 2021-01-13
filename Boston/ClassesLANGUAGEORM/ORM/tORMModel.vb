@@ -4480,9 +4480,10 @@ Namespace FBM
                 loRDSThread = New System.Threading.Thread(AddressOf Me.PopulateRDSStructureFromCoreMDAElements)
                 loRDSThread.Start()
 
-                Dim loSTMThread As System.Threading.Thread
-                loSTMThread = New System.Threading.Thread(AddressOf Me.PopulateSTMStructureFromCoreMDAElements)
-                loSTMThread.Start()
+                '20200113-VM-Can't have more han one thread on the ORMQL parser, call from within PopulateRDSStructureFromCoreMDAElements
+                'Dim loSTMThread As System.Threading.Thread
+                'loSTMThread = New System.Threading.Thread(AddressOf Me.PopulateSTMStructureFromCoreMDAElements)
+                'loSTMThread.Start()
 
                 'Call Me.PopulateRDSStructureFromCoreMDAElements()
 
