@@ -37,12 +37,18 @@
                    ByVal asText2 As String,
                    ByVal aiInt1 As Integer,
                    ByVal aiInt2 As Integer)
+
         Dim lrNode = New cTreeNode(asText1, asText2, aiInt1, aiInt2)
+
         lrNode._MyTreeNodeCollection = Me
+
         _ActualNodes.Add(lrNode)
+
         'if the node is Hidden, there is no need to add it to TreeNodeCollection
         If lrNode.Hidden = False Then _VisibleNodes.Add(lrNode)
+
         Return lrNode
+
     End Function
 
     Public Sub AddRange(Nodes() As cTreeNode)

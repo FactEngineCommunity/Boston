@@ -36,7 +36,9 @@ Namespace STD
 
         Public ValueType As FBM.ValueType = Nothing
 
-        Public STMState As FBM.STM.State = Nothing
+        Public IsStartState As Boolean = False
+
+        Public WithEvents STMState As FBM.STM.State = Nothing
 
         Public Overloads Function Equals(other As State) As Boolean Implements IEquatable(Of State).Equals
 
@@ -123,6 +125,34 @@ Namespace STD
 
         End Sub
 
+        Public Sub setStartState(ByVal abStartStateStatus As Boolean)
+
+            If abStartStateStatus Then
+
+                Call Me.STMState.makeStartState()
+
+            End If
+
+        End Sub
+
+        Private Sub STMState_IsStartStateChanged(abIsStartState As Boolean) Handles STMState.IsStartStateChanged
+
+            Dim lsSQLQuery As String
+
+            Me.IsStartState = abIsStartState
+
+            If abIsStartState Then
+
+                lsSQLQuery = "ADD FACT '" & Me.STMState.StartStateFact.Id & "'"
+                lsSQLQuery &= " TO " & pcenumCMMLRelations.CoreValueTypeHasStartCoreElementState.ToString
+                lsSQLQuery &= " ON PAGE '" & Me.Page.Name & "'"
+
+                Call Me.Page.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+            Else
+
+            End If
+
+        End Sub
     End Class
 
 End Namespace

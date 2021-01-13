@@ -278,6 +278,7 @@ Namespace FBM
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
                 prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
 
+                Return Nothing
             End Try
 
         End Function

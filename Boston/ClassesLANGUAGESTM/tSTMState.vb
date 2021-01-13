@@ -14,7 +14,11 @@ Namespace FBM.STM
         Public ValueType As FBM.ValueType = Nothing
 
         Public IsStart As Boolean = False
+        Public StartStateFact As FBM.Fact = Nothing
+
         Public IsStop As Boolean = False
+
+        Public Event IsStartStateChanged(ByVal abStartState As Boolean)
 
         ''' <summary>
         ''' Parameterless new
@@ -42,7 +46,8 @@ Namespace FBM.STM
             Me.IsStart = True
 
             'CMML
-            Return Me.Model.addCMMLStartState(Me)
+            Me.StartStateFact = Me.Model.addCMMLStartState(Me)
+            Return Me.StartStateFact
 
         End Function
 

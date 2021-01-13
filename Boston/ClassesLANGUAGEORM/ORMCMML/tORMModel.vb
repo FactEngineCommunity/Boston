@@ -93,7 +93,6 @@ Namespace FBM
             Try
 
                 Dim lsSQLQuery As String
-                Dim lrFact As FBM.Fact
 
                 lsSQLQuery = "INSERT INTO " & pcenumCMMLRelations.CoreValueTypeHasStartCoreElementState.ToString
                 lsSQLQuery &= " (ValueType, CoreElement)"
@@ -111,6 +110,8 @@ Namespace FBM
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
                 prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return Nothing
             End Try
 
         End Function
@@ -360,7 +361,7 @@ Namespace FBM
 
         Public Sub createCMMLAttributeIsMandatory(ByRef arColumn As RDS.Column)
 
-            Dim lsSQLQuery As String = ""
+            Dim lsSQLQuery As String
 
             lsSQLQuery = "INSERT INTO CoreIsMandatory (IsMandatory)"
             lsSQLQuery &= " VALUES ("
@@ -373,7 +374,7 @@ Namespace FBM
 
         Public Sub removeCMMLEntityByRDSTable(ByRef arTable As RDS.Table)
 
-            Dim lsSQLQuery As String = ""
+            Dim lsSQLQuery As String
 
             For Each lrColumn In arTable.Column
 
@@ -640,7 +641,7 @@ Namespace FBM
 
         Public Sub createCMMLTable(ByRef arTable As RDS.Table)
 
-            Dim lsSQLQuery As String = ""
+            Dim lsSQLQuery As String
 
             lsSQLQuery = "INSERT INTO " & pcenumCMMLRelations.CoreElementHasElementType.ToString
             lsSQLQuery &= " (Element, ElementType)"
@@ -702,7 +703,7 @@ Namespace FBM
         Public Function CreateUniqueEntityName(ByVal asEntityName As String, Optional ByVal aiStartingInd As Integer = 0) As String
 
             Dim lsUniqueEntityName As String = ""
-            Dim lsSQLQuery As String = ""
+            Dim lsSQLQuery As String
             Dim lrRecordset As ORMQL.Recordset
 
             If aiStartingInd = 0 Then
@@ -732,7 +733,7 @@ Namespace FBM
 
             Dim lsUniquePropertyName As String = ""
 
-            Dim lsSQLQuery As String = ""
+            Dim lsSQLQuery As String
             Dim lrRecordset As ORMQL.Recordset
             Dim lrRecordset1 As ORMQL.Recordset
 
@@ -900,7 +901,7 @@ Namespace FBM
         ''' <remarks></remarks>
         Public Sub RemoveFactTypeReferencesFromCore(ByRef arFactType As FBM.FactType)
 
-            Dim lsSQLQuery As String = ""
+            Dim lsSQLQuery As String
             'Dim lrColumn As RDS.Column
             'Dim lrTable As RDS.Table
 
@@ -919,7 +920,7 @@ Namespace FBM
 
         Public Sub removeCMMLAttribute(ByVal asEntityName As String, ByVal asAttributeId As String)
 
-            Dim lsSQLQuery As String = ""
+            Dim lsSQLQuery As String
 
             lsSQLQuery = "REMOVE INSTANCE '" & asAttributeId & "' FROM CoreElement"
 
@@ -935,7 +936,7 @@ Namespace FBM
 
         Public Sub removeCMMLAttributeIsMandatory(ByRef arColumn As RDS.Column)
 
-            Dim lsSQLQuery As String = ""
+            Dim lsSQLQuery As String
 
             lsSQLQuery = "DELETE FROM CoreIsMandatory"
             lsSQLQuery &= " WHERE IsMandatory = '" & arColumn.Id & "'"

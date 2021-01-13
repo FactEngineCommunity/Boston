@@ -1382,6 +1382,8 @@ Public Class frmDiagramORM
             lsMessage = "Error: frmDiagramORM.DropRoleAtPoint"
             lsMessage &= vbCrLf & ex.Message
             prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+            Return Nothing
         End Try
 
 

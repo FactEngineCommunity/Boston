@@ -702,8 +702,8 @@ Public Class frmStateTransitionDiagram
         loDroppedNode.Pen.Color = Color.Black
         loDroppedNode.Brush = New MindFusion.Drawing.SolidBrush(Color.White)
         loDroppedNode.ShadowColor = Color.White
-        loDroppedNode.AllowIncomingLinks = False
-        loDroppedNode.AllowOutgoingLinks = True
+        loDroppedNode.AllowIncomingLinks = True
+        loDroppedNode.AllowOutgoingLinks = False
 
         loDroppedNode.Tag = New STD.StartStateIndicator
         loDroppedNode.Resize(8, 8)
@@ -733,7 +733,6 @@ Public Class frmStateTransitionDiagram
         Dim loObject As Object = e.Link.Destination
         Dim lo_dummy_object As New MindFusion.Diagramming.DummyNode(Me.Diagram)
         Dim lrFact As New FBM.Fact
-        Dim lrFactInstance As FBM.FactInstance
         Dim loFirstEntity As New Object
         Dim loSecondEntity As New Object
         Dim lsSQLQuery As String = ""
@@ -752,13 +751,7 @@ Public Class frmStateTransitionDiagram
             Debugger.Break()
             Dim lrStartState As STD.State = loSecondEntity
 
-            lrFact = lrStartState.STMState.makeStartState
-
-            lsSQLQuery = "ADD FACT '" & lrFact.Id & "'"
-            lsSQLQuery &= " TO " & pcenumCMMLRelations.CoreValueTypeHasStartCoreElementState.ToString
-            lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
-
-            lrFactInstance = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+            Call lrStartState.setStartState(True)
 
         ElseIf (loFirstEntity.ConceptType = pcenumConceptType.State) And (loSecondEntity.ConceptType = pcenumConceptType.State) Then
             '    lrTypeOfRelation = pcenumCMMLRelations.ActorToProcessParticipationRelation

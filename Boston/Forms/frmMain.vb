@@ -718,11 +718,9 @@ Public Class frmMain
             End If
         End If
 
-        Try
-            Call Environment.Exit(0)
-        Catch ex As Exception
-            'Sometimes fails.
-        End Try
+
+        Call Environment.Exit(0)
+
 
     End Sub
 

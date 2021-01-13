@@ -102,7 +102,8 @@ Public Class frmCRUDModel
 
     Private Function checkDatabaseConnectionString(ByRef asReturnMessage As String) As Boolean
 
-        Dim lsDatabaseLocation, lsDataProvider As String
+        Dim lsDatabaseLocation As String
+        'Dim lsDataProvider as string
 
         Try
             Dim lrSQLConnectionStringBuilder As System.Data.Common.DbConnectionStringBuilder = Nothing

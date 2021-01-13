@@ -85,6 +85,9 @@ Partial Class frmStateTransitionDiagram
         Me.Diagram.LinkIntermediateShapeSize = 3.0!
         Me.Diagram.LinksSnapToBorders = True
         Me.Diagram.SelectAfterCreate = False
+        Me.Diagram.ShadowColor = System.Drawing.Color.White
+        Me.Diagram.ShadowOffsetX = 0!
+        Me.Diagram.ShadowOffsetY = 0!
         Me.Diagram.ShapeBrush = New MindFusion.Drawing.SolidBrush("#FFFFFFFF")
         Me.Diagram.ShowAnchors = MindFusion.Diagramming.ShowAnchors.Always
         Me.Diagram.ShowHandlesOnDrag = False

@@ -114,7 +114,7 @@ Public Class tApplication
                 Select Case lrUserAction.Action
                     Case Is = pcenumUserAction.MoveModelObject
                         If lrUserAction.Page.FormLoaded Then
-                            Dim lrPageObject As New Object
+                            Dim lrPageObject As Object
                             lrPageObject = lrUserAction.ModelObject
                             lrPageObject.Shape.Move(lrUserAction.PreActionModelObject.X, lrUserAction.PreActionModelObject.Y)
                             lrPageObject.X = lrPageObject.Shape.Bounds.X
@@ -139,19 +139,19 @@ Public Class tApplication
                         If lrUserAction.Page.FormLoaded Then
                             Select Case lrUserAction.ModelObject.ConceptType
                                 Case Is = pcenumConceptType.EntityType
-                                    Dim lrEntityTypeInstance As New FBM.EntityTypeInstance
+                                    Dim lrEntityTypeInstance As FBM.EntityTypeInstance
                                     lrEntityTypeInstance = lrUserAction.ModelObject
                                     lrEntityTypeInstance.RemoveFromPage(True)
                                 Case Is = pcenumConceptType.ValueType
-                                    Dim lrValueTypeInstance As New FBM.ValueTypeInstance
+                                    Dim lrValueTypeInstance As FBM.ValueTypeInstance
                                     lrValueTypeInstance = lrUserAction.ModelObject
                                     lrValueTypeInstance.RemoveFromPage(True)
                                 Case Is = pcenumConceptType.FactType
-                                    Dim lrFactTypeInstance As New FBM.FactTypeInstance
+                                    Dim lrFactTypeInstance As FBM.FactTypeInstance
                                     lrFactTypeInstance = lrUserAction.ModelObject
                                     lrFactTypeInstance.RemoveFromPage(True)
                                 Case Is = pcenumConceptType.RoleConstraint
-                                    Dim lrRoleConstraintInstance As New FBM.RoleConstraintInstance
+                                    Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
                                     lrRoleConstraintInstance = lrUserAction.ModelObject
                                     lrRoleConstraintInstance.RemoveFromPage(True)
                             End Select
@@ -160,7 +160,7 @@ Public Class tApplication
                         If lrUserAction.Page.FormLoaded Then
                             Select Case lrUserAction.ModelObject.ConceptType
                                 Case Is = pcenumConceptType.EntityType
-                                    Dim lrEntityTypeInstance As New FBM.EntityTypeInstance
+                                    Dim lrEntityTypeInstance As FBM.EntityTypeInstance
                                     lrEntityTypeInstance = lrUserAction.ModelObject
                                     lrEntityTypeInstance.RemoveFromPage(True)
                                     lrEntityTypeInstance.EntityType.RemoveFromModel(False)
@@ -205,7 +205,7 @@ Public Class tApplication
                 Select Case lrUserAction.Action
                     Case Is = pcenumUserAction.MoveModelObject
                         If lrUserAction.Page.FormLoaded Then
-                            Dim lrPageObject As New Object
+                            Dim lrPageObject As Object
                             lrPageObject = lrUserAction.ModelObject
                             lrPageObject.Shape.Move(lrUserAction.PostActionModelObject.X, lrUserAction.PostActionModelObject.Y)
                             lrPageObject.X = lrPageObject.Shape.Bounds.X
@@ -215,15 +215,15 @@ Public Class tApplication
                         If lrUserAction.Page.FormLoaded Then
                             Select Case lrUserAction.ModelObject.ConceptType
                                 Case Is = pcenumConceptType.EntityType
-                                    Dim lrEntityTypeInstance As New FBM.EntityTypeInstance
+                                    Dim lrEntityTypeInstance As FBM.EntityTypeInstance
                                     lrEntityTypeInstance = lrUserAction.ModelObject
                                     lrEntityTypeInstance.RemoveFromPage(True)
                                 Case Is = pcenumConceptType.ValueType
-                                    Dim lrValueTypeInstance As New FBM.ValueTypeInstance
+                                    Dim lrValueTypeInstance As FBM.ValueTypeInstance
                                     lrValueTypeInstance = lrUserAction.ModelObject
                                     lrValueTypeInstance.RemoveFromPage(True)
                                 Case Is = pcenumConceptType.FactType
-                                    Dim lrFactTypeInstance As New FBM.FactTypeInstance
+                                    Dim lrFactTypeInstance As FBM.FactTypeInstance
                                     lrFactTypeInstance = lrUserAction.ModelObject
                                     lrFactTypeInstance.RemoveFromPage(True)
                             End Select
