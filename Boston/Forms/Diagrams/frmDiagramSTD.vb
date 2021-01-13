@@ -186,6 +186,9 @@ Public Class frmStateTransitionDiagram
                         Case Is = "Start"
                             Dim lrStartIndicator As New STD.StartStateIndicator()
                             Call Me.dropStartIndicatorAtPoint(lrStartIndicator, pt)
+                        Case Is = "Stop"
+                            Dim lrStopIndicator As New STD.EndStateIndicator()
+                            Call Me.dropStopIndicatorAtPoint(lrStopIndicator, pt)
                     End Select
                 End If
             End If
@@ -568,7 +571,7 @@ Public Class frmStateTransitionDiagram
                 Dim lnode_dragged_node As tShapeNodeDragItem = e.Data.GetData(tShapeNodeDragItem.DraggedItemObjectType)
 
                 Select Case lnode_dragged_node.Tag.Id
-                    Case = "Start", "State"
+                    Case = "Start", "State", "Stop"
                     Case Else
                         e.Effect = DragDropEffects.None
                         Exit Sub
@@ -675,6 +678,53 @@ Public Class frmStateTransitionDiagram
 
         loDroppedNode.Tag = lrStartIndicator
 
+
+    End Sub
+
+    Sub dropStopIndicatorAtPoint(ByVal arStopIndicator As STD.EndStateIndicator, ByVal aoPtf As PointF)
+
+        Dim lrStopIndicator As New STD.EndStateIndicator
+        Dim loDroppedNode As ShapeNode
+
+
+        loDroppedNode = Diagram.Factory.CreateShapeNode(aoPtf.X, aoPtf.Y, 18, 18)
+        loDroppedNode.Shape = New Shape(
+                  New ElementTemplate() {
+                     New ArcTemplate(0, 0, 74, 74, 0, 360, Color.Black, DashStyle.Solid, 0.5),
+                     New ArcTemplate(14, 14, 48, 48, 0, 360)
+                  },
+                  FillMode.Winding, "Custom")
+
+        loDroppedNode.HandlesStyle = HandlesStyle.MoveOnly
+        loDroppedNode.ToolTip = "Start Indicator"
+        loDroppedNode.Visible = True
+        loDroppedNode.Image = Nothing
+        loDroppedNode.Pen.Color = Color.Black
+        loDroppedNode.Brush = New MindFusion.Drawing.SolidBrush(Color.White)
+        loDroppedNode.ShadowColor = Color.White
+        loDroppedNode.AllowIncomingLinks = False
+        loDroppedNode.AllowOutgoingLinks = True
+
+        loDroppedNode.Tag = New STD.StartStateIndicator
+        loDroppedNode.Resize(8, 8)
+
+        lrStopIndicator.Model = prApplication.WorkingModel
+        lrStopIndicator.LongDescription = arStopIndicator.LongDescription
+        lrStopIndicator.ShortDescription = arStopIndicator.ShortDescription
+        lrStopIndicator.Shape = loDroppedNode
+        lrStopIndicator.X = loDroppedNode.Bounds.X
+        lrStopIndicator.Y = loDroppedNode.Bounds.Y
+
+        'If Not Me.StateTransitionDiagram.State.Exists(AddressOf ar_state.Equals) Then
+        '--------------------------------------------------
+        'The State is not already within the ORMModel
+        '  so add it.
+        '--------------------------------------------------
+        '   Me.StateTransitionDiagram.State.Add(ar_state)
+        'End If
+        'Me.StateTransitionDiagram.Stat.Add(lrStopIndicator )
+
+        loDroppedNode.Tag = lrStopIndicator
 
     End Sub
 
