@@ -1773,6 +1773,8 @@ Namespace FBM
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
                 prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+
+                Me.RDSLoading = False
             End Try
 
         End Sub

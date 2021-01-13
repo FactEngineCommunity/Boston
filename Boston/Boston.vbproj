@@ -466,9 +466,10 @@
     <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.7\tXMLModelSubtypeRelationship.vb" />
     <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.7\tXMLModelValueType.vb" />
     <Compile Include="ClassesLANGUAGEORM\ORMGlossaryWriter\tORMGlossaryMaker.vb" />
-    <Compile Include="ClassesLANGUAGEORM\ORMSTD\tSTDModel.vb" />
-    <Compile Include="ClassesLANGUAGEORM\ORMSTD\tSTDState.vb" />
-    <Compile Include="ClassesLANGUAGEORM\ORMSTD\tSTDStateTransition.vb" />
+    <Compile Include="ClassesLANGUAGEORM\ORMSTM\tORMModel.vb" />
+    <Compile Include="ClassesLANGUAGESTM\tSTMModel.vb" />
+    <Compile Include="ClassesLANGUAGESTM\tSTMState.vb" />
+    <Compile Include="ClassesLANGUAGESTM\tSTMStateTransition.vb" />
     <Compile Include="ClassesLANGUAGESTD\tCMMLEndStateIndicator.vb" />
     <Compile Include="ClassesLANGUAGESTD\tCMMLStartStateIndicator.vb" />
     <Compile Include="ClassesLANGUAGEDFD\tDFDDataStore.vb" />
@@ -2422,7 +2423,7 @@
     <None Include="Images\MenuImages\backup16x16.jpg" />
     <Content Include="Boston.ico" />
     <Content Include="ClassesFBMInterfaceHost\ReadMe.txt" />
-    <Content Include="ClassesLANGUAGEORM\ORMSTD\ReadMe.txt" />
+    <Content Include="ClassesLANGUAGESTM\ReadMe.txt" />
     <Content Include="ClassesLANGUAGESTD\ReadMe.txt" />
     <Content Include="ClassesParserVA\VAQLProcessorReflection\ReadMe.txt" />
     <None Include="Images\Icons\SubtypeConnectorSmallCursor.ico" />

@@ -52,7 +52,10 @@ Namespace FBM
         Public Loaded As Boolean = False 'Used to stop reloading every time the User selects a Model in the navigation tree.
 
         <XmlIgnore()>
-        Public RDSLoading As Boolean = False 'Used to stop loading of Pages when the RDS has not finished loading under threading.
+        Public RDSLoading As Boolean = False 'Used to stop loading of Pages when the RDS (Relational Data Structure/Schema) has not finished loading under threading. See also STMLoading below.
+
+        <XmlIgnore()>
+        Public STMLoading As Boolean = False 'Used to stop loading of Pages when the STM (State Transition Model) has not finished loading under threading. See also RDSLoading above.
 
         <XmlIgnore()> _
         Public LoadedFromXMLFile As Boolean = False
@@ -1711,7 +1714,7 @@ Namespace FBM
 
         Public Sub checkIfCanCheckForErrors()
 
-            If Me.Loading Or Me.RDSLoading Or Me.Page.FindAll(Function(x) x.Loading).Count > 0 Then
+            If Me.Loading Or Me.RDSLoading Or Me.STMLoading Or Me.Page.FindAll(Function(x) x.Loading).Count > 0 Then
             Else
                 Me.AllowCheckForErrors = True
                 Dim lrValidator As New Validation.ModelValidator(Me)
@@ -4476,6 +4479,11 @@ Namespace FBM
                 Dim loRDSThread As System.Threading.Thread
                 loRDSThread = New System.Threading.Thread(AddressOf Me.PopulateRDSStructureFromCoreMDAElements)
                 loRDSThread.Start()
+
+                Dim loSTMThread As System.Threading.Thread
+                loSTMThread = New System.Threading.Thread(AddressOf Me.PopulateSTMStructureFromCoreMDAElements)
+                loSTMThread.Start()
+
                 'Call Me.PopulateRDSStructureFromCoreMDAElements()
 
             End If
