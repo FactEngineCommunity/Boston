@@ -360,6 +360,7 @@ Public Module publicConstants
         iconPage = 2
         iconPGSPage = 3 'Property Graph Schema Page
         iconERDPage = 4
+        iconSTDPage = 5
     End Enum
 
     <Serializable()> _

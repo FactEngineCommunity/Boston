@@ -834,6 +834,8 @@ Public Class frmToolboxEnterpriseExplorer
                                     Me.TreeView.ContextMenuStrip = ContextMenuStrip_Page
                                 Case Is = pcenumMenuType.pagePGSDiagram
                                     Me.TreeView.ContextMenuStrip = ContextMenuStrip_Page
+                                Case Is = pcenumMenuType.pageSTD
+                                    Me.TreeView.ContextMenuStrip = ContextMenuStrip_Page
                                 Case Else
                                     Me.TreeView.ContextMenuStrip = Nothing
                             End Select
@@ -1403,6 +1405,9 @@ Public Class frmToolboxEnterpriseExplorer
                 Case Is = pcenumLanguage.EntityRelationshipDiagram
                     liNavigationIcon = pcenumNavigationIcons.iconERDPage
                     liMenuType = pcenumMenuType.pageERD
+                Case Is = pcenumLanguage.StateTransitionDiagram
+                    liNavigationIcon = pcenumNavigationIcons.iconSTDPage
+                    liMenuType = pcenumMenuType.pageSTD
             End Select
 
             Dim lrModel As FBM.Model

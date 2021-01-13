@@ -392,7 +392,6 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.StateTransitionDiagramToolStripMenuItem.Name = "StateTransitionDiagramToolStripMenuItem"
         Me.StateTransitionDiagramToolStripMenuItem.Size = New System.Drawing.Size(220, 22)
         Me.StateTransitionDiagramToolStripMenuItem.Text = "&State Transition Diagram"
-        Me.StateTransitionDiagramToolStripMenuItem.Visible = False
         '
         'AddSTDPageToolStripMenuItem
         '
