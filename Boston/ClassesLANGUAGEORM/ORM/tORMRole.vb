@@ -1817,7 +1817,7 @@ Namespace FBM
                 Dim lrOriginallyJoinedModelObject As FBM.ModelObject = Me.JoinedORMObject
 
                 Dim lrOriginallyJoinedTable As RDS.Table = Nothing
-                Dim larOriginalColumn As List(Of RDS.Column)
+                Dim larOriginalColumn As New List(Of RDS.Column)
 
                 If lrOriginallyJoinedModelObject IsNot Nothing Then
                     lrOriginallyJoinedTable = lrOriginallyJoinedModelObject.getCorrespondingRDSTable

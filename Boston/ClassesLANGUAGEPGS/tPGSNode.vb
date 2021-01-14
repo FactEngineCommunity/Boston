@@ -357,7 +357,7 @@ Namespace PGS
                     Dim lrNode1 As PGS.Node = Nothing
                     Dim lrNode2 As PGS.Node = Nothing
 
-                    Dim lsRelationId As String
+                    Dim lsRelationId As String = ""
 
                     While Not lrRecordset1.EOF
                         lsRelationId = lrRecordset1("Relation").Data

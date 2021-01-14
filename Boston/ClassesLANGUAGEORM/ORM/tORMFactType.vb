@@ -2910,7 +2910,7 @@ Namespace FBM
         ''' <remarks></remarks>
         Public Function isRDSTable() As Boolean
 
-            Return Me.HasTotalRoleConstraint Or Me.HasPartialButMultiRoleConstraint Or Me.IsObjectified
+            Return (Me.HasTotalRoleConstraint Or Me.HasPartialButMultiRoleConstraint Or Me.IsObjectified) And Not Me.IsMDAModelElement
 
         End Function
 

@@ -18,7 +18,8 @@ Namespace FBM.STM
 
         Public IsStop As Boolean = False
 
-        Public Event IsStartStateChanged(ByVal abStartState As Boolean)
+        Public Event IsStartStateChanged(abStartStateStatus As Boolean)
+        Public Event IsEndStateChanged(abEndStateStatus As Boolean)
 
         ''' <summary>
         ''' Parameterless new

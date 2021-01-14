@@ -775,49 +775,61 @@ Public Class frmStateTransitionDiagram
 
         ElseIf (loFirstEntity.ConceptType = pcenumConceptType.EndStateIndicator) And (loSecondEntity.ConceptType = pcenumConceptType.State) Then
 
-            Dim lrEndState As STD.State = loSecondEntity
+            Dim lrState As STD.State = loSecondEntity
 
-            If Not lrEndState.isEndState Then
-                Call lrEndState.setEndState(True)
+            If Not lrState.IsEndState Then
+                Call lrState.STMState.setEndState(True)
+            End If
+
+            'the State could already be an EndState, but this EndStateTransition is different (i.e. to a different EndStateBubble).
+            Dim lrEndStateTransition As New FBM.STM.EndStateTransition(Me.zrPage.STDiagram.ValueType, lrState.STMState, "")
+
+            If Me.zrPage.Model.STM.EndStateTransition.find(AddressOf lrEndStateTransition.Equals) Is Nothing Then
+                Call Me.zrPage.Model.STM.addEndStateTransition(lrEndStateTransition)
+            Else
+                lsMessage = "There is already an End State for the State, '" & lrState.StateName & "', and with a transition event called '' (nothing)."
+                lsMessage &= vbCrLf & vbCrLf & "Name the transition event for that End State Transition and then recreate this End State."
+                lsMessage &= vbCrLf & "I.e. If you have more than one End State Transition for a State, then the End State Transitions for that State must be named."
+                MsgBox(lsMessage)
             End If
 
         ElseIf (loFirstEntity.ConceptType = pcenumConceptType.State) And (loSecondEntity.ConceptType = pcenumConceptType.State) Then
-            '    lrTypeOfRelation = pcenumCMMLRelations.ActorToProcessParticipationRelation
-            '    '----------------------------------
-            '    'Create the Fact within the Model
-            '    '----------------------------------
-            '    Dim lsSQLString As String = ""
-            '    lsSQLString = "INSERT INTO " & pcenumCMMLRelations.ActorToProcessParticipationRelation.ToString
-            '    lsSQLString &= " (Actor, Process)"
-            '    lsSQLString &= " VALUES ("
-            '    lsSQLString &= "'" & loFirstEntity.Name & "'"
-            '    lsSQLString &= ",'" & loSecondEntity.Name & "'"
-            '    lsSQLString &= ")"
+                '    lrTypeOfRelation = pcenumCMMLRelations.ActorToProcessParticipationRelation
+                '    '----------------------------------
+                '    'Create the Fact within the Model
+                '    '----------------------------------
+                '    Dim lsSQLString As String = ""
+                '    lsSQLString = "INSERT INTO " & pcenumCMMLRelations.ActorToProcessParticipationRelation.ToString
+                '    lsSQLString &= " (Actor, Process)"
+                '    lsSQLString &= " VALUES ("
+                '    lsSQLString &= "'" & loFirstEntity.Name & "'"
+                '    lsSQLString &= ",'" & loSecondEntity.Name & "'"
+                '    lsSQLString &= ")"
 
-            '    '----------------------------------
-            '    'Create the Fact within the Model
-            '    '----------------------------------
-            '    lrFact = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLString)
+                '    '----------------------------------
+                '    'Create the Fact within the Model
+                '    '----------------------------------
+                '    lrFact = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLString)
 
-            '    '----------------------------------
-            '    'Clone and instance of the Fact
-            '    '----------------------------------
-            '    lrFactInstance = lrFact.CloneInstance(Me.zrPage)
-            '    Me.StateTransitionDiagram.StateTransitionRelation.AddFact(lrFactInstance)
+                '    '----------------------------------
+                '    'Clone and instance of the Fact
+                '    '----------------------------------
+                '    lrFactInstance = lrFact.CloneInstance(Me.zrPage)
+                '    Me.StateTransitionDiagram.StateTransitionRelation.AddFact(lrFactInstance)
 
-            '    Dim lrFactDataInstance As New FBM.FactDataInstance(Me.zrPage)
-            '    Dim lrRole As New FBM.Role
-            '    lrRole.Id = pcenumCMML.Process.ToString
-            '    lrRole.Name = lrRole.Id
-            '    lrFactDataInstance.Role = lrRole.CloneInstance(Me.zrPage)
-            '    lrFactDataInstance = lrFactInstance.Data.Find(AddressOf lrFactDataInstance.EqualsByRole)
-            '    Dim lr_process As New CMML.Process
+                '    Dim lrFactDataInstance As New FBM.FactDataInstance(Me.zrPage)
+                '    Dim lrRole As New FBM.Role
+                '    lrRole.Id = pcenumCMML.Process.ToString
+                '    lrRole.Name = lrRole.Id
+                '    lrFactDataInstance.Role = lrRole.CloneInstance(Me.zrPage)
+                '    lrFactDataInstance = lrFactInstance.Data.Find(AddressOf lrFactDataInstance.EqualsByRole)
+                '    Dim lr_process As New CMML.Process
 
-            '    lr_process = lrFactDataInstance.CloneProcess(Me.zrPage)
-            '    lr_process.shape = New ShapeNode
-            '    lr_process.shape = Me.Diagram.FindNode(loSecondEntity)
-            '    lr_process.shape.Tag = lr_process
-        End If
+                '    lr_process = lrFactDataInstance.CloneProcess(Me.zrPage)
+                '    lr_process.shape = New ShapeNode
+                '    lr_process.shape = Me.Diagram.FindNode(loSecondEntity)
+                '    lr_process.shape.Tag = lr_process
+            End If
 
     End Sub
 

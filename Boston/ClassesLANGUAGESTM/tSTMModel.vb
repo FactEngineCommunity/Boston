@@ -35,6 +35,12 @@
         ''' </summary>
         Public StopState As New List(Of FBM.STM.State)
 
+        Public EndStateTransition As New List(Of FBM.STM.EndStateTransition)
+
+        '================================
+        'Events
+        Public Event EndStateTransitionAdded(ByRef arEndStateTranstion As FBM.STM.EndStateTransition)
+
         ''' <summary>
         ''' Constructor
         ''' </summary>
@@ -42,6 +48,10 @@
         Public Sub New(ByRef arModel As FBM.Model)
 
             Me.Model = arModel
+
+        End Sub
+
+        Public Sub addEndStateTransition(ByRef arEndStateTransition As STM.EndStateTransition)
 
         End Sub
 

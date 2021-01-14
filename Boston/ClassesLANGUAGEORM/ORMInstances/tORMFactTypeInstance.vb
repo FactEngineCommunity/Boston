@@ -2689,7 +2689,7 @@ Namespace FBM
 
         End Sub
 
-        Private Sub _FactType_RoleAdded(ByRef arRole As Role) Handles _FactType.RoleAdded
+        Private Sub _FactType_RoleAdded(ByRef arRole As FBM.Role) Handles _FactType.RoleAdded
 
             Dim lrRoleInstance As FBM.RoleInstance
 
@@ -2705,6 +2705,7 @@ Namespace FBM
             Dim lrFactDataInstance As New FBM.FactDataInstance
             For Each lrFact In Me.FactType.Fact
                 lrFactData = New FBM.FactData
+                lrFactData.Role = New FBM.Role(Me.FactType, lrRoleInstance.Role.JoinedORMObject)
                 lrFactData.Role.Id = arRole.Id
                 lrFactData.Fact.Symbol = lrFact.Symbol
                 lrFactData = lrFact.Data.Find(AddressOf lrFactData.EqualsByRole)
@@ -2722,10 +2723,12 @@ Namespace FBM
             ' Create a new RoleInstance.Shape to be attached to the FactTypeInstance
             '  of the selected RoleInstance.
             '-------------------------------------------------------------------------
-            Call lrRoleInstance.DisplayAndAssociate(Me)
+            If Me.Shape IsNot Nothing Then
+                Call lrRoleInstance.DisplayAndAssociate(Me)
 
-            If Me.RoleGroup.FindAll(Function(x) x.JoinedORMObject Is Nothing).Count = 0 Then
-                Call Me.SortRoleGroup()
+                If Me.RoleGroup.FindAll(Function(x) x.JoinedORMObject Is Nothing).Count = 0 Then
+                    Call Me.SortRoleGroup()
+                End If
             End If
 
         End Sub
