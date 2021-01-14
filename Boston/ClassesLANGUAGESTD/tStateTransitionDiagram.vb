@@ -7,6 +7,8 @@ Namespace STD
         Public State As New List(Of STD.State)
         Public StateTransition As New List(Of STD.StateTransition)
 
+        Public StartBubble As STD.StartStateIndicator
+
         Public Process As New List(Of CMML.Process)
         Public StateTransitionRelation As FBM.FactTypeInstance
         Public StateTransitionValueType As FBM.FactTypeInstance

@@ -123,7 +123,9 @@ Namespace STD
             lo_link.Tag = Me
             Me.Link = lo_link
             Me.Link.Visible = True
+
             Me.Link.Pen.Width = 0.3
+            Me.Link.Pen.Color = Color.Black
 
             Me.Page.Diagram.Links.Add(lo_link)
 

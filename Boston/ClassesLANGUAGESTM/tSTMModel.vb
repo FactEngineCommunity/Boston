@@ -110,6 +110,7 @@
         Public Sub removeStartState(ByRef arStartState As FBM.STM.State)
 
             Call Me.StartState.Remove(arStartState)
+            arStartState.IsStart = False
 
             'CMML
             Call Me.Model.removeCMMLStartState(arStartState)

@@ -24,7 +24,12 @@ Public Class frmStateTransitionDiagram
 
     Private Sub frmStateTransitionDiagram_FormClosing(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
 
-        Me.zrPage.Loaded = False
+        '----------------------------------------------
+        'Reset the PageLoaded flag on the Page so
+        '  that the User can open the Page again
+        '  if they want.
+        '----------------------------------------------                
+        Me.zrPage.FormLoaded = False
 
     End Sub
 
@@ -198,7 +203,7 @@ Public Class frmStateTransitionDiagram
     End Sub
 
 
-    Public Sub load_StateTransitionDiagram(ByVal arPage As FBM.Page, ByRef aoTreeNode As TreeNode)
+    Public Sub load_StateTransitionDiagram(ByRef arPage As FBM.Page, ByRef aoTreeNode As TreeNode)
 
         '------------------------------------------------------------------------
         'Loads the Use Case Diagram for the given ORM (meta-model) Page
@@ -231,6 +236,8 @@ Public Class frmStateTransitionDiagram
             Me.zrPage = arPage
             Me.TabText = arPage.Name
             Me.zoTreeNode = aoTreeNode
+
+            Me.zrPage.STDiagram = New STD.Diagram
 
             lsSQLQuery = "SELECT *"
             lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreStateTransitionIsForValueType.ToString
@@ -313,7 +320,7 @@ Public Class frmStateTransitionDiagram
                 lrToState = lrFactDataInstance.CloneState(arPage)
                 lrToState.X = lrFactDataInstance.X
                 lrToState.Y = lrFactDataInstance.Y
-                lrToState.StateName = lrRecordset("Concept2").Name
+                lrToState.StateName = lrRecordset("Concept2").Data
                 lrToState.ValueType = Me.zrPage.STDiagram.ValueType
 
                 lrToState.STMState = Me.zrPage.Model.STM.State.Find(Function(x) x.ValueType.Id = lrToState.ValueType.Id And x.Name = lrToState.StateName)
@@ -362,6 +369,7 @@ Public Class frmStateTransitionDiagram
                 lrFactInstance = lrRecordset.CurrentFact
 
                 lrStartStateIndicator = lrFactInstance.CloneStartStateIndicator(arPage, lrState)
+                Me.zrPage.STDiagram.StartBubble = lrStartStateIndicator
 
                 Call lrStartStateIndicator.DisplayAndAssociate()
 
@@ -395,6 +403,7 @@ Public Class frmStateTransitionDiagram
             Me.StateTransitionDiagramView.SendToBack()
             Me.HiddenDiagramView.SendToBack()
 
+            Call Me.reset_node_and_link_colors()
             Me.Diagram.Invalidate()
             Me.zrPage.FormLoaded = True
 
@@ -730,14 +739,9 @@ Public Class frmStateTransitionDiagram
 
     Private Sub Diagram_LinkCreated(ByVal sender As Object, ByVal e As MindFusion.Diagramming.LinkEventArgs) Handles Diagram.LinkCreated
 
-        Dim loObject As Object = e.Link.Destination
-        Dim lo_dummy_object As New MindFusion.Diagramming.DummyNode(Me.Diagram)
-        Dim lrFact As New FBM.Fact
+        Dim lsMessage As String
         Dim loFirstEntity As New Object
         Dim loSecondEntity As New Object
-        Dim lsSQLQuery As String = ""
-
-        Me.Cursor = Cursors.WaitCursor
 
         loFirstEntity = e.Link.Origin.Tag
         loSecondEntity = e.Link.Destination.Tag
@@ -748,10 +752,27 @@ Public Class frmStateTransitionDiagram
         'Dim lrTypeOfRelation As pcenumCMMLRelations
         If (loFirstEntity.ConceptType = pcenumConceptType.StartStateIndicator) And (loSecondEntity.ConceptType = pcenumConceptType.State) Then
 
-            Debugger.Break()
             Dim lrStartState As STD.State = loSecondEntity
 
-            Call lrStartState.setStartState(True)
+            If Me.zrPage.STDiagram.State.FindAll(Function(x) x.IsStartState).Count = 0 Then
+
+                Call lrStartState.setStartState(True)
+            Else
+                lsMessage = "There is already a Start State for this Value Type."
+                lsMessage &= vbCrLf & vbCrLf & "Would you like to remove the existing Start State and create a new one?"
+
+                If MsgBox(lsMessage, MsgBoxStyle.YesNo) = MsgBoxResult.Yes Then
+
+                    Dim lrExistingStartState = Me.zrPage.STDiagram.State.Find(Function(x) x.IsStartState)
+
+                    Call Me.zrPage.Model.STM.removeStartState(lrExistingStartState.STMState)
+
+                    Me.Diagram.Links.Remove(Me.zrPage.STDiagram.StartBubble.Link)
+
+                    Call lrStartState.setStartState(True)
+                End If
+            End If
+
 
         ElseIf (loFirstEntity.ConceptType = pcenumConceptType.State) And (loSecondEntity.ConceptType = pcenumConceptType.State) Then
             '    lrTypeOfRelation = pcenumCMMLRelations.ActorToProcessParticipationRelation
@@ -790,9 +811,6 @@ Public Class frmStateTransitionDiagram
             '    lr_process.shape = Me.Diagram.FindNode(loSecondEntity)
             '    lr_process.shape.Tag = lr_process
         End If
-
-
-        Me.Cursor = Cursors.Default
 
     End Sub
 

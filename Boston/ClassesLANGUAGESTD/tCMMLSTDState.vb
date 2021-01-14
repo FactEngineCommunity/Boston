@@ -36,7 +36,11 @@ Namespace STD
 
         Public ValueType As FBM.ValueType = Nothing
 
-        Public IsStartState As Boolean = False
+        Public ReadOnly Property IsStartState As Boolean
+            Get
+                Return Me.STMState.IsStart
+            End Get
+        End Property
 
         Public WithEvents STMState As FBM.STM.State = Nothing
 
@@ -138,8 +142,6 @@ Namespace STD
         Private Sub STMState_IsStartStateChanged(abIsStartState As Boolean) Handles STMState.IsStartStateChanged
 
             Dim lsSQLQuery As String
-
-            Me.IsStartState = abIsStartState
 
             If abIsStartState Then
 

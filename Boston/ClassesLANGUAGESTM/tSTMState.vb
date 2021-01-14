@@ -47,6 +47,9 @@ Namespace FBM.STM
 
             'CMML
             Me.StartStateFact = Me.Model.addCMMLStartState(Me)
+
+            RaiseEvent IsStartStateChanged(True)
+
             Return Me.StartStateFact
 
         End Function
