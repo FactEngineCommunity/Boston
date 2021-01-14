@@ -773,6 +773,13 @@ Public Class frmStateTransitionDiagram
                 End If
             End If
 
+        ElseIf (loFirstEntity.ConceptType = pcenumConceptType.EndStateIndicator) And (loSecondEntity.ConceptType = pcenumConceptType.State) Then
+
+            Dim lrEndState As STD.State = loSecondEntity
+
+            If Not lrEndState.isEndState Then
+                Call lrEndState.setEndState(True)
+            End If
 
         ElseIf (loFirstEntity.ConceptType = pcenumConceptType.State) And (loSecondEntity.ConceptType = pcenumConceptType.State) Then
             '    lrTypeOfRelation = pcenumCMMLRelations.ActorToProcessParticipationRelation

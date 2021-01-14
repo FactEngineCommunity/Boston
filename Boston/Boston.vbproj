@@ -467,6 +467,7 @@
     <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.7\tXMLModelValueType.vb" />
     <Compile Include="ClassesLANGUAGEORM\ORMGlossaryWriter\tORMGlossaryMaker.vb" />
     <Compile Include="ClassesLANGUAGEORM\ORMSTM\tORMModel.vb" />
+    <Compile Include="ClassesLANGUAGESTM\tSTMEndStateTransition.vb" />
     <Compile Include="ClassesLANGUAGESTM\tSTMModel.vb" />
     <Compile Include="ClassesLANGUAGESTM\tSTMState.vb" />
     <Compile Include="ClassesLANGUAGESTM\tSTMStateTransition.vb" />

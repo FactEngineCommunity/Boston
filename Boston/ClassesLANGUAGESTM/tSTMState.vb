@@ -54,6 +54,12 @@ Namespace FBM.STM
 
         End Function
 
+        Public Sub setEndState(ByVal abEndStateStatus As Boolean)
+
+            Me.IsStop = abEndStateStatus
+
+        End Sub
+
     End Class
 
 End Namespace

@@ -36,6 +36,12 @@ Namespace STD
 
         Public ValueType As FBM.ValueType = Nothing
 
+        Public ReadOnly Property IsEndState As Boolean
+            Get
+                Return Me.STMState.IsStop
+            End Get
+        End Property
+
         Public ReadOnly Property IsStartState As Boolean
             Get
                 Return Me.STMState.IsStart
@@ -126,6 +132,12 @@ Namespace STD
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
                 prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
             End Try
+
+        End Sub
+
+        Public Sub setEndState(ByVal abEndStateStatus As Boolean)
+
+            Call Me.STMState.setEndState(abEndStateStatus)
 
         End Sub
 
