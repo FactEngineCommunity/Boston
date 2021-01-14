@@ -53,6 +53,12 @@
 
         Public Sub addEndStateTransition(ByRef arEndStateTransition As STM.EndStateTransition)
 
+            Me.EndStateTransition.Add(arEndStateTransition)
+
+            'CMML
+            Call Me.Model.createCMMLEndStateTransition(arEndStateTransition)
+
+            RaiseEvent EndStateTransitionAdded(arEndStateTransition)
         End Sub
 
         Public Sub addStartState(ByRef arStartState As FBM.STM.State)

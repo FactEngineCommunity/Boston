@@ -237,7 +237,8 @@ Public Class frmStateTransitionDiagram
             Me.TabText = arPage.Name
             Me.zoTreeNode = aoTreeNode
 
-            Me.zrPage.STDiagram = New STD.Diagram
+            Me.zrPage.STDiagram = New STD.Diagram(Me.zrPage)
+            Me.zrPage.STDiagram.STM = Me.zrPage.Model.STM
 
             lsSQLQuery = "SELECT *"
             lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreStateTransitionIsForValueType.ToString
@@ -773,9 +774,9 @@ Public Class frmStateTransitionDiagram
                 End If
             End If
 
-        ElseIf (loFirstEntity.ConceptType = pcenumConceptType.EndStateIndicator) And (loSecondEntity.ConceptType = pcenumConceptType.State) Then
+        ElseIf (loFirstEntity.ConceptType = pcenumConceptType.State) And (loSecondEntity.ConceptType = pcenumConceptType.EndStateIndicator) Then
 
-            Dim lrState As STD.State = loSecondEntity
+            Dim lrState As STD.State = loFirstEntity
 
             If Not lrState.IsEndState Then
                 Call lrState.STMState.setEndState(True)

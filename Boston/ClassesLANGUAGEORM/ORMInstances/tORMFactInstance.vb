@@ -299,7 +299,7 @@ Namespace FBM
             With Me
                 lrEndStateIndicator.Model = .Model
                 lrEndStateIndicator.Page = arPage
-                lrEndStateIndicator.Name = .Concept.Symbol
+                'lrEndStateIndicator.Name = .Concept.Symbol
                 lrEndStateIndicator.Fact = Me.Fact
                 lrEndStateIndicator.FactInstance = Me
                 lrEndStateIndicator.Concept = .Concept

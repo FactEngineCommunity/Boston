@@ -4,6 +4,19 @@ Namespace FBM
 
     Partial Public Class Model
 
+
+        Public Sub createCMMLEndStateTransition(ByRef arEndStateTransition As STM.EndStateTransition)
+
+            Dim lsSQLQuery As String
+
+            lsSQLQuery = "INSERT INTO " & pcenumCMMLRelations.CoreValueTypeHasFinishCoreElementState.ToString & " (ValueType,CoreElement,Event)"
+            lsSQLQuery &= " VALUES ('" & arEndStateTransition.ValueType.Id & "','" & arEndStateTransition.State.Name & "','" & arEndStateTransition.Event & "'"
+            lsSQLQuery &= ")"
+
+            arEndStateTransition.Fact = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+        End Sub
+
         Public Sub PopulateSTMStructureFromCoreMDAElements()
 
             Try

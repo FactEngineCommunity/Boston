@@ -958,7 +958,7 @@ Namespace FBM
         Public Sub removeCMMLIsPGSRelation(ByRef arTable As RDS.Table)
 
             Try
-                Dim lsSQLQuery As String = ""
+                Dim lsSQLQuery As String
 
                 lsSQLQuery = "DELETE FROM " & pcenumCMMLRelations.CoreIsPGSRelation.ToString
                 lsSQLQuery &= " WHERE IsPGSRelation = '" & arTable.Name & "'"
@@ -978,7 +978,7 @@ Namespace FBM
 
         Public Sub removeCMMLPropertyFromIndexByRDSIndexColumn(ByRef arIndex As RDS.Index, ByRef arColumn As RDS.Column)
 
-            Dim lsSQLQuery As String = ""
+            Dim lsSQLQuery As String
 
             lsSQLQuery = "DELETE FROM " & pcenumCMMLRelations.CoreIndexMakesUseOfProperty.ToString
             lsSQLQuery &= " WHERE Index = '" & arIndex.Name & "'"
@@ -990,7 +990,7 @@ Namespace FBM
 
         Public Sub removeCMMLRelation(ByRef arRelation As RDS.Relation)
 
-            Dim lsSQLQuery As String = ""
+            Dim lsSQLQuery As String
 
             lsSQLQuery = "REMOVE INSTANCE '" & arRelation.Id & "' FROM CoreElement"
 
@@ -1146,7 +1146,7 @@ Namespace FBM
 
         Public Sub updateCMMLIndexName(ByVal asOriginalName As String, ByVal asNewName As String)
 
-            Dim lsSQLQuery As String = ""
+            Dim lsSQLQuery As String
 
             lsSQLQuery = "RENAME INSTANCE '" & asOriginalName & "'"
             lsSQLQuery &= " IN CoreIndex"
@@ -1158,7 +1158,7 @@ Namespace FBM
 
         Public Sub updateCMMLIndexQualifier(ByRef arIndex As RDS.Index, ByVal asNewQualifier As String)
 
-            Dim lsSQLQuery As String = ""
+            Dim lsSQLQuery As String
 
             lsSQLQuery = "UPDATE " & pcenumCMMLRelations.CoreIndexHasQualifier.ToString
             lsSQLQuery &= " SET Qualifier = '" & asNewQualifier & "'"
@@ -1170,7 +1170,7 @@ Namespace FBM
 
         Public Sub updateCMMLRelationDestinationMultiplicity(ByRef arRelation As RDS.Relation, ByVal aiMultiplicity As pcenumCMMLMultiplicity)
 
-            Dim lsSQLQuery As String = ""
+            Dim lsSQLQuery As String
 
             lsSQLQuery = "UPDATE " & pcenumCMMLRelations.CoreDestinationMultiplicity.ToString
             lsSQLQuery &= " SET Multiplicity = '" & aiMultiplicity.ToString & "'"

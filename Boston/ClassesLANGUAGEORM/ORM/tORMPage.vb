@@ -221,7 +221,7 @@ Namespace FBM
         End Property
 
         <NonSerialized()>
-        Private _STDiagram As New STD.Diagram
+        Private _STDiagram As New STD.Diagram(Me)
         Public Overridable Property STDiagram As STD.Diagram
             Get
                 Return Me._STDiagram

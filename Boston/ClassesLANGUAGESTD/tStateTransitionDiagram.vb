@@ -5,6 +5,8 @@ Namespace STD
 
     Public Class Diagram
 
+        Public Page As FBM.Page = Nothing
+
         Public ValueType As FBM.ValueType = Nothing
         Public State As New List(Of STD.State)
         Public StateTransition As New List(Of STD.StateTransition)
@@ -17,7 +19,25 @@ Namespace STD
         Public StateTransitionRelation As FBM.FactTypeInstance
         Public StateTransitionValueType As FBM.FactTypeInstance
 
-        Private Sub STM_EndStateTransitionAdded(ByRef arEndStateTranstion As EndStateTransition) Handles STM.EndStateTransitionAdded
+        Public Sub New(ByRef arPage As FBM.Page)
+            Me.Page = arPage
+        End Sub
+
+        Private Sub STM_EndStateTransitionAdded(ByRef arEndStateTranstion As FBM.STM.EndStateTransition) Handles STM.EndStateTransitionAdded
+
+            Dim lsSQLQuery As String
+
+            '-----------------------------------------------------------------------------------------------------------------------
+            'Only add the EndStateTransition to the Page if the Page.STDiagram is for the same ValueType as the EndStateTransition.           
+            If arEndStateTranstion.ValueType.Id = Me.ValueType.Id Then
+
+                lsSQLQuery = "ADD FACT '" & arEndStateTranstion.Fact.Id & "'"
+                lsSQLQuery &= " TO " & pcenumCMMLRelations.CoreValueTypeHasFinishCoreElementState.ToString
+                lsSQLQuery &= " ON PAGE '" & Me.Page.Name & "'"
+
+                Call Me.Page.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+            End If
 
         End Sub
 
