@@ -49,11 +49,13 @@ Public Class frmStateTransitionDiagram
     Private Sub load_value_types(ByVal arModel As FBM.Model)
 
         Dim lrValueType As FBM.ValueType
-        Dim lrValueTypeList As New List(Of FBM.ValueType)
+        Dim larValueTypeList As New List(Of FBM.ValueType)
 
-        lrValueTypeList = TableValueType.GetValueTypesByModel(arModel)
+        larValueTypeList = Me.zrPage.Model.ValueType.FindAll(Function(x) x.IsMDAModelElement = False And
+                                                                         pcenumORMDataType.NumericAutoCounter <> x.DataType And
+                                                                         Not x.IsReferenceMode)
 
-        For Each lrValueType In lrValueTypeList
+        For Each lrValueType In larValueTypeList
             Me.ComboBox_ValueType.Items.Add(New tComboboxItem(lrValueType, lrValueType.Name, lrValueType))
         Next
 
