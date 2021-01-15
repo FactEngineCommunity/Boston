@@ -187,9 +187,19 @@ Public Class frmStateTransitionDiagram
 
                     Select Case lrToolboxForm.ShapeListBox.Shapes(lnode_dragged_node.Index).Id
                         Case Is = "State"
-                            Dim lr_state As New STD.State
-                            lr_state.Name = "Storeman"
-                            Call Me.dropStateAtPoint(lr_state, pt)
+
+                            Using lfrmStateSelectDialog As New frmDialogSelectValueTypeState(Me.zrPage.Model)
+                                If lfrmStateSelectDialog.ShowDialog = DialogResult.OK Then
+
+                                    Dim lr_state As New STD.State(Me.zrPage)
+                                    lr_state.Concept = New FBM.Concept("New State")
+                                    lr_state.StateName = "New State"
+                                    Call Me.dropStateAtPoint(lr_state, pt)
+
+                                End If
+                            End Using
+
+
                         Case Is = "Start"
                             Dim lrStartIndicator As New STD.StartStateIndicator()
                             Call Me.dropStartIndicatorAtPoint(lrStartIndicator, pt)
@@ -420,8 +430,7 @@ Public Class frmStateTransitionDiagram
                         '------------
                         'Is State
                         '------------
-                        Dim lr_state As New STD.State
-                        lr_state = lrFactDataInstance.CloneState(arPage)
+                        Dim lr_state As STD.State = lrFactDataInstance.CloneState(arPage)
 
                         '-------------------------------------------------------------------------------
                         'Check to see if the Shape for the State has already been loaded onto the Page
@@ -612,30 +621,30 @@ Public Class frmStateTransitionDiagram
 
     Sub dropStateAtPoint(ByVal ar_state As STD.State, ByVal ao_pt As PointF)
 
-        Dim lrStateInstance As New STD.State
-        Dim loDroppedNode As ShapeNode
+        'Dim lrStateInstance As New STD.State
+        'Dim loDroppedNode As ShapeNode
 
 
-        loDroppedNode = Diagram.Factory.CreateShapeNode(ao_pt.X, ao_pt.Y, 2, 2)
-        loDroppedNode.Shape = Shapes.RoundRect
-        loDroppedNode.HandlesStyle = HandlesStyle.MoveOnly
-        loDroppedNode.ToolTip = "Actor"
-        loDroppedNode.Visible = False
-        loDroppedNode.Image = My.Resources.CMML.actor
-        loDroppedNode.Pen.Color = Color.White
-        loDroppedNode.ShadowColor = Color.White
+        'loDroppedNode = Diagram.Factory.CreateShapeNode(ao_pt.X, ao_pt.Y, 2, 2)
+        'loDroppedNode.Shape = Shapes.RoundRect
+        'loDroppedNode.HandlesStyle = HandlesStyle.MoveOnly
+        'loDroppedNode.ToolTip = "Actor"
+        'loDroppedNode.Visible = False
+        'loDroppedNode.Image = My.Resources.CMML.actor
+        'loDroppedNode.Pen.Color = Color.White
+        'loDroppedNode.ShadowColor = Color.White
 
-        loDroppedNode.Tag = New CMML.tActor
-        loDroppedNode.Resize(10, 15)
+        'loDroppedNode.Tag = New CMML.tActor
+        'loDroppedNode.Resize(10, 15)
 
-        lrStateInstance.Model = prApplication.WorkingModel
-        lrStateInstance.LongDescription = ar_state.LongDescription
-        lrStateInstance.ShortDescription = ar_state.ShortDescription
-        lrStateInstance.Name = ar_state.Name
-        lrStateInstance.Shape = loDroppedNode
-        'lrStateInstance.Symbol = ar_state.Concept.Symbol
-        lrStateInstance.X = loDroppedNode.Bounds.X
-        lrStateInstance.Y = loDroppedNode.Bounds.Y
+        'lrStateInstance.Model = prApplication.WorkingModel
+        'lrStateInstance.LongDescription = ar_state.LongDescription
+        'lrStateInstance.ShortDescription = ar_state.ShortDescription
+        'lrStateInstance.Name = ar_state.Name
+        'lrStateInstance.Shape = loDroppedNode
+        ''lrStateInstance.Symbol = ar_state.Concept.Symbol
+        'lrStateInstance.X = loDroppedNode.Bounds.X
+        'lrStateInstance.Y = loDroppedNode.Bounds.Y
 
         If Not Me.zrPage.STDiagram.State.Exists(AddressOf ar_state.Equals) Then
             '--------------------------------------------------
@@ -643,11 +652,12 @@ Public Class frmStateTransitionDiagram
             '  so add it.
             '--------------------------------------------------
             Me.zrPage.STDiagram.State.Add(ar_state)
+            ar_state.DisplayAndAssociate()
         End If
 
-        Me.zrPage.STDiagram.State.Add(lrStateInstance)
-        loDroppedNode.Tag = lrStateInstance
-        loDroppedNode.Visible = True
+        'Me.zrPage.STDiagram.State.Add(lrStateInstance)
+        'loDroppedNode.Tag = lrStateInstance
+        'loDroppedNode.Visible = True
 
     End Sub
 
@@ -1322,8 +1332,7 @@ Public Class frmStateTransitionDiagram
         Dim lr_page As FBM.Page
         Dim larPage_list As New List(Of FBM.Page)
         Dim lr_model As FBM.Model
-        Dim lr_state As New STD.State
-
+        Dim lr_state As STD.State
 
         If prApplication.WorkingPage.SelectedObject.Count = 0 Then
             Exit Sub
@@ -1415,8 +1424,7 @@ Public Class frmStateTransitionDiagram
         Call Me.HiddenDiagramView.BringToFront()
 
 
-        Dim lr_state As New STD.State
-        lr_state = prApplication.WorkingPage.SelectedObject(0)
+        Dim lr_state As STD.State = prApplication.WorkingPage.SelectedObject(0)
 
         Dim lr_shape_node As ShapeNode
 

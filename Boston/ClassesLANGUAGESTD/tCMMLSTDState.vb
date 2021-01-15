@@ -50,13 +50,19 @@ Namespace STD
 
         Public WithEvents STMState As FBM.STM.State = Nothing
 
+        Public Sub New(ByRef arPage As FBM.Page)
+            Me.Page = arPage
+        End Sub
+
+
         Public Overloads Function Equals(other As State) As Boolean Implements IEquatable(Of State).Equals
 
-            If (Me.Role.Id = other.Role.Id) And (Me.Concept.Symbol = other.Concept.Symbol) Then
-                Return True
-            Else
-                Return False
-            End If
+            Return Me.StateName = other.StateName
+            'If (Me.Role.Id = other.Role.Id) And (Me.Concept.Symbol = other.Concept.Symbol) Then
+            '    Return True
+            'Else
+            '    Return False
+            'End If
 
         End Function
 
@@ -81,7 +87,6 @@ Namespace STD
                 loDroppedNode.Text = Me.Data
                 loDroppedNode.Transparent = False
 
-                loDroppedNode.Tag = New STD.State
                 loDroppedNode.Tag = Me
                 Me.Shape = loDroppedNode
 

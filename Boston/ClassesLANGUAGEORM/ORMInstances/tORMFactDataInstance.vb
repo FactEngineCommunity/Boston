@@ -932,11 +932,10 @@ Namespace FBM
             'States are 'Values' of 'ValueTypes'
             '  for models like a StateTransitionDiagram.
             '--------------------------------------------
-            Dim lr_state As New STD.State
+            Dim lr_state As New STD.State(arPage)
 
             With Me
                 lr_state.Model = .Model
-                lr_state.Page = arPage
                 lr_state.FactData = Me.FactData
                 lr_state.Name = .Concept.Symbol
                 lr_state.FactDataInstance = Me
