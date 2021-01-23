@@ -10,6 +10,8 @@ Namespace STD
 
         Public Shadows ConceptType As pcenumConceptType = pcenumConceptType.EndStateIndicator
 
+        Public EndStateId As String = "" 'The unique identifier for an EndState.
+
         Public State As STD.State 'The State from which this EndStateIndicator comes from/terminates.
 
         Public Link As DiagramLink

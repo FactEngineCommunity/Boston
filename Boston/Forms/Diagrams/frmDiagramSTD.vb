@@ -407,8 +407,12 @@ Public Class frmStateTransitionDiagram
                 lrFactInstance = lrRecordset.CurrentFact
 
                 lrEndStateIndicator = lrFactInstance.CloneEndStateIndicator(arPage, lrState)
+                lrEndStateIndicator.EndStateId = lrRecordset("EndState").Data
 
-                Call lrEndStateIndicator.DisplayAndAssociate()
+                If Me.zrPage.STDiagram.EndStateIndicator.Find(AddressOf lrEndStateIndicator.Equals) Is Nothing Then
+                    Me.zrPage.STDiagram.EndStateIndicator.Add(lrEndStateIndicator)
+                    Call lrEndStateIndicator.DisplayAndAssociate()
+                End If
 
                 lrRecordset.MoveNext()
             End While
