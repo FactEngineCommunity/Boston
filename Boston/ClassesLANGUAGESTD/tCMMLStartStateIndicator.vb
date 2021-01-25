@@ -12,6 +12,8 @@ Namespace STD
 
         Public State As STD.State 'The State to which this StartStateIndicator links.
 
+        Public EventName As String = ""
+
         Public Link As DiagramLink
 
         Public Shadows Property X As Integer Implements iPageObject.X
@@ -126,6 +128,7 @@ Namespace STD
 
             Me.Link.Pen.Width = 0.3
             Me.Link.Pen.Color = Color.Black
+            Me.Link.Text = Me.EventName
 
             Me.Page.Diagram.Links.Add(lo_link)
 

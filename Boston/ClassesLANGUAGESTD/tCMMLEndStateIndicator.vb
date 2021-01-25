@@ -5,8 +5,9 @@ Imports MindFusion.Drawing
 Namespace STD
 
     Public Class EndStateIndicator
-        Inherits FBM.FactInstance
+        Inherits FBM.FactDataInstance
         Implements FBM.iPageObject
+        Implements IEquatable(Of STD.EndStateIndicator)
 
         Public Shadows ConceptType As pcenumConceptType = pcenumConceptType.EndStateIndicator
 
@@ -34,17 +35,24 @@ Namespace STD
             End Set
         End Property
 
+
+        Public Sub New()
+
+        End Sub
+
+        Public Shadows Function Equals(other As EndStateIndicator) As Boolean Implements IEquatable(Of EndStateIndicator).Equals
+            Return Me.EndStateId = other.EndStateId
+        End Function
+
         Public Sub Move(ByVal aiNewX As Integer, ByVal aiNewY As Integer, ByVal abBroadcastInterfaceEvent As Boolean) Implements FBM.iPageObject.Move
 
             Me.X = aiNewX
             Me.Y = aiNewY
 
-            Me.FactInstance.X = aiNewX
-            Me.FactInstance.Y = aiNewY
+            Me.FactDataInstance.X = aiNewX
+            Me.FactDataInstance.Y = aiNewY
 
-        End Sub
-
-        Public Sub New()
+            Me.makeDirty()
 
         End Sub
 
@@ -113,22 +121,9 @@ Namespace STD
             loDroppedNode.Tag = Me
 
             Me.Shape = loDroppedNode
-            Me.FactInstance.Shape = loDroppedNode
+            Me.FactDataInstance.Shape = loDroppedNode
 
             loDroppedNode.Image = My.Resources.ORMShapes.Blank
-
-            '-----------------------------------------------------------------------------
-            'Draw a link from the End State to the circle for this EndStateIndicator/terminal
-            Dim loNode As MindFusion.Diagramming.ShapeNode = Me.State.Shape
-            Dim loLink As New DiagramLink(Me.Page.Diagram, loNode, Me.Shape)
-            loLink.Locked = False
-            loLink.Tag = Me
-            Me.Link = loLink
-            Me.Link.Visible = True
-            Me.Link.ShadowColor = Color.White
-            Me.Link.Pen.Width = 0.3
-
-            Me.Page.Diagram.Links.Add(loLink)
 
         End Sub
 

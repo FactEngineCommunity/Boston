@@ -23,6 +23,7 @@ Namespace STD
                        ByRef arEndStateIndicator As STD.EndStateIndicator,
                        ByVal asEventName As String)
 
+            Me.Page = arFromState.Page
             Me.FromState = arFromState
             Me.EndStateIndicator = arEndStateIndicator
             Me.EventName = asEventName

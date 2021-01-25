@@ -382,6 +382,7 @@ Public Class frmStateTransitionDiagram
                 lrFactInstance = lrRecordset.CurrentFact
 
                 lrStartStateIndicator = lrFactInstance.CloneStartStateIndicator(arPage, lrState)
+                lrStartStateIndicator.EventName = lrRecordset("Event").Data
                 Me.zrPage.STDiagram.StartBubble = lrStartStateIndicator
 
                 Call lrStartStateIndicator.DisplayAndAssociate()
@@ -406,13 +407,19 @@ Public Class frmStateTransitionDiagram
                 lrFactInstance = New FBM.FactInstance
                 lrFactInstance = lrRecordset.CurrentFact
 
-                lrEndStateIndicator = lrFactInstance.CloneEndStateIndicator(arPage, lrState)
-                lrEndStateIndicator.EndStateId = lrRecordset("EndState").Data
+                lrFactDataInstance = lrRecordset("EndState")
+                lrEndStateIndicator = lrFactDataInstance.CloneEndStateIndicator(arPage, lrState)
+                'lrEndStateIndicator.EndStateId = lrRecordset("EndState").Data
 
                 If Me.zrPage.STDiagram.EndStateIndicator.Find(AddressOf lrEndStateIndicator.Equals) Is Nothing Then
                     Me.zrPage.STDiagram.EndStateIndicator.Add(lrEndStateIndicator)
                     Call lrEndStateIndicator.DisplayAndAssociate()
+                Else
+                    lrEndStateIndicator = Me.zrPage.STDiagram.EndStateIndicator.Find(AddressOf lrEndStateIndicator.Equals)
                 End If
+
+                Dim lrEndStateTransition = New STD.EndStateTransition(lrState, lrEndStateIndicator, lrRecordset("Event").Data)
+                Call lrEndStateTransition.DisplayAndAssociate()
 
                 lrRecordset.MoveNext()
             End While
@@ -950,6 +957,25 @@ Public Class frmStateTransitionDiagram
                 Case Is = pcenumConceptType.EndStateIndicator
                     Dim lrEndStateIndicator As STD.EndStateIndicator = e.Node.Tag
                     Call lrEndStateIndicator.NodeModified()
+
+                    '=======================================================================================================
+                    'Move all EndStates in all EndStateTransitions that have the same EndState.
+                    '  This is because you cannot guarantee that the page load will return the rows in the same order.
+                    '  Each of the EndState values (of the same EndStateId) in CoreValueTypeHasFinishCoreElementState have
+                    '  the same X,Y position and represent the same EndState.
+                    Dim lsSQLQuery = "SELECT EndState"
+                    lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreValueTypeHasFinishCoreElementState.ToString
+                    lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
+                    lsSQLQuery &= " WHERE EndState = '" & lrEndStateIndicator.EndStateId & "'"
+
+                    Dim lrRecordset = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                    While Not lrRecordset.eof
+                        Dim lrTempEndStateIndicator = lrRecordset("EndState").CloneEndStateIndicator(Me.zrPage, Nothing)
+                        Call lrTempEndStateIndicator.Move(lrEndStateIndicator.X, lrEndStateIndicator.Y, True)
+                        lrRecordset.MoveNext
+                    End While
+                    '=======================================================================================================
 
                 Case Is = pcenumConceptType.State
 

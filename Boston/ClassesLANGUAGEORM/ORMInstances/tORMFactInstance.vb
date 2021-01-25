@@ -283,36 +283,6 @@ Namespace FBM
 
         End Function
 
-        ''' <summary>
-        ''' End State Indicators are circles linked from the last State in a State Transition Diagram.
-        '''   NB An STD may have more than one End/Finishing State. See also CloneStartStateIndicator.
-        ''' </summary>
-        ''' <param name="arPage"></param>
-        ''' <returns></returns>
-        Public Function CloneEndStateIndicator(ByRef arPage As FBM.Page, Optional ByRef arState As STD.State = Nothing) As STD.EndStateIndicator
-
-            '------------------------------------------------------------------
-            'As in 'Start Status Indicator' within a State Transition Diagram
-            '------------------------------------------------------------------
-            Dim lrEndStateIndicator As New STD.EndStateIndicator
-
-            With Me
-                lrEndStateIndicator.Model = .Model
-                lrEndStateIndicator.Page = arPage
-                'lrEndStateIndicator.Name = .Concept.Symbol
-                lrEndStateIndicator.Fact = Me.Fact
-                lrEndStateIndicator.FactInstance = Me
-                lrEndStateIndicator.Concept = .Concept
-                lrEndStateIndicator.X = .X
-                lrEndStateIndicator.Y = .Y
-            End With
-
-            lrEndStateIndicator.State = arState
-
-            Return lrEndStateIndicator
-
-        End Function
-
         Public Function CloneStateTransition(ByRef arPage As FBM.Page, ByRef arFromState As STD.State, ByRef arToState As STD.State, ByVal asEventName As String)
 
             Dim lrStateTransition As New STD.StateTransition
