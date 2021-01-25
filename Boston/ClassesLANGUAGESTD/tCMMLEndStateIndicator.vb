@@ -52,7 +52,7 @@ Namespace STD
             Me.FactDataInstance.X = aiNewX
             Me.FactDataInstance.Y = aiNewY
 
-            Me.makeDirty()
+            Me.FactDataInstance.makeDirty()
 
         End Sub
 

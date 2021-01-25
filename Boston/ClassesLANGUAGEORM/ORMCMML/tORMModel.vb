@@ -4,6 +4,7 @@ Namespace FBM
 
     Partial Public Class Model 'See also the folder ORMRDS/tORMModel.vb
 
+        Public Event StateTransitionAdded(ByRef lrFact As FBM.Fact)
 
         Public Sub addCMMLColumnToRelationOrigin(ByRef arRelation As RDS.Relation,
                                                  ByRef arColumn As RDS.Column,
@@ -125,7 +126,7 @@ Namespace FBM
             Try
 
                 Dim lsSQLQuery As String
-                Dim lrFact As FBM.Fact
+                Dim lrFact, lrFact2 As FBM.Fact
 
                 lsSQLQuery = "INSERT INTO " & pcenumCMMLRelations.CoreStateTransition.ToString
                 lsSQLQuery &= " (Concept1, Concept2, Event)"
@@ -147,7 +148,9 @@ Namespace FBM
                 lsSQLQuery &= ",'" & lrFact.Id & "'"
                 lsSQLQuery &= " )"
 
-                lrFact = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                lrFact2 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                arStateTransition.Fact = lrFact
 
             Catch ex As Exception
                 Dim lsMessage1 As String

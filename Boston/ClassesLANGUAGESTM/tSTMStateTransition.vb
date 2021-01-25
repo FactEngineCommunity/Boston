@@ -16,6 +16,11 @@ Namespace FBM.STM
 
         Public ValueType As FBM.ValueType = Nothing
 
+        ''' <summary>
+        ''' The Fact that represents this StateTransition in the FBM Model. I.e. Within the Core/MDA set of tables for State Transition Modelling.
+        ''' </summary>
+        Public Fact As FBM.Fact
+
     End Class
 
 End Namespace

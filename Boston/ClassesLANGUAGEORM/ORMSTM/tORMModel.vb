@@ -4,7 +4,6 @@ Namespace FBM
 
     Partial Public Class Model
 
-
         Public Sub createCMMLEndStateTransition(ByRef arEndStateTransition As STM.EndStateTransition)
 
             Dim lsSQLQuery As String

@@ -2,6 +2,7 @@
 Imports System.Xml.Serialization
 Imports MindFusion.Diagramming
 Imports System.Reflection
+Imports Boston.FBM
 
 Namespace STD
 
@@ -17,6 +18,7 @@ Namespace STD
         '--------------------------------------------------------------------------------------------------------
         Inherits FBM.FactDataInstance
         Implements IEquatable(Of STD.State)
+        Implements FBM.iPageObject
 
         <XmlAttribute()>
         Public Shadows ConceptType As pcenumConceptType = pcenumConceptType.State
@@ -48,10 +50,29 @@ Namespace STD
             End Get
         End Property
 
+        Private Property iPageObject_X As Integer Implements iPageObject.X
+            Get
+                Throw New NotImplementedException()
+            End Get
+            Set(value As Integer)
+                Throw New NotImplementedException()
+            End Set
+        End Property
+
+        Private Property iPageObject_Y As Integer Implements iPageObject.Y
+            Get
+                Throw New NotImplementedException()
+            End Get
+            Set(value As Integer)
+                Throw New NotImplementedException()
+            End Set
+        End Property
+
         Public WithEvents STMState As FBM.STM.State = Nothing
 
         Public Sub New(ByRef arPage As FBM.Page)
             Me.Page = arPage
+            Me.FactDataInstance = New FBM.FactDataInstance(Me.Page)
         End Sub
 
 
@@ -171,6 +192,58 @@ Namespace STD
 
             End If
 
+        End Sub
+
+        Public Sub MouseDown() Implements iPageObject.MouseDown
+            Throw New NotImplementedException()
+        End Sub
+
+        Public Sub MouseMove() Implements iPageObject.MouseMove
+            Throw New NotImplementedException()
+        End Sub
+
+        Public Sub MouseUp() Implements iPageObject.MouseUp
+            Throw New NotImplementedException()
+        End Sub
+
+        Public Sub NodeDeleting() Implements iPageObject.NodeDeleting
+            Throw New NotImplementedException()
+        End Sub
+
+        Public Sub NodeDeselected() Implements iPageObject.NodeDeselected
+            Throw New NotImplementedException()
+        End Sub
+
+        Public Sub NodeModified() Implements iPageObject.NodeModified
+            Throw New NotImplementedException()
+        End Sub
+
+        Public Sub NodeSelected() Implements iPageObject.NodeSelected
+            Throw New NotImplementedException()
+        End Sub
+
+        Public Sub Move(aiNewX As Integer, aiNewY As Integer, abBroadcastInterfaceEvent As Boolean) Implements iPageObject.Move
+
+            Me.X = aiNewX
+            Me.Y = aiNewY
+
+            Me.FactDataInstance.X = aiNewX
+            Me.FactDataInstance.Y = aiNewY
+
+            Me.FactDataInstance.makeDirty()
+
+        End Sub
+
+        Public Sub Moved() Implements iPageObject.Moved
+            Throw New NotImplementedException()
+        End Sub
+
+        Public Sub RepellNeighbouringPageObjects(aiDepth As Integer) Implements iPageObject.RepellNeighbouringPageObjects
+            Throw New NotImplementedException()
+        End Sub
+
+        Public Sub SetAppropriateColour() Implements iPageObject.SetAppropriateColour
+            Throw New NotImplementedException()
         End Sub
     End Class
 

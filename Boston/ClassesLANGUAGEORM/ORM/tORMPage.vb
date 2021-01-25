@@ -244,6 +244,7 @@ Namespace FBM
 
             Me.Model = arModel
             Me.RDSModel = arModel.RDS
+            Me.STModel = arModel.STM
 
             If IsSomething(as_PageId) Then
                 Me.PageId = as_PageId
