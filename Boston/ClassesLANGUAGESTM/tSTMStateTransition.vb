@@ -21,6 +21,30 @@ Namespace FBM.STM
         ''' </summary>
         Public Fact As FBM.Fact
 
+        ''' <summary>
+        ''' Parameterless constructor
+        ''' </summary>
+        Public Sub New()
+        End Sub
+
+        Public Sub New(ByRef arValueType As FBM.ValueType,
+                        ByRef arFromState As FBM.STM.State,
+                        ByRef arToState As FBM.STM.State,
+                        ByVal asEvent As String,
+                        Optional ByRef arFact As FBM.Fact = Nothing)
+
+            Me.ValueType = arValueType
+            Me.FromState = arFromState
+            Me.ToState = arToState
+            Me.Event = asEvent
+
+            If arFact IsNot Nothing Then
+                Me.Fact = arFact
+                Me.Id = arFact.Id
+            End If
+
+        End Sub
+
     End Class
 
 End Namespace

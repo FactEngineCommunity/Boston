@@ -91,6 +91,8 @@
             'CMML
             Call Me.Model.addCMMLStateTransition(arStateTransition)
 
+            RaiseEvent StateTransitionAdded(arStateTransition)
+
         End Sub
 
         Public Sub removeState(ByVal arState As FBM.STM.State)

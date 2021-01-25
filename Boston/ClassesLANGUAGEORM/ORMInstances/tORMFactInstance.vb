@@ -159,6 +159,15 @@ Namespace FBM
 
         End Function
 
+        Default Public Property Item(ByVal asItemValue As String) As FBM.FactDataInstance
+            Get
+                Return Me.GetFactDataInstanceByRoleName(asItemValue)
+            End Get
+            Set(value As FBM.FactDataInstance)
+                Throw New NotImplementedException("Not implemented")
+            End Set
+        End Property
+
         Public Overrides Function Clone() As Object
 
             Dim lrFactInstance As New FBM.FactInstance

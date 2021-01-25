@@ -194,10 +194,13 @@ Public Class frmStateTransitionDiagram
 
                                 If lfrmStateSelectDialog.ShowDialog = DialogResult.OK Then
 
-                                    Dim lr_state As New STD.State(Me.zrPage)
-                                    lr_state.Concept = New FBM.Concept("New State")
-                                    lr_state.StateName = "New State"
-                                    Call Me.dropStateAtPoint(lr_state, pt)
+                                    Dim lrSTMState = Me.zrPage.Model.createCMMLState(Me.zrPage.STDiagram.ValueType, "New State")
+
+                                    Dim lrSTDState As New STD.State(Me.zrPage)
+                                    lrSTDState.Concept = New FBM.Concept("New State")
+                                    lrSTDState.StateName = "New State"
+                                    lrSTDState.STMState = lrSTMState
+                                    Call Me.dropStateAtPoint(lrSTDState, pt)
 
                                 End If
                             End Using
@@ -282,6 +285,7 @@ Public Class frmStateTransitionDiagram
 
                 Me.ComboBox_ValueType.SelectedIndex = Me.ComboBox_ValueType.FindString(lsValueTypeId)
                 Me.zrPage.STDiagram.ValueType = Me.zrPage.Model.ValueType.Find(Function(x) x.Id = lsValueTypeId)
+                Me.ComboBox_ValueType.Enabled = False
             Else
                 Me.ComboBox_ValueType.SelectedIndex = -1
             End If
@@ -661,10 +665,8 @@ Public Class frmStateTransitionDiagram
         'lrStateInstance.Y = loDroppedNode.Bounds.Y
 
         If Not Me.zrPage.STDiagram.State.Exists(AddressOf ar_state.Equals) Then
-            '--------------------------------------------------
-            'The State is not already within the ORMModel
-            '  so add it.
-            '--------------------------------------------------
+            '----------------------------------------------------------
+            'The State is not already within the STDiagram so add it.
             Me.zrPage.STDiagram.State.Add(ar_state)
             ar_state.DisplayAndAssociate()
         End If
@@ -825,7 +827,13 @@ Public Class frmStateTransitionDiagram
             Dim lrFromState As STD.State = loFirstEntity
             Dim lrToState As STD.State = loSecondEntity
 
-            Dim lrStateTransition As New FBM.STM.StateTransition
+            Dim lrStateTransition As New FBM.STM.StateTransition(Me.zrPage.STDiagram.ValueType,
+                                                                 lrFromState.STMState,
+                                                                 lrToState.STMState,
+                                                                 "")
+
+            'Remove the link just created, because the link is created by the Event when the new StateTransition is added to the Model.
+            Me.Diagram.Links.Remove(e.Link)
 
             Call Me.zrPage.STDiagram.STM.addStateTransition(lrStateTransition)
 

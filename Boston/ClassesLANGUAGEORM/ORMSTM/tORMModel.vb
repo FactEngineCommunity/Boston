@@ -16,6 +16,20 @@ Namespace FBM
 
         End Sub
 
+        Public Function createCMMLState(ByRef arValueType As FBM.ValueType, ByVal asStateName As String) As STM.State
+
+
+            Dim lrState = New STM.State
+            lrState.ValueType = arValueType
+            lrState.Name = asStateName
+            lrState.Model = Me
+
+            Me.STM.State.AddUnique(lrState)
+
+            Return lrState
+
+        End Function
+
         Public Sub PopulateSTMStructureFromCoreMDAElements()
 
             Try

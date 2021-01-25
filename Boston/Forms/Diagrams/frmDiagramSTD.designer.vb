@@ -351,24 +351,28 @@ Partial Class frmStateTransitionDiagram
         '
         Me.ToolStrip1.BackColor = System.Drawing.Color.White
         Me.ToolStrip1.Dock = System.Windows.Forms.DockStyle.None
+        Me.ToolStrip1.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden
         Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripLabel_ValueType, Me.ComboBox_ValueType})
-        Me.ToolStrip1.Location = New System.Drawing.Point(113, 9)
+        Me.ToolStrip1.Location = New System.Drawing.Point(9, 9)
         Me.ToolStrip1.Name = "ToolStrip1"
-        Me.ToolStrip1.Size = New System.Drawing.Size(282, 25)
+        Me.ToolStrip1.Size = New System.Drawing.Size(417, 33)
         Me.ToolStrip1.TabIndex = 11
         Me.ToolStrip1.Text = "ToolStrip1"
         '
         'ToolStripLabel_ValueType
         '
+        Me.ToolStripLabel_ValueType.Font = New System.Drawing.Font("Segoe UI", 14.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.ToolStripLabel_ValueType.Name = "ToolStripLabel_ValueType"
-        Me.ToolStripLabel_ValueType.Size = New System.Drawing.Size(68, 22)
+        Me.ToolStripLabel_ValueType.Size = New System.Drawing.Size(112, 30)
         Me.ToolStripLabel_ValueType.Text = "Value Type :"
         '
         'ComboBox_ValueType
         '
         Me.ComboBox_ValueType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.ComboBox_ValueType.Font = New System.Drawing.Font("Segoe UI", 14.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.ComboBox_ValueType.ForeColor = System.Drawing.Color.SteelBlue
         Me.ComboBox_ValueType.Name = "ComboBox_ValueType"
-        Me.ComboBox_ValueType.Size = New System.Drawing.Size(200, 25)
+        Me.ComboBox_ValueType.Size = New System.Drawing.Size(300, 33)
         '
         'frmStateTransitionDiagram
         '
