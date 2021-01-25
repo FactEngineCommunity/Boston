@@ -153,11 +153,10 @@
                             End If
                         End If
                     Next liInd
-                    'GetFactsForFactTypeInstance.Add(lrFactInstance)
+
                     'SyncLock arFactTypeInstance.Page.FactInstance
                     arFactTypeInstance.Page.FactInstance.Add(lrFactInstance)
                     'End SyncLock
-
 
                     'SyncLock arFactTypeInstance.Fact
                     arFactTypeInstance.Fact.Add(lrFactInstance)

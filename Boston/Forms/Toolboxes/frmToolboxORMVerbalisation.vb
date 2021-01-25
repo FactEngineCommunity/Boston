@@ -2078,8 +2078,13 @@ Public Class frmToolboxORMVerbalisation
                 lrVerbaliser.HTW.WriteBreak()
             Else
                 For Each lrFact In arFactType.Fact
-                    lrVerbaliser.HTW.Write(lrFact.GetReading)
-                    lrVerbaliser.HTW.WriteBreak()
+                    Try
+                        lrVerbaliser.HTW.Write(lrFact.GetReading)
+                        lrVerbaliser.HTW.WriteBreak()
+                    Catch ex As Exception
+                        'Don't abort if you can't write the fact. This allows the user to delete the fact.
+                    End Try
+
                 Next
             End If
 

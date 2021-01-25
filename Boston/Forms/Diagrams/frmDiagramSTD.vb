@@ -813,6 +813,9 @@ Public Class frmStateTransitionDiagram
             'the State could already be an EndState, but this EndStateTransition is different (i.e. to a different EndStateBubble).
             Dim lrEndStateTransition As New FBM.STM.EndStateTransition(Me.zrPage.STDiagram.ValueType, lrState.STMState, "")
 
+            Dim lrEndStateIndicator As STD.EndStateIndicator = loSecondEntity
+            lrEndStateTransition.EndStateId = lrEndStateIndicator.EndStateId
+
             If Me.zrPage.Model.STM.EndStateTransition.find(AddressOf lrEndStateTransition.Equals) Is Nothing Then
                 Call Me.zrPage.Model.STM.addEndStateTransition(lrEndStateTransition)
             Else

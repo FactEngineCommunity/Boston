@@ -8,8 +8,8 @@ Namespace FBM
 
             Dim lsSQLQuery As String
 
-            lsSQLQuery = "INSERT INTO " & pcenumCMMLRelations.CoreValueTypeHasFinishCoreElementState.ToString & " (ValueType,CoreElement,Event)"
-            lsSQLQuery &= " VALUES ('" & arEndStateTransition.ValueType.Id & "','" & arEndStateTransition.State.Name & "','" & arEndStateTransition.Event & "'"
+            lsSQLQuery = "INSERT INTO " & pcenumCMMLRelations.CoreValueTypeHasFinishCoreElementState.ToString & " (ValueType,EndState,CoreElement,Event)"
+            lsSQLQuery &= " VALUES ('" & arEndStateTransition.ValueType.Id & "','" & arEndStateTransition.EndStateId & "','" & arEndStateTransition.State.Name & "','" & arEndStateTransition.Event & "'"
             lsSQLQuery &= ")"
 
             arEndStateTransition.Fact = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
