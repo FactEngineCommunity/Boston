@@ -290,17 +290,12 @@ Public Class frmStateTransitionDiagram
                 Me.ComboBox_ValueType.SelectedIndex = -1
             End If
 
-            '------------------------------------------------------------------------
-            'Display the StateTransitionDiagram by logically associating Shape objects
-            '   with the corresponding 'object' within the ORMModelPage object
-            '------------------------------------------------------------------------
-            lrFactTypeInstance = arPage.FactTypeInstance.Find(Function(p) p.Id = pcenumCMMLRelations.CoreStateTransition.ToString)
-            Me.zrPage.STDiagram.StateTransitionRelation = lrFactTypeInstance
-
             '------------------------------------------------------------
             'PSEUDOCODE
             '  * Load all of the State shapes
             '  * Load all of the Transitions by linking the State shapes
+            '  * Load all the StartStateTransitions (only one 99.999% of the time)
+            '  * Load all the EndStateTransitions
             '------------------------------------------------------------
             lsSQLQuery = "SELECT *"
             lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreStateTransition.ToString
@@ -437,102 +432,6 @@ Public Class frmStateTransitionDiagram
             Call Me.reset_node_and_link_colors()
             Me.Diagram.Invalidate()
             Me.zrPage.FormLoaded = True
-
-            '=================================
-            'EXIT SUB - Old code below
-            Exit Sub
-
-            For Each lrFactInstance In Me.zrPage.STDiagram.StateTransitionRelation.Fact
-                For Each lrFactDataInstance In lrFactInstance.Data
-                    If lrFactDataInstance.Role.JoinedORMObject.Name = pcenumCMML.Concept.ToString Then
-                        '------------
-                        'Is State
-                        '------------
-                        Dim lr_state As STD.State = lrFactDataInstance.CloneState(arPage)
-
-                        '-------------------------------------------------------------------------------
-                        'Check to see if the Shape for the State has already been loaded onto the Page
-                        '-------------------------------------------------------------------------------
-                        Dim lr_node As MindFusion.Diagramming.DiagramNode
-                        Dim lbStateAlreadyLoaded As Boolean = False
-                        For Each lr_node In Diagram.Nodes
-                            Select Case lr_node.GetType.ToString
-                                Case Is = GetType(MindFusion.Diagramming.ShapeNode).ToString
-                                    If lr_node.Tag.ConceptType = pcenumConceptType.State Then
-                                        If lr_node.Tag.Name = lr_state.Name Then
-                                            lbStateAlreadyLoaded = True
-                                            loDroppedNode = lr_node
-                                            lr_state_shape = loDroppedNode
-                                        End If
-                                    End If
-                            End Select
-                        Next
-
-                        If lbStateAlreadyLoaded Then
-                            '----------------------------------------------------------------
-                            'Nothing further to do, because the State ShapeNode has already
-                            '  been loaded onto the Page.
-                            '----------------------------------------------------------------
-                            lrFactDataInstance.Shape = lr_state_shape
-                        Else
-                            '----------------------------------------------
-                            'Create a ShapeNode on the Page for the State
-                            '----------------------------------------------
-                            loDroppedNode = Diagram.Factory.CreateShapeNode(lr_state.X, lr_state.Y, 2, 2)
-                            loDroppedNode.Shape = Shapes.RoundRect
-                            loDroppedNode.HandlesStyle = HandlesStyle.InvisibleMove
-                            loDroppedNode.Resize(20, 15)
-                            loDroppedNode.AllowIncomingLinks = True
-                            loDroppedNode.AllowOutgoingLinks = True
-                            loDroppedNode.Text = lr_state.Data
-                            loDroppedNode.Transparent = False
-
-                            loDroppedNode.Tag = New ERD.Entity
-                            loDroppedNode.Tag = lr_state
-                            lr_state.Shape = loDroppedNode
-
-                            lr_state_shape = loDroppedNode
-
-                            lrFactDataInstance.Shape = loDroppedNode
-                        End If
-                    End If
-                Next 'For Each lrFactDataInstance In lrFactInstance.data
-            Next 'For each Fact in the StateTransitionRelation
-
-            '-----------------------------
-            'Load Transitions (Processes)
-            '-----------------------------
-            Dim lr_state_shape1, lr_state_shape2 As New ShapeNode
-            For Each lrFactInstance In Me.zrPage.STDiagram.StateTransitionRelation.Fact
-                '--------------------------------------
-                'Locate the State (Concept) ShapeNodes
-                '--------------------------------------
-                lrFactDataInstance = New FBM.FactDataInstance
-                lrFactDataInstance.Role = New FBM.RoleInstance
-                lrFactDataInstance.Role.Id = "Value1"
-                lrFactDataInstance = lrFactInstance.Data.Find(AddressOf lrFactDataInstance.EqualsByRole)
-                lr_state_shape1 = lrFactDataInstance.Shape
-
-                lrFactDataInstance = New FBM.FactDataInstance
-                lrFactDataInstance.Role = New FBM.RoleInstance
-                lrFactDataInstance.Role.Id = "Value2"
-                lrFactDataInstance = lrFactInstance.Data.Find(AddressOf lrFactDataInstance.EqualsByRole)
-                lr_state_shape2 = lrFactDataInstance.Shape
-
-                lrFactDataInstance = New FBM.FactDataInstance
-                lrFactDataInstance.Role = New FBM.RoleInstance
-                lrFactDataInstance.Role.Id = "StateTransitionRelation-Process"
-                lrFactDataInstance = lrFactInstance.Data.Find(AddressOf lrFactDataInstance.EqualsByRole)
-
-
-                '----------------------------
-                'Link the transition States  
-                '----------------------------
-                Dim lo_link As DiagramLink
-                lo_link = Me.Diagram.Factory.CreateDiagramLink(lr_state_shape1, lr_state_shape2)
-                lo_link.Text = lrFactDataInstance.Data
-                lo_link.Tag = lrFactInstance
-            Next 'For each Fact in the StateTransitionRelation
 
         Catch ex As Exception
             Dim lsMessage As String
@@ -775,10 +674,6 @@ Public Class frmStateTransitionDiagram
         loFirstEntity = e.Link.Origin.Tag
         loSecondEntity = e.Link.Destination.Tag
 
-        '===================================================================================================================
-        '20200503-VM-The code below seems to come from UseCaseDiagram processing. Modify or remove. Likely modify for STDs
-
-        'Dim lrTypeOfRelation As pcenumCMMLRelations
         If (loFirstEntity.ConceptType = pcenumConceptType.StartStateIndicator) And (loSecondEntity.ConceptType = pcenumConceptType.State) Then
 
             Dim lrStartState As STD.State = loSecondEntity
@@ -803,8 +698,12 @@ Public Class frmStateTransitionDiagram
             End If
 
         ElseIf (loFirstEntity.ConceptType = pcenumConceptType.State) And (loSecondEntity.ConceptType = pcenumConceptType.EndStateIndicator) Then
-
+            '==================================
+            'End State
             Dim lrState As STD.State = loFirstEntity
+
+            'Remove the link just created, because the link is created by the Event when the new EndStateTransition is added to the Model.
+            Me.Diagram.Links.Remove(e.Link)
 
             If Not lrState.IsEndState Then
                 Call lrState.STMState.setEndState(True)
@@ -840,42 +739,6 @@ Public Class frmStateTransitionDiagram
 
             Call Me.zrPage.STDiagram.STM.addStateTransition(lrStateTransition)
 
-
-            '    lrTypeOfRelation = pcenumCMMLRelations.ActorToProcessParticipationRelation
-            '    '----------------------------------
-            '    'Create the Fact within the Model
-            '    '----------------------------------
-            '    Dim lsSQLString As String = ""
-            '    lsSQLString = "INSERT INTO " & pcenumCMMLRelations.ActorToProcessParticipationRelation.ToString
-            '    lsSQLString &= " (Actor, Process)"
-            '    lsSQLString &= " VALUES ("
-            '    lsSQLString &= "'" & loFirstEntity.Name & "'"
-            '    lsSQLString &= ",'" & loSecondEntity.Name & "'"
-            '    lsSQLString &= ")"
-
-            '    '----------------------------------
-            '    'Create the Fact within the Model
-            '    '----------------------------------
-            '    lrFact = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLString)
-
-            '    '----------------------------------
-            '    'Clone and instance of the Fact
-            '    '----------------------------------
-            '    lrFactInstance = lrFact.CloneInstance(Me.zrPage)
-            '    Me.StateTransitionDiagram.StateTransitionRelation.AddFact(lrFactInstance)
-
-            '    Dim lrFactDataInstance As New FBM.FactDataInstance(Me.zrPage)
-            '    Dim lrRole As New FBM.Role
-            '    lrRole.Id = pcenumCMML.Process.ToString
-            '    lrRole.Name = lrRole.Id
-            '    lrFactDataInstance.Role = lrRole.CloneInstance(Me.zrPage)
-            '    lrFactDataInstance = lrFactInstance.Data.Find(AddressOf lrFactDataInstance.EqualsByRole)
-            '    Dim lr_process As New CMML.Process
-
-            '    lr_process = lrFactDataInstance.CloneProcess(Me.zrPage)
-            '    lr_process.shape = New ShapeNode
-            '    lr_process.shape = Me.Diagram.FindNode(loSecondEntity)
-            '    lr_process.shape.Tag = lr_process
         End If
 
     End Sub

@@ -11,14 +11,11 @@ Namespace STD
         Public State As New List(Of STD.State)
         Public StateTransition As New List(Of STD.StateTransition)
         Public EndStateIndicator As New List(Of STD.EndStateIndicator)
+        Public EndStateTransition As New List(Of STD.EndStateTransition)
 
         Public StartBubble As STD.StartStateIndicator
 
         Public WithEvents STM As FBM.STM.Model
-
-        Public Process As New List(Of CMML.Process)
-        Public StateTransitionRelation As FBM.FactTypeInstance
-        Public StateTransitionValueType As FBM.FactTypeInstance
 
         Public Sub New(ByRef arPage As FBM.Page)
             Me.Page = arPage

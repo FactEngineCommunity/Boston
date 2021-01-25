@@ -39,7 +39,7 @@
 
         '================================
         'Events
-        Public Event EndStateTransitionAdded(ByRef arEndStateTranstion As FBM.STM.EndStateTransition)
+        Public Event EndStateTransitionAdded(ByRef arEndStateTransition As FBM.STM.EndStateTransition)
         Public Event StateTransitionAdded(ByRef arStateTransition As FBM.STM.StateTransition)
 
         ''' <summary>

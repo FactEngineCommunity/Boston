@@ -11,9 +11,32 @@ Namespace FBM
         ''' Handles the event when a new EndStateTransition is added to the (ST) Model.
         ''' </summary>
         ''' <param name="arEndStateTranstion"></param>
-        Private Sub STModel_EndStateTransitionAdded(ByRef arEndStateTranstion As EndStateTransition) Handles STModel.EndStateTransitionAdded
+        Private Sub STModel_EndStateTransitionAdded(ByRef arEndStateTransition As EndStateTransition) Handles STModel.EndStateTransitionAdded
 
-            'Dim lsSQLQuery = "ADD FACT " & 
+            If Not Me.Language = pcenumLanguage.StateTransitionDiagram Then Exit Sub
+            If Me.STDiagram.ValueType Is Nothing Then Exit Sub
+
+            If Me.STDiagram.ValueType.Id = arEndStateTransition.ValueType.Id Then
+
+                Dim lsSQLQuery = "ADD FACT '" & arEndStateTransition.Fact.Id & "'"
+                lsSQLQuery &= " TO " & pcenumCMMLRelations.CoreValueTypeHasFinishCoreElementState.ToString
+                lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
+
+                Dim lrFactInstance As FBM.FactInstance = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                Dim lsFromStateName = arEndStateTransition.State.Name
+                Dim lrFromState = Me.STDiagram.State.Find(Function(x) x.StateName = lsFromStateName)
+
+                Dim lsEndStateId = arEndStateTransition.EndStateId
+                Dim lrEndStateIndicator = Me.STDiagram.EndStateIndicator.Find(Function(x) x.EndStateId = lsEndStateId)
+
+                Dim lrEndStateTransition As STD.EndStateTransition
+                lrEndStateTransition = lrFactInstance.CloneEndStateTransition(Me, lrFromState, lrEndStateIndicator)
+
+                Me.STDiagram.EndStateTransition.AddUnique(lrEndStateTransition)
+                Call lrEndStateTransition.DisplayAndAssociate()
+
+            End If
 
         End Sub
 

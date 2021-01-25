@@ -244,6 +244,28 @@ Namespace FBM
 
         End Function
 
+        Public Function CloneEndStateTransition(ByRef arPage As FBM.Page, ByRef arFromState As STD.State, ByRef arEndStateIndicator As STD.EndStateIndicator) As STD.EndStateTransition
+
+            Dim lrEndStateTransition As New STD.EndStateTransition
+
+            With Me
+                lrEndStateTransition.Model = .Model
+                lrEndStateTransition.Page = arPage
+                lrEndStateTransition.Fact = Me.Fact
+                lrEndStateTransition.FactInstance = Me
+                lrEndStateTransition.Concept = .Concept
+                lrEndStateTransition.X = .X
+                lrEndStateTransition.Y = .Y
+            End With
+
+            lrEndStateTransition.FromState = arFromState
+            lrEndStateTransition.EndStateIndicator = arEndStateIndicator
+
+            Return lrEndStateTransition
+
+        End Function
+
+
         ''' <summary>
         ''' Start State Indicator is a circle linking to the first State in a State Transition Diagram.
         '''   Generally an STD will only have on staring state
