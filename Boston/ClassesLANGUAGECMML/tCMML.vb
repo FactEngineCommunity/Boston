@@ -331,28 +331,27 @@ Public Class tCMML
 
     End Function
 
-    Public Function get_orm_diagram_pages_for_state(ByVal arState As STD.State) As List(Of FBM.Page)
+    Public Function getORMDiagramPagesForState(ByRef arState As STD.State) As List(Of FBM.Page)
 
-        get_orm_diagram_pages_for_state = New List(Of FBM.Page)
+        getORMDiagramPagesForState = New List(Of FBM.Page)
 
         Dim lr_model As FBM.Model
-        Dim lr_page As FBM.Page
-        Dim lr_use_case_page As New FBM.Page(arState.Model, Nothing, "", pcenumLanguage.UseCaseDiagram)
+        Dim lsStateName = arState.StateName
+        Dim lsValueTypeId = arState.ValueType.Id
 
         lr_model = arState.Model
 
-        Dim lrPage = From Page In lr_model.Page
-                     From ValueTypeInstance In Page.ValueTypeInstance
-                     From ValueConstraint In ValueTypeInstance.ValueType._ValueConstraint
-                     Where Page.Language = pcenumLanguage.ORMModel _
-                     And ValueConstraint.Symbol = arState.Symbol
-                     Select Page Distinct
-                     Order By Page.Name
+        Dim larPage = From Page In lr_model.Page
+                      From ValueTypeInstance In Page.ValueTypeInstance
+                      From ValueConstraint In ValueTypeInstance.ValueType.ValueConstraint
+                      Where ValueTypeInstance.Id = lsValueTypeId
+                      Where Page.Language = pcenumLanguage.ORMModel _
+                      And ValueConstraint = lsStateName
+                      Select Page Distinct
+                      Order By Page.Name
 
-        'And ValueTypeInstance.ValueType.Id = arState.Id _
-
-        For Each lr_page In lrPage
-            get_orm_diagram_pages_for_state.Add(lr_page)
+        For Each lrPage In larPage
+            getORMDiagramPagesForState.Add(lrPage)
         Next
 
     End Function

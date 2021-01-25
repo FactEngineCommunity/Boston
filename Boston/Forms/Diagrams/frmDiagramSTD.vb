@@ -14,6 +14,7 @@ Public Class frmStateTransitionDiagram
 
     Private morph_vector As tMorphVector
     Private morph_shape As New ShapeNode
+    Private MorphVector As New List(Of tMorphVector)
 
     Public Shadows Sub BringToFront(Optional asSelectModelElementId As String = Nothing)
 
@@ -1359,40 +1360,37 @@ Public Class frmStateTransitionDiagram
 
     Private Sub ContextMenuStrip_Actor_Opening(ByVal sender As System.Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles ContextMenuStrip_State.Opening
 
-        Dim lr_page As FBM.Page
+        Dim lrPage As FBM.Page
         Dim larPage_list As New List(Of FBM.Page)
-        Dim lr_model As FBM.Model
-        Dim lr_state As STD.State
+        Dim lrModel As FBM.Model
+        Dim lrState As STD.State
 
         If prApplication.WorkingPage.SelectedObject.Count = 0 Then
             Exit Sub
         End If
 
+
+
         '-------------------------------------
         'Check that selected object is Actor
         '-------------------------------------
-        If lr_state.GetType Is prApplication.WorkingPage.SelectedObject(0).GetType Then
-            '----------
-            'All good
-            '----------
-        Else
+        If Not TypeOf prApplication.WorkingPage.SelectedObject(0) Is STD.State Then
             '--------------------------------------------------------
-            'Sometimes the MouseDown/NodeSelected gets it wrong
-            '  and this sub receives invocation before an Actor is 
-            '  properly selected. The user may try and click again.
-            '  If it's a bug, then this can be removed obviously.
+            'Sometimes the MouseDown/NodeSelected gets it wrong and this sub receives invocation before an State is 
+            '  properly selected. The user may try and click again. If it's a bug, then this can be removed obviously.
             '--------------------------------------------------------
             Exit Sub
         End If
-        lr_state = prApplication.WorkingPage.SelectedObject(0)
 
-        lr_model = lr_state.Model
+        lrState = prApplication.WorkingPage.SelectedObject(0)
+
+        lrModel = lrState.Model
 
         '---------------------------------------------------------------------------------------------
         'Set the initial MorphVector for the selected EntityType. Morphing the EntityType to another 
         '  shape, and to/into another diagram starts at the MorphVector.
         '---------------------------------------------------------------------------------------------
-        Me.morph_vector = New tMorphVector(lr_state.X, lr_state.Y, 0, 0, 40)
+        Me.morph_vector = New tMorphVector(lrState.X, lrState.Y, 0, 0, 40)
 
 
         '--------------------------------------------------------------
@@ -1404,9 +1402,13 @@ Public Class frmStateTransitionDiagram
         'Load the ORMDiagrams that relate to the EntityType
         '  as selectable menuOptions
         '----------------------------------------------------                        
-        larPage_list = prApplication.CMML.get_orm_diagram_pages_for_state(lr_state)
+        larPage_list = prApplication.CMML.getORMDiagramPagesForState(lrState)
 
-        For Each lr_page In larPage_list
+        Me.morph_vector = New tMorphVector(lrState.X, lrState.Y, 0, 0, 40)
+        Me.MorphVector.Clear()
+        Me.MorphVector.Add(New tMorphVector(lrState.Shape.Bounds.X, lrState.Shape.Bounds.Y, 0, 0, 40))
+
+        For Each lrPage In larPage_list
             Dim lo_menu_option As ToolStripItem
 
             '----------------------------------------------------------
@@ -1417,18 +1419,18 @@ Public Class frmStateTransitionDiagram
             '----------------------------------------------------------
             Dim lr_enterprise_view As tEnterpriseEnterpriseView
             lr_enterprise_view = New tEnterpriseEnterpriseView(pcenumMenuType.pageORMModel,
-                                                       lr_page,
-                                                       lr_model.ModelId,
+                                                       lrPage,
+                                                       lrModel.ModelId,
                                                        pcenumLanguage.ORMModel,
                                                        Nothing,
-                                                       lr_page.PageId)
+                                                       lrPage.PageId)
 
             lr_enterprise_view = prPageNodes.Find(AddressOf lr_enterprise_view.Equals)
             If IsSomething(lr_enterprise_view) Then
                 '---------------------------------------------------
                 'Add the Page(Name) to the MenuOption.DropDownItems
                 '---------------------------------------------------
-                lo_menu_option = Me.ORMDiagramToolStripMenuItem.DropDownItems.Add(lr_page.Name)
+                lo_menu_option = Me.ORMDiagramToolStripMenuItem.DropDownItems.Add(lrPage.Name)
                 lo_menu_option.Tag = prPageNodes.Find(AddressOf lr_enterprise_view.Equals)
                 AddHandler lo_menu_option.Click, AddressOf Me.morph_to_ORM_diagram
             End If
@@ -1491,7 +1493,7 @@ Public Class frmStateTransitionDiagram
             '----------------------------------------------------------------
             lrValueTypeInstance = lr_page.ValueTypeInstance.Find(AddressOf lrValueTypeInstance.Equals)
 
-            If lr_page.Loaded Then
+            If lr_page.Loaded And lrValueTypeInstance.Shape IsNot Nothing Then
                 lr_shape_node = lrValueTypeInstance.Shape.Clone(True)
                 Me.morph_shape = lr_shape_node
             Else
@@ -1506,6 +1508,8 @@ Public Class frmStateTransitionDiagram
             Me.HiddenDiagram.Invalidate()
 
             Me.morph_vector = New tMorphVector(Me.morph_vector.StartPoint.X, Me.morph_vector.StartPoint.Y, lrValueTypeInstance.X, lrValueTypeInstance.Y, 40)
+
+            Me.MorphVector(0).EnterpriseTreeView = lr_enterprise_view
             Me.MorphTimer.Enabled = True
             Me.MorphStepTimer.Enabled = True
 
@@ -1595,7 +1599,7 @@ Public Class frmStateTransitionDiagram
             Me.MorphStepTimer.Stop()
             Me.MorphStepTimer.Enabled = False
 
-            frmMain.zfrmModelExplorer.TreeView.SelectedNode = Me.MorphStepTimer.Tag
+            frmMain.zfrmModelExplorer.TreeView.SelectedNode = Me.MorphVector(0).EnterpriseTreeView.TreeNode
             Call frmMain.zfrmModelExplorer.EditPageToolStripMenuItem_Click(sender, e)
             Me.StateTransitionDiagramView.BringToFront()
             Me.Diagram.Invalidate()
