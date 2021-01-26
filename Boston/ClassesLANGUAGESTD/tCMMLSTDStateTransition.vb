@@ -56,6 +56,11 @@ Namespace STD
 
         End Sub
 
+        Public Sub RefreshShape(Optional ByVal aoChangedPropertyItem As PropertyValueChangedEventArgs = Nothing,
+                                Optional ByVal asSelectedGridItemLabel As String = "")
+
+        End Sub
+
     End Class
 
 End Namespace

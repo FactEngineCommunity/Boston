@@ -161,6 +161,11 @@ Namespace STD
 
         End Sub
 
+        Public Sub RefreshShape(Optional ByVal aoChangedPropertyItem As PropertyValueChangedEventArgs = Nothing,
+                                Optional ByVal asSelectedGridItemLabel As String = "")
+
+        End Sub
+
         Public Sub setEndState(ByVal abEndStateStatus As Boolean)
 
             Call Me.STMState.setEndState(abEndStateStatus)

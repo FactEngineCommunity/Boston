@@ -947,7 +947,7 @@ Public Class frmStateTransitionDiagram
     Private Sub UseCaseDiagramView_MouseDown(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles StateTransitionDiagramView.MouseDown
 
         Dim lo_point As System.Drawing.PointF
-        Dim loNode As DiagramNode
+        Dim loNode As Object
 
         lo_point = Me.StateTransitionDiagramView.ClientToDoc(e.Location)
 
@@ -957,6 +957,9 @@ Public Class frmStateTransitionDiagram
         'Just to be sure...set the Richmond.WorkingProject
         '--------------------------------------------------
         prApplication.WorkingPage = Me.zrPage
+
+        Dim lrPropertyGridForm As frmToolboxProperties
+        lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
 
         If IsSomething(Diagram.GetNodeAt(lo_point)) Then
             '----------------------------
@@ -978,11 +981,23 @@ Public Class frmStateTransitionDiagram
             Me.StateTransitionDiagramView.DrawLinkCursor = Cursors.Hand
             Cursor.Show()
 
-            '---------------------------------------------------------------------------------------------------------------------------
-            'If the PropertiesForm is loaded, set the 'SelectedObject' property of the PropertyGrid to the UseCaseModel object selected
-            '---------------------------------------------------------------------------------------------------------------------------
-            If Not IsNothing(frmMain.zfrm_properties) Then
-                frmMain.zfrm_properties.PropertyGrid.SelectedObject = loNode.Tag
+            If IsSomething(lrPropertyGridForm) And IsSomething(loNode) Then
+                Dim lrModelObject As FBM.ModelObject
+                lrModelObject = loNode.Tag
+                lrPropertyGridForm.PropertyGrid.BrowsableAttributes = Nothing
+                lrPropertyGridForm.PropertyGrid.HiddenAttributes = Nothing
+                Select Case lrModelObject.GetType
+                    Case = GetType(STD.State)
+                        Dim lrState As STD.State
+                        lrState = lrModelObject
+                        Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
+                        Dim loMiscFilterAttribute2 As Attribute = New System.ComponentModel.CategoryAttribute("Instances")
+                        Dim loMiscFilterAttribute3 As Attribute = New System.ComponentModel.CategoryAttribute("Description (Informal)")
+                        lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute, loMiscFilterAttribute2, loMiscFilterAttribute3})
+                        lrPropertyGridForm.zrSelectedObject = lrState
+                        lrPropertyGridForm.PropertyGrid.SelectedObjects = {} 'Part of the fix to the problem where ValueConstraint were being added to the wrong ValueType.
+                        lrPropertyGridForm.PropertyGrid.SelectedObject = lrState
+                End Select
             End If
 
             'If IsSomething(Diagram.GetNodeAt(lo_point)) Then
@@ -1059,6 +1074,25 @@ Public Class frmStateTransitionDiagram
             '-------------------------
             'User clicked on a link
             '-------------------------
+            loNode = Diagram.GetLinkAt(lo_point, 2)
+            If IsSomething(lrPropertyGridForm) And IsSomething(loNode) Then
+                Dim lrModelObject As FBM.ModelObject
+                lrModelObject = loNode.Tag
+                lrPropertyGridForm.PropertyGrid.BrowsableAttributes = Nothing
+                lrPropertyGridForm.PropertyGrid.HiddenAttributes = Nothing
+                Select Case lrModelObject.GetType
+                    Case = GetType(STD.StateTransition)
+                        Dim lrStateTransition As STD.StateTransition
+                        lrStateTransition = lrModelObject
+                        Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
+                        lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute})
+                        lrPropertyGridForm.zrSelectedObject = lrStateTransition
+                        lrPropertyGridForm.PropertyGrid.SelectedObjects = {} 'Part of the fix to the problem where ValueConstraint were being added to the wrong ValueType.
+                        lrPropertyGridForm.PropertyGrid.SelectedObject = lrStateTransition
+                End Select
+            End If
+
+
         Else
             '------------------------------------------------
             'Use clicked on the Canvas
