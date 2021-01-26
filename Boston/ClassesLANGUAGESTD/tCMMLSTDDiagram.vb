@@ -30,7 +30,7 @@ Namespace STD
             If arEndStateTranstion.ValueType.Id = Me.ValueType.Id Then
 
                 lsSQLQuery = "ADD FACT '" & arEndStateTranstion.Fact.Id & "'"
-                lsSQLQuery &= " TO " & pcenumCMMLRelations.CoreValueTypeHasFinishCoreElementState.ToString
+                lsSQLQuery &= " TO " & pcenumCMMLRelations.CoreValueTypeHasEndCoreElementState.ToString
                 lsSQLQuery &= " ON PAGE '" & Me.Page.Name & "'"
 
                 Call Me.Page.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)

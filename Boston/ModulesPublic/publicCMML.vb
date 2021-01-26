@@ -20,7 +20,7 @@ Public Enum pcenumCMMLRelations
         CoreValueTypeIsSubtypeStateControlled
         CoreStateTransitionIsForValueType
         CoreValueTypeHasStartCoreElementState
-        CoreValueTypeHasFinishCoreElementState
+        CoreValueTypeHasEndCoreElementState
         CoreStateTransition
 
         '---------------------------------------------

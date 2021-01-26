@@ -19,7 +19,7 @@ Namespace FBM
             If Me.STDiagram.ValueType.Id = arEndStateTransition.ValueType.Id Then
 
                 Dim lsSQLQuery = "ADD FACT '" & arEndStateTransition.Fact.Id & "'"
-                lsSQLQuery &= " TO " & pcenumCMMLRelations.CoreValueTypeHasFinishCoreElementState.ToString
+                lsSQLQuery &= " TO " & pcenumCMMLRelations.CoreValueTypeHasEndCoreElementState.ToString
                 lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
 
                 Dim lrFactInstance As FBM.FactInstance = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)

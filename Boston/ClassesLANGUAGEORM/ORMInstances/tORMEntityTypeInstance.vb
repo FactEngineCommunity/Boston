@@ -226,11 +226,11 @@ Namespace FBM
             End Set
         End Property
 
-        <XmlIgnore()> _
-        <Browsable(False), _
-        [ReadOnly](True), _
-        BindableAttribute(False)> _
-        Public WithEvents Concept As New FBM.Concept
+        <XmlIgnore()>
+        <Browsable(False),
+        [ReadOnly](True),
+        BindableAttribute(False)>
+        Public Shadows WithEvents Concept As New FBM.Concept
 
         <XmlIgnore()> _
         Public Page As FBM.Page

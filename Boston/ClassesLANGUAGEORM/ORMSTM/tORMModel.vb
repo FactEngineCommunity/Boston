@@ -8,7 +8,7 @@ Namespace FBM
 
             Dim lsSQLQuery As String
 
-            lsSQLQuery = "INSERT INTO " & pcenumCMMLRelations.CoreValueTypeHasFinishCoreElementState.ToString & " (ValueType,EndState,CoreElement,Event)"
+            lsSQLQuery = "INSERT INTO " & pcenumCMMLRelations.CoreValueTypeHasEndCoreElementState.ToString & " (ValueType,EndState,CoreElement,Event)"
             lsSQLQuery &= " VALUES ('" & arEndStateTransition.ValueType.Id & "','" & arEndStateTransition.EndStateId & "','" & arEndStateTransition.State.Name & "','" & arEndStateTransition.Event & "'"
             lsSQLQuery &= ")"
 
@@ -22,7 +22,7 @@ Namespace FBM
             Dim lrState = New STM.State
             lrState.ValueType = arValueType
             lrState.Name = asStateName
-            lrState.Model = Me
+            lrState.Model = Me.STM
 
             Me.STM.State.AddUnique(lrState)
 
@@ -68,12 +68,12 @@ Namespace FBM
                     lrFromState = New STM.State
                     lrFromState.ValueType = lrValueType
                     lrFromState.Name = lrORMRecordset("Concept1").Data
-                    lrFromState.Model = Me
+                    lrFromState.Model = Me.STM
 
                     lrToState = New STM.State
                     lrToState.ValueType = lrValueType
                     lrToState.Name = lrORMRecordset("Concept2").Data
-                    lrToState.Model = Me
+                    lrToState.Model = Me.STM
 
                     Me.STM.State.AddUnique(lrFromState)
                     Me.STM.State.AddUnique(lrToState)
@@ -99,7 +99,7 @@ Namespace FBM
 
                     lrValueType = Me.ValueType.Find(Function(x) x.Id = lrORMRecordset("ValueType").Data)
 
-                    lrState = New STM.State(Me, lrValueType, lrORMRecordset("CoreElement").Data)
+                    lrState = New STM.State(Me.STM, lrValueType, lrORMRecordset("CoreElement").Data)
 
                     Me.STM.State.Find(AddressOf lrState.Equals).IsStart = True
 
@@ -109,7 +109,7 @@ Namespace FBM
                 '===============================================================================================
                 'Stop States
                 lsSQLQuery = " SELECT *"
-                lsSQLQuery &= "  FROM " & pcenumCMMLRelations.CoreValueTypeHasFinishCoreElementState.ToString
+                lsSQLQuery &= "  FROM " & pcenumCMMLRelations.CoreValueTypeHasEndCoreElementState.ToString
 
                 lrORMRecordset = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
@@ -117,7 +117,7 @@ Namespace FBM
 
                     lrValueType = Me.ValueType.Find(Function(x) x.Id = lrORMRecordset("ValueType").Data)
 
-                    lrState = New STM.State(Me, lrValueType, lrORMRecordset("CoreElement").Data)
+                    lrState = New STM.State(Me.STM, lrValueType, lrORMRecordset("CoreElement").Data)
 
                     lrState = Me.STM.State.Find(AddressOf lrState.Equals)
                     lrState.IsStop = True
@@ -150,7 +150,7 @@ Namespace FBM
             Dim lsSQLQuery As String
 
             'VM-Complete this
-            lsSQLQuery = "DELETE FROM " & pcenumCMMLRelations.CoreValueTypeHasFinishCoreElementState.ToString
+            lsSQLQuery = "DELETE FROM " & pcenumCMMLRelations.CoreValueTypeHasEndCoreElementState.ToString
             lsSQLQuery &= " WHERE ValueType = '" & arEndStateTransition.ValueType.Id & "'"
             lsSQLQuery &= " AND CoreElement = '" & arEndStateTransition.State.Name & "'"
             lsSQLQuery &= " AND EndState = '" & arEndStateTransition.EndStateId & "'"

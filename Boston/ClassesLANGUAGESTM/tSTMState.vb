@@ -7,7 +7,7 @@ Namespace FBM.STM
     Public Class State
         Implements IEquatable(Of FBM.STM.State)
 
-        Public Model As FBM.Model = Nothing
+        Public Model As STM.Model = Nothing
 
         Public Name As String = ""
 
@@ -20,6 +20,7 @@ Namespace FBM.STM
 
         Public Event IsStartStateChanged(abStartStateStatus As Boolean)
         Public Event IsEndStateChanged(abEndStateStatus As Boolean)
+        Public Event NameChanged(asNewName As String)
 
         ''' <summary>
         ''' Parameterless new
@@ -27,9 +28,9 @@ Namespace FBM.STM
         Public Sub New()
         End Sub
 
-        Public Sub New(ByRef arModel As FBM.Model, ByRef arValueType As FBM.ValueType, ByVal asStateName As String)
+        Public Sub New(ByRef arSTModel As STM.Model, ByRef arValueType As FBM.ValueType, ByVal asStateName As String)
 
-            Me.Model = arModel
+            Me.Model = arSTModel
             Me.ValueType = arValueType
             Me.Name = asStateName
 
@@ -47,7 +48,7 @@ Namespace FBM.STM
             Me.IsStart = True
 
             'CMML
-            Me.StartStateFact = Me.Model.addCMMLStartState(Me)
+            Me.StartStateFact = Me.Model.Model.addCMMLStartState(Me)
 
             RaiseEvent IsStartStateChanged(True)
 
@@ -58,6 +59,18 @@ Namespace FBM.STM
         Public Sub setEndState(ByVal abEndStateStatus As Boolean)
 
             Me.IsStop = abEndStateStatus
+
+        End Sub
+
+        Public Sub setName(ByVal asNewName As String)
+
+            Dim lsOldStateName = Me.Name
+            Me.Name = asNewName
+
+            'CMML
+            Call Me.Model.Model.changeCMMLStateName(Me, lsOldStateName)
+
+            RaiseEvent NameChanged(asNewName)
 
         End Sub
 

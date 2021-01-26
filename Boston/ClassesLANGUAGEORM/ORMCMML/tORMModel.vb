@@ -175,7 +175,7 @@ Namespace FBM
                 Dim lsSQLQuery As String
                 Dim lrFact As FBM.Fact
 
-                lsSQLQuery = "INSERT INTO " & pcenumCMMLRelations.CoreValueTypeHasFinishCoreElementState.ToString
+                lsSQLQuery = "INSERT INTO " & pcenumCMMLRelations.CoreValueTypeHasEndCoreElementState.ToString
                 lsSQLQuery &= " (ValueType, CoreElement)"
                 lsSQLQuery &= " VALUES ("
                 lsSQLQuery &= "'" & arStopState.ValueType.Id & "'"
@@ -204,10 +204,43 @@ Namespace FBM
 
             Dim lsSQLQuery As String
 
-
             lsSQLQuery = "UPDATE " & pcenumCMMLRelations.CorePropertyHasPropertyName.ToString
             lsSQLQuery &= " SET PropertyName = '" & arColumn.Name & "'"
             lsSQLQuery &= " WHERE Property = '" & arColumn.Id & "'"
+
+            Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+        End Sub
+
+        Public Sub changeCMMLStateName(ByRef arState As STM.State, ByVal asOldStateName As String)
+
+            Dim lsSQLQuery As String
+
+            lsSQLQuery = "UPDATE " & pcenumCMMLRelations.CoreStateTransition.ToString
+            lsSQLQuery &= " SET Concept1 = '" & arState.Name & "'"
+            lsSQLQuery &= " WHERE Concept1 = '" & asOldStateName & "'"
+            'lsSQLQuery &= " AND ValueType = '" & arState.ValueType.Id & "'"
+
+            Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+            lsSQLQuery = "UPDATE " & pcenumCMMLRelations.CoreStateTransition.ToString
+            lsSQLQuery &= " SET Concept2 = '" & arState.Name & "'"
+            lsSQLQuery &= " WHERE Concept2 = '" & asOldStateName & "'"
+            'lsSQLQuery &= " AND ValueType = '" & arState.ValueType.Id & "'"
+
+            Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+            lsSQLQuery = "UPDATE " & pcenumCMMLRelations.CoreValueTypeHasStartCoreElementState.ToString
+            lsSQLQuery &= " SET CoreElement = '" & arState.Name & "'"
+            lsSQLQuery &= " WHERE CoreElement = '" & asOldStateName & "'"
+            lsSQLQuery &= " AND ValueType = '" & arState.ValueType.Id & "'"
+
+            Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+            lsSQLQuery = "UPDATE " & pcenumCMMLRelations.CoreValueTypeHasEndCoreElementState.ToString
+            lsSQLQuery &= " SET CoreElement = '" & arState.Name & "'"
+            lsSQLQuery &= " WHERE CoreElement = '" & asOldStateName & "'"
+            lsSQLQuery &= " AND ValueType = '" & arState.ValueType.Id & "'"
 
             Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
@@ -1069,7 +1102,7 @@ Namespace FBM
             Try
                 Dim lsSQLQuery As String = ""
 
-                lsSQLQuery = "DELETE FROM " & pcenumCMMLRelations.CoreValueTypeHasFinishCoreElementState.ToString
+                lsSQLQuery = "DELETE FROM " & pcenumCMMLRelations.CoreValueTypeHasEndCoreElementState.ToString
                 lsSQLQuery &= " WHERE ValueType = '" & arStopState.ValueType.Id & "'"
                 lsSQLQuery &= " AND CoreElement = '" & arStopState.Name & "'"
 

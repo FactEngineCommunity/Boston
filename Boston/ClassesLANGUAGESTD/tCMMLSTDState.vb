@@ -27,6 +27,9 @@ Namespace STD
          DefaultValueAttribute(GetType(String), ""),
          DescriptionAttribute("Name of the State (Value).")>
         Public Shadows _Name As String = ""
+        <XmlAttribute()>
+        <CategoryAttribute("State Name"),
+         DescriptionAttribute("The 'Name' for the State")>
         Public Property StateName() As String
             Get
                 Return Me._Name
@@ -164,6 +167,13 @@ Namespace STD
         Public Sub RefreshShape(Optional ByVal aoChangedPropertyItem As PropertyValueChangedEventArgs = Nothing,
                                 Optional ByVal asSelectedGridItemLabel As String = "")
 
+            If IsSomething(aoChangedPropertyItem) Then
+                Select Case aoChangedPropertyItem.ChangedItem.PropertyDescriptor.Name
+                    Case Is = "StateName"
+                        Call Me.STMState.setName(Me.StateName)
+                End Select
+            End If
+
         End Sub
 
         Public Sub setEndState(ByVal abEndStateStatus As Boolean)
@@ -250,6 +260,15 @@ Namespace STD
         Public Sub SetAppropriateColour() Implements iPageObject.SetAppropriateColour
             Throw New NotImplementedException()
         End Sub
+
+        Private Sub STMState_NameChanged(asNewName As String) Handles STMState.NameChanged
+
+            Me.StateName = asNewName
+
+            Me.Shape.Text = asNewName
+
+        End Sub
+
     End Class
 
 End Namespace

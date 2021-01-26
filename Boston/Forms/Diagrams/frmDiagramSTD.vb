@@ -395,7 +395,7 @@ Public Class frmStateTransitionDiagram
             '-----------------------------------------------------------------------------------
             'Load the End State Indicators (terminals)
             lsSQLQuery = "SELECT *"
-            lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreValueTypeHasFinishCoreElementState.ToString
+            lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreValueTypeHasEndCoreElementState.ToString
             lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
 
             lrRecordset = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
@@ -719,7 +719,7 @@ Public Class frmStateTransitionDiagram
             Dim lrEndStateIndicator As STD.EndStateIndicator = loSecondEntity
             lrEndStateTransition.EndStateId = lrEndStateIndicator.EndStateId
 
-            If Me.zrPage.Model.STM.EndStateTransition.find(AddressOf lrEndStateTransition.Equals) Is Nothing Then
+            If Me.zrPage.Model.STM.EndStateTransition.Find(AddressOf lrEndStateTransition.Equals) Is Nothing Then
                 Call Me.zrPage.Model.STM.addEndStateTransition(lrEndStateTransition)
             Else
                 lsMessage = "There is already an End State for the State, '" & lrState.StateName & "', and with a transition event called '' (nothing)."
@@ -847,10 +847,10 @@ Public Class frmStateTransitionDiagram
                     '=======================================================================================================
                     'Move all EndStates in all EndStateTransitions that have the same EndState.
                     '  This is because you cannot guarantee that the page load will return the rows in the same order.
-                    '  Each of the EndState values (of the same EndStateId) in CoreValueTypeHasFinishCoreElementState have
+                    '  Each of the EndState values (of the same EndStateId) in CoreValueTypeHasEndCoreElementState have
                     '  the same X,Y position and represent the same EndState.
                     Dim lsSQLQuery = "SELECT EndState"
-                    lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreValueTypeHasFinishCoreElementState.ToString
+                    lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreValueTypeHasEndCoreElementState.ToString
                     lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
                     lsSQLQuery &= " WHERE EndState = '" & lrEndStateIndicator.EndStateId & "'"
 
