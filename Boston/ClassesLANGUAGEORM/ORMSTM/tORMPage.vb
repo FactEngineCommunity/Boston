@@ -80,6 +80,24 @@ Namespace FBM
 
         End Sub
 
+        Private Sub STModel_EndStateTransitionRemoved(ByRef arEndStateTransition As STM.EndStateTransition) Handles STModel.EndStateTransitionRemoved
+
+            Dim lrEndStateTransition As STM.EndStateTransition = arEndStateTransition
+
+            Dim lrSTDEndStateTransition As STD.EndStateTransition = Me.STDiagram.EndStateTransition.Find(Function(x) x.ValueType.Id = lrEndStateTransition.ValueType.Id And
+                                                                                                    x.FromState.Name = lrEndStateTransition.State.Name And
+                                                                                                    x.EndStateIndicator.EndStateId = lrEndStateTransition.EndStateId)
+
+            If lrSTDEndStateTransition IsNot Nothing Then
+                'EndStateTransition is on the Page.
+
+                Me.Diagram.Links.Remove(lrSTDEndStateTransition.Link)
+
+                Me.STDiagram.EndStateTransition.Remove(lrSTDEndStateTransition)
+            End If
+
+        End Sub
+
     End Class
 
 End Namespace

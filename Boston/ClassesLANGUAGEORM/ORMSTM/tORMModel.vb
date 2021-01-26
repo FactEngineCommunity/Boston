@@ -119,7 +119,14 @@ Namespace FBM
 
                     lrState = New STM.State(Me, lrValueType, lrORMRecordset("CoreElement").Data)
 
-                    Me.STM.State.Find(AddressOf lrState.Equals).IsStop = True
+                    lrState = Me.STM.State.Find(AddressOf lrState.Equals)
+                    lrState.IsStop = True
+
+                    Dim lrEndStateTransition = New STM.EndStateTransition(Me.STM, lrValueType, lrState, lrORMRecordset("Event").Data)
+                    lrEndStateTransition.EndStateId = lrORMRecordset("EndState").Data
+                    lrEndStateTransition.Fact = lrORMRecordset.CurrentFact
+
+                    Me.STM.EndStateTransition.Add(lrEndStateTransition)
 
                     lrORMRecordset.MoveNext()
                 End While
@@ -138,6 +145,22 @@ Namespace FBM
             End Try
         End Sub
 
+        Public Sub removeCMMLEndStateTransition(ByRef arEndStateTransition As STM.EndStateTransition)
+
+            Dim lsSQLQuery As String
+
+            'VM-Complete this
+            lsSQLQuery = "DELETE FROM " & pcenumCMMLRelations.CoreValueTypeHasFinishCoreElementState.ToString
+            lsSQLQuery &= " WHERE ValueType = '" & arEndStateTransition.ValueType.Id & "'"
+            lsSQLQuery &= " AND CoreElement = '" & arEndStateTransition.State.Name & "'"
+            lsSQLQuery &= " AND EndState = '" & arEndStateTransition.EndStateId & "'"
+
+            'NB Will automatically delete the corresponding FactInstances at the Page level as well.
+            Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+
+
+        End Sub
 
     End Class
 

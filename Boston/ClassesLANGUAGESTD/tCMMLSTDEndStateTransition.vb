@@ -6,6 +6,7 @@ Namespace STD
     Public Class EndStateTransition
         Inherits FBM.FactInstance
 
+        Public ValueType As FBM.ValueType
         Public FromState As STD.State
         Public EndStateIndicator As STD.EndStateIndicator
 
@@ -14,6 +15,8 @@ Namespace STD
         Public Shadows ConceptType As pcenumConceptType = pcenumConceptType.StateTransition
 
         Public Link As DiagramLink
+
+        Public STMEndStateTransition As FBM.STM.EndStateTransition 'The EndStateTransition as the STModel level of the FBM.Model.
 
         Public Sub New()
 

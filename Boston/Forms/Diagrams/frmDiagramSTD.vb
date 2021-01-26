@@ -421,6 +421,10 @@ Public Class frmStateTransitionDiagram
                 End If
 
                 Dim lrEndStateTransition = New STD.EndStateTransition(lrState, lrEndStateIndicator, lrRecordset("Event").Data)
+                lrEndStateTransition.ValueType = Me.zrPage.STDiagram.ValueType
+                lrEndStateTransition.STMEndStateTransition = Me.zrPage.Model.STM.EndStateTransition.Find(Function(x) x.Fact.Id = lrRecordset.CurrentFact.Id)
+
+                Me.zrPage.STDiagram.EndStateTransition.Add(lrEndStateTransition)
                 Call lrEndStateTransition.DisplayAndAssociate()
 
                 lrRecordset.MoveNext()
@@ -699,7 +703,7 @@ Public Class frmStateTransitionDiagram
 
         ElseIf (loFirstEntity.ConceptType = pcenumConceptType.State) And (loSecondEntity.ConceptType = pcenumConceptType.EndStateIndicator) Then
             '==================================
-            'End State
+            'End State Transition
             Dim lrState As STD.State = loFirstEntity
 
             'Remove the link just created, because the link is created by the Event when the new EndStateTransition is added to the Model.
@@ -710,7 +714,7 @@ Public Class frmStateTransitionDiagram
             End If
 
             'the State could already be an EndState, but this EndStateTransition is different (i.e. to a different EndStateBubble).
-            Dim lrEndStateTransition As New FBM.STM.EndStateTransition(Me.zrPage.STDiagram.ValueType, lrState.STMState, "")
+            Dim lrEndStateTransition As New FBM.STM.EndStateTransition(Me.zrPage.Model.STM, Me.zrPage.STDiagram.ValueType, lrState.STMState, "")
 
             Dim lrEndStateIndicator As STD.EndStateIndicator = loSecondEntity
             lrEndStateTransition.EndStateId = lrEndStateIndicator.EndStateId
@@ -764,24 +768,20 @@ Public Class frmStateTransitionDiagram
         lo_first_entity = e.Link.Origin.Tag
         lo_second_entity = e.Link.Destination.Tag
 
-        '=============================================================================================================================================
-        '20200503-VM-The following code likely comes from UseCaseDiagram processing. Modify for STD processing.
-        'If (lo_first_entity.ConceptType = pcenumConceptType.Actor) And (lo_second_entity.ConceptType = pcenumConceptType.Process) Then
-        '    Dim lsSQLString As String = ""
-        '    lsSQLString = "DELETE FROM " & pcenumCMMLRelations.ActorToProcessParticipationRelation.ToString
-        '    lsSQLString &= " WHERE Actor = '" & lo_first_entity.Name & "'"
-        '    lsSQLString &= "   AND Process = '" & lo_second_entity.Name & "'"
+        Dim lrLink = e.Link.Tag
 
-        '    Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLString)
-        'ElseIf (lo_first_entity.ConceptType = pcenumConceptType.Process) And (lo_second_entity.ConceptType = pcenumConceptType.Process) Then
-        '    Dim lsSQLString As String = ""
-        '    lsSQLString = "DELETE FROM " & pcenumCMMLRelations.ProcessToProcessRelation.ToString
-        '    lsSQLString &= " WHERE Process1 = '" & lo_first_entity.Name & "'"
-        '    lsSQLString &= "   AND Process2 = '" & lo_second_entity.Name & "'"
-        '    Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLString)
-        'End If
 
-        Me.Cursor = Cursors.Default
+        If lrLink Is Nothing Then Exit Sub 'Because when creating a new link, code removes/deletes the link.
+
+        Select Case lrLink.GetType
+            Case = GetType(STD.EndStateTransition)
+
+                Dim lrEndStateTransition As STD.EndStateTransition = lrLink
+
+                Call lrEndStateTransition.STMEndStateTransition.RemoveFromModel()
+            Case = GetType(STD.StateTransition)
+
+        End Select
 
     End Sub
 
@@ -1654,4 +1654,11 @@ Public Class frmStateTransitionDiagram
 
     End Sub
 
+    Private Sub Diagram_LinkDeleting(sender As Object, e As LinkValidationEventArgs) Handles Diagram.LinkDeleting
+
+        If MsgBox("Delete the transition from the model?", MsgBoxStyle.YesNo) = MsgBoxResult.No Then
+            e.Cancel = True
+        End If
+
+    End Sub
 End Class

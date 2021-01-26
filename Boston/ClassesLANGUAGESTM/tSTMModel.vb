@@ -40,6 +40,7 @@
         '================================
         'Events
         Public Event EndStateTransitionAdded(ByRef arEndStateTransition As FBM.STM.EndStateTransition)
+        Public Event EndStateTransitionRemoved(ByRef arEndStateTransition As FBM.STM.EndStateTransition)
         Public Event StateTransitionAdded(ByRef arStateTransition As FBM.STM.StateTransition)
 
         ''' <summary>
@@ -92,6 +93,17 @@
             Call Me.Model.addCMMLStateTransition(arStateTransition)
 
             RaiseEvent StateTransitionAdded(arStateTransition)
+
+        End Sub
+
+        Public Sub removeEndStateTransition(ByRef arEndStateTransition As STM.EndStateTransition)
+
+            Me.EndStateTransition.Remove(arEndStateTransition)
+
+            'CMML
+            Call Me.Model.removeCMMLEndStateTransition(arEndStateTransition)
+
+            RaiseEvent EndStateTransitionRemoved(arEndStateTransition)
 
         End Sub
 
