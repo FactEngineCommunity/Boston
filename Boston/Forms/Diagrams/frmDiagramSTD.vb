@@ -238,8 +238,12 @@ Public Class frmStateTransitionDiagram
 
 
                         Case Is = "Start"
-                            Dim lrStartIndicator As New STD.StartStateIndicator()
-                            Call Me.dropStartIndicatorAtPoint(lrStartIndicator, pt)
+                            If Me.zrPage.STDiagram.StartIndicator Is Nothing Then
+                                Dim lrStartIndicator As New STD.StartStateIndicator(Me.zrPage)
+                                Call Me.dropStartIndicatorAtPoint(lrStartIndicator, pt)
+                            Else
+                                MsgBox("There is already a Start Indicator on this Page.")
+                            End If
                         Case Is = "Stop"
                             Dim lrStopIndicator As New STD.EndStateIndicator()
                             Call Me.dropStopIndicatorAtPoint(lrStopIndicator, pt)
@@ -416,7 +420,7 @@ Public Class frmStateTransitionDiagram
 
                 lrStartStateIndicator = lrFactInstance.CloneStartStateIndicator(arPage, lrState)
                 lrStartStateIndicator.EventName = lrRecordset("Event").Data
-                Me.zrPage.STDiagram.StartBubble = lrStartStateIndicator
+                Me.zrPage.STDiagram.StartIndicator = lrStartStateIndicator
 
                 Call lrStartStateIndicator.DisplayAndAssociate()
 
@@ -612,45 +616,47 @@ Public Class frmStateTransitionDiagram
 
     End Sub
 
-    Sub dropStartIndicatorAtPoint(ByVal arStartIndicator As STD.StartStateIndicator, ByVal aoPtf As PointF)
+    Sub dropStartIndicatorAtPoint(ByRef arStartIndicator As STD.StartStateIndicator, ByVal aoPtf As PointF)
 
-        Dim lrStartIndicator As New STD.StartStateIndicator
-        Dim loDroppedNode As ShapeNode
+        'Dim lrStartIndicator As New STD.StartStateIndicator
+        'Dim loDroppedNode As ShapeNode
 
 
-        loDroppedNode = Diagram.Factory.CreateShapeNode(aoPtf.X, aoPtf.Y, 8, 8)
-        loDroppedNode.Shape = Shapes.Ellipse
-        loDroppedNode.HandlesStyle = HandlesStyle.MoveOnly
-        loDroppedNode.ToolTip = "Start Indicator"
-        loDroppedNode.Visible = True
-        loDroppedNode.Image = Nothing
-        loDroppedNode.Pen.Color = Color.Black
-        loDroppedNode.Brush = New MindFusion.Drawing.SolidBrush(Color.Black)
-        loDroppedNode.ShadowColor = Color.White
-        loDroppedNode.AllowIncomingLinks = False
-        loDroppedNode.AllowOutgoingLinks = True
+        'loDroppedNode = Diagram.Factory.CreateShapeNode(aoPtf.X, aoPtf.Y, 8, 8)
+        'loDroppedNode.Shape = Shapes.Ellipse
+        'loDroppedNode.HandlesStyle = HandlesStyle.MoveOnly
+        'loDroppedNode.ToolTip = "Start Indicator"
+        'loDroppedNode.Visible = True
+        'loDroppedNode.Image = Nothing
+        'loDroppedNode.Pen.Color = Color.Black
+        ''loDroppedNode.Brush = New MindFusion.Drawing.SolidBrush(Color.Black)
+        'loDroppedNode.Text = "Start"
+        'loDroppedNode.ShadowColor = Color.White
+        'loDroppedNode.AllowIncomingLinks = False
+        'loDroppedNode.AllowOutgoingLinks = True
 
-        loDroppedNode.Tag = New STD.StartStateIndicator
-        loDroppedNode.Resize(8, 8)
+        'loDroppedNode.Tag = New STD.StartStateIndicator
+        'loDroppedNode.Resize(8, 8)
 
-        lrStartIndicator.Model = prApplication.WorkingModel
-        lrStartIndicator.LongDescription = arStartIndicator.LongDescription
-        lrStartIndicator.ShortDescription = arStartIndicator.ShortDescription
-        lrStartIndicator.Shape = loDroppedNode
-        lrStartIndicator.X = loDroppedNode.Bounds.X
-        lrStartIndicator.Y = loDroppedNode.Bounds.Y
+        'lrStartIndicator.Model = prApplication.WorkingModel
+        'lrStartIndicator.LongDescription = arStartIndicator.LongDescription
+        'lrStartIndicator.ShortDescription = arStartIndicator.ShortDescription
+        'lrStartIndicator.Shape = loDroppedNode
+        'lrStartIndicator.X = loDroppedNode.Bounds.X
+        'lrStartIndicator.Y = loDroppedNode.Bounds.Y
 
-        'If Not Me.StateTransitionDiagram.State.Exists(AddressOf ar_state.Equals) Then
-        '--------------------------------------------------
-        'The State is not already within the ORMModel
-        '  so add it.
-        '--------------------------------------------------
-        '   Me.StateTransitionDiagram.State.Add(ar_state)
-        'End If
-        'Me.StateTransitionDiagram.Stat.Add(lrStartIndicator )
+        ''If Not Me.StateTransitionDiagram.State.Exists(AddressOf ar_state.Equals) Then
+        ''--------------------------------------------------
+        ''The State is not already within the ORMModel
+        ''  so add it.
+        ''--------------------------------------------------
+        ''   Me.StateTransitionDiagram.State.Add(ar_state)
+        ''End If
+        ''Me.StateTransitionDiagram.Stat.Add(lrStartIndicator )
 
-        loDroppedNode.Tag = lrStartIndicator
-
+        'loDroppedNode.Tag = lrStartIndicator
+        Me.zrPage.STDiagram.StartIndicator = arStartIndicator
+        arStartIndicator.DisplayAndAssociate()
 
     End Sub
 
@@ -728,7 +734,7 @@ Public Class frmStateTransitionDiagram
 
                     Call Me.zrPage.Model.STM.removeStartState(lrExistingStartState.STMState)
 
-                    Me.Diagram.Links.Remove(Me.zrPage.STDiagram.StartBubble.Link)
+                    Me.Diagram.Links.Remove(Me.zrPage.STDiagram.StartIndicator.Link)
 
                     Call lrStartState.setStartState(True)
                 End If

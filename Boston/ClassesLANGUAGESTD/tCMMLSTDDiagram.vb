@@ -13,7 +13,7 @@ Namespace STD
         Public EndStateIndicator As New List(Of STD.EndStateIndicator)
         Public EndStateTransition As New List(Of STD.EndStateTransition)
 
-        Public StartBubble As STD.StartStateIndicator
+        Public StartIndicator As STD.StartStateIndicator
 
         Public WithEvents STM As FBM.STM.Model
 

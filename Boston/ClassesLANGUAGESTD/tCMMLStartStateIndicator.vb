@@ -39,13 +39,23 @@ Namespace STD
             Me.X = aiNewX
             Me.Y = aiNewY
 
-            Me.FactInstance.X = aiNewX
-            Me.FactInstance.Y = aiNewY
+            If Me.FactInstance IsNot Nothing Then
+                Me.FactInstance.X = aiNewX
+                Me.FactInstance.Y = aiNewY
+            End If
 
         End Sub
 
+        ''' <summary>
+        ''' Parameterless new.
+        ''' </summary>
         Public Sub New()
+        End Sub
 
+        Public Sub New(ByRef arPage As FBM.Page)
+
+            Me.Model = arPage.Model
+            Me.Page = arPage
         End Sub
 
         Public Sub MouseDown() Implements iPageObject.MouseDown
@@ -113,24 +123,24 @@ Namespace STD
             loDroppedNode.Tag = Me
 
             Me.Shape = loDroppedNode
-            Me.FactInstance.Shape = loDroppedNode
+            'Me.FactInstance.Shape = loDroppedNode
 
             loDroppedNode.Image = My.Resources.ORMShapes.Blank
 
-            '-----------------------------------------------------------------------------
-            'Draw a link to the State that the respective StartStateIndicator State
-            Dim loNode As MindFusion.Diagramming.ShapeNode = Me.State.Shape
-            Dim lo_link As New DiagramLink(Me.Page.Diagram, Me.Shape, loNode)
-            lo_link.Locked = False
-            lo_link.Tag = Me
-            Me.Link = lo_link
-            Me.Link.Visible = True
+            ''-----------------------------------------------------------------------------
+            ''Draw a link to the State that the respective StartStateIndicator State
+            'Dim loNode As MindFusion.Diagramming.ShapeNode = Me.State.Shape
+            'Dim lo_link As New DiagramLink(Me.Page.Diagram, Me.Shape, loNode)
+            'lo_link.Locked = False
+            'lo_link.Tag = Me
+            'Me.Link = lo_link
+            'Me.Link.Visible = True
 
-            Me.Link.Pen.Width = 0.3
-            Me.Link.Pen.Color = Color.Black
-            Me.Link.Text = Me.EventName
+            'Me.Link.Pen.Width = 0.3
+            'Me.Link.Pen.Color = Color.Black
+            'Me.Link.Text = Me.EventName
 
-            Me.Page.Diagram.Links.Add(lo_link)
+            'Me.Page.Diagram.Links.Add(lo_link)
 
         End Sub
 
