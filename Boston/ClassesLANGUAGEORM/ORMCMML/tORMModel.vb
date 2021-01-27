@@ -96,10 +96,11 @@ Namespace FBM
                 Dim lsSQLQuery As String
 
                 lsSQLQuery = "INSERT INTO " & pcenumCMMLRelations.CoreValueTypeHasStartCoreElementState.ToString
-                lsSQLQuery &= " (ValueType, CoreElement)"
+                lsSQLQuery &= " (ValueType, CoreElement, Event)"
                 lsSQLQuery &= " VALUES ("
                 lsSQLQuery &= "'" & arStartState.ValueType.Id & "'"
                 lsSQLQuery &= ",'" & arStartState.Name & "'"
+                lsSQLQuery &= ",''"
                 lsSQLQuery &= " )"
 
                 Return Me.ORMQL.ProcessORMQLStatement(lsSQLQuery) 'As Fact
