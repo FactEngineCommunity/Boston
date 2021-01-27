@@ -225,8 +225,8 @@ Public Class frmStateTransitionDiagram
                                         If Me.zrPage.STDiagram.State.Find(Function(x) x.StateName = lfrmStateSelectDialog.msState) Is Nothing Then
                                             'Page Level
                                             Dim lrSTDState As New STD.State(Me.zrPage)
-                                            lrSTDState.Concept = New FBM.Concept("New State")
-                                            lrSTDState.StateName = "New State"
+                                            lrSTDState.Concept = New FBM.Concept(lfrmStateSelectDialog.msState)
+                                            lrSTDState.StateName = lfrmStateSelectDialog.msState
                                             lrSTDState.STMState = lrSTMState
                                             Call Me.dropStateAtPoint(lrSTDState, pt)
                                         Else
@@ -602,6 +602,7 @@ Public Class frmStateTransitionDiagram
             '----------------------------------------------------------
             'The State is not already within the STDiagram so add it.
             Me.zrPage.STDiagram.State.Add(ar_state)
+            ar_state.Move(ao_pt.X, ao_pt.Y, False)
             ar_state.DisplayAndAssociate()
         End If
 
@@ -1587,6 +1588,7 @@ Public Class frmStateTransitionDiagram
     Private Sub ComboBox_ValueType_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles ComboBox_ValueType.SelectedIndexChanged
 
         prApplication.WorkingValueType = Me.ComboBox_ValueType.SelectedItem.ItemData
+        Me.zrPage.STDiagram.ValueType = Me.ComboBox_ValueType.SelectedItem.ItemData
 
         Dim lrModelDictionaryForm As frmToolboxModelDictionary
         lrModelDictionaryForm = prApplication.GetToolboxForm(frmToolboxModelDictionary.Name)

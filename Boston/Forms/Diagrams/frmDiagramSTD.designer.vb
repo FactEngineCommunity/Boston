@@ -353,9 +353,9 @@ Partial Class frmStateTransitionDiagram
         Me.ToolStrip1.Dock = System.Windows.Forms.DockStyle.None
         Me.ToolStrip1.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden
         Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripLabel_ValueType, Me.ComboBox_ValueType})
-        Me.ToolStrip1.Location = New System.Drawing.Point(9, 9)
+        Me.ToolStrip1.Location = New System.Drawing.Point(81, 9)
         Me.ToolStrip1.Name = "ToolStrip1"
-        Me.ToolStrip1.Size = New System.Drawing.Size(417, 33)
+        Me.ToolStrip1.Size = New System.Drawing.Size(448, 33)
         Me.ToolStrip1.TabIndex = 11
         Me.ToolStrip1.Text = "ToolStrip1"
         '
