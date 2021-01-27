@@ -24,7 +24,7 @@ Partial Class frmStateTransitionDiagram
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container()
         Me.Diagram = New MindFusion.Diagramming.Diagram()
-        Me.StateTransitionDiagramView = New MindFusion.Diagramming.WinForms.DiagramView()
+        Me.DiagramView = New MindFusion.Diagramming.WinForms.DiagramView()
         Me.ContextMenuStrip_Diagram = New System.Windows.Forms.ContextMenuStrip(Me.components)
         Me.ViewToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolboxToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
@@ -92,25 +92,25 @@ Partial Class frmStateTransitionDiagram
         Me.Diagram.ShowAnchors = MindFusion.Diagramming.ShowAnchors.Always
         Me.Diagram.ShowHandlesOnDrag = False
         '
-        'StateTransitionDiagramView
+        'DiagramView
         '
-        Me.StateTransitionDiagramView.AllowDrop = True
-        Me.StateTransitionDiagramView.BackColor = System.Drawing.Color.White
-        Me.StateTransitionDiagramView.Behavior = MindFusion.Diagramming.Behavior.DrawLinks
-        Me.StateTransitionDiagramView.ContextMenuStrip = Me.ContextMenuStrip_Diagram
-        Me.StateTransitionDiagramView.ControlHandlesStyle = MindFusion.Diagramming.HandlesStyle.HatchHandles
-        Me.StateTransitionDiagramView.ControlMouseAction = MindFusion.Diagramming.ControlMouseAction.IgnoreControl
-        Me.StateTransitionDiagramView.DelKeyAction = MindFusion.Diagramming.DelKeyAction.DeleteSelectedItems
-        Me.StateTransitionDiagramView.Diagram = Me.Diagram
-        Me.StateTransitionDiagramView.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.StateTransitionDiagramView.Location = New System.Drawing.Point(0, 0)
-        Me.StateTransitionDiagramView.MiddleButtonActions = MindFusion.Diagramming.MouseButtonActions.None
-        Me.StateTransitionDiagramView.ModificationStart = MindFusion.Diagramming.ModificationStart.SelectedOnly
-        Me.StateTransitionDiagramView.Name = "StateTransitionDiagramView"
-        Me.StateTransitionDiagramView.RightButtonActions = MindFusion.Diagramming.MouseButtonActions.Cancel
-        Me.StateTransitionDiagramView.Size = New System.Drawing.Size(891, 530)
-        Me.StateTransitionDiagramView.TabIndex = 1
-        Me.StateTransitionDiagramView.Text = "DiagramView1"
+        Me.DiagramView.AllowDrop = True
+        Me.DiagramView.BackColor = System.Drawing.Color.White
+        Me.DiagramView.Behavior = MindFusion.Diagramming.Behavior.DrawLinks
+        Me.DiagramView.ContextMenuStrip = Me.ContextMenuStrip_Diagram
+        Me.DiagramView.ControlHandlesStyle = MindFusion.Diagramming.HandlesStyle.HatchHandles
+        Me.DiagramView.ControlMouseAction = MindFusion.Diagramming.ControlMouseAction.IgnoreControl
+        Me.DiagramView.DelKeyAction = MindFusion.Diagramming.DelKeyAction.DeleteSelectedItems
+        Me.DiagramView.Diagram = Me.Diagram
+        Me.DiagramView.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.DiagramView.Location = New System.Drawing.Point(0, 0)
+        Me.DiagramView.MiddleButtonActions = MindFusion.Diagramming.MouseButtonActions.None
+        Me.DiagramView.ModificationStart = MindFusion.Diagramming.ModificationStart.SelectedOnly
+        Me.DiagramView.Name = "DiagramView"
+        Me.DiagramView.RightButtonActions = MindFusion.Diagramming.MouseButtonActions.Cancel
+        Me.DiagramView.Size = New System.Drawing.Size(891, 530)
+        Me.DiagramView.TabIndex = 1
+        Me.DiagramView.Text = "DiagramView1"
         '
         'ContextMenuStrip_Diagram
         '
@@ -355,7 +355,7 @@ Partial Class frmStateTransitionDiagram
         Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripLabel_ValueType, Me.ComboBox_ValueType})
         Me.ToolStrip1.Location = New System.Drawing.Point(81, 9)
         Me.ToolStrip1.Name = "ToolStrip1"
-        Me.ToolStrip1.Size = New System.Drawing.Size(448, 33)
+        Me.ToolStrip1.Size = New System.Drawing.Size(417, 33)
         Me.ToolStrip1.TabIndex = 11
         Me.ToolStrip1.Text = "ToolStrip1"
         '
@@ -380,7 +380,7 @@ Partial Class frmStateTransitionDiagram
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(891, 530)
         Me.Controls.Add(Me.ToolStrip1)
-        Me.Controls.Add(Me.StateTransitionDiagramView)
+        Me.Controls.Add(Me.DiagramView)
         Me.Controls.Add(Me.HiddenDiagramView)
         Me.Name = "frmStateTransitionDiagram"
         Me.TabText = "State Transition Diagram"
@@ -398,7 +398,7 @@ Partial Class frmStateTransitionDiagram
 
     End Sub
     Friend WithEvents Diagram As MindFusion.Diagramming.Diagram
-    Friend WithEvents StateTransitionDiagramView As MindFusion.Diagramming.WinForms.DiagramView
+    Friend WithEvents DiagramView As MindFusion.Diagramming.WinForms.DiagramView
     Friend WithEvents ContextMenuStrip_Diagram As System.Windows.Forms.ContextMenuStrip
     Friend WithEvents ToolStripSeparator1 As System.Windows.Forms.ToolStripSeparator
     Friend WithEvents ContextMenuStrip_State As System.Windows.Forms.ContextMenuStrip

@@ -645,6 +645,22 @@ Public Class frmMain
                         lfrmToolboxForm.Focus()
                         lfrmToolboxForm.ShapeListBox.Update()
                     End If
+
+                ElseIf TypeOf prApplication.ActivePages(0) Is frmStateTransitionDiagram Then
+
+                    Call Me.LoadToolboxPropertyWindow(prApplication.ActivePages(0).Pane)
+
+                    If IsNothing(zfrm_toolbox) And My.Settings.LoadToolboxWithPage Then
+                        Call Me.LoadToolbox()
+                        Dim lfrmToolboxForm As frmToolbox
+                        lfrmToolboxForm = prApplication.GetToolboxForm(frmToolbox.Name)
+                        lfrmToolboxForm.Focus()
+
+                        lfrmToolboxForm.ShapeListBox.Shapes = MindFusion.Diagramming.ShapeLibrary.LoadFrom(My.Settings.StateTransitionShapeLibrary).Shapes
+
+                        lfrmToolboxForm.ShapeListBox.Update()
+                    End If
+
                 End If
             End If
 
@@ -1360,7 +1376,7 @@ Public Class frmMain
 
     End Function
 
-    Sub load_StateTransitionDiagram_view(ByRef arPage As FBM.Page, ByVal ao_tree_node As TreeNode)
+    Sub load_StateTransitionDiagram_view(ByRef arPage As FBM.Page, ByVal ao_tree_node As TreeNode, Optional ByVal abLoadToolboxes As Boolean = False)
 
         Dim child As New frmStateTransitionDiagram
 
@@ -1390,12 +1406,16 @@ Public Class frmMain
         arPage.Form = child
         arPage.ReferencedForm = child
         arPage.Diagram = child.Diagram
-        arPage.DiagramView = child.StateTransitionDiagramView
+        arPage.DiagramView = child.DiagramView
 
         '---------------------------------------------------------------
         'Setup the 'Page' title details
         '---------------------------------------------------------------        
         Call child.load_StateTransitionDiagram(arPage, ao_tree_node)
+
+        If abLoadToolboxes Then
+            Call Me.ShowHideToolboxes(True)
+        End If
 
     End Sub
 

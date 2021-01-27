@@ -2966,7 +2966,7 @@ Public Class frmToolboxEnterpriseExplorer
                     Case Is = pcenumLanguage.PropertyGraphSchema
                         Call frmMain.load_PGS_diagram_view(lrPage, Me.TreeView.SelectedNode, asSelectModelElementId)
                     Case Is = pcenumLanguage.StateTransitionDiagram
-                        Call frmMain.load_StateTransitionDiagram_view(lrPage, Me.TreeView.SelectedNode)
+                        Call frmMain.load_StateTransitionDiagram_view(lrPage, Me.TreeView.SelectedNode, True)
                 End Select
 
                 'Select Case Me.TreeView.SelectedNode.Tag.MenuType

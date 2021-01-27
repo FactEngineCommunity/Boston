@@ -39,6 +39,8 @@ Public Class frmStateTransitionDiagram
 
         Call Me.SetupForm()
 
+        prApplication.ActivePages.AddUnique(Me)
+
     End Sub
 
     Sub SetupForm()
@@ -108,7 +110,7 @@ Public Class frmStateTransitionDiagram
     End Sub
 
 
-    Private Sub UseCaseDiagramView_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles StateTransitionDiagramView.Click
+    Private Sub UseCaseDiagramView_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles DiagramView.Click
 
         '---------------------------------------------------------------
         'Update the Working Environment within the Main form so that
@@ -148,24 +150,24 @@ Public Class frmStateTransitionDiagram
 
     End Sub
 
-    Private Sub UseCaseDiagramView_DoubleClick(ByVal sender As Object, ByVal e As System.EventArgs) Handles StateTransitionDiagramView.DoubleClick
+    Private Sub UseCaseDiagramView_DoubleClick(ByVal sender As Object, ByVal e As System.EventArgs) Handles DiagramView.DoubleClick
 
         '---------------------------------------
         'Only allow 'InPlaceEdit' on Processes
         '---------------------------------------
         If Me.Diagram.Selection.Items.Count = 1 Then
             If Me.Diagram.Selection.Items(0).Tag.ConceptType = pcenumConceptType.Process Then
-                Me.StateTransitionDiagramView.AllowInplaceEdit = True
+                Me.DiagramView.AllowInplaceEdit = True
             Else
-                Me.StateTransitionDiagramView.AllowInplaceEdit = False
+                Me.DiagramView.AllowInplaceEdit = False
             End If
         Else
-            Me.StateTransitionDiagramView.AllowInplaceEdit = False
+            Me.DiagramView.AllowInplaceEdit = False
         End If
 
     End Sub
 
-    Private Sub UseCaseDiagramView_DragDrop(ByVal sender As Object, ByVal e As System.Windows.Forms.DragEventArgs) Handles StateTransitionDiagramView.DragDrop
+    Private Sub UseCaseDiagramView_DragDrop(ByVal sender As Object, ByVal e As System.Windows.Forms.DragEventArgs) Handles DiagramView.DragDrop
 
         Dim liInd As Integer = 0
         Dim lsMessage As String = ""
@@ -183,8 +185,8 @@ Public Class frmStateTransitionDiagram
 
             If lnode_dragged_node.Index >= 0 Then
                 If lnode_dragged_node.Index < lrToolboxForm.ShapeListBox.ShapeCount Then
-                    Dim p As Point = Me.StateTransitionDiagramView.PointToClient(New Point(e.X, e.Y))
-                    Dim pt As PointF = Me.StateTransitionDiagramView.ClientToDoc(New Point(p.X, p.Y))
+                    Dim p As Point = Me.DiagramView.PointToClient(New Point(e.X, e.Y))
+                    Dim pt As PointF = Me.DiagramView.ClientToDoc(New Point(p.X, p.Y))
 
                     Select Case lrToolboxForm.ShapeListBox.Shapes(lnode_dragged_node.Index).Id
                         Case Is = "State"
@@ -465,7 +467,7 @@ Public Class frmStateTransitionDiagram
                 lrRecordset.MoveNext()
             End While
 
-            Me.StateTransitionDiagramView.SendToBack()
+            Me.DiagramView.SendToBack()
             Me.HiddenDiagramView.SendToBack()
 
             Call Me.reset_node_and_link_colors()
@@ -531,10 +533,10 @@ Public Class frmStateTransitionDiagram
 
     End Sub
 
-    Private Sub UseCaseDiagramView_DragOver(ByVal sender As Object, ByVal e As System.Windows.Forms.DragEventArgs) Handles StateTransitionDiagramView.DragOver
+    Private Sub UseCaseDiagramView_DragOver(ByVal sender As Object, ByVal e As System.Windows.Forms.DragEventArgs) Handles DiagramView.DragOver
 
-        Dim p As Point = Me.StateTransitionDiagramView.PointToClient(New Point(e.X, e.Y))
-        Dim lo_point As PointF = Me.StateTransitionDiagramView.ClientToDoc(New Point(p.X, p.Y))
+        Dim p As Point = Me.DiagramView.PointToClient(New Point(e.X, e.Y))
+        Dim lo_point As PointF = Me.DiagramView.ClientToDoc(New Point(p.X, p.Y))
         Dim loNode As MindFusion.Diagramming.DiagramNode
 
 
@@ -655,6 +657,8 @@ Public Class frmStateTransitionDiagram
         ''Me.StateTransitionDiagram.Stat.Add(lrStartIndicator )
 
         'loDroppedNode.Tag = lrStartIndicator
+        arStartIndicator.X = aoPtf.X
+        arStartIndicator.Y = aoPtf.Y
         Me.zrPage.STDiagram.StartIndicator = arStartIndicator
         arStartIndicator.DisplayAndAssociate()
 
@@ -842,7 +846,7 @@ Public Class frmStateTransitionDiagram
                 Me.zrPage.SelectedObject.Clear()
                 Me.zrPage.SelectedObject.Add(Me.Diagram.Selection.Items(0).Tag)
 
-                Me.StateTransitionDiagramView.ContextMenuStrip = ContextMenuStrip_ProcessLink
+                Me.DiagramView.ContextMenuStrip = ContextMenuStrip_ProcessLink
 
         End Select
 
@@ -850,7 +854,7 @@ Public Class frmStateTransitionDiagram
 
     Private Sub Diagram_NodeDoubleClicked(ByVal sender As Object, ByVal e As MindFusion.Diagramming.NodeEventArgs) Handles Diagram.NodeDoubleClicked
 
-        Me.StateTransitionDiagramView.Behavior = Behavior.DrawLinks
+        Me.DiagramView.Behavior = Behavior.DrawLinks
         Me.Diagram.Invalidate()
         Me.Diagram.Selection.Clear()
         Me.Cursor = Cursors.Hand
@@ -967,16 +971,16 @@ Public Class frmStateTransitionDiagram
         '----------------------------------------------------
         Select Case Me.Diagram.Selection.Items(0).Tag.ConceptType
             Case Is = pcenumConceptType.State
-                Me.StateTransitionDiagramView.ContextMenuStrip = ContextMenuStrip_State
+                Me.DiagramView.ContextMenuStrip = ContextMenuStrip_State
             Case Else
-                Me.StateTransitionDiagramView.ContextMenuStrip = ContextMenuStrip_Diagram
+                Me.DiagramView.ContextMenuStrip = ContextMenuStrip_Diagram
         End Select
 
         Me.zrPage.SelectedObject.Add(e.Node.Tag)
 
     End Sub
 
-    Private Sub UseCaseDiagramView_GotFocus(ByVal sender As Object, ByVal e As System.EventArgs) Handles StateTransitionDiagramView.GotFocus
+    Private Sub UseCaseDiagramView_GotFocus(ByVal sender As Object, ByVal e As System.EventArgs) Handles DiagramView.GotFocus
 
         Call SetToolbox()
 
@@ -984,14 +988,14 @@ Public Class frmStateTransitionDiagram
 
     End Sub
 
-    Private Sub UseCaseDiagramView_MouseDown(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles StateTransitionDiagramView.MouseDown
+    Private Sub UseCaseDiagramView_MouseDown(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles DiagramView.MouseDown
 
         Dim lo_point As System.Drawing.PointF
         Dim loNode As Object
 
-        lo_point = Me.StateTransitionDiagramView.ClientToDoc(e.Location)
+        lo_point = Me.DiagramView.ClientToDoc(e.Location)
 
-        Me.StateTransitionDiagramView.SmoothingMode = SmoothingMode.AntiAlias
+        Me.DiagramView.SmoothingMode = SmoothingMode.AntiAlias
 
         '--------------------------------------------------
         'Just to be sure...set the Richmond.WorkingProject
@@ -1018,7 +1022,7 @@ Public Class frmStateTransitionDiagram
             'Get the Node/Shape under the mouse cursor.
             '----------------------------------------------------
             loNode = Diagram.GetNodeAt(lo_point)
-            Me.StateTransitionDiagramView.DrawLinkCursor = Cursors.Hand
+            Me.DiagramView.DrawLinkCursor = Cursors.Hand
             Cursor.Show()
 
             If IsSomething(lrPropertyGridForm) And IsSomething(loNode) Then
@@ -1144,7 +1148,7 @@ Public Class frmStateTransitionDiagram
             prApplication.WorkingPage.SelectedObject.Clear()
             Me.Diagram.Selection.Clear()
 
-            Me.StateTransitionDiagramView.ContextMenuStrip = ContextMenuStrip_Diagram
+            Me.DiagramView.ContextMenuStrip = ContextMenuStrip_Diagram
 
             Me.Diagram.AllowUnconnectedLinks = False
 
@@ -1155,7 +1159,7 @@ Public Class frmStateTransitionDiagram
             '  NB See Diagram.DoubleClick where if a 'Process' is DoubleClicked on,
             '  then 'InPlaceEdit' is temporarily allowed.
             '------------------------------------------------------------------------------
-            Me.StateTransitionDiagramView.AllowInplaceEdit = False
+            Me.DiagramView.AllowInplaceEdit = False
 
             '----------------------------------------------------------------------------------------------------------------------
             'If the PropertiesForm is loaded, set the 'SelectedObject' property of the PropertyGrid to the StateTransitionDiagram.
@@ -1184,14 +1188,14 @@ Public Class frmStateTransitionDiagram
 
     End Sub
 
-    Private Sub UseCaseDiagramView_MouseUp(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles StateTransitionDiagramView.MouseUp
+    Private Sub UseCaseDiagramView_MouseUp(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles DiagramView.MouseUp
 
         Dim liInd As Integer = 0
         Dim lo_point As System.Drawing.PointF
         Dim loObject As Object
         Dim loNode As DiagramNode
 
-        StateTransitionDiagramView.SmoothingMode = SmoothingMode.Default
+        DiagramView.SmoothingMode = SmoothingMode.Default
 
         '----------------------------------------------------
         'Check to see if the user has used the Control key to
@@ -1296,7 +1300,7 @@ Public Class frmStateTransitionDiagram
 
     End Sub
 
-    Private Sub UseCaseDiagramView_MouseWheel(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles StateTransitionDiagramView.MouseWheel
+    Private Sub UseCaseDiagramView_MouseWheel(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles DiagramView.MouseWheel
 
         Select Case e.Delta
             Case Is = 0
@@ -1415,7 +1419,7 @@ Public Class frmStateTransitionDiagram
         'Me.StateTransitionDiagramView.CopyToClipboard(False)
 
         Me.HiddenDiagram.Nodes.Clear()
-        Call Me.StateTransitionDiagramView.SendToBack()
+        Call Me.DiagramView.SendToBack()
         Call Me.HiddenDiagramView.BringToFront()
 
 
@@ -1486,7 +1490,7 @@ Public Class frmStateTransitionDiagram
 
 
         Me.HiddenDiagram.Nodes.Clear()
-        Call Me.StateTransitionDiagramView.SendToBack()
+        Call Me.DiagramView.SendToBack()
         Call Me.HiddenDiagramView.BringToFront()
 
         '--------------------------------------------------------------
@@ -1564,7 +1568,7 @@ Public Class frmStateTransitionDiagram
 
             frmMain.zfrmModelExplorer.TreeView.SelectedNode = Me.MorphVector(0).EnterpriseTreeView.TreeNode
             Call frmMain.zfrmModelExplorer.EditPageToolStripMenuItem_Click(sender, e)
-            Me.StateTransitionDiagramView.BringToFront()
+            Me.DiagramView.BringToFront()
             Me.Diagram.Invalidate()
             Me.MorphTimer.Enabled = False
 
@@ -1580,7 +1584,7 @@ Public Class frmStateTransitionDiagram
             End If
         End If
 
-        Me.StateTransitionDiagramView.SendToBack()
+        Me.DiagramView.SendToBack()
         Me.HiddenDiagramView.SendToBack()
 
         Me.ComboBox_ValueType.Visible = True
