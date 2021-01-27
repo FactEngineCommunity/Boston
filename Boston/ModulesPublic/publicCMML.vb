@@ -18,7 +18,6 @@ Public Enum pcenumCMMLRelations
         'STDs (State Transition Diagrams)
         '---------------------------------------------
         CoreValueTypeIsSubtypeStateControlled
-        CoreStateTransitionIsForValueType
         CoreValueTypeHasStartCoreElementState
         CoreValueTypeHasEndCoreElementState
         CoreStateTransition

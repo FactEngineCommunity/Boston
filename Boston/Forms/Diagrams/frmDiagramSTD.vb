@@ -168,7 +168,7 @@ Public Class frmStateTransitionDiagram
     Private Sub UseCaseDiagramView_DragDrop(ByVal sender As Object, ByVal e As System.Windows.Forms.DragEventArgs) Handles StateTransitionDiagramView.DragDrop
 
         Dim liInd As Integer = 0
-        Dim ls_message As String = ""
+        Dim lsMessage As String = ""
         Dim loNode As New ShapeNode
         Dim li_language_id As pcenumLanguage
 
@@ -189,20 +189,51 @@ Public Class frmStateTransitionDiagram
                     Select Case lrToolboxForm.ShapeListBox.Shapes(lnode_dragged_node.Index).Id
                         Case Is = "State"
 
+                            If Me.zrPage.STDiagram.ValueType Is Nothing Then
+                                lsMessage = "Select a Value Type for this Page before adding States."
+                                lsMessage &= vbCrLf & vbCrLf
+                                lsMessage.AppendString("NB States are effectively Value Constraints over Value Types.")
+                                MsgBox(lsMessage)
+                                Exit Sub
+                            End If
+
                             'Use the frmDialogSelectValueTypeState
-                            Using lfrmStateSelectDialog As New frmDialogSelectValueTypeState(Me.zrPage.Model)
+                            Using lfrmStateSelectDialog As New frmDialogSelectValueTypeState(Me.zrPage.Model, Me.zrPage.STDiagram.ValueType)
 
-                                If lfrmStateSelectDialog.ShowDialog = DialogResult.OK Then
+                                Select Case lfrmStateSelectDialog.ShowDialog
+                                    Case = DialogResult.Yes
+                                        'STM Level
+                                        Dim lrSTMState = Me.zrPage.Model.createCMMLState(Me.zrPage.STDiagram.ValueType, "New State")
 
-                                    Dim lrSTMState = Me.zrPage.Model.createCMMLState(Me.zrPage.STDiagram.ValueType, "New State")
+                                        'Page Level
+                                        Dim lrSTDState As New STD.State(Me.zrPage)
+                                        lrSTDState.Concept = New FBM.Concept("New State")
+                                        lrSTDState.StateName = "New State"
+                                        lrSTDState.STMState = lrSTMState
+                                        Call Me.dropStateAtPoint(lrSTDState, pt)
 
-                                    Dim lrSTDState As New STD.State(Me.zrPage)
-                                    lrSTDState.Concept = New FBM.Concept("New State")
-                                    lrSTDState.StateName = "New State"
-                                    lrSTDState.STMState = lrSTMState
-                                    Call Me.dropStateAtPoint(lrSTDState, pt)
+                                    Case = DialogResult.OK
 
-                                End If
+                                        'STM Level
+                                        Dim lrSTMState = Me.zrPage.STDiagram.STM.State.Find(Function(x) x.Name = lfrmStateSelectDialog.msState)
+
+                                        If lrSTMState Is Nothing Then
+                                            lrSTMState = Me.zrPage.Model.createCMMLState(Me.zrPage.STDiagram.ValueType, lfrmStateSelectDialog.msState)
+                                        End If
+
+                                        'Add to Page if isn't already on the Page
+                                        If Me.zrPage.STDiagram.State.Find(Function(x) x.StateName = lfrmStateSelectDialog.msState) Is Nothing Then
+                                            'Page Level
+                                            Dim lrSTDState As New STD.State(Me.zrPage)
+                                            lrSTDState.Concept = New FBM.Concept("New State")
+                                            lrSTDState.StateName = "New State"
+                                            lrSTDState.STMState = lrSTMState
+                                            Call Me.dropStateAtPoint(lrSTDState, pt)
+                                        Else
+                                            MsgBox("This Page already containst the State, '" & lfrmStateSelectDialog.msState & "'")
+                                        End If
+
+                                End Select
                             End Using
 
 
@@ -259,7 +290,7 @@ Public Class frmStateTransitionDiagram
             Me.zrPage.STDiagram.STM = Me.zrPage.Model.STM
 
             lsSQLQuery = "SELECT *"
-            lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreStateTransitionIsForValueType.ToString
+            lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreStateTransition.ToString
             lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
 
             lrRecordset = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
@@ -679,7 +710,8 @@ Public Class frmStateTransitionDiagram
         loSecondEntity = e.Link.Destination.Tag
 
         If (loFirstEntity.ConceptType = pcenumConceptType.StartStateIndicator) And (loSecondEntity.ConceptType = pcenumConceptType.State) Then
-
+            '=====================================
+            'Start State Transition
             Dim lrStartState As STD.State = loSecondEntity
 
             If Me.zrPage.STDiagram.State.FindAll(Function(x) x.IsStartState).Count = 0 Then
@@ -729,7 +761,8 @@ Public Class frmStateTransitionDiagram
             End If
 
         ElseIf (loFirstEntity.ConceptType = pcenumConceptType.State) And (loSecondEntity.ConceptType = pcenumConceptType.State) Then
-
+            '=====================================
+            'State Transition
             Dim lrFromState As STD.State = loFirstEntity
             Dim lrToState As STD.State = loSecondEntity
 

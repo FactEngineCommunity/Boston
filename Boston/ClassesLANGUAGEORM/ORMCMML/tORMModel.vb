@@ -126,11 +126,12 @@ Namespace FBM
             Try
 
                 Dim lsSQLQuery As String
-                Dim lrFact, lrFact2 As FBM.Fact
+                Dim lrFact As FBM.Fact
 
                 lsSQLQuery = "INSERT INTO " & pcenumCMMLRelations.CoreStateTransition.ToString
-                lsSQLQuery &= " (Concept1, Concept2, Event)"
+                lsSQLQuery &= " (ValueType, Concept1, Concept2, Event)"
                 lsSQLQuery &= " VALUES ("
+                lsSQLQuery &= "'" & arStateTransition.ValueType.Id & "'"
                 lsSQLQuery &= "'" & arStateTransition.FromState.Name & "'"
                 lsSQLQuery &= ",'" & arStateTransition.ToState.Name & "'"
                 lsSQLQuery &= ",'" & arStateTransition.Event & "'"
@@ -139,16 +140,6 @@ Namespace FBM
                 lrFact = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
                 arStateTransition.Id = lrFact.Id
-
-                'NB StateTransition (below) is the Fact.Id of the Fact that is the StateTransition.
-                lsSQLQuery = "INSERT INTO " & pcenumCMMLRelations.CoreStateTransitionIsForValueType.ToString
-                lsSQLQuery &= " (ValueType, StateTransition)"
-                lsSQLQuery &= " VALUES ("
-                lsSQLQuery &= "'" & arStateTransition.ValueType.Id & "'"
-                lsSQLQuery &= ",'" & lrFact.Id & "'"
-                lsSQLQuery &= " )"
-
-                lrFact2 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
                 arStateTransition.Fact = lrFact
 
@@ -1070,15 +1061,10 @@ Namespace FBM
                 Dim lsSQLQuery As String = ""
 
                 lsSQLQuery = "DELETE FROM " & pcenumCMMLRelations.CoreStateTransition.ToString
-                lsSQLQuery &= " WHERE Concept1 = '" & arStateTransition.FromState.Name & "'"
+                lsSQLQuery &= " WHERE ValueType = '" & arStateTransition.ValueType.Id & "'"
+                lsSQLQuery &= " AND Concept1 = '" & arStateTransition.FromState.Name & "'"
                 lsSQLQuery &= " AND Concept2 = '" & arStateTransition.ToState.Name & "'"
                 lsSQLQuery &= " AND Event = '" & arStateTransition.Event & "'"
-
-                Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-                lsSQLQuery = "DELETE FROM " & pcenumCMMLRelations.CoreStateTransitionIsForValueType.ToString
-                lsSQLQuery &= " WHERE ValueType = '" & arStateTransition.ValueType.Id & "'"
-                lsSQLQuery &= " AND StateTransition = '" & arStateTransition.Id & "'"
 
                 Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 

@@ -10,7 +10,7 @@ Namespace FBM
         ''' <summary>
         ''' Handles the event when a new EndStateTransition is added to the (ST) Model.
         ''' </summary>
-        ''' <param name="arEndStateTranstion"></param>
+        ''' <param name="arEndStateTransition"></param>
         Private Sub STModel_EndStateTransitionAdded(ByRef arEndStateTransition As EndStateTransition) Handles STModel.EndStateTransitionAdded
 
             If Not Me.Language = pcenumLanguage.StateTransitionDiagram Then Exit Sub

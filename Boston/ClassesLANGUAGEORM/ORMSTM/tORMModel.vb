@@ -37,8 +37,7 @@ Namespace FBM
                 Dim lsMessage As String = ""
 
                 Dim lsSQLQuery As String = ""
-                Dim lrORMRecordset,
-                    lrORMRecordset2 As ORMQL.Recordset
+                Dim lrORMRecordset As ORMQL.Recordset
 
                 lsSQLQuery = " SELECT *"
                 lsSQLQuery &= "  FROM " & pcenumCMMLRelations.CoreStateTransition.ToString
@@ -57,13 +56,7 @@ Namespace FBM
                 'StateTransitions
                 While Not lrORMRecordset.EOF
 
-                    lsSQLQuery = "SELECT *"
-                    lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreStateTransitionIsForValueType.ToString
-                    lsSQLQuery &= " WHERE StateTransition = '" & lrORMRecordset.CurrentFact.Id & "'"
-
-                    lrORMRecordset2 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-                    lrValueType = Me.ValueType.Find(Function(x) x.Id = lrORMRecordset2("ValueType").Data)
+                    lrValueType = Me.ValueType.Find(Function(x) x.Id = lrORMRecordset("ValueType").Data)
 
                     lrFromState = New STM.State
                     lrFromState.ValueType = lrValueType
