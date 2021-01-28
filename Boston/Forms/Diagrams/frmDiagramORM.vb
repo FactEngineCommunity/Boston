@@ -7861,8 +7861,11 @@ Public Class frmDiagramORM
             Case Is = pcenumConceptType.FactType
                 lrFactTypeInstance = Me.zrPage.SelectedObject(0)
         End Select
+
         lrFactType = lrFactTypeInstance.FactType
         lr_model = lrFactType.Model
+
+        Me.ToolStripMenuItemAddRole.Enabled = Not lrFactType.IsLinkFactType
 
         '----------------------------------------------------------------------------------------------
         'If the FactType is a LinkFactType then the user can't remove the FactType from the Model,
@@ -10908,4 +10911,28 @@ Public Class frmDiagramORM
 
 
     End Sub
+
+    Private Sub AddRoleToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItemAddRole.Click
+
+        Dim lrFactTypeInstance As FBM.FactTypeInstance
+
+        Try
+            lrFactTypeInstance = Me.zrPage.SelectedObject(0)
+
+            Dim lrRole As New FBM.Role(lrFactTypeInstance.FactType, Nothing)
+
+            Call lrFactTypeInstance.FactType.AddRole(lrRole, True)
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+
+    End Sub
+
 End Class

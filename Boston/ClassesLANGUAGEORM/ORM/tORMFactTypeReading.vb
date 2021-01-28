@@ -777,7 +777,9 @@ Namespace FBM
                     liSequenceNr += 1
 
                     arVerbaliser.VerbalisePredicateText(lrPredicatePart.PreBoundText)
-                    arVerbaliser.VerbaliseModelObject(lrPredicatePart.Role.JoinedORMObject)
+                    If lrPredicatePart.Role.JoinedORMObject IsNot Nothing Then
+                        arVerbaliser.VerbaliseModelObject(lrPredicatePart.Role.JoinedORMObject)
+                    End If
 
                     If Me.FactType.IsLinkFactType Then
                         Dim larRole = From Role In Me.FactType.LinkFactTypeRole.FactType.RoleGroup _

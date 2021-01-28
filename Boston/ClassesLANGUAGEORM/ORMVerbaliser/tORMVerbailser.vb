@@ -117,11 +117,16 @@ Namespace FBM
 
         Public Sub VerbaliseModelObject(ByRef arModelObject As FBM.ModelObject)
 
-            Me.HTW.AddAttribute(HtmlTextWriterAttribute.Class, "objectType")
-            Me.HTW.AddAttribute(HtmlTextWriterAttribute.Href, "elementid:" & arModelObject.Id)
-            Me.HTW.RenderBeginTag(HtmlTextWriterTag.A)
-            Me.HTW.Write(arModelObject.Id)
-            Me.HTW.RenderEndTag()
+            If arModelObject IsNot Nothing Then
+                Me.HTW.AddAttribute(HtmlTextWriterAttribute.Class, "objectType")
+                Me.HTW.AddAttribute(HtmlTextWriterAttribute.Href, "elementid:" & arModelObject.Id)
+                Me.HTW.RenderBeginTag(HtmlTextWriterTag.A)
+                Me.HTW.Write(arModelObject.Id)
+                Me.HTW.RenderEndTag()
+            Else
+                Me.HTW.Write("''")
+            End If
+
 
         End Sub
 

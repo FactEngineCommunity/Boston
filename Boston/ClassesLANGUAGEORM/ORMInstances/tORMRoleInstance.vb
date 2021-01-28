@@ -550,6 +550,14 @@ Namespace FBM
                     'Drop relative to other Roles in the FactType
                     '----------------------------------------------
                     loDroppedNode = Me.Page.Diagram.Factory.CreateShapeNode(Me._X + (arFactTypeInstance.RoleGroup(0).Shape.Bounds.Width * (Me.SequenceNr - 1)), Me._Y, 6, 4, Shapes.Rectangle)
+
+                    '--------------------------------------------------------------------------------------
+                    'Resize the FactType.Shape and reset the position of the RoleGroup within the factType
+                    '--------------------------------------------------------------------------------------
+                    Dim lo_rectangle As New Rectangle(Me.FactType.Shape.Bounds.X, Me.FactType.Shape.Bounds.Y, ((Me.FactType.RoleGroup(0).Shape.Bounds.Width * Me.FactType.Arity) + 6), 15)
+
+                    Me.FactType.Shape.SetRect(lo_rectangle, False)
+
                     loDroppedNode.AttachTo(arFactTypeInstance.Shape, AttachToNode.BottomCenter)
                 End If
 
@@ -635,8 +643,18 @@ Namespace FBM
                 '--------------------------------------------------------------------------------------
                 'Resize the FactType.Shape and reset the position of the RoleGroup within the factType
                 '--------------------------------------------------------------------------------------
-                Dim lo_rectangle As New Rectangle(Me.FactType.Shape.Bounds.X, Me.FactType.Shape.Bounds.Y, ((Me.FactType.RoleGroup(0).Shape.Bounds.Width * Me.FactType.Arity) + 6), 15)
-                Me.FactType.Shape.SetRect(lo_rectangle, False)
+                'Dim lo_rectangle As New Rectangle(Me.FactType.Shape.Bounds.X, Me.FactType.Shape.Bounds.Y, ((Me.FactType.RoleGroup(0).Shape.Bounds.Width * Me.FactType.Arity) + 6), 15)
+
+                'Me.FactType.Shape.SetRect(lo_rectangle, False)
+
+                'Just to be sure.
+                If Me.FactType.RoleGroup.Count > 0 Then
+                    If Me.FactType.RoleGroup(0).Shape IsNot Nothing Then
+                        Me.Shape.Move(Me.X, Me.FactType.RoleGroup(0).Shape.Bounds.Y)
+                    End If
+                End If
+
+
 
                 '------------------------------------------
                 'Set the AnchorPatterns for the RoleGroup

@@ -131,10 +131,12 @@ Public Class frmToolboxORMVerbalisation
             lrVerbaliser.HTW.WriteBreak()
 
             'LINQ
-            Dim FactType = From ft In zrModel.FactType, _
-                                rl In ft.RoleGroup _
-                                Where rl.JoinedORMObject.Id = arEntityType.Id _
-                                Select ft Distinct            
+            Dim larFactType = zrModel.FactType.FindAll(Function(x) x.allRolesJoinSomething)
+
+            Dim FactType = From ft In larFactType,
+                                rl In ft.RoleGroup
+                           Where rl.JoinedORMObject.Id = arEntityType.Id
+                           Select ft Distinct
 
             For Each lrFactType In FactType
 
