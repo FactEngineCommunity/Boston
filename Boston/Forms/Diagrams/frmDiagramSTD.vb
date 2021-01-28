@@ -295,37 +295,41 @@ Public Class frmStateTransitionDiagram
             Me.zrPage.STDiagram = New STD.Diagram(Me.zrPage)
             Me.zrPage.STDiagram.STM = Me.zrPage.Model.STM
 
+            '=================================================
+            'Start with no ValueType selected
+            Dim lsValueTypeId As String = ""
+            Me.ComboBox_ValueType.SelectedIndex = -1
+
             lsSQLQuery = "SELECT *"
             lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreStateTransition.ToString
             lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
 
             lrRecordset = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
-
-
-            'lrFactTypeInstance = arPage.FactTypeInstance.Find(Function(p) p.Id = pcenumCMMLRelations.CoreStateTransitionIsForValueType.ToString)
-            'Me.StateTransitionDiagram.StateTransitionValueType = lrFactTypeInstance
-
-            'Dim ValueTypeIdList = From Fact In lrFactTypeInstance.Fact
-            '                      From FactDataInstance In Fact.Data
-            '                      Where FactDataInstance.Role.Name = pcenumCMML.ValueType.ToString
-            '                      Select FactDataInstance.Data Distinct
-
-            Dim lsValueTypeId As String = ""
-
-            'For Each lsValueTypeId In ValueTypeIdList
-            '    Exit For
-            'Next
-
             If lrRecordset.Facts.Count > 0 Then
                 lsValueTypeId = lrRecordset("ValueType").Data
-
-                Me.ComboBox_ValueType.SelectedIndex = Me.ComboBox_ValueType.FindString(lsValueTypeId)
-                Me.zrPage.STDiagram.ValueType = Me.zrPage.Model.ValueType.Find(Function(x) x.Id = lsValueTypeId)
-                Me.ComboBox_ValueType.Enabled = False
             Else
-                Me.ComboBox_ValueType.SelectedIndex = -1
+                lsSQLQuery = "SELECT *"
+                lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreValueTypeHasStartCoreElementState.ToString
+                lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
+
+                lrRecordset = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                If lrRecordset.Facts.Count > 0 Then
+                    lsValueTypeId = lrRecordset("ValueType").Data
+                End If
             End If
+
+            '---------------------------------------------------------------------
+            'If there is no ValueType for the Page, then there is nothing to show
+            If lsValueTypeId = "" Then
+                Me.zrPage.FormLoaded = True
+                Exit Sub
+            End If
+
+            Me.ComboBox_ValueType.SelectedIndex = Me.ComboBox_ValueType.FindString(lsValueTypeId)
+            Me.zrPage.STDiagram.ValueType = Me.zrPage.Model.ValueType.Find(Function(x) x.Id = lsValueTypeId)
+            Me.ComboBox_ValueType.Enabled = False
 
             '------------------------------------------------------------
             'PSEUDOCODE

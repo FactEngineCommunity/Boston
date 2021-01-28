@@ -1640,7 +1640,7 @@ Namespace FBM
                 'JoinedORMObject may be nothing when dropping a new Role onto an existing FactType(Instance)
                 '  through the GUI.
                 '--------------------------------------------------------------------------------------------
-                If (loa Is Nothing) And (loa Is Nothing) Then
+                If (loa Is Nothing) And (lob Is Nothing) Then
                     Throw New Exception("Error: Two RoleInstances with JoinedORMObject = Nothing.")
                 ElseIf loa Is Nothing Then
                     Return lob.x

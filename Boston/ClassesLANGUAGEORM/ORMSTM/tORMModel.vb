@@ -94,7 +94,17 @@ Namespace FBM
 
                     lrState = New STM.State(Me.STM, lrValueType, lrORMRecordset("CoreElement").Data)
 
-                    Me.STM.State.Find(AddressOf lrState.Equals).IsStart = True
+                    lrState = Me.STM.State.Find(AddressOf lrState.Equals)
+                    If lrState Is Nothing Then
+                        lrToState = New STM.State
+                        lrToState.ValueType = lrValueType
+                        lrToState.Name = lrORMRecordset("CoreElement").Data
+                        lrToState.Model = Me.STM
+
+                        Me.STM.State.AddUnique(lrToState)
+                    Else
+                        lrState.IsStart = True
+                    End If
 
                     lrORMRecordset.MoveNext()
                 End While
