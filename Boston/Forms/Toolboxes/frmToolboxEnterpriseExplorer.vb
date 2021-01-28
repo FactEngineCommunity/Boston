@@ -1574,6 +1574,8 @@ Public Class frmToolboxEnterpriseExplorer
             End If
             lrPage = lrCorePage.Clone(lrModel, False, True, False) 'Injects the lrCorePage's Model Elements into the Model. No need to do anything more with the lrCorePage at all.
 
+            'Set the CoreModel VersionNr of the Model.
+            lrModel.CoreVersionNumber = prApplication.CMML.Core.CoreVersionNumber
 
             lrModel.RDSCreated = True
             '==================================================
