@@ -24,7 +24,6 @@ Partial Class frmStateTransitionDiagram
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container()
         Me.Diagram = New MindFusion.Diagramming.Diagram()
-        Me.DiagramView = New MindFusion.Diagramming.WinForms.DiagramView()
         Me.ContextMenuStrip_Diagram = New System.Windows.Forms.ContextMenuStrip(Me.components)
         Me.ViewToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolboxToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
@@ -58,13 +57,18 @@ Partial Class frmStateTransitionDiagram
         Me.UseCToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripSeparator5 = New System.Windows.Forms.ToolStripSeparator()
         Me.mnuOption_EntityTypeProperties = New System.Windows.Forms.ToolStripMenuItem()
-        Me.HiddenDiagramView = New MindFusion.Diagramming.WinForms.DiagramView()
         Me.HiddenDiagram = New MindFusion.Diagramming.Diagram()
         Me.MorphTimer = New System.Windows.Forms.Timer(Me.components)
         Me.MorphStepTimer = New System.Windows.Forms.Timer(Me.components)
         Me.ToolStrip1 = New System.Windows.Forms.ToolStrip()
         Me.ToolStripLabel_ValueType = New System.Windows.Forms.ToolStripLabel()
         Me.ComboBox_ValueType = New System.Windows.Forms.ToolStripComboBox()
+        Me.AutoLayoutToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripSeparator7 = New System.Windows.Forms.ToolStripSeparator()
+        Me.DiagramView = New MindFusion.Diagramming.WinForms.DiagramView()
+        Me.Diagram1 = New MindFusion.Diagramming.Diagram()
+        Me.HiddenDiagramView = New MindFusion.Diagramming.WinForms.DiagramView()
+        Me.Diagram2 = New MindFusion.Diagramming.Diagram()
         Me.ContextMenuStrip_Diagram.SuspendLayout()
         Me.ContextMenuStrip_State.SuspendLayout()
         Me.ContextMenuStrip_Process.SuspendLayout()
@@ -92,31 +96,11 @@ Partial Class frmStateTransitionDiagram
         Me.Diagram.ShowAnchors = MindFusion.Diagramming.ShowAnchors.Always
         Me.Diagram.ShowHandlesOnDrag = False
         '
-        'DiagramView
-        '
-        Me.DiagramView.AllowDrop = True
-        Me.DiagramView.BackColor = System.Drawing.Color.White
-        Me.DiagramView.Behavior = MindFusion.Diagramming.Behavior.DrawLinks
-        Me.DiagramView.ContextMenuStrip = Me.ContextMenuStrip_Diagram
-        Me.DiagramView.ControlHandlesStyle = MindFusion.Diagramming.HandlesStyle.HatchHandles
-        Me.DiagramView.ControlMouseAction = MindFusion.Diagramming.ControlMouseAction.IgnoreControl
-        Me.DiagramView.DelKeyAction = MindFusion.Diagramming.DelKeyAction.DeleteSelectedItems
-        Me.DiagramView.Diagram = Me.Diagram
-        Me.DiagramView.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.DiagramView.Location = New System.Drawing.Point(0, 0)
-        Me.DiagramView.MiddleButtonActions = MindFusion.Diagramming.MouseButtonActions.None
-        Me.DiagramView.ModificationStart = MindFusion.Diagramming.ModificationStart.SelectedOnly
-        Me.DiagramView.Name = "DiagramView"
-        Me.DiagramView.RightButtonActions = MindFusion.Diagramming.MouseButtonActions.Cancel
-        Me.DiagramView.Size = New System.Drawing.Size(891, 530)
-        Me.DiagramView.TabIndex = 1
-        Me.DiagramView.Text = "DiagramView1"
-        '
         'ContextMenuStrip_Diagram
         '
-        Me.ContextMenuStrip_Diagram.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ViewToolStripMenuItem, Me.ShowHideToolStripMenuItem, Me.ToolStripSeparator1, Me.CopyToolStripMenuItem})
+        Me.ContextMenuStrip_Diagram.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ViewToolStripMenuItem, Me.ShowHideToolStripMenuItem, Me.ToolStripSeparator1, Me.AutoLayoutToolStripMenuItem, Me.ToolStripSeparator7, Me.CopyToolStripMenuItem})
         Me.ContextMenuStrip_Diagram.Name = "ContextMenuStrip_Diagram"
-        Me.ContextMenuStrip_Diagram.Size = New System.Drawing.Size(208, 76)
+        Me.ContextMenuStrip_Diagram.Size = New System.Drawing.Size(208, 126)
         '
         'ViewToolStripMenuItem
         '
@@ -127,6 +111,7 @@ Partial Class frmStateTransitionDiagram
         '
         'ToolboxToolStripMenuItem
         '
+        Me.ToolboxToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.Toolbox16x16B_W
         Me.ToolboxToolStripMenuItem.Name = "ToolboxToolStripMenuItem"
         Me.ToolboxToolStripMenuItem.Size = New System.Drawing.Size(208, 22)
         Me.ToolboxToolStripMenuItem.Text = "&Toolbox"
@@ -317,23 +302,6 @@ Partial Class frmStateTransitionDiagram
         Me.mnuOption_EntityTypeProperties.Size = New System.Drawing.Size(133, 22)
         Me.mnuOption_EntityTypeProperties.Text = "&Properties"
         '
-        'HiddenDiagramView
-        '
-        Me.HiddenDiagramView.Behavior = MindFusion.Diagramming.Behavior.LinkShapes
-        Me.HiddenDiagramView.ControlHandlesStyle = MindFusion.Diagramming.HandlesStyle.HatchHandles
-        Me.HiddenDiagramView.ControlMouseAction = MindFusion.Diagramming.ControlMouseAction.SelectNode
-        Me.HiddenDiagramView.DelKeyAction = MindFusion.Diagramming.DelKeyAction.DeleteSelectedItems
-        Me.HiddenDiagramView.Diagram = Me.HiddenDiagram
-        Me.HiddenDiagramView.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.HiddenDiagramView.Location = New System.Drawing.Point(0, 0)
-        Me.HiddenDiagramView.MiddleButtonActions = MindFusion.Diagramming.MouseButtonActions.None
-        Me.HiddenDiagramView.ModificationStart = MindFusion.Diagramming.ModificationStart.SelectedOnly
-        Me.HiddenDiagramView.Name = "HiddenDiagramView"
-        Me.HiddenDiagramView.RightButtonActions = MindFusion.Diagramming.MouseButtonActions.Cancel
-        Me.HiddenDiagramView.Size = New System.Drawing.Size(891, 530)
-        Me.HiddenDiagramView.TabIndex = 10
-        Me.HiddenDiagramView.Text = "DiagramView1"
-        '
         'HiddenDiagram
         '
         Me.HiddenDiagram.BackBrush = New MindFusion.Drawing.SolidBrush("#FFFFFFFF")
@@ -373,6 +341,55 @@ Partial Class frmStateTransitionDiagram
         Me.ComboBox_ValueType.ForeColor = System.Drawing.Color.SteelBlue
         Me.ComboBox_ValueType.Name = "ComboBox_ValueType"
         Me.ComboBox_ValueType.Size = New System.Drawing.Size(300, 33)
+        '
+        'AutoLayoutToolStripMenuItem
+        '
+        Me.AutoLayoutToolStripMenuItem.Image = Global.Boston.My.Resources.MenuImagesMain.Layout16x16
+        Me.AutoLayoutToolStripMenuItem.Name = "AutoLayoutToolStripMenuItem"
+        Me.AutoLayoutToolStripMenuItem.Size = New System.Drawing.Size(207, 22)
+        Me.AutoLayoutToolStripMenuItem.Text = "&AutoLayout"
+        '
+        'ToolStripSeparator7
+        '
+        Me.ToolStripSeparator7.Name = "ToolStripSeparator7"
+        Me.ToolStripSeparator7.Size = New System.Drawing.Size(204, 6)
+        '
+        'DiagramView
+        '
+        Me.DiagramView.AllowDrop = True
+        Me.DiagramView.BackColor = System.Drawing.Color.White
+        Me.DiagramView.Behavior = MindFusion.Diagramming.Behavior.DrawLinks
+        Me.DiagramView.ContextMenuStrip = Me.ContextMenuStrip_Diagram
+        Me.DiagramView.ControlHandlesStyle = MindFusion.Diagramming.HandlesStyle.HatchHandles
+        Me.DiagramView.ControlMouseAction = MindFusion.Diagramming.ControlMouseAction.IgnoreControl
+        Me.DiagramView.DelKeyAction = MindFusion.Diagramming.DelKeyAction.DeleteSelectedItems
+        Me.DiagramView.Diagram = Me.Diagram
+        Me.DiagramView.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.DiagramView.Location = New System.Drawing.Point(0, 0)
+        Me.DiagramView.MiddleButtonActions = MindFusion.Diagramming.MouseButtonActions.None
+        Me.DiagramView.ModificationStart = MindFusion.Diagramming.ModificationStart.SelectedOnly
+        Me.DiagramView.Name = "DiagramView"
+        Me.DiagramView.RightButtonActions = MindFusion.Diagramming.MouseButtonActions.Cancel
+        Me.DiagramView.Size = New System.Drawing.Size(891, 530)
+        Me.DiagramView.TabIndex = 1
+        Me.DiagramView.Text = "DiagramView1"
+        '
+        'HiddenDiagramView
+        '
+        Me.HiddenDiagramView.Behavior = MindFusion.Diagramming.Behavior.LinkShapes
+        Me.HiddenDiagramView.ControlHandlesStyle = MindFusion.Diagramming.HandlesStyle.HatchHandles
+        Me.HiddenDiagramView.ControlMouseAction = MindFusion.Diagramming.ControlMouseAction.SelectNode
+        Me.HiddenDiagramView.DelKeyAction = MindFusion.Diagramming.DelKeyAction.DeleteSelectedItems
+        Me.HiddenDiagramView.Diagram = Me.HiddenDiagram
+        Me.HiddenDiagramView.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.HiddenDiagramView.Location = New System.Drawing.Point(0, 0)
+        Me.HiddenDiagramView.MiddleButtonActions = MindFusion.Diagramming.MouseButtonActions.None
+        Me.HiddenDiagramView.ModificationStart = MindFusion.Diagramming.ModificationStart.SelectedOnly
+        Me.HiddenDiagramView.Name = "HiddenDiagramView"
+        Me.HiddenDiagramView.RightButtonActions = MindFusion.Diagramming.MouseButtonActions.Cancel
+        Me.HiddenDiagramView.Size = New System.Drawing.Size(891, 530)
+        Me.HiddenDiagramView.TabIndex = 10
+        Me.HiddenDiagramView.Text = "DiagramView1"
         '
         'frmStateTransitionDiagram
         '
@@ -439,4 +456,8 @@ Partial Class frmStateTransitionDiagram
     Friend WithEvents mnuOption_ViewGrid As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents ToolStripSeparator6 As System.Windows.Forms.ToolStripSeparator
     Friend WithEvents PageAsORMMetaModelToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents AutoLayoutToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ToolStripSeparator7 As ToolStripSeparator
+    Friend WithEvents Diagram1 As MindFusion.Diagramming.Diagram
+    Friend WithEvents Diagram2 As MindFusion.Diagramming.Diagram
 End Class

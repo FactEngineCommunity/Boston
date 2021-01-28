@@ -22,6 +22,42 @@ Public Class frmStateTransitionDiagram
 
     End Sub
 
+    Public Sub autoLayout()
+
+        '---------------------------------------------------------------------------------------
+        ' Create the layouter object
+        Dim layout As New MindFusion.Diagramming.Layout.SpringLayout
+
+
+        ' Adjust the attributes of the layouter
+        layout.MultipleGraphsPlacement = MultipleGraphsPlacement.Horizontal
+        layout.KeepGroupLayout = True
+        layout.NodeDistance = 40
+        layout.RandomSeed = 50
+        layout.MinimizeCrossings = True
+        layout.RepulsionFactor = 50
+        layout.EnableClusters = True
+        layout.IterationCount = 100
+        'layout.GridSize = 20 'Not part of SpringLayout.
+
+        layout.Arrange(Diagram)
+
+        Dim SecondLayout = New MindFusion.Diagramming.Layout.OrthogonalLayout
+        SecondLayout.Arrange(Me.Diagram)
+        Me.Diagram.RouteAllLinks()
+
+        For Each lrLink As MindFusion.Diagramming.DiagramLink In Me.Diagram.Links
+            lrLink.Style = LinkStyle.Polyline
+        Next
+
+        'For Each lrTable In Me.zrPage.Diagram.Nodes
+        '    Dim lrEntity As ERD.Entity
+        '    lrEntity = lrTable.Tag
+        '    lrEntity.Move(lrTable.Bounds.X, lrTable.Bounds.Y, False)
+        'Next
+
+    End Sub
+
 
     Private Sub frmStateTransitionDiagram_FormClosing(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
 
@@ -338,6 +374,9 @@ Public Class frmStateTransitionDiagram
             '  * Load all the StartStateTransitions (only one 99.999% of the time)
             '  * Load all the EndStateTransitions
             '------------------------------------------------------------
+
+            '=======================================================================================
+            'State shapes
             lsSQLQuery = "SELECT *"
             lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreStateTransition.ToString
             lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
@@ -406,8 +445,33 @@ Public Class frmStateTransitionDiagram
                 lrRecordset.MoveNext()
             End While
 
+            '--------------------------------------------------------------------
+            'State from StartStateTransition
+            lsSQLQuery = "SELECT *"
+            lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreValueTypeHasStartCoreElementState.ToString
+            lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
 
-            '-----------------------------------------------------------------------------------
+            lrRecordset = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+            While Not lrRecordset.EOF
+                lrFactDataInstance = lrRecordset("CoreElement")
+                lrState = lrFactDataInstance.CloneState(arPage)
+                lrState.X = lrFactDataInstance.X
+                lrState.Y = lrFactDataInstance.Y
+                lrState.StateName = lrRecordset("CoreElement").Data
+                lrState.ValueType = Me.zrPage.STDiagram.ValueType
+
+                lrState.STMState = Me.zrPage.Model.STM.State.Find(Function(x) x.ValueType.Id = lrState.ValueType.Id And x.Name = lrState.StateName)
+
+                If Me.zrPage.STDiagram.State.FindAll(Function(x) x.StateName = lrState.StateName).Count = 0 Then
+                    Me.zrPage.STDiagram.State.AddUnique(lrState)
+                    lrState.DisplayAndAssociate()
+                End If
+                lrRecordset.MoveNext()
+            End While
+
+
+            '============================================================================================
             'Load the Start State Indicator (terminal)
             lsSQLQuery = "SELECT *"
             lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreValueTypeHasStartCoreElementState.ToString
@@ -424,11 +488,24 @@ Public Class frmStateTransitionDiagram
                 lrFactInstance = New FBM.FactInstance
                 lrFactInstance = lrRecordset.CurrentFact
 
-                lrStartStateIndicator = lrFactInstance.CloneStartStateIndicator(arPage, lrState)
-                lrStartStateIndicator.EventName = lrRecordset("Event").Data
-                Me.zrPage.STDiagram.StartIndicator = lrStartStateIndicator
+                If Me.zrPage.STDiagram.StartIndicator Is Nothing Then
+                    lrStartStateIndicator = lrFactInstance.CloneStartStateIndicator(arPage, lrState)
+                    lrStartStateIndicator.EventName = lrRecordset("Event").Data
+                    Me.zrPage.STDiagram.StartIndicator = lrStartStateIndicator
 
-                Call lrStartStateIndicator.DisplayAndAssociate()
+                    Call lrStartStateIndicator.DisplayAndAssociate()
+                Else
+                    lrStartStateIndicator = Me.zrPage.STDiagram.StartIndicator
+                End If
+
+                '-------------------------------------------------------------------------------
+                'StartStateTransition
+                Dim lrStartStateTransition = New STD.StartStateTransition(lrState, lrStartStateIndicator, lrRecordset("Event").Data)
+                lrStartStateTransition.ValueType = Me.zrPage.STDiagram.ValueType
+                lrStartStateTransition.STMStartStateTransition = Me.zrPage.Model.STM.StartStateTransition.Find(Function(x) x.Fact.Id = lrRecordset.CurrentFact.Id)
+
+                Me.zrPage.STDiagram.StartStateTransition.Add(lrStartStateTransition)
+                Call lrStartStateTransition.DisplayAndAssociate()
 
                 lrRecordset.MoveNext()
             End While
@@ -1185,9 +1262,58 @@ Public Class frmStateTransitionDiagram
 
     End Sub
 
+    Public Function CropImage(ByVal img As Image, ByVal backgroundColor As Color, Optional ByVal margin As Integer = 0) As Image
+
+        Dim minX As Integer = img.Width
+        Dim minY As Integer = img.Height
+        Dim maxX As Integer = 0
+        Dim maxY As Integer = 0
+
+        Using bmp As New Bitmap(img)
+
+            For y As Integer = 0 To bmp.Height - 1
+                For x As Integer = 0 To bmp.Width - 1
+                    If bmp.GetPixel(x, y).ToArgb <> backgroundColor.ToArgb Then
+                        If x < minX Then
+                            minX = x
+                        ElseIf x > maxX Then
+                            maxX = x
+                        End If
+                        If y < minY Then
+                            minY = y
+                        ElseIf y > maxY Then
+                            maxY = y
+                        End If
+                    End If
+                Next
+            Next
+
+            Dim rect As New Rectangle(minX - margin, minY - margin, maxX - minX + 2 * margin + 1, maxY - minY + 2 * margin + 1)
+            Dim cropped As Bitmap = bmp.Clone(rect, bmp.PixelFormat)
+
+            Return cropped
+
+        End Using
+
+    End Function
+
+    Private Function CreateFramedImage(ByVal Source As Image, ByVal BorderColor As Color, ByVal BorderThickness As Integer) As Image
+
+        Dim b As New Bitmap(Source.Width + BorderThickness * 2, Source.Height + BorderThickness * 2)
+        Dim g As Graphics = Graphics.FromImage(b)
+        g.Clear(BorderColor)
+        g.DrawImage(Source, BorderThickness, BorderThickness)
+        g.Dispose()
+        Return b
+    End Function
+
     Private Sub CopyToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CopyToolStripMenuItem.Click
 
         Dim image As Image = Diagram.CreateImage()
+
+        image = Me.CropImage(image, Color.White, 0)
+        image = Me.CreateFramedImage(image, Color.White, 15)
+
         Windows.Forms.Clipboard.SetImage(image)
 
     End Sub
@@ -1744,4 +1870,11 @@ Public Class frmStateTransitionDiagram
         End If
 
     End Sub
+
+    Private Sub AutoLayoutToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles AutoLayoutToolStripMenuItem.Click
+
+        Call Me.autoLayout()
+
+    End Sub
+
 End Class

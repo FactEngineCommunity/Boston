@@ -10,10 +10,12 @@ Namespace STD
         Public ValueType As FBM.ValueType = Nothing
         Public State As New List(Of STD.State)
         Public StateTransition As New List(Of STD.StateTransition)
-        Public EndStateIndicator As New List(Of STD.EndStateIndicator)
-        Public EndStateTransition As New List(Of STD.EndStateTransition)
 
         Public StartIndicator As STD.StartStateIndicator
+        Public EndStateIndicator As New List(Of STD.EndStateIndicator)
+
+        Public StartStateTransition As New List(Of STD.StartStateTransition)
+        Public EndStateTransition As New List(Of STD.EndStateTransition)
 
         Public WithEvents STM As FBM.STM.Model
 

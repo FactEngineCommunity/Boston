@@ -2101,9 +2101,6 @@ Public Class frmDiagramERD
 
     End Sub
 
-    Private Sub AutoLayoutToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles AutoLayoutToolStripMenuItem.Click
-
-    End Sub
 
     ''' <summary>
     ''' Diagram.LinkCustomDraw is set to 'Full'. This method is called for all Links on the diagram.

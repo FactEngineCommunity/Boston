@@ -35,12 +35,14 @@
         ''' </summary>
         Public StopState As New List(Of FBM.STM.State)
 
+        Public StartStateTransition As New List(Of FBM.STM.StartStateTransition)
         Public EndStateTransition As New List(Of FBM.STM.EndStateTransition)
 
         '================================
         'Events
         Public Event EndStateTransitionAdded(ByRef arEndStateTransition As FBM.STM.EndStateTransition)
         Public Event EndStateTransitionRemoved(ByRef arEndStateTransition As FBM.STM.EndStateTransition)
+        Public Event StartStateTransitionRemoved(ByRef arStartStateTransition As FBM.STM.StartStateTransition)
         Public Event StateTransitionAdded(ByRef arStateTransition As FBM.STM.StateTransition)
 
         ''' <summary>
@@ -104,6 +106,17 @@
             Call Me.Model.removeCMMLEndStateTransition(arEndStateTransition)
 
             RaiseEvent EndStateTransitionRemoved(arEndStateTransition)
+
+        End Sub
+
+        Public Sub removeStartStateTransition(ByRef arStartStateTransition As STM.StartStateTransition)
+
+            Me.StartStateTransition.Remove(arStartStateTransition)
+
+            'CMML
+            Call Me.Model.removeCMMLStartStateTransition(arStartStateTransition)
+
+            RaiseEvent StartStateTransitionRemoved(arStartStateTransition)
 
         End Sub
 

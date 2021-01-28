@@ -161,7 +161,20 @@ Namespace FBM
             'NB Will automatically delete the corresponding FactInstances at the Page level as well.
             Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
+        End Sub
 
+        Public Sub removeCMMLStartStateTransition(ByRef arStartStateTransition As STM.StartStateTransition)
+
+            Dim lsSQLQuery As String
+
+            'VM-Complete this
+            lsSQLQuery = "DELETE FROM " & pcenumCMMLRelations.CoreValueTypeHasStartCoreElementState.ToString
+            lsSQLQuery &= " WHERE ValueType = '" & arStartStateTransition.ValueType.Id & "'"
+            lsSQLQuery &= " AND CoreElement = '" & arStartStateTransition.State.Name & "'"
+            lsSQLQuery &= " AND Event = '" & arStartStateTransition.Event & "'"
+
+            'NB Will automatically delete the corresponding FactInstances at the Page level as well.
+            Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
         End Sub
 
