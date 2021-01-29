@@ -73,7 +73,7 @@ Namespace TinyPG
             Patterns.Add(TokenType.MODELNAME, regex)
             Tokens.Add(TokenType.MODELNAME)
 
-            regex = new Regex("[aA-zZ]+", RegexOptions.Compiled)
+            regex = new Regex("[A-Z0-9][a-z0-9]+([_|\sA-Z0-9][a-z0-9]+)*", RegexOptions.Compiled)
             Patterns.Add(TokenType.MODELELEMENTNAME, regex)
             Tokens.Add(TokenType.MODELELEMENTNAME)
 
@@ -197,6 +197,14 @@ Namespace TinyPG
             Patterns.Add(TokenType.KEYWDEXISTS, regex)
             Tokens.Add(TokenType.KEYWDEXISTS)
 
+            regex = new Regex("EXTEND", RegexOptions.Compiled)
+            Patterns.Add(TokenType.KEYWDEXTEND, regex)
+            Tokens.Add(TokenType.KEYWDEXTEND)
+
+            regex = new Regex("EXTENDING", RegexOptions.Compiled)
+            Patterns.Add(TokenType.KEYWDEXTENDING, regex)
+            Tokens.Add(TokenType.KEYWDEXTENDING)
+
             regex = new Regex("FACT", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDFACT, regex)
             Tokens.Add(TokenType.KEYWDFACT)
@@ -316,6 +324,10 @@ Namespace TinyPG
             regex = new Regex("ROLE", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDROLE, regex)
             Tokens.Add(TokenType.KEYWDROLE)
+
+            regex = new Regex("ROLECONSTRAINT", RegexOptions.Compiled)
+            Patterns.Add(TokenType.KEYWDROLECONSTRAINT, regex)
+            Tokens.Add(TokenType.KEYWDROLECONSTRAINT)
 
             regex = new Regex("SELECT", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDSELECT, regex)
@@ -518,105 +530,110 @@ Namespace TinyPG
         DELETEALLSTMT= 34
         DELETEFACTSTMT= 35
         EXISTSSTMT  = 36
-        EXTERNALUNIQUENESSCONSTRAINTSTMT= 37
-        FACTTYPESTMT= 38
-        GETSUPERTYPESTMT= 39
-        INMODELSTMT = 40
-        INSERTSTMT  = 41
-        ITISMANDATORYTHATSTMNT= 42
-        ONPAGESTMT  = 43
-        OPENMODELSTMT= 44
-        REMOVEINSTANCESTMT= 45
-        RENAMEINSTANCESTMT= 46
-        SELECTSTMT  = 47
-        UPDATESTMT  = 48
-        WHERESTMT   = 49
-        WITHPREDICATESTMT= 50
-        Start       = 51
+        EXTENDROLECONSTRAINTSTMT= 37
+        EXTERNALUNIQUENESSCONSTRAINTSTMT= 38
+        FACTTYPESTMT= 39
+        GETSUPERTYPESTMT= 40
+        INMODELSTMT = 41
+        INSERTSTMT  = 42
+        ITISMANDATORYTHATSTMNT= 43
+        ONMODELCLAUSE= 44
+        ONPAGESTMT  = 45
+        OPENMODELSTMT= 46
+        REMOVEINSTANCESTMT= 47
+        RENAMEINSTANCESTMT= 48
+        SELECTSTMT  = 49
+        UPDATESTMT  = 50
+        WHERESTMT   = 51
+        WITHPREDICATESTMT= 52
+        Start       = 53
 
         'Terminal tokens:
-        BROPEN      = 52
-        BRCLOSE     = 53
-        COLUMNNAMESTR= 54
-        COMMA       = 55
-        DOUBLEQUOTE = 56
-        EOF         = 57
-        EQUALS      = 58
-        FACTTYPENAME= 59
-        MULTDIV     = 60
-        MODELNAME   = 61
-        MODELELEMENTNAME= 62
-        MODELID     = 63
-        NUMBER      = 64
-        PAGENAME    = 65
-        PLUSMINUS   = 66
-        PREDICATE   = 67
-        ROLENAME    = 68
-        SINGLEQUOTE = 69
-        STAR        = 70
-        USERTABLENAME= 71
-        WHERECLAUSECOLUMNNAMESTR= 72
-        VALUE       = 73
-        KEYWDADD    = 74
-        KEYWDADDFACT= 75
-        KEYWDADDFACTTYPE= 76
-        KEYWDAND    = 77
-        KEYWDATMOSTONE= 78
-        KEYWDCOUNTSTAR= 79
-        KEYWDCREATE = 80
-        KEYWDCREATECONCEPT= 81
-        KEYWDCREATEENTITYTYPE= 82
-        KEYWDCREATEFACTTYPE= 83
-        KEYWDCREATEMODEL= 84
-        KEYWDCREATEVALUETYPE= 85
-        KEYWDDELETE = 86
-        KEYWDDELETEALL= 87
-        KEYWDDELETEFACT= 88
-        KEYWDDISTINCT= 89
-        KEYWDENTITY = 90
-        KEYWDENTITYTYPE= 91
-        KEYWDEXISTS = 92
-        KEYWDFACT   = 93
-        KEYWDFACTTYPE= 94
-        KEYWDFOR    = 95
-        KEYWDFOREACH= 96
-        KEYWDFROM   = 97
-        KEYWDIN     = 98
-        KEYWDINSERT = 99
-        KEYWDINTO   = 100
-        KEYWDITISMANDATORYTHAT= 101
-        KEYWDJOINING= 102
-        KEYWDGET    = 103
-        KEYWDLANGUAGE= 104
-        KEYWDLANGUAGEDFD= 105
-        KEYWDLANGUAGEERD= 106
-        KEYWDLANGUAGEETD= 107
-        KEYWDLANGUAGEORM= 108
-        KEYWDLANGUAGESTD= 109
-        KEYWDLANGUAGEUCD= 110
-        KEYWDMODEL  = 111
-        KEYWDMODELDICTIONARY= 112
-        KEYWDOBJECT = 113
-        KEYWDOF     = 114
-        KEYWDON     = 115
-        KEYWDONPAGE = 116
-        KEYWDOPEN   = 117
-        KEYWDPAGE   = 118
-        KEYWDPREDICATE= 119
-        KEYWDREMOVEINSTANCE= 120
-        KEYWDRENAMEINSTANCE= 121
-        KEYWDROLE   = 122
-        KEYWDSELECT = 123
-        KEYWDSET    = 124
-        KEYWDSUPERTYPE= 125
-        KEYWDTHAT   = 126
-        KEYWDTO     = 127
-        KEYWDUPDATE = 128
-        KEYWDVALUES = 129
-        KEYWDVALUETYPE= 130
-        KEYWDWHERE  = 131
-        KEYWDWITH   = 132
-        WHITESPACE  = 133
+        BROPEN      = 54
+        BRCLOSE     = 55
+        COLUMNNAMESTR= 56
+        COMMA       = 57
+        DOUBLEQUOTE = 58
+        EOF         = 59
+        EQUALS      = 60
+        FACTTYPENAME= 61
+        MULTDIV     = 62
+        MODELNAME   = 63
+        MODELELEMENTNAME= 64
+        MODELID     = 65
+        NUMBER      = 66
+        PAGENAME    = 67
+        PLUSMINUS   = 68
+        PREDICATE   = 69
+        ROLENAME    = 70
+        SINGLEQUOTE = 71
+        STAR        = 72
+        USERTABLENAME= 73
+        WHERECLAUSECOLUMNNAMESTR= 74
+        VALUE       = 75
+        KEYWDADD    = 76
+        KEYWDADDFACT= 77
+        KEYWDADDFACTTYPE= 78
+        KEYWDAND    = 79
+        KEYWDATMOSTONE= 80
+        KEYWDCOUNTSTAR= 81
+        KEYWDCREATE = 82
+        KEYWDCREATECONCEPT= 83
+        KEYWDCREATEENTITYTYPE= 84
+        KEYWDCREATEFACTTYPE= 85
+        KEYWDCREATEMODEL= 86
+        KEYWDCREATEVALUETYPE= 87
+        KEYWDDELETE = 88
+        KEYWDDELETEALL= 89
+        KEYWDDELETEFACT= 90
+        KEYWDDISTINCT= 91
+        KEYWDENTITY = 92
+        KEYWDENTITYTYPE= 93
+        KEYWDEXISTS = 94
+        KEYWDEXTEND = 95
+        KEYWDEXTENDING= 96
+        KEYWDFACT   = 97
+        KEYWDFACTTYPE= 98
+        KEYWDFOR    = 99
+        KEYWDFOREACH= 100
+        KEYWDFROM   = 101
+        KEYWDIN     = 102
+        KEYWDINSERT = 103
+        KEYWDINTO   = 104
+        KEYWDITISMANDATORYTHAT= 105
+        KEYWDJOINING= 106
+        KEYWDGET    = 107
+        KEYWDLANGUAGE= 108
+        KEYWDLANGUAGEDFD= 109
+        KEYWDLANGUAGEERD= 110
+        KEYWDLANGUAGEETD= 111
+        KEYWDLANGUAGEORM= 112
+        KEYWDLANGUAGESTD= 113
+        KEYWDLANGUAGEUCD= 114
+        KEYWDMODEL  = 115
+        KEYWDMODELDICTIONARY= 116
+        KEYWDOBJECT = 117
+        KEYWDOF     = 118
+        KEYWDON     = 119
+        KEYWDONPAGE = 120
+        KEYWDOPEN   = 121
+        KEYWDPAGE   = 122
+        KEYWDPREDICATE= 123
+        KEYWDREMOVEINSTANCE= 124
+        KEYWDRENAMEINSTANCE= 125
+        KEYWDROLE   = 126
+        KEYWDROLECONSTRAINT= 127
+        KEYWDSELECT = 128
+        KEYWDSET    = 129
+        KEYWDSUPERTYPE= 130
+        KEYWDTHAT   = 131
+        KEYWDTO     = 132
+        KEYWDUPDATE = 133
+        KEYWDVALUES = 134
+        KEYWDVALUETYPE= 135
+        KEYWDWHERE  = 136
+        KEYWDWITH   = 137
+        WHITESPACE  = 138
     End Enum
 
     <Serializable()> _

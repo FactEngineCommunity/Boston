@@ -463,8 +463,13 @@ Public Class tApplication
     End Sub
 
     Public Sub setWorkingModel(ByRef arModel As FBM.Model)
+
+        Dim lrOriginalWorkingModel = Me.WorkingModel
         Me.WorkingModel = arModel
-        RaiseEvent WorkingModelChanged()
+
+        If lrOriginalWorkingModel IsNot Me.WorkingModel Then
+            RaiseEvent WorkingModelChanged()
+        End If
     End Sub
 
     Private Sub WorkingModel_MadeDirty(abGlobalBroadcast As Boolean) Handles WorkingModel.MadeDirty

@@ -319,6 +319,9 @@ Namespace TinyPG
                 Case TokenType.EXISTSSTMT
                     Value = EvalEXISTSSTMT(tree, paramlist)
                     Exit Select
+                Case TokenType.EXTENDROLECONSTRAINTSTMT
+                    Value = EvalEXTENDROLECONSTRAINTSTMT(tree, paramlist)
+                    Exit Select
                 Case TokenType.EXTERNALUNIQUENESSCONSTRAINTSTMT
                     Value = EvalEXTERNALUNIQUENESSCONSTRAINTSTMT(tree, paramlist)
                     Exit Select
@@ -336,6 +339,9 @@ Namespace TinyPG
                     Exit Select
                 Case TokenType.ITISMANDATORYTHATSTMNT
                     Value = EvalITISMANDATORYTHATSTMNT(tree, paramlist)
+                    Exit Select
+                Case TokenType.ONMODELCLAUSE
+                    Value = EvalONMODELCLAUSE(tree, paramlist)
                     Exit Select
                 Case TokenType.ONPAGESTMT
                     Value = EvalONPAGESTMT(tree, paramlist)
@@ -512,6 +518,10 @@ Namespace TinyPG
             Throw New NotImplementedException()
         End Function
 
+        Protected Overridable Function EvalEXTENDROLECONSTRAINTSTMT(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
         Protected Overridable Function EvalEXTERNALUNIQUENESSCONSTRAINTSTMT(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
             Throw New NotImplementedException()
         End Function
@@ -533,6 +543,10 @@ Namespace TinyPG
         End Function
 
         Protected Overridable Function EvalITISMANDATORYTHATSTMNT(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalONMODELCLAUSE(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
             Throw New NotImplementedException()
         End Function
 

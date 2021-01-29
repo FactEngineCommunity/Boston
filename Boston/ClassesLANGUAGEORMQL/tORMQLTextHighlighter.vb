@@ -88,8 +88,8 @@ Namespace TinyPG
                 Return GetScrollPos(Textbox.Handle.ToInt32(), SB_HORZ)
             End Get
             Set(ByVal value As Integer)
-                SetScrollPos(Textbox.Handle, SB_HORZ, value, True)
-                PostMessageA(Textbox.Handle, WM_HSCROLL, SB_THUMBPOSITION + 65536 * value, 0)
+                SetScrollPos(DirectCast(Textbox.Handle, IntPtr), SB_HORZ, value, True)
+                PostMessageA(DirectCast(Textbox.Handle, IntPtr), WM_HSCROLL, SB_THUMBPOSITION + 65536 * value, 0)
             End Set
         End Property
 
@@ -98,8 +98,8 @@ Namespace TinyPG
                 Return GetScrollPos(Textbox.Handle.ToInt32(), SB_VERT)
             End Get
             Set(ByVal value As Integer)
-                SetScrollPos(Textbox.Handle, SB_VERT, value, True)
-                PostMessageA(Textbox.Handle, WM_VSCROLL, SB_THUMBPOSITION + 65536 * value, 0)
+                SetScrollPos(DirectCast(Textbox.Handle, IntPtr), SB_VERT, value, True)
+                PostMessageA(DirectCast(Textbox.Handle, IntPtr), WM_VSCROLL, SB_THUMBPOSITION + 65536 * value, 0)
             End Set
         End Property
 

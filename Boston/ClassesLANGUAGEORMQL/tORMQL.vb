@@ -370,6 +370,45 @@ Namespace ORMQL
         End Property
 
     End Class
+
+    Public Class AddRoleStatement
+
+        Private _USERTABLENAME As String = ""
+        Public Property USERTABLENAME As String
+            Get
+                Return Me._USERTABLENAME
+            End Get
+            Set(value As String)
+                Me._USERTABLENAME = value
+            End Set
+        End Property
+
+        Dim _MODELELEMENTNAME As String = ""
+        Public Property MODELELEMENTNAME As String
+            Get
+                Return Me._MODELELEMENTNAME
+            End Get
+            Set(value As String)
+                Me._MODELELEMENTNAME = value
+            End Set
+        End Property
+
+    End Class
+
+    Public Class AddModelElementStatement
+
+        Private _ADDROLESTMT As AddRoleStatement
+        Public Property ADDROLESTMT As AddRoleStatement
+            Get
+                Return Me._ADDROLESTMT
+            End Get
+            Set(value As AddRoleStatement)
+                Me._ADDROLESTMT = value
+            End Set
+        End Property
+
+    End Class
+
     Public Class Processor
 
         Private Model As FBM.Model
@@ -394,6 +433,7 @@ Namespace ORMQL
         Public UpdateStatement As New UpdateStatement
         Public RemoveInstanceStatement As New RemoveInstanceStatement
         Public RenameInstanceStatement As New RenameInstanceStatement
+        Public AddModelElementStatement As New AddModelElementStatement
 
         Public Sub New()
 
@@ -653,6 +693,10 @@ Namespace ORMQL
                     ElseIf lrType Is GetType(Object) Then
                         'ao_object.SetAttributeMember(aoParseTreeNode.Token.Type.ToString, aoParseTreeNode)
                         piInstance.SetValue(ao_object, aoParseTreeNode)
+                    Else
+                        Dim instance = Activator.CreateInstance(lrType)
+                        Call GetParseTreeTokensReflection(instance, loParseTreeNode)
+                        piInstance.SetValue(ao_object, instance)
                     End If
                 End If
 
@@ -1572,6 +1616,56 @@ Namespace ORMQL
 
         End Function
 
+        Private Function ProcessADDROLEStatement() As Object
+
+            Dim lrFact As New FBM.Fact
+            Dim lrFactType As FBM.FactType
+            Dim lsColumnName As String = ""
+
+            '=============================================================
+            Dim lrAddModelElementStatement As ORMQL.AddModelElementStatement
+            lrAddModelElementStatement = prApplication.ORMQL.AddModelElementStatement
+
+            lrAddModelElementStatement.ADDROLESTMT = New ORMQL.AddRoleStatement
+
+            '----------------------------------
+            'Get the Tokens from the ParseTree
+            '----------------------------------
+            Call Me.GetParseTreeTokensReflection(lrAddModelElementStatement, Me.Parsetree.Nodes(0))
+            '======================================================================
+
+
+
+            '========================================            
+            'Find the FactType that the ADD ROLE statement is for.
+            '---------------------------------------------------------            
+            lrFactType = Me.Model.FactType.Find(Function(x) x.Id = lrAddModelElementStatement.ADDROLESTMT.USERTABLENAME) 'AddressOf lrFactType.EqualsByName)
+
+            If lrFactType Is Nothing Then
+                Me.Parsetree.Errors.Add(New TinyPG.ParseError("Error: tModel.ProcessORMQLStatement: Can't find FactType with Name: '" & lrAddModelElementStatement.ADDROLESTMT.USERTABLENAME & "' within the Model.", 100, Nothing))
+                Return Me.Parsetree.Errors
+                Exit Function
+            End If
+
+            '-------------------------
+            'Get the JoinedORMObject
+            Dim lrModelObject As FBM.ModelObject = Me.Model.GetModelObjectByName(lrAddModelElementStatement.ADDROLESTMT.MODELELEMENTNAME)
+
+            If lrModelObject Is Nothing Then
+                Dim lrNode As New TinyPG.ParseNode()
+                lrNode.Token = New TinyPG.Token(0, 0)
+                Me.Parsetree.Errors.Add(New TinyPG.ParseError("Error: tModel.ProcessORMQLStatement: Can't find ModelElement with Id: '" & lrAddModelElementStatement.ADDROLESTMT.MODELELEMENTNAME & " to which the new Role is to join.", 100, lrNode))
+                Return Me.Parsetree.Errors
+                Exit Function
+            End If
+
+            Dim lrRole = New FBM.Role(lrFactType, lrModelObject)
+            Call lrFactType.AddRole(lrRole, True, False)
+
+            Return lrRole
+
+        End Function
+
         Private Function ProcessDELETEStatement() As Object
 
             Dim lrFact As New FBM.Fact
@@ -1904,6 +1998,10 @@ Namespace ORMQL
                 Case Is = "ADDFACTSTMT"
 
                     Return Me.ProcessADDFACTStatement()
+
+                Case Is = "ADDROLESTMT"
+
+                    Return Me.processADDROLEStatement()
 
                     ''-------------------------------------------
                     ''Create the DynamicClass within the Factory
