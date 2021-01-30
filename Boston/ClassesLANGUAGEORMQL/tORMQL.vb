@@ -434,6 +434,20 @@ Namespace ORMQL
 
     End Class
 
+    Public Class ExtendRoleConstraintStatement
+
+        Public _MODELELEMENTNAME As New List(Of String)
+        Public Property MODELELEMENTNAME As List(Of String)
+            Get
+                Return Me._MODELELEMENTNAME
+            End Get
+            Set(value As List(Of String))
+                Me._MODELELEMENTNAME = value
+            End Set
+        End Property
+
+    End Class
+
     Public Class Processor
 
         Private Model As FBM.Model
@@ -1379,6 +1393,86 @@ Namespace ORMQL
 
         End Function
 
+        Private Function processEXTENDROLECONSTRAINTStatement() As Object
+
+            Try
+
+                '=============================================================
+                'Get the Tokens from the ParseTree
+                Dim lrExtendRoleConstraintStatement As New ORMQL.ExtendRoleConstraintStatement
+
+                Call Me.GetParseTreeTokensReflection(lrExtendRoleConstraintStatement, Me.Parsetree.Nodes(0))
+
+                Dim lrRoleConstraint As FBM.RoleConstraint
+
+                '------------------------------------------------------
+                'Get the RoleConstraint
+                lrRoleConstraint = Me.Model.GetModelObjectByName(lrExtendRoleConstraintStatement.MODELELEMENTNAME(0))
+
+                If lrRoleConstraint Is Nothing Then
+                    Dim lrNode As New TinyPG.ParseNode()
+                    lrNode.Token = New TinyPG.Token(0, 0)
+                    Me.Parsetree.Errors.Add(New TinyPG.ParseError("Error: tModel.ProcessORMQLStatement: Can't find ModelElement with Id: '" & lrExtendRoleConstraintStatement.MODELELEMENTNAME(0), 100, lrNode))
+                    Return Me.Parsetree.Errors
+                    Exit Function
+                End If
+
+                '=======================================================
+                'Get the Role
+
+                '----------------------------------------
+                'Get the ModelElement joined by the Role
+                Dim lrModelElement = Me.Model.GetModelObjectByName(lrExtendRoleConstraintStatement.MODELELEMENTNAME(1))
+
+                If lrModelElement Is Nothing Then
+                    Dim lrNode As New TinyPG.ParseNode()
+                    lrNode.Token = New TinyPG.Token(0, 0)
+                    Me.Parsetree.Errors.Add(New TinyPG.ParseError("Error: tModel.ProcessORMQLStatement: Can't find ModelElement with Id: '" & lrExtendRoleConstraintStatement.MODELELEMENTNAME(1), 100, lrNode))
+                    Return Me.Parsetree.Errors
+                    Exit Function
+                End If
+
+                'Get the FactType for the Role
+                Dim lrFactType As FBM.FactType = Me.Model.GetModelObjectByName(lrExtendRoleConstraintStatement.MODELELEMENTNAME(2))
+
+                If lrFactType Is Nothing Then
+                    Dim lrNode As New TinyPG.ParseNode()
+                    lrNode.Token = New TinyPG.Token(0, 0)
+                    Me.Parsetree.Errors.Add(New TinyPG.ParseError("Error: tModel.ProcessORMQLStatement: Can't find ModelElement with Id: '" & lrExtendRoleConstraintStatement.MODELELEMENTNAME(2), 100, lrNode))
+                    Return Me.Parsetree.Errors
+                    Exit Function
+                End If
+
+                Dim lrRole As FBM.Role = lrFactType.RoleGroup.Find(Function(x) x.JoinedORMObject Is lrModelElement)
+
+                If lrRole Is Nothing Then
+                    Dim lrNode As New TinyPG.ParseNode()
+                    lrNode.Token = New TinyPG.Token(0, 0)
+                    Me.Parsetree.Errors.Add(New TinyPG.ParseError("Error: tModel.ProcessORMQLStatement: No matching Role found to extend RoleConstraint.", 100, lrNode))
+                    Return Me.Parsetree.Errors
+                    Exit Function
+                End If
+
+                '--------------------------------------------------
+                'Add the Role to the RoleConstraint
+                Dim lrRoleConstraintRole As New FBM.RoleConstraintRole(lrRole, lrRoleConstraint, ,,, True)
+                lrRoleConstraint.AddRoleConstraintRole(lrRoleConstraintRole)
+
+                Return lrRoleConstraint
+
+            Catch ex As Exception
+                Dim lsMessage1 As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return False
+            End Try
+
+        End Function
+
 
         Private Function ProcessINSERTStatement(ByVal asORMQLStatement As String) As Object
 
@@ -2214,6 +2308,10 @@ Namespace ORMQL
                         Case Is = "UPDATESTMT"
 
                             Return Me.processUPDATEStatement
+
+                        Case Is = "EXTENDROLECONSTRAINTSTMT"
+
+                            Return Me.processEXTENDROLECONSTRAINTStatement
 
                         Case Else
                             Return False
