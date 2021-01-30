@@ -314,13 +314,20 @@ Public Class tBrain
         'Me.outputchannel.SelectionLength = lsString.Length
         'Me.outputchannel.SelectionLength = 0
         'Me.outputchannel.text &= vbCrLf
-        If ab_is_echo Then
-            Me.OutputChannel.SelectionColor = Color.Black
-        Else
-            Me.OutputChannel.SelectionColor = Color.Blue
-        End If
+        Try
+            If ab_is_echo Then
+                Me.OutputChannel.SelectionColor = Color.Black
+            Else
+                Me.OutputChannel.SelectionColor = Color.Blue
+            End If
 
-        Me.OutputChannel.AppendText(lsString & vbCrLf)
+            Me.OutputChannel.AppendText(lsString & vbCrLf)
+        Catch ex As Exception
+            MsgBox("Cross thread concern.")
+        End Try
+
+
+
 
         '======================================================================
         '20200725-VM Test to see if can limit the number of lines in the textbox

@@ -319,6 +319,9 @@ Namespace TinyPG
                 Case TokenType.EXISTSSTMT
                     Value = EvalEXISTSSTMT(tree, paramlist)
                     Exit Select
+                Case TokenType.EXTENDINGROLECONSTRAINTCLAUSE
+                    Value = EvalEXTENDINGROLECONSTRAINTCLAUSE(tree, paramlist)
+                    Exit Select
                 Case TokenType.EXTENDROLECONSTRAINTSTMT
                     Value = EvalEXTENDROLECONSTRAINTSTMT(tree, paramlist)
                     Exit Select
@@ -515,6 +518,10 @@ Namespace TinyPG
         End Function
 
         Protected Overridable Function EvalEXISTSSTMT(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalEXTENDINGROLECONSTRAINTCLAUSE(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
             Throw New NotImplementedException()
         End Function
 

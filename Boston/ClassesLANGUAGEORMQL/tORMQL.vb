@@ -373,7 +373,7 @@ Namespace ORMQL
 
     Public Class AddRoleStatement
 
-        Private _USERTABLENAME As String = ""
+        Private _USERTABLENAME As String
         Public Property USERTABLENAME As String
             Get
                 Return Me._USERTABLENAME
@@ -383,17 +383,42 @@ Namespace ORMQL
             End Set
         End Property
 
-        Dim _MODELELEMENTNAME As String = ""
-        Public Property MODELELEMENTNAME As String
+        Public _MODELELEMENTNAME As New List(Of String)
+        Public Property MODELELEMENTNAME As List(Of String)
             Get
                 Return Me._MODELELEMENTNAME
             End Get
-            Set(value As String)
+            Set(value As List(Of String))
+                Me._MODELELEMENTNAME = value
+            End Set
+        End Property
+
+        Private _ExtendingRoleConstraintClause As New ORMQL.ExtendingRoleConstraintClause
+        Public Property EXTENDINGROLECONSTRAINTCLAUSE As ORMQL.ExtendingRoleConstraintClause
+            Get
+                Return Me._ExtendingRoleConstraintClause
+            End Get
+            Set(value As ORMQL.ExtendingRoleConstraintClause)
+                Me._ExtendingRoleConstraintClause = value
+            End Set
+        End Property
+
+    End Class
+
+    Public Class ExtendingRoleConstraintClause
+
+        Public _MODELELEMENTNAME As New List(Of String)
+        Public Property MODELELEMENTNAME As List(Of String)
+            Get
+                Return Me._MODELELEMENTNAME
+            End Get
+            Set(value As List(Of String))
                 Me._MODELELEMENTNAME = value
             End Set
         End Property
 
     End Class
+
 
     Public Class AddModelElementStatement
 
@@ -1649,18 +1674,34 @@ Namespace ORMQL
 
             '-------------------------
             'Get the JoinedORMObject
-            Dim lrModelObject As FBM.ModelObject = Me.Model.GetModelObjectByName(lrAddModelElementStatement.ADDROLESTMT.MODELELEMENTNAME)
+            Dim lrModelObject As FBM.ModelObject = Me.Model.GetModelObjectByName(lrAddModelElementStatement.ADDROLESTMT.MODELELEMENTNAME(0))
 
             If lrModelObject Is Nothing Then
                 Dim lrNode As New TinyPG.ParseNode()
                 lrNode.Token = New TinyPG.Token(0, 0)
-                Me.Parsetree.Errors.Add(New TinyPG.ParseError("Error: tModel.ProcessORMQLStatement: Can't find ModelElement with Id: '" & lrAddModelElementStatement.ADDROLESTMT.MODELELEMENTNAME & " to which the new Role is to join.", 100, lrNode))
+                Me.Parsetree.Errors.Add(New TinyPG.ParseError("Error: tModel.ProcessORMQLStatement: Can't find ModelElement with Id: '" & lrAddModelElementStatement.ADDROLESTMT.MODELELEMENTNAME(0) & " to which the new Role is to join.", 100, lrNode))
                 Return Me.Parsetree.Errors
                 Exit Function
             End If
 
             Dim lrRole = New FBM.Role(lrFactType, lrModelObject)
             Call lrFactType.AddRole(lrRole, True, False)
+
+            For Each lsModelElementName In lrAddModelElementStatement.ADDROLESTMT.ExtendingRoleConstraintClause.MODELELEMENTNAME
+
+                Dim lrRoleConstraint As FBM.RoleConstraint = Me.Model.GetModelObjectByName(lsModelElementName)
+
+                If lrRoleConstraint Is Nothing Then
+                    Dim lrNode As New TinyPG.ParseNode()
+                    lrNode.Token = New TinyPG.Token(0, 0)
+                    Me.Parsetree.Errors.Add(New TinyPG.ParseError("Error: tModel.ProcessORMQLStatement: Can't find ModelElement with Id: '" & lsModelElementName & " to which the new Role is to join.", 100, lrNode))
+                    Return Me.Parsetree.Errors
+                    Exit Function
+                Else
+                    Dim lrRoleConstraintRole As New FBM.RoleConstraintRole(lrRole, lrRoleConstraint, ,,, True)
+                    Call lrRoleConstraint.AddRoleConstraintRole(lrRoleConstraintRole)
+                End If
+            Next
 
             Return lrRole
 
