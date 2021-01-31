@@ -2998,8 +2998,8 @@ Public Class frmToolboxEnterpriseExplorer
                     lsMessage = lrEnterpriseView.FocusModelElement.Id
 
                     If lrEnterpriseView.FocusModelElement.ConceptType = pcenumConceptType.ValueType Then
-                        Dim larEntityTypeInstance = From EntityTypeInstance In lrPage.EntityTypeInstance _
-                                                    Where EntityTypeInstance.ReferenceModeValueType IsNot Nothing _
+                        Dim larEntityTypeInstance = From EntityTypeInstance In lrPage.EntityTypeInstance
+                                                    Where EntityTypeInstance.ReferenceModeValueType IsNot Nothing
                                                     Select EntityTypeInstance
 
                         For Each lrEntityTypeInstance In larEntityTypeInstance
@@ -3185,9 +3185,9 @@ Public Class frmToolboxEnterpriseExplorer
 
                 Richmond.WriteToStatusBar("Loading the MetaModel for Property Graph Schemas.")
 
-                Dim lrCorePage As New FBM.Page(prApplication.CMML.Core, _
-                                               pcenumCMMLCorePage.CoreEntityRelationshipDiagram.ToString, _
-                                               pcenumCMMLCorePage.CoreEntityRelationshipDiagram.ToString, _
+                Dim lrCorePage As New FBM.Page(prApplication.CMML.Core,
+                                               pcenumCMMLCorePage.CoreEntityRelationshipDiagram.ToString,
+                                               pcenumCMMLCorePage.CoreEntityRelationshipDiagram.ToString,
                                                pcenumLanguage.ORMModel)
 
                 lrCorePage = prApplication.CMML.Core.Page.Find(AddressOf lrCorePage.EqualsByName)
@@ -3237,9 +3237,9 @@ Public Class frmToolboxEnterpriseExplorer
             Using lrWaitCursor As New WaitCursor
                 Richmond.WriteToStatusBar("Loading the MetaModel for Entity Relationship Diagrams")
 
-                Dim lrCorePage As New FBM.Page(prApplication.CMML.Core, _
-                                               pcenumCMMLCorePage.CoreEntityRelationshipDiagram.ToString, _
-                                               pcenumCMMLCorePage.CoreEntityRelationshipDiagram.ToString, _
+                Dim lrCorePage As New FBM.Page(prApplication.CMML.Core,
+                                               pcenumCMMLCorePage.CoreEntityRelationshipDiagram.ToString,
+                                               pcenumCMMLCorePage.CoreEntityRelationshipDiagram.ToString,
                                                pcenumLanguage.ORMModel)
 
                 lrCorePage = prApplication.CMML.Core.Page.Find(AddressOf lrCorePage.EqualsByName)
@@ -3275,7 +3275,7 @@ Public Class frmToolboxEnterpriseExplorer
 
     Private Sub TreeView_BeforeLabelEdit(sender As Object, e As NodeLabelEditEventArgs) Handles TreeView.BeforeLabelEdit
 
-        If e.Node.Level = 0 Then            
+        If e.Node.Level = 0 Then
             e.CancelEdit = True
         Else
             Me.TreeView.LabelEdit = True
@@ -3851,7 +3851,7 @@ Public Class frmToolboxEnterpriseExplorer
                     lrPage = dropNode.Tag.Tag
 
                     Select Case lrPage.Language
-                        Case Is = pcenumLanguage.EntityRelationshipDiagram, _
+                        Case Is = pcenumLanguage.EntityRelationshipDiagram,
                                   pcenumLanguage.PropertyGraphSchema
                             lsMessage = "You can only copy ORM Diagram Pages from one Model to another Model."
                             MsgBox(lsMessage)
@@ -4075,4 +4075,5 @@ Public Class frmToolboxEnterpriseExplorer
             Me.TreeView.SelectedNode = e.Node
         End If
     End Sub
+
 End Class

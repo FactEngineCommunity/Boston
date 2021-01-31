@@ -969,6 +969,8 @@ Namespace FBM
                 Call prDuplexServiceClient.BroadcastToDuplexService(Viev.FBM.Interface.pcenumBroadcastType.ModelAddRoleToFactType, arRole, Nothing)
             End If
 
+            Me.Model.Role.AddUnique(arRole)
+
             '================================================================================================================
             'RDS
             If abDoRDSProcessing Then

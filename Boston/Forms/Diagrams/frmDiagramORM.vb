@@ -10139,6 +10139,7 @@ Public Class frmDiagramORM
             '  so that when the user moves the mouse over the Page the ModelDictionary is reloaded.
             '-----------------------------------------------------------------------------------------
             Dim child As New frmToolboxModelDictionary
+
             If prApplication.RightToolboxForms.FindAll(AddressOf child.EqualsByName).Count >= 1 Then
                 child = prApplication.RightToolboxForms.Find(AddressOf child.EqualsByName)
                 child.zrLoadedModel = Nothing

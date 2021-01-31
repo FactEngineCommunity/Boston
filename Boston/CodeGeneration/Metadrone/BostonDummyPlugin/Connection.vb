@@ -147,10 +147,10 @@ Namespace SourcePlugins.Boston
                             sr.Precision = lrColumn.getMetamodelDataTypePrecision
                             sr.Scale = 0
                             sr.Nullable = Not lrColumn.IsMandatory
-                            sr.IsIdentity = lrColumn.ContributesToPrimaryKey
+                            sr.IsIdentity = lrColumn.ContributesToPrimaryKey & lrTable.getPrimaryKeyColumns.Count = 1
+                            sr.IsPrimaryKey = lrColumn.ContributesToPrimaryKey
                             sr.IsTable = True
                             sr.IsView = False
-                            sr.IsPrimaryKey = lrColumn.ContributesToPrimaryKey
 
                             sr.IsForeignKey = lrColumn.isForeignKey
 

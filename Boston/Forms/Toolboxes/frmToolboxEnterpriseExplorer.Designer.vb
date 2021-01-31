@@ -72,7 +72,6 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.ImportExportToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItem12 = New System.Windows.Forms.ToolStripMenuItem()
         Me.FromORMCMMLFileToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.ExportToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ExportTestingToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.TocqlFileToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.DialogFolderBrowser = New System.Windows.Forms.FolderBrowserDialog()
@@ -396,7 +395,7 @@ Partial Class frmToolboxEnterpriseExplorer
         'AddSTDPageToolStripMenuItem
         '
         Me.AddSTDPageToolStripMenuItem.Name = "AddSTDPageToolStripMenuItem"
-        Me.AddSTDPageToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
+        Me.AddSTDPageToolStripMenuItem.Size = New System.Drawing.Size(148, 22)
         Me.AddSTDPageToolStripMenuItem.Text = "&Add STD Page"
         '
         'ToolStripSeparator1
@@ -450,7 +449,7 @@ Partial Class frmToolboxEnterpriseExplorer
         '
         'ImportExportToolStripMenuItem
         '
-        Me.ImportExportToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItem12, Me.ExportToolStripMenuItem})
+        Me.ImportExportToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItem12, Me.ExportTestingToolStripMenuItem, Me.TocqlFileToolStripMenuItem})
         Me.ImportExportToolStripMenuItem.Image = Global.Boston.My.Resources.MenuImages.ImportExport16x16
         Me.ImportExportToolStripMenuItem.Name = "ImportExportToolStripMenuItem"
         Me.ImportExportToolStripMenuItem.Size = New System.Drawing.Size(207, 22)
@@ -461,7 +460,7 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.ToolStripMenuItem12.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.FromORMCMMLFileToolStripMenuItem})
         Me.ToolStripMenuItem12.Image = Global.Boston.My.Resources.MenuImages.Import16x16
         Me.ToolStripMenuItem12.Name = "ToolStripMenuItem12"
-        Me.ToolStripMenuItem12.Size = New System.Drawing.Size(110, 22)
+        Me.ToolStripMenuItem12.Size = New System.Drawing.Size(180, 22)
         Me.ToolStripMenuItem12.Text = "&Import"
         Me.ToolStripMenuItem12.Visible = False
         '
@@ -472,26 +471,18 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.FromORMCMMLFileToolStripMenuItem.Size = New System.Drawing.Size(149, 22)
         Me.FromORMCMMLFileToolStripMenuItem.Text = "From .fbm file"
         '
-        'ExportToolStripMenuItem
-        '
-        Me.ExportToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ExportTestingToolStripMenuItem, Me.TocqlFileToolStripMenuItem})
-        Me.ExportToolStripMenuItem.Image = Global.Boston.My.Resources.MenuImages.Export16x16
-        Me.ExportToolStripMenuItem.Name = "ExportToolStripMenuItem"
-        Me.ExportToolStripMenuItem.Size = New System.Drawing.Size(110, 22)
-        Me.ExportToolStripMenuItem.Text = "&Export"
-        '
         'ExportTestingToolStripMenuItem
         '
         Me.ExportTestingToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.XML16x16
         Me.ExportTestingToolStripMenuItem.Name = "ExportTestingToolStripMenuItem"
-        Me.ExportTestingToolStripMenuItem.Size = New System.Drawing.Size(135, 22)
+        Me.ExportTestingToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
         Me.ExportTestingToolStripMenuItem.Text = "To .&fbm File"
         '
         'TocqlFileToolStripMenuItem
         '
         Me.TocqlFileToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.CQL16x16
         Me.TocqlFileToolStripMenuItem.Name = "TocqlFileToolStripMenuItem"
-        Me.TocqlFileToolStripMenuItem.Size = New System.Drawing.Size(135, 22)
+        Me.TocqlFileToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
         Me.TocqlFileToolStripMenuItem.Text = "To .&cql File"
         Me.TocqlFileToolStripMenuItem.Visible = False
         '
@@ -602,7 +593,6 @@ Partial Class frmToolboxEnterpriseExplorer
     Friend WithEvents HelpProvider As System.Windows.Forms.HelpProvider
     Friend WithEvents ImportExportToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents ToolStripMenuItem12 As System.Windows.Forms.ToolStripMenuItem
-    Friend WithEvents ExportToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents ToolStripSeparator5 As System.Windows.Forms.ToolStripSeparator
     Friend WithEvents Button1 As System.Windows.Forms.Button
     Friend WithEvents TextBox1 As System.Windows.Forms.TextBox
@@ -613,7 +603,6 @@ Partial Class frmToolboxEnterpriseExplorer
     Friend WithEvents ToolStripMenuItemPastePage As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents ToolStripSeparator4 As System.Windows.Forms.ToolStripSeparator
     Friend WithEvents FromORMCMMLFileToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
-    Friend WithEvents ExportTestingToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents ToolStripSeparator2 As System.Windows.Forms.ToolStripSeparator
     Friend WithEvents ToolStripMenuItem1 As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents ToolStripMenuItemLanguage As System.Windows.Forms.ToolStripMenuItem
@@ -630,7 +619,6 @@ Partial Class frmToolboxEnterpriseExplorer
     Friend WithEvents LabelPromptProject As System.Windows.Forms.Label
     Friend WithEvents ComboBoxNamespace As System.Windows.Forms.ComboBox
     Friend WithEvents LabelPromptNamespace As System.Windows.Forms.Label
-    Friend WithEvents TocqlFileToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents GenerateDocumentationToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents SaveFileDialog As System.Windows.Forms.SaveFileDialog
     Friend WithEvents StateTransitionDiagramToolStripMenuItem As ToolStripMenuItem
@@ -646,4 +634,6 @@ Partial Class frmToolboxEnterpriseExplorer
     Friend WithEvents HideToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents UnhideHiddenModelsToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents ToolStripSeparator7 As ToolStripSeparator
+    Friend WithEvents ExportTestingToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents TocqlFileToolStripMenuItem As ToolStripMenuItem
 End Class

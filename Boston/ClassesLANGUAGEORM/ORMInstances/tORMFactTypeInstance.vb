@@ -1347,6 +1347,12 @@ Namespace FBM
                         End If
                         liInd += 1
                     Next
+
+                    For Each lrInternalUniquenessConstraint In Me.InternalUniquenessConstraint
+                        For Each lrRoleConstraintRole In lrInternalUniquenessConstraint.RoleConstraintRole
+                            lrRoleConstraintRole.Shape.AttachTo(lrRoleConstraintRole.Role.Shape, AttachToNode.TopCenter)
+                        Next
+                    Next
                 End If
 
             Catch ex As Exception
