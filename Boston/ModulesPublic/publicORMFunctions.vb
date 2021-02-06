@@ -73,7 +73,8 @@ Public Module publicORMFunctions
                 lsFactData = Now.ToString("HH:mm:ss")
             Case Is = pcenumORMDataType.TextFixedLength
                 If aiDataTypeLength > 0 Then
-                    lsFactData = GenerateRandomString(GenerateRandomInteger(1, aiDataTypeLength))
+                    'Keep to max 20 characters, because MetaModelConcept table can only accept 100 characters, and anything over 20 characters is confusing for the user through the GUI.
+                    lsFactData = GenerateRandomString(GenerateRandomInteger(1, Viev.Lesser(20, aiDataTypeLength)))
                 Else
                     lsFactData = GenerateRandomString(20)
                 End If

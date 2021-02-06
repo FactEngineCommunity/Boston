@@ -378,7 +378,7 @@ Public Class frmStateTransitionDiagram
             '=======================================================================================
             'State shapes
             lsSQLQuery = "SELECT *"
-            lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreStateTransition.ToString
+            lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreElementHasElementType.ToString
             lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
 
             lrRecordset = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
@@ -386,6 +386,41 @@ Public Class frmStateTransitionDiagram
             Dim lrState As STD.State
             Dim lrFromState As STD.State
             Dim lrToState As STD.State
+
+            While Not lrRecordset.EOF
+
+                lrFactDataInstance = lrRecordset("Element")
+                lrFromState = lrFactDataInstance.CloneState(arPage)
+                lrFromState.X = lrFactDataInstance.X
+                lrFromState.Y = lrFactDataInstance.Y
+                lrFromState.StateName = lrRecordset("Element").Data
+                lrFromState.ValueType = Me.zrPage.STDiagram.ValueType
+
+                lrFromState.STMState = Me.zrPage.Model.STM.State.Find(Function(x) x.ValueType.Id = lrFromState.ValueType.Id And x.Name = lrFromState.StateName)
+
+                Dim LoadedCount = Aggregate Node In Me.Diagram.Nodes
+                                  Where Node.GetType.ToString = GetType(MindFusion.Diagramming.ShapeNode).ToString _
+                                  And Node.Tag.ConceptType = pcenumConceptType.State _
+                                  And Node.Tag.Name = lrFromState.Name
+                                  Into Count()
+
+                If LoadedCount = 0 Then
+                    Me.zrPage.STDiagram.State.AddUnique(lrFromState)
+                    lrFromState.DisplayAndAssociate()
+                Else
+                    lrFromState = Me.zrPage.STDiagram.State.Find(Function(x) x.Name = lrFromState.Name)
+                End If
+
+                lrRecordset.MoveNext()
+            End While
+
+            '================================================================
+            'Load the Transitions
+            lsSQLQuery = "SELECT *"
+            lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreStateTransition.ToString
+            lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
+
+            lrRecordset = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
             While Not lrRecordset.EOF
 
@@ -433,8 +468,6 @@ Public Class frmStateTransitionDiagram
                     lrToState = Me.zrPage.STDiagram.State.Find(Function(x) x.Name = lrToState.Name)
                 End If
 
-                '================================================================
-                'Load the Transitions
                 lrFactInstance = lrRecordset.CurrentFact
                 Dim lrStateTransition As New STD.StateTransition
                 lrStateTransition = lrFactInstance.CloneStateTransition(arPage, lrFromState, lrToState, lrRecordset("Event").Data)
