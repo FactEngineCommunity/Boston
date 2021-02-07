@@ -34,10 +34,11 @@ Partial Class frmStateTransitionDiagram
         Me.ShowHideToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.mnuOption_ViewGrid = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripSeparator1 = New System.Windows.Forms.ToolStripSeparator()
+        Me.AutoLayoutToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripSeparator7 = New System.Windows.Forms.ToolStripSeparator()
         Me.CopyToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ContextMenuStrip_State = New System.Windows.Forms.ContextMenuStrip(Me.components)
         Me.MorphToToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.UseCaseDiagramToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ORMDiagramToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripSeparator4 = New System.Windows.Forms.ToolStripSeparator()
         Me.PropertiesToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
@@ -63,12 +64,8 @@ Partial Class frmStateTransitionDiagram
         Me.ToolStrip1 = New System.Windows.Forms.ToolStrip()
         Me.ToolStripLabel_ValueType = New System.Windows.Forms.ToolStripLabel()
         Me.ComboBox_ValueType = New System.Windows.Forms.ToolStripComboBox()
-        Me.AutoLayoutToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.ToolStripSeparator7 = New System.Windows.Forms.ToolStripSeparator()
         Me.DiagramView = New MindFusion.Diagramming.WinForms.DiagramView()
-        Me.Diagram1 = New MindFusion.Diagramming.Diagram()
         Me.HiddenDiagramView = New MindFusion.Diagramming.WinForms.DiagramView()
-        Me.Diagram2 = New MindFusion.Diagramming.Diagram()
         Me.ContextMenuStrip_Diagram.SuspendLayout()
         Me.ContextMenuStrip_State.SuspendLayout()
         Me.ContextMenuStrip_Process.SuspendLayout()
@@ -100,7 +97,7 @@ Partial Class frmStateTransitionDiagram
         '
         Me.ContextMenuStrip_Diagram.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ViewToolStripMenuItem, Me.ShowHideToolStripMenuItem, Me.ToolStripSeparator1, Me.AutoLayoutToolStripMenuItem, Me.ToolStripSeparator7, Me.CopyToolStripMenuItem})
         Me.ContextMenuStrip_Diagram.Name = "ContextMenuStrip_Diagram"
-        Me.ContextMenuStrip_Diagram.Size = New System.Drawing.Size(208, 126)
+        Me.ContextMenuStrip_Diagram.Size = New System.Drawing.Size(208, 104)
         '
         'ViewToolStripMenuItem
         '
@@ -160,6 +157,18 @@ Partial Class frmStateTransitionDiagram
         Me.ToolStripSeparator1.Name = "ToolStripSeparator1"
         Me.ToolStripSeparator1.Size = New System.Drawing.Size(204, 6)
         '
+        'AutoLayoutToolStripMenuItem
+        '
+        Me.AutoLayoutToolStripMenuItem.Image = Global.Boston.My.Resources.MenuImagesMain.Layout16x16
+        Me.AutoLayoutToolStripMenuItem.Name = "AutoLayoutToolStripMenuItem"
+        Me.AutoLayoutToolStripMenuItem.Size = New System.Drawing.Size(207, 22)
+        Me.AutoLayoutToolStripMenuItem.Text = "&AutoLayout"
+        '
+        'ToolStripSeparator7
+        '
+        Me.ToolStripSeparator7.Name = "ToolStripSeparator7"
+        Me.ToolStripSeparator7.Size = New System.Drawing.Size(204, 6)
+        '
         'CopyToolStripMenuItem
         '
         Me.CopyToolStripMenuItem.Image = Global.Boston.My.Resources.MenuImagesMain.Camera16x16
@@ -175,23 +184,17 @@ Partial Class frmStateTransitionDiagram
         '
         'MorphToToolStripMenuItem
         '
-        Me.MorphToToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.UseCaseDiagramToolStripMenuItem, Me.ORMDiagramToolStripMenuItem})
+        Me.MorphToToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ORMDiagramToolStripMenuItem})
         Me.MorphToToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.Morphing16x16
         Me.MorphToToolStripMenuItem.Name = "MorphToToolStripMenuItem"
         Me.MorphToToolStripMenuItem.Size = New System.Drawing.Size(127, 22)
         Me.MorphToToolStripMenuItem.Text = "&Morph To"
         '
-        'UseCaseDiagramToolStripMenuItem
-        '
-        Me.UseCaseDiagramToolStripMenuItem.Name = "UseCaseDiagramToolStripMenuItem"
-        Me.UseCaseDiagramToolStripMenuItem.Size = New System.Drawing.Size(169, 22)
-        Me.UseCaseDiagramToolStripMenuItem.Text = "&Use Case Diagram"
-        '
         'ORMDiagramToolStripMenuItem
         '
         Me.ORMDiagramToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.ORM16x16
         Me.ORMDiagramToolStripMenuItem.Name = "ORMDiagramToolStripMenuItem"
-        Me.ORMDiagramToolStripMenuItem.Size = New System.Drawing.Size(169, 22)
+        Me.ORMDiagramToolStripMenuItem.Size = New System.Drawing.Size(149, 22)
         Me.ORMDiagramToolStripMenuItem.Text = "&ORM Diagram"
         '
         'ToolStripSeparator4
@@ -323,7 +326,7 @@ Partial Class frmStateTransitionDiagram
         Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripLabel_ValueType, Me.ComboBox_ValueType})
         Me.ToolStrip1.Location = New System.Drawing.Point(81, 9)
         Me.ToolStrip1.Name = "ToolStrip1"
-        Me.ToolStrip1.Size = New System.Drawing.Size(417, 33)
+        Me.ToolStrip1.Size = New System.Drawing.Size(450, 37)
         Me.ToolStrip1.TabIndex = 11
         Me.ToolStrip1.Text = "ToolStrip1"
         '
@@ -331,7 +334,7 @@ Partial Class frmStateTransitionDiagram
         '
         Me.ToolStripLabel_ValueType.Font = New System.Drawing.Font("Segoe UI", 14.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.ToolStripLabel_ValueType.Name = "ToolStripLabel_ValueType"
-        Me.ToolStripLabel_ValueType.Size = New System.Drawing.Size(112, 30)
+        Me.ToolStripLabel_ValueType.Size = New System.Drawing.Size(112, 34)
         Me.ToolStripLabel_ValueType.Text = "Value Type :"
         '
         'ComboBox_ValueType
@@ -340,19 +343,7 @@ Partial Class frmStateTransitionDiagram
         Me.ComboBox_ValueType.Font = New System.Drawing.Font("Segoe UI", 14.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.ComboBox_ValueType.ForeColor = System.Drawing.Color.SteelBlue
         Me.ComboBox_ValueType.Name = "ComboBox_ValueType"
-        Me.ComboBox_ValueType.Size = New System.Drawing.Size(300, 33)
-        '
-        'AutoLayoutToolStripMenuItem
-        '
-        Me.AutoLayoutToolStripMenuItem.Image = Global.Boston.My.Resources.MenuImagesMain.Layout16x16
-        Me.AutoLayoutToolStripMenuItem.Name = "AutoLayoutToolStripMenuItem"
-        Me.AutoLayoutToolStripMenuItem.Size = New System.Drawing.Size(207, 22)
-        Me.AutoLayoutToolStripMenuItem.Text = "&AutoLayout"
-        '
-        'ToolStripSeparator7
-        '
-        Me.ToolStripSeparator7.Name = "ToolStripSeparator7"
-        Me.ToolStripSeparator7.Size = New System.Drawing.Size(204, 6)
+        Me.ComboBox_ValueType.Size = New System.Drawing.Size(300, 37)
         '
         'DiagramView
         '
@@ -438,7 +429,6 @@ Partial Class frmStateTransitionDiagram
     Friend WithEvents ToolStripSeparator5 As System.Windows.Forms.ToolStripSeparator
     Friend WithEvents mnuOption_EntityTypeProperties As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents MorphToToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
-    Friend WithEvents UseCaseDiagramToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents ORMDiagramToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents ToolStripSeparator4 As System.Windows.Forms.ToolStripSeparator
     Friend WithEvents HiddenDiagramView As MindFusion.Diagramming.WinForms.DiagramView
@@ -458,6 +448,4 @@ Partial Class frmStateTransitionDiagram
     Friend WithEvents PageAsORMMetaModelToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents AutoLayoutToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents ToolStripSeparator7 As ToolStripSeparator
-    Friend WithEvents Diagram1 As MindFusion.Diagramming.Diagram
-    Friend WithEvents Diagram2 As MindFusion.Diagramming.Diagram
 End Class

@@ -7655,6 +7655,90 @@ Public Class frmDiagramORM
 
     End Sub
 
+    Public Sub morphToSTDiagram(ByVal sender As Object, ByVal e As EventArgs)
+
+        Try
+            Dim item As ToolStripItem = CType(sender, ToolStripItem)
+
+            Me.HiddenDiagramView.ZoomFactor = Me.DiagramView.ZoomFactor
+
+            Me.HiddenDiagram.Nodes.Clear()
+            Call Me.DiagramView.SendToBack()
+            Call Me.HiddenDiagramView.BringToFront()
+
+            'If Me.zrPage.SelectedObject.Count = 0 Then Exit Sub
+
+            Dim lrPageObject As New FBM.PageObject
+            lrPageObject = Me.zrPage.SelectedObject(0).ClonePageObject
+
+            Dim lrShapeNode As ShapeNode
+            lrShapeNode = lrPageObject.Shape.Clone(True)
+            lrShapeNode = New ShapeNode(lrPageObject.Shape)
+
+            lrShapeNode.Text = lrPageObject.Name
+
+            Me.MorphVector(0).ModelElementId = Me.zrPage.SelectedObject(0).Id
+            Me.MorphVector(0).Shape = lrShapeNode
+            Me.HiddenDiagram.Nodes.Add(Me.MorphVector(0).Shape)
+            Me.HiddenDiagram.Invalidate()
+
+            If IsSomething(frmMain.zfrmModelExplorer) Then
+                Dim lrEnterpriseView As tEnterpriseEnterpriseView
+                lrEnterpriseView = item.Tag 'Set when the ContextMenu.Opening event is triggered.            
+                Me.MorphVector(0).EnterpriseTreeView = lrEnterpriseView
+                prApplication.WorkingPage = lrEnterpriseView.Tag
+
+                '------------------------------------------------------------------
+                'Get the X,Y co-ordinates of the Actor/EntityType being morphed
+                '------------------------------------------------------------------
+                Dim lrPage As New FBM.Page(lrEnterpriseView.Tag.Model)
+                lrPage = lrEnterpriseView.Tag
+
+                Me.MorphVector(0).InitialZoomFactor = Me.DiagramView.ZoomFactor
+                If lrPage.DiagramView IsNot Nothing Then
+                    Me.MorphVector(0).TargetZoomFactor = lrPage.DiagramView.ZoomFactor
+                End If
+
+                'Start/End sizes
+                Me.MorphVector(0).StartSize = New Rectangle(0, 0, Me.MorphVector(0).Shape.Bounds.Width, Me.MorphVector(0).Shape.Bounds.Height)
+                Me.MorphVector(0).EndSize = New Rectangle(0, 0, 100, 10)
+
+                '===========================================
+                Dim lrNode As PGS.Node
+
+                lrNode = lrPage.ERDiagram.Entity.Find(Function(x) x.Name = lrPageObject.Name)
+
+                Me.MorphVector(0).EndPoint = New Point(40, 5)
+                Me.MorphVector(0).VectorSteps = 25
+
+                '===========================================
+                Me.MorphVector(0).Shape.Font = Me.zrPage.Diagram.Font
+                Me.MorphVector(0).Shape.Text = Me.MorphVector(0).ModelElementId
+                Me.MorphVector(0).Shape.TextFormat = New StringFormat(StringFormatFlags.NoFontFallback)
+                Me.MorphVector(0).Shape.TextFormat.Alignment = StringAlignment.Center
+                Me.MorphVector(0).Shape.TextFormat.LineAlignment = StringAlignment.Center
+
+                Me.MorphVector(0).TargetShape = pcenumTargetMorphShape.RoundRectangle
+
+                Me.MorphTimer.Enabled = True
+                Me.MorphStepTimer.Enabled = True
+                Me.MorphStepTimer.Tag = lrEnterpriseView.TreeNode
+                Me.MorphStepTimer.Start()
+                Me.MorphTimer.Start()
+
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage1 As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
 
     Private Sub MorphTimer_Tick(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MorphTimer.Tick
 
@@ -7774,7 +7858,7 @@ Public Class frmDiagramORM
             '-----------------------------------------------------------------------------
             'Clear the list of StateTransitionDiagrams that may relate to the ValueType
             '-----------------------------------------------------------------------------
-            Me.ToolStripMenuItem_StateTransitionDiagram.DropDownItems.Clear()
+            Me.ToolStripMenuItemStateTransitionDiagram.DropDownItems.Clear()
 
             '--------------------------------------------------------
             'Load the ORMDiagrams that relate to the ValueType
@@ -7805,6 +7889,38 @@ Public Class frmDiagramORM
                     lo_menu_option = Me.ToolStripMenuItem_ValueTypeMorph_ORMDiagram.DropDownItems.Add(lr_page.Name)
                     lo_menu_option.Tag = prPageNodes.Find(AddressOf lrEnterpriseView.Equals)
                     AddHandler lo_menu_option.Click, AddressOf Me.MorphToORMDiagramValueType
+                End If
+            Next
+
+            '--------------------------------------------------------
+            'Load the ORMDiagrams that relate to the ValueType
+            '  as selectable menuOptions
+            '--------------------------------------------------------        
+            larPage_list = prApplication.CMML.getSTDDiagramPagesForValueType(lrValueType)
+
+            For Each lr_page In larPage_list
+                '----------------------------------------------------------
+                'Try and find the Page within the EnterpriseView.TreeView
+                '  NB If 'Core' Pages are not shown for the model, 
+                '  they will not be in the TreeView and so a menuOption
+                '  is now added for those hidden Pages.
+                '----------------------------------------------------------
+                Dim lrEnterpriseView As tEnterpriseEnterpriseView
+                lrEnterpriseView = New tEnterpriseEnterpriseView(pcenumMenuType.pageSTD,
+                                                           lr_page,
+                                                           lr_model.ModelId,
+                                                           pcenumLanguage.StateTransitionDiagram,
+                                                           Nothing,
+                                                           lr_page.PageId)
+                lrEnterpriseView = prPageNodes.Find(AddressOf lrEnterpriseView.Equals)
+                If IsSomething(lrEnterpriseView) Then
+                    '---------------------------------------------------
+                    'Add the Page(Name) to the MenuOption.DropDownItems
+                    '---------------------------------------------------
+                    'lo_menu_option = Me.ORMDiagramToolStripMenuItem.DropDownItems.Add(lr_page.Name)
+                    lo_menu_option = Me.ToolStripMenuItemStateTransitionDiagram.DropDownItems.Add(lr_page.Name)
+                    lo_menu_option.Tag = prPageNodes.Find(AddressOf lrEnterpriseView.Equals)
+                    AddHandler lo_menu_option.Click, AddressOf Me.MorphToSTDiagram
                 End If
             Next
 
@@ -9019,14 +9135,14 @@ Public Class frmDiagramORM
 
         If ToolStripMenuItemFactTypeReadings.Checked Then
             For Each lrFactTypeInstance In Me.zrPage.FactTypeInstance
-                If IsSomething(lrFactTypeInstance.FactTypeReadingShape.shape) And Not lrFactTypeInstance.isPreferredReferenceMode Then
-                    lrFactTypeInstance.FactTypeReadingShape.shape.Visible = True
+                If IsSomething(lrFactTypeInstance.FactTypeReadingShape.Shape) And Not lrFactTypeInstance.isPreferredReferenceMode Then
+                    lrFactTypeInstance.FactTypeReadingShape.Shape.Visible = True
                 End If
             Next
         Else
             For Each lrFactTypeInstance In Me.zrPage.FactTypeInstance
-                If IsSomething(lrFactTypeInstance.FactTypeReadingShape.shape) Then
-                    lrFactTypeInstance.FactTypeReadingShape.shape.Visible = False
+                If IsSomething(lrFactTypeInstance.FactTypeReadingShape.Shape) Then
+                    lrFactTypeInstance.FactTypeReadingShape.Shape.Visible = False
                 End If
             Next
         End If
@@ -9716,7 +9832,7 @@ Public Class frmDiagramORM
             '-----------------------------------------------------------------------------
             'Clear the list of StateTransitionDiagrams that may relate to the ValueType
             '-----------------------------------------------------------------------------
-            Me.ToolStripMenuItem_StateTransitionDiagram.DropDownItems.Clear()
+            Me.ToolStripMenuItemStateTransitionDiagram.DropDownItems.Clear()
 
             '--------------------------------------------------------
             'Load the ORMDiagrams that relate to the EntityType

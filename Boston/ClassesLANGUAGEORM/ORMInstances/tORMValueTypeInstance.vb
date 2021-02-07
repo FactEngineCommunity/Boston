@@ -230,6 +230,17 @@ Namespace FBM
 
         End Function
 
+        Public Function ClonePageObject() As FBM.PageObject
+
+            Dim lrPageObject As New FBM.PageObject
+
+            lrPageObject.Name = Me.Name
+            lrPageObject.Shape = Me.Shape
+
+            Return lrPageObject
+
+        End Function
+
         Public Sub DisplayAndAssociate(Optional ByVal abForceDisplay As Boolean = False)
 
             Dim loDroppedNode As ShapeNode

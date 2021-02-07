@@ -834,6 +834,13 @@ Public Class frmStateTransitionDiagram
         loFirstEntity = e.Link.Origin.Tag
         loSecondEntity = e.Link.Destination.Tag
 
+        'User may have linked to nothing.
+        If loSecondEntity Is Nothing Then
+            Me.Diagram.Links.Remove(e.Link)
+            e.Link.Dispose()
+            Exit Sub
+        End If
+
         If (loFirstEntity.ConceptType = pcenumConceptType.StartStateIndicator) And (loSecondEntity.ConceptType = pcenumConceptType.State) Then
             '=====================================
             'Start State Transition

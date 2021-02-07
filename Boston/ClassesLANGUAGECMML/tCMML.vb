@@ -137,19 +137,47 @@ Public Class tCMML
 
         getPGSDiagramPagesForModelElementName = New List(Of FBM.Page)
 
-        Dim larPage = From Page In arModel.Page _
-                      From FactType In Page.FactTypeInstance _
-                      From Fact In FactType.Fact _
-                      From RoleData In Fact.Data _
+        Dim larPage = From Page In arModel.Page
+                      From FactType In Page.FactTypeInstance
+                      From Fact In FactType.Fact
+                      From RoleData In Fact.Data
                       Where Page.Language = pcenumLanguage.PropertyGraphSchema _
                       And FactType.Name = pcenumCMMLRelations.CoreElementHasElementType.ToString _
                       And RoleData.Role.Name = pcenumCMML.Element.ToString _
-                      And RoleData.Concept.Symbol = asModelElementName _
-                      Select Page Distinct _
+                      And RoleData.Concept.Symbol = asModelElementName
+                      Select Page Distinct
                       Order By Page.Name
 
         For Each lrPage In larPage
             getPGSDiagramPagesForModelElementName.Add(lrPage)
+        Next
+
+    End Function
+
+    Public Function getSTDDiagramPagesForValueType(ByRef arValueType As FBM.ValueType) As List(Of FBM.Page)
+
+        getSTDDiagramPagesForValueType = New List(Of FBM.Page)
+
+        Dim lrModel As FBM.Model = arValueType.Model
+        Dim lrValueType As FBM.ValueType = arValueType
+
+        Dim larPage = arValueType.Model.Page.FindAll(Function(x) x.Language = pcenumLanguage.StateTransitionDiagram)
+
+        Dim lsSQLQuery As String = ""
+        Dim lrORMRecordset As ORMQL.Recordset
+
+        For Each lrPage In larPage
+
+            lsSQLQuery = "SELECT *"
+            lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreStateTransition.ToString
+            lsSQLQuery &= " ON PAGE '" & lrPage.Name & "'"
+            lsSQLQuery &= " WHERE ValueType = '" & arValueType.Id & "'"
+
+            lrORMRecordset = arValueType.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+            If lrORMRecordset.Facts.Count > 0 Then
+                getSTDDiagramPagesForValueType.Add(lrPage)
+            End If
         Next
 
     End Function
