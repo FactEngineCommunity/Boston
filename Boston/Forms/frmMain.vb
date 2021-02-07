@@ -74,8 +74,13 @@ Public Class frmMain
             prSoftwareCategory = pcenumSoftwareCategory.Professional
             Me.StatusLabelGeneralStatus.Text = "Software Category Set"
 
-            prApplicationApplicationVersionNr = "5.4"
-            prApplicationDatabaseVersionNr = "1.25"
+            '====================================================================================
+            'Notes
+            '  Core v2.1 introduces changes to the StateTransitionDiagram model, with changes to the underlying ModelElements. Introduced in Boston v5.4
+            psApplicationApplicationVersionNr = "5.4"
+            psApplicationDatabaseVersionNr = "1.25"
+            'NB To access the Core version number go to prApplication.CMML.Core.CoreVersionNumber            
+
 
             If Not My.Settings.UseVirtualUI Then
                 ltSplashThread = New Thread(AddressOf Me.LoadSplashScreen)
@@ -194,10 +199,10 @@ Public Class frmMain
 
             Me.IsMdiContainer = True
 
-            prApplication.ApplicationVersionNr = prApplicationApplicationVersionNr
-            'The database version required by the Richmond application.
+            prApplication.ApplicationVersionNr = psApplicationApplicationVersionNr
+            'The database version required by the Boston application.
             '  NB May be different from My.Settings.DatabaseVersionNumber, which is the actual version of the database installed.
-            prApplication.DatabaseVersionNr = prApplicationDatabaseVersionNr
+            prApplication.DatabaseVersionNr = psApplicationDatabaseVersionNr
 
             Me.StatusLabelGeneralStatus.Text = "Opening Database"
             If Richmond.OpenDatabase() Then

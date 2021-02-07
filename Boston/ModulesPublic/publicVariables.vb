@@ -17,8 +17,9 @@ Public Module publicVariables
     Public prUser As ClientServer.User 'Used when loging in using VirtualUI
 
     Public prSoftwareCategory As pcenumSoftwareCategory
-    Public prApplicationApplicationVersionNr As String
-    Public prApplicationDatabaseVersionNr As String
+
+    Public psApplicationApplicationVersionNr As String
+    Public psApplicationDatabaseVersionNr As String
 
     Public prThinfinity As New Cybele.Thinfinity.VirtualUI
 

@@ -38,6 +38,7 @@ Namespace STD
                 Dim loLink As New DiagramLink(Me.Page.Diagram, loNode1, loNode2)
                 loLink.Locked = False
                 loLink.Tag = Me
+                loLink.TextStyle = LinkTextStyle.Center
                 Me.Link = loLink
                 Me.Link.Visible = True
                 Me.Link.ShadowColor = Color.White

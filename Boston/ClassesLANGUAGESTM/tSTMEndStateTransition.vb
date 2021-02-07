@@ -25,6 +25,7 @@ Namespace FBM.STM
         ''' </summary>
         Public Fact As FBM.Fact
 
+        Public Event EventNameChanged(ByVal asNewEventName As String)
         Public Event RemovedFromModel()
 
         ''' <summary>
@@ -65,6 +66,16 @@ Namespace FBM.STM
             Return True
 
         End Function
+
+        Public Sub setEventName(ByVal asEventName As String)
+
+            Me.Event = asEventName
+
+            Me.Fact("Event").Data = asEventName
+            Me.Fact.makeDirty()
+
+            RaiseEvent EventNameChanged(asEventName)
+        End Sub
 
     End Class
 

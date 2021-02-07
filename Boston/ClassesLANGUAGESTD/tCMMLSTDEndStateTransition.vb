@@ -16,7 +16,7 @@ Namespace STD
 
         Public Link As DiagramLink
 
-        Public STMEndStateTransition As FBM.STM.EndStateTransition 'The EndStateTransition as the STModel level of the FBM.Model.
+        Public WithEvents STMEndStateTransition As FBM.STM.EndStateTransition 'The EndStateTransition as the STModel level of the FBM.Model.
 
         Public Sub New()
 
@@ -59,6 +59,12 @@ Namespace STD
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
                 prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
+
+        End Sub
+
+        Private Sub STMEndStateTransition_EventNameChanged(asNewEventName As String) Handles STMEndStateTransition.EventNameChanged
+
+            Me.Link.Text = asNewEventName
 
         End Sub
 

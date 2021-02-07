@@ -26,9 +26,9 @@ Public Class frmSplash
             Me.LabelSoftwareCategory.Text = "Student"
         End If
 
-        ls_message = "Boston version: v" & prApplicationApplicationVersionNr
+        ls_message = "Boston version: v" & psApplicationApplicationVersionNr
         ls_message &= vbCrLf
-        ls_message &= "Boston database version: v" & prApplicationDatabaseVersionNr
+        ls_message &= "Boston database version: v" & psApplicationDatabaseVersionNr
 
         label_splash.Text = ls_message
 

@@ -15,6 +15,7 @@ Public Class tApplication
     ''' </summary>
     ''' <remarks></remarks>
     Public DatabaseVersionNr As String = ""    'Set in frmMain.Load
+    'NB To access the CoreVersionNumber, look to prApplication.CMML.Core.CoreVersionNumber. I.e. Is a function of the Core that ships with Boston or as updated by an upgrade.
 
     Public SoftwareCategory As pcenumSoftwareCategory = pcenumSoftwareCategory.Professional
 

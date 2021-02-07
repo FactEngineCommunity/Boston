@@ -188,15 +188,15 @@ Public Class frmStateTransitionDiagram
 
     Private Sub UseCaseDiagramView_DoubleClick(ByVal sender As Object, ByVal e As System.EventArgs) Handles DiagramView.DoubleClick
 
-        '---------------------------------------
-        'Only allow 'InPlaceEdit' on Processes
-        '---------------------------------------
+        '--------------------------------------------
+        'Allow 'InPlaceEdit' on select object types
         If Me.Diagram.Selection.Items.Count = 1 Then
-            If Me.Diagram.Selection.Items(0).Tag.ConceptType = pcenumConceptType.Process Then
-                Me.DiagramView.AllowInplaceEdit = True
-            Else
-                Me.DiagramView.AllowInplaceEdit = False
-            End If
+            Select Case Me.Diagram.Selection.Items(0).Tag.GetType
+                Case GetType(STD.EndStateTransition)
+                    Me.DiagramView.AllowInplaceEdit = True
+                Case Else
+                    Me.DiagramView.AllowInplaceEdit = False
+            End Select
         Else
             Me.DiagramView.AllowInplaceEdit = False
         End If
@@ -1917,4 +1917,34 @@ Public Class frmStateTransitionDiagram
 
     End Sub
 
+    Private Sub Diagram_LinkTextEdited(sender As Object, e As EditLinkTextEventArgs) Handles Diagram.LinkTextEdited
+
+        Select Case e.Link.Tag.GetType
+            Case GetType(STD.EndStateTransition)
+                Dim lrEndStateTransition As STD.EndStateTransition = e.Link.Tag
+                If lrEndStateTransition.EventName <> e.Link.Text Then
+                    lrEndStateTransition.STMEndStateTransition.setEventName(e.Link.Text)
+                End If
+            Case GetType(STD.StateTransition)
+                Debugger.Break()
+        End Select
+
+    End Sub
+
+    Private Sub Diagram_LinkDoubleClicked(sender As Object, e As LinkEventArgs) Handles Diagram.LinkDoubleClicked
+
+        '--------------------------------------------
+        'Allow 'InPlaceEdit' on select object types
+        If Me.Diagram.Selection.Items.Count = 1 Then
+            Select Case Me.Diagram.Selection.Items(0).Tag.GetType
+                Case GetType(STD.EndStateTransition)
+                    Me.DiagramView.AllowInplaceEdit = True
+                Case Else
+                    Me.DiagramView.AllowInplaceEdit = False
+            End Select
+        Else
+            Me.DiagramView.AllowInplaceEdit = False
+        End If
+
+    End Sub
 End Class

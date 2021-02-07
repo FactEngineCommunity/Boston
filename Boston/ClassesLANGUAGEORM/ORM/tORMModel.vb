@@ -224,12 +224,14 @@ Namespace FBM
         ''' The Relational Data Schema for the Model.
         ''' </summary>
         ''' <remarks></remarks>
+        <NonSerialized()>
         <XmlIgnore()>
         Public RDS As New RDS.Model(Me)
 
         ''' <summary>
         ''' The State Transition Model for Value Type / Value Type Constraints for the Model.
         ''' </summary>
+        <NonSerialized()>
         <XmlIgnore()>
         Public STM As New FBM.STM.Model(Me)
 

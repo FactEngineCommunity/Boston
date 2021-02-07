@@ -238,6 +238,15 @@ Namespace FBM
 
         End Function
 
+        Default Public Property Item(ByVal asItemValue As String) As FBM.FactData
+            Get
+                Return Me.GetFactDataByRoleName(asItemValue)
+            End Get
+            Set(value As FBM.FactData)
+                Throw New NotImplementedException("Not implemented")
+            End Set
+        End Property
+
         '''' <summary>
         ''''Serializes all public, private and public fields except the one 
         ''''  which are the hidden fields for the eventhandlers
