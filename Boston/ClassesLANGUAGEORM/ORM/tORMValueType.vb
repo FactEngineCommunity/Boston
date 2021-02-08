@@ -654,6 +654,28 @@ Namespace FBM
 
         End Sub
 
+        Public Sub renameValueConstraint(ByVal asOldValueConstraint As String, ByVal asNewValueConstraint As String)
+
+            Try
+                Dim liIndex = Me.ValueConstraint.IndexOf(asOldValueConstraint)
+
+                Me.ValueConstraint(liIndex) = asNewValueConstraint
+
+                Me.makeDirty()
+
+                RaiseEvent ValueConstraintModified(asOldValueConstraint, asNewValueConstraint)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
         Public Overridable Overloads Sub Save(Optional ByVal abRapidSave As Boolean = False)
 
             '-------------------------------------

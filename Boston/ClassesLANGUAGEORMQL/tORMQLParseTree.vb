@@ -355,6 +355,9 @@ Namespace TinyPG
                 Case TokenType.REMOVEINSTANCESTMT
                     Value = EvalREMOVEINSTANCESTMT(tree, paramlist)
                     Exit Select
+                Case TokenType.REMOVEMODELELEMENTSTMT
+                    Value = EvalREMOVEMODELELEMENTSTMT(tree, paramlist)
+                    Exit Select
                 Case TokenType.RENAMEINSTANCESTMT
                     Value = EvalRENAMEINSTANCESTMT(tree, paramlist)
                     Exit Select
@@ -566,6 +569,10 @@ Namespace TinyPG
         End Function
 
         Protected Overridable Function EvalREMOVEINSTANCESTMT(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalREMOVEMODELELEMENTSTMT(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
             Throw New NotImplementedException()
         End Function
 

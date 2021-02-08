@@ -208,33 +208,51 @@ Namespace FBM
 
             Dim lsSQLQuery As String
 
-            lsSQLQuery = "UPDATE " & pcenumCMMLRelations.CoreStateTransition.ToString
-            lsSQLQuery &= " SET Concept1 = '" & arState.Name & "'"
-            lsSQLQuery &= " WHERE Concept1 = '" & asOldStateName & "'"
-            'lsSQLQuery &= " AND ValueType = '" & arState.ValueType.Id & "'"
+            Try
 
-            Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                lsSQLQuery = "UPDATE " & pcenumCMMLRelations.CoreElementHasElementType.ToString
+                lsSQLQuery &= " SET Element = '" & arState.Name & "'"
+                lsSQLQuery &= " WHERE Element = '" & asOldStateName & "'"
+                lsSQLQuery &= " AND ElementType = 'State'"
 
-            lsSQLQuery = "UPDATE " & pcenumCMMLRelations.CoreStateTransition.ToString
-            lsSQLQuery &= " SET Concept2 = '" & arState.Name & "'"
-            lsSQLQuery &= " WHERE Concept2 = '" & asOldStateName & "'"
-            'lsSQLQuery &= " AND ValueType = '" & arState.ValueType.Id & "'"
+                Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
-            Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                lsSQLQuery = "UPDATE " & pcenumCMMLRelations.CoreStateTransition.ToString
+                lsSQLQuery &= " SET Concept1 = '" & arState.Name & "'"
+                lsSQLQuery &= " WHERE Concept1 = '" & asOldStateName & "'"
+                lsSQLQuery &= " AND ValueType = '" & arState.ValueType.Id & "'"
 
-            lsSQLQuery = "UPDATE " & pcenumCMMLRelations.CoreValueTypeHasStartCoreElementState.ToString
-            lsSQLQuery &= " SET CoreElement = '" & arState.Name & "'"
-            lsSQLQuery &= " WHERE CoreElement = '" & asOldStateName & "'"
-            lsSQLQuery &= " AND ValueType = '" & arState.ValueType.Id & "'"
+                Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
-            Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                lsSQLQuery = "UPDATE " & pcenumCMMLRelations.CoreStateTransition.ToString
+                lsSQLQuery &= " SET Concept2 = '" & arState.Name & "'"
+                lsSQLQuery &= " WHERE Concept2 = '" & asOldStateName & "'"
+                lsSQLQuery &= " AND ValueType = '" & arState.ValueType.Id & "'"
 
-            lsSQLQuery = "UPDATE " & pcenumCMMLRelations.CoreValueTypeHasEndCoreElementState.ToString
-            lsSQLQuery &= " SET CoreElement = '" & arState.Name & "'"
-            lsSQLQuery &= " WHERE CoreElement = '" & asOldStateName & "'"
-            lsSQLQuery &= " AND ValueType = '" & arState.ValueType.Id & "'"
+                Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
-            Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                lsSQLQuery = "UPDATE " & pcenumCMMLRelations.CoreValueTypeHasStartCoreElementState.ToString
+                lsSQLQuery &= " SET CoreElement = '" & arState.Name & "'"
+                lsSQLQuery &= " WHERE CoreElement = '" & asOldStateName & "'"
+                lsSQLQuery &= " AND ValueType = '" & arState.ValueType.Id & "'"
+
+                Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                lsSQLQuery = "UPDATE " & pcenumCMMLRelations.CoreValueTypeHasEndCoreElementState.ToString
+                lsSQLQuery &= " SET CoreElement = '" & arState.Name & "'"
+                lsSQLQuery &= " WHERE CoreElement = '" & asOldStateName & "'"
+                lsSQLQuery &= " AND ValueType = '" & arState.ValueType.Id & "'"
+
+                Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
         End Sub
 

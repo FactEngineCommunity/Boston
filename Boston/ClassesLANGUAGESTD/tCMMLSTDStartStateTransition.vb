@@ -16,7 +16,7 @@ Namespace STD
 
         Public Link As DiagramLink
 
-        Public STMStartStateTransition As FBM.STM.StartStateTransition 'The StartStateTransition as the STModel level of the FBM.Model.
+        Public WithEvents STMStartStateTransition As FBM.STM.StartStateTransition 'The StartStateTransition as the STModel level of the FBM.Model.
 
         ''' <summary>
         ''' Parameterless constructor
@@ -62,6 +62,12 @@ Namespace STD
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
                 prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
+
+        End Sub
+
+        Private Sub STMStartStateTransition_EventNameChanged(asNewEventName As String) Handles STMStartStateTransition.EventNameChanged
+
+            Me.Link.Text = asNewEventName
 
         End Sub
 

@@ -76,6 +76,8 @@ Namespace FBM
                     lrStateTransition.ToState = lrToState
                     lrStateTransition.Event = lrORMRecordset("Event").Data
 
+                    lrStateTransition.Fact = lrORMRecordset.CurrentFact
+
                     Me.STM.StateTransition.AddUnique(lrStateTransition)
 
                     lrORMRecordset.MoveNext()
@@ -101,10 +103,16 @@ Namespace FBM
                         lrToState.Name = lrORMRecordset("CoreElement").Data
                         lrToState.Model = Me.STM
 
+                        lrState = lrToState
                         Me.STM.State.AddUnique(lrToState)
                     Else
                         lrState.IsStart = True
                     End If
+
+                    '-------------------------------------------------------------------------------
+                    'StartStateTransition
+                    Dim lrStartStateTransition = New STM.StartStateTransition(Me.STM, lrValueType, lrState, lrORMRecordset("Event").Data, lrORMRecordset.CurrentFact)
+                    Me.STM.StartStateTransition.Add(lrStartStateTransition)
 
                     lrORMRecordset.MoveNext()
                 End While

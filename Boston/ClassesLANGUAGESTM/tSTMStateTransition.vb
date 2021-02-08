@@ -21,6 +21,8 @@ Namespace FBM.STM
         ''' </summary>
         Public Fact As FBM.Fact
 
+        Public Event EventNameChanged(ByVal asNewEventName As String)
+
         ''' <summary>
         ''' Parameterless constructor
         ''' </summary>
@@ -43,6 +45,16 @@ Namespace FBM.STM
                 Me.Id = arFact.Id
             End If
 
+        End Sub
+
+        Public Sub setEventName(ByVal asEventName As String)
+
+            Me.Event = asEventName
+
+            Me.Fact("Event").Data = asEventName
+            Me.Fact.makeDirty()
+
+            RaiseEvent EventNameChanged(asEventName)
         End Sub
 
     End Class

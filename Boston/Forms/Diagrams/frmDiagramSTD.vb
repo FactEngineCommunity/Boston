@@ -472,6 +472,8 @@ Public Class frmStateTransitionDiagram
                 Dim lrStateTransition As New STD.StateTransition
                 lrStateTransition = lrFactInstance.CloneStateTransition(arPage, lrFromState, lrToState, lrRecordset("Event").Data)
 
+                lrStateTransition.STMStateTransition = Me.zrPage.Model.STM.StateTransition.Find(Function(x) x.Fact.Id = lrRecordset.CurrentFact.Id)
+
                 Me.zrPage.STDiagram.StateTransition.AddUnique(lrStateTransition)
                 Call lrStateTransition.DisplayAndAssociate()
 
@@ -535,6 +537,7 @@ Public Class frmStateTransitionDiagram
                 'StartStateTransition
                 Dim lrStartStateTransition = New STD.StartStateTransition(lrState, lrStartStateIndicator, lrRecordset("Event").Data)
                 lrStartStateTransition.ValueType = Me.zrPage.STDiagram.ValueType
+
                 lrStartStateTransition.STMStartStateTransition = Me.zrPage.Model.STM.StartStateTransition.Find(Function(x) x.Fact.Id = lrRecordset.CurrentFact.Id)
 
                 Me.zrPage.STDiagram.StartStateTransition.Add(lrStartStateTransition)
@@ -971,6 +974,22 @@ Public Class frmStateTransitionDiagram
 
         End Select
 
+        '--------------------------------------------
+        'Allow 'InPlaceEdit' on select object types
+        Try
+            Select Case e.Link.Tag.GetType
+                Case GetType(STD.EndStateTransition),
+                     GetType(STD.StartStateTransition),
+                     GetType(STD.StateTransition)
+                    Me.DiagramView.AllowInplaceEdit = True
+                Case Else
+                    Me.DiagramView.AllowInplaceEdit = False
+            End Select
+        Catch ex As Exception
+
+        End Try
+
+
     End Sub
 
     Private Sub Diagram_NodeDoubleClicked(ByVal sender As Object, ByVal e As MindFusion.Diagramming.NodeEventArgs) Handles Diagram.NodeDoubleClicked
@@ -1098,6 +1117,19 @@ Public Class frmStateTransitionDiagram
         End Select
 
         Me.zrPage.SelectedObject.Add(e.Node.Tag)
+
+        '--------------------------------------------
+        'Allow 'InPlaceEdit' on select object types
+        Try
+            Select Case e.Node.Tag.GetType
+                Case GetType(STD.State)
+                    Me.DiagramView.AllowInplaceEdit = True
+                Case Else
+                    Me.DiagramView.AllowInplaceEdit = False
+            End Select
+        Catch ex As Exception
+
+        End Try
 
     End Sub
 
@@ -1296,9 +1328,23 @@ Public Class frmStateTransitionDiagram
 
     Private Sub Diagram_NodeTextEdited(ByVal sender As Object, ByVal e As MindFusion.Diagramming.EditNodeTextEventArgs) Handles Diagram.NodeTextEdited
 
-        If e.Node.Tag.ConceptType = pcenumConceptType.Process Then
-            e.Node.Tag.name = e.NewText
-        End If
+        Try
+            Select Case e.Node.Tag.GetType
+                Case GetType(STD.State)
+                    Dim lrState As STD.State = e.Node.Tag
+                    If e.NewText <> lrState.STMState.Name Then
+                        lrState.STMState.setName(e.NewText)
+                    End If
+            End Select
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 
@@ -1920,13 +1966,21 @@ Public Class frmStateTransitionDiagram
     Private Sub Diagram_LinkTextEdited(sender As Object, e As EditLinkTextEventArgs) Handles Diagram.LinkTextEdited
 
         Select Case e.Link.Tag.GetType
+            Case GetType(STD.StartStateTransition)
+                Dim lrStartStateTransition As STD.StartStateTransition = e.Link.Tag
+                If lrStartStateTransition.EventName <> e.Link.Text Then
+                    lrStartStateTransition.STMStartStateTransition.setEventName(e.Link.Text)
+                End If
             Case GetType(STD.EndStateTransition)
                 Dim lrEndStateTransition As STD.EndStateTransition = e.Link.Tag
                 If lrEndStateTransition.EventName <> e.Link.Text Then
                     lrEndStateTransition.STMEndStateTransition.setEventName(e.Link.Text)
                 End If
             Case GetType(STD.StateTransition)
-                Debugger.Break()
+                Dim lrStateTransition As STD.StateTransition = e.Link.Tag
+                If lrStateTransition.EventName <> e.Link.Text Then
+                    lrStateTransition.STMStateTransition.setEventName(e.Link.Text)
+                End If
         End Select
 
     End Sub
@@ -1937,7 +1991,9 @@ Public Class frmStateTransitionDiagram
         'Allow 'InPlaceEdit' on select object types
         If Me.Diagram.Selection.Items.Count = 1 Then
             Select Case Me.Diagram.Selection.Items(0).Tag.GetType
-                Case GetType(STD.EndStateTransition)
+                Case GetType(STD.EndStateTransition),
+                     GetType(STD.StartStateTransition),
+                     GetType(STD.StateTransition)
                     Me.DiagramView.AllowInplaceEdit = True
                 Case Else
                     Me.DiagramView.AllowInplaceEdit = False

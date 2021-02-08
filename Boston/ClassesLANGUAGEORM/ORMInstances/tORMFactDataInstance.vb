@@ -764,9 +764,7 @@ Namespace FBM
                 Me.Id = Me.FactData.Id
                 Me.Name = Me.FactData.Name
 
-                Me.Fact.isDirty = True
-                Me.Fact.FactType.isDirty = True
-                Me.isDirty = True
+                Me.makeDirty()
 
                 'NB Me.Page.MakeDirty() is not required here because the above modifies the Symbol.
                 'NB Me.makeDirty() is not required here because the above modifies the Symbol.

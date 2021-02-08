@@ -15,6 +15,8 @@ Namespace STD
 
         Public Link As DiagramLink
 
+        Public WithEvents STMStateTransition As FBM.STM.StateTransition 'The StateTransition at the STM/Model level.
+
         Public Sub New()
 
         End Sub
@@ -59,6 +61,12 @@ Namespace STD
 
         Public Sub RefreshShape(Optional ByVal aoChangedPropertyItem As PropertyValueChangedEventArgs = Nothing,
                                 Optional ByVal asSelectedGridItemLabel As String = "")
+
+        End Sub
+
+        Private Sub STMStateTransition_EventNameChanged(asNewEventName As String) Handles STMStateTransition.EventNameChanged
+
+            Me.Link.Text = asNewEventName
 
         End Sub
 

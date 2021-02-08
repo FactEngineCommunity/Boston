@@ -369,6 +369,16 @@ Namespace ORMQL
             End Set
         End Property
 
+        Private _WHERESTMT As New ORMQL.WhereClauseTree 'Stores a list of Where sub-clauses
+        Public Property WHERESTMT As ORMQL.WhereClauseTree
+            Get
+                Return Me._WHERESTMT
+            End Get
+            Set(value As ORMQL.WhereClauseTree)
+                Me._WHERESTMT = value
+            End Set
+        End Property
+
     End Class
 
     Public Class AddRoleStatement
@@ -1319,21 +1329,8 @@ Namespace ORMQL
         Private Function processUPDATEStatement() As Object
 
             Try
-                '-------------------------
-                'Create the DynamicObject
-                '-------------------------
-                'Dim lrUpdateStatement As New Object
-                'lrUpdateStatement = prApplication.ORMQL.UpdateStatement
-
-                'lrUpdateStatement.USERTABLENAME = ""
-                'lrUpdateStatement.COLUMNNAMESTR = New List(Of String)
-                'lrUpdateStatement.VALUE = New List(Of String)
-
-                ''----------------------------------
-                ''Get the Tokens from the ParseTree
-                ''----------------------------------
-                'Call Me.GetParseTreeTokens(lrUpdateStatement, Me.Parsetree.Nodes(0))
-
+                '-------------------------------------------
+                'Get the Tokens from the ParseTree
                 '=============================================================
                 Dim lrupdateStatement As New ORMQL.UpdateStatement
                 lrupdateStatement = prApplication.ORMQL.UpdateStatement
@@ -1355,23 +1352,87 @@ Namespace ORMQL
 
                 Dim liNumberOfRowsUpdated = 0
 
-                'Where Clause
-                For Each lrFact In lrFactType.Fact.FindAll(Function(x) x.Data.Find(Function(y) y.Role.Name = lrupdateStatement.COLUMNNAMESTR(1)).Data = lrupdateStatement.VALUE(1))
-                    lrFact = lrFactType.Fact.Find(Function(x) x.Data.Find(Function(y) y.Role.Name = lrupdateStatement.COLUMNNAMESTR(1)).Data = lrupdateStatement.VALUE(1))
+                '=================================================================================================================
+                '(New) Where Clause                                
 
-                    'Update Data
-                    If lrFact IsNot Nothing Then
-                        Dim lrFactData As FBM.FactData
-                        lrFactData = lrFact.Data.Find(Function(x) x.Role.Name = lrupdateStatement.COLUMNNAMESTR(0))
-                        lrFactData.Data = lrupdateStatement.VALUE(0)
-                        lrFact.isDirty = True
-                        lrFactData.isDirty = True
-                        lrFactType.isDirty = True
-                        Me.Model.IsDirty = True
+                '-----------------------------------------------------------------------------
+                'Create a FactPredicate. Used for Lambda search on the FactType.Fact
+                '  to retrieve the set of Facts that match the Predicates of the WHERESTMT
+                '-----------------------------------------------------------------------------
+                Dim lrFactPredicate As New FBM.FactPredicate
 
-                        liNumberOfRowsUpdated += 1
-                    End If
+                '-------------------------------
+                'Get the COMPARISON predicates
+                '-------------------------------
+                Dim lrComparison As New Object
+                Dim lsDataValue As String = ""
+                Dim xml As XDocument
+                Dim lrCustomClass As TinyPG.ParseNode
+                Dim lrSerializer As System.Xml.Serialization.XmlSerializer
+                Dim lrWriter As System.Xml.XmlWriter
+                Dim lsColumnName As String
+                Dim lrFactData As FBM.FactData
+
+                For Each lrComparison In lrupdateStatement.WHERESTMT.COMPARISON
+                    lrCustomClass = lrComparison
+
+                    lrSerializer = New System.Xml.Serialization.XmlSerializer(lrCustomClass.GetType())
+                    Xml = New XDocument
+
+                    lrWriter = Xml.CreateWriter
+                    lrSerializer.Serialize(lrWriter, lrCustomClass)
+                    lrWriter.Close()
+
+                    Dim lasColumnName As XElement = <Comparison><%= From p In Xml.<ParseNode>.<Nodes>.<ParseNode>.<Token>
+                                                                    Where p.@Type = "WHERECLAUSECOLUMNNAMESTR"
+                                                                    Select p.<Text>.Value
+                                                                %>
+                                                    </Comparison>
+
+                    lsColumnName = lasColumnName.Value
+
+                    Dim lrDataValue As XElement = <Comparison><%= From p In Xml.<ParseNode>.<Nodes>.<ParseNode>.<Nodes>.<ParseNode>.<Token>
+                                                                  Where p.@Type = "VALUE"
+                                                                  Select p.<Text>.Value
+                                                              %>
+                                                  </Comparison>
+
+                    lsDataValue = lrDataValue.Value
+
+                    lrFactData = New FBM.FactData(New FBM.Role(lrFactType, lsColumnName, True), New FBM.Concept(lsDataValue))
+
+                    lrFactPredicate.data.Add(lrFactData)
                 Next
+
+                '--------------------------------------------------------------------
+                'Retrieve all the Facts from the FactType that match the predicate.
+                '--------------------------------------------------------------------
+                Dim larFactList = lrFactType.Fact.FindAll(AddressOf lrFactPredicate.Equals)
+
+                For Each lrFact In larFactList
+                    lrFactData = lrFact(lrupdateStatement.COLUMNNAMESTR(0))
+                    lrFactData.Data = lrupdateStatement.VALUE(0)
+                    lrFactData.makeDirty()
+                    lrFact.Model.MakeDirty(False, False)
+                    liNumberOfRowsUpdated += 1
+                Next
+
+                'Original 'Where Clause
+                'For Each lrFact In lrFactType.Fact.FindAll(Function(x) x.Data.Find(Function(y) y.Role.Name = lrupdateStatement.COLUMNNAMESTR(1)).Data = lrupdateStatement.VALUE(1))
+                '    lrFact = lrFactType.Fact.Find(Function(x) x.Data.Find(Function(y) y.Role.Name = lrupdateStatement.COLUMNNAMESTR(1)).Data = lrupdateStatement.VALUE(1))
+
+                '    'Update Data
+                '    If lrFact IsNot Nothing Then
+                '        lrFactData = lrFact.Data.Find(Function(x) x.Role.Name = lrupdateStatement.COLUMNNAMESTR(0))
+                '        lrFactData.Data = lrupdateStatement.VALUE(0)
+                '        lrFact.isDirty = True
+                '        lrFactData.isDirty = True
+                '        lrFactType.isDirty = True
+                '        Me.Model.IsDirty = True
+
+                '        liNumberOfRowsUpdated += 1
+                '    End If
+                'Next
 
                 Dim lrORMQlREcordset As New ORMQL.Recordset
 

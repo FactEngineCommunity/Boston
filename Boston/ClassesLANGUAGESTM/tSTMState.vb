@@ -1,4 +1,5 @@
-﻿
+﻿Imports System.Reflection
+
 Namespace FBM.STM
 
     ''' <summary>
@@ -64,13 +65,26 @@ Namespace FBM.STM
 
         Public Sub setName(ByVal asNewName As String)
 
-            Dim lsOldStateName = Me.Name
-            Me.Name = asNewName
+            Try
+                Dim lsOldStateName = Me.Name
+                Me.Name = asNewName
 
-            'CMML
-            Call Me.Model.Model.changeCMMLStateName(Me, lsOldStateName)
+                'FBM Model level
+                Me.ValueType.renameValueConstraint(lsOldStateName, asNewName)
 
-            RaiseEvent NameChanged(asNewName)
+                'CMML
+                Call Me.Model.Model.changeCMMLStateName(Me, lsOldStateName)
+
+                RaiseEvent NameChanged(asNewName)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
         End Sub
 
