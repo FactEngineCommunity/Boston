@@ -283,9 +283,13 @@ Public Class frmStateTransitionDiagram
                                 MsgBox("There is already a Start Indicator on this Page.")
                             End If
                         Case Is = "End"
-                            Dim lrEndIndicator As New STD.EndStateIndicator(Me.zrPage)
-                            Me.zrPage.STDiagram.EndStateIndicator.Add(lrEndIndicator)
-                            Call Me.dropEndIndicatorAtPoint(lrEndIndicator, pt)
+
+                            Dim lrSTMEndStateIndicator As New FBM.STM.EndStateIndicator(Me.zrPage.Model.STM)
+                            Call Me.zrPage.Model.STM.addEndStateIndicator(lrSTMEndStateIndicator)
+
+                            Dim lrSTDEndStateIndicator = Me.dropEndIndicatorAtPoint(lrSTMEndStateIndicator, pt)
+
+                            Me.zrPage.STDiagram.EndStateIndicator.Add(lrSTDEndStateIndicator)
                     End Select
                 End If
             End If
@@ -373,6 +377,7 @@ Public Class frmStateTransitionDiagram
             lsSQLQuery = "SELECT *"
             lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreElementHasElementType.ToString
             lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
+            lsSQLQuery &= " WHERE ElementType = 'State'"
 
             lrRecordset = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
@@ -544,12 +549,35 @@ Public Class frmStateTransitionDiagram
             '-----------------------------------------------------------------------------------
             'Load the End State Indicators (terminals)
             lsSQLQuery = "SELECT *"
-            lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreValueTypeHasEndCoreElementState.ToString
+            lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreElementHasElementType.ToString
             lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
+            lsSQLQuery &= " WHERE ElementType = 'EndStateIndicator'"
 
             lrRecordset = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
             Dim lrEndStateIndicator As New STD.EndStateIndicator
+
+            While Not lrRecordset.EOF
+
+                lrFactInstance = New FBM.FactInstance
+                lrFactInstance = lrRecordset.CurrentFact
+
+                lrFactDataInstance = lrRecordset("Element")
+                lrEndStateIndicator = lrFactDataInstance.CloneEndStateIndicator(arPage)
+
+                Me.zrPage.STDiagram.EndStateIndicator.Add(lrEndStateIndicator)
+                Call lrEndStateIndicator.DisplayAndAssociate()
+
+                lrRecordset.MoveNext()
+            End While
+
+            '---------------------------------------------------------------------------------------
+            'Load the End State Transitions
+            lsSQLQuery = "SELECT *"
+            lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreValueTypeHasEndCoreElementState.ToString
+            lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
+
+            lrRecordset = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
             While Not lrRecordset.EOF
 
@@ -561,13 +589,7 @@ Public Class frmStateTransitionDiagram
                 lrFactDataInstance = lrRecordset("EndState")
                 lrEndStateIndicator = lrFactDataInstance.CloneEndStateIndicator(arPage)
                 lrEndStateIndicator.EndStateId = lrRecordset("EndState").Data
-
-                If Me.zrPage.STDiagram.EndStateIndicator.Find(AddressOf lrEndStateIndicator.Equals) Is Nothing Then
-                    Me.zrPage.STDiagram.EndStateIndicator.Add(lrEndStateIndicator)
-                    Call lrEndStateIndicator.DisplayAndAssociate()
-                Else
-                    lrEndStateIndicator = Me.zrPage.STDiagram.EndStateIndicator.Find(AddressOf lrEndStateIndicator.Equals)
-                End If
+                lrEndStateIndicator = Me.zrPage.STDiagram.EndStateIndicator.Find(AddressOf lrEndStateIndicator.Equals)
 
                 Dim lrEndStateTransition = New STD.EndStateTransition(lrState, lrEndStateIndicator, lrRecordset("Event").Data)
                 lrEndStateTransition.ValueType = Me.zrPage.STDiagram.ValueType
@@ -662,7 +684,7 @@ Public Class frmStateTransitionDiagram
                 Dim lnode_dragged_node As tShapeNodeDragItem = e.Data.GetData(tShapeNodeDragItem.DraggedItemObjectType)
 
                 Select Case lnode_dragged_node.Tag.Id
-                    Case = "Start", "State", "Stop"
+                    Case = "Start", "State", "End"
                     Case Else
                         e.Effect = DragDropEffects.None
                         Exit Sub
@@ -776,12 +798,24 @@ Public Class frmStateTransitionDiagram
 
     End Sub
 
-    Sub dropEndIndicatorAtPoint(ByRef arEndIndicator As STD.EndStateIndicator, ByVal aoPtf As PointF)
+    Private Function dropEndIndicatorAtPoint(ByRef arEndIndicator As FBM.STM.EndStateIndicator, ByVal aoPtf As PointF) As STD.EndStateIndicator
 
-        arEndIndicator.X = aoPtf.X
-        arEndIndicator.Y = aoPtf.Y
+        Dim lsSQLQuery As String
 
-        arEndIndicator.DisplayAndAssociate()
+        lsSQLQuery = "ADD FACT '" & arEndIndicator.Fact.Id & "'"
+        lsSQLQuery &= " TO " & pcenumCMMLRelations.CoreElementHasElementType.ToString
+        lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
+
+        Dim lrFactInstance As FBM.FactInstance = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+        Dim lrSTDEndStateIndicator As STD.EndStateIndicator = lrFactInstance("Element").CloneEndStateIndicator(Me.zrPage)
+
+        lrSTDEndStateIndicator.X = aoPtf.X
+        lrSTDEndStateIndicator.Y = aoPtf.Y
+
+        lrSTDEndStateIndicator.DisplayAndAssociate()
+
+        Return lrSTDEndStateIndicator
 
         'Dim lrStopIndicator As New STD.EndStateIndicator
         'Dim loDroppedNode As ShapeNode
@@ -826,7 +860,7 @@ Public Class frmStateTransitionDiagram
 
         'loDroppedNode.Tag = lrStopIndicator
 
-    End Sub
+    End Function
 
     Private Sub Diagram_LinkCreated(ByVal sender As Object, ByVal e As MindFusion.Diagramming.LinkEventArgs) Handles Diagram.LinkCreated
 

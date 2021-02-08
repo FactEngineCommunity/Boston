@@ -61,6 +61,17 @@
 
         End Sub
 
+        Public Function addEndStateIndicator(ByRef arEndStateIndicator As STM.EndStateIndicator) As FBM.Fact
+
+            Me.EndStateIndicator.Add(arEndStateIndicator)
+
+            'CMML
+            Me.Model.createCMMLEndStateIndicator(arEndStateIndicator)
+
+            Return arEndStateIndicator.Fact
+
+        End Function
+
         Public Sub addEndStateTransition(ByRef arEndStateTransition As STM.EndStateTransition)
 
             Me.EndStateTransition.Add(arEndStateTransition)

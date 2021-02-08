@@ -4,6 +4,18 @@ Namespace FBM
 
     Partial Public Class Model
 
+        Public Sub createCMMLEndStateIndicator(ByRef arEndStateIndicator As STM.EndStateIndicator)
+
+            Dim lsSQLQuery As String
+
+            lsSQLQuery = "INSERT INTO " & pcenumCMMLRelations.CoreElementHasElementType.ToString & " (Element, ElementType)"
+            lsSQLQuery &= " VALUES ('" & arEndStateIndicator.EndStateId & "','EndStateIndicator'"
+            lsSQLQuery &= ")"
+
+            arEndStateIndicator.Fact = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+        End Sub
+
         Public Sub createCMMLEndStateTransition(ByRef arEndStateTransition As STM.EndStateTransition)
 
             Dim lsSQLQuery As String
