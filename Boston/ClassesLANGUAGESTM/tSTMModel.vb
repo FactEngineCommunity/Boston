@@ -25,15 +25,15 @@
         ''' </summary>
         Public StateTransition As New List(Of FBM.STM.StateTransition)
 
-        ''' <summary>
-        ''' The list of StartStates for the STM.
-        ''' </summary>
-        Public StartState As New List(Of FBM.STM.State)
+        '''' <summary>
+        '''' The list of StartStates for the STM.
+        '''' </summary>
+        'Public StartState As New List(Of FBM.STM.State)
 
         ''' <summary>
         ''' The list of StopStates for the STM.
         ''' </summary>
-        Public StopState As New List(Of FBM.STM.State)
+        Public EndStateIndicator As New List(Of FBM.STM.EndStateIndicator)
 
         Public StartStateTransition As New List(Of FBM.STM.StartStateTransition)
         Public EndStateTransition As New List(Of FBM.STM.EndStateTransition)
@@ -71,14 +71,14 @@
             RaiseEvent EndStateTransitionAdded(arEndStateTransition)
         End Sub
 
-        Public Sub addStartState(ByRef arStartState As FBM.STM.State)
+        'Public Sub addStartState(ByRef arStartState As FBM.STM.State)
 
-            Me.StartState.AddUnique(arStartState)
+        '    Me.StartState.AddUnique(arStartState)
 
-            'CMML
-            Call Me.Model.addCMMLStartState(arStartState)
+        '    'CMML
+        '    Call Me.Model.addCMMLStartState(arStartState)
 
-        End Sub
+        'End Sub
 
 
         Public Sub addState(ByRef arState As FBM.STM.State)
@@ -135,36 +135,36 @@
                 Call Me.removeStateTransition(lrStateTransition)
             Next
 
-            'Remove StartState/s for the State
-            Dim larStartState = From StartState In Me.StartState
-                                Where StartState.Name = arState.Name
-                                Where StartState.ValueType.Id = arState.ValueType.Id
-                                Select StartState
+            ''Remove StartState/s for the State
+            'Dim larStartState = From StartState In Me.StartState
+            '                    Where StartState.Name = arState.Name
+            '                    Where StartState.ValueType.Id = arState.ValueType.Id
+            '                    Select StartState
 
-            For Each lrStartState In larStartState
-                Call Me.removeStartState(lrStartState)
-            Next
+            'For Each lrStartState In larStartState
+            '    Call Me.removeStartState(lrStartState)
+            'Next
 
-            'Remove StartState/s for the State
-            Dim larStopState = From StopState In Me.StartState
-                               Where StopState.Name = arState.Name
-                               Where StopState.ValueType.Id = arState.ValueType.Id
-                               Select StopState
+            ''Remove StartState/s for the State
+            'Dim larStopState = From StopState In Me.StartState
+            '                   Where StopState.Name = arState.Name
+            '                   Where StopState.ValueType.Id = arState.ValueType.Id
+            '                   Select StopState
 
-            For Each lrStopState In larStopState
-                Call Me.removeStopState(lrStopState)
-            Next
+            'For Each lrStopState In larStopState
+            '    Call Me.removeStopState(lrStopState)
+            'Next
 
         End Sub
 
-        Public Sub removeStartState(ByRef arStartState As FBM.STM.State)
+        'Public Sub removeStartState(ByRef arStartState As FBM.STM.State)
 
-            Call Me.StartState.Remove(arStartState)
-            arStartState.IsStart = False
+        '    Call Me.StartState.Remove(arStartState)
+        '    arStartState.IsStart = False
 
-            'CMML
-            Call Me.Model.removeCMMLStartState(arStartState)
-        End Sub
+        '    'CMML
+        '    Call Me.Model.removeCMMLStartState(arStartState)
+        'End Sub
 
         Public Sub removeStateTransition(ByRef arStateTransition As FBM.STM.StateTransition)
 
@@ -174,13 +174,13 @@
             Call Me.Model.removeCMMLStateTransition(arStateTransition)
         End Sub
 
-        Public Sub removeStopState(ByRef arStopState As FBM.STM.State)
+        'Public Sub removeStopState(ByRef arStopState As FBM.STM.State)
 
-            Call Me.StopState.Remove(arStopState)
+        '    Call Me.StopState.Remove(arStopState)
 
-            'CMML
-            Call Me.Model.removeCMMLStopState(arStopState)
-        End Sub
+        '    'CMML
+        '    Call Me.Model.removeCMMLStopState(arStopState)
+        'End Sub
 
     End Class
 

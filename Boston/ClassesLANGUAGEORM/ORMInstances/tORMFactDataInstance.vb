@@ -454,7 +454,7 @@ Namespace FBM
         ''' </summary>
         ''' <param name="arPage"></param>
         ''' <returns></returns>
-        Public Function CloneEndStateIndicator(ByRef arPage As FBM.Page, Optional ByRef arState As STD.State = Nothing) As STD.EndStateIndicator
+        Public Function CloneEndStateIndicator(ByRef arPage As FBM.Page) As STD.EndStateIndicator
 
             '------------------------------------------------------------------
             'As in 'Start Status Indicator' within a State Transition Diagram
@@ -472,8 +472,6 @@ Namespace FBM
                 lrEndStateIndicator.X = .X
                 lrEndStateIndicator.Y = .Y
             End With
-
-            lrEndStateIndicator.State = arState
 
             Return lrEndStateIndicator
 

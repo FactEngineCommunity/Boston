@@ -11,9 +11,7 @@ Namespace STD
 
         Public Shadows ConceptType As pcenumConceptType = pcenumConceptType.EndStateIndicator
 
-        Public EndStateId As String = "" 'The unique identifier for an EndState.
-
-        Public State As STD.State 'The State from which this EndStateIndicator comes from/terminates.
+        Public EndStateId As String = "" 'The unique identifier for an EndState.        
 
         Public Link As DiagramLink
 
@@ -35,9 +33,16 @@ Namespace STD
             End Set
         End Property
 
-
+        ''' <summary>
+        ''' Parameterless constructor.
+        ''' </summary>
         Public Sub New()
+        End Sub
 
+        Public Sub New(ByRef arPage As FBM.Page)
+            Me.Model = arPage.Model
+            Me.Page = arPage
+            Me.EndStateId = System.Guid.NewGuid.ToString
         End Sub
 
         Public Shadows Function Equals(other As EndStateIndicator) As Boolean Implements IEquatable(Of EndStateIndicator).Equals

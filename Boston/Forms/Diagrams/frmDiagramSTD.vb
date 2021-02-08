@@ -282,9 +282,10 @@ Public Class frmStateTransitionDiagram
                             Else
                                 MsgBox("There is already a Start Indicator on this Page.")
                             End If
-                        Case Is = "Stop"
-                            Dim lrStopIndicator As New STD.EndStateIndicator()
-                            Call Me.dropStopIndicatorAtPoint(lrStopIndicator, pt)
+                        Case Is = "End"
+                            Dim lrEndIndicator As New STD.EndStateIndicator(Me.zrPage)
+                            Me.zrPage.STDiagram.EndStateIndicator.Add(lrEndIndicator)
+                            Call Me.dropEndIndicatorAtPoint(lrEndIndicator, pt)
                     End Select
                 End If
             End If
@@ -367,14 +368,6 @@ Public Class frmStateTransitionDiagram
             Me.zrPage.STDiagram.ValueType = Me.zrPage.Model.ValueType.Find(Function(x) x.Id = lsValueTypeId)
             Me.ComboBox_ValueType.Enabled = False
 
-            '------------------------------------------------------------
-            'PSEUDOCODE
-            '  * Load all of the State shapes
-            '  * Load all of the Transitions by linking the State shapes
-            '  * Load all the StartStateTransitions (only one 99.999% of the time)
-            '  * Load all the EndStateTransitions
-            '------------------------------------------------------------
-
             '=======================================================================================
             'State shapes
             lsSQLQuery = "SELECT *"
@@ -390,25 +383,25 @@ Public Class frmStateTransitionDiagram
             While Not lrRecordset.EOF
 
                 lrFactDataInstance = lrRecordset("Element")
-                lrFromState = lrFactDataInstance.CloneState(arPage)
-                lrFromState.X = lrFactDataInstance.X
-                lrFromState.Y = lrFactDataInstance.Y
-                lrFromState.StateName = lrRecordset("Element").Data
-                lrFromState.ValueType = Me.zrPage.STDiagram.ValueType
+                lrState = lrFactDataInstance.CloneState(arPage)
+                lrState.X = lrFactDataInstance.X
+                lrState.Y = lrFactDataInstance.Y
+                lrState.StateName = lrRecordset("Element").Data
+                lrState.ValueType = Me.zrPage.STDiagram.ValueType
 
-                lrFromState.STMState = Me.zrPage.Model.STM.State.Find(Function(x) x.ValueType.Id = lrFromState.ValueType.Id And x.Name = lrFromState.StateName)
+                lrState.STMState = Me.zrPage.Model.STM.State.Find(Function(x) x.ValueType.Id = lrState.ValueType.Id And x.Name = lrState.StateName)
 
                 Dim LoadedCount = Aggregate Node In Me.Diagram.Nodes
                                   Where Node.GetType.ToString = GetType(MindFusion.Diagramming.ShapeNode).ToString _
                                   And Node.Tag.ConceptType = pcenumConceptType.State _
-                                  And Node.Tag.Name = lrFromState.Name
+                                  And Node.Tag.Name = lrState.Name
                                   Into Count()
 
                 If LoadedCount = 0 Then
-                    Me.zrPage.STDiagram.State.AddUnique(lrFromState)
-                    lrFromState.DisplayAndAssociate()
+                    Me.zrPage.STDiagram.State.AddUnique(lrState)
+                    lrState.DisplayAndAssociate()
                 Else
-                    lrFromState = Me.zrPage.STDiagram.State.Find(Function(x) x.Name = lrFromState.Name)
+                    lrState = Me.zrPage.STDiagram.State.Find(Function(x) x.Name = lrState.Name)
                 End If
 
                 lrRecordset.MoveNext()
@@ -424,49 +417,51 @@ Public Class frmStateTransitionDiagram
 
             While Not lrRecordset.EOF
 
-                lrFactDataInstance = lrRecordset("Concept1")
-                lrFromState = lrFactDataInstance.CloneState(arPage)
-                lrFromState.X = lrFactDataInstance.X
-                lrFromState.Y = lrFactDataInstance.Y
-                lrFromState.StateName = lrRecordset("Concept1").Data
-                lrFromState.ValueType = Me.zrPage.STDiagram.ValueType
+                lrFromState = Me.zrPage.STDiagram.State.Find(Function(x) x.Name = lrRecordset("Concept1").Data)
 
-                lrFromState.STMState = Me.zrPage.Model.STM.State.Find(Function(x) x.ValueType.Id = lrFromState.ValueType.Id And x.Name = lrFromState.StateName)
+                lrToState = Me.zrPage.STDiagram.State.Find(Function(x) x.Name = lrRecordset("Concept2").Data)
 
-                Dim LoadedCount = Aggregate Node In Me.Diagram.Nodes
-                                  Where Node.GetType.ToString = GetType(MindFusion.Diagramming.ShapeNode).ToString _
-                                  And Node.Tag.ConceptType = pcenumConceptType.State _
-                                  And Node.Tag.Name = lrFromState.Name
-                                  Into Count()
+                'lrFactDataInstance = lrRecordset("Concept1")
+                'lrFromState = lrFactDataInstance.CloneState(arPage)
+                'lrFromState.X = lrFactDataInstance.X
+                'lrFromState.Y = lrFactDataInstance.Y
+                'lrFromState.StateName = lrRecordset("Concept1").Data
+                'lrFromState.ValueType = Me.zrPage.STDiagram.ValueType
 
-                If LoadedCount = 0 Then
-                    Me.zrPage.STDiagram.State.AddUnique(lrFromState)
-                    lrFromState.DisplayAndAssociate()
-                Else
-                    lrFromState = Me.zrPage.STDiagram.State.Find(Function(x) x.Name = lrFromState.Name)
-                End If
+                'lrFromState.STMState = Me.zrPage.Model.STM.State.Find(Function(x) x.ValueType.Id = lrFromState.ValueType.Id And x.Name = lrFromState.StateName)
 
-                lrFactDataInstance = lrRecordset("Concept2")
-                lrToState = lrFactDataInstance.CloneState(arPage)
-                lrToState.X = lrFactDataInstance.X
-                lrToState.Y = lrFactDataInstance.Y
-                lrToState.StateName = lrRecordset("Concept2").Data
-                lrToState.ValueType = Me.zrPage.STDiagram.ValueType
+                'Dim LoadedCount = Aggregate Node In Me.Diagram.Nodes
+                '                  Where Node.GetType.ToString = GetType(MindFusion.Diagramming.ShapeNode).ToString _
+                '                  And Node.Tag.ConceptType = pcenumConceptType.State _
+                '                  And Node.Tag.Name = lrFromState.Name
+                '                  Into Count()
 
-                lrToState.STMState = Me.zrPage.Model.STM.State.Find(Function(x) x.ValueType.Id = lrToState.ValueType.Id And x.Name = lrToState.StateName)
+                'If LoadedCount = 0 Then
+                '    Me.zrPage.STDiagram.State.AddUnique(lrFromState)
+                '    lrFromState.DisplayAndAssociate()
+                'Else
 
-                Dim LoadedCount2 = Aggregate Node In Me.Diagram.Nodes
-                                   Where Node.GetType.ToString = GetType(MindFusion.Diagramming.ShapeNode).ToString _
-                                     And Node.Tag.ConceptType = pcenumConceptType.State _
-                                     And Node.Tag.Name = lrToState.Name
-                                    Into Count()
+                'End If
 
-                If LoadedCount2 = 0 Then
-                    Me.zrPage.STDiagram.State.AddUnique(lrToState)
-                    lrToState.DisplayAndAssociate()
-                Else
-                    lrToState = Me.zrPage.STDiagram.State.Find(Function(x) x.Name = lrToState.Name)
-                End If
+                'lrFactDataInstance = lrRecordset("Concept2")
+                'lrToState = lrFactDataInstance.CloneState(arPage)
+                'lrToState.X = lrFactDataInstance.X
+                'lrToState.Y = lrFactDataInstance.Y
+                'lrToState.StateName = lrRecordset("Concept2").Data
+                'lrToState.ValueType = Me.zrPage.STDiagram.ValueType
+
+                'Dim LoadedCount2 = Aggregate Node In Me.Diagram.Nodes
+                '                   Where Node.GetType.ToString = GetType(MindFusion.Diagramming.ShapeNode).ToString _
+                '                     And Node.Tag.ConceptType = pcenumConceptType.State _
+                '                     And Node.Tag.Name = lrToState.Name
+                '                    Into Count()
+
+                'If LoadedCount2 = 0 Then
+                '    Me.zrPage.STDiagram.State.AddUnique(lrToState)
+                '    lrToState.DisplayAndAssociate()
+                'Else
+                '    lrToState = Me.zrPage.STDiagram.State.Find(Function(x) x.Name = lrToState.Name)
+                'End If
 
                 lrFactInstance = lrRecordset.CurrentFact
                 Dim lrStateTransition As New STD.StateTransition
@@ -480,30 +475,30 @@ Public Class frmStateTransitionDiagram
                 lrRecordset.MoveNext()
             End While
 
-            '--------------------------------------------------------------------
-            'State from StartStateTransition
-            lsSQLQuery = "SELECT *"
-            lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreValueTypeHasStartCoreElementState.ToString
-            lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
+            ''--------------------------------------------------------------------
+            ''State from StartStateTransition
+            'lsSQLQuery = "SELECT *"
+            'lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreValueTypeHasStartCoreElementState.ToString
+            'lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
 
-            lrRecordset = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+            'lrRecordset = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
-            While Not lrRecordset.EOF
-                lrFactDataInstance = lrRecordset("CoreElement")
-                lrState = lrFactDataInstance.CloneState(arPage)
-                lrState.X = lrFactDataInstance.X
-                lrState.Y = lrFactDataInstance.Y
-                lrState.StateName = lrRecordset("CoreElement").Data
-                lrState.ValueType = Me.zrPage.STDiagram.ValueType
+            'While Not lrRecordset.EOF
+            '    lrFactDataInstance = lrRecordset("CoreElement")
+            '    lrState = lrFactDataInstance.CloneState(arPage)
+            '    lrState.X = lrFactDataInstance.X
+            '    lrState.Y = lrFactDataInstance.Y
+            '    lrState.StateName = lrRecordset("CoreElement").Data
+            '    lrState.ValueType = Me.zrPage.STDiagram.ValueType
 
-                lrState.STMState = Me.zrPage.Model.STM.State.Find(Function(x) x.ValueType.Id = lrState.ValueType.Id And x.Name = lrState.StateName)
+            '    lrState.STMState = Me.zrPage.Model.STM.State.Find(Function(x) x.ValueType.Id = lrState.ValueType.Id And x.Name = lrState.StateName)
 
-                If Me.zrPage.STDiagram.State.FindAll(Function(x) x.StateName = lrState.StateName).Count = 0 Then
-                    Me.zrPage.STDiagram.State.AddUnique(lrState)
-                    lrState.DisplayAndAssociate()
-                End If
-                lrRecordset.MoveNext()
-            End While
+            '    If Me.zrPage.STDiagram.State.FindAll(Function(x) x.StateName = lrState.StateName).Count = 0 Then
+            '        Me.zrPage.STDiagram.State.AddUnique(lrState)
+            '        lrState.DisplayAndAssociate()
+            '    End If
+            '    lrRecordset.MoveNext()
+            'End While
 
 
             '============================================================================================
@@ -564,8 +559,8 @@ Public Class frmStateTransitionDiagram
                 lrFactInstance = lrRecordset.CurrentFact
 
                 lrFactDataInstance = lrRecordset("EndState")
-                lrEndStateIndicator = lrFactDataInstance.CloneEndStateIndicator(arPage, lrState)
-                'lrEndStateIndicator.EndStateId = lrRecordset("EndState").Data
+                lrEndStateIndicator = lrFactDataInstance.CloneEndStateIndicator(arPage)
+                lrEndStateIndicator.EndStateId = lrRecordset("EndState").Data
 
                 If Me.zrPage.STDiagram.EndStateIndicator.Find(AddressOf lrEndStateIndicator.Equals) Is Nothing Then
                     Me.zrPage.STDiagram.EndStateIndicator.Add(lrEndStateIndicator)
@@ -781,50 +776,55 @@ Public Class frmStateTransitionDiagram
 
     End Sub
 
-    Sub dropStopIndicatorAtPoint(ByVal arStopIndicator As STD.EndStateIndicator, ByVal aoPtf As PointF)
+    Sub dropEndIndicatorAtPoint(ByRef arEndIndicator As STD.EndStateIndicator, ByVal aoPtf As PointF)
 
-        Dim lrStopIndicator As New STD.EndStateIndicator
-        Dim loDroppedNode As ShapeNode
+        arEndIndicator.X = aoPtf.X
+        arEndIndicator.Y = aoPtf.Y
+
+        arEndIndicator.DisplayAndAssociate()
+
+        'Dim lrStopIndicator As New STD.EndStateIndicator
+        'Dim loDroppedNode As ShapeNode
 
 
-        loDroppedNode = Diagram.Factory.CreateShapeNode(aoPtf.X, aoPtf.Y, 18, 18)
-        loDroppedNode.Shape = New Shape(
-                  New ElementTemplate() {
-                     New ArcTemplate(0, 0, 74, 74, 0, 360, Color.Black, DashStyle.Solid, 0.5),
-                     New ArcTemplate(14, 14, 48, 48, 0, 360)
-                  },
-                  FillMode.Winding, "Custom")
+        'loDroppedNode = Diagram.Factory.CreateShapeNode(aoPtf.X, aoPtf.Y, 18, 18)
+        'loDroppedNode.Shape = New Shape(
+        '          New ElementTemplate() {
+        '             New ArcTemplate(0, 0, 74, 74, 0, 360, Color.Black, DashStyle.Solid, 0.5),
+        '             New ArcTemplate(14, 14, 48, 48, 0, 360)
+        '          },
+        '          FillMode.Winding, "Custom")
 
-        loDroppedNode.HandlesStyle = HandlesStyle.MoveOnly
-        loDroppedNode.ToolTip = "Start Indicator"
-        loDroppedNode.Visible = True
-        loDroppedNode.Image = Nothing
-        loDroppedNode.Pen.Color = Color.Black
-        loDroppedNode.Brush = New MindFusion.Drawing.SolidBrush(Color.White)
-        loDroppedNode.ShadowColor = Color.White
-        loDroppedNode.AllowIncomingLinks = True
-        loDroppedNode.AllowOutgoingLinks = False
+        'loDroppedNode.HandlesStyle = HandlesStyle.MoveOnly
+        'loDroppedNode.ToolTip = "Start Indicator"
+        'loDroppedNode.Visible = True
+        'loDroppedNode.Image = Nothing
+        'loDroppedNode.Pen.Color = Color.Black
+        'loDroppedNode.Brush = New MindFusion.Drawing.SolidBrush(Color.White)
+        'loDroppedNode.ShadowColor = Color.White
+        'loDroppedNode.AllowIncomingLinks = True
+        'loDroppedNode.AllowOutgoingLinks = False
 
-        loDroppedNode.Tag = New STD.StartStateIndicator
-        loDroppedNode.Resize(8, 8)
+        'loDroppedNode.Tag = New STD.StartStateIndicator
+        'loDroppedNode.Resize(8, 8)
 
-        lrStopIndicator.Model = prApplication.WorkingModel
-        lrStopIndicator.LongDescription = arStopIndicator.LongDescription
-        lrStopIndicator.ShortDescription = arStopIndicator.ShortDescription
-        lrStopIndicator.Shape = loDroppedNode
-        lrStopIndicator.X = loDroppedNode.Bounds.X
-        lrStopIndicator.Y = loDroppedNode.Bounds.Y
+        'lrStopIndicator.Model = prApplication.WorkingModel
+        'lrStopIndicator.LongDescription = arStopIndicator.LongDescription
+        'lrStopIndicator.ShortDescription = arStopIndicator.ShortDescription
+        'lrStopIndicator.Shape = loDroppedNode
+        'lrStopIndicator.X = loDroppedNode.Bounds.X
+        'lrStopIndicator.Y = loDroppedNode.Bounds.Y
 
-        'If Not Me.StateTransitionDiagram.State.Exists(AddressOf ar_state.Equals) Then
-        '--------------------------------------------------
-        'The State is not already within the ORMModel
-        '  so add it.
-        '--------------------------------------------------
-        '   Me.StateTransitionDiagram.State.Add(ar_state)
-        'End If
-        'Me.StateTransitionDiagram.Stat.Add(lrStopIndicator )
+        ''If Not Me.StateTransitionDiagram.State.Exists(AddressOf ar_state.Equals) Then
+        ''--------------------------------------------------
+        ''The State is not already within the ORMModel
+        ''  so add it.
+        ''--------------------------------------------------
+        ''   Me.StateTransitionDiagram.State.Add(ar_state)
+        ''End If
+        ''Me.StateTransitionDiagram.Stat.Add(lrStopIndicator )
 
-        loDroppedNode.Tag = lrStopIndicator
+        'loDroppedNode.Tag = lrStopIndicator
 
     End Sub
 
@@ -860,7 +860,7 @@ Public Class frmStateTransitionDiagram
 
                     Dim lrExistingStartState = Me.zrPage.STDiagram.State.Find(Function(x) x.IsStartState)
 
-                    Call Me.zrPage.Model.STM.removeStartState(lrExistingStartState.STMState)
+                    Call Me.zrPage.Model.STM.removeStartStateTransition(Me.zrPage.STDiagram.StartStateTransition(0).STMStartStateTransition)
 
                     Me.Diagram.Links.Remove(Me.zrPage.STDiagram.StartIndicator.Link)
 

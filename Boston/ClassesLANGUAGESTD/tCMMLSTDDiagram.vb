@@ -35,7 +35,15 @@ Namespace STD
                 lsSQLQuery &= " TO " & pcenumCMMLRelations.CoreValueTypeHasEndCoreElementState.ToString
                 lsSQLQuery &= " ON PAGE '" & Me.Page.Name & "'"
 
-                Call Me.Page.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                Dim lrFactInstance As FBM.FactInstance = Me.Page.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                Dim lsFromStateName As String = arEndStateTranstion.State.Name
+                Dim lrFromState As STD.State = Me.State.Find(Function(x) x.StateName = lsFromStateName)
+                Dim lsEndStateId As String = arEndStateTranstion.EndStateId
+                Dim lrEndStateIndicator As STD.EndStateIndicator = Me.EndStateIndicator.Find(Function(x) x.EndStateId = lsEndStateId)
+                Dim lrEndStateTransition = lrFactInstance.CloneEndStateTransition(Me.Page, lrFromState, lrEndStateIndicator)
+
+                Call lrEndStateTransition.DisplayAndAssociate()
 
             End If
 

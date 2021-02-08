@@ -470,6 +470,7 @@
     <Compile Include="ClassesLANGUAGEORM\ORMSTM\tORMPage.vb" />
     <Compile Include="ClassesLANGUAGESTD\tCMMLSTDStartStateTransition.vb" />
     <Compile Include="ClassesLANGUAGESTD\tCMMLSTDEndStateTransition.vb" />
+    <Compile Include="ClassesLANGUAGESTM\tSTMEndStateIndicator.vb" />
     <Compile Include="ClassesLANGUAGESTM\tSTMStartStateTransition.vb" />
     <Compile Include="ClassesLANGUAGESTM\tSTMEndStateTransition.vb" />
     <Compile Include="ClassesLANGUAGESTM\tSTMModel.vb" />

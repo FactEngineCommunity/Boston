@@ -6,4 +6,17 @@
     </outline>
     <decorations />
   </shape>
+  <shape id="Start" fill-mode="Winding">
+    <outline>
+      <arc x="8" y="9" arc-width="74" arc-height="74" start="-185.8696" sweep="365.8696" color="#00000000" dash-style="Custom" width="-1" />
+    </outline>
+    <decorations />
+  </shape>
+  <shape id="End" fill-mode="Winding">
+    <outline>
+      <arc x="8" y="9" arc-width="74" arc-height="74" start="-185.8696" sweep="365.8696" color="#00000000" dash-style="Custom" width="-1" />
+      <arc x="23" y="24" arc-width="44" arc-height="44" start="-185.8696" sweep="365.8696" color="#00000000" dash-style="Custom" width="-1" />
+    </outline>
+    <decorations />
+  </shape>
 </shapes>
