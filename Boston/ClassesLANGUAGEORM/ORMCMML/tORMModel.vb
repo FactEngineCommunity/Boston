@@ -133,7 +133,7 @@ Namespace FBM
                 lsSQLQuery &= " (ValueType, Concept1, Concept2, Event)"
                 lsSQLQuery &= " VALUES ("
                 lsSQLQuery &= "'" & arStateTransition.ValueType.Id & "'"
-                lsSQLQuery &= "'" & arStateTransition.FromState.Name & "'"
+                lsSQLQuery &= ",'" & arStateTransition.FromState.Name & "'"
                 lsSQLQuery &= ",'" & arStateTransition.ToState.Name & "'"
                 lsSQLQuery &= ",'" & arStateTransition.Event & "'"
                 lsSQLQuery &= " )"

@@ -40,7 +40,9 @@ Namespace FBM.STM
         End Sub
 
         Public Shadows Function Equals(other As State) As Boolean Implements IEquatable(Of State).Equals
-            Return (Me.Name = other.Name) And (Me.ValueType.Id = other.ValueType.Id)
+
+            Return (Me.Name = other.Name) 'And (Me.ValueType.Id = other.ValueType.Id)
+
         End Function
 
         ''' <summary>

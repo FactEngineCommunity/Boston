@@ -59,6 +59,8 @@ Namespace FBM
                 Dim lsSQLQuery As String = ""
                 Dim lrORMRecordset As ORMQL.Recordset
 
+                '==============================================================================================
+                'StateTransitions
                 lsSQLQuery = " SELECT *"
                 lsSQLQuery &= "  FROM " & pcenumCMMLRelations.CoreStateTransition.ToString
 
@@ -69,11 +71,8 @@ Namespace FBM
                     lrToState As STM.State
 
                 Dim lrStateTransition As STM.StateTransition
-
                 Dim lrValueType As FBM.ValueType
 
-                '==============================================================================================
-                'StateTransitions
                 While Not lrORMRecordset.EOF
 
                     lrValueType = Me.ValueType.Find(Function(x) x.Id = lrORMRecordset("ValueType").Data)
@@ -104,7 +103,27 @@ Namespace FBM
                 End While
 
                 '===============================================================================================
-                'Start States
+                'Orphan States
+                lsSQLQuery = " SELECT *"
+                lsSQLQuery &= "  FROM " & pcenumCMMLRelations.CoreElementHasElementType.ToString
+                lsSQLQuery &= " WHERE ElementType = 'State'"
+
+                lrORMRecordset = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                While Not lrORMRecordset.EOF
+
+                    If Me.STM.State.Find(Function(x) x.Name = lrORMRecordset("Element").Data) Is Nothing Then
+                        lrState = New STM.State(Me.STM, Nothing, lrORMRecordset("Element").Data)
+                        lrState.Fact = lrORMRecordset.CurrentFact
+
+                        Me.STM.State.AddUnique(lrState)
+                    End If
+
+                    lrORMRecordset.MoveNext()
+                End While
+
+                '===============================================================================================
+                'Start State Transition
                 lsSQLQuery = " SELECT *"
                 lsSQLQuery &= "  FROM " & pcenumCMMLRelations.CoreValueTypeHasStartCoreElementState.ToString
 
@@ -138,7 +157,7 @@ Namespace FBM
                 End While
 
                 '===============================================================================================
-                'Stop States
+                'End State Transitions
                 lsSQLQuery = " SELECT *"
                 lsSQLQuery &= "  FROM " & pcenumCMMLRelations.CoreValueTypeHasEndCoreElementState.ToString
 

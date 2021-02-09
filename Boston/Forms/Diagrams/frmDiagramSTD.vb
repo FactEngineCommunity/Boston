@@ -342,23 +342,13 @@ Public Class frmStateTransitionDiagram
             Me.ComboBox_ValueType.SelectedIndex = -1
 
             lsSQLQuery = "SELECT *"
-            lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreStateTransition.ToString
+            lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreValueTypeIsStateTransitionBased.ToString
             lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
 
             lrRecordset = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
             If lrRecordset.Facts.Count > 0 Then
-                lsValueTypeId = lrRecordset("ValueType").Data
-            Else
-                lsSQLQuery = "SELECT *"
-                lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreValueTypeHasStartCoreElementState.ToString
-                lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
-
-                lrRecordset = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-                If lrRecordset.Facts.Count > 0 Then
-                    lsValueTypeId = lrRecordset("ValueType").Data
-                End If
+                lsValueTypeId = lrRecordset("IsStateTransitionBased").Data
             End If
 
             '---------------------------------------------------------------------
@@ -394,7 +384,7 @@ Public Class frmStateTransitionDiagram
                 lrState.StateName = lrRecordset("Element").Data
                 lrState.ValueType = Me.zrPage.STDiagram.ValueType
 
-                lrState.STMState = Me.zrPage.Model.STM.State.Find(Function(x) x.ValueType.Id = lrState.ValueType.Id And x.Name = lrState.StateName)
+                lrState.STMState = Me.zrPage.Model.STM.State.Find(Function(x) x.Name = lrState.StateName)
 
                 Dim LoadedCount = Aggregate Node In Me.Diagram.Nodes
                                   Where Node.GetType.ToString = GetType(MindFusion.Diagramming.ShapeNode).ToString _
