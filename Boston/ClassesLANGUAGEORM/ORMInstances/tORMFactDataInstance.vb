@@ -960,21 +960,22 @@ Namespace FBM
             'States are 'Values' of 'ValueTypes'
             '  for models like a StateTransitionDiagram.
             '--------------------------------------------
-            Dim lr_state As New STD.State(arPage)
+            Dim lrSTDState As New STD.State(arPage)
 
             With Me
-                lr_state.Model = .Model
-                lr_state.FactData = Me.FactData
-                lr_state.Name = .Concept.Symbol
-                lr_state.FactDataInstance = Me
-                lr_state.JoinedObjectType = Me.Role.JoinedORMObject
-                lr_state.Concept = .Concept
-                lr_state.Role = .Role
-                lr_state.X = .X
-                lr_state.Y = .Y
+                lrSTDState.Model = .Model
+                lrSTDState.FactData = Me.FactData
+                lrSTDState.Name = .Concept.Symbol
+                lrSTDState.FactDataInstance = Me
+                lrSTDState.JoinedObjectType = Me.Role.JoinedORMObject
+                lrSTDState.Concept = .Concept
+                lrSTDState.Role = .Role
+                lrSTDState.X = .X
+                lrSTDState.Y = .Y
+                lrSTDState.StateName = .Concept.Symbol
             End With
 
-            Return lr_state
+            Return lrSTDState
 
         End Function
 

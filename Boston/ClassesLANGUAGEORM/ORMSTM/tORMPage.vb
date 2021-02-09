@@ -7,6 +7,27 @@ Namespace FBM
         <NonSerialized>
         Public WithEvents STModel As New FBM.STM.Model
 
+        Public Function dropStateAtPoint(ByRef arSTMState As STM.State, ByVal aoPtF As PointF) As STD.State
+
+            Dim lrSTDState As STD.State
+
+            Dim lsSQLQuery = "ADD FACT '" & arSTMState.Fact.Id & "'"
+            lsSQLQuery &= " TO " & pcenumCMMLRelations.CoreElementHasElementType.ToString
+            lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
+
+            Dim lrFactInstance As FBM.FactInstance = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+            lrSTDState = lrFactInstance("Element").CloneState(Me)
+            lrSTDState.STMState = arSTMState
+
+            lrSTDState.Move(aoPtF.X, aoPtF.Y, False)
+            lrSTDState.DisplayAndAssociate()
+
+            Return lrSTDState
+
+        End Function
+
+
         ''' <summary>
         ''' Handles the event when a new EndStateTransition is added to the (ST) Model.
         ''' </summary>

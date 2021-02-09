@@ -244,11 +244,11 @@ Public Class frmStateTransitionDiagram
                                         Dim lrSTMState = Me.zrPage.Model.createCMMLState(Me.zrPage.STDiagram.ValueType, "New State")
 
                                         'Page Level
-                                        Dim lrSTDState As New STD.State(Me.zrPage)
-                                        lrSTDState.Concept = New FBM.Concept("New State")
-                                        lrSTDState.StateName = "New State"
-                                        lrSTDState.STMState = lrSTMState
-                                        Call Me.dropStateAtPoint(lrSTDState, pt)
+                                        Dim lrSTDState As STD.State
+
+                                        lrSTDState = Me.zrPage.dropStateAtPoint(lrSTMState, pt)
+
+                                        Me.zrPage.STDiagram.State.AddUnique(lrSTDState)
 
                                     Case = DialogResult.OK
 
@@ -262,11 +262,9 @@ Public Class frmStateTransitionDiagram
                                         'Add to Page if isn't already on the Page
                                         If Me.zrPage.STDiagram.State.Find(Function(x) x.StateName = lfrmStateSelectDialog.msState) Is Nothing Then
                                             'Page Level
-                                            Dim lrSTDState As New STD.State(Me.zrPage)
-                                            lrSTDState.Concept = New FBM.Concept(lfrmStateSelectDialog.msState)
-                                            lrSTDState.StateName = lfrmStateSelectDialog.msState
-                                            lrSTDState.STMState = lrSTMState
-                                            Call Me.dropStateAtPoint(lrSTDState, pt)
+                                            Dim lrSTDState As STD.State
+                                            lrSTDState = Me.zrPage.dropStateAtPoint(lrSTMState, pt)
+                                            Me.zrPage.STDiagram.State.AddUnique(lrSTDState)
                                         Else
                                             MsgBox("This Page already containst the State, '" & lfrmStateSelectDialog.msState & "'")
                                         End If
@@ -364,13 +362,13 @@ Public Class frmStateTransitionDiagram
             '---------------------------------------------------------------------
             'If there is no ValueType for the Page, then there is nothing to show
             If lsValueTypeId = "" Then
-                Me.zrPage.FormLoaded = True
-                Exit Sub
+                'Me.zrPage.FormLoaded = True
+                'Exit Sub
+            Else
+                Me.ComboBox_ValueType.SelectedIndex = Me.ComboBox_ValueType.FindString(lsValueTypeId)
+                Me.zrPage.STDiagram.ValueType = Me.zrPage.Model.ValueType.Find(Function(x) x.Id = lsValueTypeId)
+                Me.ComboBox_ValueType.Enabled = False
             End If
-
-            Me.ComboBox_ValueType.SelectedIndex = Me.ComboBox_ValueType.FindString(lsValueTypeId)
-            Me.zrPage.STDiagram.ValueType = Me.zrPage.Model.ValueType.Find(Function(x) x.Id = lsValueTypeId)
-            Me.ComboBox_ValueType.Enabled = False
 
             '=======================================================================================
             'State shapes
@@ -711,46 +709,6 @@ Public Class frmStateTransitionDiagram
 
     End Sub
 
-    Sub dropStateAtPoint(ByVal ar_state As STD.State, ByVal ao_pt As PointF)
-
-        'Dim lrStateInstance As New STD.State
-        'Dim loDroppedNode As ShapeNode
-
-
-        'loDroppedNode = Diagram.Factory.CreateShapeNode(ao_pt.X, ao_pt.Y, 2, 2)
-        'loDroppedNode.Shape = Shapes.RoundRect
-        'loDroppedNode.HandlesStyle = HandlesStyle.MoveOnly
-        'loDroppedNode.ToolTip = "Actor"
-        'loDroppedNode.Visible = False
-        'loDroppedNode.Image = My.Resources.CMML.actor
-        'loDroppedNode.Pen.Color = Color.White
-        'loDroppedNode.ShadowColor = Color.White
-
-        'loDroppedNode.Tag = New CMML.tActor
-        'loDroppedNode.Resize(10, 15)
-
-        'lrStateInstance.Model = prApplication.WorkingModel
-        'lrStateInstance.LongDescription = ar_state.LongDescription
-        'lrStateInstance.ShortDescription = ar_state.ShortDescription
-        'lrStateInstance.Name = ar_state.Name
-        'lrStateInstance.Shape = loDroppedNode
-        ''lrStateInstance.Symbol = ar_state.Concept.Symbol
-        'lrStateInstance.X = loDroppedNode.Bounds.X
-        'lrStateInstance.Y = loDroppedNode.Bounds.Y
-
-        If Not Me.zrPage.STDiagram.State.Exists(AddressOf ar_state.Equals) Then
-            '----------------------------------------------------------
-            'The State is not already within the STDiagram so add it.
-            Me.zrPage.STDiagram.State.Add(ar_state)
-            ar_state.Move(ao_pt.X, ao_pt.Y, False)
-            ar_state.DisplayAndAssociate()
-        End If
-
-        'Me.zrPage.STDiagram.State.Add(lrStateInstance)
-        'loDroppedNode.Tag = lrStateInstance
-        'loDroppedNode.Visible = True
-
-    End Sub
 
     Sub dropStartIndicatorAtPoint(ByRef arStartIndicator As STD.StartStateIndicator, ByVal aoPtf As PointF)
 

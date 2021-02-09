@@ -38,6 +38,14 @@ Namespace FBM
 
             Me.STM.State.AddUnique(lrState)
 
+            Dim lsSQLQuery As String
+
+            lsSQLQuery = "INSERT INTO " & pcenumCMMLRelations.CoreElementHasElementType.ToString & " (Element, ElementType)"
+            lsSQLQuery &= " VALUES ('" & lrState.Name & "','State'"
+            lsSQLQuery &= ")"
+
+            lrState.Fact = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
             Return lrState
 
         End Function

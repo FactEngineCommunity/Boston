@@ -23,6 +23,8 @@ Namespace FBM.STM
         Public Event IsEndStateChanged(abEndStateStatus As Boolean)
         Public Event NameChanged(asNewName As String)
 
+        Public Fact As FBM.Fact 'The Fact that represents the State in the CMML/Core Model of the FBM Model.
+
         ''' <summary>
         ''' Parameterless new
         ''' </summary>

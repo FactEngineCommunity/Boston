@@ -11036,7 +11036,7 @@ Public Class frmDiagramORM
         Try
             lrFactTypeInstance = Me.zrPage.SelectedObject(0)
 
-            Dim lrRole As New FBM.Role(lrFactTypeInstance.FactType, Nothing)
+            Dim lrRole As New FBM.Role(lrFactTypeInstance.FactType, System.Guid.NewGuid.ToString)
 
             Call lrFactTypeInstance.FactType.AddRole(lrRole, True)
 
