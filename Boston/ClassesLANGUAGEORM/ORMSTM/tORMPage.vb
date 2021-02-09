@@ -27,6 +27,17 @@ Namespace FBM
 
         End Function
 
+        ''' <summary>
+        ''' Sets the ValueType for a StateTransitionDiagram Page.
+        '''   NB Checks to see that no other ValueType is set for the Page. Each STD Page is for one ValueType and its ValueType.ValueConstraints.
+        ''' </summary>
+        ''' <param name="arFact"></param>
+        Public Sub setValueTypeAsStateTransitionBased(ByRef arFact As FBM.Fact)
+
+
+
+        End Sub
+
 
         ''' <summary>
         ''' Handles the event when a new EndStateTransition is added to the (ST) Model.

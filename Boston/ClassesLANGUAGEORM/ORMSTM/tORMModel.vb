@@ -225,6 +225,33 @@ Namespace FBM
 
         End Sub
 
+        Public Function setValueTypeAsStateTransitionBased(ByRef arValueType As FBM.ValueType) As FBM.Fact
+
+            Dim lsSQLQuery As String
+
+            Try
+
+                lsSQLQuery = "INSERT INTO " & pcenumCMMLRelations.CoreValueTypeIsStateTransitionBased.ToString
+                lsSQLQuery &= " (IsStateTransitionBased) VALUES ('" & arValueType.Id & "')"
+
+                Dim lrFact As FBM.Fact = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                Return lrFact
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return Nothing
+            End Try
+
+
+        End Function
+
     End Class
 
 End Namespace

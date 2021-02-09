@@ -1800,6 +1800,11 @@ Public Class frmStateTransitionDiagram
         prApplication.WorkingValueType = Me.ComboBox_ValueType.SelectedItem.ItemData
         Me.zrPage.STDiagram.ValueType = Me.ComboBox_ValueType.SelectedItem.ItemData
 
+        '20210210-VM-Add code here to effect change at the CMML level.
+        Dim lrFact As FBM.Fact = Me.zrPage.Model.setValueTypeAsStateTransitionBased(Me.zrPage.STDiagram.ValueType)
+
+        Call Me.zrPage.setValueTypeAsStateTransitionBased(lrFact) 'NB Checks to see that no other ValueType is set for the page.
+
         Dim lrModelDictionaryForm As frmToolboxModelDictionary
         lrModelDictionaryForm = prApplication.GetToolboxForm(frmToolboxModelDictionary.Name)
 
