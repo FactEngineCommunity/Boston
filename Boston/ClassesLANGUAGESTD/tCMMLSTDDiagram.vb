@@ -23,6 +23,33 @@ Namespace STD
             Me.Page = arPage
         End Sub
 
+        ''' <summary>
+        ''' Creates a unique State Name for the State Transition Diagram.
+        '''  NB Not necessarily a unique State Name for the Model/STModel, because more than one ValueType can have the same State Name.
+        ''' </summary>
+        ''' <param name="asRootStateName"></param>
+        ''' <param name="aiCounter"></param>
+        ''' <returns></returns>
+        Public Function CreateUniqueStateName(ByVal asRootStateName As String, ByVal aiCounter As Integer) As String
+
+            Dim lsTrialStateName As String
+
+            If aiCounter = 0 Then
+                lsTrialStateName = asRootStateName
+            Else
+                lsTrialStateName = asRootStateName & CStr(aiCounter)
+            End If
+
+            CreateUniqueStateName = lsTrialStateName
+
+            If Me.State.Find(Function(x) x.StateName = lsTrialStateName) IsNot Nothing Then
+                CreateUniqueStateName = Me.CreateUniqueStateName(asRootStateName, aiCounter + 1)
+            Else
+                Return lsTrialStateName
+            End If
+
+        End Function
+
         Private Sub STM_EndStateTransitionAdded(ByRef arEndStateTranstion As FBM.STM.EndStateTransition) Handles STM.EndStateTransitionAdded
 
             Dim lsSQLQuery As String

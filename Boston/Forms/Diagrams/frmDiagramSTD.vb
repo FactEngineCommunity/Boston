@@ -240,8 +240,10 @@ Public Class frmStateTransitionDiagram
 
                                 Select Case lfrmStateSelectDialog.ShowDialog
                                     Case = DialogResult.Yes
+                                        'User is creating their own State rather than dropping a State/ValueConstraint that already belongs to the ValueType for the STD.
                                         'STM Level
-                                        Dim lrSTMState = Me.zrPage.Model.createCMMLState(Me.zrPage.STDiagram.ValueType, "New State")
+                                        Dim lsUniqueStateName = Me.zrPage.STDiagram.CreateUniqueStateName("New State", 0)
+                                        Dim lrSTMState = Me.zrPage.Model.createCMMLState(Me.zrPage.STDiagram.ValueType, lsUniqueStateName)
 
                                         'Page Level
                                         Dim lrSTDState As STD.State
