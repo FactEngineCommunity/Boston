@@ -1016,25 +1016,6 @@ Public Class frmStateTransitionDiagram
                     Dim lrEndStateIndicator As STD.EndStateIndicator = e.Node.Tag
                     Call lrEndStateIndicator.NodeModified()
 
-                    '=======================================================================================================
-                    'Move all EndStates in all EndStateTransitions that have the same EndState.
-                    '  This is because you cannot guarantee that the page load will return the rows in the same order.
-                    '  Each of the EndState values (of the same EndStateId) in CoreValueTypeHasEndCoreElementState have
-                    '  the same X,Y position and represent the same EndState.
-                    Dim lsSQLQuery = "SELECT EndState"
-                    lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreValueTypeHasEndCoreElementState.ToString
-                    lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
-                    lsSQLQuery &= " WHERE EndState = '" & lrEndStateIndicator.EndStateId & "'"
-
-                    Dim lrRecordset = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-                    While Not lrRecordset.eof
-                        Dim lrTempEndStateIndicator = lrRecordset("EndState").CloneEndStateIndicator(Me.zrPage, Nothing)
-                        Call lrTempEndStateIndicator.Move(lrEndStateIndicator.X, lrEndStateIndicator.Y, True)
-                        lrRecordset.MoveNext
-                    End While
-                    '=======================================================================================================
-
                 Case Is = pcenumConceptType.State
 
                     'Dim lrFactDataInstance As New FBM.FactDataInstance(Me.zrPage)
