@@ -357,9 +357,13 @@ Public Class frmStateTransitionDiagram
                 'Me.zrPage.FormLoaded = True
                 'Exit Sub
             Else
+                'Temporarily disable he handler when setting the SelectedIndex.
+                RemoveHandler ComboBox_ValueType.SelectedIndexChanged, AddressOf ComboBox_ValueType_SelectedIndexChanged
                 Me.ComboBox_ValueType.SelectedIndex = Me.ComboBox_ValueType.FindString(lsValueTypeId)
+                AddHandler ComboBox_ValueType.SelectedIndexChanged, AddressOf ComboBox_ValueType_SelectedIndexChanged
+
                 Me.zrPage.STDiagram.ValueType = Me.zrPage.Model.ValueType.Find(Function(x) x.Id = lsValueTypeId)
-                Me.ComboBox_ValueType.Enabled = False
+                'Me.ComboBox_ValueType.Enabled = False
             End If
 
             '=======================================================================================

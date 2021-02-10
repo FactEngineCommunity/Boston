@@ -34,6 +34,29 @@ Namespace FBM
         ''' <param name="arFact"></param>
         Public Sub setValueTypeAsStateTransitionBased(ByRef arFact As FBM.Fact)
 
+            Dim lsSQLQuery As String
+
+            lsSQLQuery = "SELECT *"
+            lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreValueTypeIsStateTransitionBased.ToString
+            lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
+
+            Dim lrRecordset As ORMQL.Recordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+            If lrRecordset.Facts.Count > 0 Then
+
+                Dim lrFact As FBM.Fact = arFact
+                Dim lrFactInstance = Me.FactTypeInstance.Find(Function(x) x.Id = lrFact.FactType.Id).Fact.Find(Function(x) x.Id = lrRecordset.CurrentFact.Id)
+
+                If lrFactInstance IsNot Nothing Then
+                    Me.FactTypeInstance.Find(Function(x) x.Id = lrFact.FactType.Id).RemoveFactById(lrFactInstance.Fact)
+                End If
+            End If
+
+            lsSQLQuery = "ADD FACT '" & arFact.Id & "'"
+            lsSQLQuery &= " TO " & pcenumCMMLRelations.CoreValueTypeIsStateTransitionBased.ToString
+            lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
+
+            Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
 
         End Sub

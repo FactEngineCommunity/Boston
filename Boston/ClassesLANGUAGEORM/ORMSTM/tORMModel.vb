@@ -230,13 +230,22 @@ Namespace FBM
             Dim lsSQLQuery As String
 
             Try
+                lsSQLQuery = "SELECT *"
+                lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreValueTypeIsStateTransitionBased.ToString
+                lsSQLQuery &= " WHERE IsStateTransitionBased = '" & arValueType.Id & "'"
 
-                lsSQLQuery = "INSERT INTO " & pcenumCMMLRelations.CoreValueTypeIsStateTransitionBased.ToString
-                lsSQLQuery &= " (IsStateTransitionBased) VALUES ('" & arValueType.Id & "')"
+                Dim lrRecordset As ORMQL.Recordset = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
-                Dim lrFact As FBM.Fact = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                If lrRecordset.Facts.Count > 0 Then
+                    Return lrRecordset.CurrentFact
+                Else
+                    lsSQLQuery = "INSERT INTO " & pcenumCMMLRelations.CoreValueTypeIsStateTransitionBased.ToString
+                    lsSQLQuery &= " (IsStateTransitionBased) VALUES ('" & arValueType.Id & "')"
 
-                Return lrFact
+                    Dim lrFact As FBM.Fact = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                    Return lrFact
+                End If
 
             Catch ex As Exception
                 Dim lsMessage As String
