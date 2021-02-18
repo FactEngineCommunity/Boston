@@ -4469,7 +4469,14 @@ Namespace FBM
 
                     Call Me.Save()
 
-                ElseIf Me.CoreVersionNumber = "2.0" Then
+                ElseIf Me.CoreVersionNumber = "" Then 'Makes up for anomaly where CoreVersionNumber wasn't added when creating a new model in earlier versions.
+                    'The CMML metamodels should be in all customer's models.
+                    Me.CoreVersionNumber = "2.0"
+                    Me.ContainsLanguage.AddUnique(pcenumLanguage.EntityRelationshipDiagram)
+                    Me.ContainsLanguage.AddUnique(pcenumLanguage.PropertyGraphSchema)
+
+
+                ElseIf CSng(Me.CoreVersionNumber) >= 2.0 Then
                     'Nothing to do (at this point), because is the latest version of the Core @ 16/05/2020
                     Me.ContainsLanguage.AddUnique(pcenumLanguage.EntityRelationshipDiagram)
                     Me.ContainsLanguage.AddUnique(pcenumLanguage.PropertyGraphSchema)
@@ -4481,7 +4488,7 @@ Namespace FBM
                 Call Me.performCoreManagement()
 
                 '==============================================
-                'Either Way, populate the RDS data structure.
+                'Populate the RDS,STM data structure.
                 Dim loRDSThread As System.Threading.Thread
                 loRDSThread = New System.Threading.Thread(AddressOf Me.PopulateRDSStructureFromCoreMDAElements)
                 loRDSThread.Start()
@@ -4517,27 +4524,49 @@ Namespace FBM
                 'NB Tightly coupled to the v5.5 release of Boston.
                 'NB Must upgrade to v2.1 Core, at least nominally, because new model elements are created/copied when the user creates a STD Page.
                 '  No need to create/modify the model elements here...just need to remove the old ones.
+                'STM (State Transition Model) totally changed.
 
-                lsSQLQuery = "REMOVE MODELELEMENT CoreValueTypeHasFinishCoreElementState"
-                Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                If Me.GetModelObjectByName("CoreValueTypeHasFinishCoreElementState") IsNot Nothing Then
+                    lsSQLQuery = "REMOVE MODELELEMENT CoreValueTypeHasFinishCoreElementState"
+                    Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                End If
 
-                lsSQLQuery = "REMOVE MODELELEMENT CoreValueTypeHasStartCoreElementState"
-                Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                If Me.GetModelObjectByName("CoreValueTypeHasStartCoreElementState") IsNot Nothing Then
+                    lsSQLQuery = "REMOVE MODELELEMENT CoreValueTypeHasStartCoreElementState"
+                    Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                End If
 
-                lsSQLQuery = "REMOVE MODELELEMENT CoreValueTypeIsSubtypeStateControlled"
-                Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                If Me.GetModelObjectByName("CoreValueTypeIsSubtypeStateControlled") IsNot Nothing Then
+                    lsSQLQuery = "REMOVE MODELELEMENT CoreValueTypeIsSubtypeStateControlled"
+                    Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                End If
 
-                lsSQLQuery = "REMOVE MODELELEMENT CoreStateTransitionIsForValueType"
-                Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                If Me.GetModelObjectByName("CoreStateTransitionIsForValueType") IsNot Nothing Then
+                    lsSQLQuery = "REMOVE MODELELEMENT CoreStateTransitionIsForValueType"
+                    Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                End If
 
-                lsSQLQuery = "REMOVE MODELELEMENT CoreStateTransition"
-                Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
+                If Me.GetModelObjectByName("CoreStateTransition") IsNot Nothing Then
+                    lsSQLQuery = "REMOVE MODELELEMENT CoreStateTransition"
+                    Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                End If
 
                 'Upgrade to CoreVersionNumber, v2.1
                 Me.CoreVersionNumber = "2.1"
 
                 Call TableModel.update_model(Me)
+
+                '==================================================
+                'CMML. STM - (State Transition Model). Create a CMML Page and then dispose of it.                
+                'For StateTransitionDiagrams
+                Dim lrCorePage = prApplication.CMML.Core.Page.Find(Function(x) x.Name = pcenumCMMLCorePage.CoreStateTransitionDiagram.ToString) 'AddressOf lrCorePage.EqualsByName)
+
+                If lrCorePage Is Nothing Then
+                    Throw New Exception("Couldn't find Page, '" & pcenumCMMLCorePage.CoreStateTransitionDiagram.ToString & "', in the Core Model.")
+                End If
+
+                Dim lrPage = lrCorePage.Clone(Me, False, True, False) 'Clone the Page's Model Element for the State Transition Diagrams into the core metamodel.
+                Me.ContainsLanguage.AddUnique(pcenumLanguage.StateTransitionDiagram)
 
             End If
 
@@ -4586,6 +4615,11 @@ Namespace FBM
             Me.ContainsLanguage.AddUnique(pcenumLanguage.EntityRelationshipDiagram)
             Me.ContainsLanguage.AddUnique(pcenumLanguage.PropertyGraphSchema)
             Me.ContainsLanguage.AddUnique(pcenumLanguage.StateTransitionDiagram)
+
+            '------------------------------------------------------------------
+            'Set the CoreVersionNumber
+            Me.CoreVersionNumber = prApplication.CMML.Core.CoreVersionNumber
+            Call TableModel.update_model(Me)
 
 
             lfrmFlashCard = New frmFlashCard

@@ -1739,14 +1739,21 @@ Namespace FBM
 
                     If larNullActiveRoles.Count > 0 Then
                         'CodeSafe
-                        For Each lrColumn In larNullActiveRoles
-                            If lrColumn.Role.FactType.Id = lrColumn.Table.Name And
+                        For Each lrColumn In larNullActiveRoles.ToArray
+                            Try
+                                If lrColumn.Role.FactType.Id = lrColumn.Table.Name And
                                 lrColumn.Role.FactType.IsObjectified Then
-                                If lrColumn.Role.JoinedORMObject.ConceptType = pcenumConceptType.ValueType Then
-                                    lrColumn.ActiveRole = lrColumn.Role
-                                    Call Me.updateORSetCMMLPropertyActiveRole(lrColumn)
+                                    If lrColumn.Role.JoinedORMObject.ConceptType = pcenumConceptType.ValueType Then
+                                        lrColumn.ActiveRole = lrColumn.Role
+                                        Call Me.updateORSetCMMLPropertyActiveRole(lrColumn)
+                                    End If
                                 End If
-                            End If
+                            Catch ex As Exception
+                                'CodeSafe
+                                If lrColumn.ActiveRole Is Nothing And lrColumn.Role Is Nothing And lrColumn.FactType Is Nothing Then
+                                    Call lrTable.removeColumn(lrColumn)
+                                End If
+                            End Try
                         Next
                     End If
 
@@ -1767,7 +1774,7 @@ Namespace FBM
                 '==========================================================
                 'State Transition Model
                 '  NB Is called from within this thread so as to not clash on the ORMQL Parser.
-                If CSng(prApplication.ApplicationVersionNr) >= 5.5 Then
+                If CSng(prApplication.CMML.Core.CoreVersionNumber) >= 2.1 Then
                     Call Me.PopulateSTMStructureFromCoreMDAElements()
                 End If
 

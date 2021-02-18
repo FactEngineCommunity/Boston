@@ -126,74 +126,85 @@ Public Class frmToolboxErrorList
 
         Dim lrModelError As FBM.ModelError = Nothing
 
-        If Me.DataGrid_ErrorList.SelectedRows.Count = 1 Then
-            ziSelectedErrorNumber = Me.DataGrid_ErrorList.Rows(Me.DataGrid_ErrorList.SelectedRows(0).Index).Cells(0).Value
-            lrModelError = Me.zrModel.ModelError(Me.DataGrid_ErrorList.SelectedRows(0).Index)
-        ElseIf Me.DataGrid_ErrorList.SelectedCells.Count = 1 Then
-            ziSelectedErrorNumber = Me.DataGrid_ErrorList.Rows(Me.DataGrid_ErrorList.SelectedCells(0).RowIndex).Cells(0).Value
-            lrModelError = Me.zrModel.ModelError(Me.DataGrid_ErrorList.SelectedCells(0).RowIndex)
-        Else
-            ziSelectedErrorNumber = 0
-        End If
+        Try
 
-        '==========================================================================================================
-        If lrModelError IsNot Nothing Then
-
-            Dim larPage As New List(Of FBM.Page)
-            Dim loMenuOption As ToolStripItem
-
-            '--------------------------------------------------------
-            'Load the ORMDiagrams that relate to the ValueType
-            '  as selectable menuOptions
-            '--------------------------------------------------------        
-            Select Case lrModelError.ModelObject.ConceptType
-                Case Is = pcenumConceptType.ValueType
-                    larPage = prApplication.CMML.get_orm_diagram_pages_for_value_type(lrModelError.ModelObject)
-                Case Is = pcenumConceptType.EntityType
-                    larPage = prApplication.CMML.getORMDiagramPagesForEntityType(lrModelError.ModelObject)
-                Case Is = pcenumConceptType.FactType
-                    larPage = prApplication.CMML.get_orm_diagram_pages_for_FactType(lrModelError.ModelObject)
-                Case Is = pcenumConceptType.RoleConstraint
-                    larPage = prApplication.CMML.GetORMDiagramPagesForRoleConstraint(lrModelError.ModelObject)
-            End Select
-
-            Me.ToolStripMenuItemShowInDiagram.DropDownItems.Clear()
-
-            If larPage.Count = 0 Then
-                loMenuOption = Me.ToolStripMenuItemShowInDiagram.DropDownItems.Add("The Model Object related to this error is not on any Page in the Model.")
+            If Me.DataGrid_ErrorList.SelectedRows.Count = 1 Then
+                ziSelectedErrorNumber = Me.DataGrid_ErrorList.Rows(Me.DataGrid_ErrorList.SelectedRows(0).Index).Cells(0).Value
+                lrModelError = Me.zrModel.ModelError(Me.DataGrid_ErrorList.SelectedRows(0).Index)
+            ElseIf Me.DataGrid_ErrorList.SelectedCells.Count = 1 Then
+                ziSelectedErrorNumber = Me.DataGrid_ErrorList.Rows(Me.DataGrid_ErrorList.SelectedCells(0).RowIndex).Cells(0).Value
+                lrModelError = Me.zrModel.ModelError(Me.DataGrid_ErrorList.SelectedCells(0).RowIndex)
             Else
-                For Each lrPage In larPage
-                    '----------------------------------------------------------
-                    'Try and find the Page within the EnterpriseView.TreeView
-                    '  NB If 'Core' Pages are not shown for the model, 
-                    '  they will not be in the TreeView and so a menuOption
-                    '  is now added for those hidden Pages.
-                    '----------------------------------------------------------
-                    Dim lrEnterpriseView As tEnterpriseEnterpriseView
-                    lrEnterpriseView = New tEnterpriseEnterpriseView(pcenumMenuType.pageORMModel,
-                                                               lrPage,
-                                                               Me.zrModel.ModelId,
-                                                               pcenumLanguage.ORMModel,
-                                                               Nothing,
-                                                               lrPage.PageId)
-
-                    lrEnterpriseView = prPageNodes.Find(AddressOf lrEnterpriseView.Equals)
-
-                    lrEnterpriseView.FocusModelElement = lrModelError.ModelObject
-
-                    If IsSomething(lrEnterpriseView) Then
-                        '---------------------------------------------------
-                        'Add the Page(Name) to the MenuOption.DropDownItems
-                        '---------------------------------------------------
-                        loMenuOption = Me.ToolStripMenuItemShowInDiagram.DropDownItems.Add(lrPage.Name)
-                        loMenuOption.Tag = prPageNodes.Find(AddressOf lrEnterpriseView.Equals)
-                        AddHandler loMenuOption.Click, AddressOf Me.OpenModelPage
-                    End If
-                Next
+                ziSelectedErrorNumber = 0
             End If
 
-        End If
-        '==========================================================================================================
+            '==========================================================================================================
+            If lrModelError IsNot Nothing Then
+
+                Dim larPage As New List(Of FBM.Page)
+                Dim loMenuOption As ToolStripItem
+
+                '--------------------------------------------------------
+                'Load the ORMDiagrams that relate to the ValueType
+                '  as selectable menuOptions
+                '--------------------------------------------------------        
+                Select Case lrModelError.ModelObject.ConceptType
+                    Case Is = pcenumConceptType.ValueType
+                        larPage = prApplication.CMML.get_orm_diagram_pages_for_value_type(lrModelError.ModelObject)
+                    Case Is = pcenumConceptType.EntityType
+                        larPage = prApplication.CMML.getORMDiagramPagesForEntityType(lrModelError.ModelObject)
+                    Case Is = pcenumConceptType.FactType
+                        larPage = prApplication.CMML.get_orm_diagram_pages_for_FactType(lrModelError.ModelObject)
+                    Case Is = pcenumConceptType.RoleConstraint
+                        larPage = prApplication.CMML.GetORMDiagramPagesForRoleConstraint(lrModelError.ModelObject)
+                End Select
+
+                Me.ToolStripMenuItemShowInDiagram.DropDownItems.Clear()
+
+                If larPage.Count = 0 Then
+                    loMenuOption = Me.ToolStripMenuItemShowInDiagram.DropDownItems.Add("The Model Object related to this error is not on any Page in the Model.")
+                Else
+                    For Each lrPage In larPage
+                        '----------------------------------------------------------
+                        'Try and find the Page within the EnterpriseView.TreeView
+                        '  NB If 'Core' Pages are not shown for the model, 
+                        '  they will not be in the TreeView and so a menuOption
+                        '  is now added for those hidden Pages.
+                        '----------------------------------------------------------
+                        Dim lrEnterpriseView As tEnterpriseEnterpriseView
+                        lrEnterpriseView = New tEnterpriseEnterpriseView(pcenumMenuType.pageORMModel,
+                                                                   lrPage,
+                                                                   Me.zrModel.ModelId,
+                                                                   pcenumLanguage.ORMModel,
+                                                                   Nothing,
+                                                                   lrPage.PageId)
+
+                        lrEnterpriseView = prPageNodes.Find(AddressOf lrEnterpriseView.Equals)
+
+                        lrEnterpriseView.FocusModelElement = lrModelError.ModelObject
+
+                        If IsSomething(lrEnterpriseView) Then
+                            '---------------------------------------------------
+                            'Add the Page(Name) to the MenuOption.DropDownItems
+                            '---------------------------------------------------
+                            loMenuOption = Me.ToolStripMenuItemShowInDiagram.DropDownItems.Add(lrPage.Name)
+                            loMenuOption.Tag = prPageNodes.Find(AddressOf lrEnterpriseView.Equals)
+                            AddHandler loMenuOption.Click, AddressOf Me.OpenModelPage
+                        End If
+                    Next
+                End If
+
+            End If
+            '==========================================================================================================
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 

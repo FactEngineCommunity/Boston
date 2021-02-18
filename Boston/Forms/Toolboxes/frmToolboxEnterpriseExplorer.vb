@@ -1666,6 +1666,9 @@ Public Class frmToolboxEnterpriseExplorer
                 lrModel.Namespace = Me.ComboBoxNamespace.SelectedItem.Tag
             End If
 
+            'CMML
+            Call lrModel.AddCoreERDPGSAndSTDModelElements(Nothing)
+
             lrModel.IsDirty = True
             lrModel.Save()
 
