@@ -391,11 +391,12 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.StateTransitionDiagramToolStripMenuItem.Name = "StateTransitionDiagramToolStripMenuItem"
         Me.StateTransitionDiagramToolStripMenuItem.Size = New System.Drawing.Size(220, 22)
         Me.StateTransitionDiagramToolStripMenuItem.Text = "&State Transition Diagram"
+        Me.StateTransitionDiagramToolStripMenuItem.Visible = False
         '
         'AddSTDPageToolStripMenuItem
         '
         Me.AddSTDPageToolStripMenuItem.Name = "AddSTDPageToolStripMenuItem"
-        Me.AddSTDPageToolStripMenuItem.Size = New System.Drawing.Size(148, 22)
+        Me.AddSTDPageToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
         Me.AddSTDPageToolStripMenuItem.Text = "&Add STD Page"
         '
         'ToolStripSeparator1
@@ -460,7 +461,7 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.ToolStripMenuItem12.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.FromORMCMMLFileToolStripMenuItem})
         Me.ToolStripMenuItem12.Image = Global.Boston.My.Resources.MenuImages.Import16x16
         Me.ToolStripMenuItem12.Name = "ToolStripMenuItem12"
-        Me.ToolStripMenuItem12.Size = New System.Drawing.Size(180, 22)
+        Me.ToolStripMenuItem12.Size = New System.Drawing.Size(135, 22)
         Me.ToolStripMenuItem12.Text = "&Import"
         Me.ToolStripMenuItem12.Visible = False
         '
@@ -475,14 +476,14 @@ Partial Class frmToolboxEnterpriseExplorer
         '
         Me.ExportTestingToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.XML16x16
         Me.ExportTestingToolStripMenuItem.Name = "ExportTestingToolStripMenuItem"
-        Me.ExportTestingToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
+        Me.ExportTestingToolStripMenuItem.Size = New System.Drawing.Size(135, 22)
         Me.ExportTestingToolStripMenuItem.Text = "To .&fbm File"
         '
         'TocqlFileToolStripMenuItem
         '
         Me.TocqlFileToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.CQL16x16
         Me.TocqlFileToolStripMenuItem.Name = "TocqlFileToolStripMenuItem"
-        Me.TocqlFileToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
+        Me.TocqlFileToolStripMenuItem.Size = New System.Drawing.Size(135, 22)
         Me.TocqlFileToolStripMenuItem.Text = "To .&cql File"
         Me.TocqlFileToolStripMenuItem.Visible = False
         '

@@ -1767,7 +1767,9 @@ Namespace FBM
                 '==========================================================
                 'State Transition Model
                 '  NB Is called from within this thread so as to not clash on the ORMQL Parser.
-                Call Me.PopulateSTMStructureFromCoreMDAElements()
+                If CSng(prApplication.ApplicationVersionNr) >= 5.5 Then
+                    Call Me.PopulateSTMStructureFromCoreMDAElements()
+                End If
 
                 Me.RDSLoading = False
 
@@ -2199,11 +2201,8 @@ Namespace FBM
 
                             lrRecordset2 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
-                            Try
-                                lrDictionary.Add(CInt(lrRecordset2("OrdinalPosition").Data), lrRecordset1("Attribute").Data)
-                            Catch ex As Exception
-                                Debugger.Break()
-                            End Try
+
+                            lrDictionary.Add(CInt(lrRecordset2("OrdinalPosition").Data), lrRecordset1("Attribute").Data)
 
                             lrRecordset1.MoveNext()
                         End While

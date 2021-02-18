@@ -4476,6 +4476,10 @@ Namespace FBM
                     Me.ContainsLanguage.AddUnique(pcenumLanguage.StateTransitionDiagram)
                 End If
 
+                '============================================================================================
+                'Core Management. E.g. If the Core needs modification for a new release.
+                Call Me.performCoreManagement()
+
                 '==============================================
                 'Either Way, populate the RDS data structure.
                 Dim loRDSThread As System.Threading.Thread
@@ -4502,6 +4506,40 @@ Namespace FBM
             Richmond.WriteToStatusBar(".")
 
             Me.Loading = False
+
+        End Sub
+
+        Private Sub performCoreManagement()
+
+            Dim lsSQLQuery As String
+
+            If Me.CoreVersionNumber = "2.0" Then
+                'NB Tightly coupled to the v5.5 release of Boston.
+                'NB Must upgrade to v2.1 Core, at least nominally, because new model elements are created/copied when the user creates a STD Page.
+                '  No need to create/modify the model elements here...just need to remove the old ones.
+
+                lsSQLQuery = "REMOVE MODELELEMENT CoreValueTypeHasFinishCoreElementState"
+                Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                lsSQLQuery = "REMOVE MODELELEMENT CoreValueTypeHasStartCoreElementState"
+                Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                lsSQLQuery = "REMOVE MODELELEMENT CoreValueTypeIsSubtypeStateControlled"
+                Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                lsSQLQuery = "REMOVE MODELELEMENT CoreStateTransitionIsForValueType"
+                Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                lsSQLQuery = "REMOVE MODELELEMENT CoreStateTransition"
+                Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+
+                'Upgrade to CoreVersionNumber, v2.1
+                Me.CoreVersionNumber = "2.1"
+
+                Call TableModel.update_model(Me)
+
+            End If
 
         End Sub
 

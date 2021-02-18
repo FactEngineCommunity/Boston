@@ -1202,20 +1202,22 @@ Namespace FBM
                         Dim larDownstreamActiveRoles As New List(Of FBM.Role)
                         Dim larCoveredRoles As New List(Of FBM.Role)
 
-                        Dim lrTable As RDS.Table = Me.JoinsFactType.getCorrespondingRDSTable
+                        If Not Me.JoinsFactType.IsMDAModelElement Then
 
-                        'larReturnColumns.Add(lrTable.Column.Find(Function(x) x.Role Is Me))
+                            Dim lrTable As RDS.Table = Me.JoinsFactType.getCorrespondingRDSTable
 
-                        larDownstreamActiveRoles = Me.getDownstreamRoleActiveRoles(larCoveredRoles) 'Returns all Roles joined ObjectifiedFactTypes and their Roles' JoinedORMObjects (recursively).
+                            'larReturnColumns.Add(lrTable.Column.Find(Function(x) x.Role Is Me))
 
-                        Dim larFurtherUpstreamColumns = From Table In Me.Model.RDS.Table
-                                                        From Column In Table.Column
-                                                        Where larDownstreamActiveRoles.Contains(Column.ActiveRole) _
-                                                        And Not larCoveredRoles.Contains(Column.Role)
-                                                        Select Column
+                            larDownstreamActiveRoles = Me.getDownstreamRoleActiveRoles(larCoveredRoles) 'Returns all Roles joined ObjectifiedFactTypes and their Roles' JoinedORMObjects (recursively).
 
-                        Call larReturnColumns.AddRange(larFurtherUpstreamColumns.ToList)
+                            Dim larFurtherUpstreamColumns = From Table In Me.Model.RDS.Table
+                                                            From Column In Table.Column
+                                                            Where larDownstreamActiveRoles.Contains(Column.ActiveRole) _
+                                                            And Not larCoveredRoles.Contains(Column.Role)
+                                                            Select Column
 
+                            Call larReturnColumns.AddRange(larFurtherUpstreamColumns.ToList)
+                        End If
 
 
                 End Select

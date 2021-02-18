@@ -227,6 +227,20 @@ Namespace ORMQL
 
     End Class
 
+    Public Class RemoveModelElementStatement
+
+        Dim _MODELELEMENTNAME As String = Nothing
+        Public Property MODELELEMENTNAME As String
+            Get
+                Return Me._MODELELEMENTNAME
+            End Get
+            Set(value As String)
+                Me._MODELELEMENTNAME = value
+            End Set
+        End Property
+
+    End Class
+
     Public Class RenameInstanceStatement
 
         Dim _MODELELEMENTNAME As String
@@ -818,6 +832,44 @@ Namespace ORMQL
             End Try
 
         End Function
+
+        Public Function ProcessREMOVEMODELELEMENTStatement() As Boolean
+
+            Try
+
+                '=============================================================
+                Dim lrRemoveModelElementStatement As New ORMQL.RemoveModelElementStatement
+
+                '----------------------------------
+                'Get the Tokens from the ParseTree
+                '----------------------------------
+                Call Me.GetParseTreeTokensReflection(lrRemoveModelElementStatement, Me.Parsetree.Nodes(0))
+                '======================================================================
+
+                Dim lrModelElement As FBM.ModelObject = Me.Model.GetModelObjectByName(lrRemoveModelElementStatement.MODELELEMENTNAME)
+
+                If lrModelElement IsNot Nothing Then
+
+                    Call lrModelElement.RemoveFromModel()
+
+                Else
+                    Throw New Exception("Unknown Model Element Name: '" & lrRemoveModelElementStatement.MODELELEMENTNAME & "'")
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return False
+            End Try
+
+        End Function
+
+
 
         Private Function ProcessRENAMEINSTANCEStatement() As Boolean
 
@@ -2358,9 +2410,9 @@ Namespace ORMQL
 
                             Return Me.ProcessADDMODELELEMENTStatement
 
-                        Case Is = "REMOVEINSTANCESTMT"
+                        Case Is = "REMOVEMODELELEMENTSTMT"
 
-                            Return Me.ProcessREMOVEINSTANCEStatement
+                            Return Me.ProcessREMOVEMODELELEMENTStatement
 
                         Case Is = "RENAMEINSTANCESTMT"
 
