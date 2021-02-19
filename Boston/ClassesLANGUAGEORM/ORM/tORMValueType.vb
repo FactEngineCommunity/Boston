@@ -380,6 +380,7 @@ Namespace FBM
         Public Sub AddValueConstraint(ByVal asValueConstraint As String)
 
             Me.ValueConstraint.Add(asValueConstraint)
+            Call Me.makeDirty()
 
             RaiseEvent ValueConstraintAdded(asValueConstraint)
 

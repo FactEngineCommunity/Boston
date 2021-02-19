@@ -19,6 +19,7 @@ Namespace FBM.STM
 
         Public IsStop As Boolean = False
 
+        Public Event FactChanged(ByRef arFact As FBM.Fact)
         Public Event IsStartStateChanged(abStartStateStatus As Boolean)
         Public Event IsEndStateChanged(abEndStateStatus As Boolean)
         Public Event NameChanged(asNewName As String)
@@ -41,7 +42,7 @@ Namespace FBM.STM
 
         Public Shadows Function Equals(other As State) As Boolean Implements IEquatable(Of State).Equals
 
-            Return (Me.Name = other.Name) 'And (Me.ValueType.Id = other.ValueType.Id)
+            Return (Me.Name = other.Name) And (Me.ValueType Is other.ValueType)
 
         End Function
 
@@ -67,10 +68,23 @@ Namespace FBM.STM
 
         End Sub
 
+        Public Sub setFact(ByRef arFact As FBM.Fact)
+
+            Me.Fact = arFact
+
+            RaiseEvent FactChanged(arFact)
+
+        End Sub
+
         Public Sub setName(ByVal asNewName As String)
 
             Try
                 Dim lsOldStateName = Me.Name
+
+                '===================================================================================
+                'States can belong to more than ValueType.
+                Dim larDuplicateState = Me.Model.State.FindAll(Function(x) x.ValueType.Id <> Me.ValueType.Id And x.Name = Me.Name)
+
                 Me.Name = asNewName
 
                 'FBM Model level
@@ -78,6 +92,12 @@ Namespace FBM.STM
 
                 'CMML
                 Call Me.Model.Model.changeCMMLStateName(Me, lsOldStateName)
+
+                For Each lrDuplicateState In larDuplicateState
+                    'Need to create a new State in the CMML ElementHasElementType relation.
+                    Call Me.Model.Model.createCMMLState(lrDuplicateState.ValueType, lsOldStateName)
+                    Exit For
+                Next
 
                 RaiseEvent NameChanged(asNewName)
 

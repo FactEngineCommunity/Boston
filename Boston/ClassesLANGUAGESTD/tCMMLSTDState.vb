@@ -269,6 +269,26 @@ Namespace STD
 
         End Sub
 
+        Private Sub STMState_FactChanged(ByRef arFact As Fact) Handles STMState.FactChanged
+
+            Try
+                'Remove the original Fact from the FactType(Instance)
+                Me.Fact.FactType.RemoveFactById(Me.Fact.Fact)
+
+                'Change the Fact
+                Me.Fact = Me.Fact.FactType.AddFact(arFact)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
     End Class
 
 End Namespace

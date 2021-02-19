@@ -30,7 +30,6 @@ Namespace FBM
 
         Public Function createCMMLState(ByRef arValueType As FBM.ValueType, ByVal asStateName As String) As STM.State
 
-
             Dim lrState = New STM.State
             lrState.ValueType = arValueType
             lrState.Name = asStateName
@@ -44,7 +43,7 @@ Namespace FBM
             lsSQLQuery &= " VALUES ('" & lrState.Name & "','State'"
             lsSQLQuery &= ")"
 
-            lrState.Fact = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+            lrState.setFact(Me.ORMQL.ProcessORMQLStatement(lsSQLQuery))
 
             Return lrState
 

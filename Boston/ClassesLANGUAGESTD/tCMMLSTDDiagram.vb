@@ -42,7 +42,8 @@ Namespace STD
 
             CreateUniqueStateName = lsTrialStateName
 
-            If Me.State.Find(Function(x) x.StateName = lsTrialStateName) IsNot Nothing Then
+            If Me.State.Find(Function(x) x.StateName = lsTrialStateName) IsNot Nothing _
+                Or Me.ValueType.ValueConstraint.Contains(lsTrialStateName) Then
                 CreateUniqueStateName = Me.CreateUniqueStateName(asRootStateName, aiCounter + 1)
             Else
                 Return lsTrialStateName

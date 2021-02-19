@@ -4476,7 +4476,7 @@ Namespace FBM
                     Me.ContainsLanguage.AddUnique(pcenumLanguage.PropertyGraphSchema)
 
 
-                ElseIf CSng(Me.CoreVersionNumber) >= 2.0 Then
+                ElseIf CDbl(Me.CoreVersionNumber) >= 2.0 Then
                     'Nothing to do (at this point), because is the latest version of the Core @ 16/05/2020
                     Me.ContainsLanguage.AddUnique(pcenumLanguage.EntityRelationshipDiagram)
                     Me.ContainsLanguage.AddUnique(pcenumLanguage.PropertyGraphSchema)
