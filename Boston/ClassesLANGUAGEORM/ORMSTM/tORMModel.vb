@@ -90,6 +90,8 @@ Namespace FBM
                     Me.STM.State.AddUnique(lrToState)
 
                     lrStateTransition = New STM.StateTransition
+                    lrStateTransition.ValueType = Me.ValueType.Find(Function(x) x.Id = lrORMRecordset("ValueType").Data)
+                    lrStateTransition.Model = Me.STM
                     lrStateTransition.FromState = lrFromState
                     lrStateTransition.ToState = lrToState
                     lrStateTransition.Event = lrORMRecordset("Event").Data
@@ -112,6 +114,7 @@ Namespace FBM
                 While Not lrORMRecordset.EOF
                     Dim lsStateName = lrORMRecordset("Element").Data
                     If Me.STM.State.Find(Function(x) x.Name = lsStateName) Is Nothing Then
+
                         lrState = New STM.State(Me.STM, Nothing, lsStateName)
                         lrState.Fact = lrORMRecordset.CurrentFact
 

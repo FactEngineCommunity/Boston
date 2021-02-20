@@ -422,55 +422,12 @@ Public Class frmStateTransitionDiagram
             While Not lrRecordset.EOF
 
                 lrFromState = Me.zrPage.STDiagram.State.Find(Function(x) x.Name = lrRecordset("Concept1").Data)
-
                 lrToState = Me.zrPage.STDiagram.State.Find(Function(x) x.Name = lrRecordset("Concept2").Data)
 
-                'lrFactDataInstance = lrRecordset("Concept1")
-                'lrFromState = lrFactDataInstance.CloneState(arPage)
-                'lrFromState.X = lrFactDataInstance.X
-                'lrFromState.Y = lrFactDataInstance.Y
-                'lrFromState.StateName = lrRecordset("Concept1").Data
-                'lrFromState.ValueType = Me.zrPage.STDiagram.ValueType
-
-                'lrFromState.STMState = Me.zrPage.Model.STM.State.Find(Function(x) x.ValueType.Id = lrFromState.ValueType.Id And x.Name = lrFromState.StateName)
-
-                'Dim LoadedCount = Aggregate Node In Me.Diagram.Nodes
-                '                  Where Node.GetType.ToString = GetType(MindFusion.Diagramming.ShapeNode).ToString _
-                '                  And Node.Tag.ConceptType = pcenumConceptType.State _
-                '                  And Node.Tag.Name = lrFromState.Name
-                '                  Into Count()
-
-                'If LoadedCount = 0 Then
-                '    Me.zrPage.STDiagram.State.AddUnique(lrFromState)
-                '    lrFromState.DisplayAndAssociate()
-                'Else
-
-                'End If
-
-                'lrFactDataInstance = lrRecordset("Concept2")
-                'lrToState = lrFactDataInstance.CloneState(arPage)
-                'lrToState.X = lrFactDataInstance.X
-                'lrToState.Y = lrFactDataInstance.Y
-                'lrToState.StateName = lrRecordset("Concept2").Data
-                'lrToState.ValueType = Me.zrPage.STDiagram.ValueType
-
-                'Dim LoadedCount2 = Aggregate Node In Me.Diagram.Nodes
-                '                   Where Node.GetType.ToString = GetType(MindFusion.Diagramming.ShapeNode).ToString _
-                '                     And Node.Tag.ConceptType = pcenumConceptType.State _
-                '                     And Node.Tag.Name = lrToState.Name
-                '                    Into Count()
-
-                'If LoadedCount2 = 0 Then
-                '    Me.zrPage.STDiagram.State.AddUnique(lrToState)
-                '    lrToState.DisplayAndAssociate()
-                'Else
-                '    lrToState = Me.zrPage.STDiagram.State.Find(Function(x) x.Name = lrToState.Name)
-                'End If
-
                 lrFactInstance = lrRecordset.CurrentFact
-                Dim lrStateTransition As New STD.StateTransition
-                lrStateTransition = lrFactInstance.CloneStateTransition(arPage, lrFromState, lrToState, lrRecordset("Event").Data)
 
+                Dim lrStateTransition As STD.StateTransition
+                lrStateTransition = lrFactInstance.CloneStateTransition(arPage, lrFromState, lrToState, lrRecordset("Event").Data)
                 lrStateTransition.STMStateTransition = Me.zrPage.Model.STM.StateTransition.Find(Function(x) x.Fact.Id = lrRecordset.CurrentFact.Id)
 
                 Me.zrPage.STDiagram.StateTransition.AddUnique(lrStateTransition)
@@ -894,7 +851,8 @@ Public Class frmStateTransitionDiagram
             Dim lrFromState As STD.State = loFirstEntity
             Dim lrToState As STD.State = loSecondEntity
 
-            Dim lrStateTransition As New FBM.STM.StateTransition(Me.zrPage.STDiagram.ValueType,
+            Dim lrStateTransition As New FBM.STM.StateTransition(Me.zrPage.Model.STM,
+                                                                 Me.zrPage.STDiagram.ValueType,
                                                                  lrFromState.STMState,
                                                                  lrToState.STMState,
                                                                  "")
@@ -922,27 +880,39 @@ Public Class frmStateTransitionDiagram
         Dim lo_first_entity As New Object
         Dim lo_second_entity As New Object
 
+        Try
 
-        Me.Cursor = Cursors.WaitCursor
+            Me.Cursor = Cursors.WaitCursor
+
+            lo_first_entity = e.Link.Origin.Tag
+            lo_second_entity = e.Link.Destination.Tag
+
+            Dim lrLink = e.Link.Tag
 
 
-        lo_first_entity = e.Link.Origin.Tag
-        lo_second_entity = e.Link.Destination.Tag
+            If lrLink Is Nothing Then Exit Sub 'Because when creating a new link, code removes/deletes the link.
 
-        Dim lrLink = e.Link.Tag
+            Select Case lrLink.GetType
+                Case = GetType(STD.EndStateTransition)
 
+                    Dim lrEndStateTransition As STD.EndStateTransition = lrLink
+                    Call lrEndStateTransition.STMEndStateTransition.RemoveFromModel()
 
-        If lrLink Is Nothing Then Exit Sub 'Because when creating a new link, code removes/deletes the link.
+                Case = GetType(STD.StateTransition)
 
-        Select Case lrLink.GetType
-            Case = GetType(STD.EndStateTransition)
+                    Dim lrSTDStateTransition As STD.StateTransition = lrLink
+                    Call lrSTDStateTransition.STMStateTransition.removeFromModel()
 
-                Dim lrEndStateTransition As STD.EndStateTransition = lrLink
+            End Select
 
-                Call lrEndStateTransition.STMEndStateTransition.RemoveFromModel()
-            Case = GetType(STD.StateTransition)
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
-        End Select
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 
@@ -955,15 +925,16 @@ Public Class frmStateTransitionDiagram
     Private Sub Diagram_LinkSelected(ByVal sender As Object, ByVal e As MindFusion.Diagramming.LinkEventArgs) Handles Diagram.LinkSelected
 
         Select Case Me.Diagram.Selection.Items(0).Tag.ConceptType
-            Case Is = pcenumConceptType.Fact
+            Case Is = pcenumConceptType.StateTransition
                 '-------------------------------------------------------------
                 'The only type of Facts in a StateTransitionDiagram Page are
                 '  Process/Transition links between States.
                 '-------------------------------------------------------------
-                Me.zrPage.SelectedObject.Clear()
-                Me.zrPage.SelectedObject.Add(Me.Diagram.Selection.Items(0).Tag)
+                Dim lrSTDStateTransition As STD.StateTransition = Me.Diagram.Selection.Items(0).Tag
+                Me.zrPage.SelectedObject.Add(lrSTDStateTransition)
+                Me.DiagramView.ContextMenuStrip = ContextMenuStrip_StateTransition
 
-                Me.DiagramView.ContextMenuStrip = ContextMenuStrip_ProcessLink
+                Call lrSTDStateTransition.NodeSelected()
 
         End Select
 
@@ -1137,6 +1108,25 @@ Public Class frmStateTransitionDiagram
         Dim lrPropertyGridForm As frmToolboxProperties
         lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
 
+
+        '---------------------------------------------------------------------------------------------------------------------
+        'RichtClick handling is mostly taken care of in Diagram.NodeSelected
+        '---------------------------------------------------------------------
+        If e.Button = Windows.Forms.MouseButtons.Right Then
+            Dim loSelectedNode = Diagram.GetNodeAt(lo_point)
+            Dim loSelectedLink As DiagramLink = Diagram.GetLinkAt(lo_point, 2)
+            If (loSelectedNode Is Nothing) And (loSelectedLink Is Nothing) Then
+                Me.zrPage.SelectedObject.Clear()
+                Me.Diagram.Selection.Clear()
+                Me.DiagramView.ContextMenuStrip = ContextMenuStrip_Diagram
+            ElseIf IsSomething(loSelectedNode) Then
+                loSelectedNode.Selected = True
+            End If
+
+            Exit Sub
+        End If
+
+
         If IsSomething(Diagram.GetNodeAt(lo_point)) Then
             '----------------------------
             'Mouse is over an ShapeNode
@@ -1177,81 +1167,67 @@ Public Class frmStateTransitionDiagram
                 End Select
             End If
 
-            'If IsSomething(Diagram.GetNodeAt(lo_point)) Then
-            '    '----------------------------
-            '    'Mouse is over an ShapeNode
-            '    '----------------------------
 
-            '    '----------------------------------------------------
-            '    'Get the Node/Shape under the mouse cursor.
-            '    '----------------------------------------------------
-            '    If TypeOf Diagram.GetNodeAt(lo_point) Is MindFusion.Diagramming.TableNode Then
-            '        Exit Sub
-            '    End If
-            '    loNode = Diagram.GetNodeAt(lo_point)
+            If Control.ModifierKeys And Keys.Control Then
+                '------------------------------------
+                'Use is holding down the CtrlKey so
+                '  enforce the selection of the object
+                '------------------------------------                
+                loNode.Selected = True
+                loNode.Pen.Color = Color.Blue
+                prApplication.WorkingPage.MultiSelectionPerformed = True
 
-            '    If Control.ModifierKeys And Keys.Control Then
-            '        '------------------------------------
-            '        'Use is holding down the CtrlKey so
-            '        '  enforce the selection of the object
-            '        '------------------------------------                
-            '        loNode.Selected = True
-            '        loNode.Pen.Color = Color.Blue
-            '        prApplication.workingpage.MultiSelectionPerformed = True
+                Exit Sub
+            Else
+                If prApplication.WorkingPage.MultiSelectionPerformed Then
+                    '            If Diagram.Selection.Nodes.Contains(loNode) Then
+                    '                '--------------------------------------------------------------------
+                    '                'Don't clear the SelectedObjects if the ShapeNode selected/clicked on 
+                    '                '  is within the Diagram.Selection because the user has just performed
+                    '                '  a MultiSelection, ostensibly (one would assume) to then 'move'
+                    '                '  or 'delete' the selection of objects.
+                    '                '--------------------------------------------------------------------                    
+                    '                '------------------------------------------------------------------------------
+                    '                'Unless the Shape.Tag is a FactType, then just select it
+                    '                '  The reason for this, is because of MindFusion.Groups.
+                    '                '  When a User selects a Role...the whole RoleGroup (all Roles in the FactType)
+                    '                '  are selected, so it is a MultiSelection by default.
+                    '                '------------------------------------------------------------------------------
+                    '                Select Case loNode.Tag.ConceptType
+                    '                    Case Is = pcenumConceptType.FactType
+                    '                        prApplication.workingpage.SelectedObject.Clear()
+                    '                        Diagram.Selection.Clear()
+                    '                        '-----------------------------------------------
+                    '                        'Select the ShapeNode/ORMObject just clicked on
+                    '                        '-----------------------------------------------                    
+                    '                        loNode.Selected = True
+                    '                        loNode.Pen.Color = Color.Blue
 
-            '        Select Case loNode.Tag.ConceptType
-            '            Case Is = pcenumConceptType.role
-            '                '----------------------------------------------------------------------
-            '                'This stops a Role AND its FactType being selected at the same time
-            '                '----------------------------------------------------------------------
-            '                prApplication.workingpage.SelectedObject.Remove(loNode.Tag.FactType)
-            '        End Select
+                    '                        '-------------------------------------------------------------------
+                    '                        'Reset the MultiSelectionPerformed flag on the ORMModel
+                    '                        '-------------------------------------------------------------------
+                    '                        prApplication.workingpage.MultiSelectionPerformed = False
+                    '                End Select
+                Else
+                    '---------------------------------------------------------------------------
+                    'Clear the SelectedObjects because the user neither did a MultiSelection
+                    '  nor held down the [Ctrl] key before clicking on the ShapeNode.
+                    '  Clearing the SelectedObject groups, allows for new objects to be selected
+                    '  starting with the ShapeNode/ORMObject just clicked on.
+                    '---------------------------------------------------------------------------
+                    Me.zrPage.SelectedObject.Clear()
+                    loNode.Selected = True
+                    Diagram.Selection.Clear()
+                End If
+            End If
 
-            '        Exit Sub
-            '    Else
-            '        If prApplication.workingpage.MultiSelectionPerformed Then
-            '            If Diagram.Selection.Nodes.Contains(loNode) Then
-            '                '--------------------------------------------------------------------
-            '                'Don't clear the SelectedObjects if the ShapeNode selected/clicked on 
-            '                '  is within the Diagram.Selection because the user has just performed
-            '                '  a MultiSelection, ostensibly (one would assume) to then 'move'
-            '                '  or 'delete' the selection of objects.
-            '                '--------------------------------------------------------------------                    
-            '                '------------------------------------------------------------------------------
-            '                'Unless the Shape.Tag is a FactType, then just select it
-            '                '  The reason for this, is because of MindFusion.Groups.
-            '                '  When a User selects a Role...the whole RoleGroup (all Roles in the FactType)
-            '                '  are selected, so it is a MultiSelection by default.
-            '                '------------------------------------------------------------------------------
-            '                Select Case loNode.Tag.ConceptType
-            '                    Case Is = pcenumConceptType.FactType
-            '                        prApplication.workingpage.SelectedObject.Clear()
-            '                        Diagram.Selection.Clear()
-            '                        '-----------------------------------------------
-            '                        'Select the ShapeNode/ORMObject just clicked on
-            '                        '-----------------------------------------------                    
-            '                        loNode.Selected = True
-            '                        loNode.Pen.Color = Color.Blue
-
-            '                        '-------------------------------------------------------------------
-            '                        'Reset the MultiSelectionPerformed flag on the ORMModel
-            '                        '-------------------------------------------------------------------
-            '                        prApplication.workingpage.MultiSelectionPerformed = False
-            '                End Select
-            '            Else
-            '                '---------------------------------------------------------------------------
-            '                'Clear the SelectedObjects because the user neither did a MultiSelection
-            '                '  nor held down the [Ctrl] key before clicking on the ShapeNode.
-            '                '  Clearing the SelectedObject groups, allows for new objects to be selected
-            '                '  starting with the ShapeNode/ORMObject just clicked on.
-            '                '---------------------------------------------------------------------------
-            '                prApplication.workingpage.SelectedObject.Clear()
-            '                Diagram.Selection.Clear()
         ElseIf IsSomething(Diagram.GetLinkAt(lo_point, 2)) Then
+
             '-------------------------
             'User clicked on a link
             '-------------------------
             loNode = Diagram.GetLinkAt(lo_point, 2)
+
             If IsSomething(lrPropertyGridForm) And IsSomething(loNode) Then
                 Dim lrModelObject As FBM.ModelObject
                 lrModelObject = loNode.Tag
@@ -1269,18 +1245,18 @@ Public Class frmStateTransitionDiagram
                 End Select
             End If
 
+            Me.zrPage.SelectedObject.Clear()
 
+            loNode.Selected = True
         Else
             '------------------------------------------------
             'Use clicked on the Canvas
-            '------------------------------------------------
-
-            '---------------------------
+            '------------------------------------------------            
             'Clear the SelectedObjects
             '---------------------------
             prApplication.WorkingPage.SelectedObject.Clear()
-            Me.Diagram.Selection.Clear()
 
+            Me.Diagram.Selection.Clear()
             Me.DiagramView.ContextMenuStrip = ContextMenuStrip_Diagram
 
             Me.Diagram.AllowUnconnectedLinks = False
@@ -1477,22 +1453,6 @@ Public Class frmStateTransitionDiagram
         'Me.UseCaseDiagramView.Behavior = Behavior.DrawLinks
 
         TimerLinkSwitch.Enabled = False
-
-    End Sub
-
-
-
-    Private Sub mnuOption_ProcessProperties_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles PropertiesToolStripMenuItem2.Click
-
-        Call frmMain.LoadToolboxPropertyWindow(Me.DockPanel.ActivePane)
-
-        If Not IsNothing(frmMain.zfrm_properties) Then
-            If Me.Diagram.Selection.Items.Count > 0 Then
-                frmMain.zfrm_properties.PropertyGrid.SelectedObject = Me.Diagram.Selection.Items(0).Tag
-            Else
-                frmMain.zfrm_properties.PropertyGrid.SelectedObject = Me.zrPage.STDiagram
-            End If
-        End If
 
     End Sub
 
@@ -1810,93 +1770,6 @@ Public Class frmStateTransitionDiagram
 
     End Sub
 
-    Private Sub ContextMenuStrip_ProcessLink_Opening(ByVal sender As System.Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles ContextMenuStrip_ProcessLink.Opening
-
-        Dim larPage_list As New List(Of FBM.Page)
-        Dim lr_model As FBM.Model
-        Dim lr_process As New CMML.Process
-
-
-        If Me.zrPage.SelectedObject.Count = 0 Then
-            Exit Sub
-        End If
-
-        '-------------------------------------
-        'Check that selected object is Process
-        '-------------------------------------
-        If Me.zrPage.SelectedObject(0).GetType Is GetType(FBM.FactInstance) Then
-            '----------
-            'All good
-            '----------
-        Else
-            '--------------------------------------------------------
-            'Sometimes the MouseDown/NodeSelected gets it wrong
-            '  and this sub receives invocation before an Actor is 
-            '  properly selected. The user may try and click again.
-            '  If it's a bug, then this can be removed obviously.
-            '--------------------------------------------------------
-            Exit Sub
-        End If
-
-        Dim lrDiagramLink As DiagramLink = Me.Diagram.Selection.Items(0)
-        Dim lrFactInstance As FBM.FactInstance = Me.zrPage.SelectedObject(0)
-
-
-
-        Dim lrFactDataInstance As New FBM.FactDataInstance
-        lrFactDataInstance.Role.Id = "StateTransitionRelation-Process"
-        lrFactDataInstance = lrFactInstance.Data.Find(AddressOf lrFactDataInstance.EqualsByRole)
-
-        lr_process = lrFactDataInstance.CloneProcess(Me.zrPage)
-        lr_model = lr_process.Model
-
-        '---------------------------------------------------------------------------------------------
-        'Set the initial MorphVector for the selected EntityType. Morphing the EntityType to another 
-        '  shape, and to/into another diagram starts at the MorphVector.
-        '---------------------------------------------------------------------------------------------
-        Me.morph_vector = New tMorphVector(lrDiagramLink.Bounds.X, lrDiagramLink.Bounds.Y, 0, 0, 40)
-
-        '---------------------------------------------------------------------
-        'Clear the list of UseCaseDiagrams that may relate to the EntityType
-        '---------------------------------------------------------------------
-        Me.UseCaseDiagramToolStripMenuItem1.DropDownItems.Clear()
-
-        '--------------------------------------------------------
-        'Load the UseCaseDiagrams that relate to the EntityType
-        '  as selectable menuOptions
-        '--------------------------------------------------------
-
-        '--------------------------------------------------------------------------------------------------------
-        'The EntityType represents an Actor. i.e. Has a ParentEntityType of 'Actor' within the Core meta-schema
-        '--------------------------------------------------------------------------------------------------------
-        '=================================================================================================
-        '20200503-VM-Undo commentout below when have some UseCase (or other) diagram type to morph to.
-        '=================================================================================================
-        'larPage_list = prApplication.CMML.get_use_case_diagram_pages_for_process(lr_process)
-
-
-        'For Each lr_page In larPage_list
-        '    Dim lo_menu_option As ToolStripItem
-        '    '---------------------------------------------------
-        '    'Add the Page(Name) to the MenuOption.DropDownItems
-        '    '---------------------------------------------------
-        '    lo_menu_option = Me.UseCaseDiagramToolStripMenuItem1.DropDownItems.Add(lr_page.Name)
-        '    Dim lr_enterprise_view As tEnterpriseEnterpriseView
-        '    lr_enterprise_view = New tEnterpriseEnterpriseView(pcenumMenuType.pageUseCaseDiagram,
-        '                                               lr_page,
-        '                                               lr_page.Model.EnterpriseId,
-        '                                               lr_page.Model.SubjectAreaId,
-        '                                               lr_page.Model.ProjectId,
-        '                                               lr_page.Model.SolutionId,
-        '                                               lr_page.Model.ModelId,
-        '                                               pcenumLanguage.UseCaseDiagram,
-        '                                               Nothing, lr_page.PageId)
-        '    lo_menu_option.Tag = prPageNodes.Find(AddressOf lr_enterprise_view.Equals)
-        '    AddHandler lo_menu_option.Click, AddressOf Me.morph_to_UseCase_diagram
-        'Next
-
-    End Sub
-
     Private Sub mnuOption_ViewGrid_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuOption_ViewGrid.Click
 
         mnuOption_ViewGrid.Checked = Not mnuOption_ViewGrid.Checked
@@ -2025,6 +1898,24 @@ Public Class frmStateTransitionDiagram
                 Me.Diagram.Nodes.Remove(lrSTDState.Shape)
 
             End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
+    Private Sub RemoveFromPageAndModelToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles RemoveFromPageAndModelToolStripMenuItem.Click
+
+        Try
+            Dim lrSTDStateTransition As STD.StateTransition = Me.zrPage.SelectedObject(0)
+
+            Call lrSTDStateTransition.STMStateTransition.removeFromModel()
 
         Catch ex As Exception
             Dim lsMessage As String

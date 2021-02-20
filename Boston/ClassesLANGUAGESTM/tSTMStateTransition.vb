@@ -1,7 +1,10 @@
-﻿
+﻿Imports System.Reflection
+
 Namespace FBM.STM
 
     Public Class StateTransition
+
+        Public Model As FBM.STM.Model
 
         ''' <summary>
         ''' Is the Id of the Fact (in the FBM/Core model) that is the StateTransition.
@@ -22,6 +25,7 @@ Namespace FBM.STM
         Public Fact As FBM.Fact
 
         Public Event EventNameChanged(ByVal asNewEventName As String)
+        Public Event RemovedFromModel()
 
         ''' <summary>
         ''' Parameterless constructor
@@ -29,12 +33,14 @@ Namespace FBM.STM
         Public Sub New()
         End Sub
 
-        Public Sub New(ByRef arValueType As FBM.ValueType,
-                        ByRef arFromState As FBM.STM.State,
-                        ByRef arToState As FBM.STM.State,
-                        ByVal asEvent As String,
-                        Optional ByRef arFact As FBM.Fact = Nothing)
+        Public Sub New(ByRef arModel As FBM.STM.Model,
+                       ByRef arValueType As FBM.ValueType,
+                       ByRef arFromState As FBM.STM.State,
+                       ByRef arToState As FBM.STM.State,
+                       ByVal asEvent As String,
+                       Optional ByRef arFact As FBM.Fact = Nothing)
 
+            Me.Model = arModel
             Me.ValueType = arValueType
             Me.FromState = arFromState
             Me.ToState = arToState
@@ -44,6 +50,24 @@ Namespace FBM.STM
                 Me.Fact = arFact
                 Me.Id = arFact.Id
             End If
+
+        End Sub
+
+        Public Sub removeFromModel()
+
+            Try
+                Call Me.Model.removeStateTransition(Me)
+
+                RaiseEvent RemovedFromModel()
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
         End Sub
 

@@ -1,10 +1,12 @@
 ﻿Imports System.Reflection
+Imports Boston.FBM
 Imports MindFusion.Diagramming
 
 
 Namespace STD
     Public Class StateTransition
         Inherits FBM.FactInstance
+        Implements FBM.iPageObject
 
         Public FromState As STD.State
         Public ToState As STD.State
@@ -17,17 +19,38 @@ Namespace STD
 
         Public WithEvents STMStateTransition As FBM.STM.StateTransition 'The StateTransition at the STM/Model level.
 
+        ''' <summary>
+        ''' Parameterless constructor
+        ''' </summary>
         Public Sub New()
-
         End Sub
 
-        Public Sub New(ByRef arFromState As STD.State, ByRef arToState As STD.State, ByVal asEventName As String)
+        Public Sub New(ByRef arPage As FBM.Page, ByRef arFromState As STD.State, ByRef arToState As STD.State, ByVal asEventName As String)
 
+            Me.Page = arPage
             Me.FromState = arFromState
             Me.ToState = arToState
             Me.EventName = asEventName
 
         End Sub
+
+        Private Property iPageObject_X As Integer Implements iPageObject.X
+            Get
+                Throw New NotImplementedException()
+            End Get
+            Set(value As Integer)
+                Throw New NotImplementedException()
+            End Set
+        End Property
+
+        Private Property iPageObject_Y As Integer Implements iPageObject.Y
+            Get
+                Throw New NotImplementedException()
+            End Get
+            Set(value As Integer)
+                Throw New NotImplementedException()
+            End Set
+        End Property
 
         Public Sub DisplayAndAssociate()
 
@@ -64,9 +87,74 @@ Namespace STD
 
         End Sub
 
+        Public Sub MouseDown() Implements iPageObject.MouseDown
+            Throw New NotImplementedException()
+        End Sub
+
+        Public Sub MouseMove() Implements iPageObject.MouseMove
+            Throw New NotImplementedException()
+        End Sub
+
+        Public Sub MouseUp() Implements iPageObject.MouseUp
+            Throw New NotImplementedException()
+        End Sub
+
+        Public Sub NodeDeleting() Implements iPageObject.NodeDeleting
+            Throw New NotImplementedException()
+        End Sub
+
+        Public Sub NodeDeselected() Implements iPageObject.NodeDeselected
+            Throw New NotImplementedException()
+        End Sub
+
+        Public Sub NodeModified() Implements iPageObject.NodeModified
+            Throw New NotImplementedException()
+        End Sub
+
+        Public Sub NodeSelected() Implements iPageObject.NodeSelected
+            Call Me.SetAppropriateColour()
+        End Sub
+
+        Public Sub Move(aiNewX As Integer, aiNewY As Integer, abBroadcastInterfaceEvent As Boolean) Implements iPageObject.Move
+            Throw New NotImplementedException()
+        End Sub
+
+        Public Sub Moved() Implements iPageObject.Moved
+            Throw New NotImplementedException()
+        End Sub
+
+        Public Sub RepellNeighbouringPageObjects(aiDepth As Integer) Implements iPageObject.RepellNeighbouringPageObjects
+            Throw New NotImplementedException()
+        End Sub
+
+        Public Sub SetAppropriateColour() Implements iPageObject.SetAppropriateColour
+
+            If IsSomething(Me.Link) Then
+                If Me.Link.Selected Then
+                    Me.Link.Pen.Color = Color.Blue
+                Else
+                    Me.Link.Pen.Color = Color.Black
+                End If
+
+                If Me.Page.Diagram IsNot Nothing Then
+                    Me.Page.Diagram.Invalidate()
+                End If
+
+            End If
+
+        End Sub
+
         Private Sub STMStateTransition_EventNameChanged(asNewEventName As String) Handles STMStateTransition.EventNameChanged
 
             Me.Link.Text = asNewEventName
+
+        End Sub
+
+        Private Sub STMStateTransition_RemovedFromModel() Handles STMStateTransition.RemovedFromModel
+
+            If Me.Page.Diagram IsNot Nothing Then
+                Me.Page.Diagram.Links.Remove(Me.Link)
+            End If
 
         End Sub
 

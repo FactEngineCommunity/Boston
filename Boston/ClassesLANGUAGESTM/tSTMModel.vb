@@ -44,6 +44,7 @@
         Public Event EndStateTransitionRemoved(ByRef arEndStateTransition As FBM.STM.EndStateTransition)
         Public Event StartStateTransitionRemoved(ByRef arStartStateTransition As FBM.STM.StartStateTransition)
         Public Event StateTransitionAdded(ByRef arStateTransition As FBM.STM.StateTransition)
+        Public Event StateTranistionRemoved(ByRef arStateTransition As FBM.STM.StateTransition)
 
         ''' <summary>
         ''' Parmeterless constructor
@@ -183,6 +184,9 @@
 
             'CMML
             Call Me.Model.removeCMMLStateTransition(arStateTransition)
+
+            RaiseEvent StateTranistionRemoved(arStateTransition)
+
         End Sub
 
         'Public Sub removeStopState(ByRef arStopState As FBM.STM.State)
