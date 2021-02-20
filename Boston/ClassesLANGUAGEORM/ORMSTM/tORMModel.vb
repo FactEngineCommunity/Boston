@@ -102,7 +102,7 @@ Namespace FBM
                 End While
 
                 '===============================================================================================
-                'Orphan States
+                'Orphan States (States that are not within a StateTransition)
                 lsSQLQuery = " SELECT *"
                 lsSQLQuery &= "  FROM " & pcenumCMMLRelations.CoreElementHasElementType.ToString
                 lsSQLQuery &= " WHERE ElementType = 'State'"
@@ -110,10 +110,29 @@ Namespace FBM
                 lrORMRecordset = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
                 While Not lrORMRecordset.EOF
-
-                    If Me.STM.State.Find(Function(x) x.Name = lrORMRecordset("Element").Data) Is Nothing Then
-                        lrState = New STM.State(Me.STM, Nothing, lrORMRecordset("Element").Data)
+                    Dim lsStateName = lrORMRecordset("Element").Data
+                    If Me.STM.State.Find(Function(x) x.Name = lsStateName) Is Nothing Then
+                        lrState = New STM.State(Me.STM, Nothing, lsStateName)
                         lrState.Fact = lrORMRecordset.CurrentFact
+
+                        Dim larValueType = From ValueType In Me.ValueType
+                                           Where ValueType.ValueConstraint.Contains(lsStateName)
+                                           Select ValueType
+
+                        If larValueType.Count = 1 Then
+                            lrState.ValueType = larValueType.First
+                        Else
+                            Dim larStateValueType = From State In Me.STM.State
+                                                    Where State.Name = lsStateName
+                                                    Select State.ValueType
+
+                            For Each lrValueType In larValueType
+                                If Not larStateValueType.Contains(lrValueType) Then
+                                    lrState.ValueType = lrValueType
+                                    Exit For
+                                End If
+                            Next
+                        End If
 
                         Me.STM.State.AddUnique(lrState)
                     End If

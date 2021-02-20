@@ -66,6 +66,7 @@ Partial Class frmStateTransitionDiagram
         Me.ComboBox_ValueType = New System.Windows.Forms.ToolStripComboBox()
         Me.DiagramView = New MindFusion.Diagramming.WinForms.DiagramView()
         Me.HiddenDiagramView = New MindFusion.Diagramming.WinForms.DiagramView()
+        Me.RemoveFromPageToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ContextMenuStrip_Diagram.SuspendLayout()
         Me.ContextMenuStrip_State.SuspendLayout()
         Me.ContextMenuStrip_Process.SuspendLayout()
@@ -178,16 +179,16 @@ Partial Class frmStateTransitionDiagram
         '
         'ContextMenuStrip_State
         '
-        Me.ContextMenuStrip_State.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MorphToToolStripMenuItem, Me.ToolStripSeparator4, Me.PropertiesToolStripMenuItem1})
+        Me.ContextMenuStrip_State.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MorphToToolStripMenuItem, Me.ToolStripSeparator4, Me.RemoveFromPageToolStripMenuItem, Me.PropertiesToolStripMenuItem1})
         Me.ContextMenuStrip_State.Name = "ContextMenuStrip_Actor"
-        Me.ContextMenuStrip_State.Size = New System.Drawing.Size(128, 54)
+        Me.ContextMenuStrip_State.Size = New System.Drawing.Size(181, 98)
         '
         'MorphToToolStripMenuItem
         '
         Me.MorphToToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ORMDiagramToolStripMenuItem})
         Me.MorphToToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.Morphing16x16
         Me.MorphToToolStripMenuItem.Name = "MorphToToolStripMenuItem"
-        Me.MorphToToolStripMenuItem.Size = New System.Drawing.Size(127, 22)
+        Me.MorphToToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
         Me.MorphToToolStripMenuItem.Text = "&Morph To"
         '
         'ORMDiagramToolStripMenuItem
@@ -200,13 +201,13 @@ Partial Class frmStateTransitionDiagram
         'ToolStripSeparator4
         '
         Me.ToolStripSeparator4.Name = "ToolStripSeparator4"
-        Me.ToolStripSeparator4.Size = New System.Drawing.Size(124, 6)
+        Me.ToolStripSeparator4.Size = New System.Drawing.Size(177, 6)
         '
         'PropertiesToolStripMenuItem1
         '
         Me.PropertiesToolStripMenuItem1.Image = Global.Boston.My.Resources.MenuImages.Properties216x16
         Me.PropertiesToolStripMenuItem1.Name = "PropertiesToolStripMenuItem1"
-        Me.PropertiesToolStripMenuItem1.Size = New System.Drawing.Size(127, 22)
+        Me.PropertiesToolStripMenuItem1.Size = New System.Drawing.Size(180, 22)
         Me.PropertiesToolStripMenuItem1.Text = "&Properties"
         '
         'ContextMenuStrip_Process
@@ -383,6 +384,12 @@ Partial Class frmStateTransitionDiagram
         Me.HiddenDiagramView.TabIndex = 10
         Me.HiddenDiagramView.Text = "DiagramView1"
         '
+        'RemoveFromPageToolStripMenuItem
+        '
+        Me.RemoveFromPageToolStripMenuItem.Name = "RemoveFromPageToolStripMenuItem"
+        Me.RemoveFromPageToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
+        Me.RemoveFromPageToolStripMenuItem.Text = "&Remove from Page"
+        '
         'frmStateTransitionDiagram
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -449,4 +456,5 @@ Partial Class frmStateTransitionDiagram
     Friend WithEvents PageAsORMMetaModelToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents AutoLayoutToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents ToolStripSeparator7 As ToolStripSeparator
+    Friend WithEvents RemoveFromPageToolStripMenuItem As ToolStripMenuItem
 End Class

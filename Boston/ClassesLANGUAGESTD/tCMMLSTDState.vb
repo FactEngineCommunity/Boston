@@ -234,7 +234,7 @@ Namespace STD
         End Sub
 
         Public Sub NodeSelected() Implements iPageObject.NodeSelected
-            Throw New NotImplementedException()
+            Call Me.SetAppropriateColour()
         End Sub
 
         Public Sub Move(aiNewX As Integer, aiNewY As Integer, abBroadcastInterfaceEvent As Boolean) Implements iPageObject.Move
@@ -258,7 +258,24 @@ Namespace STD
         End Sub
 
         Public Sub SetAppropriateColour() Implements iPageObject.SetAppropriateColour
-            Throw New NotImplementedException()
+
+            If IsSomething(Me.Shape) Then
+                If Me.Shape.Selected Then
+                    Me.Shape.Pen.Color = Color.Blue
+                Else
+                    If Me.ValueType.HasModelError Then
+                        Me.Shape.Pen.Color = Color.Red
+                    Else
+                        Me.Shape.Pen.Color = Color.Black
+                    End If
+                End If
+
+                If Me.Page.Diagram IsNot Nothing Then
+                    Me.Page.Diagram.Invalidate()
+                End If
+
+            End If
+
         End Sub
 
         Private Sub STMState_NameChanged(asNewName As String) Handles STMState.NameChanged
@@ -277,6 +294,8 @@ Namespace STD
 
                 'Change the Fact
                 Me.Fact = Me.Fact.FactType.AddFact(arFact)
+                Me.FactData = arFact("Element")
+                Me.FactDataInstance = Me.Fact("Element")
 
             Catch ex As Exception
                 Dim lsMessage As String
@@ -288,6 +307,24 @@ Namespace STD
             End Try
 
         End Sub
+
+        Public Overrides Function RemoveFromPage() As Boolean
+
+            Try
+
+                Call Me.Fact.FactType.RemoveFact(Me.Fact)
+
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Function
 
     End Class
 

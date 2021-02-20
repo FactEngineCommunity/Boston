@@ -1071,38 +1071,43 @@ Public Class frmStateTransitionDiagram
         '  is displayed in the PropertyGrid is performed in ORMDiagram.MouseDown
         '------------------------------------------------------------------------------------------
 
-        Select Case e.Node.Tag.ConceptType
-            Case Is = pcenumConceptType.Process
-                e.Node.Pen.Color = Color.Blue
-            Case Is = pcenumConceptType.Actor
-                e.Node.Pen.Color = Color.Blue
-            Case Else
-                'Do nothing
-        End Select
-
-        '----------------------------------------------------
-        'Set the ContextMenuStrip menu for the selected item
-        '----------------------------------------------------
-        Select Case Me.Diagram.Selection.Items(0).Tag.ConceptType
-            Case Is = pcenumConceptType.State
-                Me.DiagramView.ContextMenuStrip = ContextMenuStrip_State
-            Case Else
-                Me.DiagramView.ContextMenuStrip = ContextMenuStrip_Diagram
-        End Select
-
-        Me.zrPage.SelectedObject.Add(e.Node.Tag)
-
-        '--------------------------------------------
-        'Allow 'InPlaceEdit' on select object types
         Try
-            Select Case e.Node.Tag.GetType
-                Case GetType(STD.State)
-                    Me.DiagramView.AllowInplaceEdit = True
+            '----------------------------------------------------
+            'Set the ContextMenuStrip menu for the selected item
+            ' & invoke NodeSelected
+            '----------------------------------------------------
+            Select Case Me.Diagram.Selection.Items(0).Tag.ConceptType
+                Case Is = pcenumConceptType.State
+                    Me.DiagramView.ContextMenuStrip = ContextMenuStrip_State
+                    Dim lrSTDState As STD.State
+                    lrSTDState = e.Node.Tag
+                    Call lrSTDState.NodeSelected()
                 Case Else
-                    Me.DiagramView.AllowInplaceEdit = False
+                    Me.DiagramView.ContextMenuStrip = ContextMenuStrip_Diagram
             End Select
-        Catch ex As Exception
 
+            Me.zrPage.SelectedObject.Add(e.Node.Tag)
+
+            '--------------------------------------------
+            'Allow 'InPlaceEdit' on select object types
+            Try
+                Select Case e.Node.Tag.GetType
+                    Case GetType(STD.State)
+                        Me.DiagramView.AllowInplaceEdit = True
+                    Case Else
+                        Me.DiagramView.AllowInplaceEdit = False
+                End Select
+            Catch ex As Exception
+
+            End Try
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Sub
@@ -1164,7 +1169,8 @@ Public Class frmStateTransitionDiagram
                         Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
                         Dim loMiscFilterAttribute2 As Attribute = New System.ComponentModel.CategoryAttribute("Instances")
                         Dim loMiscFilterAttribute3 As Attribute = New System.ComponentModel.CategoryAttribute("Description (Informal)")
-                        lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute, loMiscFilterAttribute2, loMiscFilterAttribute3})
+                        Dim loMiscFilterAttribute4 As Attribute = New System.ComponentModel.CategoryAttribute("Name")
+                        lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute, loMiscFilterAttribute2, loMiscFilterAttribute3, loMiscFilterAttribute4})
                         lrPropertyGridForm.zrSelectedObject = lrState
                         lrPropertyGridForm.PropertyGrid.SelectedObjects = {} 'Part of the fix to the problem where ValueConstraint were being added to the wrong ValueType.
                         lrPropertyGridForm.PropertyGrid.SelectedObject = lrState
@@ -1982,4 +1988,53 @@ Public Class frmStateTransitionDiagram
         End If
 
     End Sub
+
+    Private Sub PropertiesToolStripMenuItem1_Click(sender As Object, e As EventArgs) Handles PropertiesToolStripMenuItem1.Click
+
+        Call frmMain.LoadToolboxPropertyWindow(Me.DockPanel.ActivePane)
+
+        Dim lrPropertyGridForm As frmToolboxProperties
+
+        If IsSomething(prApplication.GetToolboxForm(frmToolboxProperties.Name)) Then
+            lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
+            Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
+            Dim loMiscFilterAttribute2 As Attribute = New System.ComponentModel.CategoryAttribute("Instances")
+            Dim loMiscFilterAttribute3 As Attribute = New System.ComponentModel.CategoryAttribute("Description (Informal)")
+            Dim loMiscFilterAttribute4 As Attribute = New System.ComponentModel.CategoryAttribute("Name")
+            lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute, loMiscFilterAttribute2, loMiscFilterAttribute3, loMiscFilterAttribute4})
+            If Me.Diagram.Selection.Items.Count > 0 Then
+                lrPropertyGridForm.PropertyGrid.SelectedObject = Me.Diagram.Selection.Items(0).Tag
+            End If
+        End If
+
+    End Sub
+
+    Private Sub RemoveFromPageToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles RemoveFromPageToolStripMenuItem.Click
+
+        Try
+
+            Dim lrSTDState As STD.State = Me.zrPage.SelectedObject(0)
+
+            Dim lsMessage = "Are you sure you want to remove this State from the Page?"
+            lsMessage.AppendString(vbCrLf & vbCrLf & "NB Removing the State from the Page will not remove the State from the set of Value Constraints for the Value Type.")
+
+            If MsgBox(lsMessage, MsgBoxStyle.YesNo) = MsgBoxResult.Yes Then
+
+                'Remove the State from the Page.
+                Call lrSTDState.RemoveFromPage()
+                Me.Diagram.Nodes.Remove(lrSTDState.Shape)
+
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
 End Class

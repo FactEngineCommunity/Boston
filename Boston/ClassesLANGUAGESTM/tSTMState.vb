@@ -83,12 +83,14 @@ Namespace FBM.STM
 
                 '===================================================================================
                 'States can belong to more than ValueType.
-                Dim larDuplicateState = Me.Model.State.FindAll(Function(x) x.ValueType.Id <> Me.ValueType.Id And x.Name = Me.Name)
+                Dim larDuplicateState = Me.Model.State.FindAll(Function(x) x.ValueType IsNot Me.ValueType And x.Name = Me.Name)
 
                 Me.Name = asNewName
 
                 'FBM Model level
-                Me.ValueType.renameValueConstraint(lsOldStateName, asNewName)
+                If Me.ValueType IsNot Nothing Then
+                    Me.ValueType.renameValueConstraint(lsOldStateName, asNewName)
+                End If
 
                 'CMML
                 Call Me.Model.Model.changeCMMLStateName(Me, lsOldStateName)

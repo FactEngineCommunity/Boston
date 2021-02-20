@@ -798,12 +798,14 @@ Namespace FBM
 
         End Sub
 
-        Public Function RemoveFromPage() As Boolean
+        Public Overridable Function RemoveFromPage() As Boolean
 
             Me.Fact.Data.Remove(Me)
 
             Dim lrConceptInstance As New FBM.ConceptInstance(Me.Model, Me.Page, Me.Data, pcenumConceptType.Value)
             TableConceptInstance.DeleteConceptInstance(lrConceptInstance)
+
+            Return True
 
         End Function
 
@@ -965,6 +967,7 @@ Namespace FBM
             With Me
                 lrSTDState.Model = .Model
                 lrSTDState.FactData = Me.FactData
+                lrSTDState.Fact = Me.Fact
                 lrSTDState.Name = .Concept.Symbol
                 lrSTDState.FactDataInstance = Me
                 lrSTDState.JoinedObjectType = Me.Role.JoinedORMObject

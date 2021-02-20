@@ -159,7 +159,7 @@ Namespace FBM
 
         End Function
 
-        Default Public Property Item(ByVal asItemValue As String) As FBM.FactDataInstance
+        Default Public Overloads Property Item(ByVal asItemValue As String) As FBM.FactDataInstance
             Get
                 Return Me.GetFactDataInstanceByRoleName(asItemValue)
             End Get
