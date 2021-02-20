@@ -58,13 +58,6 @@ Namespace FBM
                 Dim lsSQLQuery As String = ""
                 Dim lrORMRecordset As ORMQL.Recordset
 
-                '==============================================================================================
-                'StateTransitions
-                lsSQLQuery = " SELECT *"
-                lsSQLQuery &= "  FROM " & pcenumCMMLRelations.CoreStateTransition.ToString
-
-                lrORMRecordset = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
                 Dim lrState,
                     lrFromState,
                     lrToState As STM.State
@@ -72,25 +65,51 @@ Namespace FBM
                 Dim lrStateTransition As STM.StateTransition
                 Dim lrValueType As FBM.ValueType
 
+                '==============================================================================================
+                'States
+                lsSQLQuery = " SELECT *"
+                lsSQLQuery &= "  FROM " & pcenumCMMLRelations.CoreValueTypeHasState.ToString
+
+                lrORMRecordset = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
                 While Not lrORMRecordset.EOF
 
                     lrValueType = Me.ValueType.Find(Function(x) x.Id = lrORMRecordset("ValueType").Data)
 
-                    lrFromState = New STM.State
-                    lrFromState.ValueType = lrValueType
-                    lrFromState.Name = lrORMRecordset("Concept1").Data
-                    lrFromState.Model = Me.STM
+                    lrState = New STM.State
+                    lrState.Id = lrORMRecordset("State").Data
+                    lrState.ValueType = lrValueType
+                    lrState.Model = Me.STM
 
-                    lrToState = New STM.State
-                    lrToState.ValueType = lrValueType
-                    lrToState.Name = lrORMRecordset("Concept2").Data
-                    lrToState.Model = Me.STM
+                    lsSQLQuery = "SELECT *"
+                    lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreStateHasName.ToString
+                    lsSQLQuery &= " WHERE State = '" & lrORMRecordset("State").Data & "'"
 
-                    Me.STM.State.AddUnique(lrFromState)
-                    Me.STM.State.AddUnique(lrToState)
+                    Dim lrORMRecordset2 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                    lrState.Name = lrORMRecordset2("StateName").Data
+
+                    Me.STM.State.AddUnique(lrState)
+
+                    lrORMRecordset.MoveNext()
+                End While
+
+                '==============================================================================================
+                'State Transitions
+                lsSQLQuery = " SELECT *"
+                lsSQLQuery &= "  FROM " & pcenumCMMLRelations.CoreStateTransition.ToString
+
+                lrORMRecordset = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                While Not lrORMRecordset.EOF
+
+                    lrValueType = Me.ValueType.Find(Function(x) x.Id = lrORMRecordset("ValueType").Data)
+
+                    lrFromState = Me.STM.State.Find(Function(x) x.Id = lrORMRecordset("Concept1").Data)
+                    lrToState = Me.STM.State.Find(Function(x) x.Id = lrORMRecordset("Concept2").Data)
 
                     lrStateTransition = New STM.StateTransition
-                    lrStateTransition.ValueType = Me.ValueType.Find(Function(x) x.Id = lrORMRecordset("ValueType").Data)
+                    lrStateTransition.ValueType = lrValueType
                     lrStateTransition.Model = Me.STM
                     lrStateTransition.FromState = lrFromState
                     lrStateTransition.ToState = lrToState
@@ -103,45 +122,56 @@ Namespace FBM
                     lrORMRecordset.MoveNext()
                 End While
 
-                '===============================================================================================
-                'Orphan States (States that are not within a StateTransition)
-                lsSQLQuery = " SELECT *"
-                lsSQLQuery &= "  FROM " & pcenumCMMLRelations.CoreElementHasElementType.ToString
-                lsSQLQuery &= " WHERE ElementType = 'State'"
 
-                lrORMRecordset = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                ''===============================================================================================
+                'VM-20200220-There should be no orphaned States, because is catered for by CoreValueTypeHasState.
+                ''Orphan States (States that are not within a StateTransition)
+                'lsSQLQuery = " SELECT *"
+                'lsSQLQuery &= "  FROM " & pcenumCMMLRelations.CoreElementHasElementType.ToString
+                'lsSQLQuery &= " WHERE ElementType = 'State'"
 
-                While Not lrORMRecordset.EOF
-                    Dim lsStateName = lrORMRecordset("Element").Data
-                    If Me.STM.State.Find(Function(x) x.Name = lsStateName) Is Nothing Then
+                'lrORMRecordset = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
-                        lrState = New STM.State(Me.STM, Nothing, lsStateName)
-                        lrState.Fact = lrORMRecordset.CurrentFact
+                'While Not lrORMRecordset.EOF
 
-                        Dim larValueType = From ValueType In Me.ValueType
-                                           Where ValueType.ValueConstraint.Contains(lsStateName)
-                                           Select ValueType
+                '    lsSQLQuery = "SELECT *"
+                '    lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreStateHasName.ToString
+                '    lsSQLQuery &= " WHERE State = '" & lrORMRecordset("Element").Data
 
-                        If larValueType.Count = 1 Then
-                            lrState.ValueType = larValueType.First
-                        Else
-                            Dim larStateValueType = From State In Me.STM.State
-                                                    Where State.Name = lsStateName
-                                                    Select State.ValueType
+                '    Dim lrORMRecordset2 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
-                            For Each lrValueType In larValueType
-                                If Not larStateValueType.Contains(lrValueType) Then
-                                    lrState.ValueType = lrValueType
-                                    Exit For
-                                End If
-                            Next
-                        End If
+                '    Dim lsStateName = lrORMRecordset2("StateName").Data
 
-                        Me.STM.State.AddUnique(lrState)
-                    End If
+                '    lrState = New STM.State(Me.STM,
+                '                            lrORMRecordset("Element").Data,
+                '                            Nothing,
+                '                            lsStateName)
 
-                    lrORMRecordset.MoveNext()
-                End While
+                '    lrState.Fact = lrORMRecordset.CurrentFact
+
+                '    Dim larValueType = From ValueType In Me.ValueType
+                '                       Where ValueType.ValueConstraint.Contains(lsStateName)
+                '                       Select ValueType
+
+                '    If larValueType.Count = 1 Then
+                '        lrState.ValueType = larValueType.First
+                '    Else
+                '        Dim larStateValueType = From State In Me.STM.State
+                '                                Where State.Name = lsStateName
+                '                                Select State.ValueType
+
+                '        For Each lrValueType In larValueType
+                '            If Not larStateValueType.Contains(lrValueType) Then
+                '                lrState.ValueType = lrValueType
+                '                Exit For
+                '            End If
+                '        Next
+                '    End If
+
+                '    Me.STM.State.AddUnique(lrState)
+
+                '    lrORMRecordset.MoveNext()
+                'End While
 
                 '===============================================================================================
                 'Start State Transition
@@ -154,24 +184,21 @@ Namespace FBM
 
                     lrValueType = Me.ValueType.Find(Function(x) x.Id = lrORMRecordset("ValueType").Data)
 
-                    lrState = New STM.State(Me.STM, lrValueType, lrORMRecordset("CoreElement").Data)
+                    lrState = New STM.State
+                    lrState.Id = lrORMRecordset("CoreElement").Data
 
                     lrState = Me.STM.State.Find(AddressOf lrState.Equals)
-                    If lrState Is Nothing Then
-                        lrToState = New STM.State
-                        lrToState.ValueType = lrValueType
-                        lrToState.Name = lrORMRecordset("CoreElement").Data
-                        lrToState.Model = Me.STM
 
-                        lrState = lrToState
-                        Me.STM.State.AddUnique(lrToState)
-                    Else
-                        lrState.IsStart = True
-                    End If
+                    lrState.IsStart = True
 
                     '-------------------------------------------------------------------------------
                     'StartStateTransition
-                    Dim lrStartStateTransition = New STM.StartStateTransition(Me.STM, lrValueType, lrState, lrORMRecordset("Event").Data, lrORMRecordset.CurrentFact)
+                    Dim lrStartStateTransition = New STM.StartStateTransition(Me.STM,
+                                                                              lrValueType,
+                                                                              lrState,
+                                                                              lrORMRecordset("Event").Data,
+                                                                              lrORMRecordset.CurrentFact)
+
                     Me.STM.StartStateTransition.Add(lrStartStateTransition)
 
                     lrORMRecordset.MoveNext()
@@ -188,12 +215,17 @@ Namespace FBM
 
                     lrValueType = Me.ValueType.Find(Function(x) x.Id = lrORMRecordset("ValueType").Data)
 
-                    lrState = New STM.State(Me.STM, lrValueType, lrORMRecordset("CoreElement").Data)
+                    lrState = New STM.State
+                    lrState.Id = lrORMRecordset("CoreElement").Data
 
                     lrState = Me.STM.State.Find(AddressOf lrState.Equals)
                     lrState.IsStop = True
 
-                    Dim lrEndStateTransition = New STM.EndStateTransition(Me.STM, lrValueType, lrState, lrORMRecordset("Event").Data)
+                    Dim lrEndStateTransition = New STM.EndStateTransition(Me.STM,
+                                                                          lrValueType,
+                                                                          lrState,
+                                                                          lrORMRecordset("Event").Data)
+
                     lrEndStateTransition.EndStateId = lrORMRecordset("EndState").Data
                     lrEndStateTransition.Fact = lrORMRecordset.CurrentFact
 

@@ -6860,18 +6860,21 @@ Public Class frmDiagramORM
                                             lasData.Add(lsPrimaryKeyData)
                                             lasData.Add(lsPrimaryKeyData)
 
-                                            lrFact = Me.zrPage.Model.CreateFact(lrEntityType.ReferenceModeFactType, lasData, True)
+                                            lrFact = Me.zrPage.Model.CreateFact(CType(lrEntityType.GetTopmostSupertype, FBM.EntityType).ReferenceModeFactType, lasData, True)
 
                                             Dim lrEntityTypeInstance As FBM.EntityTypeInstance = lrFactTypeInstance.RoleGroup.Find(Function(x) x.JoinedORMObject.Id = lrEntityType.Id).JoinedORMObject
 
-                                            lrEntityTypeInstance.ReferenceModeFactType.FactType.AddFact(lrFact)
+                                            CType(lrEntityTypeInstance.EntityType.GetTopmostSupertype, FBM.EntityType).ReferenceModeFactType.AddFact(lrFact)
 
                                             lrFactInstance = lrFact.CloneInstance(Me.zrPage, False, True)
 
-                                            lrEntityTypeInstance.ReferenceModeFactType.Fact.Add(lrFactInstance)
-                                            lrEntityTypeInstance.ReferenceModeFactType.FactTable.ResortFactTable()
+                                            If lrEntityTypeInstance.ReferenceModeFactType IsNot Nothing Then
+                                                lrEntityTypeInstance.ReferenceModeFactType.Fact.Add(lrFactInstance)
+                                                lrEntityTypeInstance.ReferenceModeFactType.FactTable.ResortFactTable()
+                                            End If
+
                                         End If
-                                    End If
+                                        End If
                                 End If
                             End If
                         End If

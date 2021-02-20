@@ -10,6 +10,8 @@ Namespace FBM.STM
 
         Public Model As STM.Model = Nothing
 
+        Public Id As String
+
         Public Name As String = ""
 
         Public ValueType As FBM.ValueType = Nothing
@@ -27,13 +29,18 @@ Namespace FBM.STM
         Public Fact As FBM.Fact 'The Fact that represents the State in the CMML/Core Model of the FBM Model.
 
         ''' <summary>
-        ''' Parameterless new
+        ''' Parameterless constructor
         ''' </summary>
         Public Sub New()
+            Me.Id = System.Guid.NewGuid.ToString
         End Sub
 
-        Public Sub New(ByRef arSTModel As STM.Model, ByRef arValueType As FBM.ValueType, ByVal asStateName As String)
+        Public Sub New(ByRef arSTModel As STM.Model,
+                       ByVal asId As String,
+                       ByRef arValueType As FBM.ValueType,
+                       ByVal asStateName As String)
 
+            Me.Id = asId
             Me.Model = arSTModel
             Me.ValueType = arValueType
             Me.Name = asStateName
@@ -42,7 +49,8 @@ Namespace FBM.STM
 
         Public Shadows Function Equals(other As State) As Boolean Implements IEquatable(Of State).Equals
 
-            Return (Me.Name = other.Name) And (Me.ValueType Is other.ValueType)
+            Return Me.Id = other.Id
+            ' Return (Me.Name = other.Name) And (Me.ValueType Is other.ValueType)
 
         End Function
 

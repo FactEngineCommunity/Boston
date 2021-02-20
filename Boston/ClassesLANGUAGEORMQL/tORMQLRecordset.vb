@@ -71,31 +71,35 @@
 
         Default Public Property Item(ByVal asItemValue As String) As FBM.FactData
             Get
-                Me.CurrentFact = Me.Facts(Me.CurrentFactIndex)
+                Try
+                    Me.CurrentFact = Me.Facts(Me.CurrentFactIndex)
 
-                If asItemValue.IsNumeric Then
-                    Select Case Me.CurrentFact.GetType.ToString
-                        Case Is = GetType(FBM.Fact).ToString
-                            Return Me.CurrentFact.Data(CInt(asItemValue))
-                        Case Is = GetType(FBM.FactInstance).ToString
-                            Dim lrFactInstance As New FBM.FactInstance
-                            lrFactInstance = Me.CurrentFact
-                            Return lrFactInstance.Data(CInt(asItemValue))
-                        Case Else
-                            Return Nothing
-                    End Select
-                Else
-                    Select Case Me.CurrentFact.GetType.ToString
-                        Case Is = GetType(FBM.Fact).ToString
-                            Return Me.CurrentFact.GetFactDataByRoleName(asItemValue)
-                        Case Is = GetType(FBM.FactInstance).ToString
-                            Dim lrFactInstance As New FBM.FactInstance
-                            lrFactInstance = Me.CurrentFact
-                            Return lrFactInstance.GetFactDataInstanceByRoleName(asItemValue)
-                        Case Else
-                            Return Nothing
-                    End Select
-                End If
+                    If asItemValue.IsNumeric Then
+                        Select Case Me.CurrentFact.GetType.ToString
+                            Case Is = GetType(FBM.Fact).ToString
+                                Return Me.CurrentFact.Data(CInt(asItemValue))
+                            Case Is = GetType(FBM.FactInstance).ToString
+                                Dim lrFactInstance As New FBM.FactInstance
+                                lrFactInstance = Me.CurrentFact
+                                Return lrFactInstance.Data(CInt(asItemValue))
+                            Case Else
+                                Return Nothing
+                        End Select
+                    Else
+                        Select Case Me.CurrentFact.GetType.ToString
+                            Case Is = GetType(FBM.Fact).ToString
+                                Return Me.CurrentFact.GetFactDataByRoleName(asItemValue)
+                            Case Is = GetType(FBM.FactInstance).ToString
+                                Dim lrFactInstance As New FBM.FactInstance
+                                lrFactInstance = Me.CurrentFact
+                                Return lrFactInstance.GetFactDataInstanceByRoleName(asItemValue)
+                            Case Else
+                                Return Nothing
+                        End Select
+                    End If
+                Catch ex As Exception
+                    Return Nothing
+                End Try
             End Get
             Set(ByVal value As FBM.FactData)
                 Dim lrFactData As New FBM.FactData

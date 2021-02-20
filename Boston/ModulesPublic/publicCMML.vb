@@ -17,10 +17,12 @@ Public Enum pcenumCMMLRelations
         '---------------------------------------------
         'STDs (State Transition Diagrams)
         '---------------------------------------------
+        CoreStateHasName
+        CoreStateTransition
         CoreValueTypeIsStateTransitionBased
         CoreValueTypeHasStartCoreElementState
+        CoreValueTypeHasState
         CoreValueTypeHasEndCoreElementState
-        CoreStateTransition
 
         '---------------------------------------------
         'DFDs (Data Flow Diagrams
