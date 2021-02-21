@@ -12,13 +12,14 @@ Namespace FBM
             Dim lrSTDState As STD.State
 
             Dim lsSQLQuery = "ADD FACT '" & arSTMState.Fact.Id & "'"
-            lsSQLQuery &= " TO " & pcenumCMMLRelations.CoreElementHasElementType.ToString
+            lsSQLQuery &= " TO " & pcenumCMMLRelations.CoreValueTypeHasState.ToString
             lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
 
             Dim lrFactInstance As FBM.FactInstance = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
-            lrSTDState = lrFactInstance("Element").CloneState(Me)
+            lrSTDState = lrFactInstance("State").CloneState(Me)
             lrSTDState.STMState = arSTMState
+            lrSTDState.StateName = arSTMState.Name
 
             lrSTDState.Move(aoPtF.X, aoPtF.Y, False)
             lrSTDState.DisplayAndAssociate()

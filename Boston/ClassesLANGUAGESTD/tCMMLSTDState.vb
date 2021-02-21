@@ -81,7 +81,7 @@ Namespace STD
 
         Public Overloads Function Equals(other As State) As Boolean Implements IEquatable(Of State).Equals
 
-            Return Me.StateName = other.StateName
+            Return Me.Id = other.Id
             'If (Me.Role.Id = other.Role.Id) And (Me.Concept.Symbol = other.Concept.Symbol) Then
             '    Return True
             'Else
@@ -108,7 +108,7 @@ Namespace STD
                 loDroppedNode.Resize(20, 15)
                 loDroppedNode.AllowIncomingLinks = True
                 loDroppedNode.AllowOutgoingLinks = True
-                loDroppedNode.Text = Me.Data
+                loDroppedNode.Text = Me.StateName
                 loDroppedNode.Transparent = False
 
                 loDroppedNode.Tag = Me

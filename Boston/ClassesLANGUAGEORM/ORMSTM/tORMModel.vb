@@ -40,7 +40,19 @@ Namespace FBM
             Dim lsSQLQuery As String
 
             lsSQLQuery = "INSERT INTO " & pcenumCMMLRelations.CoreElementHasElementType.ToString & " (Element, ElementType)"
-            lsSQLQuery &= " VALUES ('" & lrState.Name & "','State'"
+            lsSQLQuery &= " VALUES ('" & lrState.Id & "','State'"
+            lsSQLQuery &= ")"
+
+            Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+            lsSQLQuery = "INSERT INTO " & pcenumCMMLRelations.CoreStateHasName.ToString & " (State, StateName)"
+            lsSQLQuery &= " VALUES ('" & lrState.Id & "','" & lrState.Name & "'"
+            lsSQLQuery &= ")"
+
+            Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+            lsSQLQuery = "INSERT INTO " & pcenumCMMLRelations.CoreValueTypeHasState.ToString & " (ValueType, State)"
+            lsSQLQuery &= " VALUES ('" & arValueType.Id & "','" & lrState.Id & "'"
             lsSQLQuery &= ")"
 
             lrState.setFact(Me.ORMQL.ProcessORMQLStatement(lsSQLQuery))

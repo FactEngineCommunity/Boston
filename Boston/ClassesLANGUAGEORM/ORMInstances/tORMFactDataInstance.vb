@@ -965,6 +965,7 @@ Namespace FBM
             Dim lrSTDState As New STD.State(arPage)
 
             With Me
+                lrSTDState.Id = .Data
                 lrSTDState.Model = .Model
                 lrSTDState.FactData = Me.FactData
                 lrSTDState.Fact = Me.Fact

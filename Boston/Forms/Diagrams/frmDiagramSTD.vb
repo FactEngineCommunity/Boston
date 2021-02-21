@@ -260,7 +260,8 @@ Public Class frmStateTransitionDiagram
                                     Case = DialogResult.OK
 
                                         'STM Level
-                                        Dim lrSTMState = Me.zrPage.STDiagram.STM.State.Find(Function(x) x.Name = lfrmStateSelectDialog.msState)
+                                        Dim lrSTMState = Me.zrPage.STDiagram.STM.State.Find(Function(x) x.ValueType Is Me.zrPage.STDiagram.ValueType _
+                                                                                            And x.Name = lfrmStateSelectDialog.msState)
 
                                         If lrSTMState Is Nothing Then
                                             lrSTMState = Me.zrPage.Model.createCMMLState(Me.zrPage.STDiagram.ValueType, lfrmStateSelectDialog.msState)
@@ -362,7 +363,7 @@ Public Class frmStateTransitionDiagram
                 'Me.zrPage.FormLoaded = True
                 'Exit Sub
             Else
-                'Temporarily disable he handler when setting the SelectedIndex.
+                'Temporarily disable the handler when setting the SelectedIndex.
                 RemoveHandler ComboBox_ValueType.SelectedIndexChanged, AddressOf ComboBox_ValueType_SelectedIndexChanged
                 Me.ComboBox_ValueType.SelectedIndex = Me.ComboBox_ValueType.FindString(lsValueTypeId)
                 AddHandler ComboBox_ValueType.SelectedIndexChanged, AddressOf ComboBox_ValueType_SelectedIndexChanged
@@ -374,9 +375,8 @@ Public Class frmStateTransitionDiagram
             '=======================================================================================
             'State shapes
             lsSQLQuery = "SELECT *"
-            lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreElementHasElementType.ToString
+            lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreValueTypeHasState.ToString
             lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
-            lsSQLQuery &= " WHERE ElementType = 'State'"
 
             lrRecordset = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
@@ -386,14 +386,15 @@ Public Class frmStateTransitionDiagram
 
             While Not lrRecordset.EOF
 
-                lrFactDataInstance = lrRecordset("Element")
+                lrFactDataInstance = lrRecordset("State")
                 lrState = lrFactDataInstance.CloneState(arPage)
+
+                lrState.STMState = Me.zrPage.Model.STM.State.Find(Function(x) x.Id = lrState.Id)
+
                 lrState.X = lrFactDataInstance.X
                 lrState.Y = lrFactDataInstance.Y
-                lrState.StateName = lrRecordset("Element").Data
+                lrState.StateName = lrState.STMState.Name
                 lrState.ValueType = Me.zrPage.STDiagram.ValueType
-
-                lrState.STMState = Me.zrPage.Model.STM.State.Find(Function(x) x.Name = lrState.StateName)
 
                 Dim LoadedCount = Aggregate Node In Me.Diagram.Nodes
                                   Where Node.GetType.ToString = GetType(MindFusion.Diagramming.ShapeNode).ToString _
@@ -421,8 +422,8 @@ Public Class frmStateTransitionDiagram
 
             While Not lrRecordset.EOF
 
-                lrFromState = Me.zrPage.STDiagram.State.Find(Function(x) x.Name = lrRecordset("Concept1").Data)
-                lrToState = Me.zrPage.STDiagram.State.Find(Function(x) x.Name = lrRecordset("Concept2").Data)
+                lrFromState = Me.zrPage.STDiagram.State.Find(Function(x) x.Id = lrRecordset("Concept1").Data)
+                lrToState = Me.zrPage.STDiagram.State.Find(Function(x) x.Id = lrRecordset("Concept2").Data)
 
                 lrFactInstance = lrRecordset.CurrentFact
 
@@ -474,7 +475,7 @@ Public Class frmStateTransitionDiagram
 
             While Not lrRecordset.EOF
 
-                lrState = Me.zrPage.STDiagram.State.Find(Function(x) x.Name = lrRecordset("CoreElement").Data)
+                lrState = Me.zrPage.STDiagram.State.Find(Function(x) x.Id = lrRecordset("CoreElement").Data)
 
                 lrFactInstance = New FBM.FactInstance
                 lrFactInstance = lrRecordset.CurrentFact
@@ -537,7 +538,7 @@ Public Class frmStateTransitionDiagram
 
             While Not lrRecordset.EOF
 
-                lrState = Me.zrPage.STDiagram.State.Find(Function(x) x.Name = lrRecordset("CoreElement").Data)
+                lrState = Me.zrPage.STDiagram.State.Find(Function(x) x.Id = lrRecordset("CoreElement").Data)
 
                 lrFactInstance = New FBM.FactInstance
                 lrFactInstance = lrRecordset.CurrentFact
