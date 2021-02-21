@@ -21,7 +21,7 @@ Namespace FBM
             Dim lsSQLQuery As String
 
             lsSQLQuery = "INSERT INTO " & pcenumCMMLRelations.CoreValueTypeHasEndCoreElementState.ToString & " (ValueType,EndState,CoreElement,Event)"
-            lsSQLQuery &= " VALUES ('" & arEndStateTransition.ValueType.Id & "','" & arEndStateTransition.EndStateId & "','" & arEndStateTransition.State.Name & "','" & arEndStateTransition.Event & "'"
+            lsSQLQuery &= " VALUES ('" & arEndStateTransition.ValueType.Id & "','" & arEndStateTransition.EndStateId & "','" & arEndStateTransition.State.Id & "','" & arEndStateTransition.Event & "'"
             lsSQLQuery &= ")"
 
             arEndStateTransition.Fact = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
@@ -267,7 +267,7 @@ Namespace FBM
             'VM-Complete this
             lsSQLQuery = "DELETE FROM " & pcenumCMMLRelations.CoreValueTypeHasEndCoreElementState.ToString
             lsSQLQuery &= " WHERE ValueType = '" & arEndStateTransition.ValueType.Id & "'"
-            lsSQLQuery &= " AND CoreElement = '" & arEndStateTransition.State.Name & "'"
+            lsSQLQuery &= " AND CoreElement = '" & arEndStateTransition.State.Id & "'"
             lsSQLQuery &= " AND EndState = '" & arEndStateTransition.EndStateId & "'"
 
             'NB Will automatically delete the corresponding FactInstances at the Page level as well.
@@ -282,7 +282,7 @@ Namespace FBM
             'VM-Complete this
             lsSQLQuery = "DELETE FROM " & pcenumCMMLRelations.CoreValueTypeHasStartCoreElementState.ToString
             lsSQLQuery &= " WHERE ValueType = '" & arStartStateTransition.ValueType.Id & "'"
-            lsSQLQuery &= " AND CoreElement = '" & arStartStateTransition.State.Name & "'"
+            lsSQLQuery &= " AND CoreElement = '" & arStartStateTransition.State.Id & "'"
             lsSQLQuery &= " AND Event = '" & arStartStateTransition.Event & "'"
 
             'NB Will automatically delete the corresponding FactInstances at the Page level as well.

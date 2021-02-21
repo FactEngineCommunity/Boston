@@ -104,6 +104,7 @@ Namespace STD
                 '----------------------------------------------
                 loDroppedNode = Me.Page.Diagram.Factory.CreateShapeNode(Me.X, Me.Y, 2, 2)
                 loDroppedNode.Shape = Shapes.RoundRect
+                loDroppedNode.Pen.Width = 0.4
                 loDroppedNode.HandlesStyle = HandlesStyle.InvisibleMove
                 loDroppedNode.Resize(20, 15)
                 loDroppedNode.AllowIncomingLinks = True

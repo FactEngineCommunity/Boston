@@ -73,6 +73,8 @@ Public Class frmStateTransitionDiagram
 
     Private Sub frmStateTransitionDiagram_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
 
+        Me.DiagramView.SmoothingMode = SmoothingMode.AntiAlias
+
         Call Me.SetupForm()
 
         prApplication.ActivePages.AddUnique(Me)
@@ -1058,7 +1060,7 @@ Public Class frmStateTransitionDiagram
                     Me.DiagramView.ContextMenuStrip = ContextMenuStrip_Diagram
             End Select
 
-            Me.zrPage.SelectedObject.Add(e.Node.Tag)
+            Me.zrPage.SelectedObject.AddUnique(e.Node.Tag)
 
             '--------------------------------------------
             'Allow 'InPlaceEdit' on select object types
@@ -1255,7 +1257,7 @@ Public Class frmStateTransitionDiagram
             '------------------------------------------------            
             'Clear the SelectedObjects
             '---------------------------
-            prApplication.WorkingPage.SelectedObject.Clear()
+            Me.zrPage.SelectedObject.Clear()
 
             Me.Diagram.Selection.Clear()
             Me.DiagramView.ContextMenuStrip = ContextMenuStrip_Diagram
@@ -1368,7 +1370,7 @@ Public Class frmStateTransitionDiagram
         Dim loObject As Object
         Dim loNode As DiagramNode
 
-        DiagramView.SmoothingMode = SmoothingMode.Default
+        'DiagramView.SmoothingMode = SmoothingMode.Default 'Turns out yuck
 
         '----------------------------------------------------
         'Check to see if the user has used the Control key to

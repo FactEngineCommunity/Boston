@@ -739,9 +739,7 @@ Public Class frmMain
             End If
         End If
 
-
         Call Environment.Exit(0)
-
 
     End Sub
 

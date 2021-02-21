@@ -89,10 +89,6 @@ Namespace FBM.STM
             Try
                 Dim lsOldStateName = Me.Name
 
-                '===================================================================================
-                'States can belong to more than ValueType.
-                Dim larDuplicateState = Me.Model.State.FindAll(Function(x) x.ValueType IsNot Me.ValueType And x.Name = Me.Name)
-
                 Me.Name = asNewName
 
                 'FBM Model level
@@ -102,12 +98,6 @@ Namespace FBM.STM
 
                 'CMML
                 Call Me.Model.Model.changeCMMLStateName(Me, lsOldStateName)
-
-                For Each lrDuplicateState In larDuplicateState
-                    'Need to create a new State in the CMML ElementHasElementType relation.
-                    Call Me.Model.Model.createCMMLState(lrDuplicateState.ValueType, lsOldStateName)
-                    Exit For
-                Next
 
                 RaiseEvent NameChanged(asNewName)
 

@@ -274,7 +274,7 @@ Partial Class frmStateTransitionDiagram
         Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripLabel_ValueType, Me.ComboBox_ValueType})
         Me.ToolStrip1.Location = New System.Drawing.Point(81, 9)
         Me.ToolStrip1.Name = "ToolStrip1"
-        Me.ToolStrip1.Size = New System.Drawing.Size(450, 37)
+        Me.ToolStrip1.Size = New System.Drawing.Size(417, 33)
         Me.ToolStrip1.TabIndex = 11
         Me.ToolStrip1.Text = "ToolStrip1"
         '
@@ -305,6 +305,7 @@ Partial Class frmStateTransitionDiagram
         Me.DiagramView.DelKeyAction = MindFusion.Diagramming.DelKeyAction.DeleteSelectedItems
         Me.DiagramView.Diagram = Me.Diagram
         Me.DiagramView.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.DiagramView.InplaceEditAcceptOnEnter = True
         Me.DiagramView.Location = New System.Drawing.Point(0, 0)
         Me.DiagramView.MiddleButtonActions = MindFusion.Diagramming.MouseButtonActions.None
         Me.DiagramView.ModificationStart = MindFusion.Diagramming.ModificationStart.SelectedOnly
