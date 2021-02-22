@@ -1374,95 +1374,95 @@ Public Class frmToolboxEnterpriseExplorer
             Dim liMenuType As pcenumMenuType = Nothing
             Dim lsCorePageName As String = ""
 
-            Me.Cursor = Cursors.WaitCursor
+            With New WaitCursor
 
-            '---------------------------------------------------
-            'Get the MenuType and LanguageType for the new Page
-            '---------------------------------------------------
-            Dim liNavigationIcon As pcenumNavigationIcons
+                '---------------------------------------------------
+                'Get the MenuType and LanguageType for the new Page
+                '---------------------------------------------------
+                Dim liNavigationIcon As pcenumNavigationIcons
 
-            '-----------------------------------------------
-            'Add a Page to the currently selected Model
-            '-----------------------------------------------
-            If IsSomething(arPage) Then
-                '------------------------
-                'Page is already created 
-                '------------------------
-                lrPage = arPage
-            Else
-                lsPageName = "New Model Page " & (liPageCount + 1).ToString
-                lrPage = New FBM.Page(prApplication.WorkingModel, Nothing, lsPageName, pcenumLanguage.ORMModel) 'Creates a new page for the model.
-                lrPage.Loaded = True
-            End If
+                '-----------------------------------------------
+                'Add a Page to the currently selected Model
+                '-----------------------------------------------
+                If IsSomething(arPage) Then
+                    '------------------------
+                    'Page is already created 
+                    '------------------------
+                    lrPage = arPage
+                Else
+                    lsPageName = "New Model Page " & (liPageCount + 1).ToString
+                    lrPage = New FBM.Page(prApplication.WorkingModel, Nothing, lsPageName, pcenumLanguage.ORMModel) 'Creates a new page for the model.
+                    lrPage.Loaded = True
+                End If
 
-            Select Case lrPage.Language
-                Case Is = pcenumLanguage.ORMModel
-                    liNavigationIcon = pcenumNavigationIcons.iconPage
-                    liMenuType = pcenumMenuType.pageORMModel
-                Case Is = pcenumLanguage.PropertyGraphSchema
-                    liNavigationIcon = pcenumNavigationIcons.iconPGSPage
-                    liMenuType = pcenumMenuType.pagePGSDiagram
-                Case Is = pcenumLanguage.EntityRelationshipDiagram
-                    liNavigationIcon = pcenumNavigationIcons.iconERDPage
-                    liMenuType = pcenumMenuType.pageERD
-                Case Is = pcenumLanguage.StateTransitionDiagram
-                    liNavigationIcon = pcenumNavigationIcons.iconSTDPage
-                    liMenuType = pcenumMenuType.pageSTD
-            End Select
+                Select Case lrPage.Language
+                    Case Is = pcenumLanguage.ORMModel
+                        liNavigationIcon = pcenumNavigationIcons.iconPage
+                        liMenuType = pcenumMenuType.pageORMModel
+                    Case Is = pcenumLanguage.PropertyGraphSchema
+                        liNavigationIcon = pcenumNavigationIcons.iconPGSPage
+                        liMenuType = pcenumMenuType.pagePGSDiagram
+                    Case Is = pcenumLanguage.EntityRelationshipDiagram
+                        liNavigationIcon = pcenumNavigationIcons.iconERDPage
+                        liMenuType = pcenumMenuType.pageERD
+                    Case Is = pcenumLanguage.StateTransitionDiagram
+                        liNavigationIcon = pcenumNavigationIcons.iconSTDPage
+                        liMenuType = pcenumMenuType.pageSTD
+                End Select
 
-            Dim lrModel As FBM.Model
-            lrModel = arModelNode.Tag.Tag
-            lrModel.Page.AddUnique(lrPage)
+                Dim lrModel As FBM.Model
+                lrModel = arModelNode.Tag.Tag
+                lrModel.Page.AddUnique(lrPage)
 
-            prApplication.WorkingPage = lrPage
+                prApplication.WorkingPage = lrPage
 
-            Richmond.WriteToStatusBar("Saving Model: " & lrModel.Name)
-            lrModel.Save()
-            Richmond.WriteToStatusBar("Model saved.")
+                Richmond.WriteToStatusBar("Saving Model: " & lrModel.Name)
+                lrModel.Save()
+                Richmond.WriteToStatusBar("Model saved.")
 
-            '------------------------------------
-            'Add a new TreeNode to the TreeView
-            '------------------------------------        
-            loNode = arModelNode.Nodes.Add(lrPage.PageId, lrPage.Name, liNavigationIcon, liNavigationIcon)
+                '------------------------------------
+                'Add a new TreeNode to the TreeView
+                '------------------------------------        
+                loNode = arModelNode.Nodes.Add(lrPage.PageId, lrPage.Name, liNavigationIcon, liNavigationIcon)
 
-            loNode.Tag = New tEnterpriseEnterpriseView(liMenuType,
-                                             prApplication.WorkingPage,
-                                             prApplication.WorkingModel.ModelId,
-                                             lrPage.Language,
-                                             loNode,
-                                             lrPage.PageId)
+                loNode.Tag = New tEnterpriseEnterpriseView(liMenuType,
+                                                 prApplication.WorkingPage,
+                                                 prApplication.WorkingModel.ModelId,
+                                                 lrPage.Language,
+                                                 loNode,
+                                                 lrPage.PageId)
 
-            Me.TreeView.SelectedNode = loNode
+                Me.TreeView.SelectedNode = loNode
 
-            '---------------------------------------------------------------------------
-            'Dirty the Page, so if the User saves the page it is saved to the database
-            '---------------------------------------------------------------------------
-            lrPage.IsDirty = True
-            frmMain.ToolStripButton_Save.Enabled = True
+                '---------------------------------------------------------------------------
+                'Dirty the Page, so if the User saves the page it is saved to the database
+                '---------------------------------------------------------------------------
+                lrPage.IsDirty = True
+                frmMain.ToolStripButton_Save.Enabled = True
 
-            '------------------------------------
-            'Display the Page if required
-            '------------------------------------
-            If abLoadPage Then
-                Call load_page(lrPage, Me.TreeView.SelectedNode)
-            End If
+                '------------------------------------
+                'Display the Page if required
+                '------------------------------------
+                If abLoadPage Then
+                    Call load_page(lrPage, Me.TreeView.SelectedNode)
+                End If
 
-            '----------------------------------------------------------------------------------------
-            'Register the Page so that when Morphing from Diagram to Diagram, Language to Language
-            '  i.e. 'Walking the model via LS', then the TreeNode within the Tree can be found
-            '----------------------------------------------------------------------------------------
-            prPageNodes.Add(loNode.Tag)
+                '----------------------------------------------------------------------------------------
+                'Register the Page so that when Morphing from Diagram to Diagram, Language to Language
+                '  i.e. 'Walking the model via LS', then the TreeNode within the Tree can be found
+                '----------------------------------------------------------------------------------------
+                prPageNodes.Add(loNode.Tag)
 
-            If abToolTipNewPage Then
+                If abToolTipNewPage Then
 
-                Dim lsMessage As String = "New Page added to the Model."
-                Me.zrToolTip.IsBalloon = True
-                Me.zrToolTip.ToolTipIcon = ToolTipIcon.None
-                Me.zrToolTip.Show(lsMessage, Me, loNode.Bounds.X, loNode.Bounds.Y + loNode.Bounds.Height, 4000)
-            End If
+                    Dim lsMessage As String = "New Page added to the Model."
+                    Me.zrToolTip.IsBalloon = True
+                    Me.zrToolTip.ToolTipIcon = ToolTipIcon.None
+                    Me.zrToolTip.Show(lsMessage, Me, loNode.Bounds.X, loNode.Bounds.Y + loNode.Bounds.Height, 4000)
+                End If
 
 
-            Me.Cursor = Cursors.Default
+            End With
 
             Return loNode.Tag
 
@@ -1542,73 +1542,76 @@ Public Class frmToolboxEnterpriseExplorer
     Public Sub addNewModelToBoston()
 
         Try
-            Dim lrNewTreeNode As TreeNode = Nothing
-            Dim lrModel As FBM.Model
+            With New WaitCursor
+                Dim lrNewTreeNode As TreeNode = Nothing
+                Dim lrModel As FBM.Model
 
-            If Me.TreeView.Nodes(0).Nodes.Count > 0 Then
-                Me.TreeView.Nodes(0).Nodes(Me.TreeView.Nodes(0).Nodes.Count - 1).EnsureVisible()
-            End If
+                If Me.TreeView.Nodes(0).Nodes.Count > 0 Then
+                    Me.TreeView.Nodes(0).Nodes(Me.TreeView.Nodes(0).Nodes.Count - 1).EnsureVisible()
+                End If
 
-            lrModel = Me.AddNewModel(lrNewTreeNode)
+                lrModel = Me.AddNewModel(lrNewTreeNode, False)
 
-            '---------------------------------------------------------------------
-            'Abort if a Model is not created.
-            'e.g. The Student version only allows 3 Modelsin the Model Explorer.
-            If lrModel Is Nothing Then Exit Sub
+                '---------------------------------------------------------------------
+                'Abort if a Model is not created.
+                'e.g. The Student version only allows 3 Modelsin the Model Explorer.
+                If lrModel Is Nothing Then Exit Sub
 
-            '==================================================
-            'RDS - Create a CMML Page and then dispose of it.            
-            'Inject the Core ERD metamodel into the model
-            Dim lrPage As FBM.Page
-            Dim lrCorePage As FBM.Page
+                '==================================================
+                'RDS - Create a CMML Page and then dispose of it.            
+                'Inject the Core ERD metamodel into the model
+                Dim lrPage As FBM.Page
+                Dim lrCorePage As FBM.Page
 
-            lrCorePage = prApplication.CMML.Core.Page.Find(Function(x) x.Name = pcenumCMMLCorePage.CoreEntityRelationshipDiagram.ToString)
-            If lrCorePage Is Nothing Then
-                Throw New Exception("Couldn't find Page, '" & pcenumCMMLCorePage.CoreEntityRelationshipDiagram.ToString & "', in the Core Model.")
-            End If
-            lrPage = lrCorePage.Clone(lrModel, False, True, False) 'Injects the lrCorePage's Model Elements into the Model. No need to do anything more with the lrCorePage at all.
+                lrCorePage = prApplication.CMML.Core.Page.Find(Function(x) x.Name = pcenumCMMLCorePage.CoreEntityRelationshipDiagram.ToString)
+                If lrCorePage Is Nothing Then
+                    Throw New Exception("Couldn't find Page, '" & pcenumCMMLCorePage.CoreEntityRelationshipDiagram.ToString & "', in the Core Model.")
+                End If
+                lrPage = lrCorePage.Clone(lrModel, False, True, False) 'Injects the lrCorePage's Model Elements into the Model. No need to do anything more with the lrCorePage at all.
 
-            lrCorePage = prApplication.CMML.Core.Page.Find(Function(x) x.Name = pcenumCMMLCorePage.CoreStateTransitionDiagram.ToString)
-            If lrCorePage Is Nothing Then
-                Throw New Exception("Couldn't find Page, '" & pcenumCMMLCorePage.CoreStateTransitionDiagram.ToString & "', in the Core Model.")
-            End If
-            lrPage = lrCorePage.Clone(lrModel, False, True, False) 'Injects the lrCorePage's Model Elements into the Model. No need to do anything more with the lrCorePage at all.
+                lrCorePage = prApplication.CMML.Core.Page.Find(Function(x) x.Name = pcenumCMMLCorePage.CoreStateTransitionDiagram.ToString)
+                If lrCorePage Is Nothing Then
+                    Throw New Exception("Couldn't find Page, '" & pcenumCMMLCorePage.CoreStateTransitionDiagram.ToString & "', in the Core Model.")
+                End If
+                lrPage = lrCorePage.Clone(lrModel, False, True, False) 'Injects the lrCorePage's Model Elements into the Model. No need to do anything more with the lrCorePage at all.
 
-            'Set the CoreModel VersionNr of the Model.
-            lrModel.CoreVersionNumber = prApplication.CMML.Core.CoreVersionNumber
+                'Set the CoreModel VersionNr of the Model.
+                lrModel.CoreVersionNumber = prApplication.CMML.Core.CoreVersionNumber
 
-            lrModel.RDSCreated = True
-            '==================================================
+                lrModel.RDSCreated = True
+                '==================================================
 
-            '==============================================================================================
-            'Client/Server
-            If My.Settings.UseClientServer And My.Settings.InitialiseClient Then
-                Dim lrInterfaceModel As New Viev.FBM.Interface.Model
-                lrInterfaceModel.ModelId = lrModel.ModelId
-                lrInterfaceModel.Name = lrModel.Name
-                If Not ((lrModel.ProjectId = "MyPersonalModels") Or (lrModel.Namespace Is Nothing)) Then
-                    lrInterfaceModel.ProjectId = lrModel.ProjectId
-                    lrInterfaceModel.Namespace = lrModel.Namespace.Name
-                    If My.Settings.UseClientServer And My.Settings.InitialiseClient Then
-                        Dim lrBroadcast As New Viev.FBM.Interface.Broadcast
-                        lrBroadcast.Model = lrInterfaceModel
-                        Call prDuplexServiceClient.SendBroadcast([Interface].pcenumBroadcastType.AddModel, lrBroadcast)
+                '==============================================================================================
+                'Client/Server
+                If My.Settings.UseClientServer And My.Settings.InitialiseClient Then
+                    Dim lrInterfaceModel As New Viev.FBM.Interface.Model
+                    lrInterfaceModel.ModelId = lrModel.ModelId
+                    lrInterfaceModel.Name = lrModel.Name
+                    If Not ((lrModel.ProjectId = "MyPersonalModels") Or (lrModel.Namespace Is Nothing)) Then
+                        lrInterfaceModel.ProjectId = lrModel.ProjectId
+                        lrInterfaceModel.Namespace = lrModel.Namespace.Name
+                        If My.Settings.UseClientServer And My.Settings.InitialiseClient Then
+                            Dim lrBroadcast As New Viev.FBM.Interface.Broadcast
+                            lrBroadcast.Model = lrInterfaceModel
+                            Call prDuplexServiceClient.SendBroadcast([Interface].pcenumBroadcastType.AddModel, lrBroadcast)
+                        End If
                     End If
                 End If
-            End If
 
-            '==============================================================================================
+                '==============================================================================================
 
-            lrModel.Loaded = True 'Important, otherwise adding the Page will try and reload the model.
-            Call Me.AddPageToModel(lrNewTreeNode)
+                lrModel.Loaded = True 'Important, otherwise adding the Page will try and reload the model.
+                Call Me.AddPageToModel(lrNewTreeNode)
 
-            Dim lsMessage As String = "New Model and Page added."
+                Dim lsMessage As String = "New Model and Page added."
 
-            Me.zrToolTip.IsBalloon = True
-            Me.zrToolTip.ToolTipIcon = ToolTipIcon.None
-            Me.zrToolTip.Show(lsMessage, Me, lrNewTreeNode.Bounds.X, lrNewTreeNode.Bounds.Y + lrNewTreeNode.Bounds.Height, 4000)
+                Me.zrToolTip.IsBalloon = True
+                Me.zrToolTip.ToolTipIcon = ToolTipIcon.None
+                Me.zrToolTip.Show(lsMessage, Me, lrNewTreeNode.Bounds.X, lrNewTreeNode.Bounds.Y + lrNewTreeNode.Bounds.Height, 4000)
 
-            Call Me.TreeView.Nodes(0).Expand()
+                Call Me.TreeView.Nodes(0).Expand()
+
+            End With 'WaitCursor
 
         Catch ex As Exception
             Dim lsMessage1 As String
@@ -1622,7 +1625,7 @@ Public Class frmToolboxEnterpriseExplorer
 
     End Sub
 
-    Public Function AddNewModel(ByRef arCreatedTreeNode As TreeNode) As FBM.Model
+    Public Function AddNewModel(ByRef arCreatedTreeNode As TreeNode, Optional abAddCoreElements As Boolean = True) As FBM.Model
 
         Try
             Dim loNode As TreeNode = Nothing
@@ -1667,7 +1670,9 @@ Public Class frmToolboxEnterpriseExplorer
             End If
 
             'CMML
-            Call lrModel.AddCoreERDPGSAndSTDModelElements(Nothing)
+            If abAddCoreElements Then
+                Call lrModel.AddCoreERDPGSAndSTDModelElements(Nothing)
+            End If
 
             lrModel.IsDirty = True
             lrModel.Save()
@@ -1678,8 +1683,8 @@ Public Class frmToolboxEnterpriseExplorer
             'Add a new TreeNode to the TreeView
             '------------------------------------
             loNode = Me.TreeView.Nodes(0).Nodes.Add(lrModel.ModelId, lrModel.Name, pcenumNavigationIcons.iconDatabase, pcenumNavigationIcons.iconDatabase)
-            loNode.Tag = New tEnterpriseEnterpriseView(pcenumMenuType.modelORMModel, _
-                                                       prApplication.WorkingModel, _
+            loNode.Tag = New tEnterpriseEnterpriseView(pcenumMenuType.modelORMModel,
+                                                       prApplication.WorkingModel,
                                                        prApplication.WorkingModel.ModelId)
 
             Call prApplication.addModel(lrModel)
@@ -1878,9 +1883,16 @@ Public Class frmToolboxEnterpriseExplorer
                         Call lrModel.RemoveFromDatabase()
 
 
+                        '=================================
+                        'Remove then readd handler. Stops the previous Model from being loaded unintentionally.
+                        RemoveHandler Me.TreeView.AfterSelect, AddressOf TreeView1_AfterSelect
+
                         Dim lrTempNode As TreeNode = Me.TreeView.SelectedNode
-                        Me.TreeView.SelectedNode = Me.TreeView.Nodes(0)
                         lrTempNode.Remove()
+                        Me.TreeView.SelectedNode = Me.TreeView.Nodes(0)
+
+                        AddHandler Me.TreeView.AfterSelect, AddressOf TreeView1_AfterSelect
+                        '=================================
 
                         Dim lrInterfaceModel As New Viev.FBM.Interface.Model
                         lrInterfaceModel.ModelId = lrModel.ModelId
@@ -1895,6 +1907,7 @@ Public Class frmToolboxEnterpriseExplorer
 
                 End If
             End With
+
         Catch ex As Exception
             Dim lsMessage1 As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
@@ -3950,6 +3963,17 @@ Public Class frmToolboxEnterpriseExplorer
     Private Sub AddSTDPageToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles AddSTDPageToolStripMenuItem.Click
 
         Try
+            '========================================================================================
+            'Can only add STDiagrams to Models that have at least one ValueType.
+            Dim lrModel As FBM.Model
+            lrModel = Me.TreeView.SelectedNode.Tag.Tag
+
+            If lrModel.ValueType.FindAll(Function(x) x.IsMDAModelElement = False).Count = 0 Then
+                Dim lsMessage = "The Model must have at least one Value Type before adding a State Transition Diagram"
+                MsgBox(lsMessage)
+                Exit Sub
+            End If
+
             '==============================================================
             'Get the Core Metamodel.Page for an StateTransitionDiagram
             '==============================================================
@@ -4011,9 +4035,9 @@ Public Class frmToolboxEnterpriseExplorer
 
     Private Sub ButtonNewModel_Click(sender As Object, e As EventArgs) Handles ButtonNewModel.Click
 
-        Cursor.Current = Cursors.WaitCursor
-        Call Me.addNewModelToBoston()
-        Cursor.Current = Cursors.Default
+        With New WaitCursor
+            Call Me.addNewModelToBoston()
+        End With
 
     End Sub
 

@@ -4575,12 +4575,10 @@ Namespace FBM
         Public Sub AddCoreERDPGSAndSTDModelElements(Optional ByRef aoBackgroundWorker As System.ComponentModel.BackgroundWorker = Nothing)
 
             Dim lfrmFlashCard As New frmFlashCard
-            lfrmFlashCard.ziIntervalMilliseconds = 5600
+            lfrmFlashCard.ziIntervalMilliseconds = 2600
             lfrmFlashCard.BackColor = Color.LightGray
             Dim lsMessage As String = ""
-            lsMessage = "Creating the Relational Data Structure for Entity Relationship Diagrams and Property Graph Schemas."
-            lsMessage &= vbCrLf & vbCrLf
-            lsMessage &= "This is a one-off process and may take a minute."
+            lsMessage = "Adding core data structure."
             lfrmFlashCard.zsText = lsMessage
             Dim liDialogResult As DialogResult = lfrmFlashCard.ShowDialog(frmMain)
 
@@ -4622,11 +4620,11 @@ Namespace FBM
             Call TableModel.update_model(Me)
 
 
-            lfrmFlashCard = New frmFlashCard
-            lfrmFlashCard.ziIntervalMilliseconds = 3000
-            lfrmFlashCard.BackColor = Color.LightGray
-            lfrmFlashCard.zsText = "Your model is ready for Entity Relationship Diagrams and Property Graph Schemas."
-            liDialogResult = lfrmFlashCard.ShowDialog(frmMain)
+            'lfrmFlashCard = New frmFlashCard
+            'lfrmFlashCard.ziIntervalMilliseconds = 3000
+            'lfrmFlashCard.BackColor = Color.LightGray
+            'lfrmFlashCard.zsText = "Your model is ready for Entity Relationship Diagrams and Property Graph Schemas."
+            'liDialogResult = lfrmFlashCard.ShowDialog(frmMain)
 
         End Sub
 
