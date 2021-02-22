@@ -26,6 +26,7 @@ Partial Class frmToolboxModelDictionary
         Me.components = New System.ComponentModel.Container()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmToolboxModelDictionary))
         Me.GroupBox_Main = New System.Windows.Forms.GroupBox()
+        Me.ButtonRefresh = New System.Windows.Forms.Button()
         Me.CheckBoxShowModelDictionary = New System.Windows.Forms.CheckBox()
         Me.CheckBoxShowCoreModelElements = New System.Windows.Forms.CheckBox()
         Me.LabelModelName = New System.Windows.Forms.Label()
@@ -40,7 +41,6 @@ Partial Class frmToolboxModelDictionary
         Me.ToolStripStatusLabelRealisationsCount = New System.Windows.Forms.ToolStripStatusLabel()
         Me.ToolStripStatusLabelPromptModelElementTypeCount = New System.Windows.Forms.ToolStripStatusLabel()
         Me.ToolStripStatusLabelModelElementTypeCount = New System.Windows.Forms.ToolStripStatusLabel()
-        Me.ButtonRefresh = New System.Windows.Forms.Button()
         Me.GroupBox_Main.SuspendLayout()
         Me.ContextMenuStrip1.SuspendLayout()
         Me.StatusStrip1.SuspendLayout()
@@ -65,6 +65,16 @@ Partial Class frmToolboxModelDictionary
         Me.GroupBox_Main.TabIndex = 0
         Me.GroupBox_Main.TabStop = False
         Me.GroupBox_Main.Text = "Model Dictionary:"
+        '
+        'ButtonRefresh
+        '
+        Me.ButtonRefresh.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.ButtonRefresh.Image = Global.Boston.My.Resources.Resources.Refresh_16x16
+        Me.ButtonRefresh.Location = New System.Drawing.Point(316, 25)
+        Me.ButtonRefresh.Name = "ButtonRefresh"
+        Me.ButtonRefresh.Size = New System.Drawing.Size(24, 23)
+        Me.ButtonRefresh.TabIndex = 6
+        Me.ButtonRefresh.UseVisualStyleBackColor = True
         '
         'CheckBoxShowModelDictionary
         '
@@ -151,7 +161,7 @@ Partial Class frmToolboxModelDictionary
         '
         Me.ContextMenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ViewOnPageToolStripMenuItem, Me.RemoveFromModelToolStripMenuItem})
         Me.ContextMenuStrip1.Name = "ContextMenuStrip1"
-        Me.ContextMenuStrip1.Size = New System.Drawing.Size(186, 48)
+        Me.ContextMenuStrip1.Size = New System.Drawing.Size(186, 70)
         '
         'ViewOnPageToolStripMenuItem
         '
@@ -198,16 +208,6 @@ Partial Class frmToolboxModelDictionary
         Me.ToolStripStatusLabelModelElementTypeCount.Name = "ToolStripStatusLabelModelElementTypeCount"
         Me.ToolStripStatusLabelModelElementTypeCount.Size = New System.Drawing.Size(13, 17)
         Me.ToolStripStatusLabelModelElementTypeCount.Text = "0"
-        '
-        'ButtonRefresh
-        '
-        Me.ButtonRefresh.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.ButtonRefresh.Image = Global.Boston.My.Resources.Resources.Refresh_16x16
-        Me.ButtonRefresh.Location = New System.Drawing.Point(316, 25)
-        Me.ButtonRefresh.Name = "ButtonRefresh"
-        Me.ButtonRefresh.Size = New System.Drawing.Size(24, 23)
-        Me.ButtonRefresh.TabIndex = 6
-        Me.ButtonRefresh.UseVisualStyleBackColor = True
         '
         'frmToolboxModelDictionary
         '

@@ -631,6 +631,32 @@ Namespace FBM
 
                 Me.Model.RemoveValueType(Me, abDoDatabaseProcessing)
 
+                '====================================================================================================
+                'RDS/STM
+                'If there are any StateTransitionDiagrams for the ValueType, they must be removed from the Model.
+                Dim larPage = From Page In Me.Model.Page
+                              Where Page.Language = pcenumLanguage.StateTransitionDiagram
+
+                For Each lrPage In larPage.ToArray
+                    Dim lsSQLQuery = "SELECT *"
+                    lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreValueTypeIsStateTransitionBased.ToString
+                    lsSQLQuery &= " ON PAGE '" & lrPage.Name & "'"
+
+                    Dim lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                    If lrRecordset.Facts.Count > 0 Then
+                        Dim lsValueTypeId = lrRecordset("IsStateTransitionBased").Data
+
+                        If lsValueTypeId = Me.Id Then
+                            Call lrPage.RemoveFromModel()
+                            If IsSomething(lrPage.Form) Then
+                                lrPage.Form.Close()
+                            End If
+                        End If
+                    End If
+                Next
+                '====================================================================================================
+
                 RaiseEvent RemovedFromModel(abDoDatabaseProcessing)
 
                 Return True

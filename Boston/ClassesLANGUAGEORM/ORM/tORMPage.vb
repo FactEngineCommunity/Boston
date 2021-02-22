@@ -2238,10 +2238,26 @@ Namespace FBM
 
         Public Sub RemoveFromModel()
 
-            Call TableConceptInstance.DeleteConceptInstancesForPage(Me)
-            Me.Model.Page.Remove(Me)
+            Try
+                Call TableConceptInstance.DeleteConceptInstancesForPage(Me)
+                Me.Model.Page.Remove(Me)
 
-            TablePage.DeletePage(Me)
+                TablePage.DeletePage(Me)
+
+                '------------------------------------------------------
+                'Remove the Page from the EnterpriseExplorer TreeView
+                '--------------------------------------
+                Dim lrEnterpriseView = prPageNodes.Find(Function(x) x.PageId = Me.PageId)
+                lrEnterpriseView.TreeNode.Remove()
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
         End Sub
 
