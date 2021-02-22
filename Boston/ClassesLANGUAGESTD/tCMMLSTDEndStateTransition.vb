@@ -12,7 +12,7 @@ Namespace STD
 
         Public EventName As String = ""
 
-        Public Shadows ConceptType As pcenumConceptType = pcenumConceptType.StateTransition
+        Public Shadows ConceptType As pcenumConceptType = pcenumConceptType.EndStateTransition
 
         Public Link As DiagramLink
 

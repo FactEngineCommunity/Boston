@@ -54,10 +54,11 @@ Namespace STD
             Me.X = aiNewX
             Me.Y = aiNewY
 
-            Me.FactDataInstance.X = aiNewX
-            Me.FactDataInstance.Y = aiNewY
-
-            Me.FactDataInstance.makeDirty()
+            If Me.FactDataInstance IsNot Nothing Then
+                Me.FactDataInstance.X = aiNewX
+                Me.FactDataInstance.Y = aiNewY
+                Me.FactDataInstance.makeDirty()
+            End If
 
         End Sub
 

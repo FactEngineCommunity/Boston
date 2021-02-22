@@ -729,8 +729,8 @@ Public Class frmStateTransitionDiagram
 
         Dim lrSTDEndStateIndicator As STD.EndStateIndicator = lrFactInstance("Element").CloneEndStateIndicator(Me.zrPage)
 
-        lrSTDEndStateIndicator.X = aoPtf.X
-        lrSTDEndStateIndicator.Y = aoPtf.Y
+        lrSTDEndStateIndicator.FactDataInstance = lrFactInstance("Element")
+        lrSTDEndStateIndicator.Move(aoPtf.X, aoPtf.Y, True)
 
         lrSTDEndStateIndicator.DisplayAndAssociate()
 
@@ -800,11 +800,13 @@ Public Class frmStateTransitionDiagram
         If (loFirstEntity.ConceptType = pcenumConceptType.StartStateIndicator) And (loSecondEntity.ConceptType = pcenumConceptType.State) Then
             '=====================================
             'Start State Transition
-            Dim lrStartState As STD.State = loSecondEntity
+            Dim lrSTDStartStateIndicator As STD.StartStateIndicator = loFirstEntity
+            Dim lrSTDState As STD.State = loSecondEntity
 
             If Me.zrPage.STDiagram.State.FindAll(Function(x) x.IsStartState).Count = 0 Then
 
-                Call lrStartState.setStartState(True)
+                Dim lrFact As FBM.Fact = lrSTDState.setStartState(True)
+
             Else
                 lsMessage = "There is already a Start State for this Value Type."
                 lsMessage &= vbCrLf & vbCrLf & "Would you like to remove the existing Start State and create a new one?"
@@ -817,7 +819,8 @@ Public Class frmStateTransitionDiagram
 
                     Me.Diagram.Links.Remove(Me.zrPage.STDiagram.StartIndicator.Link)
 
-                    Call lrStartState.setStartState(True)
+                    Dim lrFact As FBM.Fact = lrSTDState.setStartState(True)
+
                 End If
             End If
 
@@ -896,6 +899,11 @@ Public Class frmStateTransitionDiagram
             If lrLink Is Nothing Then Exit Sub 'Because when creating a new link, code removes/deletes the link.
 
             Select Case lrLink.GetType
+                Case = GetType(STD.StartStateTransition)
+
+                    Dim lrStartStateTransition As STD.StartStateTransition = lrLink
+                    Call lrStartStateTransition.STMStartStateTransition.RemoveFromModel()
+
                 Case = GetType(STD.EndStateTransition)
 
                     Dim lrEndStateTransition As STD.EndStateTransition = lrLink
@@ -927,35 +935,51 @@ Public Class frmStateTransitionDiagram
 
     Private Sub Diagram_LinkSelected(ByVal sender As Object, ByVal e As MindFusion.Diagramming.LinkEventArgs) Handles Diagram.LinkSelected
 
-        Select Case Me.Diagram.Selection.Items(0).Tag.ConceptType
-            Case Is = pcenumConceptType.StateTransition
-                '-------------------------------------------------------------
-                'The only type of Facts in a StateTransitionDiagram Page are
-                '  Process/Transition links between States.
-                '-------------------------------------------------------------
-                Dim lrSTDStateTransition As STD.StateTransition = Me.Diagram.Selection.Items(0).Tag
-                Me.zrPage.SelectedObject.Add(lrSTDStateTransition)
-                Me.DiagramView.ContextMenuStrip = ContextMenuStrip_StateTransition
-
-                Call lrSTDStateTransition.NodeSelected()
-
-        End Select
-
-        '--------------------------------------------
-        'Allow 'InPlaceEdit' on select object types
         Try
-            Select Case e.Link.Tag.GetType
-                Case GetType(STD.EndStateTransition),
-                     GetType(STD.StartStateTransition),
-                     GetType(STD.StateTransition)
-                    Me.DiagramView.AllowInplaceEdit = True
-                Case Else
-                    Me.DiagramView.AllowInplaceEdit = False
+            Select Case Me.Diagram.Selection.Items(0).Tag.ConceptType
+                Case Is = pcenumConceptType.StateTransition
+                    '-------------------------------------------------------------
+                    'The only type of Facts in a StateTransitionDiagram Page are
+                    '  Process/Transition links between States.
+                    '-------------------------------------------------------------
+                    Dim lrSTDStateTransition As STD.StateTransition = Me.Diagram.Selection.Items(0).Tag
+                    Me.zrPage.SelectedObject.Add(lrSTDStateTransition)
+                    Me.DiagramView.ContextMenuStrip = ContextMenuStrip_StateTransition
+
+                    Call lrSTDStateTransition.NodeSelected()
+
+                Case Is = pcenumConceptType.StartStateTransition
+
+                    Dim lrSTDStartStateTransition As STD.StartStateTransition = Me.Diagram.Selection.Items(0).Tag
+                    Me.zrPage.SelectedObject.AddUnique(lrSTDStartStateTransition)
+                    Me.DiagramView.ContextMenuStrip = ContextMenuStrip_StartStateTransition
+
+                    Call lrSTDStartStateTransition.NodeSelected()
             End Select
+
+            '--------------------------------------------
+            'Allow 'InPlaceEdit' on select object types
+            Try
+                Select Case e.Link.Tag.GetType
+                    Case GetType(STD.EndStateTransition),
+                         GetType(STD.StartStateTransition),
+                         GetType(STD.StateTransition)
+                        Me.DiagramView.AllowInplaceEdit = True
+                    Case Else
+                        Me.DiagramView.AllowInplaceEdit = False
+                End Select
+            Catch ex As Exception
+
+            End Try
+
         Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
-
 
     End Sub
 
@@ -1919,6 +1943,24 @@ Public Class frmStateTransitionDiagram
             Dim lrSTDStateTransition As STD.StateTransition = Me.zrPage.SelectedObject(0)
 
             Call lrSTDStateTransition.STMStateTransition.removeFromModel()
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
+    Private Sub ToolStripMenuItem1_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItem1.Click
+
+        Try
+            Dim lrSTDStartStateTransition As STD.StartStateTransition = Me.zrPage.SelectedObject(0)
+
+            Call lrSTDStartStateTransition.STMStartStateTransition.RemoveFromModel()
 
         Catch ex As Exception
             Dim lsMessage As String

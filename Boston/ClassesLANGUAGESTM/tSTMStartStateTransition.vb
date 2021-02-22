@@ -68,7 +68,7 @@ Namespace FBM.STM
 
         Public Shadows Function RemoveFromModel() As Boolean
 
-            Call Me.Model.removeStartStateTransition(Me)
+            Call Me.Model.removeStartStateTransition(Me) 'Includes CMML
 
             RaiseEvent RemovedFromModel()
 

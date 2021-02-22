@@ -183,15 +183,29 @@ Namespace STD
 
         End Sub
 
-        Public Sub setStartState(ByVal abStartStateStatus As Boolean)
+        Public Function setStartState(ByVal abStartStateStatus As Boolean) As FBM.Fact
 
-            If abStartStateStatus Then
+            Try
 
-                Call Me.STMState.makeStartState()
+                If abStartStateStatus Then
 
-            End If
+                    Return Me.STMState.makeStartState
+                Else
+                    Return Nothing
+                End If
 
-        End Sub
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return Nothing
+            End Try
+
+        End Function
 
         Private Sub STMState_IsStartStateChanged(abIsStartState As Boolean) Handles STMState.IsStartStateChanged
 
@@ -203,7 +217,8 @@ Namespace STD
                 lsSQLQuery &= " TO " & pcenumCMMLRelations.CoreValueTypeHasStartCoreElementState.ToString
                 lsSQLQuery &= " ON PAGE '" & Me.Page.Name & "'"
 
-                Call Me.Page.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                Me.Page.STDiagram.StartIndicator.FactInstance = Me.Page.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                Call Me.Page.STDiagram.StartIndicator.Move(Me.Page.STDiagram.StartIndicator.X, Me.Page.STDiagram.StartIndicator.Y, True)
             Else
 
             End If

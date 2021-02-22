@@ -147,6 +147,7 @@ Public Module publicConstants
         Decision
         DerivationText
         EndStateIndicator
+        EndStateTransition
         Enterprise
         Entity
         EntityType
@@ -188,6 +189,7 @@ Public Module publicConstants
         RoleConstraintRole
         Solution
         StartStateIndicator
+        StartStateTransition
         State
         StateTransition
         StrategicGoal        

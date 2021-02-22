@@ -59,11 +59,14 @@ Partial Class frmStateTransitionDiagram
         Me.ComboBox_ValueType = New System.Windows.Forms.ToolStripComboBox()
         Me.DiagramView = New MindFusion.Diagramming.WinForms.DiagramView()
         Me.HiddenDiagramView = New MindFusion.Diagramming.WinForms.DiagramView()
+        Me.ContextMenuStrip_StartStateTransition = New System.Windows.Forms.ContextMenuStrip(Me.components)
+        Me.ToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
         Me.ContextMenuStrip_Diagram.SuspendLayout()
         Me.ContextMenuStrip_State.SuspendLayout()
         Me.ContextMenuStrip_StateTransition.SuspendLayout()
         Me.ContextMenuStrip_EntityType.SuspendLayout()
         Me.ToolStrip1.SuspendLayout()
+        Me.ContextMenuStrip_StartStateTransition.SuspendLayout()
         Me.SuspendLayout()
         '
         'Diagram
@@ -332,6 +335,18 @@ Partial Class frmStateTransitionDiagram
         Me.HiddenDiagramView.TabIndex = 10
         Me.HiddenDiagramView.Text = "DiagramView1"
         '
+        'ContextMenuStrip_StartStateTransition
+        '
+        Me.ContextMenuStrip_StartStateTransition.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItem1})
+        Me.ContextMenuStrip_StartStateTransition.Name = "ContextMenuStrip_Process"
+        Me.ContextMenuStrip_StartStateTransition.Size = New System.Drawing.Size(236, 48)
+        '
+        'ToolStripMenuItem1
+        '
+        Me.ToolStripMenuItem1.Name = "ToolStripMenuItem1"
+        Me.ToolStripMenuItem1.Size = New System.Drawing.Size(235, 22)
+        Me.ToolStripMenuItem1.Text = "&Remove from Page and Model"
+        '
         'frmStateTransitionDiagram
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -350,6 +365,7 @@ Partial Class frmStateTransitionDiagram
         Me.ContextMenuStrip_EntityType.ResumeLayout(False)
         Me.ToolStrip1.ResumeLayout(False)
         Me.ToolStrip1.PerformLayout()
+        Me.ContextMenuStrip_StartStateTransition.ResumeLayout(False)
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -390,4 +406,6 @@ Partial Class frmStateTransitionDiagram
     Friend WithEvents ToolStripSeparator7 As ToolStripSeparator
     Friend WithEvents RemoveFromPageToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents RemoveFromPageAndModelToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ContextMenuStrip_StartStateTransition As ContextMenuStrip
+    Friend WithEvents ToolStripMenuItem1 As ToolStripMenuItem
 End Class
