@@ -241,6 +241,9 @@ Namespace FBM
                     lrEndStateTransition.EndStateId = lrORMRecordset("EndState").Data
                     lrEndStateTransition.Fact = lrORMRecordset.CurrentFact
 
+                    Dim lrEndStateIndicator = New STM.EndStateIndicator(Me.STM, lrEndStateTransition.EndStateId)
+                    Me.STM.EndStateIndicator.AddUnique(lrEndStateIndicator)
+
                     Me.STM.EndStateTransition.Add(lrEndStateTransition)
 
                     lrORMRecordset.MoveNext()
@@ -260,15 +263,26 @@ Namespace FBM
             End Try
         End Sub
 
+        Public Sub removeCMMLEndStateIndicator(ByRef arEndStateIndicator As STM.EndStateIndicator)
+
+            Dim lsSQLQuery As String
+
+            lsSQLQuery = "DELETE FROM " & pcenumCMMLRelations.CoreElementHasElementType.ToString
+            lsSQLQuery &= " WHERE Element = '" & arEndStateIndicator.EndStateId & "'"
+
+            Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+        End Sub
+
         Public Sub removeCMMLEndStateTransition(ByRef arEndStateTransition As STM.EndStateTransition)
 
             Dim lsSQLQuery As String
 
-            'VM-Complete this
             lsSQLQuery = "DELETE FROM " & pcenumCMMLRelations.CoreValueTypeHasEndCoreElementState.ToString
             lsSQLQuery &= " WHERE ValueType = '" & arEndStateTransition.ValueType.Id & "'"
             lsSQLQuery &= " AND CoreElement = '" & arEndStateTransition.State.Id & "'"
             lsSQLQuery &= " AND EndState = '" & arEndStateTransition.EndStateId & "'"
+            lsSQLQuery &= " AND Event = '" & arEndStateTransition.Event & "'"
 
             'NB Will automatically delete the corresponding FactInstances at the Page level as well.
             Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)

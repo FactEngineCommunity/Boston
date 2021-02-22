@@ -119,6 +119,7 @@ Namespace STD
             loDroppedNode.AllowIncomingLinks = False
             loDroppedNode.AllowOutgoingLinks = True
             loDroppedNode.Text = "Start"
+            loDroppedNode.Locked = False
 
             loDroppedNode.Tag = Me
 

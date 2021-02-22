@@ -197,6 +197,63 @@
         '    Call Me.Model.removeCMMLStopState(arStopState)
         'End Sub
 
+        Public Sub removeValueTypeElements(ByRef arValueType As FBM.ValueType)
+
+            Dim lrValueType = arValueType
+
+            '--------------------------------------------------------
+            'StartStateTransition
+            Dim larStartStateTransition = From StartStateTransition In Me.StartStateTransition
+                                          Where StartStateTransition.ValueType Is lrValueType
+                                          Select StartStateTransition
+
+            For Each lrStartStateTransition In larStartStateTransition.ToArray
+                Me.StartStateTransition.Remove(lrStartStateTransition)
+                Call Me.Model.removeCMMLStartStateTransition(lrStartStateTransition)
+            Next
+
+            '--------------------------------------------------------
+            'StateTransition
+            Dim larStateTransition = From StateTransition In Me.StateTransition
+                                     Where StateTransition.ValueType Is lrValueType
+                                     Select StateTransition
+
+            For Each lrStateTransition In larStateTransition.ToArray
+                Me.StateTransition.Remove(lrStateTransition)
+                Call Me.Model.removeCMMLStateTransition(lrStateTransition)
+            Next
+
+            '--------------------------------------------------------
+            'EndStateTransition
+            Dim larEndStateTransition = From EndStateTransition In Me.EndStateTransition
+                                        Where EndStateTransition.ValueType Is lrValueType
+                                        Select EndStateTransition
+
+            For Each lrEndStateTransition In larEndStateTransition.ToArray
+
+                Dim lrEndStateIndicator = Me.EndStateIndicator.Find(Function(x) x.EndStateId = lrEndStateTransition.EndStateId)
+                If lrEndStateIndicator IsNot Nothing Then
+                    Call Me.EndStateIndicator.Remove(lrEndStateIndicator)
+                    Call Me.Model.removeCMMLEndStateIndicator(lrEndStateIndicator)
+                End If
+
+                Me.EndStateTransition.Remove(lrEndStateTransition)
+                Call Me.Model.removeCMMLEndStateTransition(lrEndStateTransition)
+            Next
+
+            '--------------------------------------------------------
+            'States
+            Dim larState = From State In Me.State
+                           Where State.ValueType Is lrValueType
+                           Select State
+
+            For Each lrState In larState.ToArray
+                Me.State.Remove(lrState)
+                Call Me.Model.removeCMMLState(lrState)
+            Next
+
+        End Sub
+
     End Class
 
 End Namespace

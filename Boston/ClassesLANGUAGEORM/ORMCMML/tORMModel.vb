@@ -1041,6 +1041,24 @@ Namespace FBM
 
         End Sub
 
+        Public Sub removeCMMLState(ByRef arState As STM.State)
+
+            Dim lsSQLQuery = "DELETE FROM " & pcenumCMMLRelations.CoreValueTypeHasState.ToString
+            lsSQLQuery &= " WHERE ValueType = '" & arState.ValueType.Id & "'"
+            lsSQLQuery &= " AND State = '" & arState.Id & "'"
+
+            Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+            lsSQLQuery = "DELETE FROM " & pcenumCMMLRelations.CoreStateHasName.ToString
+            lsSQLQuery &= " WHERE State = '" & arState.Id & "'"
+
+            Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+            lsSQLQuery = "REMOVE INSTANCE '" & arState.Id & "' FROM CoreElement"
+            Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+        End Sub
+
         ''' <summary>
         ''' For the State Transition Model (STM) of the FBM Model...for ValueType/ValueConstraint state transitions
         ''' </summary>
@@ -1052,8 +1070,8 @@ Namespace FBM
 
                 lsSQLQuery = "DELETE FROM " & pcenumCMMLRelations.CoreStateTransition.ToString
                 lsSQLQuery &= " WHERE ValueType = '" & arStateTransition.ValueType.Id & "'"
-                lsSQLQuery &= " AND Concept1 = '" & arStateTransition.FromState.Name & "'"
-                lsSQLQuery &= " AND Concept2 = '" & arStateTransition.ToState.Name & "'"
+                lsSQLQuery &= " AND Concept1 = '" & arStateTransition.FromState.Id & "'"
+                lsSQLQuery &= " AND Concept2 = '" & arStateTransition.ToState.Id & "'"
                 lsSQLQuery &= " AND Event = '" & arStateTransition.Event & "'"
 
                 Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)

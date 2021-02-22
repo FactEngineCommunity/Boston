@@ -10311,21 +10311,31 @@ Public Class frmDiagramORM
         '------------------------------------------------------------------------------------------------------------------
         '20170119-VM-Need to test this code. If the code works fine, remove this message.
         '  NB Code copied/adapted from the [Delete Fact From Page] menu option.
+        Try
 
-        If Me.zrPage.SelectedObject(0).ConceptType = pcenumConceptType.FactTable Then
+            If Me.zrPage.SelectedObject(0).ConceptType = pcenumConceptType.FactTable Then
 
-            lrTableNode = Me.zrPage.SelectedObject(0).TableShape
-            lrFactTable = lrTableNode.Tag
+                lrTableNode = Me.zrPage.SelectedObject(0).TableShape
+                lrFactTable = lrTableNode.Tag
 
-            If lrFactTable.SelectedRow > 0 Then
-                lrFactTypeInstance = lrFactTable.FactTypeInstance
-                lrFactInstance = lrFactTypeInstance.Fact(lrFactTable.SelectedRow - 1)
+                If lrFactTable.SelectedRow > 0 Then
+                    lrFactTypeInstance = lrFactTable.FactTypeInstance
+                    lrFactInstance = lrFactTypeInstance.Fact(lrFactTable.SelectedRow - 1)
 
-                lrFactTable.TableShape.DeleteRow(lrFactTable.SelectedRow - 1)
-                lrFactTypeInstance.RemoveFact(lrFactInstance)
-                lrFactTypeInstance.FactType.RemoveFactById(lrFactInstance.Fact)
+                    lrFactTable.TableShape.DeleteRow(lrFactTable.SelectedRow - 1)
+                    lrFactTypeInstance.RemoveFact(lrFactInstance)
+                    lrFactTypeInstance.FactType.RemoveFactById(lrFactInstance.Fact)
+                End If
             End If
-        End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 

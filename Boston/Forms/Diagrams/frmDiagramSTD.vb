@@ -1219,8 +1219,8 @@ Public Class frmStateTransitionDiagram
                     '  starting with the ShapeNode/ORMObject just clicked on.
                     '---------------------------------------------------------------------------
                     Me.zrPage.SelectedObject.Clear()
-                    loNode.Selected = True
                     Diagram.Selection.Clear()
+                    loNode.Selected = True
                 End If
             End If
 

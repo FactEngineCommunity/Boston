@@ -298,7 +298,7 @@ Partial Class frmStateTransitionDiagram
         Me.DiagramView.AllowDrop = True
         Me.DiagramView.AllowInplaceEdit = True
         Me.DiagramView.BackColor = System.Drawing.Color.White
-        Me.DiagramView.Behavior = MindFusion.Diagramming.Behavior.DrawLinks
+        Me.DiagramView.Behavior = MindFusion.Diagramming.Behavior.LinkShapes
         Me.DiagramView.ContextMenuStrip = Me.ContextMenuStrip_Diagram
         Me.DiagramView.ControlHandlesStyle = MindFusion.Diagramming.HandlesStyle.HatchHandles
         Me.DiagramView.ControlMouseAction = MindFusion.Diagramming.ControlMouseAction.IgnoreControl

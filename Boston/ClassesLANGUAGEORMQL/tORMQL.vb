@@ -2414,6 +2414,10 @@ Namespace ORMQL
 
                             Return Me.ProcessREMOVEMODELELEMENTStatement
 
+                        Case Is = "REMOVEINSTANCESTMT"
+
+                            Return Me.ProcessREMOVEINSTANCEStatement
+
                         Case Is = "RENAMEINSTANCESTMT"
 
                             Return Me.ProcessRENAMEINSTANCEStatement

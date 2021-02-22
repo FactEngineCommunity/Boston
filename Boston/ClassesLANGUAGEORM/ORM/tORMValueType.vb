@@ -655,6 +655,11 @@ Namespace FBM
                         End If
                     End If
                 Next
+
+                '---------------
+                'STM and CMML
+                Call Me.Model.STM.removeValueTypeElements(Me)
+
                 '====================================================================================================
 
                 RaiseEvent RemovedFromModel(abDoDatabaseProcessing)

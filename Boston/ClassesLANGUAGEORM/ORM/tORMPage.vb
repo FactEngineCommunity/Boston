@@ -329,6 +329,7 @@ Namespace FBM
                     If abSetRDSModel Then
                         lrPage.RDSModel = arModel.RDS
                     End If
+                    lrPage.STModel = arModel.STM
                     lrPage.PageId = System.Guid.NewGuid.ToString
                     lrPage.Name = Me.Name
                     lrPage.ConceptType = .ConceptType
