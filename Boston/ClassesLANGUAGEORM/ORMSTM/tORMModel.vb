@@ -217,6 +217,21 @@ Namespace FBM
                 End While
 
                 '===============================================================================================
+                'End State Indicators
+                lsSQLQuery = " SELECT *"
+                lsSQLQuery &= "  FROM " & pcenumCMMLRelations.CoreElementHasElementType.ToString
+                lsSQLQuery &= " WHERE ElementType = 'EndStateIndicator'"
+
+                lrORMRecordset = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                While Not lrORMRecordset.EOF
+                    Dim lrEndStateIndicator = New STM.EndStateIndicator(Me.STM, lrORMRecordset("Element").Data)
+                    Me.STM.EndStateIndicator.AddUnique(lrEndStateIndicator)
+
+                    lrORMRecordset.MoveNext()
+                End While
+
+                '===============================================================================================
                 'End State Transitions
                 lsSQLQuery = " SELECT *"
                 lsSQLQuery &= "  FROM " & pcenumCMMLRelations.CoreValueTypeHasEndCoreElementState.ToString

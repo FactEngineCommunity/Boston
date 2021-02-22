@@ -2447,6 +2447,9 @@ Namespace FBM
 
                 End If
 
+                'CMML
+                Call Me.performCMMLPreSaveProcessing
+
                 '------------------------------------
                 'Save EntityTypeInstance objects
                 '------------------------------------

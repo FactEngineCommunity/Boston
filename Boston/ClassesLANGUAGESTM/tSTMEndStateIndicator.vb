@@ -13,6 +13,8 @@ Namespace FBM.STM
 
         Public ValueType As FBM.ValueType
 
+        Public Event RemovedFromModel()
+
         ''' <summary>
         ''' Parameterless constructor
         ''' </summary>
@@ -32,6 +34,18 @@ Namespace FBM.STM
         Public Shadows Function Equals(other As EndStateIndicator) As Boolean Implements IEquatable(Of EndStateIndicator).Equals
             Return Me.EndStateId = other.EndStateId
         End Function
+
+        Public Sub removeFromModel()
+
+            Call Me.Model.EndStateIndicator.Remove(Me)
+
+            'CMML
+            Call Me.Model.Model.removeCMMLEndStateIndicator(Me)
+
+            RaiseEvent RemovedFromModel()
+
+        End Sub
+
     End Class
 
 End Namespace

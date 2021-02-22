@@ -61,6 +61,7 @@ Partial Class frmStateTransitionDiagram
         Me.HiddenDiagramView = New MindFusion.Diagramming.WinForms.DiagramView()
         Me.ContextMenuStrip_StartStateTransition = New System.Windows.Forms.ContextMenuStrip(Me.components)
         Me.ToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
+        Me.LabelHelp = New System.Windows.Forms.Label()
         Me.ContextMenuStrip_Diagram.SuspendLayout()
         Me.ContextMenuStrip_State.SuspendLayout()
         Me.ContextMenuStrip_StateTransition.SuspendLayout()
@@ -339,7 +340,7 @@ Partial Class frmStateTransitionDiagram
         '
         Me.ContextMenuStrip_StartStateTransition.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItem1})
         Me.ContextMenuStrip_StartStateTransition.Name = "ContextMenuStrip_Process"
-        Me.ContextMenuStrip_StartStateTransition.Size = New System.Drawing.Size(236, 48)
+        Me.ContextMenuStrip_StartStateTransition.Size = New System.Drawing.Size(236, 26)
         '
         'ToolStripMenuItem1
         '
@@ -347,11 +348,21 @@ Partial Class frmStateTransitionDiagram
         Me.ToolStripMenuItem1.Size = New System.Drawing.Size(235, 22)
         Me.ToolStripMenuItem1.Text = "&Remove from Page and Model"
         '
+        'LabelHelp
+        '
+        Me.LabelHelp.BackColor = System.Drawing.SystemColors.Info
+        Me.LabelHelp.Dock = System.Windows.Forms.DockStyle.Bottom
+        Me.LabelHelp.Location = New System.Drawing.Point(0, 447)
+        Me.LabelHelp.Name = "LabelHelp"
+        Me.LabelHelp.Size = New System.Drawing.Size(891, 83)
+        Me.LabelHelp.TabIndex = 12
+        '
         'frmStateTransitionDiagram
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(891, 530)
+        Me.Controls.Add(Me.LabelHelp)
         Me.Controls.Add(Me.ToolStrip1)
         Me.Controls.Add(Me.DiagramView)
         Me.Controls.Add(Me.HiddenDiagramView)
@@ -408,4 +419,5 @@ Partial Class frmStateTransitionDiagram
     Friend WithEvents RemoveFromPageAndModelToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents ContextMenuStrip_StartStateTransition As ContextMenuStrip
     Friend WithEvents ToolStripMenuItem1 As ToolStripMenuItem
+    Friend WithEvents LabelHelp As Label
 End Class

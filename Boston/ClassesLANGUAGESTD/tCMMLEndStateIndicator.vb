@@ -1,6 +1,7 @@
 ﻿Imports Boston.FBM
 Imports MindFusion.Diagramming
 Imports MindFusion.Drawing
+Imports System.Reflection
 
 Namespace STD
 
@@ -14,6 +15,8 @@ Namespace STD
         Public EndStateId As String = "" 'The unique identifier for an EndState.        
 
         Public Link As DiagramLink
+
+        Public WithEvents STMEndStateIndicator As STM.EndStateIndicator
 
         Public Shadows Property X As Integer Implements iPageObject.X
             Get
@@ -130,6 +133,25 @@ Namespace STD
             Me.FactDataInstance.Shape = loDroppedNode
 
             loDroppedNode.Image = My.Resources.ORMShapes.Blank
+
+        End Sub
+
+        Private Sub STMEndStateIndicator_RemovedFromModel() Handles STMEndStateIndicator.RemovedFromModel
+
+            Try
+                Me.Page.STDiagram.EndStateIndicator.Remove(Me)
+
+                If Me.Page.Diagram IsNot Nothing Then
+                    Me.Page.Diagram.Nodes.Remove(Me.Shape)
+                End If
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
         End Sub
 

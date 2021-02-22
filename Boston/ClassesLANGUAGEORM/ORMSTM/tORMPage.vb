@@ -1,4 +1,5 @@
 ﻿Imports Boston.FBM.STM
+Imports System.Reflection
 
 Namespace FBM
 
@@ -27,6 +28,35 @@ Namespace FBM
             Return lrSTDState
 
         End Function
+
+        ''' <summary>
+        ''' Used to clean things up before saving the Page, esp for STDiagrams.
+        ''' </summary>
+        Private Sub performCMMLPreSaveProcessing()
+
+            Try
+
+                If Me.Language = pcenumLanguage.StateTransitionDiagram Then
+
+                    If Me.STDiagram.EndStateTransition.Count = 0 And Me.STDiagram.EndStateIndicator.Count > 0 Then
+                        'Get rid of all the EndStateIndicators that are orphaned.
+                        For Each lrSTDEndStateIndicator In Me.STDiagram.EndStateIndicator.ToArray
+                            Call lrSTDEndStateIndicator.STMEndStateIndicator.removeFromModel()
+                        Next
+                    End If
+
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
 
         ''' <summary>
         ''' Sets the ValueType for a StateTransitionDiagram Page.
@@ -129,6 +159,7 @@ Namespace FBM
                     lrStateTransition.ToState = lrNewToState
                 End If
 
+                lrStateTransition.STMStateTransition = arStateTransition
                 Me.STDiagram.StateTransition.AddUnique(lrStateTransition)
                 Call lrStateTransition.DisplayAndAssociate()
 
