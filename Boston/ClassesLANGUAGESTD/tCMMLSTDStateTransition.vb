@@ -1,7 +1,7 @@
 ﻿Imports System.Reflection
 Imports Boston.FBM
 Imports MindFusion.Diagramming
-
+Imports System.ComponentModel
 
 Namespace STD
     Public Class StateTransition
@@ -11,7 +11,38 @@ Namespace STD
         Public FromState As STD.State
         Public ToState As STD.State
 
-        Public EventName As String = ""
+        <CategoryAttribute("Name"),
+        Browsable(False)>
+        Public Overrides Property Name() As String
+            Get
+                Return _Name
+            End Get
+            Set(ByVal value As String)
+                '------------------------------------------------------
+                'See Me.SetName for management of Me.Id and Me.Symbol
+                '------------------------------------------------------
+                _Name = value
+            End Set
+        End Property
+
+        <EditorBrowsable(EditorBrowsableState.Never)>
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Public _EventName As String = ""
+        <CategoryAttribute("EventName"),
+        Browsable(True),
+        DefaultValueAttribute(GetType(String), ""),
+        DescriptionAttribute("The Event that triggers this transition.")>
+        Public Overridable Property EventName() As String
+            Get
+                Return _EventName
+            End Get
+            Set(ByVal value As String)
+                '------------------------------------------------------
+                'See Me.SetName for management of Me.Id and Me.Symbol
+                '------------------------------------------------------
+                _EventName = value
+            End Set
+        End Property
 
         Public Shadows ConceptType As pcenumConceptType = pcenumConceptType.StateTransition
 
@@ -85,6 +116,25 @@ Namespace STD
         Public Sub RefreshShape(Optional ByVal aoChangedPropertyItem As PropertyValueChangedEventArgs = Nothing,
                                 Optional ByVal asSelectedGridItemLabel As String = "")
 
+            Try
+                '---------------------------------------------------------
+                'Set the values in the underlying Model.StateTransition
+                '------------------------------------------------
+                If IsSomething(aoChangedPropertyItem) Then
+                    Select Case aoChangedPropertyItem.ChangedItem.PropertyDescriptor.Name
+                        Case Is = "EventName"
+                            Call Me.STMStateTransition.setEventName(Me.EventName)
+                    End Select
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
         End Sub
 
         Public Sub MouseDown() Implements iPageObject.MouseDown
@@ -146,6 +196,7 @@ Namespace STD
 
         Private Sub STMStateTransition_EventNameChanged(asNewEventName As String) Handles STMStateTransition.EventNameChanged
 
+            Me.EventName = asNewEventName
             Me.Link.Text = asNewEventName
 
         End Sub

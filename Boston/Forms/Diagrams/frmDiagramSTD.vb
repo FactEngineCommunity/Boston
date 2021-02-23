@@ -964,6 +964,14 @@ Public Class frmStateTransitionDiagram
                     Me.DiagramView.ContextMenuStrip = ContextMenuStrip_StartStateTransition
 
                     Call lrSTDStartStateTransition.NodeSelected()
+
+                Case Is = pcenumConceptType.EndStateTransition
+
+                    Dim lrSTDEndStateTransition As STD.EndStateTransition = Me.Diagram.Selection.Items(0).Tag
+                    Me.zrPage.SelectedObject.AddUnique(lrSTDEndStateTransition)
+                    Me.DiagramView.ContextMenuStrip = ContextMenuStrip_EndStateTransition
+
+                    Call lrSTDEndStateTransition.NodeSelected()
             End Select
 
             '--------------------------------------------
@@ -1289,10 +1297,23 @@ Public Class frmStateTransitionDiagram
                             Dim lrStateTransition As STD.StateTransition
                             lrStateTransition = lrModelObject
                             Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
-                            lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute})
+                            Dim loMiscFilterAttribute2 As Attribute = New System.ComponentModel.CategoryAttribute("Instances")
+                            Dim loMiscFilterAttribute3 As Attribute = New System.ComponentModel.CategoryAttribute("Description (Informal)")
+                            lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute, loMiscFilterAttribute2, loMiscFilterAttribute3})
                             lrPropertyGridForm.zrSelectedObject = lrStateTransition
                             lrPropertyGridForm.PropertyGrid.SelectedObjects = {} 'Part of the fix to the problem where ValueConstraint were being added to the wrong ValueType.
                             lrPropertyGridForm.PropertyGrid.SelectedObject = lrStateTransition
+                        Case = GetType(STD.EndStateTransition)
+                            Dim lrEndStateTransition As STD.EndStateTransition
+                            lrEndStateTransition = lrModelObject
+                            Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
+                            Dim loMiscFilterAttribute2 As Attribute = New System.ComponentModel.CategoryAttribute("Instances")
+                            Dim loMiscFilterAttribute3 As Attribute = New System.ComponentModel.CategoryAttribute("Description (Informal)")
+                            lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute, loMiscFilterAttribute2, loMiscFilterAttribute3})
+                            lrPropertyGridForm.zrSelectedObject = lrEndStateTransition
+                            lrPropertyGridForm.PropertyGrid.SelectedObjects = {} 'Part of the fix to the problem where ValueConstraint were being added to the wrong ValueType.
+                            lrPropertyGridForm.PropertyGrid.SelectedObject = lrEndStateTransition
+
                     End Select
                 End If
 
@@ -2028,4 +2049,75 @@ Public Class frmStateTransitionDiagram
 
     End Sub
 
+    Private Sub EditEventTextToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles EditEventTextToolStripMenuItem.Click
+
+        Try
+            Dim lrSTDStateTransition As STD.StateTransition = Me.zrPage.SelectedObject(0)
+
+            Call Me.DiagramView.BeginEdit(lrSTDStateTransition.Link)
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
+    Private Sub ToolStripMenuItem2_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItem2.Click
+
+        Try
+            Dim lrSTDStartStateTransition As STD.StartStateTransition = Me.zrPage.SelectedObject(0)
+
+            Call Me.DiagramView.BeginEdit(lrSTDStartStateTransition.Link)
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
+    Private Sub ToolStripMenuItem3_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItem3.Click
+
+        Try
+            Dim lrSTDEndStateTransition As STD.EndStateTransition = Me.zrPage.SelectedObject(0)
+
+            Call Me.DiagramView.BeginEdit(lrSTDEndStateTransition.Link)
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
+    Private Sub ToolStripMenuItem4_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItem4.Click
+
+        Try
+            Dim lrSTDEndStateTransition As STD.EndStateTransition = Me.zrPage.SelectedObject(0)
+
+            Call lrSTDEndStateTransition.STMEndStateTransition.RemoveFromModel()
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
 End Class

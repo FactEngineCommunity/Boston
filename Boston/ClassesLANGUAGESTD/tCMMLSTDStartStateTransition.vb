@@ -158,6 +158,8 @@ Namespace STD
 
         Private Sub STMStartStateTransition_RemovedFromModel() Handles STMStartStateTransition.RemovedFromModel
 
+            Me.Page.STDiagram.StartStateTransition.Remove(Me)
+
             Me.Page.Diagram.Links.Remove(Me.Link)
             Me.Link.Dispose()
 
