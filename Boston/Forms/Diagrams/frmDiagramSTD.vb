@@ -1303,6 +1303,16 @@ Public Class frmStateTransitionDiagram
                             lrPropertyGridForm.zrSelectedObject = lrStateTransition
                             lrPropertyGridForm.PropertyGrid.SelectedObjects = {} 'Part of the fix to the problem where ValueConstraint were being added to the wrong ValueType.
                             lrPropertyGridForm.PropertyGrid.SelectedObject = lrStateTransition
+                        Case = GetType(STD.StartStateTransition)
+                            Dim lrStartStateTransition As STD.StartStateTransition
+                            lrStartStateTransition = lrModelObject
+                            Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
+                            Dim loMiscFilterAttribute2 As Attribute = New System.ComponentModel.CategoryAttribute("Instances")
+                            Dim loMiscFilterAttribute3 As Attribute = New System.ComponentModel.CategoryAttribute("Description (Informal)")
+                            lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute, loMiscFilterAttribute2, loMiscFilterAttribute3})
+                            lrPropertyGridForm.zrSelectedObject = lrStartStateTransition
+                            lrPropertyGridForm.PropertyGrid.SelectedObjects = {} 'Part of the fix to the problem where ValueConstraint were being added to the wrong ValueType.
+                            lrPropertyGridForm.PropertyGrid.SelectedObject = lrStartStateTransition
                         Case = GetType(STD.EndStateTransition)
                             Dim lrEndStateTransition As STD.EndStateTransition
                             lrEndStateTransition = lrModelObject

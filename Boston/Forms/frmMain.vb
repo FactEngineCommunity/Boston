@@ -78,7 +78,7 @@ Public Class frmMain
             'Notes
             '  Core v2.1 introduces changes to the StateTransitionDiagram model, with changes to the underlying ModelElements. Introduced in Boston v5.4
             psApplicationApplicationVersionNr = "5.5"
-            psApplicationDatabaseVersionNr = "1.25"
+            psApplicationDatabaseVersionNr = "1.26"
             'NB To access the Core version number go to prApplication.CMML.Core.CoreVersionNumber once the Core has loaded.          
 
 
@@ -2938,13 +2938,6 @@ Public Class frmMain
 
     End Sub
 
-    Private Sub RichmondToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles RichmondToolStripMenuItem.Click
-
-        Call Me.LoadCRUDRichmondConfiguration()
-
-    End Sub
-
-
     Private Sub ToolStripButtonNew_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripButtonNew.Click
 
         If IsSomething(Me.zfrmModelExplorer) Then
@@ -4096,4 +4089,11 @@ Public Class frmMain
         Call Me.LoadFactEngine()
 
     End Sub
+
+    Private Sub ConfigurationToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ConfigurationToolStripMenuItem.Click
+
+        Call Me.LoadCRUDRichmondConfiguration()
+
+    End Sub
+
 End Class
