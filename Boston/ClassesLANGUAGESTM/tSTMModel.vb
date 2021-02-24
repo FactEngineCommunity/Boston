@@ -252,6 +252,9 @@
                 Call Me.Model.removeCMMLState(lrState)
             Next
 
+            'CMML for ValueType itself
+            Call Me.Model.removeCMMLValueTypeIsStateTransitionBased(arValueType)
+
         End Sub
 
     End Class

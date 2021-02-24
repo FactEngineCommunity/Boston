@@ -304,6 +304,28 @@ Namespace FBM
 
         End Sub
 
+        Public Sub removeCMMLValueTypeIsStateTransitionBased(ByRef arValueType As FBM.ValueType)
+
+            Try
+
+                Dim lsSQLQuery As String
+
+                lsSQLQuery = "DELETE FROM " & pcenumCMMLRelations.CoreValueTypeIsStateTransitionBased.ToString
+                lsSQLQuery &= " WHERE IsStateTransitionBased = '" & arValueType.Id & "'"
+
+                Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
         Public Sub removeCMMLStartStateTransition(ByRef arStartStateTransition As STM.StartStateTransition)
 
             Dim lsSQLQuery As String

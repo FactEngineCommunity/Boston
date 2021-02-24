@@ -630,6 +630,60 @@ Public Class frmStateTransitionDiagram
             Diagram.Links(liInd - 1).Pen.Color = Color.Black
         Next
 
+        Dim lrLink As DiagramLink
+        For liInd = 1 To Diagram.Links.Count
+
+            lrLink = Diagram.Links(liInd - 1)
+
+            '--------------------------------
+            'Disambiguate overlapping links
+            '--------------------------------
+            Dim commonLinks = GetCommonLinks(lrLink.Origin, lrLink.Destination) 'As DiagramLinkCollection
+
+            Dim pt1 As PointF = lrLink.ControlPoints(0)
+            Dim pt2 As PointF = lrLink.ControlPoints(lrLink.ControlPoints.Count - 1)
+
+            If commonLinks.Count > 1 Then
+                For c As Integer = 0 To commonLinks.Count - 1
+                    Dim link As DiagramLink = commonLinks(c)
+
+                    'If Not link.Tag.HasBeenMoved Then
+                    link.Style = LinkStyle.Bezier
+                    link.SegmentCount = 1
+
+                    Dim cp1 As New PointF(pt1.X + 1 * (pt2.X - pt1.X) / 3, pt1.Y + 1 * (pt2.Y - pt1.Y) / 3)
+                    Dim cp2 As New PointF(pt1.X + 2 * (pt2.X - pt1.X) / 3, pt1.Y + 2 * (pt2.Y - pt1.Y) / 3)
+
+                    Dim angle As Single = 0, radius As Single = 0
+                    CarteseanToPolar(pt1, pt2, angle, radius)
+
+                    Dim pairOffset As Integer = (c / 2 + 1) * 5
+                    'If commonLinks.Count Mod 2 = 0 Then
+                    PolarToCartesean(cp1, If(c Mod 2 = 0, angle - 90, angle + 90), pairOffset, cp1)
+                    PolarToCartesean(cp2, If(c Mod 2 = 0, angle - 90, angle + 90), pairOffset, cp2)
+
+                    If link.ControlPoints(0) = pt1 Then
+                        link.ControlPoints(1) = cp1
+                        link.ControlPoints(2) = cp2
+                    Else
+                        link.ControlPoints(1) = cp2
+                        link.ControlPoints(2) = cp1
+                    End If
+
+                    'link.Tag.HasBeenMoved = True
+
+                    link.UpdateFromPoints()
+                    'End If
+
+                    '  End If
+                Next
+            Else
+                'lrLink.AutoRoute = True
+            End If
+
+
+        Next
+
         Me.Diagram.Invalidate()
 
     End Sub
@@ -2130,4 +2184,49 @@ Public Class frmStateTransitionDiagram
         End Try
 
     End Sub
+
+    Private Function GetCommonLinks(ByVal node1 As DiagramNode, ByVal node2 As DiagramNode) As DiagramLinkCollection
+        'NB See Richmond DFD Form for another example of this function. This one works better.
+
+        Dim commonLinks As New DiagramLinkCollection
+
+        Dim larCommonLinks = From Link In Me.Diagram.Links
+                             Where (Link.Origin Is node1 And Link.Destination Is node2) Or (Link.Origin Is node2 And Link.Destination Is node1)
+                             Select Link
+
+        For Each lrLink In larCommonLinks
+            commonLinks.Add(lrLink)
+        Next
+
+        Return commonLinks
+
+    End Function
+
+    Private Sub PolarToCartesean(ByVal coordCenter As PointF, ByVal a As Single, ByVal r As Single, ByRef dekart As PointF)
+        If r = 0 Then
+            dekart = coordCenter
+            Return
+        End If
+
+        dekart.X = CSng(coordCenter.X + Math.Cos(a * Math.PI / 180) * r)
+        dekart.Y = CSng(coordCenter.Y - Math.Sin(a * Math.PI / 180) * r)
+    End Sub
+
+    Private Sub CarteseanToPolar(ByVal coordCenter As PointF, ByVal dekart As PointF, ByRef a As Single, ByRef r As Single)
+        If coordCenter = dekart Then
+            a = 0
+            r = 0
+            Return
+        End If
+
+        Dim dx As Single = dekart.X - coordCenter.X
+        Dim dy As Single = dekart.Y - coordCenter.Y
+        r = CSng(Math.Sqrt(Math.Pow(dx, 2) + Math.Pow(dy, 2)))
+
+        a = CSng(Math.Atan(-dy / dx) * 180 / Math.PI)
+        If dx < 0 Then
+            a += 180
+        End If
+    End Sub
+
 End Class
