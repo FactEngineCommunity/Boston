@@ -244,51 +244,83 @@ Public Class frmStateTransitionDiagram
                                 Exit Sub
                             End If
 
-                            'Use the frmDialogSelectValueTypeState
-                            Using lfrmStateSelectDialog As New frmDialogSelectValueTypeState(Me.zrPage.Model, Me.zrPage.STDiagram.ValueType)
+                            Dim lasStateName = From State In Me.zrPage.STDiagram.State
+                                               Select State.StateName
 
-                                Select Case lfrmStateSelectDialog.ShowDialog
-                                    Case = DialogResult.Yes
-                                        '==========================================================
-                                        'User is creating their own State rather than dropping a State/ValueConstraint that already belongs to the ValueType for the STD.
+                            Dim lasValueTypeConstraint = From ValueConstraint In Me.zrPage.STDiagram.ValueType.ValueConstraint
+                                                         Select ValueConstraint
 
-                                        'STM Level
-                                        Dim lsUniqueStateName = Me.zrPage.STDiagram.CreateUniqueStateName("New State", 0)
-                                        Dim lrSTMState = Me.zrPage.Model.createCMMLState(Me.zrPage.STDiagram.ValueType, lsUniqueStateName)
+                            Dim lbEqualSet = lasValueTypeConstraint.ToList.FindAll(Function(x) lasStateName.Contains(x)).Count = lasValueTypeConstraint.Count
 
-                                        'Model/ValueType Level
-                                        Me.zrPage.STDiagram.ValueType.AddValueConstraint(lsUniqueStateName)
+                            If lbEqualSet Then
 
-                                        'Page Level
-                                        Dim lrSTDState As STD.State
+                                'User is creating their own State rather than dropping a State/ValueConstraint that already belongs to the ValueType for the STD.
 
-                                        lrSTDState = Me.zrPage.dropStateAtPoint(lrSTMState, pt)
+                                'STM Level
+                                Dim lsUniqueStateName = Me.zrPage.STDiagram.CreateUniqueStateName("New State", 0)
+                                Dim lrSTMState = Me.zrPage.Model.createCMMLState(Me.zrPage.STDiagram.ValueType, lsUniqueStateName)
 
-                                        Me.zrPage.STDiagram.State.AddUnique(lrSTDState)
+                                'Model/ValueType Level
+                                Me.zrPage.STDiagram.ValueType.AddValueConstraint(lsUniqueStateName)
 
-                                    Case = DialogResult.OK
+                                'Page Level
+                                Dim lrSTDState As STD.State
 
-                                        'STM Level
-                                        Dim lrSTMState = Me.zrPage.STDiagram.STM.State.Find(Function(x) x.ValueType Is Me.zrPage.STDiagram.ValueType _
-                                                                                            And x.Name = lfrmStateSelectDialog.msState)
+                                lrSTDState = Me.zrPage.dropStateAtPoint(lrSTMState, pt)
 
-                                        If lrSTMState Is Nothing Then
-                                            lrSTMState = Me.zrPage.Model.createCMMLState(Me.zrPage.STDiagram.ValueType, lfrmStateSelectDialog.msState)
-                                        End If
+                                Me.zrPage.STDiagram.State.AddUnique(lrSTDState)
 
-                                        'Add to Page if isn't already on the Page
-                                        If Me.zrPage.STDiagram.State.Find(Function(x) x.StateName = lfrmStateSelectDialog.msState) Is Nothing Then
+
+                            Else
+
+                                'Use the frmDialogSelectValueTypeState
+                                Using lfrmStateSelectDialog As New frmDialogSelectValueTypeState(Me.zrPage.Model, Me.zrPage.STDiagram)
+
+                                    Select Case lfrmStateSelectDialog.ShowDialog
+                                        Case = DialogResult.Yes
+                                            '==========================================================
+                                            'User is creating their own State rather than dropping a State/ValueConstraint that already belongs to the ValueType for the STD.
+
+                                            'STM Level
+                                            Dim lsUniqueStateName = Me.zrPage.STDiagram.CreateUniqueStateName("New State", 0)
+                                            Dim lrSTMState = Me.zrPage.Model.createCMMLState(Me.zrPage.STDiagram.ValueType, lsUniqueStateName)
+
+                                            'Model/ValueType Level
+                                            Me.zrPage.STDiagram.ValueType.AddValueConstraint(lsUniqueStateName)
+
                                             'Page Level
                                             Dim lrSTDState As STD.State
+
                                             lrSTDState = Me.zrPage.dropStateAtPoint(lrSTMState, pt)
+
                                             Me.zrPage.STDiagram.State.AddUnique(lrSTDState)
-                                        Else
-                                            MsgBox("This Page already containst the State, '" & lfrmStateSelectDialog.msState & "'")
-                                        End If
 
-                                End Select
-                            End Using
+                                        Case = DialogResult.OK
 
+                                            'STM Level
+                                            Dim lrSTMState = Me.zrPage.STDiagram.STM.State.Find(Function(x) x.ValueType Is Me.zrPage.STDiagram.ValueType _
+                                                                                            And x.Name = lfrmStateSelectDialog.msState)
+
+                                            If lrSTMState Is Nothing Then
+                                                lrSTMState = Me.zrPage.Model.createCMMLState(Me.zrPage.STDiagram.ValueType, lfrmStateSelectDialog.msState)
+                                            End If
+
+                                            'Add to Page if isn't already on the Page
+                                            If Me.zrPage.STDiagram.State.Find(Function(x) x.StateName = lfrmStateSelectDialog.msState) Is Nothing Then
+                                                'Page Level
+                                                Dim lrSTDState As STD.State
+                                                lrSTDState = Me.zrPage.dropStateAtPoint(lrSTMState, pt)
+                                                Me.zrPage.STDiagram.State.AddUnique(lrSTDState)
+                                            Else
+                                                MsgBox("This Page already containst the State, '" & lfrmStateSelectDialog.msState & "'")
+                                            End If
+
+                                    End Select
+                                End Using
+
+                            End If
+
+                            Me.ComboBox_ValueType.Enabled = False 'Regardless of how the user created a State for the ValueType.
 
                         Case Is = "Start"
                             If Me.zrPage.STDiagram.StartIndicator Is Nothing Then

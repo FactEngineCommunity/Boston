@@ -244,6 +244,17 @@ Namespace FBM
 
         Public Sub Move(ByVal aiNewX As Integer, ByVal aiNewY As Integer, ByVal abBroadcastInterfaceEvent As Boolean) Implements iPageObject.Move
 
+            Try
+                Me.X = aiNewX
+                Me.Y = aiNewY
+
+                Me.isDirty = True
+                Me.RoleInstance.makeDirty()
+
+            Catch ex As Exception
+
+            End Try
+
         End Sub
     End Class
 

@@ -361,26 +361,38 @@ Public Class tCMML
 
     Public Function getORMDiagramPagesForState(ByRef arState As STD.State) As List(Of FBM.Page)
 
-        getORMDiagramPagesForState = New List(Of FBM.Page)
+        Try
+            getORMDiagramPagesForState = New List(Of FBM.Page)
 
-        Dim lr_model As FBM.Model
-        Dim lsStateName = arState.StateName
-        Dim lsValueTypeId = arState.ValueType.Id
+            Dim lr_model As FBM.Model
+            Dim lsStateName = arState.StateName
+            Dim lsValueTypeId = arState.ValueType.Id
 
-        lr_model = arState.Model
+            lr_model = arState.Model
 
-        Dim larPage = From Page In lr_model.Page
-                      From ValueTypeInstance In Page.ValueTypeInstance
-                      From ValueConstraint In ValueTypeInstance.ValueType.ValueConstraint
-                      Where ValueTypeInstance.Id = lsValueTypeId
-                      Where Page.Language = pcenumLanguage.ORMModel _
-                      And ValueConstraint = lsStateName
-                      Select Page Distinct
-                      Order By Page.Name
+            Dim larPage = From Page In lr_model.Page
+                          From ValueTypeInstance In Page.ValueTypeInstance
+                          From ValueConstraint In ValueTypeInstance.ValueType.ValueConstraint
+                          Where ValueTypeInstance.Id = lsValueTypeId
+                          Where Page.Language = pcenumLanguage.ORMModel _
+                          And ValueConstraint = lsStateName
+                          Select Page Distinct
+                          Order By Page.Name
 
-        For Each lrPage In larPage
-            getORMDiagramPagesForState.Add(lrPage)
-        Next
+            For Each lrPage In larPage
+                getORMDiagramPagesForState.Add(lrPage)
+            Next
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+            Return New List(Of FBM.Page)
+        End Try
 
     End Function
 

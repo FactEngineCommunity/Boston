@@ -92,6 +92,7 @@ Namespace FBM
                     lrState.Id = lrORMRecordset("State").Data
                     lrState.ValueType = lrValueType
                     lrState.Model = Me.STM
+                    lrState.Fact = lrORMRecordset.CurrentFact
 
                     lsSQLQuery = "SELECT *"
                     lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreStateHasName.ToString

@@ -1215,6 +1215,13 @@ Namespace FBM
 
         End Sub
 
+        Public Overrides Sub makeDirty()
+            Me.FactType.isDirty = True
+            Me.isDirty = True
+            Me.Page.MakeDirty()
+
+        End Sub
+
         Public Sub MouseDown() Implements iPageObject.MouseDown
 
         End Sub

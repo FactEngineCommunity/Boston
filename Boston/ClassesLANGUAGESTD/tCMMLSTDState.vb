@@ -327,7 +327,7 @@ Namespace STD
         Public Overrides Function RemoveFromPage() As Boolean
 
             Try
-
+                Call Me.Page.STDiagram.State.Remove(Me)
                 Call Me.Fact.FactType.RemoveFact(Me.Fact)
 
 

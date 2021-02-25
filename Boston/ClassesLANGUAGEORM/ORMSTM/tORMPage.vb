@@ -10,22 +10,36 @@ Namespace FBM
 
         Public Function dropStateAtPoint(ByRef arSTMState As STM.State, ByVal aoPtF As PointF) As STD.State
 
-            Dim lrSTDState As STD.State
+            Try
 
-            Dim lsSQLQuery = "ADD FACT '" & arSTMState.Fact.Id & "'"
-            lsSQLQuery &= " TO " & pcenumCMMLRelations.CoreValueTypeHasState.ToString
-            lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
+                Dim lrSTDState As STD.State
 
-            Dim lrFactInstance As FBM.FactInstance = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                Dim lsSQLQuery = "ADD FACT '" & arSTMState.Fact.Id & "'"
+                lsSQLQuery &= " TO " & pcenumCMMLRelations.CoreValueTypeHasState.ToString
+                lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
 
-            lrSTDState = lrFactInstance("State").CloneState(Me)
-            lrSTDState.STMState = arSTMState
-            lrSTDState.StateName = arSTMState.Name
+                Dim lrFactInstance As FBM.FactInstance = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
-            lrSTDState.Move(aoPtF.X, aoPtF.Y, False)
-            lrSTDState.DisplayAndAssociate()
+                lrSTDState = lrFactInstance("State").CloneState(Me)
+                lrSTDState.STMState = arSTMState
+                lrSTDState.StateName = arSTMState.Name
+                lrSTDState.ValueType = arSTMState.ValueType
 
-            Return lrSTDState
+                lrSTDState.Move(aoPtF.X, aoPtF.Y, False)
+                lrSTDState.DisplayAndAssociate()
+
+                Return lrSTDState
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return Nothing
+            End Try
 
         End Function
 
