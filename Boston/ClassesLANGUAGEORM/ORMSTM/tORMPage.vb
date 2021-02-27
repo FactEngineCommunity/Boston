@@ -132,6 +132,7 @@ Namespace FBM
 
                 Dim lrEndStateTransition As STD.EndStateTransition
                 lrEndStateTransition = lrFactInstance.CloneEndStateTransition(Me, lrFromState, lrEndStateIndicator)
+                lrEndStateTransition.STMEndStateTransition = arEndStateTransition
 
                 Me.STDiagram.EndStateTransition.AddUnique(lrEndStateTransition)
                 Call lrEndStateTransition.DisplayAndAssociate()

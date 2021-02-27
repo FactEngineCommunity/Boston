@@ -2012,6 +2012,7 @@ Public Class frmStateTransitionDiagram
     Private Sub Diagram_LinkTextEdited(sender As Object, e As EditLinkTextEventArgs) Handles Diagram.LinkTextEdited
 
         Try
+            Dim lsMessage As String
 
             Select Case e.Link.Tag.GetType
                 Case GetType(STD.StartStateTransition)
@@ -2022,11 +2023,47 @@ Public Class frmStateTransitionDiagram
                 Case GetType(STD.EndStateTransition)
                     Dim lrEndStateTransition As STD.EndStateTransition = e.Link.Tag
                     If lrEndStateTransition.EventName <> e.Link.Text Then
+
+                        Dim larEndStateTransition = From EndStateTransition In Me.zrPage.STDiagram.EndStateTransition
+                                                    Where EndStateTransition.FromState Is lrEndStateTransition.FromState
+                                                    Where EndStateTransition.EventName = e.Link.Text
+                                                    Select EndStateTransition
+
+                        Dim larStateTransition = From StateTransition In Me.zrPage.STDiagram.StateTransition
+                                                 Where StateTransition.FromState Is lrEndStateTransition.FromState
+                                                 Where StateTransition.EventName = e.Link.Text
+                                                 Select StateTransition
+
+                        If (larEndStateTransition.Count > 0) Or (larStateTransition.Count > 0) Then
+                            lsMessage = "The State, '" & lrEndStateTransition.FromState.StateName & "', already has a transition with Event Name, '" & e.Link.Text & "'."
+                            MsgBox(lsMessage)
+                            e.Link.Text = e.OldText
+                            Exit Sub
+                        End If
+
                         lrEndStateTransition.STMEndStateTransition.setEventName(e.Link.Text)
                     End If
                 Case GetType(STD.StateTransition)
                     Dim lrStateTransition As STD.StateTransition = e.Link.Tag
                     If lrStateTransition.EventName <> e.Link.Text Then
+
+                        Dim larEndStateTransition = From EndStateTransition In Me.zrPage.STDiagram.EndStateTransition
+                                                    Where EndStateTransition.FromState Is lrStateTransition.FromState
+                                                    Where EndStateTransition.EventName = e.Link.Text
+                                                    Select EndStateTransition
+
+                        Dim larStateTransition = From StateTransition In Me.zrPage.STDiagram.StateTransition
+                                                 Where StateTransition.FromState Is lrStateTransition.FromState
+                                                 Where StateTransition.EventName = e.Link.Text
+                                                 Select StateTransition
+
+                        If (larEndStateTransition.Count > 0) Or (larStateTransition.Count > 0) Then
+                            lsMessage = "The State, '" & lrStateTransition.FromState.StateName & "', already has a transition with Event Name, '" & e.Link.Text & "'."
+                            MsgBox(lsMessage)
+                            e.Link.Text = e.OldText
+                            Exit Sub
+                        End If
+
                         lrStateTransition.STMStateTransition.setEventName(e.Link.Text)
                     End If
             End Select
