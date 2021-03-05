@@ -385,6 +385,9 @@ Namespace FEQL
                 Case TokenType.CREATECONCEPTSTMT
                     Value = EvalCREATECONCEPTSTMT(tree, paramlist)
                     Exit Select
+                Case TokenType.CREATEDATABASESTMT
+                    Value = EvalCREATEDATABASESTMT(tree, paramlist)
+                    Exit Select
                 Case TokenType.CREATEENTITYTYPESTMT
                     Value = EvalCREATEENTITYTYPESTMT(tree, paramlist)
                     Exit Select
@@ -402,6 +405,15 @@ Namespace FEQL
                     Exit Select
                 Case TokenType.CREATEVALUETYPESTMT
                     Value = EvalCREATEVALUETYPESTMT(tree, paramlist)
+                    Exit Select
+                Case TokenType.DATABASECREATECLAUSE
+                    Value = EvalDATABASECREATECLAUSE(tree, paramlist)
+                    Exit Select
+                Case TokenType.DATABASELOCATIONCLAUSE
+                    Value = EvalDATABASELOCATIONCLAUSE(tree, paramlist)
+                    Exit Select
+                Case TokenType.DATABASETYPECLAUSE
+                    Value = EvalDATABASETYPECLAUSE(tree, paramlist)
                     Exit Select
                 Case TokenType.DELETESTMT
                     Value = EvalDELETESTMT(tree, paramlist)
@@ -786,6 +798,10 @@ Namespace FEQL
             Throw New NotImplementedException()
         End Function
 
+        Protected Overridable Function EvalCREATEDATABASESTMT(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
         Protected Overridable Function EvalCREATEENTITYTYPESTMT(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
             Throw New NotImplementedException()
         End Function
@@ -807,6 +823,18 @@ Namespace FEQL
         End Function
 
         Protected Overridable Function EvalCREATEVALUETYPESTMT(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalDATABASECREATECLAUSE(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalDATABASELOCATIONCLAUSE(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalDATABASETYPECLAUSE(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
             Throw New NotImplementedException()
         End Function
 
