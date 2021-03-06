@@ -329,6 +329,27 @@ Public Class tApplication
 
     End Sub
 
+    Public Sub createDatabase(ByVal arCreateDatabaseStatement As FEQL.CREATEDATABASEStatement)
+
+        Try
+            If frmMain.zfrmModelExplorer IsNot Nothing Then
+
+                Call frmMain.zfrmModelExplorer.addNewModelToBoston(arCreateDatabaseStatement.DATABASENAME, arCreateDatabaseStatement)
+            Else
+                MsgBox("Please check that the Model Explorer view is open before adding a new model to Boston.")
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
     ''' <summary>
     ''' Gets a Model from the list of Models loaded into the application (in this class), else returns Nothing
     ''' </summary>

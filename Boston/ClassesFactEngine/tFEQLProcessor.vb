@@ -26,6 +26,20 @@ Namespace FEQL
 
     End Class
 
+    Public Class CREATEDATABASEStatement
+
+        Private _DATABASENAME As String
+        Public Property DATABASENAME As String
+            Get
+                Return Me._DATABASENAME
+            End Get
+            Set(value As String)
+                Me._DATABASENAME = value
+            End Set
+        End Property
+
+    End Class
+
     Public Class EntityTypeIsIdentifiedByItsStatement
 
         <DebuggerBrowsable(DebuggerBrowsableState.Never)>
@@ -993,6 +1007,13 @@ Namespace FEQL
                     If Me.ParseTreeContainsTokenType(Me.Parsetree, FEQL.TokenType.VALUETYPEISWRITTENASSTMT) Then ' VALUETYPEISWRITTENASCLAUSE
                         aoTokenType = FEQL.TokenType.VALUETYPEISWRITTENASSTMT
                         aoParseTree = Me.Parsetree
+                        Return Nothing
+
+                    ElseIf Me.ParseTreeContainsTokenType(Me.Parsetree, FEQL.TokenType.KEYWDCREATE) And
+                       Me.ParseTreeContainsTokenType(Me.ParseTree, FEQL.TokenType.KEYWDDATABASE) Then
+                        aoTokenType = FEQL.TokenType.CREATEDATABASESTMT
+                        aoParseTree = Me.Parsetree
+                        Call Me.processCREATEDATABASEStatement(asFEQLStatement)
                         Return Nothing
                     ElseIf Me.ParseTreeContainsTokenType(Me.Parsetree, FEQL.TokenType.KEYWDISIDENTIFIEDBYITS) Then
                         aoTokenType = FEQL.TokenType.KEYWDISIDENTIFIEDBYITS

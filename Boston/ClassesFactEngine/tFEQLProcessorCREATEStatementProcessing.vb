@@ -1,5 +1,27 @@
-﻿Namespace FEQL
+﻿Imports System.Reflection
+
+Namespace FEQL
     Partial Public Class Processor
+
+        Public Sub processCREATEDATABASEStatement(ByVal asFEQLStatement As String)
+
+            Try
+                Dim lrCREATESDATABASEtatement = New FEQL.CREATEDATABASEStatement
+
+                Call Me.GetParseTreeTokensReflection(lrCREATESDATABASEtatement, Me.Parsetree.Nodes(0))
+
+                Call prApplication.createDatabase(lrCREATESDATABASEtatement)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
 
         Public Function ProcessCREATEStatement(ByVal asFEQLStatement As String) As ORMQL.Recordset
 

@@ -1540,7 +1540,8 @@ Public Class frmToolboxEnterpriseExplorer
 
     End Sub
 
-    Public Sub addNewModelToBoston()
+    Public Sub addNewModelToBoston(Optional ByVal asModelName As String = Nothing,
+                                   Optional arCreateDatabaseStatement As FEQL.CREATEDATABASEStatement = Nothing)
 
         Try
             With New WaitCursor
@@ -1551,7 +1552,7 @@ Public Class frmToolboxEnterpriseExplorer
                     Me.TreeView.Nodes(0).Nodes(Me.TreeView.Nodes(0).Nodes.Count - 1).EnsureVisible()
                 End If
 
-                lrModel = Me.AddNewModel(lrNewTreeNode, False)
+                lrModel = Me.AddNewModel(lrNewTreeNode, False, arCreateDatabaseStatement)
 
                 '---------------------------------------------------------------------
                 'Abort if a Model is not created.
@@ -1626,7 +1627,9 @@ Public Class frmToolboxEnterpriseExplorer
 
     End Sub
 
-    Public Function AddNewModel(ByRef arCreatedTreeNode As TreeNode, Optional abAddCoreElements As Boolean = True) As FBM.Model
+    Public Function AddNewModel(ByRef arCreatedTreeNode As TreeNode,
+                                Optional abAddCoreElements As Boolean = True,
+                                Optional arCreateDatabaseStatement As FEQL.CREATEDATABASEStatement = Nothing) As FBM.Model
 
         Try
             Dim loNode As TreeNode = Nothing
@@ -1651,7 +1654,12 @@ Public Class frmToolboxEnterpriseExplorer
             '-----------------------------------------------
             lrModel = New FBM.Model
 
-            lsModelName = "New Model "
+            If arCreateDatabaseStatement IsNot Nothing Then
+                lsModelName = arCreateDatabaseStatement.DATABASENAME
+            Else
+                lsModelName = "New Model "
+            End If
+
             lsModelName = lrModel.CreateUniqueModelName(lsModelName, 0)
 
             lrModel = New FBM.Model(pcenumLanguage.ORMModel, lsModelName, False)
