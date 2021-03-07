@@ -345,29 +345,34 @@ Namespace DatabaseUpgradeFunctions
         Public Sub BackupDatabase()
 
             Try
-                Dim lsDBLocation As String = ""
+                'Dim lsDBLocation As String = ""
                 Dim liInd As Integer = 0
-                Dim larConnectionString() As String
+                'Dim larConnectionString() As String
                 Dim lsNewDatabaseAndPath As String
 
-                larConnectionString = Split(My.Settings.DatabaseConnectionString, ";")
+                Dim lrSQLConnectionStringBuilder As New System.Data.Common.DbConnectionStringBuilder(True)
+                lrSQLConnectionStringBuilder.ConnectionString = Trim(My.Settings.DatabaseConnectionString)
 
-                For liInd = 0 To larConnectionString.Length - 1
-                    lsDBLocation = larConnectionString(liInd)
-                    lsDBLocation = Trim(lsDBLocation)
-                    If lsDBLocation.StartsWith("Data Source=") Then
-                        lsDBLocation = lsDBLocation.Replace("Data Source=", "")
-                        Exit For
-                    End If
-                Next
+                Dim lsDatabaseLocation = lrSQLConnectionStringBuilder("Data Source")
+
+                'larConnectionString = Split(My.Settings.DatabaseConnectionString, ";")
+
+                'For liInd = 0 To larConnectionString.Length - 1
+                '    lsDBLocation = larConnectionString(liInd)
+                '    lsDBLocation = Trim(lsDBLocation)
+                '    If lsDBLocation.StartsWith("Data Source=") Then
+                '        lsDBLocation = lsDBLocation.Replace("Data Source=", "")
+                '        Exit For
+                '    End If
+                'Next
 
                 '------------------------------------------------
                 'Define the location of database
                 '------------------------------------------------
-                lsNewDatabaseAndPath = Path.GetDirectoryName(lsDBLocation)
+                lsNewDatabaseAndPath = Path.GetDirectoryName(lsDatabaseLocation)
                 lsNewDatabaseAndPath = String.Format(lsNewDatabaseAndPath & "\Boston{0:yyyyMMddHHmmss}.mdb", Now)
 
-                File.Copy(lsDBLocation, lsNewDatabaseAndPath, True)
+                File.Copy(lsDatabaseLocation, lsNewDatabaseAndPath, True)
 
             Catch ex As Exception
                 Dim lsMessage1 As String
