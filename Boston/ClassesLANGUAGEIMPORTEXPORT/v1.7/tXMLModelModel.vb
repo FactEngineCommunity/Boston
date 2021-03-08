@@ -506,6 +506,9 @@ Namespace XMLModel
 
                 Dim lrModel As New FBM.Model(pcenumLanguage.ORMModel, Me.ORMModel.Name, Me.ORMModel.ModelId)
 
+                'So that DictionaryEntries are dirty
+                lrModel.Loaded = True
+
                 lrModel.CoreVersionNumber = Me.ORMModel.CoreVersionNumber
 
                 '==============================
@@ -534,7 +537,7 @@ Namespace XMLModel
                     '------------------------------------------------
                     'Link to the Concept within the ModelDictionary
                     '------------------------------------------------
-                    Dim lrDictionaryEntry As New FBM.DictionaryEntry(lrModel, lrValueType.Id, pcenumConceptType.ValueType, lrValueType.ShortDescription, lrValueType.LongDescription, True)
+                    Dim lrDictionaryEntry As New FBM.DictionaryEntry(lrModel, lrValueType.Id, pcenumConceptType.ValueType, lrValueType.ShortDescription, lrValueType.LongDescription, True, True)
                     lrDictionaryEntry = lrModel.AddModelDictionaryEntry(lrDictionaryEntry)
 
 
@@ -698,7 +701,7 @@ Namespace XMLModel
                     '------------------------------------------------
                     'Link to the Concept within the ModelDictionary
                     '------------------------------------------------
-                    Dim lrDictionaryEntry As New FBM.DictionaryEntry(lrModel, lrRoleConstraint.Id, pcenumConceptType.RoleConstraint, lrRoleConstraint.ShortDescription, lrRoleConstraint.LongDescription, True)
+                    Dim lrDictionaryEntry As New FBM.DictionaryEntry(lrModel, lrRoleConstraint.Id, pcenumConceptType.RoleConstraint, lrRoleConstraint.ShortDescription, lrRoleConstraint.LongDescription, True, True)
                     lrDictionaryEntry = lrModel.AddModelDictionaryEntry(lrDictionaryEntry, , False)
 
                     If lrDictionaryEntry Is Nothing Then
