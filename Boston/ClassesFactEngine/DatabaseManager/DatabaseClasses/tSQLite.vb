@@ -33,6 +33,27 @@ Namespace FactEngine
 
         End Sub
 
+        ''' <summary>
+        ''' Adds a new Column to a Table.
+        ''' </summary>
+        ''' <param name="arColumn"></param>
+        Public Overrides Sub addColumn(ByRef arColumn As RDS.Column)
+
+            Dim lsSQLCommand As String
+
+            Try
+                lsSQLCommand = "ALTER TABLE " & arColumn.Table.Name
+                lsSQLCommand &= " ADD COLUMN "
+                lsSQLCommand &= arColumn.Name & " " & "TEXT(100)" '& arColumn.DataTypeName
+
+                Me.GONonQuery(lsSQLCommand)
+
+            Catch ex As Exception
+
+            End Try
+
+        End Sub
+
         Public Overrides Function createDatabase(ByVal asDatabaseLocationName As String) As ORMQL.Recordset
 
             Dim lrRecordset As New ORMQL.Recordset
@@ -60,8 +81,8 @@ Namespace FactEngine
 
             Try
                 lsSQLCommand = "CREATE TABLE " & arTable.Name
-                lsSQLCommand &= "("
-                lsSQLCommand &= arColumn.Name & " " & arColumn.DataTypeName
+                lsSQLCommand &= " ("
+                lsSQLCommand &= arColumn.Name & " " & "TEXT(100)" '& arColumn.DataTypeName
                 lsSQLCommand &= ")"
 
                 Me.GONonQuery(lsSQLCommand)
@@ -73,7 +94,7 @@ Namespace FactEngine
 
         End Sub
 
-        Public Overrides Function GO(asQuery As String) As Recordset Implements iDatabaseConnection.GO
+        Public Overrides Function GO(asQuery As String) As ORMQL.Recordset Implements iDatabaseConnection.GO
 
             Dim lrRecordset As New ORMQL.Recordset
 
@@ -135,7 +156,7 @@ Namespace FactEngine
                         End Select
 
                         Try
-                            lrFact.Data.Add(New FBM.FactData(lrFactType.RoleGroup(liInd), New FBM.Concept(loFieldValue), lrFact))
+                            lrFact.Data.Add(New FBM.FactData(lrFactType.RoleGroup(liInd), New FBM.Concept(Viev.NullVal(loFieldValue, "")), lrFact))
                             '=====================================================
                         Catch
                             Throw New Exception("Tried to add a recordset Column that is not in the Project Columns. Column Index: " & liInd)
@@ -200,6 +221,102 @@ Namespace FactEngine
             End Try
 
         End Function
+
+        ''' <summary>
+        ''' Removes the Column from its Table.
+        ''' </summary>
+        ''' <param name="arColumn"></param>
+        Public Overrides Sub removeColumn(ByRef arColumn As RDS.Column)
+
+            Try
+
+                'Dim mSqliteDbConnection = New SQLiteConnection("Data Source=db_folder\MySqliteBasedApp.db;Version=3;Page Size=1024;")
+                'SqliteDbConnection.Open()
+                Dim columnDefinition = New List(Of String)()
+                Dim mSql = "SELECT type, sql FROM sqlite_master WHERE tbl_name='" & arColumn.Table.Name & "'"
+                'Dim mSqliteCommand = New SQLiteCommand(mSql, mSqliteDbConnection)
+                Dim sqlScript As String = ""
+
+                Dim lrRecordset = Me.GO(mSql)
+                'Using CSharpImpl.__Assign(mSqliteReader, mSqliteCommand.ExecuteReader())
+                While Not lrRecordset.EOF
+                    sqlScript = lrRecordset("sql").Data
+                    Exit While
+                    lrRecordset.MoveNext()
+                End While
+                'End Using
+
+                If Not String.IsNullOrEmpty(sqlScript) Then
+                    Dim firstIndex As Integer = sqlScript.IndexOf("(")
+                    Dim lastIndex As Integer = sqlScript.LastIndexOf(")")
+
+                    If firstIndex >= 0 AndAlso lastIndex <= sqlScript.Length - 1 Then
+                        sqlScript = sqlScript.Substring(firstIndex, lastIndex - firstIndex + 1)
+                    End If
+
+                    Dim scriptParts As String() = sqlScript.Split(New String() {","}, StringSplitOptions.RemoveEmptyEntries)
+
+                    For Each s As String In scriptParts
+                        If Not s.Contains(arColumn.Name) Then
+                            columnDefinition.Add(s)
+                        End If
+                    Next
+                End If
+
+                Dim columnDefinitionString As String = String.Join(",", columnDefinition)
+                Dim columns As List(Of String) = New List(Of String)()
+                mSql = "PRAGMA table_info(" & arColumn.Table.Name & ")"
+                'mSqliteCommand = New SQLiteCommand(mSql, mSqliteDbConnection)
+                lrRecordset = Me.GO(mSql)
+                'Using CSharpImpl.__Assign(mSqliteReader, mSqliteCommand.ExecuteReader())
+
+                While Not lrRecordset.EOF
+                    columns.Add(lrRecordset("name").Data)
+                    lrRecordset.MoveNext()
+                End While
+                '    End Using
+
+                columns.Remove(arColumn.Name)
+                Dim columnString As String = String.Join(",", columns)
+
+                mSql = "PRAGMA foreign_keys=OFF"
+                '    mSqliteCommand = New SQLiteCommand(mSql, mSqliteDbConnection)
+                Me.GONonQuery(mSql)
+                'Dim n As Integer = mSqliteCommand.ExecuteNonQuery()
+
+                Dim lrSQLiteConnection = Database.CreateConnection(Me.DatabaseConnectionString)
+                Using tr As SQLiteTransaction = lrSQLiteConnection.BeginTransaction()
+
+                    Using cmd As SQLiteCommand = lrSQLiteConnection.CreateCommand()
+                        cmd.Transaction = tr
+                        Dim query As String = "CREATE TEMPORARY TABLE " & arColumn.Table.Name & "_backup " & columnDefinitionString & ")"
+                        cmd.CommandText = query
+                        cmd.ExecuteNonQuery()
+                        cmd.CommandText = "INSERT INTO " & arColumn.Table.Name & "_backup SELECT " & columnString & " FROM " & arColumn.Table.Name
+                        cmd.ExecuteNonQuery()
+                        cmd.CommandText = "DROP TABLE " & arColumn.Table.Name & ""
+                        cmd.ExecuteNonQuery()
+                        cmd.CommandText = "CREATE TABLE " & arColumn.Table.Name & columnDefinitionString & ")"
+                        cmd.ExecuteNonQuery()
+                        cmd.CommandText = "INSERT INTO " & arColumn.Table.Name & " SELECT " & columnString & " FROM " & arColumn.Table.Name & "_backup;"
+                        cmd.ExecuteNonQuery()
+                        cmd.CommandText = "DROP TABLE " & arColumn.Table.Name & "_backup"
+                        cmd.ExecuteNonQuery()
+                    End Using
+
+                    tr.Commit()
+                End Using
+
+                mSql = "PRAGMA foreign_keys=ON"
+                'mSqliteCommand = New SQLiteCommand(mSql, mSqliteDbConnection)
+                'n = mSqliteCommand.ExecuteNonQuery()
+                Me.GONonQuery(mSql)
+
+            Catch ex As Exception
+                Debugger.Break()
+            End Try
+
+        End Sub
 
 
     End Class

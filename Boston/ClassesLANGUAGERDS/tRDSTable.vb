@@ -155,7 +155,13 @@ Namespace RDS
 
         End Sub
 
-        Public Sub addColumn(ByRef arColumn As RDS.Column)
+        ''' <summary>
+        ''' Adds the specified Column to the Table.
+        ''' </summary>
+        ''' <param name="arColumn"></param>
+        ''' <param name="abAddToDatabase">True if the column is to be added to the connected database.</param>
+        Public Sub addColumn(ByRef arColumn As RDS.Column,
+                             Optional abAddToDatabase As Boolean = False)
 
             Try
                 arColumn.OrdinalPosition = Me.Column.Count + 1
@@ -204,6 +210,17 @@ Namespace RDS
                 '------------------------------------------------------------------------------
                 'CMML Code
                 Call Me.Model.Model.createCMMLAttribute(Me.Name, arColumn.Name, arColumn.Role, arColumn)
+
+                '------------------------------------------------------------------------------
+                'Database Synchronisation Code
+                If abAddToDatabase Then
+                    If Me.Column.Count = 1 Then
+                        'Create the Table/Column combination, because can't create the Column without the Table and is first Column in Table.
+                        Call Me.Model.Model.DatabaseConnection.createTable(Me, arColumn)
+                    Else
+                        Call Me.Model.Model.DatabaseConnection.addColumn(arColumn)
+                    End If
+                End If
 
                 RaiseEvent ColumnAdded(arColumn)
 
@@ -909,7 +926,8 @@ Namespace RDS
         ''' </summary>
         ''' <param name="arColumn">The actual Column object to be removed from the Table.</param>
         ''' <remarks></remarks>
-        Public Sub removeColumn(ByRef arColumn As RDS.Column)
+        Public Sub removeColumn(ByRef arColumn As RDS.Column,
+                                Optional abRemoveFromDatabase As Boolean = False)
 
             Try
                 Me.Column.Remove(arColumn)
@@ -925,6 +943,11 @@ Namespace RDS
                 '------------------------------------------------------------------------------
                 'CMML Code
                 Call Me.Model.Model.removeCMMLAttribute(arColumn.Table.Name, arColumn.Id)
+
+                'Database synchronisation
+                If abRemoveFromDatabase Then
+                    Call Me.Model.Model.DatabaseConnection.removeColumn(arColumn)
+                End If
 
             Catch ex As Exception
                 Dim lsMessage1 As String
