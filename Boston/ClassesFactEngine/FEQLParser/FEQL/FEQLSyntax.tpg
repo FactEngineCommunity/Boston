@@ -21,7 +21,7 @@ DOUBLEQUOTE   -> @"""";
 EOF           -> @"^$";
 [Color(135, 207, 243)]	EQUALS -> "=";
 FACTTYPENAME -> @"[aA-zZ]+";
-[Color(227, 143, 247)]  FILELOCATIONNAME	-> @"((?:[^/]*/)*)([aA-zZ\.]*)"; //@"^([aA-zZ]+)\/([^\/]+)$";
+[Color(227, 143, 247)]  FILELOCATIONNAME	-> @"^[a-zA-Z]:\\((?:[^/]*/)*)([aA-zZ\.]*)"; //@"^([aA-zZ]+)\/([^\/]+)$";
 [Color(227, 143, 247)] FOLLOWINGREADINGTEXT -> @"([a-z]+[\s]?)+$";
 [Color(216, 127, 178)]	IDENTIFIER -> @"[aA-zZ0-9 \-]+";
 [Color(216, 127, 178)]	MATHFUNCTION -> @"<=|<|=|>=|>";

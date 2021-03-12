@@ -38,6 +38,16 @@ Namespace FEQL
             End Set
         End Property
 
+        Private _FILELOCATIONNAME As String
+        Public Property FILELOCATIONNAME As String
+            Get
+                Return Me._FILELOCATIONNAME
+            End Get
+            Set(value As String)
+                Me._FILELOCATIONNAME = value
+            End Set
+        End Property
+
     End Class
 
     Public Class EntityTypeIsIdentifiedByItsStatement

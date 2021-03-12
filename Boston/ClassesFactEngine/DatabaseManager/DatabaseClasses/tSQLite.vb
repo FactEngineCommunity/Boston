@@ -1,4 +1,5 @@
 ﻿Imports Boston.ORMQL
+Imports System.Data.SQLite
 
 Namespace FactEngine
 
@@ -12,20 +13,63 @@ Namespace FactEngine
 
         Public Sub New(ByRef arFBMModel As FBM.Model,
                        ByVal asDatabaseConnectionString As String,
-                       ByVal aiDefaultQueryLimit As Integer)
+                       ByVal aiDefaultQueryLimit As Integer,
+                       Optional ByVal abCreatingNewDatabase As Boolean = False)
 
             Me.FBMModel = arFBMModel
             Me.DatabaseConnectionString = asDatabaseConnectionString
             Me.DefaultQueryLimit = aiDefaultQueryLimit
 
+            If abCreatingNewDatabase Then Exit Sub
+
             Try
-                Dim lrSQLiteConnection = Database.CreateConnection(Me.DatabaseConnectionString)
+                Dim lrSQLiteConnection = Boston.Database.CreateConnection(Me.DatabaseConnectionString)
                 Me.Connected = True 'Connections are actually made for each Query.
                 lrSQLiteConnection.Close()
             Catch ex As Exception
                 Me.Connected = False
                 Throw New Exception("Could not connect to the database. Check the Model Configuration's Connection String.")
             End Try
+
+        End Sub
+
+        Public Overrides Function createDatabase(ByVal asDatabaseLocationName As String) As ORMQL.Recordset
+
+            Dim lrRecordset As New ORMQL.Recordset
+
+            Try
+                Call System.Data.SQLite.SQLiteConnection.CreateFile(asDatabaseLocationName)
+
+                Return lrRecordset
+
+            Catch ex As Exception
+                lrRecordset.ErrorString = ex.Message
+                Return lrRecordset
+            End Try
+
+        End Function
+
+        ''' Creates a new table in the database. Relational tablles must have at least one one column.
+        ''' <summary>
+        ''' <param name="arTable">The table to be created.</param>
+        ''' <param name="arColumn">The column to be created for the new table.</param>
+        ''' </summary>
+        Public Overrides Sub createTable(ByRef arTable As RDS.Table, ByRef arColumn As RDS.Column)
+
+            Dim lsSQLCommand As String
+
+            Try
+                lsSQLCommand = "CREATE TABLE " & arTable.Name
+                lsSQLCommand &= "("
+                lsSQLCommand &= arColumn.Name & " " & arColumn.DataTypeName
+                lsSQLCommand &= ")"
+
+                Me.GONonQuery(lsSQLCommand)
+
+            Catch ex As Exception
+
+            End Try
+
 
         End Sub
 

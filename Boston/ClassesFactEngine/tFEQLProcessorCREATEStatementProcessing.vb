@@ -10,7 +10,11 @@ Namespace FEQL
 
                 Call Me.GetParseTreeTokensReflection(lrCREATESDATABASEtatement, Me.Parsetree.Nodes(0))
 
-                Call prApplication.createDatabase(lrCREATESDATABASEtatement)
+                Dim lrModel = prApplication.createDatabase(lrCREATESDATABASEtatement)
+
+                'Create the actual database. SQLite only at this stage.
+                Me.DatabaseManager.Connection = New FactEngine.SQLiteConnection(lrModel, lrCREATESDATABASEtatement.FILELOCATIONNAME, 100, True)
+                Call Me.DatabaseManager.Connection.createDatabase(lrCREATESDATABASEtatement.FILELOCATIONNAME)
 
             Catch ex As Exception
                 Dim lsMessage As String
