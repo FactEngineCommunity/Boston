@@ -246,6 +246,12 @@ Namespace FBM
         <NonSerialized()>
         Public DatabaseConnection As FactEngine.DatabaseConnection = Nothing
 
+        ''' <summary>
+        ''' True if modifying the model modifies the database schema of the connected database.
+        ''' </summary>
+        <XmlAttribute>
+        Public IsDatabaseSynchronised As Boolean = False
+
 
         '------------------------------------------------------
         'The Parser and ParseTree are built into the Model
@@ -737,7 +743,7 @@ Namespace FBM
                                             lrNewColumn.IsMandatory = True
                                             '20200719-VM-ToDo lrColumn.Index Index for the PrimaryKey
                                             '20200719-VM-ToDo lrColumn.Relation Relation for any Column in the PK that has a Relation
-                                            Call lrTable.addColumn(lrNewColumn)
+                                            Call lrTable.addColumn(lrNewColumn, Me.IsDatabaseSynchronised)
 
                                             larIndexColumn.Add(lrNewColumn)
                                         Next
@@ -805,7 +811,7 @@ Namespace FBM
                                             lrColumn.IsMandatory = True
                                         End If
 
-                                        lrTable.addColumn(lrColumn)
+                                        lrTable.addColumn(lrColumn, Me.IsDatabaseSynchronised)
                                     End If
 
                                     'Relation
@@ -904,7 +910,7 @@ Namespace FBM
                                                                       lrRoleConstraintRole,
                                                                       lrActiveRole,
                                                                       lrRoleConstraintRole.Mandatory)
-                                    lrTable.addColumn(lrNewColumn)
+                                    lrTable.addColumn(lrNewColumn, Me.IsDatabaseSynchronised)
                                 Next
 
                                 'Relation
@@ -1005,7 +1011,7 @@ Namespace FBM
                                                 If arRoleConstraint.Role.Contains(lrRole) Then
                                                     lrColumn.IsMandatory = True
                                                 End If
-                                                lrTable.addColumn(lrColumn)
+                                                lrTable.addColumn(lrColumn, Me.IsDatabaseSynchronised)
                                             End If
 
                                         Case Is = pcenumConceptType.EntityType
@@ -1026,7 +1032,7 @@ Namespace FBM
                                                                 lrColumn.ContributesToPrimaryKey = True
                                                             End If
                                                         End If
-                                                        lrTable.addColumn(lrColumn)
+                                                        lrTable.addColumn(lrColumn, Me.IsDatabaseSynchronised)
                                                     Next
                                                 Else
                                                     lrColumn = lrRole.GetCorrespondingFactTypeColumn(lrTable)
@@ -1036,7 +1042,7 @@ Namespace FBM
                                                             lrColumn.ContributesToPrimaryKey = True
                                                         End If
                                                     End If
-                                                    lrTable.addColumn(lrColumn)
+                                                    lrTable.addColumn(lrColumn, Me.IsDatabaseSynchronised)
                                                 End If
 
                                             End If
@@ -1058,7 +1064,7 @@ Namespace FBM
                                                             lrColumn.ContributesToPrimaryKey = True
                                                         End If
                                                     End If
-                                                    lrTable.addColumn(lrColumn)
+                                                    lrTable.addColumn(lrColumn, Me.IsDatabaseSynchronised)
                                                 End If
                                             Next
                                     End Select
@@ -1169,7 +1175,7 @@ Namespace FBM
                                             'There is no Column in the Table for the Role.
                                             lrColumn.Name = lrTable.createUniqueColumnName(lrColumn, lrColumn.Name, 0)
                                             lrColumn.IsMandatory = lrRole.Mandatory
-                                            lrTable.addColumn(lrColumn)
+                                            lrTable.addColumn(lrColumn, Me.IsDatabaseSynchronised)
                                         Next
 
                                     Case Is = pcenumConceptType.EntityType
@@ -1192,7 +1198,7 @@ Namespace FBM
 
                                             For Each lrColumn In larColumn
                                                 lrColumn.IsMandatory = lrRole.Mandatory
-                                                lrTable.addColumn(lrColumn)
+                                                lrTable.addColumn(lrColumn, Me.IsDatabaseSynchronised)
                                             Next
                                         End If
 
@@ -3008,7 +3014,7 @@ Namespace FBM
                                     larColumn = lrTable.Column.FindAll(Function(x) x.Role.Id = lrRole.Id)
 
                                     For Each lrColumn In larColumn.ToList
-                                        Call lrTable.removeColumn(lrColumn)
+                                        Call lrTable.removeColumn(lrColumn, Me.IsDatabaseSynchronised)
 
                                         Dim larRelation = lrTable.getOutgoingRelations.FindAll(Function(x) x.OriginColumns.Contains(lrColumn)) 'Origin
                                         larRelation.AddRange(lrTable.getOutgoingRelations.FindAll(Function(x) x.ReverseDestinationColumns.Contains(lrColumn)))
@@ -3090,7 +3096,7 @@ Namespace FBM
 
                                 For Each lrRole In arRoleConstraint.RoleConstraintRole(0).Role.FactType.RoleGroup
                                     lrColumn = lrTable.Column.Find(Function(x) x.Role.Id = lrRole.Id)
-                                    Call lrTable.removeColumn(lrColumn)
+                                    Call lrTable.removeColumn(lrColumn, Me.IsDatabaseSynchronised)
                                 Next
 
                                 Dim larIncomingRelations As New List(Of RDS.Relation)
@@ -3119,7 +3125,7 @@ Namespace FBM
                                                 Select Column
 
                                 For Each lrColumn In larColumn.ToList
-                                    Call lrColumn.Table.removeColumn(lrColumn)
+                                    Call lrColumn.Table.removeColumn(lrColumn, Me.IsDatabaseSynchronised)
                                 Next
 
                                 'Relations: Already removed within FactType.RemoveInternalUniquenessConstraint.

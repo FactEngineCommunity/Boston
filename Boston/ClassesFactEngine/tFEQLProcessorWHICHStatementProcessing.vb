@@ -213,6 +213,8 @@
             'E.g. "WHICH is in (Factulty:'IT') "
             arQueryEdge.WhichClauseType = FactEngine.Constants.pcenumWhichClauseType.WhichPredicateNodePropertyIdentification
 
+            If arWHICHCLAUSE.KEYWDWHICH IsNot Nothing Then arQueryEdge.IsProjectColumn = True
+
             If arPreviousTargetNode Is Nothing Then
                 arQueryEdge.BaseNode = arQueryGraph.HeadNode
             Else

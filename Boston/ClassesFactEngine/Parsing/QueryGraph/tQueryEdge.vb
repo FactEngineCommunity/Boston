@@ -111,6 +111,7 @@ Namespace FactEngine
                     larRole.Add(New FBM.Role(lrDummyFactType, larModelObject(1)))
 
                     Dim lrFactTypeReading As New FBM.FactTypeReading(lrDummyFactType, larRole, lasPredicatePart)
+                    lrFactTypeReading.PredicatePart(1).PreBoundText = arTargetNode.PreboundText
 
                     Select Case Me.BaseNode.FBMModelObject.GetType
                         Case Is = GetType(FBM.FactType)
@@ -240,6 +241,7 @@ Namespace FactEngine
                     End If
 
                     Dim lrFactTypeReading As New FBM.FactTypeReading(lrDummyFactType, larRole, lasPredicatePart)
+                    lrFactTypeReading.PredicatePart(1).PreBoundText = arTargetNode.PreboundText
 
                     '---------------------------------------------------------------------------------------------
                     'Get the FactType

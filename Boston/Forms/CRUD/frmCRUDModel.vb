@@ -51,6 +51,7 @@ Public Class frmCRUDModel
 
             Me.zrModel.TargetDatabaseType = Me.ComboBoxDatabaseType.SelectedItem.Tag
             Me.zrModel.TargetDatabaseConnectionString = Trim(Me.TextBoxDatabaseConnectionString.Text)
+            Me.zrModel.IsDatabaseSynchronised = Me.CheckBoxIsDatabaseSynchronised.Checked
 
             Me.zrModel.Save()
 

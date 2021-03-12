@@ -329,12 +329,12 @@ Public Class tApplication
 
     End Sub
 
-    Public Sub createDatabase(ByVal arCreateDatabaseStatement As FEQL.CREATEDATABASEStatement)
+    Public Function createDatabase(ByVal arCreateDatabaseStatement As FEQL.CREATEDATABASEStatement) As FBM.Model
 
         Try
             If frmMain.zfrmModelExplorer IsNot Nothing Then
 
-                Call frmMain.zfrmModelExplorer.addNewModelToBoston(arCreateDatabaseStatement.DATABASENAME, arCreateDatabaseStatement)
+                Return frmMain.zfrmModelExplorer.addNewModelToBoston(arCreateDatabaseStatement.DATABASENAME, arCreateDatabaseStatement)
             Else
                 MsgBox("Please check that the Model Explorer view is open before adding a new model to Boston.")
             End If
@@ -348,7 +348,7 @@ Public Class tApplication
             prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
-    End Sub
+    End Function
 
     ''' <summary>
     ''' Gets a Model from the list of Models loaded into the application (in this class), else returns Nothing

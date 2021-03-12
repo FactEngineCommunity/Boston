@@ -1540,8 +1540,8 @@ Public Class frmToolboxEnterpriseExplorer
 
     End Sub
 
-    Public Sub addNewModelToBoston(Optional ByVal asModelName As String = Nothing,
-                                   Optional arCreateDatabaseStatement As FEQL.CREATEDATABASEStatement = Nothing)
+    Public Function addNewModelToBoston(Optional ByVal asModelName As String = Nothing,
+                                        Optional arCreateDatabaseStatement As FEQL.CREATEDATABASEStatement = Nothing) As FBM.Model
 
         Try
             With New WaitCursor
@@ -1557,7 +1557,7 @@ Public Class frmToolboxEnterpriseExplorer
                 '---------------------------------------------------------------------
                 'Abort if a Model is not created.
                 'e.g. The Student version only allows 3 Modelsin the Model Explorer.
-                If lrModel Is Nothing Then Exit Sub
+                If lrModel Is Nothing Then Exit Function
 
                 '==================================================
                 'RDS - Create a CMML Page and then dispose of it.            
@@ -1613,6 +1613,8 @@ Public Class frmToolboxEnterpriseExplorer
 
                 Call Me.TreeView.Nodes(0).Expand()
 
+                Return lrModel
+
             End With 'WaitCursor
 
         Catch ex As Exception
@@ -1622,10 +1624,12 @@ Public Class frmToolboxEnterpriseExplorer
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
             prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+
+            Return Nothing
         End Try
 
 
-    End Sub
+    End Function
 
     Public Function AddNewModel(ByRef arCreatedTreeNode As TreeNode,
                                 Optional abAddCoreElements As Boolean = True,
