@@ -111,13 +111,13 @@ Namespace FEQL
             End Set
         End Property
 
-        Private _NODEPROPERTYIDENTIFICATION As NODEPROPERTYIDENTIFICATION
-        Public Property NODEPROPERTYIDENTIFICATION As NODEPROPERTYIDENTIFICATION
+        Private _NODE As FEQL.NODE 'PROPERTYIDENTIFICATION As NODEPROPERTYIDENTIFICATION
+        Public Property NODE As FEQL.NODE 'PROPERTYIDENTIFICATION As NODEPROPERTYIDENTIFICATION
             Get
-                Return Me._NODEPROPERTYIDENTIFICATION
+                Return Me._NODE 'PROPERTYIDENTIFICATION
             End Get
-            Set(value As NODEPROPERTYIDENTIFICATION)
-                Me._NODEPROPERTYIDENTIFICATION = value
+            Set(value As NODE) 'PROPERTYIDENTIFICATION)
+                Me._NODE = value 'PROPERTYIDENTIFICATION = value
             End Set
         End Property
 
@@ -1077,7 +1077,7 @@ Namespace FEQL
                         Case Is = "DELETEFACTSTMT"
                             '20200727-VM-Just here as an example.
                             'Return Me.ProcessDELETEFACTSTMTStatement
-
+                            Return Nothing
                         Case Else
                             Dim lrRecordset As New ORMQL.Recordset
                             lrRecordset.ErrorString = "Unknown Query/Command"

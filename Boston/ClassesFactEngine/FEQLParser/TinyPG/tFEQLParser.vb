@@ -9335,7 +9335,7 @@ Namespace FEQL
             End If
 
              ' Concat Rule
-            ParseNODEPROPERTYIDENTIFICATION(node) ' NonTerminal Rule: NODEPROPERTYIDENTIFICATION
+            ParseNODE(node) ' NonTerminal Rule: NODE
             If m_tree.Errors.Count > 0 Then
                         parent.Token.UpdateRange(node.Token)
                         Exit Sub

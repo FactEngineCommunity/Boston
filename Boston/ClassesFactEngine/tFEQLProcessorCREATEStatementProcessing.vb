@@ -81,7 +81,7 @@ Namespace FEQL
                     lrQueryEdge = New FactEngine.QueryEdge(lrQueryGraph, Nothing)
 
                     Dim lrBaseFBMModelObject = Me.Model.GetModelObjectByName(lrInsertTable.Name)
-                    Dim lrTargetFBMModelObject = Me.Model.GetModelObjectByName(lrPredicateNodePropertyIndentification.NODEPROPERTYIDENTIFICATION.MODELELEMENTNAME)
+                    Dim lrTargetFBMModelObject = Me.Model.GetModelObjectByName(lrPredicateNodePropertyIndentification.NODE.MODELELEMENTNAME) 'PROPERTYIDENTIFICATION.MODELELEMENTNAME)
                     lrQueryEdge.BaseNode = New FactEngine.QueryNode(lrBaseFBMModelObject, lrQueryEdge)
                     lrQueryEdge.TargetNode = New FactEngine.QueryNode(lrTargetFBMModelObject, lrQueryEdge)
 
@@ -118,8 +118,8 @@ Namespace FEQL
                                 lsSQLQuery &= " WHERE "
 
                                 'CodeSafe
-                                If larUniqueIndexColumn.Count <> lrPredicateNodePropertyIndentification.NODEPROPERTYIDENTIFICATION.IDENTIFIER.Count Then
-                                    Throw New Exception("The primary unique index for model element, '" & lrTargetTable.Name & "', has " & larUniqueIndexColumn.Count.ToString & " columns, rather than the " & lrPredicateNodePropertyIndentification.NODEPROPERTYIDENTIFICATION.IDENTIFIER.Count.ToString & " for which values are provided.")
+                                If larUniqueIndexColumn.Count <> lrPredicateNodePropertyIndentification.NODE.NODEPROPERTYIDENTIFICATION.IDENTIFIER.Count Then
+                                    Throw New Exception("The primary unique index for model element, '" & lrTargetTable.Name & "', has " & larUniqueIndexColumn.Count.ToString & " columns, rather than the " & lrPredicateNodePropertyIndentification.NODE.NODEPROPERTYIDENTIFICATION.IDENTIFIER.Count.ToString & " for which values are provided.")
                                 End If
 
                                 Dim lsSelectValues = ""
@@ -129,7 +129,7 @@ Namespace FEQL
                                     lsSQLQuery &= lrUniqueIndexColumn.Name & " = "
                                     Dim lsSelectValue = ""
                                     If lrUniqueIndexColumn.DataTypeIsText Then lsSelectValue &= "'"
-                                    lsSelectValue &= lrPredicateNodePropertyIndentification.NODEPROPERTYIDENTIFICATION.IDENTIFIER(liInd)
+                                    lsSelectValue &= lrPredicateNodePropertyIndentification.NODE.NODEPROPERTYIDENTIFICATION.IDENTIFIER(liInd)
                                     If lrUniqueIndexColumn.DataTypeIsText Then lsSelectValue &= "'"
                                     If liInd > 0 Then lsSelectValue &= ", "
                                     lsSelectValues &= lsSelectValue
@@ -151,7 +151,7 @@ Namespace FEQL
                                 Next
                             Case GetType(FBM.ValueType)
                                 lrInsertColumn = lrTable.Column.Find(Function(x) x.FactType Is lrQueryEdge.FBMFactType).Clone(Nothing, Nothing)
-                                lrInsertColumn.TemporaryData = lrPredicateNodePropertyIndentification.NODEPROPERTYIDENTIFICATION.IDENTIFIER(0)
+                                lrInsertColumn.TemporaryData = lrPredicateNodePropertyIndentification.NODE.NODEPROPERTYIDENTIFICATION.IDENTIFIER(0)
                                 larInsertColumn.Add(lrInsertColumn)
                         End Select
                     End If
