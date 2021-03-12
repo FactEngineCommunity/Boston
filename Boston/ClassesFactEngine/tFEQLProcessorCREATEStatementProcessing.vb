@@ -68,7 +68,8 @@ Namespace FEQL
 
                         larInsertColumn.Add(lrInsertColumn)
                     Else
-                        Dim lrInsertColumn As New RDS.Column(lrInsertTable, lrPKColumn.Name, Nothing, Nothing)
+                        'Dim lrInsertColumn As New RDS.Column(lrInsertTable, lrPKColumn.Name, Nothing, Nothing)
+                        Dim lrInsertColumn = lrPKColumn.Clone(Nothing, Nothing)
                         lrInsertColumn.TemporaryData = Me.CREATEStatement.NODEPROPERTYIDENTIFICATION(0).IDENTIFIER(0)
                         larInsertColumn.Add(lrInsertColumn)
                     End If
@@ -78,7 +79,8 @@ Namespace FEQL
                     End If
                     liInd = 0
                     For Each lrPKColumn In lrTable.getPrimaryKeyColumns
-                        Dim lrInsertColumn As New RDS.Column(lrInsertTable, lrPKColumn.Name, Nothing, Nothing)
+                        'Dim lrInsertColumn As New RDS.Column(lrInsertTable, lrPKColumn.Name, Nothing, Nothing)
+                        Dim lrInsertColumn = lrPKColumn.Clone(Nothing, Nothing)
                         lrInsertColumn.TemporaryData = Me.CREATEStatement.NODEPROPERTYIDENTIFICATION(0).IDENTIFIER(liInd)
                         larInsertColumn.Add(lrInsertColumn)
                         liInd += 1
@@ -97,6 +99,7 @@ Namespace FEQL
                     Dim lrTargetFBMModelObject = Me.Model.GetModelObjectByName(lrPredicateNodePropertyIndentification.NODE.MODELELEMENTNAME) 'PROPERTYIDENTIFICATION.MODELELEMENTNAME)
                     lrQueryEdge.BaseNode = New FactEngine.QueryNode(lrBaseFBMModelObject, lrQueryEdge)
                     lrQueryEdge.TargetNode = New FactEngine.QueryNode(lrTargetFBMModelObject, lrQueryEdge)
+                    lrQueryEdge.TargetNode.PreboundText = lrPredicateNodePropertyIndentification.NODE.PREBOUNDREADINGTEXT
 
                     '---------------------------------------------------------
                     'Get the Predicate. Every which clause has a Predicate.
