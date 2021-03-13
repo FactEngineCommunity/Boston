@@ -646,12 +646,12 @@ Namespace FEQL
 
     Public Class NODEPROPERTYNAMEIDENTIFICATION
 
-        Private _MODELELEMENTNAME As String
-        Public Property MODELELEMENTNAME As String
+        Private _MODELELEMENTNAME As New List(Of String)
+        Public Property MODELELEMENTNAME As List(Of String)
             Get
                 Return Me._MODELELEMENTNAME
             End Get
-            Set(value As String)
+            Set(value As List(Of String))
                 Me._MODELELEMENTNAME = value
             End Set
         End Property
@@ -1105,7 +1105,7 @@ Namespace FEQL
                 'Parse the ORMQR statement
                 '---------------------------
                 SyncLock Me.Parsetree
-                    Me.Parsetree = Me.Parser.Parse(asFEQLStatement)
+                    Me.Parsetree = Me.Parser.Parse(Trim(asFEQLStatement))
 
                     If Me.ParseTreeContainsTokenType(Me.Parsetree, FEQL.TokenType.VALUETYPEISWRITTENASSTMT) Then ' VALUETYPEISWRITTENASCLAUSE
                         aoTokenType = FEQL.TokenType.VALUETYPEISWRITTENASSTMT

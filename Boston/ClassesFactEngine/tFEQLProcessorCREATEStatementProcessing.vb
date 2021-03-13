@@ -62,7 +62,7 @@ Namespace FEQL
                 Call Me.GetParseTreeTokensReflection(Me.CREATEStatement, Me.Parsetree.Nodes(0))
 
                 'Get primary Table
-                Dim lrTable = Me.Model.RDS.Table.Find(Function(x) x.Name = Me.CREATEStatement.NODEPROPERTYNAMEIDENTIFICATION.MODELELEMENTNAME)
+                Dim lrTable = Me.Model.RDS.Table.Find(Function(x) x.Name = Me.CREATEStatement.NODEPROPERTYNAMEIDENTIFICATION.MODELELEMENTNAME(0))
                 lrInsertTable.Name = lrTable.Name
 
                 If lrTable.getPrimaryKeyColumns.Count = 1 Then
@@ -94,7 +94,18 @@ Namespace FEQL
                     For Each lrPKColumn In lrTable.getPrimaryKeyColumns
                         'Dim lrInsertColumn As New RDS.Column(lrInsertTable, lrPKColumn.Name, Nothing, Nothing)
                         Dim lrInsertColumn = lrPKColumn.Clone(Nothing, Nothing)
-                        lrInsertColumn.TemporaryData = Me.CREATEStatement.NODEPROPERTYNAMEIDENTIFICATION.IDENTIFIER(liInd)
+
+                        If Me.CREATEStatement.NODEPROPERTYNAMEIDENTIFICATION.QUOTEDPROPERTYIDENTIFIERLIST IsNot Nothing Then
+                            Dim liInd2 = Me.CREATEStatement.NODEPROPERTYNAMEIDENTIFICATION.MODELELEMENTNAME.IndexOf(lrInsertColumn.Name)
+
+                            If liInd2 < 0 Then
+                                Throw New Exception("Cannot find property, " & lrInsertColumn.Name & ", in your statement. Required for Primmary Key of the Object Type, " & lrTable.Name)
+                            End If
+
+                            lrInsertColumn.TemporaryData = Me.CREATEStatement.NODEPROPERTYNAMEIDENTIFICATION.IDENTIFIER(liInd2 - 1)
+                        Else
+                            lrInsertColumn.TemporaryData = Me.CREATEStatement.NODEPROPERTYNAMEIDENTIFICATION.IDENTIFIER(liInd)
+                        End If
                         larInsertColumn.Add(lrInsertColumn)
                         liInd += 1
                     Next
