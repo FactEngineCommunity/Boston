@@ -46,6 +46,15 @@ Namespace FEQL
                 Dim lsInsertStatement As String = ""
                 Dim liInd As Integer
 
+                If Me.DatabaseManager.Connection Is Nothing Then
+                    'Try and establish a connection
+                    Call Me.DatabaseManager.establishConnection(prApplication.WorkingModel.TargetDatabaseType, prApplication.WorkingModel.TargetDatabaseConnectionString)
+                    If Me.DatabaseManager.Connection Is Nothing Then
+                        Throw New Exception("No database connection has been established.")
+                    End If
+                ElseIf Me.DatabaseManager.Connection.Connected = False Then
+                    Throw New Exception("The database is not connected.")
+                End If
 
                 'Richmond.WriteToStatusBar("Processsing WHICH Statement.", True)
                 Me.CREATEStatement = New FEQL.CREATEStatement
@@ -173,6 +182,12 @@ Namespace FEQL
                     End If
                 Next
 
+                'Mandatory Column check
+                For Each lrColumn In lrTable.Column.FindAll(Function(x) x.IsMandatory)
+                    If larInsertColumn.Find(Function(x) x.Name = lrColumn.Name) Is Nothing Then
+                        Throw New Exception("The Object Type, " & lrTable.Name & ", requires that " & lrColumn.Name & " is polulated.")
+                    End If
+                Next
 
                 'Create the INSERT Statement
                 lsInsertStatement = "INSERT INTO " & lrInsertTable.Name
@@ -195,10 +210,10 @@ Namespace FEQL
                 Next
                 lsInsertStatement &= vbCrLf & ")"
 
-                Return Me.DatabaseManager.Connection.GONonQuery(lsInsertStatement)
+                Call Me.DatabaseManager.Connection.GONonQuery(lsInsertStatement)
 
-                'lrRecordset.ErrorString = lsInsertStatement
-                'Return lrRecordset
+                lrRecordset.ErrorString = "1 row inserted"
+                Return lrRecordset
 
             Catch ex As Exception
                 If ex.InnerException Is Nothing Then
