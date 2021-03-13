@@ -301,17 +301,26 @@ Namespace FEQL
                 Case TokenType.NODEPROPERTYIDENTIFICATION
                     Value = EvalNODEPROPERTYIDENTIFICATION(tree, paramlist)
                     Exit Select
+                Case TokenType.NODEPROPERTYNAMEIDENTIFICATION
+                    Value = EvalNODEPROPERTYNAMEIDENTIFICATION(tree, paramlist)
+                    Exit Select
                 Case TokenType.NODEIDENTIFICATION
                     Value = EvalNODEIDENTIFICATION(tree, paramlist)
                     Exit Select
                 Case TokenType.PREDICATECLAUSE
                     Value = EvalPREDICATECLAUSE(tree, paramlist)
                     Exit Select
+                Case TokenType.PROPERTYIDENTIFIER
+                    Value = EvalPROPERTYIDENTIFIER(tree, paramlist)
+                    Exit Select
                 Case TokenType.QUOTEDIDENTIFIER
                     Value = EvalQUOTEDIDENTIFIER(tree, paramlist)
                     Exit Select
                 Case TokenType.QUOTEDIDENTIFIERLIST
                     Value = EvalQUOTEDIDENTIFIERLIST(tree, paramlist)
+                    Exit Select
+                Case TokenType.QUOTEDPROPERTYIDENTIFIERLIST
+                    Value = EvalQUOTEDPROPERTYIDENTIFIERLIST(tree, paramlist)
                     Exit Select
                 Case TokenType.REFERENCEMODECLAUSE
                     Value = EvalREFERENCEMODECLAUSE(tree, paramlist)
@@ -686,6 +695,10 @@ Namespace FEQL
             Throw New NotImplementedException()
         End Function
 
+        Protected Overridable Function EvalNODEPROPERTYNAMEIDENTIFICATION(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
         Protected Overridable Function EvalNODEIDENTIFICATION(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
             Throw New NotImplementedException()
         End Function
@@ -694,11 +707,19 @@ Namespace FEQL
             Throw New NotImplementedException()
         End Function
 
+        Protected Overridable Function EvalPROPERTYIDENTIFIER(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
         Protected Overridable Function EvalQUOTEDIDENTIFIER(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
             Throw New NotImplementedException()
         End Function
 
         Protected Overridable Function EvalQUOTEDIDENTIFIERLIST(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalQUOTEDPROPERTYIDENTIFIERLIST(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
             Throw New NotImplementedException()
         End Function
 

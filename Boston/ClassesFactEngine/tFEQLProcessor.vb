@@ -4,13 +4,13 @@ Namespace FEQL
 
     Public Class CREATEStatement
 
-        Private _NODEPROPERTYIDENTIFICATION As New List(Of FEQL.NODEPROPERTYIDENTIFICATION)
-        Public Property NODEPROPERTYIDENTIFICATION As List(Of FEQL.NODEPROPERTYIDENTIFICATION)
+        Private _NODEPROPERTYNAMEIDENTIFICATION As FEQL.NODEPROPERTYNAMEIDENTIFICATION
+        Public Property NODEPROPERTYNAMEIDENTIFICATION As FEQL.NODEPROPERTYNAMEIDENTIFICATION
             Get
-                Return Me._NODEPROPERTYIDENTIFICATION
+                Return Me._NODEPROPERTYNAMEIDENTIFICATION
             End Get
-            Set(value As List(Of FEQL.NODEPROPERTYIDENTIFICATION))
-                Me._NODEPROPERTYIDENTIFICATION = value
+            Set(value As FEQL.NODEPROPERTYNAMEIDENTIFICATION)
+                Me._NODEPROPERTYNAMEIDENTIFICATION = value
             End Set
         End Property
 
@@ -621,6 +621,98 @@ Namespace FEQL
                 Me._MODELELEMENT = value
             End Set
         End Property
+
+        Private _MODELELEMENTNAME As String
+        Public Property MODELELEMENTNAME As String
+            Get
+                Return Me._MODELELEMENTNAME
+            End Get
+            Set(value As String)
+                Me._MODELELEMENTNAME = value
+            End Set
+        End Property
+
+        Private _IDENTIFIER As New List(Of String)
+        Public Property IDENTIFIER As List(Of String)
+            Get
+                Return Me._IDENTIFIER
+            End Get
+            Set(value As List(Of String))
+                Me._IDENTIFIER = value
+            End Set
+        End Property
+
+    End Class
+
+    Public Class NODEPROPERTYNAMEIDENTIFICATION
+
+        Private _MODELELEMENTNAME As String
+        Public Property MODELELEMENTNAME As String
+            Get
+                Return Me._MODELELEMENTNAME
+            End Get
+            Set(value As String)
+                Me._MODELELEMENTNAME = value
+            End Set
+        End Property
+
+        Private _QUOTEDPROPERTYIDENTIFIERLIST
+        Public Property QUOTEDPROPERTYIDENTIFIERLIST As FEQL.QuotedPropertyIdentifierList
+            Get
+                Return Me._QUOTEDPROPERTYIDENTIFIERLIST
+            End Get
+            Set(value As FEQL.QuotedPropertyIdentifierList)
+                Me._QUOTEDPROPERTYIDENTIFIERLIST = value
+            End Set
+        End Property
+
+        Private _QUOTEDIDENTIFIERLIST
+        Public Property QUOTEDIDENTIFIERLIST As FEQL.QuotedIdentifierList
+            Get
+                Return Me._QUOTEDIDENTIFIERLIST
+            End Get
+            Set(value As FEQL.QuotedIdentifierList)
+                Me._QUOTEDIDENTIFIERLIST = value
+            End Set
+        End Property
+
+        Private _IDENTIFIER As New List(Of String)
+        Public Property IDENTIFIER As List(Of String)
+            Get
+                Return Me._IDENTIFIER
+            End Get
+            Set(value As List(Of String))
+                Me._IDENTIFIER = value
+            End Set
+        End Property
+
+    End Class
+
+    Public Class QuotedIdentifierList
+
+        Private _COLON As String
+        Public Property COLON As String
+            Get
+                Return Me._COLON
+            End Get
+            Set(value As String)
+                Me._COLON = value
+            End Set
+        End Property
+
+        Private _IDENTIFIER As New List(Of String)
+        Public Property IDENTIFIER As List(Of String)
+            Get
+                Return Me._IDENTIFIER
+            End Get
+            Set(value As List(Of String))
+                Me._IDENTIFIER = value
+            End Set
+        End Property
+
+    End Class
+
+    Public Class QuotedPropertyIdentifierList
 
         Private _MODELELEMENTNAME As String
         Public Property MODELELEMENTNAME As String
