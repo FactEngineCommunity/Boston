@@ -871,6 +871,7 @@ Namespace FEQL
 
         Public Sub New(ByRef arModel As FBM.Model)
             Me.Model = arModel
+            Me.DatabaseManager.FBMModel = arModel
         End Sub
 
         Public Sub GetParseTreeTokensReflection(ByRef ao_object As Object, ByRef aoParseTreeNode As FEQL.ParseNode)
