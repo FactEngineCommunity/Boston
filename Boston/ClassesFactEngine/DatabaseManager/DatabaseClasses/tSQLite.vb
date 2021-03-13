@@ -318,6 +318,25 @@ Namespace FactEngine
 
         End Sub
 
+        ''' <summary>
+        ''' Renames the given Column to the new column name.
+        ''' </summary>
+        ''' <param name="arColumn"></param>
+        ''' <param name="asNewColumnName"></param>
+        Public Overrides Sub renameColumn(ByRef arColumn As RDS.Column, ByVal asNewColumnName As String)
+
+            Try
+                Dim lsSQLCommmand = "ALTER TABLE " & arColumn.Table.Name
+                lsSQLCommmand &= " RENAME COLUMN " & arColumn.Name & " TO " & asNewColumnName
+
+                Me.GONonQuery(lsSQLCommmand)
+
+            Catch ex As Exception
+                Debugger.Break()
+            End Try
+
+        End Sub
+
 
     End Class
 

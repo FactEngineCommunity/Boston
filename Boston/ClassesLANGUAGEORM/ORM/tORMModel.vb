@@ -242,6 +242,8 @@ Namespace FBM
         <XmlIgnore()>
         Public TargetDatabaseConnectionString As String = "" 'The ConnectionString used to connect to the Target Database.
 
+        Public DatabaseManager As FactEngine.DatabaseManager = New FactEngine.DatabaseManager(Me)
+
         <XmlIgnore()>
         <NonSerialized()>
         Public DatabaseConnection As FactEngine.DatabaseConnection = Nothing

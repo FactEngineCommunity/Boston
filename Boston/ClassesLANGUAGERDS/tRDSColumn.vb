@@ -591,12 +591,38 @@ Namespace RDS
 
         Public Sub setName(ByVal asNewName As String)
 
-            Me.Name = asNewName
+            Try
+                'For database modification
+                Dim lrTempColumn = Me.Clone(Nothing, Nothing)
+                lrTempColumn.Name = Me.Name
 
-            'CMML
-            Call Me.Model.Model.changeCMMLAttributeName(Me)
+                Me.Name = asNewName
 
-            RaiseEvent NameChanged(asNewName)
+                'CMML
+                Call Me.Model.Model.changeCMMLAttributeName(Me)
+
+                RaiseEvent NameChanged(asNewName)
+
+                If Me.Model.Model.IsDatabaseSynchronised Then
+
+                    If Me.Model.Model.DatabaseConnection Is Nothing Then
+                        'Try and establish a connection
+                        Call Me.Model.Model.DatabaseManager.establishConnection(Me.Model.Model.TargetDatabaseType, Me.Model.Model.TargetDatabaseConnectionString)
+                        If Me.Model.Model.DatabaseConnection Is Nothing Then
+                            Throw New Exception("No database connection has been established.")
+                        End If
+                    ElseIf Me.Model.model.DatabaseConnection.Connected = False Then
+                        Throw New Exception("The database is not connected.")
+                    End If
+
+
+                    Call Me.Model.Model.DatabaseConnection.renameColumn(lrTempColumn, asNewName)
+                End If
+
+            Catch ex As Exception
+                Debugger.Break()
+            End Try
+
 
         End Sub
 

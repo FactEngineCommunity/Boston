@@ -39,6 +39,14 @@
         Public Overridable Sub removeColumn(ByRef arColumn As RDS.Column)
         End Sub
 
+        ''' <summary>
+        ''' Renames the given Column to the new column name.
+        ''' </summary>
+        ''' <param name="arColumn"></param>
+        ''' <param name="asNewColumnName"></param>
+        Public Overridable Sub renameColumn(ByRef arColumn As RDS.Column, ByVal asNewColumnName As String)
+        End Sub
+
     End Class
 
 End Namespace

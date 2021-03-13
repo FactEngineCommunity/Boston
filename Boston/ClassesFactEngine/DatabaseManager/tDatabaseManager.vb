@@ -46,7 +46,8 @@ Namespace FactEngine
 
         End Function
 
-        Public Function establishConnection(ByVal aiDatabaseType As pcenumDatabaseType, ByVal asDatabaseConnectionString As String) As FactEngine.DatabaseConnection
+        Public Function establishConnection(ByVal aiDatabaseType As pcenumDatabaseType,
+                                            ByVal asDatabaseConnectionString As String) As FactEngine.DatabaseConnection
 
             Try
 
@@ -57,9 +58,11 @@ Namespace FactEngine
                         Me.Connection = New FactEngine.MongoDbConnection(Me.FBMModel, asDatabaseConnectionString, My.Settings.FactEngineDefaultQueryResultLimit)
                 End Select
 
+                Me.FBMModel.DatabaseConnection = Me.Connection
+
                 Return Me.Connection
 
-            Catch ex As exception
+            Catch ex As Exception
 
                 Dim lsMessage1 As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
