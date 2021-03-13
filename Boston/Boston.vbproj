@@ -365,6 +365,7 @@
     <Compile Include="ClassesFactEngine\Parsing\QueryGraph\tQueryGraph.vb" />
     <Compile Include="ClassesFactEngine\Parsing\QueryGraph\tQueryNode.vb" />
     <Compile Include="ClassesFactEngine\tFEQLProcessorCREATEStatementProcessing.vb" />
+    <Compile Include="ClassesFactEngine\tFEQLProcessorDatabaseFunctions.vb" />
     <Compile Include="ClassesFactEngine\tFEQLProcessorDerivationProcessing.vb" />
     <Compile Include="ClassesFactEngine\tFEQLProcessorDESCRIBEStatementProcessing.vb" />
     <Compile Include="ClassesFactEngine\tFEQLProcessorENUMERATEStatementProcessing.vb" />

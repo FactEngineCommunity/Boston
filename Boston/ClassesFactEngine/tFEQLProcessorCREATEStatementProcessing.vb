@@ -189,6 +189,47 @@ Namespace FEQL
                     End If
                 Next
 
+                'Data Type check
+                For Each lrColumn In larInsertColumn
+                    Select Case lrColumn.getMetamodelDataType
+                        Case Is = pcenumORMDataType.TextFixedLength
+                            If Len(lrColumn.TemporaryData) > lrColumn.ActiveRole.JoinsValueType.DataTypeLength Then
+                                Throw New Exception("Property, " & lrColumn.Name & ", has a maximum data length of " & lrColumn.ActiveRole.JoinsValueType.DataTypeLength & ".")
+                            End If
+                        Case Is = pcenumORMDataType.NumericFloatSinglePrecision
+                            If Not IsNumeric(lrColumn.TemporaryData) Then
+                                Throw New Exception("Property, " & lrColumn.Name & ", requires a Numeric Single Precision compatible value.")
+                            End If
+                    End Select
+                Next
+
+                'Indexes Check                
+                For Each lrIndex In lrTable.Index
+                    Dim larColumn = larInsertColumn.FindAll(Function(x) lrIndex.Column.Find(Function(y) y.Name = x.Name) IsNot Nothing)
+                    If Me.IndexedValuesExistInDatabase(lrIndex, larColumn) Then
+                        Dim lsMessage = "The values, "
+                        Dim lsColumnNames = ""
+                        liInd = 0
+                        For Each lrColumn In larColumn
+                            If liInd > 0 Then
+                                lsMessage &= ", "
+                                lsColumnNames &= ", "
+                            End If
+                            lsMessage &= lrColumn.TemporaryData
+                            lsColumnNames &= lrColumn.Name
+                            liInd += 1
+                        Next
+                        Throw New Exception(lsMessage & " already uniquely exist for Columns, " & lsColumnNames)
+                    End If
+                Next
+
+                'Value Constraint check
+                For Each lrColumn In larInsertColumn.FindAll(Function(x) x.ActiveRole.JoinsValueType.ValueConstraint.Count > 0)
+                    If Not lrColumn.ActiveRole.JoinsValueType.ValueConstraint.Contains(lrColumn.TemporaryData) Then
+                        Throw New Exception("Value, " & lrColumn.TemporaryData & ", for Property, " & lrColumn.Name & ", is outside the Value Constraints for that Property.")
+                    End If
+                Next
+
                 'Create the INSERT Statement
                 lsInsertStatement = "INSERT INTO " & lrInsertTable.Name
                 lsInsertStatement &= " ("
