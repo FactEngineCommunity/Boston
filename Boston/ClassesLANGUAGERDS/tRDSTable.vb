@@ -869,6 +869,25 @@ Namespace RDS
 
         End Function
 
+        Public Function isConstrainedByRingConstraint(ByRef arRoleConstraint As FBM.RoleConstraint) As Boolean
+
+            Try
+                For Each lrRingConstraint In Me.Model.Model.RoleConstraint.FindAll(Function(x) x.RoleConstraintType = pcenumRoleConstraintType.RingConstraint)
+                    If lrRingConstraint.Role(0).JoinedORMObject Is Me.Column(0).Role.JoinedORMObject Then
+                        arRoleConstraint = lrRingConstraint
+                        Return True
+                    End If
+                Next
+
+                Return False
+
+            Catch ex As Exception
+                Debugger.Break()
+                Return False
+            End Try
+
+        End Function
+
         ''' <summary>
         ''' Used when the User changes a Unique Index (that is not the existing Primary Key) to the Primary Key. Therefore, the existing Primary Key becomes simple a Unique Index (not Primary Key)
         ''' </summary>

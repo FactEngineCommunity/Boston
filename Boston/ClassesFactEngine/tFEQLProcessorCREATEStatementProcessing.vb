@@ -231,6 +231,40 @@ Namespace FEQL
                     End Select
                 Next
 
+                'Ring Constraint check
+                Dim lrRingConstraint As FBM.RoleConstraint = Nothing
+                If lrTable.isConstrainedByRingConstraint(lrRingConstraint) Then
+
+                    Select Case lrRingConstraint.RingConstraintType
+                        Case Is = pcenumRingConstraintType.Asymmetric
+
+                            Dim lsSQLQuery As String = "SELECT *"
+                            lsSQLQuery &= " FROM " & lrTable.Name
+                            lsSQLQuery &= " WHERE "
+
+                            liInd = 0
+                            Dim lrTempRingConstraint As FBM.RoleConstraint = lrRingConstraint.Clone(Me.Model, False, False)
+                            Call lrTempRingConstraint.RoleConstraintRole.Reverse()
+                            For Each lrRole In lrTempRingConstraint.Role
+                                For Each lrColumn In larInsertColumn.FindAll(Function(x) x.Role.Id = lrRole.Id)
+                                    If liInd > 0 Then lsSQLQuery &= " AND "
+                                    lsSQLQuery &= lrColumn.Name & " = "
+                                    If lrColumn.DataTypeIsText Then lsSQLQuery &= "'"
+                                    lsSQLQuery &= lrColumn.TemporaryData
+                                    If lrColumn.DataTypeIsText Then lsSQLQuery &= "'"
+                                Next
+                                liInd += 1
+                            Next
+
+                            Dim lrInterimRecordset = Me.DatabaseManager.Connection.GO(lsSQLQuery)
+
+                            If lrInterimRecordset.Facts.Count > 0 Then
+                                Throw New Exception(lrRingConstraint.RingConstraintType.ToString & " Ring Constraint, " & lrRingConstraint.Id & ", violated. No record inserted.")
+                            End If
+
+                    End Select
+                End If
+
                 'Indexes Check                
                 For Each lrIndex In lrTable.Index
                     Dim larColumn = larInsertColumn.FindAll(Function(x) lrIndex.Column.Find(Function(y) y.Name = x.Name) IsNot Nothing)

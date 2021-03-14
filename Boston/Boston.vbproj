@@ -369,6 +369,7 @@
     <Compile Include="ClassesFactEngine\tFEQLProcessorDerivationProcessing.vb" />
     <Compile Include="ClassesFactEngine\tFEQLProcessorDESCRIBEStatementProcessing.vb" />
     <Compile Include="ClassesFactEngine\tFEQLProcessorENUMERATEStatementProcessing.vb" />
+    <Compile Include="ClassesFactEngine\tFEQLProcessorORMFunctions.vb" />
     <Compile Include="ClassesFactEngine\tFEQLProcessorWHICHStatementProcessing.vb" />
     <Compile Include="ClassesFBMInterfaceHost\tFBMInterfaceHost.vb" />
     <Compile Include="ClassesGeneral\BostonTreeView.vb">

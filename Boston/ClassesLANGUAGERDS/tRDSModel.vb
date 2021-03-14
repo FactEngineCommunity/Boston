@@ -110,7 +110,9 @@ Namespace RDS
             End If
 
             Return asTrialName
+
         End Function
+
         Public Function getColumnsThatReferenceValueType(ByVal arValueType As FBM.ValueType) As List(Of Column)
 
             Try

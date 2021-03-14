@@ -235,7 +235,7 @@
                         Dim larRelation = lrOriginTable.getRelations
 
                         larRelation = larRelation.FindAll(Function(x) (x.DestinationTable.Name = lrQueryEdge.BaseNode.Name) Or
-                                                                       (x.DestinationTable.Name = lrQueryEdge.TargetNode.Name))
+                                                                       (x.DestinationTable.Name = lrQueryEdge.TargetNode.Name)).OrderBy(Function(x) x.OriginColumns(0).OrdinalPosition).ToList
                         Dim liTempInd = 0
                         Dim liRelationCounter = 1
                         For Each lrRelation In larRelation
