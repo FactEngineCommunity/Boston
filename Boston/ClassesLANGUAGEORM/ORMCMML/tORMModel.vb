@@ -227,6 +227,26 @@ Namespace FBM
 
         End Sub
 
+        ''' <summary>
+        ''' Connects to the database if it is not already connected
+        ''' </summary>
+        Public Sub connectToDatabase()
+
+            Try
+                If Me.DatabaseConnection Is Nothing Then
+                    'Try and establish a connection
+                    Call Me.DatabaseManager.establishConnection(Me.TargetDatabaseType, Me.TargetDatabaseConnectionString)
+                    If Me.DatabaseConnection Is Nothing Then
+                        Throw New Exception("No database connection has been established.")
+                    End If
+                ElseIf Me.DatabaseConnection.Connected = False Then
+                    Throw New Exception("The database is not connected.")
+                End If
+            Catch ex As Exception
+                Debugger.Break()
+            End Try
+        End Sub
+
         Public Sub createCMMLAttribute(ByVal asEntityName As String,
                                        ByVal asAttributeName As String,
                                        ByRef arRole As FBM.Role,

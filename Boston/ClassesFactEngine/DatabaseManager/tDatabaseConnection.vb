@@ -47,6 +47,14 @@
         Public Overridable Sub renameColumn(ByRef arColumn As RDS.Column, ByVal asNewColumnName As String)
         End Sub
 
+        ''' <summary>
+        ''' Renames a table in the database.
+        ''' </summary>
+        ''' <param name="arTable"></param>
+        ''' <param name="asNewName"></param>
+        Public Overridable Sub RenameTable(ByRef arTable As RDS.Table, ByVal asNewName As String)
+        End Sub
+
     End Class
 
 End Namespace

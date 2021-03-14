@@ -92,6 +92,27 @@ Namespace RDS
 
         End Sub
 
+        ''' <summary>
+        ''' Clones the table. Limited functionality at this stage. [VM-20210313]
+        ''' </summary>
+        ''' <returns></returns>
+        Public Function Clone() As RDS.Table
+
+            Dim lrTable As New RDS.Table
+            Try
+                With Me
+                    lrTable.Name = .Name
+                End With
+
+                Return lrTable
+
+            Catch ex As Exception
+                Debugger.Break()
+                Return lrTable
+            End Try
+
+        End Function
+
         Public Shadows Function Equals(other As Table) As Boolean Implements IEquatable(Of Table).Equals
 
             Return Me.Name = other.Name
@@ -802,9 +823,18 @@ Namespace RDS
 
         Private Sub FBMModelElement_NameChanged(ByVal asNewName As String) Handles FBMModelElement.NameChanged
 
+            'For database synchronisation
+            Dim lrTempTable = Me.Clone
+
             Me.Name = asNewName
 
             RaiseEvent NameChanged(asNewName)
+
+            'Database synchronisation
+            If Me.Model.Model.IsDatabaseSynchronised Then
+                Call Me.Model.Model.connectToDatabase()
+                Call Me.Model.Model.DatabaseConnection.RenameTable(lrTempTable, asNewName)
+            End If
 
         End Sub
 

@@ -65,52 +65,6 @@ Namespace FEQL
                 Dim lrTable = Me.Model.RDS.Table.Find(Function(x) x.Name = Me.CREATEStatement.NODEPROPERTYNAMEIDENTIFICATION.MODELELEMENTNAME(0))
                 lrInsertTable.Name = lrTable.Name
 
-                If lrTable.getPrimaryKeyColumns.Count = 1 Then
-                    Dim lrPKColumn = lrTable.getPrimaryKeyColumns(0)
-                    If lrPKColumn.getMetamodelDataType = pcenumORMDataType.NumericAutoCounter Then
-                        Dim lrInsertColumn As New RDS.Column(lrInsertTable, lrPKColumn.Name, Nothing, Nothing)
-                        If Me.CREATEStatement.NODEPROPERTYNAMEIDENTIFICATION.QUOTEDIDENTIFIERLIST IsNot Nothing Then
-                            If Me.CREATEStatement.NODEPROPERTYNAMEIDENTIFICATION.QUOTEDIDENTIFIERLIST.COLON IsNot Nothing Then
-                                lrInsertColumn.TemporaryData = Me.CREATEStatement.NODEPROPERTYNAMEIDENTIFICATION.IDENTIFIER(0)
-                            Else
-                                lrInsertColumn.TemporaryData = "1"
-                            End If
-                        Else
-                            lrInsertColumn.TemporaryData = "1"
-                        End If
-
-                        larInsertColumn.Add(lrInsertColumn)
-                    Else
-                        'Dim lrInsertColumn As New RDS.Column(lrInsertTable, lrPKColumn.Name, Nothing, Nothing)
-                        Dim lrInsertColumn = lrPKColumn.Clone(Nothing, Nothing)
-                        lrInsertColumn.TemporaryData = Me.CREATEStatement.NODEPROPERTYNAMEIDENTIFICATION.IDENTIFIER(0)
-                        larInsertColumn.Add(lrInsertColumn)
-                    End If
-                Else
-                    If Me.CREATEStatement.NODEPROPERTYNAMEIDENTIFICATION.IDENTIFIER.Count <> lrTable.getPrimaryKeyColumns.Count Then
-                        Throw New Exception("The model element, '" & lrInsertTable.Name & "', has " & lrTable.getPrimaryKeyColumns.Count.ToString & " primary key columns. You have specified " & Me.CREATEStatement.NODEPROPERTYNAMEIDENTIFICATION.IDENTIFIER.Count.ToString & " primary key columns.")
-                    End If
-                    liInd = 0
-                    For Each lrPKColumn In lrTable.getPrimaryKeyColumns
-                        'Dim lrInsertColumn As New RDS.Column(lrInsertTable, lrPKColumn.Name, Nothing, Nothing)
-                        Dim lrInsertColumn = lrPKColumn.Clone(Nothing, Nothing)
-
-                        If Me.CREATEStatement.NODEPROPERTYNAMEIDENTIFICATION.QUOTEDPROPERTYIDENTIFIERLIST IsNot Nothing Then
-                            Dim liInd2 = Me.CREATEStatement.NODEPROPERTYNAMEIDENTIFICATION.MODELELEMENTNAME.IndexOf(lrInsertColumn.Name)
-
-                            If liInd2 < 0 Then
-                                Throw New Exception("Cannot find property, " & lrInsertColumn.Name & ", in your statement. Required for Primmary Key of the Object Type, " & lrTable.Name)
-                            End If
-
-                            lrInsertColumn.TemporaryData = Me.CREATEStatement.NODEPROPERTYNAMEIDENTIFICATION.IDENTIFIER(liInd2 - 1)
-                        Else
-                            lrInsertColumn.TemporaryData = Me.CREATEStatement.NODEPROPERTYNAMEIDENTIFICATION.IDENTIFIER(liInd)
-                        End If
-                        larInsertColumn.Add(lrInsertColumn)
-                        liInd += 1
-                    Next
-                End If
-
                 '========================================================================
                 'Get the rest of the Columns
                 Dim lrQueryGraph As New FactEngine.QueryGraph(Me.Model)
@@ -185,7 +139,11 @@ Namespace FEQL
                                 End If
 
                                 For Each lrPrimaryIndexColumn In lrTargetTable.getPrimaryKeyColumns
-                                    lrInsertColumn = lrTable.Column.Find(Function(x) x.Role Is lrQueryEdge.FBMFactType.RoleGroup(0)).Clone(Nothing, Nothing)
+                                    If lrQueryEdge.FBMFactType.IsLinkFactType Then
+                                        lrInsertColumn = lrTable.Column.Find(Function(x) x.Role Is lrQueryEdge.FBMFactType.LinkFactTypeRole)
+                                    Else
+                                        lrInsertColumn = lrTable.Column.Find(Function(x) x.Role Is lrQueryEdge.FBMFactType.RoleGroup(0)).Clone(Nothing, Nothing)
+                                    End If
                                     lrInsertColumn.TemporaryData = lrInterimRecordset.CurrentFact.Data(0).Data
                                     larInsertColumn.Add(lrInsertColumn)
                                 Next
@@ -196,6 +154,61 @@ Namespace FEQL
                         End Select
                     End If
                 Next
+
+                'PK Columns
+                If lrTable.getPrimaryKeyColumns.Count = 1 Then
+                    Dim lrPKColumn = lrTable.getPrimaryKeyColumns(0)
+                    If lrPKColumn.getMetamodelDataType = pcenumORMDataType.NumericAutoCounter Then
+                        Dim lrInsertColumn As New RDS.Column(lrInsertTable, lrPKColumn.Name, Nothing, Nothing)
+                        If Me.CREATEStatement.NODEPROPERTYNAMEIDENTIFICATION.QUOTEDIDENTIFIERLIST IsNot Nothing Then
+                            If Me.CREATEStatement.NODEPROPERTYNAMEIDENTIFICATION.QUOTEDIDENTIFIERLIST.COLON IsNot Nothing Then
+                                lrInsertColumn.TemporaryData = Me.CREATEStatement.NODEPROPERTYNAMEIDENTIFICATION.IDENTIFIER(0)
+                            Else
+                                lrInsertColumn.TemporaryData = "1"
+                            End If
+                        Else
+                            lrInsertColumn.TemporaryData = "1"
+                        End If
+
+                        larInsertColumn.Add(lrInsertColumn)
+                    Else
+                        'Dim lrInsertColumn As New RDS.Column(lrInsertTable, lrPKColumn.Name, Nothing, Nothing)
+                        Dim lrInsertColumn = lrPKColumn.Clone(Nothing, Nothing)
+                        lrInsertColumn.TemporaryData = Me.CREATEStatement.NODEPROPERTYNAMEIDENTIFICATION.IDENTIFIER(0)
+                        larInsertColumn.Add(lrInsertColumn)
+                    End If
+                Else
+                    If Me.CREATEStatement.NODEPROPERTYNAMEIDENTIFICATION.IDENTIFIER.Count > 0 And
+                       Me.CREATEStatement.NODEPROPERTYNAMEIDENTIFICATION.IDENTIFIER.Count <> lrTable.getPrimaryKeyColumns.Count Then
+                        Throw New Exception("The model element, '" & lrInsertTable.Name & "', has " & lrTable.getPrimaryKeyColumns.Count.ToString & " primary key columns. You have specified " & Me.CREATEStatement.NODEPROPERTYNAMEIDENTIFICATION.IDENTIFIER.Count.ToString & " primary key columns.")
+                    ElseIf Me.CREATEStatement.NODEPROPERTYNAMEIDENTIFICATION.IDENTIFIER.Count = 0 Then
+                        For Each lrColumn In lrTable.getPrimaryKeyColumns
+                            If Not larInsertColumn.Contains(lrColumn) Then
+                                Throw New Exception("You haven't specified relationships for each of the primary key properties of the Object Type.")
+                            End If
+                        Next
+                    Else
+                        liInd = 0
+                        For Each lrPKColumn In lrTable.getPrimaryKeyColumns
+                            'Dim lrInsertColumn As New RDS.Column(lrInsertTable, lrPKColumn.Name, Nothing, Nothing)
+                            Dim lrInsertColumn = lrPKColumn.Clone(Nothing, Nothing)
+
+                            If Me.CREATEStatement.NODEPROPERTYNAMEIDENTIFICATION.QUOTEDPROPERTYIDENTIFIERLIST IsNot Nothing Then
+                                Dim liInd2 = Me.CREATEStatement.NODEPROPERTYNAMEIDENTIFICATION.MODELELEMENTNAME.IndexOf(lrInsertColumn.Name)
+
+                                If liInd2 < 0 Then
+                                    Throw New Exception("Cannot find property, " & lrInsertColumn.Name & ", in your statement. Required for Primmary Key of the Object Type, " & lrTable.Name)
+                                End If
+
+                                lrInsertColumn.TemporaryData = Me.CREATEStatement.NODEPROPERTYNAMEIDENTIFICATION.IDENTIFIER(liInd2 - 1)
+                            Else
+                                lrInsertColumn.TemporaryData = Me.CREATEStatement.NODEPROPERTYNAMEIDENTIFICATION.IDENTIFIER(liInd)
+                            End If
+                            larInsertColumn.Add(lrInsertColumn)
+                            liInd += 1
+                        Next
+                    End If
+                End If
 
                 'Mandatory Column check
                 For Each lrColumn In lrTable.Column.FindAll(Function(x) x.IsMandatory)

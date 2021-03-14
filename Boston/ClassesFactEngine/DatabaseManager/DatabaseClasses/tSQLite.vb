@@ -337,6 +337,25 @@ Namespace FactEngine
 
         End Sub
 
+        ''' <summary>
+        ''' Renames a table in the database.
+        ''' </summary>
+        ''' <param name="arTable"></param>
+        ''' <param name="asNewName"></param>
+        Public Overrides Sub RenameTable(ByRef arTable As RDS.Table, ByVal asNewName As String)
+
+            Try
+                Dim lsSQLCommmand = "ALTER TABLE " & arTable.Name
+                lsSQLCommmand &= " RENAME TO " & asNewName
+
+                Me.GONonQuery(lsSQLCommmand)
+
+            Catch ex As Exception
+                Debugger.Break()
+            End Try
+
+        End Sub
+
 
     End Class
 
