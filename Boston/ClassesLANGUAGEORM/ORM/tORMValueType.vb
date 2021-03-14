@@ -377,6 +377,28 @@ Namespace FBM
 
         End Sub
 
+        Public Sub CheckForErrors()
+
+            Dim lsErrorMessage As String = ""
+            Dim lrModelError As FBM.ModelError
+
+            If Me.DataType = pcenumORMDataType.DataTypeNotSet Then
+
+                lsErrorMessage = "Data Type Not Specified Error - "
+                lsErrorMessage &= "Value Type: '" &
+                                  Me.Name & "'."
+
+                lrModelError = New FBM.ModelError(pcenumModelErrors.DataTypeNotSpecifiedError,
+                                                  lsErrorMessage,
+                                                  Nothing,
+                                                  Me)
+
+                Me.ModelError.Add(lrModelError)
+                Me.Model.AddModelError(lrModelError)
+
+            End If
+        End Sub
+
         Public Sub AddValueConstraint(ByVal asValueConstraint As String)
 
             Me.ValueConstraint.Add(asValueConstraint)

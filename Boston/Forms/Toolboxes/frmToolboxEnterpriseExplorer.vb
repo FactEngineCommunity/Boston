@@ -1668,6 +1668,11 @@ Public Class frmToolboxEnterpriseExplorer
 
             lrModel = New FBM.Model(pcenumLanguage.ORMModel, lsModelName, False)
 
+            If arCreateDatabaseStatement IsNot Nothing Then
+                lrModel.TargetDatabaseType = pcenumDatabaseType.SQLite
+                'lrModel.TargetDatabaseType = arCreateDatabaseStatement.DATABASETYPE
+            End If
+
             If My.Settings.UseClientServer Or (prApplication.User IsNot Nothing) Then
                 lrModel.CreatedByUserId = prApplication.User.Id
             End If
@@ -1699,6 +1704,25 @@ Public Class frmToolboxEnterpriseExplorer
             loNode.Tag = New tEnterpriseEnterpriseView(pcenumMenuType.modelORMModel,
                                                        prApplication.WorkingModel,
                                                        prApplication.WorkingModel.ModelId)
+
+            If arCreateDatabaseStatement IsNot Nothing Then
+                If My.Settings.FactEngineShowDatabaseLogoInModelExplorer Then
+                    Select Case lrModel.TargetDatabaseType
+                        Case Is = pcenumDatabaseType.MongoDB
+                            loNode.ImageIndex = 6
+                            loNode.SelectedImageIndex = 6
+                        Case Is = pcenumDatabaseType.SQLServer
+                            loNode.ImageIndex = 9
+                            loNode.SelectedImageIndex = 9
+                        Case Is = pcenumDatabaseType.MSJet
+                            loNode.ImageIndex = 7
+                            loNode.SelectedImageIndex = 7
+                        Case Is = pcenumDatabaseType.SQLite
+                            loNode.ImageIndex = 8
+                            loNode.SelectedImageIndex = 8
+                    End Select
+                End If
+            End If
 
             Call prApplication.addModel(lrModel)
 

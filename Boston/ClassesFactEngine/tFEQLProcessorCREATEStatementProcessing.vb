@@ -210,6 +210,11 @@ Namespace FEQL
                     End If
                 End If
 
+                'Data Types set, check.
+                If larInsertColumn.FindAll(Function(x) x.getMetamodelDataType = pcenumORMDataType.DataTypeNotSet).Count > 0 Then
+                    Throw New Exception("Make sure the Data Type is set for all properties before creating a new record.")
+                End If
+
                 'Mandatory Column check
                 For Each lrColumn In lrTable.Column.FindAll(Function(x) x.IsMandatory)
                     If larInsertColumn.Find(Function(x) x.Name = lrColumn.Name) Is Nothing Then
@@ -313,9 +318,12 @@ Namespace FEQL
                 Next
                 lsInsertStatement &= vbCrLf & ")"
 
-                Call Me.DatabaseManager.Connection.GONonQuery(lsInsertStatement)
+                lrRecordset = Me.DatabaseManager.Connection.GONonQuery(lsInsertStatement)
 
-                lrRecordset.ErrorString = "1 row inserted"
+                If lrRecordset.ErrorString Is Nothing Then
+                    lrRecordset.ErrorString = "1 row inserted"
+                End If
+
                 Return lrRecordset
 
             Catch ex As Exception

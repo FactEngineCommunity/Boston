@@ -550,6 +550,9 @@ Partial Public Class tBrain
 
         End If
 
+        'Add Error to ValueType because does not have a DataType
+        Call lrValueType.CheckForErrors()
+
         If Me.Page IsNot Nothing Then
 
             lrValueTypeInstance = Me.Page.DropValueTypeAtPoint(lrValueType, New PointF(100, 100)) 'VM-20181329-Remove this commented-out code, if all okay. Me.Page.Form.CreateValueType(lsValueTypeName, True)
