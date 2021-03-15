@@ -996,6 +996,7 @@ Namespace RDS
 
                 'Database synchronisation
                 If abRemoveFromDatabase Then
+                    Call Me.Model.Model.connectToDatabase()
                     Call Me.Model.Model.DatabaseConnection.removeColumn(arColumn)
                 End If
 
