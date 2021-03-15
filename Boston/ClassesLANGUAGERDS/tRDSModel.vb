@@ -333,6 +333,12 @@ Namespace RDS
 
                 RaiseEvent TableRemoved(arTable)
 
+                'Database synchronisation
+                If Me.Model.IsDatabaseSynchronised Then
+                    Me.Model.connectToDatabase()
+                    Call Me.Model.DatabaseConnection.removeTable(arTable)
+                End If
+
             Catch ex As Exception
                 Dim lsMessage1 As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()

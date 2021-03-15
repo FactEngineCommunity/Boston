@@ -319,6 +319,23 @@ Namespace FactEngine
         End Sub
 
         ''' <summary>
+        ''' Removes/Drops the Table from the database.
+        ''' </summary>
+        ''' <param name="arTable"></param>
+        Public Overrides Sub removeTable(ByRef arTable As RDS.Table)
+
+            Try
+                Dim lsSQLCommand = "DROP TABLE " & arTable.Name
+
+                Me.GONonQuery(lsSQLCommand)
+
+            Catch ex As Exception
+                Debugger.Break()
+            End Try
+
+        End Sub
+
+        ''' <summary>
         ''' Renames the given Column to the new column name.
         ''' </summary>
         ''' <param name="arColumn"></param>

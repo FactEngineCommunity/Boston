@@ -235,6 +235,7 @@ Namespace RDS
                 '------------------------------------------------------------------------------
                 'Database Synchronisation Code
                 If abAddToDatabase Then
+                    Call Me.Model.Model.connectToDatabase()
                     If Me.Column.Count = 1 Then
                         'Create the Table/Column combination, because can't create the Column without the Table and is first Column in Table.
                         Call Me.Model.Model.DatabaseConnection.createTable(Me, arColumn)
