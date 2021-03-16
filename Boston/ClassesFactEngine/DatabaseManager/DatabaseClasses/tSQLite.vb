@@ -72,7 +72,7 @@ Namespace FactEngine
                 Dim reader As System.IO.TextReader = New System.IO.StreamReader(lsPath)
 
                 Dim csvReader = New CsvHelper.CsvReader(reader, System.Globalization.CultureInfo.InvariantCulture)
-                Dim records = csvReader.GetRecords(Of DatabaseDataType)()
+                Dim records = csvReader.GetRecords(Of DatabaseDataType)
                 Dim blah = records.ToList
                 For Each lrRecord In records
                     Debugger.Break()
