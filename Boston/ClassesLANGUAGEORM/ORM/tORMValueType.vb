@@ -831,6 +831,19 @@ Namespace FBM
             Me.isDirty = True
             Me.Model.Save()
 
+            'Database synchronisation
+            If Me.Model.IsDatabaseSynchronised Then
+
+                Dim larColumn = From Table In Me.Model.RDS.Table
+                                From Column In Table.Column
+                                Where Column.ActiveRole.JoinedORMObject Is Me
+                                Select Column
+
+                For Each lrColumn In larColumn
+                    Call Me.Model.RDS.columnSetDataType(lrColumn, Me.DataType, Me.DataTypeLength, Me.DataTypePrecision)
+                Next
+            End If
+
         End Sub
 
         Public Sub SetDataTypeLength(ByVal aiNewDataTypeLength As Integer, _

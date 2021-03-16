@@ -20,6 +20,19 @@
         Public Overridable Sub addColumn(ByRef arColumn As RDS.Column)
         End Sub
 
+        ''' <summary>
+        ''' Changes the data type of the nominated column.
+        ''' </summary>
+        ''' <param name="arColumn">The Column to have its data type changed.</param>
+        ''' <param name="asDataType">The new data type.</param>
+        ''' <param name="aiLength">The length of the data type. 0 is nothing.</param>
+        ''' <param name="aiPrecision">The precision of the data type. 0 is nothing.</param>
+        Public Overridable Sub columnChangeDatatype(ByRef arColumn As RDS.Column,
+                                                    ByVal asDataType As pcenumORMDataType,
+                                                    ByVal aiLength As Integer,
+                                                    ByRef aiPrecision As Integer)
+        End Sub
+
         Public Overridable Function createDatabase(ByVal asDatabaseLocationName As String) As ORMQL.Recordset
             Return New ORMQL.Recordset
         End Function

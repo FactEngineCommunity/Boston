@@ -5,6 +5,16 @@
         Public Facts As New List(Of FBM.Fact)
         Public Columns As New List(Of String)
 
+        ''' <summary>
+        ''' True if an error was returned when creating the recordset. See ErrorString for error details.
+        ''' </summary>
+        ''' <returns></returns>
+        Public ReadOnly Property ErrorReturned As Boolean
+            Get
+                Return Me.ErrorString IsNot Nothing
+            End Get
+        End Property
+
         Public ErrorString As String = Nothing
 
         Public Query As String = Nothing

@@ -155,6 +155,24 @@ Namespace RDS
             End Get
         End Property
 
+        Public ReadOnly Property DBCreateString() As String
+            Get
+                Dim lsCreateString As String
+
+                lsCreateString = Me.getMetamodelDataType.ToString
+                If Me.ActiveRole.JoinsValueType.DataTypeLength > 0 Then
+                    lsCreateString &= "(" & Me.ActiveRole.JoinsValueType.DataTypeLength
+                    If Me.ActiveRole.JoinsValueType.DataTypePrecision > 0 Then
+                        lsCreateString &= "," & Me.ActiveRole.JoinsValueType.DataTypePrecision
+                    End If
+                    lsCreateString &= ")"
+                End If
+
+                Return lsCreateString
+            End Get
+        End Property
+
+
 #Region "FactEngine secific"
         ''' <summary>
         ''' Used when creating SQL etc for FactEngine. When the set of Projection Columns is returned, this Alias is set so that ProjectionColumns refer to the correct Table in the From clause etc.

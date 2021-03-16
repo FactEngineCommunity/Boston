@@ -97,6 +97,21 @@ Namespace RDS
 
         End Sub
 
+        Public Sub columnSetDataType(ByRef arColumn As RDS.Column,
+                                     ByVal aiDataType As pcenumORMDataType,
+                                     ByVal aiLength As Integer,
+                                     ByVal aiPrecision As Integer)
+
+            Try
+                'Database synchronisation.
+                Call Me.Model.connectToDatabase()
+                Call Me.Model.DatabaseConnection.columnChangeDatatype(arColumn, aiDataType, aiLength, aiPrecision)
+            Catch ex As Exception
+                Debugger.Break()
+            End Try
+
+        End Sub
+
         Public Function createUniqueIndexName(ByRef asTrialName As String, ByVal aiSuffix As Integer) As String
 
             Dim lsTrialName = asTrialName

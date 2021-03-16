@@ -54,6 +54,38 @@ Namespace FactEngine
 
         End Sub
 
+        ''' <summary>
+        ''' Changes the data type of the nominated column.
+        ''' </summary>
+        ''' <param name="arColumn">The Column to have its data type changed.</param>
+        ''' <param name="asDataType">The new data type.</param>
+        ''' <param name="asLength">The length of the data type. 0 is nothing.</param>
+        ''' <param name="arPrecision">The precision of the data type. 0 is nothing.</param>
+        Public Overrides Sub columnChangeDatatype(ByRef arColumn As RDS.Column,
+                                                    ByVal asDataType As pcenumORMDataType,
+                                                    ByVal asLength As Integer,
+                                                    ByRef arPrecision As Integer)
+            Try
+
+
+                Dim lsPath = Richmond.MyPath & "\database\databasedatatypes\bostondatabasedatattypes.csv"
+                Dim reader As System.IO.TextReader = New System.IO.StreamReader(lsPath)
+
+                Dim csvReader = New CsvHelper.CsvReader(reader, System.Globalization.CultureInfo.InvariantCulture)
+                Dim records = csvReader.GetRecords(Of DatabaseDataType)()
+                Dim blah = records.ToList
+                For Each lrRecord In records
+                    Debugger.Break()
+                Next
+
+                Debugger.Break()
+
+            Catch ex As Exception
+                Debugger.Break()
+            End Try
+
+        End Sub
+
         Public Overrides Function createDatabase(ByVal asDatabaseLocationName As String) As ORMQL.Recordset
 
             Dim lrRecordset As New ORMQL.Recordset
