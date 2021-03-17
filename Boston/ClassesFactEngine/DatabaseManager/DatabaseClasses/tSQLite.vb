@@ -67,7 +67,96 @@ Namespace FactEngine
                                                     ByRef arPrecision As Integer)
             Try
                 Call Me.FBMModel.connectToDatabase()
-                Debugger.Break()
+
+                Dim columnDefinition = New List(Of String)()
+                Dim mSql = "SELECT type, sql FROM sqlite_master WHERE tbl_name='" & arColumn.Table.Name & "'"
+                Dim sqlScript As String = ""
+
+                Dim lrRecordset = Me.GO(mSql)
+                sqlScript = lrRecordset("sql").Data
+
+                If Not String.IsNullOrEmpty(sqlScript) Then
+                    Dim firstIndex As Integer = sqlScript.IndexOf("(")
+                    Dim lastIndex As Integer = sqlScript.LastIndexOf(")")
+
+                    If firstIndex >= 0 AndAlso lastIndex <= sqlScript.Length - 1 Then
+                        sqlScript = sqlScript.Substring(firstIndex + 1, lastIndex - firstIndex - 1)
+                    End If
+
+                    Dim scriptParts As String() = sqlScript.Split(New String() {","}, StringSplitOptions.RemoveEmptyEntries)
+
+                    For Each s As String In scriptParts
+                        If s.Contains(arColumn.Name) Then
+                            s = arColumn.Name
+                            s &= " " & arColumn.ActiveRole.JoinsValueType.DBDataType
+                            If arColumn.ActiveRole.JoinsValueType.DataTypeLength > 0 Then
+                                If arColumn.DataTypeIsText Then
+                                    s &= "(" & arColumn.ActiveRole.JoinsValueType.DataTypeLength.ToString
+                                    If arColumn.ActiveRole.JoinsValueType.DataTypePrecision > 0 Then
+                                        s &= arColumn.ActiveRole.JoinsValueType.DataTypePrecision.ToString
+                                    End If
+                                    s &= ")"
+                                End If
+                            End If
+                            columnDefinition.Add(s)
+                        Else
+                            columnDefinition.Add(s)
+                        End If
+                    Next
+                End If
+
+                Dim columnDefinitionString As String = String.Join(",", columnDefinition)
+                Dim columns As List(Of String) = New List(Of String)()
+
+                mSql = "PRAGMA table_info(" & arColumn.Table.Name & ")"
+                lrRecordset = Me.GO(mSql)
+
+                While Not lrRecordset.EOF
+                    columns.Add(lrRecordset("name").Data)
+                    lrRecordset.MoveNext()
+                End While
+
+                Dim columnString As String = String.Join(",", columns)
+
+                mSql = "PRAGMA foreign_keys=OFF"
+                Me.GONonQuery(mSql)
+
+                Dim lrSQLiteConnection = Database.CreateConnection(Me.DatabaseConnectionString)
+                Using tr As SQLiteTransaction = lrSQLiteConnection.BeginTransaction()
+
+                    Try
+                        Using cmd As SQLiteCommand = lrSQLiteConnection.CreateCommand()
+                            cmd.Transaction = tr
+                            If columns.Count > 0 Then
+                                Dim query As String = "CREATE TEMPORARY TABLE " & arColumn.Table.Name & "_backup (" & columnDefinitionString & ")"
+                                cmd.CommandText = query
+                                cmd.ExecuteNonQuery()
+                                cmd.CommandText = "INSERT INTO " & arColumn.Table.Name & "_backup SELECT " & columnString & " FROM " & arColumn.Table.Name
+                                cmd.ExecuteNonQuery()
+                                cmd.CommandText = "DROP TABLE " & arColumn.Table.Name & ""
+                                cmd.ExecuteNonQuery()
+                                cmd.CommandText = "CREATE TABLE " & arColumn.Table.Name & "(" & columnDefinitionString & ")"
+                                cmd.ExecuteNonQuery()
+                                cmd.CommandText = "INSERT INTO " & arColumn.Table.Name & " SELECT " & columnString & " FROM " & arColumn.Table.Name & "_backup;"
+                                cmd.ExecuteNonQuery()
+                                cmd.CommandText = "DROP TABLE " & arColumn.Table.Name & "_backup"
+                                cmd.ExecuteNonQuery()
+                            Else
+                                cmd.CommandText = "DROP TABLE " & arColumn.Table.Name & ""
+                                cmd.ExecuteNonQuery()
+                            End If
+                        End Using
+
+                    Catch ex As Exception
+                        MsgBox(ex.Message)
+                        tr.Rollback()
+                    Finally
+                        tr.Commit()
+                    End Try
+                End Using
+
+                mSql = "PRAGMA foreign_keys=ON"
+                Me.GONonQuery(mSql)
 
             Catch ex As Exception
                 Debugger.Break()
