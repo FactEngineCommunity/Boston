@@ -242,6 +242,15 @@ Namespace FBM
                 ElseIf Me.DatabaseConnection.Connected = False Then
                     Throw New Exception("The database is not connected.")
                 End If
+
+                If Me.IsDatabaseSynchronised And Me.RDS.DatabaseDataType.Count = 0 Then
+                    Dim lsPath = Richmond.MyPath & "\database\databasedatatypes\bostondatabasedatattypes.csv"
+                    Dim reader As System.IO.TextReader = New System.IO.StreamReader(lsPath)
+
+                    Dim csvReader = New CsvHelper.CsvReader(reader, System.Globalization.CultureInfo.InvariantCulture)
+                    Me.RDS.DatabaseDataType = csvReader.GetRecords(Of DatabaseDataType).ToList
+                End If
+
             Catch ex As Exception
                 Debugger.Break()
             End Try

@@ -114,6 +114,18 @@ Namespace FBM
             End Set
         End Property
 
+        <XmlIgnore>
+        <Browsable(True)>
+        <CategoryAttribute("Target Database"),
+        [ReadOnly](False),
+        DescriptionAttribute("The data type for this Value Type in the target database.")>
+        Public Shadows ReadOnly Property DBDataType As String
+            Get
+                Return Me.ValueType.DBDataType
+            End Get
+        End Property
+
+
         <XmlIgnore()> _
         <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
         Public _HasBeenMoved As Boolean = False

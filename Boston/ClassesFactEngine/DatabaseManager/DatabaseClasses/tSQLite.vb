@@ -66,18 +66,7 @@ Namespace FactEngine
                                                     ByVal asLength As Integer,
                                                     ByRef arPrecision As Integer)
             Try
-
-
-                Dim lsPath = Richmond.MyPath & "\database\databasedatatypes\bostondatabasedatattypes.csv"
-                Dim reader As System.IO.TextReader = New System.IO.StreamReader(lsPath)
-
-                Dim csvReader = New CsvHelper.CsvReader(reader, System.Globalization.CultureInfo.InvariantCulture)
-                Dim records = csvReader.GetRecords(Of DatabaseDataType)
-                Dim blah = records.ToList
-                For Each lrRecord In records
-                    Debugger.Break()
-                Next
-
+                Call Me.FBMModel.connectToDatabase()
                 Debugger.Break()
 
             Catch ex As Exception

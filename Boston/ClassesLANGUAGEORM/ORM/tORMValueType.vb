@@ -460,10 +460,10 @@ Namespace FBM
 
             Dim liFactTypeCount As Integer = 0
 
-            liFactTypeCount = Aggregate FactType In Me.Model.FactType _
-                              From Role In FactType.RoleGroup _
+            liFactTypeCount = Aggregate FactType In Me.Model.FactType
+                              From Role In FactType.RoleGroup
                               Where Role.JoinedORMObject Is Me _
-                              And FactType.IsPreferredReferenceMode = True _
+                              And FactType.IsPreferredReferenceMode = True
                               Into Count()
 
             If liFactTypeCount > 0 Then
@@ -471,6 +471,27 @@ Namespace FBM
             End If
 
         End Function
+
+        Public ReadOnly Property DBDataType() As String
+            Get
+                Try
+                    If Me.Model.IsDatabaseSynchronised Then
+                        If Me.Model.DatabaseConnection Is Nothing Then
+                            Call Me.Model.connectToDatabase()
+                        End If
+                    End If
+
+                    Dim larDBDataType = From DatabaseDataType In Me.Model.RDS.DatabaseDataType
+                                        Where DatabaseDataType.BostonDataType = Me.DataType
+                                        Where Me.Model.TargetDatabaseType = DatabaseDataType.Database
+                                        Select DatabaseDataType
+
+                    Return larDBDataType.First.DataType
+                Catch ex As Exception
+                    Return "Error"
+                End Try
+            End Get
+        End Property
 
         ''' <summary>
         ''' Returns the CQL for the ValueType

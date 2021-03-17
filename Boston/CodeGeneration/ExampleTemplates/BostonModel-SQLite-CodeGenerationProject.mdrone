@@ -54,7 +54,7 @@ elseif column.datatype = "NumericFloatCustomPrecision"
 elseif column.datatype = "NumericFloatDoublePrecision"
 	set column.datatype = "NUMBER"
 	
-elseif column.datatype = "NumericFloatSinglePrecistion"
+elseif column.datatype = "NumericFloatSinglePrecision"
 	set column.datatype = "NUMBER"
 	
 elseif column.datatype = "NumericMoney"

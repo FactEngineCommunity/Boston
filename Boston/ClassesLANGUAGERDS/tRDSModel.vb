@@ -24,9 +24,13 @@ Namespace RDS
         <XmlElement()> _
         Public Relation As New List(Of RDS.Relation)
 
-        <XmlIgnore()> _
-        <NonSerialized()> _
+        <XmlIgnore()>
+        <NonSerialized()>
         Public TargetDatabaseType As pcenumDatabaseType = Nothing
+
+        <XmlIgnore()>
+        <NonSerialized()>
+        Public DatabaseDataType As New List(Of DatabaseDataType)
 
         Public Event IndexAdded(ByRef arIndex As RDS.Index)
         Public Event IndexRemoved(ByRef arIndex As RDS.Index)
