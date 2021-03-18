@@ -536,6 +536,34 @@ Namespace RDS
 
         End Function
 
+        Public Function makeSQLColumnDefinition() As String
+
+            Try
+                Dim lsSQLColumnDefinition As String
+                lsSQLColumnDefinition = Me.Name
+                lsSQLColumnDefinition &= " " & Me.ActiveRole.JoinsValueType.DBDataType
+                If Me.ActiveRole.JoinsValueType.DataTypeLength > 0 Then
+                    If Me.DataTypeIsText Then
+                        lsSQLColumnDefinition &= "(" & Me.ActiveRole.JoinsValueType.DataTypeLength.ToString
+                        If Me.ActiveRole.JoinsValueType.DataTypePrecision > 0 Then
+                            lsSQLColumnDefinition &= Me.ActiveRole.JoinsValueType.DataTypePrecision.ToString
+                        End If
+                        lsSQLColumnDefinition &= ")"
+                    End If
+                End If
+
+                If Me.Role.Mandatory Then lsSQLColumnDefinition &= " NOT NULL"
+
+                Return lsSQLColumnDefinition
+
+            Catch ex As Exception
+                Debugger.Break()
+
+                Return Nothing
+            End Try
+
+        End Function
+
         Public Sub moveToOrdinalPosition(ByVal aiOrdinalPosition As Integer)
 
             Try
@@ -604,6 +632,12 @@ Namespace RDS
             End If
 
             RaiseEvent IsMandatoryChanged(abIsMandatory)
+
+            'Database synchronisation
+            If Me.Model.Model.IsDatabaseSynchronised Then
+                Call Me.Model.Model.connectToDatabase()
+                Call Me.Model.Model.DatabaseConnection.columnSetMandatory(Me, abIsMandatory)
+            End If
 
         End Sub
 

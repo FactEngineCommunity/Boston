@@ -33,6 +33,15 @@
                                                     ByRef aiPrecision As Integer)
         End Sub
 
+        ''' <summary>
+        ''' Sets whether the specified Column is mandatory or not, in the database.
+        ''' </summary>
+        ''' <param name="arColumn">The Column to have its schema definition changed.</param>
+        ''' <param name="abIsMandatory">True if the Column is mandatory for its Table.</param>
+        Public Overridable Sub columnSetMandatory(ByRef arColumn As RDS.Column,
+                                                  ByVal abIsMandatory As Boolean)
+        End Sub
+
         Public Overridable Function createDatabase(ByVal asDatabaseLocationName As String) As ORMQL.Recordset
             Return New ORMQL.Recordset
         End Function
