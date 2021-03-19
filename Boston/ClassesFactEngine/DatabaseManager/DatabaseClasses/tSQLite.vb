@@ -61,6 +61,42 @@ Namespace FactEngine
         Public Overrides Sub addIndex(ByRef arIndex As RDS.Index)
 
             Try
+                Dim lsSQL As String
+
+                lsSQL = "PRAGMA foreign_keys=OFF"
+                Me.GONonQuery(lsSQL)
+
+                Dim lrIndex As RDS.Index = arIndex
+                Dim lasColumnNames = From Column In lrIndex.Table.Column
+                                     Select Column.Name
+                Dim lsColumnList = String.Join(",", lasColumnNames)
+
+                Dim lrSQLiteConnection = Database.CreateConnection(Me.DatabaseConnectionString)
+                Using tr As SQLiteTransaction = lrSQLiteConnection.BeginTransaction()
+
+                    Try
+                        Using cmd As SQLiteCommand = lrSQLiteConnection.CreateCommand()
+                            cmd.Transaction = tr
+                            cmd.CommandText = Me.generateSQLCREATETABLEStatement(arIndex.Table, arIndex.Table.Name & "_temp") ''"CREATE TEMPORARY TABLE " & arColumn.Table.Name & "_backup (" & lsColumnDefinitions & ")"
+                            cmd.ExecuteNonQuery()
+                            cmd.CommandText = "INSERT INTO " & arIndex.Table.Name & "_temp SELECT " & lsColumnList & " FROM " & arIndex.Table.Name
+                            cmd.ExecuteNonQuery()
+                            cmd.CommandText = "DROP TABLE " & arIndex.Table.Name & ""
+                            cmd.ExecuteNonQuery()
+                            cmd.CommandText = "ALTER TABLE " & arIndex.Table.Name & "_temp RENAME TO " & arIndex.Table.Name
+                            cmd.ExecuteNonQuery()
+                        End Using
+
+                        tr.Commit()
+                    Catch ex As Exception
+                        MsgBox(ex.Message)
+                        tr.Rollback()
+                    End Try
+                End Using
+
+                lsSQL = "PRAGMA foreign_keys=ON"
+                Me.GONonQuery(lsSQL)
+
 
             Catch ex As Exception
                 Debugger.Break()
@@ -293,8 +329,6 @@ Namespace FactEngine
         Public Overrides Sub columnSetMandatory(ByRef arColumn As RDS.Column,
                                                   ByVal abIsMandatory As Boolean)
             Try
-                Call Me.FBMModel.connectToDatabase()
-
                 Dim columnDefinition = New List(Of String)()
                 Dim mSql = "SELECT type, sql FROM sqlite_master WHERE tbl_name='" & arColumn.Table.Name & "'"
                 Dim lsSQLScript As String = ""
@@ -462,13 +496,21 @@ Namespace FactEngine
         ''' <summary>
         ''' Generates a CREATE TABLE Statement for the given Table, specific to the database type.
         ''' </summary>
+        ''' <param name="arTable">The RDS Table for which the SQL CREATE statement is to be generated.</param>
+        ''' <param name="asTableName">Optional table name for the table in the CREATE statement.</param>
         ''' <returns></returns>
-        Public Overrides Function generateSQLCREATETABLEStatement(ByRef arTable As RDS.Table) As String
+        Public Overrides Function generateSQLCREATETABLEStatement(ByRef arTable As RDS.Table,
+                                                                  Optional asTableName As String = Nothing) As String
 
             Try
                 Dim lsSQLCommand As String
 
-                lsSQLCommand = "CREATE TABLE " & arTable.Name & "("
+                If asTableName Is Nothing Then
+                    lsSQLCommand = "CREATE TABLE " & arTable.Name
+                Else
+                    lsSQLCommand = "CREATE TABLE " & asTableName
+                End If
+                lsSQLCommand &= " ("
                 'Column defs
                 Dim liInd = 0
                 For Each lrColumn In arTable.Column
@@ -478,7 +520,7 @@ Namespace FactEngine
                 Next
                 'Primary Key
                 If arTable.getPrimaryKeyColumns.Count > 0 Then
-                    lsSQLCommand &= "CONSTRAINT " & arTable.Name & "_PK PRIMARY KEY ("
+                    lsSQLCommand &= ", CONSTRAINT " & arTable.Name & "_PK PRIMARY KEY ("
                     liInd = 0
                     For Each lrColumn In arTable.getPrimaryKeyColumns
                         If liInd > 0 Then lsSQLCommand &= ","
@@ -491,9 +533,9 @@ Namespace FactEngine
                 If arTable.Index.FindAll(Function(x) Not x.IsPrimaryKey).Count > 0 Then
                     liInd = 1
                     For Each lrIndex In arTable.Index.FindAll(Function(x) Not x.IsPrimaryKey)
-                        lsSQLCommand &= "CONSTRAINT " & arTable.Name & "_UC" & liInd.ToString & " UNIQUE ("
+                        lsSQLCommand &= ", CONSTRAINT " & lrIndex.Name & " UNIQUE ("
                         Dim liInd2 = 0
-                        For Each lrColumn In arTable.getPrimaryKeyColumns
+                        For Each lrColumn In lrIndex.Column
                             If liInd2 > 0 Then lsSQLCommand &= ","
                             lsSQLCommand &= lrColumn.Name
                             liInd2 += 1
@@ -502,8 +544,8 @@ Namespace FactEngine
                     Next
                 End If
                 'Foreign Keys
-                For Each lrRelation In arTable.getOutgoingRelations
-                    lsSQLCommand &= "FOREIGN KEY ("
+                For Each lrRelation In arTable.getOutgoingRelations '.FindAll(Function(x) x.OriginColumns.Count > 1)
+                    lsSQLCommand &= ", FOREIGN KEY ("
                     liInd = 0
                     For Each lrColumn In lrRelation.OriginColumns
                         If liInd > 0 Then lsSQLCommand &= ","

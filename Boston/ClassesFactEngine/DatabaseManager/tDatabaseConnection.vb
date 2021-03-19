@@ -76,8 +76,11 @@
         ''' <summary>
         ''' Generates a CREATE TABLE Statement for the given Table, specific to the database type.
         ''' </summary>
+        ''' <param name="arTable">The RDS Table for which the SQL CREATE statement is to be generated.</param>
+        ''' <param name="asTableName">Optional table name for the table in the CREATE statement.</param>
         ''' <returns></returns>
-        Public Overridable Function generateSQLCREATETABLEStatement(ByRef arTable As RDS.Table) As String
+        Public Overridable Function generateSQLCREATETABLEStatement(ByRef arTable As RDS.Table,
+                                                                     Optional asTableName As String = Nothing) As String
             Return ""
         End Function
 

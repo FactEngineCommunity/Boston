@@ -282,6 +282,12 @@ Namespace RDS
 
             RaiseEvent IndexAdded(arIndex)
 
+            'Database synchronisation
+            If Me.Model.Model.IsDatabaseSynchronised Then
+                Call Me.Model.Model.connectToDatabase()
+                Call Me.Model.Model.DatabaseConnection.addIndex(arIndex)
+            End If
+
         End Sub
 
         Public Function getIncomingRelations() As List(Of RDS.Relation)
