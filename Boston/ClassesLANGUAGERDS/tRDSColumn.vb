@@ -416,6 +416,17 @@ Namespace RDS
 
         End Function
 
+        Public Function getReferencedColumn() As RDS.Column
+
+            Try
+                Return Me.Relation.Find(Function(x) x.OriginTable Is Me.Table).DestinationColumns.Find(Function(x) x.ActiveRole Is Me.ActiveRole)
+            Catch ex As Exception
+                Debugger.Break()
+            End Try
+
+
+        End Function
+
         Public Function getMetamodelDataTypeLength() As Integer
 
             Try
@@ -532,42 +543,6 @@ Namespace RDS
                 prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
 
                 Return False
-            End Try
-
-        End Function
-
-        Public Function makeSQLColumnDefinition() As String
-
-            Try
-                Dim lsSQLColumnDefinition As String
-                lsSQLColumnDefinition = Me.Name
-                lsSQLColumnDefinition &= " " & Me.ActiveRole.JoinsValueType.DBDataType
-                If Me.ActiveRole.JoinsValueType.DataTypeLength > 0 Then
-                    If Me.DataTypeIsText Then
-                        lsSQLColumnDefinition &= "(" & Me.ActiveRole.JoinsValueType.DataTypeLength.ToString
-                        If Me.ActiveRole.JoinsValueType.DataTypePrecision > 0 Then
-                            lsSQLColumnDefinition &= Me.ActiveRole.JoinsValueType.DataTypePrecision.ToString
-                        End If
-                        lsSQLColumnDefinition &= ")"
-                    End If
-                End If
-
-                Dim larOutgoingRelation = Me.Relation.FindAll(Function(x) x.OriginTable Is Me.Table)
-                If larOutgoingRelation.Count > 0 Then
-                    If larOutgoingRelation(0).OriginColumns.Count = 1 Then
-                        lsSQLColumnDefinition &= " REFERENCES " & larOutgoingRelation(0).DestinationTable.Name
-                    End If
-                    If Me.Role.Mandatory Then lsSQLColumnDefinition &= " NOT NULL"
-                ElseIf Me.Role.Mandatory Then
-                    lsSQLColumnDefinition &= " NOT NULL"
-                End If
-
-                Return lsSQLColumnDefinition
-
-            Catch ex As Exception
-                Debugger.Break()
-
-                Return Nothing
             End Try
 
         End Function

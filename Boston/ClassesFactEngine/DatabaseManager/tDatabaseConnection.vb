@@ -21,6 +21,13 @@
         End Sub
 
         ''' <summary>
+        ''' Adds the referenced Index to the database. Table is within Index definition.
+        ''' </summary>
+        ''' <param name="arIndex">The Index to be added to the database.</param>
+        Public Overridable Sub addIndex(ByRef arIndex As RDS.Index)
+        End Sub
+
+        ''' <summary>
         ''' Adds the given Relation/ForeignKey to the database. Relation holds relative Tables.
         ''' </summary>
         ''' <param name="arRelation"></param>
@@ -61,6 +68,18 @@
         ''' <param name="arColumn">The column to be created for the new table.</param>
         Public Overridable Sub createTable(ByRef arTable As RDS.Table, ByRef arColumn As RDS.Column)
         End Sub
+
+        Public Overridable Function generateSQLColumnDefinition(ByRef arColumn As RDS.Column) As String
+            Return ""
+        End Function
+
+        ''' <summary>
+        ''' Generates a CREATE TABLE Statement for the given Table, specific to the database type.
+        ''' </summary>
+        ''' <returns></returns>
+        Public Overridable Function generateSQLCREATETABLEStatement(ByRef arTable As RDS.Table) As String
+            Return ""
+        End Function
 
         ''' <summary>
         ''' Removes the Column from its Table.

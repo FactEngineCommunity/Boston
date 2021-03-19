@@ -55,6 +55,20 @@ Namespace FactEngine
         End Sub
 
         ''' <summary>
+        ''' Adds the referenced Index to the database. Table is within Index definition.
+        ''' </summary>
+        ''' <param name="arIndex">The Index to be added to the database.</param>
+        Public Overrides Sub addIndex(ByRef arIndex As RDS.Index)
+
+            Try
+
+            Catch ex As Exception
+                Debugger.Break()
+            End Try
+
+        End Sub
+
+        ''' <summary>
         ''' Adds the given Relation/ForeignKey to the database. Relation holds relative Tables.
         ''' </summary>
         ''' <param name="arRelation"></param>
@@ -81,7 +95,7 @@ Namespace FactEngine
 
                     For Each s As String In scriptParts
                         If arRelation.OriginColumns.Count = 1 And s.Contains(arRelation.OriginColumns(0).Name) Then
-                            s = arRelation.OriginColumns(0).makeSQLColumnDefinition
+                            s = Me.generateSQLColumnDefinition(arRelation.OriginColumns(0))
                             columnDefinition.Add(s)
                         Else
                             columnDefinition.Add(s)
@@ -300,7 +314,7 @@ Namespace FactEngine
 
                     For Each s As String In scriptParts
                         If s.Contains(arColumn.Name) Then
-                            s = arColumn.makeSQLColumnDefinition
+                            s = Me.generateSQLColumnDefinition(arColumn)
                             columnDefinition.Add(s)
                         Else
                             columnDefinition.Add(s)
@@ -406,6 +420,116 @@ Namespace FactEngine
 
         End Sub
 
+        Public Overrides Function generateSQLColumnDefinition(ByRef arColumn As RDS.Column) As String
+            Try
+
+                Dim lsSQLColumnDefinition As String
+                Dim lrColumn As RDS.Column = arColumn
+
+
+                lsSQLColumnDefinition = arColumn.Name
+                lsSQLColumnDefinition &= " " & arColumn.ActiveRole.JoinsValueType.DBDataType
+                If arColumn.ActiveRole.JoinsValueType.DataTypeLength > 0 Then
+                    If arColumn.DataTypeIsText Then
+                        lsSQLColumnDefinition &= "(" & arColumn.ActiveRole.JoinsValueType.DataTypeLength.ToString
+                        If arColumn.ActiveRole.JoinsValueType.DataTypePrecision > 0 Then
+                            lsSQLColumnDefinition &= arColumn.ActiveRole.JoinsValueType.DataTypePrecision.ToString
+                        End If
+                        lsSQLColumnDefinition &= ")"
+                    End If
+                End If
+
+                Dim larOutgoingRelation = arColumn.Relation.FindAll(Function(x) x.OriginTable Is lrColumn.Table)
+                If larOutgoingRelation.Count > 0 Then
+                    If larOutgoingRelation(0).OriginColumns.Count = 1 Then
+                        lsSQLColumnDefinition &= " REFERENCES " & larOutgoingRelation(0).DestinationTable.Name
+                    End If
+                    If arColumn.Role.Mandatory Then lsSQLColumnDefinition &= " NOT NULL"
+                ElseIf arColumn.Role.Mandatory Then
+                    lsSQLColumnDefinition &= " NOT NULL"
+                End If
+
+                Return lsSQLColumnDefinition
+
+            Catch ex As Exception
+                Debugger.Break()
+
+                Return Nothing
+            End Try
+
+        End Function
+
+        ''' <summary>
+        ''' Generates a CREATE TABLE Statement for the given Table, specific to the database type.
+        ''' </summary>
+        ''' <returns></returns>
+        Public Overrides Function generateSQLCREATETABLEStatement(ByRef arTable As RDS.Table) As String
+
+            Try
+                Dim lsSQLCommand As String
+
+                lsSQLCommand = "CREATE TABLE " & arTable.Name & "("
+                'Column defs
+                Dim liInd = 0
+                For Each lrColumn In arTable.Column
+                    If liInd > 0 Then lsSQLCommand &= ","
+                    lsSQLCommand &= Me.generateSQLColumnDefinition(lrColumn) & vbCrLf
+                    liInd += 1
+                Next
+                'Primary Key
+                If arTable.getPrimaryKeyColumns.Count > 0 Then
+                    lsSQLCommand &= "CONSTRAINT " & arTable.Name & "_PK PRIMARY KEY ("
+                    liInd = 0
+                    For Each lrColumn In arTable.getPrimaryKeyColumns
+                        If liInd > 0 Then lsSQLCommand &= ","
+                        lsSQLCommand &= lrColumn.Name
+                        liInd += 1
+                    Next
+                    lsSQLCommand &= ")" & vbCrLf
+                End If
+                'Unique Indexes
+                If arTable.Index.FindAll(Function(x) Not x.IsPrimaryKey).Count > 0 Then
+                    liInd = 1
+                    For Each lrIndex In arTable.Index.FindAll(Function(x) Not x.IsPrimaryKey)
+                        lsSQLCommand &= "CONSTRAINT " & arTable.Name & "_UC" & liInd.ToString & " UNIQUE ("
+                        Dim liInd2 = 0
+                        For Each lrColumn In arTable.getPrimaryKeyColumns
+                            If liInd2 > 0 Then lsSQLCommand &= ","
+                            lsSQLCommand &= lrColumn.Name
+                            liInd2 += 1
+                        Next
+                        lsSQLCommand &= ")" & vbCrLf
+                    Next
+                End If
+                'Foreign Keys
+                For Each lrRelation In arTable.getOutgoingRelations
+                    lsSQLCommand &= "FOREIGN KEY ("
+                    liInd = 0
+                    For Each lrColumn In lrRelation.OriginColumns
+                        If liInd > 0 Then lsSQLCommand &= ","
+                        lsSQLCommand &= lrColumn.Name
+                        liInd += 1
+                    Next
+                    lsSQLCommand &= ") REFERENCES " & lrRelation.DestinationTable.Name & "("
+                    liInd = 0
+                    For Each lrColumn In lrRelation.OriginColumns
+                        If liInd > 0 Then lsSQLCommand &= ","
+                        lsSQLCommand &= lrColumn.getReferencedColumn.Name
+                        liInd += 1
+                    Next
+                    lsSQLCommand &= ")"
+                    lsSQLCommand &= " ON DELETE CASCADE ON UPDATE CASCADE" & vbCrLf
+                Next
+                lsSQLCommand &= ")"
+
+                Return lsSQLCommand
+            Catch ex As Exception
+                Debugger.Break()
+                Return ""
+            End Try
+
+        End Function
+
         Public Overrides Function GO(asQuery As String) As ORMQL.Recordset Implements iDatabaseConnection.GO
 
             Dim lrRecordset As New ORMQL.Recordset
@@ -415,7 +539,7 @@ Namespace FactEngine
 
                 '==========================================================
                 'Populate the lrRecordset with results from the database
-                'Richmond.WriteToStatusBar("Connecting to database.", True)
+                'Richmond.WriteToStatusBar("Connecting To database.", True)
                 Dim lrSQLiteConnection = Database.CreateConnection(Me.DatabaseConnectionString)
 
                 If lrSQLiteConnection Is Nothing Then
