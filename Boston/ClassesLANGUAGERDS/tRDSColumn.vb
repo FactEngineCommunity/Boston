@@ -552,7 +552,15 @@ Namespace RDS
                     End If
                 End If
 
-                If Me.Role.Mandatory Then lsSQLColumnDefinition &= " NOT NULL"
+                Dim larOutgoingRelation = Me.Relation.FindAll(Function(x) x.OriginTable Is Me.Table)
+                If larOutgoingRelation.Count > 0 Then
+                    If larOutgoingRelation(0).OriginColumns.Count = 1 Then
+                        lsSQLColumnDefinition &= " REFERENCES " & larOutgoingRelation(0).DestinationTable.Name
+                    End If
+                    If Me.Role.Mandatory Then lsSQLColumnDefinition &= " NOT NULL"
+                ElseIf Me.Role.Mandatory Then
+                    lsSQLColumnDefinition &= " NOT NULL"
+                End If
 
                 Return lsSQLColumnDefinition
 

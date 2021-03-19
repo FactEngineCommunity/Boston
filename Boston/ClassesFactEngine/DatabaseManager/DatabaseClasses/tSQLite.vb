@@ -55,6 +55,113 @@ Namespace FactEngine
         End Sub
 
         ''' <summary>
+        ''' Adds the given Relation/ForeignKey to the database. Relation holds relative Tables.
+        ''' </summary>
+        ''' <param name="arRelation"></param>
+        Public Overrides Sub AddForeignKey(ByRef arRelation As RDS.Relation)
+
+            Try
+                Dim columnDefinition = New List(Of String)()
+
+                Dim mSql = "SELECT type, sql FROM sqlite_master WHERE tbl_name='" & arRelation.OriginTable.Name & "'"
+                Dim lsSQLScript As String = ""
+
+                Dim lrRecordset = Me.GO(mSql)
+                lsSQLScript = lrRecordset("sql").Data
+
+                If Not String.IsNullOrEmpty(lsSQLScript) Then
+                    Dim firstIndex As Integer = lsSQLScript.IndexOf("(")
+                    Dim lastIndex As Integer = lsSQLScript.LastIndexOf(")")
+
+                    If firstIndex >= 0 AndAlso lastIndex <= lsSQLScript.Length - 1 Then
+                        lsSQLScript = lsSQLScript.Substring(firstIndex + 1, lastIndex - firstIndex - 1)
+                    End If
+
+                    Dim scriptParts As String() = lsSQLScript.Split(New String() {","}, StringSplitOptions.RemoveEmptyEntries)
+
+                    For Each s As String In scriptParts
+                        If arRelation.OriginColumns.Count = 1 And s.Contains(arRelation.OriginColumns(0).Name) Then
+                            s = arRelation.OriginColumns(0).makeSQLColumnDefinition
+                            columnDefinition.Add(s)
+                        Else
+                            columnDefinition.Add(s)
+                        End If
+                    Next
+                End If
+
+                Dim lsForeighKeyClause As String = Nothing
+                If arRelation.OriginColumns.Count > 1 Then
+                    lsForeighKeyClause = "FOREIGN KEY ("
+                    Dim liInd = 0
+                    For Each lrColumn In arRelation.OriginColumns
+                        If liInd > 0 Then lsForeighKeyClause &= ","
+                        lsForeighKeyClause &= lrColumn.Name
+                        liInd += 1
+                    Next
+                    lsForeighKeyClause &= ") REFERENCES ("
+                    liInd = 0
+                    For Each lrColumn In arRelation.DestinationColumns
+                        If liInd > 0 Then lsForeighKeyClause &= ","
+                        lsForeighKeyClause &= lrColumn.Name
+                        liInd += 1
+                    Next
+                    lsForeighKeyClause &= ")"
+                End If
+
+                Dim lsColumnDefinitions As String = String.Join(",", columnDefinition)
+                Dim larColumnName As List(Of String) = New List(Of String)()
+
+                mSql = "PRAGMA table_info(" & arRelation.OriginTable.Name & ")"
+                lrRecordset = Me.GO(mSql)
+
+                While Not lrRecordset.EOF
+                    larColumnName.Add(lrRecordset("name").Data)
+                    lrRecordset.MoveNext()
+                End While
+
+                Dim lsColumnList As String = String.Join(",", larColumnName)
+
+                mSql = "PRAGMA foreign_keys=OFF"
+                Me.GONonQuery(mSql)
+
+                Dim lrSQLiteConnection = Database.CreateConnection(Me.DatabaseConnectionString)
+                Using tr As SQLiteTransaction = lrSQLiteConnection.BeginTransaction()
+
+                    Try
+                        Using cmd As SQLiteCommand = lrSQLiteConnection.CreateCommand()
+                            cmd.Transaction = tr
+                            Dim lsQuery = "CREATE TABLE " & arRelation.OriginTable.Name & "_temp (" & lsColumnDefinitions & ") "
+                            If lsForeighKeyClause IsNot Nothing Then
+                                lsQuery &= "," & lsForeighKeyClause
+                            End If
+                            cmd.CommandText = lsQuery
+                            cmd.ExecuteNonQuery()
+                            cmd.CommandText = "INSERT INTO " & arRelation.OriginTable.Name & "_temp SELECT " & lsColumnList & " FROM " & arRelation.OriginTable.Name
+                            cmd.ExecuteNonQuery()
+                            cmd.CommandText = "DROP TABLE " & arRelation.OriginTable.Name & ""
+                            cmd.ExecuteNonQuery()
+                            cmd.CommandText = "ALTER TABLE " & arRelation.OriginTable.Name & "_temp RENAME TO " & arRelation.OriginTable.Name
+                            cmd.ExecuteNonQuery()
+                        End Using
+
+                    Catch ex As Exception
+                        MsgBox(ex.Message)
+                        tr.Rollback()
+                    Finally
+                        tr.Commit()
+                    End Try
+                End Using
+
+                mSql = "PRAGMA foreign_keys=ON"
+                Me.GONonQuery(mSql)
+
+            Catch ex As Exception
+                Debugger.Break()
+            End Try
+        End Sub
+
+
+        ''' <summary>
         ''' Changes the data type of the nominated column.
         ''' </summary>
         ''' <param name="arColumn">The Column to have its data type changed.</param>

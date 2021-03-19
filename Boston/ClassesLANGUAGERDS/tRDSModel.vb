@@ -59,6 +59,12 @@ Namespace RDS
 
                 RaiseEvent RelationAdded(arRelation)
 
+                'Database synchronisation
+                If Me.Model.IsDatabaseSynchronised Then
+                    Call Me.Model.connectToDatabase()
+                    Call Me.Model.DatabaseConnection.AddForeignKey(arRelation)
+                End If
+
             Catch ex As Exception
                 Dim lsMessage1 As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()

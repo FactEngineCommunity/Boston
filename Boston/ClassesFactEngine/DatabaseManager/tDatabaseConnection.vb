@@ -21,6 +21,14 @@
         End Sub
 
         ''' <summary>
+        ''' Adds the given Relation/ForeignKey to the database. Relation holds relative Tables.
+        ''' </summary>
+        ''' <param name="arRelation"></param>
+        Public Overridable Sub AddForeignKey(ByRef arRelation As RDS.Relation)
+        End Sub
+
+
+        ''' <summary>
         ''' Changes the data type of the nominated column.
         ''' </summary>
         ''' <param name="arColumn">The Column to have its data type changed.</param>
