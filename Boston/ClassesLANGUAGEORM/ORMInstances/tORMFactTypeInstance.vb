@@ -3010,8 +3010,12 @@ Namespace FBM
                     End If
 
                     Me.Page.Form._comboBoxEntityTypeInstance.Text = e.Table(Me.Page.Form._col, Me.Page.Form._row).Text
-
                     Me.Page.Form._ComboBoxEntityTypeInstance.focus()
+
+                    Dim lsCellText = e.Table(Me.Page.Form._col, Me.Page.Form._row).Text
+                    Dim lrSizeF = lrGraphics.MeasureString(lsCellText, Me.Page.Form._comboBoxEntityTypeInstance.Font)
+                    Me.Page.Form._comboBoxEntityTypeInstance.Width = Viev.Greater(lrSizeF.Width + 30, 60)
+
                 Case Is = pcenumRoleJoinType.ValueType
 
                     '------------------------------------------------------
@@ -3034,7 +3038,11 @@ Namespace FBM
                         End If
                     Next
 
-                    Me.Page.Form._comboBoxValueTypeInstance.text = e.Table(Me.Page.Form._col, Me.Page.Form._row).Text
+                    Dim lsCellText = e.Table(Me.Page.Form._col, Me.Page.Form._row).Text
+                    Me.Page.Form._comboBoxValueTypeInstance.text = lsCellText
+
+                    Dim lrSizeF = lrGraphics.MeasureString(lsCellText, Me.Page.Form._comboBoxValueTypeInstance.Font)
+                    Me.Page.Form._comboBoxValueTypeInstance.Width = Viev.Greater(lrSizeF.Width + 30, 60)
 
                     If lrJoinedValueTypeInstance.ValueConstraint.Count > 0 Then
                         Me.Page.Form._comboBoxValueTypeInstance.Items.clear()

@@ -81,6 +81,20 @@ Public Class frmDiagramORM
 
     End Sub
 
+    Private Sub ComboBoxEntityType_KeyUp(sender As Object, e As KeyEventArgs) Handles ComboBoxEntityType.KeyUp
+
+        Try
+            Dim lrGraphics As Graphics
+            lrGraphics = Me.zrPage.Form.CreateGraphics
+
+            Dim lrSizeF = lrGraphics.MeasureString(Me.ComboBoxEntityType.Text, Me.ComboBoxEntityType.Font)
+            Me.ComboBoxEntityType.Width = Viev.Greater(lrSizeF.Width + 30, 60)
+        Catch ex As Exception
+            Debugger.Break()
+        End Try
+
+    End Sub
+
     Private Sub ComboBoxEntityType_Leave(ByVal sender As Object, ByVal e As System.EventArgs) Handles ComboBoxEntityType.Leave
 
         Dim lrFactDataInstance As New FBM.FactDataInstance
@@ -228,8 +242,21 @@ Public Class frmDiagramORM
 
         If e.KeyCode = Keys.Enter Then
             Me.DiagramView.Focus()
+            Exit Sub
         End If
 
+    End Sub
+
+    Private Sub ComboBoxValueType_KeyUp(sender As Object, e As KeyEventArgs) Handles ComboBoxValueType.KeyUp
+        Try
+            Dim lrGraphics As Graphics
+            lrGraphics = Me.zrPage.Form.CreateGraphics
+
+            Dim lrSizeF = lrGraphics.MeasureString(Me.ComboBoxValueType.Text, Me.ComboBoxValueType.Font)
+            Me.ComboBoxValueType.Width = Viev.Greater(lrSizeF.Width + 30, 60)
+        Catch ex As Exception
+            Debugger.Break()
+        End Try
     End Sub
 
     Private Sub ComboBoxValueType_Leave(ByVal sender As Object, ByVal e As System.EventArgs) Handles ComboBoxValueType.Leave
