@@ -85,6 +85,13 @@
         End Function
 
         ''' <summary>
+        ''' Updates the Index in the database. E.g. Changing a Unique Index to Primary Key.
+        ''' </summary>
+        ''' <param name="arIndex">The Index to be updated.</param>
+        Public Overridable Sub IndexUpdate(ByRef arIndex As RDS.Index)
+        End Sub
+
+        ''' <summary>
         ''' Removes the Column from its Table.
         ''' </summary>
         ''' <param name="arColumn"></param>

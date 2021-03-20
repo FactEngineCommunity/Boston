@@ -875,7 +875,43 @@ Public Class frmDiagramORM
                         Dim lrFactTypeInstance As New FBM.FactTypeInstance(lrModel, Me.zrPage, pcenumLanguage.ORMModel, lrFactType.Name, True)
 
                         If IsSomething(Me.zrPage.FactTypeInstance.Find(AddressOf lrFactTypeInstance.Equals)) Then
-                            MsgBox("This Page already contains the Fact Type, '" & lrFactType.Name & "'.")
+                            If lrFactTypeInstance.Shape Is Nothing Then
+                                lrFactType = Me.zrPage.Model.GetModelObjectByName(lrFactTypeInstance.Id)
+                                '===================================================================================
+                                'CodeSafe
+                                '  May be something wrong. E.g. IsPreferredReferenceMode, but is not actually.
+                                If lrFactType.IsPreferredReferenceMode Then
+                                    Dim lasRoleConstraintId = From RoleConstraint In lrFactType.InternalUniquenessConstraint
+                                                              Select RoleConstraint.Id
+
+                                    Dim larEntityType = From EntityType In Me.zrPage.Model.EntityType
+                                                        Where lasRoleConstraintId.Contains(EntityType.PreferredIdentifierRCId)
+                                                        Select EntityType
+
+                                    If larEntityType.Count = 0 Then
+                                        lrFactType.IsPreferredReferenceMode = False
+                                        Call lrFactTypeInstance.RemoveFromPage(True)
+                                        lrFactTypeInstance = Me.zrPage.DropFactTypeAtPoint(lrFactType, New PointF(100, 100), False, False, True)
+                                        lrFactType.makeDirty()
+                                        Dim larObjectType = From RoleInstance In lrFactTypeInstance.RoleGroup
+                                                            Select RoleInstance.JoinedORMObject
+
+                                        For Each lrObjectType As Object In larObjectType
+                                            If lrObjectType.Shape IsNot Nothing Then
+                                                lrObjectType.Shape.Visible = True
+                                            End If
+                                        Next
+                                    Else
+                                        Dim lrEntityTypeInstance = Me.zrPage.EntityTypeInstance.Find(Function(x) x.Id = larEntityType.First.Id)
+                                        Call lrEntityTypeInstance.ExpandTheReferenceScheme()
+                                    End If
+                                End If
+                                '===================================================================================
+                            ElseIf lrFactTypeInstance.Shape.Visible = False Then
+                                Call lrFactTypeInstance.Show()
+                            Else
+                                MsgBox("This Page already contains the Fact Type, '" & lrFactType.Name & "'.")
+                            End If
                         Else
                             '--------------------------------------------------------------------------------------
                             'Check to see if the ModelObjects joined by the Roles of the FactType are already

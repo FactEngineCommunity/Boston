@@ -907,7 +907,7 @@ Namespace FBM
                 ElseIf Me.AreObjectTypesLoadedForFactType(arFactType) Then
                     '--------------------------------------------------------------
                     'No need to load the ObjectTypes for the FactType because they
-                    '  are already loaded on the Page.
+                    '  are already loaded on the Page. Just make sure their shapes are visible.
                     '--------------------------------------------------------------
                 Else
                     '--------------------------------------------------------------

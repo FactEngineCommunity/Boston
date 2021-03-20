@@ -653,6 +653,11 @@ Namespace FBM
                     Call lrRoleInstance.RemoveFromPage()
                 Next
 
+                'CodeSafe
+                For Each lrRoleInstance In Me.Page.RoleInstance.FindAll(Function(x) x.FactType.Id = Me.Id).ToArray
+                    Call lrRoleInstance.RemoveFromPage()
+                Next
+
                 Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
 
                 For Each lrRoleConstraintInstance In Me.InternalUniquenessConstraint.ToArray
@@ -1465,6 +1470,12 @@ Namespace FBM
                         For Each lrRoleInstance In Me.RoleGroup
                             lrRoleInstance.Shape.Visible = True
                             lrRoleInstance.Link.Visible = True
+
+                            Select Case lrRoleInstance.TypeOfJoin
+                                Case Is = pcenumRoleJoinType.ValueType
+                                    lrRoleInstance.JoinsValueType.Shape.Visible = True
+                            End Select
+
                         Next
 
                         If Me.FactTypeReadingShape.Shape IsNot Nothing Then                        

@@ -915,7 +915,7 @@ Namespace FBM
                     '------------------------------------------------------------------------------------------------------------------
                     lrRoleConstraintRole.Shape = loDroppedShapeNode
 
-                    If lrRoleConstraintRole.Role.FactType.isPreferredReferenceMode Then
+                    If lrRoleConstraintRole.Role.FactType.FactType.IsPreferredReferenceMode Then
                         lrRoleConstraintRole.Shape.Visible = False
                     Else
                         lrRoleConstraintRole.Shape.Visible = True

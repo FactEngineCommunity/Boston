@@ -298,6 +298,12 @@ Namespace RDS
 
                 RaiseEvent IsPrimaryKeyChanged(abIsPrimaryKey)
 
+                If Me.Model.Model.IsDatabaseSynchronised Then
+                    Me.Model.Model.connectToDatabase()
+                    Call Me.Model.Model.DatabaseConnection.IndexUpdate(Me)
+
+                End If
+
             Catch ex As Exception
                 Dim lsMessage1 As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
