@@ -90,8 +90,6 @@ Namespace FEQL
                                                           lrQueryEdge.TargetNode,
                                                           lrQueryEdge.Predicate)
 
-
-
                     Dim lrInsertColumn As RDS.Column
 
                     If lrQueryEdge.FBMFactType.IsManyTo1BinaryFactType Or lrQueryEdge.FBMFactType.Is1To1BinaryFactType Then
@@ -112,7 +110,8 @@ Namespace FEQL
                                 lsSQLQuery &= " WHERE "
 
                                 'CodeSafe
-                                If larUniqueIndexColumn.Count <> lrPredicateNodePropertyIndentification.NODE.NODEPROPERTYIDENTIFICATION.IDENTIFIER.Count Then
+                                ' Check that the user has provided at least the number of primary key columns by count
+                                If larUniqueIndexColumn.Count > lrPredicateNodePropertyIndentification.NODE.NODEPROPERTYIDENTIFICATION.IDENTIFIER.Count Then
                                     Throw New Exception("The primary unique index for model element, '" & lrTargetTable.Name & "', has " & larUniqueIndexColumn.Count.ToString & " columns, rather than the " & lrPredicateNodePropertyIndentification.NODE.NODEPROPERTYIDENTIFICATION.IDENTIFIER.Count.ToString & " for which values are provided.")
                                 End If
 
@@ -154,6 +153,17 @@ Namespace FEQL
                         End Select
                     End If
                 Next
+
+                ''Check to see that the user has provided the primary key columns.
+                'For Each lrUniqueIndexColumn In larUniqueIndexColumn
+                '    If Not lrPredicateNodePropertyIndentification.NODE.NODEPROPERTYIDENTIFICATION.IDENTIFIER.Contains(lrUniqueIndexColumn.Name) Then
+                '        Dim lsErrorMessage = "Error: Provide values for at least the unique index key properties of " & lrTargetTable.Name
+                '        For Each lrPKColumn In larUniqueIndexColumn
+                '            lsErrorMessage &= "," & lrPKColumn.Name
+                '        Next
+                '        Throw New Exception(lsErrorMessage & ".")
+                '    End If
+                'Next
 
                 'PK Columns
                 If lrTable.getPrimaryKeyColumns.Count = 1 Then
@@ -197,7 +207,7 @@ Namespace FEQL
                                 Dim liInd2 = Me.CREATEStatement.NODEPROPERTYNAMEIDENTIFICATION.MODELELEMENTNAME.IndexOf(lrInsertColumn.Name)
 
                                 If liInd2 < 0 Then
-                                    Throw New Exception("Cannot find property, " & lrInsertColumn.Name & ", in your statement. Required for Primmary Key of the Object Type, " & lrTable.Name)
+                                    Throw New Exception("Cannot find property, " & lrInsertColumn.Name & ", in your statement. Required for Primary Key of the Object Type, " & lrTable.Name)
                                 End If
 
                                 lrInsertColumn.TemporaryData = Me.CREATEStatement.NODEPROPERTYNAMEIDENTIFICATION.IDENTIFIER(liInd2 - 1)
