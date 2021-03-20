@@ -94,7 +94,7 @@ Namespace FEQL
 
                     Dim lrInsertColumn As RDS.Column
 
-                    If lrQueryEdge.FBMFactType.IsManyTo1BinaryFactType Then
+                    If lrQueryEdge.FBMFactType.IsManyTo1BinaryFactType Or lrQueryEdge.FBMFactType.Is1To1BinaryFactType Then
                         Select Case lrQueryEdge.FBMFactType.RoleGroup(1).JoinedORMObject.GetType
                             Case GetType(FBM.EntityType)
                                 'Need to get the value of the PrimaryKey of row for the Table/EntityType based on the UniqueIndex value supplied by the user
