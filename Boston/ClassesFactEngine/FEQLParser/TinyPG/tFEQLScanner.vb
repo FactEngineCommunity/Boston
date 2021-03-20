@@ -53,7 +53,7 @@ Namespace FEQL
             Patterns.Add(TokenType.COLON, regex)
             Tokens.Add(TokenType.COLON)
 
-            regex = new Regex("[aA-zZ0-9]+", RegexOptions.Compiled)
+            regex = new Regex("(([A-Z0-9][a-z0-9]+)+[_|\s]?)+", RegexOptions.Compiled)
             Patterns.Add(TokenType.COLUMNNAMESTR, regex)
             Tokens.Add(TokenType.COLUMNNAMESTR)
 

@@ -1438,6 +1438,13 @@ Public Class frmFactEngine
                 End If
 
                 Select Case liTokenType
+                    Case Is = FEQL.TokenType.COLUMNNAMESTR
+                        If larModelElementNameParseNode.Count > 0 Then
+                            Dim lrTable As RDS.Table = prApplication.WorkingModel.RDS.Table.Find(Function(x) x.Name = larModelElementNameParseNode.Last.Token.Text)
+                            For Each lrColumn In lrTable.Column
+                                Me.AddEnterpriseAwareItem(lrColumn.Name)
+                            Next
+                        End If
                     Case Is = FEQL.TokenType.EOF
                     Case Is = FEQL.TokenType.MODELELEMENTSUFFIX
                     Case Is = FEQL.TokenType.BROPEN

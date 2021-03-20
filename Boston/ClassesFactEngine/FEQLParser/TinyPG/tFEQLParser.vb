@@ -2826,12 +2826,12 @@ Namespace FEQL
 
 
              ' Concat Rule
-            tok = m_scanner.Scan(TokenType.MODELELEMENTNAME) ' Terminal Rule: MODELELEMENTNAME
+            tok = m_scanner.Scan(TokenType.COLUMNNAMESTR) ' Terminal Rule: COLUMNNAMESTR
             n = node.CreateNode(tok, tok.ToString() )
             node.Token.UpdateRange(tok)
             node.Nodes.Add(n)
-            If tok.Type <> TokenType.MODELELEMENTNAME Then
-                m_tree.Errors.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.MODELELEMENTNAME.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MODELELEMENTNAME"))
+            If tok.Type <> TokenType.COLUMNNAMESTR Then
+                m_tree.Errors.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.COLUMNNAMESTR.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "COLUMNNAMESTR"))
                 Return
 
             End If

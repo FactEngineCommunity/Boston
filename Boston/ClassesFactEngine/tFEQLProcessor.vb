@@ -714,13 +714,13 @@ Namespace FEQL
 
     Public Class QuotedPropertyIdentifierList
 
-        Private _MODELELEMENTNAME As String
-        Public Property MODELELEMENTNAME As String
+        Private _COLUMNNAMESTR As String
+        Public Property COLUMNNAMESTR As String
             Get
-                Return Me._MODELELEMENTNAME
+                Return Me._COLUMNNAMESTR
             End Get
             Set(value As String)
-                Me._MODELELEMENTNAME = value
+                Me._COLUMNNAMESTR = value
             End Set
         End Property
 
