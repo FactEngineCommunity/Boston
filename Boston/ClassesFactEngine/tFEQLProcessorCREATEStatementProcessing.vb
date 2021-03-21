@@ -165,6 +165,7 @@ Namespace FEQL
                 '    End If
                 'Next
 
+
                 'PK Columns
                 If lrTable.getPrimaryKeyColumns.Count = 1 Then
                     Dim lrPKColumn = lrTable.getPrimaryKeyColumns(0)
@@ -176,6 +177,10 @@ Namespace FEQL
                             Else
                                 lrInsertColumn.TemporaryData = "1"
                             End If
+                        ElseIf Me.CREATEStatement.NODEPROPERTYNAMEIDENTIFICATION.QUOTEDPROPERTYIDENTIFIERLIST IsNot Nothing Then
+                            If Me.CREATEStatement.NODEPROPERTYNAMEIDENTIFICATION.QUOTEDPROPERTYIDENTIFIERLIST.COLUMNNAMESTR.Contains(lrTable.getPrimaryKeyColumns.First.Name) Then
+                                Throw New Exception("Error: Primary Key property, " & lrTable.getPrimaryKeyColumns.First.Name & ", is missing from the property identifier list.")
+                            End If
                         Else
                             lrInsertColumn.TemporaryData = "1"
                         End If
@@ -184,7 +189,15 @@ Namespace FEQL
                     Else
                         'Dim lrInsertColumn As New RDS.Column(lrInsertTable, lrPKColumn.Name, Nothing, Nothing)
                         Dim lrInsertColumn = lrPKColumn.Clone(Nothing, Nothing)
-                        lrInsertColumn.TemporaryData = Me.CREATEStatement.NODEPROPERTYNAMEIDENTIFICATION.IDENTIFIER(0)
+                        If Me.CREATEStatement.NODEPROPERTYNAMEIDENTIFICATION.QUOTEDPROPERTYIDENTIFIERLIST IsNot Nothing Then
+                            If Not Me.CREATEStatement.NODEPROPERTYNAMEIDENTIFICATION.QUOTEDPROPERTYIDENTIFIERLIST.COLUMNNAMESTR.Contains(lrTable.getPrimaryKeyColumns.First.Name) Then
+                                Throw New Exception("Error: Primary Key property, " & lrTable.getPrimaryKeyColumns.First.Name & ", is missing from the property identifier list.")
+                            Else
+                                lrInsertColumn.TemporaryData = Me.CREATEStatement.NODEPROPERTYNAMEIDENTIFICATION.IDENTIFIER(0)
+                            End If
+                        Else
+                            lrInsertColumn.TemporaryData = Me.CREATEStatement.NODEPROPERTYNAMEIDENTIFICATION.IDENTIFIER(0)
+                        End If
                         larInsertColumn.Add(lrInsertColumn)
                     End If
                 Else

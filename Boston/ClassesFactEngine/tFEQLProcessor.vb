@@ -714,12 +714,12 @@ Namespace FEQL
 
     Public Class QuotedPropertyIdentifierList
 
-        Private _COLUMNNAMESTR As String
-        Public Property COLUMNNAMESTR As String
+        Private _COLUMNNAMESTR As New List(Of String)
+        Public Property COLUMNNAMESTR As List(Of String)
             Get
                 Return Me._COLUMNNAMESTR
             End Get
-            Set(value As String)
+            Set(value As List(Of String))
                 Me._COLUMNNAMESTR = value
             End Set
         End Property
