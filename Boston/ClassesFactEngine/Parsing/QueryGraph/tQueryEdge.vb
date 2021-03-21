@@ -19,6 +19,8 @@ Namespace FactEngine
 
         Public FBMFactTypeReading As FBM.FactTypeReading = Nothing
 
+        Public FBMPredicatePart As FBM.PredicatePart = Nothing
+
         ''' <summary>
         ''' 'E.g. WHICH "Person was armed by WHICH Person 2", rather than "WHICH Person armed Person 2" and where the latter is the primary FactTypeReading predicate.
         ''' </summary>
@@ -96,7 +98,8 @@ Namespace FactEngine
 
         Public Function getAndSetFBMFactType(ByRef arBaseNode As FactEngine.QueryNode,
                                              ByRef arTargetNode As FactEngine.QueryNode,
-                                             ByVal asPredicate As String) As Exception
+                                             ByVal asPredicate As String,
+                                             Optional ByVal arPreviousTargetNode As FactEngine.QueryNode = Nothing) As Exception
 
             Dim lsMessage As String = ""
             Try
@@ -300,6 +303,26 @@ Namespace FactEngine
                                 If Me.FBMPossibleFactTypes.First.RoleGroup.Count > 2 Then
                                     Me.IsPartialFactTypeMatch = True
                                     Me.FBMFactType = Me.FBMPossibleFactTypes.First
+                                    Dim lsModelElementId As String
+                                    If arPreviousTargetNode Is Nothing Then
+                                        lsModelElementId = larModelObject(0).Id
+                                    Else
+                                        lsModelElementId = arPreviousTargetNode.Name
+                                    End If
+                                    Me.FBMFactTypeReading = (From FactTypeReading In Me.FBMPossibleFactTypes(0).FactTypeReading
+                                                             From PredicatePart In FactTypeReading.PredicatePart
+                                                             Where PredicatePart.Role.JoinedORMObject.Id = lsModelElementId
+                                                             Where PredicatePart.PredicatePartText = asPredicate
+                                                             Select FactTypeReading
+                                                            ).First
+
+                                    Me.FBMPredicatePart = (From FactTypeReading In Me.FBMPossibleFactTypes(0).FactTypeReading
+                                                           From PredicatePart In FactTypeReading.PredicatePart
+                                                           Where PredicatePart.Role.JoinedORMObject.Id = lsModelElementId
+                                                           Where PredicatePart.PredicatePartText = asPredicate
+                                                           Select PredicatePart
+                                                          ).First
+
                                 End If
                             End If
                         Else

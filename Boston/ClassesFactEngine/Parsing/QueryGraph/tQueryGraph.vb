@@ -395,7 +395,7 @@
                     liInd = 0
                     For Each lrColumn In Me.HeadNode.RDSTable.getFirstUniquenessConstraintColumns
                         lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") & "[" & lrTargetTable.Name & Viev.NullVal(Me.HeadNode.Alias, "") & "]." & lrColumn.Name & " = '" & Me.HeadNode.IdentifierList(liInd) & "'" & vbCrLf
-                        If liInd < Me.HeadNode.IdentifierList.Count - 1 Then lsSQLQuery &= "AND "
+                        If liInd < Me.HeadNode.RDSTable.getFirstUniquenessConstraintColumns.Count - 1 Then lsSQLQuery &= "AND "
                         liInd += 1
                     Next
                     lbIntialWhere = "AND "
@@ -616,9 +616,12 @@
                 Dim liRoleInd As Integer
                 'Edge Column/s
                 Dim lrQueryEdge As FactEngine.QueryEdge
+                Dim lrRole As FBM.Role = Nothing
                 For Each lrQueryEdge In Me.getProjectQueryEdges()
-                    If lrQueryEdge.BaseNode.FBMModelObject.Id = lrQueryEdge.FBMFactType.RoleGroup(0).JoinedORMObject.Id Then
+                    If lrQueryEdge.FBMFactType.IsBinaryFactType And lrQueryEdge.BaseNode.FBMModelObject.Id = lrQueryEdge.FBMFactType.RoleGroup(0).JoinedORMObject.Id Then
                         liRoleInd = 1 'Other side of a BinaryFactType
+                    ElseIf lrQueryEdge.IsPartialFactTypeMatch Then
+                        lrRole = lrQueryEdge.FBMFactTypeReading.PredicatePart(lrQueryEdge.FBMFactTypeReading.PredicatePart.IndexOf(lrQueryEdge.FBMPredicatePart) + 1).Role
                     Else
                         liRoleInd = 0 'First Role of a BinaryFactType
                     End If
@@ -639,11 +642,18 @@
 
                             larColumn.AddUnique(lrColumn)
                         Case Else
-                            Dim larEdgeColumn = lrQueryEdge.FBMFactType.RoleGroup(liRoleInd).JoinedORMObject.getCorrespondingRDSTable.getFirstUniquenessConstraintColumns.OrderBy(Function(x) x.OrdinalPosition)
+                            Dim larEdgeColumn As List(Of RDS.Column)
+                            If lrRole IsNot Nothing Then
+                                larEdgeColumn = lrRole.JoinedORMObject.getCorrespondingRDSTable.getFirstUniquenessConstraintColumns.OrderBy(Function(x) x.OrdinalPosition).ToList
+                            Else
+                                larEdgeColumn = lrQueryEdge.FBMFactType.RoleGroup(liRoleInd).JoinedORMObject.getCorrespondingRDSTable.getFirstUniquenessConstraintColumns.OrderBy(Function(x) x.OrdinalPosition).ToList
+                            End If
                             Dim lrTempColumn As RDS.Column
                             For Each lrColumn In larEdgeColumn
                                 lrTempColumn = lrColumn.Clone(Nothing, Nothing)
-                                If liRoleInd = 1 Then
+                                If lrRole IsNot Nothing Then
+                                    lrTempColumn.TemporaryAlias = lrQueryEdge.TargetNode.Alias
+                                ElseIf liRoleInd = 1 Then
                                     lrTempColumn.TemporaryAlias = lrQueryEdge.TargetNode.Alias
                                 Else
                                     lrTempColumn.TemporaryAlias = lrQueryEdge.Alias
@@ -659,7 +669,7 @@
 
                 Return larColumn
             Catch ex As Exception
-                Throw New Exception("Error in QueryGraph.getProjectionColumns:" & vbCrLf & vbCrLf & ex.StackTrace.ToString)
+                Throw New Exception("Error in QueryGraph.getProjectionColumns:" & vbCrLf & vbCrLf & ex.Message & vbCrLf & vbCrLf & ex.StackTrace.ToString)
             End Try
 
         End Function

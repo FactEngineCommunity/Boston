@@ -251,7 +251,8 @@
             'Get the relevant FBM.FactType
             Call arQueryEdge.getAndSetFBMFactType(arQueryEdge.BaseNode,
                                                   arQueryEdge.TargetNode,
-                                                  arQueryEdge.Predicate)
+                                                  arQueryEdge.Predicate,
+                                                  arPreviousTargetNode)
 
             If arQueryEdge.FBMFactType IsNot Nothing Then
                 If arQueryEdge.FBMFactType.Arity = 2 Then
@@ -310,7 +311,8 @@
             'Get the relevant FBM.FactType
             Call arQueryEdge.getAndSetFBMFactType(arQueryEdge.BaseNode,
                                                   arQueryEdge.TargetNode,
-                                                  arQueryEdge.Predicate)
+                                                  arQueryEdge.Predicate,
+                                                  arPreviousTargetNode)
 
             If Not arQueryEdge.FBMFactType.getPrimaryFactTypeReading.PredicatePart(0).PredicatePartText = arQueryEdge.Predicate Then
                 '    'Switch the Base and Target nodes
