@@ -25,6 +25,7 @@ Public Class frmCRUDModel
         Call Me.LoadDatabaseTypes()
 
         Me.TextBoxDatabaseConnectionString.Text = Me.zrModel.TargetDatabaseConnectionString
+        Me.CheckBoxIsDatabaseSynchronised.Checked = Me.zrModel.IsDatabaseSynchronised
 
         If Me.zrModel.IsEmpty Then
             Me.Button1.Enabled = True
