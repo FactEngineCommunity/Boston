@@ -25,6 +25,12 @@ Namespace FactEngine
         Public IsReciprocal As Boolean = False
 
         ''' <summary>
+        ''' True if the Predicate is one of many (2 or more) PredicateParts of a Ternary or greater FactType.
+        ''' E.g. WHICH Part is in (Bin:'H1')  where 'is in' is a PredicatePart of 'Part is in Bin in Warehouse'.
+        ''' </summary>
+        Public IsPartialPredicateEdge As Boolean = False
+
+        ''' <summary>
         ''' Used when QueryEdge matches one of the many PredicateParts of a FTR for a FactType with Arity greater than 2
         ''' E.g. "Person visited (Country:'China')" within a larger ternary FactType, "Person visited (Country:'China') within the last 10 months"
         ''' </summary>
@@ -289,6 +295,12 @@ Namespace FactEngine
 
                                 lsMessage = "There is no Fact Type Reading in the Model, '" & arBaseNode.FBMModelObject.Id & " " & asPredicate & " " & arTargetNode.Name & "'"
                                 Throw New Exception(lsMessage)
+                            ElseIf Me.FBMPossibleFactTypes.Count = 1 Then
+                                'Check if is PartialPredicate of a FactTypeReading with more than 2 PredicateParts
+                                If Me.FBMPossibleFactTypes.First.RoleGroup.Count > 2 Then
+                                    Me.IsPartialFactTypeMatch = True
+                                    Me.FBMFactType = Me.FBMPossibleFactTypes.First
+                                End If
                             End If
                         Else
                             Me.FBMFactType = larFactType.First

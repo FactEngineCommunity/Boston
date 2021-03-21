@@ -137,7 +137,7 @@
 
                 liInd = 1
                 Dim larQuerEdgeWithFBMFactType = Me.QueryEdges.FindAll(Function(x) x.FBMFactType IsNot Nothing)
-                Dim larRDSTableQueryEdge = larQuerEdgeWithFBMFactType.FindAll(Function(x) x.FBMFactType.isRDSTable And Not x.FBMFactType.IsDerived)
+                Dim larRDSTableQueryEdge = larQuerEdgeWithFBMFactType.FindAll(Function(x) x.FBMFactType.isRDSTable And Not x.FBMFactType.IsDerived And Not x.IsPartialFactTypeMatch)
 
                 'RDS Tables
                 For Each lrQueryEdge In larRDSTableQueryEdge
@@ -160,9 +160,23 @@
                     lsSQLQuery &= vbCrLf & ","
 
                     lsSQLQuery &= lrDerivationProcessor.processDerivationText(lrQueryEdge.FBMFactType.DerivationText, lrQueryEdge.FBMFactType)
-
                 Next
 
+                'PartialFactTypeMatch
+                Dim lrPartialMatchFactType As FBM.FactType = Nothing
+                For Each lrQueryEdge In Me.QueryEdges
+                    If lrQueryEdge.IsPartialFactTypeMatch Then
+                        If lrQueryEdge.FBMFactType IsNot lrPartialMatchFactType Then
+                            lsSQLQuery &= vbCrLf & "," & lrQueryEdge.FBMFactType.Id
+                            If lrQueryEdge.Alias IsNot Nothing Then
+                                lsSQLQuery &= " " & lrQueryEdge.FBMFactType.Id & Viev.NullVal(lrQueryEdge.Alias, "")
+                            End If
+                        End If
+                        lrPartialMatchFactType = lrQueryEdge.FBMFactType
+                    Else
+                        lrPartialMatchFactType = Nothing
+                    End If
+                Next
 #End Region
 
                 'WHERE
@@ -209,7 +223,19 @@
 
                     Dim lrOriginTable As RDS.Table
 
-                    If lrQueryEdge.WhichClauseType = pcenumWhichClauseType.AndThatIdentityCompatitor Then
+                    If lrQueryEdge.IsPartialFactTypeMatch Then
+
+                        Dim lrNaryTable As RDS.Table = lrQueryEdge.FBMFactType.getCorrespondingRDSTable
+                        For Each lrColumn In lrQueryEdge.BaseNode.RDSTable.getPrimaryKeyColumns
+                            lsSQLQuery &= lrNaryTable.Name & "." & lrNaryTable.Column.Find(Function(x) x.ActiveRole Is lrColumn.ActiveRole).Name
+                            lsSQLQuery &= "=" & lrColumn.Table.Name & "." & lrColumn.Name & vbCrLf
+                        Next
+                        lsSQLQuery &= " AND "
+                        For Each lrColumn In lrQueryEdge.TargetNode.RDSTable.getPrimaryKeyColumns
+                            lsSQLQuery &= lrNaryTable.Name & "." & lrNaryTable.Column.Find(Function(x) x.ActiveRole Is lrColumn.ActiveRole).Name
+                            lsSQLQuery &= "=" & lrColumn.Table.Name & "." & lrColumn.Name & vbCrLf
+                        Next
+                    ElseIf lrQueryEdge.WhichClauseType = pcenumWhichClauseType.AndThatIdentityCompatitor Then
                         'E.g. Of the type "Person 1 IS NOT Person 2" or "Person 1 IS Person 2"
 
                         lsSQLQuery &= "("
