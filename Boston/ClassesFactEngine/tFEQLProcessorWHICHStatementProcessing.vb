@@ -449,6 +449,10 @@
                 If arQueryEdge.FBMFactType.IsManyTo1BinaryFactType And arQueryEdge.BaseNode.Name <> arQueryEdge.FBMFactType.RoleGroup(0).JoinedORMObject.Id Then
                     arQueryEdge.IsReciprocal = True
                 End If
+            ElseIf arQueryEdge.FBMFactType.FactTypeReading.Find(Function(x) x.IsPreferred) Is Nothing And
+                   arQueryEdge.FBMFactType.IsManyTo1BinaryFactType And
+                   arQueryEdge.BaseNode.Name <> arQueryEdge.FBMFactType.RoleGroup(0).JoinedORMObject.Id Then
+                arQueryEdge.IsReciprocal = True
             End If
 
 
