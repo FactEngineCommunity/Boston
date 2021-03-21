@@ -337,6 +337,7 @@ Public Class tApplication
                 Return frmMain.zfrmModelExplorer.addNewModelToBoston(arCreateDatabaseStatement.DATABASENAME, arCreateDatabaseStatement)
             Else
                 MsgBox("Please check that the Model Explorer view is open before adding a new model to Boston.")
+                Return Nothing
             End If
 
         Catch ex As Exception
@@ -346,6 +347,8 @@ Public Class tApplication
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
             prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+            Return Nothing
         End Try
 
     End Function

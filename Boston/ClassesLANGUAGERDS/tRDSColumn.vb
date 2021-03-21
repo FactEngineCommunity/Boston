@@ -422,7 +422,12 @@ Namespace RDS
                 If Me.Relation.Count = 0 Then Return Nothing
                 Return Me.Relation.Find(Function(x) x.OriginTable Is Me.Table).DestinationColumns.Find(Function(x) x.ActiveRole Is Me.ActiveRole)
             Catch ex As Exception
-                Debugger.Break()
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
                 Return Nothing
             End Try
 
@@ -657,7 +662,12 @@ Namespace RDS
                 End If
 
             Catch ex As Exception
-                Debugger.Break()
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
 

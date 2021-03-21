@@ -1,4 +1,6 @@
-﻿Namespace FEQL
+﻿Imports System.Reflection
+
+Namespace FEQL
     Partial Public Class Processor
 
         Public Function doesQueryEdgeHaveAnRingConstraint(ByRef arQueryEdge As FactEngine.QueryEdge) As Boolean
@@ -17,7 +19,13 @@
                 Return False
 
             Catch ex As Exception
-                Debugger.Break()
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
                 Return False
             End Try
 

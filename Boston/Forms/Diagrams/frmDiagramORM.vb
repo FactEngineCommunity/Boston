@@ -90,7 +90,12 @@ Public Class frmDiagramORM
             Dim lrSizeF = lrGraphics.MeasureString(Me.ComboBoxEntityType.Text, Me.ComboBoxEntityType.Font)
             Me.ComboBoxEntityType.Width = Viev.Greater(lrSizeF.Width + 30, 60)
         Catch ex As Exception
-            Debugger.Break()
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Sub
@@ -255,7 +260,12 @@ Public Class frmDiagramORM
             Dim lrSizeF = lrGraphics.MeasureString(Me.ComboBoxValueType.Text, Me.ComboBoxValueType.Font)
             Me.ComboBoxValueType.Width = Viev.Greater(lrSizeF.Width + 30, 60)
         Catch ex As Exception
-            Debugger.Break()
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
     End Sub
 
