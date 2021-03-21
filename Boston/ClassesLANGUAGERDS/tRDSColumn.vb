@@ -419,9 +419,11 @@ Namespace RDS
         Public Function getReferencedColumn() As RDS.Column
 
             Try
+                If Me.Relation.Count = 0 Then Return Nothing
                 Return Me.Relation.Find(Function(x) x.OriginTable Is Me.Table).DestinationColumns.Find(Function(x) x.ActiveRole Is Me.ActiveRole)
             Catch ex As Exception
                 Debugger.Break()
+                Return Nothing
             End Try
 
 

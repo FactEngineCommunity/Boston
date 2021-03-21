@@ -154,18 +154,6 @@ Namespace FEQL
                     End If
                 Next
 
-                ''Check to see that the user has provided the primary key columns.
-                'For Each lrUniqueIndexColumn In larUniqueIndexColumn
-                '    If Not lrPredicateNodePropertyIndentification.NODE.NODEPROPERTYIDENTIFICATION.IDENTIFIER.Contains(lrUniqueIndexColumn.Name) Then
-                '        Dim lsErrorMessage = "Error: Provide values for at least the unique index key properties of " & lrTargetTable.Name
-                '        For Each lrPKColumn In larUniqueIndexColumn
-                '            lsErrorMessage &= "," & lrPKColumn.Name
-                '        Next
-                '        Throw New Exception(lsErrorMessage & ".")
-                '    End If
-                'Next
-
-
                 'PK Columns
                 If lrTable.getPrimaryKeyColumns.Count = 1 Then
                     Dim lrPKColumn = lrTable.getPrimaryKeyColumns(0)
@@ -201,40 +189,62 @@ Namespace FEQL
                         larInsertColumn.Add(lrInsertColumn)
                     End If
                 Else
-                    If Me.CREATEStatement.NODEPROPERTYNAMEIDENTIFICATION.IDENTIFIER.Count > 0 And
-                       Me.CREATEStatement.NODEPROPERTYNAMEIDENTIFICATION.IDENTIFIER.Count <> lrTable.getPrimaryKeyColumns.Count Then
-                        Throw New Exception("The model element, '" & lrInsertTable.Name & "', has " & lrTable.getPrimaryKeyColumns.Count.ToString & " primary key columns. You have specified " & Me.CREATEStatement.NODEPROPERTYNAMEIDENTIFICATION.IDENTIFIER.Count.ToString & " primary key columns.")
-                    ElseIf Me.CREATEStatement.NODEPROPERTYNAMEIDENTIFICATION.IDENTIFIER.Count = 0 Then
-                        For Each lrColumn In lrTable.getPrimaryKeyColumns
-                            If Not larInsertColumn.Contains(lrColumn) Then
-                                Throw New Exception("You haven't specified relationships for each of the primary key properties of the Object Type.")
+                    If Me.CREATEStatement.NODEPROPERTYNAMEIDENTIFICATION.QUOTEDPROPERTYIDENTIFIERLIST IsNot Nothing Then
+                        'Check to see that the user has provided the primary key columns.
+                        For Each lrPKColumn In lrTable.getPrimaryKeyColumns
+                            If Not Me.CREATEStatement.NODEPROPERTYNAMEIDENTIFICATION.QUOTEDPROPERTYIDENTIFIERLIST.COLUMNNAMESTR.Contains(lrPKColumn.Name) Then
+                                Dim lsErrorMessage = "Error: Provide values for at least the unique index key properties of the " & lrTable.Name & " Object Type"
+                                For Each lrPKColumnA In lrTable.getPrimaryKeyColumns
+                                    lsErrorMessage &= ", " & lrPKColumnA.Name
+                                Next
+                                Throw New Exception(lsErrorMessage & ".")
                             End If
                         Next
-                    Else
+
                         liInd = 0
-                        For Each lrPKColumn In lrTable.getPrimaryKeyColumns
-                            'Dim lrInsertColumn As New RDS.Column(lrInsertTable, lrPKColumn.Name, Nothing, Nothing)
-                            Dim lrInsertColumn = lrPKColumn.Clone(Nothing, Nothing)
-
-                            If Me.CREATEStatement.NODEPROPERTYNAMEIDENTIFICATION.QUOTEDPROPERTYIDENTIFIERLIST IsNot Nothing Then
-                                Dim liInd2 = Me.CREATEStatement.NODEPROPERTYNAMEIDENTIFICATION.MODELELEMENTNAME.IndexOf(lrInsertColumn.Name)
-
-                                If liInd2 < 0 Then
-                                    Throw New Exception("Cannot find property, " & lrInsertColumn.Name & ", in your statement. Required for Primary Key of the Object Type, " & lrTable.Name)
-                                End If
-
-                                lrInsertColumn.TemporaryData = Me.CREATEStatement.NODEPROPERTYNAMEIDENTIFICATION.IDENTIFIER(liInd2 - 1)
-                            Else
-                                lrInsertColumn.TemporaryData = Me.CREATEStatement.NODEPROPERTYNAMEIDENTIFICATION.IDENTIFIER(liInd)
-                            End If
+                        For Each lsColumnName In Me.CREATEStatement.NODEPROPERTYNAMEIDENTIFICATION.QUOTEDPROPERTYIDENTIFIERLIST.COLUMNNAMESTR
+                            Dim lrInsertColumn = lrTable.Column.Find(Function(x) x.Name = lsColumnName).Clone(Nothing, Nothing)
+                            lrInsertColumn.TemporaryData = Me.CREATEStatement.NODEPROPERTYNAMEIDENTIFICATION.QUOTEDPROPERTYIDENTIFIERLIST.IDENTIFIER(liInd)
                             larInsertColumn.Add(lrInsertColumn)
                             liInd += 1
                         Next
+
+                    Else
+                        If Me.CREATEStatement.NODEPROPERTYNAMEIDENTIFICATION.IDENTIFIER.Count > 0 And
+                       Me.CREATEStatement.NODEPROPERTYNAMEIDENTIFICATION.IDENTIFIER.Count <> lrTable.getPrimaryKeyColumns.Count Then
+                            Throw New Exception("The model element, '" & lrInsertTable.Name & "', has " & lrTable.getPrimaryKeyColumns.Count.ToString & " primary key columns. You have specified " & Me.CREATEStatement.NODEPROPERTYNAMEIDENTIFICATION.IDENTIFIER.Count.ToString & " primary key columns.")
+                        ElseIf Me.CREATEStatement.NODEPROPERTYNAMEIDENTIFICATION.IDENTIFIER.Count = 0 Then
+                            For Each lrColumn In lrTable.getPrimaryKeyColumns
+                                If Not larInsertColumn.Contains(lrColumn) Then
+                                    Throw New Exception("You haven't specified relationships for each of the primary key properties of the Object Type.")
+                                End If
+                            Next
+                        Else
+                            liInd = 0
+                            For Each lrPKColumn In lrTable.getPrimaryKeyColumns
+                                'Dim lrInsertColumn As New RDS.Column(lrInsertTable, lrPKColumn.Name, Nothing, Nothing)
+                                Dim lrInsertColumn = lrPKColumn.Clone(Nothing, Nothing)
+
+                                If Me.CREATEStatement.NODEPROPERTYNAMEIDENTIFICATION.QUOTEDPROPERTYIDENTIFIERLIST IsNot Nothing Then
+                                    Dim liInd2 = Me.CREATEStatement.NODEPROPERTYNAMEIDENTIFICATION.MODELELEMENTNAME.IndexOf(lrInsertColumn.Name)
+
+                                    If liInd2 < 0 Then
+                                        Throw New Exception("Cannot find property, " & lrInsertColumn.Name & ", in your statement. Required for Primary Key of the Object Type, " & lrTable.Name)
+                                    End If
+
+                                    lrInsertColumn.TemporaryData = Me.CREATEStatement.NODEPROPERTYNAMEIDENTIFICATION.IDENTIFIER(liInd2 - 1)
+                                Else
+                                    lrInsertColumn.TemporaryData = Me.CREATEStatement.NODEPROPERTYNAMEIDENTIFICATION.IDENTIFIER(liInd)
+                                End If
+                                larInsertColumn.Add(lrInsertColumn)
+                                liInd += 1
+                            Next
+                        End If
                     End If
                 End If
 
-                'Data Types set, check.
-                If larInsertColumn.FindAll(Function(x) x.getMetamodelDataType = pcenumORMDataType.DataTypeNotSet).Count > 0 Then
+                    'Data Types set, check.
+                    If larInsertColumn.FindAll(Function(x) x.getMetamodelDataType = pcenumORMDataType.DataTypeNotSet).Count > 0 Then
                     Throw New Exception("Make sure the Data Type is set for all properties before creating a new record.")
                 End If
 

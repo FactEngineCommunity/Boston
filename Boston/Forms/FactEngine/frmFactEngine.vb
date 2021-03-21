@@ -292,7 +292,7 @@ Public Class frmFactEngine
                         Me.LabelError.Text &= vbCrLf & vbCrLf
                         For Each lrCOlumn In lrTable.Column
                             Dim lsString = String.Format("{0,6}{1,-" & 20 - lrCOlumn.Name.Length & "}{2}", lrCOlumn.Name, " ", lrCOlumn.getMetamodelDataType.ToString)
-                            Me.LabelError.Text &= lsString
+                            Me.LabelError.Text &= LTrim(lsString)
                             If lrCOlumn.getMetamodelDataTypeLength <> 0 Then
                                 Me.LabelError.Text &= "(" & lrCOlumn.getMetamodelDataTypeLength.ToString
                                 If lrCOlumn.getMetamodelDataTypePrecision <> 0 Then
@@ -301,6 +301,13 @@ Public Class frmFactEngine
                                     Me.LabelError.Text &= ")"
                                 End If
                             End If
+
+                            If lrCOlumn.Role.Mandatory Then Me.LabelError.Text &= "  NOT NULL"
+
+                            If lrCOlumn.getReferencedColumn IsNot Nothing Then
+                                Me.LabelError.Text &= "  " & lrCOlumn.FactType.getOutgoingFactTypeReading(lrCOlumn.Role.JoinedORMObject).GetReadingText
+                            End If
+
                             Me.LabelError.Text &= vbCrLf
                         Next
 
