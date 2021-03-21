@@ -1396,13 +1396,25 @@ Public Class frmDiagramERD
 
                     If lrNode.NodeType = pcenumPGSEntityType.Relationship Then
                         Dim lrRelation As ERD.Relation
-                        lrRelation = lrPage.ERDiagram.Relation.FindAll(Function(x) x.ActualPGSNode IsNot Nothing).Find(Function(x) x.ActualPGSNode.Id = lrPageObject.Name)
+                        Dim larRelation = From Relation In lrPage.ERDiagram.Relation
+                                          Where Relation.ActualPGSNode IsNot Nothing
+                                          Select Relation
+                        If larRelation.Count > 0 Then
+                            lrRelation = larRelation.ToList.Find(Function(x) x.ActualPGSNode.Id = lrPageObject.Name)
+                        Else
+                            lrRelation = Nothing
+                        End If
 
-                        Dim lrPGSLink As PGS.Link = lrRelation.Link
+                        If lrRelation IsNot Nothing Then
+                            Dim lrPGSLink As PGS.Link = lrRelation.Link
 
-                        Me.MorphVector(0).EndSize = New Rectangle(lrPGSLink.Link.Bounds.X, lrPGSLink.Link.Bounds.Y, lrPGSLink.Link.Bounds.Width, Viev.Greater(1, lrPGSLink.Link.Bounds.Height))
-                        Me.MorphVector(0).EndPoint = New Point(lrRelation.Link.Link.Bounds.X - lrPage.DiagramView.ScrollX, lrRelation.Link.Link.bounds.Y - lrPage.DiagramView.ScrollY)
-                        Me.MorphVector(0).VectorSteps = Viev.Greater(15, (Math.Abs(lrRelation.Link.Link.Bounds.X - lrShapeNode.Bounds.X) + Math.Abs(lrRelation.Link.Link.Bounds.Y - lrShapeNode.Bounds.Y) + 1)) / 3
+                            Me.MorphVector(0).EndSize = New Rectangle(lrPGSLink.Link.Bounds.X, lrPGSLink.Link.Bounds.Y, lrPGSLink.Link.Bounds.Width, Viev.Greater(1, lrPGSLink.Link.Bounds.Height))
+                            Me.MorphVector(0).EndPoint = New Point(lrRelation.Link.Link.Bounds.X - lrPage.DiagramView.ScrollX, lrRelation.Link.Link.bounds.Y - lrPage.DiagramView.ScrollY)
+                            Me.MorphVector(0).VectorSteps = Viev.Greater(15, (Math.Abs(lrRelation.Link.Link.Bounds.X - lrShapeNode.Bounds.X) + Math.Abs(lrRelation.Link.Link.Bounds.Y - lrShapeNode.Bounds.Y) + 1)) / 3
+                        Else
+                            Me.MorphVector(0).EndSize = New Rectangle(0, 0, 20, 20)
+                            Me.MorphVector(0).EndPoint = New Point(lrNode.Shape.Bounds.X - lrPage.DiagramView.ScrollX, lrNode.Shape.Bounds.Y - lrPage.DiagramView.ScrollY) 'lrFactDataInstance.X, lrFactDataInstance.Y)
+                        End If
                     Else
                         Me.MorphVector(0).EndSize = New Rectangle(0, 0, 20, 20)
                         Me.MorphVector(0).EndPoint = New Point(lrNode.shape.Bounds.X - lrPage.DiagramView.ScrollX, lrNode.shape.Bounds.Y - lrPage.DiagramView.ScrollY) 'lrFactDataInstance.X, lrFactDataInstance.Y)

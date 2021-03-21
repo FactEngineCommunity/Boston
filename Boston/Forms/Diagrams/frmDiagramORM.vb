@@ -7683,18 +7683,34 @@ Public Class frmDiagramORM
                 If lrNode IsNot Nothing Then
                     If lrNode.NodeType = pcenumPGSEntityType.Relationship Then
                         Dim lrRelation As ERD.Relation
-                        lrRelation = lrPage.ERDiagram.Relation.Find(Function(x) x.ActualPGSNode.Id = lrPageObject.Name)
+                        Dim larRelation = From Relation In lrPage.ERDiagram.Relation
+                                          Where Relation.ActualPGSNode IsNot Nothing
+                                          Select Relation
+                        If larRelation.Count > 0 Then
+                            lrRelation = larRelation.ToList.Find(Function(x) x.ActualPGSNode.Id = lrPageObject.Name)
+                        Else
+                            lrRelation = Nothing
+                        End If
 
-                        Dim lrPGSLink As PGS.Link = lrRelation.Link
+                        If lrRelation IsNot Nothing Then
+                            Dim lrPGSLink As PGS.Link = lrRelation.Link
 
-                        Me.MorphVector(0).EndSize = New Rectangle(lrPGSLink.Link.Bounds.X, lrPGSLink.Link.Bounds.Y, lrPGSLink.Link.Bounds.Width, Viev.Greater(1, lrPGSLink.Link.Bounds.Height))
-                        Me.MorphVector(0).EndPoint = New Point(lrRelation.Link.Link.Bounds.X, lrRelation.Link.Link.bounds.Y)
-                        Me.MorphVector(0).VectorSteps = Viev.Lesser(25, (Math.Abs(lrRelation.Link.Link.Bounds.X - lrShapeNode.Bounds.X) + Math.Abs(lrRelation.Link.Link.Bounds.Y - lrShapeNode.Bounds.Y) + 1))
+                            Me.MorphVector(0).EndSize = New Rectangle(lrPGSLink.Link.Bounds.X, lrPGSLink.Link.Bounds.Y, lrPGSLink.Link.Bounds.Width, Viev.Greater(1, lrPGSLink.Link.Bounds.Height))
+                            Me.MorphVector(0).EndPoint = New Point(lrRelation.Link.Link.Bounds.X, lrRelation.Link.Link.bounds.Y)
+                            Me.MorphVector(0).VectorSteps = Viev.Lesser(25, (Math.Abs(lrRelation.Link.Link.Bounds.X - lrShapeNode.Bounds.X) + Math.Abs(lrRelation.Link.Link.Bounds.Y - lrShapeNode.Bounds.Y) + 1))
+                        Else
+                            Me.MorphVector(0).EndSize = New Rectangle(lrNode.X,
+                                                                  lrNode.Y,
+                                                                  lrNode.Shape.Bounds.Width,
+                                                                  lrNode.Shape.Bounds.Height)
+                            Me.MorphVector(0).EndPoint = New Point(lrNode.Shape.Bounds.X, lrNode.Shape.Bounds.Y) ' (lrFactDataInstance.x, lrFactDataInstance.y)
+                            Me.MorphVector(0).VectorSteps = Viev.Lesser(25, (Math.Abs(lrNode.Shape.Bounds.X - lrShapeNode.Bounds.X) + Math.Abs(lrNode.Shape.Bounds.Y - lrShapeNode.Bounds.Y) + 1))
+                        End If
                     Else
                         Me.MorphVector(0).EndSize = New Rectangle(lrNode.X,
                                                                   lrNode.Y,
-                                                                  lrNode.shape.Bounds.Width,
-                                                                  lrNode.shape.Bounds.Height)
+                                                                  lrNode.Shape.Bounds.Width,
+                                                                  lrNode.Shape.Bounds.Height)
                         Me.MorphVector(0).EndPoint = New Point(lrNode.Shape.Bounds.X, lrNode.Shape.Bounds.Y) ' (lrFactDataInstance.x, lrFactDataInstance.y)
                         Me.MorphVector(0).VectorSteps = Viev.Lesser(25, (Math.Abs(lrNode.Shape.Bounds.X - lrShapeNode.Bounds.X) + Math.Abs(lrNode.Shape.Bounds.Y - lrShapeNode.Bounds.Y) + 1))
                     End If
@@ -7727,6 +7743,9 @@ Public Class frmDiagramORM
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
             prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+
+            Me.HiddenDiagramView.SendToBack()
+            Me.CircularProgressBar.SendToBack()
         End Try
 
     End Sub
