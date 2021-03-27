@@ -1060,14 +1060,16 @@ Public Class frmDiagramPGS
                     'If lrColumn.ContributesToPrimaryKey And lrRDSTable.Column.Count > 1 Then
                     '    'Don't show the Column
                     'Else
-                    If lrColumn.Relation.FindAll(Function(x) x.OriginTable.Name = lrColumn.Table.Name).Count > 0 Then
-                        'ForeignKey. Don't show the Column
-                    Else
-                        Me.PropertyTableNode.RowCount += 1
 
-                        Me.PropertyTableNode.Item(0, Me.PropertyTableNode.RowCount - 1).Tag = lrColumn
-                        Me.PropertyTableNode.Item(0, Me.PropertyTableNode.RowCount - 1).Text = lrColumn.Name
-                    End If
+                    '20200326-VM-Removed for demo purposes.
+                    'If lrColumn.Relation.FindAll(Function(x) x.OriginTable.Name = lrColumn.Table.Name).Count > 0 Then
+                    '    'ForeignKey. Don't show the Column
+                    'Else
+                    Me.PropertyTableNode.RowCount += 1
+
+                    Me.PropertyTableNode.Item(0, Me.PropertyTableNode.RowCount - 1).Tag = lrColumn
+                    Me.PropertyTableNode.Item(0, Me.PropertyTableNode.RowCount - 1).Text = lrColumn.Name
+                    'End If
                     '============================================================
                 Next
                 Me.PropertyTableNode.ResizeToFitText(True)

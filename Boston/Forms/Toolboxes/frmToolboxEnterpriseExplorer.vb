@@ -757,46 +757,56 @@ Public Class frmToolboxEnterpriseExplorer
         Dim loObject As New Object
         Dim loTreeNode As TreeNode
 
+        Try
 
-        loTreeNode = e.Item
+            loTreeNode = e.Item
 
-        lrEnterpriseView = loTreeNode.Tag
+            lrEnterpriseView = loTreeNode.Tag
 
-        loObject = lrEnterpriseView.Tag
+            loObject = lrEnterpriseView.Tag
 
-        If loObject.GetType Is GetType(FBM.Model) Then
-            Dim lrModel As FBM.Model
+            If loObject.GetType Is GetType(FBM.Model) Then
+                Dim lrModel As FBM.Model
 
-            lrModel = loObject
-            If lrModel.Loaded Then
-                '----------------------------------------
-                'That's great. Can drag a Loaded Model.
-                '----------------------------------------
-            Else
-                '----------------------------------------------------------------------
-                'Let the user know that the Model needs to be loaded before dragging.
-                '----------------------------------------------------------------------
-                Dim lsMessage As String = ""
+                lrModel = loObject
+                If lrModel.Loaded Then
+                    '----------------------------------------
+                    'That's great. Can drag a Loaded Model.
+                    '----------------------------------------
+                Else
+                    '----------------------------------------------------------------------
+                    'Let the user know that the Model needs to be loaded before dragging.
+                    '----------------------------------------------------------------------
+                    Dim lsMessage As String = ""
 
-                lsMessage = "The Model, '" & lrModel.Name & "', needs to be loaded before dragging to another location on the Enterprise Tree."
-                lsMessage &= vbCrLf & vbCrLf
-                lsMessage &= "Click [Yes] to load the Model now."
+                    lsMessage = "The Model, '" & lrModel.Name & "', needs to be loaded before dragging to another location on the Enterprise Tree."
+                    lsMessage &= vbCrLf & vbCrLf
+                    lsMessage &= "Click [Yes] to load the Model now."
 
-                If MsgBox(lsMessage, MsgBoxStyle.YesNoCancel) = MsgBoxResult.Yes Then
-                    Call lrModel.Load(True)
+                    If MsgBox(lsMessage, MsgBoxStyle.YesNoCancel) = MsgBoxResult.Yes Then
+                        Call lrModel.Load(True)
+                    End If
+
+                    Me.TreeView.SelectedNode = loTreeNode
+
                 End If
-
-                Me.TreeView.SelectedNode = loTreeNode
 
             End If
 
-        End If
+            If Richmond.GetAsyncKeyState(Keys.ControlKey) Then
+                DoDragDrop(e.Item, DragDropEffects.Copy Or DragDropEffects.Move)
+            Else
+                DoDragDrop(e.Item, DragDropEffects.Move Or DragDropEffects.Copy)
+            End If
 
-        If Richmond.GetAsyncKeyState(Keys.ControlKey) Then
-            DoDragDrop(e.Item, DragDropEffects.Copy Or DragDropEffects.Move)
-        Else
-            DoDragDrop(e.Item, DragDropEffects.Move Or DragDropEffects.Copy)
-        End If
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 

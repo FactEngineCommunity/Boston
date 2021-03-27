@@ -739,7 +739,10 @@ Public Class frmMain
             End If
         End If
 
-        Call Environment.Exit(0)
+        Try
+            Call Environment.Exit(0)
+        Catch ex As Exception
+        End Try
 
     End Sub
 
