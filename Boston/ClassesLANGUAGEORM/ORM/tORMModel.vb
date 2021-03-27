@@ -4576,6 +4576,18 @@ Namespace FBM
                 Dim lrPage = lrCorePage.Clone(Me, False, True, False) 'Clone the Page's Model Element for the State Transition Diagrams into the core metamodel.
                 Me.ContainsLanguage.AddUnique(pcenumLanguage.StateTransitionDiagram)
 
+            ElseIf Me.CoreVersionNumber = "2.1" Then
+                'CodeSafe
+                If Me.GetModelObjectByName(pcenumCMMLRelations.CoreValueTypeHasState.ToString) Is Nothing Then
+                    Dim lrCorePage = prApplication.CMML.Core.Page.Find(Function(x) x.Name = pcenumCMMLCorePage.CoreStateTransitionDiagram.ToString) 'AddressOf lrCorePage.EqualsByName)
+
+                    If lrCorePage Is Nothing Then
+                        Throw New Exception("Couldn't find Page, '" & pcenumCMMLCorePage.CoreStateTransitionDiagram.ToString & "', in the Core Model.")
+                    End If
+
+                    Dim lrPage = lrCorePage.Clone(Me, False, True, False) 'Clone the Page's Model Element for the State Transition Diagrams into the core metamodel.
+                    Me.ContainsLanguage.AddUnique(pcenumLanguage.StateTransitionDiagram)
+                End If
             End If
 
         End Sub
