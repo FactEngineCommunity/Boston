@@ -113,7 +113,7 @@ Namespace ERD
         End Function
 
         Public Shadows Function Equals(other As Relation) As Boolean Implements IEquatable(Of Relation).Equals
-            If Me.Id = other.Id Then Return True
+            Return Me.Id = other.Id
         End Function
 
         Private Sub RelationFactType_FactTypeReadingAdded(ByRef arFactTypeReading As FBM.FactTypeReading) Handles RelationFactType.FactTypeReadingAdded

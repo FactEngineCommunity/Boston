@@ -12,7 +12,7 @@
 [Color(227, 143, 247)]	CLOSEPARENTHESIS	-> @"}";
 [Color(227, 143, 247)]	CLOSESQUAREBRACKET	-> @"]";
 [Color(94, 213, 165)]  COLON		-> ":";
-[Color(94, 213, 165)]	COLUMNNAMESTR -> @"(([A-Z0-9][a-z0-9]+)+[_|\s]?)+";  //@"(([A-Z]+[a-z]+)+[_|\s]?)+";//@"[aA-zZ]+";
+[Color(255, 171, 26)]	COLUMNNAMESTR -> @"(([A-Z0-9][a-z0-9]+)+[_|\s]?)+";  //@"(([A-Z]+[a-z]+)+[_|\s]?)+";//@"[aA-zZ]+";
 ///COLUMNNAMESTR -> @"[aA-zZ0-9]+";
 [Color(135, 207, 243)]	COMMA         -> ",";
 CURLYBRACKETCLOSE -> @"\}+";
