@@ -147,6 +147,40 @@ Namespace FEQL
 
     End Class
 
+    Public Class RECURSIVECLAUSE
+
+        Private _NUMBER1 As String = Nothing
+        Public Property NUMBER1 As String
+            Get
+                Return Me._NUMBER1
+            End Get
+            Set(value As String)
+                Me._NUMBER1 = value
+            End Set
+        End Property
+
+        Private _NUMBER2 As String = Nothing
+        Public Property NUMBER2 As String
+            Get
+                Return Me._NUMBER2
+            End Get
+            Set(value As String)
+                Me._NUMBER2 = value
+            End Set
+        End Property
+
+        Private _NUMBER As New List(Of String)
+        Public Property NUMBER As List(Of String)
+            Get
+                Return Me._NUMBER
+            End Get
+            Set(value As List(Of String))
+                Me._NUMBER = value
+            End Set
+        End Property
+
+    End Class
+
     Public Class SHOWStatement
 
         Private _MODELELEMENTNAME As String = Nothing
@@ -531,6 +565,16 @@ Namespace FEQL
             End Get
             Set(value As MATHCLAUSE)
                 Me._MATHCLAUSE = value
+            End Set
+        End Property
+
+        Private _RECURSIVECLAUSE As RECURSIVECLAUSE = Nothing
+        Public Property RECURSIVECLAUSE As RECURSIVECLAUSE
+            Get
+                Return Me._RECURSIVECLAUSE
+            End Get
+            Set(value As RECURSIVECLAUSE)
+                Me._RECURSIVECLAUSE = value
             End Set
         End Property
 

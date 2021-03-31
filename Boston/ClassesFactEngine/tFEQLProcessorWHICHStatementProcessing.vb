@@ -307,6 +307,20 @@
             '    lrQueryEdge.Predicate = Trim(lrQueryEdge.Predicate & " " & lsPredicatePart)
             'Next
 
+            'Recursion
+            If arWHICHCLAUSE.RECURSIVECLAUSE IsNot Nothing Then
+                arQueryEdge.IsRecursive = True
+                If arWHICHCLAUSE.RECURSIVECLAUSE.NUMBER1 IsNot Nothing Then
+                    arQueryEdge.RecursiveNumber1 = arWHICHCLAUSE.RECURSIVECLAUSE.NUMBER(0)
+                    If arWHICHCLAUSE.RECURSIVECLAUSE.NUMBER2 IsNot Nothing Then
+                        arQueryEdge.RecursiveNumber2 = arWHICHCLAUSE.RECURSIVECLAUSE.NUMBER(1)
+                    End If
+                ElseIf arWHICHCLAUSE.RECURSIVECLAUSE.NUMBER2 IsNot Nothing Then
+                    arQueryEdge.RecursiveNumber1 = "0"
+                    arQueryEdge.RecursiveNumber2 = arWHICHCLAUSE.RECURSIVECLAUSE.NUMBER(0)
+                End If
+            End If
+
             '-----------------------------------------
             'Get the relevant FBM.FactType
             Call arQueryEdge.getAndSetFBMFactType(arQueryEdge.BaseNode,

@@ -307,6 +307,12 @@ Namespace FEQL
                 Case TokenType.NODEIDENTIFICATION
                     Value = EvalNODEIDENTIFICATION(tree, paramlist)
                     Exit Select
+                Case TokenType.NUMBER1
+                    Value = EvalNUMBER1(tree, paramlist)
+                    Exit Select
+                Case TokenType.NUMBER2
+                    Value = EvalNUMBER2(tree, paramlist)
+                    Exit Select
                 Case TokenType.PREDICATECLAUSE
                     Value = EvalPREDICATECLAUSE(tree, paramlist)
                     Exit Select
@@ -322,8 +328,14 @@ Namespace FEQL
                 Case TokenType.QUOTEDPROPERTYIDENTIFIERLIST
                     Value = EvalQUOTEDPROPERTYIDENTIFIERLIST(tree, paramlist)
                     Exit Select
+                Case TokenType.RECURSIVECLAUSE
+                    Value = EvalRECURSIVECLAUSE(tree, paramlist)
+                    Exit Select
                 Case TokenType.REFERENCEMODECLAUSE
                     Value = EvalREFERENCEMODECLAUSE(tree, paramlist)
+                    Exit Select
+                Case TokenType.RETURNCOLUMN
+                    Value = EvalRETURNCOLUMN(tree, paramlist)
                     Exit Select
                 Case TokenType.RETURNCLAUSE
                     Value = EvalRETURNCLAUSE(tree, paramlist)
@@ -703,6 +715,14 @@ Namespace FEQL
             Throw New NotImplementedException()
         End Function
 
+        Protected Overridable Function EvalNUMBER1(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalNUMBER2(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
         Protected Overridable Function EvalPREDICATECLAUSE(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
             Throw New NotImplementedException()
         End Function
@@ -723,7 +743,15 @@ Namespace FEQL
             Throw New NotImplementedException()
         End Function
 
+        Protected Overridable Function EvalRECURSIVECLAUSE(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
         Protected Overridable Function EvalREFERENCEMODECLAUSE(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalRETURNCOLUMN(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
             Throw New NotImplementedException()
         End Function
 

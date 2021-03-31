@@ -21,6 +21,10 @@ Namespace FactEngine
 
         Public FBMPredicatePart As FBM.PredicatePart = Nothing
 
+        Public IsRecursive As Boolean = False
+        Public RecursiveNumber1 As String = Nothing
+        Public RecursiveNumber2 As String = Nothing
+
         ''' <summary>
         ''' 'E.g. WHICH "Person was armed by WHICH Person 2", rather than "WHICH Person armed Person 2" and where the latter is the primary FactTypeReading predicate.
         ''' </summary>
@@ -341,6 +345,8 @@ Namespace FactEngine
                         Me.IsPartialFactTypeMatch = True
 
                     End If
+
+                    Me.FBMFactTypeReading = Me.FBMFactType.FactTypeReading.Find(AddressOf lrFactTypeReading.EqualsByPredicatePartText)
 
                 End If
 
