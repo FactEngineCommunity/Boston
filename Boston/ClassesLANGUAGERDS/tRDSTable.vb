@@ -417,10 +417,15 @@ Namespace RDS
                     Dim larColumn = From Column In Me.Column
                                     Where Column.isPartOfPrimaryKey = True
                                     Select Column Distinct
+                                    Order By Column.OrdinalPosition
 
                     Return larColumn.ToList
                 Else
-                    Return lrIndex.Column
+                    Dim larColumn = From Column In lrIndex.Column
+                                    Select Column
+                                    Order By Column.OrdinalPosition
+
+                    Return larColumn.ToList
                 End If
 
             Catch ex As Exception

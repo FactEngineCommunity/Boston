@@ -2923,25 +2923,35 @@ Public Class frmToolboxEnterpriseExplorer
 
     Private Sub ContextMenuStrip_Page_Opening(ByVal sender As System.Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles ContextMenuStrip_Page.Opening
 
-        Dim lrEnterpriseView As tEnterpriseEnterpriseView
-        Dim lrPage As FBM.Page
+        Try
+            Dim lrEnterpriseView As tEnterpriseEnterpriseView
+            Dim lrPage As FBM.Page
 
-        If Nothing Is Me.TreeView.SelectedNode Then
-            Me.ToolStripMenuItemEditPageAsORMDiagram.Visible = False
-        End If
+            If Nothing Is Me.TreeView.SelectedNode Then
+                Me.ToolStripMenuItemEditPageAsORMDiagram.Visible = False
+            End If
 
-        '----------------------------------------
-        'Create a temporary object for the Page
-        '----------------------------------------
-        lrEnterpriseView = Me.TreeView.SelectedNode.Tag
-        lrPage = lrEnterpriseView.Tag
+            '----------------------------------------
+            'Create a temporary object for the Page
+            '----------------------------------------
+            lrEnterpriseView = Me.TreeView.SelectedNode.Tag
+            lrPage = lrEnterpriseView.Tag
 
 
-        If My.Settings.SuperuserMode And Not lrPage.Language = pcenumLanguage.ORMModel Then
-            Me.ToolStripMenuItemEditPageAsORMDiagram.Visible = True
-        Else
-            Me.ToolStripMenuItemEditPageAsORMDiagram.Visible = False
-        End If
+            If My.Settings.SuperuserMode And Not lrPage.Language = pcenumLanguage.ORMModel Then
+                Me.ToolStripMenuItemEditPageAsORMDiagram.Visible = True
+            Else
+                Me.ToolStripMenuItemEditPageAsORMDiagram.Visible = False
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 

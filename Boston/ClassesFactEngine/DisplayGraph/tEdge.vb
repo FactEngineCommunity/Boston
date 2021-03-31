@@ -8,6 +8,8 @@
 
         Public Link As MindFusion.Diagramming.DiagramLink = Nothing
 
+        Public Predicate As String = ""
+
         Public Sub New(ByRef arBaseNode As FactEngine.DisplayGraph.Node,
                         ByRef arTargetNode As FactEngine.DisplayGraph.Node)
             Me.BaseNode = arBaseNode

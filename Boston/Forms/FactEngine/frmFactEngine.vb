@@ -1,5 +1,6 @@
 ﻿Imports System.Reflection
 Imports MindFusion.Diagramming.Layout
+Imports MindFusion.Diagramming
 
 Public Class frmFactEngine
 
@@ -51,7 +52,116 @@ Public Class frmFactEngine
             lrLink.SegmentCount = 1
         Next
 
+        Call Me.DisambiguateOverlappingLinks
+
     End Sub
+
+    Private Sub DisambiguateOverlappingLinks()
+
+        '--------------------------------
+        'Disambiguate overlapping links
+        '--------------------------------
+
+        For Each lrLink In Me.Diagram.Links
+            Dim commonLinks As DiagramLinkCollection = GetCommonLinks(lrLink.Origin, lrLink.Destination)
+
+            Dim pt1 As PointF = lrLink.ControlPoints(0)
+            Dim pt2 As PointF = lrLink.ControlPoints(lrLink.ControlPoints.Count - 1)
+
+            If commonLinks.Count > 1 Then
+                For c As Integer = 0 To commonLinks.Count - 1
+
+                    Dim link As DiagramLink = commonLinks(c)
+
+                    If link.Origin Is link.Destination Then
+
+                    Else
+                        '===================================                        
+                        'If Not link.Tag.HasBeenMoved Then
+                        link.Style = LinkStyle.Bezier
+                        link.SegmentCount = 1 'Keep as 1, because bows () links. 2 makes funny bezier links.
+
+                        Dim cp1 As New PointF(pt1.X + 1 * (pt2.X - pt1.X) / 3, pt1.Y + 1 * (pt2.Y - pt1.Y) / 3)
+                        Dim cp2 As New PointF(pt1.X + 2 * (pt2.X - pt1.X) / 3, pt1.Y + 2 * (pt2.Y - pt1.Y) / 3)
+
+                        Dim angle As Single = 0, radius As Single = 0
+                        CarteseanToPolar(pt1, pt2, angle, radius)
+
+                        Dim pairOffset As Integer = (c / 2 + 1) * 5
+                        'If commonLinks.Count Mod 2 = 0 Then
+                        PolarToCartesean(cp1, If(c Mod 2 = 0, angle - 90, angle + 90), pairOffset, cp1)
+                        PolarToCartesean(cp2, If(c Mod 2 = 0, angle - 90, angle + 90), pairOffset, cp2)
+
+                        If link.ControlPoints(0) = pt1 Then
+                            link.ControlPoints(1) = cp1
+                            link.ControlPoints(2) = cp2
+                        Else
+                            link.ControlPoints(1) = cp2
+                            link.ControlPoints(2) = cp1
+                        End If
+
+                        'link.Tag.HasBeenMoved = True
+
+                        link.UpdateFromPoints()
+
+                        '===================================
+                    End If
+                Next
+            Else
+                'lrLink.AutoRoute = True
+                lrLink.SegmentCount = 2
+                lrLink.SegmentCount = 1
+            End If
+        Next
+
+    End Sub
+
+
+    Private Sub CarteseanToPolar(ByVal coordCenter As PointF, ByVal dekart As PointF, ByRef a As Single, ByRef r As Single)
+        If coordCenter = dekart Then
+            a = 0
+            r = 0
+            Return
+        End If
+
+        Dim dx As Single = dekart.X - coordCenter.X
+        Dim dy As Single = dekart.Y - coordCenter.Y
+        r = CSng(Math.Sqrt(Math.Pow(dx, 2) + Math.Pow(dy, 2)))
+
+        a = CSng(Math.Atan(-dy / dx) * 180 / Math.PI)
+        If dx < 0 Then
+            a += 180
+        End If
+    End Sub
+
+    Private Sub PolarToCartesean(ByVal coordCenter As PointF, ByVal a As Single, ByVal r As Single, ByRef dekart As PointF)
+        If r = 0 Then
+            dekart = coordCenter
+            Return
+        End If
+
+        dekart.X = CSng(coordCenter.X + Math.Cos(a * Math.PI / 180) * r)
+        dekart.Y = CSng(coordCenter.Y - Math.Sin(a * Math.PI / 180) * r)
+    End Sub
+
+    Private Function GetCommonLinks(ByVal node1 As DiagramNode, ByVal node2 As DiagramNode) As DiagramLinkCollection
+        Dim commonLinks As New DiagramLinkCollection()
+
+        For Each link As DiagramLink In node1.OutgoingLinks
+            If link.Destination.Tag.Name = node2.Tag.Name Then
+                commonLinks.Add(link)
+            End If
+        Next
+
+        For Each link As DiagramLink In node1.IncomingLinks
+            If link.Origin.Tag.Name = node2.Tag.Name Then
+                commonLinks.Add(link)
+            End If
+        Next
+
+        Return commonLinks
+
+    End Function
 
     Private Sub AddEnterpriseAwareItem(ByVal asEAItem As String,
                                        Optional ByVal aoTagObject As Object = Nothing,
@@ -716,9 +826,18 @@ Public Class frmFactEngine
                                                 If lrBaseGraphNode Is Nothing Then
                                                     Throw New Exception("frmFactEngine.GO: BaseGraphNode is Nothing.")
                                                 End If
-                                                lrBaseGraphNode.Edge.Add(lrEdge)
+
+                                                Dim larDuplicateEdge = From Edge In lrBaseGraphNode.Edge
+                                                                       Where Edge.BaseNode Is lrEdge.BaseNode
+                                                                       Where Edge.TargetNode Is lrEdge.TargetNode
+                                                                       Where Edge.QueryEdge Is lrEdge.QueryEdge
+                                                                       Select Edge
+
+                                                If larDuplicateEdge.Count = 0 Then
+                                                    lrBaseGraphNode.Edge.Add(lrEdge)
+                                                End If
                                             End If
-                                        End If
+                                            End If
                                         liInd += 1
                                     Next
 
@@ -752,10 +871,15 @@ Public Class frmFactEngine
                                     lrPGSLink.HeadPen.Color = Drawing.Color.DeepSkyBlue
                                     lrPGSLink.AutoRoute = False
                                     lrPGSLink.Locked = True
+                                    lrPGSLink.HeadShapeSize = 3
+
+                                    Try
+                                        lrPGSLink.Text = lrEdge.TargetNode.Column(0).QueryEdge.Predicate
+                                    Catch ex As Exception
+                                    End Try
 
                                     'lrPGSLink.Tag = Me
                                     'Me.Link = lrPGSLink                                
-
                                     Me.Diagram.Links.Add(lrPGSLink)
                                 Next
 

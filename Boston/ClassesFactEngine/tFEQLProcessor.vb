@@ -686,6 +686,16 @@ Namespace FEQL
             End Set
         End Property
 
+        Private _MODELELEMENTSUFFIX As String = Nothing
+        Public Property MODELELEMENTSUFFIX As String
+            Get
+                Return Me._MODELELEMENTSUFFIX
+            End Get
+            Set(value As String)
+                Me._MODELELEMENTSUFFIX = value
+            End Set
+        End Property
+
     End Class
 
     Public Class NODEPROPERTYNAMEIDENTIFICATION
