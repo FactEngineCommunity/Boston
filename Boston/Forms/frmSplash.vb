@@ -32,23 +32,25 @@ Public Class frmSplash
 
         label_splash.Text = ls_message
 
-        Dim lo_random As New Random
-        Dim li_random As Integer = lo_random.Next(1, 5)
+        Me.PictureboxSplash.Image = My.Resources.Splash.Shutterstock_267251567
 
-        Select Case li_random
-            Case Is = 1
-                Me.PictureboxSplash.Image = My.Resources.Splash.Shutterstock_267251567
-            Case Is = 2
-                Me.PictureboxSplash.Image = My.Resources.Splash.Shutterstock_218779708
-            Case Is = 3
-                Me.PictureboxSplash.Image = My.Resources.Splash.Shutterstock_218779708
-            Case Is = 4
-                Me.PictureboxSplash.Image = My.Resources.Splash.Shutterstock_267251567
-            Case Is = 5
-                Me.PictureboxSplash.Image = My.Resources.Splash.Shutterstock_267251567
-        End Select
+        'Dim lo_random As New Random
+        'Dim li_random As Integer = lo_random.Next(1, 5)
 
-        
+        'Select Case li_random
+        '    Case Is = 1
+        '        Me.PictureboxSplash.Image = My.Resources.Splash.Shutterstock_267251567
+        '    Case Is = 2
+        '        Me.PictureboxSplash.Image = My.Resources.Splash.Shutterstock_218779708
+        '    Case Is = 3
+        '        Me.PictureboxSplash.Image = My.Resources.Splash.Shutterstock_218779708
+        '    Case Is = 4
+        '        Me.PictureboxSplash.Image = My.Resources.Splash.Shutterstock_267251567
+        '    Case Is = 5
+        '        Me.PictureboxSplash.Image = My.Resources.Splash.Shutterstock_267251567
+        'End Select
+
+
 
     End Sub
 
