@@ -2354,4 +2354,16 @@ Public Class frmFactEngine
 
     End Sub
 
+    Private Sub ClearToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ClearToolStripMenuItem.Click
+
+        Try
+            Me.Diagram.Links.Clear()
+            Me.Diagram.Nodes.Clear()
+            Me.Diagram.Invalidate()
+        Catch ex As Exception
+
+        End Try
+
+    End Sub
+
 End Class
