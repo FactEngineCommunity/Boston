@@ -38,7 +38,7 @@
         ''' Generates SQL to run against the database for this QueryGraph
         ''' </summary>
         ''' <returns></returns>
-        Public Function generateSQL() As String
+        Public Function generateSQL(ByRef arWhichSelectStatement As FEQL.WHICHSELECTStatement) As String
 
             Dim lsSQLQuery As String = ""
             Dim liInd As Integer
@@ -53,7 +53,7 @@
 
 #Region "ProjectionColums"
                 liInd = 1
-                Dim larProjectionColumn = Me.getProjectionColumns
+                Dim larProjectionColumn = Me.getProjectionColumns(arWhichSelectStatement)
                 Me.ProjectionColumn = larProjectionColumn
                 For Each lrProjectColumn In larProjectionColumn.FindAll(Function(x) x IsNot Nothing)
 
@@ -326,37 +326,34 @@
                                 For Each lrColumn In lrRelation.DestinationColumns
                                     If liTempInd > 0 Then lsSQLQuery &= "And "
 
-                                    Select Case liRelationCounter
-                                        Case Is = 1
-                                            Select Case lrQueryEdge.BaseNode.FBMModelObject.ConceptType
+                                Select Case liRelationCounter
+                                    Case Is = 1
+                                        Select Case lrQueryEdge.BaseNode.FBMModelObject.ConceptType
+                                            Case = pcenumConceptType.ValueType
+                                                'Nothing to do here
+                                            Case Else
+                                                lsSQLQuery &= lrRelation.OriginTable.Name & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrRelation.OriginColumns(liColumnCounter).Name & " = "
+                                                Dim lrTargetColumn = lrRelation.DestinationColumns.Find(Function(x) x.ActiveRole Is lrRelation.OriginColumns(liColumnCounter).ActiveRole)
+                                                lsSQLQuery &= lrRelation.DestinationTable.Name & Viev.NullVal(lrQueryEdge.BaseNode.Alias, "") & "." & lrTargetColumn.Name & vbCrLf
+                                        End Select
+                                    Case Else
+                                        Select Case lrQueryEdge.TargetNode.FBMModelObject.ConceptType
+                                            Case = pcenumConceptType.ValueType
+                                                'Nothing to do here
+                                            Case Else
+                                                lsSQLQuery &= lrRelation.OriginTable.Name & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrRelation.OriginColumns(liColumnCounter).Name & " = "
+                                                Dim lrTargetColumn = lrRelation.DestinationColumns.Find(Function(x) x.ActiveRole Is lrRelation.OriginColumns(liColumnCounter).ActiveRole)
+                                                lsSQLQuery &= lrRelation.DestinationTable.Name & Viev.NullVal(lrQueryEdge.TargetNode.Alias, "") & "." & lrTargetColumn.Name & vbCrLf
+                                        End Select
+                                End Select
 
-                                                Case = pcenumConceptType.ValueType
-
-                                                    'Nothing to do here
-
-                                                Case Else
-                                                    lsSQLQuery &= lrRelation.OriginTable.Name & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrRelation.OriginColumns(liColumnCounter).Name & " = "
-                                                    Dim lrTargetColumn = lrRelation.DestinationColumns.Find(Function(x) x.ActiveRole Is lrRelation.OriginColumns(liColumnCounter).ActiveRole)
-                                                    lsSQLQuery &= lrRelation.DestinationTable.Name & Viev.NullVal(lrQueryEdge.BaseNode.Alias, "") & "." & lrTargetColumn.Name & vbCrLf
-                                            End Select
-                                        Case Else
-                                            Select Case lrQueryEdge.TargetNode.FBMModelObject.ConceptType
-                                                Case = pcenumConceptType.ValueType
-                                                    'Nothing to do here
-                                                Case Else
-                                                    lsSQLQuery &= lrRelation.OriginTable.Name & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrRelation.OriginColumns(liColumnCounter).Name & " = "
-                                                    Dim lrTargetColumn = lrRelation.DestinationColumns.Find(Function(x) x.ActiveRole Is lrRelation.OriginColumns(liColumnCounter).ActiveRole)
-                                                    lsSQLQuery &= lrRelation.DestinationTable.Name & Viev.NullVal(lrQueryEdge.TargetNode.Alias, "") & "." & lrTargetColumn.Name & vbCrLf
-                                            End Select
-                                    End Select
-
-                                    'lsSQLQuery &= lrQueryEdge.BaseNode.Name & Viev.NullVal(lrQueryEdge.BaseNode.Alias, "") & "." & lrColumn.Name & " = "
-                                    'lsSQLQuery &= lrOriginTable.Name & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrTargetColumn.Name & vbCrLf 'lrOriginTable.getColumnByOrdingalPosition(1).Name & vbCrLf
-                                    liTempInd += 1
-                                    liColumnCounter += 1
-                                Next
-                                liRelationCounter += 1
+                                'lsSQLQuery &= lrQueryEdge.BaseNode.Name & Viev.NullVal(lrQueryEdge.BaseNode.Alias, "") & "." & lrColumn.Name & " = "
+                                'lsSQLQuery &= lrOriginTable.Name & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrTargetColumn.Name & vbCrLf 'lrOriginTable.getColumnByOrdingalPosition(1).Name & vbCrLf
+                                liTempInd += 1
+                                liColumnCounter += 1
                             Next
+                            liRelationCounter += 1
+                        Next
 
                             'For Each lrColumn In lrQueryEdge.BaseNode.RDSTable.getPrimaryKeyColumns
                             '    If liTempInd > 0 Then lsSQLQuery &= "And "
@@ -380,14 +377,14 @@
 
                         ElseIf lrQueryEdge.FBMFactType.DerivationType = pcenumFEQLDerivationType.Count Then
 
-                            Dim lrBaseNode, lrTargetNode As FactEngine.QueryNode
-                            lrBaseNode = lrQueryEdge.BaseNode
-                            lrTargetNode = New FactEngine.QueryNode(lrQueryEdge.FBMFactType, lrQueryEdge)
+                        Dim lrBaseNode, lrTargetNode As FactEngine.QueryNode
+                        lrBaseNode = lrQueryEdge.BaseNode
+                        lrTargetNode = New FactEngine.QueryNode(lrQueryEdge.FBMFactType, lrQueryEdge)
 
                             lsSQLQuery &= lrBaseNode.Name & "." & lrBaseNode.RDSTable.getPrimaryKeyColumns.First.Name & " = " & lrTargetNode.Name & "." & lrBaseNode.RDSTable.getPrimaryKeyColumns.First.Name
 
                         Else
-                            Dim lrBaseNode, lrTargetNode As FactEngine.QueryNode
+                        Dim lrBaseNode, lrTargetNode As FactEngine.QueryNode
                         If lrQueryEdge.IsReciprocal Then
                             lrBaseNode = lrQueryEdge.TargetNode
                             lrTargetNode = lrQueryEdge.BaseNode
@@ -639,97 +636,120 @@
 
         End Function
 
-        Public Function getProjectionColumns() As List(Of RDS.Column)
+        Public Function getProjectionColumns(ByRef arWhichSelectStatement As FEQL.WHICHSELECTStatement) As List(Of RDS.Column)
 
             Dim larColumn As New List(Of RDS.Column)
 
             Try
 
+                If arWhichSelectStatement.RETURNCLAUSE IsNot Nothing Then
+
+                    For Each lrReturnColumn In arWhichSelectStatement.RETURNCLAUSE.RETURNCOLUMN
+
+                        Dim larReturnColumn = From Table In Me.Model.RDS.Table
+                                              From Column In Table.Column
+                                              Where Table.Name = lrReturnColumn.MODELELEMENTNAME
+                                              Where Column.Name = lrReturnColumn.COLUMNNAMESTR
+                                              Select Column
+
+                        Try
+                            Dim lrColumn As RDS.Column = larReturnColumn.First.Clone(Nothing, Nothing)
+                            lrColumn.TemporaryAlias = lrReturnColumn.MODELELEMENTSUFFIX
+                            larColumn.Add(lrColumn)
+                        Catch ex As Exception
+                            Throw New Exception("Column, " & lrReturnColumn.MODELELEMENTNAME & "." & lrReturnColumn.COLUMNNAMESTR & ", not found. Check your RETURN clause.")
+                        End Try
+                    Next
+
+                Else
 
 
-                'Head Column/s
-                Dim larHeadColumn As New List(Of RDS.Column)
-                Select Case Me.HeadNode.FBMModelObject.ConceptType
-                    Case Is = pcenumConceptType.ValueType
-                        Dim lrVTColumn = (From Column In Me.QueryEdges(0).TargetNode.FBMModelObject.getCorrespondingRDSTable.Column
-                                          Where Column.Role Is Me.QueryEdges(0).FBMFactType.RoleGroup(0)
-                                          Where Column.ActiveRole Is Me.QueryEdges(0).FBMFactType.RoleGroup(1)
-                                          Select Column).First
 
-                        lrVTColumn = lrVTColumn.Clone(Nothing, Nothing)
-                        lrVTColumn.TemporaryAlias = Viev.NullVal(Me.HeadNode.QueryEdgeAlias, "")
-                        lrVTColumn.GraphNodeType = Me.HeadNode.Name
-                        larHeadColumn.Add(lrVTColumn)
-
-                    Case Else
-                        Dim lrTempColumn As RDS.Column = Nothing
-                        For Each lrColumn In Me.HeadNode.FBMModelObject.getCorrespondingRDSTable.getFirstUniquenessConstraintColumns.OrderBy(Function(x) x.OrdinalPosition)
-                            lrTempColumn = lrColumn.Clone(Nothing, Nothing)
-                            lrTempColumn.TemporaryAlias = Viev.NullVal(Me.HeadNode.Alias, "")
-                            lrTempColumn.GraphNodeType = Me.HeadNode.Name
-                            lrTempColumn.IsPartOfUniqueIdentifier = True
-                            If Me.QueryEdges.Count > 0 Then
-                                lrTempColumn.QueryEdge = Me.QueryEdges(0)
-                            End If
-                            larHeadColumn.Add(lrTempColumn)
-                        Next
-                End Select
-
-                larColumn.AddRange(larHeadColumn.ToList)
-
-                Dim liRoleInd As Integer
-                'Edge Column/s
-                Dim lrQueryEdge As FactEngine.QueryEdge
-                Dim lrRole As FBM.Role = Nothing
-                For Each lrQueryEdge In Me.getProjectQueryEdges()
-                    If lrQueryEdge.FBMFactType.IsBinaryFactType And lrQueryEdge.BaseNode.FBMModelObject.Id = lrQueryEdge.FBMFactType.RoleGroup(0).JoinedORMObject.Id Then
-                        liRoleInd = 1 'Other side of a BinaryFactType
-                    ElseIf lrQueryEdge.IsPartialFactTypeMatch Then
-                        lrRole = lrQueryEdge.FBMFactTypeReading.PredicatePart(lrQueryEdge.FBMFactTypeReading.PredicatePart.IndexOf(lrQueryEdge.FBMPredicatePart) + 1).Role
-                    Else
-                        liRoleInd = 0 'First Role of a BinaryFactType
-                    End If
-                    Select Case lrQueryEdge.FBMFactType.RoleGroup(liRoleInd).JoinedORMObject.ConceptType
+                    'Head Column/s
+                    Dim larHeadColumn As New List(Of RDS.Column)
+                    Select Case Me.HeadNode.FBMModelObject.ConceptType
                         Case Is = pcenumConceptType.ValueType
-                            Dim lrColumn = lrQueryEdge.BaseNode.FBMModelObject.getCorrespondingRDSTable.Column.Find(Function(x) x.Role.FactType Is lrQueryEdge.FBMFactType)
-                            If lrColumn Is Nothing And lrQueryEdge.FBMFactType.IsLinkFactType Then
-                                lrColumn = lrQueryEdge.BaseNode.FBMModelObject.getCorrespondingRDSTable.Column.Find(Function(x) x.Role.FactType Is lrQueryEdge.FBMFactType.LinkFactTypeRole.FactType).Clone(Nothing, Nothing)
-                                lrColumn.TemporaryAlias = lrQueryEdge.Alias
-                            ElseIf lrColumn Is Nothing And lrQueryEdge.FBMFactType.IsBinaryFactType And lrQueryEdge.FBMFactType.HasTotalRoleConstraint Then
-                                lrColumn = lrQueryEdge.FBMFactType.getCorrespondingRDSTable.Column.Find(Function(x) x.ActiveRole Is lrQueryEdge.FBMFactType.RoleGroup(liRoleInd))
-                                lrColumn.TemporaryAlias = lrQueryEdge.TargetNode.Alias
-                            Else
-                                lrColumn.TemporaryAlias = lrQueryEdge.BaseNode.Alias
-                            End If
-                            lrColumn.GraphNodeType = lrQueryEdge.BaseNode.Name
-                            lrColumn.QueryEdge = lrQueryEdge
+                            Dim lrVTColumn = (From Column In Me.QueryEdges(0).TargetNode.FBMModelObject.getCorrespondingRDSTable.Column
+                                              Where Column.Role Is Me.QueryEdges(0).FBMFactType.RoleGroup(0)
+                                              Where Column.ActiveRole Is Me.QueryEdges(0).FBMFactType.RoleGroup(1)
+                                              Select Column).First
 
-                            larColumn.AddUnique(lrColumn)
+                            lrVTColumn = lrVTColumn.Clone(Nothing, Nothing)
+                            lrVTColumn.TemporaryAlias = Viev.NullVal(Me.HeadNode.QueryEdgeAlias, "")
+                            lrVTColumn.GraphNodeType = Me.HeadNode.Name
+                            larHeadColumn.Add(lrVTColumn)
+
                         Case Else
-                            Dim larEdgeColumn As List(Of RDS.Column)
-                            If lrRole IsNot Nothing Then
-                                larEdgeColumn = lrRole.JoinedORMObject.getCorrespondingRDSTable.getFirstUniquenessConstraintColumns.OrderBy(Function(x) x.OrdinalPosition).ToList
-                            Else
-                                larEdgeColumn = lrQueryEdge.FBMFactType.RoleGroup(liRoleInd).JoinedORMObject.getCorrespondingRDSTable.getFirstUniquenessConstraintColumns.OrderBy(Function(x) x.OrdinalPosition).ToList
-                            End If
-                            Dim lrTempColumn As RDS.Column
-                            For Each lrColumn In larEdgeColumn
+                            Dim lrTempColumn As RDS.Column = Nothing
+                            For Each lrColumn In Me.HeadNode.FBMModelObject.getCorrespondingRDSTable.getFirstUniquenessConstraintColumns.OrderBy(Function(x) x.OrdinalPosition)
                                 lrTempColumn = lrColumn.Clone(Nothing, Nothing)
-                                If lrRole IsNot Nothing Then
-                                    lrTempColumn.TemporaryAlias = lrQueryEdge.TargetNode.Alias
-                                ElseIf liRoleInd = 1 Then
-                                    lrTempColumn.TemporaryAlias = lrQueryEdge.TargetNode.Alias
-                                Else
-                                    lrTempColumn.TemporaryAlias = lrQueryEdge.Alias
-                                End If
-                                lrTempColumn.GraphNodeType = lrQueryEdge.TargetNode.Name
+                                lrTempColumn.TemporaryAlias = Viev.NullVal(Me.HeadNode.Alias, "")
+                                lrTempColumn.GraphNodeType = Me.HeadNode.Name
                                 lrTempColumn.IsPartOfUniqueIdentifier = True
-                                lrTempColumn.QueryEdge = lrQueryEdge
-                                larColumn.Add(lrTempColumn)
+                                If Me.QueryEdges.Count > 0 Then
+                                    lrTempColumn.QueryEdge = Me.QueryEdges(0)
+                                End If
+                                larHeadColumn.Add(lrTempColumn)
                             Next
                     End Select
 
-                Next
+                    larColumn.AddRange(larHeadColumn.ToList)
+
+                    Dim liRoleInd As Integer
+                    'Edge Column/s
+                    Dim lrQueryEdge As FactEngine.QueryEdge
+                    Dim lrRole As FBM.Role = Nothing
+                    For Each lrQueryEdge In Me.getProjectQueryEdges()
+                        If lrQueryEdge.FBMFactType.IsBinaryFactType And lrQueryEdge.BaseNode.FBMModelObject.Id = lrQueryEdge.FBMFactType.RoleGroup(0).JoinedORMObject.Id Then
+                            liRoleInd = 1 'Other side of a BinaryFactType
+                        ElseIf lrQueryEdge.IsPartialFactTypeMatch Then
+                            lrRole = lrQueryEdge.FBMFactTypeReading.PredicatePart(lrQueryEdge.FBMFactTypeReading.PredicatePart.IndexOf(lrQueryEdge.FBMPredicatePart) + 1).Role
+                        Else
+                            liRoleInd = 0 'First Role of a BinaryFactType
+                        End If
+                        Select Case lrQueryEdge.FBMFactType.RoleGroup(liRoleInd).JoinedORMObject.ConceptType
+                            Case Is = pcenumConceptType.ValueType
+                                Dim lrColumn = lrQueryEdge.BaseNode.FBMModelObject.getCorrespondingRDSTable.Column.Find(Function(x) x.Role.FactType Is lrQueryEdge.FBMFactType)
+                                If lrColumn Is Nothing And lrQueryEdge.FBMFactType.IsLinkFactType Then
+                                    lrColumn = lrQueryEdge.BaseNode.FBMModelObject.getCorrespondingRDSTable.Column.Find(Function(x) x.Role.FactType Is lrQueryEdge.FBMFactType.LinkFactTypeRole.FactType).Clone(Nothing, Nothing)
+                                    lrColumn.TemporaryAlias = lrQueryEdge.Alias
+                                ElseIf lrColumn Is Nothing And lrQueryEdge.FBMFactType.IsBinaryFactType And lrQueryEdge.FBMFactType.HasTotalRoleConstraint Then
+                                    lrColumn = lrQueryEdge.FBMFactType.getCorrespondingRDSTable.Column.Find(Function(x) x.ActiveRole Is lrQueryEdge.FBMFactType.RoleGroup(liRoleInd))
+                                    lrColumn.TemporaryAlias = lrQueryEdge.TargetNode.Alias
+                                Else
+                                    lrColumn.TemporaryAlias = lrQueryEdge.BaseNode.Alias
+                                End If
+                                lrColumn.GraphNodeType = lrQueryEdge.BaseNode.Name
+                                lrColumn.QueryEdge = lrQueryEdge
+
+                                larColumn.AddUnique(lrColumn)
+                            Case Else
+                                Dim larEdgeColumn As List(Of RDS.Column)
+                                If lrRole IsNot Nothing Then
+                                    larEdgeColumn = lrRole.JoinedORMObject.getCorrespondingRDSTable.getFirstUniquenessConstraintColumns.OrderBy(Function(x) x.OrdinalPosition).ToList
+                                Else
+                                    larEdgeColumn = lrQueryEdge.FBMFactType.RoleGroup(liRoleInd).JoinedORMObject.getCorrespondingRDSTable.getFirstUniquenessConstraintColumns.OrderBy(Function(x) x.OrdinalPosition).ToList
+                                End If
+                                Dim lrTempColumn As RDS.Column
+                                For Each lrColumn In larEdgeColumn
+                                    lrTempColumn = lrColumn.Clone(Nothing, Nothing)
+                                    If lrRole IsNot Nothing Then
+                                        lrTempColumn.TemporaryAlias = lrQueryEdge.TargetNode.Alias
+                                    ElseIf liRoleInd = 1 Then
+                                        lrTempColumn.TemporaryAlias = lrQueryEdge.TargetNode.Alias
+                                    Else
+                                        lrTempColumn.TemporaryAlias = lrQueryEdge.Alias
+                                    End If
+                                    lrTempColumn.GraphNodeType = lrQueryEdge.TargetNode.Name
+                                    lrTempColumn.IsPartOfUniqueIdentifier = True
+                                    lrTempColumn.QueryEdge = lrQueryEdge
+                                    larColumn.Add(lrTempColumn)
+                                Next
+                        End Select
+
+                    Next
+
+                End If
 
                 Return larColumn
             Catch ex As Exception

@@ -462,6 +462,7 @@ Public Class tApplication
                             MsgBox(asErrorMessage, MsgBoxStyle.Critical)
 
                             If abAbortApplication Then Call Application.Exit()
+
                         End If
 
                 End Select

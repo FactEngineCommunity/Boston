@@ -165,7 +165,7 @@
 
                 '==========================================================================
                 'Get the records
-                lsSQLQuery = lrQueryGraph.generateSQL
+                lsSQLQuery = lrQueryGraph.generateSQL(Me.WHICHSELECTStatement)
 
                 If Me.DatabaseManager.Connection Is Nothing Then
                     'Try and establish a connection

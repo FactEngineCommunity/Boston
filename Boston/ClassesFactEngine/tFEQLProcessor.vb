@@ -181,6 +181,54 @@ Namespace FEQL
 
     End Class
 
+    Public Class RETURNCOLUMN
+
+        Private _MODELELEMENTNAME As String = Nothing
+        Public Property MODELELEMENTNAME As String
+            Get
+                Return Me._MODELELEMENTNAME
+            End Get
+            Set(value As String)
+                Me._MODELELEMENTNAME = value
+            End Set
+        End Property
+
+        Private _MODELELEMENTSUFFIX As String = Nothing
+        Public Property MODELELEMENTSUFFIX As String
+            Get
+                Return Me._MODELELEMENTSUFFIX
+            End Get
+            Set(value As String)
+                Me._MODELELEMENTSUFFIX = value
+            End Set
+        End Property
+
+        Private _COLUMNNAMESTR As String = Nothing
+        Public Property COLUMNNAMESTR As String
+            Get
+                Return Me._COLUMNNAMESTR
+            End Get
+            Set(value As String)
+                Me._COLUMNNAMESTR = value
+            End Set
+        End Property
+
+    End Class
+
+    Public Class RETURNCLAUSE
+
+        Private _RETURNCOLUMN As New List(Of RETURNCOLUMN)
+        Public Property RETURNCOLUMN As List(Of RETURNCOLUMN)
+            Get
+                Return Me._RETURNCOLUMN
+            End Get
+            Set(value As List(Of RETURNCOLUMN))
+                Me._RETURNCOLUMN = value
+            End Set
+        End Property
+
+    End Class
+
     Public Class SHOWStatement
 
         Private _MODELELEMENTNAME As String = Nothing
@@ -329,6 +377,16 @@ Namespace FEQL
             End Get
             Set(value As List(Of Object))
                 Me._WHICHCLAUSE = value
+            End Set
+        End Property
+
+        Private _RETURNCLAUSE As RETURNCLAUSE
+        Public Property RETURNCLAUSE As RETURNCLAUSE
+            Get
+                Return Me._RETURNCLAUSE
+            End Get
+            Set(value As RETURNCLAUSE)
+                Me._RETURNCLAUSE = value
             End Set
         End Property
 
