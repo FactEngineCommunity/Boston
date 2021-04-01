@@ -4,13 +4,13 @@ Namespace FEQL
 
     Public Class ASSERTStatement
 
-        Private _NODEPROPERTYIDENTIFICATION As New List(Of NODEPROPERTYIDENTIFICATION)
-        Public Property NODEPROPERTYIDENTIFICATION As List(Of NODEPROPERTYIDENTIFICATION)
+        Private _NODEPROPERTYNAMEIDENTIFICATION As New List(Of NODEPROPERTYNAMEIDENTIFICATION)
+        Public Property NODEPROPERTYNAMEIDENTIFICATION As List(Of NODEPROPERTYNAMEIDENTIFICATION)
             Get
-                Return Me._NODEPROPERTYIDENTIFICATION
+                Return Me._NODEPROPERTYNAMEIDENTIFICATION
             End Get
-            Set(value As List(Of NODEPROPERTYIDENTIFICATION))
-                Me._NODEPROPERTYIDENTIFICATION = value
+            Set(value As List(Of NODEPROPERTYNAMEIDENTIFICATION))
+                Me._NODEPROPERTYNAMEIDENTIFICATION = value
             End Set
         End Property
 
@@ -129,6 +129,60 @@ Namespace FEQL
             Set(value As FEQL.ValueTypeWrittenAsClause)
                 Me._VALUETYPEWRITTENASCLAUSE = value
             End Set
+        End Property
+
+    End Class
+
+    Public Class PROPERTYIDENTIFIER
+
+        Private _COLUMNNAMESTR As String = Nothing
+        Public Property COLUMNNAMESTR As String
+            Get
+                Return Me._COLUMNNAMESTR
+            End Get
+            Set(value As String)
+                Me._COLUMNNAMESTR = value
+            End Set
+        End Property
+
+        Private _SINGLEQUOTE As String = ""
+        Public Property SINGLEQUOTE As String
+            Get
+                Return Me._SINGLEQUOTE
+            End Get
+            Set(value As String)
+                Me._SINGLEQUOTE = value
+            End Set
+        End Property
+
+        Private _IDENTIFIER As String = Nothing
+        Public Property IDENTIFIER As String
+            Get
+                Return Me._IDENTIFIER
+            End Get
+            Set(value As String)
+                Me._IDENTIFIER = value
+            End Set
+        End Property
+
+        Private _EMAILADDRESS As String = Nothing
+        Public Property EMAILADDRESS As String
+            Get
+                Return Me._EMAILADDRESS
+            End Get
+            Set(value As String)
+                Me._EMAILADDRESS = value
+            End Set
+        End Property
+
+        Public ReadOnly Property ID As String
+            Get
+                If Me._IDENTIFIER IsNot Nothing Then
+                    Return Me._IDENTIFIER
+                Else
+                    Return Me._EMAILADDRESS
+                End If
+            End Get
         End Property
 
     End Class
@@ -792,6 +846,16 @@ Namespace FEQL
 
     Public Class NODEPROPERTYNAMEIDENTIFICATION
 
+        Private _COLON As String = Nothing
+        Public Property COLON As String
+            Get
+                Return Me._COLON
+            End Get
+            Set(value As String)
+                Me._COLON = value
+            End Set
+        End Property
+
         Private _MODELELEMENTNAME As New List(Of String)
         Public Property MODELELEMENTNAME As List(Of String)
             Get
@@ -802,7 +866,7 @@ Namespace FEQL
             End Set
         End Property
 
-        Private _QUOTEDPROPERTYIDENTIFIERLIST
+        Private _QUOTEDPROPERTYIDENTIFIERLIST As FEQL.QuotedPropertyIdentifierList
         Public Property QUOTEDPROPERTYIDENTIFIERLIST As FEQL.QuotedPropertyIdentifierList
             Get
                 Return Me._QUOTEDPROPERTYIDENTIFIERLIST
@@ -834,6 +898,30 @@ Namespace FEQL
 
     End Class
 
+    Public Class QuotedIdentifier
+
+        Private _IDENTIFIER As String
+        Public Property IDENTIFIER As String
+            Get
+                Return Me._IDENTIFIER
+            End Get
+            Set(value As String)
+                Me._IDENTIFIER = value
+            End Set
+        End Property
+
+        Private _SINGLEQUOTE As String = ""
+        Public Property SINGLEQUOTE As String
+            Get
+                Return Me._SINGLEQUOTE
+            End Get
+            Set(value As String)
+                Me._SINGLEQUOTE = value
+            End Set
+        End Property
+
+    End Class
+
     Public Class QuotedIdentifierList
 
         Private _COLON As String
@@ -843,6 +931,16 @@ Namespace FEQL
             End Get
             Set(value As String)
                 Me._COLON = value
+            End Set
+        End Property
+
+        Private _QUOTEDIDENTIFIER As New List(Of QuotedIdentifier)
+        Public Property QUOTEDIDENTIFIER As List(Of QuotedIdentifier)
+            Get
+                Return Me._QUOTEDIDENTIFIER
+            End Get
+            Set(value As List(Of QuotedIdentifier))
+                Me._QUOTEDIDENTIFIER = value
             End Set
         End Property
 
@@ -869,6 +967,16 @@ Namespace FEQL
     End Class
 
     Public Class QuotedPropertyIdentifierList
+
+        Private _PROPERTYIDENTIFIER As New List(Of PROPERTYIDENTIFIER)
+        Public Property PROPERTYIDENTIFIER As List(Of PROPERTYIDENTIFIER)
+            Get
+                Return Me._PROPERTYIDENTIFIER
+            End Get
+            Set(value As List(Of PROPERTYIDENTIFIER))
+                Me._PROPERTYIDENTIFIER = value
+            End Set
+        End Property
 
         Private _COLUMNNAMESTR As New List(Of String)
         Public Property COLUMNNAMESTR As List(Of String)

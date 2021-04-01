@@ -9,43 +9,70 @@ Namespace FEQL
             Try
                 Dim lrASSERTStatement = New FEQL.ASSERTStatement
 
-
                 Call Me.GetParseTreeTokensReflection(lrASSERTStatement, Me.Parsetree.Nodes(0))
 
                 'Get the first ObjectType
-                Dim lrFirstModelElement = Me.Model.GetModelObjectByName(lrASSERTStatement.NODEPROPERTYIDENTIFICATION(0).MODELELEMENTNAME)
+                Dim lrFirstModelElement = Me.Model.GetModelObjectByName(lrASSERTStatement.NODEPROPERTYNAMEIDENTIFICATION(0).MODELELEMENTNAME(0))
 
                 If lrFirstModelElement Is Nothing Then
-                    Throw New Exception("Unknown Model Element, '" & lrASSERTStatement.NODEPROPERTYIDENTIFICATION(0).MODELELEMENTNAME & "'.")
+                    Throw New Exception("Unknown Model Element, '" & lrASSERTStatement.NODEPROPERTYNAMEIDENTIFICATION(0).MODELELEMENTNAME(0) & "'.")
                 End If
 
-                If lrASSERTStatement.NODEPROPERTYIDENTIFICATION(0).IDENTIFIER.Count = 0 Then
-                    Throw New Exception("Model Element, '" & lrASSERTStatement.NODEPROPERTYIDENTIFICATION(0).MODELELEMENTNAME & "', requires an identifier.")
+                If lrASSERTStatement.NODEPROPERTYNAMEIDENTIFICATION(0).IDENTIFIER.Count = 0 Then
+                    Throw New Exception("Model Element, '" & lrASSERTStatement.NODEPROPERTYNAMEIDENTIFICATION(0).MODELELEMENTNAME(0) & "', requires an identifier.")
                 End If
 
                 Dim lsSQLCommand As String
 
-                If lrASSERTStatement.NODEPROPERTYIDENTIFICATION(0).COLON IsNot Nothing Then
+                If lrASSERTStatement.NODEPROPERTYNAMEIDENTIFICATION(0).COLON IsNot Nothing Then
                     'Uses the first NonPrimary Unique Index
-
                     Dim lasUCColumnNames = From Column In lrFirstModelElement.getCorrespondingRDSTable.getFirstUniquenessConstraintColumns
                                            Select Column.Name
 
                     Dim lsColumnNamesList = Strings.Join(lasUCColumnNames.ToArray, ",")
 
-                    lsSQLCommand = "INSERT INTO " & lrFirstModelElement.Name & " (" & lsColumnNamesList
-                    lsSQLCommand &= ") VALUES ("
-                    Dim liInd = 0
-                    For Each lsIdentifier In lrASSERTStatement.NODEPROPERTYIDENTIFICATION(0).IDENTIFIER
-                        If liInd > 0 Then lsSQLCommand &= ","
-                        lsSQLCommand &= lrASSERTStatement.NODEPROPERTYIDENTIFICATION(0).QUOTEDIDENTIFIERLIST.SINGLEQUOTE &
+                    If lrASSERTStatement.NODEPROPERTYNAMEIDENTIFICATION(0).QUOTEDPROPERTYIDENTIFIERLIST IsNot Nothing Then
+                        'Is Update
+                        lsSQLCommand = "UPDATE " & lrFirstModelElement.Name & " SET "
+                        Dim liInd = 0
+                        For Each lrPropertyIdentifier In lrASSERTStatement.NODEPROPERTYNAMEIDENTIFICATION(0).QUOTEDPROPERTYIDENTIFIERLIST.PROPERTYIDENTIFIER
+                            If liInd > 0 Then lsSQLCommand &= vbCrLf & ","
+                            lsSQLCommand &= lrPropertyIdentifier.COLUMNNAMESTR & " = "
+                            lsSQLCommand &= lrPropertyIdentifier.SINGLEQUOTE &
+                                            lrPropertyIdentifier.ID &
+                                            lrPropertyIdentifier.SINGLEQUOTE
+                            liInd += 1
+                        Next
+                        lsSQLCommand &= vbCrLf & " WHERE "
+                        liInd = 0
+                        For Each lsUCColumnName In lasUCColumnNames
+                            If liInd > 0 Then lsSQLCommand &= vbCrLf & " AND "
+                            lsSQLCommand &= lsUCColumnName & " = "
+                            lsSQLCommand &= lrASSERTStatement.NODEPROPERTYNAMEIDENTIFICATION(0).QUOTEDIDENTIFIERLIST.QUOTEDIDENTIFIER(liInd).SINGLEQUOTE &
+                                            lrASSERTStatement.NODEPROPERTYNAMEIDENTIFICATION(0).QUOTEDIDENTIFIERLIST.QUOTEDIDENTIFIER(liInd).IDENTIFIER &
+                                            lrASSERTStatement.NODEPROPERTYNAMEIDENTIFICATION(0).QUOTEDIDENTIFIERLIST.QUOTEDIDENTIFIER(liInd).SINGLEQUOTE
+                            liInd += 1
+                        Next
+                    Else
+                        'Is Insert
+                        lsSQLCommand = "INSERT INTO " & lrFirstModelElement.Name & " (" & lsColumnNamesList
+                        lsSQLCommand &= ") VALUES ("
+                        Dim liInd = 0
+                        For Each lsIdentifier In lrASSERTStatement.NODEPROPERTYNAMEIDENTIFICATION(0).IDENTIFIER
+                            If liInd > 0 Then lsSQLCommand &= ","
+                            lsSQLCommand &= lrASSERTStatement.NODEPROPERTYNAMEIDENTIFICATION(0).QUOTEDIDENTIFIERLIST.SINGLEQUOTE &
                                         lsIdentifier &
-                                        lrASSERTStatement.NODEPROPERTYIDENTIFICATION(0).QUOTEDIDENTIFIERLIST.SINGLEQUOTE
-                        liInd += 1
-                    Next
-                    lsSQLCommand &= ")"
+                                        lrASSERTStatement.NODEPROPERTYNAMEIDENTIFICATION(0).QUOTEDIDENTIFIERLIST.SINGLEQUOTE
+                            liInd += 1
+                        Next
+                        lsSQLCommand &= ")"
+                    End If
 
                     lrRecordset = Me.DatabaseManager.Connection.GONonQuery(lsSQLCommand)
+
+                    If Not lrRecordset.ErrorReturned Then
+                        lrRecordset.ErrorString = "1 row updated."
+                    End If
 
                 Else
                     Dim lasPKColumnNames = From Column In lrFirstModelElement.getCorrespondingRDSTable.getPrimaryKeyColumns
@@ -56,7 +83,7 @@ Namespace FEQL
                     lsSQLCommand = "INSERT INTO " & lrFirstModelElement.Name & " (" & lsColumnNamesList
                     lsSQLCommand &= ") VALUES ("
                     Dim liInd = 0
-                    For Each lsIdentifier In lrASSERTStatement.NODEPROPERTYIDENTIFICATION(0).IDENTIFIER
+                    For Each lsIdentifier In lrASSERTStatement.NODEPROPERTYNAMEIDENTIFICATION(0).IDENTIFIER
                         If liInd > 0 Then lsSQLCommand &= ","
                         lsSQLCommand &= lsIdentifier
                         liInd += 1
@@ -65,11 +92,12 @@ Namespace FEQL
 
                     lrRecordset = Me.DatabaseManager.Connection.GONonQuery(lsSQLCommand)
 
+                    If Not lrRecordset.ErrorReturned Then
+                        lrRecordset.ErrorString = "1 row inserted."
+                    End If
+
                 End If
 
-                If Not lrRecordset.ErrorReturned Then
-                    lrRecordset.ErrorString = "1 row inserted."
-                End If
                 Return lrRecordset
 
             Catch ex As Exception
