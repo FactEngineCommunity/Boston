@@ -54,6 +54,28 @@ Public Class frmCRUDModel
             Me.zrModel.TargetDatabaseConnectionString = Trim(Me.TextBoxDatabaseConnectionString.Text)
             Me.zrModel.IsDatabaseSynchronised = Me.CheckBoxIsDatabaseSynchronised.Checked
 
+            Try
+                If Me.zrModel.TreeNode IsNot Nothing Then
+                    If My.Settings.FactEngineShowDatabaseLogoInModelExplorer Then
+                        Select Case Me.zrModel.TargetDatabaseType
+                            Case Is = pcenumDatabaseType.MongoDB
+                                Me.zrModel.TreeNode.ImageIndex = 6
+                                Me.zrModel.TreeNode.SelectedImageIndex = 6
+                            Case Is = pcenumDatabaseType.SQLServer
+                                Me.zrModel.TreeNode.ImageIndex = 9
+                                Me.zrModel.TreeNode.SelectedImageIndex = 9
+                            Case Is = pcenumDatabaseType.MSJet
+                                Me.zrModel.TreeNode.ImageIndex = 7
+                                Me.zrModel.TreeNode.SelectedImageIndex = 7
+                            Case Is = pcenumDatabaseType.SQLite
+                                Me.zrModel.TreeNode.ImageIndex = 8
+                                Me.zrModel.TreeNode.SelectedImageIndex = 8
+                        End Select
+                    End If
+                End If
+            Catch ex As Exception
+            End Try
+
             Me.zrModel.Save()
 
             Me.Hide()

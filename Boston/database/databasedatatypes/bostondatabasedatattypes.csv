@@ -6,7 +6,7 @@ SQLite,NumericAutoCounter,AUTOINCREMENT
 SQLite,NumericDecimal,NUMBER
 SQLite,NumericFloatCustomPrecision,NUMBER
 SQLite,NumericFloatDoublePrecision,NUMBER
-SQLite,NumericFloatSinglePrecistion,NUMBER
+SQLite,NumericFloatSinglePrecision,NUMBER
 SQLite,NumericMoney,NUMBER
 SQLite,NumericSignedBigInteger,NUMBER
 SQLite,NumericSignedInteger,NUMBER
@@ -24,8 +24,8 @@ SQLite,RawDataPicture,IMAGE
 SQLite,RawDataVariableLength,IMAGE
 SQLite,TemporalAutoTimestamp,DATETIME
 SQLite,TemporalDate,DATETIME
-SQLite,TemporalDateTime,DATETIME
-SQLite,TemportalTime,DATETIME
+SQLite,TemporalDateAndTime,DATETIME
+SQLite,TemporalTime,DATETIME
 SQLite,TextFixedLength,TEXT
 SQLite,TextLargeLength,TEXT
 SQLite,TextVariableLength,TEXT
