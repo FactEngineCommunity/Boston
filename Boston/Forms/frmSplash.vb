@@ -50,8 +50,6 @@ Public Class frmSplash
         '        Me.PictureboxSplash.Image = My.Resources.Splash.Shutterstock_267251567
         'End Select
 
-
-
     End Sub
 
     Private Sub time_close_form_Tick(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles time_close_form.Tick
