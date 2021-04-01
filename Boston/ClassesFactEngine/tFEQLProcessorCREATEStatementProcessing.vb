@@ -3,6 +3,82 @@
 Namespace FEQL
     Partial Public Class Processor
 
+        Public Function processASSERTStatement(ByVal asFEQLStatement As String) As ORMQL.Recordset
+
+            Dim lrRecordset As New ORMQL.Recordset
+            Try
+                Dim lrASSERTStatement = New FEQL.ASSERTStatement
+
+
+                Call Me.GetParseTreeTokensReflection(lrASSERTStatement, Me.Parsetree.Nodes(0))
+
+                'Get the first ObjectType
+                Dim lrFirstModelElement = Me.Model.GetModelObjectByName(lrASSERTStatement.NODEPROPERTYIDENTIFICATION(0).MODELELEMENTNAME)
+
+                If lrFirstModelElement Is Nothing Then
+                    Throw New Exception("Unknown Model Element, '" & lrASSERTStatement.NODEPROPERTYIDENTIFICATION(0).MODELELEMENTNAME & "'.")
+                End If
+
+                If lrASSERTStatement.NODEPROPERTYIDENTIFICATION(0).IDENTIFIER.Count = 0 Then
+                    Throw New Exception("Model Element, '" & lrASSERTStatement.NODEPROPERTYIDENTIFICATION(0).MODELELEMENTNAME & "', requires an identifier.")
+                End If
+
+                Dim lsSQLCommand As String
+
+                If lrASSERTStatement.NODEPROPERTYIDENTIFICATION(0).COLON IsNot Nothing Then
+                    'Uses the first NonPrimary Unique Index
+
+                    Dim lasUCColumnNames = From Column In lrFirstModelElement.getCorrespondingRDSTable.getFirstUniquenessConstraintColumns
+                                           Select Column.Name
+
+                    Dim lsColumnNamesList = Strings.Join(lasUCColumnNames.ToArray, ",")
+
+                    lsSQLCommand = "INSERT INTO " & lrFirstModelElement.Name & " (" & lsColumnNamesList
+                    lsSQLCommand &= ") VALUES ("
+                    Dim liInd = 0
+                    For Each lsIdentifier In lrASSERTStatement.NODEPROPERTYIDENTIFICATION(0).IDENTIFIER
+                        If liInd > 0 Then lsSQLCommand &= ","
+                        lsSQLCommand &= lrASSERTStatement.NODEPROPERTYIDENTIFICATION(0).QUOTEDIDENTIFIERLIST.SINGLEQUOTE &
+                                        lsIdentifier &
+                                        lrASSERTStatement.NODEPROPERTYIDENTIFICATION(0).QUOTEDIDENTIFIERLIST.SINGLEQUOTE
+                        liInd += 1
+                    Next
+                    lsSQLCommand &= ")"
+
+                    lrRecordset = Me.DatabaseManager.Connection.GONonQuery(lsSQLCommand)
+
+                Else
+                    Dim lasPKColumnNames = From Column In lrFirstModelElement.getCorrespondingRDSTable.getPrimaryKeyColumns
+                                           Select Column.Name
+
+                    Dim lsColumnNamesList = Strings.Join(lasPKColumnNames.ToArray, ",")
+
+                    lsSQLCommand = "INSERT INTO " & lrFirstModelElement.Name & " (" & lsColumnNamesList
+                    lsSQLCommand &= ") VALUES ("
+                    Dim liInd = 0
+                    For Each lsIdentifier In lrASSERTStatement.NODEPROPERTYIDENTIFICATION(0).IDENTIFIER
+                        If liInd > 0 Then lsSQLCommand &= ","
+                        lsSQLCommand &= lsIdentifier
+                        liInd += 1
+                    Next
+                    lsSQLCommand &= ")"
+
+                    lrRecordset = Me.DatabaseManager.Connection.GONonQuery(lsSQLCommand)
+
+                End If
+
+                If Not lrRecordset.ErrorReturned Then
+                    lrRecordset.ErrorString = "1 row inserted."
+                End If
+                Return lrRecordset
+
+            Catch ex As Exception
+                lrRecordset.ErrorString = ex.Message
+                Return lrRecordset
+            End Try
+
+        End Function
+
         Public Sub processCREATEDATABASEStatement(ByVal asFEQLStatement As String)
 
             Try
@@ -243,8 +319,8 @@ Namespace FEQL
                     End If
                 End If
 
-                    'Data Types set, check.
-                    If larInsertColumn.FindAll(Function(x) x.getMetamodelDataType = pcenumORMDataType.DataTypeNotSet).Count > 0 Then
+                'Data Types set, check.
+                If larInsertColumn.FindAll(Function(x) x.getMetamodelDataType = pcenumORMDataType.DataTypeNotSet).Count > 0 Then
                     Throw New Exception("Make sure the Data Type is set for all properties before creating a new record.")
                 End If
 

@@ -382,6 +382,9 @@ Namespace FEQL
                 Case TokenType.BINARYFACTTYPEMANYTOONEDEFINITIONSTMT
                     Value = EvalBINARYFACTTYPEMANYTOONEDEFINITIONSTMT(tree, paramlist)
                     Exit Select
+                Case TokenType.CONNECTTOMODELSTMT
+                    Value = EvalCONNECTTOMODELSTMT(tree, paramlist)
+                    Exit Select
                 Case TokenType.CONSTRAINTEITHEROREXTERNAL
                     Value = EvalCONSTRAINTEITHEROREXTERNAL(tree, paramlist)
                     Exit Select
@@ -812,6 +815,10 @@ Namespace FEQL
         End Function
 
         Protected Overridable Function EvalBINARYFACTTYPEMANYTOONEDEFINITIONSTMT(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalCONNECTTOMODELSTMT(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
             Throw New NotImplementedException()
         End Function
 

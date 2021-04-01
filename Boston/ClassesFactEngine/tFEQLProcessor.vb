@@ -2,6 +2,30 @@
 
 Namespace FEQL
 
+    Public Class ASSERTStatement
+
+        Private _NODEPROPERTYIDENTIFICATION As New List(Of NODEPROPERTYIDENTIFICATION)
+        Public Property NODEPROPERTYIDENTIFICATION As List(Of NODEPROPERTYIDENTIFICATION)
+            Get
+                Return Me._NODEPROPERTYIDENTIFICATION
+            End Get
+            Set(value As List(Of NODEPROPERTYIDENTIFICATION))
+                Me._NODEPROPERTYIDENTIFICATION = value
+            End Set
+        End Property
+
+        Private _PREDICATECLAUSE As FEQL.PREDICATECLAUSE
+        Public Property PREDICATECLAUSE As FEQL.PREDICATECLAUSE
+            Get
+                Return Me._PREDICATECLAUSE
+            End Get
+            Set(value As FEQL.PREDICATECLAUSE)
+                Me._PREDICATECLAUSE = value
+            End Set
+        End Property
+
+    End Class
+
     Public Class CREATEStatement
 
         Private _NODEPROPERTYNAMEIDENTIFICATION As FEQL.NODEPROPERTYNAMEIDENTIFICATION
@@ -744,6 +768,16 @@ Namespace FEQL
             End Set
         End Property
 
+        Private _QUOTEDIDENTIFIERLIST As FEQL.QuotedIdentifierList
+        Public Property QUOTEDIDENTIFIERLIST As FEQL.QuotedIdentifierList
+            Get
+                Return Me._QUOTEDIDENTIFIERLIST
+            End Get
+            Set(value As FEQL.QuotedIdentifierList)
+                Me._QUOTEDIDENTIFIERLIST = value
+            End Set
+        End Property
+
         Private _MODELELEMENTSUFFIX As String = Nothing
         Public Property MODELELEMENTSUFFIX As String
             Get
@@ -778,7 +812,7 @@ Namespace FEQL
             End Set
         End Property
 
-        Private _QUOTEDIDENTIFIERLIST
+        Private _QUOTEDIDENTIFIERLIST As FEQL.QuotedIdentifierList
         Public Property QUOTEDIDENTIFIERLIST As FEQL.QuotedIdentifierList
             Get
                 Return Me._QUOTEDIDENTIFIERLIST
@@ -819,6 +853,16 @@ Namespace FEQL
             End Get
             Set(value As List(Of String))
                 Me._IDENTIFIER = value
+            End Set
+        End Property
+
+        Private _SINGLEQUOTE As String = ""
+        Public Property SINGLEQUOTE As String
+            Get
+                Return Me._SINGLEQUOTE
+            End Get
+            Set(value As String)
+                Me._SINGLEQUOTE = value
             End Set
         End Property
 
@@ -1224,8 +1268,13 @@ Namespace FEQL
                         aoParseTree = Me.Parsetree
                         Return Nothing
 
+                    ElseIf Me.ParseTreeContainsTokenType(Me.Parsetree, FEQL.TokenType.KEYWDASSERT) Then
+                        aoTokenType = FEQL.TokenType.ASSERTSTMT
+                        aoParseTree = Me.Parsetree
+                        Return Me.processASSERTStatement(asFEQLStatement)
+
                     ElseIf Me.ParseTreeContainsTokenType(Me.Parsetree, FEQL.TokenType.KEYWDCREATE) And
-                       Me.ParseTreeContainsTokenType(Me.ParseTree, FEQL.TokenType.KEYWDDATABASE) Then
+                       Me.ParseTreeContainsTokenType(Me.Parsetree, FEQL.TokenType.KEYWDDATABASE) Then
                         aoTokenType = FEQL.TokenType.CREATEDATABASESTMT
                         aoParseTree = Me.Parsetree
                         Call Me.processCREATEDATABASEStatement(asFEQLStatement)
