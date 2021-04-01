@@ -646,19 +646,30 @@
 
                     For Each lrReturnColumn In arWhichSelectStatement.RETURNCLAUSE.RETURNCOLUMN
 
-                        Dim larReturnColumn = From Table In Me.Model.RDS.Table
-                                              From Column In Table.Column
-                                              Where Table.Name = lrReturnColumn.MODELELEMENTNAME
-                                              Where Column.Name = lrReturnColumn.COLUMNNAMESTR
-                                              Select Column
+                        If lrReturnColumn.MODELELEMENTNAME IsNot Nothing Then
 
-                        Try
-                            Dim lrColumn As RDS.Column = larReturnColumn.First.Clone(Nothing, Nothing)
-                            lrColumn.TemporaryAlias = lrReturnColumn.MODELELEMENTSUFFIX
-                            larColumn.Add(lrColumn)
-                        Catch ex As Exception
-                            Throw New Exception("Column, " & lrReturnColumn.MODELELEMENTNAME & "." & lrReturnColumn.COLUMNNAMESTR & ", not found. Check your RETURN clause.")
-                        End Try
+                            Dim larReturnColumn = From Table In Me.Model.RDS.Table
+                                                  From Column In Table.Column
+                                                  Where Table.Name = lrReturnColumn.MODELELEMENTNAME
+                                                  Where Column.Name = lrReturnColumn.COLUMNNAMESTR
+                                                  Select Column
+
+                            Try
+                                Dim lrColumn As RDS.Column = larReturnColumn.First.Clone(Nothing, Nothing)
+                                lrColumn.TemporaryAlias = lrReturnColumn.MODELELEMENTSUFFIX
+                                larColumn.Add(lrColumn)
+                            Catch ex As Exception
+                                Throw New Exception("Column, " & lrReturnColumn.MODELELEMENTNAME & "." & lrReturnColumn.COLUMNNAMESTR & ", not found. Check your RETURN clause.")
+                            End Try
+                        Else
+                            'Must be * (STAR)
+                            For Each lrColumn In Me.HeadNode.FBMModelObject.getCorrespondingRDSTable.Column
+                                larColumn.Add(lrColumn.Clone(Nothing, Nothing))
+                            Next
+                            For Each lrQueryEdge In Me.QueryEdges.FindAll(Function(x) x.IsProjectColumn)
+
+                            Next
+                        End If
                     Next
 
                 Else
