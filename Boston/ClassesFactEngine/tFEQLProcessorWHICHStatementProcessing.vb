@@ -44,7 +44,9 @@
                             Next
                             lrQueryGraph.HeadNode.HasIdentifier = True
                         End If
-                        lrQueryGraph.HeadNode.Alias = Me.WHICHSELECTStatement.NODEPROPERTYIDENTIFICATION(0).MODELELEMENTSUFFIX
+                        If lrQueryGraph.HeadNode.Alias Is Nothing Then
+                            lrQueryGraph.HeadNode.Alias = Me.WHICHSELECTStatement.NODEPROPERTYIDENTIFICATION(0).MODELELEMENTSUFFIX
+                        End If
                     End If
                 End If
 
@@ -360,6 +362,8 @@
             Dim lrTargetFBMModelObject = Me.Model.GetModelObjectByName(Me.WHICHCLAUSE.MODELELEMENTNAME(0))
             If lrTargetFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & Me.WHICHCLAUSE.MODELELEMENTNAME(0) & "'.")
             arQueryEdge.TargetNode = New FactEngine.QueryNode(lrTargetFBMModelObject)
+            arQueryEdge.TargetNode.PreboundText = arWHICHCLAUSE.NODE(0).PREBOUNDREADINGTEXT
+            arQueryEdge.TargetNode.Alias = Me.WHICHCLAUSE.NODE(0).MODELELEMENTSUFFIX
             arQueryGraph.Nodes.AddUnique(arQueryEdge.TargetNode)
 
 
