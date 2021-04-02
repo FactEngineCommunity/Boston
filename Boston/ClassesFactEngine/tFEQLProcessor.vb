@@ -257,6 +257,16 @@ Namespace FEQL
             End Set
         End Property
 
+        Private _KEYWDCIRCULAR As String = Nothing
+        Public Property KEYWDCIRCULAR As String
+            Get
+                Return Me._KEYWDCIRCULAR
+            End Get
+            Set(value As String)
+                Me._KEYWDCIRCULAR = value
+            End Set
+        End Property
+
     End Class
 
     Public Class RETURNCOLUMN

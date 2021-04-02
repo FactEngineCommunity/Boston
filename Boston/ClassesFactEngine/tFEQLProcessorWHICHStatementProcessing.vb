@@ -44,7 +44,9 @@
                             Next
                             lrQueryGraph.HeadNode.HasIdentifier = True
                         End If
-                        lrQueryGraph.HeadNode.Alias = Me.WHICHSELECTStatement.NODEPROPERTYIDENTIFICATION(0).MODELELEMENTSUFFIX
+                        If lrQueryGraph.HeadNode.Alias Is Nothing Then
+                            lrQueryGraph.HeadNode.Alias = Me.WHICHSELECTStatement.NODEPROPERTYIDENTIFICATION(0).MODELELEMENTSUFFIX
+                        End If
                     End If
                 End If
 

@@ -125,7 +125,7 @@
                 Dim larFromNodes = Me.Nodes.FindAll(Function(x) x.FBMModelObject.ConceptType <> pcenumConceptType.ValueType)
                 For Each lrQueryNode In larFromNodes
                     If lrQueryNode.Alias Is Nothing Then
-                        lsSQLQuery &= lrQueryNode.Name 'FBMModelObject.getCorrespondingRDSTable.Name
+                        lsSQLQuery &= "[" & lrQueryNode.Name & "]" 'FBMModelObject.getCorrespondingRDSTable.Name
                     Else
                         'FBMModelObject.getCorrespondingRDSTable.Name
                         lsSQLQuery &= lrQueryNode.Name & " " & lrQueryNode.Name & Viev.NullVal(lrQueryNode.Alias, "")
@@ -417,8 +417,8 @@
                                 'was
                                 'lsSQLQuery &= lrQueryEdge.BaseNode.FBMModelObject.Id & "." & lrColumn.Name
                                 'lsSQLQuery &= " = " & lrQueryEdge.TargetNode.Name & Viev.NullVal(lrQueryEdge.TargetNode.Alias, "") & "." & lrColumn.Name
-                                lsSQLQuery &= lrColumn.Table.Name & Viev.NullVal(lrBaseNode.Alias, "") & "." & lrColumn.Name
-                                lsSQLQuery &= " = " & larTargetColumn(liInd2 - 1).Table.Name & Viev.NullVal(lrTargetNode.Alias, "") & "." & larTargetColumn(liInd2 - 1).Name
+                                lsSQLQuery &= "[" & lrColumn.Table.Name & Viev.NullVal(lrBaseNode.Alias, "") & "]." & lrColumn.Name
+                                lsSQLQuery &= " = [" & larTargetColumn(liInd2 - 1).Table.Name & Viev.NullVal(lrTargetNode.Alias, "") & "]." & larTargetColumn(liInd2 - 1).Name
                                 If liInd2 < larTargetColumn.Count Then lsSQLQuery &= vbCrLf & "And "
                                 liInd2 += 1
                             Next
