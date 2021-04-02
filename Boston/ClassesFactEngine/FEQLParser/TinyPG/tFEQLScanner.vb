@@ -101,7 +101,7 @@ Namespace FEQL
             Patterns.Add(TokenType.FACTTYPENAME, regex)
             Tokens.Add(TokenType.FACTTYPENAME)
 
-            regex = new Regex("^[a-zA-Z]:\\((?:[^/]*/)*)([aA-zZ\.]*)", RegexOptions.Compiled)
+            regex = new Regex("^[a-zA-Z]:\\((?:[^/]*/)*)([aA-zZ0-9\-\.]*)", RegexOptions.Compiled)
             Patterns.Add(TokenType.FILELOCATIONNAME, regex)
             Tokens.Add(TokenType.FILELOCATIONNAME)
 

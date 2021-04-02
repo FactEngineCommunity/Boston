@@ -124,6 +124,7 @@ Namespace FEQL
                 lrModel.TargetDatabaseConnectionString = "Data Source=" & lrCREATESDATABASEtatement.FILELOCATIONNAME & ";"
                 lrModel.TargetDatabaseConnectionString &= "Version=3;"
 
+                Me.DatabaseManager.FBMModel = lrModel
                 lrModel.DatabaseConnection = Me.DatabaseManager.establishConnection(lrModel.TargetDatabaseType,
                                                                                     lrModel.TargetDatabaseConnectionString)
 
