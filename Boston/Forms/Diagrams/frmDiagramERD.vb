@@ -1063,6 +1063,20 @@ Public Class frmDiagramERD
 
         Me.zrPage.SelectedObject.Add(e.Node.Tag)
 
+        'Load the IndexEditor toolbox if Table selected
+        Select Case Me.Diagram.Selection.Items(0).Tag.ConceptType
+            Case Is = pcenumConceptType.Entity
+                Dim lrEntity As ERD.Entity = Me.Diagram.Selection.Items(0).Tag
+                'Call frmMain.loadToolboxIndexEditor(Me.DockPanel.ActivePane)
+
+                Dim lrIndexEditorForm As frmToolboxIndexEditor
+                lrIndexEditorForm = prApplication.GetToolboxForm(frmToolboxIndexEditor.Name)
+                If lrIndexEditorForm IsNot Nothing Then
+                    lrIndexEditorForm.mrTable = lrEntity.RDSTable
+                    Call lrIndexEditorForm.SetupForm()
+                End If
+        End Select
+
         '--------------------------------------
         'Set the PropertiesGrid.SeletedObject
         '--------------------------------------
@@ -2839,5 +2853,19 @@ Public Class frmDiagramERD
         End Select
 
         Call Me.DiagramView.Focus()
+    End Sub
+
+    Private Sub IndexEditorToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles IndexEditorToolStripMenuItem.Click
+
+        Try
+            Call frmMain.loadToolboxIndexEditor(Me.DockPanel.ActivePane)
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
     End Sub
 End Class
