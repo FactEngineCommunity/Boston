@@ -123,6 +123,13 @@
 #Region "FromClause"
                 liInd = 1
                 Dim larFromNodes = Me.Nodes.FindAll(Function(x) x.FBMModelObject.ConceptType <> pcenumConceptType.ValueType)
+
+                'Circular/Recursive QueryEdges/TargetNodes are treated differently. See Recursive region below.
+                Dim larNode As List(Of QueryNode) = (From Node In larFromNodes
+                                                     Where Node.QueryEdge IsNot Nothing
+                                                     Where Node.QueryEdge.IsCircular).ToList
+                larFromNodes.RemoveAll(Function(x) larNode.Contains(x))
+
                 For Each lrQueryNode In larFromNodes
                     If lrQueryNode.Alias Is Nothing Then
                         lsSQLQuery &= "[" & lrQueryNode.Name & "]" 'FBMModelObject.getCorrespondingRDSTable.Name
@@ -136,8 +143,11 @@
                 Next
 
                 liInd = 1
-                Dim larQuerEdgeWithFBMFactType = Me.QueryEdges.FindAll(Function(x) x.FBMFactType IsNot Nothing)
-                Dim larRDSTableQueryEdge = larQuerEdgeWithFBMFactType.FindAll(Function(x) x.FBMFactType.isRDSTable And Not x.FBMFactType.IsDerived And Not x.IsPartialFactTypeMatch)
+                Dim larQuerEdgeWithFBMFactType = Me.QueryEdges.FindAll(Function(x) x.FBMFactType IsNot Nothing Or x.IsCircular)
+                Dim larRDSTableQueryEdge = larQuerEdgeWithFBMFactType.FindAll(Function(x) (x.FBMFactType.isRDSTable And
+                                                                              Not x.FBMFactType.IsDerived And
+                                                                              Not x.IsPartialFactTypeMatch) Or
+                                                                              x.IsCircular)
 
                 'RDS Tables
                 For Each lrQueryEdge In larRDSTableQueryEdge
@@ -151,55 +161,89 @@
                         End If
 
                     Else
-                        Dim lrRDSTable As RDS.Table = lrQueryEdge.FBMFactType.getCorrespondingRDSTable
+#Region "Recursive"
+                        If lrQueryEdge.IsCircular Then
 
-                        lsSQLQuery &= vbCrLf & ", ("
+                            Dim lrPGSRelationTable = lrQueryEdge.TargetNode.FBMModelObject.getCorrespondingRDSTable
 
-                        Dim larLeftColumn = From PredicatePart In lrQueryEdge.FBMFactTypeReading.PredicatePart
-                                            From Column In lrRDSTable.Column
-                                            Where PredicatePart.SequenceNr = 1
-                                            Where PredicatePart.Role.Id = Column.Role.Id
-                                            Select Column
+                            Dim lasColumnName = From Column In lrPGSRelationTable.Column
+                                                Select Column.Name
 
-                        Dim larRightColumn = From PredicatePart In lrQueryEdge.FBMFactTypeReading.PredicatePart
-                                             From Column In lrRDSTable.Column
-                                             Where PredicatePart.SequenceNr = 2
-                                             Where PredicatePart.Role.Id = Column.Role.Id
+                            Dim larJoinColumn As List(Of RDS.Column)
+
+                            larJoinColumn = (From Column In lrPGSRelationTable.Column.FindAll(Function(x) x.Relation.Count > 0)
+                                             Where Column.Relation.Find(Function(x) x.OriginTable Is lrPGSRelationTable).DestinationTable.Name = lrQueryEdge.BaseNode.Name
                                              Select Column
+                                             Order By Column.OrdinalPosition).ToList
 
-                        lsSQLQuery &= "WITH RECURSIVE nodes(" & larLeftColumn(0).Name & "," & larRightColumn(0).Name & ",depth) As ("
-                        lsSQLQuery &= vbCrLf & " SELECT " & lrRDSTable.Name & "." & larLeftColumn(0).Name & "," & lrRDSTable.Name & "." & larRightColumn(0).Name & ",0"
-                        lsSQLQuery &= vbCrLf & " FROM " & lrRDSTable.Name
-                        If lrQueryEdge.BaseNode.IdentifierList.Count > 0 Then
-                            Dim lrTargetTable As RDS.Table = larLeftColumn(0).Relation.Find(Function(x) x.OriginTable.Name = lrRDSTable.Name).DestinationTable
-                            lsSQLQuery &= "," & lrTargetTable.Name & vbCrLf & " WHERE "
-                            liInd = 0
-                            For Each lrColumn In lrTargetTable.getFirstUniquenessConstraintColumns
-                                lsSQLQuery &= "[" & lrTargetTable.Name & Viev.NullVal(lrQueryEdge.Alias, "") & "]." & lrColumn.Name & " = '"
-                                lsSQLQuery &= lrQueryEdge.BaseNode.IdentifierList(liInd) & "'" & vbCrLf
-                                If liInd < Me.HeadNode.RDSTable.getFirstUniquenessConstraintColumns.Count - 1 Then lsSQLQuery &= "AND "
-                                liInd += 1
-                            Next
-                            lsSQLQuery &= vbCrLf & " AND " & lrRDSTable.Name & "." & larLeftColumn(0).Name & " = " & lrTargetTable.Name & "." & lrTargetTable.getPrimaryKeyColumns(0).Name
+                            If Not larJoinColumn(0).Role Is lrQueryEdge.FBMFactTypeReading.PredicatePart(1).Role Then
+                                larJoinColumn.Reverse()
+                            End If
+
+                            Dim lsColumnNames = Strings.Join(lasColumnName.ToArray, ",")
+                            lsSQLQuery &= vbCrLf & ", (WITH RECURSIVE nodes(" & lsColumnNames & ",depth) As ("
+                            lsSQLQuery &= vbCrLf & " SELECT [" & lrPGSRelationTable.Name & "]." & Strings.Join(lasColumnName.ToArray, ",[" & lrPGSRelationTable.Name & "].") & ",0"
+                            lsSQLQuery &= vbCrLf & " FROM [" & lrPGSRelationTable.Name & "]"
+                            lsSQLQuery &= vbCrLf & " UNION"
+                            lsSQLQuery &= " SELECT [" & lrPGSRelationTable.Name & "]." & Strings.Join(lasColumnName.ToArray, ",[" & lrPGSRelationTable.Name & "].") & ",depth+1"
+                            lsSQLQuery &= vbCrLf & " FROM nodes, [" & lrPGSRelationTable.Name & "]"
+                            lsSQLQuery &= vbCrLf & " WHERE nodes." & larJoinColumn(1).Name & " = [" & lrPGSRelationTable.Name & "]." & larJoinColumn(0).Name
+                            lsSQLQuery &= vbCrLf & " LIMIT 100"
+                            lsSQLQuery &= vbCrLf & ")"
+                            lsSQLQuery &= vbCrLf & " SELECT " & Strings.Join(lasColumnName.ToArray, ",") & ",depth"
+                            lsSQLQuery &= vbCrLf & " FROM nodes"
+                            lsSQLQuery &= vbCrLf & " WHERE depth = (SELECT MAX(depth) FROM nodes N2)) " & lrPGSRelationTable.Name & lrQueryEdge.TargetNode.Alias
+                        Else
+                            Dim lrRDSTable As RDS.Table = lrQueryEdge.FBMFactType.getCorrespondingRDSTable
+
+                            lsSQLQuery &= vbCrLf & ", ("
+
+                            Dim larLeftColumn = From PredicatePart In lrQueryEdge.FBMFactTypeReading.PredicatePart
+                                                From Column In lrRDSTable.Column
+                                                Where PredicatePart.SequenceNr = 1
+                                                Where PredicatePart.Role.Id = Column.Role.Id
+                                                Select Column
+
+                            Dim larRightColumn = From PredicatePart In lrQueryEdge.FBMFactTypeReading.PredicatePart
+                                                 From Column In lrRDSTable.Column
+                                                 Where PredicatePart.SequenceNr = 2
+                                                 Where PredicatePart.Role.Id = Column.Role.Id
+                                                 Select Column
+
+                            lsSQLQuery &= "WITH RECURSIVE nodes(" & larLeftColumn(0).Name & "," & larRightColumn(0).Name & ",depth) As ("
+                            lsSQLQuery &= vbCrLf & " SELECT " & lrRDSTable.Name & "." & larLeftColumn(0).Name & "," & lrRDSTable.Name & "." & larRightColumn(0).Name & ",0"
+                            lsSQLQuery &= vbCrLf & " FROM " & lrRDSTable.Name
+                            If lrQueryEdge.BaseNode.IdentifierList.Count > 0 Then
+                                Dim lrTargetTable As RDS.Table = larLeftColumn(0).Relation.Find(Function(x) x.OriginTable.Name = lrRDSTable.Name).DestinationTable
+                                lsSQLQuery &= "," & lrTargetTable.Name & vbCrLf & " WHERE "
+                                liInd = 0
+                                For Each lrColumn In lrTargetTable.getFirstUniquenessConstraintColumns
+                                    lsSQLQuery &= "[" & lrTargetTable.Name & Viev.NullVal(lrQueryEdge.Alias, "") & "]." & lrColumn.Name & " = '"
+                                    lsSQLQuery &= lrQueryEdge.BaseNode.IdentifierList(liInd) & "'" & vbCrLf
+                                    If liInd < Me.HeadNode.RDSTable.getFirstUniquenessConstraintColumns.Count - 1 Then lsSQLQuery &= "AND "
+                                    liInd += 1
+                                Next
+                                lsSQLQuery &= vbCrLf & " AND " & lrRDSTable.Name & "." & larLeftColumn(0).Name & " = " & lrTargetTable.Name & "." & lrTargetTable.getPrimaryKeyColumns(0).Name
+                            End If
+                            lsSQLQuery &= vbCrLf & " UNION "
+                            lsSQLQuery &= vbCrLf & " SELECT " & lrRDSTable.Name & "." & larLeftColumn(0).Name & "," & lrRDSTable.Name & "." & larRightColumn(0).Name & ", depth + 1"
+                            lsSQLQuery &= vbCrLf & " FROM nodes, " & lrRDSTable.Name
+                            lsSQLQuery &= vbCrLf & " WHERE Nodes." & larRightColumn(0).Name & " = " & lrRDSTable.Name & "." & larLeftColumn(0).Name
+                            If My.Settings.FactEngineDefaultQueryResultLimit > 0 Then
+                                lsSQLQuery &= vbCrLf & " LIMIT " & My.Settings.FactEngineDefaultQueryResultLimit
+                            End If
+                            lsSQLQuery &= vbCrLf & " )"
+                            lsSQLQuery &= vbCrLf & " SELECT " & larLeftColumn(0).Name & "," & larRightColumn(0).Name
+                            lsSQLQuery &= vbCrLf & " FROM nodes"
+                            If lrQueryEdge.RecursiveNumber1 IsNot Nothing And lrQueryEdge.RecursiveNumber2 IsNot Nothing Then
+                                lsSQLQuery &= vbCrLf & " WHERE depth BETWEEN " & lrQueryEdge.RecursiveNumber1 & " AND " & lrQueryEdge.RecursiveNumber2
+                            ElseIf lrQueryEdge.RecursiveNumber2 Is Nothing Then
+                                lsSQLQuery &= vbCrLf & " WHERE depth >= " & lrQueryEdge.RecursiveNumber1
+                            End If
+                            lsSQLQuery &= vbCrLf & ") AS " & lrQueryEdge.FBMFactType.Id
                         End If
-                        lsSQLQuery &= vbCrLf & " UNION "
-                        lsSQLQuery &= vbCrLf & " SELECT " & lrRDSTable.Name & "." & larLeftColumn(0).Name & "," & lrRDSTable.Name & "." & larRightColumn(0).Name & ", depth + 1"
-                        lsSQLQuery &= vbCrLf & " FROM nodes, " & lrRDSTable.Name
-                        lsSQLQuery &= vbCrLf & " WHERE Nodes." & larRightColumn(0).Name & " = " & lrRDSTable.Name & "." & larLeftColumn(0).Name
-                        If My.Settings.FactEngineDefaultQueryResultLimit > 0 Then
-                            lsSQLQuery &= vbCrLf & " LIMIT " & My.Settings.FactEngineDefaultQueryResultLimit
-                        End If
-                        lsSQLQuery &= vbCrLf & " )"
-                        lsSQLQuery &= vbCrLf & " SELECT " & larLeftColumn(0).Name & "," & larRightColumn(0).Name
-                        lsSQLQuery &= vbCrLf & " FROM nodes"
-                        If lrQueryEdge.RecursiveNumber1 IsNot Nothing And lrQueryEdge.RecursiveNumber2 IsNot Nothing Then
-                            lsSQLQuery &= vbCrLf & " WHERE depth BETWEEN " & lrQueryEdge.RecursiveNumber1 & " AND " & lrQueryEdge.RecursiveNumber2
-                        ElseIf lrQueryEdge.RecursiveNumber2 Is Nothing Then
-                            lsSQLQuery &= vbCrLf & " WHERE depth >= " & lrQueryEdge.RecursiveNumber1
-                        End If
-                        lsSQLQuery &= vbCrLf & ") AS " & lrQueryEdge.FBMFactType.Id
                     End If
-
+#End Region
                     'If liInd < larRDSTableQueryEdge.Count Then lsSQLQuery &= "," & vbCrLf
                     liInd += 1
                 Next
@@ -747,6 +791,8 @@
                                     If lrRole IsNot Nothing Then
                                         lrTempColumn.TemporaryAlias = lrQueryEdge.TargetNode.Alias
                                     ElseIf liRoleInd = 1 Then
+                                        lrTempColumn.TemporaryAlias = lrQueryEdge.TargetNode.Alias
+                                    ElseIf lrQueryEdge.IsCircular Then
                                         lrTempColumn.TemporaryAlias = lrQueryEdge.TargetNode.Alias
                                     Else
                                         lrTempColumn.TemporaryAlias = lrQueryEdge.Alias

@@ -24,6 +24,7 @@ Namespace FactEngine
         Public IsRecursive As Boolean = False
         Public RecursiveNumber1 As String = Nothing
         Public RecursiveNumber2 As String = Nothing
+        Public IsCircular As Boolean = False
 
         ''' <summary>
         ''' 'E.g. WHICH "Person was armed by WHICH Person 2", rather than "WHICH Person armed Person 2" and where the latter is the primary FactTypeReading predicate.

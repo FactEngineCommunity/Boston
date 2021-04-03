@@ -300,8 +300,16 @@
             'Call Me.GetParseTreeTokensReflection(Me.MODELELEMENTCLAUSE, Me.WHICHCLAUSE.MODELELEMENT(0))
             lrFBMModelObject = Me.Model.GetModelObjectByName(Me.WHICHCLAUSE.NODE(0).MODELELEMENTNAME)
             If lrFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & Me.WHICHCLAUSE.MODELELEMENTNAME(0) & "'.")
-            arQueryEdge.TargetNode = New FactEngine.QueryNode(lrFBMModelObject, arQueryEdge)
+            arQueryEdge.TargetNode = New FactEngine.QueryNode(lrFBMModelObject, arQueryEdge, True)
             arQueryEdge.TargetNode.Alias = Me.WHICHCLAUSE.NODE(0).MODELELEMENTSUFFIX
+
+            If arWHICHCLAUSE.RECURSIVECLAUSE IsNot Nothing Then
+                If arWHICHCLAUSE.RECURSIVECLAUSE.KEYWDCIRCULAR IsNot Nothing Then
+                    arQueryEdge.TargetNode.Alias = "RND" & 100.ToString & New Random().Next(10).ToString
+                    arQueryEdge.IsCircular = True
+                End If
+            End If
+
             arQueryGraph.Nodes.Add(arQueryEdge.TargetNode)
 
             ''---------------------------------------------------------
