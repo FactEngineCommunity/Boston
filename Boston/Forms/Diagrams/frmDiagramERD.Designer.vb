@@ -68,6 +68,7 @@ Partial Class frmDiagramERD
         Me.ContextMenuStripTab = New System.Windows.Forms.ContextMenuStrip(Me.components)
         Me.CloseToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.CloseAllButThisPageToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.IndexEditorToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ContextMenuStrip_Entity.SuspendLayout()
         Me.ContextMenuStrip_Diagram.SuspendLayout()
         Me.ContextMenuStripAttribute.SuspendLayout()
@@ -185,7 +186,7 @@ Partial Class frmDiagramERD
         '
         'ViewToolStripMenuItem
         '
-        Me.ViewToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ModelDictionaryToolStripMenuItem, Me.PropertiesToolStripMenuItem, Me.ToolStripSeparator3, Me.PageAsORMMetamodelToolStripMenuItem})
+        Me.ViewToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.IndexEditorToolStripMenuItem, Me.ModelDictionaryToolStripMenuItem, Me.PropertiesToolStripMenuItem, Me.ToolStripSeparator3, Me.PageAsORMMetamodelToolStripMenuItem})
         Me.ViewToolStripMenuItem.Name = "ViewToolStripMenuItem"
         Me.ViewToolStripMenuItem.Size = New System.Drawing.Size(207, 22)
         Me.ViewToolStripMenuItem.Text = "&View"
@@ -384,6 +385,12 @@ Partial Class frmDiagramERD
         Me.CloseAllButThisPageToolStripMenuItem.Size = New System.Drawing.Size(190, 22)
         Me.CloseAllButThisPageToolStripMenuItem.Text = "Close all but this &Page"
         '
+        'IndexEditorToolStripMenuItem
+        '
+        Me.IndexEditorToolStripMenuItem.Name = "IndexEditorToolStripMenuItem"
+        Me.IndexEditorToolStripMenuItem.Size = New System.Drawing.Size(208, 22)
+        Me.IndexEditorToolStripMenuItem.Text = "&Index Editor"
+        '
         'frmDiagramERD
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -402,7 +409,7 @@ Partial Class frmDiagramERD
         Me.ContextMenuStripTab.ResumeLayout(False)
         Me.ResumeLayout(False)
 
-End Sub
+    End Sub
     Friend WithEvents Diagram As MindFusion.Diagramming.Diagram
     Friend WithEvents DiagramView As MindFusion.Diagramming.WinForms.DiagramView
     Friend WithEvents ContextMenuStrip_Entity As System.Windows.Forms.ContextMenuStrip
@@ -448,4 +455,5 @@ End Sub
     Friend WithEvents ContextMenuStripTab As System.Windows.Forms.ContextMenuStrip
     Friend WithEvents CloseToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents CloseAllButThisPageToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents IndexEditorToolStripMenuItem As ToolStripMenuItem
 End Class
