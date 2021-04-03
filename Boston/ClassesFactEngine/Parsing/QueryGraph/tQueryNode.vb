@@ -36,6 +36,8 @@
 
         Public Edge As New List(Of FactEngine.QueryEdge)
 
+        Public IsTargetNode As Boolean = False
+
         ''' <summary>
         ''' The QueryEdge that resulted in this Node being added to the QueryGraph.Nodes collection
         ''' </summary>
@@ -65,15 +67,44 @@
         ''' </summary>
         ''' <param name="arFBMModelObject"></param>
         Public Sub New(ByRef arFBMModelObject As FBM.ModelObject,
-                       Optional ByRef arQueryEdge As FactEngine.QueryEdge = Nothing)
+                       Optional ByRef arQueryEdge As FactEngine.QueryEdge = Nothing,
+                       Optional abIsTargetNode As Boolean = False)
             Me.FBMModelObject = arFBMModelObject
             Me.QueryEdge = arQueryEdge
+            Me.IsTargetNode = abIsTargetNode
         End Sub
 
         Public Shadows Function Equals(other As QueryNode) As Boolean Implements IEquatable(Of QueryNode).Equals
 
             Return Me.FBMModelObject.Id = other.FBMModelObject.Id And Me.Alias = other.Alias
         End Function
+
+        Public Function IsPGSRelationByDefacto() As Boolean
+
+            Try
+                Dim lrTable As RDS.Table = Me.FBMModelObject.getCorrespondingRDSTable
+
+                If lrTable.isPGSRelation Then
+                    Return True
+                Else
+                    If Me.QueryEdge.BaseNode Is Nothing Then
+                        Return False
+                    ElseIf Me.IsTargetNode = False Then
+                        Return False
+                    Else
+                        If lrTable.Column.FindAll(Function(x) x.ActiveRole.JoinedORMObject.Id = Me.QueryEdge.BaseNode.Name).Count = 2 Then
+                            Return True
+                        End If
+                    End If
+                End If
+
+                Return False
+
+            Catch ex As Exception
+                Return ex.Message
+            End Try
+        End Function
+
     End Class
 
 End Namespace
