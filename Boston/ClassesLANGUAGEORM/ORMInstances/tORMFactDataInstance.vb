@@ -809,19 +809,32 @@ Namespace FBM
 
         End Function
 
-        Public Overrides Sub setName(ByVal asNewName As String, Optional ByVal abBroadcastInterfaceEvent As Boolean = True)
+        Public Overrides Function setName(ByVal asNewName As String, Optional ByVal abBroadcastInterfaceEvent As Boolean = True) As Boolean
 
             '----------------------------------------------------------------------------------------------
             'Modify the FactData referenced by the FactData instance.
             '  The FactDataInstance event handler (FactData.Updated) manages(the) changes 
             '  to Me.Id, Me.Name, Me.Data etc
             '----------------------------------------------------------------------------------------------
-            Me.FactData.Id = asNewName
-            Me.FactData.Name = asNewName
-            Me.FactData.Data = asNewName
-            Me.FactData.isDirty = True
+            Try
+                Me.FactData.Id = asNewName
+                Me.FactData.Name = asNewName
+                Me.FactData.Data = asNewName
+                Me.FactData.isDirty = True
 
-        End Sub
+                Return True
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                Return False
+            End Try
+
+        End Function
 
         Public Overloads Sub SwitchConcept(ByVal asNewInstance As String)
 

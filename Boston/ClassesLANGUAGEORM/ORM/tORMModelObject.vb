@@ -814,9 +814,9 @@ Namespace FBM
             Me.Model.MakeDirty(False, False)
         End Sub
 
-        Public Overridable Sub setName(ByVal asNewName As String, Optional ByVal abBroadcastInterfaceEvent As Boolean = True)
+        Public Overridable Function setName(ByVal asNewName As String, Optional ByVal abBroadcastInterfaceEvent As Boolean = True) As Boolean
             'See inherited Classes.
-        End Sub
+        End Function
 
         Public Sub SetShortDescription(ByVal asShortDescription As String)
             Me.ShortDescription = asShortDescription

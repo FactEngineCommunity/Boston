@@ -266,17 +266,28 @@ Namespace ERD
 
         End Sub
 
-        Public Overrides Sub SetName(ByVal asNewName As String, Optional ByVal abBroadcastInterfaceEvent As Boolean = True)
+        Public Overrides Function SetName(ByVal asNewName As String, Optional ByVal abBroadcastInterfaceEvent As Boolean = True) As Boolean
 
             '----------------------------------------------------------------------------------------------
             'Modify the FactData referenced by the FactData instance.
             '  The FactDataInstance event handler (FactData.Updated) manages(the) changes 
             '  to Me.Id, Me.Name, Me.Data etc
             '----------------------------------------------------------------------------------------------            
-            Me.FactData.Name = asNewName
-            Me.FactData.Data = asNewName
+            Try
+                Me.FactData.Name = asNewName
+                Me.FactData.Data = asNewName
+                Return True
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
-        End Sub
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                Return False
+            End Try
+
+        End Function
 
         Public Sub RefreshShape(Optional ByVal aoChangedPropertyItem As PropertyValueChangedEventArgs = Nothing,
                                 Optional ByVal asSelectedGridItemLabel As String = "")

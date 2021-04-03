@@ -5480,7 +5480,9 @@ Public Class frmDiagramORM
                         MsgBox("The name, '" & lrEntityTypeDictionaryEntry.Symbol & "', conflicts with a Role Constraint of the same name in the Model, '" & lrEntityTypeInstance.Model.Name & "'.", MsgBoxStyle.Exclamation, "Model Object Conflict")
                         lrEntityTypeInstance.EntityTypeNameShape.Text = e.OldText
                     Else
-                        lrEntityTypeInstance.EntityType.SetName(e.NewText)
+                        If Not lrEntityTypeInstance.EntityType.SetName(e.NewText) Then
+                            lrEntityTypeInstance.EntityTypeNameShape.Text = e.OldText
+                        End If
                     End If
                 End If
 
@@ -5512,9 +5514,9 @@ Public Class frmDiagramORM
                         MsgBox("The name, '" & lrEntityTypeDictionaryEntry.Symbol & "', conflicts with a Role Constraint of the same name in the Model, '" & lrValueTypeInstance.Model.Name & "'.", MsgBoxStyle.Exclamation, "Model Object Conflict")
                         lrValueTypeInstance.Shape.Text = e.OldText
                     Else
-                        lrValueTypeInstance.ValueType.SetName(e.NewText)
-                        lrValueTypeInstance.Model.MakeDirty()
-                        Call Me.EnableSaveButton()
+                        If Not lrValueTypeInstance.ValueType.SetName(e.NewText) Then
+                            lrValueTypeInstance.Shape.Text = e.OldText
+                        End If
                     End If
                 End If
 
@@ -5523,7 +5525,9 @@ Public Class frmDiagramORM
                 lrRoleConstraintInstance = lrModelObject.CloneRoleConstraintInstance(Me.zrPage)
                 lrRoleConstraintInstance = Me.zrPage.RoleConstraintInstance.Find(AddressOf lrRoleConstraintInstance.Equals)
                 lrRoleConstraintInstance.Name = e.NewText
-                lrRoleConstraintInstance.RoleConstraint.SetName(e.NewText)
+                If Not lrRoleConstraintInstance.RoleConstraint.SetName(e.NewText) Then
+                    lrRoleConstraintInstance.Name = e.OldText
+                End If
 
             Case Is = pcenumConceptType.ModelNote
 
