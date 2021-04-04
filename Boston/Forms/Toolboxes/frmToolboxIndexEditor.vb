@@ -61,7 +61,9 @@ Public Class frmToolboxIndexEditor
                     Dim lrRoleConstraint As FBM.RoleConstraint = lrIndex.getResponsibleRoleConstraintFromORMModel
                     Dim lsMessage As String
                     lsMessage = "Are you absolutely sure you want to delete Index, '" & lsIndexName & "'?"
-                    lsMessage &= vbCrLf & vbCrLf & "The Index is tied to the Role Constraint, '" & lrRoleConstraint.Id & "'."
+                    If lrRoleConstraint IsNot Nothing Then
+                        lsMessage &= vbCrLf & vbCrLf & "The Index is tied to the Role Constraint, '" & lrRoleConstraint.Id & "'."
+                    End If
                     If MsgBox(lsMessage, MsgBoxStyle.YesNo) = MsgBoxResult.Yes Then
                         Call mrTable.removeIndex(lrIndex)
                     End If

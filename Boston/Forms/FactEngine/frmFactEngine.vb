@@ -816,14 +816,17 @@ Public Class frmFactEngine
 
                                         'Edge/s based on the TupleNode Column's QueryEdge
                                         If liInd > 1 And lrActualGraphNode.Column(0).QueryEdge IsNot Nothing Then
-                                            Dim lrBaseTupleNode = larTupleNode.Find(Function(x) x.Type = lrActualGraphNode.Column(0).QueryEdge.BaseNode.Name And
-                                                                                            x.Alias = lrActualGraphNode.Column(0).QueryEdge.BaseNode.Alias)
+                                            'Dim lrBaseTupleNode = larTupleNode.Find(Function(x) x.Type = lrActualGraphNode.Column(0).QueryEdge.BaseNode.Name And
+                                            '                                                x.Alias = lrActualGraphNode.Column(0).QueryEdge.BaseNode.Alias)
+                                            Dim lrBaseTupleNode = larTupleNode.Find(Function(x) x.Type = lrTupleNode.Column(0).QueryEdge.BaseNode.Name And
+                                                                                                x.Alias = lrTupleNode.Column(0).QueryEdge.BaseNode.Alias)
 
                                             If lrBaseTupleNode IsNot Nothing Then
                                                 Dim lrBaseGraphNode = Me.GraphNodes.Find(Function(x) x.Type = lrBaseTupleNode.Type And
                                                                                                      x.Name = lrBaseTupleNode.Name)
 
                                                 Dim lrEdge As New FactEngine.DisplayGraph.Edge(lrBaseGraphNode, lrActualGraphNode)
+                                                lrEdge.Predicate = lrTupleNode.Column(0).QueryEdge.Predicate
 
                                                 If lrBaseGraphNode Is Nothing Then
                                                     Throw New Exception("frmFactEngine.GO: BaseGraphNode is Nothing.")
@@ -838,6 +841,8 @@ Public Class frmFactEngine
                                                 If larDuplicateEdge.Count = 0 Then
                                                     lrBaseGraphNode.Edge.Add(lrEdge)
                                                 End If
+                                            Else
+                                                Debugger.Break()
                                             End If
                                         End If
                                         liInd += 1
@@ -876,7 +881,7 @@ Public Class frmFactEngine
                                     lrPGSLink.HeadShapeSize = 3
 
                                     Try
-                                        lrPGSLink.Text = lrEdge.TargetNode.Column(0).QueryEdge.Predicate
+                                        lrPGSLink.Text = lrEdge.Predicate 'argetNode.Column(0).QueryEdge.Predicate
                                     Catch ex As Exception
                                     End Try
 
