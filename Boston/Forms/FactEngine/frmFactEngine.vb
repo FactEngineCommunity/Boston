@@ -810,8 +810,9 @@ Public Class frmFactEngine
 
                                     liInd = 1
                                     For Each lrTupleNode In larTupleNode.ToArray
+
                                         Dim lrActualGraphNode = Me.GraphNodes.Find(Function(x) x.Type = lrTupleNode.Type And
-                                                                                           x.Name = lrTupleNode.Name)
+                                                                                               x.Name = lrTupleNode.Name)
 
                                         'Edge/s based on the TupleNode Column's QueryEdge
                                         If liInd > 1 And lrActualGraphNode.Column(0).QueryEdge IsNot Nothing Then
@@ -820,7 +821,8 @@ Public Class frmFactEngine
 
                                             If lrBaseTupleNode IsNot Nothing Then
                                                 Dim lrBaseGraphNode = Me.GraphNodes.Find(Function(x) x.Type = lrBaseTupleNode.Type And
-                                                                                             x.Name = lrBaseTupleNode.Name)
+                                                                                                     x.Name = lrBaseTupleNode.Name)
+
                                                 Dim lrEdge As New FactEngine.DisplayGraph.Edge(lrBaseGraphNode, lrActualGraphNode)
 
                                                 If lrBaseGraphNode Is Nothing Then
@@ -837,7 +839,7 @@ Public Class frmFactEngine
                                                     lrBaseGraphNode.Edge.Add(lrEdge)
                                                 End If
                                             End If
-                                            End If
+                                        End If
                                         liInd += 1
                                     Next
 
