@@ -444,6 +444,7 @@
     <Compile Include="ClassesGeneral\tFlickerFreeListbox.vb">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="ClassesGeneral\tInformationException.vb" />
     <Compile Include="ClassesGeneral\tMorphVector.vb" />
     <Compile Include="ClassesGeneral\tRecentNodes.vb" />
     <Compile Include="ClassesGeneral\tRichtextCell.vb" />
@@ -1365,7 +1366,6 @@
     <Compile Include="ModulesPublic\publicConstantsPGS.vb" />
     <Compile Include="ModulesPublic\publicDatabaseUpgradeFunctions.vb" />
     <Compile Include="ModulesPublic\ClientServer\tDSCEntityType.vb" />
-    <Compile Include="ModulesPublic\tInformationException.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
