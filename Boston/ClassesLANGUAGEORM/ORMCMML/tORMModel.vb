@@ -1256,6 +1256,24 @@ Namespace FBM
 
         End Sub
 
+        Public Sub updateCMMLTableName(ByVal asOldName As String, ByVal asNewName As String)
+            Try
+                Dim lsSQLQuery As String = ""
+
+                lsSQLQuery = "RENAME INSTANCE '" & asOldName & "' IN " & pcenumCMMLCoreModel.CoreElement.ToString & " TO '" & asNewName & "'"
+
+                Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+        End Sub
+
         Public Sub updateORSetCMMLPropertyActiveRole(ByRef arColumn As RDS.Column)
 
             Dim lsSQLQuery As String = ""

@@ -1465,6 +1465,7 @@ Namespace ORMQL
                     lrFactData = lrFact(lrupdateStatement.COLUMNNAMESTR(0))
                     lrFactData.Data = lrupdateStatement.VALUE(0)
                     lrFactData.makeDirty()
+                    lrFact.makeDirty()
                     lrFact.Model.MakeDirty(False, False)
                     liNumberOfRowsUpdated += 1
                 Next

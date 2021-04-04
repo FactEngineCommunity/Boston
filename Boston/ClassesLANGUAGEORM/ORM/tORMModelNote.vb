@@ -191,12 +191,21 @@ Namespace FBM
 
         Public Sub SetText(ByVal asText As String)
 
-            Me.Text = asText
+            Try
+                Me.Text = asText
 
-            Call Me.makeDirty()
-            Call Me.Model.MakeDirty(False, False)
+                Call Me.makeDirty()
+                Call Me.Model.MakeDirty(False, False)
 
-            RaiseEvent TextChanged(asText)
+                RaiseEvent TextChanged(asText)
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
         End Sub
 

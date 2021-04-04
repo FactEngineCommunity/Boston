@@ -2268,20 +2268,34 @@ Namespace FBM
         ''' </summary>
         ''' <param name="asName"></param>
         ''' <remarks></remarks>
-        Public Overrides Sub setName(ByVal asName As String, Optional ByVal abBroadcastInterfaceEvent As Boolean = True)
+        Public Overrides Function setName(ByVal asName As String, Optional ByVal abBroadcastInterfaceEvent As Boolean = True) As Boolean
 
-            Me.Name = asName
+            Try
 
-            Call Me.makeDirty()
-            Call Me.Model.MakeDirty(False, False)
+                Me.Name = asName
 
-            RaiseEvent RoleNameChanged(asName)
+                Call Me.makeDirty()
+                Call Me.Model.MakeDirty(False, False)
 
-            If My.Settings.UseClientServer And My.Settings.InitialiseClient And abBroadcastInterfaceEvent Then
-                Call prDuplexServiceClient.BroadcastToDuplexService(Viev.FBM.Interface.pcenumBroadcastType.ModelUpdateRole, Me, Nothing)
-            End If
+                RaiseEvent RoleNameChanged(asName)
 
-        End Sub
+                If My.Settings.UseClientServer And My.Settings.InitialiseClient And abBroadcastInterfaceEvent Then
+                    Call prDuplexServiceClient.BroadcastToDuplexService(Viev.FBM.Interface.pcenumBroadcastType.ModelUpdateRole, Me, Nothing)
+                End If
+
+                Return True
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                Return False
+            End Try
+
+        End Function
 
         Public Sub SetValueRange(ByVal asNewValueRange As String)
 

@@ -196,6 +196,16 @@ Namespace FBM
 
         End Function
 
+        Public Shadows Function EqualsCase(ByVal other As FBM.DictionaryEntry) As Boolean
+
+            If Me.Symbol = other.Symbol Then
+                Return True
+            Else
+                Return False
+            End If
+
+        End Function
+
         Public Function EqualsLowercase(ByVal other As FBM.DictionaryEntry) As Boolean
 
             If LCase(Me.Symbol) = LCase(other.Symbol) Then

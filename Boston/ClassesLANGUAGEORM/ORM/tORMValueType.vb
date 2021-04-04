@@ -896,7 +896,7 @@ Namespace FBM
 
         End Sub
 
-        Public Overrides Sub SetName(ByVal asNewName As String, Optional ByVal abBroadcastInterfaceEvent As Boolean = True)
+        Public Overrides Function SetName(ByVal asNewName As String, Optional ByVal abBroadcastInterfaceEvent As Boolean = True) As Boolean
 
             '-----------------------------------------------------------------------------------------------------------------
             'The following explains the logic and philosophy of Richmond.
@@ -916,6 +916,12 @@ Namespace FBM
             Try
                 _Name = asNewName
                 Me.Symbol = asNewName
+
+                'Check to see that the name begins with a capital letter.
+                If Not Char.IsUpper(asNewName.Chars(0)) Then
+                    Throw New tInformationException("Object Type names must start with a capital letter followed by one or more lowercase letters.")
+                    Return False
+                End If
 
                 '--------------------------------------------------------------------------------------------------------
                 'The surrogate key for the ValueType is about to change (to match the name of the ValueType)
@@ -961,8 +967,8 @@ Namespace FBM
                     '  may reference another FactType, so that FactType must be saved...etc.
                     '  i.e. It's easier and safer to simply save the whole model.
                     '------------------------------------------------------------------------------------
-                    Dim larRole = From Role In Me.Model.Role _
-                                  Where Role.JoinedORMObject Is Me _
+                    Dim larRole = From Role In Me.Model.Role
+                                  Where Role.JoinedORMObject Is Me
                                   Select Role
 
                     For Each lrRole In larRole
@@ -990,18 +996,24 @@ Namespace FBM
                     'To make sure all the FactData and FactDataInstances/Pages are saved for RDS
                     Me.Model.Save()
 
+                    Return True
                 End If 'Me.Id <> asNewName
 
 
+                Return False
 
+            Catch iex As tInformationException
+                prApplication.ThrowErrorMessage(iex.Message, pcenumErrorType.Information, Nothing, False, False, True)
+                Return False
             Catch ex As Exception
                 Dim lsMessage As String
                 lsMessage = "Error: tValueType.SetName"
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
                 prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                Return False
             End Try
 
-        End Sub
+        End Function
 
         Sub SetValueConstraint(ByVal arValueConstraint As Viev.Strings.StringCollection)
 

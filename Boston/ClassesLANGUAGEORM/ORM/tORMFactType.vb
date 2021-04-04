@@ -3980,7 +3980,7 @@ Namespace FBM
 
         End Sub
 
-        Public Overrides Sub setName(ByVal asNewName As String, Optional ByVal abBroadcastInterfaceEvent As Boolean = True)
+        Public Overrides Function setName(ByVal asNewName As String, Optional ByVal abBroadcastInterfaceEvent As Boolean = True) As Boolean
 
             Dim lsMessage As String = ""
             '-----------------------------------------------------------------------------------------------------------
@@ -4006,6 +4006,12 @@ Namespace FBM
                 '--------------------------------------------------------------------------------------------------------
                 'CodeSafe: Abort if an attempt is made to set the Name/Id/Symbol of the ModelObject to "" (EmptyString)
                 '--------------------------------------------------------------------------------------------------------
+                'Check to see that the name begins with a capital letter.
+                If Not Char.IsUpper(asNewName.Chars(0)) Then
+                    Throw New tInformationException("Object Type names must start with a capital letter followed by one or more lowercase letters.")
+                    Return False
+                End If
+
                 If asNewName = "" Then
                     lsMessage = "Failed: Attempt to set FactType.Name to Empty String, ''."
                     Throw New Exception(lsMessage)
@@ -4046,8 +4052,8 @@ Namespace FBM
                     Call Me.RaiseEventNameChanged(asNewName)
                     RaiseEvent Updated()
 
-                    Dim larRole = From Role In Me.Model.Role _
-                                  Where Role.JoinedORMObject Is Me _
+                    Dim larRole = From Role In Me.Model.Role
+                                  Where Role.JoinedORMObject Is Me
                                   Select Role
 
                     For Each lrRole In larRole
@@ -4056,6 +4062,7 @@ Namespace FBM
                         lrRole.FactType.Save()
                     Next
 
+                    Return True
                 End If 'Me.Id <> asNewName
 
                 'If abTriggerEvents Then
@@ -4078,15 +4085,21 @@ Namespace FBM
 
                 '-------------------------------------------------------------
                 'To make sure all the FactData and FactDataInstances/Pages are saved for RDS
-                Me.Model.Save()                
+                Me.Model.Save()
 
+                Return True
+            Catch iex As tInformationException
+                prApplication.ThrowErrorMessage(iex.Message, pcenumErrorType.Information, Nothing, False, False, True)
+                Return False
             Catch ex As Exception
                 lsMessage = "Error: tFactType.SetName"
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
                 prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return False
             End Try
 
-        End Sub
+        End Function
 
         Public Sub SetShowFactTypeName(ByVal abNewShowFactTypeName As Boolean)
 

@@ -1365,6 +1365,7 @@
     <Compile Include="ModulesPublic\publicConstantsPGS.vb" />
     <Compile Include="ModulesPublic\publicDatabaseUpgradeFunctions.vb" />
     <Compile Include="ModulesPublic\ClientServer\tDSCEntityType.vb" />
+    <Compile Include="ModulesPublic\tInformationException.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>

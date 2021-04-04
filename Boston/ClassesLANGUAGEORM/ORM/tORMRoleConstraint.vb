@@ -1878,7 +1878,7 @@ Namespace FBM
 
         End Sub
 
-        Public Overrides Sub SetName(ByVal asNewName As String, Optional ByVal abBroadcastInterfaceEvent As Boolean = True)
+        Public Overrides Function SetName(ByVal asNewName As String, Optional ByVal abBroadcastInterfaceEvent As Boolean = True) As Boolean
 
             '-----------------------------------------------------------------------------------------------------------
             'The following explains the logic and philosophy of Boston.
@@ -1901,6 +1901,12 @@ Namespace FBM
                 '-----------------------------------------------------------
                 _Name = asNewName
                 Me.Symbol = asNewName
+
+                'Check to see that the name begins with a capital letter.
+                If Not Char.IsUpper(asNewName.Chars(0)) Then
+                    Throw New tInformationException("Object Type names must start with a capital letter followed by one or more lowercase letters.")
+                    Return False
+                End If
 
                 '--------------------------------------------------------------------------------------------------------
                 'The surrogate key for the RoleConstraint is about to change (to match the name of the RoleConstraint)
@@ -1930,14 +1936,21 @@ Namespace FBM
                 'To make sure all the FactData and FactDataInstances/Pages are saved for RDS
                 Me.Model.Save()
 
+                Return True
+
+            Catch iex As tInformationException
+                prApplication.ThrowErrorMessage(iex.Message, pcenumErrorType.Information, Nothing, False, False, True)
+                Return False
             Catch ex As Exception
                 Dim lsMessage As String
                 lsMessage = "Error: tRoleConstraint.SetName"
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
                 prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return False
             End Try
 
-        End Sub
+        End Function
 
         Public Sub SetRoleConstraintType(ByVal aiRoleConstraintType As pcenumRoleConstraintType)
 

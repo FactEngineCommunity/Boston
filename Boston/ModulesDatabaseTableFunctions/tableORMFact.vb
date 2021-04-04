@@ -136,7 +136,7 @@ Namespace TableFact
                             'Get the Concept from the ModelDictionary so that FactData objects are linked directly to the Concept/Value in the ModelDictionary
                             '--------------------------------------------------------------------------------------------------
                             lrDictionaryEntry = New FBM.DictionaryEntry(arFactType.Model, lRecordset("ValueSymbol").Value, pcenumConceptType.Value)
-                            lrDictionaryEntry = arFactType.Model.AddModelDictionaryEntry(lrDictionaryEntry, , False, False)
+                            lrDictionaryEntry = arFactType.Model.AddModelDictionaryEntry(lrDictionaryEntry, , False, False, False, True)
 
                             Dim lrConcept = lrDictionaryEntry.Concept
 

@@ -399,7 +399,8 @@ Public Class tApplication
                                  ByVal aiMessageType As pcenumErrorType,
                                  Optional ByVal asStackTrace As String = Nothing,
                                  Optional ByVal abShowStackTrace As Boolean = True,
-                                 Optional ByVal abAbortApplication As Boolean = False)
+                                 Optional ByVal abAbortApplication As Boolean = False,
+                                 Optional ByVal abThrowtoMSGBox As Boolean = False)
 
         Dim lsStackTrace As String = ""
 
@@ -445,9 +446,14 @@ Public Class tApplication
                             '-----------------------
                             Call prLogger.WriteToErrorLog(asErrorMessage, "", "Critial Error")
                         Else
-                            '-----------------------------
-                            'Do nothing
-                            '-----------------------------
+                            If abThrowtoMSGBox Then
+                                MsgBox(asErrorMessage)
+                            Else
+                                '-----------------------------
+                                'Do nothing
+                                '-----------------------------
+                            End If
+
                         End If
                     Case Is = pcenumErrorType.Critical
                         '-----------------------

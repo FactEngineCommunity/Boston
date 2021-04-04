@@ -1653,13 +1653,16 @@ Namespace FBM
                                                 Optional ByVal abAppendRealisations As Boolean = True,
                                                 Optional ByVal abMakeModelDirty As Boolean = True,
                                                 Optional ByVal abCheckForErrors As Boolean = False,
-                                                Optional ByVal abStraightSave As Boolean = False) As FBM.DictionaryEntry
+                                                Optional ByVal abStraightSave As Boolean = False,
+                                                Optional ByVal abMatchCase As Boolean = False) As FBM.DictionaryEntry
 
             Try
                 Dim lrDictionaryEntry As FBM.DictionaryEntry
 
                 If abStraightSave Then
                     lrDictionaryEntry = arDictionaryEntry
+                ElseIf abMatchCase Then
+                    lrDictionaryEntry = Me.ModelDictionary.Find(AddressOf arDictionaryEntry.EqualsCase)
                 Else
                     lrDictionaryEntry = Me.ModelDictionary.Find(AddressOf arDictionaryEntry.Equals)
                 End If

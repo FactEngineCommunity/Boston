@@ -162,6 +162,7 @@ Public Enum pcenumCMMLRelations
 
     Enum pcenumCMMLCoreModel
         Core
+        CoreElement
     End Enum
 
 End Module

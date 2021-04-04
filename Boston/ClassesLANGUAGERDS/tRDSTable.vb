@@ -1178,6 +1178,20 @@ Namespace RDS
 
         End Sub
 
+        Public Sub setName(ByVal asNewName As String)
+            Try
+                Call Me.Model.Model.updateCMMLTableName(Me.Name, asNewName)
+                Me.Name = asNewName
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+        End Sub
+
         Public Sub addPrimaryKeyToNonAbsorbedTables(ByRef arPrimaryKeyIndex As RDS.Index, ByVal abIsPreferredIdentifier As Boolean)
 
             Try

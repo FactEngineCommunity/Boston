@@ -316,7 +316,11 @@ Namespace PGS
                     Dim lrFactTypeReading As FBM.FactTypeReading = Nothing
                     Dim lsPredicate As String = Nothing
 
-                    If lrFactType.FactTypeReading.Count = 1 Then
+                    If lrFactType.FactTypeReading.Count = 0 Then
+                        'There is no predicate to set.
+                        lsPredicate = "Set a predicate"
+                        Me.Link.TextColor = Color.Red
+                    ElseIf lrFactType.FactTypeReading.Count = 1 Then
                         lrFactTypeReading = lrFactType.FactTypeReading(0)
 
                         lsPredicate = lrFactTypeReading.PredicatePart(0).PredicatePartText
