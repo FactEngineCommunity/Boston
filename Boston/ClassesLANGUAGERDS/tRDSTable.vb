@@ -887,6 +887,31 @@ Namespace RDS
 
         End Function
 
+        ''' <summary>
+        ''' TRUE if is a table like 'LecturerLikesLecturer' joining on Lecturer table twice.
+        ''' </summary>
+        ''' <param name="arTable"></param>
+        ''' <returns></returns>
+        Public Function isCircularToTable(ByVal arTable As RDS.Table) As Boolean
+
+            Try
+                Dim larJoinColumn = (From Column In Me.Column.FindAll(Function(x) x.Relation.Count > 0)
+                                     Where Column.Relation.Find(Function(x) x.OriginTable Is Me).DestinationTable.Name = arTable.Name
+                                     Select Column
+                                     Order By Column.OrdinalPosition).ToList
+
+                Return larJoinColumn.Count = 2
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+        End Function
+
         Public Function isConstrainedByRingConstraint(ByRef arRoleConstraint As FBM.RoleConstraint) As Boolean
 
             Try

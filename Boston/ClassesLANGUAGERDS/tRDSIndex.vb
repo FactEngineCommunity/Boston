@@ -159,7 +159,11 @@ Namespace RDS
         Public Sub addColumn(ByRef arColumn As RDS.Column)
 
             Me.Column.Add(arColumn)
-            arColumn.AddIndex(Me)
+            arColumn.addIndex(Me)
+
+            'Database synchronisation.
+            Call Me.Model.Model.connectToDatabase()
+            Call Me.Model.Model.DatabaseConnection.IndexAddColumn(Me, arColumn)
 
         End Sub
 

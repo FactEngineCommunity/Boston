@@ -85,6 +85,14 @@
         End Function
 
         ''' <summary>
+        ''' Adds the nominated Column to the nominated Index.
+        ''' </summary>
+        ''' <param name="arIndex">The Index to add the nominated Column to.</param>
+        ''' <param name="arColumn">The Column to add to the nominated Index.</param>
+        Public Overridable Sub IndexAddColumn(ByRef arIndex As RDS.Index, ByRef arColumn As RDS.Column)
+        End Sub
+
+        ''' <summary>
         ''' Updates the Index in the database. E.g. Changing a Unique Index to Primary Key.
         ''' </summary>
         ''' <param name="arIndex">The Index to be updated.</param>
