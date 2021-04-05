@@ -162,8 +162,10 @@ Namespace RDS
             arColumn.addIndex(Me)
 
             'Database synchronisation.
-            Call Me.Model.Model.connectToDatabase()
-            Call Me.Model.Model.DatabaseConnection.IndexAddColumn(Me, arColumn)
+            If Me.Model.Model.IsDatabaseSynchronised Then
+                Call Me.Model.Model.connectToDatabase()
+                Call Me.Model.Model.DatabaseConnection.IndexAddColumn(Me, arColumn)
+            End If
 
         End Sub
 

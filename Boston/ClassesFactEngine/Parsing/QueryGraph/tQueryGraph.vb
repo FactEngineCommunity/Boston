@@ -264,8 +264,8 @@
                                         If liInd < Me.HeadNode.RDSTable.getFirstUniquenessConstraintColumns.Count - 1 Then lsSQLQuery &= "AND "
                                         liInd += 1
                                     Next
-                                    lsSQLQuery &= vbCrLf & " AND " & lrRDSTable.Name & "." & larLeftColumn(0).Name & " = " & lrTargetTable.Name & "." & lrTargetTable.getPrimaryKeyColumns(0).Name
-                                End If
+                                lsSQLQuery &= vbCrLf & " AND [" & lrRDSTable.Name & "]." & larLeftColumn(0).Name & " = [" & lrTargetTable.Name & "]." & lrTargetTable.getPrimaryKeyColumns(0).Name
+                            End If
                                 lsSQLQuery &= vbCrLf & " UNION "
                             lsSQLQuery &= vbCrLf & " SELECT [" & lrRDSTable.Name & "]." & Strings.Join(lasColumnName.ToArray, ",[" & lrRDSTable.Name & "].") & ",depth + 1"
                             lsSQLQuery &= vbCrLf & " FROM nodes, [" & lrRDSTable.Name & "]"
@@ -281,8 +281,15 @@
                             ElseIf lrQueryEdge.RecursiveNumber2 Is Nothing Then
                                 lsSQLQuery &= vbCrLf & " WHERE depth >= " & lrQueryEdge.RecursiveNumber1
                                 End If
-                                lsSQLQuery &= vbCrLf & ") AS " & lrQueryEdge.FBMFactType.Id
+                            lsSQLQuery &= vbCrLf & ")"
+                            If lrQueryEdge.FBMFactType.isRDSTable Then
+                                lsSQLQuery &= " AS " & lrQueryEdge.FBMFactType.Id
+                            ElseIf lrQueryEdge.TargetNode.RDSTable.isCircularToTable(lrQueryEdge.BaseNode.RDSTable) Then
+                                lsSQLQuery &= " AS " & lrRDSTable.Name & lrQueryEdge.TargetNode.Alias
+                            Else
+                                lsSQLQuery &= " AS " & lrQueryEdge.FBMFactType.Id
                             End If
+                        End If
                         End If
 #End Region
                     'If liInd < larRDSTableQueryEdge.Count Then lsSQLQuery &= "," & vbCrLf
@@ -833,7 +840,9 @@
                                         lrTempColumn.TemporaryAlias = lrQueryEdge.TargetNode.Alias
                                     ElseIf liRoleInd = 1 Then
                                         lrTempColumn.TemporaryAlias = lrQueryEdge.TargetNode.Alias
-                                    ElseIf lrQueryEdge.IsCircular Then
+                                    ElseIf lrQueryEdge.IsCircular And lrQueryEdge.IsRecursive Then
+                                        lrTempColumn.TemporaryAlias = lrQueryEdge.TargetNode.Alias
+                                    ElseIf lrQueryEdge.TargetNode.RDSTable.isCircularToTable(lrQueryEdge.BaseNode.RDSTable) And lrQueryEdge.IsRecursive Then
                                         lrTempColumn.TemporaryAlias = lrQueryEdge.TargetNode.Alias
                                     Else
                                         lrTempColumn.TemporaryAlias = lrQueryEdge.Alias

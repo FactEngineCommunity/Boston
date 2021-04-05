@@ -896,7 +896,8 @@ Namespace RDS
 
             Try
                 Dim larJoinColumn = (From Column In Me.Column.FindAll(Function(x) x.Relation.Count > 0)
-                                     Where Column.Relation.Find(Function(x) x.OriginTable Is Me).DestinationTable.Name = arTable.Name
+                                     From Relation In Column.Relation.FindAll(Function(x) x.OriginTable Is Me)
+                                     Where Relation.DestinationTable.Name = arTable.Name
                                      Select Column
                                      Order By Column.OrdinalPosition).ToList
 
