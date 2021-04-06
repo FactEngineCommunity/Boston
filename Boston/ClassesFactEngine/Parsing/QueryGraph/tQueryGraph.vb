@@ -127,6 +127,7 @@
                 'Circular/Recursive QueryEdges/TargetNodes are treated differently. See Recursive region below.
                 Dim larNode As List(Of QueryNode) = (From Node In larFromNodes
                                                      Where Node.QueryEdge IsNot Nothing
+                                                     Where Node.QueryEdge.IsRecursive
                                                      Where (Node.QueryEdge.IsCircular Or
                                                             Node.RDSTable.isCircularToTable(Node.QueryEdge.BaseNode.RDSTable))).ToList
                 larFromNodes.RemoveAll(Function(x) larNode.Contains(x))
@@ -144,12 +145,13 @@
                 Next
 
                 liInd = 1
-                Dim larQuerEdgeWithFBMFactType = Me.QueryEdges.FindAll(Function(x) x.FBMFactType IsNot Nothing Or x.IsCircular)
+                Dim larQuerEdgeWithFBMFactType = Me.QueryEdges.FindAll(Function(x) x.FBMFactType IsNot Nothing Or (x.IsRecursive And x.IsCircular))
                 Dim larRDSTableQueryEdge = larQuerEdgeWithFBMFactType.FindAll(Function(x) (x.FBMFactType.isRDSTable And
                                                                                            Not x.FBMFactType.IsDerived And
                                                                                            Not x.IsPartialFactTypeMatch) Or
+                                                                                           (x.IsRecursive And (
                                                                                            x.IsCircular Or
-                                                                                           x.TargetNode.RDSTable.isCircularToTable(x.BaseNode.RDSTable))
+                                                                                           x.TargetNode.RDSTable.isCircularToTable(x.BaseNode.RDSTable))))
 
                 'RDS Tables
                 For Each lrQueryEdge In larRDSTableQueryEdge
