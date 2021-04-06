@@ -34,6 +34,24 @@ Namespace FBM
 
         End Sub
 
+        Public Sub addCMMLColumnToIndex(ByRef arIndex As RDS.Index,
+                                        ByRef arColumn As RDS.Column)
+
+            Try
+
+                Dim lsSQLQuery As String
+
+                lsSQLQuery = "INSERT INTO " & pcenumCMMLRelations.CoreIndexMakesUseOfProperty.ToString & " (Index, Property) VALUES ("
+                lsSQLQuery &= "'" & arIndex.Name & "','" & arColumn.Id & "'"
+                lsSQLQuery &= ")"
+                Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+            Catch ex As Exception
+                Debugger.Break()
+            End Try
+
+        End Sub
+
         Public Sub addCMMLColumnToRelationDestination(ByRef arRelation As RDS.Relation,
                                                       ByRef arColumn As RDS.Column,
                                                       ByVal aiOrdinalPosition As Integer)

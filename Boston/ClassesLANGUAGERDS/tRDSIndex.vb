@@ -161,6 +161,9 @@ Namespace RDS
             Me.Column.Add(arColumn)
             arColumn.addIndex(Me)
 
+            'CMML
+            Call Me.Model.Model.addCMMLColumnToIndex(Me, arColumn)
+
             'Database synchronisation.
             If Me.Model.Model.IsDatabaseSynchronised Then
                 Call Me.Model.Model.connectToDatabase()
