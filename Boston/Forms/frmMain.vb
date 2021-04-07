@@ -1536,7 +1536,7 @@ Public Class frmMain
                     Case Is = pcenumConceptType.FactType
                         Dim lrFactType As FBM.FactType
                         lrFactType = arFocalModelObject
-                        Call child.zrPage.DropFactTypeAtPoint(lrFactType, loPt, False)
+                        Call child.zrPage.DropFactTypeAtPoint(lrFactType, loPt, False, False, False, True)
                     Case Is = pcenumConceptType.RoleConstraint
                         Dim lrRoleConstraint As FBM.RoleConstraint
                         Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance

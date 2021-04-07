@@ -507,7 +507,34 @@ Public Class frmDiagramORM
             If lrFactType.IsObjectified Then
                 Me.zrPage.DropEntityTypeAtPoint(lrFactType.ObjectifyingEntityType, loPoint)
             End If
+
             Call Me.zrPage.DropFactTypeAtPoint(lrFactType, loPoint, False)
+
+            Try
+                If lrFactType.Is1To1BinaryFactType Then
+
+                    Dim larIUC = From IUC In lrFactType.InternalUniquenessConstraint
+                                 Where IUC.IsPreferredIdentifier
+                                 Select IUC
+
+                    If larIUC.Count > 0 Then
+                        If larIUC.First.RoleConstraintRole(0).Role.JoinedORMObject.Id = aoModelObject.Id Then
+                            'aoModelObject is ReferenceModeValueType
+                            Dim lrRole = larIUC.First.RoleConstraintRole(0).Role
+                            Dim lrRoleET = lrFactType.GetOtherRoleOfBinaryFactType(lrRole.Id)
+                            If lrRoleET.JoinedORMObject.GetType = GetType(FBM.EntityType) Then
+                                Dim lrEntityType = lrRoleET.JoinedORMObject
+                                Dim lrEntityTypeInstance = Me.zrPage.EntityTypeInstance.Find(Function(x) x.Id = lrEntityType.Id)
+                                If lrEntityTypeInstance IsNot Nothing Then
+                                    Call lrEntityTypeInstance.ExpandTheReferenceScheme()
+                                End If
+                            End If
+                        End If
+                    End If
+                End If
+            Catch ex As Exception
+
+            End Try
         Next
 
     End Sub
@@ -6589,7 +6616,7 @@ Public Class frmDiagramORM
 
             Call Me.ResetNodeAndLinkColors()
 
-            For Each lrEntityTypeInstance In Me.zrPage.EntityTypeInstance
+            For Each lrEntityTypeInstance In Me.zrPage.EntityTypeInstance.FindAll(Function(x) x.Shape IsNot Nothing)
                 lrEntityTypeInstance.Shape.Move(lrEntityTypeInstance.X, lrEntityTypeInstance.Y)
             Next
 

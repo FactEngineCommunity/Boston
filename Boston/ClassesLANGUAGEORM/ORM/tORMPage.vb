@@ -871,11 +871,12 @@ Namespace FBM
 
         End Function
 
-        Public Function DropFactTypeAtPoint(ByRef arFactType As FBM.FactType, _
-                                            ByVal ao_pt As PointF, _
-                                            ByVal abDisplayFactTable As Boolean, _
+        Public Function DropFactTypeAtPoint(ByRef arFactType As FBM.FactType,
+                                            ByVal ao_pt As PointF,
+                                            ByVal abDisplayFactTable As Boolean,
                                             Optional ByVal abCloneFactType As Boolean = True,
-                                            Optional ByVal abBroadcastInterfaceEvent As Boolean = False) As FBM.FactTypeInstance
+                                            Optional ByVal abBroadcastInterfaceEvent As Boolean = False,
+                                            Optional ByVal abExpandIfReferenceModeFactType As Boolean = False) As FBM.FactTypeInstance
 
             Dim lrRoleInstance As New FBM.RoleInstance
             Dim lrFactTypeInstance As New FBM.FactTypeInstance
@@ -1123,6 +1124,15 @@ Namespace FBM
                     End If
 
                     Me.DiagramView.Cursor = Cursors.Default
+                End If
+
+                If abExpandIfReferenceModeFactType Then
+                    If lrFactTypeInstance.FactType.IsPreferredReferenceMode And lrFactTypeInstance.FactType.Is1To1BinaryFactType Then
+                        Dim lrEntityTypeInstance = lrFactTypeInstance.RoleGroup.Find(Function(x) x.JoinsEntityType IsNot Nothing).JoinsEntityType
+                        If lrEntityTypeInstance IsNot Nothing Then
+                            Call lrEntityTypeInstance.ExpandTheReferenceScheme()
+                        End If
+                    End If
                 End If
 
                 Return lrFactTypeInstance
