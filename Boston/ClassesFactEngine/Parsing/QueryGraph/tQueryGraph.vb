@@ -311,7 +311,13 @@
                 Dim lrPartialMatchFactType As FBM.FactType = Nothing
                 For Each lrQueryEdge In Me.QueryEdges
                     If lrQueryEdge.IsPartialFactTypeMatch Then
-                        If lrQueryEdge.FBMFactType IsNot lrPartialMatchFactType Then
+
+                        Dim larExistingNode = From Node In larFromNodes
+                                              Where Node.Name = lrQueryEdge.FBMFactType.Id
+                                              Where Node.Alias = lrQueryEdge.Alias
+                                              Select Node
+
+                        If (lrQueryEdge.FBMFactType IsNot lrPartialMatchFactType) And larExistingNode.Count = 0 Then
                             lsSQLQuery &= vbCrLf & "," & lrQueryEdge.FBMFactType.Id
                             If lrQueryEdge.Alias IsNot Nothing Then
                                 lsSQLQuery &= " " & lrQueryEdge.FBMFactType.Id & Viev.NullVal(lrQueryEdge.Alias, "")
