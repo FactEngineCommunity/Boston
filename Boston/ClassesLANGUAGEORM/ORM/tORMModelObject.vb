@@ -605,6 +605,24 @@ Namespace FBM
 
         End Function
 
+        Public Function getPartialFactTypeReadings() As List(Of FBM.FactTypeReading)
+
+            Dim larFactType = From FactType In Me.Model.FactType.FindAll(Function(x) x.Arity > 2)
+                              From Role In FactType.RoleGroup
+                              Where Role.JoinedORMObject.Id = Me.Id
+                              Select FactType
+
+            Dim larFactTypeReading = From FactType In larFactType
+                                     From FactTypeReading In FactType.FactTypeReading
+                                     From PredicatePart In FactTypeReading.PredicatePart
+                                     Where PredicatePart.SequenceNr < FactType.Arity
+                                     Where PredicatePart.Role.JoinedORMObject.Id = Me.Id
+                                     Select FactTypeReading Distinct
+
+            Return larFactTypeReading.ToList
+
+        End Function
+
         ''' <summary>
         ''' Returns the unique Signature of the ModelObject
         ''' </summary>

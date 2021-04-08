@@ -215,6 +215,9 @@ Namespace FactEngine
                             Else
                                 If larFinalFactTypeReading.Count = 1 Then
                                     Me.FBMFactType = larFinalFactTypeReading(0).FactType
+                                    If larFinalFactTypeReading(0).FactType.Arity > 2 Then
+                                        Me.IsPartialFactTypeMatch = True
+                                    End If
                                 Else
                                     Me.FBMPossibleFactTypes = Me.QueryGraph.Model.getFactTypeByPartialMatchModelObjectsFactTypeReading(larModelObject,
                                                                                                                                        lrFactTypeReading)
@@ -347,7 +350,9 @@ Namespace FactEngine
 
                     End If
 
-                    Me.FBMFactTypeReading = Me.FBMFactType.FactTypeReading.Find(AddressOf lrFactTypeReading.EqualsByPredicatePartText)
+                    If Me.FBMFactTypeReading Is Nothing Then
+                        Me.FBMFactTypeReading = Me.FBMFactType.FactTypeReading.Find(AddressOf lrFactTypeReading.EqualsByPredicatePartText)
+                    End If
 
                 End If
 

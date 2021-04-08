@@ -689,6 +689,50 @@ Namespace FactEngine
         End Sub
 
         ''' <summary>
+        ''' Creates or Recreates the Table in the database.
+        ''' </summary>
+        ''' <param name="arTable"></param>
+        Public Overrides Sub recreateTable(ByRef arTable As RDS.Table)
+
+            Try
+
+                Dim lsSQL As String
+
+                lsSQL = "PRAGMA foreign_keys=OFF"
+                Me.GONonQuery(lsSQL)
+
+                Dim lrSQLiteConnection = Database.CreateConnection(Me.DatabaseConnectionString)
+
+                Using tr As SQLiteTransaction = lrSQLiteConnection.BeginTransaction()
+
+                    Try
+                        Using cmd As SQLiteCommand = lrSQLiteConnection.CreateCommand()
+                            cmd.Transaction = tr
+                            cmd.CommandText = Me.generateSQLCREATETABLEStatement(arTable, arTable.Name)
+                            cmd.ExecuteNonQuery()
+                        End Using
+
+                        tr.Commit()
+                    Catch ex As Exception
+                        MsgBox(ex.Message)
+                        tr.Rollback()
+                    End Try
+                End Using
+
+                lsSQL = "PRAGMA foreign_keys=ON"
+                Me.GONonQuery(lsSQL)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+        End Sub
+
+        ''' <summary>
         ''' Removes the Column from its Table.
         ''' </summary>
         ''' <param name="arColumn"></param>

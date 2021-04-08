@@ -706,6 +706,13 @@ Public Class frmDiagramERD
             lr_model = lrEntity.Model
 
             '--------------------------------------------------------------------
+            'Database Synchronisation
+            If lr_model.IsDatabaseSynchronised Then
+                Me.ToolStripSeparatorReCreateTable.Visible = True
+                Me.ToolStripMenuItemReCreateDatabaseTable.Visible = True
+            End If
+
+            '--------------------------------------------------------------------
             'ModelErrors - Add menu items for the ModelErrors for the EntityType
             '--------------------------------------------------------------------
             Me.ToolStripMenuItemEntityModelErrors.DropDownItems.Clear()
@@ -2868,4 +2875,31 @@ Public Class frmDiagramERD
             prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
     End Sub
+
+    Private Sub ToolStripMenuItemReCreateDatabaseTable_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItemReCreateDatabaseTable.Click
+
+        Dim lrTableNode As ERD.TableNode = Me.Diagram.Selection.Items(0)
+        Dim lrEntity As New ERD.Entity
+
+        Me.Cursor = Cursors.WaitCursor
+
+        Try
+            ''---------------------------------------------------------
+            ''Get the EntityType represented by the (selected) Entity
+            ''---------------------------------------------------------
+            lrEntity = lrTableNode.Tag
+
+            Call lrEntity.Model.DatabaseConnection.recreateTable(lrEntity.RDSTable)
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
 End Class

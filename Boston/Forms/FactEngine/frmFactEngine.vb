@@ -1328,6 +1328,19 @@ Public Class frmFactEngine
                                         End If
                                     Next
 
+                                    Dim larFactTypeReading2 = lrModelElement.getPartialFactTypeReadings()
+
+                                    Dim larPredicatePart = From FactTypeReading In larFactTypeReading2
+                                                           From PredicatePart In FactTypeReading.PredicatePart
+                                                           Where PredicatePart.Role.JoinedORMObject.Id = lrModelElement.Id
+                                                           Where PredicatePart.SequenceNr < FactTypeReading.PredicatePart.Count
+                                                           Select PredicatePart
+
+                                    For Each lrPredicatePart In larPredicatePart
+                                        Dim lrNextPredicatePart = lrPredicatePart.FactTypeReading.PredicatePart(lrPredicatePart.SequenceNr)
+                                        Call Me.AddEnterpriseAwareItem(lrPredicatePart.PredicatePartText, FEQL.TokenType.PREDICATE, False, lrNextPredicatePart.Role.JoinedORMObject.Id, False)
+                                    Next
+
                                     If Me.AutoComplete.Visible = False Then
                                         Me.showAutoCompleteForm()
                                     End If
@@ -1385,6 +1398,19 @@ Public Class frmFactEngine
                                 Else
                                     lrPredicateModelObject = lrFirstModelElement
                                 End If
+
+                                Dim larFactTypeReading2 = lrModelElement.getPartialFactTypeReadings()
+
+                                larPredicatePart = From FactTypeReading In larFactTypeReading2
+                                                   From PredicatePart In FactTypeReading.PredicatePart
+                                                   Where PredicatePart.Role.JoinedORMObject.Id = lrModelElement.Id
+                                                   Where PredicatePart.SequenceNr < FactTypeReading.PredicatePart.Count
+                                                   Select PredicatePart
+
+                                For Each lrPredicatePart In larPredicatePart
+                                    Dim lrNextPredicatePart = lrPredicatePart.FactTypeReading.PredicatePart(lrPredicatePart.SequenceNr)
+                                    Call Me.AddEnterpriseAwareItem(lrPredicatePart.PredicatePartText, FEQL.TokenType.PREDICATE, False, lrNextPredicatePart.Role.JoinedORMObject.Id, False)
+                                Next
 
                                 If lrPredicateModelObject IsNot Nothing Then
 

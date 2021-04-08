@@ -100,6 +100,13 @@
         End Sub
 
         ''' <summary>
+        ''' Creates or Recreates the Table in the database.
+        ''' </summary>
+        ''' <param name="arTable"></param>
+        Public Overridable Sub recreateTable(ByRef arTable As RDS.Table)
+        End Sub
+
+        ''' <summary>
         ''' Removes the Column from its Table.
         ''' </summary>
         ''' <param name="arColumn"></param>
