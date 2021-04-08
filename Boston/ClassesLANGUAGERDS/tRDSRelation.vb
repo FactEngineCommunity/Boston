@@ -31,9 +31,9 @@ Namespace RDS
         <XmlAttribute()> _
         Public ContributesToPrimaryKey As Boolean = False
 
-        <XmlIgnore()> _
-        <NonSerialized()> _
-        Public DestinationTable As RDS.Table
+        <XmlIgnore()>
+        <NonSerialized()>
+        Public WithEvents DestinationTable As RDS.Table
 
         <XmlElement()> _
         Public DestinationColumns As New List(Of RDS.Column)
@@ -321,6 +321,83 @@ Namespace RDS
 
         End Sub
 
+        Private Sub DestinationTable_IndexRemoved(ByRef arIndex As Index) Handles DestinationTable.IndexRemoved
+
+            Try
+                If arIndex.IsPrimaryKey Then
+                    If Me.OriginColumns.Count <> Me.DestinationColumns.Count Then
+                        Debugger.Break()
+                        If Me.DestinationTable.getPrimaryKeyColumns.Count > 0 Then
+                            If Me.OriginColumns.Count > 0 Then
+                                'Should get this far
+
+                            End If
+                        End If
+                    End If
+                End If
+
+            Catch ex As Exception
+                Debugger.Break()
+            End Try
+
+
+        End Sub
+
+        Public Sub AddOriginColumn(ByRef arColumn As RDS.Column, ByVal aiOrdinalPosition As Integer)
+
+            Try
+                Me.OriginColumns.Add(arColumn)
+
+                'CMML
+                Call Me.Model.Model.addCMMLColumnToRelationOrigin(Me, arColumn, aiOrdinalPosition)
+
+            Catch ex As Exception
+                Debugger.Break()
+            End Try
+        End Sub
+
+        Public Sub RemoveOriginColumn(ByRef arColumn As RDS.Column)
+
+            Try
+                Me.OriginColumns.Remove(arColumn)
+
+                'CMML
+                Call Me.Model.Model.removeCMMLRelationOriginColumn(Me, arColumn)
+
+            Catch ex As Exception
+                Debugger.Break()
+            End Try
+        End Sub
+
+        Private Sub DestinationTable_IndexModified(ByRef arIndex As Index) Handles DestinationTable.IndexModified
+            Try
+                If arIndex.IsPrimaryKey Then
+                    If Me.OriginColumns.Count <> Me.DestinationColumns.Count Then
+                        Debugger.Break()
+                        If Me.OriginColumns.Count > 0 Then
+                            'Should get this far
+                            If Me.OriginColumns.Count = 1 And Me.OriginColumns(0).ActiveRole.JoinsEntityType IsNot Nothing Then
+                                Debugger.Break()
+                                'Column joins, via its ActiveRole, an EntityType rather than the ReferenceScheme ValueTypes of that EntityType.
+                                Dim lrOriginalColumn As RDS.Column = Me.OriginColumns(0)
+                                Call Me.RemoveOriginColumn(lrOriginalColumn)
+                                For Each lrColumn In arIndex.Column
+                                    Dim lrNewColumn As New RDS.Column(Me.OriginTable, lrColumn.Name, lrOriginalColumn.Role, lrColumn.ActiveRole)
+                                    Call Me.OriginTable.addColumn(lrNewColumn)
+                                    lrNewColumn.Relation.Add(Me)
+                                    Call Me.AddOriginColumn(lrNewColumn, Me.OriginColumns.Count)
+                                Next
+                                Call Me.OriginTable.removeColumn(lrOriginalColumn)
+                            End If
+                        End If
+                    End If
+                End If
+
+            Catch ex As Exception
+                Debugger.Break()
+            End Try
+
+        End Sub
     End Class
 
 End Namespace

@@ -71,6 +71,7 @@ Namespace RDS
         Public Event ColumnRemoved(ByVal arColumn As RDS.Column)
         Public Event ColumnAdded(ByRef arColumn As RDS.Column)
         Public Event IndexAdded(ByRef arIndex As RDS.Index)
+        Public Event IndexModified(ByRef arIndex As RDS.Index)
         Public Event IndexRemoved(ByRef arIndex As RDS.Index)
         Public Event IsPGSRelationChanged(ByVal abNewValue As Boolean)
         Public Event NameChanged(ByVal asNewName As String)
@@ -1018,6 +1019,15 @@ Namespace RDS
                 End If
             End If
 
+        End Sub
+
+        Public Sub RaiseIndexModifiedEvent(ByRef arIndex As RDS.Index)
+
+            Try
+                RaiseEvent IndexModified(arIndex)
+            Catch ex As Exception
+                Debugger.Break()
+            End Try
         End Sub
 
         ''' <summary>

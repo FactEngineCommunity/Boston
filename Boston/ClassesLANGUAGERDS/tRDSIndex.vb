@@ -307,10 +307,12 @@ Namespace RDS
 
                 RaiseEvent IsPrimaryKeyChanged(abIsPrimaryKey)
 
+                Call Me.Table.RaiseIndexModifiedEvent(Me)
+
+                'Database synchronisation
                 If Me.Model.Model.IsDatabaseSynchronised Then
                     Me.Model.Model.connectToDatabase()
                     Call Me.Model.Model.DatabaseConnection.IndexUpdate(Me)
-
                 End If
 
             Catch ex As Exception
