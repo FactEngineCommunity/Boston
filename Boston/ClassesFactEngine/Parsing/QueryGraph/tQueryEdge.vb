@@ -204,7 +204,10 @@ Namespace FactEngine
                                 End If
                             Next
 
-                            If larFinalFactTypeReading.Count > 1 Then
+                            Dim larFactType = From FactTypeReading In larFinalFactTypeReading
+                                              Select FactTypeReading.FactType Distinct
+
+                            If larFactType.Count > 1 Then
                                 lsMessage = "More than one Fact Type has a Predicate Part, '" & asPredicate & "', for Model Elements, '" & arBaseNode.FBMModelObject.Id & " and " & arTargetNode.FBMModelObject.Id & "."
                                 lsMessage &= vbCrLf & vbCrLf & "Try referencing the following Fact Types directly in your query:"
                                 lsMessage &= vbCrLf & vbCrLf
