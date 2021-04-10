@@ -904,6 +904,69 @@ Public Class frmToolboxEnterpriseExplorer
 
     End Sub
 
+    Private Sub DoModelLoading(ByRef arModel As FBM.Model)
+
+        Try
+            '==============================================================================================
+            'Client/Server
+            'The Model hasn't been loaded, but another User may be working on the same Model. So we need
+            '  to save the Model (in the other instance) before loading it (in this instance). The reason
+            '  is that the other User may not have saved their changes, so the database Model and their 
+            '  instance Model will be out of synch.
+            If My.Settings.UseClientServer And My.Settings.InitialiseClient Then
+                Dim lrInterfaceModel As New Viev.FBM.Interface.Model
+                lrInterfaceModel.ModelId = arModel.ModelId
+                lrInterfaceModel.Name = arModel.Name
+                If Not (arModel.ProjectId = "MyPersonalModels" Or arModel.ProjectId = "") Then
+                    lrInterfaceModel.ProjectId = arModel.ProjectId
+                    lrInterfaceModel.Namespace = arModel.Namespace.Name
+
+                    If My.Settings.UseClientServer And My.Settings.InitialiseClient Then
+                        Dim lrBroadcast As New Viev.FBM.Interface.Broadcast
+                        lrBroadcast.Model = lrInterfaceModel
+                        Call prDuplexServiceClient.SendBroadcast([Interface].pcenumBroadcastType.SaveModel, lrBroadcast)
+                    End If
+
+                End If
+            End If
+
+            '==============================================================================================
+
+            '------------------------------
+            'Load the Model and the Pages
+            '------------------------------                                
+            If TableModel.ExistsModelById(arModel.ModelId) And Not arModel.Loaded Then
+                Call TableModel.GetModelDetails(arModel)
+
+                Me.Cursor = Cursors.WaitCursor
+                Richmond.WriteToStatusBar("Loading Model")
+                Me.CircularProgressBar.Top = Me.Height / 3 - (Me.CircularProgressBar.Height / 2)
+                Me.CircularProgressBar.Left = Me.Panel1.Width - (Me.CircularProgressBar.Width + 30)
+                Me.CircularProgressBar.BringToFront()
+                Me.CircularProgressBar.Value = 0
+                Me.CircularProgressBar.Value = 1
+                Me.CircularProgressBar.Invalidate()
+                Me.Invalidate()
+                If My.Settings.UseClientServer And My.Settings.InitialiseClient Then
+                    pdbConnection.Close() 'keep this here (Close/Open database). Because Access doesn't refresh quick enough from the Save Broadcast above.
+                    pdb_OLEDB_connection.Close() 'keep this here (Close/Open database). Because Access doesn't refresh quick enough from the Save Broadcast above.
+                    Richmond.OpenDatabase() 'keep this here (Close/Open database). Because Access doesn't refresh quick enough from the Save Broadcast above.
+                End If
+                Call arModel.Load(True, True, Me.BackgroundWorkerModelLoader)
+                Me.CircularProgressBar.Value = 0
+                Me.CircularProgressBar.Text = "0%"
+                Me.CircularProgressBar.Invalidate()
+                Me.CircularProgressBar.SendToBack()
+                Me.Invalidate(True)
+                Me.Cursor = Cursors.Default
+                Richmond.WriteToStatusBar("Loaded Model: '" & arModel.Name & "'")
+            End If
+        Catch ex As Exception
+            Debugger.Break()
+        End Try
+
+    End Sub
+
     Private Sub TreeView1_AfterSelect(ByVal sender As System.Object, ByVal e As System.Windows.Forms.TreeViewEventArgs) Handles TreeView.AfterSelect
 
         Dim loObject As Object
@@ -980,59 +1043,7 @@ Public Class frmToolboxEnterpriseExplorer
                                     Richmond.WriteToStatusBar("Model loaded")
                                 End If
                             Else
-                                '==============================================================================================
-                                'Client/Server
-                                'The Model hasn't been loaded, but another User may be working on the same Model. So we need
-                                '  to save the Model (in the other instance) before loading it (in this instance). The reason
-                                '  is that the other User may not have saved their changes, so the database Model and their 
-                                '  instance Model will be out of synch.
-                                If My.Settings.UseClientServer And My.Settings.InitialiseClient Then
-                                    Dim lrInterfaceModel As New Viev.FBM.Interface.Model
-                                    lrInterfaceModel.ModelId = lrModel.ModelId
-                                    lrInterfaceModel.Name = lrModel.Name
-                                    If Not (lrModel.ProjectId = "MyPersonalModels" Or lrModel.ProjectId = "") Then
-                                        lrInterfaceModel.ProjectId = lrModel.ProjectId
-                                        lrInterfaceModel.Namespace = lrModel.Namespace.Name
-
-                                        If My.Settings.UseClientServer And My.Settings.InitialiseClient Then
-                                            Dim lrBroadcast As New Viev.FBM.Interface.Broadcast
-                                            lrBroadcast.Model = lrInterfaceModel
-                                            Call prDuplexServiceClient.SendBroadcast([Interface].pcenumBroadcastType.SaveModel, lrBroadcast)
-                                        End If
-
-                                    End If
-                                End If
-                                '==============================================================================================
-
-                                '------------------------------
-                                'Load the Model and the Pages
-                                '------------------------------                                
-                                If TableModel.ExistsModelById(lrModel.ModelId) And Not lrModel.Loaded Then
-                                    Call TableModel.GetModelDetails(lrModel)
-
-                                    Me.Cursor = Cursors.WaitCursor
-                                    Richmond.WriteToStatusBar("Loading Model")
-                                    Me.CircularProgressBar.Top = Me.Height / 3 - (Me.CircularProgressBar.Height / 2)
-                                    Me.CircularProgressBar.Left = Me.Panel1.Width - (Me.CircularProgressBar.Width + 30)
-                                    Me.CircularProgressBar.BringToFront()
-                                    Me.CircularProgressBar.Value = 0
-                                    Me.CircularProgressBar.Value = 1
-                                    Me.CircularProgressBar.Invalidate()
-                                    Me.Invalidate()
-                                    If My.Settings.UseClientServer And My.Settings.InitialiseClient Then
-                                        pdbConnection.Close() 'keep this here (Close/Open database). Because Access doesn't refresh quick enough from the Save Broadcast above.
-                                        pdb_OLEDB_connection.Close() 'keep this here (Close/Open database). Because Access doesn't refresh quick enough from the Save Broadcast above.
-                                        Richmond.OpenDatabase() 'keep this here (Close/Open database). Because Access doesn't refresh quick enough from the Save Broadcast above.
-                                    End If
-                                    Call lrModel.Load(True, True, Me.BackgroundWorkerModelLoader)
-                                    Me.CircularProgressBar.Value = 0
-                                    Me.CircularProgressBar.Text = "0%"
-                                    Me.CircularProgressBar.Invalidate()
-                                    Me.CircularProgressBar.SendToBack()
-                                    Me.Invalidate(True)
-                                    Me.Cursor = Cursors.Default
-                                    Richmond.WriteToStatusBar("Loaded Model: '" & lrModel.Name & "'")
-                                End If
+                                Call Me.DoModelLoading(lrModel)
                             End If
 
                             '-----------------------------------------
@@ -1300,6 +1311,13 @@ Public Class frmToolboxEnterpriseExplorer
             Dim lsMessage As String = ""
 
             With New WaitCursor
+
+                Dim lrModel As FBM.Model = Me.TreeView.SelectedNode.Tag.Tag
+                If Not lrModel.Loaded Then
+                    Call Me.DoModelLoading(lrModel)
+                    Call Me.SetWorkingEnvironmentForObject(Me.TreeView.SelectedNode.Tag)
+                End If
+
                 'Make sure all the Pages for the Model are loaded before adding another page
                 While prApplication.WorkingModel.Page.FindAll(Function(x) x.Loaded).Count <> prApplication.WorkingModel.Page.Count
                 End While
@@ -1510,6 +1528,12 @@ Public Class frmToolboxEnterpriseExplorer
     End Sub
 
     Private Sub ViewModelDictionaryToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ViewModelDictionaryToolStripMenuItem.Click
+
+        Dim lrModel As FBM.Model = Me.TreeView.SelectedNode.Tag.Tag
+        If Not lrModel.Loaded Then
+            Call Me.DoModelLoading(lrModel)
+            Call Me.SetWorkingEnvironmentForObject(Me.TreeView.SelectedNode.Tag)
+        End If
 
         Call frmMain.LoadToolboxModelDictionary()
 
@@ -2292,33 +2316,45 @@ Public Class frmToolboxEnterpriseExplorer
 
         Dim RichmondPage As DataFormats.Format = DataFormats.GetFormat("RichmondPage")
 
-        '----------------------------------------
-        ' Retrieve the data from the clipboard.
-        '----------------------------------------
-        Dim myRetrievedObject As IDataObject = Clipboard.GetDataObject()
+        Try
 
-        '----------------------------------------------------
-        ' Convert the IDataObject type to MyNewObject type. 
-        '----------------------------------------------------
-        Dim lrClipboardPage As New FBM.Page 'Clipbrd.ClipboardPage
+            Dim lrModel As FBM.Model = Me.TreeView.SelectedNode.Tag.Tag
+            If Not lrModel.Loaded Then
+                Call Me.DoModelLoading(lrModel)
+                Call Me.SetWorkingEnvironmentForObject(Me.TreeView.SelectedNode.Tag)
+            End If
 
-        lrClipboardPage = CType(myRetrievedObject.GetData(RichmondPage.Name), FBM.Page) ' Clipbrd.ClipboardPage)
+            '----------------------------------------
+            ' Retrieve the data from the clipboard.
+            '----------------------------------------
+            Dim myRetrievedObject As IDataObject = Clipboard.GetDataObject()
 
+            '----------------------------------------------------
+            ' Convert the IDataObject type to MyNewObject type. 
+            '----------------------------------------------------
+            Dim lrClipboardPage As New FBM.Page 'Clipbrd.ClipboardPage
 
-        Dim lrPage As New FBM.Page
-
-        If lrClipboardPage Is Nothing Then
-            MsgBox("There is no Page in the clipboard to Paste.")
-        Else
-            lrClipboardPage.Name &= "-Copy"
-
-            lrPage = lrClipboardPage.Clone(prApplication.WorkingModel, True)
-
-            Call Me.AddPageToModel(Me.TreeView.SelectedNode, lrPage)
-        End If
+            lrClipboardPage = CType(myRetrievedObject.GetData(RichmondPage.Name), FBM.Page) ' Clipbrd.ClipboardPage)
 
 
-        Me.Cursor = Cursors.Default
+            Dim lrPage As New FBM.Page
+
+            If lrClipboardPage Is Nothing Then
+                MsgBox("There is no Page in the clipboard to Paste.")
+            Else
+                lrClipboardPage.Name &= "-Copy"
+
+                lrPage = lrClipboardPage.Clone(prApplication.WorkingModel, True)
+
+                Call Me.AddPageToModel(Me.TreeView.SelectedNode, lrPage)
+            End If
+
+
+            Me.Cursor = Cursors.Default
+
+        Catch ex As Exception
+            Debugger.Break()
+        End Try
 
     End Sub
 
@@ -2564,6 +2600,10 @@ Public Class frmToolboxEnterpriseExplorer
             'Get the Model from the selected TreeNode
             '-----------------------------------------
             lrModel = Me.TreeView.SelectedNode.Tag.Tag
+            If Not lrModel.Loaded Then
+                Call Me.DoModelLoading(lrModel)
+                Call Me.SetWorkingEnvironmentForObject(Me.TreeView.SelectedNode.Tag)
+            End If
 
             lrExportModel.ORMModel.ModelId = lrModel.ModelId
             lrExportModel.ORMModel.Name = lrModel.Name
@@ -3253,6 +3293,12 @@ Public Class frmToolboxEnterpriseExplorer
     Private Sub AddPGSPageToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles AddPGSPageToolStripMenuItem.Click
 
         Try
+            Dim lrModel As FBM.Model = Me.TreeView.SelectedNode.Tag.Tag
+            If Not lrModel.Loaded Then
+                Call Me.DoModelLoading(lrModel)
+                Call Me.SetWorkingEnvironmentForObject(Me.TreeView.SelectedNode.Tag)
+            End If
+
             '==============================================================
             'Get the Core Metamodel.Page for an EntityRelationshipDiagram
             ' NB Is the same metamodel as used for PropertyGraphSchemas
@@ -3299,13 +3345,17 @@ Public Class frmToolboxEnterpriseExplorer
             prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
-
-
     End Sub
 
     Private Sub AddERDPageToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles AddERDPageToolStripMenuItem.Click
 
         Try
+            Dim lrModel As FBM.Model = Me.TreeView.SelectedNode.Tag.Tag
+            If Not lrModel.Loaded Then
+                Call Me.DoModelLoading(lrModel)
+                Call Me.SetWorkingEnvironmentForObject(Me.TreeView.SelectedNode.Tag)
+            End If
+
             '==============================================================
             'Get the Core Metamodel.Page for an EntityRelationshipDiagram
             '==============================================================
@@ -3366,6 +3416,13 @@ Public Class frmToolboxEnterpriseExplorer
     Private Sub ViewGlossaryToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ViewGlossaryToolStripMenuItem.Click
 
         With New WaitCursor
+
+            Dim lrModel As FBM.Model = Me.TreeView.SelectedNode.Tag.Tag
+            If Not lrModel.Loaded Then
+                Call Me.DoModelLoading(lrModel)
+                Call Me.SetWorkingEnvironmentForObject(Me.TreeView.SelectedNode.Tag)
+            End If
+
             While (prApplication.WorkingModel.Loading And Not prApplication.WorkingModel.Loaded) Or prApplication.WorkingModel.Page.FindAll(Function(x) x.Loading).Count > 0
                 WriteToStatusBar("Still loading the Model's Pages")
             End While
@@ -3977,6 +4034,12 @@ Public Class frmToolboxEnterpriseExplorer
         Try
             With New WaitCursor
 
+                Dim lrModel As FBM.Model = Me.TreeView.SelectedNode.Tag.Tag
+                If Not lrModel.Loaded Then
+                    Call Me.DoModelLoading(lrModel)
+                    Call Me.SetWorkingEnvironmentForObject(Me.TreeView.SelectedNode.Tag)
+                End If
+
                 While (prApplication.WorkingModel.Loading And Not prApplication.WorkingModel.Loaded) Or prApplication.WorkingModel.Page.FindAll(Function(x) x.Loading).Count > 0
                 End While
 
@@ -4031,6 +4094,10 @@ Public Class frmToolboxEnterpriseExplorer
             'Can only add STDiagrams to Models that have at least one ValueType.
             Dim lrModel As FBM.Model
             lrModel = Me.TreeView.SelectedNode.Tag.Tag
+            If Not lrModel.Loaded Then
+                Call Me.DoModelLoading(lrModel)
+                Call Me.SetWorkingEnvironmentForObject(Me.TreeView.SelectedNode.Tag)
+            End If
 
             If lrModel.ValueType.FindAll(Function(x) x.IsMDAModelElement = False).Count = 0 Then
                 Dim lsMessage = "The Model must have at least one Value Type before adding a State Transition Diagram"
@@ -4136,6 +4203,12 @@ Public Class frmToolboxEnterpriseExplorer
             MsgBox(lsMessage)
         Else
             With New WaitCursor
+                Dim lrModel As FBM.Model = Me.TreeView.SelectedNode.Tag.Tag
+                If Not lrModel.Loaded Then
+                    Call Me.DoModelLoading(lrModel)
+                    Call Me.SetWorkingEnvironmentForObject(Me.TreeView.SelectedNode.Tag)
+                End If
+
                 Call frmMain.loadCodeGenerator()
             End With
         End If
@@ -4145,6 +4218,12 @@ Public Class frmToolboxEnterpriseExplorer
 
     Private Sub FactEngineToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles FactEngineToolStripMenuItem.Click
         With New WaitCursor
+            Dim lrModel As FBM.Model = Me.TreeView.SelectedNode.Tag.Tag
+            If Not lrModel.Loaded Then
+                Call Me.DoModelLoading(lrModel)
+                Call Me.SetWorkingEnvironmentForObject(Me.TreeView.SelectedNode.Tag)
+            End If
+
             Call frmMain.LoadFactEngine()
         End With
     End Sub
