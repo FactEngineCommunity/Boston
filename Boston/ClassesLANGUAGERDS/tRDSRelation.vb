@@ -343,6 +343,19 @@ Namespace RDS
 
         End Sub
 
+        Public Sub AddDestinationColumn(ByRef arColumn As RDS.Column, ByVal aiOrdinalPosition As Integer)
+
+            Try
+                Me.DestinationColumns.Add(arColumn)
+
+                'CMML
+                Call Me.Model.Model.addCMMLColumnToRelationDestination(Me, arColumn, aiOrdinalPosition)
+
+            Catch ex As Exception
+                Debugger.Break()
+            End Try
+        End Sub
+
         Public Sub AddOriginColumn(ByRef arColumn As RDS.Column, ByVal aiOrdinalPosition As Integer)
 
             Try
@@ -386,6 +399,7 @@ Namespace RDS
                                     Call Me.OriginTable.addColumn(lrNewColumn)
                                     lrNewColumn.Relation.Add(Me)
                                     Call Me.AddOriginColumn(lrNewColumn, Me.OriginColumns.Count)
+                                    Call Me.AddDestinationColumn(lrColumn, Me.DestinationColumns.Count)
                                 Next
                                 Call Me.OriginTable.removeColumn(lrOriginalColumn)
                             End If

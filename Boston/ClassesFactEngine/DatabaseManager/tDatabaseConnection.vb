@@ -136,6 +136,14 @@
         Public Overridable Sub RenameTable(ByRef arTable As RDS.Table, ByVal asNewName As String)
         End Sub
 
+        ''' <summary>
+        ''' Returns True if a Table with the given name exists in the database, else returns False.
+        ''' </summary>
+        ''' <param name="asTableName"></param>
+        ''' <returns></returns>
+        Public Overridable Function TableExists(ByVal asTableName As String) As Boolean
+        End Function
+
     End Class
 
 End Namespace

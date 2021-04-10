@@ -4525,6 +4525,46 @@ Namespace FBM
 
             Me.Loading = False
 
+            'Temporary-20210410
+            Call Me.FixErrors
+
+        End Sub
+
+        Public Sub FixErrors()
+
+            Try
+                Dim larFatalRole = From Role In Me.Role
+                                   Where Role.JoinedORMObject Is Nothing
+                                   Select Role
+
+                For Each lrRole In larFatalRole.ToArray
+                    Call lrRole.RemoveFromModel(True, False)
+                Next
+
+                Dim larFatalColumn = From Table In Me.RDS.Table
+                                     From Column In Table.Column
+                                     Where Column.ActiveRole Is Nothing
+                                     Select Column
+
+                For Each lrColumn In larFatalColumn.ToArray
+                    Call lrColumn.Table.RemoveColumn(lrColumn)
+                Next
+
+                'LevelNumbers of InternalUniquenessConstraints
+                For Each lrFactType In Me.FactType
+                    Dim liInternalUniquenessConstraintLevelNrSum = (From InternalUniquenessConstraint In lrFactType.InternalUniquenessConstraint
+                                                                    Select InternalUniquenessConstraint.LevelNr).Sum
+                    Dim liSum As Integer = (lrFactType.InternalUniquenessConstraint.Count / 2) * (1 + lrFactType.InternalUniquenessConstraint.Count)
+                    If liInternalUniquenessConstraintLevelNrSum <> liSum Then
+                        Call lrFactType.ResetInternalUniquenessConstraintLevelNumbers()
+                    End If
+                Next
+
+
+            Catch ex As Exception
+                Debugger.Break()
+            End Try
+
         End Sub
 
         Private Sub performCoreManagement()

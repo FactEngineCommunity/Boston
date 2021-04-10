@@ -3590,10 +3590,10 @@ Namespace FBM
             '--------------------------------
             Try
                 Dim lsRoleId As String = arRole.Id
-                Dim larFactData = From f In Me.Fact, _
-                                      fd In f.Data _
-                                      Where fd.Role.Id = lsRoleId _
-                                     Select fd
+                Dim larFactData = From f In Me.Fact,
+                                      fd In f.Data
+                                  Where fd.Role.Id = lsRoleId
+                                  Select fd
 
                 Dim lrFactData As FBM.FactData
                 Dim larFactDataSet As New System.Collections.Generic.List(Of FBM.FactData)
@@ -3637,9 +3637,9 @@ Namespace FBM
                     Dim lrRole As FBM.Role = arRole
 
                     'Must remove the corresponding LinkFactType
-                    Dim larLinkFactType = From FactType In Me.Model.FactType _
+                    Dim larLinkFactType = From FactType In Me.Model.FactType
                                           Where FactType.IsLinkFactType _
-                                          And FactType.LinkFactTypeRole Is lrRole _
+                                          And FactType.LinkFactTypeRole Is lrRole
                                           Select FactType
 
                     If larLinkFactType.Count > 0 Then
@@ -3698,6 +3698,25 @@ Namespace FBM
                 prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
+        End Sub
+
+        ''' <summary>
+        ''' Resets the Internal Uniqueness Constraint level numbers.
+        ''' </summary>
+        Public Sub ResetInternalUniquenessConstraintLevelNumbers()
+
+            Try
+                Dim liInd = 1
+                For Each lrInternalUniquenessConstraint In Me.InternalUniquenessConstraint
+                    lrInternalUniquenessConstraint.SetLevelNr(liInd)
+                    lrInternalUniquenessConstraint.makeDirty()
+                    liInd += 1
+                Next
+                Me.makeDirty()
+
+            Catch ex As Exception
+                Debugger.Break()
+            End Try
         End Sub
 
 

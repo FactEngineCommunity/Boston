@@ -588,6 +588,12 @@
 
                                 Case GetType(FBM.EntityType)
                                     lrFactType = lrQueryEdge.FBMFactType
+                                Case GetType(FBM.ValueType)
+                                    If lrQueryEdge.IsPartialFactTypeMatch Then
+                                        lrFactType = lrQueryEdge.FBMFactType
+                                    Else
+                                        Throw New NotImplementedException("Unknown Conditional type in query. Contact support.")
+                                    End If
                             End Select
 
                             Dim larPredicatePart As List(Of FBM.PredicatePart)

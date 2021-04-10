@@ -2755,7 +2755,12 @@ Public Class frmToolboxORMVerbalisation
 
             lrVerbaliser.VerbaliseQuantifier("Data Type: ")
             Dim liDataType As pcenumORMDataType = arAttribute.Column.getMetamodelDataType
-            lrVerbaliser.VerbaliseBlackText(liDataType.ToString)
+            If liDataType = pcenumORMDataType.DataTypeNotSet Then
+                lrVerbaliser.VerbaliseError(liDataType.ToString)
+            Else
+                lrVerbaliser.VerbaliseBlackText(liDataType.ToString)
+            End If
+
             lrVerbaliser.HTW.WriteBreak()
 
             Select Case liDataType

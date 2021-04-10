@@ -175,6 +175,7 @@ Namespace FBM
                 End If
 
                 Dim laoRole = From Role In Me.Model.Role
+                              Where Role.JoinedORMObject IsNot Nothing
                               Where Role.JoinedORMObject.Id = Me.Id
                               Select Role
 

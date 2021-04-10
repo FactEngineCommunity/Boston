@@ -856,6 +856,32 @@ Namespace FactEngine
 
         End Sub
 
+        ''' <summary>
+        ''' Returns True if a Table with the given name exists in the database, else returns False.
+        ''' </summary>
+        ''' <param name="asTableName"></param>
+        ''' <returns></returns>
+        Public Overrides Function TableExists(ByVal asTableName As String) As Boolean
+
+            Try
+                Dim lsSQLQuery As String
+
+                lsSQLQuery = "SELECT * FROM sqlite_master"
+                lsSQLQuery &= " WHERE Type ='table'"
+                lsSQLQuery &= " AND name ='" & asTableName & "'"
+
+                Dim lrRecordset As ORMQL.Recordset
+
+                lrRecordset = Me.GO(lsSQLQuery)
+
+                Return lrRecordset.Facts.Count > 0
+
+            Catch ex As Exception
+                Debugger.Break()
+            End Try
+
+        End Function
+
     End Class
 
 End Namespace

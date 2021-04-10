@@ -124,6 +124,10 @@ Public Class BostonTreeView
         Next
     End Sub
 
+    Public Sub ForceSelectedNode(ByRef arNode As cTreeNode)
+        MyBase.SelectedNode = arNode
+    End Sub
+
 #End Region
 
 

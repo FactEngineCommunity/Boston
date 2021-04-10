@@ -549,7 +549,7 @@ Public Class frmToolboxORMReadingEditor
                 Dim lsOldName As String = Me.zrFactTypeInstance.FactType.Id
                 Dim lsMessage = "Change the Fact Type's name to, '" & lsNewName & "'?"
                 If lsNewName <> lsOldName Then
-                    If MsgBox(lsMessage, MsgBoxStyle.YesNo) = DialogResult.Yes Then
+                    If MsgBox(lsMessage, MsgBoxStyle.DefaultButton2 + MsgBoxStyle.YesNo, "Rename Fact Type?") = DialogResult.Yes Then
 
                         Call Me.zrFactTypeInstance.FactType.setName(lsNewName, True)
 
@@ -569,10 +569,13 @@ Public Class frmToolboxORMReadingEditor
                         If Not lrRecordset.EOF Then
                             '20180611-VM-If the code never reaches this breakpoint....then FactType.SetName is modifying the appropriate FactData entries.
                             '  so can delete this.
+                            '20210410-VM-Checked again and added break (in red Visual Studio). If not getting here, then can delete.
                             Dim lrNewDictionaryEntry As New FBM.DictionaryEntry(Me.zrFactTypeInstance.Model, lsNewName, pcenumConceptType.FactType)
                             lrNewDictionaryEntry = Me.zrFactTypeInstance.Model.AddModelDictionaryEntry(lrNewDictionaryEntry)
                             Call lrRecordset("FactType").SwitchConcept(lrNewDictionaryEntry.Concept, pcenumConceptType.FactType)
                         End If
+
+                        Call Me.zrPage.Model.Save()
                     End If
                 End If
 

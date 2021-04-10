@@ -94,11 +94,14 @@ Namespace TableValueTypeInstance
                         End If
 
 
-                            '-------------------------------------------------------------------------------------------
-                            'CodeSafe: Remove the ValueTypeInstance if it references a ValueType that no longer exists
-                            If lrValueTypeInstance.ValueType Is Nothing Then
+                        '-------------------------------------------------------------------------------------------
+                        'CodeSafe: Remove the ValueTypeInstance if it references a ValueType that no longer exists
+                        If lrValueTypeInstance.ValueType Is Nothing Then
                             Call TableValueTypeInstance.DeleteValueTypeInstance(lrValueTypeInstance)
                         Else
+                            lrValueTypeInstance.Name = lREcordset("ValueTypeName").Value
+                            lrValueTypeInstance.X = lREcordset("x").Value
+                            lrValueTypeInstance.Y = lREcordset("y").Value
                             lrValueTypeInstance.DataType = CType([Enum].Parse(GetType(pcenumORMDataType), Trim(lREcordset("DataType").Value)), pcenumORMDataType)
                             lrValueTypeInstance.DataTypeLength = lREcordset("DataTypeLength").Value
                             lrValueTypeInstance.DataTypePrecision = lREcordset("DataTypePrecision").Value
@@ -107,10 +110,6 @@ Namespace TableValueTypeInstance
                             lrValueTypeInstance.LongDescription = lrValueTypeInstance.ValueType.LongDescription
                             lrValueTypeInstance.GUID = lrValueTypeInstance.ValueType.GUID
                             lrValueTypeInstance.IsIndependent = lrValueTypeInstance.ValueType.IsIndependent
-
-                            lrValueTypeInstance.Name = lREcordset("ValueTypeName").Value
-                            lrValueTypeInstance.X = lREcordset("x").Value
-                            lrValueTypeInstance.Y = lREcordset("y").Value
 
                             getValueTypeInstances_by_page.Add(lrValueTypeInstance)
                         End If

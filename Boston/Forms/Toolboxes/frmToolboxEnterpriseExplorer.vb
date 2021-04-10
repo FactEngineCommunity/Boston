@@ -821,7 +821,13 @@ Public Class frmToolboxEnterpriseExplorer
                     '---------------------------------
                     'Select the node under the Mouse
                     '---------------------------------
+                    'Remove then readd handler. Stops the previous Model from being loaded unintentionally.
+                    RemoveHandler Me.TreeView.AfterSelect, AddressOf TreeView1_AfterSelect
                     Me.TreeView.SelectedNode = Me.TreeView.GetNodeAt(e.Location)
+                    Call Me.TreeView.ForceSelectedNode(Me.TreeView._SelectedNode)
+                    'Readd handler. Stops the previous Model from being loaded unintentionally.
+                    AddHandler Me.TreeView.AfterSelect, AddressOf TreeView1_AfterSelect
+
                     If IsSomething(Me.TreeView.SelectedNode) Then
                         If IsSomething(Me.TreeView.SelectedNode.Tag) Then
                             loObject = Me.TreeView.SelectedNode.Tag
@@ -856,6 +862,7 @@ Public Class frmToolboxEnterpriseExplorer
                     Else
                         Me.TreeView.ContextMenuStrip = Nothing
                     End If
+
                 ElseIf e.Button = Windows.Forms.MouseButtons.Left Then
                     Me.TreeView.SelectedNode = Me.TreeView.GetNodeAt(e.Location)
                     If IsSomething(Me.TreeView.SelectedNode) Then

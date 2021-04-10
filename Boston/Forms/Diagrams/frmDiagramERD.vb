@@ -685,7 +685,7 @@ Public Class frmDiagramERD
             End If
 
             '-------------------------------------
-            'Check that selected object is Actor
+            'Check that selected object is Entity
             '-------------------------------------
             If Me.zrPage.SelectedObject(0).GetType Is lrEntity.GetType Then
                 '----------
@@ -2888,6 +2888,23 @@ Public Class frmDiagramERD
             ''Get the EntityType represented by the (selected) Entity
             ''---------------------------------------------------------
             lrEntity = lrTableNode.Tag
+
+            If Not Me.zrPage.Model.IsDatabaseSynchronised Then
+                MsgBox("Set the Model's configuration to 'Is Database Synchronised before creating tables.")
+                Exit Sub
+            End If
+
+            Me.zrPage.Model.connectToDatabase()
+
+            For Each lrRelation In lrEntity.RDSTable.getOutgoingRelations
+                If Not lrEntity.Model.DatabaseConnection.TableExists(lrRelation.DestinationTable.Name) Then
+                    Dim lsMessage As String
+                    lsMessage = "Referenced table '" & lrRelation.DestinationTable.Name & "' does not exist in the database."
+                    lsMessage &= vbCrLf & vbCrLf & "Create the referenced tables for table, '" & lrEntity.Name & "', and then try again."
+                    MsgBox(lsMessage, MsgBoxStyle.Exclamation)
+                    Exit Sub
+                End If
+            Next
 
             Call lrEntity.Model.DatabaseConnection.recreateTable(lrEntity.RDSTable)
 
