@@ -1067,11 +1067,34 @@ Namespace FBM
 
         End Sub
 
+        Public Sub removeCMMLRelationDestinationColumn(ByRef arRelation As RDS.Relation,
+                                                  ByRef arColumn As RDS.Column)
+
+            Dim lsSQLQuery As String
+
+            Try
+
+                lsSQLQuery = "DELETE FROM " & pcenumCMMLRelations.CoreAttributeIsPartOfRelationDestination.ToString
+                lsSQLQuery &= " WHERE Attribute = '" & arColumn.Id & "'"
+                lsSQLQuery &= " AND Relation = '" & arRelation.Id & "'"
+
+                Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                'lsSQLQuery = "DELETE FROM " & pcenumCMMLRelations.CoreAttributeIsPartOfRelationOriginHasOrdinalPosition.ToString
+                'lsSQLQuery &= " WHERE RelationAttribute = '" & lrFact.Id & "'"
+
+                'Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+            Catch ex As Exception
+                Debugger.Break()
+            End Try
+
+        End Sub
+
         Public Sub removeCMMLRelationOriginColumn(ByRef arRelation As RDS.Relation,
                                                   ByRef arColumn As RDS.Column)
 
             Dim lsSQLQuery As String
-            Dim lrFact As FBM.Fact
 
             Try
 

@@ -2829,6 +2829,7 @@ Public Class frmToolboxEnterpriseExplorer
             'RDS
             If (lrModel.ModelId <> "Core") And lrModel.HasCoreModel Then
                 Call lrModel.PopulateRDSStructureFromCoreMDAElements()
+                lrModel.RDSCreated = True
             ElseIf (lrModel.ModelId <> "Core") Then
                 '==================================================
                 'RDS - Create a CMML Page and then dispose of it.
@@ -2855,6 +2856,7 @@ Public Class frmToolboxEnterpriseExplorer
 
                 Call lrModel.createEntityRelationshipArtifacts()
                 Call lrModel.PopulateRDSStructureFromCoreMDAElements()
+                lrModel.RDSCreated = True
 
                 lfrmFlashCard = New frmFlashCard
                 lfrmFlashCard.ziIntervalMilliseconds = 3500

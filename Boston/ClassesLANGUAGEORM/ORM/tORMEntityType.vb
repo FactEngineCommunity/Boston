@@ -1001,7 +1001,7 @@ Namespace FBM
                     'Add the ValueType to the Model/ModelDictionary
                     '------------------------------------------------
                     lrValueType = New FBM.ValueType(Me.Model, pcenumLanguage.ORMModel, lsValueTypeName, True)
-                    Me.Model.AddValueType(lrValueType, False, abBroadcastInterfaceEvent)
+                    Me.Model.AddValueType(lrValueType, True, abBroadcastInterfaceEvent)
                 End If
 
                 '------------------------------------------
@@ -1149,11 +1149,33 @@ Namespace FBM
                     Dim lrOriginColumn = lrRelation.OriginTable.Column.Find(Function(x) x.ActiveRole Is Me.ReferenceModeFactType.RoleGroup(1))
                     Dim lrDestinationColumn = Me.getCorrespondingRDSTable.Column.Find(Function(x) x.ActiveRole Is Me.ReferenceModeFactType.RoleGroup(1))
 
-                    lrRelation.OriginColumns.Add(lrOriginColumn)
-                    lrRelation.DestinationColumns.Add(lrDestinationColumn)
+                    If lrOriginColumn IsNot Nothing And lrDestinationColumn IsNot Nothing Then
+                        lrRelation.OriginColumns.Add(lrOriginColumn)
+                        lrRelation.DestinationColumns.Add(lrDestinationColumn)
 
-                    Call Me.Model.addCMMLColumnToRelationOrigin(lrRelation, lrOriginColumn, 1)
-                    Call Me.Model.addCMMLColumnToRelationDestination(lrRelation, lrDestinationColumn, 1)
+
+                        Call Me.Model.addCMMLColumnToRelationOrigin(lrRelation, lrOriginColumn, 1)
+                        Call Me.Model.addCMMLColumnToRelationDestination(lrRelation, lrDestinationColumn, 1)
+                    Else
+                        Dim lrResponsibleRole As FBM.Role = lrRelation.OriginColumns(0).Role
+                        For Each lrColumn In lrRelation.OriginColumns
+                            Call Me.Model.removeCMMLRelationOriginColumn(lrRelation, lrColumn)
+                            lrRelation.OriginTable.removeColumn(lrColumn)
+                        Next
+                        lrRelation.OriginColumns.Clear()
+
+                        Dim lrNewColumn = New RDS.Column(lrRelation.OriginTable, Me.ReferenceModeValueType.Id, lrResponsibleRole, Me.ReferenceModeFactType.RoleGroup(1), True)
+                        Call lrRelation.OriginTable.addColumn(lrNewColumn)
+                        Call Me.Model.addCMMLColumnToRelationOrigin(lrRelation, lrNewColumn, 1)
+
+                        lrNewColumn = lrRelation.DestinationTable.getPrimaryKeyColumns.First
+                        For Each lrColumn In lrRelation.DestinationColumns
+                            Call Me.Model.removeCMMLRelationDestinationColumn(lrRelation, lrColumn)
+                        Next
+                        lrRelation.DestinationColumns.Clear()
+                        lrRelation.DestinationColumns.Add(lrNewColumn)
+                        Call Me.Model.addCMMLColumnToRelationDestination(lrRelation, lrNewColumn, 1)
+                    End If
 
                 Next
 
