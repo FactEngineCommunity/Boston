@@ -24,6 +24,16 @@ Namespace FEQL
             End Set
         End Property
 
+        Private _NODEPROPERTYIDENTIFICATION As New List(Of FEQL.NODEPROPERTYIDENTIFICATION)
+        Public Property NODEPROPERTYIDENTIFICATION As List(Of FEQL.NODEPROPERTYIDENTIFICATION)
+            Get
+                Return Me._NODEPROPERTYIDENTIFICATION
+            End Get
+            Set(value As List(Of FEQL.NODEPROPERTYIDENTIFICATION))
+                Me._NODEPROPERTYIDENTIFICATION = value
+            End Set
+        End Property
+
     End Class
 
     Public Class CREATEStatement
@@ -910,7 +920,7 @@ Namespace FEQL
 
     Public Class QuotedIdentifier
 
-        Private _IDENTIFIER As String
+        Private _IDENTIFIER As String = Nothing
         Public Property IDENTIFIER As String
             Get
                 Return Me._IDENTIFIER
@@ -919,6 +929,27 @@ Namespace FEQL
                 Me._IDENTIFIER = value
             End Set
         End Property
+
+        Private _EMAILADDRESS As String = Nothing
+        Public Property EMAILADDRESS As String
+            Get
+                Return Me._EMAILADDRESS
+            End Get
+            Set(value As String)
+                Me._EMAILADDRESS = value
+            End Set
+        End Property
+
+        Public ReadOnly Property ActualIdentifier As String
+            Get
+                If Me.EMAILADDRESS IsNot Nothing Then
+                    Return Me.EMAILADDRESS
+                Else
+                    Return Me.IDENTIFIER
+                End If
+            End Get
+        End Property
+
 
         Private _SINGLEQUOTE As String = ""
         Public Property SINGLEQUOTE As String

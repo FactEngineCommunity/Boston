@@ -53,6 +53,76 @@ Namespace FEQL
                                             lrASSERTStatement.NODEPROPERTYNAMEIDENTIFICATION(0).QUOTEDIDENTIFIERLIST.QUOTEDIDENTIFIER(liInd).SINGLEQUOTE
                             liInd += 1
                         Next
+                    ElseIf lrASSERTStatement.PREDICATECLAUSE IsNot Nothing Then
+
+
+                        'Find the FactType for the predicate/FactType reading
+                        Dim lrQueryGraph As New FactEngine.QueryGraph(Me.Model)
+                        Dim lrQueryEdge As New FactEngine.QueryEdge(lrQueryGraph, Nothing)
+                        Dim lrModelObject = Me.Model.GetModelObjectByName(lrFirstModelElement.Id)
+                        Dim lrBaseNode As New FactEngine.QueryNode(lrModelObject, lrQueryEdge, False)
+                        lrQueryEdge.BaseNode = lrBaseNode
+                        lrModelObject = Me.Model.GetModelObjectByName(lrASSERTStatement.NODEPROPERTYIDENTIFICATION(0).MODELELEMENTNAME)
+                        Dim lrTargetNode As New FactEngine.QueryNode(lrModelObject, lrQueryEdge, True)
+                        lrQueryEdge.TargetNode = lrTargetNode
+                        lrQueryEdge.Predicate = Strings.Join(lrASSERTStatement.PREDICATECLAUSE.PREDICATE.ToArray, " ")
+
+                        Call lrQueryEdge.getAndSetFBMFactType(lrBaseNode, lrTargetNode, lrQueryEdge.Predicate)
+
+                        lsSQLCommand = "UPDATE [" & lrFirstModelElement.Name & "] SET "
+
+                        Select Case lrQueryEdge.FBMFactType.RoleGroup(1).JoinedORMObject.GetType
+                            Case = GetType(FBM.ValueType)
+                                lsSQLCommand &= lrASSERTStatement.NODEPROPERTYIDENTIFICATION(0).MODELELEMENTNAME & " = "
+                                lsSQLCommand &= lrASSERTStatement.NODEPROPERTYIDENTIFICATION(0).QUOTEDIDENTIFIERLIST.QUOTEDIDENTIFIER(0).SINGLEQUOTE
+                                lsSQLCommand &= lrASSERTStatement.NODEPROPERTYIDENTIFICATION(0).QUOTEDIDENTIFIERLIST.QUOTEDIDENTIFIER(0).ActualIdentifier
+                                lsSQLCommand &= lrASSERTStatement.NODEPROPERTYIDENTIFICATION(0).QUOTEDIDENTIFIERLIST.QUOTEDIDENTIFIER(0).SINGLEQUOTE
+                            Case = GetType(FBM.EntityType)
+
+                                Dim lrTargetTable = Me.Model.RDS.getTableByName(lrASSERTStatement.NODEPROPERTYIDENTIFICATION(0).MODELELEMENTNAME)
+
+                                Dim larColumn = lrTargetTable.getFirstUniquenessConstraintColumns.OrderBy(Function(x) x.OrdinalPosition).ToList
+
+                                Dim liInd2 = 0
+                                For Each lrIdentifier In lrASSERTStatement.NODEPROPERTYIDENTIFICATION(0).QUOTEDIDENTIFIERLIST.QUOTEDIDENTIFIER
+                                    larColumn(liInd2).TemporaryData = lrIdentifier.ActualIdentifier
+                                    liInd2 += 1
+                                Next
+
+                                Dim lrRecordset2 = Me.GetEntityPrimaryKeyValuesForEntityAndColumns(lrTargetTable, larColumn)
+
+                                If lrRecordset2.Facts.Count = 0 Then
+                                    Dim lasIdentifier = From Column In larColumn
+                                                        Select Column.TemporaryData
+
+                                    Dim lsMessage = "Error: No " & lrTargetNode.Name & " is identified by " & Strings.Join(lasIdentifier.ToArray, " and ")
+                                    Throw New Exception(lsMessage)
+                                End If
+
+                                liInd2 = 0
+                                For Each lrColumn In lrTargetTable.getPrimaryKeyColumns.OrderBy(Function(x) x.OrdinalPosition).ToList
+                                    Dim lrBaseColumn = lrQueryEdge.BaseNode.RDSTable.Column.Find(Function(x) x.ActiveRole Is lrColumn.ActiveRole)
+                                    lsSQLCommand &= "[" & lrBaseColumn.Name & "] = "
+                                    lsSQLCommand &= Richmond.returnIfTrue(lrBaseColumn.DataTypeIsText, "'", "")
+                                    lsSQLCommand &= lrRecordset2.CurrentFact.Data(liInd2).Data
+                                    lsSQLCommand &= Richmond.returnIfTrue(lrBaseColumn.DataTypeIsText, "'", "")
+                                    liInd2 += 1
+                                Next
+                        End Select
+
+
+                        lsSQLCommand &= vbCrLf & " WHERE "
+                        Dim lrTable = lrFirstModelElement.getCorrespondingRDSTable
+                        Dim liInd = 0
+                        For Each lsUCColumnName In lasUCColumnNames
+                            If liInd > 0 Then lsSQLCommand &= vbCrLf & " AND "
+                            lsSQLCommand &= "[" & lrTable.Name & "]." & lsUCColumnName & " = "
+                            lsSQLCommand &= lrASSERTStatement.NODEPROPERTYNAMEIDENTIFICATION(0).QUOTEDIDENTIFIERLIST.QUOTEDIDENTIFIER(liInd).SINGLEQUOTE &
+                                            lrASSERTStatement.NODEPROPERTYNAMEIDENTIFICATION(0).QUOTEDIDENTIFIERLIST.QUOTEDIDENTIFIER(liInd).IDENTIFIER &
+                                            lrASSERTStatement.NODEPROPERTYNAMEIDENTIFICATION(0).QUOTEDIDENTIFIERLIST.QUOTEDIDENTIFIER(liInd).SINGLEQUOTE
+                            liInd += 1
+                        Next
+
                     Else
                         'Is Insert
                         lsSQLCommand = "INSERT INTO " & lrFirstModelElement.Name & " (" & lsColumnNamesList
@@ -103,6 +173,39 @@ Namespace FEQL
             Catch ex As Exception
                 lrRecordset.ErrorString = ex.Message
                 Return lrRecordset
+            End Try
+
+        End Function
+
+        Public Function GetEntityPrimaryKeyValuesForEntityAndColumns(ByVal arTable As RDS.Table, ByVal aarColumn As List(Of RDS.Column)) As ORMQL.Recordset
+
+            Try
+                Dim lsSQLQuery As String
+
+                lsSQLQuery = "SELECT "
+                Dim liInd = 0
+                For Each lrColumn In arTable.getPrimaryKeyColumns.OrderBy(Function(x) x.OrdinalPosition)
+                    If liInd > 0 Then lsSQLQuery &= ","
+                    lsSQLQuery &= lrColumn.Name
+                    liInd += 1
+                Next
+                lsSQLQuery &= vbCrLf & " FROM [" & arTable.Name & "]"
+                lsSQLQuery &= " WHERE "
+
+                liInd = 0
+                For Each lrColumn In aarColumn
+                    If liInd > 0 Then lsSQLQuery &= vbCrLf & " AND "
+                    lsSQLQuery &= "[" & arTable.Name & "].[" & lrColumn.Name & "] = "
+                    lsSQLQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsText, "'", "")
+                    lsSQLQuery &= aarColumn(liInd).TemporaryData
+                    lsSQLQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsText, "'", "")
+                    liInd += 1
+                Next
+
+                Return Me.DatabaseManager.Connection.GO(lsSQLQuery)
+
+            Catch ex As Exception
+                Debugger.Break()
             End Try
 
         End Function
