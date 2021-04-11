@@ -2046,7 +2046,8 @@ Namespace FBM
         ''' <param name="abDoRDSProcessing">When creating the first Uniqueness Constraint for a Ternary/greater Fact Type, we want to set the RC.IsPreferredIndentifier to True, 
         ''' but not create the Index, because that is done further in Model.AddRoleConstraint, so abort at RDS processing here.</param>
         Public Sub SetIsPreferredIdentifier(ByVal abIsPreferredIdentifier As Boolean,
-                                            Optional ByVal abDoRDSProcessing As Boolean = True)
+                                            Optional ByVal abDoRDSProcessing As Boolean = True,
+                                            Optional ByRef arExistingPreferedReferenceSchemeRoleConstraint As FBM.RoleConstraint = Nothing)
 
             Try
                 '============================================================================================
@@ -2054,9 +2055,23 @@ Namespace FBM
                 '  E.g. If a Fact Type accross Part, Bin and Warehouse has a binary Internal RC that is Preferred,
                 '    and now we are making a second IUC preferred, then neeed to set the existing preferred IUC to isPreferred = False.
                 If Me.RoleConstraintType = pcenumRoleConstraintType.InternalUniquenessConstraint Then
-                    Dim lrExistingPreferredIndentifierRoleConstraint = Me.RoleConstraintRole(0).Role.FactType.getPreferredInternalUniquenessConstraint
-                    If (Not lrExistingPreferredIndentifierRoleConstraint Is Me) And abIsPreferredIdentifier Then
-                        Call lrExistingPreferredIndentifierRoleConstraint.SetIsPreferredIdentifier(False)
+                    If Me.Role(0).FactType.Is1To1BinaryFactType Then
+                        If Me.Role(0).FactType.IsPreferredReferenceMode Then
+                            Dim lrModelObject As FBM.ModelObject = Me.Role(0).FactType.GetOtherRoleOfBinaryFactType(Me.Role(0).Id).JoinedORMObject
+                            Select Case lrModelObject.GetType
+                                Case = GetType(FBM.EntityType)
+                                    If arExistingPreferedReferenceSchemeRoleConstraint IsNot Nothing Then
+                                        Call arExistingPreferedReferenceSchemeRoleConstraint.SetIsPreferredIdentifier(False)
+                                    End If
+                                Case Else
+                                    Throw New NotImplementedException("Only Entity Types catered for at this stage. Contact support.")
+                            End Select
+                        End If
+                    Else
+                        Dim lrExistingPreferredIndentifierRoleConstraint = Me.RoleConstraintRole(0).Role.FactType.getPreferredInternalUniquenessConstraint
+                        If (Not lrExistingPreferredIndentifierRoleConstraint Is Me) And abIsPreferredIdentifier Then
+                            Call lrExistingPreferredIndentifierRoleConstraint.SetIsPreferredIdentifier(False)
+                        End If
                     End If
                 End If
 
@@ -2104,7 +2119,6 @@ Namespace FBM
                     'Modify the existing PrimaryKey
                     '20200722-VM-Removed because if exists, should change the actual Index
                     'Call lrTable.makeExistingPrimaryKeySimplyUnique(larColumnsAffected)
-
 
                     Dim lrExistingIndex As RDS.Index = lrTable.getIndexByColumns(larColumnsAffected)
 

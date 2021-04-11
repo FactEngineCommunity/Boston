@@ -1106,9 +1106,11 @@ Namespace FBM
                 lrRoleConstraint = lrFactType.CreateInternalUniquenessConstraint(larRole, True, False, False)
                 Call Me.Model.AddRoleConstraint(lrRoleConstraint, False, abBroadcastInterfaceEvent)
 
+                Dim lrExistingReferenceModeRoleConstraint As FBM.RoleConstraint = Me.ReferenceModeRoleConstraint
+
                 Me.ReferenceModeRoleConstraint = lrRoleConstraint 'Leave before setting the PreferredIdentifier flag, so Index created can get ResponsibleRoleConstraint
 
-                Call lrRoleConstraint.SetIsPreferredIdentifier(True) 'Already true, but triggers RDS processing to make respective Column part of the PrimaryKey.
+                Call lrRoleConstraint.SetIsPreferredIdentifier(True, True, lrExistingReferenceModeRoleConstraint) 'Already true, but triggers RDS processing to make respective Column part of the PrimaryKey.
 
 
 
