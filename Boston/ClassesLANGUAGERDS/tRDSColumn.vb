@@ -216,6 +216,7 @@ Namespace RDS
             Me.Role = arResponsibleRole
             Me.ActiveRole = arActiveRole
             Me.Nullable = Not abIsMandatory
+            Me.IsMandatory = abIsMandatory
 
         End Sub
 

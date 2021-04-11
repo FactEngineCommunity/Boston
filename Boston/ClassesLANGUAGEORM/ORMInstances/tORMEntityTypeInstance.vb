@@ -1571,7 +1571,9 @@ Namespace FBM
 
                             End If
                         Case Is = "ReferenceMode" 'The name of the Property on the EntityType class related to this EntityTypeInstance                            
-                            Call Me.EntityType.SetReferenceMode(Trim(Me.ReferenceMode))
+                            With New WaitCursor
+                                Call Me.EntityType.SetReferenceMode(Trim(Me.ReferenceMode))
+                            End With
                             If Me.ReferenceMode = " " Then
                                 Call Me.SetPropertyAttributes(Me, "DataType", False)
                             Else

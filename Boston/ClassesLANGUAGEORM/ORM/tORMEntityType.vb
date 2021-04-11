@@ -1160,15 +1160,36 @@ Namespace FBM
                         Call Me.Model.addCMMLColumnToRelationDestination(lrRelation, lrDestinationColumn, 1)
                     Else
                         Dim lrResponsibleRole As FBM.Role = lrRelation.OriginColumns(0).Role
+
+                        Dim larIndex As New List(Of RDS.Index)
+
+                        Dim lbIsMandatory As Boolean = lrRelation.OriginColumns(0).IsMandatory
+
                         For Each lrColumn In lrRelation.OriginColumns
                             Call Me.Model.removeCMMLRelationOriginColumn(lrRelation, lrColumn)
+
+                            'See if any Index in Relation.OriginTable contains the Column being removed.
+                            Dim larExistingIndex = (From Index In lrRelation.OriginTable.Index
+                                                    Where Index.Column.Contains(lrColumn)
+                                                    Select Index).ToList
+
+                            For Each lrIndex In larExistingIndex
+                                larIndex.AddUnique(lrIndex)
+                            Next
+
                             lrRelation.OriginTable.removeColumn(lrColumn)
                         Next
                         lrRelation.OriginColumns.Clear()
 
-                        Dim lrNewColumn = New RDS.Column(lrRelation.OriginTable, Me.ReferenceModeValueType.Id, lrResponsibleRole, Me.ReferenceModeFactType.RoleGroup(1), True)
+                        Dim lrNewColumn = New RDS.Column(lrRelation.OriginTable, Me.ReferenceModeValueType.Id, lrResponsibleRole, Me.ReferenceModeFactType.RoleGroup(1), lbIsMandatory)
                         Call lrRelation.OriginTable.addColumn(lrNewColumn)
+                        lrNewColumn.Relation.Add(lrRelation)
                         Call Me.Model.addCMMLColumnToRelationOrigin(lrRelation, lrNewColumn, 1)
+
+                        'Add the new Column to the ExistingIndexes for the OriginTable
+                        For Each lrIndex In larIndex
+                            Call lrIndex.addColumn(lrNewColumn)
+                        Next
 
                         lrNewColumn = lrRelation.DestinationTable.getPrimaryKeyColumns.First
                         For Each lrColumn In lrRelation.DestinationColumns
@@ -2267,6 +2288,9 @@ Namespace FBM
                 If My.Settings.UseClientServer And My.Settings.InitialiseClient And abBroadcastInterfaceEvent Then
                     Call prDuplexServiceClient.BroadcastToDuplexService(Viev.FBM.Interface.pcenumBroadcastType.ModelUpdateEntityType, Me, Nothing)
                 End If
+
+                'So much happens/changes, so save.
+                Call Me.Model.Save()
 
             Catch ex As Exception
                 Dim lsMessage1 As String
