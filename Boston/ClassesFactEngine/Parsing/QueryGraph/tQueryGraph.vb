@@ -167,7 +167,7 @@
                     Else
 #Region "Recursive"
                         If lrQueryEdge.IsCircular Then
-
+#Region "Circular"
                             Dim lrPGSRelationTable = lrQueryEdge.TargetNode.FBMModelObject.getCorrespondingRDSTable
 
                             Dim lasColumnName = From Column In lrPGSRelationTable.Column
@@ -217,6 +217,76 @@
                             lsSQLQuery &= vbCrLf & " FROM nodes"
                             lsSQLQuery &= vbCrLf & " WHERE depth = (SELECT MAX(depth) FROM nodes N2) - 1) " & lrPGSRelationTable.Name & lrQueryEdge.TargetNode.Alias
                             'MAX - 1 because is circular and could go on forever, and so LIMIT may stop half way through the last circular set of references.
+#End Region
+                        ElseIf lrQueryEdge.IsShortestPath Then
+#Region "Shortest Path"
+                            Dim lrPGSRelationTable = lrQueryEdge.TargetNode.FBMModelObject.getCorrespondingRDSTable
+
+                            Dim lasColumnName = From Column In lrPGSRelationTable.Column
+                                                Order By Column.OrdinalPosition
+                                                Select Column.Name
+
+                            Dim larJoinColumn As List(Of RDS.Column)
+
+                            larJoinColumn = (From Column In lrPGSRelationTable.Column.FindAll(Function(x) x.Relation.Count > 0)
+                                             Where Column.Relation.Find(Function(x) x.OriginTable Is lrPGSRelationTable).DestinationTable.Name = lrQueryEdge.BaseNode.Name
+                                             Select Column
+                                             Order By Column.OrdinalPosition).ToList
+
+                            If Not larJoinColumn(0).Role Is lrQueryEdge.FBMFactTypeReading.PredicatePart(1).Role Then
+                                larJoinColumn.Reverse()
+                            End If
+
+                            Dim lsColumnNames = Strings.Join(lasColumnName.ToArray, ",")
+
+                            lsSQLQuery &= vbCrLf & ", (WITH RECURSIVE nodes(" & lsColumnNames & ",level,path) As ("
+                            lsSQLQuery &= vbCrLf & " SELECT [" & lrPGSRelationTable.Name & "]." & Strings.Join(lasColumnName.ToArray, ",[" & lrPGSRelationTable.Name & "].") & ",1 as level,(" & larJoinColumn(0).Name & " || '->' || " & larJoinColumn(1).Name & ") AS path"
+                            lsSQLQuery &= vbCrLf & " FROM [" & lrPGSRelationTable.Name & "]"
+                            If lrQueryEdge.BaseNode.HasIdentifier Then
+                                lsSQLQuery &= " WHERE "
+
+                                Dim larPKColumn = lrQueryEdge.BaseNode.RDSTable.getPrimaryKeyColumns.OrderBy(Function(x) x.OrdinalPosition)
+                                liInd = 0
+                                For Each lrPKColumn In larPKColumn
+                                    If liInd > 0 Then lsSQLQuery &= ","
+                                    Dim lrPGSRelationColumn = From Column In lrPGSRelationTable.Column
+                                                              From Relation In Column.Relation
+                                                              Where Column.Relation.Count > 0
+                                                              Where Relation.DestinationColumns(0).Id = lrPKColumn.Id
+                                                              Select Column
+                                                              Order By Column.OrdinalPosition
+
+                                    lsSQLQuery &= "[" & lrPGSRelationTable.Name & "]." & lrPGSRelationColumn.First.Name & " = " & lrQueryEdge.BaseNode.IdentifierList(liInd)
+                                    liInd += 1
+                                Next
+                            End If
+                            lsSQLQuery &= vbCrLf & " UNION ALL"
+                            lsSQLQuery &= " SELECT [" & lrPGSRelationTable.Name & "]." & Strings.Join(lasColumnName.ToArray, ",[" & lrPGSRelationTable.Name & "].") & ",level+1, (nodes.path || '->' || [" & lrPGSRelationTable.Name & "]." & larJoinColumn(1).Name & ") AS path"
+                            lsSQLQuery &= vbCrLf & " FROM nodes JOIN [" & lrPGSRelationTable.Name & "]"
+                            lsSQLQuery &= vbCrLf & " ON [" & lrPGSRelationTable.Name & "]." & larJoinColumn(0).Name & " = nodes." & larJoinColumn(1).Name
+                            lsSQLQuery &= vbCrLf & " WHERE ([" & lrPGSRelationTable.Name & "]." & larJoinColumn(1).Name & " = " & lrQueryEdge.GetNextQueryEdge.IdentifierList(0) & " OR level<10)"
+                            lsSQLQuery &= vbCrLf & " AND NOT nodes.path LIKE '%->' || " & lrQueryEdge.GetNextQueryEdge.IdentifierList(0)
+                            lsSQLQuery &= vbCrLf & ")"
+                            lsSQLQuery &= vbCrLf & " SELECT DISTINCT nodes.*" ' & Strings.Join(lasColumnName.ToArray, ",") & ",depth"
+                            lsSQLQuery &= vbCrLf & " FROM nodes,"
+                            lsSQLQuery &= vbCrLf & " (SELECT path, level"
+                            lsSQLQuery &= vbCrLf & " FROM nodes"
+                            lsSQLQuery &= vbCrLf & " WHERE " & larJoinColumn(1).Name & " = " & lrQueryEdge.GetNextQueryEdge.IdentifierList(0)
+                            lsSQLQuery &= vbCrLf & " AND level = (SELECT level"
+                            lsSQLQuery &= vbCrLf & " FROM nodes"
+                            lsSQLQuery &= vbCrLf & " WHERE " & larJoinColumn(1).Name & " = " & lrQueryEdge.GetNextQueryEdge.IdentifierList(0)
+                            lsSQLQuery &= vbCrLf & " )"
+                            lsSQLQuery &= vbCrLf & " ) pth"
+                            lsSQLQuery &= vbCrLf & " WHERE nodes.level <= (SELECT level"
+                            lsSQLQuery &= vbCrLf & " FROM nodes"
+                            lsSQLQuery &= vbCrLf & " WHERE " & larJoinColumn(1).Name & " = " & lrQueryEdge.GetNextQueryEdge.IdentifierList(0)
+                            lsSQLQuery &= vbCrLf & " )"
+                            lsSQLQuery &= vbCrLf & " AND pth.path LIKE '%' || nodes.path || '%'"
+                            lsSQLQuery &= vbCrLf & " ORDER BY level) " & lrPGSRelationTable.Name & lrQueryEdge.TargetNode.Alias
+
+                            lrQueryEdge.GetNextQueryEdge.TargetNode.IsExcludedConditional = True
+
+#End Region
                         Else
                             Dim lrRDSTable As RDS.Table
                             If lrQueryEdge.FBMFactType.isRDSTable Then
@@ -253,8 +323,8 @@
                                                 Order By Column.OrdinalPosition
                                                 Select Column.Name
                             Dim lsColumnNames = Strings.Join(lasColumnName.ToArray, ",")
-                            lsSQLQuery &= vbCrLf & ", (WITH RECURSIVE nodes(" & lsColumnNames & ",depth) As ("
-                            lsSQLQuery &= vbCrLf & " SELECT [" & lrRDSTable.Name & "]." & Strings.Join(lasColumnName.ToArray, ",[" & lrRDSTable.Name & "].") & ",0"
+                            lsSQLQuery &= vbCrLf & ", (With RECURSIVE nodes(" & lsColumnNames & ",depth) As ("
+                            lsSQLQuery &= vbCrLf & " Select [" & lrRDSTable.Name & "]." & Strings.Join(lasColumnName.ToArray, ",[" & lrRDSTable.Name & "].") & ",0"
                             lsSQLQuery &= vbCrLf & " FROM [" & lrRDSTable.Name & "]"
                             If lrQueryEdge.BaseNode.IdentifierList.Count > 0 Then
                                     Dim lrTargetTable As RDS.Table = larLeftColumn(0).Relation.Find(Function(x) x.OriginTable.Name = lrRDSTable.Name).DestinationTable
@@ -353,6 +423,11 @@
 
                 'BooleanPredicate edges. E.g. Protein is enzyme
                 larConditionalQueryEdges.AddRange(Me.QueryEdges.FindAll(Function(x) x.TargetNode Is Nothing))
+
+                'ShortestPath conditionals are excluded.
+                '  E.g. For '(Account:1) made [SHORTEST PATH 0..10] WHICH Transaction THAT was made to (Account 2:4) '
+                '  the second QueryEdge conditional is taken care of in the FROM clause processing for the recursive query.
+                larConditionalQueryEdges.RemoveAll(Function(x) x.TargetNode.IsExcludedConditional)
 
                 If larWhereEdges.Count = 0 And larConditionalQueryEdges.Count = 0 And (Not Me.HeadNode.HasIdentifier) Then
                     Return lsSQLQuery
@@ -557,7 +632,7 @@
                 If (Not lbAddedAND And lbIntialWhere Is Nothing And
                     (larConditionalQueryEdges.Count > 0 And larWhereEdges.Count > 0)) Or
                     (Me.HeadNode.HasIdentifier And Not Me.QueryEdges(0).IsRecursive And larWhereEdges.Count > 0) Then
-                    lsSQLQuery &= "And "
+                    lsSQLQuery &= "AND "
                     lbIntialWhere = Nothing
                 End If
 
@@ -778,7 +853,16 @@
 
         Public Function getProjectQueryEdges() As List(Of FactEngine.QueryEdge)
 
-            Return Me.QueryEdges.FindAll(Function(x) x.IsProjectColumn).ToList
+            Dim larQueryEdge As List(Of FactEngine.QueryEdge) = Me.QueryEdges.FindAll(Function(x) x.IsProjectColumn).ToList
+
+            'ShortestPath Targets
+            Dim larShortestPathQueryEdge = Me.QueryEdges.FindAll(Function(x) x.IsShortestPath)
+
+            For Each lrQueryEdge In larShortestPathQueryEdge
+                larQueryEdge.AddUnique(lrQueryEdge.GetNextQueryEdge)
+            Next
+
+            Return larQueryEdge
 
         End Function
 

@@ -24,7 +24,14 @@ Namespace FactEngine
         Public IsRecursive As Boolean = False
         Public RecursiveNumber1 As String = Nothing
         Public RecursiveNumber2 As String = Nothing
+        ''' <summary>
+        ''' For graph queries looking for circular paths.
+        ''' </summary>
         Public IsCircular As Boolean = False
+        ''' <summary>
+        ''' For graph queries looking for shortest path.
+        ''' </summary>
+        Public IsShortestPath As Boolean = False
 
         ''' <summary>
         ''' 'E.g. WHICH "Person was armed by WHICH Person 2", rather than "WHICH Person armed Person 2" and where the latter is the primary FactTypeReading predicate.
@@ -365,6 +372,25 @@ Namespace FactEngine
             End Try
 
             Return Nothing
+        End Function
+
+        Public Function GetNextQueryEdge() As FactEngine.QueryEdge
+
+            Try
+
+                Return Me.QueryGraph.QueryEdges(Me.QueryGraph.QueryEdges.IndexOf(Me) + 1)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return Nothing
+            End Try
+
         End Function
 
     End Class

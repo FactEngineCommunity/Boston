@@ -39,6 +39,13 @@
         Public IsTargetNode As Boolean = False
 
         ''' <summary>
+        ''' True if is Target node and is on the other side of a Shortest Path query.
+        '''   E.g. (Account:1) made [SHORTEST PATH 0..10] WHICH Transaction THAT was made to (Account 2:4) 
+        '''   The above would otherwise have Account 2 as a conditional QueryNode/TargetNode, but is taken care of inside the Shortest Path FROM clause processing.
+        ''' </summary>
+        Public IsExcludedConditional As Boolean = False
+
+        ''' <summary>
         ''' The QueryEdge that resulted in this Node being added to the QueryGraph.Nodes collection
         ''' </summary>
         Public QueryEdge As FactEngine.QueryEdge = Nothing

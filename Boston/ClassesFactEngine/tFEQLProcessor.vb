@@ -277,6 +277,16 @@ Namespace FEQL
             End Set
         End Property
 
+        Private _KEYWDSHORTESTPATH As String = Nothing
+        Public Property KEYWDSHORTESTPATH As String
+            Get
+                Return Me._KEYWDSHORTESTPATH
+            End Get
+            Set(value As String)
+                Me._KEYWDSHORTESTPATH = value
+            End Set
+        End Property
+
     End Class
 
     Public Class RETURNCOLUMN

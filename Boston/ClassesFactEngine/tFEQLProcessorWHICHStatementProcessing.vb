@@ -307,6 +307,9 @@
                 If arWHICHCLAUSE.RECURSIVECLAUSE.KEYWDCIRCULAR IsNot Nothing Then
                     arQueryEdge.TargetNode.Alias = "RND" & 100.ToString & New Random().Next(10).ToString
                     arQueryEdge.IsCircular = True
+                ElseIf arWHICHCLAUSE.RECURSIVECLAUSE.KEYWDSHORTESTPATH IsNot Nothing Then
+                    arQueryEdge.TargetNode.Alias = "RND" & 100.ToString & New Random().Next(10).ToString
+                    arQueryEdge.IsShortestPath = True
                 ElseIf arQueryEdge.TargetNode.RDSTable.isCircularToTable(arQueryEdge.BaseNode.RDSTable) Then
                     arQueryEdge.TargetNode.Alias = "RND" & 100.ToString & New Random().Next(10).ToString
                 End If

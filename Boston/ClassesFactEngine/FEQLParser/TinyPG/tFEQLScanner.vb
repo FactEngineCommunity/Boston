@@ -109,7 +109,7 @@ Namespace FEQL
             Patterns.Add(TokenType.FOLLOWINGREADINGTEXT, regex)
             Tokens.Add(TokenType.FOLLOWINGREADINGTEXT)
 
-            regex = new Regex("[aA-zZ0-9 \-]+", RegexOptions.Compiled)
+            regex = new Regex("[aA-zZ0-9 \-\:]+", RegexOptions.Compiled)
             Patterns.Add(TokenType.IDENTIFIER, regex)
             Tokens.Add(TokenType.IDENTIFIER)
 
@@ -149,7 +149,7 @@ Namespace FEQL
             Patterns.Add(TokenType.OPENSQUAREBRACKET, regex)
             Tokens.Add(TokenType.OPENSQUAREBRACKET)
 
-            regex = new Regex(".", RegexOptions.Compiled)
+            regex = new Regex("\.", RegexOptions.Compiled)
             Patterns.Add(TokenType.PERIOD, regex)
             Tokens.Add(TokenType.PERIOD)
 
@@ -665,6 +665,10 @@ Namespace FEQL
             Patterns.Add(TokenType.KEYWDSET, regex)
             Tokens.Add(TokenType.KEYWDSET)
 
+            regex = new Regex("SHORTEST PATH", RegexOptions.Compiled)
+            Patterns.Add(TokenType.KEYWDSHORTESTPATH, regex)
+            Tokens.Add(TokenType.KEYWDSHORTESTPATH)
+
             regex = new Regex("SHOW", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDSHOW, regex)
             Tokens.Add(TokenType.KEYWDSHOW)
@@ -1155,27 +1159,28 @@ Namespace FEQL
         KEYWDRESTRICTEDTO= 281
         KEYWDROLECONSTRAINTS= 282
         KEYWDSET    = 283
-        KEYWDSHOW   = 284
-        KEYWDSUPERTYPE= 285
-        KEYWDTHAT   = 286
-        KEYWDTO     = 287
-        KEYWDTYPE   = 288
-        KEYWDUPDATE = 289
-        KEYWDVALUES = 290
-        KEYWDVALUETYPE= 291
-        KEYWDVALUETYPES= 292
-        KEYWDWHEN   = 293
-        KEYWDWHERE  = 294
-        KEYWDWITH   = 295
-        KEYWDWHAT   = 296
-        KEYWDWHICH  = 297
-        KEYWDWRITTENAS= 298
-        PLUS        = 299
-        MINUS       = 300
-        DIVIDE      = 301
-        TIMES       = 302
-        EXPRESSIONSYMBOL= 303
-        WHITESPACE  = 304
+        KEYWDSHORTESTPATH= 284
+        KEYWDSHOW   = 285
+        KEYWDSUPERTYPE= 286
+        KEYWDTHAT   = 287
+        KEYWDTO     = 288
+        KEYWDTYPE   = 289
+        KEYWDUPDATE = 290
+        KEYWDVALUES = 291
+        KEYWDVALUETYPE= 292
+        KEYWDVALUETYPES= 293
+        KEYWDWHEN   = 294
+        KEYWDWHERE  = 295
+        KEYWDWITH   = 296
+        KEYWDWHAT   = 297
+        KEYWDWHICH  = 298
+        KEYWDWRITTENAS= 299
+        PLUS        = 300
+        MINUS       = 301
+        DIVIDE      = 302
+        TIMES       = 303
+        EXPRESSIONSYMBOL= 304
+        WHITESPACE  = 305
     End Enum
 
     <Serializable()> _
