@@ -103,7 +103,6 @@ Namespace TableFact
             Dim lsSQLQuery As String = ""
             Dim lRecordset As New ADODB.Recordset
             Dim lsMessage As String = ""
-            Dim lsId As String
 
             Try
 
@@ -123,22 +122,15 @@ Namespace TableFact
 
                 If Not lRecordset.EOF Then
                     While Not lRecordset.EOF
-                        lrFact = New FBM.Fact(lRecordset("Symbol").Value, arFactType)
-                        lrFact.isDirty = False
+                        lrFact = New FBM.Fact(lRecordset("Symbol").Value, arFactType, False)
                         For liInd = 1 To arFactType.Arity
-                            lsId = lRecordset("RoleId").Value
-                            lrRole = arFactType.RoleGroup.Find(Function(x) x.Id = lsId)
-                            If lrRole Is Nothing Then
-                                Throw New Exception("Error: GetFactsForFactType: " & vbCrLf & "Could not find Role with RoleId: " & lRecordset("RoleId").Value & vbCrLf & " for Fact with FactId/Symbol: " & lrFact.Symbol & vbCrLf & " for FactType with FactTypeId: " & arFactType.Id & vbCrLf & " in table MetaModelFactData.")
-                            End If
+                            lrRole = arFactType.RoleGroup.Find(Function(x) x.Id = lRecordset("RoleId").Value)
 
                             '--------------------------------------------------------------------------------------------------
                             'Get the Concept from the ModelDictionary so that FactData objects are linked directly to the Concept/Value in the ModelDictionary
                             '--------------------------------------------------------------------------------------------------
                             lrDictionaryEntry = New FBM.DictionaryEntry(arFactType.Model, lRecordset("ValueSymbol").Value, pcenumConceptType.Value)
                             lrDictionaryEntry = arFactType.Model.AddModelDictionaryEntry(lrDictionaryEntry, , False, False, False, True)
-
-                            Dim lrConcept = lrDictionaryEntry.Concept
 
                             If lrDictionaryEntry Is Nothing Then
                                 lsMessage = "Missing ModelDictionary (IsValue) entry for:"
@@ -149,18 +141,15 @@ Namespace TableFact
                                 lsMessage &= vbCrLf & vbCrLf
                                 lsMessage &= vbCrLf & " Reload the Model for the changes to make effect."
 
-                                Dim lrNewDictionaryEntry As New FBM.DictionaryEntry(arFactType.Model, lRecordset("ValueSymbol").Value, pcenumConceptType.Value)
-                                lrNewDictionaryEntry.Save()
-
-                                lrConcept = lrNewDictionaryEntry.Concept
+                                lrDictionaryEntry = New FBM.DictionaryEntry(arFactType.Model, lRecordset("ValueSymbol").Value, pcenumConceptType.Value)
+                                lrDictionaryEntry.Save()
 
                                 Throw New Exception(lsMessage)
                             End If
 
-                            Dim lrFactData As New FBM.FactData(lrRole, lrConcept, lrFact)
+                            Dim lrFactData As New FBM.FactData(lrRole, lrDictionaryEntry.Concept, lrFact)
 
                             lrFactData.isDirty = False
-                            lrFactData.Model = arFactType.Model
                             '-----------------------------
                             'Add the RoleData to the Fact
                             '-----------------------------
@@ -239,13 +228,6 @@ Namespace TableFact
                         'SyncLock arFactType.Fact
                         arFactType.Fact.Add(lrFact)
                         'End SyncLock
-
-                        '-------------------------------------------------------------
-                        'CodeSafe: If there are no Roles for the FactType then abort
-                        '-------------------------------------------------------------
-                        If arFactType.Arity = 0 Then
-                            Exit While
-                        End If
 
                     End While
                 End If

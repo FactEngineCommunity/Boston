@@ -1686,7 +1686,9 @@ Namespace FBM
                         'CodeSafe - Only allow multiple Value realisations.
                         lrDictionaryEntry.AddRealisation(arDictionaryEntry.ConceptType, arDictionaryEntry.ConceptType <> pcenumConceptType.Value)
                     End If
-                    If Me.Loaded And Me.Page.FindAll(Function(x) x.Loaded = False) IsNot Nothing Then arDictionaryEntry.isDirty = True
+                    If Me.Loaded Then
+                        If Me.Page.FindAll(Function(x) x.Loaded = False).Count > 0 Then arDictionaryEntry.isDirty = True
+                    End If
                     Me.ModelDictionary.Add(arDictionaryEntry)
                     If abMakeModelDirty Then
                         Me.MakeDirty(False, abCheckForErrors)
@@ -4332,8 +4334,7 @@ Namespace FBM
             '------------------------------------
             'Get ValueTypes
             '------------------------------------
-            'Richmond.WriteToStatusBar("Loading the Value Types")
-            prApplication.ThrowErrorMessage("Loading ValueTypes", pcenumErrorType.Information)
+            'Richmond.WriteToStatusBar("Loading the Value Types")            
             If TableValueType.GetValueTypeCountByModel(Me.ModelId) > 0 Then
                 '-----------------------------------------------
                 'There are EntityTypes within the ORMDiagram

@@ -182,27 +182,21 @@ Namespace FBM
 
             '--------------------------------------------------------
             'NB Me.isDirty = False by default for DictionaryEntries
-            If Me.Model.Loaded And Me.Model.Page.FindAll(Function(x) x.Loaded = False) IsNot Nothing Then Me.isDirty = abMakeDictionaryEntryDirty
+            If Me.Model.Loaded Then
+                If Me.Model.Page.FindAll(Function(x) x.Loaded = False) IsNot Nothing Then Me.isDirty = abMakeDictionaryEntryDirty
+            End If
 
         End Sub
 
         Public Shadows Function Equals(ByVal other As FBM.DictionaryEntry) As Boolean Implements System.IEquatable(Of FBM.DictionaryEntry).Equals
 
-            If LCase(Me.Symbol) = LCase(other.Symbol) Then
-                Return True
-            Else
-                Return False
-            End If
+            Return LCase(Me.Symbol) = LCase(other.Symbol)
 
         End Function
 
         Public Shadows Function EqualsCase(ByVal other As FBM.DictionaryEntry) As Boolean
 
-            If Me.Symbol = other.Symbol Then
-                Return True
-            Else
-                Return False
-            End If
+            Return Me.Symbol = other.Symbol
 
         End Function
 
@@ -418,8 +412,9 @@ Namespace FBM
             End Select
 
             Me.Realisations.AddUnique(aiConceptType)
-            If Me.Model.Loaded And Me.Model.Page.FindAll(Function(x) x.Loaded = False) IsNot Nothing Then Me.isDirty = True
-
+            If Me.Model.Loaded Then
+                If Me.Model.Page.FindAll(Function(x) x.Loaded = False) IsNot Nothing Then Me.isDirty = True
+            End If
         End Sub
 
         Public Sub AddRealisation(ByVal aiConceptType As pcenumConceptType, Optional ByVal abUnique As Boolean = False)

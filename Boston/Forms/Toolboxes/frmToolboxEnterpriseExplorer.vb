@@ -4220,13 +4220,22 @@ Public Class frmToolboxEnterpriseExplorer
 
     Private Sub FactEngineToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles FactEngineToolStripMenuItem.Click
         With New WaitCursor
-            Dim lrModel As FBM.Model = Me.TreeView.SelectedNode.Tag.Tag
-            If Not lrModel.Loaded Then
-                Call Me.DoModelLoading(lrModel)
-                Call Me.SetWorkingEnvironmentForObject(Me.TreeView.SelectedNode.Tag)
-            End If
+            Try
+                Dim lrModel As FBM.Model = Me.TreeView.SelectedNode.Tag.Tag
+                If Not lrModel.Loaded Then
+                    Call Me.DoModelLoading(lrModel)
+                    Call Me.SetWorkingEnvironmentForObject(Me.TreeView.SelectedNode.Tag)
+                End If
 
-            Call frmMain.LoadFactEngine()
+                Call frmMain.LoadFactEngine()
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
         End With
     End Sub
 
@@ -4246,6 +4255,16 @@ Public Class frmToolboxEnterpriseExplorer
         If e.Button = MouseButtons.Right Then
             Me.TreeView.SelectedNode = e.Node
         End If
+    End Sub
+
+    Private Sub HideAllotherModelsToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles HideAllotherModelsToolStripMenuItem.Click
+
+        For Each lrNode As cTreeNode In Me.TreeView.Nodes(0).Nodes
+            If lrNode IsNot Me.TreeView.SelectedNode Then
+                lrNode.Hidden(False, False) = True
+            End If
+        Next
+
     End Sub
 
 End Class

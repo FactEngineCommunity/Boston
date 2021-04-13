@@ -10,6 +10,8 @@ Namespace FBM
         Implements FBM.iValidationErrorHandler
         'Implements IXmlSerializable
 
+        Public Shadows ConceptType As pcenumConceptType = pcenumConceptType.Fact
+
         <XmlIgnore()> _
         Public FactType As FBM.FactType
 
@@ -53,7 +55,6 @@ Namespace FBM
             '--------------------
             Me.Symbol = System.Guid.NewGuid.ToString
             Me.Id = Me.Symbol
-            Me.ConceptType = pcenumConceptType.Fact
         End Sub
 
         Public Sub New(ByRef arFactType As FBM.FactType, Optional ByVal abMakeDirty As Boolean = False)
@@ -65,13 +66,15 @@ Namespace FBM
 
         End Sub
 
-        Public Sub New(ByVal asFactId As String, ByRef arFactType As FBM.FactType)
+        Public Sub New(ByVal asFactId As String,
+                       ByRef arFactType As FBM.FactType,
+                       Optional abIsDirty As Boolean = True)
 
-            Call Me.New()
             Me.Model = arFactType.Model
             Me.Id = Trim(asFactId)
             Me.Symbol = Me.Id
             Me.FactType = arFactType
+            Me.isDirty = abIsDirty
 
         End Sub
 

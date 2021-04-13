@@ -364,11 +364,19 @@ Namespace TableFactType
                 '  was loaded, so the 'find' function will have returned 'Nothing'
                 '--------------------------------------------------------------
                 Dim lrRole As FBM.Role
-                For Each lrFactType In arModel.FactType
-                    For Each lrRole In lrFactType.RoleGroup.FindAll(Function(p) p.TypeOfJoin = pcenumRoleJoinType.FactType)
-                        lrRole.JoinedORMObject = arModel.FactType.Find(Function(x) x.Id = lrRole.JoinsFactType.Id)
-                    Next
+                Dim larRole = From FactType In arModel.FactType
+                              From Role In FactType.RoleGroup
+                              Where Role.JoinedORMObject Is Nothing
+                              Select Role
+
+                For Each lrRole In larRole
+                    lrRole.JoinedORMObject = arModel.FactType.Find(Function(x) x.Id = lrRole.JoinsFactType.Id)
                 Next
+                'For Each lrFactType In arModel.FactType
+                '    For Each lrRole In lrFactType.RoleGroup.FindAll(Function(p) p.TypeOfJoin = pcenumRoleJoinType.FactType)
+                '        lrRole.JoinedORMObject = arModel.FactType.Find(Function(x) x.Id = lrRole.JoinsFactType.Id)
+                '    Next
+                'Next
 
                 lREcordset.Close()
 

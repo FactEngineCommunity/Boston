@@ -842,7 +842,7 @@ Public Class frmFactEngine
                                                     lrBaseGraphNode.Edge.Add(lrEdge)
                                                 End If
                                             Else
-                                                Debugger.Break()
+                                                'Debugger.Break()
                                             End If
                                         End If
                                         liInd += 1
@@ -1152,8 +1152,10 @@ Public Class frmFactEngine
                             e.SuppressKeyPress = True
                             e.Handled = True
                             Call Me.setAutoCompletePosition()
+                        Case Is = Keys.Back
+                            'Do nothing 
                         Case Else
-                            Call Me.ProcessAutoComplete(New KeyEventArgs(e.KeyCode))
+                            'Call Me.ProcessAutoComplete(New KeyEventArgs(e.KeyCode))
                     End Select
             End Select
 
@@ -1181,7 +1183,9 @@ Public Class frmFactEngine
             '-------------------
             'Get the ParseTree
             '-------------------
-            Me.zrTextHighlighter.Tree = Me.zrParser.Parse(Trim(Me.TextBoxInput.Text))
+            If Not e.KeyCode = Keys.Back Then
+                Me.zrTextHighlighter.Tree = Me.zrParser.Parse(Trim(Me.TextBoxInput.Text))
+            End If
 
             '=================================================================
             'Check valid ModelElement Names
@@ -1197,32 +1201,42 @@ Public Class frmFactEngine
                 Call Me.GetMODELELEMENTParseNodes(Me.zrTextHighlighter.Tree.Nodes(0), larModelElementNameParseNode)
 
                 Dim larModelMatch As New List(Of ModelMatch)
-                For Each lrParseNode In larModelElementNameParseNode
-                    lrModelElement = prApplication.WorkingModel.GetModelObjectByName(lrParseNode.Token.Text)
-                    If lrModelElement Is Nothing Then
-                        Me.TextMarker.AddWord(lrParseNode.Token.StartPos, lrParseNode.Token.Length, Color.Red, "Uknown Model Element")
+                Dim larMissingModelElement = From ParseNode In larModelElementNameParseNode
+                                             Where prApplication.WorkingModel.GetModelObjectByName(ParseNode.Token.Text) Is Nothing
+                                             Select ParseNode
 
-                        For Each lrModel In prApplication.getModelsByModelElementName(lrParseNode.Token.Text)
-                            Dim lrModelMatch = New ModelMatch(lrModel, lrParseNode.Token.Text)
-                            If larModelMatch.Contains(lrModelMatch) Then
-                                larModelMatch.Find(Function(x) x.Model Is lrModelMatch.Model).addKeyWord(lrParseNode.Token.Text)
-                            Else
-                                larModelMatch.Add(lrModelMatch)
-                            End If
-                        Next
-                    End If
+                For Each lrParseNode In larMissingModelElement ' ModelElementNameParseNode
+                    'lrModelElement = prApplication.WorkingModel.GetModelObjectByName(lrParseNode.Token.Text)
+                    'If lrModelElement Is Nothing Then
+                    Me.TextMarker.AddWord(lrParseNode.Token.StartPos, lrParseNode.Token.Length, Color.Red, "Uknown Model Element")
+
+                    For Each lrModel In prApplication.getModelsByModelElementName(lrParseNode.Token.Text)
+                        Dim lrModelMatch = New ModelMatch(lrModel, lrParseNode.Token.Text)
+                        If larModelMatch.Contains(lrModelMatch) Then
+                            larModelMatch.Find(Function(x) x.Model Is lrModelMatch.Model).addKeyWord(lrParseNode.Token.Text)
+                        Else
+                            larModelMatch.Add(lrModelMatch)
+                        End If
+                    Next
+                    'End If
                 Next
 
                 larParseNode = New List(Of FEQL.ParseNode)
                 Call Me.GetPredicateClauseNodes(Me.zrTextHighlighter.Tree.Nodes(0), larModelPredicateClauseParseNode)
+                Dim lsPredicatePartText As String
+
+
+                Dim larPredicateNode As List(Of FEQL.ParseNode)
                 For Each lrParseNode In larModelPredicateClauseParseNode
-                    Dim larPredicateNode As New List(Of FEQL.ParseNode)
+                    larPredicateNode = New List(Of FEQL.ParseNode)
                     Call Me.GetPredicateNodes(lrParseNode, larPredicateNode)
-                    Dim lsPredicatePartText As String = ""
-                    For Each lrPredicateNode In larPredicateNode
-                        lsPredicatePartText &= Trim(lrPredicateNode.Token.Text) & " "
-                    Next
-                    If Not prApplication.WorkingModel.existsPredicatePart(Trim(lsPredicatePartText)) Then
+                    Dim lasPredicate = (From PredicateNode In larPredicateNode
+                                        Select Trim(PredicateNode.Token.Text)).ToArray
+                    lsPredicatePartText = Trim(Strings.Join(lasPredicate, " "))
+                    'For Each lrPredicateNode In larPredicateNode
+                    '    lsPredicatePartText &= Trim(lrPredicateNode.Token.Text) & " "
+                    'Next
+                    If Not prApplication.WorkingModel.existsPredicatePart(lsPredicatePartText) Then
                         Me.TextMarker.AddWord(lrParseNode.Token.StartPos, lrParseNode.Token.Length, Color.Red, "Uknown Predicate")
 
                         For Each lrModel In prApplication.getModelsByPredicatePartText(lsPredicatePartText)
@@ -1386,8 +1400,8 @@ Public Class frmFactEngine
                                     End If
                                 End If
 
-                                    'Predicates
-                                    Dim lrPredicateModelObject As FBM.ModelObject
+                                'Predicates
+                                Dim lrPredicateModelObject As FBM.ModelObject
                                 If lrLastWhichClause.KEYWDAND IsNot Nothing And lrLastWhichClause.KEYWDTHAT.Count = 1 Then
                                     lrModelElement = prApplication.WorkingModel.GetModelObjectByName(lrLastModelElementNameParseNode.Token.Text)
                                 End If
@@ -1877,35 +1891,44 @@ Public Class frmFactEngine
         'Dim lbStartsWith As Boolean = False
         'lbStartsWith = "asdf".StartsWith(zsIntellisenseBuffer, True, System.Globalization.CultureInfo.CurrentUICulture)
 
-        For Each lrEntityType In prApplication.WorkingModel.EntityType.FindAll(Function(x) x.IsMDAModelElement = False)
-            If zsIntellisenseBuffer.Length > 0 Then
-                If LCase(lrEntityType.Name).StartsWith(LCase(zsIntellisenseBuffer), True, System.Globalization.CultureInfo.CurrentUICulture) Then
-                    Call Me.AddEnterpriseAwareItem(lrEntityType.Name, FEQL.TokenType.MODELELEMENTNAME)
-                End If
-            Else
+
+        If zsIntellisenseBuffer.Length > 0 Then
+            For Each lrEntityType In prApplication.WorkingModel.EntityType.FindAll(Function(x) x.IsMDAModelElement = False And
+                                                                                   LCase(x.Name).StartsWith(LCase(zsIntellisenseBuffer), True, System.Globalization.CultureInfo.CurrentUICulture))
                 Call Me.AddEnterpriseAwareItem(lrEntityType.Name, FEQL.TokenType.MODELELEMENTNAME)
-            End If
-        Next
+            Next
+        Else
+            For Each lrEntityType In prApplication.WorkingModel.EntityType.FindAll(Function(x) x.IsMDAModelElement = False)
+                Call Me.AddEnterpriseAwareItem(lrEntityType.Name, FEQL.TokenType.MODELELEMENTNAME)
+            Next
+        End If
 
-        For Each lrValueType In prApplication.WorkingModel.ValueType.FindAll(Function(x) x.IsMDAModelElement = False)
-            If zsIntellisenseBuffer.Length > 0 Then
-                If lrValueType.Name.StartsWith(zsIntellisenseBuffer, True, System.Globalization.CultureInfo.CurrentUICulture) Then
-                    Call Me.AddEnterpriseAwareItem(lrValueType.Name, FEQL.TokenType.MODELELEMENTNAME)
-                End If
-            Else
+
+
+        If zsIntellisenseBuffer.Length > 0 Then
+            For Each lrValueType In prApplication.WorkingModel.ValueType.FindAll(Function(x) x.IsMDAModelElement = False And
+                                                                                 LCase(x.Name).StartsWith(LCase(zsIntellisenseBuffer), True, System.Globalization.CultureInfo.CurrentUICulture))
                 Call Me.AddEnterpriseAwareItem(lrValueType.Name, FEQL.TokenType.MODELELEMENTNAME)
-            End If
-        Next
+            Next
+        Else
+            For Each lrValueType In prApplication.WorkingModel.ValueType.FindAll(Function(x) x.IsMDAModelElement = False)
+                Call Me.AddEnterpriseAwareItem(lrValueType.Name, FEQL.TokenType.MODELELEMENTNAME)
+            Next
+        End If
 
-        For Each lrFactType In prApplication.WorkingModel.FactType.FindAll(Function(x) x.IsObjectified And x.IsMDAModelElement = False)
-            If zsIntellisenseBuffer.Length > 0 Then
-                If lrFactType.Name.StartsWith(zsIntellisenseBuffer, True, System.Globalization.CultureInfo.CurrentUICulture) Then
-                    Call Me.AddEnterpriseAwareItem(lrFactType.Name, FEQL.TokenType.MODELELEMENTNAME)
-                End If
-            Else
+
+
+        If zsIntellisenseBuffer.Length > 0 Then
+            For Each lrFactType In prApplication.WorkingModel.FactType.FindAll(Function(x) x.IsObjectified And x.IsMDAModelElement = False And
+                                                                               LCase(x.Name).StartsWith(LCase(zsIntellisenseBuffer), True, System.Globalization.CultureInfo.CurrentUICulture))
                 Call Me.AddEnterpriseAwareItem(lrFactType.Name, FEQL.TokenType.MODELELEMENTNAME)
-            End If
-        Next
+            Next
+        Else
+            For Each lrFactType In prApplication.WorkingModel.FactType.FindAll(Function(x) x.IsObjectified And x.IsMDAModelElement = False)
+                Call Me.AddEnterpriseAwareItem(lrFactType.Name, FEQL.TokenType.MODELELEMENTNAME)
+            Next
+        End If
+
 
     End Sub
 
@@ -2076,7 +2099,7 @@ Public Class frmFactEngine
 
             'If the user has highlighted a section of a query to execute, execute that.
             If Me.TextBoxQuery.SelectionLength > 0 Then
-                lsQuery = Me.TextBoxInput.SelectedText
+                lsQuery = Me.TextBoxQuery.SelectedText
             End If
 
             lrRecordset = Me.FEQLProcessor.DatabaseManager.GO(lsQuery)
@@ -2396,6 +2419,107 @@ Public Class frmFactEngine
         Catch ex As Exception
 
         End Try
+
+    End Sub
+
+    Private Sub TextBoxQuery_KeyDown(sender As Object, e As KeyEventArgs) Handles TextBoxQuery.KeyDown
+
+        Try
+
+            If e.KeyCode = Keys.F5 Then
+
+                Call Me.TextBoxQueryGO()
+
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
+    Private Sub TextBoxQueryGO()
+
+        Try
+            Dim lrRecordset As ORMQL.Recordset
+
+            'Clear the Graph View because there is not enough information to create a graph.
+            Call Me.clearGraphView()
+
+            If prApplication.WorkingModel.TargetDatabaseConnectionString = "" Then
+                Me.LabelError.ForeColor = Color.Orange
+                Me.LabelError.Text = "The Model needs a database connection string."
+                Exit Sub
+            End If
+
+            Me.LabelError.Text = ""
+
+            'Get the Query from the SQL/Cypher/etc query textbox
+            Dim lsQuery = Me.TextBoxQuery.Text '.Replace(vbLf, " ") 'Leave this here.
+
+            'If the user has highlighted a section of a query to execute, execute that.
+            If Me.TextBoxQuery.SelectionLength > 0 Then
+                lsQuery = Me.TextBoxQuery.SelectedText
+            End If
+
+            lrRecordset = Me.FEQLProcessor.DatabaseManager.GO(lsQuery)
+
+
+            If lrRecordset.ErrorString IsNot Nothing Then
+                Me.LabelError.Show()
+                Me.LabelError.BringToFront()
+                Me.LabelError.Text = lrRecordset.ErrorString
+                Me.TabControl1.SelectedTab = Me.TabPageResults
+            Else
+                Me.TabControl1.SelectedTab = Me.TabPageResults
+                Me.LabelError.Show()
+                Select Case lrRecordset.StatementType
+                    Case Is = FactEngine.pcenumFEQLStatementType.DESCRIBEStatement
+                        Call Me.DesbribeModelElement(lrRecordset.ModelElement)
+                    Case Else
+
+                        Me.LabelError.Text = ""
+
+                        If lrRecordset.Facts.Count = 0 Then
+                            Me.LabelError.ForeColor = Color.Orange
+                            Me.LabelError.Text = "No results returned"
+                        Else
+                            Me.LabelError.ForeColor = Color.Black
+                            Me.LabelError.Text = ""
+
+                            Dim liInd = 0
+                            For Each lsColumnName In lrRecordset.Columns
+                                liInd += 1
+                                Me.LabelError.Text &= " " & lsColumnName & " "
+                                If liInd < lrRecordset.Columns.Count Then Me.LabelError.Text &= ","
+                            Next
+                            Me.LabelError.Text &= vbCrLf & "=======================================" & vbCrLf
+                            For Each lrFact In lrRecordset.Facts
+
+                                Me.LabelError.Text &= lrFact.EnumerateAsBracketedFact(True) & vbCrLf
+                            Next
+                        End If
+                End Select
+            End If
+
+            Me.TabPageResults.Show()
+
+
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
 
     End Sub
 

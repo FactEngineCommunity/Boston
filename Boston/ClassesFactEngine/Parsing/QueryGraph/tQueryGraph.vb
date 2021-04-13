@@ -457,8 +457,8 @@
                         If lrQueryEdge.BaseNode.FBMModelObject.GetType IsNot GetType(FBM.ValueType) Then
                             For Each lrColumn In lrQueryEdge.BaseNode.RDSTable.getPrimaryKeyColumns
                                 If liInd2 > 0 Then lsSQLQuery &= " And "
-                                lsSQLQuery &= lrNaryTable.Name & "." & lrNaryTable.Column.Find(Function(x) x.ActiveRole Is lrColumn.ActiveRole).Name
-                                lsSQLQuery &= "=" & lrColumn.Table.Name & "." & lrColumn.Name & vbCrLf
+                                lsSQLQuery &= "[" & lrNaryTable.Name & "]." & lrNaryTable.Column.Find(Function(x) x.ActiveRole Is lrColumn.ActiveRole).Name
+                                lsSQLQuery &= "=" & "[" & lrColumn.Table.Name & "]." & lrColumn.Name & vbCrLf
                                 liInd2 += 1
                             Next
                             lsSQLQuery &= " And "
@@ -466,8 +466,8 @@
                         liInd2 = 0
                         For Each lrColumn In lrQueryEdge.TargetNode.RDSTable.getPrimaryKeyColumns
                             If liInd2 > 0 Then lsSQLQuery &= " And "
-                            lsSQLQuery &= lrNaryTable.Name & "." & lrNaryTable.Column.Find(Function(x) x.ActiveRole Is lrColumn.ActiveRole).Name
-                            lsSQLQuery &= "=" & lrColumn.Table.Name & "." & lrColumn.Name & vbCrLf
+                            lsSQLQuery &= "[" & lrNaryTable.Name & "]." & lrNaryTable.Column.Find(Function(x) x.ActiveRole Is lrColumn.ActiveRole).Name
+                            lsSQLQuery &= "=" & "[" & lrColumn.Table.Name & "]." & lrColumn.Name & vbCrLf
                             liInd2 += 1
                         Next
                     ElseIf lrQueryEdge.WhichClauseType = pcenumWhichClauseType.AndThatIdentityCompatitor Then
@@ -475,13 +475,13 @@
 
                         lsSQLQuery &= "("
                         For Each lrColumn In lrQueryEdge.BaseNode.RDSTable.getPrimaryKeyColumns
-                            lsSQLQuery &= lrQueryEdge.BaseNode.Name & Viev.NullVal(lrQueryEdge.BaseNode.Alias, "") & "." & lrColumn.Name
+                            lsSQLQuery &= "[" & lrQueryEdge.BaseNode.Name & Viev.NullVal(lrQueryEdge.BaseNode.Alias, "") & "]." & lrColumn.Name
                             If lrQueryEdge.WhichClauseSubType = pcenumWhichClauseType.ISClause Then
                                 lsSQLQuery &= " = "
                             Else
                                 lsSQLQuery &= " <> "
                             End If
-                            lsSQLQuery &= lrQueryEdge.TargetNode.Name & Viev.NullVal(lrQueryEdge.TargetNode.Alias, "") & "." & lrColumn.Name
+                            lsSQLQuery &= "[" & lrQueryEdge.TargetNode.Name & Viev.NullVal(lrQueryEdge.TargetNode.Alias, "") & "]." & lrColumn.Name
                         Next
                         lsSQLQuery &= ")"
 
@@ -516,18 +516,18 @@
                                             Case = pcenumConceptType.ValueType
                                                 'Nothing to do here
                                             Case Else
-                                                lsSQLQuery &= lrRelation.OriginTable.Name & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrRelation.OriginColumns(liColumnCounter).Name & " = "
+                                                lsSQLQuery &= "[" & lrRelation.OriginTable.Name & Viev.NullVal(lrQueryEdge.Alias, "") & "]." & lrRelation.OriginColumns(liColumnCounter).Name & " = "
                                                 Dim lrTargetColumn = lrRelation.DestinationColumns.Find(Function(x) x.ActiveRole Is lrRelation.OriginColumns(liColumnCounter).ActiveRole)
-                                                lsSQLQuery &= lrRelation.DestinationTable.Name & Viev.NullVal(lrQueryEdge.BaseNode.Alias, "") & "." & lrTargetColumn.Name & vbCrLf
+                                                lsSQLQuery &= "[" & lrRelation.DestinationTable.Name & Viev.NullVal(lrQueryEdge.BaseNode.Alias, "") & "]." & lrTargetColumn.Name & vbCrLf
                                         End Select
                                     Case Else
                                         Select Case lrQueryEdge.TargetNode.FBMModelObject.ConceptType
                                             Case = pcenumConceptType.ValueType
                                                 'Nothing to do here
                                             Case Else
-                                                lsSQLQuery &= lrRelation.OriginTable.Name & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrRelation.OriginColumns(liColumnCounter).Name & " = "
+                                                lsSQLQuery &= "[" & lrRelation.OriginTable.Name & Viev.NullVal(lrQueryEdge.Alias, "") & "]." & lrRelation.OriginColumns(liColumnCounter).Name & " = "
                                                 Dim lrTargetColumn = lrRelation.DestinationColumns.Find(Function(x) x.ActiveRole Is lrRelation.OriginColumns(liColumnCounter).ActiveRole)
-                                                lsSQLQuery &= lrRelation.DestinationTable.Name & Viev.NullVal(lrQueryEdge.TargetNode.Alias, "") & "." & lrTargetColumn.Name & vbCrLf
+                                                lsSQLQuery &= "[" & lrRelation.DestinationTable.Name & Viev.NullVal(lrQueryEdge.TargetNode.Alias, "") & "]." & lrTargetColumn.Name & vbCrLf
                                         End Select
                                 End Select
 
@@ -565,7 +565,7 @@
                         lrBaseNode = lrQueryEdge.BaseNode
                         lrTargetNode = New FactEngine.QueryNode(lrQueryEdge.FBMFactType, lrQueryEdge)
 
-                        lsSQLQuery &= lrBaseNode.Name & "." & lrBaseNode.RDSTable.getPrimaryKeyColumns.First.Name & " = " & lrTargetNode.Name & "." & lrBaseNode.RDSTable.getPrimaryKeyColumns.First.Name
+                        lsSQLQuery &= "[" & lrBaseNode.Name & "]." & lrBaseNode.RDSTable.getPrimaryKeyColumns.First.Name & " = " & "[" & lrTargetNode.Name & "]." & lrBaseNode.RDSTable.getPrimaryKeyColumns.First.Name
                     Else
                         Dim lrBaseNode, lrTargetNode As FactEngine.QueryNode
                         If lrQueryEdge.IsReciprocal Then
@@ -612,8 +612,8 @@
                             Dim larTargetColumn = lrQueryEdge.BaseNode.FBMModelObject.getCorrespondingRDSTable.getPrimaryKeyColumns
                             For Each lrColumn In larTargetColumn
                                 Dim lrOriginColumn = lrRelation.OriginColumns.Find(Function(x) x.ActiveRole Is lrColumn.ActiveRole)
-                                lsSQLQuery &= lrQueryEdge.TargetNode.Name & Viev.NullVal(lrQueryEdge.TargetNode.Alias, "") & "." & lrOriginColumn.Name
-                                lsSQLQuery &= " = " & lrQueryEdge.BaseNode.Name & "." & lrColumn.Name
+                                lsSQLQuery &= "[" & lrQueryEdge.TargetNode.Name & Viev.NullVal(lrQueryEdge.TargetNode.Alias, "") & "]." & lrOriginColumn.Name
+                                lsSQLQuery &= " = " & "[" & lrQueryEdge.BaseNode.Name & "]." & lrColumn.Name
                                 If liInd2 < larTargetColumn.Count Then lsSQLQuery &= vbCrLf & "And "
                                 liInd2 += 1
                             Next
@@ -753,7 +753,7 @@
                                                 Where Column.ActiveRole.JoinedORMObject Is lrQueryEdge.TargetNode.FBMModelObject
                                                 Select Column).First
 
-                                lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") & lrTable.Name & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrColumn.Name & " = "
+                                lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") & "[" & lrTable.Name & Viev.NullVal(lrQueryEdge.Alias, "") & "]." & lrColumn.Name & " = "
                                 lsSQLQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lrQueryEdge.IdentifierList(0) & Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
                             Else
                                 lrTable = lrQueryEdge.BaseNode.RDSTable
@@ -763,7 +763,7 @@
                                                 Where Column.ActiveRole.JoinedORMObject Is lrQueryEdge.TargetNode.FBMModelObject
                                                 Select Column).First
 
-                                lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") & lrQueryEdge.BaseNode.RDSTable.Name & Viev.NullVal(lrQueryEdge.BaseNode.Alias, "") & "." & lrColumn.Name & " = "
+                                lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") & "[" & lrQueryEdge.BaseNode.RDSTable.Name & Viev.NullVal(lrQueryEdge.BaseNode.Alias, "") & "]." & lrColumn.Name & " = "
                                 lsSQLQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lrQueryEdge.IdentifierList(0) & Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
                             End If
 
@@ -773,7 +773,7 @@
                             Select Case lrQueryEdge.WhichClauseType
                                 Case Is = pcenumWhichClauseType.BooleanPredicate
 
-                                    lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") & lrQueryEdge.BaseNode.Name & "."
+                                    lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") & "[" & lrQueryEdge.BaseNode.Name & "]."
 
                                     Dim lrTargetTable = lrQueryEdge.BaseNode.FBMModelObject.getCorrespondingRDSTable
                                     Dim lrTargetColumn = lrTargetTable.Column.Find(Function(x) x.FactType Is lrQueryEdge.FBMFactType)
@@ -790,9 +790,9 @@
                                         Dim lrTargetTable = lrQueryEdge.BaseNode.FBMModelObject.getCorrespondingRDSTable
                                         Dim lrTargetColumn = lrTargetTable.Column.Find(Function(x) x.FactType Is lrQueryEdge.FBMFactType)
                                         lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") &
-                                              lrTargetTable.Name &
+                                              "[" & lrTargetTable.Name &
                                               Viev.NullVal(lrQueryEdge.TargetNode.Alias, "") &
-                                              "." &
+                                              "]." &
                                               lrTargetColumn.Name
 
                                         lsSQLQuery &= " " & Viev.GetEnumDescription(lrQueryEdge.TargetNode.MathFunction)
@@ -814,7 +814,7 @@
                                             Else
                                                 Throw New NotImplementedException("Unkown condition in query. Contact support.")
                                             End If
-                                            lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") & lrTargetTable.Name & lsAlias & "." & lrColumn.Name & " = '" & lrQueryEdge.IdentifierList(0) & "'" & vbCrLf
+                                            lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") & "[" & lrTargetTable.Name & lsAlias & "]." & lrColumn.Name & " = '" & lrQueryEdge.IdentifierList(0) & "'" & vbCrLf
                                         Else
                                             If lrQueryEdge.TargetNode.HasIdentifier Then
                                                 lrTargetTable = lrQueryEdge.TargetNode.FBMModelObject.getCorrespondingRDSTable
@@ -829,7 +829,7 @@
                                             liInd = 0
                                             For Each lsIdentifier In lrQueryEdge.IdentifierList
                                                 If liInd > 0 Then lsSQLQuery &= "AND "
-                                                lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") & lrTargetTable.Name & lsAlias & "." & larIndexColumns(liInd).Name & " = '" & lsIdentifier & "'" & vbCrLf
+                                                lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") & "[" & lrTargetTable.Name & lsAlias & "]." & larIndexColumns(liInd).Name & " = '" & lsIdentifier & "'" & vbCrLf
                                                 liInd += 1
                                             Next
                                         End If

@@ -31,8 +31,9 @@ Namespace FBM
         ''' The Fact to which the RoleData belongs.
         ''' </summary>
         ''' <remarks></remarks>
-        <XmlIgnore()> _
-        Public WithEvents Fact As New FBM.Fact 'The Fact within which this RoleData represents a Value. e.g. in Fact P={a,b,c} this RoleData may represent the value, b.
+        <XmlIgnore()>
+        Public WithEvents Fact As FBM.Fact 'The Fact within which this RoleData represents a Value. e.g. in Fact P={a,b,c} this RoleData may represent the value, b.
+        '20210413-VM-Was New FBM.Fact
 
         ''' <summary>
         ''' The Role to which the 'Concept' (Value) is related within the Fact.
