@@ -1654,7 +1654,8 @@ Namespace FBM
                                                 Optional ByVal abMakeModelDirty As Boolean = True,
                                                 Optional ByVal abCheckForErrors As Boolean = False,
                                                 Optional ByVal abStraightSave As Boolean = False,
-                                                Optional ByVal abMatchCase As Boolean = False) As FBM.DictionaryEntry
+                                                Optional ByVal abMatchCase As Boolean = False,
+                                                Optional ByVal abMakeDirtyIfNotExists As Boolean = False) As FBM.DictionaryEntry
 
             Try
                 Dim lrDictionaryEntry As FBM.DictionaryEntry
@@ -1680,12 +1681,12 @@ Namespace FBM
                 Else
                     '----------------------------------------------
                     'Add a the new Concept to the ModelDictionary
-                    '----------------------------------------------
-                    lrDictionaryEntry = arDictionaryEntry
+                    '----------------------------------------------                    
                     If abAppendRealisations Then
                         'CodeSafe - Only allow multiple Value realisations.
-                        lrDictionaryEntry.AddRealisation(arDictionaryEntry.ConceptType, arDictionaryEntry.ConceptType <> pcenumConceptType.Value)
+                        arDictionaryEntry.AddRealisation(arDictionaryEntry.ConceptType, arDictionaryEntry.ConceptType <> pcenumConceptType.Value)
                     End If
+                    arDictionaryEntry.isDirty = abMakeDirtyIfNotExists
                     If Me.Loaded Then
                         If Me.Page.FindAll(Function(x) x.Loaded = False).Count > 0 Then arDictionaryEntry.isDirty = True
                     End If
@@ -1693,6 +1694,7 @@ Namespace FBM
                     If abMakeModelDirty Then
                         Me.MakeDirty(False, abCheckForErrors)
                     End If
+                    lrDictionaryEntry = arDictionaryEntry
                 End If
 
                 Return lrDictionaryEntry

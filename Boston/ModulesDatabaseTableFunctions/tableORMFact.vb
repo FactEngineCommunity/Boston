@@ -130,7 +130,7 @@ Namespace TableFact
                             'Get the Concept from the ModelDictionary so that FactData objects are linked directly to the Concept/Value in the ModelDictionary
                             '--------------------------------------------------------------------------------------------------
                             lrDictionaryEntry = New FBM.DictionaryEntry(arFactType.Model, lRecordset("ValueSymbol").Value, pcenumConceptType.Value)
-                            lrDictionaryEntry = arFactType.Model.AddModelDictionaryEntry(lrDictionaryEntry, , False, False, False, True)
+                            lrDictionaryEntry = arFactType.Model.AddModelDictionaryEntry(lrDictionaryEntry, , False, False, False, True, True)
 
                             If lrDictionaryEntry Is Nothing Then
                                 lsMessage = "Missing ModelDictionary (IsValue) entry for:"
@@ -197,7 +197,7 @@ Namespace TableFact
                         'Get the Concept from the ModelDictionary so that Facts are linked directly to the Concept/Value.
                         '--------------------------------------------------------------------------------------------------
                         lrDictionaryEntry = New FBM.DictionaryEntry(arFactType.Model, lrFact.Id, pcenumConceptType.Fact)
-                        lrDictionaryEntry = arFactType.Model.AddModelDictionaryEntry(lrDictionaryEntry, True, False)
+                        lrDictionaryEntry = arFactType.Model.AddModelDictionaryEntry(lrDictionaryEntry, True, True, False, False, False, True)
 
                         If lrDictionaryEntry IsNot Nothing Then
                             lrDictionaryEntry.LongDescription = lrFact.LongDescription

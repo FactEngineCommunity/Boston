@@ -108,7 +108,7 @@ Namespace TableValueTypeValueConstraint
                             '------------------------------------------------------
                             lrDictionaryEntry = arValueType.Model.ModelDictionary.Find(AddressOf lrDictionaryEntry.Equals)
                         Else
-                            arValueType.Model.AddModelDictionaryEntry(lrDictionaryEntry, True, False)
+                            arValueType.Model.AddModelDictionaryEntry(lrDictionaryEntry, True, False, False, False, True, True)
                         End If
 
                         '-----------------------------------------
