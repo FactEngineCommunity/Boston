@@ -197,7 +197,7 @@ Namespace TableModelDictionary
             '-----------------------------
             'Initialise the return value
             '-----------------------------
-            GetDictionaryEntriesByModel = New List(Of FBM.DictionaryEntry)
+            ar_model.ModelDictionary = New List(Of FBM.DictionaryEntry)
 
             Try
                 '---------------------------------------------
@@ -254,7 +254,8 @@ Namespace TableModelDictionary
                             'Call lrDictionaryEntry.GenerateKLIdentityLetter(GetDictionaryEntriesByModel, 1)
                         End If
 
-                        GetDictionaryEntriesByModel.Add(lrDictionaryEntry)
+                        ar_model.ModelDictionary.Add(lrDictionaryEntry)
+                        ar_model.Dictionary.Add(lrDictionaryEntry.Symbol, ar_model.ModelDictionary.Count - 1)
                         lREcordset.MoveNext()
                     End While
                 End If

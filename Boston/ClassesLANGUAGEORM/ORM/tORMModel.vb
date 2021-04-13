@@ -91,8 +91,12 @@ Namespace FBM
         <XmlIgnore()>
         Public [Namespace] As ClientServer.Namespace
 
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public CreatedByUserId As String = "" 'The User who created the Model when in Client/Server mode.
+
+
+        <XmlIgnore()>
+        Public [Dictionary] As New Dictionary(Of String, Integer)
 
         <XmlIgnore()> _
         <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
@@ -1658,14 +1662,17 @@ Namespace FBM
                                                 Optional ByVal abMakeDirtyIfNotExists As Boolean = False) As FBM.DictionaryEntry
 
             Try
-                Dim lrDictionaryEntry As FBM.DictionaryEntry
+                Dim lrDictionaryEntry As FBM.DictionaryEntry = Nothing
 
                 If abStraightSave Then
                     lrDictionaryEntry = arDictionaryEntry
                 ElseIf abMatchCase Then
-                    lrDictionaryEntry = Me.ModelDictionary.Find(AddressOf arDictionaryEntry.EqualsCase)
+                    If Me.Dictionary.ContainsKey(arDictionaryEntry.Symbol) Then
+                        lrDictionaryEntry = Me.ModelDictionary(Me.Dictionary(arDictionaryEntry.Symbol))
+                    End If
+                    'lrDictionaryEntry = Me.ModelDictionary.Find(AddressOf arDictionaryEntry.EqualsCase)
                 Else
-                    lrDictionaryEntry = Me.ModelDictionary.Find(AddressOf arDictionaryEntry.Equals)
+                        lrDictionaryEntry = Me.ModelDictionary.Find(AddressOf arDictionaryEntry.Equals)
                 End If
 
                 If lrDictionaryEntry IsNot Nothing Then
@@ -1695,6 +1702,7 @@ Namespace FBM
                         Me.MakeDirty(False, abCheckForErrors)
                     End If
                     lrDictionaryEntry = arDictionaryEntry
+                    Me.Dictionary.Add(lrDictionaryEntry.Symbol, Me.ModelDictionary.Count - 1)
                 End If
 
                 Return lrDictionaryEntry
@@ -2725,6 +2733,7 @@ Namespace FBM
                 If arDictionaryEntry.Realisations.Count <= 1 Then
 
                     Me.ModelDictionary.Remove(arDictionaryEntry)
+                    Me.Dictionary.Remove(arDictionaryEntry.Symbol)
 
                     If abDoDatabaseProcessing Then
                         TableModelDictionary.DeleteModelDictionaryEntry(arDictionaryEntry)
@@ -4330,7 +4339,7 @@ Namespace FBM
             'Richmond.WriteToStatusBar("Loading the ModelDictionary")
 
             If TableModelDictionary.GetModelDictionaryCountByModel(Me) > 0 Then
-                Me.ModelDictionary = TableModelDictionary.GetDictionaryEntriesByModel(Me)
+                Call TableModelDictionary.GetDictionaryEntriesByModel(Me)
             End If
 
             '------------------------------------

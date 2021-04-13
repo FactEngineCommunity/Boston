@@ -11,6 +11,7 @@ Namespace FBM
     <Serializable()> _
     Public Class DictionaryEntry
         Implements IEquatable(Of DictionaryEntry)
+        Implements IComparer(Of DictionaryEntry)
         Implements Relational.iObjectRelationalMap(Of DictionaryEntry)
 
         '--------------------------------------------------------------------------------------------------------------------------
@@ -646,6 +647,10 @@ Namespace FBM
 
         Public Function Load() As DictionaryEntry Implements iObjectRelationalMap(Of DictionaryEntry).Load
             Throw New NotImplementedException()
+        End Function
+
+        Public Function Compare(x As DictionaryEntry, y As DictionaryEntry) As Integer Implements IComparer(Of DictionaryEntry).Compare
+            Return StrComp(x.Symbol, y.Symbol)
         End Function
 
     End Class

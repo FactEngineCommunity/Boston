@@ -205,13 +205,17 @@ Namespace FBM
             Me.ConceptType = pcenumConceptType.RoleData
         End Sub
 
-        Public Sub New(ByRef arRole As FBM.Role, ByRef arConcept As FBM.Concept, Optional ByRef arFact As FBM.Fact = Nothing)
+        Public Sub New(ByRef arRole As FBM.Role,
+                       ByRef arConcept As FBM.Concept,
+                       Optional ByRef arFact As FBM.Fact = Nothing,
+                       Optional ByRef abIsDirty As Boolean = True)
 
             Me.ConceptType = pcenumConceptType.RoleData
             Me.Model = arRole.Model
             Me.Role = arRole
             Me.Concept = arConcept
             Me.Symbol = arConcept.Symbol
+            Me.isDirty = abIsDirty
 
             If arFact IsNot Nothing Then
                 Me.Fact = arFact

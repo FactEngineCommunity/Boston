@@ -120,11 +120,17 @@ Namespace TableFact
 
                 lRecordset.Open(lsSQLQuery)
 
+                Dim lrRoleDictionary As New Dictionary(Of String, Integer)
+                For liInd = 1 To arFactType.Arity
+                    lrRoleDictionary.Add(arFactType.RoleGroup(liInd - 1).Id, liInd - 1)
+                Next
+
                 If Not lRecordset.EOF Then
                     While Not lRecordset.EOF
                         lrFact = New FBM.Fact(lRecordset("Symbol").Value, arFactType, False)
                         For liInd = 1 To arFactType.Arity
-                            lrRole = arFactType.RoleGroup.Find(Function(x) x.Id = lRecordset("RoleId").Value)
+
+                            lrRole = arFactType.RoleGroup(lrRoleDictionary(lRecordset("RoleId").Value)) '.Find(Function(x) x.Id = lRecordset("RoleId").Value)
 
                             '--------------------------------------------------------------------------------------------------
                             'Get the Concept from the ModelDictionary so that FactData objects are linked directly to the Concept/Value in the ModelDictionary
@@ -147,9 +153,7 @@ Namespace TableFact
                                 Throw New Exception(lsMessage)
                             End If
 
-                            Dim lrFactData As New FBM.FactData(lrRole, lrDictionaryEntry.Concept, lrFact)
-
-                            lrFactData.isDirty = False
+                            Dim lrFactData As New FBM.FactData(lrRole, lrDictionaryEntry.Concept, lrFact, False)
                             '-----------------------------
                             'Add the RoleData to the Fact
                             '-----------------------------
@@ -158,6 +162,7 @@ Namespace TableFact
                             'Add the RoleData to the Role as well
                             '-------------------------------------
                             lrRole.Data.Add(lrFactData)
+
                             'If Not lrRole.JoinedORMObject.Instance.Exists(Function(x) x = lrFactData.Data) Then
                             lrRole.JoinedORMObject.Instance.AddUnique(lrFactData.Data)
                             'End If
