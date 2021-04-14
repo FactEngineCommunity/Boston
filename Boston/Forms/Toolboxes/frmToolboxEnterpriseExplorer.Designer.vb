@@ -64,6 +64,7 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.ToolStripSeparator1 = New System.Windows.Forms.ToolStripSeparator()
         Me.EmptyModelToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.HideToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.HideAllotherModelsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.RenameToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.DeleteModelToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripSeparator3 = New System.Windows.Forms.ToolStripSeparator()
@@ -87,7 +88,6 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.ToolTip = New System.Windows.Forms.ToolTip(Me.components)
         Me.Panel1 = New System.Windows.Forms.Panel()
         Me.TreeView = New Boston.BostonTreeView()
-        Me.HideAllotherModelsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.GroupBox_main.SuspendLayout()
         Me.ContextMenuStrip_Page.SuspendLayout()
         Me.ContextMenuStrip_ORMModel.SuspendLayout()
@@ -246,10 +246,9 @@ Partial Class frmToolboxEnterpriseExplorer
         '
         'ContextMenuStrip_Page
         '
-        Me.ContextMenuStrip_Page.ImageScalingSize = New System.Drawing.Size(24, 24)
         Me.ContextMenuStrip_Page.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.EditPageToolStripMenuItem, Me.DeletePageToolStripMenuItem, Me.ToolStripMenuItemEditPageAsORMDiagram, Me.ToolStripMenuItem2, Me.ToolStripSeparator4, Me.CopyPageToolStripMenuItem})
         Me.ContextMenuStrip_Page.Name = "ContextMenuStrip_Page"
-        Me.ContextMenuStrip_Page.Size = New System.Drawing.Size(224, 160)
+        Me.ContextMenuStrip_Page.Size = New System.Drawing.Size(216, 120)
         '
         'EditPageToolStripMenuItem
         '
@@ -291,10 +290,9 @@ Partial Class frmToolboxEnterpriseExplorer
         '
         'ContextMenuStrip_ORMModel
         '
-        Me.ContextMenuStrip_ORMModel.ImageScalingSize = New System.Drawing.Size(24, 24)
         Me.ContextMenuStrip_ORMModel.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ViewModelDictionaryToolStripMenuItem, Me.ViewGlossaryToolStripMenuItem, Me.GenerateDocumentationToolStripMenuItem, Me.CodeGenerationToolStripMenuItem, Me.FactEngineToolStripMenuItem, Me.ToolStripSeparator7, Me.AddPageToolStripMenuItem1, Me.ToolStripMenuItemPastePage, Me.ToolStripMenuItemLanguage, Me.ToolStripSeparator1, Me.EmptyModelToolStripMenuItem, Me.HideToolStripMenuItem, Me.HideAllotherModelsToolStripMenuItem, Me.RenameToolStripMenuItem, Me.DeleteModelToolStripMenuItem, Me.ToolStripSeparator3, Me.ToolStripMenuItemModelConfiguration, Me.ToolStripSeparator5, Me.ImportExportToolStripMenuItem})
         Me.ContextMenuStrip_ORMModel.Name = "ContextMenuStrip_ORMModel"
-        Me.ContextMenuStrip_ORMModel.Size = New System.Drawing.Size(216, 500)
+        Me.ContextMenuStrip_ORMModel.Size = New System.Drawing.Size(208, 358)
         '
         'ViewModelDictionaryToolStripMenuItem
         '
@@ -419,6 +417,12 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.HideToolStripMenuItem.Name = "HideToolStripMenuItem"
         Me.HideToolStripMenuItem.Size = New System.Drawing.Size(215, 30)
         Me.HideToolStripMenuItem.Text = "&Hide"
+        '
+        'HideAllotherModelsToolStripMenuItem
+        '
+        Me.HideAllotherModelsToolStripMenuItem.Name = "HideAllotherModelsToolStripMenuItem"
+        Me.HideAllotherModelsToolStripMenuItem.Size = New System.Drawing.Size(215, 30)
+        Me.HideAllotherModelsToolStripMenuItem.Text = "Hide all &other models"
         '
         'RenameToolStripMenuItem
         '
@@ -557,12 +561,6 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.TreeView.SelectedNode = Nothing
         Me.TreeView.Size = New System.Drawing.Size(380, 482)
         Me.TreeView.TabIndex = 0
-        '
-        'HideAllotherModelsToolStripMenuItem
-        '
-        Me.HideAllotherModelsToolStripMenuItem.Name = "HideAllotherModelsToolStripMenuItem"
-        Me.HideAllotherModelsToolStripMenuItem.Size = New System.Drawing.Size(215, 30)
-        Me.HideAllotherModelsToolStripMenuItem.Text = "Hide all &other models"
         '
         'frmToolboxEnterpriseExplorer
         '
