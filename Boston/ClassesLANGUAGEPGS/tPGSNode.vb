@@ -234,6 +234,19 @@ Namespace PGS
                                 Optional ByVal asSelectedGridItemLabel As String = "")
             Try
 
+                If IsSomething(aoChangedPropertyItem) Then
+                    Select Case aoChangedPropertyItem.ChangedItem.PropertyDescriptor.Name
+                        Case Is = "Name"
+                            '-----------------------------------------------------------------------------
+                            'Update the Model.
+                            '  GUI is updated via the event triggered, (Me)FactData.ConceptSymbolUpdated
+                            '-----------------------------------------------------------------------------
+                            'Me.FactData.Data = Me.Name
+                            Call Me.RDSTable.FBMModelElement.setName(Me.Name)
+                            Call Me.Model.Save()
+                    End Select
+                End If
+
             Catch ex As Exception
 
             End Try
