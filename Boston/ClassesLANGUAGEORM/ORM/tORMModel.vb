@@ -1688,7 +1688,7 @@ Namespace FBM
                 Else
                     '----------------------------------------------
                     'Add a the new Concept to the ModelDictionary
-                    '----------------------------------------------                    
+                    '----------------------------------------------    
                     If abAppendRealisations Then
                         'CodeSafe - Only allow multiple Value realisations.
                         arDictionaryEntry.AddRealisation(arDictionaryEntry.ConceptType, arDictionaryEntry.ConceptType <> pcenumConceptType.Value)
@@ -4453,6 +4453,11 @@ Namespace FBM
             'Flush unused ModelDictionary entries
             '--------------------------------------
             For Each lrDictionaryEntry In Me.ModelDictionary.FindAll(Function(x) (x.Realisations.Count = 0) And Not x.isGeneralConcept)
+
+                'Dim larDictionaryEntry = From Entry In Me.ModelDictionary
+                '                         Where Entry.Symbol = lrDictionaryEntry.Symbol
+                '                         Select Entry
+
                 Me.RemoveDictionaryEntry(lrDictionaryEntry, True)
             Next
 

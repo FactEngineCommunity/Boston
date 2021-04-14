@@ -89,6 +89,9 @@ Namespace TableValueTypeValueConstraint
 
                 If Not lREcordset.EOF Then
                     While Not lREcordset.EOF
+
+                        '--------------------------------------------------------------------------
+                        'Add the Concept/Symbol/Value to the value_constraint' for this ValueType                        
                         arValueType.ValueConstraint.Add(lREcordset("Symbol").Value)
 
                         Dim lrDictionaryEntry As FBM.DictionaryEntry = New FBM.DictionaryEntry(arValueType.Model, lREcordset("Symbol").Value, pcenumConceptType.Value)
@@ -99,23 +102,8 @@ Namespace TableValueTypeValueConstraint
                         '  ModelDictionary (e.g. The same 'Value'
                         '  may be within many ValueConstraints/Facts
                         '--------------------------------------------
-                        If arValueType.Model.ModelDictionary.Exists(AddressOf lrDictionaryEntry.Equals) Then
-                            '------------------------------------------------------
-                            'The ModelDictionary already containst the lrConcept.
-                            '  Set the Concept to the ModelDictionary entry
-                            '  so that the Concept/Value is linked to the 
-                            '  ModelDictionary entry for the Concept/Value
-                            '------------------------------------------------------
-                            lrDictionaryEntry = arValueType.Model.ModelDictionary.Find(AddressOf lrDictionaryEntry.Equals)
-                        Else
-                            arValueType.Model.AddModelDictionaryEntry(lrDictionaryEntry, True, False, False, False, True, True)
-                        End If
+                        lrDictionaryEntry = arValueType.Model.AddModelDictionaryEntry(lrDictionaryEntry, True, True, False, False, True, True)
 
-                        '-----------------------------------------
-                        'Add the Concept/Symbol/Value to the
-                        '  'value_constraint' for this ValueType
-                        '-----------------------------------------
-                        'arValueType.ValueConstraint.Add(lrDictionaryEntry.Symbol)
 
                         lREcordset.MoveNext()
                     End While
