@@ -182,7 +182,7 @@ Namespace TableRoleConstraint
                         'Link to the Concept within the ModelDictionary
                         '------------------------------------------------
                         Dim lrDictionaryEntry As New FBM.DictionaryEntry(arModel, lrRoleConstraint.Id, pcenumConceptType.RoleConstraint, lrRoleConstraint.ShortDescription, lrRoleConstraint.LongDescription)
-                        lrDictionaryEntry = arModel.AddModelDictionaryEntry(lrDictionaryEntry)
+                        lrDictionaryEntry = arModel.AddModelDictionaryEntry(lrDictionaryEntry, True, False, False, False, True, True)
 
                         If lrDictionaryEntry Is Nothing Then
                             lsMessage = "Cannot find DictionaryEntry in the ModelDictionary for RoleConstraint:"

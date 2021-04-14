@@ -230,6 +230,15 @@ Namespace PGS
 
         End Sub
 
+        Public Sub RefreshShape(Optional ByVal aoChangedPropertyItem As PropertyValueChangedEventArgs = Nothing,
+                                Optional ByVal asSelectedGridItemLabel As String = "")
+            Try
+
+            Catch ex As Exception
+
+            End Try
+        End Sub
+
         Public Sub RepellNeighbouringPageObjects(aiDepth As Integer) Implements FBM.iPageObject.RepellNeighbouringPageObjects
 
         End Sub
