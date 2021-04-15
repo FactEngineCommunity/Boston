@@ -215,7 +215,11 @@
                             lsSQLQuery &= vbCrLf & ")"
                             lsSQLQuery &= vbCrLf & " SELECT " & Strings.Join(lasColumnName.ToArray, ",") & ",depth"
                             lsSQLQuery &= vbCrLf & " FROM nodes"
-                            lsSQLQuery &= vbCrLf & " WHERE depth = (SELECT MAX(depth) FROM nodes N2) - 1) " & lrPGSRelationTable.Name & lrQueryEdge.TargetNode.Alias
+                            lsSQLQuery &= vbCrLf & " WHERE depth <= (SELECT MIN(depth) FROM nodes N2 "
+                            If lrQueryEdge.BaseNode.HasIdentifier Then
+                                lsSQLQuery &= " WHERE " & "N2." & larJoinColumn(1).Name & " = " & lrQueryEdge.BaseNode.IdentifierList(0)
+                            End If
+                            lsSQLQuery &= "))" & lrPGSRelationTable.Name & lrQueryEdge.TargetNode.Alias
                             'MAX - 1 because is circular and could go on forever, and so LIMIT may stop half way through the last circular set of references.
 #End Region
                         ElseIf lrQueryEdge.IsShortestPath Then
