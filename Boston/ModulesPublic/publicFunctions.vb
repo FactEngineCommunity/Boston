@@ -15,9 +15,16 @@ Namespace Richmond
 
     Public Module publicFunctions
 
+        Private ReadOnly random As Random = New Random()
+
+        Public Function RandomString(ByVal length As Integer) As String
+            Const chars As String = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+            Return New String(Enumerable.Repeat(chars, length).[Select](Function(s) s(random.[Next](s.Length))).ToArray())
+        End Function
+
         Public Declare Function GetAsyncKeyState Lib "user32" (ByVal vKey As System.Windows.Forms.Keys) As Integer 'was vKey As Long
 
-        <Extension()> _
+        <Extension()>
         Public Sub Add(Of T)(ByRef arr As T(), ByVal item As T)
             Array.Resize(arr, arr.Length + 1)
             arr(arr.Length - 1) = item
@@ -221,17 +228,17 @@ Namespace Richmond
         ''' <param name="asFieldList"></param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Function DisplayGenericSelectForm(ByRef arGenericSelection As tGenericSelection, _
-                                                 ByVal as_form_title As String, _
-                                                 ByVal as_select_object As String, _
-                                                 ByVal as_select_field As String, _
-                                                 ByVal as_index_field As String, _
-                                                 Optional ByVal as_where_clause As String = "", _
-                                                 Optional ByVal ao_combobox_item As tComboboxItem = Nothing, _
-                                                 Optional ByVal aiComboboxStyle As pcenumComboBoxStyle = pcenumComboBoxStyle.DropdownList, _
-                                                 Optional ByVal asOrderByFields As String = Nothing, _
-                                                 Optional ByVal aiSelectColumn As Integer = 1, _
-                                                 Optional ByVal asColumnWidthString As String = "100", _
+        Public Function DisplayGenericSelectForm(ByRef arGenericSelection As tGenericSelection,
+                                                 ByVal as_form_title As String,
+                                                 ByVal as_select_object As String,
+                                                 ByVal as_select_field As String,
+                                                 ByVal as_index_field As String,
+                                                 Optional ByVal as_where_clause As String = "",
+                                                 Optional ByVal ao_combobox_item As tComboboxItem = Nothing,
+                                                 Optional ByVal aiComboboxStyle As pcenumComboBoxStyle = pcenumComboBoxStyle.DropdownList,
+                                                 Optional ByVal asOrderByFields As String = Nothing,
+                                                 Optional ByVal aiSelectColumn As Integer = 1,
+                                                 Optional ByVal asColumnWidthString As String = "100",
                                                  Optional ByVal asFieldList As String = ""
                                                  ) As DialogResult
 

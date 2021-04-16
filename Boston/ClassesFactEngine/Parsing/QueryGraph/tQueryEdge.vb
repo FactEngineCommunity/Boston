@@ -15,6 +15,10 @@ Namespace FactEngine
 
         Public IdentifierList As New List(Of String)
 
+        Public IsSubQueryLeader As Boolean = False
+        Public IsPartOfSubQuery As Boolean = False
+        Public SubQueryAlias As String = ""
+
         Public FBMFactType As FBM.FactType = Nothing
 
         Public FBMFactTypeReading As FBM.FactTypeReading = Nothing
@@ -378,7 +382,53 @@ Namespace FactEngine
 
             Try
 
-                Return Me.QueryGraph.QueryEdges(Me.QueryGraph.QueryEdges.IndexOf(Me) + 1)
+                If Me.QueryGraph.QueryEdges.IndexOf(Me) < Me.QueryGraph.QueryEdges.Count - 1 Then
+                    Return Me.QueryGraph.QueryEdges(Me.QueryGraph.QueryEdges.IndexOf(Me) + 1)
+                Else
+                    Return Nothing
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return Nothing
+            End Try
+
+        End Function
+
+        Public Function GetPreviousQueryEdge() As FactEngine.QueryEdge
+
+            Try
+
+                If Me.QueryGraph.QueryEdges.IndexOf(Me) > 0 Then
+                    Return Me.QueryGraph.QueryEdges(Me.QueryGraph.QueryEdges.IndexOf(Me) - 1)
+                Else
+                    Return Nothing
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return Nothing
+            End Try
+
+        End Function
+
+        Public Function HasPreviousQueryEdge() As Boolean
+
+            Try
+
+                Return Me.QueryGraph.QueryEdges.IndexOf(Me) > 0
 
             Catch ex As Exception
                 Dim lsMessage As String

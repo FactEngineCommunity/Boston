@@ -109,7 +109,7 @@ Namespace FEQL
             Patterns.Add(TokenType.FOLLOWINGREADINGTEXT, regex)
             Tokens.Add(TokenType.FOLLOWINGREADINGTEXT)
 
-            regex = new Regex("[aA-zZ0-9 \-\:]+", RegexOptions.Compiled)
+            regex = new Regex("[aA-zZ0-9 \-\:/]+", RegexOptions.Compiled)
             Patterns.Add(TokenType.IDENTIFIER, regex)
             Tokens.Add(TokenType.IDENTIFIER)
 
@@ -592,6 +592,10 @@ Namespace FEQL
             regex = new Regex("MODEL.DICTIONARY", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDMODELDICTIONARY, regex)
             Tokens.Add(TokenType.KEYWDMODELDICTIONARY)
+
+            regex = new Regex("NO", RegexOptions.Compiled)
+            Patterns.Add(TokenType.KEYWDNO, regex)
+            Tokens.Add(TokenType.KEYWDNO)
 
             regex = new Regex("", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDNULL, regex)
@@ -1141,46 +1145,47 @@ Namespace FEQL
         KEYWDMODEL  = 263
         KEYWDMODELNOTES= 264
         KEYWDMODELDICTIONARY= 265
-        KEYWDNULL   = 266
-        KEYWDOBJECT = 267
-        KEYWDOCCURSATLEASTONETIME= 268
-        KEYWDOCCURSATLEASTONETIMEINEACHOF= 269
-        KEYWDOF     = 270
-        KEYWDON     = 271
-        KEYWDONE    = 272
-        KEYWDONPAGE = 273
-        KEYWDOPEN   = 274
-        KEYWDOR     = 275
-        KEYWDPAGE   = 276
-        KEYWDPREDICATE= 277
-        KEYWDRETURN = 278
-        KEYWDROLE   = 279
-        KEYWDSELECT = 280
-        KEYWDRESTRICTEDTO= 281
-        KEYWDROLECONSTRAINTS= 282
-        KEYWDSET    = 283
-        KEYWDSHORTESTPATH= 284
-        KEYWDSHOW   = 285
-        KEYWDSUPERTYPE= 286
-        KEYWDTHAT   = 287
-        KEYWDTO     = 288
-        KEYWDTYPE   = 289
-        KEYWDUPDATE = 290
-        KEYWDVALUES = 291
-        KEYWDVALUETYPE= 292
-        KEYWDVALUETYPES= 293
-        KEYWDWHEN   = 294
-        KEYWDWHERE  = 295
-        KEYWDWITH   = 296
-        KEYWDWHAT   = 297
-        KEYWDWHICH  = 298
-        KEYWDWRITTENAS= 299
-        PLUS        = 300
-        MINUS       = 301
-        DIVIDE      = 302
-        TIMES       = 303
-        EXPRESSIONSYMBOL= 304
-        WHITESPACE  = 305
+        KEYWDNO     = 266
+        KEYWDNULL   = 267
+        KEYWDOBJECT = 268
+        KEYWDOCCURSATLEASTONETIME= 269
+        KEYWDOCCURSATLEASTONETIMEINEACHOF= 270
+        KEYWDOF     = 271
+        KEYWDON     = 272
+        KEYWDONE    = 273
+        KEYWDONPAGE = 274
+        KEYWDOPEN   = 275
+        KEYWDOR     = 276
+        KEYWDPAGE   = 277
+        KEYWDPREDICATE= 278
+        KEYWDRETURN = 279
+        KEYWDROLE   = 280
+        KEYWDSELECT = 281
+        KEYWDRESTRICTEDTO= 282
+        KEYWDROLECONSTRAINTS= 283
+        KEYWDSET    = 284
+        KEYWDSHORTESTPATH= 285
+        KEYWDSHOW   = 286
+        KEYWDSUPERTYPE= 287
+        KEYWDTHAT   = 288
+        KEYWDTO     = 289
+        KEYWDTYPE   = 290
+        KEYWDUPDATE = 291
+        KEYWDVALUES = 292
+        KEYWDVALUETYPE= 293
+        KEYWDVALUETYPES= 294
+        KEYWDWHEN   = 295
+        KEYWDWHERE  = 296
+        KEYWDWITH   = 297
+        KEYWDWHAT   = 298
+        KEYWDWHICH  = 299
+        KEYWDWRITTENAS= 300
+        PLUS        = 301
+        MINUS       = 302
+        DIVIDE      = 303
+        TIMES       = 304
+        EXPRESSIONSYMBOL= 305
+        WHITESPACE  = 306
     End Enum
 
     <Serializable()> _

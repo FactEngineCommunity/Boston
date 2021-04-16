@@ -38,7 +38,8 @@
         ''' Generates SQL to run against the database for this QueryGraph
         ''' </summary>
         ''' <returns></returns>
-        Public Function generateSQL(ByRef arWhichSelectStatement As FEQL.WHICHSELECTStatement) As String
+        Public Function generateSQL(ByRef arWhichSelectStatement As FEQL.WHICHSELECTStatement,
+                                    Optional ByVal abIsCountStarSubQuery As Boolean = False) As String
 
             Dim lsSQLQuery As String = ""
             Dim liInd As Integer
@@ -49,74 +50,78 @@
                 Call Me.setNodeAliases()
                 Call Me.setQueryEdgeAliases()
 
-                lsSQLQuery = "SELECT "
 
+                If Not abIsCountStarSubQuery Then
+                    lsSQLQuery = "SELECT "
 #Region "ProjectionColums"
-                liInd = 1
-                Dim larProjectionColumn = Me.getProjectionColumns(arWhichSelectStatement)
-                Me.ProjectionColumn = larProjectionColumn
-                For Each lrProjectColumn In larProjectionColumn.FindAll(Function(x) x IsNot Nothing)
+                    liInd = 1
+                    Dim larProjectionColumn = Me.getProjectionColumns(arWhichSelectStatement)
+                    Me.ProjectionColumn = larProjectionColumn
+                    For Each lrProjectColumn In larProjectionColumn.FindAll(Function(x) x IsNot Nothing)
 
-                    If lrProjectColumn.Role.FactType.IsDerived Then
-                        lsSQLQuery &= "[" & lrProjectColumn.Role.FactType.Id & Viev.NullVal(lrProjectColumn.TemporaryAlias, "") & "]." & lrProjectColumn.Name
-                    Else
-                        lsSQLQuery &= "[" & lrProjectColumn.Table.DatabaseName & Viev.NullVal(lrProjectColumn.TemporaryAlias, "") & "]." & lrProjectColumn.Name
-                    End If
-                    If liInd < larProjectionColumn.Count Then lsSQLQuery &= ","
-                    liInd += 1
-                Next
+                        If lrProjectColumn.Role.FactType.IsDerived Then
+                            lsSQLQuery &= "[" & lrProjectColumn.Role.FactType.Id & Viev.NullVal(lrProjectColumn.TemporaryAlias, "") & "]." & lrProjectColumn.Name
+                        Else
+                            lsSQLQuery &= "[" & lrProjectColumn.Table.DatabaseName & Viev.NullVal(lrProjectColumn.TemporaryAlias, "") & "]." & lrProjectColumn.Name
+                        End If
+                        If liInd < larProjectionColumn.Count Then lsSQLQuery &= ","
+                        liInd += 1
+                    Next
 
-                '20201015-VM-If all seems fine, remove the following.
-                'Select Case (Me.HeadNode.FBMModelObject).GetType
-                '    Case GetType(FBM.ValueType)
-                '        'lsSQLQuery &= Me.HeadNode. Me.HeadNode.FBMModelObject.Id
-                '    Case Else
-                '        larColumn = Me.HeadNode.FBMModelObject.getCorrespondingRDSTable.getFirstUniquenessConstraintColumns
-                '        liInd = 1
-                '        For Each lrColumn In larColumn
-                '            lsSQLQuery &= lrColumn.Table.Name & "." & lrColumn.Name
-                '            If liInd < larColumn.Count Then lsSQLQuery &= ","
-                '            liInd += 1
-                '        Next
-                'End Select
+                    '20201015-VM-If all seems fine, remove the following.
+                    'Select Case (Me.HeadNode.FBMModelObject).GetType
+                    '    Case GetType(FBM.ValueType)
+                    '        'lsSQLQuery &= Me.HeadNode. Me.HeadNode.FBMModelObject.Id
+                    '    Case Else
+                    '        larColumn = Me.HeadNode.FBMModelObject.getCorrespondingRDSTable.getFirstUniquenessConstraintColumns
+                    '        liInd = 1
+                    '        For Each lrColumn In larColumn
+                    '            lsSQLQuery &= lrColumn.Table.Name & "." & lrColumn.Name
+                    '            If liInd < larColumn.Count Then lsSQLQuery &= ","
+                    '            liInd += 1
+                    '        Next
+                    'End Select
 
-                'If Me.getProjectQueryEdges.Count > 0 And larColumn.Count > 0 Then lsSQLQuery &= ", "
+                    'If Me.getProjectQueryEdges.Count > 0 And larColumn.Count > 0 Then lsSQLQuery &= ", "
 
-                'liInd = 1
-                'Dim larProjectQueryEdge = Me.getProjectQueryEdges()
-                'For Each lrQueryEdge In larProjectQueryEdge
-                '    'larColumn = lrQueryEdge.FBMFactType.RoleGroup(1).JoinedORMObject.getCorrespondingRDSTable.getPrimaryKeyColumns
-                '    Dim liRoleInd As Integer
-                '    If lrQueryEdge.FBMFactType.RoleGroup(0).JoinedORMObject.Id = lrQueryEdge.BaseNode.FBMModelObject.Id Then
-                '        liRoleInd = 1
-                '    Else
-                '        liRoleInd = 0
-                '    End If
-                '    larColumn = New List(Of RDS.Column)
-                '    If lrQueryEdge.FBMFactType.RoleGroup(liRoleInd).JoinedORMObject.ConceptType = pcenumConceptType.ValueType Then
-                '        larColumn.Add(lrQueryEdge.BaseNode.FBMModelObject.getCorrespondingRDSTable.Column.Find(Function(x) x.Role.FactType Is lrQueryEdge.FBMFactType))
-                '    Else
-                '        larColumn = lrQueryEdge.FBMFactType.RoleGroup(liRoleInd).JoinedORMObject.getCorrespondingRDSTable.getFirstUniquenessConstraintColumns
-                '    End If
+                    'liInd = 1
+                    'Dim larProjectQueryEdge = Me.getProjectQueryEdges()
+                    'For Each lrQueryEdge In larProjectQueryEdge
+                    '    'larColumn = lrQueryEdge.FBMFactType.RoleGroup(1).JoinedORMObject.getCorrespondingRDSTable.getPrimaryKeyColumns
+                    '    Dim liRoleInd As Integer
+                    '    If lrQueryEdge.FBMFactType.RoleGroup(0).JoinedORMObject.Id = lrQueryEdge.BaseNode.FBMModelObject.Id Then
+                    '        liRoleInd = 1
+                    '    Else
+                    '        liRoleInd = 0
+                    '    End If
+                    '    larColumn = New List(Of RDS.Column)
+                    '    If lrQueryEdge.FBMFactType.RoleGroup(liRoleInd).JoinedORMObject.ConceptType = pcenumConceptType.ValueType Then
+                    '        larColumn.Add(lrQueryEdge.BaseNode.FBMModelObject.getCorrespondingRDSTable.Column.Find(Function(x) x.Role.FactType Is lrQueryEdge.FBMFactType))
+                    '    Else
+                    '        larColumn = lrQueryEdge.FBMFactType.RoleGroup(liRoleInd).JoinedORMObject.getCorrespondingRDSTable.getFirstUniquenessConstraintColumns
+                    '    End If
 
-                '    Dim liInd2 = 1
-                '    For Each lrColumn In larColumn
-                '        If lrQueryEdge.FBMFactType.RoleGroup(liRoleInd).JoinedORMObject.ConceptType = pcenumConceptType.ValueType Then
-                '            lsSQLQuery &= lrColumn.Table.Name & "." _
-                '                      & lrColumn.Name
-                '        Else
-                '            lsSQLQuery &= lrColumn.Table.Name & "." _ 'lrQueryEdge.FBMFactType.RoleGroup(liRoleInd).JoinedORMObject.getCorrespondingRDSTable.Name & "." _
-                '                      & lrColumn.Name
-                '        End If
+                    '    Dim liInd2 = 1
+                    '    For Each lrColumn In larColumn
+                    '        If lrQueryEdge.FBMFactType.RoleGroup(liRoleInd).JoinedORMObject.ConceptType = pcenumConceptType.ValueType Then
+                    '            lsSQLQuery &= lrColumn.Table.Name & "." _
+                    '                      & lrColumn.Name
+                    '        Else
+                    '            lsSQLQuery &= lrColumn.Table.Name & "." _ 'lrQueryEdge.FBMFactType.RoleGroup(liRoleInd).JoinedORMObject.getCorrespondingRDSTable.Name & "." _
+                    '                      & lrColumn.Name
+                    '        End If
 
-                '        If liInd2 < larColumn.Count Then lsSQLQuery &= ","
-                '        liInd2 += 1
-                '    Next
+                    '        If liInd2 < larColumn.Count Then lsSQLQuery &= ","
+                    '        liInd2 += 1
+                    '    Next
 
-                '    If liInd < Me.getProjectQueryEdges.Count Then lsSQLQuery &= ","
-                '    liInd += 1
-                'Next
+                    '    If liInd < Me.getProjectQueryEdges.Count Then lsSQLQuery &= ","
+                    '    liInd += 1
+                    'Next
 #End Region
+                Else
+                    lsSQLQuery = " 1 > (SELECT COUNT(*)"
+                End If
 
                 lsSQLQuery &= vbCrLf & "FROM "
 
@@ -131,6 +136,14 @@
                                                      Where (Node.QueryEdge.IsCircular Or
                                                             Node.RDSTable.isCircularToTable(Node.QueryEdge.BaseNode.RDSTable))).ToList
                 larFromNodes.RemoveAll(Function(x) larNode.Contains(x))
+
+                Dim larSubQueryNodes As List(Of FactEngine.QueryNode) = (From Node In larFromNodes
+                                                                         Where Node.QueryEdge IsNot Nothing
+                                                                         Where (Node.QueryEdge.IsSubQueryLeader Or Node.QueryEdge.IsPartOfSubQuery)
+                                                                         Select Node
+                                                                        ).ToList
+
+                larFromNodes.RemoveAll(Function(x) larSubQueryNodes.Contains(x))
 
                 For Each lrQueryNode In larFromNodes
                     If lrQueryNode.Alias Is Nothing Then
@@ -148,7 +161,8 @@
                 Dim larQuerEdgeWithFBMFactType = Me.QueryEdges.FindAll(Function(x) x.FBMFactType IsNot Nothing Or (x.IsRecursive And x.IsCircular))
                 Dim larRDSTableQueryEdge = larQuerEdgeWithFBMFactType.FindAll(Function(x) (x.FBMFactType.isRDSTable And
                                                                                            Not x.FBMFactType.IsDerived And
-                                                                                           Not x.IsPartialFactTypeMatch) Or
+                                                                                           Not x.IsPartialFactTypeMatch) And
+                                                                                           Not (x.IsSubQueryLeader Or x.IsPartOfSubQuery) Or
                                                                                            (x.IsRecursive And (
                                                                                            x.IsCircular Or
                                                                                            x.TargetNode.RDSTable.isCircularToTable(x.BaseNode.RDSTable))))
@@ -331,32 +345,32 @@
                             lsSQLQuery &= vbCrLf & " Select [" & lrRDSTable.Name & "]." & Strings.Join(lasColumnName.ToArray, ",[" & lrRDSTable.Name & "].") & ",0"
                             lsSQLQuery &= vbCrLf & " FROM [" & lrRDSTable.Name & "]"
                             If lrQueryEdge.BaseNode.IdentifierList.Count > 0 Then
-                                    Dim lrTargetTable As RDS.Table = larLeftColumn(0).Relation.Find(Function(x) x.OriginTable.Name = lrRDSTable.Name).DestinationTable
-                                    lsSQLQuery &= "," & lrTargetTable.Name & vbCrLf & " WHERE "
-                                    liInd = 0
-                                    For Each lrColumn In lrTargetTable.getFirstUniquenessConstraintColumns
-                                        lsSQLQuery &= "[" & lrTargetTable.Name & Viev.NullVal(lrQueryEdge.Alias, "") & "]." & lrColumn.Name & " = '"
-                                        lsSQLQuery &= lrQueryEdge.BaseNode.IdentifierList(liInd) & "'" & vbCrLf
-                                        If liInd < Me.HeadNode.RDSTable.getFirstUniquenessConstraintColumns.Count - 1 Then lsSQLQuery &= "AND "
-                                        liInd += 1
-                                    Next
+                                Dim lrTargetTable As RDS.Table = larLeftColumn(0).Relation.Find(Function(x) x.OriginTable.Name = lrRDSTable.Name).DestinationTable
+                                lsSQLQuery &= "," & lrTargetTable.Name & vbCrLf & " WHERE "
+                                liInd = 0
+                                For Each lrColumn In lrTargetTable.getFirstUniquenessConstraintColumns
+                                    lsSQLQuery &= "[" & lrTargetTable.Name & Viev.NullVal(lrQueryEdge.Alias, "") & "]." & lrColumn.Name & " = '"
+                                    lsSQLQuery &= lrQueryEdge.BaseNode.IdentifierList(liInd) & "'" & vbCrLf
+                                    If liInd < Me.HeadNode.RDSTable.getFirstUniquenessConstraintColumns.Count - 1 Then lsSQLQuery &= "AND "
+                                    liInd += 1
+                                Next
                                 lsSQLQuery &= vbCrLf & " AND [" & lrRDSTable.Name & "]." & larLeftColumn(0).Name & " = [" & lrTargetTable.Name & "]." & lrTargetTable.getPrimaryKeyColumns(0).Name
                             End If
-                                lsSQLQuery &= vbCrLf & " UNION "
+                            lsSQLQuery &= vbCrLf & " UNION "
                             lsSQLQuery &= vbCrLf & " SELECT [" & lrRDSTable.Name & "]." & Strings.Join(lasColumnName.ToArray, ",[" & lrRDSTable.Name & "].") & ",depth + 1"
                             lsSQLQuery &= vbCrLf & " FROM nodes, [" & lrRDSTable.Name & "]"
                             lsSQLQuery &= vbCrLf & " WHERE Nodes." & larRightColumn(0).Name & " = [" & lrRDSTable.Name & "]." & larLeftColumn(0).Name
                             If My.Settings.FactEngineDefaultQueryResultLimit > 0 Then
-                                    lsSQLQuery &= vbCrLf & " LIMIT " & My.Settings.FactEngineDefaultQueryResultLimit
-                                End If
-                                lsSQLQuery &= vbCrLf & " )"
+                                lsSQLQuery &= vbCrLf & " LIMIT " & My.Settings.FactEngineDefaultQueryResultLimit
+                            End If
+                            lsSQLQuery &= vbCrLf & " )"
                             lsSQLQuery &= vbCrLf & " SELECT " & Strings.Join(lasColumnName.ToArray, ",") & ",depth"
                             lsSQLQuery &= vbCrLf & " FROM nodes"
                             If lrQueryEdge.RecursiveNumber1 IsNot Nothing And lrQueryEdge.RecursiveNumber2 IsNot Nothing Then
                                 lsSQLQuery &= vbCrLf & " WHERE depth BETWEEN " & lrQueryEdge.RecursiveNumber1 & " AND " & lrQueryEdge.RecursiveNumber2
                             ElseIf lrQueryEdge.RecursiveNumber2 Is Nothing Then
                                 lsSQLQuery &= vbCrLf & " WHERE depth >= " & lrQueryEdge.RecursiveNumber1
-                                End If
+                            End If
                             lsSQLQuery &= vbCrLf & ")"
                             If lrQueryEdge.FBMFactType.isRDSTable Then
                                 lsSQLQuery &= " AS " & lrQueryEdge.FBMFactType.Id
@@ -366,7 +380,7 @@
                                 lsSQLQuery &= " AS " & lrQueryEdge.FBMFactType.Id
                             End If
                         End If
-                        End If
+                    End If
 #End Region
                     'If liInd < larRDSTableQueryEdge.Count Then lsSQLQuery &= "," & vbCrLf
                     liInd += 1
@@ -383,7 +397,7 @@
 
                 'PartialFactTypeMatch
                 Dim lrPartialMatchFactType As FBM.FactType = Nothing
-                For Each lrQueryEdge In Me.QueryEdges
+                For Each lrQueryEdge In Me.QueryEdges.FindAll(Function(x) Not (x.IsSubQueryLeader Or x.IsPartOfSubQuery))
                     If lrQueryEdge.IsPartialFactTypeMatch Then
 
                         Dim larExistingNode = From Node In larFromNodes
@@ -445,7 +459,7 @@
                 Dim lbIntialWhere = Nothing
 
 #Region "WhereJoins"
-                For Each lrQueryEdge In larWhereEdges
+                For Each lrQueryEdge In larWhereEdges.FindAll(Function(x) Not (x.IsSubQueryLeader Or x.IsPartOfSubQuery))
 
                     If lbAddedAND Or liInd > 1 Then
                         lsSQLQuery &= "And "
@@ -653,7 +667,7 @@
                 End If
 
 
-                For Each lrQueryEdge In larConditionalQueryEdges
+                For Each lrQueryEdge In larConditionalQueryEdges.FindAll(Function(x) Not (x.IsSubQueryLeader Or x.IsPartOfSubQuery))
                     Select Case lrQueryEdge.WhichClauseSubType
                         Case Is = FactEngine.Constants.pcenumWhichClauseType.IsPredicateNodePropertyIdentification
                             Dim lrFactType As FBM.FactType = Nothing
@@ -847,6 +861,29 @@
 #End Region
 #End Region
 
+                '=====================================================================================
+                'SubQueries
+                Dim lasSubQueryAlias = From QueryEdge In Me.QueryEdges
+                                       Where QueryEdge.IsSubQueryLeader Or QueryEdge.IsPartOfSubQuery
+                                       Select QueryEdge.SubQueryAlias Distinct
+
+                For Each lsSubQueryAlias In lasSubQueryAlias
+                    Dim larSubQueryEdge = Me.QueryEdges.FindAll(Function(x) x.SubQueryAlias = lsSubQueryAlias)
+
+                    Dim lrSubQueryGraph = New FactEngine.QueryGraph(Me.Model)
+
+                    lrSubQueryGraph.HeadNode = larSubQueryEdge.First.BaseNode
+                    lrSubQueryGraph.QueryEdges.AddRange(larSubQueryEdge)
+                    lrSubQueryGraph.QueryEdges.ForEach(Sub(x) x.IsSubQueryLeader = False)
+                    lrSubQueryGraph.QueryEdges.ForEach(Sub(x) x.IsPartOfSubQuery = False)
+                    For Each lrQueryEdge In lrSubQueryGraph.QueryEdges
+                        lrSubQueryGraph.Nodes.Add(lrQueryEdge.TargetNode)
+                    Next
+                    lsSQLQuery &= lrSubQueryGraph.generateSQL(arWhichSelectStatement, True)
+
+                    lsSQLQuery &= ")"
+                Next
+                '=====================================================================================
                 Return lsSQLQuery
             Catch ex As Exception
                 Throw New Exception(ex.Message & vbCrLf & vbCrLf & lsSQLQuery)
@@ -857,7 +894,7 @@
 
         Public Function getProjectQueryEdges() As List(Of FactEngine.QueryEdge)
 
-            Dim larQueryEdge As List(Of FactEngine.QueryEdge) = Me.QueryEdges.FindAll(Function(x) x.IsProjectColumn).ToList
+            Dim larQueryEdge As List(Of FactEngine.QueryEdge) = Me.QueryEdges.FindAll(Function(x) x.IsProjectColumn And Not (x.IsSubQueryLeader Or x.IsPartOfSubQuery)).ToList
 
             'ShortestPath Targets
             Dim larShortestPathQueryEdge = Me.QueryEdges.FindAll(Function(x) x.IsShortestPath)

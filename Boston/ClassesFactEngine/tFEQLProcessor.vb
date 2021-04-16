@@ -622,6 +622,16 @@ Namespace FEQL
             End Set
         End Property
 
+        Private _KEYWDNO As String = Nothing
+        Public Property KEYWDNO As String
+            Get
+                Return Me._KEYWDNO
+            End Get
+            Set(value As String)
+                Me._KEYWDNO = value
+            End Set
+        End Property
+
         Private _KEYWDAND As String = Nothing
         Public Property KEYWDAND As String
             Get
