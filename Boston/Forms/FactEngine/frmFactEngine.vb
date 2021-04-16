@@ -1,6 +1,7 @@
 ﻿Imports System.Reflection
 Imports MindFusion.Diagramming.Layout
 Imports MindFusion.Diagramming
+Imports System.Runtime.InteropServices
 
 Public Class frmFactEngine
 
@@ -21,6 +22,36 @@ Public Class frmFactEngine
     Private miDefaultForeColour As Color = Color.Wheat
 
     Private mrModel As FBM.Model
+
+    <DllImport("user32.dll")>
+    Private Shared Function GetKeyboardState(ByVal lpKeyState As Byte()) As Boolean
+    End Function
+    <DllImport("user32.dll")>
+    Private Shared Function MapVirtualKey(ByVal uCode As UInteger, ByVal uMapType As UInteger) As UInteger
+    End Function
+    <DllImport("user32.dll")>
+    Private Shared Function GetKeyboardLayout(ByVal idThread As UInteger) As IntPtr
+    End Function
+    <DllImport("user32.dll")>
+    Private Shared Function ToUnicodeEx(ByVal wVirtKey As UInteger, ByVal wScanCode As UInteger, ByVal lpKeyState As Byte(),
+    <Out, MarshalAs(UnmanagedType.LPWStr)> ByVal pwszBuff As System.Text.StringBuilder, ByVal cchBuff As Integer, ByVal wFlags As UInteger, ByVal dwhkl As IntPtr) As Integer
+    End Function
+
+    Public Function KeyCodeToUnicode(ByVal key As Keys) As String
+        Dim keyboardState As Byte() = New Byte(254) {}
+        Dim keyboardStateStatus As Boolean = GetKeyboardState(keyboardState)
+
+        If Not keyboardStateStatus Then
+            Return ""
+        End If
+
+        Dim virtualKeyCode As UInteger = CUInt(key)
+        Dim scanCode As UInteger = MapVirtualKey(virtualKeyCode, 0)
+        Dim inputLocaleIdentifier As IntPtr = GetKeyboardLayout(0)
+        Dim result As New System.Text.StringBuilder()
+        ToUnicodeEx(virtualKeyCode, scanCode, keyboardState, result, CInt(5), CUInt(0), inputLocaleIdentifier)
+        Return result.ToString()
+    End Function
 
     Public Sub autoLayout()
 
@@ -1183,8 +1214,9 @@ Public Class frmFactEngine
             '-------------------
             'Get the ParseTree
             '-------------------
+            Dim lsLastKeyDown = KeyCodeToUnicode(e.KeyCode)
             If Not e.KeyCode = Keys.Back Then
-                Me.zrTextHighlighter.Tree = Me.zrParser.Parse(Trim(Me.TextBoxInput.Text))
+                Me.zrTextHighlighter.Tree = Me.zrParser.Parse(Trim(Me.TextBoxInput.Text & lsLastKeyDown))
             End If
 
             '=================================================================
@@ -1943,12 +1975,15 @@ Public Class frmFactEngine
         Me.AutoComplete.ListBox.BringToFront()
 
         If Me.AutoComplete.ListBox.Items.Count > 0 Then
+            Me.AutoComplete.ListBox.SelectedIndex = 0
+            Me.AutoComplete.ListBox.SelectedIndex = -1
             Me.AutoComplete.zsIntellisenseBuffer = Me.zsIntellisenseBuffer
             Me.AutoComplete.zrCallingForm = Me
             If Me.AutoComplete.Visible = False Then
                 Me.AutoComplete.Visible = True
-                Me.TextBoxInput.Focus()
+                'Me.TextBoxInput.Focus() 'Originally was here. 20210416
             End If
+            Me.TextBoxInput.Focus()
             Me.AutoComplete.Owner = Me
             Call Me.populateHelpLabel()
         End If
