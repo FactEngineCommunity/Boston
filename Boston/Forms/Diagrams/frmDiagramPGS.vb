@@ -1870,176 +1870,190 @@ Public Class frmDiagramPGS
         Dim lo_point As System.Drawing.PointF
         Dim loNode As DiagramNode = Nothing
 
-        Me.DiagramView.ContextMenuStrip = ContextMenuStrip_Diagram
+        Try
 
-        lo_point = Me.DiagramView.ClientToDoc(e.Location)
+            Me.DiagramView.ContextMenuStrip = ContextMenuStrip_Diagram
 
-        Me.DiagramView.SmoothingMode = SmoothingMode.AntiAlias
+            lo_point = Me.DiagramView.ClientToDoc(e.Location)
 
-        '--------------------------------------------------
-        'Just to be sure...set the Richmond.WorkingProject
-        '--------------------------------------------------
-        prApplication.WorkingPage = Me.zrPage
+            Me.DiagramView.SmoothingMode = SmoothingMode.AntiAlias
 
-        loNode = Diagram.GetNodeAt(lo_point)
+            '--------------------------------------------------
+            'Just to be sure...set the Richmond.WorkingProject
+            '--------------------------------------------------
+            prApplication.WorkingPage = Me.zrPage
 
-        If (ModifierKeys = (Keys.Control Or Keys.ShiftKey)) And My.Settings.SuperuserMode Then
-            For Each lrPGSRelationNode In Me.zrPage.ERDiagram.Entity.FindAll(Function(x) x.getCorrespondingRDSTable.isPGSRelation)
-                lrPGSRelationNode.Shape.Visible = True
-                If Not Me.zrPage.Diagram.Nodes.Contains(lrPGSRelationNode.Shape) Then
-                    Me.zrPage.Diagram.Nodes.Add(lrPGSRelationNode.Shape)
-                    'Make sure the Shape has a Tag
-                    lrPGSRelationNode.Shape.Tag = lrPGSRelationNode
-                End If
-                Me.zrPage.Diagram.Invalidate()
-            Next
-        End If
-
-        If IsSomething(loNode) And (e.Button = Windows.Forms.MouseButtons.Left) Then
-
-            If 1 = 0 Then
-                '----------------------------------------
-                'Put MultiSelection Code here if needed
-                '----------------------------------------
-            Else
-                '------------------------------------------------------------------------------
-                ' Otherwise clear the selected objects.
-                '  Will be populated by the event on the ShapeObject itself
-                '-------------------------------------------------------------------------------
-
-                Me.zrPage.SelectedObject.Clear()
-                Me.Diagram.Selection.Clear()
-                '----------------------------------------------------
-                'Select the ShapeNode/ORMObject just clicked on
-                '  Updates the Me.zrPage.SelectedObject collection.
-                '----------------------------------------------------                 
-                loNode.Selected = True
-
-            End If
-
-            Me.DiagramView.ContextMenuStrip = Me.ContextMenuStrip_Node
-
-            '----------------------------
-            'Mouse is over an ShapeNode
-            '----------------------------
-            Me.Diagram.AllowUnconnectedLinks = True
-
-            '--------------------------------------------
-            'Turn on the TimerLinkSwitch.
-            '  After the user has held down the mouse button for 1second over a object,
-            '  then link creation will be allowed
-            '--------------------------------------------
-            'TimerLinkSwitch.Enabled = True
-
-            '----------------------------------------------------
-            'Get the Node/Shape under the mouse cursor.
-            '----------------------------------------------------
             loNode = Diagram.GetNodeAt(lo_point)
-            Me.DiagramView.DrawLinkCursor = Cursors.Hand
-            Cursor.Show()
 
-
-        ElseIf IsSomething(Diagram.GetLinkAt(lo_point, 2)) Then
-            '-------------------------
-            'User clicked on a link
-            '-------------------------
-            Me.DiagramView.ContextMenuStrip = Me.ContextMenuStrip_Relation
-
-            Dim lrPGSRelation As PGS.Link = Diagram.GetLinkAt(lo_point, 2).Tag
-
-
-            lrPGSRelation.Link.TextStyle = LinkTextStyle.Rotate
-            If lrPGSRelation.Link.Origin Is lrPGSRelation.Link.Destination Then
-                lrPGSRelation.Link.Font = New Font("Arial", 8)
-            Else
-                lrPGSRelation.Link.Font = New Font("Arial", 10)
+            If (ModifierKeys = (Keys.Control Or Keys.ShiftKey)) And My.Settings.SuperuserMode Then
+                For Each lrPGSRelationNode In Me.zrPage.ERDiagram.Entity.FindAll(Function(x) x.getCorrespondingRDSTable.isPGSRelation)
+                    lrPGSRelationNode.Shape.Visible = True
+                    If Not Me.zrPage.Diagram.Nodes.Contains(lrPGSRelationNode.Shape) Then
+                        Me.zrPage.Diagram.Nodes.Add(lrPGSRelationNode.Shape)
+                        'Make sure the Shape has a Tag
+                        lrPGSRelationNode.Shape.Tag = lrPGSRelationNode
+                    End If
+                    Me.zrPage.Diagram.Invalidate()
+                Next
             End If
 
-            If lrPGSRelation.Relation.IsPGSRelationNode Then
-                '=================================================================
-                'Origin/Destination Predicates
-                Dim lsOriginPredicate As String = ""
-                Dim lsDestinationPredicate As String = ""
+            If IsSomething(loNode) And (e.Button = Windows.Forms.MouseButtons.Left) Then
 
-                Dim larRole As New List(Of FBM.Role)
-                Dim lrFactTypeReading As FBM.FactTypeReading
-
-                larRole.Add(lrPGSRelation.RDSRelation.ResponsibleFactType.RoleGroup(0)) 'NB Is opposite to the way you would think, because ER Diagrams read predicates at the opposite end of the Relation
-                larRole.Add(lrPGSRelation.RDSRelation.ResponsibleFactType.RoleGroup(1))
-
-                lrFactTypeReading = lrPGSRelation.RDSRelation.ResponsibleFactType.FindSuitableFactTypeReadingByRoles(larRole, True)
-
-                If lrFactTypeReading IsNot Nothing Then
-                    lsDestinationPredicate = lrFactTypeReading.PredicatePart(0).PredicatePartText & " " & lrFactTypeReading.PredicatePart(1).PreBoundText
+                If 1 = 0 Then
+                    '----------------------------------------
+                    'Put MultiSelection Code here if needed
+                    '----------------------------------------
                 Else
-                    lsDestinationPredicate = "unknown predicate"
+                    '------------------------------------------------------------------------------
+                    ' Otherwise clear the selected objects.
+                    '  Will be populated by the event on the ShapeObject itself
+                    '-------------------------------------------------------------------------------
+
+                    Me.zrPage.SelectedObject.Clear()
+                    Me.Diagram.Selection.Clear()
+                    '----------------------------------------------------
+                    'Select the ShapeNode/ORMObject just clicked on
+                    '  Updates the Me.zrPage.SelectedObject collection.
+                    '----------------------------------------------------                 
+                    loNode.Selected = True
+
                 End If
 
-                larRole.Clear()
-                larRole.Add(lrPGSRelation.RDSRelation.ResponsibleFactType.RoleGroup(1)) 'NB Is opposite to the way you would think, because ER Diagrams read predicates at the opposite end of the Relation
-                larRole.Add(lrPGSRelation.RDSRelation.ResponsibleFactType.RoleGroup(0))
+                Me.DiagramView.ContextMenuStrip = Me.ContextMenuStrip_Node
 
-                lrFactTypeReading = lrPGSRelation.RDSRelation.ResponsibleFactType.FindSuitableFactTypeReadingByRoles(larRole, True)
+                '----------------------------
+                'Mouse is over an ShapeNode
+                '----------------------------
+                Me.Diagram.AllowUnconnectedLinks = True
 
-                If lrFactTypeReading IsNot Nothing Then
-                    lsOriginPredicate = lrFactTypeReading.PredicatePart(0).PredicatePartText & " " & lrFactTypeReading.PredicatePart(1).PreBoundText
+                '--------------------------------------------
+                'Turn on the TimerLinkSwitch.
+                '  After the user has held down the mouse button for 1second over a object,
+                '  then link creation will be allowed
+                '--------------------------------------------
+                'TimerLinkSwitch.Enabled = True
+
+                '----------------------------------------------------
+                'Get the Node/Shape under the mouse cursor.
+                '----------------------------------------------------
+                loNode = Diagram.GetNodeAt(lo_point)
+                Me.DiagramView.DrawLinkCursor = Cursors.Hand
+                Cursor.Show()
+
+
+            ElseIf IsSomething(Diagram.GetLinkAt(lo_point, 2)) Then
+                '-------------------------
+                'User clicked on a link
+                '-------------------------
+                Me.DiagramView.ContextMenuStrip = Me.ContextMenuStrip_Relation
+
+                Dim lrPGSRelation As PGS.Link = Diagram.GetLinkAt(lo_point, 2).Tag
+
+
+                lrPGSRelation.Link.TextStyle = LinkTextStyle.Rotate
+                If lrPGSRelation.Link.Origin Is lrPGSRelation.Link.Destination Then
+                    lrPGSRelation.Link.Font = New Font("Arial", 8)
                 Else
-                    lsOriginPredicate = "unknown predicate"
+                    lrPGSRelation.Link.Font = New Font("Arial", 10)
                 End If
 
-                If lrPGSRelation.Link.Origin.Bounds.X < lrPGSRelation.Link.Destination.Bounds.X Then
-                    lrPGSRelation.Link.Text = lsOriginPredicate & " / " & lsDestinationPredicate
+                If lrPGSRelation.Relation.IsPGSRelationNode Then
+                    '=================================================================
+                    'Origin/Destination Predicates
+                    Dim lsOriginPredicate As String = ""
+                    Dim lsDestinationPredicate As String = ""
+
+                    Dim larRole As New List(Of FBM.Role)
+                    Dim lrFactTypeReading As FBM.FactTypeReading
+
+                    larRole.Add(lrPGSRelation.RDSRelation.ResponsibleFactType.RoleGroup(0)) 'NB Is opposite to the way you would think, because ER Diagrams read predicates at the opposite end of the Relation
+                    larRole.Add(lrPGSRelation.RDSRelation.ResponsibleFactType.RoleGroup(1))
+
+                    lrFactTypeReading = lrPGSRelation.RDSRelation.ResponsibleFactType.FindSuitableFactTypeReadingByRoles(larRole, True)
+
+                    If lrFactTypeReading IsNot Nothing Then
+                        lsDestinationPredicate = lrFactTypeReading.PredicatePart(0).PredicatePartText & " " & lrFactTypeReading.PredicatePart(1).PreBoundText
+                    Else
+                        lsDestinationPredicate = "unknown predicate"
+                    End If
+
+                    larRole.Clear()
+                    larRole.Add(lrPGSRelation.RDSRelation.ResponsibleFactType.RoleGroup(1)) 'NB Is opposite to the way you would think, because ER Diagrams read predicates at the opposite end of the Relation
+                    larRole.Add(lrPGSRelation.RDSRelation.ResponsibleFactType.RoleGroup(0))
+
+                    lrFactTypeReading = lrPGSRelation.RDSRelation.ResponsibleFactType.FindSuitableFactTypeReadingByRoles(larRole, True)
+
+                    If lrFactTypeReading IsNot Nothing Then
+                        lsOriginPredicate = lrFactTypeReading.PredicatePart(0).PredicatePartText & " " & lrFactTypeReading.PredicatePart(1).PreBoundText
+                    Else
+                        lsOriginPredicate = "unknown predicate"
+                    End If
+
+                    If lrPGSRelation.Link.Origin.Bounds.X < lrPGSRelation.Link.Destination.Bounds.X Then
+                        lrPGSRelation.Link.Text = lsOriginPredicate & " / " & lsDestinationPredicate
+                    Else
+                        lrPGSRelation.Link.Text = lsDestinationPredicate & " / " & lsOriginPredicate
+                    End If
                 Else
-                    lrPGSRelation.Link.Text = lsDestinationPredicate & " / " & lsOriginPredicate
+                    Dim lsOriginPredicate, lsDestinationPredicate As String
+                    If lrPGSRelation.RDSRelation IsNot Nothing Then
+                        lsOriginPredicate = lrPGSRelation.RDSRelation.OriginPredicate
+                        lsDestinationPredicate = lrPGSRelation.RDSRelation.DestinationPredicate
+                    Else
+                        lsOriginPredicate = lrPGSRelation.Relation.OriginPredicate
+                        lsDestinationPredicate = lrPGSRelation.Relation.DestinationPredicate
+                    End If
+                    If lrPGSRelation.Link.Origin.Bounds.X < lrPGSRelation.Link.Destination.Bounds.X Then
+                        lrPGSRelation.Link.Text = lsOriginPredicate & " / " & lsDestinationPredicate
+                    Else
+                        lrPGSRelation.Link.Text = lsDestinationPredicate & " / " & lsOriginPredicate
+                    End If
                 End If
+
+            ElseIf e.Button = Windows.Forms.MouseButtons.Right Then
+                '------------------------------------------------
+                'Keep, so that ContextMenu is not changed from
+                '  how set in Diagram.NodeSelected
+                '-----------------------------------------------
+                If loNode IsNot Nothing Then Me.DiagramView.ContextMenuStrip = Me.ContextMenuStrip_Node
             Else
-                If lrPGSRelation.Link.Origin.Bounds.X < lrPGSRelation.Link.Destination.Bounds.X Then
-                    lrPGSRelation.Link.Text = lrPGSRelation.RDSRelation.OriginPredicate & " / " & lrPGSRelation.RDSRelation.DestinationPredicate
-                Else
-                    lrPGSRelation.Link.Text = lrPGSRelation.RDSRelation.DestinationPredicate & " / " & lrPGSRelation.RDSRelation.OriginPredicate
+                '------------------------------------------------
+                'User Left-Clicked on the Canvas
+                '------------------------------------------------
+                If Me.PropertyTableNode IsNot Nothing Then
+                    Me.Diagram.Nodes.Remove(Me.PropertyTableNode)
+                    Me.PropertyTableNode = Nothing
                 End If
+                Me.PropertyTableNode = Nothing
+
+                '---------------------------
+                'Clear the SelectedObjects
+                '---------------------------
+                Me.zrPage.SelectedObject.Clear()
+
+                'Me.Diagram.Selection.Clear()
+
+                Me.DiagramView.ContextMenuStrip = ContextMenuStrip_Diagram
+
+                'Me.Diagram.AllowUnconnectedLinks = False
+
+                '------------------------------------------------------------------------------
+                'Clear the 'InPlaceEdit' on principal.
+                '  i.e. Is only allowed for 'Processes' and the user clicked on the Canvas,
+                '  so disable the 'InPlaceEdit'.
+                '  NB See Diagram.DoubleClick where if a 'Process' is DoubleClicked on,
+                '  then 'InPlaceEdit' is temporarily allowed.
+                '------------------------------------------------------------------------------
+                Me.DiagramView.AllowInplaceEdit = False
+
+                Call Me.resetNodeAndLinkColors()
             End If
 
-        ElseIf e.Button = Windows.Forms.MouseButtons.Right Then
-            '------------------------------------------------
-            'Keep, so that ContextMenu is not changed from
-            '  how set in Diagram.NodeSelected
-            '-----------------------------------------------
-            If loNode IsNot Nothing Then Me.DiagramView.ContextMenuStrip = Me.ContextMenuStrip_Node
-        Else
-        '------------------------------------------------
-        'User Left-Clicked on the Canvas
-        '------------------------------------------------
-        If Me.PropertyTableNode IsNot Nothing Then
-            Me.Diagram.Nodes.Remove(Me.PropertyTableNode)
-            Me.PropertyTableNode = Nothing
-        End If
-        Me.PropertyTableNode = Nothing
+            Me.Diagram.Invalidate()
 
-        '---------------------------
-        'Clear the SelectedObjects
-        '---------------------------
-        Me.zrPage.SelectedObject.Clear()
-
-        'Me.Diagram.Selection.Clear()
-
-        Me.DiagramView.ContextMenuStrip = ContextMenuStrip_Diagram
-
-        'Me.Diagram.AllowUnconnectedLinks = False
-
-        '------------------------------------------------------------------------------
-        'Clear the 'InPlaceEdit' on principal.
-        '  i.e. Is only allowed for 'Processes' and the user clicked on the Canvas,
-        '  so disable the 'InPlaceEdit'.
-        '  NB See Diagram.DoubleClick where if a 'Process' is DoubleClicked on,
-        '  then 'InPlaceEdit' is temporarily allowed.
-        '------------------------------------------------------------------------------
-        Me.DiagramView.AllowInplaceEdit = False
-
-        Call Me.resetNodeAndLinkColors()
-        End If
-
-        Me.Diagram.Invalidate()
+        Catch ex As Exception
+            Debugger.Break()
+        End Try
 
     End Sub
 
@@ -3149,6 +3163,7 @@ Public Class frmDiagramPGS
 
         If IsSomething(Diagram.GetLinkAt(lo_point, 2)) Then
             Dim lrPGSRelation As PGS.Link = Diagram.GetLinkAt(lo_point, 2).Tag
+            lrPGSRelation.Link.Text = ""
             Call lrPGSRelation.setPredicate()
             'lrPGSRelation.Link.Text = ""
         End If

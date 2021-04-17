@@ -2208,6 +2208,10 @@ Namespace FBM
 
                             lrRecordset2 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
+                            While lrDictionary.ContainsKey(lrRecordset2("OrdinalPosition").Data)
+                                lrRecordset2("OrdinalPosition").Data += 1
+                                lrRecordset("OrdinalPosition").makeDirty()
+                            End While
 
                             lrDictionary.Add(CInt(lrRecordset2("OrdinalPosition").Data), lrRecordset1("Attribute").Data)
 
