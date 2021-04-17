@@ -4081,6 +4081,10 @@ Public Class frmToolboxEnterpriseExplorer
             End If
         End If
 
+        If My.Settings.SuperuserMode = True Then
+            Me.ToolStripMenuItemFixModelErrors.Visible = True
+        End If
+
     End Sub
 
     Private Sub TreeView_DragLeave(sender As Object, e As EventArgs) Handles TreeView.DragLeave
@@ -4267,4 +4271,20 @@ Public Class frmToolboxEnterpriseExplorer
 
     End Sub
 
+    Private Sub ToolStripMenuItemFixModelErrors_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItemFixModelErrors.Click
+
+        Dim lrModel As FBM.Model
+
+        Try
+            With New WaitCursor
+                '-----------------------------------------
+                'Get the Model from the selected TreeNode
+                '-----------------------------------------
+                lrModel = Me.TreeView.SelectedNode.Tag.Tag
+
+                Call lrModel.FixErrors()
+            End With
+        Catch ex As Exception
+        End Try
+    End Sub
 End Class

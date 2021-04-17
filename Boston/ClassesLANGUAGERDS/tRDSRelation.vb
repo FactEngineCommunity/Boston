@@ -382,15 +382,13 @@ Namespace RDS
             End Try
         End Sub
 
-        Private Sub DestinationTable_IndexModified(ByRef arIndex As Index) Handles DestinationTable.IndexModified
+        Public Sub DestinationTable_IndexModified(ByRef arIndex As Index) Handles DestinationTable.IndexModified
             Try
                 If arIndex.IsPrimaryKey Then
                     If Me.OriginColumns.Count <> Me.DestinationColumns.Count Then
-                        Debugger.Break()
                         If Me.OriginColumns.Count > 0 Then
                             'Should get this far
                             If Me.OriginColumns.Count = 1 And Me.OriginColumns(0).ActiveRole.JoinsEntityType IsNot Nothing Then
-                                Debugger.Break()
                                 'Column joins, via its ActiveRole, an EntityType rather than the ReferenceScheme ValueTypes of that EntityType.
                                 Dim lrOriginalColumn As RDS.Column = Me.OriginColumns(0)
                                 Call Me.RemoveOriginColumn(lrOriginalColumn)
