@@ -2919,4 +2919,13 @@ Public Class frmDiagramERD
 
     End Sub
 
+    Private Sub ORMVerbalisationViewToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ORMVerbalisationViewToolStripMenuItem.Click
+
+        prApplication.WorkingModel = Me.zrPage.Model
+        prApplication.WorkingPage = Me.zrPage
+
+        Call frmMain.loadToolboxORMVerbalisationForm(Me.zrPage.Model, Me.DockPanel.ActivePane)
+
+    End Sub
+
 End Class

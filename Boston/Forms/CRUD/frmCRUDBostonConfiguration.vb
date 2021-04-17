@@ -77,6 +77,10 @@ Public Class frmCRUDBostonConfiguration
         'ER Diagrams
         Me.CheckBoxHideUnknownPredicates.Checked = My.Settings.ERDViewHideUnknowPredicates
 
+        'Superuser Mode
+        RemoveHandler CheckBoxSuperuserMode.CheckedChanged, AddressOf CheckBoxSuperuserMode_CheckedChanged
+        Me.CheckBoxSuperuserMode.Checked = My.Settings.SuperuserMode
+        AddHandler CheckBoxSuperuserMode.CheckedChanged, AddressOf CheckBoxSuperuserMode_CheckedChanged
 
     End Sub
 
@@ -121,6 +125,8 @@ Public Class frmCRUDBostonConfiguration
             My.Settings.FactEngineShowDatabaseLogoInModelExplorer = Me.CheckBoxFactEngineShowDatabaseLogoModelExplorer.Checked
             My.Settings.ERDViewHideUnknowPredicates = Me.CheckBoxHideUnknownPredicates.Checked
             My.Settings.FactEngineUseReferenceModeOnlyForSimpleReferenceSchemes = Me.CheckBoxFactEngineUseReferenceModeOnlyForSimpleReferenceSchemes.Checked
+            'Superuser Mode          
+            My.Settings.SuperuserMode = Me.CheckBoxSuperuserMode.Checked
 
             Try
                 If Me.DomainUpDownFactEngineDefaultQueryResultLimit.Text = "Infinite" Then
@@ -372,6 +378,16 @@ Public Class frmCRUDBostonConfiguration
             Me.TabPage3.Show()
             Me.TabControl1.SelectedTab = Me.TabPage3
         End Try
+
+    End Sub
+
+    Private Sub CheckBoxSuperuserMode_CheckedChanged(sender As Object, e As EventArgs) Handles CheckBoxSuperuserMode.CheckedChanged
+
+        If Me.CheckBoxSuperuserMode.Checked Then
+            Dim lsMessage = "Use Superuser Mode with caution. Superuser Mode allows you to modify a model in such a way that it may become unusable."
+            lsMessage &= vbCrLf & vbCrLf & "Please contact support if you have any questions."
+            MsgBox(lsMessage, MsgBoxStyle.Exclamation)
+        End If
 
     End Sub
 
