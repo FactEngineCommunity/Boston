@@ -70,9 +70,10 @@ Namespace FBM
 
         <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
         Public _LanguageId As pcenumLanguage = pcenumLanguage.ORMModel 'Default to ORMModel
-        <XmlAttribute()> _
-        <CategoryAttribute("Page"), _
-        DescriptionAttribute("The Language of the Page/Diagram.")> _
+        <XmlAttribute()>
+        <CategoryAttribute("Page"),
+        DisplayNameAttribute("Language"),
+        DescriptionAttribute("The Language of the Page/Diagram.")>
         Public Overridable Property Language() As pcenumLanguage
             Get
                 Return Me._LanguageId

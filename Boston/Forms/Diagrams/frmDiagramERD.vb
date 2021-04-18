@@ -1902,11 +1902,20 @@ Public Class frmDiagramERD
                 If IsSomething(lrPropertyGridForm) Then
 
                     Dim myfilterattribute As Attribute = New System.ComponentModel.CategoryAttribute("Page")
+                    Dim myHiddenAttribute As Attribute = New System.ComponentModel.DisplayNameAttribute("Language")
+                    Dim myHiddenMiscAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
                     ' And you pass it to the PropertyGrid,
                     ' via its BrowsableAttributes property :
-                    lrPropertyGridForm.PropertyGrid.BrowsableAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {myfilterattribute})
-                    lrPropertyGridForm.PropertyGrid.HiddenAttributes = Nothing
-                    lrPropertyGridForm.PropertyGrid.SelectedObject = Me.zrPage
+                    If My.Settings.SuperuserMode Then
+                        lrPropertyGridForm.PropertyGrid.BrowsableAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {myfilterattribute})
+                        lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {myHiddenMiscAttribute})
+                        lrPropertyGridForm.PropertyGrid.SelectedObject = Me.zrPage
+                    Else
+                        lrPropertyGridForm.PropertyGrid.BrowsableAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {myfilterattribute})
+                        lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {myHiddenAttribute, myHiddenMiscAttribute})
+                        lrPropertyGridForm.PropertyGrid.SelectedObject = Me.zrPage
+                    End If
+
 
                 End If
                 '---------------------------------------------------------------------------------------------------------------------------
