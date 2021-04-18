@@ -43,9 +43,17 @@ Namespace ERD
         Public WithEvents ModelFactType As FBM.FactType
 
         Public _DataType As String = ""
+        <CategoryAttribute("Attribute"),
+        [ReadOnly](True),
+        DefaultValueAttribute(GetType(String), ""),
+        DescriptionAttribute("The data type of the Attribute.")>
         Public Overridable Property DataType() As String
             Get
-                Return Me._DataType
+                If Me.Column IsNot Nothing Then
+                    Return Me.Column.getMetamodelDataType.ToString '_DataType
+                Else
+                    Return "Unkown, Column not set"
+                End If
             End Get
             Set(ByVal value As String)
                 Me._DataType = value

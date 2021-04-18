@@ -868,6 +868,9 @@ Public Class frmDiagramERD
         Dim lrAttribute As ERD.Attribute
         lrAttribute = e.Cell.Tag
 
+        Me.zrPage.SelectedObject.Clear()
+        Me.zrPage.SelectedObject.Add(lrAttribute)
+
         If e.MouseButton = MouseButton.Right Then
             'ContextMenuStripAttribute.Show(Me.ERDDiagramView, New Point((e.Table.Bounds.X + e.MousePosition.X), (e.Table.Bounds.Y + e.MousePosition.Y)))
 
@@ -878,9 +881,6 @@ Public Class frmDiagramERD
 
             ContextMenuStripAttribute.Show(Me.DiagramView, Me.DiagramView.DocToClient(e.MousePosition))
             'Me.DiagramView.ContextMenuStrip = ContextMenuStrip_Role
-
-            Me.zrPage.SelectedObject.Clear()
-            Me.zrPage.SelectedObject.Add(lrAttribute)
         Else
             Dim lrTableNode As MindFusion.Diagramming.TableNode
 
@@ -2082,7 +2082,7 @@ Public Class frmDiagramERD
             If Me.Diagram.Selection.Items.Count > 0 Then
                 lrPropertyGridForm.PropertyGrid.SelectedObject = Me.Diagram.Selection.Items(0).Tag
             Else
-                lrPropertyGridForm.PropertyGrid.SelectedObject = Me.zrPage.Model
+                lrPropertyGridForm.PropertyGrid.SelectedObject = Me.zrPage
             End If
         End If
 
@@ -2945,6 +2945,24 @@ Public Class frmDiagramERD
 
         If My.Settings.SuperuserMode Then
             Me.ToolStripMenuItemDeleteAttribute.Visible = True
+        End If
+
+    End Sub
+
+    Private Sub ToolStripMenuItem1_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItem1.Click
+
+        Call frmMain.LoadToolboxPropertyWindow(Me.DockPanel.ActivePane)
+
+        Dim lrPropertyGridForm As frmToolboxProperties
+
+        If IsSomething(prApplication.GetToolboxForm(frmToolboxProperties.Name)) Then
+            lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
+            lrPropertyGridForm.PropertyGrid.HiddenAttributes = Nothing
+            If Me.zrPage.SelectedObject.Count > 0 Then
+                Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
+                lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute, loMiscFilterAttribute})
+                lrPropertyGridForm.PropertyGrid.SelectedObject = Me.zrPage.SelectedObject(0)
+            End If
         End If
 
     End Sub

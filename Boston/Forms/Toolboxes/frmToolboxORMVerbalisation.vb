@@ -2963,7 +2963,17 @@ Public Class frmToolboxORMVerbalisation
                 lrVerbaliser.VerbaliseQuantifier("There are no Value Constraints for this Attribute.")
             End If
 
-            Me.WebBrowser.DocumentText = lrVerbaliser.Verbalise
+            If My.Settings.SuperuserMode Then
+                If arAttribute.ActiveRole.JoinedORMObject.GetType = GetType(FBM.EntityType) Then
+                    lrVerbaliser.HTW.WriteBreak()
+                    lrVerbaliser.HTW.WriteBreak()
+                    lrVerbaliser.VerbaliseError("Error: This Attribute is joined to an EntityType (" & arAttribute.ActiveRole.JoinedORMObject.Id & ") rather than the Entity Type's Reference Scheme's Value Type.")
+                    lrVerbaliser.HTW.WriteBreak()
+                    lrVerbaliser.VerbaliseError("Either set the Reference Scheme for the joined Entity Type or contact support for how to resolve this issue.")
+                End If
+            End If
+
+                Me.WebBrowser.DocumentText = lrVerbaliser.Verbalise
 
         Catch ex As Exception
             Dim lsMessage1 As String
