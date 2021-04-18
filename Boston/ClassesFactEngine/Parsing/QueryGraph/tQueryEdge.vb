@@ -62,6 +62,18 @@ Namespace FactEngine
         Public IsPartialFactTypeMatch As Boolean = False
 
         ''' <summary>
+        ''' Populated on initial parse if more than one Partial FactType Match
+        ''' </summary>
+        Public AmbiguousFactTypeMatches As New List(Of FBM.FactType)
+
+        Public AmbiguousFactTypeReading As FBM.FactTypeReading
+
+        ''' <summary>
+        ''' Populated if Ambiguous FactType Match for Partial FactType Match type QueryEdges. I.e. Partial FactTypeReading is found.
+        ''' </summary>
+        Public ErrorMessage As String = Nothing
+
+        ''' <summary>
         ''' TRUE if is the project of a select/project
         ''' </summary>
         Public IsProjectColumn As Boolean = False
@@ -344,8 +356,12 @@ Namespace FactEngine
                                                            Where PredicatePart.PredicatePartText = asPredicate
                                                            Select PredicatePart
                                                           ).First
-
                                 End If
+                            Else
+                                Me.AmbiguousFactTypeMatches = FBMPossibleFactTypes
+                                lsMessage = "Ambiguous predicate reading, '" & arBaseNode.FBMModelObject.Id & " " & asPredicate & " " & arTargetNode.Name & "'."
+                                lsMessage &= vbCrLf & vbCrLf & "There is more than one Fact Type with this predicate part."
+                                Me.ErrorMessage = lsMessage
                             End If
                         Else
                             Me.FBMFactType = larFactType.First
@@ -364,8 +380,10 @@ Namespace FactEngine
 
                     End If
 
-                    If Me.FBMFactTypeReading Is Nothing Then
+                    If Me.FBMFactTypeReading Is Nothing And Me.FBMFactType IsNot Nothing Then
                         Me.FBMFactTypeReading = Me.FBMFactType.FactTypeReading.Find(AddressOf lrFactTypeReading.EqualsByPredicatePartText)
+                    ElseIf Me.AmbiguousFactTypeMatches.Count > 0 Then
+                        Me.AmbiguousFactTypeReading = lrFactTypeReading
                     End If
 
                 End If

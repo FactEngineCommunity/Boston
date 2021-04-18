@@ -151,6 +151,30 @@
                     lrPreviousTargetNode = lrQueryEdge.TargetNode
                     lrPreviousTopicNode = lrQueryEdge.BaseNode
 
+                    '-------------------------------------------------
+                    'PartialFactTypeMatch processing
+                    If lrQueryGraph.QueryEdges.Count > 1 And lrQueryEdge.IsPartialFactTypeMatch Then
+                        If Not lrQueryEdge.AmbiguousFactTypeMatches.Count > 0 Then
+                            Dim lrPreviousQueryEdge = lrQueryEdge.GetPreviousQueryEdge
+                            If lrPreviousQueryEdge.AmbiguousFactTypeMatches.Contains(lrQueryEdge.FBMFactType) Then
+                                lrPreviousQueryEdge.FBMFactType = lrQueryEdge.FBMFactType
+                                lrPreviousQueryEdge.FBMFactTypeReading = lrQueryEdge.FBMFactType.FactTypeReading.Find(AddressOf lrPreviousQueryEdge.AmbiguousFactTypeReading.EqualsPartiallyByPredicatePartText)
+                                If lrQueryEdge.FBMFactTypeReading Is Nothing Then
+                                    Throw New Exception(lrPreviousQueryEdge.ErrorMessage)
+                                Else
+                                    'PredicatePart
+                                    lrPreviousQueryEdge.FBMPredicatePart = (From PredicatePart In lrPreviousQueryEdge.FBMFactTypeReading.PredicatePart
+                                                                            Where PredicatePart.Role.JoinedORMObject.Id = lrPreviousQueryEdge.BaseNode.Name
+                                                                            Where PredicatePart.PredicatePartText = lrPreviousQueryEdge.Predicate
+                                                                            Select PredicatePart
+                                                                            ).First
+
+                                    lrPreviousQueryEdge.ErrorMessage = Nothing
+                                End If
+                            End If
+                        End If
+                    End If
+
                     ''Derivation Clauses
                     'If lrQueryEdge.FBMFactType.IsDerived Then
                     '    Dim lrDerivationClause = New FEQL.DERIVATIONCLAUSE
@@ -162,6 +186,15 @@
                 Next
 
                 'Richmond.WriteToStatusBar("Generating SQL", True)
+                Dim larErroredQueryEdges = From QueryEdge In lrQueryGraph.QueryEdges
+                                           Where QueryEdge.ErrorMessage IsNot Nothing Or QueryEdge.FBMFactType Is Nothing
+                                           Select QueryEdge
+
+                If larErroredQueryEdges.Count > 0 Then
+                    Dim lsMessage = "Error: " & larErroredQueryEdges.First.ErrorMessage
+                    Throw New Exception(lsMessage)
+                End If
+
 
                 Call lrQueryGraph.checkNodeAliases()
 
@@ -351,15 +384,17 @@
                                                   arQueryEdge.Predicate,
                                                   arPreviousTargetNode)
 
-            If Not arQueryEdge.FBMFactType.getPrimaryFactTypeReading.PredicatePart(0).PredicatePartText = arQueryEdge.Predicate Then
-                '    'Switch the Base and Target nodes
-                '    Dim lrTempQueryNode As New FactEngine.QueryNode
-                '    lrTempQueryNode = arQueryEdge.BaseNode
-                '    arQueryEdge.BaseNode = arQueryEdge.TargetNode
-                '    arQueryEdge.TargetNode = lrTempQueryNode
-                '    arQueryGraph.HeadNode = arQueryEdge.BaseNode
-                If arQueryEdge.FBMFactType.IsManyTo1BinaryFactType And arQueryEdge.BaseNode.Name <> arQueryEdge.FBMFactType.RoleGroup(0).JoinedORMObject.Id Then
-                    arQueryEdge.IsReciprocal = True
+            If Not arQueryEdge.AmbiguousFactTypeMatches.Count > 0 Then
+                If Not arQueryEdge.FBMFactType.getPrimaryFactTypeReading.PredicatePart(0).PredicatePartText = arQueryEdge.Predicate Then
+                    '    'Switch the Base and Target nodes
+                    '    Dim lrTempQueryNode As New FactEngine.QueryNode
+                    '    lrTempQueryNode = arQueryEdge.BaseNode
+                    '    arQueryEdge.BaseNode = arQueryEdge.TargetNode
+                    '    arQueryEdge.TargetNode = lrTempQueryNode
+                    '    arQueryGraph.HeadNode = arQueryEdge.BaseNode
+                    If arQueryEdge.FBMFactType.IsManyTo1BinaryFactType And arQueryEdge.BaseNode.Name <> arQueryEdge.FBMFactType.RoleGroup(0).JoinedORMObject.Id Then
+                        arQueryEdge.IsReciprocal = True
+                    End If
                 End If
             End If
 

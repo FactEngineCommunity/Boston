@@ -87,7 +87,7 @@ Partial Class frmFactEngine
         Me.SplitContainer1.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D
         Me.SplitContainer1.Dock = System.Windows.Forms.DockStyle.Fill
         Me.SplitContainer1.Location = New System.Drawing.Point(0, 0)
-        Me.SplitContainer1.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.SplitContainer1.Margin = New System.Windows.Forms.Padding(2)
         Me.SplitContainer1.Name = "SplitContainer1"
         Me.SplitContainer1.Orientation = System.Windows.Forms.Orientation.Horizontal
         '
@@ -116,7 +116,7 @@ Partial Class frmFactEngine
         Me.TextBoxInput.Font = New System.Drawing.Font("Tahoma", 10.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.TextBoxInput.ForeColor = System.Drawing.Color.Wheat
         Me.TextBoxInput.Location = New System.Drawing.Point(0, 31)
-        Me.TextBoxInput.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.TextBoxInput.Margin = New System.Windows.Forms.Padding(2)
         Me.TextBoxInput.Name = "TextBoxInput"
         Me.TextBoxInput.Size = New System.Drawing.Size(822, 106)
         Me.TextBoxInput.TabIndex = 0
@@ -325,7 +325,7 @@ Partial Class frmFactEngine
         Me.TabControl1.Controls.Add(Me.TabPageGraph)
         Me.TabControl1.Dock = System.Windows.Forms.DockStyle.Fill
         Me.TabControl1.Location = New System.Drawing.Point(0, 0)
-        Me.TabControl1.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.TabControl1.Margin = New System.Windows.Forms.Padding(2)
         Me.TabControl1.Name = "TabControl1"
         Me.TabControl1.SelectedIndex = 0
         Me.TabControl1.Size = New System.Drawing.Size(822, 216)
@@ -336,9 +336,9 @@ Partial Class frmFactEngine
         Me.TabPageResults.Controls.Add(Me.LabelError)
         Me.TabPageResults.Controls.Add(Me.ToolStrip2)
         Me.TabPageResults.Location = New System.Drawing.Point(4, 22)
-        Me.TabPageResults.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.TabPageResults.Margin = New System.Windows.Forms.Padding(2)
         Me.TabPageResults.Name = "TabPageResults"
-        Me.TabPageResults.Padding = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.TabPageResults.Padding = New System.Windows.Forms.Padding(2)
         Me.TabPageResults.Size = New System.Drawing.Size(814, 190)
         Me.TabPageResults.TabIndex = 0
         Me.TabPageResults.Text = "Results"
@@ -349,7 +349,7 @@ Partial Class frmFactEngine
         Me.LabelError.BackColor = System.Drawing.SystemColors.Control
         Me.LabelError.Dock = System.Windows.Forms.DockStyle.Fill
         Me.LabelError.Location = New System.Drawing.Point(2, 27)
-        Me.LabelError.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.LabelError.Margin = New System.Windows.Forms.Padding(2)
         Me.LabelError.Multiline = True
         Me.LabelError.Name = "LabelError"
         Me.LabelError.ScrollBars = System.Windows.Forms.ScrollBars.Vertical
@@ -371,9 +371,9 @@ Partial Class frmFactEngine
         Me.TabPageQuery.Controls.Add(Me.TextBoxQuery)
         Me.TabPageQuery.Controls.Add(Me.ToolStrip3)
         Me.TabPageQuery.Location = New System.Drawing.Point(4, 22)
-        Me.TabPageQuery.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.TabPageQuery.Margin = New System.Windows.Forms.Padding(2)
         Me.TabPageQuery.Name = "TabPageQuery"
-        Me.TabPageQuery.Padding = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.TabPageQuery.Padding = New System.Windows.Forms.Padding(2)
         Me.TabPageQuery.Size = New System.Drawing.Size(814, 190)
         Me.TabPageQuery.TabIndex = 1
         Me.TabPageQuery.Text = "Query"
@@ -383,7 +383,7 @@ Partial Class frmFactEngine
         '
         Me.TextBoxQuery.Dock = System.Windows.Forms.DockStyle.Fill
         Me.TextBoxQuery.Location = New System.Drawing.Point(2, 33)
-        Me.TextBoxQuery.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.TextBoxQuery.Margin = New System.Windows.Forms.Padding(2)
         Me.TextBoxQuery.Multiline = True
         Me.TextBoxQuery.Name = "TextBoxQuery"
         Me.TextBoxQuery.Size = New System.Drawing.Size(810, 155)
@@ -471,9 +471,9 @@ Partial Class frmFactEngine
         Me.ClientSize = New System.Drawing.Size(826, 479)
         Me.Controls.Add(Me.SplitContainer1)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
-        Me.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.Margin = New System.Windows.Forms.Padding(2)
         Me.Name = "frmFactEngine"
-        Me.Text = "Fact Engine"
+        Me.Text = "Fact Engine (Beta)"
         Me.SplitContainer1.Panel1.ResumeLayout(False)
         Me.SplitContainer1.Panel1.PerformLayout()
         Me.SplitContainer1.Panel2.ResumeLayout(False)

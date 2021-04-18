@@ -263,7 +263,10 @@ Namespace ERD
                 End If
 
                 If Me.Cell.Table.Rows.Count > 0 Then
-                    Me.Cell.Table.ResizeToFitText(True)
+                    Try
+                        Me.Cell.Table.ResizeToFitText(True)
+                    Catch
+                    End Try
                 End If
 
 
