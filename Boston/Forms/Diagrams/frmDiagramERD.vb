@@ -2572,91 +2572,104 @@ Public Class frmDiagramERD
 
     End Sub
 
-    Private Sub DeleteAttributeToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles DeleteAttributeToolStripMenuItem.Click
+    Private Sub DeleteAttributeToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripMenuItemDeleteAttribute.Click
 
         Dim lrAttribute As ERD.Attribute
-        Dim lrChangingAttribute As ERD.Attribute
-        Dim lrFactInstance As FBM.FactInstance
-        Dim liInd As Integer = 0
-        Dim lrRecordset As ORMQL.Recordset
-        Dim lsSQLQuery As String = ""
 
-        lrAttribute = Me.zrPage.SelectedObject(0)
+        Try
+            lrAttribute = Me.zrPage.SelectedObject(0)
 
-        lsSQLQuery = "DELETE FROM " & pcenumCMMLRelations.CoreERDAttribute.ToString
-        lsSQLQuery &= " WHERE ModelObject = '" & lrAttribute.Entity.Id & "'"
-        lsSQLQuery &= " AND Attribute = '" & lrAttribute.Name & "'"
+            Dim lsMessage = "Are you sure that you want to delete the attribute, " & lrAttribute.Name & ", from the entity, " & lrAttribute.Entity.Name & "?"
+            lsMessage &= vbCrLf & vbCrLf & "This action cannot be undone and is only available to you because you are using Boston in Superuser Mode."
 
-        Call Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-        lsSQLQuery = "DELETE FROM " & pcenumCMMLRelations.CorePropertyHasPropertyName.ToString
-        lsSQLQuery &= " WHERE Property = '" & lrAttribute.Name & "'"
-
-        Call Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-        lrAttribute.Entity.Attribute.Remove(lrAttribute)
-
-        lrAttribute.Entity.TableShape.DeleteRow(lrAttribute.OrdinalPosition - 1)
-
-        '----------------------------------------------------------------------------------
-        'Reset the OrdinalPosition of the Attributes above the Attribute that was deleted
-        '----------------------------------------------------------------------------------
-        For liInd = lrAttribute.OrdinalPosition To lrAttribute.Entity.Attribute.Count
-            lrChangingAttribute = lrAttribute.Entity.Attribute(liInd - 1)
-            lrChangingAttribute.OrdinalPosition -= 1
-
-            lsSQLQuery = "SELECT * FROM " & pcenumCMMLRelations.CorePropertyHasOrdinalPosition.ToString
-            lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
-            lsSQLQuery &= " WHERE Property = '" & lrChangingAttribute.FactDataInstance.Fact.Id & "'"
-
-            lrRecordset = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-            lrFactInstance = lrRecordset.CurrentFact
-            lrFactInstance.GetFactDataInstanceByRoleName("Position").Data = lrChangingAttribute.OrdinalPosition.ToString
-
-            Call lrFactInstance.FactType.FactTable.ResortFactTable()
-        Next
-
-        '-------------------------------------------------
-        'Remove the underlying FactType from the Model
-        '-------------------------------------------------
-        Dim lrModelObject As New FBM.ModelObject
-        Dim lsRoleId As String = ""
-
-        lsSQLQuery = "SELECT *"
-        lsSQLQuery &= "FROM CorePropertyIsForRole"
-        lsSQLQuery &= " WHERE Property = '" & lrAttribute.Id & "'"
-
-        lrRecordset = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-        lsRoleId = lrRecordset("Role").Data
-
-        lsSQLQuery = "SELECT *"
-        lsSQLQuery &= "FROM " & pcenumCMMLRelations.CorePropertyIsForFactType.ToString
-        lsSQLQuery &= " WHERE Property = '" & lrAttribute.Id & "'"
-
-        lrRecordset = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-        Dim lrFactType As New FBM.FactType(lrRecordset("FactType").Data, True)
-
-        lrFactType = Me.zrPage.Model.FactType.Find(AddressOf lrFactType.Equals)
-
-        If lrFactType.CanSafelyRemoveFromModel Then
-            If lrFactType.IsBinaryFactType Then
-                lrModelObject = lrFactType.GetOtherRoleOfBinaryFactType(lsRoleId).JoinedORMObject
-
-                Call lrFactType.RemoveFromModel()
-
-                Select Case lrModelObject.ConceptType
-                    Case Is = pcenumConceptType.ValueType
-                        lrModelObject.RemoveFromModel()
-                    Case Is = pcenumConceptType.EntityType
-                        lrModelObject.RemoveFromModel()
-                    Case Is = pcenumConceptType.FactType
-                End Select
-
+            If MsgBox(lsMessage, MsgBoxStyle.YesNo + MsgBoxStyle.Critical) = MsgBoxResult.Yes Then
+                Call lrAttribute.Column.Table.removeColumn(lrAttribute.Column)
             End If
 
-        End If
+        Catch ex As Exception
+            Debugger.Break()
+        End Try
+
+        'Dim lrChangingAttribute As ERD.Attribute
+        'Dim lrFactInstance As FBM.FactInstance
+        'Dim liInd As Integer = 0
+        'Dim lrRecordset As ORMQL.Recordset
+        'Dim lsSQLQuery As String = ""
+
+        'lsSQLQuery = "DELETE FROM " & pcenumCMMLRelations.CoreERDAttribute.ToString
+        'lsSQLQuery &= " WHERE ModelObject = '" & lrAttribute.Entity.Id & "'"
+        'lsSQLQuery &= " AND Attribute = '" & lrAttribute.Name & "'"
+
+        'Call Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+        'lsSQLQuery = "DELETE FROM " & pcenumCMMLRelations.CorePropertyHasPropertyName.ToString
+        'lsSQLQuery &= " WHERE Property = '" & lrAttribute.Name & "'"
+
+        'Call Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+        'lrAttribute.Entity.Attribute.Remove(lrAttribute)
+
+        'lrAttribute.Entity.TableShape.DeleteRow(lrAttribute.OrdinalPosition - 1)
+
+        ''----------------------------------------------------------------------------------
+        ''Reset the OrdinalPosition of the Attributes above the Attribute that was deleted
+        ''----------------------------------------------------------------------------------
+        'For liInd = lrAttribute.OrdinalPosition To lrAttribute.Entity.Attribute.Count
+        '    lrChangingAttribute = lrAttribute.Entity.Attribute(liInd - 1)
+        '    lrChangingAttribute.OrdinalPosition -= 1
+
+        '    lsSQLQuery = "SELECT * FROM " & pcenumCMMLRelations.CorePropertyHasOrdinalPosition.ToString
+        '    lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
+        '    lsSQLQuery &= " WHERE Property = '" & lrChangingAttribute.FactDataInstance.Fact.Id & "'"
+
+        '    lrRecordset = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+        '    lrFactInstance = lrRecordset.CurrentFact
+        '    lrFactInstance.GetFactDataInstanceByRoleName("Position").Data = lrChangingAttribute.OrdinalPosition.ToString
+
+        '    Call lrFactInstance.FactType.FactTable.ResortFactTable()
+        'Next
+
+        ''-------------------------------------------------
+        ''Remove the underlying FactType from the Model
+        ''-------------------------------------------------
+        'Dim lrModelObject As New FBM.ModelObject
+        'Dim lsRoleId As String = ""
+
+        'lsSQLQuery = "SELECT *"
+        'lsSQLQuery &= "FROM CorePropertyIsForRole"
+        'lsSQLQuery &= " WHERE Property = '" & lrAttribute.Id & "'"
+
+        'lrRecordset = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+        'lsRoleId = lrRecordset("Role").Data
+
+        'lsSQLQuery = "SELECT *"
+        'lsSQLQuery &= "FROM " & pcenumCMMLRelations.CorePropertyIsForFactType.ToString
+        'lsSQLQuery &= " WHERE Property = '" & lrAttribute.Id & "'"
+
+        'lrRecordset = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+        'Dim lrFactType As New FBM.FactType(lrRecordset("FactType").Data, True)
+
+        'lrFactType = Me.zrPage.Model.FactType.Find(AddressOf lrFactType.Equals)
+
+        'If lrFactType.CanSafelyRemoveFromModel Then
+        '    If lrFactType.IsBinaryFactType Then
+        '        lrModelObject = lrFactType.GetOtherRoleOfBinaryFactType(lsRoleId).JoinedORMObject
+
+        '        Call lrFactType.RemoveFromModel()
+
+        '        Select Case lrModelObject.ConceptType
+        '            Case Is = pcenumConceptType.ValueType
+        '                lrModelObject.RemoveFromModel()
+        '            Case Is = pcenumConceptType.EntityType
+        '                lrModelObject.RemoveFromModel()
+        '            Case Is = pcenumConceptType.FactType
+        '        End Select
+
+        '    End If
+
+        'End If
 
     End Sub
 
@@ -2916,6 +2929,23 @@ Public Class frmDiagramERD
             lsMessage &= vbCrLf & vbCrLf & ex.Message
             prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
+
+    End Sub
+
+    Private Sub ORMVerbalisationViewToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ORMVerbalisationViewToolStripMenuItem.Click
+
+        prApplication.WorkingModel = Me.zrPage.Model
+        prApplication.WorkingPage = Me.zrPage
+
+        Call frmMain.loadToolboxORMVerbalisationForm(Me.zrPage.Model, Me.DockPanel.ActivePane)
+
+    End Sub
+
+    Private Sub ContextMenuStripAttribute_Opening(sender As Object, e As System.ComponentModel.CancelEventArgs) Handles ContextMenuStripAttribute.Opening
+
+        If My.Settings.SuperuserMode Then
+            Me.ToolStripMenuItemDeleteAttribute.Visible = True
+        End If
 
     End Sub
 

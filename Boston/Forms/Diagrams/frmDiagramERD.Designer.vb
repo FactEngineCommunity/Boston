@@ -49,6 +49,7 @@ Partial Class frmDiagramERD
         Me.ModelDictionaryToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.PropertiesToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripSeparator3 = New System.Windows.Forms.ToolStripSeparator()
+        Me.ORMVerbalisationViewToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.PageAsORMMetamodelToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ShowHideToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.mnuOption_ViewGrid = New System.Windows.Forms.ToolStripMenuItem()
@@ -60,7 +61,7 @@ Partial Class frmDiagramERD
         Me.MoveDownToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripSeparator6 = New System.Windows.Forms.ToolStripSeparator()
         Me.EditAttributeToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.DeleteAttributeToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripMenuItemDeleteAttribute = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripSeparator1 = New System.Windows.Forms.ToolStripSeparator()
         Me.ToolStripMenuItemIsMandatory = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItemIsPartOfPrimaryKey = New System.Windows.Forms.ToolStripMenuItem()
@@ -203,7 +204,7 @@ Partial Class frmDiagramERD
         '
         'ViewToolStripMenuItem
         '
-        Me.ViewToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.IndexEditorToolStripMenuItem, Me.ModelDictionaryToolStripMenuItem, Me.PropertiesToolStripMenuItem, Me.ToolStripSeparator3, Me.PageAsORMMetamodelToolStripMenuItem})
+        Me.ViewToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.IndexEditorToolStripMenuItem, Me.ModelDictionaryToolStripMenuItem, Me.PropertiesToolStripMenuItem, Me.ToolStripSeparator3, Me.ORMVerbalisationViewToolStripMenuItem, Me.PageAsORMMetamodelToolStripMenuItem})
         Me.ViewToolStripMenuItem.Name = "ViewToolStripMenuItem"
         Me.ViewToolStripMenuItem.Size = New System.Drawing.Size(215, 30)
         Me.ViewToolStripMenuItem.Text = "&View"
@@ -234,6 +235,13 @@ Partial Class frmDiagramERD
         Me.ToolStripSeparator3.Name = "ToolStripSeparator3"
         Me.ToolStripSeparator3.Size = New System.Drawing.Size(205, 6)
         Me.ToolStripSeparator3.Visible = False
+        '
+        'ORMVerbalisationViewToolStripMenuItem
+        '
+        Me.ORMVerbalisationViewToolStripMenuItem.Image = CType(resources.GetObject("ORMVerbalisationViewToolStripMenuItem.Image"), System.Drawing.Image)
+        Me.ORMVerbalisationViewToolStripMenuItem.Name = "ORMVerbalisationViewToolStripMenuItem"
+        Me.ORMVerbalisationViewToolStripMenuItem.Size = New System.Drawing.Size(316, 34)
+        Me.ORMVerbalisationViewToolStripMenuItem.Text = "&Verbalisation View"
         '
         'PageAsORMMetamodelToolStripMenuItem
         '
@@ -278,8 +286,8 @@ Partial Class frmDiagramERD
         '
         'ContextMenuStripAttribute
         '
-        Me.ContextMenuStripAttribute.AutoSize = False
-        Me.ContextMenuStripAttribute.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MoveUpToolStripMenuItem, Me.MoveDownToolStripMenuItem, Me.ToolStripSeparator6, Me.EditAttributeToolStripMenuItem, Me.DeleteAttributeToolStripMenuItem, Me.ToolStripSeparator1, Me.ToolStripMenuItemIsMandatory, Me.ToolStripMenuItemIsPartOfPrimaryKey})
+        Me.ContextMenuStripAttribute.ImageScalingSize = New System.Drawing.Size(24, 24)
+        Me.ContextMenuStripAttribute.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MoveUpToolStripMenuItem, Me.MoveDownToolStripMenuItem, Me.ToolStripSeparator6, Me.EditAttributeToolStripMenuItem, Me.ToolStripMenuItemDeleteAttribute, Me.ToolStripSeparator1, Me.ToolStripMenuItemIsMandatory, Me.ToolStripMenuItemIsPartOfPrimaryKey})
         Me.ContextMenuStripAttribute.Name = "ContextMenuStripAttribute"
         Me.ContextMenuStripAttribute.Size = New System.Drawing.Size(195, 218)
         '
@@ -303,6 +311,26 @@ Partial Class frmDiagramERD
         Me.ToolStripSeparator6.Size = New System.Drawing.Size(191, 6)
         Me.ToolStripSeparator6.Visible = False
         '
+        'MoveUpToolStripMenuItem
+        '
+        Me.MoveUpToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.Up16x16
+        Me.MoveUpToolStripMenuItem.Name = "MoveUpToolStripMenuItem"
+        Me.MoveUpToolStripMenuItem.Size = New System.Drawing.Size(260, 32)
+        Me.MoveUpToolStripMenuItem.Text = "Move &Up"
+        '
+        'MoveDownToolStripMenuItem
+        '
+        Me.MoveDownToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.Down16x16
+        Me.MoveDownToolStripMenuItem.Name = "MoveDownToolStripMenuItem"
+        Me.MoveDownToolStripMenuItem.Size = New System.Drawing.Size(260, 32)
+        Me.MoveDownToolStripMenuItem.Text = "Move &Down"
+        '
+        'ToolStripSeparator6
+        '
+        Me.ToolStripSeparator6.Name = "ToolStripSeparator6"
+        Me.ToolStripSeparator6.Size = New System.Drawing.Size(257, 6)
+        Me.ToolStripSeparator6.Visible = False
+        '
         'EditAttributeToolStripMenuItem
         '
         Me.EditAttributeToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.edit16x16
@@ -311,13 +339,14 @@ Partial Class frmDiagramERD
         Me.EditAttributeToolStripMenuItem.Text = "&Edit Attribute"
         Me.EditAttributeToolStripMenuItem.Visible = False
         '
-        'DeleteAttributeToolStripMenuItem
+        'ToolStripMenuItemDeleteAttribute
         '
-        Me.DeleteAttributeToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.deleteround16x16
-        Me.DeleteAttributeToolStripMenuItem.Name = "DeleteAttributeToolStripMenuItem"
-        Me.DeleteAttributeToolStripMenuItem.Size = New System.Drawing.Size(194, 30)
-        Me.DeleteAttributeToolStripMenuItem.Text = "D&elete Attribute"
-        Me.DeleteAttributeToolStripMenuItem.Visible = False
+        Me.ToolStripMenuItemDeleteAttribute.Image = Global.Boston.My.Resources.Resources.deleteround16x16
+        Me.ToolStripMenuItemDeleteAttribute.Name = "ToolStripMenuItemDeleteAttribute"
+        Me.ToolStripMenuItemDeleteAttribute.Size = New System.Drawing.Size(260, 32)
+        Me.ToolStripMenuItemDeleteAttribute.Text = "D&elete Attribute"
+        Me.ToolStripMenuItemDeleteAttribute.Visible = False
+
         '
         'ToolStripSeparator1
         '
@@ -468,7 +497,7 @@ Partial Class frmDiagramERD
     Friend WithEvents ToolStripSeparator6 As System.Windows.Forms.ToolStripSeparator
     Friend WithEvents MoveUpToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents MoveDownToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
-    Friend WithEvents DeleteAttributeToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents ToolStripMenuItemDeleteAttribute As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents ContextMenuStrip_Relation As System.Windows.Forms.ContextMenuStrip
     Friend WithEvents ToolStripMenuItemEditRelation As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents ToolStripMenuItemDeleteRelation As System.Windows.Forms.ToolStripMenuItem
@@ -485,4 +514,5 @@ Partial Class frmDiagramERD
     Friend WithEvents IndexEditorToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents ToolStripSeparatorReCreateTable As ToolStripSeparator
     Friend WithEvents ToolStripMenuItemReCreateDatabaseTable As ToolStripMenuItem
+    Friend WithEvents ORMVerbalisationViewToolStripMenuItem As ToolStripMenuItem
 End Class
