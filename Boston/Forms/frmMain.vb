@@ -77,7 +77,7 @@ Public Class frmMain
             '====================================================================================
             'Notes
             '  Core v2.1 introduces changes to the StateTransitionDiagram model, with changes to the underlying ModelElements. Introduced in Boston v5.4
-            psApplicationApplicationVersionNr = "5.5"
+            psApplicationApplicationVersionNr = "5.6"
             psApplicationDatabaseVersionNr = "1.26"
             'NB To access the Core version number go to prApplication.CMML.Core.CoreVersionNumber once the Core has loaded.          
 

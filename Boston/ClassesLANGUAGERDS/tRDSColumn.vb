@@ -197,6 +197,7 @@ Namespace RDS
         Public Event NameChanged(ByVal asNewName As String)
         Public Event ContributesToPrimaryKeyChanged(ByVal abContributesToPrimaryKey As Boolean)
         Public Event forceRefresh()
+        Public Event OrdinalPositionChanged(ByVal aiNewOrdinalPosition As Integer)
 
         ''' <summary>
         ''' Parameterless New
@@ -555,24 +556,27 @@ Namespace RDS
 
         End Function
 
-        Public Sub moveToOrdinalPosition(ByVal aiOrdinalPosition As Integer)
+        Public Sub moveToOrdinalPosition(ByVal aiNewOrdinalPosition As Integer, ByVal aiFromOrdinalPosition As Integer)
 
             Try
-                If aiOrdinalPosition > Me.Table.Column.Count Then
+                If aiNewOrdinalPosition > Me.Table.Column.Count Then
                     Throw New Exception("Tried to move the Column to an Ordinal Position outside the range of Columns within the Table.")
                 End If
 
-                Dim larColumn = From Column In Me.Table.Column _
-                                Where Column.OrdinalPosition >= aiOrdinalPosition _
+                Dim larColumn = From Column In Me.Table.Column
+                                Where Column.OrdinalPosition >= Viev.Lesser(aiNewOrdinalPosition, aiFromOrdinalPosition) And
+                                      Column.OrdinalPosition <= Viev.Greater(aiNewOrdinalPosition, aiFromOrdinalPosition)
                                 Select Column
 
                 For Each lrColumn In larColumn
-                    lrColumn.OrdinalPosition += 1
-                    Call Me.Model.Model.setCMMLAttributeOrdinalPosition(lrColumn.Id, lrColumn.OrdinalPosition)
+                    If aiNewOrdinalPosition < aiFromOrdinalPosition Then
+                        Call lrColumn.setOrdinalPosition(lrColumn.OrdinalPosition + 1)
+                    Else
+                        Call lrColumn.setOrdinalPosition(lrColumn.OrdinalPosition - 1)
+                    End If
                 Next
 
-                Me.OrdinalPosition = aiOrdinalPosition
-                Call Me.Model.Model.setCMMLAttributeOrdinalPosition(Me.Id, Me.OrdinalPosition)
+                Call Me.setOrdinalPosition(aiNewOrdinalPosition)
 
             Catch ex As Exception
                 Dim lsMessage1 As String
@@ -672,6 +676,25 @@ Namespace RDS
             End Try
 
 
+        End Sub
+
+        Public Sub setOrdinalPosition(ByRef aiOrdinalPosition As Integer)
+
+            Try
+                Me.OrdinalPosition = aiOrdinalPosition
+
+                Call Me.Model.Model.setCMMLAttributeOrdinalPosition(Me.Id, aiOrdinalPosition)
+
+                RaiseEvent OrdinalPositionChanged(aiOrdinalPosition)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
         End Sub
 
     End Class

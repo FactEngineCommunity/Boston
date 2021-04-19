@@ -4550,73 +4550,88 @@ Namespace FBM
         Public Sub FixErrors()
 
             Try
-                '----------------------------------------------------------
-                'Fatal Roles. Roles without JoinedORMObject
-                Dim larFatalRole = From Role In Me.Role
-                                   Where Role.JoinedORMObject Is Nothing
-                                   Select Role
 
-                For Each lrRole In larFatalRole.ToArray
-                    Call lrRole.RemoveFromModel(True, False)
-                Next
+                With New WaitCursor
+                    '----------------------------------------------------------
+                    'Fatal Roles. Roles without JoinedORMObject
+                    Dim larFatalRole = From Role In Me.Role
+                                       Where Role.JoinedORMObject Is Nothing
+                                       Select Role
 
-                '----------------------------------------------------------
-                'Relations, Invalid ActiveRole on OriginColumns (OriginColumn.ActiveRole <> Destination.ActiveRole)
-                '           OriginColumn.Count <> DestinationColumn.Count
-                Dim larRelation = (From Relation In Me.RDS.Relation
-                                   Where Relation.OriginColumns.Count > 0 'Is likely always, but CodeSafe
-                                   Where Relation.OriginColumns.Count <> Relation.DestinationColumns.Count
-                                   Select Relation).ToList
+                    For Each lrRole In larFatalRole.ToArray
+                        Call lrRole.RemoveFromModel(True, False)
+                    Next
 
-                For Each lrRelation In larRelation.findall(Function(x) x.origincolumns.count > 0 And x.destinationColumns.count > 0)
-                    Dim lrOriginColumn = (From Column In lrRelation.OriginColumns
-                                          Select Column
-                                          Order By Column.OrdinalPosition).First
+                    '----------------------------------------------------------
+                    'Relations, Invalid ActiveRole on OriginColumns (OriginColumn.ActiveRole <> Destination.ActiveRole)
+                    '           OriginColumn.Count <> DestinationColumn.Count
+                    Dim larRelation = (From Relation In Me.RDS.Relation
+                                       Where Relation.OriginColumns.Count > 0 'Is likely always, but CodeSafe
+                                       Where Relation.OriginColumns.Count <> Relation.DestinationColumns.Count
+                                       Select Relation).ToList
 
-                    Dim lrDestinationColumn = (From Column In lrRelation.DestinationColumns
-                                               Select Column
-                                               Order By Column.OrdinalPosition).First
+                    For Each lrRelation In larRelation.FindAll(Function(x) x.OriginColumns.Count > 0 And x.DestinationColumns.Count > 0)
+                        Dim lrOriginColumn = (From Column In lrRelation.OriginColumns
+                                              Select Column
+                                              Order By Column.OrdinalPosition).First
 
-                    If lrOriginColumn.ActiveRole IsNot lrDestinationColumn.ActiveRole Then
-                        'Extra checks
-                        If lrRelation.DestinationTable.FBMModelElement.GetType = GetType(FBM.EntityType) And
-                            lrRelation.DestinationTable.Index.Find(Function(x) x.IsPrimaryKey) IsNot Nothing Then
-                            If lrOriginColumn.Role.FactType Is lrOriginColumn.ActiveRole.FactType Then
-                                'The best checks have been done. This is a Relation where the 
-                                '  Relation was made before the PrimaryKey was created for the DestinationTable.
-                                '  The OriginColumn count <> DestinationColumn count,
-                                '  the ActiveRole of the first OriginColumn <> the ActiveRole of the first DestinationColumn,
-                                '  and is likely this way for all of the OriginColumns. It needs to be fixed.
-                                'Call lrRelation.triggerDestinationColumnsChanged
-                                Dim lrIndex As RDS.Index = lrRelation.DestinationTable.Index.Find(Function(x) x.IsPrimaryKey)
-                                Call lrRelation.DestinationTable_IndexModified(lrIndex)
+                        Dim lrDestinationColumn = (From Column In lrRelation.DestinationColumns
+                                                   Select Column
+                                                   Order By Column.OrdinalPosition).First
+
+                        If lrOriginColumn.ActiveRole IsNot lrDestinationColumn.ActiveRole Then
+                            'Extra checks
+                            If lrRelation.DestinationTable.FBMModelElement.GetType = GetType(FBM.EntityType) And
+                                lrRelation.DestinationTable.Index.Find(Function(x) x.IsPrimaryKey) IsNot Nothing Then
+                                If lrOriginColumn.Role.FactType Is lrOriginColumn.ActiveRole.FactType Then
+                                    'The best checks have been done. This is a Relation where the 
+                                    '  Relation was made before the PrimaryKey was created for the DestinationTable.
+                                    '  The OriginColumn count <> DestinationColumn count,
+                                    '  the ActiveRole of the first OriginColumn <> the ActiveRole of the first DestinationColumn,
+                                    '  and is likely this way for all of the OriginColumns. It needs to be fixed.
+                                    'Call lrRelation.triggerDestinationColumnsChanged
+                                    Dim lrIndex As RDS.Index = lrRelation.DestinationTable.Index.Find(Function(x) x.IsPrimaryKey)
+                                    Call lrRelation.DestinationTable_IndexModified(lrIndex)
+                                End If
                             End If
                         End If
-                    End If
-                Next
+                    Next
 
-                '----------------------------------------------------------
-                'Fatal Columns. Columns where ActiveRole is Nothing
-                Dim larFatalColumn = From Table In Me.RDS.Table
-                                     From Column In Table.Column
-                                     Where Column.ActiveRole Is Nothing
-                                     Select Column
+                    '----------------------------------------------------------
+                    'Fatal Columns. Columns where ActiveRole is Nothing
+                    Dim larFatalColumn = From Table In Me.RDS.Table
+                                         From Column In Table.Column
+                                         Where Column.ActiveRole Is Nothing
+                                         Select Column
 
-                For Each lrColumn In larFatalColumn.ToArray
-                    Call lrColumn.Table.removeColumn(lrColumn)
-                Next
+                    For Each lrColumn In larFatalColumn.ToArray
+                        Call lrColumn.Table.removeColumn(lrColumn)
+                    Next
 
-                '---------------------------------------------------------
-                'InternalUniquenessConstraints, where LevelNumbers are not correct.
-                For Each lrFactType In Me.FactType
-                    Dim liInternalUniquenessConstraintLevelNrSum = (From InternalUniquenessConstraint In lrFactType.InternalUniquenessConstraint
-                                                                    Select InternalUniquenessConstraint.LevelNr).Sum
-                    Dim liSum As Integer = (lrFactType.InternalUniquenessConstraint.Count / 2) * (1 + lrFactType.InternalUniquenessConstraint.Count)
-                    If liInternalUniquenessConstraintLevelNrSum <> liSum Then
-                        Call lrFactType.ResetInternalUniquenessConstraintLevelNumbers()
-                    End If
-                Next
+                    '---------------------------------------------------------
+                    'InternalUniquenessConstraints, where LevelNumbers are not correct.
+                    For Each lrFactType In Me.FactType
+                        Dim liInternalUniquenessConstraintLevelNrSum = (From InternalUniquenessConstraint In lrFactType.InternalUniquenessConstraint
+                                                                        Select InternalUniquenessConstraint.LevelNr).Sum
+                        Dim liSum As Integer = (lrFactType.InternalUniquenessConstraint.Count / 2) * (1 + lrFactType.InternalUniquenessConstraint.Count)
+                        If liInternalUniquenessConstraintLevelNrSum <> liSum Then
+                            Call lrFactType.ResetInternalUniquenessConstraintLevelNumbers()
+                        End If
+                    Next
 
+                    '-----------------------------------------------------------------
+                    'Column Ordinal Positions
+                    For Each lrTable In Me.RDS.Table
+                        Dim liColumnOrdinalPositionSum = (From Column In lrTable.Column
+                                                          Select Column.OrdinalPosition).Sum
+                        Dim liSum As Integer = (lrTable.Column.Count / 2) * (1 + lrTable.Column.Count)
+                        If liColumnOrdinalPositionSum <> liSum And Not lrTable.isSubtype Then
+                            Call lrTable.resetColumnOrdinalPositions()
+                        End If
+                    Next
+
+
+                End With
 
             Catch ex As Exception
                 Debugger.Break()

@@ -2469,49 +2469,52 @@ Public Class frmDiagramERD
                 '-----------------------------------------------------------------
                 Exit Sub
             Else
-                lrAttribute.OrdinalPosition -= 1
 
-                '--------------------------------------------------------------------
-                'Change the Ordinal Positions of the Attributes above the Attribute
-                '--------------------------------------------------------------------
-                Dim lrChangingAttribute As ERD.Attribute
+                Call lrAttribute.Column.moveToOrdinalPosition(lrAttribute.Column.OrdinalPosition - 1, lrAttribute.Column.OrdinalPosition)
 
-                Dim lrTableNode As MindFusion.Diagramming.TableNode = Me.Diagram.Selection.Items(0)
-                Dim lrEntity As New ERD.Entity
-                '---------------------------------------------------------
-                'Get the EntityType represented by the (selected) Entity
-                '---------------------------------------------------------
-                lrEntity = lrTableNode.Tag
+                'lrAttribute.OrdinalPosition -= 1
 
-                lrChangingAttribute = lrEntity.Attribute(lrAttribute.OrdinalPosition - 1)
-                lrChangingAttribute.OrdinalPosition += 1
+                ''--------------------------------------------------------------------
+                ''Change the Ordinal Positions of the Attributes above the Attribute
+                ''--------------------------------------------------------------------
+                'Dim lrChangingAttribute As ERD.Attribute
 
-                lrAttribute.Cell = lrEntity.TableShape.Item(0, lrAttribute.OrdinalPosition - 1)
-                lrAttribute.Cell.Tag = lrAttribute
-                lrChangingAttribute.Cell = lrEntity.TableShape.Item(0, lrChangingAttribute.OrdinalPosition - 1)
-                lrChangingAttribute.Cell.Tag = lrChangingAttribute
+                'Dim lrTableNode As MindFusion.Diagramming.TableNode = Me.Diagram.Selection.Items(0)
+                'Dim lrEntity As New ERD.Entity
+                ''---------------------------------------------------------
+                ''Get the EntityType represented by the (selected) Entity
+                ''---------------------------------------------------------
+                'lrEntity = lrTableNode.Tag
 
-                Call lrAttribute.RefreshShape()
-                Call lrChangingAttribute.RefreshShape()
+                'lrChangingAttribute = lrEntity.Attribute(lrAttribute.OrdinalPosition - 1)
+                'lrChangingAttribute.OrdinalPosition += 1
 
-                lrEntity.Attribute.Insert(lrAttribute.OrdinalPosition - 1, lrAttribute)
-                lrEntity.Attribute.RemoveAt(lrAttribute.OrdinalPosition + 1)
+                'lrAttribute.Cell = lrEntity.TableShape.Item(0, lrAttribute.OrdinalPosition - 1)
+                'lrAttribute.Cell.Tag = lrAttribute
+                'lrChangingAttribute.Cell = lrEntity.TableShape.Item(0, lrChangingAttribute.OrdinalPosition - 1)
+                'lrChangingAttribute.Cell.Tag = lrChangingAttribute
 
-                Dim lrFact As FBM.Fact
+                'Call lrAttribute.RefreshShape()
+                'Call lrChangingAttribute.RefreshShape()
 
-                lsSQLQuery = "SELECT * FROM " & pcenumCMMLRelations.CorePropertyHasOrdinalPosition.ToString
-                lsSQLQuery &= " WHERE Property = '" & lrAttribute.Id & "'"
+                'lrEntity.Attribute.Insert(lrAttribute.OrdinalPosition - 1, lrAttribute)
+                'lrEntity.Attribute.RemoveAt(lrAttribute.OrdinalPosition + 1)
 
-                Dim lrRecordset As ORMQL.Recordset = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-                lrFact = lrRecordset.CurrentFact
-                lrFact.GetFactDataByRoleName("Position").Data = lrAttribute.OrdinalPosition.ToString
+                'Dim lrFact As FBM.Fact
 
-                lsSQLQuery = "SELECT * FROM " & pcenumCMMLRelations.CorePropertyHasOrdinalPosition.ToString
-                lsSQLQuery &= " WHERE Property = '" & lrChangingAttribute.Id & "'"
+                'lsSQLQuery = "SELECT * FROM " & pcenumCMMLRelations.CorePropertyHasOrdinalPosition.ToString
+                'lsSQLQuery &= " WHERE Property = '" & lrAttribute.Id & "'"
 
-                lrRecordset = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-                lrFact = lrRecordset.CurrentFact
-                lrFact.GetFactDataByRoleName("Position").Data = lrChangingAttribute.OrdinalPosition.ToString
+                'Dim lrRecordset As ORMQL.Recordset = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                'lrFact = lrRecordset.CurrentFact
+                'lrFact.GetFactDataByRoleName("Position").Data = lrAttribute.OrdinalPosition.ToString
+
+                'lsSQLQuery = "SELECT * FROM " & pcenumCMMLRelations.CorePropertyHasOrdinalPosition.ToString
+                'lsSQLQuery &= " WHERE Property = '" & lrChangingAttribute.Id & "'"
+
+                'lrRecordset = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                'lrFact = lrRecordset.CurrentFact
+                'lrFact.GetFactDataByRoleName("Position").Data = lrChangingAttribute.OrdinalPosition.ToString
 
                 '20200725-VM-Might still need this.
                 'Call lrFactInstance.FactType.FactTable.ResortFactTable()
@@ -2550,42 +2553,43 @@ Public Class frmDiagramERD
             '-----------------------------------------------------------------
             Exit Sub
         Else
-            lrAttribute.OrdinalPosition += 1
+            Call lrAttribute.Column.moveToOrdinalPosition(lrAttribute.Column.OrdinalPosition + 1, lrAttribute.Column.OrdinalPosition)
 
-            '--------------------------------------------------------------------
-            'Change the Ordinal Positions of the Attributes above the Attribute
-            '--------------------------------------------------------------------
-            Dim lrChangingAttribute As ERD.Attribute
+            'lrAttribute.OrdinalPosition += 1
+            ''--------------------------------------------------------------------
+            ''Change the Ordinal Positions of the Attributes above the Attribute
+            ''--------------------------------------------------------------------
+            'Dim lrChangingAttribute As ERD.Attribute
 
-            lrChangingAttribute = lrEntity.Attribute(lrAttribute.OrdinalPosition - 1)
-            lrChangingAttribute.OrdinalPosition -= 1
+            'lrChangingAttribute = lrEntity.Attribute(lrAttribute.OrdinalPosition - 1)
+            'lrChangingAttribute.OrdinalPosition -= 1
 
-            lrAttribute.Cell = lrEntity.TableShape.Item(0, lrAttribute.OrdinalPosition - 1)
-            lrAttribute.Cell.Tag = lrAttribute
-            lrChangingAttribute.Cell = lrEntity.TableShape.Item(0, lrChangingAttribute.OrdinalPosition - 1)
-            lrChangingAttribute.Cell.Tag = lrChangingAttribute
+            'lrAttribute.Cell = lrEntity.TableShape.Item(0, lrAttribute.OrdinalPosition - 1)
+            'lrAttribute.Cell.Tag = lrAttribute
+            'lrChangingAttribute.Cell = lrEntity.TableShape.Item(0, lrChangingAttribute.OrdinalPosition - 1)
+            'lrChangingAttribute.Cell.Tag = lrChangingAttribute
 
-            Call lrAttribute.RefreshShape()
-            Call lrChangingAttribute.RefreshShape()
+            'Call lrAttribute.RefreshShape()
+            'Call lrChangingAttribute.RefreshShape()
 
-            lrEntity.Attribute.Insert(lrAttribute.OrdinalPosition, lrAttribute)
-            lrEntity.Attribute.RemoveAt(lrAttribute.OrdinalPosition - 2)
+            'lrEntity.Attribute.Insert(lrAttribute.OrdinalPosition, lrAttribute)
+            'lrEntity.Attribute.RemoveAt(lrAttribute.OrdinalPosition - 2)
 
-            Dim lrFact As FBM.Fact
+            'Dim lrFact As FBM.Fact
 
-            lsSQLQuery = "SELECT * FROM " & pcenumCMMLRelations.CorePropertyHasOrdinalPosition.ToString
-            lsSQLQuery &= " WHERE Property = '" & lrAttribute.Id & "'"
+            'lsSQLQuery = "SELECT * FROM " & pcenumCMMLRelations.CorePropertyHasOrdinalPosition.ToString
+            'lsSQLQuery &= " WHERE Property = '" & lrAttribute.Id & "'"
 
-            Dim lrRecordset As ORMQL.Recordset = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-            lrFact = lrRecordset.CurrentFact
-            lrFact.GetFactDataByRoleName("Position").Data = lrAttribute.OrdinalPosition.ToString
+            'Dim lrRecordset As ORMQL.Recordset = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+            'lrFact = lrRecordset.CurrentFact
+            'lrFact.GetFactDataByRoleName("Position").Data = lrAttribute.OrdinalPosition.ToString
 
-            lsSQLQuery = "SELECT * FROM " & pcenumCMMLRelations.CorePropertyHasOrdinalPosition.ToString
-            lsSQLQuery &= " WHERE Property = '" & lrChangingAttribute.Id & "'"
+            'lsSQLQuery = "SELECT * FROM " & pcenumCMMLRelations.CorePropertyHasOrdinalPosition.ToString
+            'lsSQLQuery &= " WHERE Property = '" & lrChangingAttribute.Id & "'"
 
-            lrRecordset = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-            lrFact = lrRecordset.CurrentFact
-            lrFact.GetFactDataByRoleName("Position").Data = lrChangingAttribute.OrdinalPosition.ToString
+            'lrRecordset = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+            'lrFact = lrRecordset.CurrentFact
+            'lrFact.GetFactDataByRoleName("Position").Data = lrChangingAttribute.OrdinalPosition.ToString
 
             '20200725-VM-Might still need this.
             'Call lrFactInstance.FactType.FactTable.ResortFactTable()

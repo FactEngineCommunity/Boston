@@ -1012,7 +1012,7 @@ Namespace RDS
                     For Each lrColumn In larColumn
                         If lrColumn.hasNonPrimaryKeyColumnsAboveIt() Then
                             liOrdinalPosition = Me.getFirstNonPrimaryKeyColumnOrdinalPosition
-                            Call lrColumn.moveToOrdinalPosition(liOrdinalPosition)
+                            Call lrColumn.moveToOrdinalPosition(liOrdinalPosition, lrColumn.OrdinalPosition)
                         End If
                     Next
 
@@ -1187,6 +1187,24 @@ Namespace RDS
             End Try
 
         End Sub
+
+        Public Sub resetColumnOrdinalPositions()
+
+            Try
+                For liInd = 0 To Me.Column.Count - 1
+                    Call Me.Column(liInd).setOrdinalPosition(liInd + 1)
+                Next
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
         Public Sub setIsPGSRelation(ByVal abIsPGSRelation As Boolean)
 
             Try

@@ -473,6 +473,22 @@ Namespace ERD
             End Try
         End Sub
 
+        Private Sub Column_OrdinalPositionChanged(aiNewOrdinalPosition As Integer) Handles Column.OrdinalPositionChanged
+
+            Try
+                Me.OrdinalPosition = aiNewOrdinalPosition
+                Call Me.Entity.RefreshShape()
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
     End Class
 
 End Namespace
