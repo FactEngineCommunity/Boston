@@ -1129,7 +1129,7 @@ Public Class frmDiagramERD
 
                 Dim lrRDSTable = lrEntity.getCorrespondingRDSTable
 
-                For Each lrSubtypeTable In lrRDSTable.getSubtypeTables
+                For Each lrSubtypeTable In lrRDSTable.getSubtypeTables(False)
 
                     lrSubtypeEntity = Me.zrPage.ERDiagram.Entity.Find(Function(x) x.Name = lrSubtypeTable.Name)
 

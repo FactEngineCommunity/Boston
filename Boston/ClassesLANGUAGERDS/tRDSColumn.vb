@@ -687,6 +687,28 @@ Namespace RDS
 
                 RaiseEvent OrdinalPositionChanged(aiOrdinalPosition)
 
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+        End Sub
+
+        ''' <summary>
+        ''' Sets the Table for a Column. Used particularly when changing 'IsAbsorbed' for a ModelObject.
+        ''' </summary>
+        ''' <param name="arTable"></param>
+        Public Sub setTable(ByRef arTable As RDS.Table)
+
+            Try
+                Call Me.Model.Model.changeCMMLAttributeEntityForColumn(Me, arTable)
+
+                Me.Table = arTable
+
             Catch ex As Exception
                 Dim lsMessage As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()

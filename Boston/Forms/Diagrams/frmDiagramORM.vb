@@ -2402,7 +2402,7 @@ Public Class frmDiagramORM
                     Call TableRoleConstraintRole.DeleteRoleConstraintRole(lrRoleConstraintRole)
                 End If
             Case GetType(FBM.SubtypeRelationshipInstance)
-                If MsgBox("Remove the Subtype from the Model?", MsgBoxStyle.YesNo) = MsgBoxResult.Yes Then
+                If MsgBox("Remove the Subtype Relationship from the Model?", MsgBoxStyle.YesNo) = MsgBoxResult.Yes Then
 
                     Dim lrSubtypeInstance As FBM.SubtypeRelationshipInstance = e.Link.Tag
 

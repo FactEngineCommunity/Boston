@@ -477,7 +477,11 @@ Namespace ERD
 
             Try
                 Me.OrdinalPosition = aiNewOrdinalPosition
-                Call Me.Entity.RefreshShape()
+
+                If Me.Entity.Name = Me.Column.Table.Name Then
+                    'Column may be moved to a new Table/Entity, so may not exist in Me.Entity.
+                    Call Me.Entity.RefreshShape()
+                End If
             Catch ex As Exception
                 Dim lsMessage As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()

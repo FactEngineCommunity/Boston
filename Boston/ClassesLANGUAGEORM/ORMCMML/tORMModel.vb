@@ -222,6 +222,29 @@ Namespace FBM
 
         End Sub
 
+        Public Sub changeCMMLAttributeEntityForColumn(ByRef arColumn As RDS.Column, ByRef arTable As RDS.Table)
+
+            Try
+
+                Dim lsSQLQuery As String
+
+                lsSQLQuery = "UPDATE " & pcenumCMMLRelations.CoreERDAttribute.ToString
+                lsSQLQuery &= " SET ModelObject = '" & arTable.Name & "'"
+                lsSQLQuery &= " WHERE Attribute = '" & arColumn.Id & "'"
+                lsSQLQuery &= "   AND ModelObject = '" & arColumn.Table.Name & "'"
+
+                Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+        End Sub
+
         Public Sub changeCMMLStateName(ByRef arState As STM.State, ByVal asOldStateName As String)
 
             Dim lsSQLQuery As String
@@ -282,7 +305,7 @@ Namespace FBM
         Public Sub createCMMLAttribute(ByVal asEntityName As String,
                                        ByVal asAttributeName As String,
                                        ByRef arRole As FBM.Role,
-                                       Optional ByRef arColumn As RDS.Column = Nothing)
+                                       ByRef arColumn As RDS.Column)
 
             Dim lsSQLQuery As String = ""
             Dim lrFact As New FBM.Fact
@@ -338,39 +361,6 @@ Namespace FBM
                     lsPropertyInstanceId = arColumn.Id
                 End If
 
-                lsSQLQuery = "INSERT INTO CorePropertyHasPropertyName (Property, PropertyName)"
-                lsSQLQuery &= " VALUES ("
-                lsSQLQuery &= " '" & lsPropertyInstanceId & "'"
-                lsSQLQuery &= " ,'" & asAttributeName & "'"
-                lsSQLQuery &= " )"
-
-                lrFact = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-
-                lsSQLQuery = "INSERT INTO CorePropertyIsForFactType (Property, FactType)"
-                lsSQLQuery &= " VALUES ("
-                lsSQLQuery &= " '" & lsPropertyInstanceId & "'"
-                lsSQLQuery &= " ,'" & arRole.FactType.Id & "'"
-                lsSQLQuery &= " )"
-
-                Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-                lsSQLQuery = "INSERT INTO CorePropertyIsForRole (Property, Role)"
-                lsSQLQuery &= " VALUES ("
-                lsSQLQuery &= " '" & lsPropertyInstanceId & "'"
-                lsSQLQuery &= " ,'" & arRole.Id & "'"
-                lsSQLQuery &= " )"
-
-                Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-                lsSQLQuery = "INSERT INTO CorePropertyHasActiveRole (Property, Role)"
-                lsSQLQuery &= " VALUES ("
-                lsSQLQuery &= " '" & lsPropertyInstanceId & "'"
-                lsSQLQuery &= " ,'" & arColumn.ActiveRole.Id & "'"
-                lsSQLQuery &= " )"
-
-                Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
                 '---------------------------------------------
                 'Create the Attribute against the Entity
                 '---------------------------------------------
@@ -382,39 +372,78 @@ Namespace FBM
 
                 lrFact = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
-                '--------------------------------------------------
-                'Set the Ordinal Position of the Attribute
-                '--------------------------------------------------
-                lsSQLQuery = "SELECT COUNT(*)"
-                lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreERDAttribute.ToString
-                lsSQLQuery &= " WHERE ModelObject = '" & asEntityName & "'"
+                '====================================================================================================
+                If asEntityName = arColumn.Table.Name Then
+                    'Columns can be reused on Subtype Entities, and don't need their definition twice,
+                    '  just their relationship with the ERD Entity (above).
 
-                Dim lrCountRecordset As New ORMQL.Recordset
-
-                lrCountRecordset = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-                lsSQLQuery = "INSERT INTO " & pcenumCMMLRelations.CorePropertyHasOrdinalPosition.ToString
-                lsSQLQuery &= " (Property, Position)"
-                lsSQLQuery &= " VALUES ("
-                lsSQLQuery &= "'" & lsPropertyInstanceId & "'"
-                lsSQLQuery &= ",'" & lrCountRecordset("Count").Data & "'"
-                lsSQLQuery &= " )"
-
-                Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-                '--------------------------------------------
-                'Check to see if the Attribute is Mandatory
-                '--------------------------------------------
-                If arColumn.Nullable = False Then
-
-                    Richmond.WriteToStatusBar("Creating MandatoryConstraint for Attribute, '" & asAttributeName & "', for Entity, '" & asEntityName & "'", True)
-
-                    lsSQLQuery = "INSERT INTO CoreIsMandatory (IsMandatory)"
+                    lsSQLQuery = "INSERT INTO CorePropertyHasPropertyName (Property, PropertyName)"
                     lsSQLQuery &= " VALUES ("
-                    lsSQLQuery &= " '" & lsPropertyInstanceId & "'" 'lsAttributeName & "'"
+                    lsSQLQuery &= " '" & lsPropertyInstanceId & "'"
+                    lsSQLQuery &= " ,'" & asAttributeName & "'"
                     lsSQLQuery &= " )"
 
                     lrFact = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+
+                    lsSQLQuery = "INSERT INTO CorePropertyIsForFactType (Property, FactType)"
+                    lsSQLQuery &= " VALUES ("
+                    lsSQLQuery &= " '" & lsPropertyInstanceId & "'"
+                    lsSQLQuery &= " ,'" & arRole.FactType.Id & "'"
+                    lsSQLQuery &= " )"
+
+                    Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                    lsSQLQuery = "INSERT INTO CorePropertyIsForRole (Property, Role)"
+                    lsSQLQuery &= " VALUES ("
+                    lsSQLQuery &= " '" & lsPropertyInstanceId & "'"
+                    lsSQLQuery &= " ,'" & arRole.Id & "'"
+                    lsSQLQuery &= " )"
+
+                    Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                    lsSQLQuery = "INSERT INTO CorePropertyHasActiveRole (Property, Role)"
+                    lsSQLQuery &= " VALUES ("
+                    lsSQLQuery &= " '" & lsPropertyInstanceId & "'"
+                    lsSQLQuery &= " ,'" & arColumn.ActiveRole.Id & "'"
+                    lsSQLQuery &= " )"
+
+                    Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                    '--------------------------------------------------
+                    'Set the Ordinal Position of the Attribute
+                    '--------------------------------------------------
+                    lsSQLQuery = "SELECT COUNT(*)"
+                    lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreERDAttribute.ToString
+                    lsSQLQuery &= " WHERE ModelObject = '" & asEntityName & "'"
+
+                    Dim lrCountRecordset As New ORMQL.Recordset
+
+                    lrCountRecordset = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                    lsSQLQuery = "INSERT INTO " & pcenumCMMLRelations.CorePropertyHasOrdinalPosition.ToString
+                    lsSQLQuery &= " (Property, Position)"
+                    lsSQLQuery &= " VALUES ("
+                    lsSQLQuery &= "'" & lsPropertyInstanceId & "'"
+                    lsSQLQuery &= ",'" & lrCountRecordset("Count").Data & "'"
+                    lsSQLQuery &= " )"
+
+                    Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                    '--------------------------------------------
+                    'Check to see if the Attribute is Mandatory
+                    '--------------------------------------------
+                    If arColumn.Nullable = False Then
+
+                        Richmond.WriteToStatusBar("Creating MandatoryConstraint for Attribute, '" & asAttributeName & "', for Entity, '" & asEntityName & "'", True)
+
+                        lsSQLQuery = "INSERT INTO CoreIsMandatory (IsMandatory)"
+                        lsSQLQuery &= " VALUES ("
+                        lsSQLQuery &= " '" & lsPropertyInstanceId & "'" 'lsAttributeName & "'"
+                        lsSQLQuery &= " )"
+
+                        lrFact = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                    End If
                 End If
 
             Catch ex As Exception

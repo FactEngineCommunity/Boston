@@ -136,21 +136,31 @@ Namespace FBM
 
         Public Shadows Sub RemoveFromModel()
 
-            Call Me.EntityType.RemoveSubtypeRelationship(Me)
-            Call Me.FactType.RemoveFromModel(True, False, True, True)
-            Call Me.Delete()
+            Try
+                Call Me.EntityType.RemoveSubtypeRelationship(Me)
+                Call Me.FactType.RemoveFromModel(True, False, True, True)
+                Call Me.Delete()
 
-            'RDS
-            Dim lrTable = CType(Me.EntityType, FBM.EntityType).getCorrespondingRDSTable
+                'RDS
+                Dim lrTable = CType(Me.EntityType, FBM.EntityType).getCorrespondingRDSTable
 
-            If lrTable.getPrimaryKeyColumns.Count > 0 Then
-                If lrTable.getPrimaryKeyColumns(0).Role.JoinedORMObject IsNot Me Then
-                    'Must have got the Primary Key from a Supertype.
-                    Call lrTable.removeExistingPrimaryKeyColumnsAndIndex(True)
+                If lrTable.getPrimaryKeyColumns.Count > 0 Then
+                    If lrTable.getPrimaryKeyColumns(0).Role.JoinedORMObject IsNot Me Then
+                        'Must have got the Primary Key from a Supertype.
+                        Call lrTable.removeExistingPrimaryKeyColumnsAndIndex(True)
+                    End If
                 End If
-            End If
 
-            Call lrTable.removeSupertypeColumns(Me)
+                Call lrTable.removeSupertypeColumns(Me)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
         End Sub
 

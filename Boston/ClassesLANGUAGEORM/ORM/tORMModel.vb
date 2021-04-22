@@ -801,13 +801,21 @@ Namespace FBM
                                     If lrRole.IsERDPropertyRole Then
 
                                         lsTableName = lrRole.BelongsToTable
-                                        lrTable = Me.RDS.getTableByName(lsTableName)
+
+                                        Dim lrModelObject = Me.GetModelObjectByName(lsTableName).GetTopmostNonAbsorbedSupertype
+
+                                        lrTable = Me.RDS.getTableByName(lrModelObject.Id)
 
                                         If lrTable Is Nothing Then
                                             'Table not created yet
-                                            Dim lrModelElement As FBM.ModelObject = Me.GetModelObjectByName(lsTableName)
-                                            lrTable = New RDS.Table(Me.RDS, lsTableName, lrModelElement)
-                                            Me.RDS.Table.AddUnique(lrTable)
+                                            If lsTableName = lrModelObject.Id Then
+                                                Dim lrModelElement As FBM.ModelObject = Me.GetModelObjectByName(lsTableName)
+                                                lrTable = New RDS.Table(Me.RDS, lsTableName, lrModelElement)
+                                                Me.RDS.Table.AddUnique(lrTable)
+                                            Else
+                                                lrTable = New RDS.Table(Me.RDS, lrModelObject.Id, lrModelObject)
+                                                Me.RDS.Table.AddUnique(lrTable)
+                                            End If
                                         End If
 
                                         lrColumn = lrRole.GetCorrespondingUnaryOrBinaryFactTypeColumn(lrTable)
@@ -4628,6 +4636,12 @@ Namespace FBM
                         If liColumnOrdinalPositionSum <> liSum And Not lrTable.isSubtype Then
                             Call lrTable.resetColumnOrdinalPositions()
                         End If
+                    Next
+
+                    '------------------------------------------------------------------
+                    'RDS Tables with no Columns
+                    For Each lrTable In Me.RDS.Table.FindAll(Function(x) x.Column.Count = 0)
+                        Me.RDS.removeTable(lrTable)
                     Next
 
 

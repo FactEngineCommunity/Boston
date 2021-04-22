@@ -313,12 +313,14 @@ Namespace ERD
                 'CodeSafe: Remove Attributes where Column is Nothing
                 Me.Attribute.RemoveAll(Function(x) x.Column Is Nothing)
 
+                Dim liInd = 0
                 For Each lrERAttribute In Me.Attribute
-                    lrERAttribute.Cell = Me.TableShape.Item(0, lrERAttribute.Column.OrdinalPosition - 1)
-                    Me.TableShape.Item(0, lrERAttribute.Column.OrdinalPosition - 1).Tag = lrERAttribute
+                    lrERAttribute.Cell = Me.TableShape.Item(0, liInd) 'lrERAttribute.Column.OrdinalPosition - 1)
+                    Me.TableShape.Item(0, liInd).Tag = lrERAttribute 'lrERAttribute.Column.OrdinalPosition - 1
                     Call lrERAttribute.RefreshShape()
 
                     Me.TableShape.ResizeToFitText(False)
+                    liInd += 1
                 Next
 
             Catch ex As Exception

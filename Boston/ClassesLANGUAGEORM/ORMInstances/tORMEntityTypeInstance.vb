@@ -1509,6 +1509,18 @@ Namespace FBM
                             Call Me.EntityType.SetIsPersonal(Me.IsPersonal)
                             Call Me.Page.Form.EnableSaveButton()
                         Case Is = "IsAbsorbed"
+
+                            If Me.IsAbsorbed Then
+                                For Each lrModelObject In Me.EntityType.HasSubtype
+                                    If Not lrModelObject.IsAbsorbed Then
+                                        Dim lsMessage = "The model element, " & Me.Id & ", has subtypes that are not absorbed. It only makes sense for this model element to be absorbed if its subtypes are absorbed."
+                                        MsgBox(lsMessage, MsgBoxStyle.Exclamation)
+                                        Me.IsAbsorbed = False
+                                        Exit Sub
+                                    End If
+                                Next
+                            End If
+
                             Call Me.EntityType.SetIsAbsorbed(Me.IsAbsorbed)
                             Call Me.Page.Form.EnableSaveButton()
                         Case Is = "ShortDescription"

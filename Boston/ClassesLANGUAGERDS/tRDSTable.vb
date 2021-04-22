@@ -192,7 +192,7 @@ Namespace RDS
                              Optional abAddToDatabase As Boolean = False)
 
             Try
-                arColumn.OrdinalPosition = Me.Column.Count + 1
+                Call arColumn.setOrdinalPosition(Me.Column.Count + 1)
                 arColumn.Table = Me 'CodeSafe
 
                 'CodeSafe: Don't add the Column if it already exists.
@@ -229,10 +229,8 @@ Namespace RDS
                 End If
 
                 'NonAbsorbed Subtypes
-                For Each lrTable In Me.getSubtypeTables.FindAll(Function(x) x.isAbsorbed = False)
-
+                For Each lrTable In Me.getSubtypeTables(False).FindAll(Function(x) x.isAbsorbed = False)
                     Call lrTable.addColumn(arColumn)
-
                 Next
 
                 '------------------------------------------------------------------------------
@@ -526,14 +524,19 @@ Namespace RDS
         ''' Non recursive, single layer return of subtype Tables.
         ''' </summary>
         ''' <returns></returns>
-        Public Function getSubtypeTables() As List(Of RDS.Table)
+        Public Function getSubtypeTables(Optional ByVal abCreateTableIfNotExists As Boolean = True) As List(Of RDS.Table)
 
             Dim larSubtypeTable As New List(Of RDS.Table)
 
-            Dim larEntityType = Me.FBMModelElement.getSubtypes()
+            Dim larModelObject = Me.FBMModelElement.getSubtypes
 
-            For Each lrEntityType In larEntityType
-                larSubtypeTable.Add(CType(lrEntityType, FBM.EntityType).getCorrespondingRDSTable(True))
+            For Each lrModelObject In larModelObject
+                If Not lrModelObject.IsAbsorbed Then 'Absorbed Subtypes do not have Tables.
+                    Dim lrTable = CType(lrModelObject, FBM.EntityType).getCorrespondingRDSTable(abCreateTableIfNotExists)
+                    If lrTable IsNot Nothing Then
+                        larSubtypeTable.Add(lrTable)
+                    End If
+                End If
             Next
 
             Return larSubtypeTable
@@ -1051,7 +1054,9 @@ Namespace RDS
 
                 '------------------------------------------------------------------------------
                 'CMML Code
-                Call Me.Model.Model.removeCMMLAttribute(arColumn.Table.Name, arColumn.Id)
+                If arColumn.Table Is Me Then
+                    Call Me.Model.Model.removeCMMLAttribute(arColumn.Table.Name, arColumn.Id)
+                End If
 
                 'Database synchronisation
                 If abRemoveFromDatabase Then

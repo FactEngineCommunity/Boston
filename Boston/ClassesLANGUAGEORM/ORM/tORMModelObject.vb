@@ -537,19 +537,22 @@ Namespace FBM
 
             If Me.parentModelObjectList.Count = 0 Then
                 Return Me
+            ElseIf Me.IsAbsorbed = False Then
+                Return Me
             Else
-                For Each lrSubtypeRelationship In Me.SubtypeRelationship
-                    '20200722-Need to fix this to discern between the PK SubtypeRelationship and other.
-                    '  For now just return the first one.
-                    If Not lrSubtypeRelationship.parentEntityType.IsAbsorbed Then
-                        Return lrSubtypeRelationship.parentEntityType
-                    End If
-                Next
+                Return Me.parentModelObjectList(0).GetTopmostNonAbsorbedSupertype()
+                'For Each lrSubtypeRelationship In Me.SubtypeRelationship
+                '    '20200722-Need to fix this to discern between the PK SubtypeRelationship and other.
+                '    '  For now just return the first one.
+                '    If Not lrSubtypeRelationship.parentEntityType.IsAbsorbed Then
+                '        Return lrSubtypeRelationship.parentEntityType
+                '    End If
+                'Next
             End If
 
             '20200722-Need to fix this to discern between the PK SubtypeRelationship and other.
             '  For now just return the first one.
-            Return Me.parentModelObjectList(0).GetTopmostNonAbsorbedSupertype()
+            'Return Me.parentModelObjectList(0).GetTopmostNonAbsorbedSupertype()
 
         End Function
 
@@ -658,6 +661,29 @@ Namespace FBM
             Else
                 Return Nothing
             End If
+        End Function
+
+        Public Function HasSubtype() As List(Of FBM.ModelObject)
+
+            Try
+                Dim larSubtypeModelObject = From ModelObject In Me.Model.getModelObjects
+                                            From SubtypeRelationship In ModelObject.SubtypeRelationship
+                                            Where SubtypeRelationship.parentEntityType Is Me
+                                            Select SubtypeRelationship.EntityType
+
+                Return larSubtypeModelObject.ToList
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return New List(Of ModelObject)
+            End Try
+
         End Function
 
         Public Overridable Function HasTotalRoleConstraint() As Boolean

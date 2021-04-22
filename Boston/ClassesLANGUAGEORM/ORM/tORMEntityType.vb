@@ -169,9 +169,10 @@ Namespace FBM
             End Set
         End Property
 
-        <XmlIgnore()>
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
-        Public Shadows _IsAbsorbed As Boolean = False
+        '20200422-Removed. Keep removed if all okay.
+        '<XmlIgnore()>
+        '<DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        'Public Shadows _IsAbsorbed As Boolean = False
         <XmlAttribute()> _
         <CategoryAttribute("Entity Type"), _
         DefaultValueAttribute(False),
@@ -1323,15 +1324,14 @@ Namespace FBM
                 '  * Need to pull the Primary Reference Scheme from the Supertype if this EntityType is not absorbed.
                 Call Me.getRDSPrimaryReferenceSchemeFromSupertypeIfNecessary()
 
-                If Me.IsAbsorbed Then
+                If Not Me.IsAbsorbed Then
                     Call Me.getCorrespondingRDSTable.absorbSupertypeColumns()
                     'Supertype needs to get Columns from this subtype
+                Else
                     Dim lrSupertypeTable = arParentEntityType.GetTopmostNonAbsorbedSupertype.getCorrespondingRDSTable
                     Call lrSupertypeTable.absorbSubtypeColumns(Me.getCorrespondingRDSTable)
-                Else 'Not Absorbed
+                End If 'Not Absorbed
 
-
-                End If
 
                 Call Me.Model.MakeDirty()
 
@@ -2079,6 +2079,11 @@ Namespace FBM
             'Deletion from the database is handled in FBM.SubtypeConstraint.RemoveFromModel
             '--------------------------------------------------------------------------------
 
+            If Me.SubtypeRelationship.Count = 0 Then
+                'No point in the ModelObject being Absorbed.
+                Me.IsAbsorbed = False
+            End If
+
             RaiseEvent SubtypeConstraintRemoved(arSubtypeConstraint)
 
         End Sub
@@ -2799,7 +2804,35 @@ Namespace FBM
 
         Public Sub SetIsAbsorbed(ByVal abNewIsAbsorbed As Boolean, Optional ByVal abBroadcastInterfaceEvent As Boolean = True)
 
+            Dim lbWasAbsorbed = Me.IsAbsorbed
+
             Me.IsAbsorbed = abNewIsAbsorbed
+
+            '==========================================================================================================
+            'Reassign Columns if need be.
+            If Not lbWasAbsorbed And abNewIsAbsorbed = True Then
+                'Need to move all the Columns up the subtype heirarchy.
+                Dim lrSubtypeTable As RDS.Table = Me.getCorrespondingRDSTable
+
+                For Each lrColumn In lrSubtypeTable.Column.ToArray
+                    If lrColumn.Role.JoinedORMObject IsNot Me Then
+                        'Is already from a higher type. Just remove the Column
+                        lrSubtypeTable.removeColumn(lrColumn)
+                    Else
+                        Dim lrSupertypeTable = Me.GetTopmostNonAbsorbedSupertype.getCorrespondingRDSTable
+                        Call lrColumn.setTable(lrSupertypeTable)
+                        Call lrSupertypeTable.addColumn(lrColumn)
+                        Call lrSubtypeTable.removeColumn(lrColumn)
+                    End If
+                Next
+
+                Call Me.Model.RDS.removeTable(lrSubtypeTable)
+            ElseIf lbWasAbsorbed And Not abNewIsAbsorbed Then
+
+                Call Me.getCorrespondingRDSTable(True).absorbSupertypeColumns()
+            End If
+            '==========================================================================================================
+
             RaiseEvent IsAbsorbedChanged(abNewIsAbsorbed)
 
             If My.Settings.UseClientServer And My.Settings.InitialiseClient And abBroadcastInterfaceEvent Then
