@@ -26,7 +26,6 @@ Namespace RDS
             End Get
         End Property
 
-
         <XmlElement()>
         Public Column As New List(Of RDS.Column)
 
@@ -543,7 +542,8 @@ Namespace RDS
 
         End Function
 
-        Public Function getSupertypeTables(Optional ByRef aarSupertypeTable As List(Of RDS.Table) = Nothing, Optional arSubtypeRelationship As FBM.tSubtypeRelationship = Nothing) As List(Of RDS.Table)
+        Public Function getSupertypeTables(Optional ByRef aarSupertypeTable As List(Of RDS.Table) = Nothing,
+                                           Optional arSubtypeRelationship As FBM.tSubtypeRelationship = Nothing) As List(Of RDS.Table)
 
             Dim larSupertypeTable As New List(Of RDS.Table)
 
@@ -1071,6 +1071,30 @@ Namespace RDS
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
                 prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
+        ''' <summary>
+        ''' Removes Columns that are actually from the given other (Sub/Supertype) Table.
+        '''   This is used, for example, when a Subtype is changed from IsAbsorbed = True to IsAbsorbed = False.
+        ''' </summary>
+        ''' <param name="arTable"></param>
+        Public Sub RemoveColumnsFromTable(ByRef arTable As RDS.Table)
+
+            Try
+                Dim lrTable As RDS.Table = arTable
+
+                Dim larColumn = From Column In Me.Column
+                                Where Column.Table.Name = lrTable.Name
+                                Select Column
+
+                For Each lrColumn In larColumn.ToArray
+                    Call Me.removeColumn(lrColumn)
+                Next
+
+            Catch ex As Exception
+                Debugger.Break()
             End Try
 
         End Sub

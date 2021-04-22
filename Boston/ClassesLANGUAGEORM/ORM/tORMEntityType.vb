@@ -2811,6 +2811,7 @@ Namespace FBM
             '==========================================================================================================
             'Reassign Columns if need be.
             If Not lbWasAbsorbed And abNewIsAbsorbed = True Then
+                'Absorbed
                 'Need to move all the Columns up the subtype heirarchy.
                 Dim lrSubtypeTable As RDS.Table = Me.getCorrespondingRDSTable
 
@@ -2827,9 +2828,16 @@ Namespace FBM
                 Next
 
                 Call Me.Model.RDS.removeTable(lrSubtypeTable)
-            ElseIf lbWasAbsorbed And Not abNewIsAbsorbed Then
 
-                Call Me.getCorrespondingRDSTable(True).absorbSupertypeColumns()
+            ElseIf lbWasAbsorbed And Not abNewIsAbsorbed Then
+                'Not Absorbed
+                Dim lrTable = Me.getCorrespondingRDSTable(True)
+
+                Call lrTable.absorbSupertypeColumns()
+
+                For Each lrTable In lrTable.getSupertypeTables
+                    Call lrTable.RemoveColumnsFromTable(lrTable)
+                Next
             End If
             '==========================================================================================================
 
