@@ -1521,7 +1521,9 @@ Namespace FBM
                                 Next
                             End If
 
-                            Call Me.EntityType.SetIsAbsorbed(Me.IsAbsorbed)
+                            With New WaitCursor
+                                Call Me.EntityType.SetIsAbsorbed(Me.IsAbsorbed)
+                            End With
                             Call Me.Page.Form.EnableSaveButton()
                         Case Is = "ShortDescription"
                             Call Me.EntityType.SetShortDescription(Me.ShortDescription)

@@ -372,8 +372,15 @@ Namespace FBM
 
                 lrFact = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
+                lsSQLQuery = "SELECT COUNT(*)"
+                lsSQLQuery &= " FROM " & pcenumCMMLRelations.CorePropertyHasPropertyName.ToString
+                lsSQLQuery &= " WHERE Property = '" & lsPropertyInstanceId & "'"
+
+                Dim lrRecordsetCount = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+
                 '====================================================================================================
-                If asEntityName = arColumn.Table.Name Then
+                If asEntityName = arColumn.Role.JoinedORMObject.Id And lrRecordsetCount("Count").Data = 0 Then
                     'Columns can be reused on Subtype Entities, and don't need their definition twice,
                     '  just their relationship with the ERD Entity (above).
 
@@ -1030,6 +1037,22 @@ Namespace FBM
             '----------------------------------------------------------------------------------
             '20180606-VM-ToDo: Maybe already done. Check this
 
+        End Sub
+
+        Public Sub removeCMMLAttributeFromTableOnly(ByRef arColumn As RDS.Column, arTable As RDS.Table)
+
+            Try
+                Dim lsSQLQuery As String
+
+                lsSQLQuery = "DELETE FROM " & pcenumCMMLRelations.CoreERDAttribute.ToString  '" & asAttributeId & "' FROM CoreElement"
+                lsSQLQuery &= " WHERE ModelObject = '" & arTable.Name & "'"
+                lsSQLQuery &= " AND Attribute = '" & arColumn.Id & "'"
+
+                Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+            Catch ex As Exception
+                Debugger.Break()
+            End Try
         End Sub
 
         Public Sub removeCMMLAttributeIsMandatory(ByRef arColumn As RDS.Column)

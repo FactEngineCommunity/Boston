@@ -463,7 +463,9 @@ Namespace ERD
         Private Sub RDSTable_ColumnAdded(ByRef arColumn As RDS.Column) Handles RDSTable.ColumnAdded
 
             Try
-                Call Me.Page.AddAttributeToEntity(arColumn)
+                If arColumn.Role.JoinedORMObject.Id = Me.Name Then
+                    Call Me.Page.AddAttributeToEntity(arColumn)
+                End If
 
                 Dim lrERAttribute As ERD.Attribute
                 Dim lsSQLQuery As String = ""

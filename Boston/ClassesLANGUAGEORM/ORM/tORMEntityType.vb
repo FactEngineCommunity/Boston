@@ -2818,12 +2818,12 @@ Namespace FBM
                 For Each lrColumn In lrSubtypeTable.Column.ToArray
                     If lrColumn.Role.JoinedORMObject IsNot Me Then
                         'Is already from a higher type. Just remove the Column
-                        lrSubtypeTable.removeColumn(lrColumn)
+                        lrSubtypeTable.removeColumn(lrColumn,, False)
                     Else
                         Dim lrSupertypeTable = Me.GetTopmostNonAbsorbedSupertype.getCorrespondingRDSTable
+                        Call lrSubtypeTable.removeColumn(lrColumn,, False)
                         Call lrColumn.setTable(lrSupertypeTable)
                         Call lrSupertypeTable.addColumn(lrColumn)
-                        Call lrSubtypeTable.removeColumn(lrColumn)
                     End If
                 Next
 
@@ -2835,8 +2835,8 @@ Namespace FBM
 
                 Call lrTable.absorbSupertypeColumns()
 
-                For Each lrTable In lrTable.getSupertypeTables
-                    Call lrTable.RemoveColumnsFromTable(lrTable)
+                For Each lrSupertypeTable In lrTable.getSupertypeTables
+                    Call lrSupertypeTable.RemoveColumnsFromTable(lrTable)
                 Next
             End If
             '==========================================================================================================

@@ -1037,9 +1037,11 @@ Namespace RDS
         ''' Removes a Column from the table.
         ''' </summary>
         ''' <param name="arColumn">The actual Column object to be removed from the Table.</param>
+        ''' <param name="abRemoveResidualCMML">Use False if the CMML for the Column/Attribute/Property is to be kept.</param>
         ''' <remarks></remarks>
         Public Sub removeColumn(ByRef arColumn As RDS.Column,
-                                Optional abRemoveFromDatabase As Boolean = False)
+                                Optional abRemoveFromDatabase As Boolean = False,
+                                Optional abRemoveResidualCMML As Boolean = True)
 
             Try
                 Me.Column.Remove(arColumn)
@@ -1054,8 +1056,13 @@ Namespace RDS
 
                 '------------------------------------------------------------------------------
                 'CMML Code
-                If arColumn.Table Is Me Then
+                If arColumn.Table Is Me And abRemoveResidualCMML Then
+                    'If Column is from another Table, may want to keep it (RemoveResidualCMML = False).
+                    '  E.g. If changing a Subtype EntityType to Not IsAbsorbed, a Column may be moved from a
+                    '  Supertype to that Subtype, so do not want to remove the CMML.
                     Call Me.Model.Model.removeCMMLAttribute(arColumn.Table.Name, arColumn.Id)
+                Else
+                    Call Me.Model.Model.removeCMMLAttributeFromTableOnly(arColumn, Me)
                 End If
 
                 'Database synchronisation
@@ -1086,11 +1093,11 @@ Namespace RDS
                 Dim lrTable As RDS.Table = arTable
 
                 Dim larColumn = From Column In Me.Column
-                                Where Column.Table.Name = lrTable.Name
+                                Where Column.Role.JoinedORMObject.Id = lrTable.Name
                                 Select Column
 
                 For Each lrColumn In larColumn.ToArray
-                    Call Me.removeColumn(lrColumn)
+                    Call Me.removeColumn(lrColumn,, False)
                 Next
 
             Catch ex As Exception
