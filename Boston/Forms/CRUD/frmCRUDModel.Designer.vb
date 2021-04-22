@@ -34,6 +34,7 @@ Partial Class frmCRUDModel
         Me.LabelModelName = New System.Windows.Forms.Label()
         Me.LabelModel = New System.Windows.Forms.Label()
         Me.GroupBoxDatabase = New System.Windows.Forms.GroupBox()
+        Me.CheckBoxIsDatabaseSynchronised = New System.Windows.Forms.CheckBox()
         Me.LabelOpenSuccessfull = New System.Windows.Forms.Label()
         Me.ButtonTestConnection = New System.Windows.Forms.Button()
         Me.ComboBoxDatabaseType = New System.Windows.Forms.ComboBox()
@@ -43,16 +44,22 @@ Partial Class frmCRUDModel
         Me.DialogOpenFile = New System.Windows.Forms.OpenFileDialog()
         Me.DialogFolderBrowser = New System.Windows.Forms.FolderBrowserDialog()
         Me.ErrorProvider = New System.Windows.Forms.ErrorProvider(Me.components)
-        Me.CheckBoxIsDatabaseSynchronised = New System.Windows.Forms.CheckBox()
+        Me.TabControl1 = New System.Windows.Forms.TabControl()
+        Me.Tab1 = New System.Windows.Forms.TabPage()
+        Me.Advanced = New System.Windows.Forms.TabPage()
+        Me.LabelPromptIsDatabaseSynchronised = New System.Windows.Forms.Label()
         Me.GroupBox_main.SuspendLayout()
         Me.GroupBox1.SuspendLayout()
         Me.GroupBoxDatabase.SuspendLayout()
         CType(Me.ErrorProvider, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.TabControl1.SuspendLayout()
+        Me.Tab1.SuspendLayout()
+        Me.Advanced.SuspendLayout()
         Me.SuspendLayout()
         '
         'Button_Cancel
         '
-        Me.Button_Cancel.Location = New System.Drawing.Point(924, 78)
+        Me.Button_Cancel.Location = New System.Drawing.Point(974, 91)
         Me.Button_Cancel.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.Button_Cancel.Name = "Button_Cancel"
         Me.Button_Cancel.Size = New System.Drawing.Size(105, 37)
@@ -62,7 +69,7 @@ Partial Class frmCRUDModel
         '
         'button_okay
         '
-        Me.button_okay.Location = New System.Drawing.Point(924, 32)
+        Me.button_okay.Location = New System.Drawing.Point(974, 41)
         Me.button_okay.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.button_okay.Name = "button_okay"
         Me.button_okay.Size = New System.Drawing.Size(105, 37)
@@ -76,11 +83,11 @@ Partial Class frmCRUDModel
         Me.GroupBox_main.Controls.Add(Me.LabelModelName)
         Me.GroupBox_main.Controls.Add(Me.LabelModel)
         Me.GroupBox_main.Controls.Add(Me.GroupBoxDatabase)
-        Me.GroupBox_main.Location = New System.Drawing.Point(18, 18)
+        Me.GroupBox_main.Location = New System.Drawing.Point(18, 21)
         Me.GroupBox_main.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.GroupBox_main.Name = "GroupBox_main"
         Me.GroupBox_main.Padding = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.GroupBox_main.Size = New System.Drawing.Size(892, 582)
+        Me.GroupBox_main.Size = New System.Drawing.Size(892, 506)
         Me.GroupBox_main.TabIndex = 6
         Me.GroupBox_main.TabStop = False
         '
@@ -94,7 +101,7 @@ Partial Class frmCRUDModel
         Me.GroupBox1.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.GroupBox1.Name = "GroupBox1"
         Me.GroupBox1.Padding = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.GroupBox1.Size = New System.Drawing.Size(834, 218)
+        Me.GroupBox1.Size = New System.Drawing.Size(834, 145)
         Me.GroupBox1.TabIndex = 15
         Me.GroupBox1.TabStop = False
         Me.GroupBox1.Text = "Reverse Engineering"
@@ -162,7 +169,6 @@ Partial Class frmCRUDModel
         '
         'GroupBoxDatabase
         '
-        Me.GroupBoxDatabase.Controls.Add(Me.CheckBoxIsDatabaseSynchronised)
         Me.GroupBoxDatabase.Controls.Add(Me.LabelOpenSuccessfull)
         Me.GroupBoxDatabase.Controls.Add(Me.ButtonTestConnection)
         Me.GroupBoxDatabase.Controls.Add(Me.ComboBoxDatabaseType)
@@ -177,6 +183,16 @@ Partial Class frmCRUDModel
         Me.GroupBoxDatabase.TabIndex = 12
         Me.GroupBoxDatabase.TabStop = False
         Me.GroupBoxDatabase.Text = "Database:"
+        '
+        'CheckBoxIsDatabaseSynchronised
+        '
+        Me.CheckBoxIsDatabaseSynchronised.AutoSize = True
+        Me.CheckBoxIsDatabaseSynchronised.Location = New System.Drawing.Point(20, 23)
+        Me.CheckBoxIsDatabaseSynchronised.Name = "CheckBoxIsDatabaseSynchronised"
+        Me.CheckBoxIsDatabaseSynchronised.Size = New System.Drawing.Size(222, 24)
+        Me.CheckBoxIsDatabaseSynchronised.TabIndex = 7
+        Me.CheckBoxIsDatabaseSynchronised.Text = "Is Database Synchronised"
+        Me.CheckBoxIsDatabaseSynchronised.UseVisualStyleBackColor = True
         '
         'LabelOpenSuccessfull
         '
@@ -245,24 +261,57 @@ Partial Class frmCRUDModel
         '
         Me.ErrorProvider.ContainerControl = Me
         '
-        'CheckBoxIsDatabaseSynchronised
+        'TabControl1
         '
-        Me.CheckBoxIsDatabaseSynchronised.AutoSize = True
-        Me.CheckBoxIsDatabaseSynchronised.Location = New System.Drawing.Point(447, 31)
-        Me.CheckBoxIsDatabaseSynchronised.Name = "CheckBoxIsDatabaseSynchronised"
-        Me.CheckBoxIsDatabaseSynchronised.Size = New System.Drawing.Size(222, 24)
-        Me.CheckBoxIsDatabaseSynchronised.TabIndex = 7
-        Me.CheckBoxIsDatabaseSynchronised.Text = "Is Database Synchronised"
-        Me.CheckBoxIsDatabaseSynchronised.UseVisualStyleBackColor = True
+        Me.TabControl1.Controls.Add(Me.Tab1)
+        Me.TabControl1.Controls.Add(Me.Advanced)
+        Me.TabControl1.Location = New System.Drawing.Point(12, 12)
+        Me.TabControl1.Name = "TabControl1"
+        Me.TabControl1.SelectedIndex = 0
+        Me.TabControl1.Size = New System.Drawing.Size(944, 586)
+        Me.TabControl1.TabIndex = 9
+        '
+        'Tab1
+        '
+        Me.Tab1.Controls.Add(Me.GroupBox_main)
+        Me.Tab1.Location = New System.Drawing.Point(4, 29)
+        Me.Tab1.Name = "Tab1"
+        Me.Tab1.Padding = New System.Windows.Forms.Padding(3)
+        Me.Tab1.Size = New System.Drawing.Size(936, 553)
+        Me.Tab1.TabIndex = 0
+        Me.Tab1.Text = "Database"
+        Me.Tab1.UseVisualStyleBackColor = True
+        '
+        'Advanced
+        '
+        Me.Advanced.Controls.Add(Me.LabelPromptIsDatabaseSynchronised)
+        Me.Advanced.Controls.Add(Me.CheckBoxIsDatabaseSynchronised)
+        Me.Advanced.Location = New System.Drawing.Point(4, 29)
+        Me.Advanced.Name = "Advanced"
+        Me.Advanced.Padding = New System.Windows.Forms.Padding(3)
+        Me.Advanced.Size = New System.Drawing.Size(936, 553)
+        Me.Advanced.TabIndex = 1
+        Me.Advanced.Text = "Advanced"
+        Me.Advanced.UseVisualStyleBackColor = True
+        '
+        'LabelPromptIsDatabaseSynchronised
+        '
+        Me.LabelPromptIsDatabaseSynchronised.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.LabelPromptIsDatabaseSynchronised.Location = New System.Drawing.Point(20, 66)
+        Me.LabelPromptIsDatabaseSynchronised.Name = "LabelPromptIsDatabaseSynchronised"
+        Me.LabelPromptIsDatabaseSynchronised.Size = New System.Drawing.Size(824, 52)
+        Me.LabelPromptIsDatabaseSynchronised.TabIndex = 8
+        Me.LabelPromptIsDatabaseSynchronised.Text = "Warning: When 'Is Database Synchronised' is checked, Boston will modify the datab" &
+    "ase when you change the ORM Model within the Model."
         '
         'frmCRUDModel
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1048, 618)
+        Me.ClientSize = New System.Drawing.Size(1144, 618)
+        Me.Controls.Add(Me.TabControl1)
         Me.Controls.Add(Me.Button_Cancel)
         Me.Controls.Add(Me.button_okay)
-        Me.Controls.Add(Me.GroupBox_main)
         Me.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.Name = "frmCRUDModel"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
@@ -275,6 +324,10 @@ Partial Class frmCRUDModel
         Me.GroupBoxDatabase.ResumeLayout(False)
         Me.GroupBoxDatabase.PerformLayout()
         CType(Me.ErrorProvider, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.TabControl1.ResumeLayout(False)
+        Me.Tab1.ResumeLayout(False)
+        Me.Advanced.ResumeLayout(False)
+        Me.Advanced.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub
@@ -299,4 +352,8 @@ Partial Class frmCRUDModel
     Friend WithEvents Button2 As System.Windows.Forms.Button
     Friend WithEvents ErrorProvider As System.Windows.Forms.ErrorProvider
     Friend WithEvents CheckBoxIsDatabaseSynchronised As CheckBox
+    Friend WithEvents TabControl1 As TabControl
+    Friend WithEvents Tab1 As TabPage
+    Friend WithEvents Advanced As TabPage
+    Friend WithEvents LabelPromptIsDatabaseSynchronised As Label
 End Class
