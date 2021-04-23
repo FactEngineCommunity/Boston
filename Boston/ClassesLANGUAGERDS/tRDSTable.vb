@@ -557,12 +557,12 @@ Namespace RDS
 
             For Each lrSubtypeRelationship In larSubtypeRelationship
                 Dim lrSupertypeTable = lrSubtypeRelationship.parentEntityType.getCorrespondingRDSTable
-                larSupertypeTable.Add(lrSupertypeTable)
+                larSupertypeTable.AddUnique(lrSupertypeTable)
                 Call lrSupertypeTable.getSupertypeTables(larSupertypeTable)
             Next
 
             If aarSupertypeTable IsNot Nothing Then
-                larSupertypeTable.AddRange(aarSupertypeTable)
+                aarSupertypeTable.AddRange(larSupertypeTable)
             End If
 
             Return larSupertypeTable
@@ -1029,7 +1029,12 @@ Namespace RDS
             Try
                 RaiseEvent IndexModified(arIndex)
             Catch ex As Exception
-                Debugger.Break()
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
         End Sub
 
@@ -1101,7 +1106,12 @@ Namespace RDS
                 Next
 
             Catch ex As Exception
-                Debugger.Break()
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub

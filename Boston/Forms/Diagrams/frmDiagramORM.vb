@@ -11094,6 +11094,8 @@ Public Class frmDiagramORM
         Dim lrPage As New FBM.Page
         Dim loForm As Form
 
+        Me.ContextMenuStrip_Diagram.ImageScalingSize = New Drawing.Size(16, 16)
+
         loForm = frmMain.DockPanel.ActiveDocument
 
         If frmMain.PageDataExistsInClipboard(lrPage) Then

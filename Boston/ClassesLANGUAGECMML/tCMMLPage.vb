@@ -193,7 +193,7 @@ Namespace CMML
                     lsSQLQuery &= " WHERE Attribute = '" & lrRecordset("Property").Data & "'" '& lrERAttribute.FactDataInstance.Fact.Id & "'"
 
                     lrRecordset1 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-                    lrERAttribute.OrdinalPosition = CInt(lrRecordset1("Position").Data)
+                    'lrERAttribute.OrdinalPosition = CInt(lrRecordset1("Position").Data)
 
                     lsSQLQuery = "ADD FACT '" & lrRecordset1.CurrentFact.Id & "'"
                     lsSQLQuery &= " TO " & pcenumCMMLRelations.CorePropertyHasOrdinalPosition.ToString

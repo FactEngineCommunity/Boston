@@ -333,18 +333,18 @@ Namespace RDS
                 '-----------------------------------------------------------------------------------------------------
                 'Relations
                 '  NB All relations should have been removed before removing the Table. But just for completeness, remove the Relations if there are any.
-                Dim larRelation = From Relation In Me.Relation _
-                                  From OriginColumn In Relation.OriginColumns _
-                                  Where lrTable.Column.Contains(OriginColumn) _
+                Dim larRelation = From Relation In Me.Relation
+                                  From OriginColumn In Relation.OriginColumns
+                                  Where lrTable.Column.Contains(OriginColumn)
                                   Select Relation
 
                 For Each lrRelation In larRelation.ToArray
                     Call Me.removeRelation(lrRelation)
                 Next
 
-                larRelation = From Relation In Me.Relation _
-                              From DestinationColumn In Relation.DestinationColumns _
-                              Where lrTable.Column.Contains(DestinationColumn) _
+                larRelation = From Relation In Me.Relation
+                              From DestinationColumn In Relation.DestinationColumns
+                              Where lrTable.Column.Contains(DestinationColumn)
                               Select Relation
 
                 For Each lrRelation In larRelation
@@ -378,6 +378,27 @@ Namespace RDS
                 prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
+        End Sub
+
+        Public Sub RemoveTablesWithNoColumns()
+
+            Try
+                Dim larTable = From Table In Me.Table
+                               Where Table.Column.Count = 0
+                               Select Table
+
+                For Each lrTable In larTable.ToArray
+                    Call Me.removeTable(lrTable)
+                Next
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
         End Sub
 
 

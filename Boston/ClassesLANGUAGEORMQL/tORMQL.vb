@@ -470,6 +470,16 @@ Namespace ORMQL
             End Set
         End Property
 
+        Public _USERTABLENAME As New List(Of String)
+        Public Property USERTABLENAME As List(Of String)
+            Get
+                Return Me._USERTABLENAME
+            End Get
+            Set(value As List(Of String))
+                Me._USERTABLENAME = value
+            End Set
+        End Property
+
     End Class
 
     Public Class Processor
@@ -1547,7 +1557,7 @@ Namespace ORMQL
                 End If
 
                 'Get the FactType for the Role
-                Dim lrFactType As FBM.FactType = Me.Model.GetModelObjectByName(lrExtendRoleConstraintStatement.MODELELEMENTNAME(2))
+                Dim lrFactType As FBM.FactType = Me.Model.GetModelObjectByName(lrExtendRoleConstraintStatement.USERTABLENAME(0))
 
                 If lrFactType Is Nothing Then
                     Dim lrNode As New TinyPG.ParseNode()

@@ -903,6 +903,11 @@ Namespace FBM
                 '==============================================================
                 'Get the Core Metamodel.Page for an EntityRelationshipDiagram
                 '==============================================================
+
+                '----------------------------------------------
+                'CodeSafe: Remove Tables with no Columns.
+                Call Me.Model.RDS.RemoveTablesWithNoColumns()
+
                 '-------------------------------------------
                 'Get the EntityRelationshipModel Core Page
                 '-------------------------------------------
@@ -1073,24 +1078,24 @@ Namespace FBM
                         lrORMRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
                         If lrORMRecordset.EOF Then
+                            'Nothing to do here.
+                            'Table may not exist because it IsAbsorbed (for its FBMModelObject).
+
+                            '20200422-VM-Below redacted. ORM Pages take care of creating Tables in the RDS.
                             '---------------------------------------------------------------
                             'The Entity does not exist in the ERD MetaModel, so create it.
                             '---------------------------------------------------------------
-                            Richmond.WriteToStatusBar("Creating Entity, '" & lsEntityName & "'")
+                            'Richmond.WriteToStatusBar("Creating Entity, '" & lsEntityName & "'")
 
-                            lsSQLQuery = "INSERT INTO " & pcenumCMMLRelations.CoreElementHasElementType.ToString
-                            lsSQLQuery &= " (Element, ElementType)"
-                            lsSQLQuery &= " ON PAGE '" & lrPage.Name & "'"
-                            lsSQLQuery &= " VALUES ('" & lsEntityName & "', 'Entity')"
-
-                            Call Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                            'lsSQLQuery = "INSERT INTO " & pcenumCMMLRelations.CoreElementHasElementType.ToString
+                            'lsSQLQuery &= " (Element, ElementType)"
+                            'lsSQLQuery &= " ON PAGE '" & lrPage.Name & "'"
+                            'lsSQLQuery &= " VALUES ('" & lsEntityName & "', 'Entity')"
+                            'Call Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)                            
                         Else
                             '---------------------------------------------------------------
                             'The Entity may already exist in the Model but not on the Page
                             '---------------------------------------------------------------
-                            '                            Dim lrElementElementTypeFactTypeInstance As New FBM.FactTypeInstance(lrPage.Model, lrPage, pcenumLanguage.ORMModel, pcenumCMMLRelations.CoreElementHasElementType.ToString, True)
-                            '                            lrElementElementTypeFactTypeInstance = lrPage.FactTypeInstance.Find(AddressOf lrElementElementTypeFactTypeInstance.Equals)
-                            'If lrElementElementTypeFactTypeInstance.Fact.Exists(AddressOf lrORMRecordset.CurrentFact.EqualsById) Then
                             lsSQLQuery = "SELECT *"
                             lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreElementHasElementType.ToString
                             lsSQLQuery &= " ON PAGE '" & lrPage.Name & "'"
@@ -1660,7 +1665,7 @@ Namespace FBM
                     lsSQLQuery &= " WHERE Property = '" & lrRecordset("Attribute").Data & "'" '& lrERAttribute.FactDataInstance.Fact.Id & "'"
 
                     lrRecordset1 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-                    lrERAttribute.OrdinalPosition = CInt(lrRecordset1("Position").Data)
+                    'lrERAttribute.OrdinalPosition = CInt(lrRecordset1("Position").Data)
 
                     lsSQLQuery = "ADD FACT '" & lrRecordset1.CurrentFact.Id & "'"
                     lsSQLQuery &= " TO " & pcenumCMMLRelations.CorePropertyHasOrdinalPosition.ToString
@@ -2827,7 +2832,7 @@ Namespace FBM
 
                 lrORMRecordset2 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
-                lrERAttribute.OrdinalPosition = lrORMRecordset2("Position").Data
+                'lrERAttribute.OrdinalPosition = lrORMRecordset2("Position").Data
 
                 lsSQLQuery = "ADD FACT '" & lrORMRecordset2.CurrentFact.Id & "'"
                 lsSQLQuery &= " TO " & pcenumCMMLRelations.CorePropertyHasOrdinalPosition.ToString

@@ -308,12 +308,28 @@ Namespace ERD
 
                 Me.Attribute.Sort(AddressOf ERD.Attribute.ComparerOrdinalPosition)
 
+                Dim liInd As Integer
+                Dim larSupertypeTable = Me.RDSTable.getSupertypeTables
+                If larSupertypeTable.Count > 0 Then
+                    larSupertypeTable.Reverse()
+                    larSupertypeTable.Add(Me.RDSTable)
+                    liInd = 0
+                    For Each lrSupertypeTable In larSupertypeTable
+                        For Each lrAttrubute In Me.Attribute.FindAll(Function(x) x.Column.Role.JoinedORMObject.Id = lrSupertypeTable.Name)
+                            Me.Attribute.Remove(lrAttrubute)
+                            Me.Attribute.Insert(liInd, lrAttrubute)
+                            liInd += 1
+                        Next
+                    Next
+                End If
+
+
                 Me.TableShape.RowCount = Me.Attribute.Count
 
                 'CodeSafe: Remove Attributes where Column is Nothing
                 Me.Attribute.RemoveAll(Function(x) x.Column Is Nothing)
 
-                Dim liInd = 0
+                liInd = 0
                 For Each lrERAttribute In Me.Attribute
                     lrERAttribute.Cell = Me.TableShape.Item(0, liInd) 'lrERAttribute.Column.OrdinalPosition - 1)
                     Me.TableShape.Item(0, liInd).Tag = lrERAttribute 'lrERAttribute.Column.OrdinalPosition - 1
@@ -506,8 +522,6 @@ Namespace ERD
                 'Check to see whether the Attribute is Mandatory
                 '-------------------------------------------------
                 lrERAttribute.Mandatory = arColumn.IsMandatory
-
-                lrERAttribute.OrdinalPosition = arColumn.OrdinalPosition
 
                 '--------------------------------------------------------
                 'Check to see whether the Entity has a PrimaryKey

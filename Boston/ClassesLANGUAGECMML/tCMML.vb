@@ -281,10 +281,10 @@ Public Class tCMML
         '-------------------------------------
         'Pages where Entity is an EntityType
         '-------------------------------------
-        Dim larPage = From Page In lrModel.Page _
-                      Where Page.EntityTypeInstance.FindAll(Function(x) x.Id = arNode.Name).Count > 0 _
-                      Or Page.FactTypeInstance.FindAll(Function(x) x.Id = arNode.Name).Count > 0 _
-                      Select Page Distinct _
+        Dim larPage = From Page In lrModel.Page
+                      Where (Page.EntityTypeInstance.FindAll(Function(x) x.Id = arNode.Name).Count > 0 _
+                      Or Page.FactTypeInstance.FindAll(Function(x) x.Id = arNode.Name).Count > 0) And Page.Language = pcenumLanguage.ORMModel
+                      Select Page Distinct
                       Order By Page.Name
 
         Return larPage.ToList

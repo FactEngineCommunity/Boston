@@ -783,11 +783,14 @@ Public Class frmToolboxModelDictionary
                                                                Nothing, lrPage.PageId)
 
                     lr_enterprise_view = prPageNodes.Find(AddressOf lr_enterprise_view.Equals)
-                    lr_enterprise_view.FocusModelElement = prApplication.WorkingModel.GetModelObjectByName(asRoleConstraintId)
-                    loToolStripMenuItem = aoMenuStripItem.DropDownItems.Add(lrPage.Name)
-                    loToolStripMenuItem.Tag = lr_enterprise_view
 
-                    AddHandler loToolStripMenuItem.Click, AddressOf Me.OpenORMDiagram
+                    If lr_enterprise_view IsNot Nothing Then
+                        lr_enterprise_view.FocusModelElement = prApplication.WorkingModel.GetModelObjectByName(asRoleConstraintId)
+                        loToolStripMenuItem = aoMenuStripItem.DropDownItems.Add(lrPage.Name)
+                        loToolStripMenuItem.Tag = lr_enterprise_view
+
+                        AddHandler loToolStripMenuItem.Click, AddressOf Me.OpenORMDiagram
+                    End If
                 Next
             Else
                 Dim loToolStripMenuItem As ToolStripMenuItem

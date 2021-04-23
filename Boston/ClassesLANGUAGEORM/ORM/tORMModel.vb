@@ -4630,11 +4630,11 @@ Namespace FBM
 
                     '-----------------------------------------------------------------
                     'Column Ordinal Positions
-                    For Each lrTable In Me.RDS.Table
+                    For Each lrTable In Me.RDS.Table.FindAll(Function(x) Not x.isSubtype)
                         Dim liColumnOrdinalPositionSum = (From Column In lrTable.Column
                                                           Select Column.OrdinalPosition).Sum
                         Dim liSum As Integer = (lrTable.Column.Count / 2) * (1 + lrTable.Column.Count)
-                        If liColumnOrdinalPositionSum <> liSum And Not lrTable.isSubtype Then
+                        If liColumnOrdinalPositionSum <> liSum Then
                             Call lrTable.resetColumnOrdinalPositions()
                         End If
                     Next
@@ -4649,7 +4649,12 @@ Namespace FBM
                 End With
 
             Catch ex As Exception
-                Debugger.Break()
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub

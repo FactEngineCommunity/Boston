@@ -89,7 +89,15 @@ Namespace ERD
         ''' <remarks></remarks>
         Public ReferencesAttribute As ERD.Attribute
 
-        Public OrdinalPosition As Integer = 1 'The Ordinal Position of the Attribute in the set of Attributes for an Entity
+        Public ReadOnly Property OrdinalPosition As Integer
+            Get
+                If Me.Column Is Nothing Then
+                    Return 1
+                Else
+                    Return Me.Column.OrdinalPosition
+                End If
+            End Get
+        End Property
 
         ''' <summary>
         ''' The FactType (at the ORMModel level) responsible for the existance of this Attribute.
@@ -503,7 +511,7 @@ Namespace ERD
         Private Sub Column_OrdinalPositionChanged(aiNewOrdinalPosition As Integer) Handles Column.OrdinalPositionChanged
 
             Try
-                Me.OrdinalPosition = aiNewOrdinalPosition
+                'Me.OrdinalPosition = aiNewOrdinalPosition '20210422-VM-Removed because made ReadOnly Property returning Attribute.Column.OrdinalPosition
 
                 If Me.Entity.Name = Me.Column.Table.Name Then
                     'Column may be moved to a new Table/Entity, so may not exist in Me.Entity.

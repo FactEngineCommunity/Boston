@@ -243,7 +243,7 @@ Public Class frmDiagramERD
                     lrERAttribute.ActiveRole = lrColumn.ActiveRole
                     lrERAttribute.ResponsibleFactType = lrERAttribute.ResponsibleRole.FactType
                     lrERAttribute.Mandatory = lrColumn.IsMandatory
-                    lrERAttribute.OrdinalPosition = lrColumn.OrdinalPosition
+                    'lrERAttribute.OrdinalPosition = lrColumn.OrdinalPosition
                     lrERAttribute.PartOfPrimaryKey = lrColumn.ContributesToPrimaryKey
                     lrERAttribute.Page = Me.zrPage
 
@@ -399,6 +399,21 @@ Public Class frmDiagramERD
             For Each lrEREntity In Me.zrPage.ERDiagram.Entity
 
                 lrEREntity.Attribute.Sort(AddressOf ERD.Attribute.ComparerOrdinalPosition)
+
+                Dim liInd As Integer
+                Dim larSupertypeTable = lrEREntity.RDSTable.getSupertypeTables
+                If larSupertypeTable.Count > 0 Then
+                    larSupertypeTable.Reverse()
+                    larSupertypeTable.Add(lrEREntity.RDSTable)
+                    liInd = 0
+                    For Each lrSupertypeTable In larSupertypeTable
+                        For Each lrAttrubute In lrEREntity.Attribute.FindAll(Function(x) x.Column.Role.JoinedORMObject.Id = lrSupertypeTable.Name).OrderBy(Function(x) x.OrdinalPosition)
+                            lrEREntity.Attribute.Remove(lrAttrubute)
+                            lrEREntity.Attribute.Insert(liInd, lrAttrubute)
+                            liInd += 1
+                        Next
+                    Next
+                End If
 
                 For Each lrERAttribute In lrEREntity.Attribute
                     lrEREntity.TableShape.RowCount += 1
@@ -680,6 +695,9 @@ Public Class frmDiagramERD
         Dim lrEntity As New ERD.Entity
 
         Try
+            Me.ContextMenuStrip_Entity.ImageScalingSize = New Drawing.Size(16, 16)
+
+
             If Me.zrPage.SelectedObject.Count = 0 Then
                 Exit Sub
             End If
@@ -779,11 +797,11 @@ Public Class frmDiagramERD
                 '  is now added for those hidden Pages.
                 '----------------------------------------------------------
                 Dim lrEnterpriseView As tEnterpriseEnterpriseView
-                lrEnterpriseView = New tEnterpriseEnterpriseView(pcenumMenuType.pageERD, _
-                                                           lrPage, _
-                                                           lr_model.ModelId, _
-                                                           pcenumLanguage.EntityRelationshipDiagram, _
-                                                           Nothing, _
+                lrEnterpriseView = New tEnterpriseEnterpriseView(pcenumMenuType.pageERD,
+                                                           lrPage,
+                                                           lr_model.ModelId,
+                                                           pcenumLanguage.EntityRelationshipDiagram,
+                                                           Nothing,
                                                            lrPage.PageId)
 
                 lrEnterpriseView = prPageNodes.Find(AddressOf lrEnterpriseView.Equals)
@@ -810,11 +828,11 @@ Public Class frmDiagramERD
                 '  is now added for those hidden Pages.
                 '----------------------------------------------------------
                 Dim lrEnterpriseView As tEnterpriseEnterpriseView
-                lrEnterpriseView = New tEnterpriseEnterpriseView(pcenumMenuType.pageORMModel, _
-                                                           lrPage, _
-                                                           lr_model.ModelId, _
-                                                           pcenumLanguage.ORMModel, _
-                                                           Nothing, _
+                lrEnterpriseView = New tEnterpriseEnterpriseView(pcenumMenuType.pageORMModel,
+                                                           lrPage,
+                                                           lr_model.ModelId,
+                                                           pcenumLanguage.ORMModel,
+                                                           Nothing,
                                                            lrPage.PageId)
 
                 lrEnterpriseView = prPageNodes.Find(AddressOf lrEnterpriseView.Equals)
@@ -2634,7 +2652,12 @@ Public Class frmDiagramERD
             End If
 
         Catch ex As Exception
-            Debugger.Break()
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
         'Dim lrChangingAttribute As ERD.Attribute
@@ -3046,6 +3069,12 @@ Public Class frmDiagramERD
                 lrPropertyGridForm.PropertyGrid.SelectedObject = Me.zrPage.SelectedObject(0)
             End If
         End If
+
+    End Sub
+
+    Private Sub ContextMenuStrip_Diagram_Opening(sender As Object, e As System.ComponentModel.CancelEventArgs) Handles ContextMenuStrip_Diagram.Opening
+
+        Me.ContextMenuStrip_Diagram.ImageScalingSize = New Drawing.Size(16, 16)
 
     End Sub
 

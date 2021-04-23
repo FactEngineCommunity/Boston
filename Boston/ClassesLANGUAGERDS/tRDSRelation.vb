@@ -326,7 +326,6 @@ Namespace RDS
             Try
                 If arIndex.IsPrimaryKey Then
                     If Me.OriginColumns.Count <> Me.DestinationColumns.Count Then
-                        Debugger.Break()
                         If Me.DestinationTable.getPrimaryKeyColumns.Count > 0 Then
                             If Me.OriginColumns.Count > 0 Then
                                 'Should get this far
@@ -337,7 +336,12 @@ Namespace RDS
                 End If
 
             Catch ex As Exception
-                Debugger.Break()
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
 
@@ -352,7 +356,12 @@ Namespace RDS
                 Call Me.Model.Model.addCMMLColumnToRelationDestination(Me, arColumn, aiOrdinalPosition)
 
             Catch ex As Exception
-                Debugger.Break()
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
         End Sub
 
@@ -365,7 +374,12 @@ Namespace RDS
                 Call Me.Model.Model.addCMMLColumnToRelationOrigin(Me, arColumn, aiOrdinalPosition)
 
             Catch ex As Exception
-                Debugger.Break()
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
         End Sub
 
@@ -378,7 +392,12 @@ Namespace RDS
                 Call Me.Model.Model.removeCMMLRelationOriginColumn(Me, arColumn)
 
             Catch ex As Exception
-                Debugger.Break()
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
         End Sub
 
@@ -406,7 +425,12 @@ Namespace RDS
                 End If
 
             Catch ex As Exception
-                Debugger.Break()
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub

@@ -1048,13 +1048,34 @@ Public Class frmDiagramPGS
         If Not TypeOf (e.Node) Is TableNode Then
             If Me.PropertyTableNode Is Nothing And
                 ((Control.ModifierKeys = Keys.Control) Or (Control.ModifierKeys = Keys.ControlKey)) Then
+
                 Me.PropertyTableNode = Me.zrPage.Diagram.Factory.CreateTableNode(e.Node.Bounds.X, e.Node.Bounds.Y + 25, 30, 20, 1, 0)
                 Me.PropertyTableNode.EnableStyledText = True
                 Me.PropertyTableNode.Caption = "<B>" & " " & lrNode.Name & " "
                 Me.PropertyTableNode.Tag = lrNode
+
                 Dim lrRDSTable As RDS.Table = Me.zrPage.Model.RDS.Table.Find(Function(x) x.Name = lrNode.Id)
 
-                For Each lrColumn In lrRDSTable.Column
+                Dim larColumn = lrRDSTable.Column.ToList.OrderBy(Function(x) x.OrdinalPosition).ToList
+
+                '--------------------------------------------------------------------
+                'Refined sort of Columns based on Supertype Column ordering and Subtype ordering
+                Dim liInd As Integer
+                Dim larSupertypeTable = lrRDSTable.getSupertypeTables
+                If larSupertypeTable.Count > 0 Then
+                    larSupertypeTable.Reverse()
+                    larSupertypeTable.Add(lrRDSTable)
+                    liInd = 0
+                    For Each lrSupertypeTable In larSupertypeTable
+                        For Each lrColumn In larColumn.FindAll(Function(x) x.Role.JoinedORMObject.Id = lrSupertypeTable.Name).OrderBy(Function(x) x.OrdinalPosition)
+                            larColumn.Remove(lrColumn)
+                            larColumn.Insert(liInd, lrColumn)
+                            liInd += 1
+                        Next
+                    Next
+                End If
+
+                For Each lrColumn In larColumn
 
                     '============================================================
                     'If lrColumn.ContributesToPrimaryKey And lrRDSTable.Column.Count > 1 Then
@@ -2015,7 +2036,13 @@ Public Class frmDiagramPGS
                 'Keep, so that ContextMenu is not changed from
                 '  how set in Diagram.NodeSelected
                 '-----------------------------------------------
-                If loNode IsNot Nothing Then Me.DiagramView.ContextMenuStrip = Me.ContextMenuStrip_Node
+                If loNode IsNot Nothing Then
+                    If loNode.GetType = GetType(MindFusion.Diagramming.ShapeNode) Then
+                        Me.DiagramView.ContextMenuStrip = Me.ContextMenuStrip_Node
+                    Else
+                        Me.DiagramView.ContextMenuStrip = Nothing
+                    End If
+                End If
             Else
                 '------------------------------------------------
                 'User Left-Clicked on the Canvas
@@ -2052,7 +2079,7 @@ Public Class frmDiagramPGS
             Me.Diagram.Invalidate()
 
         Catch ex As Exception
-            Debugger.Break()
+            'Debugger.Break()
         End Try
 
     End Sub
@@ -2367,7 +2394,7 @@ Public Class frmDiagramPGS
 
                 lrERAttribute = lrFactDataInstance.CloneAttribute(Me.zrPage)
 
-                lrERAttribute.OrdinalPosition = lrEntity.Attribute.Count + 1
+                'lrERAttribute.OrdinalPosition = lrEntity.Attribute.Count + 1
                 lrERAttribute.Entity = New ERD.Entity
                 lrERAttribute.Entity = lrEntity
                 lrEntity.Attribute.Add(lrERAttribute)
@@ -2816,7 +2843,7 @@ Public Class frmDiagramPGS
             '-----------------------------------------------------------------
             Exit Sub
         Else
-            lrAttribute.OrdinalPosition -= 1
+            'lrAttribute.OrdinalPosition -= 1
 
             '--------------------------------------------------------------------
             'Change the Ordinal Positions of the Attributes above the Attribute
@@ -2831,7 +2858,7 @@ Public Class frmDiagramPGS
             lrEntity = lrTableNode.Tag
 
             lrChangingAttribute = lrEntity.Attribute(lrAttribute.OrdinalPosition - 1)
-            lrChangingAttribute.OrdinalPosition += 1
+            'lrChangingAttribute.OrdinalPosition += 1
 
             lrAttribute.Cell = lrEntity.TableShape.Item(0, lrAttribute.OrdinalPosition - 1)
             lrAttribute.Cell.Tag = lrAttribute
@@ -2890,7 +2917,7 @@ Public Class frmDiagramPGS
             '-----------------------------------------------------------------
             Exit Sub
         Else
-            lrAttribute.OrdinalPosition += 1
+            'lrAttribute.OrdinalPosition += 1
 
             '--------------------------------------------------------------------
             'Change the Ordinal Positions of the Attributes above the Attribute
@@ -2898,7 +2925,7 @@ Public Class frmDiagramPGS
             Dim lrChangingAttribute As ERD.Attribute
 
             lrChangingAttribute = lrEntity.Attribute(lrAttribute.OrdinalPosition - 1)
-            lrChangingAttribute.OrdinalPosition -= 1
+            'lrChangingAttribute.OrdinalPosition -= 1
 
             lrAttribute.Cell = lrEntity.TableShape.Item(0, lrAttribute.OrdinalPosition - 1)
             lrAttribute.Cell.Tag = lrAttribute
@@ -2961,7 +2988,7 @@ Public Class frmDiagramPGS
         '----------------------------------------------------------------------------------
         For liInd = lrAttribute.OrdinalPosition To lrAttribute.Entity.Attribute.Count
             lrChangingAttribute = lrAttribute.Entity.Attribute(liInd - 1)
-            lrChangingAttribute.OrdinalPosition -= 1
+            'lrChangingAttribute.OrdinalPosition -= 1
 
             lsSQLQuery = "SELECT * FROM " & pcenumCMMLRelations.CorePropertyHasOrdinalPosition.ToString
             lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"

@@ -2342,39 +2342,61 @@ Public Class frmToolboxORMVerbalisation
 
     Public Sub VerbalisePage(ByRef arPage As FBM.Page)
 
-        Dim lrVerbaliser As New FBM.ORMVerbailser
-        Call lrVerbaliser.Reset()
+        Try
 
-        '------------------------------------------------------
-        'Declare that Page is in a Model
-        '------------------------------------------------------
-        lrVerbaliser.VerbaliseQuantifier("'" & arPage.Name & "' is a Page in Model, '" & arPage.Model.Name & "'")
+            Dim lrVerbaliser As New FBM.ORMVerbailser
+            Call lrVerbaliser.Reset()
 
-        Me.WebBrowser.DocumentText = lrVerbaliser.Verbalise
+            '------------------------------------------------------
+            'Declare that Page is in a Model
+            '------------------------------------------------------
+            lrVerbaliser.VerbaliseQuantifier("'" & arPage.Name & "' is a Page in Model, '" & arPage.Model.Name & "'")
+
+            Me.WebBrowser.DocumentText = lrVerbaliser.Verbalise
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 
     Public Sub VerbalisePGSNode(ByVal arNode As PGS.Node)
 
-        Dim lrVerbaliser As New FBM.ORMVerbailser
-        Call lrVerbaliser.Reset()
+        Try
 
-        '------------------------------------------------------
-        'Declare that the EntityType(Name) is an EntityType
-        '------------------------------------------------------
-        lrVerbaliser.VerbalisePredicateText(arNode.Data)
-        lrVerbaliser.VerbaliseQuantifier(" is a Node.")
-        lrVerbaliser.HTW.WriteBreak()
-        lrVerbaliser.HTW.WriteBreak()
+            Dim lrVerbaliser As New FBM.ORMVerbailser
+            Call lrVerbaliser.Reset()
 
-        lrVerbaliser.VerbaliseHeading("Properties")
-        lrVerbaliser.HTW.WriteBreak()
-        For Each lrColumn In arNode.RDSTable.Column
-            lrVerbaliser.VerbalisePredicateText(lrColumn.Name)
+            '------------------------------------------------------
+            'Declare that the EntityType(Name) is an EntityType
+            '------------------------------------------------------
+            lrVerbaliser.VerbalisePredicateText(arNode.Data)
+            lrVerbaliser.VerbaliseQuantifier(" is a Node.")
             lrVerbaliser.HTW.WriteBreak()
-        Next
+            lrVerbaliser.HTW.WriteBreak()
 
-        Me.WebBrowser.DocumentText = lrVerbaliser.Verbalise
+            lrVerbaliser.VerbaliseHeading("Properties")
+            lrVerbaliser.HTW.WriteBreak()
+            For Each lrColumn In arNode.RDSTable.Column
+                lrVerbaliser.VerbalisePredicateText(lrColumn.Name)
+                lrVerbaliser.HTW.WriteBreak()
+            Next
+
+            Me.WebBrowser.DocumentText = lrVerbaliser.Verbalise
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 
