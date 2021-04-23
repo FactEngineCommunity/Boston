@@ -550,12 +550,12 @@ Public Class frmDiagramERD
                     Dim lrRelation As New ERD.Relation(Me.zrPage.Model,
                                                        Me.zrPage,
                                                        lrRecordset("Relation").Data,
-                                                       lrOrigingEREntity, _
-                                                       liOriginMultiplicity, _
-                                                       lbRelationOriginIsMandatory, _
-                                                       lbContributesToPrimaryKey, _
-                                                       lrDestinationgEREntity, _
-                                                       liDestinationMultiplicity, _
+                                                       lrOrigingEREntity,
+                                                       liOriginMultiplicity,
+                                                       lbRelationOriginIsMandatory,
+                                                       lbContributesToPrimaryKey,
+                                                       lrDestinationgEREntity,
+                                                       liDestinationMultiplicity,
                                                        lbRelationDestinationIsMandatory)
 
                     lrRelation.Id = lsRelationId
@@ -625,7 +625,7 @@ Public Class frmDiagramERD
 
             '==================================================================
             'Subtype Relationships
-            Call Me.mapSubtypeRelationships
+            Call Me.mapSubtypeRelationships()
 
             If Me.areAllEntitiesAtPoint00() Then
                 Call Me.autoLayout()
@@ -1234,13 +1234,13 @@ Public Class frmDiagramERD
                 Dim lr_page As New FBM.Page(lrEnterpriseView.Tag.Model)
                 lr_page = lrEnterpriseView.Tag
 
-                Dim larFactDataInstance = From FactTypeInstance In lr_page.FactTypeInstance _
-                                   From FactInstance In FactTypeInstance.Fact _
-                                   From FactDataInstance In FactInstance.Data _
-                                   Where FactTypeInstance.Name = pcenumCMMLRelations.CoreElementHasElementType.ToString _
+                Dim larFactDataInstance = From FactTypeInstance In lr_page.FactTypeInstance
+                                          From FactInstance In FactTypeInstance.Fact
+                                          From FactDataInstance In FactInstance.Data
+                                          Where FactTypeInstance.Name = pcenumCMMLRelations.CoreElementHasElementType.ToString _
                                    And FactDataInstance.Role.Name = pcenumCMML.Element.ToString _
-                                   And FactDataInstance.Concept.Symbol = lr_page_object.Name _
-                                   Select New FBM.FactDataInstance(lr_page, FactInstance, FactDataInstance.Role, FactDataInstance.Concept, FactDataInstance.X, FactDataInstance.Y)
+                                   And FactDataInstance.Concept.Symbol = lr_page_object.Name
+                                          Select New FBM.FactDataInstance(lr_page, FactInstance, FactDataInstance.Role, FactDataInstance.Concept, FactDataInstance.X, FactDataInstance.Y)
 
                 Dim lrFactDataInstance As New Object
 
@@ -1417,24 +1417,24 @@ Public Class frmDiagramERD
                     Me.MorphVector(0).TargetZoomFactor = lrPage.DiagramView.ZoomFactor
                 End If
 
-                Dim larFactDataInstance = From FactTypeInstance In lrPage.FactTypeInstance _
-                                   From FactInstance In FactTypeInstance.Fact _
-                                   From FactDataInstance In FactInstance.Data _
-                                   Where FactTypeInstance.Name = pcenumCMMLRelations.CoreElementHasElementType.ToString _
+                Dim larFactDataInstance = From FactTypeInstance In lrPage.FactTypeInstance
+                                          From FactInstance In FactTypeInstance.Fact
+                                          From FactDataInstance In FactInstance.Data
+                                          Where FactTypeInstance.Name = pcenumCMMLRelations.CoreElementHasElementType.ToString _
                                    And FactDataInstance.Role.Name = pcenumCMML.Element.ToString _
-                                   And FactDataInstance.Concept.Symbol = lrPageObject.Name _
-                                   Select New FBM.FactDataInstance(lrPage, FactInstance, FactDataInstance.Role, FactDataInstance.Concept, FactDataInstance.X, FactDataInstance.Y)
+                                   And FactDataInstance.Concept.Symbol = lrPageObject.Name
+                                          Select New FBM.FactDataInstance(lrPage, FactInstance, FactDataInstance.Role, FactDataInstance.Concept, FactDataInstance.X, FactDataInstance.Y)
 
                 Dim lrFactDataInstance As New FBM.FactDataInstance
                 For Each lrFactDataInstance In larFactDataInstance
                     Exit For
                 Next
 
-                If lrFactDataInstance.shape IsNot Nothing Then
+                If lrFactDataInstance.Shape IsNot Nothing Then
                     Me.MorphVector(0).EndSize = New Rectangle(lrFactDataInstance.X,
                                                               lrFactDataInstance.Y,
-                                                              lrFactDataInstance.shape.Bounds.Width,
-                                                              lrFactDataInstance.shape.Bounds.Height)
+                                                              lrFactDataInstance.Shape.Bounds.Width,
+                                                              lrFactDataInstance.Shape.Bounds.Height)
                 Else
                     Me.MorphVector(0).EndSize = New Rectangle(0, 0, 20, 10)
                 End If
@@ -1449,9 +1449,9 @@ Public Class frmDiagramERD
                 If lrNode IsNot Nothing Then
                     Me.MorphVector(0).EndSize = New Rectangle(lrNode.X,
                                                               lrNode.Y,
-                                                              lrNode.shape.Bounds.Width,
-                                                              lrNode.shape.Bounds.Height)
-                    Me.MorphVector(0).EndPoint = New Point(lrNode.shape.Bounds.X, lrNode.shape.Bounds.Y) ' (lrFactDataInstance.x, lrFactDataInstance.y)
+                                                              lrNode.Shape.Bounds.Width,
+                                                              lrNode.Shape.Bounds.Height)
+                    Me.MorphVector(0).EndPoint = New Point(lrNode.Shape.Bounds.X, lrNode.Shape.Bounds.Y) ' (lrFactDataInstance.x, lrFactDataInstance.y)
 
                     If lrNode.NodeType = pcenumPGSEntityType.Relationship Then
                         Dim lrRelation As ERD.Relation
@@ -1476,7 +1476,7 @@ Public Class frmDiagramERD
                         End If
                     Else
                         Me.MorphVector(0).EndSize = New Rectangle(0, 0, 20, 20)
-                        Me.MorphVector(0).EndPoint = New Point(lrNode.shape.Bounds.X - lrPage.DiagramView.ScrollX, lrNode.shape.Bounds.Y - lrPage.DiagramView.ScrollY) 'lrFactDataInstance.X, lrFactDataInstance.Y)
+                        Me.MorphVector(0).EndPoint = New Point(lrNode.Shape.Bounds.X - lrPage.DiagramView.ScrollX, lrNode.Shape.Bounds.Y - lrPage.DiagramView.ScrollY) 'lrFactDataInstance.X, lrFactDataInstance.Y)
                     End If
                 Else
                     Me.MorphVector(0).EndSize = New Rectangle(0, 0, 20, 20)
@@ -2006,7 +2006,7 @@ Public Class frmDiagramERD
                     Select Case Diagram.Nodes(liInd - 1).Tag.RoleConstraintType
                         Case Is = pcenumRoleConstraintType.InternalUniquenessConstraint
                             Diagram.Nodes(liInd - 1).Pen.Color = Color.Maroon
-                        Case Is = pcenumRoleConstraintType.ExclusionConstraint, _
+                        Case Is = pcenumRoleConstraintType.ExclusionConstraint,
                                   pcenumRoleConstraintType.ExternalUniquenessConstraint
                             Diagram.Nodes(liInd - 1).Pen.Color = Color.White
                     End Select
