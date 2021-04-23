@@ -1120,6 +1120,26 @@ Public Class frmDiagramERD
 
     End Sub
 
+    Public Sub mapSupertypeRelationshipsForEntity(ByRef arEntity As ERD.Entity)
+
+        Dim lrRDSTable = arEntity.RDSTable
+
+        For Each lrSupertypeTable In lrRDSTable.getSupertypeTables
+
+            Dim lrSupertypeEntity As ERD.Entity = Me.zrPage.ERDiagram.Entity.Find(Function(x) x.Name = lrSupertypeTable.Name)
+
+            If lrSupertypeEntity IsNot Nothing Then
+                Dim lo_link As New DiagramLink(Me.zrPage.Diagram, arEntity.TableShape, lrSupertypeEntity.TableShape)
+                lo_link.HeadShape = ArrowHead.Arrow
+                lo_link.Pen.Color = Color.Gray
+                lo_link.Locked = True
+                Me.zrPage.Diagram.Links.Add(lo_link)
+                arEntity.TableShape.OutgoingLinks.Add(lo_link)
+            End If
+        Next
+
+    End Sub
+
     Public Sub mapSubtypeRelationships()
 
         Try
@@ -1731,6 +1751,7 @@ Public Class frmDiagramERD
 
                             Call Me.zrPage.DropExistingEntityAtPoint(lrEntity, loPointF, False)
                             Call Me.zrPage.loadRelationsForEntity(lrEntity, False)
+                            Call Me.mapSupertypeRelationshipsForEntity(lrEntity)
                             Call lrEntity.Move(loPointF.X, loPointF.Y, True)
                             Call Me.zrPage.Save(False, False)
                         End With
