@@ -135,6 +135,33 @@ Namespace ERD
         ''' <remarks></remarks>
         Public Relation As ERD.Relation
 
+        Public Overrides Property ModelError() As System.Collections.Generic.List(Of Boston.FBM.ModelError)
+            Get
+                Dim larModelError As New List(Of Boston.FBM.ModelError)
+
+                If Me.Column.ActiveRole.JoinsValueType IsNot Nothing Then
+                    larModelError.AddRange(Me.Column.ActiveRole.JoinsValueType.ModelError)
+                End If
+
+                If Me.Column.getMetamodelDataType = pcenumORMDataType.DataTypeNotSet And larModelError.Count = 0 Then
+
+                    Dim lsErrorMessage = "Data Type Not Specified Error - Value Type: '" & Me.Column.ActiveRole.JoinsValueType.Name & "'."
+
+                    Dim lrModelError = New FBM.ModelError(pcenumModelErrors.DataTypeNotSpecifiedError,
+                                                          lsErrorMessage,
+                                                          Nothing,
+                                                          Me.Column.ActiveRole.JoinsValueType)
+
+                    larModelError.AddUnique(lrModelError)
+                End If
+
+                Return larModelError
+            End Get
+            Set(value As System.Collections.Generic.List(Of Boston.FBM.ModelError))
+                'Nothing to do here. See getter above.
+            End Set
+        End Property
+
         Public Sub New()
 
             Me.Id = System.Guid.NewGuid.ToString

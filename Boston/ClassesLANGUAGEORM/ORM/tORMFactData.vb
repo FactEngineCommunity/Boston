@@ -183,7 +183,7 @@ Namespace FBM
         End Property
 
         Private _ModelError As New List(Of FBM.ModelError)
-        Public Property ModelError() As System.Collections.Generic.List(Of ModelError) Implements iValidationErrorHandler.ModelError
+        Public Overridable Property ModelError() As System.Collections.Generic.List(Of ModelError) Implements iValidationErrorHandler.ModelError
             Get
                 Return Me._ModelError
             End Get

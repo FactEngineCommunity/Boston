@@ -618,10 +618,9 @@ Namespace FBM
                 If Me.Realisations.Count = 0 Then
                     Call TableModelDictionary.DeleteModelDictionaryEntry(Me)
                     Me.Model.ModelDictionary.Remove(Me)
+                    Me.Model.Dictionary.Remove(Me.Symbol)
                 End If
             End If
-
-
 
             Me.isDirty = True
 

@@ -2454,7 +2454,7 @@ Public Class frmDiagramERD
 
     End Sub
 
-    Private Sub MoveUpToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MoveUpToolStripMenuItem.Click
+    Private Sub MoveUpToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripMenuItemMoveUp.Click
 
 
         Try
@@ -2533,7 +2533,7 @@ Public Class frmDiagramERD
     End Sub
 
 
-    Private Sub MoveDownToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MoveDownToolStripMenuItem.Click
+    Private Sub MoveDownToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripMenuItemMoveDown.Click
 
         Dim lrAttribute As ERD.Attribute
         Dim lsSQLQuery As String = ""
@@ -2969,9 +2969,44 @@ Public Class frmDiagramERD
 
     Private Sub ContextMenuStripAttribute_Opening(sender As Object, e As System.ComponentModel.CancelEventArgs) Handles ContextMenuStripAttribute.Opening
 
+        Me.ContextMenuStripAttribute.ImageScalingSize = New Drawing.Size(16, 16)
+
         If My.Settings.SuperuserMode Then
             Me.ToolStripMenuItemDeleteAttribute.Visible = True
         End If
+
+        Dim lrAttribute As ERD.Attribute
+
+        Try
+            lrAttribute = Me.zrPage.SelectedObject(0)
+
+            'Can't modify the OrdinalPosition of a Column in a Subtype at this stage.
+            Me.ToolStripMenuItemMoveUp.Enabled = Not lrAttribute.Entity.RDSTable.isSubtype
+            Me.ToolStripMenuItemMoveDown.Enabled = Not lrAttribute.Entity.RDSTable.isSubtype
+
+            '--------------------------------------------------------------------
+            'ModelErrors - Add menu items for the ModelErrors for the EntityType
+            '--------------------------------------------------------------------
+            Me.ToolStripMenuItemAttributeModelErrors.DropDownItems.Clear()
+            Dim lrModelError As FBM.ModelError
+            Dim lo_menu_option As ToolStripItem
+            If lrAttribute.ModelError.Count > 0 Then
+                For Each lrModelError In lrAttribute.ModelError
+                    lo_menu_option = Me.ToolStripMenuItemAttributeModelErrors.DropDownItems.Add(lrModelError.Description)
+                    lo_menu_option.Image = My.Resources.MenuImages.RainCloudRed16x16
+                Next
+                ToolStripMenuItemAttributeModelErrors.Image = My.Resources.MenuImages.RainCloudRed16x16
+            Else
+                Me.ToolStripMenuItemAttributeModelErrors.Image = My.Resources.MenuImages.Cloud216x16
+                lo_menu_option = Me.ToolStripMenuItemAttributeModelErrors.DropDownItems.Add("There are no Model Errors for this Entity Type.")
+                lo_menu_option.Image = My.Resources.MenuImages.Cloud216x16
+            End If
+
+        Catch ex As Exception
+        End Try
+
+
+
 
     End Sub
 

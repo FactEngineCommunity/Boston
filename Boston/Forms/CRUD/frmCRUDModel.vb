@@ -70,6 +70,9 @@ Public Class frmCRUDModel
                             Case Is = pcenumDatabaseType.SQLite
                                 Me.zrModel.TreeNode.ImageIndex = 8
                                 Me.zrModel.TreeNode.SelectedImageIndex = 8
+                            Case Is = pcenumDatabaseType.None
+                                Me.zrModel.TreeNode.ImageIndex = 1
+                                Me.zrModel.TreeNode.SelectedImageIndex = 1
                         End Select
                     End If
                 End If

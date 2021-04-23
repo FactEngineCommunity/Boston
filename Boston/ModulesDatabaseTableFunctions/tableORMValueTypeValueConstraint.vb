@@ -30,6 +30,21 @@ Namespace TableValueTypeValueConstraint
 
         End Sub
 
+        Public Sub DeleteValueConstraint(ByVal arValueType As FBM.ValueType, ByVal asValueConstraint As String)
+
+            Dim lsSQLQuery As String = ""
+
+            lsSQLQuery = "DELETE FROM MetaModelValueTypeValueConstraint"
+            lsSQLQuery &= " WHERE ModelId = '" & Replace(arValueType.Model.ModelId, "'", "`") & "'"
+            lsSQLQuery &= "   AND ValueTypeId = '" & Replace(arValueType.Id, "'", "`") & "'"
+            lsSQLQuery &= "   AND Symbol = '" & asValueConstraint & "'"
+
+            pdbConnection.BeginTrans()
+            pdbConnection.Execute(lsSQLQuery)
+            pdbConnection.CommitTrans()
+
+        End Sub
+
         Public Function ExistsValueTypeValueConstraint(ByVal arValueType As FBM.ValueType, ByVal ar_concept As FBM.Concept) As Boolean
 
             Dim lsSQLQuery As String = ""

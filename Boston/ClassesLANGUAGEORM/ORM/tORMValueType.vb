@@ -668,6 +668,7 @@ Namespace FBM
 
                 Dim lrModelDictionaryEntry As New FBM.DictionaryEntry(Me.Model, Me.Id, pcenumConceptType.ValueType)
                 lrModelDictionaryEntry = Me.Model.ModelDictionary.Find(AddressOf lrModelDictionaryEntry.Equals)
+                lrModelDictionaryEntry.removeConceptType(pcenumConceptType.ValueType)
 
                 If abDoDatabaseProcessing Then
                     Call TableValueType.DeleteValueType(Me)
@@ -725,6 +726,8 @@ Namespace FBM
         Public Sub RemoveValueConstraint(ByVal asValueConstraint As String)
 
             Me.ValueConstraint.Remove(asValueConstraint)
+
+            Call TableValueTypeValueConstraint.DeleteValueConstraint(Me, asValueConstraint)
 
             RaiseEvent ValueConstraintRemoved(asValueConstraint)
 

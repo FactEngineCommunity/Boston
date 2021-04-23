@@ -1376,7 +1376,7 @@ Namespace FBM
                     Me.ValueType.Add(arValueType)
 
                     If abMakeModelDirty Then
-                        Me.MakeDirty()
+                        Me.MakeDirty(False, False)
                     End If
 
                     '=====================================================================================
@@ -1669,9 +1669,9 @@ Namespace FBM
                                                 Optional ByVal abMatchCase As Boolean = False,
                                                 Optional ByVal abMakeDirtyIfNotExists As Boolean = False) As FBM.DictionaryEntry
 
-            Try
-                Dim lrDictionaryEntry As FBM.DictionaryEntry = Nothing
+            Dim lrDictionaryEntry As FBM.DictionaryEntry = Nothing
 
+            Try
                 If abStraightSave Then
                     lrDictionaryEntry = arDictionaryEntry
                 ElseIf abMatchCase Then
@@ -1680,7 +1680,7 @@ Namespace FBM
                     End If
                     'lrDictionaryEntry = Me.ModelDictionary.Find(AddressOf arDictionaryEntry.EqualsCase)
                 Else
-                        lrDictionaryEntry = Me.ModelDictionary.Find(AddressOf arDictionaryEntry.Equals)
+                    lrDictionaryEntry = Me.ModelDictionary.Find(AddressOf arDictionaryEntry.Equals)
                 End If
 
                 If lrDictionaryEntry IsNot Nothing Then
@@ -1723,7 +1723,7 @@ Namespace FBM
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
                 prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
 
-                Return Nothing
+                Return lrDictionaryEntry 'Which may be Nothing.
             End Try
 
         End Function
@@ -3881,6 +3881,7 @@ Namespace FBM
                             lsMessage.AppendString(vbCrLf & vbCrLf & "Boston will now remove the ModelElement from the ModelDictionary.")
                             Throw New Exception(lsMessage)
                             Me.ModelDictionary.Remove(New FBM.DictionaryEntry(Me, lsModelObjectName, pcenumConceptType.Actor))
+                            Me.Dictionary.Remove(lsModelObjectName)
                         End If
                     End If
 
