@@ -26,7 +26,7 @@ Partial Class frmCRUDModel
         Me.Button_Cancel = New System.Windows.Forms.Button()
         Me.button_okay = New System.Windows.Forms.Button()
         Me.GroupBox_main = New System.Windows.Forms.GroupBox()
-        Me.GroupBox1 = New System.Windows.Forms.GroupBox()
+        Me.GroupBoxReverseEngineering = New System.Windows.Forms.GroupBox()
         Me.Button2 = New System.Windows.Forms.Button()
         Me.LabelSchema = New System.Windows.Forms.Label()
         Me.ComboBoxSchema = New System.Windows.Forms.ComboBox()
@@ -34,13 +34,13 @@ Partial Class frmCRUDModel
         Me.LabelModelName = New System.Windows.Forms.Label()
         Me.LabelModel = New System.Windows.Forms.Label()
         Me.GroupBoxDatabase = New System.Windows.Forms.GroupBox()
-        Me.CheckBoxIsDatabaseSynchronised = New System.Windows.Forms.CheckBox()
         Me.LabelOpenSuccessfull = New System.Windows.Forms.Label()
         Me.ButtonTestConnection = New System.Windows.Forms.Button()
         Me.ComboBoxDatabaseType = New System.Windows.Forms.ComboBox()
         Me.TextBoxDatabaseConnectionString = New System.Windows.Forms.TextBox()
         Me.LabelConnectionString = New System.Windows.Forms.Label()
         Me.LabelDatabaseType = New System.Windows.Forms.Label()
+        Me.CheckBoxIsDatabaseSynchronised = New System.Windows.Forms.CheckBox()
         Me.DialogOpenFile = New System.Windows.Forms.OpenFileDialog()
         Me.DialogFolderBrowser = New System.Windows.Forms.FolderBrowserDialog()
         Me.ErrorProvider = New System.Windows.Forms.ErrorProvider(Me.components)
@@ -49,7 +49,7 @@ Partial Class frmCRUDModel
         Me.Advanced = New System.Windows.Forms.TabPage()
         Me.LabelPromptIsDatabaseSynchronised = New System.Windows.Forms.Label()
         Me.GroupBox_main.SuspendLayout()
-        Me.GroupBox1.SuspendLayout()
+        Me.GroupBoxReverseEngineering.SuspendLayout()
         Me.GroupBoxDatabase.SuspendLayout()
         CType(Me.ErrorProvider, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.TabControl1.SuspendLayout()
@@ -79,7 +79,7 @@ Partial Class frmCRUDModel
         '
         'GroupBox_main
         '
-        Me.GroupBox_main.Controls.Add(Me.GroupBox1)
+        Me.GroupBox_main.Controls.Add(Me.GroupBoxReverseEngineering)
         Me.GroupBox_main.Controls.Add(Me.LabelModelName)
         Me.GroupBox_main.Controls.Add(Me.LabelModel)
         Me.GroupBox_main.Controls.Add(Me.GroupBoxDatabase)
@@ -91,20 +91,20 @@ Partial Class frmCRUDModel
         Me.GroupBox_main.TabIndex = 6
         Me.GroupBox_main.TabStop = False
         '
-        'GroupBox1
+        'GroupBoxReverseEngineering
         '
-        Me.GroupBox1.Controls.Add(Me.Button2)
-        Me.GroupBox1.Controls.Add(Me.LabelSchema)
-        Me.GroupBox1.Controls.Add(Me.ComboBoxSchema)
-        Me.GroupBox1.Controls.Add(Me.Button1)
-        Me.GroupBox1.Location = New System.Drawing.Point(28, 331)
-        Me.GroupBox1.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.GroupBox1.Name = "GroupBox1"
-        Me.GroupBox1.Padding = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.GroupBox1.Size = New System.Drawing.Size(834, 145)
-        Me.GroupBox1.TabIndex = 15
-        Me.GroupBox1.TabStop = False
-        Me.GroupBox1.Text = "Reverse Engineering"
+        Me.GroupBoxReverseEngineering.Controls.Add(Me.Button2)
+        Me.GroupBoxReverseEngineering.Controls.Add(Me.LabelSchema)
+        Me.GroupBoxReverseEngineering.Controls.Add(Me.ComboBoxSchema)
+        Me.GroupBoxReverseEngineering.Controls.Add(Me.Button1)
+        Me.GroupBoxReverseEngineering.Location = New System.Drawing.Point(28, 331)
+        Me.GroupBoxReverseEngineering.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.GroupBoxReverseEngineering.Name = "GroupBoxReverseEngineering"
+        Me.GroupBoxReverseEngineering.Padding = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.GroupBoxReverseEngineering.Size = New System.Drawing.Size(834, 145)
+        Me.GroupBoxReverseEngineering.TabIndex = 15
+        Me.GroupBoxReverseEngineering.TabStop = False
+        Me.GroupBoxReverseEngineering.Text = "Reverse Engineering"
         '
         'Button2
         '
@@ -184,16 +184,6 @@ Partial Class frmCRUDModel
         Me.GroupBoxDatabase.TabStop = False
         Me.GroupBoxDatabase.Text = "Database:"
         '
-        'CheckBoxIsDatabaseSynchronised
-        '
-        Me.CheckBoxIsDatabaseSynchronised.AutoSize = True
-        Me.CheckBoxIsDatabaseSynchronised.Location = New System.Drawing.Point(20, 23)
-        Me.CheckBoxIsDatabaseSynchronised.Name = "CheckBoxIsDatabaseSynchronised"
-        Me.CheckBoxIsDatabaseSynchronised.Size = New System.Drawing.Size(222, 24)
-        Me.CheckBoxIsDatabaseSynchronised.TabIndex = 7
-        Me.CheckBoxIsDatabaseSynchronised.Text = "Is Database Synchronised"
-        Me.CheckBoxIsDatabaseSynchronised.UseVisualStyleBackColor = True
-        '
         'LabelOpenSuccessfull
         '
         Me.LabelOpenSuccessfull.Location = New System.Drawing.Point(192, 169)
@@ -252,6 +242,16 @@ Partial Class frmCRUDModel
         Me.LabelDatabaseType.Size = New System.Drawing.Size(125, 20)
         Me.LabelDatabaseType.TabIndex = 1
         Me.LabelDatabaseType.Text = "Database Type :"
+        '
+        'CheckBoxIsDatabaseSynchronised
+        '
+        Me.CheckBoxIsDatabaseSynchronised.AutoSize = True
+        Me.CheckBoxIsDatabaseSynchronised.Location = New System.Drawing.Point(20, 23)
+        Me.CheckBoxIsDatabaseSynchronised.Name = "CheckBoxIsDatabaseSynchronised"
+        Me.CheckBoxIsDatabaseSynchronised.Size = New System.Drawing.Size(222, 24)
+        Me.CheckBoxIsDatabaseSynchronised.TabIndex = 7
+        Me.CheckBoxIsDatabaseSynchronised.Text = "Is Database Synchronised"
+        Me.CheckBoxIsDatabaseSynchronised.UseVisualStyleBackColor = True
         '
         'DialogOpenFile
         '
@@ -319,8 +319,8 @@ Partial Class frmCRUDModel
         Me.Text = "Model Configuration"
         Me.GroupBox_main.ResumeLayout(False)
         Me.GroupBox_main.PerformLayout()
-        Me.GroupBox1.ResumeLayout(False)
-        Me.GroupBox1.PerformLayout()
+        Me.GroupBoxReverseEngineering.ResumeLayout(False)
+        Me.GroupBoxReverseEngineering.PerformLayout()
         Me.GroupBoxDatabase.ResumeLayout(False)
         Me.GroupBoxDatabase.PerformLayout()
         CType(Me.ErrorProvider, System.ComponentModel.ISupportInitialize).EndInit()
@@ -345,7 +345,7 @@ Partial Class frmCRUDModel
     Friend WithEvents ComboBoxDatabaseType As System.Windows.Forms.ComboBox
     Friend WithEvents ButtonTestConnection As System.Windows.Forms.Button
     Friend WithEvents LabelOpenSuccessfull As System.Windows.Forms.Label
-    Friend WithEvents GroupBox1 As System.Windows.Forms.GroupBox
+    Friend WithEvents GroupBoxReverseEngineering As System.Windows.Forms.GroupBox
     Friend WithEvents Button1 As System.Windows.Forms.Button
     Friend WithEvents LabelSchema As System.Windows.Forms.Label
     Friend WithEvents ComboBoxSchema As System.Windows.Forms.ComboBox

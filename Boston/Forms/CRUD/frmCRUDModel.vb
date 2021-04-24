@@ -22,6 +22,8 @@ Public Class frmCRUDModel
 
         Me.LabelModelName.Text = Me.zrModel.Name
 
+        Me.GroupBoxReverseEngineering.Visible = My.Settings.SuperuserMode
+
         Call Me.LoadDatabaseTypes()
 
         Me.TextBoxDatabaseConnectionString.Text = Me.zrModel.TargetDatabaseConnectionString
