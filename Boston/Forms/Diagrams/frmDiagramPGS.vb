@@ -3064,6 +3064,12 @@ Public Class frmDiagramPGS
 
             lrRelation = Me.zrPage.SelectedObject(0)
 
+            Me.ToolStripMenuItemDeleteRelation.Visible = My.Settings.SuperuserMode
+            Me.ToolStripMenuItemEditRelation.Visible = My.Settings.SuperuserMode
+            Me.ToolStripSeparator8.Visible = My.Settings.SuperuserMode
+
+            '=============================================================================================
+            'Morphing
             '---------------------------------------------------------------------------------------------
             'Set the initial MorphVector for the selected EntityType. Morphing the EntityType to another 
             '  shape, and to/into another diagram starts at the MorphVector.
@@ -3329,4 +3335,66 @@ Public Class frmDiagramPGS
         End Select
 
     End Sub
+
+    Private Sub ShowPropertiesForNode(ByRef arNode As PGS.Node)
+
+        Try
+            Dim lrNode As PGS.Node = arNode
+
+            Me.PropertyTableNode = Me.zrPage.Diagram.Factory.CreateTableNode(lrNode.Shape.Bounds.X, lrNode.Shape.Bounds.Y + 25, 30, 20, 1, 0)
+            Me.PropertyTableNode.EnableStyledText = True
+            Me.PropertyTableNode.Caption = "<B>" & " " & arNode.Name & " "
+            Me.PropertyTableNode.Tag = arNode
+
+            Dim lrRDSTable As RDS.Table = Me.zrPage.Model.RDS.Table.Find(Function(x) x.Name = lrNode.ID)
+
+            Dim larColumn = lrRDSTable.Column.ToList.OrderBy(Function(x) x.OrdinalPosition).ToList
+
+            '--------------------------------------------------------------------
+            'Refined sort of Columns based on Supertype Column ordering and Subtype ordering
+            Dim liInd As Integer
+            Dim larSupertypeTable = lrRDSTable.getSupertypeTables
+            If larSupertypeTable.Count > 0 Then
+                larSupertypeTable.Reverse()
+                larSupertypeTable.Add(lrRDSTable)
+                liInd = 0
+                For Each lrSupertypeTable In larSupertypeTable
+                    For Each lrColumn In larColumn.FindAll(Function(x) x.Role.JoinedORMObject.Id = lrSupertypeTable.Name).OrderBy(Function(x) x.OrdinalPosition)
+                        larColumn.Remove(lrColumn)
+                        larColumn.Insert(liInd, lrColumn)
+                        liInd += 1
+                    Next
+                Next
+            End If
+
+            For Each lrColumn In larColumn
+                Me.PropertyTableNode.RowCount += 1
+
+                Me.PropertyTableNode.Item(0, Me.PropertyTableNode.RowCount - 1).Tag = lrColumn
+                Me.PropertyTableNode.Item(0, Me.PropertyTableNode.RowCount - 1).Text = lrColumn.Name
+            Next
+
+            Me.PropertyTableNode.ResizeToFitText(True)
+
+        Catch ex As Exception
+            Debugger.Break()
+        End Try
+
+    End Sub
+
+    Private Sub ViewPropertiesToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ViewPropertiesToolStripMenuItem.Click
+
+        Dim lrShapeNode As MindFusion.Diagramming.ShapeNode = Me.Diagram.Selection.Items(0)
+        Dim lrNode As New PGS.Node
+
+        Try
+            ''---------------------------------------------------------
+            ''Get the EntityType represented by the (selected) Entity
+            ''---------------------------------------------------------
+            lrNode = lrShapeNode.Tag
+            Call Me.ShowPropertiesForNode(lrNode)
+        Catch
+        End Try
+    End Sub
+
 End Class
