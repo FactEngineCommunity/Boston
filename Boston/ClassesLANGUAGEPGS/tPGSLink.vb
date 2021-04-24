@@ -232,7 +232,8 @@ Namespace PGS
                         Dim lrFactType As FBM.FactType
                         If Me.RDSRelation.ResponsibleFactType.LinkFactTypeRole Is Nothing Then
                             lrFactType = Me.RDSRelation.ResponsibleFactType
-                        ElseIf Me.RDSRelation.ResponsibleFactType.LinkFactTypeRole.FactType.Arity = 2 And Me.getCorrespondingRDSTable.isPGSRelation Then
+                        ElseIf Me.RDSRelation.ResponsibleFactType.LinkFactTypeRole.FactType.Arity = 2 And
+                            Me.RDSRelation.ResponsibleFactType.LinkFactTypeRole.FactType.getCorrespondingRDSTable.isPGSRelation Then
                             'Must be binary and a PGS Relation
                             lrFactType = Me.RDSRelation.ResponsibleFactType.LinkFactTypeRole.FactType
                         Else
@@ -258,8 +259,13 @@ Namespace PGS
                                 Me.Link.HeadShape = ArrowHead.None
                             End If
                         Else
+                            If lrFactType.HasTotalRoleConstraint Then
+                                Me.Link.BaseShapeSize = Me.Link.HeadShapeSize
+                            Else
+                                Me.Link.BaseShapeSize = 2
+                            End If
                             Me.Link.BaseShape = ArrowHead.PointerArrow
-                            Me.Link.BaseShapeSize = 2
+
                             Me.Link.HeadShape = ArrowHead.PointerArrow
                         End If
 
@@ -267,6 +273,13 @@ Namespace PGS
                         If Me.RDSRelation.ResponsibleFactType.FactTypeReading.Count > 1 Then
                             Me.Link.BaseShape = ArrowHead.PointerArrow
                             Me.Link.BaseShapeSize = Me.Link.HeadShapeSize
+                        End If
+                    Else
+                        If Me.RDSRelation.ResponsibleFactType.FactTypeReading.Count > 1 Then
+                            Me.Link.BaseShape = ArrowHead.PointerArrow
+                            Me.Link.BaseShapeSize = 2
+                        Else
+                            Me.Link.BaseShape = ArrowHead.None
                         End If
                     End If
                 End If
@@ -330,12 +343,24 @@ Namespace PGS
                         lsPredicate = lrFactTypeReading.PredicatePart(0).PredicatePartText
                     Else
                         lrFactTypeReading = lrFactType.FactTypeReading(0)
-                        lsPredicate &= lrFactTypeReading.PredicatePart(0).PredicatePartText
-
+                        Dim lsPredicate1 = lrFactTypeReading.PredicatePart(0).PredicatePartText
+                        Dim lsPredicate2 As String = Nothing
                         If lrFactType.FactTypeReading.Count = 2 Then
                             lrFactTypeReading = lrFactType.FactTypeReading(1)
-                            lsPredicate &= " / " & lrFactTypeReading.PredicatePart(0).PredicatePartText
+                            lsPredicate2 &= lrFactTypeReading.PredicatePart(0).PredicatePartText
                         End If
+
+                        If lsPredicate2 Is Nothing Then
+                            lsPredicate = lsPredicate1
+                        Else
+                            If Me.Link.Origin.Bounds.X > Me.Link.Destination.Bounds.X Then
+                                lsPredicate = lsPredicate1 & " / " & lsPredicate2
+                            Else
+                                lsPredicate = lsPredicate2 & " / " & lsPredicate1
+                            End If
+
+                        End If
+
                         '20200714-VM-Not yet implemented.
                     End If
 
