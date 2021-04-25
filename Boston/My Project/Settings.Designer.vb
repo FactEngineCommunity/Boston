@@ -56,7 +56,7 @@ Namespace My
         
         <Global.System.Configuration.UserScopedSettingAttribute(),  _
          Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("1.26")>  _
+         Global.System.Configuration.DefaultSettingValueAttribute("1.27")>  _
         Public Property DatabaseVersionNumber() As String
             Get
                 Return CType(Me("DatabaseVersionNumber"),String)

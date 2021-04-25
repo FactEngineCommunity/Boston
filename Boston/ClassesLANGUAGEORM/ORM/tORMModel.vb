@@ -4726,7 +4726,7 @@ Namespace FBM
             End If
 
             If Me.CoreVersionNumber = "2.1" Then
-                Dim lrFactType As FBM.FactType = Me.GetModelObjectByName("CoreERDAtrribute")
+                Dim lrFactType As FBM.FactType = Me.GetModelObjectByName("CoreERDAttribute")
                 If lrFactType.InternalUniquenessConstraint(0).Role.Count = 1 Then
 
                     Dim lsSQLCommand = "EXTEND ROLECONSTRAINT CoreInternalUniquenessConstraint16 WITH ROLE JOINING CoreEntity IN FACTTYPE CoreERDAttribute"

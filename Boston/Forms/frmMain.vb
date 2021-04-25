@@ -58,6 +58,8 @@ Public Class frmMain
 
             Dim lsMessage As String = ""
 
+            Me.MenuStrip_main.ImageScalingSize = New Drawing.Size(16, 16)
+
 
             Cursor.Current = Cursors.WaitCursor
 
@@ -78,7 +80,7 @@ Public Class frmMain
             'Notes
             '  Core v2.1 introduces changes to the StateTransitionDiagram model, with changes to the underlying ModelElements. Introduced in Boston v5.4
             psApplicationApplicationVersionNr = "5.6"
-            psApplicationDatabaseVersionNr = "1.26"
+            psApplicationDatabaseVersionNr = "1.27"
             'NB To access the Core version number go to prApplication.CMML.Core.CoreVersionNumber once the Core has loaded.          
 
 

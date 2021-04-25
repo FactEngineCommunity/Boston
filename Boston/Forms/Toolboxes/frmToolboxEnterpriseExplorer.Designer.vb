@@ -509,7 +509,7 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.ContextMenuStrip_ORMModels.ImageScalingSize = New System.Drawing.Size(24, 24)
         Me.ContextMenuStrip_ORMModels.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItemAddModel, Me.ToolStripSeparator2, Me.ToolStripMenuItem1, Me.UnhideHiddenModelsToolStripMenuItem})
         Me.ContextMenuStrip_ORMModels.Name = "ContextMenuStrip_ORMModels"
-        Me.ContextMenuStrip_ORMModels.Size = New System.Drawing.Size(205, 122)
+        Me.ContextMenuStrip_ORMModels.Size = New System.Drawing.Size(205, 100)
         '
         'ToolStripMenuItemAddModel
         '

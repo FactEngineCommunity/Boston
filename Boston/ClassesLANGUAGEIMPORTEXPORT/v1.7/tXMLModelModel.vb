@@ -764,9 +764,10 @@ Namespace XMLModel
                     Dim lrXMLRoleReference As XMLModel.RoleReference
 
                     For Each lrXMLRoleConstraintArgument In lrXMLRoleConstraint.Argument
-                        lrRoleConstraintArgument = New FBM.RoleConstraintArgument(lrRoleConstraint, _
-                                                                                  lrXMLRoleConstraintArgument.SequenceNr, _
+                        lrRoleConstraintArgument = New FBM.RoleConstraintArgument(lrRoleConstraint,
+                                                                                  lrXMLRoleConstraintArgument.SequenceNr,
                                                                                   lrXMLRoleConstraintArgument.Id)
+                        lrRoleConstraintArgument.isDirty = True
 
                         lrJoinPath = New FBM.JoinPath(lrRoleConstraintArgument)
                         lrJoinPath.JoinPathError = lrXMLRoleConstraintArgument.JoinPath.JoinPathError

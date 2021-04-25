@@ -22,10 +22,11 @@ Partial Class frmToolboxORMVerbalisation
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        Me.components = New System.ComponentModel.Container
+        Me.components = New System.ComponentModel.Container()
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmToolboxORMVerbalisation))
         Me.ContextMenuStripAddBusinessRequirement = New System.Windows.Forms.ContextMenuStrip(Me.components)
-        Me.AddAsBusinessRequirementToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.WebBrowser = New System.Windows.Forms.WebBrowser
+        Me.AddAsBusinessRequirementToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.WebBrowser = New System.Windows.Forms.WebBrowser()
         Me.ContextMenuStripAddBusinessRequirement.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -56,6 +57,7 @@ Partial Class frmToolboxORMVerbalisation
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(962, 424)
         Me.Controls.Add(Me.WebBrowser)
+        Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.Name = "frmToolboxORMVerbalisation"
         Me.TabText = "ORM Verbalisation"
         Me.Text = "ORM Verbalisation"

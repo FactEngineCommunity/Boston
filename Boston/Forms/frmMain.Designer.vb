@@ -154,13 +154,12 @@ Partial Class frmMain
         '
         'MenuStrip_main
         '
-        Me.MenuStrip_main.AutoSize = False
         Me.MenuStrip_main.ImageScalingSize = New System.Drawing.Size(24, 24)
         Me.MenuStrip_main.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnu_Session, Me.ToolStripMenuItemPage, Me.ToolStripMenuItemEdit, Me.ToolStripMenuItemView, Me.ToolStripMenuItemBoston, Me.ToolStripMenuItemUser, Me.ToolStripMenuItemProject, Me.HelpToolStripMenuItem, Me.ToolStripMenuItemTestClientServer, Me.TestNotificationToolStripMenuItem})
         Me.MenuStrip_main.Location = New System.Drawing.Point(0, 0)
         Me.MenuStrip_main.Name = "MenuStrip_main"
         Me.MenuStrip_main.Padding = New System.Windows.Forms.Padding(4, 1, 0, 1)
-        Me.MenuStrip_main.Size = New System.Drawing.Size(1066, 23)
+        Me.MenuStrip_main.Size = New System.Drawing.Size(1066, 24)
         Me.MenuStrip_main.TabIndex = 8
         Me.MenuStrip_main.Text = "MenuStrip1"
         '
@@ -168,80 +167,80 @@ Partial Class frmMain
         '
         Me.mnu_Session.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.SaveToolStripMenuItem, Me.SaveAllToolStripMenuItem, Me.ToolStripSeparator10, Me.ToolStripMenuItemNewModel, Me.ToolStripSeparator5, Me.ToolStripMenuItemRecentNodes, Me.ToolStripSeparator11, Me.ToolStripMenuItemLogIn, Me.ToolStripMenuItemLogOut, Me.ToolStripSeparator6, Me.mnuOption_EndSession})
         Me.mnu_Session.Name = "mnu_Session"
-        Me.mnu_Session.Size = New System.Drawing.Size(58, 21)
+        Me.mnu_Session.Size = New System.Drawing.Size(58, 22)
         Me.mnu_Session.Text = "&Session"
         '
         'SaveToolStripMenuItem
         '
         Me.SaveToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.Save16x16
         Me.SaveToolStripMenuItem.Name = "SaveToolStripMenuItem"
-        Me.SaveToolStripMenuItem.Size = New System.Drawing.Size(194, 22)
+        Me.SaveToolStripMenuItem.Size = New System.Drawing.Size(202, 30)
         Me.SaveToolStripMenuItem.Text = "&Save"
         '
         'SaveAllToolStripMenuItem
         '
         Me.SaveAllToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.SaveAll16x16
         Me.SaveAllToolStripMenuItem.Name = "SaveAllToolStripMenuItem"
-        Me.SaveAllToolStripMenuItem.Size = New System.Drawing.Size(194, 22)
+        Me.SaveAllToolStripMenuItem.Size = New System.Drawing.Size(202, 30)
         Me.SaveAllToolStripMenuItem.Text = "&Save All"
         '
         'ToolStripSeparator10
         '
         Me.ToolStripSeparator10.Name = "ToolStripSeparator10"
-        Me.ToolStripSeparator10.Size = New System.Drawing.Size(191, 6)
+        Me.ToolStripSeparator10.Size = New System.Drawing.Size(199, 6)
         '
         'ToolStripMenuItemNewModel
         '
         Me.ToolStripMenuItemNewModel.Image = Global.Boston.My.Resources.Resources.ModelAdd16x16
         Me.ToolStripMenuItemNewModel.Name = "ToolStripMenuItemNewModel"
-        Me.ToolStripMenuItemNewModel.Size = New System.Drawing.Size(194, 22)
+        Me.ToolStripMenuItemNewModel.Size = New System.Drawing.Size(202, 30)
         Me.ToolStripMenuItemNewModel.Text = "&New Model"
         '
         'ToolStripSeparator5
         '
         Me.ToolStripSeparator5.Name = "ToolStripSeparator5"
-        Me.ToolStripSeparator5.Size = New System.Drawing.Size(191, 6)
+        Me.ToolStripSeparator5.Size = New System.Drawing.Size(199, 6)
         '
         'ToolStripMenuItemRecentNodes
         '
         Me.ToolStripMenuItemRecentNodes.Name = "ToolStripMenuItemRecentNodes"
-        Me.ToolStripMenuItemRecentNodes.Size = New System.Drawing.Size(194, 22)
+        Me.ToolStripMenuItemRecentNodes.Size = New System.Drawing.Size(202, 30)
         Me.ToolStripMenuItemRecentNodes.Text = "Recent Models / Pages"
         '
         'ToolStripSeparator11
         '
         Me.ToolStripSeparator11.Name = "ToolStripSeparator11"
-        Me.ToolStripSeparator11.Size = New System.Drawing.Size(191, 6)
+        Me.ToolStripSeparator11.Size = New System.Drawing.Size(199, 6)
         '
         'ToolStripMenuItemLogIn
         '
         Me.ToolStripMenuItemLogIn.Name = "ToolStripMenuItemLogIn"
-        Me.ToolStripMenuItemLogIn.Size = New System.Drawing.Size(194, 22)
+        Me.ToolStripMenuItemLogIn.Size = New System.Drawing.Size(202, 30)
         Me.ToolStripMenuItemLogIn.Text = "&Log in"
         '
         'ToolStripMenuItemLogOut
         '
         Me.ToolStripMenuItemLogOut.Name = "ToolStripMenuItemLogOut"
-        Me.ToolStripMenuItemLogOut.Size = New System.Drawing.Size(194, 22)
+        Me.ToolStripMenuItemLogOut.Size = New System.Drawing.Size(202, 30)
         Me.ToolStripMenuItemLogOut.Text = "Log &out"
         Me.ToolStripMenuItemLogOut.Visible = False
         '
         'ToolStripSeparator6
         '
         Me.ToolStripSeparator6.Name = "ToolStripSeparator6"
-        Me.ToolStripSeparator6.Size = New System.Drawing.Size(191, 6)
+        Me.ToolStripSeparator6.Size = New System.Drawing.Size(199, 6)
         '
         'mnuOption_EndSession
         '
         Me.mnuOption_EndSession.Name = "mnuOption_EndSession"
-        Me.mnuOption_EndSession.Size = New System.Drawing.Size(194, 22)
+        Me.mnuOption_EndSession.Size = New System.Drawing.Size(202, 30)
         Me.mnuOption_EndSession.Text = "&End Session"
         '
         'ToolStripMenuItemPage
         '
         Me.ToolStripMenuItemPage.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.PrintPreviewToolStripMenuItem, Me.PrintToolStripMenuItem})
         Me.ToolStripMenuItemPage.Name = "ToolStripMenuItemPage"
-        Me.ToolStripMenuItemPage.Size = New System.Drawing.Size(45, 21)
+        Me.ToolStripMenuItemPage.Size = New System.Drawing.Size(45, 22)
         Me.ToolStripMenuItemPage.Text = "&Page"
         '
         'PrintPreviewToolStripMenuItem
@@ -262,7 +261,7 @@ Partial Class frmMain
         '
         Me.ToolStripMenuItemEdit.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.CopyToolStripMenuItem, Me.PasteToolStripMenuItem, Me.ToolStripMenuItemUndo, Me.ToolStripMenuItemRedo, Me.SelectAllToolStripMenuItem, Me.CopyAsImageToClipboardToolStripMenuItem})
         Me.ToolStripMenuItemEdit.Name = "ToolStripMenuItemEdit"
-        Me.ToolStripMenuItemEdit.Size = New System.Drawing.Size(39, 21)
+        Me.ToolStripMenuItemEdit.Size = New System.Drawing.Size(39, 22)
         Me.ToolStripMenuItemEdit.Text = "&Edit"
         '
         'CopyToolStripMenuItem
@@ -316,7 +315,7 @@ Partial Class frmMain
         '
         Me.ToolStripMenuItemView.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MenuItem_ShowEnterpriseTreeView, Me.CodeGeneratorToolStripMenuItem, Me.ToolStripMenuItemFactEngine, Me.ToolStripSeparator8, Me.ToolStripMenuItem11, Me.ToolboxesToolStripMenuItem, Me.StatusBarToolStripMenuItem, Me.ToolStripSeparator1, Me.ToolStripMenuItemDiagramSpy})
         Me.ToolStripMenuItemView.Name = "ToolStripMenuItemView"
-        Me.ToolStripMenuItemView.Size = New System.Drawing.Size(44, 21)
+        Me.ToolStripMenuItemView.Size = New System.Drawing.Size(44, 22)
         Me.ToolStripMenuItemView.Text = "&View"
         '
         'MenuItem_ShowEnterpriseTreeView
@@ -415,7 +414,7 @@ Partial Class frmMain
         '
         Me.ToolStripMenuItemBoston.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ConfigurationToolStripMenuItem, Me.ToolStripSeparator14, Me.PluginViewerToolStripMenuItem, Me.ToolStripSeparator2, Me.DatabaseToolStripMenuItem, Me.LogFileToolStripMenuItem})
         Me.ToolStripMenuItemBoston.Name = "ToolStripMenuItemBoston"
-        Me.ToolStripMenuItemBoston.Size = New System.Drawing.Size(56, 21)
+        Me.ToolStripMenuItemBoston.Size = New System.Drawing.Size(56, 22)
         Me.ToolStripMenuItemBoston.Text = "&Boston"
         '
         'ConfigurationToolStripMenuItem
@@ -480,7 +479,7 @@ Partial Class frmMain
         '
         Me.ToolStripMenuItemUser.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItemAddUser, Me.EditUserToolStripMenuItem, Me.ToolStripSeparator7, Me.GroupToolStripMenuItem, Me.ToolStripSeparator9, Me.ToolStripMenuItemRole, Me.ToolStripSeparator15, Me.LogOutToolStripMenuItem, Me.ToolStripMenuItem1})
         Me.ToolStripMenuItemUser.Name = "ToolStripMenuItemUser"
-        Me.ToolStripMenuItemUser.Size = New System.Drawing.Size(42, 21)
+        Me.ToolStripMenuItemUser.Size = New System.Drawing.Size(42, 22)
         Me.ToolStripMenuItemUser.Text = "&User"
         '
         'ToolStripMenuItemAddUser
@@ -563,7 +562,7 @@ Partial Class frmMain
         '
         Me.ToolStripMenuItemProject.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.AddProjectToolStripMenuItem, Me.EditProjectToolStripMenuItem, Me.ToolStripSeparator16, Me.NamespaceToolStripMenuItem})
         Me.ToolStripMenuItemProject.Name = "ToolStripMenuItemProject"
-        Me.ToolStripMenuItemProject.Size = New System.Drawing.Size(56, 21)
+        Me.ToolStripMenuItemProject.Size = New System.Drawing.Size(56, 22)
         Me.ToolStripMenuItemProject.Text = "P&roject"
         '
         'AddProjectToolStripMenuItem
@@ -606,7 +605,7 @@ Partial Class frmMain
         '
         Me.HelpToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItemHelp, Me.AboutRichmondToolStripMenuItem, Me.ToolStripSeparator13, Me.ToolStripMenuItemOpenLogFile, Me.EmailSupportvievcomToolStripMenuItem})
         Me.HelpToolStripMenuItem.Name = "HelpToolStripMenuItem"
-        Me.HelpToolStripMenuItem.Size = New System.Drawing.Size(44, 21)
+        Me.HelpToolStripMenuItem.Size = New System.Drawing.Size(44, 22)
         Me.HelpToolStripMenuItem.Text = "&Help"
         '
         'ToolStripMenuItemHelp
@@ -647,7 +646,7 @@ Partial Class frmMain
         '
         Me.ToolStripMenuItemTestClientServer.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ShowBroadcastEventMonitorToolStripMenuItem})
         Me.ToolStripMenuItemTestClientServer.Name = "ToolStripMenuItemTestClientServer"
-        Me.ToolStripMenuItemTestClientServer.Size = New System.Drawing.Size(85, 21)
+        Me.ToolStripMenuItemTestClientServer.Size = New System.Drawing.Size(85, 22)
         Me.ToolStripMenuItemTestClientServer.Text = "Clie&nt Server"
         '
         'ShowBroadcastEventMonitorToolStripMenuItem
@@ -660,7 +659,7 @@ Partial Class frmMain
         '
         Me.TestNotificationToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.DoNotificationToolStripMenuItem})
         Me.TestNotificationToolStripMenuItem.Name = "TestNotificationToolStripMenuItem"
-        Me.TestNotificationToolStripMenuItem.Size = New System.Drawing.Size(105, 21)
+        Me.TestNotificationToolStripMenuItem.Size = New System.Drawing.Size(105, 22)
         Me.TestNotificationToolStripMenuItem.Text = "Test Notification"
         Me.TestNotificationToolStripMenuItem.Visible = False
         '
@@ -674,7 +673,7 @@ Partial Class frmMain
         '
         Me.ToolStrip_main.AutoSize = False
         Me.ToolStrip_main.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButton1, Me.ToolStripButton_Save, Me.ToolStripSeparator4, Me.ToolStripButtonNewModel, Me.ToolStripButtonNew, Me.ToolStripButtonPrint, Me.ToolStripButtonCopy, Me.ToolStripButtonPaste, Me.toolStripSeparator12, Me.ToolStripLabelPrompt_zoom, Me.ToolStripComboBox_zoom, Me.toolStripSeparator, Me.ToolStripButtonHelp, Me.ToolStripSeparator3, Me.ToolStripButtonProfile, Me.ToolStripButtonNotifications})
-        Me.ToolStrip_main.Location = New System.Drawing.Point(0, 23)
+        Me.ToolStrip_main.Location = New System.Drawing.Point(0, 24)
         Me.ToolStrip_main.Name = "ToolStrip_main"
         Me.ToolStrip_main.Padding = New System.Windows.Forms.Padding(0, 0, 2, 0)
         Me.ToolStrip_main.Size = New System.Drawing.Size(1066, 22)
@@ -863,9 +862,9 @@ Partial Class frmMain
         'DockPanel
         '
         Me.DockPanel.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.DockPanel.Location = New System.Drawing.Point(0, 45)
+        Me.DockPanel.Location = New System.Drawing.Point(0, 46)
         Me.DockPanel.Name = "DockPanel"
-        Me.DockPanel.Size = New System.Drawing.Size(1066, 498)
+        Me.DockPanel.Size = New System.Drawing.Size(1066, 497)
         Me.DockPanel.TabIndex = 24
         '
         'HelpProvider
