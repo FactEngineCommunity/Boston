@@ -242,6 +242,9 @@ Public Class frmToolboxEnterpriseExplorer
                 Case Is = pcenumDatabaseType.SQLite
                     loNode.ImageIndex = 8
                     loNode.SelectedImageIndex = 8
+                Case Is = pcenumDatabaseType.ODBC
+                    loNode.ImageIndex = 10
+                    loNode.SelectedImageIndex = 10
             End Select
         End If
 
@@ -2986,6 +2989,8 @@ Public Class frmToolboxEnterpriseExplorer
             Dim lrEnterpriseView As tEnterpriseEnterpriseView
             Dim lrPage As FBM.Page
 
+            Me.ContextMenuStrip_Page.ImageScalingSize = New Drawing.Size(16, 16)
+
             If Nothing Is Me.TreeView.SelectedNode Then
                 Me.ToolStripMenuItemEditPageAsORMDiagram.Visible = False
             End If
@@ -4083,6 +4088,8 @@ Public Class frmToolboxEnterpriseExplorer
 
     Private Sub ContextMenuStrip_ORMModel_Opening(sender As Object, e As System.ComponentModel.CancelEventArgs) Handles ContextMenuStrip_ORMModel.Opening
 
+        Me.ContextMenuStrip_ORMModel.ImageScalingSize = New Drawing.Size(16, 16)
+
         If prApplication.User IsNot Nothing Then 'Is nothing if not using Client/Server.
             If prApplication.User.IsSuperuser Or prApplication.User.Function.Contains(pcenumFunction.FullPermission) Then
                 Me.ToolStripMenuItemModelConfiguration.Enabled = True
@@ -4147,7 +4154,7 @@ Public Class frmToolboxEnterpriseExplorer
                 'Create the Page for the StateTransitionDiagram.
                 '----------------------------------------------------
                 Richmond.WriteToStatusBar("Creating the Page.")
-                lrPage = lrCorePage.Clone(prApplication.WorkingModel) 'Assigns new PageId
+                lrPage = lrCorePage.Clone(prApplication.WorkingModel, True, True, , True) 'Assigns new PageId
                 lrPage.Name = prApplication.WorkingModel.CreateUniquePageName("NewStateTransitionDiagram", 0)
                 lrPage.Language = pcenumLanguage.StateTransitionDiagram
 
@@ -4296,5 +4303,11 @@ Public Class frmToolboxEnterpriseExplorer
             End With
         Catch ex As Exception
         End Try
+    End Sub
+
+    Private Sub ContextMenuStrip_ORMModels_Opening(sender As Object, e As System.ComponentModel.CancelEventArgs) Handles ContextMenuStrip_ORMModels.Opening
+
+        Me.ContextMenuStrip_ORMModels.ImageScalingSize = New Drawing.Size(16, 16)
+
     End Sub
 End Class

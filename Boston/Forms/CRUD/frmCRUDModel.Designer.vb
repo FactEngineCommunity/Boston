@@ -48,6 +48,8 @@ Partial Class frmCRUDModel
         Me.Tab1 = New System.Windows.Forms.TabPage()
         Me.Advanced = New System.Windows.Forms.TabPage()
         Me.LabelPromptIsDatabaseSynchronised = New System.Windows.Forms.Label()
+        Me.LabelPromptCoreVersion = New System.Windows.Forms.Label()
+        Me.LabelCoreVersion = New System.Windows.Forms.Label()
         Me.GroupBox_main.SuspendLayout()
         Me.GroupBoxReverseEngineering.SuspendLayout()
         Me.GroupBoxDatabase.SuspendLayout()
@@ -59,35 +61,33 @@ Partial Class frmCRUDModel
         '
         'Button_Cancel
         '
-        Me.Button_Cancel.Location = New System.Drawing.Point(974, 91)
-        Me.Button_Cancel.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.Button_Cancel.Location = New System.Drawing.Point(649, 59)
         Me.Button_Cancel.Name = "Button_Cancel"
-        Me.Button_Cancel.Size = New System.Drawing.Size(105, 37)
+        Me.Button_Cancel.Size = New System.Drawing.Size(70, 24)
         Me.Button_Cancel.TabIndex = 8
         Me.Button_Cancel.Text = "&Cancel"
         Me.Button_Cancel.UseVisualStyleBackColor = True
         '
         'button_okay
         '
-        Me.button_okay.Location = New System.Drawing.Point(974, 41)
-        Me.button_okay.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.button_okay.Location = New System.Drawing.Point(649, 27)
         Me.button_okay.Name = "button_okay"
-        Me.button_okay.Size = New System.Drawing.Size(105, 37)
+        Me.button_okay.Size = New System.Drawing.Size(70, 24)
         Me.button_okay.TabIndex = 7
         Me.button_okay.Text = "&Okay"
         Me.button_okay.UseVisualStyleBackColor = True
         '
         'GroupBox_main
         '
+        Me.GroupBox_main.Controls.Add(Me.LabelCoreVersion)
+        Me.GroupBox_main.Controls.Add(Me.LabelPromptCoreVersion)
         Me.GroupBox_main.Controls.Add(Me.GroupBoxReverseEngineering)
         Me.GroupBox_main.Controls.Add(Me.LabelModelName)
         Me.GroupBox_main.Controls.Add(Me.LabelModel)
         Me.GroupBox_main.Controls.Add(Me.GroupBoxDatabase)
-        Me.GroupBox_main.Location = New System.Drawing.Point(18, 21)
-        Me.GroupBox_main.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.GroupBox_main.Location = New System.Drawing.Point(12, 14)
         Me.GroupBox_main.Name = "GroupBox_main"
-        Me.GroupBox_main.Padding = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.GroupBox_main.Size = New System.Drawing.Size(892, 506)
+        Me.GroupBox_main.Size = New System.Drawing.Size(595, 329)
         Me.GroupBox_main.TabIndex = 6
         Me.GroupBox_main.TabStop = False
         '
@@ -97,11 +97,9 @@ Partial Class frmCRUDModel
         Me.GroupBoxReverseEngineering.Controls.Add(Me.LabelSchema)
         Me.GroupBoxReverseEngineering.Controls.Add(Me.ComboBoxSchema)
         Me.GroupBoxReverseEngineering.Controls.Add(Me.Button1)
-        Me.GroupBoxReverseEngineering.Location = New System.Drawing.Point(28, 331)
-        Me.GroupBoxReverseEngineering.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.GroupBoxReverseEngineering.Location = New System.Drawing.Point(19, 215)
         Me.GroupBoxReverseEngineering.Name = "GroupBoxReverseEngineering"
-        Me.GroupBoxReverseEngineering.Padding = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.GroupBoxReverseEngineering.Size = New System.Drawing.Size(834, 145)
+        Me.GroupBoxReverseEngineering.Size = New System.Drawing.Size(556, 94)
         Me.GroupBoxReverseEngineering.TabIndex = 15
         Me.GroupBoxReverseEngineering.TabStop = False
         Me.GroupBoxReverseEngineering.Text = "Reverse Engineering"
@@ -109,10 +107,9 @@ Partial Class frmCRUDModel
         'Button2
         '
         Me.Button2.Enabled = False
-        Me.Button2.Location = New System.Drawing.Point(246, 29)
-        Me.Button2.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.Button2.Location = New System.Drawing.Point(164, 19)
         Me.Button2.Name = "Button2"
-        Me.Button2.Size = New System.Drawing.Size(296, 43)
+        Me.Button2.Size = New System.Drawing.Size(197, 28)
         Me.Button2.TabIndex = 3
         Me.Button2.Text = "Step 2: Reverse Engineer Database"
         Me.Button2.UseVisualStyleBackColor = True
@@ -120,10 +117,9 @@ Partial Class frmCRUDModel
         'LabelSchema
         '
         Me.LabelSchema.AutoSize = True
-        Me.LabelSchema.Location = New System.Drawing.Point(12, 82)
-        Me.LabelSchema.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
+        Me.LabelSchema.Location = New System.Drawing.Point(8, 53)
         Me.LabelSchema.Name = "LabelSchema"
-        Me.LabelSchema.Size = New System.Drawing.Size(76, 20)
+        Me.LabelSchema.Size = New System.Drawing.Size(52, 13)
         Me.LabelSchema.TabIndex = 2
         Me.LabelSchema.Text = "Schema :"
         '
@@ -131,18 +127,16 @@ Partial Class frmCRUDModel
         '
         Me.ComboBoxSchema.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.ComboBoxSchema.FormattingEnabled = True
-        Me.ComboBoxSchema.Location = New System.Drawing.Point(99, 82)
-        Me.ComboBoxSchema.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.ComboBoxSchema.Location = New System.Drawing.Point(66, 53)
         Me.ComboBoxSchema.Name = "ComboBoxSchema"
-        Me.ComboBoxSchema.Size = New System.Drawing.Size(164, 28)
+        Me.ComboBoxSchema.Size = New System.Drawing.Size(111, 21)
         Me.ComboBoxSchema.TabIndex = 1
         '
         'Button1
         '
-        Me.Button1.Location = New System.Drawing.Point(14, 29)
-        Me.Button1.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.Button1.Location = New System.Drawing.Point(9, 19)
         Me.Button1.Name = "Button1"
-        Me.Button1.Size = New System.Drawing.Size(224, 43)
+        Me.Button1.Size = New System.Drawing.Size(149, 28)
         Me.Button1.TabIndex = 0
         Me.Button1.Text = "Step 1: Analyse Database"
         Me.Button1.UseVisualStyleBackColor = True
@@ -150,20 +144,18 @@ Partial Class frmCRUDModel
         'LabelModelName
         '
         Me.LabelModelName.AutoSize = True
-        Me.LabelModelName.Location = New System.Drawing.Point(102, 37)
-        Me.LabelModelName.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
+        Me.LabelModelName.Location = New System.Drawing.Point(68, 24)
         Me.LabelModelName.Name = "LabelModelName"
-        Me.LabelModelName.Size = New System.Drawing.Size(133, 20)
+        Me.LabelModelName.Size = New System.Drawing.Size(90, 13)
         Me.LabelModelName.TabIndex = 14
         Me.LabelModelName.Text = "LabelModelName"
         '
         'LabelModel
         '
         Me.LabelModel.AutoSize = True
-        Me.LabelModel.Location = New System.Drawing.Point(30, 37)
-        Me.LabelModel.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
+        Me.LabelModel.Location = New System.Drawing.Point(20, 24)
         Me.LabelModel.Name = "LabelModel"
-        Me.LabelModel.Size = New System.Drawing.Size(60, 20)
+        Me.LabelModel.Size = New System.Drawing.Size(42, 13)
         Me.LabelModel.TabIndex = 13
         Me.LabelModel.Text = "Model :"
         '
@@ -175,31 +167,27 @@ Partial Class frmCRUDModel
         Me.GroupBoxDatabase.Controls.Add(Me.TextBoxDatabaseConnectionString)
         Me.GroupBoxDatabase.Controls.Add(Me.LabelConnectionString)
         Me.GroupBoxDatabase.Controls.Add(Me.LabelDatabaseType)
-        Me.GroupBoxDatabase.Location = New System.Drawing.Point(28, 91)
-        Me.GroupBoxDatabase.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.GroupBoxDatabase.Location = New System.Drawing.Point(19, 59)
         Me.GroupBoxDatabase.Name = "GroupBoxDatabase"
-        Me.GroupBoxDatabase.Padding = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.GroupBoxDatabase.Size = New System.Drawing.Size(834, 231)
+        Me.GroupBoxDatabase.Size = New System.Drawing.Size(556, 150)
         Me.GroupBoxDatabase.TabIndex = 12
         Me.GroupBoxDatabase.TabStop = False
         Me.GroupBoxDatabase.Text = "Database:"
         '
         'LabelOpenSuccessfull
         '
-        Me.LabelOpenSuccessfull.Location = New System.Drawing.Point(192, 169)
-        Me.LabelOpenSuccessfull.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
+        Me.LabelOpenSuccessfull.Location = New System.Drawing.Point(128, 110)
         Me.LabelOpenSuccessfull.Name = "LabelOpenSuccessfull"
-        Me.LabelOpenSuccessfull.Size = New System.Drawing.Size(615, 40)
+        Me.LabelOpenSuccessfull.Size = New System.Drawing.Size(410, 26)
         Me.LabelOpenSuccessfull.TabIndex = 6
         Me.LabelOpenSuccessfull.Text = "LabelOpenSuccessfull"
         Me.LabelOpenSuccessfull.Visible = False
         '
         'ButtonTestConnection
         '
-        Me.ButtonTestConnection.Location = New System.Drawing.Point(42, 169)
-        Me.ButtonTestConnection.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.ButtonTestConnection.Location = New System.Drawing.Point(28, 110)
         Me.ButtonTestConnection.Name = "ButtonTestConnection"
-        Me.ButtonTestConnection.Size = New System.Drawing.Size(141, 38)
+        Me.ButtonTestConnection.Size = New System.Drawing.Size(94, 25)
         Me.ButtonTestConnection.TabIndex = 5
         Me.ButtonTestConnection.Text = "Test Connection"
         Me.ButtonTestConnection.UseVisualStyleBackColor = True
@@ -208,47 +196,44 @@ Partial Class frmCRUDModel
         '
         Me.ComboBoxDatabaseType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.ComboBoxDatabaseType.FormattingEnabled = True
-        Me.ComboBoxDatabaseType.Location = New System.Drawing.Point(192, 31)
-        Me.ComboBoxDatabaseType.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.ComboBoxDatabaseType.Location = New System.Drawing.Point(128, 20)
         Me.ComboBoxDatabaseType.Name = "ComboBoxDatabaseType"
-        Me.ComboBoxDatabaseType.Size = New System.Drawing.Size(180, 28)
+        Me.ComboBoxDatabaseType.Size = New System.Drawing.Size(121, 21)
         Me.ComboBoxDatabaseType.TabIndex = 4
         '
         'TextBoxDatabaseConnectionString
         '
-        Me.TextBoxDatabaseConnectionString.Location = New System.Drawing.Point(192, 78)
-        Me.TextBoxDatabaseConnectionString.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.TextBoxDatabaseConnectionString.Location = New System.Drawing.Point(128, 51)
         Me.TextBoxDatabaseConnectionString.Multiline = True
         Me.TextBoxDatabaseConnectionString.Name = "TextBoxDatabaseConnectionString"
-        Me.TextBoxDatabaseConnectionString.Size = New System.Drawing.Size(613, 72)
+        Me.TextBoxDatabaseConnectionString.Size = New System.Drawing.Size(410, 48)
         Me.TextBoxDatabaseConnectionString.TabIndex = 3
         '
         'LabelConnectionString
         '
         Me.LabelConnectionString.AutoSize = True
-        Me.LabelConnectionString.Location = New System.Drawing.Point(38, 78)
-        Me.LabelConnectionString.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
+        Me.LabelConnectionString.Location = New System.Drawing.Point(25, 51)
         Me.LabelConnectionString.Name = "LabelConnectionString"
-        Me.LabelConnectionString.Size = New System.Drawing.Size(144, 20)
+        Me.LabelConnectionString.Size = New System.Drawing.Size(97, 13)
         Me.LabelConnectionString.TabIndex = 2
         Me.LabelConnectionString.Text = "Connection String :"
         '
         'LabelDatabaseType
         '
         Me.LabelDatabaseType.AutoSize = True
-        Me.LabelDatabaseType.Location = New System.Drawing.Point(38, 35)
-        Me.LabelDatabaseType.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
+        Me.LabelDatabaseType.Location = New System.Drawing.Point(25, 23)
         Me.LabelDatabaseType.Name = "LabelDatabaseType"
-        Me.LabelDatabaseType.Size = New System.Drawing.Size(125, 20)
+        Me.LabelDatabaseType.Size = New System.Drawing.Size(86, 13)
         Me.LabelDatabaseType.TabIndex = 1
         Me.LabelDatabaseType.Text = "Database Type :"
         '
         'CheckBoxIsDatabaseSynchronised
         '
         Me.CheckBoxIsDatabaseSynchronised.AutoSize = True
-        Me.CheckBoxIsDatabaseSynchronised.Location = New System.Drawing.Point(20, 23)
+        Me.CheckBoxIsDatabaseSynchronised.Location = New System.Drawing.Point(13, 15)
+        Me.CheckBoxIsDatabaseSynchronised.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
         Me.CheckBoxIsDatabaseSynchronised.Name = "CheckBoxIsDatabaseSynchronised"
-        Me.CheckBoxIsDatabaseSynchronised.Size = New System.Drawing.Size(222, 24)
+        Me.CheckBoxIsDatabaseSynchronised.Size = New System.Drawing.Size(150, 17)
         Me.CheckBoxIsDatabaseSynchronised.TabIndex = 7
         Me.CheckBoxIsDatabaseSynchronised.Text = "Is Database Synchronised"
         Me.CheckBoxIsDatabaseSynchronised.UseVisualStyleBackColor = True
@@ -265,19 +250,21 @@ Partial Class frmCRUDModel
         '
         Me.TabControl1.Controls.Add(Me.Tab1)
         Me.TabControl1.Controls.Add(Me.Advanced)
-        Me.TabControl1.Location = New System.Drawing.Point(12, 12)
+        Me.TabControl1.Location = New System.Drawing.Point(8, 8)
+        Me.TabControl1.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
         Me.TabControl1.Name = "TabControl1"
         Me.TabControl1.SelectedIndex = 0
-        Me.TabControl1.Size = New System.Drawing.Size(944, 586)
+        Me.TabControl1.Size = New System.Drawing.Size(629, 381)
         Me.TabControl1.TabIndex = 9
         '
         'Tab1
         '
         Me.Tab1.Controls.Add(Me.GroupBox_main)
-        Me.Tab1.Location = New System.Drawing.Point(4, 29)
+        Me.Tab1.Location = New System.Drawing.Point(4, 22)
+        Me.Tab1.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
         Me.Tab1.Name = "Tab1"
-        Me.Tab1.Padding = New System.Windows.Forms.Padding(3)
-        Me.Tab1.Size = New System.Drawing.Size(936, 553)
+        Me.Tab1.Padding = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.Tab1.Size = New System.Drawing.Size(621, 355)
         Me.Tab1.TabIndex = 0
         Me.Tab1.Text = "Database"
         Me.Tab1.UseVisualStyleBackColor = True
@@ -286,10 +273,11 @@ Partial Class frmCRUDModel
         '
         Me.Advanced.Controls.Add(Me.LabelPromptIsDatabaseSynchronised)
         Me.Advanced.Controls.Add(Me.CheckBoxIsDatabaseSynchronised)
-        Me.Advanced.Location = New System.Drawing.Point(4, 29)
+        Me.Advanced.Location = New System.Drawing.Point(4, 22)
+        Me.Advanced.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
         Me.Advanced.Name = "Advanced"
-        Me.Advanced.Padding = New System.Windows.Forms.Padding(3)
-        Me.Advanced.Size = New System.Drawing.Size(936, 553)
+        Me.Advanced.Padding = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.Advanced.Size = New System.Drawing.Size(621, 355)
         Me.Advanced.TabIndex = 1
         Me.Advanced.Text = "Advanced"
         Me.Advanced.UseVisualStyleBackColor = True
@@ -297,22 +285,40 @@ Partial Class frmCRUDModel
         'LabelPromptIsDatabaseSynchronised
         '
         Me.LabelPromptIsDatabaseSynchronised.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.LabelPromptIsDatabaseSynchronised.Location = New System.Drawing.Point(20, 66)
+        Me.LabelPromptIsDatabaseSynchronised.Location = New System.Drawing.Point(13, 43)
+        Me.LabelPromptIsDatabaseSynchronised.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.LabelPromptIsDatabaseSynchronised.Name = "LabelPromptIsDatabaseSynchronised"
-        Me.LabelPromptIsDatabaseSynchronised.Size = New System.Drawing.Size(824, 52)
+        Me.LabelPromptIsDatabaseSynchronised.Size = New System.Drawing.Size(549, 34)
         Me.LabelPromptIsDatabaseSynchronised.TabIndex = 8
         Me.LabelPromptIsDatabaseSynchronised.Text = "Warning: When 'Is Database Synchronised' is checked, Boston will modify the datab" &
     "ase when you change the ORM Model within the Model."
         '
+        'LabelPromptCoreVersion
+        '
+        Me.LabelPromptCoreVersion.AutoSize = True
+        Me.LabelPromptCoreVersion.Location = New System.Drawing.Point(474, 24)
+        Me.LabelPromptCoreVersion.Name = "LabelPromptCoreVersion"
+        Me.LabelPromptCoreVersion.Size = New System.Drawing.Size(69, 13)
+        Me.LabelPromptCoreVersion.TabIndex = 16
+        Me.LabelPromptCoreVersion.Text = "Core version:"
+        '
+        'LabelCoreVersion
+        '
+        Me.LabelCoreVersion.AutoSize = True
+        Me.LabelCoreVersion.Location = New System.Drawing.Point(540, 24)
+        Me.LabelCoreVersion.Name = "LabelCoreVersion"
+        Me.LabelCoreVersion.Size = New System.Drawing.Size(90, 13)
+        Me.LabelCoreVersion.TabIndex = 17
+        Me.LabelCoreVersion.Text = "LabelCoreVersion"
+        '
         'frmCRUDModel
         '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1144, 618)
+        Me.ClientSize = New System.Drawing.Size(763, 402)
         Me.Controls.Add(Me.TabControl1)
         Me.Controls.Add(Me.Button_Cancel)
         Me.Controls.Add(Me.button_okay)
-        Me.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.Name = "frmCRUDModel"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.TabText = "Model Configuration"
@@ -356,4 +362,6 @@ Partial Class frmCRUDModel
     Friend WithEvents Tab1 As TabPage
     Friend WithEvents Advanced As TabPage
     Friend WithEvents LabelPromptIsDatabaseSynchronised As Label
+    Friend WithEvents LabelCoreVersion As Label
+    Friend WithEvents LabelPromptCoreVersion As Label
 End Class

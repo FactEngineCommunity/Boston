@@ -306,6 +306,10 @@ Namespace FBM
         ''' Makes a copy/clone of the Page. Every ModelElement is the same except for the Model and Page that it is related to.
         ''' </summary>
         ''' <param name="arModel">The Model to which the cloned Page is allocated.</param>
+        ''' <param name="abAddToModel">Filters down for model elements copied. Adds them to the model if not already present.</param>
+        ''' <param name="abMakeModelObjectsMDAModelElements">Forces model elemets to be MDA model elements.</param>
+        ''' <param name="abSetRDSModel">Sets the Page's RDSModel to the Model's RDS (Model) if True.</param>
+        ''' <param name="abMakeDirty">Makes the Page dirty if True.</param>
         ''' <returns>A new Page object (as clone of the Page being cloned).</returns>
         ''' <remarks></remarks>
         Public Function Clone(ByRef arModel As FBM.Model, _
@@ -323,8 +327,6 @@ Namespace FBM
             Dim lrDictionaryEntry As FBM.DictionaryEntry
 
             Try
-
-
                 With Me
                     lrPage.Model = arModel
                     If abSetRDSModel Then

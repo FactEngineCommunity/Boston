@@ -86,6 +86,7 @@ Public Module publicConstants
         ORACLE = 103
         SQLite = 104
         MongoDB = 105
+        ODBC = 106
     End Enum
 
     Public Enum pcenumDebugMode

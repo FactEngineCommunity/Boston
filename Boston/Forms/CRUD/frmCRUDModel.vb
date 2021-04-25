@@ -21,6 +21,7 @@ Public Class frmCRUDModel
     Private Sub SetupForm()
 
         Me.LabelModelName.Text = Me.zrModel.Name
+        Me.LabelCoreVersion.Text = Me.zrModel.CoreVersionNumber
 
         Me.GroupBoxReverseEngineering.Visible = My.Settings.SuperuserMode
 
@@ -72,6 +73,9 @@ Public Class frmCRUDModel
                             Case Is = pcenumDatabaseType.SQLite
                                 Me.zrModel.TreeNode.ImageIndex = 8
                                 Me.zrModel.TreeNode.SelectedImageIndex = 8
+                            Case Is = pcenumDatabaseType.ODBC
+                                Me.zrModel.TreeNode.ImageIndex = 10
+                                Me.zrModel.TreeNode.SelectedImageIndex = 10
                             Case Is = pcenumDatabaseType.None
                                 Me.zrModel.TreeNode.ImageIndex = 1
                                 Me.zrModel.TreeNode.SelectedImageIndex = 1
