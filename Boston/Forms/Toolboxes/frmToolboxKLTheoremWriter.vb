@@ -1,7 +1,15 @@
-﻿Public Class frmToolboxKLTheoremWriter
+﻿Imports System.Reflection
+Imports System.Runtime.InteropServices
+
+Public Class frmToolboxKLTheoremWriter
 
     Public zrPage As FBM.Page
     Public zrKLProofGenerator As New tKLProofGenerator
+
+    <DllImport("gdi32.dll", EntryPoint:="AddFontResourceW", SetLastError:=True)>
+    Public Shared Function AddFontResource(<[In]> <MarshalAs(UnmanagedType.LPWStr)> ByVal lpFileName As String) As Integer
+    End Function
+
 
     Public Function EqualsByName(ByVal other As Form) As Boolean
         If Me.Name = other.Name Then
@@ -27,7 +35,30 @@
 
         Call Me.SetupForm()
 
+
     End Sub
+
+    Private Function zFontInstalled() As Boolean
+
+        Try
+
+            Dim fontName As String = "Z Font"
+            Dim fontSize As Single = 12
+
+            Dim fontTester As New Font(fontName, fontSize, FontStyle.Regular, GraphicsUnit.Pixel)
+
+            Return fontTester.Name = fontName
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Function
 
     Private Sub SetupForm()
 
@@ -39,6 +70,24 @@
         Else
             Me.ButtonAnalyseCurrentPage.Enabled = False
         End If
+
+        '===========================================================================================================
+        'ZFont
+        Try
+            If Not Me.zFontInstalled Then
+                Dim lbResult As Boolean = AddFontResource(Richmond.MyPath & "\zfont\ZFONT.TTF")
+
+                Dim loPrivateFontCollection = New System.Drawing.Text.PrivateFontCollection
+                loPrivateFontCollection.AddFontFile(Richmond.MyPath & "\zfont\ZFONT.TTF")
+
+                Me.TextBox1.Font = New Font(loPrivateFontCollection.Families(0), 11, FontStyle.Regular, GraphicsUnit.Pixel)
+            Else
+                Me.TextBox1.Font = New Font("Z Font", 11, FontStyle.Regular, GraphicsUnit.Pixel)
+            End If
+        Catch ex As Exception
+            Me.TextBox1.Text = "You need the Z Font installed to use the KL Theorem Writer. Please contact support for instructions on how to install the 'Z Font' True Type Font."
+        End Try
+        '===========================================================================================================
 
     End Sub
 
@@ -206,5 +255,13 @@
         Me.TextBox1.Width = Me.Width - 20
 
     End Sub
+
+    Private Sub frmToolboxKLTheoremWriter_Closed(sender As Object, e As EventArgs) Handles Me.Closed
+
+        frmMain.zfrm_KL_theorem_writer = Nothing
+        prApplication.RightToolboxForms.RemoveAll(AddressOf Me.EqualsByName)
+
+    End Sub
+
 
 End Class
