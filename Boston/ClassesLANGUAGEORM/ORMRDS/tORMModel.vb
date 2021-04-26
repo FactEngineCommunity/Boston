@@ -1332,10 +1332,19 @@ Namespace FBM
                                 Next
                         End Select
 
+                        'Origin Columns
                         lrRelation.OriginColumns = larOriginColumn
                         For Each lrColumn In lrRelation.OriginColumns
                             lrColumn.Relation.Add(lrRelation) 'Only need to do this on the Origin side. The Origin Column 'has' the Relation.
                         Next
+
+                        If lrRelation.OriginColumns.Count = 0 Then
+                            'CodeSafe. Destination Table has no PrimaryKey most likely,
+                            '  but can get Origin Column from the arRole
+                            Dim lrColumn = arRole.JoinedORMObject.getCorrespondingRDSTable.Column.Find(Function(x) x.Role.Id = lrRole.Id)
+                            lrColumn.Relation.Add(lrRelation)
+                            lrRelation.OriginColumns.Add(lrColumn)
+                        End If
 
                         Me.RDS.addRelation(lrRelation)
 

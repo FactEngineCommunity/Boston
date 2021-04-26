@@ -944,6 +944,7 @@ Namespace FBM
                         '-----------------------------------------------------------------------------------------------
                         'Switch the Symbol of the Concept, which effectively changes the existing ModelDictionaryEntry
                         Me.Concept.Symbol = arNewConcept.Symbol
+                        Me.Model.Dictionary.RenameKey(lrOriginalDictionaryEntry.Symbol, lrNewDictionaryEntry.Symbol)
                     End If
 
                     If Me.Model.Loaded Then Call Me.makeDirty()

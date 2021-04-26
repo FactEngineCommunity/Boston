@@ -36,6 +36,13 @@ Module MyMethodExtensions
         Return True
     End Function
 
+    <Extension()>
+    Public Sub RenameKey(Of TKey, TValue)(ByVal dic As IDictionary(Of TKey, TValue), ByVal fromKey As TKey, ByVal toKey As TKey)
+        Dim value As TValue = dic(fromKey)
+        dic.Remove(fromKey)
+        dic(toKey) = value
+    End Sub
+
     ''' <summary>
     ''' For the ErrorProvider. Returns control with a validation error or Nothing
     ''' </summary>

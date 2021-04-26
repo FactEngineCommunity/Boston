@@ -368,6 +368,8 @@ Partial Public Class tBrain
                 lsFactTypeName &= lrModelObject.Name
             Next
 
+            lsFactTypeName = Me.Model.CreateUniqueFactTypeName(lsFactTypeName, 0, True)
+
             lrFactType = Me.Model.CreateFactType(lsFactTypeName, larModelObject, False, True, , , True,  )
 
             Dim lrRole As FBM.Role
