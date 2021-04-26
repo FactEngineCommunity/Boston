@@ -9821,43 +9821,54 @@ Public Class frmDiagramORM
         '============================
         Dim lrPage As FBM.Page
 
-        frmMain.Cursor = Cursors.WaitCursor
-        Me.zrPage.Model.AllowCheckForErrors = False
+        Try
 
-        Me.CircularProgressBar.Left = (Me.Width / 2) - (Me.CircularProgressBar.Size.Width / 2)
-        Me.CircularProgressBar.BringToFront()
-        Me.CircularProgressBar.Value = 1
-        Me.CircularProgressBar.Invalidate()
-        Me.Invalidate()
-        Me.BackgroundWorker.ReportProgress(0)
+            frmMain.Cursor = Cursors.WaitCursor
+            Me.zrPage.Model.AllowCheckForErrors = False
 
-        lrPage = Me.zrPage.CreatePropertyGraphSchema(Me.BackgroundWorker)
-        lrPage.Loaded = True
-        lrPage.Save(True, True)
+            Me.CircularProgressBar.Left = (Me.Width / 2) - (Me.CircularProgressBar.Size.Width / 2)
+            Me.CircularProgressBar.BringToFront()
+            Me.CircularProgressBar.Value = 1
+            Me.CircularProgressBar.Invalidate()
+            Me.Invalidate()
+            Me.BackgroundWorker.ReportProgress(0)
 
-        Me.CircularProgressBar.Value = 0
-        Me.CircularProgressBar.Text = "0%"
-        Me.CircularProgressBar.Invalidate()
-        Me.CircularProgressBar.SendToBack()
+            lrPage = Me.zrPage.CreatePropertyGraphSchema(Me.BackgroundWorker)
+            lrPage.Loaded = True
+            lrPage.Save(True, True)
+
+            Me.CircularProgressBar.Value = 0
+            Me.CircularProgressBar.Text = "0%"
+            Me.CircularProgressBar.Invalidate()
+            Me.CircularProgressBar.SendToBack()
 
 
-        Me.zrPage.Model.AllowCheckForErrors = True
-        frmMain.Cursor = Cursors.Default
+            Me.zrPage.Model.AllowCheckForErrors = True
+            frmMain.Cursor = Cursors.Default
 
-        Dim lrEnterpriseView As tEnterpriseEnterpriseView = Nothing
-        If IsSomething(lrPage) Then
-            lrEnterpriseView = frmMain.zfrmModelExplorer.AddExistingPageToModel(lrPage, lrPage.Model, lrPage.Model.TreeNode, True)
+            Dim lrEnterpriseView As tEnterpriseEnterpriseView = Nothing
+            If IsSomething(lrPage) Then
+                lrEnterpriseView = frmMain.zfrmModelExplorer.AddExistingPageToModel(lrPage, lrPage.Model, lrPage.Model.TreeNode, True)
 
-            MsgBox("Added the new Property Graph Schema Page, '" & lrPage.Name & "', to the Model.")
+                MsgBox("Added the new Property Graph Schema Page, '" & lrPage.Name & "', to the Model.")
 
-            Dim loToolStripItem As ToolStripItem = CType(sender, ToolStripItem)
+                Dim loToolStripItem As ToolStripItem = CType(sender, ToolStripItem)
 
-            If loToolStripItem.Tag = True Then
-                Dim lrToolstripItem As New tDummyToolStripItem(lrEnterpriseView)
-                Call Me.morphToERDiagram(lrToolstripItem, lrEnterpriseView)
+                If loToolStripItem.Tag = True Then
+                    Dim lrToolstripItem As New tDummyToolStripItem(lrEnterpriseView)
+                    Call Me.morphToERDiagram(lrToolstripItem, lrEnterpriseView)
+                End If
+
             End If
 
-        End If
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
 
     End Sub
