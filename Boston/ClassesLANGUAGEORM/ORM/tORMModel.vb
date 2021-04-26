@@ -4731,10 +4731,9 @@ Namespace FBM
 
                     Dim lsSQLCommand = "EXTEND ROLECONSTRAINT CoreInternalUniquenessConstraint16 WITH ROLE JOINING CoreEntity IN FACTTYPE CoreERDAttribute"
                     Call Me.ORMQL.ProcessORMQLStatement(lsSQLCommand)
-
-                    Me.CoreVersionNumber = "2.2"
-                    Call Me.Save()
                 End If
+                Me.CoreVersionNumber = "2.2"
+                Call Me.Save()
             End If
 
         End Sub
