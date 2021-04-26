@@ -388,6 +388,7 @@ Namespace FBM
                 lrPage = lrCorePage.Clone(Me.Model, False, True)
                 lrPage.IsDirty = True
                 lrPage.Name = "ERD-" & Trim(Me.Name) '"NewEntityRelationshipDiagram"
+                lrPage.Name = Me.Model.CreateUniquePageName(lrPage.Name, 0)
                 lrPage.Language = pcenumLanguage.EntityRelationshipDiagram
 
                 Me.Model.Page.Add(lrPage)
@@ -926,7 +927,8 @@ Namespace FBM
 
                 lrPage = lrCorePage.Clone(Me.Model, False, True)
                 lrPage.IsDirty = True
-                lrPage.Name = "PGS-" & Me.Name
+                lrPage.Name = "PGS-" & Trim(Me.Name)
+                lrPage.Name = Me.Model.CreateUniquePageName(lrPage.Name, 0)
                 lrPage.Language = pcenumLanguage.PropertyGraphSchema
 
                 Me.Model.Page.Add(lrPage)
