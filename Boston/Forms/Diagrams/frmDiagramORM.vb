@@ -3558,7 +3558,7 @@ Public Class frmDiagramORM
         Try
             Me.DiagramView.Behavior = Behavior.DrawLinks
 
-            prApplication.WorkingPage = Me.zrPage
+            Call prApplication.setWorkingPage(Me.zrPage)
 
             lo_point = Me.DiagramView.ClientToDoc(e.Location)
 
@@ -7307,6 +7307,7 @@ Public Class frmDiagramORM
 
     Private Sub ModelDictionaryToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ModelDictionaryToolStripMenuItem.Click
 
+        Call prApplication.setWorkingModel(Me.zrPage.Model)
         Call frmMain.LoadToolboxModelDictionary(True)
 
     End Sub

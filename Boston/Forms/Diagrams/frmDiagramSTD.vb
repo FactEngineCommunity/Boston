@@ -1248,7 +1248,7 @@ Public Class frmStateTransitionDiagram
             '--------------------------------------------------
             'Just to be sure...set the Richmond.WorkingProject
             '--------------------------------------------------
-            prApplication.WorkingPage = Me.zrPage
+            Call prApplication.setWorkingPage(Me.zrPage)
 
             Dim lrPropertyGridForm As frmToolboxProperties
             lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)

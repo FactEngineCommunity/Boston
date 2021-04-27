@@ -1585,9 +1585,16 @@ Namespace FBM
 
                             End If
                         Case Is = "ReferenceMode" 'The name of the Property on the EntityType class related to this EntityTypeInstance                            
-                            With New WaitCursor
-                                Call Me.EntityType.SetReferenceMode(Trim(Me.ReferenceMode))
-                            End With
+                            If Me.EntityType.GetTopmostNonAbsorbedSupertype Is Me.EntityType Then
+                                With New WaitCursor
+                                    Call Me.EntityType.SetReferenceMode(Trim(Me.ReferenceMode))
+                                End With
+                            Else
+                                Dim lsMessage = "It makes no sense to have a Primary Reference Schema for a Model Element that is is absorbed into a supertype."
+                                lsMessage &= vbCrLf & vbCrLf & "Reverting Reference Model for this Entity Type to ' '."
+                                Me.ReferenceMode = " "
+                                MsgBox(lsMessage)
+                            End If
                             If Me.ReferenceMode = " " Then
                                 Call Me.SetPropertyAttributes(Me, "DataType", False)
                             Else

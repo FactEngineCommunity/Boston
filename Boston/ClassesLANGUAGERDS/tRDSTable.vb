@@ -543,7 +543,8 @@ Namespace RDS
         End Function
 
         Public Function getSupertypeTables(Optional ByRef aarSupertypeTable As List(Of RDS.Table) = Nothing,
-                                           Optional arSubtypeRelationship As FBM.tSubtypeRelationship = Nothing) As List(Of RDS.Table)
+                                           Optional arSubtypeRelationship As FBM.tSubtypeRelationship = Nothing,
+                                           Optional abIsRecursive As Boolean = True) As List(Of RDS.Table)
 
             Dim larSupertypeTable As New List(Of RDS.Table)
 
@@ -558,7 +559,9 @@ Namespace RDS
             For Each lrSubtypeRelationship In larSubtypeRelationship
                 Dim lrSupertypeTable = lrSubtypeRelationship.parentEntityType.getCorrespondingRDSTable
                 larSupertypeTable.AddUnique(lrSupertypeTable)
-                Call lrSupertypeTable.getSupertypeTables(larSupertypeTable)
+                If abIsRecursive Then
+                    Call lrSupertypeTable.getSupertypeTables(larSupertypeTable)
+                End If
             Next
 
             If aarSupertypeTable IsNot Nothing Then

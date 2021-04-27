@@ -522,7 +522,10 @@ Namespace RDS
         ''' <returns></returns>
         Public Function isPartOfPrimaryKey() As Boolean
 
-            Return Me.Table.Index.Find(Function(x) x.IsPrimaryKey And (x.Column.Find(Function(y) y.Id = Me.Id) IsNot Nothing)) IsNot Nothing
+            Dim lrTable As RDS.Table = Me.Role.JoinedORMObject.getCorrespondingRDSTable
+
+            Return lrTable.Index.Find(Function(x) x.IsPrimaryKey And (x.Column.Find(Function(y) y.Id = Me.Id) IsNot Nothing)) IsNot Nothing
+            '20200427-VM-was Me.Table.Index.Find(Function(x) x.IsPrimaryKey And (x.Column.Find(Function(y) y.Id = Me.Id) IsNot Nothing)) IsNot Nothing
 
         End Function
 

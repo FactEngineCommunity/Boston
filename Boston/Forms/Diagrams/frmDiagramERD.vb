@@ -244,7 +244,7 @@ Public Class frmDiagramERD
                     lrERAttribute.ResponsibleFactType = lrERAttribute.ResponsibleRole.FactType
                     lrERAttribute.Mandatory = lrColumn.IsMandatory
                     'lrERAttribute.OrdinalPosition = lrColumn.OrdinalPosition
-                    lrERAttribute.PartOfPrimaryKey = lrColumn.ContributesToPrimaryKey
+                    lrERAttribute.PartOfPrimaryKey = lrColumn.isPartOfPrimaryKey
                     lrERAttribute.Page = Me.zrPage
 
                     lrERAttribute.Column = lrColumn
@@ -1142,7 +1142,7 @@ Public Class frmDiagramERD
 
         Dim lrRDSTable = arEntity.RDSTable
 
-        For Each lrSupertypeTable In lrRDSTable.getSupertypeTables
+        For Each lrSupertypeTable In lrRDSTable.getSupertypeTables(Nothing, Nothing, False)
 
             Dim lrSupertypeEntity As ERD.Entity = Me.zrPage.ERDiagram.Entity.Find(Function(x) x.Name = lrSupertypeTable.Name)
 
@@ -1710,8 +1710,12 @@ Public Class frmDiagramERD
                                 Dim lrEntityType As New FBM.EntityType(Me.zrPage.Model, pcenumLanguage.ORMModel)
                                 lrEntityType = Me.zrPage.Model.CreateEntityType
 
+                                Dim lrTable As New RDS.Table(Me.zrPage.Model.RDS, lrEntityType.Id, lrEntityType)
+                                Call Me.zrPage.Model.RDS.addTable(lrTable)
+
                                 Dim lsEntityName As String = Me.zrPage.Model.CreateUniqueEntityName(lrEntityType.Name)
                                 Dim lrEntity As New ERD.Entity(Me.zrPage, lsEntityName)
+                                lrEntity.RDSTable = lrTable
                                 '=========================================================================================
 
                                 Call Me.zrPage.DropEntityAtPoint(lrEntity, loPointF)
@@ -1842,7 +1846,7 @@ Public Class frmDiagramERD
             '--------------------------------------------------
             'Just to be sure...set the Richmond.WorkingProject
             '--------------------------------------------------
-            prApplication.WorkingPage = Me.zrPage
+            prApplication.setWorkingPage(Me.zrPage)
 
             '---------------------------------------------------------------------------------------------------------------------
             'RichtClick handling is mostly taken care of in Diagram.NodeSelected

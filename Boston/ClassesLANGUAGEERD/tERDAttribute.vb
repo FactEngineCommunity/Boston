@@ -63,10 +63,15 @@ Namespace ERD
         Public _PartOfPrimaryKey As Boolean = False
         Public Overridable Property PartOfPrimaryKey() As Boolean
             Get
-                Dim lbIsPartOfPrimaryKey = (From Index In Me.Column.Index
-                                            Where Index.IsPrimaryKey
-                                            Select Index).Count > 0
-                Return lbIsPartOfPrimaryKey
+                If Me.Column IsNot Nothing Then
+                    Return Me.Column.isPartOfPrimaryKey
+                Else
+                    Dim lbIsPartOfPrimaryKey = (From Index In Me.Column.Index
+                                                Where Index.IsPrimaryKey
+                                                Select Index).Count > 0
+                    Return lbIsPartOfPrimaryKey
+                End If
+
             End Get
             Set(ByVal value As Boolean)
                 Me._PartOfPrimaryKey = value
@@ -76,7 +81,7 @@ Namespace ERD
         Public _Mandatory As Boolean = False
         Public Overridable Property Mandatory() As Boolean
             Get
-                Return Me._Mandatory
+                Return Me.Column.IsMandatory
             End Get
             Set(ByVal value As Boolean)
                 Me._Mandatory = value

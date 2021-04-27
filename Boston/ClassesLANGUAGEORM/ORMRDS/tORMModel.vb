@@ -1766,15 +1766,21 @@ Namespace FBM
                         Next
                     End If
 
-                    '================================
-                    'CodeSafe
-                    For Each lrColumn In lrTable.Column
-                        lrColumn.ContributesToPrimaryKey = lrColumn.isPartOfPrimaryKey
-                    Next
-
                     lrORMRecordset.MoveNext()
 
                 End While 'Stepping through Tables
+
+                '================================
+                'CodeSafe
+                For Each lrTable In Me.RDS.Table
+                    For Each lrColumn In lrTable.Column
+                        Try
+                            lrColumn.ContributesToPrimaryKey = lrColumn.isPartOfPrimaryKey
+                        Catch ex As Exception
+                            Debugger.Break()
+                        End Try
+                    Next
+                Next
 
                 '==========================================================================================================
                 'Relations                

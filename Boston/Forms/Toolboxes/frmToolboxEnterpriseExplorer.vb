@@ -20,7 +20,6 @@ Public Class frmToolboxEnterpriseExplorer
 
     Private WithEvents zrToolTip As New ToolTip
 
-
     Private zbSetupFormComplete As Boolean = False
     Private zoCurrentNode As TreeNode = Nothing
 
@@ -4310,4 +4309,5 @@ Public Class frmToolboxEnterpriseExplorer
         Me.ContextMenuStrip_ORMModels.ImageScalingSize = New Drawing.Size(16, 16)
 
     End Sub
+
 End Class

@@ -5,6 +5,7 @@ Public Class frmToolboxModelDictionary
     Public WithEvents zrORMModel As FBM.Model
     Public zrLoadedModel As FBM.Model = Nothing
     Public ziLoadedLanguage As pcenumLanguage
+    Private WithEvents mrApplication As tApplication = prApplication
 
     Public Function EqualsByName(ByVal other As Form) As Boolean
         If Me.Name = other.Name Then
@@ -1015,6 +1016,23 @@ Public Class frmToolboxModelDictionary
         Else
             Call Me.LoadToolboxModelDictionary(pcenumLanguage.ORMModel, True)
         End If
+
+    End Sub
+
+    Private Sub mrApplication_WorkingPageChanged() Handles mrApplication.WorkingPageChanged
+
+        Try
+            If Me.mrApplication.WorkingPage.Language <> Me.ziLoadedLanguage Then
+                Call Me.LoadToolboxModelDictionary(prApplication.WorkingPage.Language, True)
+            End If
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 

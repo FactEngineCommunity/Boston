@@ -1902,7 +1902,7 @@ Public Class frmDiagramPGS
             '--------------------------------------------------
             'Just to be sure...set the Richmond.WorkingProject
             '--------------------------------------------------
-            prApplication.WorkingPage = Me.zrPage
+            Call prApplication.setWorkingPage(Me.zrPage)
 
             loNode = Diagram.GetNodeAt(lo_point)
 

@@ -63,6 +63,7 @@ Public Class tApplication
 
     Public Event ModelAdded(ByRef arModel As FBM.Model)
     Public Event WorkingModelChanged()
+    Public Event WorkingPageChanged()
     Public Event ConfigurationChanged()
 
     Public Sub New()
@@ -501,6 +502,20 @@ Public Class tApplication
 
         If lrOriginalWorkingModel IsNot Me.WorkingModel Then
             RaiseEvent WorkingModelChanged()
+        End If
+    End Sub
+
+    Public Sub setWorkingPage(ByRef arPage As FBM.Page)
+
+        If arPage.Model IsNot Me.WorkingModel Then
+            Call Me.setWorkingModel(arPage.Model)
+        End If
+
+        Dim lrOriginalWorkingPage = Me.WorkingPage
+        Me.WorkingPage = arPage
+
+        If lrOriginalWorkingPage IsNot Me.WorkingPage Then
+            RaiseEvent WorkingPageChanged()
         End If
     End Sub
 
