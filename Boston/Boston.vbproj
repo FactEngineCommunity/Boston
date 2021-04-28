@@ -2412,6 +2412,7 @@
     <None Include="Shapelibrary\ORMShapes\value_comparrison_less_than.bmp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="startup\images\FactEngineLogo.png" />
     <None Include="Images\MenuImages\dictionary16x16.png" />
     <None Include="Images\MenuImages\ErrorList.png" />
     <None Include="Images\MenuImages\FactTables16x16.png" />

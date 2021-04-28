@@ -1710,8 +1710,13 @@ Namespace FBM
                         Me.MakeDirty(False, abCheckForErrors)
                     End If
                     lrDictionaryEntry = arDictionaryEntry
-                    Me.Dictionary.Add(lrDictionaryEntry.Symbol, Me.ModelDictionary.Count - 1)
+                    Try
+                        Me.Dictionary.Add(lrDictionaryEntry.Symbol, Me.ModelDictionary.Count - 1)
+                    Catch ex As Exception
+                    End Try
+
                 End If
+
 
                 Return lrDictionaryEntry
 

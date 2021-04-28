@@ -385,7 +385,7 @@ Namespace FBM
 
 
                 '====================================================================================================
-                If asEntityName = arColumn.Role.JoinedORMObject.Id And lrRecordsetCount("Count").Data = 0 Then
+                If (asEntityName = arColumn.Role.JoinedORMObject.Id Or asEntityName = arColumn.Role.FactType.Id) And lrRecordsetCount("Count").Data = 0 Then
                     'Columns can be reused on Subtype Entities, and don't need their definition twice,
                     '  just their relationship with the ERD Entity (above).
 

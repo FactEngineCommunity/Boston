@@ -10178,42 +10178,50 @@ Public Class frmDiagramORM
 
         Dim lrPage As FBM.Page
 
-        frmMain.Cursor = Cursors.WaitCursor
-        Me.zrPage.Model.AllowCheckForErrors = False
+        With New WaitCursor
 
-        Me.CircularProgressBar.Left = (Me.Width / 2) - (Me.CircularProgressBar.Size.Width / 2)
-        Me.CircularProgressBar.BringToFront()
-        Me.CircularProgressBar.Value = 1
-        Me.CircularProgressBar.Invalidate()
-        Me.Invalidate()
-        Me.BackgroundWorker.ReportProgress(0)
+            Try
+                Me.zrPage.Model.AllowCheckForErrors = False
 
-        lrPage = Me.zrPage.CreateEntityRelationshipDiagram(Me.BackgroundWorker)
-        lrPage.Loaded = True
-        lrPage.Save(True, True)
+                Me.CircularProgressBar.Left = (Me.Width / 2) - (Me.CircularProgressBar.Size.Width / 2)
+                Me.CircularProgressBar.BringToFront()
+                Me.CircularProgressBar.Value = 1
+                Me.CircularProgressBar.Invalidate()
+                Me.Invalidate()
+                Me.BackgroundWorker.ReportProgress(0)
 
-        Me.CircularProgressBar.Value = 0
-        Me.CircularProgressBar.Text = "0%"
-        Me.CircularProgressBar.Invalidate()
-        Me.CircularProgressBar.SendToBack()
+                lrPage = Me.zrPage.CreateEntityRelationshipDiagram(Me.BackgroundWorker)
+                lrPage.Loaded = True
+                lrPage.Save(True, True)
 
-        Me.zrPage.Model.AllowCheckForErrors = True
-        frmMain.Cursor = Cursors.Default
+                Me.CircularProgressBar.Value = 0
+                Me.CircularProgressBar.Text = "0%"
+                Me.CircularProgressBar.Invalidate()
+                Me.CircularProgressBar.SendToBack()
 
-        Dim lrEnterpriseView As tEnterpriseEnterpriseView = Nothing
-        If IsSomething(lrPage) Then
-            lrEnterpriseView = frmMain.zfrmModelExplorer.AddExistingPageToModel(lrPage, lrPage.Model, lrPage.Model.TreeNode, True)
+                Me.zrPage.Model.AllowCheckForErrors = True
+                frmMain.Cursor = Cursors.Default
 
-            MsgBox("Added the new Entity Relationship Diagram Page, '" & lrPage.Name & "' to the Model.")
+                Dim lrEnterpriseView As tEnterpriseEnterpriseView = Nothing
+                If IsSomething(lrPage) Then
+                    lrEnterpriseView = frmMain.zfrmModelExplorer.AddExistingPageToModel(lrPage, lrPage.Model, lrPage.Model.TreeNode, True)
 
-            Dim loToolStripItem As ToolStripItem = CType(sender, ToolStripItem)
+                    MsgBox("Added the new Entity Relationship Diagram Page, '" & lrPage.Name & "' to the Model.")
 
-            If loToolStripItem.Tag = True Then
-                Dim lrToolstripItem As New tDummyToolStripItem(lrEnterpriseView)
-                Call Me.morphToERDiagram(lrToolstripItem, lrEnterpriseView)
-            End If
+                    Dim loToolStripItem As ToolStripItem = CType(sender, ToolStripItem)
 
-        End If
+                    If loToolStripItem.Tag = True Then
+                        Dim lrToolstripItem As New tDummyToolStripItem(lrEnterpriseView)
+                        Call Me.morphToERDiagram(lrToolstripItem, lrEnterpriseView)
+                    End If
+
+                End If
+
+            Catch ex As Exception
+                Debugger.Break()
+            End Try
+
+        End With
 
     End Sub
 

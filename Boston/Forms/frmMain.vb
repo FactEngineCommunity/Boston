@@ -470,6 +470,7 @@ Public Class frmMain
     Public Sub ShowHideMenuOptions()
 
         Try
+
             If prApplication.ActivePages.Count = 0 Then
                 Me.ToolStripMenuItemPage.Enabled = False
                 Me.ToolStripMenuItemPage.Visible = False
@@ -603,8 +604,11 @@ Public Class frmMain
 
             '------------------------------------------------------------------------------------------------------
             'Toggle LogIn/LogOut menu items
-            Me.ToolStripMenuItemLogOut.Visible = True
+            Me.ToolStripMenuItemLogOut.Visible = My.Settings.UseClientServer Or prApplication.User IsNot Nothing
             Me.ToolStripMenuItemLogIn.Visible = False
+            If Me.ToolStripMenuItemLogOut.Visible = False And Me.ToolStripMenuItemLogIn.Visible = False Then
+                Me.ToolStripSeparator6.Visible = False
+            End If
 
         Catch ex As Exception
             Dim lsMessage As String
