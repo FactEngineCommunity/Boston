@@ -23,7 +23,7 @@ Public Class frmCRUDModel
         Me.LabelModelName.Text = Me.zrModel.Name
         Me.LabelCoreVersion.Text = Me.zrModel.CoreVersionNumber
 
-        Me.GroupBoxReverseEngineering.Visible = My.Settings.SuperuserMode
+        Me.GroupBoxReverseEngineering.Visible = False ' My.Settings.SuperuserMode
 
         Call Me.LoadDatabaseTypes()
 
