@@ -538,7 +538,7 @@ Namespace XMLModel
                     'Link to the Concept within the ModelDictionary
                     '------------------------------------------------
                     Dim lrDictionaryEntry As New FBM.DictionaryEntry(lrModel, lrValueType.Id, pcenumConceptType.ValueType, lrValueType.ShortDescription, lrValueType.LongDescription, True, True)
-                    lrDictionaryEntry = lrModel.AddModelDictionaryEntry(lrDictionaryEntry)
+                    lrDictionaryEntry = lrModel.AddModelDictionaryEntry(lrDictionaryEntry, ,,, True,, True)
 
 
                     lrValueType.Concept = lrDictionaryEntry.Concept
@@ -580,7 +580,7 @@ Namespace XMLModel
                     'Link to the Concept within the ModelDictionary
                     '------------------------------------------------
                     Dim lrDictionaryEntry As New FBM.DictionaryEntry(lrModel, lrEntityType.Name, pcenumConceptType.EntityType, , , True, True)
-                    lrDictionaryEntry = lrModel.AddModelDictionaryEntry(lrDictionaryEntry, , True)
+                    lrDictionaryEntry = lrModel.AddModelDictionaryEntry(lrDictionaryEntry, , True,, True,, True)
 
                     lrEntityType.Concept = lrDictionaryEntry.Concept
 
@@ -702,7 +702,7 @@ Namespace XMLModel
                     'Link to the Concept within the ModelDictionary
                     '------------------------------------------------
                     Dim lrDictionaryEntry As New FBM.DictionaryEntry(lrModel, lrRoleConstraint.Id, pcenumConceptType.RoleConstraint, lrRoleConstraint.ShortDescription, lrRoleConstraint.LongDescription, True, True)
-                    lrDictionaryEntry = lrModel.AddModelDictionaryEntry(lrDictionaryEntry, , False)
+                    lrDictionaryEntry = lrModel.AddModelDictionaryEntry(lrDictionaryEntry, , False,, True,, True)
 
                     If lrDictionaryEntry Is Nothing Then
                         lsMessage = "Cannot find DictionaryEntry in the ModelDictionary for RoleConstraint:"
@@ -1347,6 +1347,15 @@ Namespace XMLModel
             'Get the Facts (FactData) for the FactType
             '-------------------------------------------
             Call Me.GetFactsForFactType(arFactType)
+
+            '------------------------------------------------
+            'Link to the Concept within the ModelDictionary
+            '------------------------------------------------
+            Dim lrDictionaryEntry As New FBM.DictionaryEntry(arFactType.Model, arFactType.Id, pcenumConceptType.FactType, arFactType.ShortDescription, arFactType.LongDescription, True, True)
+            lrDictionaryEntry = arFactType.Model.AddModelDictionaryEntry(lrDictionaryEntry, ,,, True,, True)
+
+
+            arFactType.Concept = lrDictionaryEntry.Concept
 
             Call arFactType.Model.AddFactType(arFactType, False, False, Nothing)
 

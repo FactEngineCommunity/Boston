@@ -1674,6 +1674,15 @@ Namespace FBM
             Try
                 If abStraightSave Then
                     lrDictionaryEntry = arDictionaryEntry
+                    Me.ModelDictionary.Add(arDictionaryEntry)
+                    If abMakeModelDirty Then
+                        Me.MakeDirty(False, abCheckForErrors)
+                    End If
+                    lrDictionaryEntry = arDictionaryEntry
+                    Try
+                        Me.Dictionary.Add(lrDictionaryEntry.Symbol, Me.ModelDictionary.Count - 1)
+                    Catch ex As Exception
+                    End Try
                 ElseIf abMatchCase Then
                     If Me.Dictionary.ContainsKey(arDictionaryEntry.Symbol) Then
                         lrDictionaryEntry = Me.ModelDictionary(Me.Dictionary(arDictionaryEntry.Symbol))

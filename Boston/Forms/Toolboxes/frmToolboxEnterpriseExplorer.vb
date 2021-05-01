@@ -1652,6 +1652,7 @@ Public Class frmToolboxEnterpriseExplorer
 
                 lrModel.Loaded = True 'Important, otherwise adding the Page will try and reload the model.
                 Call Me.AddPageToModel(lrNewTreeNode)
+                lrModel.TreeNode.EnsureVisible()
 
                 Dim lsMessage As String = "New Model and Page added."
 
