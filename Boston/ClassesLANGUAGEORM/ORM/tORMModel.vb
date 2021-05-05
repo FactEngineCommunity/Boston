@@ -1915,7 +1915,7 @@ Namespace FBM
                                   Select FactType Distinct
 
                 If larFactType.Count = 0 Then
-                    Return Nothing
+                    Return New List(Of FBM.FactType)
                 Else
                     Dim larFTRFactType = From FactType In larFactType
                                          From FactTypeReading In FactType.FactTypeReading
@@ -1950,13 +1950,13 @@ Namespace FBM
                                              Select FactType Distinct
 
                             If larFTRFactType.Count = 0 Then
-                                Return Nothing
+                                Return New List(Of FBM.FactType)
                             Else
                                 Return larFTRFactType.ToList
                             End If
 
                         Else
-                            Return Nothing
+                            Return New List(Of FBM.FactType)
                         End If
                     Else
                         Return larFTRFactType.ToList
@@ -1973,7 +1973,7 @@ Namespace FBM
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
                 prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
-                Return Nothing
+                Return New List(Of FBM.FactType)
             End Try
 
         End Function

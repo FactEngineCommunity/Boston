@@ -892,7 +892,7 @@
                     For Each lrQueryEdge In lrSubQueryGraph.QueryEdges
                         lrSubQueryGraph.Nodes.Add(lrQueryEdge.TargetNode)
                     Next
-                    lsSQLQuery &= lrSubQueryGraph.generateSQL(arWhichSelectStatement, True)
+                    lsSQLQuery &= Richmond.returnIfTrue(lbAddedAND, "", " AND ") & lrSubQueryGraph.generateSQL(arWhichSelectStatement, True)
 
                     lsSQLQuery &= ")"
                 Next
