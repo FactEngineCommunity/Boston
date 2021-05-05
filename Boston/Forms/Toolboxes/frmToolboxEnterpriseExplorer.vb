@@ -449,12 +449,15 @@ Public Class frmToolboxEnterpriseExplorer
         Dim lrPage As FBM.Page = Nothing
         Dim lrModel As FBM.Model = Nothing
 
-        If Not node Is Nothing Then
-            Me.TreeView.SelectedNode = node
+        If node IsNot Nothing Then
+            Me.TreeView.Focus()
+            node.EnsureVisible()
+            Me.TreeView.ForceSelectedNode(node)
             lrMenuOption = Me.TreeView.SelectedNode.Tag
             Select Case lrMenuOption.MenuType
                 Case Is = pcenumMenuType.modelORMModel
-                Case Is = pcenumMenuType.pageORMModel
+                Case Is = pcenumMenuType.pageORMModel,
+                          pcenumMenuType.pageERD
                     lrPage = lrMenuOption.Tag
                     If Not lrPage.Loaded Then
                         frmMain.Cursor = Cursors.WaitCursor

@@ -1777,7 +1777,6 @@ Namespace FBM
                         Try
                             lrColumn.ContributesToPrimaryKey = lrColumn.isPartOfPrimaryKey
                         Catch ex As Exception
-                            Debugger.Break()
                         End Try
                     Next
                 Next
