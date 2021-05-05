@@ -526,7 +526,7 @@ Namespace ERD
                 '--------------------------------------------------------
                 'Check to see whether the Entity has a PrimaryKey
                 '--------------------------------------------------------
-                lrERAttribute.PartOfPrimaryKey = arColumn.ContributesToPrimaryKey 'Should also be reflected in the Index for the Column etc.
+                lrERAttribute.PartOfPrimaryKey = arColumn.isPartOfPrimaryKey 'ContributesToPrimaryKey 'Should also be reflected in the Index for the Column etc.
 
                 Me.Attribute.Add(lrERAttribute)
                 Me.Page.ERDiagram.Attribute.Add(lrERAttribute)

@@ -854,7 +854,7 @@ Namespace FBM
                                             Call lrRelation.establishReverseColumns()
 
                                             Dim larDestinationColumn As New List(Of RDS.Column)
-                                            larDestinationColumn = lrRelation.OriginTable.Column.FindAll(Function(x) x.ContributesToPrimaryKey = True)
+                                            larDestinationColumn = lrRelation.OriginTable.Column.FindAll(Function(x) x.isPartOfPrimaryKey = True) '20210505-VM-Was ContributesToPrimaryKey
 
                                             For Each lrOriginColumn In larDestinationColumn
                                                 For Each lrColumn In lrRelation.DestinationTable.Column.FindAll(Function(x) x.ActiveRole.Id = lrOriginColumn.ActiveRole.Id)
@@ -1019,9 +1019,10 @@ Namespace FBM
                                             If Not lrTable.Column.Exists(Function(x) x.Role.Id = lrRole.Id) Then
                                                 'There is no Column in the Table for the Role.
                                                 lrColumn = lrRole.GetCorrespondingFactTypeColumn(lrTable)
-                                                If arRoleConstraint.Role.Contains(lrRole) And lrFactType.InternalUniquenessConstraint.Count = 1 Then
-                                                    lrColumn.ContributesToPrimaryKey = True
-                                                End If
+                                                '20210505-VM-No longer needed. IsPartOfPrimaryKey uses Table Indexes to determine.
+                                                'If arRoleConstraint.Role.Contains(lrRole) And lrFactType.InternalUniquenessConstraint.Count = 1 Then
+                                                '    lrColumn.ContributesToPrimaryKey = True
+                                                'End If
                                                 If arRoleConstraint.Role.Contains(lrRole) Then
                                                     lrColumn.IsMandatory = True
                                                 End If
@@ -1042,9 +1043,10 @@ Namespace FBM
                                                     For Each lrColumn In larColumn
                                                         If arRoleConstraint.Role.Contains(lrRole) Then
                                                             lrColumn.IsMandatory = True
-                                                            If lrFactType.InternalUniquenessConstraint.Count = 1 Then
-                                                                lrColumn.ContributesToPrimaryKey = True
-                                                            End If
+                                                            '20210505-VM-No longer needed. IsPartOfPrimaryKey uses Table Indexes to determine.
+                                                            'If lrFactType.InternalUniquenessConstraint.Count = 1 Then
+                                                            '    lrColumn.ContributesToPrimaryKey = True
+                                                            'End If
                                                         End If
                                                         lrTable.addColumn(lrColumn, Me.IsDatabaseSynchronised)
                                                     Next
@@ -1052,9 +1054,10 @@ Namespace FBM
                                                     lrColumn = lrRole.GetCorrespondingFactTypeColumn(lrTable)
                                                     If arRoleConstraint.Role.Contains(lrRole) Then
                                                         lrColumn.IsMandatory = True
-                                                        If lrFactType.InternalUniquenessConstraint.Count = 1 Then
-                                                            lrColumn.ContributesToPrimaryKey = True
-                                                        End If
+                                                        '20210505-VM-No longer needed. IsPartOfPrimaryKey uses Table Indexes to determine.
+                                                        'If lrFactType.InternalUniquenessConstraint.Count = 1 Then
+                                                        '    lrColumn.ContributesToPrimaryKey = True
+                                                        'End If
                                                     End If
                                                     lrTable.addColumn(lrColumn, Me.IsDatabaseSynchronised)
                                                 End If
@@ -1074,9 +1077,10 @@ Namespace FBM
                                                     lrColumn.Name = lrTable.createUniqueColumnName(lrColumn, lrColumn.Name, 0)
                                                     If arRoleConstraint.Role.Contains(lrRole) Then
                                                         lrColumn.IsMandatory = True
-                                                        If lrFactType.InternalUniquenessConstraint.Count = 1 Then
-                                                            lrColumn.ContributesToPrimaryKey = True
-                                                        End If
+                                                        '20210505-VM-No longer needed. IsPartOfPrimaryKey uses Table Indexes to determine.
+                                                        'If lrFactType.InternalUniquenessConstraint.Count = 1 Then
+                                                        '    lrColumn.ContributesToPrimaryKey = True
+                                                        'End If
                                                     End If
                                                     lrTable.addColumn(lrColumn, Me.IsDatabaseSynchronised)
                                                 End If
@@ -1244,7 +1248,7 @@ Namespace FBM
                                         Call lrRelation.establishReverseColumns()
 
                                         Dim larDestinationColumn As New List(Of RDS.Column)
-                                        larDestinationColumn = lrRelation.OriginTable.Column.FindAll(Function(x) x.ContributesToPrimaryKey = True)
+                                        larDestinationColumn = lrRelation.OriginTable.Column.FindAll(Function(x) x.isPartOfPrimaryKey) '20210505-VM-Was ContributesToPrimaryKey
 
                                         For Each lrOriginColumn In larDestinationColumn
                                             For Each lrColumn In lrRelation.DestinationTable.Column.FindAll(Function(x) x.ActiveRole.Id = lrOriginColumn.ActiveRole.Id)

@@ -301,7 +301,7 @@ Namespace RDS
                                           Select Index).Count > 0
 
                     'If lbPrimaryIndex Then
-                    Call lrColumn.setContributesToPrimaryKey(lbPrimaryIndex)
+                    Call lrColumn.triggerContributesToPrimaryKey(lbPrimaryIndex)
                     'End If
                 Next
 

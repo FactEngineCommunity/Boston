@@ -1022,9 +1022,10 @@ Namespace FBM
 
                 Dim lrColumn As RDS.Column = New RDS.Column(arTable, lsColumnName, lrResponsibleRole, lrActiveRole, lbIsMandatory)
 
-                If lrResponsibleRole.isPartOfFactTypesPreferredReferenceScheme Then
-                    lrColumn.ContributesToPrimaryKey = True
-                End If
+                '20210505-VM-No longer needed. IsPartOfPrimaryKey uses Table Indexes to determine.
+                'If lrResponsibleRole.isPartOfFactTypesPreferredReferenceScheme Then
+                '    lrColumn.ContributesToPrimaryKey = True
+                'End If
 
                 Return lrColumn
 
@@ -1993,7 +1994,8 @@ Namespace FBM
 
                                             If lrResponsibleRole.isPartOfFactTypesPreferredReferenceScheme Then
                                                 lrNewColumn.IsMandatory = True
-                                                lrNewColumn.ContributesToPrimaryKey = True
+                                                '20210505-VM-No longer needed. IsPartOfPrimaryKey uses Table Indexes to determine.
+                                                'lrNewColumn.ContributesToPrimaryKey = True
                                             End If
 
                                             Call lrTable.addColumn(lrNewColumn)
@@ -2022,8 +2024,8 @@ Namespace FBM
                                                 lrNewColumn = Me.GetCorrespondingFactTypeColumn(lrTable)
                                                 lrNewColumn.Role = lrResponsibleRole
 
-
-                                                lrNewColumn.ContributesToPrimaryKey = lrResponsibleRole.isPartOfFactTypesPreferredReferenceScheme
+                                                '20210505-VM-No longer needed. IsPartOfPrimaryKey uses Table Indexes to determine.
+                                                'lrNewColumn.ContributesToPrimaryKey = lrResponsibleRole.isPartOfFactTypesPreferredReferenceScheme
 
                                                 lrTable.addColumn(lrNewColumn)
                                             End If
@@ -2044,7 +2046,8 @@ Namespace FBM
 
                                                 If Me.isPartOfFactTypesPreferredReferenceScheme Then
                                                     lrNewColumn.IsMandatory = True
-                                                    lrNewColumn.ContributesToPrimaryKey = True
+                                                    '20210505-VM-No longer needed. IsPartOfPrimaryKey uses Table Indexes to determine.
+                                                    'lrNewColumn.ContributesToPrimaryKey = True
                                                 End If
 
                                                 Call lrTable.addColumn(lrNewColumn)
@@ -2065,8 +2068,9 @@ Namespace FBM
 
                                         For Each lrNewColumn In larNewColumn
 
-                                            lrNewColumn.ContributesToPrimaryKey = lrResponsibleRole.isPartOfFactTypesPreferredReferenceScheme
-                                            lrNewColumn.IsMandatory = lrResponsibleRole.Mandatory Or lrNewColumn.ContributesToPrimaryKey
+                                            '20210505-VM-No longer needed. IsPartOfPrimaryKey uses Table Indexes to determine.
+                                            'lrNewColumn.ContributesToPrimaryKey = lrResponsibleRole.isPartOfFactTypesPreferredReferenceScheme
+                                            lrNewColumn.IsMandatory = lrResponsibleRole.Mandatory Or lrNewColumn.isPartOfPrimaryKey '20210505-VM-Was ContributesToPrimaryKey
 
                                             lrTable.addColumn(lrNewColumn)
                                         Next
