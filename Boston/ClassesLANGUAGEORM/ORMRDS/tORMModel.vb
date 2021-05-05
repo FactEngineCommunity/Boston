@@ -228,7 +228,7 @@ Namespace FBM
 
                 '=======================================================
                 'Start creating the Entities, Attributes and Relations
-                If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(10)                
+                If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(10)
                 Call Me.generateEntityArtifacts()
 
                 '=======================
@@ -386,9 +386,10 @@ Namespace FBM
                                     'There is no Column in the Table for the Role.
 
                                     lrColumn = lrRole.GetCorrespondingFactTypeColumn(lrTable)
-                                    If arRoleConstraint.Role.Contains(lrRole) And lrFactType.InternalUniquenessConstraint.Count = 1 Then
-                                        lrColumn.ContributesToPrimaryKey = True
-                                    End If
+                                    '20210505-VM-Not needed because IsPartOfPrimaryKey is a function of Table Indexes
+                                    'If arRoleConstraint.Role.Contains(lrRole) And lrFactType.InternalUniquenessConstraint.Count = 1 Then
+                                    '    lrColumn.ContributesToPrimaryKey = True
+                                    'End If
                                     If arRoleConstraint.Role.Contains(lrRole) Then
                                         lrColumn.IsMandatory = True
                                     End If
@@ -409,9 +410,10 @@ Namespace FBM
                                         For Each lrColumn In larColumn
                                             If arRoleConstraint.Role.Contains(lrRole) Then
                                                 lrColumn.IsMandatory = True
-                                                If lrFactType.InternalUniquenessConstraint.Count = 1 Then
-                                                    lrColumn.ContributesToPrimaryKey = True
-                                                End If
+                                                '20210505-VM-Not needed because IsPartOfPrimaryKey is a function of Table Indexes
+                                                'If lrFactType.InternalUniquenessConstraint.Count = 1 Then
+                                                '    lrColumn.ContributesToPrimaryKey = True
+                                                'End If
                                             End If
                                             lrTable.addColumn(lrColumn)
                                         Next
@@ -419,9 +421,10 @@ Namespace FBM
                                         lrColumn = lrRole.GetCorrespondingFactTypeColumn(lrTable)
                                         If arRoleConstraint.Role.Contains(lrRole) Then
                                             lrColumn.IsMandatory = True
-                                            If lrFactType.InternalUniquenessConstraint.Count = 1 Then
-                                                lrColumn.ContributesToPrimaryKey = True
-                                            End If
+                                            '20210505-VM-Not needed because IsPartOfPrimaryKey is a function of Table Indexes
+                                            'If lrFactType.InternalUniquenessConstraint.Count = 1 Then
+                                            '    lrColumn.ContributesToPrimaryKey = True
+                                            'End If
                                         End If
                                         lrTable.addColumn(lrColumn)
                                     End If
@@ -441,9 +444,10 @@ Namespace FBM
                                         lrColumn.Name = lrTable.createUniqueColumnName(lrColumn, lrColumn.Name, 0)
                                         If arRoleConstraint.Role.Contains(lrRole) Then
                                             lrColumn.IsMandatory = True
-                                            If lrFactType.InternalUniquenessConstraint.Count = 1 Then
-                                                lrColumn.ContributesToPrimaryKey = True
-                                            End If
+                                            '20210505-VM-Not needed because IsPartOfPrimaryKey is a function of Table Indexes
+                                            'If lrFactType.InternalUniquenessConstraint.Count = 1 Then
+                                            '    lrColumn.ContributesToPrimaryKey = True
+                                            'End If
                                         End If
                                         lrTable.addColumn(lrColumn)
                                     End If
@@ -674,7 +678,8 @@ Namespace FBM
                                         Select Column Distinct ' 'ActiveRole.Id = lrRoleConstraintRole.Role.Id _
 
                         For Each lrColumn In larColumns
-                            lrColumn.ContributesToPrimaryKey = True
+                            '20210505-VM-Not needed because IsPartOfPrimaryKey is a function of Table Indexes
+                            'lrColumn.ContributesToPrimaryKey = True
                             larColumn.Add(lrColumn)
                         Next
                     Next
@@ -738,7 +743,8 @@ Namespace FBM
 
                     lrColumn = larColumns(0)
 
-                    lrColumn.ContributesToPrimaryKey = True
+                    '20210505-VM-Not needed because IsPartOfPrimaryKey is a function of Table Indexes
+                    'lrColumn.ContributesToPrimaryKey = True
 
                     larColumn = New List(Of RDS.Column)
                     larColumn.Add(lrColumn)
@@ -786,11 +792,13 @@ Namespace FBM
             'Generate the Indexes for SimpleReferenceSchemes
             '=================================================
             Try
-                Dim larRoleConstraint = From RoleConstraint In Me.RoleConstraint _
+                Dim larRoleConstraint = From RoleConstraint In Me.RoleConstraint
                                         Where RoleConstraint.IsMDAModelElement = False _
                                         And RoleConstraint.RoleConstraintType = pcenumRoleConstraintType.InternalUniquenessConstraint _
-                                        And RoleConstraint.RoleConstraintRole.Count > 1 _
+                                        And RoleConstraint.RoleConstraintRole.Count > 1
                                         Select RoleConstraint
+
+                Dim lbIsPK As Boolean = False
 
                 For Each lrRoleConstraint In larRoleConstraint
 
@@ -799,25 +807,32 @@ Namespace FBM
 
                         larColumn = New List(Of RDS.Column)
 
+
+
                         For Each lrRoleConstraintRole In lrRoleConstraint.RoleConstraintRole
 
-                            Dim larIndexColumn = From Table In Me.RDS.Table _
-                                                 From Column In Table.Column _
-                                                 Where Column.Role.Id = lrRoleConstraintRole.Role.Id _
+                            Dim larIndexColumn = From Table In Me.RDS.Table
+                                                 From Column In Table.Column
+                                                 Where Column.Role.Id = lrRoleConstraintRole.Role.Id
                                                  Select Column Distinct
 
                             For Each lrColumn In larIndexColumn
 
                                 If lrRoleConstraint.RoleConstraintRole(0).Role.FactType.InternalUniquenessConstraint.Count = 1 Then
-                                    lrColumn.ContributesToPrimaryKey = True
+                                    lbIsPK = True
+                                    Exit For
+                                    'lrColumn.ContributesToPrimaryKey = True
                                 End If
 
                                 If lrRoleConstraint.IsPreferredIdentifier = True Then
-                                    lrColumn.ContributesToPrimaryKey = True
+                                    lbIsPK = True
+                                    Exit For
+                                    'lrColumn.ContributesToPrimaryKey = True
                                 End If
 
-                                larColumn.AddUnique(lrColumn)
+                                'larColumn.AddUnique(lrColumn) 'See below ToList
                             Next
+                            larColumn = larIndexColumn.ToList
                         Next
 
                         Dim lsIndexName As String = ""
@@ -828,7 +843,7 @@ Namespace FBM
                         End If
 
                         Dim lbIsPrimaryKey As Boolean = False
-                        If larColumn(0).ContributesToPrimaryKey Then
+                        If lbIsPK Then 'larColumn(0).ContributesToPrimaryKey Then
                             lsIndexName = larColumn(0).Table.Name & "_PK"
                             lsQualifier = "PK"
                             lbIsPrimaryKey = True
@@ -1119,7 +1134,7 @@ Namespace FBM
                         '--------------------------------------------------------------------------
                         'Get the Origin/Destination Columns
                         Dim larDestinationColumn As New List(Of RDS.Column)
-                        larDestinationColumn = lrDestinationTable.Column.FindAll(Function(x) x.ContributesToPrimaryKey = True)
+                        larDestinationColumn = lrDestinationTable.Column.FindAll(Function(x) x.isPartOfPrimaryKey = True)
                         lrRelation.DestinationColumns = larDestinationColumn
 
                         Dim larOriginColumn As New List(Of RDS.Column)
@@ -1142,7 +1157,7 @@ Namespace FBM
 
                         'Reciprocal relations for 'Destination' Table's Columns
                         larDestinationColumn = New List(Of RDS.Column)
-                        larDestinationColumn = lrOriginTable.Column.FindAll(Function(x) x.ContributesToPrimaryKey = True)
+                        larDestinationColumn = lrOriginTable.Column.FindAll(Function(x) x.isPartOfPrimaryKey = True)
 
                         For Each lrOriginColumn In larDestinationColumn
                             For Each lrColumn In lrDestinationTable.Column.FindAll(Function(x) x.ActiveRole.Id = lrOriginColumn.ActiveRole.Id)
@@ -1297,7 +1312,7 @@ Namespace FBM
                         Dim larDestinationColumn As New List(Of RDS.Column)
                         Select Case lrDestinationModelObject.ConceptType
                             Case Is = pcenumConceptType.EntityType
-                                larDestinationColumn = lrDestinationTable.Column.FindAll(Function(x) x.ContributesToPrimaryKey = True)
+                                larDestinationColumn = lrDestinationTable.Column.FindAll(Function(x) x.isPartOfPrimaryKey = True)
                             Case Else 'FactType by enlcosing IF
                                 larDestinationColumn = lrDestinationTable.Column
                         End Select
@@ -1426,7 +1441,7 @@ Namespace FBM
                 '--------------------------------------------------------------------------
                 'Get the Origin/Destination Columns
                 Dim larDestinationColumn As New List(Of RDS.Column)
-                larDestinationColumn = lrDestinationTable.Column.FindAll(Function(x) x.ContributesToPrimaryKey = True)
+                larDestinationColumn = lrDestinationTable.Column.FindAll(Function(x) x.isPartOfPrimaryKey = True)
                 lrRelation.DestinationColumns = larDestinationColumn
 
                 Dim larOriginColumn As New List(Of RDS.Column)
@@ -1563,9 +1578,10 @@ Namespace FBM
 
                     lrRecordset1 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
                     lrIndex.IsPrimaryKey = Not lrRecordset1.EOF
-                    For Each lrColumn In lrIndex.Column
-                        lrColumn.ContributesToPrimaryKey = Not lrRecordset1.EOF
-                    Next
+                    '20210505-VM-Not needed because IsPartOfPrimaryKey is a function of Table Indexes
+                    'For Each lrColumn In lrIndex.Column
+                    '    lrColumn.ContributesToPrimaryKey = Not lrRecordset1.EOF
+                    'Next
 
                     'Ignore Nulls
                     lsSQLQuery = "SELECT *"
@@ -1677,6 +1693,7 @@ Namespace FBM
 
                     lrORMRecordset2 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
+                    If lrTable.Name = "Session" Then Debugger.Break()
 
                     While Not lrORMRecordset2.EOF
 
@@ -1772,14 +1789,17 @@ Namespace FBM
 
                 '================================
                 'CodeSafe
-                For Each lrTable In Me.RDS.Table
-                    For Each lrColumn In lrTable.Column
-                        Try
-                            lrColumn.ContributesToPrimaryKey = lrColumn.isPartOfPrimaryKey
-                        Catch ex As Exception
-                        End Try
-                    Next
-                Next
+                '20210505-VM-Not needed because IsPartOfPrimaryKey is a function of Table Indexes
+                'For Each lrTable In Me.RDS.Table
+                '    For Each lrColumn In lrTable.Column
+                '        Try
+                '            lrColumn.ContributesToPrimaryKey = lrColumn.isPartOfPrimaryKey
+                '        Catch ex As Exception
+                '            Debugger.Break()
+                '        End Try
+                '    Next
+                'Next
+
 
                 '==========================================================================================================
                 'Relations                

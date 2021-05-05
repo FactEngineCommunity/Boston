@@ -216,13 +216,13 @@ Namespace RDS
                 'Is only IsPGSRelation if the Objectified Fact Type (i.e. The objectified relation) only references ValueTypes. 
                 'i.e.Where ObjectifiedFactType Is only joined To ValueTypes.
                 ' If Is joined To any EntityType Or another ObjectifiedFactType, Then cannot be a PGSRelation, And must be a Node.
-                If (arColumn.ContributesToPrimaryKey = False) And (TypeOf (arColumn.Role.JoinedORMObject) IsNot FBM.ValueType) Then
+                If (arColumn.isPartOfPrimaryKey = False) And (TypeOf (arColumn.Role.JoinedORMObject) IsNot FBM.ValueType) Then '20210505-VM-Was ContributesToPrimaryKey
                     '--------------------------------------------------------------------
                     'Remove IsPGSRelation if join is not to a ValueType
                     'Call Me.setIsPGSRelation(False) '20200726-VM-Commented this out. See notes above.
                 ElseIf TypeOf (Me.FBMModelElement) Is FBM.FactType Then
                     'FBMModelObject is the ModelElement that the Table relates to.
-                    If Not (arColumn.ContributesToPrimaryKey) And (arColumn.FactType IsNot Me.FBMModelElement) And (TypeOf (arColumn.Role.JoinedORMObject) IsNot FBM.ValueType) Then
+                    If Not (arColumn.isPartOfPrimaryKey) And (arColumn.FactType IsNot Me.FBMModelElement) And (TypeOf (arColumn.Role.JoinedORMObject) IsNot FBM.ValueType) Then '20210505-VM-Was ContributesToPrimaryKey
                         Call Me.setIsPGSRelation(False)
                     End If
                 End If
@@ -753,9 +753,11 @@ Namespace RDS
 
                     lrRecordset1 = Me.Model.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
                     lrIndex.IsPrimaryKey = Not lrRecordset1.EOF
-                    For Each lrColumn In lrIndex.Column
-                        lrColumn.ContributesToPrimaryKey = Not lrRecordset1.EOF
-                    Next
+
+                    '20210505-VM-No longer needed. IsPartOfPrimaryKey uses Table Indexes to determine.
+                    'For Each lrColumn In lrIndex.Column
+                    '    lrColumn.ContributesToPrimaryKey = Not lrRecordset1.EOF
+                    'Next
 
                     'Ignore Nulls
                     lsSQLQuery = "SELECT *"
@@ -824,7 +826,7 @@ Namespace RDS
 
             Try
                 For Each lrColumn In Me.Column.OrderBy(Function(x) x.OrdinalPosition)
-                    If lrColumn.ContributesToPrimaryKey = False Then
+                    If lrColumn.isPartOfPrimaryKey = False Then '20210505-VM-Was ContributesToPrimaryKey
                         Return lrColumn.OrdinalPosition
                     End If
                 Next
@@ -992,10 +994,10 @@ Namespace RDS
             Dim lrColumn As RDS.Column
             Dim lrSwitchingColumn As RDS.Column
 
-            If Me.Column.FindAll(Function(x) x.ContributesToPrimaryKey = True).Count = 1 Then
+            If Me.Column.FindAll(Function(x) x.isPartOfPrimaryKey = True).Count = 1 Then '20210505-VM-Was ContributesToPrimaryKey
 
                 lrSwitchingColumn = Me.Column.Find(Function(x) x.OrdinalPosition = 1)
-                lrColumn = Me.Column.Find(Function(x) x.ContributesToPrimaryKey = True)
+                lrColumn = Me.Column.Find(Function(x) x.isPartOfPrimaryKey = True) '20210505-VM-Was ContributesToPrimaryKey
 
                 Dim liOriginalOrdinalPosition = lrColumn.OrdinalPosition
 
@@ -1008,7 +1010,7 @@ Namespace RDS
                 End If
             Else
                 Dim larColumn = From Column In Me.Column
-                                Where Column.ContributesToPrimaryKey = True
+                                Where Column.isPartOfPrimaryKey = True '20210505-VM-Was ContributesToPrimaryKey
                                 Select Column
 
                 Dim liOrdinalPosition As Integer = 0
@@ -1144,7 +1146,7 @@ Namespace RDS
 
             'Remove the Columns
             Dim larColumn = From Column In Me.Column
-                            Where Column.ContributesToPrimaryKey = True
+                            Where Column.isPartOfPrimaryKey '20210505-BM-Was ContributesToPrimaryKey
                             Select Column
 
             For Each lrColumn In larColumn.ToArray

@@ -232,9 +232,12 @@ Public Class frmDiagramERD
             Dim lrERAttribute As ERD.Attribute
             For Each lrEntity In Me.zrPage.ERDiagram.Entity
 
+                If lrEntity.Name = "Session" Then Debugger.Break()
+
                 For Each lrColumn In lrEntity.RDSTable.Column
 
                     lrERAttribute = New ERD.Attribute
+                    lrERAttribute.Column = lrColumn
                     lrERAttribute.Model = Me.zrPage.Model
                     lrERAttribute.Id = lrColumn.Id
                     lrERAttribute.Entity = lrEntity

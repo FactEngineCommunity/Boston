@@ -83,8 +83,8 @@ Namespace RDS
         <XmlAttribute()> _
         Public SSDataType As Integer = 0
 
-        <XmlAttribute()> _
-        Public ContributesToPrimaryKey As Boolean = False
+        '<XmlAttribute()> _
+        'Public ContributesToPrimaryKey As Boolean = False
 
         'CrossLayer Members
         ''' <summary>
@@ -249,7 +249,8 @@ Namespace RDS
                 lrColumn.Nullable = .Nullable
                 lrColumn.OrdinalPosition = .OrdinalPosition
                 lrColumn.Relation = New List(Of RDS.Relation)
-                lrColumn.ContributesToPrimaryKey = .ContributesToPrimaryKey
+                '20210505-VM-Not needed because IsPartOfPrimaryKey is a function of Table Indexes
+                'lrColumn.ContributesToPrimaryKey = .ContributesToPrimaryKey
                 If arOriginTable Is Nothing Then
                     For Each lrRelation In .Relation
                         If arRelation IsNot Nothing Then
@@ -497,7 +498,7 @@ Namespace RDS
         Public Function hasNonPrimaryKeyColumnsAboveIt() As Boolean
 
             Dim liNonPrimaryKeyCount = Aggregate Column In Me.Table.Column
-                                       Where Column.ContributesToPrimaryKey = False _
+                                       Where Column.isPartOfPrimaryKey = False _
                                        And Column.OrdinalPosition < Me.OrdinalPosition
                                        Into Count()
 
@@ -522,10 +523,24 @@ Namespace RDS
         ''' <returns></returns>
         Public Function isPartOfPrimaryKey() As Boolean
 
-            Dim lrTable As RDS.Table = Me.Role.JoinedORMObject.getCorrespondingRDSTable
+            Dim lrTable As RDS.Table
 
-            Return lrTable.Index.Find(Function(x) x.IsPrimaryKey And (x.Column.Find(Function(y) y.Id = Me.Id) IsNot Nothing)) IsNot Nothing
-            '20200427-VM-was Me.Table.Index.Find(Function(x) x.IsPrimaryKey And (x.Column.Find(Function(y) y.Id = Me.Id) IsNot Nothing)) IsNot Nothing
+            Try
+                If Me.Role.JoinedORMObject.Id = Me.Table.Name Then
+                    lrTable = Me.Table
+                ElseIf Me.Role.FactType.Id = Me.Table.Name Then
+                    lrTable = Me.FactType.getCorrespondingRDSTable
+                Else
+                    'This is required because some Columns may be inherited by Not IsAbsorbed on corresponding ModelElement.
+                    lrTable = Me.Role.JoinedORMObject.getCorrespondingRDSTable
+                End If
+
+                Return lrTable.Index.Find(Function(x) x.IsPrimaryKey And (x.Column.Find(Function(y) y.Id = Me.Id) IsNot Nothing)) IsNot Nothing
+                '20200427-VM-was Me.Table.Index.Find(Function(x) x.IsPrimaryKey And (x.Column.Find(Function(y) y.Id = Me.Id) IsNot Nothing)) IsNot Nothing
+
+            Catch ex As Exception
+                Return False
+            End Try
 
         End Function
 
@@ -610,10 +625,9 @@ Namespace RDS
 
         End Sub
 
-        Public Sub setContributesToPrimaryKey(ByVal abContributesToPrimaryKey As Boolean)
+        Public Sub triggerContributesToPrimaryKey(ByVal abContributesToPrimaryKey As Boolean)
 
-            Me.ContributesToPrimaryKey = abContributesToPrimaryKey
-
+            'Me.ContributesToPrimaryKey = abContributesToPrimaryKey '20210505-VM-ContributesToPrimaryKey no loger used.
             RaiseEvent ContributesToPrimaryKeyChanged(abContributesToPrimaryKey)
 
         End Sub

@@ -1714,7 +1714,6 @@ Namespace FBM
                     Dim lrColumn As RDS.Column = arEntityInstance.RDSTable.Column.Find(Function(x) x.Id = lrERAttribute.Id)
                     lrERAttribute.Column = lrColumn
 
-                    lrERAttribute.PartOfPrimaryKey = lrColumn.ContributesToPrimaryKey
                     lrERAttribute.ActiveRole = lrColumn.ActiveRole
                     lrERAttribute.ResponsibleRole = lrColumn.Role
 
