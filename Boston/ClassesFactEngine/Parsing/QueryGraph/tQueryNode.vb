@@ -63,6 +63,16 @@
         Public MathFunction As pcenumMathFunction = pcenumMathFunction.None
         Public MathNumber As Double = 0
 
+        Public ReadOnly Property RelativeFBMModelObject() As FBM.ModelObject
+            Get
+                If Me.FBMModelObject.IsAbsorbed Then
+                    Return Me.FBMModelObject.GetTopmostNonAbsorbedSupertype
+                Else
+                    Return Me.FBMModelObject
+                End If
+            End Get
+        End Property
+
         ''' <summary>
         ''' Parameterless New
         ''' </summary>

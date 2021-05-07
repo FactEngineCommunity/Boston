@@ -347,7 +347,7 @@ Namespace RDS
                               Where lrTable.Column.Contains(DestinationColumn)
                               Select Relation
 
-                For Each lrRelation In larRelation
+                For Each lrRelation In larRelation.ToArray
                     Call Me.removeRelation(lrRelation)
                 Next
 

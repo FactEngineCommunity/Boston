@@ -131,13 +131,10 @@ Namespace FactEngine
 
             Dim lsMessage As String = ""
             Try
-
-
-
                 If Me.WhichClauseSubType = pcenumWhichClauseType.IsPredicateNodePropertyIdentification Then
 
                     Dim larModelObject As New List(Of FBM.ModelObject)
-                    larModelObject.Add(arBaseNode.FBMModelObject)
+                    larModelObject.Add(arBaseNode.RelativeFBMModelObject)
                     larModelObject.Add(arTargetNode.FBMModelObject)
                     Dim lasPredicatePart As New List(Of String)
                     lasPredicatePart.Add(asPredicate)
@@ -271,7 +268,7 @@ Namespace FactEngine
                     Dim lrDummyFactType As New FBM.FactType
                     Dim lasPredicatePart As New List(Of String)
 
-                    larModelObject.Add(arBaseNode.FBMModelObject)
+                    larModelObject.Add(arBaseNode.RelativeFBMModelObject)
 
                     lasPredicatePart.Add(asPredicate)
 

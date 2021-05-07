@@ -740,7 +740,9 @@ Namespace FBM
         Public Shadows Function getCorrespondingRDSTable(Optional abCreateTableIfNotExists As Boolean = False) As RDS.Table
 
             Try
-                Dim lrTable As RDS.Table = Me.Model.RDS.Table.Find(Function(x) x.Name = Me.Id)
+                Dim lrTable As RDS.Table
+
+                lrTable = Me.Model.RDS.Table.Find(Function(x) x.Name = Me.Id)
 
                 If lrTable Is Nothing And abCreateTableIfNotExists Then
                     lrTable = New RDS.Table(Me.Model.RDS, Me.Id, Me)
