@@ -892,7 +892,7 @@
                     For Each lrQueryEdge In lrSubQueryGraph.QueryEdges
                         lrSubQueryGraph.Nodes.Add(lrQueryEdge.TargetNode)
                     Next
-                    lsSQLQuery &= lrSubQueryGraph.generateSQL(arWhichSelectStatement, True)
+                    lsSQLQuery &= Richmond.returnIfTrue(lbAddedAND, "", " AND ") & lrSubQueryGraph.generateSQL(arWhichSelectStatement, True)
 
                     lsSQLQuery &= ")"
                 Next
@@ -981,7 +981,7 @@
 
                         Case Else
                             Dim lrTempColumn As RDS.Column = Nothing
-                            For Each lrColumn In Me.HeadNode.FBMModelObject.getCorrespondingRDSTable.getFirstUniquenessConstraintColumns.OrderBy(Function(x) x.OrdinalPosition)
+                            For Each lrColumn In Me.HeadNode.RelativeFBMModelObject.getCorrespondingRDSTable.getFirstUniquenessConstraintColumns.OrderBy(Function(x) x.OrdinalPosition)
                                 lrTempColumn = lrColumn.Clone(Nothing, Nothing)
                                 lrTempColumn.TemporaryAlias = Viev.NullVal(Me.HeadNode.Alias, "")
                                 lrTempColumn.GraphNodeType = Me.HeadNode.Name
