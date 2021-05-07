@@ -1693,8 +1693,6 @@ Namespace FBM
 
                     lrORMRecordset2 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
-                    If lrTable.Name = "Session" Then Debugger.Break()
-
                     While Not lrORMRecordset2.EOF
 
                         'Column Name
