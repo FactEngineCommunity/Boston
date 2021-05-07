@@ -1576,7 +1576,7 @@ Public Class frmFactEngine
                             Call Me.showAutoCompleteForm()
                             Me.AutoComplete.DateTimePicker.BringToFront()
                             Me.AutoComplete.DateTimePicker.Visible = True
-                            Exit Sub
+                            'Exit Sub
                         End If
 
                         If CType(lrModelElement, FBM.ValueType).ValueConstraint.Count > 0 Then
@@ -1587,26 +1587,74 @@ Public Class frmFactEngine
                     End If
 
                     Dim lsSQLQuery = "SELECT "
-                    Dim liInd = 0
-                    For Each lrColumn In lrModelElement.getCorrespondingRDSTable.getFirstUniquenessConstraintColumns
-                        If liInd > 0 Then lsSQLQuery &= " ,"
-                        lsSQLQuery &= lrColumn.Name
-                        liInd += 1
-                    Next
-                    lsSQLQuery &= vbCrLf & "FROM " & lrModelElement.Id
-                    If Me.zrTextHighlighter.GetCurrentContext.Token.Type = FEQL.TokenType.IDENTIFIER Then
-                        Try
-                            If lrModelElement.getCorrespondingRDSTable.getFirstUniquenessConstraintColumns.Count > 0 Then
-                                Dim lsDatabaseWildcardOperator = Database.gerLikeWildcardOperator(prApplication.WorkingModel.TargetDatabaseType)
-                                lsSQLQuery &= vbCrLf & "WHERE " & lrModelElement.getCorrespondingRDSTable.getFirstUniquenessConstraintColumns(0).Name & " LIKE '" & Me.zrTextHighlighter.GetCurrentContext.Token.Text & lsDatabaseWildcardOperator & "'"
-                            End If
-                        Catch ex As Exception
-                            'Do nothing. Just don't add anything to the SQL.
-                        End Try
+                    Dim liInd As Integer
+                    If lrModelElement.ConceptType = pcenumConceptType.ValueType Then
+                        'Try and find the FactType that belongs to the PreviousModelElement/PredicateClause/ValueType
+
+                        If larModelElementNameParseNode.Count > 1 Then
+                            Try
+                                Dim lrQueryEdge As New FactEngine.QueryEdge(New FactEngine.QueryGraph(prApplication.WorkingModel), Nothing)
+                                Dim lrBaseModelElement = prApplication.WorkingModel.GetModelObjectByName(Trim(larModelElementNameParseNode(larModelElementNameParseNode.Count - 2).Token.Text))
+                                Dim lrBaseNode = New FactEngine.QueryNode(lrBaseModelElement, lrQueryEdge)
+                                Dim lrTargetNode = New FactEngine.QueryNode(lrModelElement, lrQueryEdge, True)
+                                lrQueryEdge.BaseNode = lrBaseNode
+                                lrQueryEdge.TargetNode = lrTargetNode
+                                Dim lrPredicateClauseNode = larModelPredicateClauseParseNode.Last
+                                Dim larPredicateNode = New List(Of FEQL.ParseNode)
+                                Call Me.GetPredicateNodes(lrPredicateClauseNode, larPredicateNode)
+                                Dim lasPredicate = (From PredicateNode In larPredicateNode
+                                                    Select Trim(PredicateNode.Token.Text)).ToArray
+                                Dim lsPredicatePartText = Trim(Strings.Join(lasPredicate, " "))
+                                lrQueryEdge.Predicate = lsPredicatePartText
+                                Call lrQueryEdge.getAndSetFBMFactType(lrBaseNode, lrTargetNode, lsPredicatePartText)
+
+                                lsSQLQuery &= lrModelElement.Id
+                                If lrQueryEdge.IsPartialFactTypeMatch Then
+                                    lsSQLQuery &= " FROM " & lrQueryEdge.FBMFactType.Id
+                                Else
+                                    lsSQLQuery &= " FROM " & lrBaseNode.Name
+                                End If
+
+                                If Me.zrTextHighlighter.GetCurrentContext.Token.Type = FEQL.TokenType.IDENTIFIER Then
+                                    Try
+                                        Dim lsDatabaseWildcardOperator = Database.gerLikeWildcardOperator(prApplication.WorkingModel.TargetDatabaseType)
+                                        lsSQLQuery &= vbCrLf & "WHERE " & lrModelElement.Id & " LIKE '" & Me.zrTextHighlighter.GetCurrentContext.Token.Text & lsDatabaseWildcardOperator & "'"
+                                    Catch ex As Exception
+                                        'Do nothing. Just don't add anything to the SQL.
+                                    End Try
+                                End If
+                                lsSQLQuery &= vbCrLf & " LIMIT 20"
+                            Catch ex As Exception
+
+                            End Try
+                        End If
+
+                    Else
+                        liInd = 0
+
+                        For Each lrColumn In lrModelElement.getCorrespondingRDSTable.getFirstUniquenessConstraintColumns
+                            If liInd > 0 Then lsSQLQuery &= " ,"
+                            lsSQLQuery &= lrColumn.Name
+                            liInd += 1
+                        Next
+
+                        lsSQLQuery &= vbCrLf & "FROM " & lrModelElement.Id
+
+                        If Me.zrTextHighlighter.GetCurrentContext.Token.Type = FEQL.TokenType.IDENTIFIER Then
+                            Try
+                                If lrModelElement.getCorrespondingRDSTable.getFirstUniquenessConstraintColumns.Count > 0 Then
+                                    Dim lsDatabaseWildcardOperator = Database.gerLikeWildcardOperator(prApplication.WorkingModel.TargetDatabaseType)
+                                    lsSQLQuery &= vbCrLf & "WHERE " & lrModelElement.getCorrespondingRDSTable.getFirstUniquenessConstraintColumns(0).Name & " LIKE '" & Me.zrTextHighlighter.GetCurrentContext.Token.Text & lsDatabaseWildcardOperator & "'"
+                                End If
+                            Catch ex As Exception
+                                'Do nothing. Just don't add anything to the SQL.
+                            End Try
+                        End If
+
+                        lsSQLQuery &= vbCrLf & "LIMIT 20"
                     End If
-                    lsSQLQuery &= vbCrLf & "LIMIT 20"
-                    Dim lrRecordset As ORMQL.Recordset
                     Try
+                        Dim lrRecordset As ORMQL.Recordset
                         lrRecordset = Me.FEQLProcessor.DatabaseManager.GO(lsSQLQuery)
 
                         For Each lrFact In lrRecordset.Facts
