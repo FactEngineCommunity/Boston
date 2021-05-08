@@ -239,6 +239,16 @@ Public Class frmCRUDModel
 
                         lrODBCConnection.Close()
 
+                    Case Is = pcenumDatabaseType.ODBC
+                        Dim lrODBCConnection As New System.Data.Odbc.OdbcConnection(Me.TextBoxDatabaseConnectionString.Text)
+
+                        lrODBCConnection.Open()
+
+                        Me.LabelOpenSuccessfull.ForeColor = Color.Green
+                        Me.LabelOpenSuccessfull.Text = "Success"
+                        Me.LabelOpenSuccessfull.Visible = True
+
+                        lrODBCConnection.Close()
                     Case Else
 
                         Me.LabelOpenSuccessfull.ForeColor = Color.Red
