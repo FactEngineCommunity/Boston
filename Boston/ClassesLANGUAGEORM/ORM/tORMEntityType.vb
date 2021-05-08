@@ -1284,6 +1284,7 @@ Namespace FBM
                 lrSubtypeRelationship.FactType = Me.Model.CreateFactType(lsFactTypeName, larModelObject, False, False)
                 lrSubtypeRelationship.FactType.IsSubtypeRelationshipFactType = True
 
+
                 lrSubtypeRelationship.FactType.RoleGroup(0).Name = "Subtype"
                 lrSubtypeRelationship.FactType.RoleGroup(1).Name = "Supertype"
 
