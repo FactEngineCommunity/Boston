@@ -874,6 +874,11 @@
 #End Region
 #End Region
 
+                'CodeSafe Remove wayward ANDs
+                If Trim(lsSQLQuery).EndsWith("AND") Then
+                    lsSQLQuery = Trim(lsSQLQuery).Substring(0, lsSQLQuery.Length - 4)
+                    lbAddedAND = False
+                End If
                 '=====================================================================================
                 'SubQueries
                 Dim lasSubQueryAlias = From QueryEdge In Me.QueryEdges
