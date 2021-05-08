@@ -1019,7 +1019,7 @@
                                 If lrQueryEdge.IsPartialFactTypeMatch Then
                                     lrColumn = lrQueryEdge.FBMFactType.getCorrespondingRDSTable.Column.Find(Function(x) x.Role Is lrRole)
                                 Else
-                                    lrColumn = lrQueryEdge.BaseNode.FBMModelObject.getCorrespondingRDSTable.Column.Find(Function(x) x.Role.FactType Is lrQueryEdge.FBMFactType)
+                                    lrColumn = lrQueryEdge.BaseNode.RelativeFBMModelObject.getCorrespondingRDSTable.Column.Find(Function(x) x.Role.FactType Is lrQueryEdge.FBMFactType)
                                 End If
                                 If lrColumn Is Nothing And lrQueryEdge.FBMFactType.IsLinkFactType Then
                                     lrColumn = lrQueryEdge.BaseNode.FBMModelObject.getCorrespondingRDSTable.Column.Find(Function(x) x.Role Is lrQueryEdge.FBMFactType.LinkFactTypeRole).Clone(Nothing, Nothing)
