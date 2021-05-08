@@ -60,7 +60,6 @@ Public Class frmMain
 
             Me.MenuStrip_main.ImageScalingSize = New Drawing.Size(16, 16)
 
-
             Cursor.Current = Cursors.WaitCursor
 
             '---------------------------------------------------------------------------

@@ -147,7 +147,7 @@
 
                 For Each lrQueryNode In larFromNodes
                     If lrQueryNode.Alias Is Nothing Then
-                        lsSQLQuery &= "[" & lrQueryNode.Name & "]" 'FBMModelObject.getCorrespondingRDSTable.Name
+                        lsSQLQuery &= "[" & lrQueryNode.RelativeFBMModelObject.getCorrespondingRDSTable.Name & "]" 'FBMModelObject.getCorrespondingRDSTable.Name
                     Else
                         'FBMModelObject.getCorrespondingRDSTable.Name
                         lsSQLQuery &= lrQueryNode.Name & " " & lrQueryNode.Name & Viev.NullVal(lrQueryNode.Alias, "")
@@ -514,7 +514,7 @@
 
                         Dim larRelation = lrOriginTable.getRelations
 
-                        larRelation = larRelation.FindAll(Function(x) (x.DestinationTable.Name = lrQueryEdge.BaseNode.Name) Or
+                        larRelation = larRelation.FindAll(Function(x) (x.DestinationTable.Name = lrQueryEdge.BaseNode.RelativeFBMModelObject.Id) Or
                                                                        (x.DestinationTable.Name = lrQueryEdge.TargetNode.Name)).OrderBy(Function(x) x.OriginColumns(0).OrdinalPosition).ToList
 
                         Dim liTempInd = 0
@@ -1005,7 +1005,7 @@
                     Dim lrQueryEdge As FactEngine.QueryEdge
                     Dim lrRole As FBM.Role = Nothing
                     For Each lrQueryEdge In Me.getProjectQueryEdges()
-                        If lrQueryEdge.FBMFactType.IsBinaryFactType And lrQueryEdge.BaseNode.FBMModelObject.Id = lrQueryEdge.FBMFactType.RoleGroup(0).JoinedORMObject.Id Then
+                        If lrQueryEdge.FBMFactType.IsBinaryFactType And lrQueryEdge.BaseNode.RelativeFBMModelObject.Id = lrQueryEdge.FBMFactType.RoleGroup(0).JoinedORMObject.Id Then
                             liRoleInd = 1 'Other side of a BinaryFactType
                         ElseIf lrQueryEdge.IsPartialFactTypeMatch Then
                             lrRole = lrQueryEdge.FBMFactTypeReading.PredicatePart(lrQueryEdge.FBMFactTypeReading.PredicatePart.IndexOf(lrQueryEdge.FBMPredicatePart) + 1).Role

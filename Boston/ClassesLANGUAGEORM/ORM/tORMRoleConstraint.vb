@@ -228,7 +228,7 @@ Namespace FBM
         Public Event MaximumFrequencyCountChanged(ByVal aiNewMaximumFrequencyCount As Integer)
         Public Event IsDeonticChanged(ByVal abNewIsDeontic As Boolean)
         Public Event IsPreferredIdentifierChanged(ByVal abNewIsPreferredIdentifier As Boolean)
-        Public Event RoleConstraintRoleAdded(ByRef arRoleConstraintRole As FBM.RoleConstraintRole, ByRef arSubtypeRelationshipInstance As FBM.SubtypeRelationshipInstance)
+        Public Event RoleConstraintRoleAdded(ByRef arRoleConstraintRole As FBM.RoleConstraintRole, ByRef arSubtypeRelationship As FBM.tSubtypeRelationship)
         Public Event RoleConstraintRoleRemoved(ByVal arRoleConstraintRole As FBM.RoleConstraintRole)
         Public Event ArgumentRemoved(ByRef arRoleConstraintArgument As FBM.RoleConstraintArgument)
 
@@ -526,7 +526,8 @@ Namespace FBM
 
         End Sub
 
-        Public Sub AddRoleConstraintRole(ByRef arRoleConstraintRole As FBM.RoleConstraintRole)
+        Public Sub AddRoleConstraintRole(ByRef arRoleConstraintRole As FBM.RoleConstraintRole,
+                                         Optional arSubtypeRelationship As FBM.tSubtypeRelationship = Nothing)
 
             Try
                 Me.RoleConstraintRole.Add(arRoleConstraintRole)
@@ -555,8 +556,8 @@ Namespace FBM
                             Dim larIndexColumn As New List(Of RDS.Column)
 
                             'Find new Column
-                            Dim larColumn = From Column In lrTable.Column _
-                                            Where Column.Role.Id = lrOtherRoleOfFactType.Id _
+                            Dim larColumn = From Column In lrTable.Column
+                                            Where Column.Role.Id = lrOtherRoleOfFactType.Id
                                             Select Column
 
                             If larColumn.Count > 0 Then
@@ -565,8 +566,8 @@ Namespace FBM
 
                                 For Each lrRoleConstraintRole In Me.RoleConstraintRole.FindAll(Function(x) x.Role.Id <> lrNewRole.Id)
 
-                                    larColumn = From Column In lrTable.Column _
-                                                Where Column.Role.Id = lrRoleConstraintRole.Role.FactType.GetOtherRoleOfBinaryFactType(lrRoleConstraintRole.Role.Id).Id _
+                                    larColumn = From Column In lrTable.Column
+                                                Where Column.Role.Id = lrRoleConstraintRole.Role.FactType.GetOtherRoleOfBinaryFactType(lrRoleConstraintRole.Role.Id).Id
                                                 Select Column
 
                                     For Each lrColumn In larColumn
@@ -595,7 +596,7 @@ Namespace FBM
                                     Dim lsIndexName As String = lrTable.Name & "_" & Trim(lsQualifier)
 
                                     'Add the new Index
-                                    lrIndex = New RDS.Index(lrTable, _
+                                    lrIndex = New RDS.Index(lrTable,
                                                             lsIndexName,
                                                             lsQualifier,
                                                             pcenumODBCAscendingOrDescending.Ascending,
@@ -624,7 +625,7 @@ Namespace FBM
 
                 End If 'Is ExternalUniquenessConstraint.
 
-                RaiseEvent RoleConstraintRoleAdded(arRoleConstraintRole, Nothing)
+                RaiseEvent RoleConstraintRoleAdded(arRoleConstraintRole, arSubtypeRelationship)
 
             Catch ex As Exception
                 Dim lsMessage1 As String
@@ -1515,9 +1516,9 @@ Namespace FBM
 
         End Sub
 
-        Public Function CreateRoleConstraintRole(ByRef arRole As FBM.Role, _
-                                                 Optional arArgument As FBM.RoleConstraintArgument = Nothing, _
-                                                 Optional arSubtypeConstraintInstance As FBM.SubtypeRelationshipInstance = Nothing) As FBM.RoleConstraintRole
+        Public Function CreateRoleConstraintRole(ByRef arRole As FBM.Role,
+                                                 Optional arArgument As FBM.RoleConstraintArgument = Nothing,
+                                                 Optional arSubtypeRelationshipInstance As FBM.SubtypeRelationshipInstance = Nothing) As FBM.RoleConstraintRole
 
             Dim lrRoleConstraintRole As New FBM.RoleConstraintRole(arRole, Me, False, False, Me.RoleConstraintRole.Count + 1, True)
 
@@ -1527,7 +1528,7 @@ Namespace FBM
 
             '--------------------------------------------------------------------
             'Add the RoleConstraintRole and do RDS processing at the same time.
-            Me.AddRoleConstraintRole(lrRoleConstraintRole)
+            Me.AddRoleConstraintRole(lrRoleConstraintRole, arSubtypeRelationshipInstance.SubtypeRelationship)
 
             If arArgument IsNot Nothing Then
                 arArgument.AddRoleConstraintRole(lrRoleConstraintRole)

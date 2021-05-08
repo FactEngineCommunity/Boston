@@ -2137,6 +2137,9 @@ Namespace FBM
                 '-------------------------------------------------------------
                 'CodeSafe
                 If Me.Page IsNot Nothing Then
+                    Dim lrFactType = lrSubtypeRelationshipInstance.SubtypeRelationship.FactType
+                    Dim lrFactTypeInstance = Me.Page.DropFactTypeAtPoint(lrFactType, New PointF(0, 0), False,, True, False)
+                    lrFactTypeInstance.SubtypeConstraintInstance = lrSubtypeRelationshipInstance
                     Call lrSubtypeRelationshipInstance.DisplayAndAssociate()
                 End If
 

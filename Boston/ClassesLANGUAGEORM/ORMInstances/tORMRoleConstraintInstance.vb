@@ -1592,7 +1592,7 @@ Namespace FBM
         End Sub
 
         Private Sub RoleConstraint_RoleConstraintRoleAdded(ByRef arRoleConstraintRole As RoleConstraintRole,
-                                                           ByRef arSubtypeConstraintInstance As FBM.SubtypeRelationshipInstance) Handles RoleConstraint.RoleConstraintRoleAdded
+                                                           ByRef arSubtypeRelationship As FBM.tSubtypeRelationship) Handles RoleConstraint.RoleConstraintRoleAdded
 
             Try
                 Dim lrRoleConstraintRoleInstance As FBM.RoleConstraintRoleInstance
