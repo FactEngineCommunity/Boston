@@ -1188,6 +1188,16 @@ Namespace FEQL
             End Set
         End Property
 
+        Private _KEYWDEQUALS As String = Nothing
+        Public Property KEYWDEQUALS As String
+            Get
+                Return Me._KEYWDEQUALS
+            End Get
+            Set(value As String)
+                Me._KEYWDEQUALS = value
+            End Set
+        End Property
+
         Private _EXPRESSION As New List(Of FEQL.EXPRESSION)
         Public Property EXPRESSION As List(Of FEQL.EXPRESSION)
             Get
