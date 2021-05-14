@@ -8,15 +8,16 @@ Namespace FBM
     <Serializable()> _
     Public Class Page
         Implements IEquatable(Of FBM.Page)
+        Implements IDisposable
 
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public PageId As String = ""
 
         ''' <summary>
         ''' Used when copying the Page to the Clipboard so don't paste a Page back on itself.
         ''' </summary>
         ''' <remarks></remarks>
-        <XmlIgnore()> _
+        <XmlIgnore()>
         Public CopiedPageId As String = ""
 
         ''' <summary>
@@ -24,16 +25,16 @@ Namespace FBM
         ''' i.e. It 'is' required to check signatures of pasted ModelObjects when pasting to a different Model. Not required when pasting to the same Model.
         ''' </summary>
         ''' <remarks></remarks>
-        <XmlIgnore()> _
+        <XmlIgnore()>
         Public CopiedModelId As String = ""
 
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public IsCoreModelPage As Boolean = False
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public _Name As String = ""
-        <CategoryAttribute("Page"), _
-        DescriptionAttribute("The Name of the Page/Diagram.")> _
+        <CategoryAttribute("Page"),
+        DescriptionAttribute("The Name of the Page/Diagram.")>
         Public Overridable Property Name() As String
             Get
                 Return Me._Name
@@ -43,22 +44,22 @@ Namespace FBM
             End Set
         End Property
 
-        <XmlIgnore()> _
+        <XmlIgnore()>
         Public UserRejectedSave As Boolean = False
 
-        <XmlIgnore()> _
+        <XmlIgnore()>
         Public IsDirty As Boolean = False
 
-        <XmlIgnore()> _
+        <XmlIgnore()>
         Public Loaded As Boolean = False
 
-        <XmlIgnore()> _
+        <XmlIgnore()>
         Public Loading As Boolean = False
 
         <XmlIgnore()>
         <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public WithEvents _Model As FBM.Model
-        <XmlIgnore()> _
+        <XmlIgnore()>
         Public Overridable Property Model() As FBM.Model
             Get
                 Return Me._Model
@@ -68,7 +69,7 @@ Namespace FBM
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public _LanguageId As pcenumLanguage = pcenumLanguage.ORMModel 'Default to ORMModel
         <XmlAttribute()>
         <CategoryAttribute("Page"),
@@ -83,10 +84,10 @@ Namespace FBM
             End Set
         End Property
 
-        <XmlIgnore()> _
+        <XmlIgnore()>
         Public Shadows ConceptType As pcenumConceptType = pcenumConceptType.Page
 
-        <XmlIgnore()> _
+        <XmlIgnore()>
         Public FormLoaded As Boolean = False 'TRUE when the form/diagram of the Page is loaded within Richmond (i.e. displayed on the screen).
 
 
@@ -94,7 +95,7 @@ Namespace FBM
         <NonSerialized(),
         XmlIgnore()>
         Public _Form As Object
-        <XmlIgnore()> _
+        <XmlIgnore()>
         Public Overridable Property Form() As Object
             Get
                 Return Me._Form
@@ -128,8 +129,8 @@ Namespace FBM
         Public _SelectedObject As New List(Of Object) 'NB Each SelectedObject will be an 'Instance' type object with X,Y coordinates
 
         <XmlIgnore()>
-        <Browsable(False), _
-        [ReadOnly](False)> _
+        <Browsable(False),
+        [ReadOnly](False)>
         Public Property SelectedObject() As List(Of Object)
             Get
                 If Me._SelectedObject.Count > 1 Then
@@ -156,11 +157,11 @@ Namespace FBM
         ''' <remarks></remarks>
         Public IsInvalidated As Boolean = False
 
-        <XmlIgnore()> _
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <XmlIgnore()>
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public _MultiSelectionPerformed As Boolean = False
-        <Browsable(False), _
-        [ReadOnly](False)> _
+        <Browsable(False),
+        [ReadOnly](False)>
         Public Property MultiSelectionPerformed() As Boolean
             Get
                 If Me.SelectedObject.Count > 1 Then
@@ -196,21 +197,21 @@ Namespace FBM
 
         Public SubtypeRelationship As New List(Of FBM.SubtypeRelationshipInstance)
 
-        <XmlIgnore()> _
+        <XmlIgnore()>
         Public ModelNote As New List(Of FBM.ModelNoteInstance)
 
-        <NonSerialized()> _
-        <XmlIgnore()> _
+        <NonSerialized()>
+        <XmlIgnore()>
         Public ReferencedForm As WeifenLuo.WinFormsUI.Docking.DockContent
 
-        <XmlIgnore()> _
+        <XmlIgnore()>
         Public InternalUniquenessConstraintsExpanded As Boolean = False 'For use with ORM Models only: Toggle indicating whether 
         'the size of the InternalUniquenessConstraints is expanded or contracted so that users can click on them
 
-        <XmlIgnore()> _
+        <XmlIgnore()>
         Public ShowFacts As Boolean = False
 
-        <NonSerialized()> _
+        <NonSerialized()>
         Private _ERDiagram As New ERD.Diagram
         Public Overridable Property ERDiagram As ERD.Diagram
             Get
@@ -223,6 +224,8 @@ Namespace FBM
 
         <NonSerialized()>
         Private _STDiagram As New STD.Diagram(Me)
+        Private disposedValue As Boolean
+
         Public Overridable Property STDiagram As STD.Diagram
             Get
                 Return Me._STDiagram
@@ -312,10 +315,10 @@ Namespace FBM
         ''' <param name="abMakeDirty">Makes the Page dirty if True.</param>
         ''' <returns>A new Page object (as clone of the Page being cloned).</returns>
         ''' <remarks></remarks>
-        Public Function Clone(ByRef arModel As FBM.Model, _
-                              Optional ByVal abAddToModel As Boolean = False, _
+        Public Function Clone(ByRef arModel As FBM.Model,
+                              Optional ByVal abAddToModel As Boolean = False,
                               Optional ByVal abMakeModelObjectsMDAModelElements As Boolean = False,
-                              Optional ByVal abSetRDSModel As Boolean = True, _
+                              Optional ByVal abSetRDSModel As Boolean = True,
                               Optional ByVal abMakeDirty As Boolean = False) As FBM.Page
 
             Dim lrPage As New FBM.Page
@@ -458,9 +461,9 @@ Namespace FBM
                 '---------------------------
                 'Create the RoleConstraint
                 '---------------------------
-                lrRoleConstraint = Me.Model.CreateRoleConstraint(pcenumRoleConstraintType.RingConstraint, _
-                                                                 arFactTypeInstance.FactType.RoleGroup, _
-                                                                 "RingConstraint", _
+                lrRoleConstraint = Me.Model.CreateRoleConstraint(pcenumRoleConstraintType.RingConstraint,
+                                                                 arFactTypeInstance.FactType.RoleGroup,
+                                                                 "RingConstraint",
                                                                  0)
                 lrRoleConstraint.RingConstraintType = pcenumRingConstraintType.Acyclic
                 Dim lrRoleConstraintInstance = lrRoleConstraint.CloneInstance(Me, True)
@@ -489,9 +492,9 @@ Namespace FBM
             For Each lrObject In Me.SelectedObject.ToArray
                 lrModelObject = lrObject
                 Select Case lrModelObject.ConceptType
-                    Case Is = pcenumConceptType.EntityType, _
-                              pcenumConceptType.ValueType, _
-                              pcenumConceptType.FactType, _
+                    Case Is = pcenumConceptType.EntityType,
+                              pcenumConceptType.ValueType,
+                              pcenumConceptType.FactType,
                               pcenumConceptType.RoleConstraint
                         If lrModelObject.Id = arModelObject.Id Then
                             lbFound = True
@@ -551,7 +554,7 @@ Namespace FBM
                 lrModelObject1 = Me.SelectedObject(0)
                 lrModelObject2 = Me.SelectedObject(1)
 
-                If lrModelObject1.ConceptType = pcenumConceptType.EntityType And _
+                If lrModelObject1.ConceptType = pcenumConceptType.EntityType And
                    lrModelObject2.ConceptType = pcenumConceptType.FactType Then
                     Return True
                 Else
@@ -671,8 +674,8 @@ Namespace FBM
 
         Public Function AreSelectedObjectsMultipleObjectTypes() As Boolean
 
-            Dim laiObjectTypes As Integer() = {pcenumConceptType.EntityType, _
-                                               pcenumConceptType.ValueType, _
+            Dim laiObjectTypes As Integer() = {pcenumConceptType.EntityType,
+                                               pcenumConceptType.ValueType,
                                                pcenumConceptType.FactType}
 
             Return Me.SelectedObject.FindAll(Function(x) laiObjectTypes.Contains(x.ConceptType)).Count > 1
@@ -1362,8 +1365,8 @@ Namespace FBM
             Else
                 For liInd = 1 To Me.SelectedObject.Count
                     Select Case Me.SelectedObject(liInd - 1).ConceptType
-                        Case Is = pcenumConceptType.EntityType, _
-                                  pcenumConceptType.ValueType, _
+                        Case Is = pcenumConceptType.EntityType,
+                                  pcenumConceptType.ValueType,
                                   pcenumConceptType.FactType
                             lb_object_type_selected = True
                             liObjectTypeCount += 1
@@ -1418,7 +1421,7 @@ Namespace FBM
             End Try
         End Function
 
-        Public Function GetAllPageObjects(Optional abGetRoleConstraints As Boolean = False, _
+        Public Function GetAllPageObjects(Optional abGetRoleConstraints As Boolean = False,
                                           Optional abGetModelNotes As Boolean = False) As List(Of Object)
 
             Dim OutputList As New List(Of Object)
@@ -1498,8 +1501,8 @@ Namespace FBM
         Public Function GetModelElementsJoinedFactTypes(ByVal arModelElement As FBM.ModelObject) As List(Of FBM.FactTypeInstance)
 
 
-            Dim larFactType = From Role In Me.RoleInstance _
-                              Where Role.JoinedORMObject.Id = arModelElement.Id _
+            Dim larFactType = From Role In Me.RoleInstance
+                              Where Role.JoinedORMObject.Id = arModelElement.Id
                               Select Role.FactType
 
             Dim larFactTypeInstance = larFactType.ToList
@@ -1620,7 +1623,7 @@ Namespace FBM
                     For liY = 0 To 49
                         If laiGrid(liX, liY) = 0 Then
                             abEmptySpaceFound = True
-                            Return New PointF(lrCentrePoint.X + (liX - 25), _
+                            Return New PointF(lrCentrePoint.X + (liX - 25),
                                                lrCentrePoint.Y + (liY - 25))
                         End If
                     Next
@@ -2042,8 +2045,8 @@ Namespace FBM
             Try
                 For Each loObject In Me.SelectedObject
                     Select Case loObject.ConceptType
-                        Case Is = pcenumConceptType.EntityType, _
-                                  pcenumConceptType.ValueType, _
+                        Case Is = pcenumConceptType.EntityType,
+                                  pcenumConceptType.ValueType,
                                   pcenumConceptType.FactType
                             GetFirstSelectedModelObject = loObject
                             Exit For
@@ -2091,8 +2094,8 @@ Namespace FBM
 
             For Each lrModelObject In aarModelObject
 
-                Dim lrPageObject = From PageObject In Me.GetAllPageObjects _
-                                   Where PageObject.Id = lrModelObject.Id _
+                Dim lrPageObject = From PageObject In Me.GetAllPageObjects
+                                   Where PageObject.Id = lrModelObject.Id
                                    Select PageObject
 
                 liXTotal += lrPageObject(0).X
@@ -2461,7 +2464,7 @@ Namespace FBM
                 End If
 
                 'CMML
-                Call Me.performCMMLPreSaveProcessing
+                Call Me.performCMMLPreSaveProcessing()
 
                 '------------------------------------
                 'Save EntityTypeInstance objects
@@ -2663,6 +2666,31 @@ Namespace FBM
         Public Sub Invalidate()
 
             Me.IsInvalidated = True
+        End Sub
+
+        Protected Overridable Sub Dispose(disposing As Boolean)
+            If Not disposedValue Then
+                If disposing Then
+                    ' TODO: dispose managed state (managed objects)
+                End If
+
+                ' TODO: free unmanaged resources (unmanaged objects) and override finalizer
+                ' TODO: set large fields to null
+                disposedValue = True
+            End If
+        End Sub
+
+        ' ' TODO: override finalizer only if 'Dispose(disposing As Boolean)' has code to free unmanaged resources
+        ' Protected Overrides Sub Finalize()
+        '     ' Do not change this code. Put cleanup code in 'Dispose(disposing As Boolean)' method
+        '     Dispose(disposing:=False)
+        '     MyBase.Finalize()
+        ' End Sub
+
+        Public Sub Dispose() Implements IDisposable.Dispose
+            ' Do not change this code. Put cleanup code in 'Dispose(disposing As Boolean)' method
+            Dispose(disposing:=True)
+            GC.SuppressFinalize(Me)
         End Sub
 
     End Class

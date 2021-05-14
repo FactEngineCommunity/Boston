@@ -2105,7 +2105,6 @@ Namespace FBM
                     End If
 
                     For Each lrColumn In larColumn
-                        lrColumn.setContributesToPrimaryKey(abIsPreferredIdentifier)
                         larColumnsAffected.Add(lrColumn)
                     Next
                 Next

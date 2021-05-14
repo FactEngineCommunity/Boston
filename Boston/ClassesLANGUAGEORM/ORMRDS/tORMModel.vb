@@ -1806,7 +1806,7 @@ Namespace FBM
                 '==========================================================
                 'State Transition Model
                 '  NB Is called from within this thread so as to not clash on the ORMQL Parser.
-                If CDbl(Me.CoreVersionNumber) >= 2.1 Then
+                If CDbl(Viev.NullVal(Me.CoreVersionNumber, 0)) >= 2.1 Then
                     Call Me.PopulateSTMStructureFromCoreMDAElements()
                 End If
 
