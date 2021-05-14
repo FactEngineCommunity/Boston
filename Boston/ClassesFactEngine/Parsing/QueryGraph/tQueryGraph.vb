@@ -147,7 +147,7 @@
 
                 For Each lrQueryNode In larFromNodes
                     If lrQueryNode.Alias Is Nothing Then
-                        lsSQLQuery &= "[" & lrQueryNode.RelativeFBMModelObject.getCorrespondingRDSTable.Name & "]" 'FBMModelObject.getCorrespondingRDSTable.Name
+                        lsSQLQuery &= "[" & lrQueryNode.RDSTable.Name & "]" 'FBMModelObject.getCorrespondingRDSTable.Name
                     Else
                         'FBMModelObject.getCorrespondingRDSTable.Name
                         lsSQLQuery &= lrQueryNode.Name & " " & lrQueryNode.Name & Viev.NullVal(lrQueryNode.Alias, "")
@@ -182,7 +182,7 @@
 #Region "Recursive"
                         If lrQueryEdge.IsCircular Then
 #Region "Circular"
-                            Dim lrPGSRelationTable = lrQueryEdge.TargetNode.FBMModelObject.getCorrespondingRDSTable
+                            Dim lrPGSRelationTable = lrQueryEdge.TargetNode.RDSTable
 
                             Dim lasColumnName = From Column In lrPGSRelationTable.Column
                                                 Order By Column.OrdinalPosition
@@ -238,7 +238,7 @@
 #End Region
                         ElseIf lrQueryEdge.IsShortestPath Then
 #Region "Shortest Path"
-                            Dim lrPGSRelationTable = lrQueryEdge.TargetNode.FBMModelObject.getCorrespondingRDSTable
+                            Dim lrPGSRelationTable = lrQueryEdge.TargetNode.RDSTable
 
                             Dim lasColumnName = From Column In lrPGSRelationTable.Column
                                                 Order By Column.OrdinalPosition
@@ -602,7 +602,7 @@
                             lrTargetNode = lrQueryEdge.TargetNode
                         End If
 
-                        lrOriginTable = lrBaseNode.FBMModelObject.getCorrespondingRDSTable
+                        lrOriginTable = lrBaseNode.RDSTable
                         Dim larModelObject = New List(Of FBM.ModelObject)
                         larModelObject.Add(lrBaseNode.FBMModelObject)
                         larModelObject.Add(lrTargetNode.FBMModelObject)
@@ -632,7 +632,7 @@
                                 liInd2 += 1
                             Next
                         Else
-                            Dim larTargetColumn = lrQueryEdge.BaseNode.FBMModelObject.getCorrespondingRDSTable.getPrimaryKeyColumns
+                            Dim larTargetColumn = lrQueryEdge.BaseNode.RDSTable.getPrimaryKeyColumns
                             For Each lrColumn In larTargetColumn
                                 Dim lrOriginColumn = lrRelation.OriginColumns.Find(Function(x) x.ActiveRole Is lrColumn.ActiveRole)
                                 lsSQLQuery &= "[" & lrQueryEdge.TargetNode.Name & Viev.NullVal(lrQueryEdge.TargetNode.Alias, "") & "]." & lrOriginColumn.Name
@@ -803,7 +803,7 @@
 
                                     lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") & "[" & lrQueryEdge.BaseNode.Name & "]."
 
-                                    Dim lrTargetTable = lrQueryEdge.BaseNode.FBMModelObject.getCorrespondingRDSTable
+                                    Dim lrTargetTable = lrQueryEdge.BaseNode.RDSTable
                                     Dim lrTargetColumn = lrTargetTable.Column.Find(Function(x) x.FactType Is lrQueryEdge.FBMFactType)
 
                                     lsSQLQuery &= lrTargetColumn.Name & " = True"
@@ -815,7 +815,7 @@
                                     If lrQueryEdge.TargetNode.MathFunction <> pcenumMathFunction.None Then
 
                                         'Math function
-                                        Dim lrTargetTable = lrQueryEdge.BaseNode.FBMModelObject.getCorrespondingRDSTable
+                                        Dim lrTargetTable = lrQueryEdge.BaseNode.RDSTable
                                         Dim lrTargetColumn = lrTargetTable.Column.Find(Function(x) x.FactType Is lrQueryEdge.FBMFactType)
                                         lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") &
                                               "[" & lrTargetTable.Name &
@@ -845,10 +845,10 @@
                                             lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") & "[" & lrTargetTable.Name & lsAlias & "]." & lrColumn.Name & " = '" & lrQueryEdge.IdentifierList(0) & "'" & vbCrLf
                                         Else
                                             If lrQueryEdge.TargetNode.HasIdentifier Then
-                                                lrTargetTable = lrQueryEdge.TargetNode.FBMModelObject.getCorrespondingRDSTable
+                                                lrTargetTable = lrQueryEdge.TargetNode.RDSTable
                                                 lsAlias = Viev.NullVal(lrQueryEdge.TargetNode.Alias, "")
                                             Else
-                                                lrTargetTable = lrQueryEdge.BaseNode.FBMModelObject.getCorrespondingRDSTable
+                                                lrTargetTable = lrQueryEdge.BaseNode.RDSTable
                                                 lsAlias = Viev.NullVal(lrQueryEdge.BaseNode.Alias, "")
                                             End If
 

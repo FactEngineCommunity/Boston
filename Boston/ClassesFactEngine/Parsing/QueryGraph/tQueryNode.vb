@@ -26,7 +26,7 @@
 
         Public ReadOnly Property RDSTable As RDS.Table
             Get
-                Return Me.FBMModelObject.getCorrespondingRDSTable
+                Return Me.RelativeFBMModelObject.getCorrespondingRDSTable
             End Get
         End Property
 
