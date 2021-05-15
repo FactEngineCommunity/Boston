@@ -167,6 +167,15 @@
                                                                                            x.IsCircular Or
                                                                                            x.TargetNode.RDSTable.isCircularToTable(x.BaseNode.RDSTable))))
 
+                Dim larRecursiveTableQueryEdge = From QueryEdge In Me.QueryEdges
+                                                 Where QueryEdge.IsRecursive And QueryEdge.TargetNode.RDSTable.isCircularToTable(QueryEdge.BaseNode.RDSTable)
+                                                 Select QueryEdge
+
+                For Each lrQueryEdge In larRecursiveTableQueryEdge
+                    larRDSTableQueryEdge.AddUnique(lrQueryEdge)
+                Next
+
+
                 'RDS Tables
                 For Each lrQueryEdge In larRDSTableQueryEdge
 

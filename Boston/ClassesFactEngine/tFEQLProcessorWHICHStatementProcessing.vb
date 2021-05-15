@@ -502,7 +502,6 @@
                 arQueryEdge.BaseNode = arQueryGraph.HeadNode
             End If
 
-
             'Get the TargetNode                        
             'Me.MODELELEMENTCLAUSE = New FEQL.MODELELEMENTClause
             'Call Me.GetParseTreeTokensReflection(Me.MODELELEMENTCLAUSE, Me.WHICHCLAUSE.MODELELEMENT(0))
@@ -513,6 +512,28 @@
             arQueryEdge.TargetNode.PreboundText = arWHICHCLAUSE.NODE(0).PREBOUNDREADINGTEXT
             arQueryEdge.TargetNode.PostboundText = arWHICHCLAUSE.NODE(0).POSTBOUNDREADINGTEXT
             arQueryGraph.Nodes.AddUnique(arQueryEdge.TargetNode) '20200808-VM-Was AddUnique
+
+            If arWHICHCLAUSE.RECURSIVECLAUSE IsNot Nothing Then
+                If arWHICHCLAUSE.RECURSIVECLAUSE.KEYWDCIRCULAR IsNot Nothing Then
+                    arQueryEdge.TargetNode.Alias = "RND" & 100.ToString & New Random().Next(10).ToString
+                    arQueryEdge.IsCircular = True
+                ElseIf arWHICHCLAUSE.RECURSIVECLAUSE.KEYWDSHORTESTPATH IsNot Nothing Then
+                    arQueryEdge.TargetNode.Alias = "RND" & 100.ToString & New Random().Next(10).ToString
+                    arQueryEdge.IsShortestPath = True
+                ElseIf arQueryEdge.TargetNode.RDSTable.isCircularToTable(arQueryEdge.BaseNode.RDSTable) Then
+                    arQueryEdge.TargetNode.Alias = "RND" & 100.ToString & New Random().Next(10).ToString
+                End If
+                If arWHICHCLAUSE.RECURSIVECLAUSE.NUMBER1 IsNot Nothing Then
+                    arQueryEdge.RecursiveNumber1 = arWHICHCLAUSE.RECURSIVECLAUSE.NUMBER(0)
+                    If arWHICHCLAUSE.RECURSIVECLAUSE.NUMBER2 IsNot Nothing Then
+                        arQueryEdge.RecursiveNumber2 = arWHICHCLAUSE.RECURSIVECLAUSE.NUMBER(1)
+                    End If
+                ElseIf arWHICHCLAUSE.RECURSIVECLAUSE.NUMBER2 IsNot Nothing Then
+                    arQueryEdge.RecursiveNumber1 = "0"
+                    arQueryEdge.RecursiveNumber2 = arWHICHCLAUSE.RECURSIVECLAUSE.NUMBER(0)
+                End If
+                arQueryEdge.IsRecursive = True
+            End If
 
             If arWHICHCLAUSE.MATHCLAUSE IsNot Nothing Then
                 arQueryEdge.TargetNode.MathFunction = Richmond.GetEnumFromDescriptionAttribute(Of pcenumMathFunction)(arWHICHCLAUSE.MATHCLAUSE.MATHFUNCTION)
