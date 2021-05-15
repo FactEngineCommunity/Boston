@@ -191,6 +191,13 @@ Namespace FBM
             Try
                 Dim lrRelation As RDS.Relation = arRelation
                 Dim lrOriginEntity, lrDestinationEntity As FBM.FactDataInstance
+
+                'CodeSafe
+                If Not Me.Model.Page.Contains(Me) Then
+                    Me.Dispose()
+                    Exit Sub
+                End If
+
                 'CodeSafe 
                 If Me.IsCoreModelPage Then Exit Sub
 

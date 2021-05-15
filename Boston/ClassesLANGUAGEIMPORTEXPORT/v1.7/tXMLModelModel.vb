@@ -1352,7 +1352,7 @@ Namespace XMLModel
             'Link to the Concept within the ModelDictionary
             '------------------------------------------------
             Dim lrDictionaryEntry As New FBM.DictionaryEntry(arFactType.Model, arFactType.Id, pcenumConceptType.FactType, arFactType.ShortDescription, arFactType.LongDescription, True, True)
-            lrDictionaryEntry = arFactType.Model.AddModelDictionaryEntry(lrDictionaryEntry, ,,, True,, True)
+            lrDictionaryEntry = arFactType.Model.AddModelDictionaryEntry(lrDictionaryEntry, ,,, False,, True)
 
 
             arFactType.Concept = lrDictionaryEntry.Concept

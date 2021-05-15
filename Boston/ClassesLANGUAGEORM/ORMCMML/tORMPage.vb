@@ -1885,6 +1885,38 @@ Namespace FBM
 
         End Sub
 
+        ''' <summary>
+        ''' Empties the Page of objects. Used particularly when deleting a Page.
+        ''' </summary>
+        Public Sub Empty()
+
+            Try
+                'ERD Objects
+                Me.ERDiagram.Relation.Clear()
+                Me.ERDiagram.Entity.Clear()
+                Me.ERDiagram.Attribute.Clear()
+
+                'StateTransition objects.
+                Me.STDiagram.StateTransition.Clear()
+                Me.STDiagram.State.Clear()
+                Me.STDiagram.StartStateTransition.Clear()
+                Me.STDiagram.StartIndicator = Nothing
+                Me.STDiagram.EndStateTransition.Clear()
+                Me.STDiagram.EndStateIndicator.Clear()
+                Me.STDiagram.ValueType = Nothing
+
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
         Public Function ExistsDataStore(ByVal asProcessName As String) As Boolean
 
             Dim lsSQLQuery As String = ""
@@ -1919,7 +1951,6 @@ Namespace FBM
             lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
             Return Not lrRecordset.EOF
-
 
         End Function
 

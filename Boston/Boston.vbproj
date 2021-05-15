@@ -3003,6 +3003,7 @@
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="ClassesFactEngine\DerivationParser\TinyPG\" />
     <Folder Include="ClassesLINFUORM\" />
     <Folder Include="CodeGeneration\bin\Debug\" />
   </ItemGroup>

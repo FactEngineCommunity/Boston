@@ -1567,18 +1567,43 @@ Public Class frmToolboxEnterpriseExplorer
             '--------------------------------------
             'Delete the Page from the Database
             '--------------------------------------
-            Dim lr_page As FBM.Page = Me.TreeView.SelectedNode.Tag.Tag
-            Call lr_page.delete()
-
-            '--------------------------------------
-            'Remove the Page from the Model
-            '--------------------------------------
-            lr_page.Model.Page.Remove(lr_page)
+            Dim lrPage As FBM.Page = Me.TreeView.SelectedNode.Tag.Tag
+            Call lrPage.delete()
 
             '--------------------------------------
             'Remove the Page from the TreeView
             '--------------------------------------
             Me.TreeView.SelectedNode.Remove()
+
+            '--------------------------------------
+            'Remove the Page from the Model
+            '--------------------------------------
+            If lrPage.Form IsNot Nothing Then
+                lrPage.Form.Close
+                prApplication.ActivePages.Remove(lrPage.Form)
+            End If
+
+            '-------------------------------------------------
+            'Undo and Redo logs
+            Dim larUserAction = (From UserAction In prApplication.UndoLog
+                                 Where UserAction.Page Is lrPage
+                                 Select UserAction).ToArray
+            For Each lrUserAction In larUserAction
+                prApplication.UndoLog.Remove(lrUserAction)
+            Next
+
+            larUserAction = (From UserAction In prApplication.RedoLog
+                             Where UserAction.Page Is lrPage
+                             Select UserAction).ToArray
+            For Each lrUserAction In larUserAction
+                prApplication.UndoLog.Remove(lrUserAction)
+            Next
+
+
+            lrPage.Model.Page.Remove(lrPage)
+            lrPage.Empty()
+            lrPage.Dispose()
+
         End If
 
     End Sub
@@ -2808,7 +2833,7 @@ Public Class frmToolboxEnterpriseExplorer
 
                 lrModel.MakeDirty(False, True)
 
-                MsgBox(lsMessage)
+                'MsgBox(lsMessage)
             End If
 
             If TableModel.ExistsModelByName(lrModel.Name) Then
@@ -2817,7 +2842,7 @@ Public Class frmToolboxEnterpriseExplorer
                 lsMessage &= vbCrLf & vbCrLf
                 lrModel.Name = lrModel.CreateUniqueModelName(lrModel.Name, 0)
                 lsMessage &= "The Model that you are loading will be given the new Name: " & lrModel.Name
-                MsgBox(lsMessage)
+                'MsgBox(lsMessage)
             End If
 
             If My.Settings.UseClientServer And (prApplication.User IsNot Nothing) Then
