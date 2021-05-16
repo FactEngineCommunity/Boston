@@ -5,7 +5,7 @@
 
         '============================================
         'Example Fact Engine Query
-        '--------------------------
+        '-----------------------------
         'WHICH Lecturer is located in WHICH Room 
         'AND holds WHICH Position
         'AND is in WHICH School
