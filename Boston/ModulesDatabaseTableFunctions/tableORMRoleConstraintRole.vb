@@ -188,12 +188,15 @@ Namespace TableRoleConstraintRole
                         lsId = Trim(lREcordset("RoleId").Value)
                         lrRoleConstraintRole.Role = arRoleConstraint.Model.Role.Find(Function(x) x.Id = lsId)
 
-                        getRoleConstraintRoles_by_RoleConstraint.Add(lrRoleConstraintRole)
+                        'CodeSafe: Role must exist
+                        If lrRoleConstraintRole.Role IsNot Nothing Then
+                            getRoleConstraintRoles_by_RoleConstraint.Add(lrRoleConstraintRole)
 
-                        '-----------------------------------------------------------------
-                        'Add the RoleConstraintRole to the (byRef) RoleConstraint as well
-                        '-----------------------------------------------------------------
-                        arRoleConstraint.RoleConstraintRole.Add(lrRoleConstraintRole)
+                            '-----------------------------------------------------------------
+                            'Add the RoleConstraintRole to the (byRef) RoleConstraint as well
+                            '-----------------------------------------------------------------
+                            arRoleConstraint.RoleConstraintRole.Add(lrRoleConstraintRole)
+                        End If
 
                         lREcordset.MoveNext()
                     End While
