@@ -8098,6 +8098,9 @@ Public Class frmDiagramORM
         Dim lo_menu_option As ToolStripItem
 
 
+        Me.ContextMenuStrip_FactType.ImageScalingSize = New Drawing.Size(16, 16)
+
+
         If Me.zrPage.SelectedObject.Count = 0 Then
             Exit Sub
         End If
@@ -9906,6 +9909,8 @@ Public Class frmDiagramORM
         Dim lrEntityTypeInstance As New FBM.EntityTypeInstance
 
         Try
+            Me.ContextMenuStrip_EntityType.ImageScalingSize = New Drawing.Size(16, 16)
+
             If Me.zrPage.SelectedObject.Count = 0 Then
                 Exit Sub
             End If
@@ -9984,7 +9989,7 @@ Public Class frmDiagramORM
             'Load the ORMDiagrams that relate to the EntityType
             '  as selectable menuOptions
             '--------------------------------------------------------        
-            larPage_list = prApplication.CMML.GetORMDiagramPagesForEntityType(lrEntityType)
+            larPage_list = prApplication.CMML.getORMDiagramPagesForEntityType(lrEntityType)
 
             For Each lrPage In larPage_list
                 '----------------------------------------------------------
@@ -10016,7 +10021,7 @@ Public Class frmDiagramORM
             '====================================================================================
             'Load the ERDiagrams that relate to the EntityType as selectable menuOptions
             '--------------------------------------------------------        
-            larPage_list = prApplication.CMML.GetERDiagramPagesForEntityType(lrEntityType)
+            larPage_list = prApplication.CMML.getERDiagramPagesForEntityType(lrEntityType)
 
             For Each lrPage In larPage_list
                 '----------------------------------------------------------
@@ -10041,7 +10046,7 @@ Public Class frmDiagramORM
                     '---------------------------------------------------
                     lo_menu_option = Me.ERDiagramToolStripMenu.DropDownItems.Add(lrPage.Name, My.Resources.MenuImages.ERD16x16)
                     lo_menu_option.Tag = prPageNodes.Find(AddressOf lrEnterpriseView.Equals)
-                    AddHandler lo_menu_option.Click, AddressOf Me.MorphToERDiagram
+                    AddHandler lo_menu_option.Click, AddressOf Me.morphToERDiagram
                 End If
 
                 Me.ERDiagramToolStripMenu.Enabled = True
@@ -10079,7 +10084,7 @@ Public Class frmDiagramORM
                     '---------------------------------------------------
                     lo_menu_option = Me.ToolStripMenuItemPropertyGraphSchema.DropDownItems.Add(lrPage.Name, My.Resources.MenuImages.PGS16x16)
                     lo_menu_option.Tag = prPageNodes.Find(AddressOf lrEnterpriseView.Equals)
-                    AddHandler lo_menu_option.Click, AddressOf Me.MorphToPGSDiagram
+                    AddHandler lo_menu_option.Click, AddressOf Me.morphToPGSDiagram
                 End If
 
                 Me.ERDiagramToolStripMenu.Enabled = True
