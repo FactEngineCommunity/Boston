@@ -260,13 +260,13 @@ Namespace FBM
         Public IsDatabaseSynchronised As Boolean = False
 
 
-        '------------------------------------------------------
+        '-------------------------------------------------------
         'The Parser and ParseTree are built into the Model
         '  such that ORMQL statements can be passed to 
         '  a Model for processing (on itself), in the same
         '  way that an SQL relational database has its own Parser
         ' for SQL statements.
-        '------------------------------------------------------
+        '-------------------------------------------------------
         <XmlIgnore()> _
         <NonSerialized()> _
         <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
