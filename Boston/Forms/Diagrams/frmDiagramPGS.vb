@@ -682,13 +682,14 @@ Public Class frmDiagramPGS
 
     End Sub
 
-    Private Sub ContextMenuStrip_Entity_Opening(ByVal sender As System.Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles ContextMenuStrip_Node.Opening
+    Private Sub ContextMenuStrip_Node_Opening(ByVal sender As System.Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles ContextMenuStrip_Node.Opening
 
         Dim lrPage As FBM.Page
         Dim larPage_list As New List(Of FBM.Page)
         Dim lrModel As FBM.Model
         Dim lrNode As New PGS.Node
 
+        Me.ContextMenuStrip_Node.ImageScalingSize = New Drawing.Size(16, 16)
 
         If Me.zrPage.SelectedObject.Count = 0 Then
             Exit Sub
@@ -722,7 +723,7 @@ Public Class frmDiagramPGS
         '---------------------------------------------------------------------------------------------
         Me.MorphVector.Clear()
         'Me.MorphVector.Add(New tMorphVector(lrNode.X, lrNode.Y, 0, 0, 40))
-        Me.MorphVector.Add(New tMorphVector(lrNode.shape.Bounds.X, lrNode.shape.Bounds.Y, 0, 0, 40))
+        Me.MorphVector.Add(New tMorphVector(lrNode.Shape.Bounds.X, lrNode.Shape.Bounds.Y, 0, 0, 40))
 
         '====================================================
         'Load the ORMDiagrams that relate to the EntityType
@@ -761,7 +762,7 @@ Public Class frmDiagramPGS
 
         '--------------------------------------------------------------------------------------------------------
         'Get the ER Diagrams for the selected Node.
-        larPage_list = prApplication.CMML.GetERDiagramPagesForNode(lrNode)
+        larPage_list = prApplication.CMML.getERDiagramPagesForNode(lrNode)
 
         For Each lrPage In larPage_list
             '---------------------------------------------------------------------------------------------------------
@@ -3063,6 +3064,8 @@ Public Class frmDiagramPGS
         Dim lrRelation As New ERD.Relation
 
         Try
+            Me.ContextMenuStrip_Relation.ImageScalingSize = New Drawing.Size(16, 16)
+
             If Me.zrPage.SelectedObject.Count = 0 Then
                 Exit Sub
             End If
