@@ -1024,9 +1024,9 @@ Namespace FBM
                                                 'If arRoleConstraint.Role.Contains(lrRole) And lrFactType.InternalUniquenessConstraint.Count = 1 Then
                                                 '    lrColumn.ContributesToPrimaryKey = True
                                                 'End If
-                                                If arRoleConstraint.Role.Contains(lrRole) Then
-                                                    lrColumn.IsMandatory = True
-                                                End If
+                                                'If arRoleConstraint.Role.Contains(lrRole) Then  20210523-VM-Removed, because e.g. if a FT is ternary, and a two role IUC/RC is being made, the third role/Column is none the less mandatory.
+                                                lrColumn.IsMandatory = True
+                                                'End If
                                                 lrTable.addColumn(lrColumn, Me.IsDatabaseSynchronised)
                                             End If
 
@@ -1053,13 +1053,13 @@ Namespace FBM
                                                     Next
                                                 Else
                                                     lrColumn = lrRole.GetCorrespondingFactTypeColumn(lrTable)
-                                                    If arRoleConstraint.Role.Contains(lrRole) Then
-                                                        lrColumn.IsMandatory = True
-                                                        '20210505-VM-No longer needed. IsPartOfPrimaryKey uses Table Indexes to determine.
-                                                        'If lrFactType.InternalUniquenessConstraint.Count = 1 Then
-                                                        '    lrColumn.ContributesToPrimaryKey = True
-                                                        'End If
-                                                    End If
+                                                    'If arRoleConstraint.Role.Contains(lrRole) Then '20210523-VM-Removed, because e.g. if a FT is ternary, and a two role IUC/RC is being made, the third role/Column is none the less mandatory.
+                                                    lrColumn.IsMandatory = True
+                                                    '20210505-VM-No longer needed. IsPartOfPrimaryKey uses Table Indexes to determine.
+                                                    'If lrFactType.InternalUniquenessConstraint.Count = 1 Then
+                                                    '    lrColumn.ContributesToPrimaryKey = True
+                                                    'End If
+                                                    'End If
                                                     lrTable.addColumn(lrColumn, Me.IsDatabaseSynchronised)
                                                 End If
 
@@ -4662,6 +4662,18 @@ Namespace FBM
                     'RDS Tables with no Columns
                     For Each lrTable In Me.RDS.Table.FindAll(Function(x) x.Column.Count = 0)
                         Me.RDS.removeTable(lrTable)
+                    Next
+
+                    'RDS Columns that should be Mandatory (i.e. on Objectifed Fact Types).
+                    Dim larColumn = From Table In Me.RDS.Table
+                                    From Column In Table.Column
+                                    Where Column.Role.FactType.IsObjectified And Column.Table.Name = Column.Role.FactType.Id And Not Column.IsMandatory
+                                    Select Column
+
+                    For Each lrColumn In larColumn
+                        Call Me.createCMMLAttributeIsMandatory(lrColumn)
+                        lrColumn.IsMandatory = True
+                        Call lrColumn.triggerForceRefreshEvent()
                     Next
 
 
