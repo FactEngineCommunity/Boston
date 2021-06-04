@@ -3083,4 +3083,24 @@ Public Class frmDiagramERD
 
     End Sub
 
+    Private Sub ViewTableDataToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ViewTableDataToolStripMenuItem.Click
+
+        Dim lrTableNode As ERD.TableNode = Me.Diagram.Selection.Items(0)
+        Dim lrEntity As New ERD.Entity
+
+        '-------------------------
+        'Get the selected Entity        
+        lrEntity = lrTableNode.Tag '(above lrTableNode = Me.Diagram.Selection.Items(0) )
+
+        prApplication.WorkingModel = Me.zrPage.Model
+        prApplication.WorkingPage = Me.zrPage
+
+        Dim lfrmToolboxTableData = frmMain.loadToolboxTableDataForm(Me.zrPage.Model, Me.DockPanel.ActivePane)
+
+        lfrmToolboxTableData.mrTableName = lrEntity.RDSTable.Name
+        Call lfrmToolboxTableData.SetupForm
+
+    End Sub
+
+
 End Class

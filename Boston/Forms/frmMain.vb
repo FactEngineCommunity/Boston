@@ -1880,6 +1880,66 @@ Public Class frmMain
 
     End Sub
 
+    Public Function loadToolboxTableDataForm(ByVal arModel As FBM.Model, ByVal aoActivePane As WeifenLuo.WinFormsUI.Docking.DockPane) As frmToolboxTableData
+
+        Dim child As New frmToolboxTableData
+
+        Try
+            If prApplication.ToolboxForms.FindAll(AddressOf child.EqualsByName).Count > 0 Then
+                '-------------------------------------------------------------
+                'Form is already loaded. Bring it to the front of the ZOrder
+                '-------------------------------------------------------------            
+                child = prApplication.ToolboxForms.Find(AddressOf child.EqualsByName)
+                'child.Show()
+                child.BringToFront()
+                Return child
+            Else
+                '----------------------------------------------
+                'Create a new instance of the ErrorList form.
+                '----------------------------------------------
+                If prApplication.ToolboxForms.Count > 0 Then
+                    '----------------------------------------------------------------------------------------
+                    'Add the ErrorList form to the Panel of a form already loaded at the bottom of the Page
+                    '----------------------------------------------------------------------------------------                
+                    child.mrModel = arModel
+                    'child.MdiParent = prApplication.ToolboxForms(0)
+                    'child.Show(aoActivePane, WeifenLuo.WinFormsUI.Docking.DockAlignment.Bottom, 0.4)
+
+                    'child.Show(aoActivePane, WeifenLuo.WinFormsUI.Docking.DockAlignment.Bottom)
+                    Dim lrPane As WeifenLuo.WinFormsUI.Docking.DockPane
+                    Dim lrDockpanel As WeifenLuo.WinFormsUI.Docking.DockPanel
+                    'prApplication.ToolboxForms(0).Focus()
+                    lrPane = prApplication.ToolboxForms(0).Pane  'DockPanel.ActivePane
+                    lrDockpanel = prApplication.ToolboxForms(0).DockPanel
+                    child.Show(lrPane, WeifenLuo.WinFormsUI.Docking.DockAlignment.Right, 0.3)
+                    'child.DockTo(prApplication.ToolboxForms(0).PanelPane, DockStyle.Right, 1)
+                    child.DockTo(lrPane, DockStyle.Fill, 0)
+                    prApplication.ToolboxForms.Add(child)
+                Else
+                    '--------------------------------------------------
+                    'Add the ErrorList form to the bottom of the Page
+                    '--------------------------------------------------
+                    child.mrModel = arModel
+                    child.Show(aoActivePane, WeifenLuo.WinFormsUI.Docking.DockAlignment.Bottom, 0.3)
+                    prApplication.ToolboxForms.Add(child)
+                End If
+            End If
+
+            Return child
+        Catch ex As Exception
+            Dim lsMessage1 As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+
+            Return Nothing
+        End Try
+
+    End Function
+
+
     Sub loadToolboxRichmondBrainBox(ByRef arPage As FBM.Page, ByVal aoActivePane As WeifenLuo.WinFormsUI.Docking.DockPane)
 
         Dim child As New frmToolboxBrainBox

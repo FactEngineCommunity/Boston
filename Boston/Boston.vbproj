@@ -495,6 +495,7 @@
     <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.7\tXMLModelRoleReference.vb" />
     <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.7\tXMLModelSubtypeRelationship.vb" />
     <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.7\tXMLModelValueType.vb" />
+    <Compile Include="ClassesLANGUAGEORMQL\tORMQLRecordsetDataGridList.vb" />
     <Compile Include="ClassesLANGUAGEORM\ORMGlossaryWriter\tORMGlossaryMaker.vb" />
     <Compile Include="ClassesLANGUAGEORM\ORMSTM\tORMModel.vb" />
     <Compile Include="ClassesLANGUAGEORM\ORMSTM\tORMPage.vb" />
@@ -1314,6 +1315,12 @@
     <Compile Include="Forms\Toolboxes\frmToolboxIndexEditor.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Forms\Toolboxes\frmToolboxTableData.Designer.vb">
+      <DependentUpon>frmToolboxTableData.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Toolboxes\frmToolboxTableData.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="GlobalSuppressions.vb" />
     <Compile Include="ModulesDatabaseTableFunctions\tableClientServerGroup.vb" />
     <Compile Include="ModulesDatabaseTableFunctions\tableClientServerGroupUser.vb" />
@@ -2091,6 +2098,9 @@
     <EmbeddedResource Include="Forms\Toolboxes\frmToolboxProperties.resx">
       <DependentUpon>frmToolboxProperties.vb</DependentUpon>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Toolboxes\frmToolboxTableData.resx">
+      <DependentUpon>frmToolboxTableData.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="My Project\licenses.licx" />
     <EmbeddedResource Include="My Project\Resources.resx">
