@@ -2,6 +2,7 @@
 
     Public mrModel As FBM.Model
     Public mrTableName As String = Nothing
+    Private mrRecordset As ORMQL.Recordset
 
     Public Function EqualsByName(ByVal other As Form) As Boolean
         Return Me.Name = other.Name
@@ -22,9 +23,9 @@
             If mrTableName Is Nothing Then
             Else
                 lsSQLQuery = "SELECT * FROM " & mrTableName
-                Dim lrRecordset = prApplication.WorkingModel.DatabaseConnection.GO(lsSQLQuery)
+                Me.mrRecordset = prApplication.WorkingModel.DatabaseConnection.GO(lsSQLQuery)
 
-                Dim lrDataGridList As New ORMQL.RecordsetDataGridList(lrRecordset)
+                Dim lrDataGridList As New ORMQL.RecordsetDataGridList(Me.mrRecordset)
                 Me.DataGridView.DataSource = lrDataGridList
 
             End If
@@ -38,4 +39,17 @@
 
     End Sub
 
+    Private Sub DataGridView_CellEndEdit(sender As Object, e As DataGridViewCellEventArgs) Handles DataGridView.CellEndEdit
+
+        'Dim lsValue = Me.DataGridView.Rows(e.RowIndex).Cells(e.ColumnIndex).Value
+        'Me.mrRecordset.Facts(e.RowIndex)(Me.mrRecordset.Columns(e.ColumnIndex)).Data = lsValue
+
+    End Sub
+
+    Private Sub DataGridView_CellValidating(sender As Object, e As DataGridViewCellValidatingEventArgs) Handles DataGridView.CellValidating
+
+
+        'Debugger.Break()
+        Me.mrRecordset.Facts(e.RowIndex)(Me.mrRecordset.Columns(e.ColumnIndex)).Data = e.FormattedValue
+    End Sub
 End Class
