@@ -7,7 +7,7 @@ Namespace ORMQL
 
         Public mrRecordset As ORMQL.Recordset
         Public mrTable As RDS.Table
-        Private DynamicClass As New DynamicClassLibrary.Factory.tClass
+        Private DynamicClass As DynamicClassLibrary.Factory.tClass
         Public DynamicObject As Object
 
 
@@ -17,8 +17,14 @@ Namespace ORMQL
             Me.mrRecordset = arRecordset
             Me.mrTable = arTable
 
+            Me.DynamicClass = New DynamicClassLibrary.Factory.tClass
             For Each lsColumn In Me.mrRecordset.Columns
-                Me.DynamicClass.add_attribute(New DynamicClassLibrary.Factory.tAttribute(lsColumn, GetType(Object)))
+                Select Case lsColumn
+                    Case Is = "Date"
+                        Me.DynamicClass.add_attribute(New DynamicClassLibrary.Factory.tAttribute("[" & lsColumn & "]", GetType(String)))
+                    Case Else
+                        Me.DynamicClass.add_attribute(New DynamicClassLibrary.Factory.tAttribute(lsColumn, GetType(String)))
+                End Select
             Next
             Me.DynamicObject = Me.DynamicClass.clone()
 
