@@ -70,7 +70,15 @@
 
     Private Sub DataGridView_CellBeginEdit(sender As Object, e As DataGridViewCellCancelEventArgs) Handles DataGridView.CellBeginEdit
 
-        Me.OldValue = Me.mrRecordset.Facts(e.RowIndex)(Me.mrRecordset.Columns(e.ColumnIndex)).Data
+        If e.RowIndex <= Me.mrRecordset.Facts.Count - 1 Then
+            Me.OldValue = Me.mrRecordset.Facts(e.RowIndex)(Me.mrRecordset.Columns(e.ColumnIndex)).Data
+        Else
+            Dim lrNewFact As FBM.Fact = Me.mrRecordset.Facts(0).Clone(Me.mrRecordset.Facts(0).FactType, True)
+            For Each lrFactData In lrNewFact.Data
+                lrFactData.setData("", pcenumConceptType.Value, False)
+            Next
+            Me.mrRecordset.Facts.Add(lrNewFact)
+        End If
 
     End Sub
 
