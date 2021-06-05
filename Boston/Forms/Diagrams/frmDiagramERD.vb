@@ -3097,7 +3097,7 @@ Public Class frmDiagramERD
 
         Dim lfrmToolboxTableData = frmMain.loadToolboxTableDataForm(Me.zrPage.Model, Me.DockPanel.ActivePane)
 
-        lfrmToolboxTableData.mrTableName = lrEntity.RDSTable.Name
+        lfrmToolboxTableData.mrTable = lrEntity.RDSTable
         Call lfrmToolboxTableData.SetupForm
 
     End Sub

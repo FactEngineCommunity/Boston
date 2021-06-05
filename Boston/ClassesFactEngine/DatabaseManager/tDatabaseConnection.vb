@@ -144,6 +144,20 @@
         Public Overridable Function TableExists(ByVal asTableName As String) As Boolean
         End Function
 
+        ''' <summary>
+        ''' Updates the value of a Column in the database.
+        ''' </summary>
+        ''' <param name="asTableName">The name of the Table for which the Attribute/Column value is to be updated.</param>
+        ''' <param name="arColumn">The Column/Attribute for which the value is to be updated.</param>
+        ''' <param name="asNewValue">The new value for the Attribute/Column.</param>
+        ''' <param name="aarPKColumn">A list of the Primary Key Columns/Attributes for the record to be updated. TemporaryValue of Column is existing/old value of the Primary Key Column/Attribute.</param>
+        Public Overridable Function UpdateAttributeValue(ByVal asTableName As String,
+                                                         ByVal arColumn As RDS.Column,
+                                                         ByVal asNewValue As String,
+                                                         ByVal aarPKColumn As List(Of RDS.Column)) As Boolean
+            Return False
+        End Function
+
     End Class
 
 End Namespace

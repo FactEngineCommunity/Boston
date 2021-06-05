@@ -6,12 +6,16 @@ Namespace ORMQL
         Implements IBindingList
 
         Public mrRecordset As ORMQL.Recordset
+        Public mrTable As RDS.Table
         Private DynamicClass As New DynamicClassLibrary.Factory.tClass
         Public DynamicObject As Object
 
 
-        Public Sub New(ByRef arRecordset As ORMQL.Recordset)
+        Public Sub New(ByRef arRecordset As ORMQL.Recordset,
+                       ByRef arTable As RDS.Table)
+
             Me.mrRecordset = arRecordset
+            Me.mrTable = arTable
 
             For Each lsColumn In Me.mrRecordset.Columns
                 Me.DynamicClass.add_attribute(New DynamicClassLibrary.Factory.tAttribute(lsColumn, GetType(Object)))
@@ -164,7 +168,7 @@ Namespace ORMQL
         End Sub
 
         Public Function AddNew() As Object Implements IBindingList.AddNew
-            Throw New NotImplementedException()
+            'Throw New NotImplementedException()
         End Function
 
         Public Function Find([property] As PropertyDescriptor, key As Object) As Integer Implements IBindingList.Find

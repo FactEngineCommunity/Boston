@@ -887,6 +887,39 @@ Namespace FactEngine
 
         End Function
 
+        ''' <summary>
+        ''' Updates the value of a Column in the database.
+        ''' </summary>
+        ''' <param name="asTableName">The name of the Table for which the Attribute/Column value is to be updated.</param>
+        ''' <param name="arColumn">The Column/Attribute for which the value is to be updated.</param>
+        ''' <param name="asNewValue">The new value for the Attribute/Column.</param>
+        ''' <param name="aarPKColumn">A list of the Primary Key Columns/Attributes for the record to be updated. TemporaryValue of Column is existing/old value of the Primary Key Column/Attribute.</param>
+        Public Overrides Function UpdateAttributeValue(ByVal asTableName As String,
+                                                       ByVal arColumn As RDS.Column,
+                                                       ByVal asNewValue As String,
+                                                       ByVal aarPKColumn As List(Of RDS.Column)) As Boolean
+
+            Dim lsSQLQuery As String
+
+            lsSQLQuery = "UPDATE " & asTableName & vbCrLf
+            lsSQLQuery &= " SET " & arColumn.Name & " = " & vbCrLf
+            lsSQLQuery &= Richmond.returnIfTrue(arColumn.DataTypeIsText, "'", "")
+            lsSQLQuery &= asNewValue
+            lsSQLQuery &= Richmond.returnIfTrue(arColumn.DataTypeIsText, "'", "") & vbCrLf
+            lsSQLQuery &= " WHERE "
+            For Each lrColumn In aarPKColumn
+                lsSQLQuery &= lrColumn.Name & " = "
+                lsSQLQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsText, "'", "")
+                lsSQLQuery &= lrColumn.TemporaryData
+                lsSQLQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsText, "'", "") & vbCrLf
+            Next
+
+            Dim lrRecordseet = Me.GO(lsSQLQuery)
+
+            Return Not lrRecordseet.ErrorReturned
+
+        End Function
+
     End Class
 
 End Namespace

@@ -1,8 +1,11 @@
 ﻿Public Class frmToolboxTableData
 
     Public mrModel As FBM.Model
-    Public mrTableName As String = Nothing
+    Public mrTable As RDS.Table = Nothing
     Private mrRecordset As ORMQL.Recordset
+
+    'For Cell text editting
+    Private OldValue, NewValue As String
 
     Public Function EqualsByName(ByVal other As Form) As Boolean
         Return Me.Name = other.Name
@@ -20,12 +23,13 @@
 
         If prApplication.WorkingModel.DatabaseConnection Is Nothing Then
         Else
-            If mrTableName Is Nothing Then
+            If Me.mrTable Is Nothing Then
             Else
-                lsSQLQuery = "SELECT * FROM " & mrTableName
+                lsSQLQuery = "SELECT * FROM " & mrTable.Name
                 Me.mrRecordset = prApplication.WorkingModel.DatabaseConnection.GO(lsSQLQuery)
 
-                Dim lrDataGridList As New ORMQL.RecordsetDataGridList(Me.mrRecordset)
+
+                Dim lrDataGridList As New ORMQL.RecordsetDataGridList(Me.mrRecordset, Me.mrTable)
                 Me.DataGridView.DataSource = lrDataGridList
 
             End If
@@ -41,15 +45,38 @@
 
     Private Sub DataGridView_CellEndEdit(sender As Object, e As DataGridViewCellEventArgs) Handles DataGridView.CellEndEdit
 
-        'Dim lsValue = Me.DataGridView.Rows(e.RowIndex).Cells(e.ColumnIndex).Value
-        'Me.mrRecordset.Facts(e.RowIndex)(Me.mrRecordset.Columns(e.ColumnIndex)).Data = lsValue
+        Try
+            Me.mrRecordset.Facts(e.RowIndex)(Me.mrRecordset.Columns(e.ColumnIndex)).Data = Me.NewValue
+
+            Dim lrColumn As RDS.Column = Me.mrTable.Column.Find(Function(x) x.Name = Me.mrRecordset.Columns(e.ColumnIndex))
+
+            Dim larPKColumn As List(Of RDS.Column) = Me.mrTable.getPrimaryKeyColumns
+
+            Dim liColumnIndex As Integer
+            Dim lsValue As String
+            For Each lrPKColumn In larPKColumn
+                liColumnIndex = Me.mrRecordset.Columns.IndexOf(lrPKColumn.Name)
+                lsValue = Me.mrRecordset.Facts(e.RowIndex)(Me.mrRecordset.Columns(liColumnIndex)).Data
+                lrPKColumn.TemporaryData = lsValue
+            Next
+
+            Call prApplication.WorkingModel.DatabaseConnection.UpdateAttributeValue(Me.mrTable.Name, lrColumn, Me.NewValue, larPKColumn)
+
+        Catch ex As Exception
+
+        End Try
+
+    End Sub
+
+    Private Sub DataGridView_CellBeginEdit(sender As Object, e As DataGridViewCellCancelEventArgs) Handles DataGridView.CellBeginEdit
+
+        Me.OldValue = Me.mrRecordset.Facts(e.RowIndex)(Me.mrRecordset.Columns(e.ColumnIndex)).Data
 
     End Sub
 
     Private Sub DataGridView_CellValidating(sender As Object, e As DataGridViewCellValidatingEventArgs) Handles DataGridView.CellValidating
 
+        Me.NewValue = e.FormattedValue
 
-        'Debugger.Break()
-        Me.mrRecordset.Facts(e.RowIndex)(Me.mrRecordset.Columns(e.ColumnIndex)).Data = e.FormattedValue
     End Sub
 End Class
