@@ -22,10 +22,17 @@ Partial Class frmToolboxTableData
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmToolboxTableData))
         Me.GroupBox1 = New System.Windows.Forms.GroupBox()
         Me.DataGridView = New System.Windows.Forms.DataGridView()
+        Me.ToolStrip1 = New System.Windows.Forms.ToolStrip()
+        Me.ToolStripButtonCommit = New System.Windows.Forms.ToolStripButton()
+        Me.StatusStrip1 = New System.Windows.Forms.StatusStrip()
+        Me.ToolStripStatusLabel = New System.Windows.Forms.ToolStripStatusLabel()
         Me.GroupBox1.SuspendLayout()
         CType(Me.DataGridView, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.ToolStrip1.SuspendLayout()
+        Me.StatusStrip1.SuspendLayout()
         Me.SuspendLayout()
         '
         'GroupBox1
@@ -33,6 +40,8 @@ Partial Class frmToolboxTableData
         Me.GroupBox1.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
             Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.GroupBox1.Controls.Add(Me.StatusStrip1)
+        Me.GroupBox1.Controls.Add(Me.ToolStrip1)
         Me.GroupBox1.Controls.Add(Me.DataGridView)
         Me.GroupBox1.Location = New System.Drawing.Point(12, 12)
         Me.GroupBox1.Name = "GroupBox1"
@@ -47,12 +56,48 @@ Partial Class frmToolboxTableData
             Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.DataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        Me.DataGridView.Location = New System.Drawing.Point(6, 25)
+        Me.DataGridView.Location = New System.Drawing.Point(6, 58)
         Me.DataGridView.Name = "DataGridView"
         Me.DataGridView.RowHeadersWidth = 62
         Me.DataGridView.RowTemplate.Height = 28
-        Me.DataGridView.Size = New System.Drawing.Size(1217, 496)
+        Me.DataGridView.Size = New System.Drawing.Size(1217, 463)
         Me.DataGridView.TabIndex = 0
+        '
+        'ToolStrip1
+        '
+        Me.ToolStrip1.ImageScalingSize = New System.Drawing.Size(24, 24)
+        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButtonCommit})
+        Me.ToolStrip1.Location = New System.Drawing.Point(3, 22)
+        Me.ToolStrip1.Name = "ToolStrip1"
+        Me.ToolStrip1.Size = New System.Drawing.Size(1223, 33)
+        Me.ToolStrip1.TabIndex = 1
+        Me.ToolStrip1.Text = "ToolStrip1"
+        '
+        'ToolStripButtonCommit
+        '
+        Me.ToolStripButtonCommit.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.ToolStripButtonCommit.Enabled = False
+        Me.ToolStripButtonCommit.Image = CType(resources.GetObject("ToolStripButtonCommit.Image"), System.Drawing.Image)
+        Me.ToolStripButtonCommit.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ToolStripButtonCommit.Name = "ToolStripButtonCommit"
+        Me.ToolStripButtonCommit.Size = New System.Drawing.Size(34, 28)
+        Me.ToolStripButtonCommit.Text = "ToolStripButton1"
+        '
+        'StatusStrip1
+        '
+        Me.StatusStrip1.ImageScalingSize = New System.Drawing.Size(24, 24)
+        Me.StatusStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripStatusLabel})
+        Me.StatusStrip1.Location = New System.Drawing.Point(3, 492)
+        Me.StatusStrip1.Name = "StatusStrip1"
+        Me.StatusStrip1.Size = New System.Drawing.Size(1223, 32)
+        Me.StatusStrip1.TabIndex = 2
+        Me.StatusStrip1.Text = "StatusStrip1"
+        '
+        'ToolStripStatusLabel
+        '
+        Me.ToolStripStatusLabel.Name = "ToolStripStatusLabel"
+        Me.ToolStripStatusLabel.Size = New System.Drawing.Size(170, 25)
+        Me.ToolStripStatusLabel.Text = "ToolStripStatusLabel"
         '
         'frmToolboxTableData
         '
@@ -63,11 +108,20 @@ Partial Class frmToolboxTableData
         Me.Name = "frmToolboxTableData"
         Me.Text = "Database Table Data"
         Me.GroupBox1.ResumeLayout(False)
+        Me.GroupBox1.PerformLayout()
         CType(Me.DataGridView, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.ToolStrip1.ResumeLayout(False)
+        Me.ToolStrip1.PerformLayout()
+        Me.StatusStrip1.ResumeLayout(False)
+        Me.StatusStrip1.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub
 
     Friend WithEvents GroupBox1 As GroupBox
     Friend WithEvents DataGridView As DataGridView
+    Friend WithEvents ToolStrip1 As ToolStrip
+    Friend WithEvents ToolStripButtonCommit As ToolStripButton
+    Friend WithEvents StatusStrip1 As StatusStrip
+    Friend WithEvents ToolStripStatusLabel As ToolStripStatusLabel
 End Class

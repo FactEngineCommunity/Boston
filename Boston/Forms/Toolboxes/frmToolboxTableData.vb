@@ -35,6 +35,8 @@
             End If
         End If
 
+        Me.ToolStripStatusLabel.Text = ""
+
     End Sub
 
     Private Sub frmToolboxTableData_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
@@ -48,6 +50,8 @@
         Try
             Me.mrRecordset.Facts(e.RowIndex)(Me.mrRecordset.Columns(e.ColumnIndex)).Data = Me.NewValue
 
+            If Me.mrRecordset.Facts(e.RowIndex).IsNewFact Then Exit Sub
+
             Dim lrColumn As RDS.Column = Me.mrTable.Column.Find(Function(x) x.Name = Me.mrRecordset.Columns(e.ColumnIndex))
 
             Dim larPKColumn As List(Of RDS.Column) = Me.mrTable.getPrimaryKeyColumns
@@ -60,6 +64,8 @@
                 lrPKColumn.TemporaryData = lsValue
             Next
 
+
+
             Call prApplication.WorkingModel.DatabaseConnection.UpdateAttributeValue(Me.mrTable.Name, lrColumn, Me.NewValue, larPKColumn)
 
         Catch ex As Exception
@@ -70,6 +76,8 @@
 
     Private Sub DataGridView_CellBeginEdit(sender As Object, e As DataGridViewCellCancelEventArgs) Handles DataGridView.CellBeginEdit
 
+        Me.ToolStripStatusLabel.Text = ""
+
         If e.RowIndex <= Me.mrRecordset.Facts.Count - 1 Then
             Me.OldValue = Me.mrRecordset.Facts(e.RowIndex)(Me.mrRecordset.Columns(e.ColumnIndex)).Data
         Else
@@ -77,9 +85,58 @@
             For Each lrFactData In lrNewFact.Data
                 lrFactData.setData("", pcenumConceptType.Value, False)
             Next
+            lrNewFact.IsNewFact = True
             Me.mrRecordset.Facts.Add(lrNewFact)
+            Me.ToolStripButtonCommit.Enabled = True
         End If
 
+    End Sub
+
+    Private Sub ToolStripButtonCommit_Click(sender As Object, e As EventArgs) Handles ToolStripButtonCommit.Click
+
+        Try
+            Dim larNewModifiedFacts = From Fact In Me.mrRecordset.Facts
+                                      Where Fact.IsNewFact
+                                      Select Fact
+
+            Dim lsSQLQuery As String
+            For Each lrFact In larNewModifiedFacts
+                lsSQLQuery = "INSERT INTO " & Me.mrTable.Name & "("
+                Dim liInd = 0
+                Dim lrColumn As RDS.Column
+                Dim larColumn As New List(Of RDS.Column)
+                For Each lsColumn In Me.mrRecordset.Columns
+                    If liInd > 0 Then lsSQLQuery &= ","
+                    lsSQLQuery &= lsColumn
+                    lrColumn = Me.mrTable.Column.Find(Function(x) x.Name = lsColumn)
+                    larColumn.Add(lrColumn)
+                    liInd += 1
+                Next
+                lsSQLQuery &= ") VALUES ("
+                liInd = 0
+                For Each lsColumn In Me.mrRecordset.Columns
+                    If liInd > 0 Then lsSQLQuery &= ","
+                    lsSQLQuery &= Richmond.returnIfTrue(larColumn(liInd).DataTypeIsText, "'", "")
+                    lsSQLQuery &= lrFact.Data(liInd).Data
+                    lsSQLQuery &= Richmond.returnIfTrue(larColumn(liInd).DataTypeIsText, "'", "")
+                    liInd += 1
+                Next
+                lsSQLQuery &= ")"
+
+                Dim lrRecordset = Me.mrModel.DatabaseConnection.GO(lsSQLQuery)
+                If Not lrRecordset.ErrorReturned Then
+                    Me.ToolStripButtonCommit.Enabled = False
+                    Me.ToolStripStatusLabel.Text = lrRecordset.ErrorString
+                    Me.ToolStripStatusLabel.ForeColor = Color.Black
+                Else
+                    Me.ToolStripStatusLabel.Text = lrRecordset.ErrorString
+                    Me.ToolStripStatusLabel.ForeColor = Color.Red
+                End If
+            Next
+
+        Catch ex As Exception
+
+        End Try
     End Sub
 
     Private Sub DataGridView_CellValidating(sender As Object, e As DataGridViewCellValidatingEventArgs) Handles DataGridView.CellValidating

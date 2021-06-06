@@ -117,4 +117,29 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <metadata name="StatusStrip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>162, 17</value>
+  </metadata>
+  <metadata name="ToolStrip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>17, 17</value>
+  </metadata>
+  <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+  <data name="ToolStripButtonCommit.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
+        YQUAAAAJcEhZcwAAFiUAABYlAUlSJPAAAALXSURBVDhPLVNdSxRRGJ6/0l0QhMgmunWRlUFdBF1EF+lq
+        YmtWBgUGQRcRfYAh5GpdKFHaJpmCXUSGdyUmEVhZlFa6K5t9qKv75ezMOWfO0/OO7cyZnXPmfd7neb8c
+        F4DHFRg+5N1a+AjgogzDf6v5TQxQgsIvFDHP9QM5ZFDAHzg+P/kW0DoQK5SUSyeKYA1LB3IbpUmySsAC
+        sphF9/BlNHcc4/syHEUwb2glNALcAsNSklJEa54UsIJvmNl8gTO9h9F4cz9Gph/w7DccbQTOHw1tIOJ9
+        aGq2SrQp7nPIYxGTf0dxsrsOsdtRjHzoIjjNoIpwyA1jyEQ/gbYkllAYO535WCd4Hq9+DuLEjRq09dZh
+        9N0twuYYUp5KAcdol1g6EG6frIEoUjTYIHcKk6tJNN2J4kL/Idx9fp6w96TMQJtySEoFHjclspXokTWx
+        kv11sizhbeEZjiciOD2wF5f6jzATM3Se4cqFhCLWMWSamn2JN6lxHn9Hwc7R8DPmgnHEenaj9ck+1PdU
+        sWBTZF4kboVgqg6kSnSQY2liVw6i5V4tYr0RDH3sYNRJNPftwNmhajT378HTT12ELLGcWeZI2Kma5RYV
+        zhpZU5hGU6IGrYNVaEtWoKFvG5m3o/VRJS4OHGXcqTAnAmB5mCYPijkw1pdGyvNTGgvqNRo7qxEf2IX2
+        sQjiQztRn6jAzNoENmlRNpJsaTQv7NQynz6TzSQquEGWKcxg4ut9NPVEcCpZiXOPo7g2FuP5MspBkWCW
+        2wZhvdgl3Gk68JhEVkCSIitnF3B1uAHtD2vRkojiiz+OvE0LLyHFEBrKkFYxLDnDCBXIMpodKJVXk4h3
+        HsD1wTi7bZb2WXjeOjGF0IHlXIQOpGc4aY4MimJcMnlFm6NZmlpS3K8QnA/B0q0yWPr/yBrFTuXUBgGr
+        YDgLosolpMzLZcUVwcZnuWSOyaKpToZO4L4yBG9FYgLgHzeIlYA8YYyEAAAAAElFTkSuQmCC
+</value>
+  </data>
 </root>

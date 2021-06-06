@@ -26,8 +26,13 @@ Namespace FBM
             End Set
         End Property
 
-        <XmlIgnore()> _
+        <XmlIgnore()>
         Public DictionarySet As New Dictionary(Of String, String)
+
+        ''' <summary>
+        ''' Used in the frmToolboxTableData for for new Facts added to the Recordset but not yet saved to the database.
+        ''' </summary>
+        Public IsNewFact As Boolean = False
 
         Private _ModelError As New List(Of FBM.ModelError)
         Public Property ModelError() As System.Collections.Generic.List(Of ModelError) Implements iValidationErrorHandler.ModelError
