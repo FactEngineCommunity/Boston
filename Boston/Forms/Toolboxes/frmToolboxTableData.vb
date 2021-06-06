@@ -3,6 +3,7 @@
     Public mrModel As FBM.Model
     Public mrTable As RDS.Table = Nothing
     Private mrRecordset As ORMQL.Recordset
+    Private mrDataGridList As ORMQL.RecordsetDataGridList
 
     'For Cell text editting
     Private OldValue, NewValue As String
@@ -28,9 +29,8 @@
                 lsSQLQuery = "SELECT * FROM " & mrTable.Name
                 Me.mrRecordset = prApplication.WorkingModel.DatabaseConnection.GO(lsSQLQuery)
 
-
-                Dim lrDataGridList As New ORMQL.RecordsetDataGridList(Me.mrRecordset, Me.mrTable)
-                Me.DataGridView.DataSource = lrDataGridList
+                Me.mrDataGridList = New ORMQL.RecordsetDataGridList(Me.mrRecordset, Me.mrTable)
+                Me.DataGridView.DataSource = Me.mrDataGridList
 
             End If
         End If
@@ -64,9 +64,17 @@
                 lrPKColumn.TemporaryData = lsValue
             Next
 
+            Dim lrRecordset = prApplication.WorkingModel.DatabaseConnection.UpdateAttributeValue(Me.mrTable.Name, lrColumn, Me.NewValue, larPKColumn)
 
-
-            Call prApplication.WorkingModel.DatabaseConnection.UpdateAttributeValue(Me.mrTable.Name, lrColumn, Me.NewValue, larPKColumn)
+            If Not lrRecordset.ErrorReturned Then
+                Me.ToolStripButtonCommit.Enabled = False
+                Me.ToolStripStatusLabel.Text = lrRecordset.ErrorString
+                Me.ToolStripStatusLabel.ForeColor = Color.Black
+            Else
+                Me.ToolStripStatusLabel.Text = lrRecordset.ErrorString
+                Me.ToolStripStatusLabel.ForeColor = Color.Red
+                Me.mrRecordset.Facts(e.RowIndex)(Me.mrRecordset.Columns(e.ColumnIndex)).Data = Me.OldValue
+            End If
 
         Catch ex As Exception
 
@@ -82,12 +90,14 @@
             Me.OldValue = Me.mrRecordset.Facts(e.RowIndex)(Me.mrRecordset.Columns(e.ColumnIndex)).Data
         Else
             Dim lrNewFact As FBM.Fact = Me.mrRecordset.Facts(0).Clone(Me.mrRecordset.Facts(0).FactType, True)
+            lrNewFact.Id = System.Guid.NewGuid.ToString
             For Each lrFactData In lrNewFact.Data
                 lrFactData.setData("", pcenumConceptType.Value, False)
             Next
             lrNewFact.IsNewFact = True
             Me.mrRecordset.Facts.Add(lrNewFact)
             Me.ToolStripButtonCommit.Enabled = True
+            Me.ToolStripButtonUndo.Enabled = True
         End If
 
     End Sub
@@ -135,8 +145,35 @@
             Next
 
         Catch ex As Exception
-
+            Debugger.Break()
         End Try
+    End Sub
+
+    Private Sub ToolStripButtonUndo_Click(sender As Object, e As EventArgs) Handles ToolStripButtonUndo.Click
+
+        Try
+            Dim lbNewFactRemoved As Boolean = False
+            Dim larNewFact = From Fact In Me.mrRecordset.Facts
+                             Where Fact.IsNewFact
+                             Select Fact
+
+            For Each lrFact In larNewFact.ToArray
+                Me.mrRecordset.Facts.Remove(lrFact)
+                lbNewFactRemoved = True
+            Next
+
+            If lbNewFactRemoved Then
+                'Dim lrDataGridList As New ORMQL.RecordsetDataGridList(Me.mrRecordset, Me.mrTable)
+                Me.DataGridView.DataSource = Nothing
+                Me.DataGridView.DataSource = Me.mrDataGridList
+            End If
+
+            Me.ToolStripButtonUndo.Enabled = False
+            Me.ToolStripButtonCommit.Enabled = False
+        Catch ex As Exception
+            Debugger.Break()
+        End Try
+
     End Sub
 
     Private Sub DataGridView_CellValidating(sender As Object, e As DataGridViewCellValidatingEventArgs) Handles DataGridView.CellValidating

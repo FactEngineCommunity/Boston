@@ -897,7 +897,7 @@ Namespace FactEngine
         Public Overrides Function UpdateAttributeValue(ByVal asTableName As String,
                                                        ByVal arColumn As RDS.Column,
                                                        ByVal asNewValue As String,
-                                                       ByVal aarPKColumn As List(Of RDS.Column)) As Boolean
+                                                       ByVal aarPKColumn As List(Of RDS.Column)) As ORMQL.Recordset
 
             Dim lsSQLQuery As String
 
@@ -914,9 +914,9 @@ Namespace FactEngine
                 lsSQLQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsText, "'", "") & vbCrLf
             Next
 
-            Dim lrRecordseet = Me.GO(lsSQLQuery)
+            Dim lrRecordset = Me.GO(lsSQLQuery)
 
-            Return Not lrRecordseet.ErrorReturned
+            Return lrRecordset
 
         End Function
 

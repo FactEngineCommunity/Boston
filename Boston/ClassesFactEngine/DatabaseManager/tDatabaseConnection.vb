@@ -154,8 +154,8 @@
         Public Overridable Function UpdateAttributeValue(ByVal asTableName As String,
                                                          ByVal arColumn As RDS.Column,
                                                          ByVal asNewValue As String,
-                                                         ByVal aarPKColumn As List(Of RDS.Column)) As Boolean
-            Return False
+                                                         ByVal aarPKColumn As List(Of RDS.Column)) As ORMQL.Recordset
+            Return New ORMQL.Recordset
         End Function
 
     End Class
