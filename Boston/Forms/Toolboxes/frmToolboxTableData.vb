@@ -37,6 +37,8 @@
 
         Me.ToolStripStatusLabel.Text = ""
 
+        Me.DataGridView.RowTemplate.Height = 16
+
     End Sub
 
     Private Sub frmToolboxTableData_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing

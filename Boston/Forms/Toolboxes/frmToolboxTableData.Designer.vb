@@ -28,8 +28,8 @@ Partial Class frmToolboxTableData
         Me.ToolStripStatusLabel = New System.Windows.Forms.ToolStripStatusLabel()
         Me.ToolStrip1 = New System.Windows.Forms.ToolStrip()
         Me.ToolStripButtonCommit = New System.Windows.Forms.ToolStripButton()
-        Me.DataGridView = New System.Windows.Forms.DataGridView()
         Me.ToolStripButtonUndo = New System.Windows.Forms.ToolStripButton()
+        Me.DataGridView = New System.Windows.Forms.DataGridView()
         Me.GroupBox1.SuspendLayout()
         Me.StatusStrip1.SuspendLayout()
         Me.ToolStrip1.SuspendLayout()
@@ -44,9 +44,11 @@ Partial Class frmToolboxTableData
         Me.GroupBox1.Controls.Add(Me.StatusStrip1)
         Me.GroupBox1.Controls.Add(Me.ToolStrip1)
         Me.GroupBox1.Controls.Add(Me.DataGridView)
-        Me.GroupBox1.Location = New System.Drawing.Point(12, 12)
+        Me.GroupBox1.Location = New System.Drawing.Point(8, 8)
+        Me.GroupBox1.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
         Me.GroupBox1.Name = "GroupBox1"
-        Me.GroupBox1.Size = New System.Drawing.Size(1229, 527)
+        Me.GroupBox1.Padding = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.GroupBox1.Size = New System.Drawing.Size(819, 343)
         Me.GroupBox1.TabIndex = 0
         Me.GroupBox1.TabStop = False
         Me.GroupBox1.Text = "TableName"
@@ -55,25 +57,25 @@ Partial Class frmToolboxTableData
         '
         Me.StatusStrip1.ImageScalingSize = New System.Drawing.Size(24, 24)
         Me.StatusStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripStatusLabel})
-        Me.StatusStrip1.Location = New System.Drawing.Point(3, 492)
+        Me.StatusStrip1.Location = New System.Drawing.Point(2, 319)
         Me.StatusStrip1.Name = "StatusStrip1"
-        Me.StatusStrip1.Size = New System.Drawing.Size(1223, 32)
+        Me.StatusStrip1.Padding = New System.Windows.Forms.Padding(1, 0, 9, 0)
+        Me.StatusStrip1.Size = New System.Drawing.Size(815, 22)
         Me.StatusStrip1.TabIndex = 2
         Me.StatusStrip1.Text = "StatusStrip1"
         '
         'ToolStripStatusLabel
         '
         Me.ToolStripStatusLabel.Name = "ToolStripStatusLabel"
-        Me.ToolStripStatusLabel.Size = New System.Drawing.Size(170, 25)
+        Me.ToolStripStatusLabel.Size = New System.Drawing.Size(113, 17)
         Me.ToolStripStatusLabel.Text = "ToolStripStatusLabel"
         '
         'ToolStrip1
         '
-        Me.ToolStrip1.ImageScalingSize = New System.Drawing.Size(24, 24)
         Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButtonCommit, Me.ToolStripButtonUndo})
-        Me.ToolStrip1.Location = New System.Drawing.Point(3, 22)
+        Me.ToolStrip1.Location = New System.Drawing.Point(2, 15)
         Me.ToolStrip1.Name = "ToolStrip1"
-        Me.ToolStrip1.Size = New System.Drawing.Size(1223, 38)
+        Me.ToolStrip1.Size = New System.Drawing.Size(815, 25)
         Me.ToolStrip1.TabIndex = 1
         Me.ToolStrip1.Text = "ToolStrip1"
         '
@@ -84,21 +86,8 @@ Partial Class frmToolboxTableData
         Me.ToolStripButtonCommit.Image = CType(resources.GetObject("ToolStripButtonCommit.Image"), System.Drawing.Image)
         Me.ToolStripButtonCommit.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ToolStripButtonCommit.Name = "ToolStripButtonCommit"
-        Me.ToolStripButtonCommit.Size = New System.Drawing.Size(34, 33)
+        Me.ToolStripButtonCommit.Size = New System.Drawing.Size(23, 22)
         Me.ToolStripButtonCommit.Text = "ToolStripButton1"
-        '
-        'DataGridView
-        '
-        Me.DataGridView.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-            Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.DataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        Me.DataGridView.Location = New System.Drawing.Point(6, 58)
-        Me.DataGridView.Name = "DataGridView"
-        Me.DataGridView.RowHeadersWidth = 62
-        Me.DataGridView.RowTemplate.Height = 28
-        Me.DataGridView.Size = New System.Drawing.Size(1217, 463)
-        Me.DataGridView.TabIndex = 0
         '
         'ToolStripButtonUndo
         '
@@ -107,15 +96,30 @@ Partial Class frmToolboxTableData
         Me.ToolStripButtonUndo.Image = Global.Boston.My.Resources.Resources.Undo16x16
         Me.ToolStripButtonUndo.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ToolStripButtonUndo.Name = "ToolStripButtonUndo"
-        Me.ToolStripButtonUndo.Size = New System.Drawing.Size(34, 33)
+        Me.ToolStripButtonUndo.Size = New System.Drawing.Size(28, 17)
         Me.ToolStripButtonUndo.Text = "ToolStripButton1"
+        '
+        'DataGridView
+        '
+        Me.DataGridView.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.DataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
+        Me.DataGridView.Location = New System.Drawing.Point(4, 42)
+        Me.DataGridView.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.DataGridView.Name = "DataGridView"
+        Me.DataGridView.RowHeadersWidth = 62
+        Me.DataGridView.RowTemplate.Height = 28
+        Me.DataGridView.Size = New System.Drawing.Size(811, 275)
+        Me.DataGridView.TabIndex = 0
         '
         'frmToolboxTableData
         '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1253, 551)
+        Me.ClientSize = New System.Drawing.Size(835, 358)
         Me.Controls.Add(Me.GroupBox1)
+        Me.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
         Me.Name = "frmToolboxTableData"
         Me.Text = "Database Table Data"
         Me.GroupBox1.ResumeLayout(False)
