@@ -37,7 +37,7 @@
 
         Me.ToolStripStatusLabel.Text = ""
 
-        Me.DataGridView.RowTemplate.Height = 16
+        Me.DataGridView.RowTemplate.Height = Me.DataGridView.Font.Height + 8
 
     End Sub
 
