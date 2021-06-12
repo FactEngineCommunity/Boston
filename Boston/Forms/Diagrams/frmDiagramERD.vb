@@ -3088,17 +3088,26 @@ Public Class frmDiagramERD
         Dim lrTableNode As ERD.TableNode = Me.Diagram.Selection.Items(0)
         Dim lrEntity As New ERD.Entity
 
-        '-------------------------
-        'Get the selected Entity        
-        lrEntity = lrTableNode.Tag '(above lrTableNode = Me.Diagram.Selection.Items(0) )
+        Try
+            '-------------------------
+            'Get the selected Entity        
+            lrEntity = lrTableNode.Tag '(above lrTableNode = Me.Diagram.Selection.Items(0) )
 
-        prApplication.WorkingModel = Me.zrPage.Model
-        prApplication.WorkingPage = Me.zrPage
+            prApplication.WorkingModel = Me.zrPage.Model
+            prApplication.WorkingPage = Me.zrPage
 
-        Dim lfrmToolboxTableData = frmMain.loadToolboxTableDataForm(Me.zrPage.Model, Me.DockPanel.ActivePane)
+            If prApplication.WorkingModel.DatabaseConnection Is Nothing Then
+                Call prApplication.WorkingModel.connectToDatabase()
+            End If
 
-        lfrmToolboxTableData.mrTable = lrEntity.RDSTable
-        Call lfrmToolboxTableData.SetupForm
+            Dim lfrmToolboxTableData = frmMain.loadToolboxTableDataForm(Me.zrPage.Model, Me.DockPanel.ActivePane)
+
+            lfrmToolboxTableData.mrTable = lrEntity.RDSTable
+            Call lfrmToolboxTableData.SetupForm()
+
+        Catch ex As Exception
+            Debugger.Break()
+        End Try
 
     End Sub
 

@@ -20,6 +20,8 @@
 
     Public Sub SetupForm()
 
+        'RemoveHandler Me.DataGridView.RowsRemoved, AddressOf DataGridView_RowsRemoved
+
         Dim lsSQLQuery As String
 
         If prApplication.WorkingModel.DatabaseConnection Is Nothing Then
@@ -38,6 +40,8 @@
         Me.ToolStripStatusLabel.Text = ""
 
         Me.DataGridView.RowTemplate.Height = Me.DataGridView.Font.Height + 8
+
+        'AddHandler Me.DataGridView.RowsRemoved, AddressOf DataGridView_RowsRemoved
 
     End Sub
 
@@ -181,6 +185,22 @@
     Private Sub DataGridView_CellValidating(sender As Object, e As DataGridViewCellValidatingEventArgs) Handles DataGridView.CellValidating
 
         Me.NewValue = e.FormattedValue
+
+    End Sub
+
+
+    Private Sub DataGridView_KeyDown(sender As Object, e As KeyEventArgs) Handles DataGridView.KeyDown
+
+        If e.KeyCode = Keys.Delete Then
+            If Me.DataGridView.SelectedRows.Count > 0 Then
+                If MsgBox("Are you sure you want to delete this row from the database?", MsgBoxStyle.YesNo) = MsgBoxResult.Yes Then
+                    Me.mrRecordset.Facts.RemoveAt(Me.DataGridView.SelectedRows(0).Index)
+                    '20210608-VM-Put in code here to remove the record from the database
+                    Me.DataGridView.DataSource = Nothing
+                    Me.DataGridView.DataSource = Me.mrDataGridList
+                End If
+            End If
+        End If
 
     End Sub
 End Class

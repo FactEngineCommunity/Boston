@@ -38,6 +38,7 @@ Partial Class frmDiagramERD
         Me.RemoveFromPageToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripSeparator7 = New System.Windows.Forms.ToolStripSeparator()
         Me.ToolStripMenuItemReCreateDatabaseTable = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ViewTableDataToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripSeparatorReCreateTable = New System.Windows.Forms.ToolStripSeparator()
         Me.PropertiesToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
         Me.HiddenDiagram = New MindFusion.Diagramming.Diagram()
@@ -78,7 +79,6 @@ Partial Class frmDiagramERD
         Me.Diagram1 = New MindFusion.Diagramming.Diagram()
         Me.HiddenDiagramView = New MindFusion.Diagramming.WinForms.DiagramView()
         Me.Diagram2 = New MindFusion.Diagramming.Diagram()
-        Me.ViewTableDataToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ContextMenuStrip_Entity.SuspendLayout()
         Me.ContextMenuStrip_Diagram.SuspendLayout()
         Me.ContextMenuStripAttribute.SuspendLayout()
@@ -96,7 +96,7 @@ Partial Class frmDiagramERD
         'ContextMenuStrip_Entity
         '
         Me.ContextMenuStrip_Entity.ImageScalingSize = New System.Drawing.Size(24, 24)
-        Me.ContextMenuStrip_Entity.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MorphToToolStripMenuItem, Me.ToolStripSeparator2, Me.DisplayDataIndexRelationInformationToolStripMenuItem, Me.ToolStripMenuItemEntityModelErrors, Me.ToolStripSeparator8, Me.RemoveFromPageToolStripMenuItem, Me.ToolStripSeparator7, Me.ToolStripMenuItemReCreateDatabaseTable, Me.ViewTableDataToolStripMenuItem, Me.ToolStripSeparatorReCreateTable, Me.PropertiesToolStripMenuItem1})
+        Me.ContextMenuStrip_Entity.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MorphToToolStripMenuItem, Me.ToolStripSeparator2, Me.DisplayDataIndexRelationInformationToolStripMenuItem, Me.ToolStripMenuItemEntityModelErrors, Me.ToolStripSeparator8, Me.RemoveFromPageToolStripMenuItem, Me.ToolStripSeparator7, Me.ViewTableDataToolStripMenuItem, Me.ToolStripMenuItemReCreateDatabaseTable, Me.ToolStripSeparatorReCreateTable, Me.PropertiesToolStripMenuItem1})
         Me.ContextMenuStrip_Entity.Name = "ContextMenuStrip_Actor"
         Me.ContextMenuStrip_Entity.Size = New System.Drawing.Size(454, 285)
         '
@@ -175,6 +175,13 @@ Partial Class frmDiagramERD
         Me.ToolStripMenuItemReCreateDatabaseTable.Name = "ToolStripMenuItemReCreateDatabaseTable"
         Me.ToolStripMenuItemReCreateDatabaseTable.Size = New System.Drawing.Size(453, 32)
         Me.ToolStripMenuItemReCreateDatabaseTable.Text = "Re/Create Database Table"
+        '
+        'ViewTableDataToolStripMenuItem
+        '
+        Me.ViewTableDataToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.Table
+        Me.ViewTableDataToolStripMenuItem.Name = "ViewTableDataToolStripMenuItem"
+        Me.ViewTableDataToolStripMenuItem.Size = New System.Drawing.Size(453, 32)
+        Me.ViewTableDataToolStripMenuItem.Text = "View &Table Data"
         '
         'ToolStripSeparatorReCreateTable
         '
@@ -451,12 +458,6 @@ Partial Class frmDiagramERD
         Me.HiddenDiagramView.Size = New System.Drawing.Size(1407, 806)
         Me.HiddenDiagramView.TabIndex = 11
         Me.HiddenDiagramView.Text = "DiagramView1"
-        '
-        'ViewTableDataToolStripMenuItem
-        '
-        Me.ViewTableDataToolStripMenuItem.Name = "ViewTableDataToolStripMenuItem"
-        Me.ViewTableDataToolStripMenuItem.Size = New System.Drawing.Size(453, 32)
-        Me.ViewTableDataToolStripMenuItem.Text = "View &Table Data"
         '
         'frmDiagramERD
         '

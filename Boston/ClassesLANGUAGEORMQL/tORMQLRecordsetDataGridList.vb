@@ -166,7 +166,7 @@ Namespace ORMQL
         End Sub
 
         Public Sub RemoveAt(index As Integer) Implements IList.RemoveAt
-            Throw New NotImplementedException()
+            'Me.mrRecordset.Facts.RemoveAt(index)
         End Sub
 
         Public Sub CopyTo(array As Array, index As Integer) Implements ICollection.CopyTo
