@@ -1456,8 +1456,8 @@ Namespace FEQL
                        Me.ParseTreeContainsTokenType(Me.Parsetree, FEQL.TokenType.KEYWDDATABASE) Then
                         aoTokenType = FEQL.TokenType.CREATEDATABASESTMT
                         aoParseTree = Me.Parsetree
-                        Call Me.processCREATEDATABASEStatement(asFEQLStatement)
-                        Return Nothing
+                        Return Me.processCREATEDATABASEStatement(asFEQLStatement)
+
                     ElseIf Me.ParseTreeContainsTokenType(Me.Parsetree, FEQL.TokenType.KEYWDISIDENTIFIEDBYITS) Then
                         aoTokenType = FEQL.TokenType.KEYWDISIDENTIFIEDBYITS
                         aoParseTree = Me.Parsetree
