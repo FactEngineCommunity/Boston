@@ -705,6 +705,7 @@ Public Class frmFactEngine
                     Me.LabelError.BringToFront()
                     Me.LabelError.Text = lrRecordset.ErrorString
                     Me.TabControl1.SelectedTab = Me.TabPageResults
+                    Me.LabelError.ForeColor = Color.Orange
                 Else
                     Select Case lrRecordset.StatementType
                         Case Is = FactEngine.pcenumFEQLStatementType.DESCRIBEStatement

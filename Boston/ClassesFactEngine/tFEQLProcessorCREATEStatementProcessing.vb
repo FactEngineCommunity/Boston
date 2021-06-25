@@ -215,7 +215,9 @@ Namespace FEQL
 
         End Function
 
-        Public Sub processCREATEDATABASEStatement(ByVal asFEQLStatement As String)
+        Public Function processCREATEDATABASEStatement(ByVal asFEQLStatement As String) As ORMQL.Recordset
+
+            Dim lrRecordset As New ORMQL.Recordset
 
             Try
                 Dim lrCREATESDATABASEtatement = New FEQL.CREATEDATABASEStatement
@@ -226,7 +228,11 @@ Namespace FEQL
 
                 'Create the actual database. SQLite only at this stage.
                 Me.DatabaseManager.Connection = New FactEngine.SQLiteConnection(lrModel, lrCREATESDATABASEtatement.FILELOCATIONNAME, 100, True)
-                Call Me.DatabaseManager.Connection.createDatabase(lrCREATESDATABASEtatement.FILELOCATIONNAME)
+                lrRecordset = Me.DatabaseManager.Connection.createDatabase(lrCREATESDATABASEtatement.FILELOCATIONNAME)
+
+                If lrRecordset.ErrorReturned Then
+                    Throw New tInformationException(lrRecordset.ErrorString)
+                End If
 
                 lrModel.TargetDatabaseType = pcenumDatabaseType.SQLite
                 lrModel.TargetDatabaseConnectionString = "Data Source=" & lrCREATESDATABASEtatement.FILELOCATIONNAME & ";"
@@ -238,6 +244,10 @@ Namespace FEQL
 
                 lrModel.IsDatabaseSynchronised = True
 
+            Catch AppEx As tInformationException
+
+                Return lrRecordset
+
             Catch ex As Exception
                 Dim lsMessage As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
@@ -245,9 +255,13 @@ Namespace FEQL
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
                 prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return lrRecordset
             End Try
 
-        End Sub
+            Return lrRecordset
+
+        End Function
 
         Public Function ProcessCREATEStatement(ByVal asFEQLStatement As String) As ORMQL.Recordset
 
