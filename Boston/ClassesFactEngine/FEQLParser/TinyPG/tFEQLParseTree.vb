@@ -451,11 +451,11 @@ Namespace FEQL
                 Case TokenType.DELETEFACTSTMT
                     Value = EvalDELETEFACTSTMT(tree, paramlist)
                     Exit Select
-                Case TokenType.DERIVATIONSUBCLAUSE
-                    Value = EvalDERIVATIONSUBCLAUSE(tree, paramlist)
-                    Exit Select
                 Case TokenType.DERIVATIONCLAUSE
                     Value = EvalDERIVATIONCLAUSE(tree, paramlist)
+                    Exit Select
+                Case TokenType.DERIVATIONSUBCLAUSE
+                    Value = EvalDERIVATIONSUBCLAUSE(tree, paramlist)
                     Exit Select
                 Case TokenType.DERIVEDFACTTYPESTMT
                     Value = EvalDERIVEDFACTTYPESTMT(tree, paramlist)
@@ -474,6 +474,9 @@ Namespace FEQL
                     Exit Select
                 Case TokenType.EXPRESSION
                     Value = EvalEXPRESSION(tree, paramlist)
+                    Exit Select
+                Case TokenType.EXPRESSIONPART
+                    Value = EvalEXPRESSIONPART(tree, paramlist)
                     Exit Select
                 Case TokenType.EXISTSSTMT
                     Value = EvalEXISTSSTMT(tree, paramlist)
@@ -910,11 +913,11 @@ Namespace FEQL
             Throw New NotImplementedException()
         End Function
 
-        Protected Overridable Function EvalDERIVATIONSUBCLAUSE(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+        Protected Overridable Function EvalDERIVATIONCLAUSE(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
             Throw New NotImplementedException()
         End Function
 
-        Protected Overridable Function EvalDERIVATIONCLAUSE(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+        Protected Overridable Function EvalDERIVATIONSUBCLAUSE(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
             Throw New NotImplementedException()
         End Function
 
@@ -939,6 +942,10 @@ Namespace FEQL
         End Function
 
         Protected Overridable Function EvalEXPRESSION(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalEXPRESSIONPART(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
             Throw New NotImplementedException()
         End Function
 

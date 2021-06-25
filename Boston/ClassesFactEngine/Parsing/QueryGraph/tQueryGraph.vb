@@ -44,6 +44,8 @@
             Dim lsSQLQuery As String = ""
             Dim liInd As Integer
             Dim larColumn As New List(Of RDS.Column)
+            Dim lbRequiresGroupByClause As Boolean = False
+            Dim lsSelectClause As String = ""
 
             Try
                 'Set the Node Aliases. E.g. If Lecturer occurs twice in the FROM clause, then Lecturer, Lecturer2 etc
@@ -57,16 +59,30 @@
                     liInd = 1
                     Dim larProjectionColumn = Me.getProjectionColumns(arWhichSelectStatement)
                     Me.ProjectionColumn = larProjectionColumn
+
+
                     For Each lrProjectColumn In larProjectionColumn.FindAll(Function(x) x IsNot Nothing)
 
                         If lrProjectColumn.Role.FactType.IsDerived Then
-                            lsSQLQuery &= "[" & lrProjectColumn.Role.FactType.Id & Viev.NullVal(lrProjectColumn.TemporaryAlias, "") & "]." & lrProjectColumn.Name
+                            lsSelectClause &= "[" & lrProjectColumn.Role.FactType.Id & Viev.NullVal(lrProjectColumn.TemporaryAlias, "") & "]." & lrProjectColumn.Name
                         Else
-                            lsSQLQuery &= "[" & lrProjectColumn.Table.DatabaseName & Viev.NullVal(lrProjectColumn.TemporaryAlias, "") & "]." & lrProjectColumn.Name
+                            lsSelectClause &= "[" & lrProjectColumn.Table.DatabaseName & Viev.NullVal(lrProjectColumn.TemporaryAlias, "") & "]." & lrProjectColumn.Name
                         End If
-                        If liInd < larProjectionColumn.Count Then lsSQLQuery &= ","
+                        If liInd < larProjectionColumn.Count Then lsSelectClause &= ","
                         liInd += 1
                     Next
+                    lsSQLQuery &= lsSelectClause
+
+                    If arWhichSelectStatement.RETURNCLAUSE IsNot Nothing Then
+                        Dim larCountStarColumn = From ReturnColumn In arWhichSelectStatement.RETURNCLAUSE.RETURNCOLUMN
+                                                 Where ReturnColumn.KEYWDCOUNTSTAR IsNot Nothing
+                                                 Select ReturnColumn
+
+                        If larCountStarColumn.Count > 0 Then
+                            lsSQLQuery &= ", COUNT(*)"
+                            lbRequiresGroupByClause = True
+                        End If
+                    End If
 
                     '20201015-VM-If all seems fine, remove the following.
                     'Select Case (Me.HeadNode.FBMModelObject).GetType
@@ -911,6 +927,13 @@
                     lsSQLQuery &= ")"
                 Next
                 '=====================================================================================
+
+                '=====================================
+                'Group By clause
+                If lbRequiresGroupByClause Then
+                    lsSQLQuery &= "GROUP BY" & lsSelectClause
+                End If
+
                 Return lsSQLQuery
             Catch ex As Exception
                 Throw New Exception(ex.Message & vbCrLf & vbCrLf & lsSQLQuery)
@@ -959,6 +982,9 @@
                             Catch ex As Exception
                                 Throw New Exception("Column, " & lrReturnColumn.MODELELEMENTNAME & "." & lrReturnColumn.COLUMNNAMESTR & ", not found. Check your RETURN clause.")
                             End Try
+
+                        ElseIf lrReturnColumn.KEYWDCOUNTSTAR IsNot Nothing Then
+                            'COUNT(*) is added in GenerateSQL
                         Else
                             'Must be * (STAR)
                             For Each lrColumn In Me.HeadNode.FBMModelObject.getCorrespondingRDSTable.Column

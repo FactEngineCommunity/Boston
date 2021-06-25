@@ -3780,7 +3780,7 @@ Namespace FEQL
             Dim node As ParseNode = parent.CreateNode(m_scanner.GetToken(TokenType.RETURNCOLUMN), "RETURNCOLUMN")
             parent.Nodes.Add(node)
 
-            tok = m_scanner.LookAhead(TokenType.STAR, TokenType.MODELELEMENTNAME) ' Choice Rule
+            tok = m_scanner.LookAhead(TokenType.STAR, TokenType.KEYWDCOUNTSTAR, TokenType.MODELELEMENTNAME) ' Choice Rule
             Select Case tok.Type
              ' Choice Rule
                 Case TokenType.STAR
@@ -3790,6 +3790,21 @@ Namespace FEQL
                     node.Nodes.Add(n)
                     If tok.Type <> TokenType.STAR Then
                         m_tree.Errors.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.STAR.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "STAR"))
+                        Return
+
+                    End If
+
+            If m_tree.Errors.Count > 0 Then
+                                parent.Token.UpdateRange(node.Token)
+                                Exit Sub
+            End If
+                Case TokenType.KEYWDCOUNTSTAR
+                    tok = m_scanner.Scan(TokenType.KEYWDCOUNTSTAR) ' Terminal Rule: KEYWDCOUNTSTAR
+                    n = node.CreateNode(tok, tok.ToString() )
+                    node.Token.UpdateRange(tok)
+                    node.Nodes.Add(n)
+                    If tok.Type <> TokenType.KEYWDCOUNTSTAR Then
+                        m_tree.Errors.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDCOUNTSTAR.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDCOUNTSTAR"))
                         Return
 
                     End If
@@ -3912,6 +3927,7 @@ Namespace FEQL
                 If m_tree.Errors.Count = 0 Then
                 m_tree.Optionals.Clear
                 m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.STAR.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "STAR"))
+                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.STAR.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDCOUNTSTAR"))
                 m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.STAR.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MODELELEMENTNAME"))
                 End If
                     m_tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found.", &H0002, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos))
@@ -7964,119 +7980,6 @@ Namespace FEQL
             End If
         End Sub ' NonTerminalSymbol: DELETEFACTSTMT
 
-        Private Sub ParseDERIVATIONSUBCLAUSE(ByVal parent As ParseNode) ' NonTerminalSymbol: DERIVATIONSUBCLAUSE
-            Dim tok As Token
-            Dim n As ParseNode
-            Dim node As ParseNode = parent.CreateNode(m_scanner.GetToken(TokenType.DERIVATIONSUBCLAUSE), "DERIVATIONSUBCLAUSE")
-            parent.Nodes.Add(node)
-
-
-             ' Concat Rule
-            ParseMODELELEMENT(node) ' NonTerminal Rule: MODELELEMENT
-            If m_tree.Errors.Count > 0 Then
-                        parent.Token.UpdateRange(node.Token)
-                        Exit Sub
-            End If
-
-             ' Concat Rule
-            tok = m_scanner.LookAhead(TokenType.EXPRESSIONSYMBOL, TokenType.PREDICATE) ' ZeroOrMore Rule
-            While tok.Type = TokenType.EXPRESSIONSYMBOL Or tok.Type = TokenType.PREDICATE
-                tok = m_scanner.LookAhead(TokenType.EXPRESSIONSYMBOL, TokenType.PREDICATE) ' Choice Rule
-                Select Case tok.Type
-                 ' Choice Rule
-                    Case TokenType.EXPRESSIONSYMBOL
-
-                         ' Concat Rule
-                        ParseEXPRESSION(node) ' NonTerminal Rule: EXPRESSION
-            If m_tree.Errors.Count > 0 Then
-                                    parent.Token.UpdateRange(node.Token)
-                                    Exit Sub
-            End If
-
-                         ' Concat Rule
-                        ParseMATHCLAUSE(node) ' NonTerminal Rule: MATHCLAUSE
-            If m_tree.Errors.Count > 0 Then
-                                    parent.Token.UpdateRange(node.Token)
-                                    Exit Sub
-            End If
-            If m_tree.Errors.Count > 0 Then
-                                    parent.Token.UpdateRange(node.Token)
-                                    Exit Sub
-            End If
-                    Case TokenType.PREDICATE
-
-                         ' Concat Rule
-                        ParsePREDICATECLAUSE(node) ' NonTerminal Rule: PREDICATECLAUSE
-            If m_tree.Errors.Count > 0 Then
-                                    parent.Token.UpdateRange(node.Token)
-                                    Exit Sub
-            End If
-
-                         ' Concat Rule
-                        tok = m_scanner.LookAhead(TokenType.KEYWDCOUNT) ' Option Rule
-                        If tok.Type = TokenType.KEYWDCOUNT Then
-                            tok = m_scanner.Scan(TokenType.KEYWDCOUNT) ' Terminal Rule: KEYWDCOUNT
-                            n = node.CreateNode(tok, tok.ToString() )
-                            node.Token.UpdateRange(tok)
-                            node.Nodes.Add(n)
-                            If tok.Type <> TokenType.KEYWDCOUNT Then
-                                m_tree.Errors.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDCOUNT.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDCOUNT"))
-                                Return
-
-                            End If
-
-            If m_tree.Errors.Count > 0 Then
-                                        parent.Token.UpdateRange(node.Token)
-                                        Exit Sub
-            End If
-                        Else
-                                                    m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDCOUNT.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDCOUNT"))
-                        End If
-            If m_tree.Errors.Count > 0 Then
-                                    parent.Token.UpdateRange(node.Token)
-                                    Exit Sub
-            End If
-
-                         ' Concat Rule
-                        ParseMODELELEMENT(node) ' NonTerminal Rule: MODELELEMENT
-            If m_tree.Errors.Count > 0 Then
-                                    parent.Token.UpdateRange(node.Token)
-                                    Exit Sub
-            End If
-            If m_tree.Errors.Count > 0 Then
-                                    parent.Token.UpdateRange(node.Token)
-                                    Exit Sub
-            End If
-                    Case Else
-                    If m_tree.Errors.Count = 0 Then
-                    m_tree.Optionals.Clear
-                    m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.EXPRESSIONSYMBOL.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "EXPRESSIONSYMBOL"))
-                    m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.EXPRESSIONSYMBOL.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "PREDICATE"))
-                    End If
-                        m_tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found.", &H0002, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos))
-                        Exit Select
-                End Select ' Choice Rule
-            If m_tree.Errors.Count > 0 Then
-                            parent.Token.UpdateRange(node.Token)
-                            Exit Sub
-            End If
-            tok = m_scanner.LookAhead(TokenType.EXPRESSIONSYMBOL, TokenType.PREDICATE) ' ZeroOrMore Rule
-            End While
-            If m_tree.Errors.Count > 0 Then
-                        parent.Token.UpdateRange(node.Token)
-                        Exit Sub
-            End If
-            If m_tree.Errors.Count > 0 Then
-                        parent.Token.UpdateRange(node.Token)
-                        Exit Sub
-            End If
-
-            parent.Token.UpdateRange(node.Token)
-            If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
-            m_tree.Optionals.Clear()
-            End If
-        End Sub ' NonTerminalSymbol: DERIVATIONSUBCLAUSE
-
         Private Sub ParseDERIVATIONCLAUSE(ByVal parent As ParseNode) ' NonTerminalSymbol: DERIVATIONCLAUSE
             Dim tok As Token
             Dim n As ParseNode
@@ -8108,8 +8011,8 @@ Namespace FEQL
             End If
 
              ' Concat Rule
-            tok = m_scanner.LookAhead(TokenType.KEYWDAND) ' Option Rule
-            If tok.Type = TokenType.KEYWDAND Then
+            tok = m_scanner.LookAhead(TokenType.KEYWDAND) ' ZeroOrMore Rule
+            While tok.Type = TokenType.KEYWDAND
 
                  ' Concat Rule
                 tok = m_scanner.Scan(TokenType.KEYWDAND) ' Terminal Rule: KEYWDAND
@@ -8137,9 +8040,8 @@ Namespace FEQL
                             parent.Token.UpdateRange(node.Token)
                             Exit Sub
             End If
-            Else
-                            m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDAND.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDAND"))
-            End If
+            tok = m_scanner.LookAhead(TokenType.KEYWDAND) ' ZeroOrMore Rule
+            End While
             If m_tree.Errors.Count > 0 Then
                         parent.Token.UpdateRange(node.Token)
                         Exit Sub
@@ -8154,6 +8056,24 @@ Namespace FEQL
             m_tree.Optionals.Clear()
             End If
         End Sub ' NonTerminalSymbol: DERIVATIONCLAUSE
+
+        Private Sub ParseDERIVATIONSUBCLAUSE(ByVal parent As ParseNode) ' NonTerminalSymbol: DERIVATIONSUBCLAUSE
+            Dim tok As Token
+            Dim n As ParseNode
+            Dim node As ParseNode = parent.CreateNode(m_scanner.GetToken(TokenType.DERIVATIONSUBCLAUSE), "DERIVATIONSUBCLAUSE")
+            parent.Nodes.Add(node)
+
+            ParseWHICHCLAUSE(node) ' NonTerminal Rule: WHICHCLAUSE
+            If m_tree.Errors.Count > 0 Then
+                        parent.Token.UpdateRange(node.Token)
+                        Exit Sub
+            End If
+
+            parent.Token.UpdateRange(node.Token)
+            If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
+            m_tree.Optionals.Clear()
+            End If
+        End Sub ' NonTerminalSymbol: DERIVATIONSUBCLAUSE
 
         Private Sub ParseDERIVEDFACTTYPESTMT(ByVal parent As ParseNode) ' NonTerminalSymbol: DERIVEDFACTTYPESTMT
             Dim tok As Token
@@ -8756,6 +8676,62 @@ Namespace FEQL
             m_tree.Optionals.Clear()
             End If
         End Sub ' NonTerminalSymbol: EXPRESSION
+
+        Private Sub ParseEXPRESSIONPART(ByVal parent As ParseNode) ' NonTerminalSymbol: EXPRESSIONPART
+            Dim tok As Token
+            Dim n As ParseNode
+            Dim node As ParseNode = parent.CreateNode(m_scanner.GetToken(TokenType.EXPRESSIONPART), "EXPRESSIONPART")
+            parent.Nodes.Add(node)
+
+
+             ' Concat Rule
+            tok = m_scanner.Scan(TokenType.EXPRESSIONSYMBOL) ' Terminal Rule: EXPRESSIONSYMBOL
+            n = node.CreateNode(tok, tok.ToString() )
+            node.Token.UpdateRange(tok)
+            node.Nodes.Add(n)
+            If tok.Type <> TokenType.EXPRESSIONSYMBOL Then
+                m_tree.Errors.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.EXPRESSIONSYMBOL.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "EXPRESSIONSYMBOL"))
+                Return
+
+            End If
+
+            If m_tree.Errors.Count > 0 Then
+                        parent.Token.UpdateRange(node.Token)
+                        Exit Sub
+            End If
+
+             ' Concat Rule
+            ParseMODELELEMENT(node) ' NonTerminal Rule: MODELELEMENT
+            If m_tree.Errors.Count > 0 Then
+                        parent.Token.UpdateRange(node.Token)
+                        Exit Sub
+            End If
+
+             ' Concat Rule
+            tok = m_scanner.LookAhead(TokenType.MATHFUNCTION) ' Option Rule
+            If tok.Type = TokenType.MATHFUNCTION Then
+                ParseMATHCLAUSE(node) ' NonTerminal Rule: MATHCLAUSE
+            If m_tree.Errors.Count > 0 Then
+                            parent.Token.UpdateRange(node.Token)
+                            Exit Sub
+            End If
+            Else
+                            m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.MATHFUNCTION.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MATHFUNCTION"))
+            End If
+            If m_tree.Errors.Count > 0 Then
+                        parent.Token.UpdateRange(node.Token)
+                        Exit Sub
+            End If
+            If m_tree.Errors.Count > 0 Then
+                        parent.Token.UpdateRange(node.Token)
+                        Exit Sub
+            End If
+
+            parent.Token.UpdateRange(node.Token)
+            If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
+            m_tree.Optionals.Clear()
+            End If
+        End Sub ' NonTerminalSymbol: EXPRESSIONPART
 
         Private Sub ParseEXISTSSTMT(ByVal parent As ParseNode) ' NonTerminalSymbol: EXISTSSTMT
             Dim tok As Token
