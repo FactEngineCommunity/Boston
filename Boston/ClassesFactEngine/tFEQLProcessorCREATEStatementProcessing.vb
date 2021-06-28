@@ -224,15 +224,15 @@ Namespace FEQL
 
                 Call Me.GetParseTreeTokensReflection(lrCREATESDATABASEtatement, Me.Parsetree.Nodes(0))
 
-                Dim lrModel = prApplication.createDatabase(lrCREATESDATABASEtatement)
-
-                'Create the actual database. SQLite only at this stage.
-                Me.DatabaseManager.Connection = New FactEngine.SQLiteConnection(lrModel, lrCREATESDATABASEtatement.FILELOCATIONNAME, 100, True)
+                'Create the actual database. SQLite only at this stage.                
                 lrRecordset = Me.DatabaseManager.Connection.createDatabase(lrCREATESDATABASEtatement.FILELOCATIONNAME)
 
                 If lrRecordset.ErrorReturned Then
                     Throw New tInformationException(lrRecordset.ErrorString)
                 End If
+
+                Dim lrModel = prApplication.createDatabase(lrCREATESDATABASEtatement)
+                Me.DatabaseManager.Connection = New FactEngine.SQLiteConnection(lrModel, lrCREATESDATABASEtatement.FILELOCATIONNAME, 100, True)
 
                 lrModel.TargetDatabaseType = pcenumDatabaseType.SQLite
                 lrModel.TargetDatabaseConnectionString = "Data Source=" & lrCREATESDATABASEtatement.FILELOCATIONNAME & ";"
@@ -243,6 +243,8 @@ Namespace FEQL
                                                                                     lrModel.TargetDatabaseConnectionString)
 
                 lrModel.IsDatabaseSynchronised = True
+
+                lrRecordset.ErrorString = "Database successfully created for Model, '" & lrModel.Name & "'"
 
             Catch AppEx As tInformationException
 

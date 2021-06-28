@@ -5879,6 +5879,13 @@ Public Class frmDiagramORM
                     '------------------------
                     'Objectify the FactType
                     '------------------------
+
+                    If lrFactTypeInstance.FactType.InternalUniquenessConstraint.Count = 0 Then
+                        MsgBox("The Fact Type must have at least one Internal Uniqueness Constraint before objectification.")
+                        Exit Sub
+                    End If
+
+
                     Using loWaitCursor As New WaitCursor
                         '-------------------------------------------------------------------------------
                         'Set the 'IsObjectified' value for the FactTypeInstance and underlying FactType
