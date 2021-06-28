@@ -3445,12 +3445,15 @@ Namespace FBM
                 Else
                     Dim lrTable As RDS.Table = Me.Model.RDS.Table.Find(Function(x) x.Name = Me.Id)
 
-                    '  Move Relations that reference this FactType to their respective LinkFactType
-                    'NB Do this before setting IsPGSRelation, such that the single Relation is created.
-                    Call Me.Model.moveRelationsOfFactTypeToRespectiveLinkFactTypes(Me)
+                    If lrTable IsNot Nothing Then
 
-                    If Not lrTable.isPGSRelation Then
-                        lrTable.setIsPGSRelation(True)
+                        '  Move Relations that reference this FactType to their respective LinkFactType
+                        'NB Do this before setting IsPGSRelation, such that the single Relation is created.
+                        Call Me.Model.moveRelationsOfFactTypeToRespectiveLinkFactTypes(Me)
+
+                        If Not lrTable.isPGSRelation Then
+                            lrTable.setIsPGSRelation(True)
+                        End If
                     End If
 
                 End If
