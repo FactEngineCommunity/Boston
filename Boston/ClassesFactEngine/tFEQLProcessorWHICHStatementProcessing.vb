@@ -160,7 +160,12 @@
                                 lrPreviousQueryEdge.FBMFactType = lrQueryEdge.FBMFactType
                                 lrPreviousQueryEdge.FBMFactTypeReading = lrQueryEdge.FBMFactType.FactTypeReading.Find(AddressOf lrPreviousQueryEdge.AmbiguousFactTypeReading.EqualsPartiallyByPredicatePartText)
                                 If lrQueryEdge.FBMFactTypeReading Is Nothing Then
-                                    Throw New Exception(lrPreviousQueryEdge.ErrorMessage)
+                                    If lrPreviousQueryEdge.FBMFactTypeReading IsNot Nothing Then
+                                        lrQueryEdge.FBMFactTypeReading = lrPreviousQueryEdge.FBMFactTypeReading
+                                        lrPreviousQueryEdge.ErrorMessage = Nothing
+                                    Else
+                                        Throw New Exception(lrPreviousQueryEdge.ErrorMessage)
+                                    End If
                                 Else
                                     'PredicatePart
                                     lrPreviousQueryEdge.FBMPredicatePart = (From PredicatePart In lrPreviousQueryEdge.FBMFactTypeReading.PredicatePart

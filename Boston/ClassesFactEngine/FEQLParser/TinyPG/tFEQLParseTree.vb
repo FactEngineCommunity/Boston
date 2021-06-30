@@ -214,6 +214,12 @@ Namespace FEQL
             Dim Value As Object = Nothing
 
             Select Case Token.Type
+                Case TokenType.AddExpr
+                    Value = EvalAddExpr(tree, paramlist)
+                    Exit Select
+                Case TokenType.MultExpr
+                    Value = EvalMultExpr(tree, paramlist)
+                    Exit Select
                 Case TokenType.Atom
                     Value = EvalAtom(tree, paramlist)
                     Exit Select
@@ -595,6 +601,14 @@ Namespace FEQL
                     Exit Select
             End Select
             Return Value
+        End Function
+
+        Protected Overridable Function EvalAddExpr(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalMultExpr(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
         End Function
 
         Protected Overridable Function EvalAtom(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
