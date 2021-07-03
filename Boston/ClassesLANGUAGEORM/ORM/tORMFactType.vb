@@ -394,11 +394,7 @@ Namespace FBM
 
         Public Shadows Function Equals(ByVal other As FBM.FactType) As Boolean Implements System.IEquatable(Of FBM.FactType).Equals
 
-            If Me.Id = other.Id Then
-                Return True
-            Else
-                Return False
-            End If
+            Return Me.Id = other.Id
 
         End Function
 

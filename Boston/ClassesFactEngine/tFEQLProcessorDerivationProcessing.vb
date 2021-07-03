@@ -1,4 +1,6 @@
-﻿Namespace FEQL
+﻿Imports System.Reflection
+
+Namespace FEQL
 
     Partial Public Class Processor
 
@@ -34,6 +36,7 @@
                 For Each lrDerivationSubClause In lrDerivationClause.DERIVATIONSUBCLAUSE
 
                     If lrDerivationSubClause.isFactTypeOnly Then
+#Region "FACTREADING"
                         'Get the FactType for the DerivationSubClause
                         Dim larModelObject As New List(Of FBM.ModelObject)
                         Dim larRole As New List(Of FBM.Role)
@@ -43,8 +46,8 @@
                         Dim lrSentence As New Language.Sentence("DummySentence")
 
                         Dim liInd = 0
-                        For Each lsModelElementName In lrDerivationSubClause.MODELELEMENTNAME
-                            Dim lrModelObject = Me.Model.GetModelObjectByName(lsModelElementName)
+                        For Each lsModelElementName In lrDerivationSubClause.FACTREADING.MODELELEMENTNAME
+                            Dim lrModelObject = Me.Model.GetModelObjectByName(Trim(lsModelElementName).Replace(vbCr, ""))
                             larModelObject.Add(lrModelObject)
 
                             Dim lrRole = New FBM.Role(lrFactType, lrModelObject)
@@ -52,8 +55,8 @@
 
                             Dim lrPredicatePart = New Language.PredicatePart()
                             Dim lsPredicatePartText = ""
-                            If liInd < lrDerivationSubClause.MODELELEMENTNAME.Count - 1 Then
-                                For Each lsPredicatePart In lrDerivationSubClause.PREDICATECLAUSE(liInd).PREDICATE
+                            If liInd < lrDerivationSubClause.FACTREADING.MODELELEMENTNAME.Count - 1 Then
+                                For Each lsPredicatePart In lrDerivationSubClause.FACTREADING.PREDICATECLAUSE(liInd).PREDICATE
                                     lsPredicatePartText &= lsPredicatePart & " "
                                 Next
                                 lrPredicatePart.PredicatePartText = Trim(lsPredicatePartText)
@@ -68,7 +71,9 @@
                         lrFactTypeReading = New FBM.FactTypeReading(lrFactType, larRole, lrSentence)
 
                         lrDerivationSubClause.FBMFactType = Me.Model.getFactTypeByModelObjectsFactTypeReading(larModelObject, lrFactTypeReading)
-
+#End Region
+                    ElseIf lrDerivationSubClause.DERIVATIONFORMULA IsNot Nothing Then
+                        'Nothing to do at this stage
                     End If
 
                 Next
@@ -84,12 +89,125 @@
                         arFactType.DerivationType = FactEngine.Constants.pcenumFEQLDerivationType.Count
                         Return Me.getCountDerivationSQL(lrDerivationClause, arFactType)
 
+                    Case Else
+                        Return Me.getStraightDerivationSQL(lrDerivationClause, arFactType)
+
                 End Select
 
                 Return ""
 
             Catch ex As Exception
                 Throw New Exception(ex.Message)
+            End Try
+
+        End Function
+
+        Private Function getStraightDerivationSQL(ByRef arDerivationClause As FEQL.DERIVATIONCLAUSE,
+                                               ByRef arFactType As FBM.FactType) As String
+
+            Dim lsSQL As String = ""
+
+            Try
+                lsSQL = "(" & vbCrLf
+
+                Dim lsColumnNames As String = ""
+
+                Dim larFactReading = From DerivationClause In arDerivationClause.DERIVATIONSUBCLAUSE.FindAll(Function(x) x.FACTREADING IsNot Nothing)
+                                     Select DerivationClause.FACTREADING
+
+                Dim liInd As Integer = 0
+                For Each lrFactReading In larFactReading
+                    For Each lsModelElementName In lrFactReading.MODELELEMENTNAME
+                        If liInd > 0 Then lsColumnNames &= ", "
+                        Dim lrModelElement = arFactType.Model.GetModelObjectByName(lsModelElementName)
+                        Select Case lrModelElement.GetType
+                            Case GetType(FBM.ValueType)
+                                lsColumnNames &= lrModelElement.Id
+                            Case Else
+                                Dim liInd2 As Integer = 0
+                                For Each lrColumn In lrModelElement.getCorrespondingRDSTable.getFirstUniquenessConstraintColumns
+                                    If liInd2 > 0 Then lsColumnNames &= ", "
+                                    lsColumnNames &= lrColumn.Name
+                                    liInd2 += 1
+                                Next
+                        End Select
+                        liInd += 1
+                    Next
+                Next
+
+                lsSQL &= "SELECT " & lsColumnNames & vbCrLf
+                lsSQL &= " FROM "
+                liInd = 0
+                For Each lrDerivationSubClause In arDerivationClause.DERIVATIONSUBCLAUSE.FindAll(Function(x) x.isFactTypeOnly)
+                    If liInd > 0 Then lsSQL &= "," & vbCrLf
+                    Dim lrTable = lrDerivationSubClause.FBMFactType.getCorrespondingRDSTable
+                    If lrTable IsNot Nothing Then
+                        lsSQL &= lrTable.Name
+                    End If
+                    liInd += 1
+                Next
+
+                lsSQL &= vbCrLf & "WHERE "
+
+                For Each lrDerivationSubClause In arDerivationClause.DERIVATIONSUBCLAUSE.FindAll(Function(x) Not x.isFactTypeOnly)
+                    Dim lrDerivationFormula = lrDerivationSubClause.DERIVATIONFORMULA
+                    lsSQL &= Me.walkDerivationFormulaTree(lrDerivationFormula)
+                Next
+
+                lsSQL &= ") AS " & arFactType.Name & vbCrLf
+
+                Return lsSQL
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return lsSQL
+            End Try
+
+        End Function
+
+        Public Function walkDerivationFormulaTree(ByRef arDerivationFormula As FEQL.ParseNode)
+
+            Dim lsSQL As String = ""
+
+            Try
+                For Each lrParseNode In arDerivationFormula.Nodes
+                    Select Case lrParseNode.Token.Type
+                        Case Is = FEQL.TokenType.MODELELEMENTNAME
+                            lsSQL &= lrParseNode.Token.Text & " "
+                        Case Is = FEQL.TokenType.EQUALS,
+                                  FEQL.TokenType.KEYWDLESSTHAN,
+                                  FEQL.TokenType.KEYWDGREATERTHAN,
+                                  FEQL.TokenType.PLUS,
+                                  FEQL.TokenType.MINUS,
+                                  FEQL.TokenType.TIMES,
+                                  FEQL.TokenType.DIVIDE,
+                                  FEQL.TokenType.NUMBER,
+                                  FEQL.TokenType.BROPEN,
+                                  FEQL.TokenType.BRCLOSE
+                            lsSQL &= lrParseNode.Token.Text & " "
+                    End Select
+
+                    For Each lrSubParseNode In lrParseNode.Nodes
+                        lsSQL &= walkDerivationFormulaTree(lrSubParseNode)
+                    Next
+                Next
+
+                Return lsSQL
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return lsSQL
             End Try
 
         End Function
@@ -105,7 +223,7 @@
 
             lsSQL = "(" & vbCrLf
 
-            Dim lsBaseTableName = arDerivationClause.DERIVATIONSUBCLAUSE(0).MODELELEMENTNAME(0)
+            Dim lsBaseTableName = arDerivationClause.DERIVATIONSUBCLAUSE(0).FACTREADING.MODELELEMENTNAME(0)
             Dim lrColumn = arDerivationClause.DERIVATIONSUBCLAUSE(0).FBMFactType.getCorrespondingRDSTable.Column.Find(Function(x) x.Role.JoinedORMObject.Id = lsBaseTableName)
 
             lsSQL &= "SELECT " & lrColumn.Name

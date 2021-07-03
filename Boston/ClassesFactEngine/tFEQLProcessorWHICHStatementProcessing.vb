@@ -563,16 +563,17 @@
                                                   arQueryEdge.TargetNode,
                                                   arQueryEdge.Predicate)
 
-            If Not arQueryEdge.FBMFactType.getPrimaryFactTypeReading.PredicatePart(0).PredicatePartText = arQueryEdge.Predicate Then
-                If arQueryEdge.FBMFactType.IsManyTo1BinaryFactType And arQueryEdge.BaseNode.Name <> arQueryEdge.FBMFactType.RoleGroup(0).JoinedORMObject.Id Then
+            If arQueryEdge.FBMFactType IsNot Nothing Then 'May be PartialFactTypeMatch and hasn't found the FactType yet.
+                If Not arQueryEdge.FBMFactType.getPrimaryFactTypeReading.PredicatePart(0).PredicatePartText = arQueryEdge.Predicate Then
+                    If arQueryEdge.FBMFactType.IsManyTo1BinaryFactType And arQueryEdge.BaseNode.Name <> arQueryEdge.FBMFactType.RoleGroup(0).JoinedORMObject.Id Then
+                        arQueryEdge.IsReciprocal = True
+                    End If
+                ElseIf arQueryEdge.FBMFactType.FactTypeReading.Find(Function(x) x.IsPreferred) Is Nothing And
+                       arQueryEdge.FBMFactType.IsManyTo1BinaryFactType And
+                       arQueryEdge.BaseNode.Name <> arQueryEdge.FBMFactType.RoleGroup(0).JoinedORMObject.Id Then
                     arQueryEdge.IsReciprocal = True
                 End If
-            ElseIf arQueryEdge.FBMFactType.FactTypeReading.Find(Function(x) x.IsPreferred) Is Nothing And
-                   arQueryEdge.FBMFactType.IsManyTo1BinaryFactType And
-                   arQueryEdge.BaseNode.Name <> arQueryEdge.FBMFactType.RoleGroup(0).JoinedORMObject.Id Then
-                arQueryEdge.IsReciprocal = True
             End If
-
 
         End Sub
 #End Region

@@ -1158,92 +1158,115 @@ Namespace FEQL
 
         Public FBMFactType As FBM.FactType = Nothing
 
-        Private _MODELELEMENT As New List(Of MODELELEMENTClause)
-        Public Property MODELELEMENT As List(Of MODELELEMENTClause)
-            Get
-                Return Me._MODELELEMENT
-            End Get
-            Set(value As List(Of MODELELEMENTClause))
-                Me._MODELELEMENT = value
-            End Set
-        End Property
-
-        Private _MODELELEMENTNAME As New List(Of String)
-        Public Property MODELELEMENTNAME As List(Of String)
-            Get
-                Return Me._MODELELEMENTNAME
-            End Get
-            Set(value As List(Of String))
-                Me._MODELELEMENTNAME = value
-            End Set
-        End Property
-
-        Private _PREDICATECLAUSE As New List(Of FEQL.PREDICATECLAUSE)
-        Public Property PREDICATECLAUSE As List(Of FEQL.PREDICATECLAUSE)
-            Get
-                Return Me._PREDICATECLAUSE
-            End Get
-            Set(value As List(Of FEQL.PREDICATECLAUSE))
-                Me._PREDICATECLAUSE = value
-            End Set
-        End Property
-
-        Private _KEYWDCOUNT As String = Nothing
-        Public Property KEYWDCOUNT As String
-            Get
-                Return Me._KEYWDCOUNT
-            End Get
-            Set(value As String)
-                Me._KEYWDCOUNT = value
-            End Set
-        End Property
-
-        Private _KEYWDEQUALS As String = Nothing
-        Public Property KEYWDEQUALS As String
-            Get
-                Return Me._KEYWDEQUALS
-            End Get
-            Set(value As String)
-                Me._KEYWDEQUALS = value
-            End Set
-        End Property
-
-        Private _EXPRESSION As New List(Of FEQL.EXPRESSION)
-        Public Property EXPRESSION As List(Of FEQL.EXPRESSION)
-            Get
-                Return Me._EXPRESSION
-            End Get
-            Set(value As List(Of FEQL.EXPRESSION))
-                Me._EXPRESSION = value
-            End Set
-        End Property
-
-        Private _MATHCLAUSE As New List(Of FEQL.MATHCLAUSE)
-        Public Property MATHCLAUSE As List(Of MATHCLAUSE)
-            Get
-                Return Me._MATHCLAUSE
-            End Get
-            Set(value As List(Of MATHCLAUSE))
-                Me._MATHCLAUSE = value
-            End Set
-        End Property
-
         Public Function isFactTypeOnly() As Boolean
 
             isFactTypeOnly = True
 
-            If Me.KEYWDCOUNT IsNot Nothing Or
-               Me.EXPRESSION.Count > 0 Or
-               Me.MATHCLAUSE.Count > 0 Then
-                isFactTypeOnly = False
-            End If
+            Return Me.FACTREADING IsNot Nothing
 
-            'for now
-            If Me.KEYWDCOUNT IsNot Nothing Then
-                isFactTypeOnly = True
-            End If
+            'If Me.KEYWDCOUNT IsNot Nothing Or
+            '   Me.EXPRESSION.Count > 0 Or
+            '   Me.MATHCLAUSE.Count > 0 Then
+            '    isFactTypeOnly = False
+            'End If
+
+            ''for now
+            'If Me.KEYWDCOUNT IsNot Nothing Then
+            '    isFactTypeOnly = True
+            'End If
 
         End Function
+
+        Private _FACTREADING As FEQL.FACTREADINGClause
+        Public Property FACTREADING As FACTREADINGClause
+            Get
+                Return Me._FACTREADING
+            End Get
+            Set(value As FACTREADINGClause)
+                Me._FACTREADING = value
+            End Set
+        End Property
+
+        Private _DERIVATIONFORMULA As Object
+        Public Property DERIVATIONFORMULA As Object
+            Get
+                Return Me._DERIVATIONFORMULA
+            End Get
+            Set(value As Object)
+                Me._DERIVATIONFORMULA = value
+            End Set
+        End Property
+
+
+        'Private _MODELELEMENT As New List(Of MODELELEMENTClause)
+        'Public Property MODELELEMENT As List(Of MODELELEMENTClause)
+        '    Get
+        '        Return Me._MODELELEMENT
+        '    End Get
+        '    Set(value As List(Of MODELELEMENTClause))
+        '        Me._MODELELEMENT = value
+        '    End Set
+        'End Property
+
+        'Private _MODELELEMENTNAME As New List(Of String)
+        'Public Property MODELELEMENTNAME As List(Of String)
+        '    Get
+        '        Return Me._MODELELEMENTNAME
+        '    End Get
+        '    Set(value As List(Of String))
+        '        Me._MODELELEMENTNAME = value
+        '    End Set
+        'End Property
+
+        'Private _PREDICATECLAUSE As New List(Of FEQL.PREDICATECLAUSE)
+        'Public Property PREDICATECLAUSE As List(Of FEQL.PREDICATECLAUSE)
+        '    Get
+        '        Return Me._PREDICATECLAUSE
+        '    End Get
+        '    Set(value As List(Of FEQL.PREDICATECLAUSE))
+        '        Me._PREDICATECLAUSE = value
+        '    End Set
+        'End Property
+
+        'Private _KEYWDCOUNT As String = Nothing
+        'Public Property KEYWDCOUNT As String
+        '    Get
+        '        Return Me._KEYWDCOUNT
+        '    End Get
+        '    Set(value As String)
+        '        Me._KEYWDCOUNT = value
+        '    End Set
+        'End Property
+
+        'Private _KEYWDEQUALS As String = Nothing
+        'Public Property KEYWDEQUALS As String
+        '    Get
+        '        Return Me._KEYWDEQUALS
+        '    End Get
+        '    Set(value As String)
+        '        Me._KEYWDEQUALS = value
+        '    End Set
+        'End Property
+
+        'Private _EXPRESSION As New List(Of FEQL.EXPRESSION)
+        'Public Property EXPRESSION As List(Of FEQL.EXPRESSION)
+        '    Get
+        '        Return Me._EXPRESSION
+        '    End Get
+        '    Set(value As List(Of FEQL.EXPRESSION))
+        '        Me._EXPRESSION = value
+        '    End Set
+        'End Property
+
+        'Private _MATHCLAUSE As New List(Of FEQL.MATHCLAUSE)
+        'Public Property MATHCLAUSE As List(Of MATHCLAUSE)
+        '    Get
+        '        Return Me._MATHCLAUSE
+        '    End Get
+        '    Set(value As List(Of MATHCLAUSE))
+        '        Me._MATHCLAUSE = value
+        '    End Set
+        'End Property
 
     End Class
 

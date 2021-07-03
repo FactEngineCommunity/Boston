@@ -413,16 +413,23 @@
 
                 'Derived FactTypes
                 Dim lrDerivationProcessor As New FEQL.Processor(prApplication.WorkingModel)
-                For Each lrQueryEdge In Me.QueryEdges.FindAll(Function(x) x.FBMFactType.IsDerived)
 
-                    lsSQLQuery &= vbCrLf & ","
+                Dim larDerivedFactType = From QueryEdge In Me.QueryEdges
+                                         Where QueryEdge.FBMFactType.IsDerived
+                                         Select New With {QueryEdge.FBMFactType, QueryEdge.Alias}
 
-                    lsSQLQuery &= lrDerivationProcessor.processDerivationText(lrQueryEdge.FBMFactType.DerivationText, lrQueryEdge.FBMFactType)
+                Dim lasAlias As New List(Of String)
+                For Each lrQueryEdge In larDerivedFactType 'Me.QueryEdges.FindAll(Function(x) x.FBMFactType.IsDerived)
+                    If Not lasAlias.Contains(lrQueryEdge.FBMFactType.Id & NullVal(lrQueryEdge.Alias, "")) Then
+                        lsSQLQuery &= "," & vbCrLf
+                        lsSQLQuery &= lrDerivationProcessor.processDerivationText((lrQueryEdge.FBMFactType.DerivationText).Replace(vbCr, " "), lrQueryEdge.FBMFactType)
+                        lasAlias.Add(lrQueryEdge.FBMFactType.Id & NullVal(lrQueryEdge.Alias, ""))
+                    End If
                 Next
 
                 'PartialFactTypeMatch
                 Dim lrPartialMatchFactType As FBM.FactType = Nothing
-                For Each lrQueryEdge In Me.QueryEdges.FindAll(Function(x) Not (x.IsSubQueryLeader Or x.IsPartOfSubQuery))
+                For Each lrQueryEdge In Me.QueryEdges.FindAll(Function(x) Not (x.IsSubQueryLeader Or x.IsPartOfSubQuery) And Not x.FBMFactType.IsDerived)
                     If lrQueryEdge.IsPartialFactTypeMatch Then
 
                         Dim larExistingNode = From Node In larFromNodes
@@ -1223,4 +1230,22 @@
 
     End Class
 
+    Friend Class NewClass
+        Public Property FBMFactType As FBM.FactType
+        Public Property Item As Object
+
+        Public Sub New(fBMFactType As FBM.FactType, item As Object)
+            Me.FBMFactType = fBMFactType
+            Me.Item = item
+        End Sub
+
+        Public Overrides Function Equals(obj As Object) As Boolean
+            Dim other = TryCast(obj, NewClass)
+            Return other IsNot Nothing
+        End Function
+
+        Public Overrides Function GetHashCode() As Integer
+            Return 0
+        End Function
+    End Class
 End Namespace
