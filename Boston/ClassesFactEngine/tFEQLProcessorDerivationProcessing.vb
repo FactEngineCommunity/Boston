@@ -11,7 +11,8 @@ Namespace FEQL
         ''' <param name="arFactType">The FactType for the Derivation Text</param>
         ''' <returns></returns>
         Public Function processDerivationText(ByVal asDerivationText As String,
-                                              ByRef arFactType As FBM.FactType) As String
+                                              ByRef arFactType As FBM.FactType,
+                                              ByVal ParamArray aarParameterArray As FactEngine.QueryEdge()) As String
 
             Try
 
@@ -90,7 +91,7 @@ Namespace FEQL
                         Return Me.getCountDerivationSQL(lrDerivationClause, arFactType)
 
                     Case Else
-                        Return Me.getStraightDerivationSQL(lrDerivationClause, arFactType)
+                        Return Me.getStraightDerivationSQL(lrDerivationClause, arFactType, aarParameterArray)
 
                 End Select
 
@@ -103,7 +104,8 @@ Namespace FEQL
         End Function
 
         Private Function getStraightDerivationSQL(ByRef arDerivationClause As FEQL.DERIVATIONCLAUSE,
-                                               ByRef arFactType As FBM.FactType) As String
+                                                  ByRef arFactType As FBM.FactType,
+                                                  ByVal ParamArray aarParameterArray As FactEngine.QueryEdge()) As String
 
             Dim lsSQL As String = ""
 
@@ -125,7 +127,7 @@ Namespace FEQL
                                 lsColumnNames &= lrModelElement.Id
                             Case Else
                                 Dim liInd2 As Integer = 0
-                                For Each lrColumn In lrModelElement.getCorrespondingRDSTable.getFirstUniquenessConstraintColumns
+                                For Each lrColumn In lrModelElement.getCorrespondingRDSTable.getPrimaryKeyColumns
                                     If liInd2 > 0 Then lsColumnNames &= ", "
                                     lsColumnNames &= lrColumn.Name
                                     liInd2 += 1
@@ -151,7 +153,7 @@ Namespace FEQL
 
                 For Each lrDerivationSubClause In arDerivationClause.DERIVATIONSUBCLAUSE.FindAll(Function(x) Not x.isFactTypeOnly)
                     Dim lrDerivationFormula = lrDerivationSubClause.DERIVATIONFORMULA
-                    lsSQL &= Me.walkDerivationFormulaTree(lrDerivationFormula)
+                    lsSQL &= Me.walkDerivationFormulaTree(lrDerivationFormula, aarParameterArray)
                 Next
 
                 lsSQL &= ") AS " & arFactType.Name & vbCrLf
@@ -171,32 +173,103 @@ Namespace FEQL
 
         End Function
 
-        Public Function walkDerivationFormulaTree(ByRef arDerivationFormula As FEQL.ParseNode)
+        Public Function walkDerivationFormulaTree(ByRef arDerivationFormula As FEQL.ParseNode,
+                                                  ByVal ParamArray aarParameterArray As FactEngine.QueryEdge())
 
             Dim lsSQL As String = ""
-
+            Dim lsTokenText As String = Nothing
             Try
-                For Each lrParseNode In arDerivationFormula.Nodes
-                    Select Case lrParseNode.Token.Type
-                        Case Is = FEQL.TokenType.MODELELEMENTNAME
-                            lsSQL &= lrParseNode.Token.Text & " "
-                        Case Is = FEQL.TokenType.EQUALS,
-                                  FEQL.TokenType.KEYWDLESSTHAN,
-                                  FEQL.TokenType.KEYWDGREATERTHAN,
-                                  FEQL.TokenType.PLUS,
-                                  FEQL.TokenType.MINUS,
-                                  FEQL.TokenType.TIMES,
-                                  FEQL.TokenType.DIVIDE,
-                                  FEQL.TokenType.NUMBER,
-                                  FEQL.TokenType.BROPEN,
-                                  FEQL.TokenType.BRCLOSE
-                            lsSQL &= lrParseNode.Token.Text & " "
-                    End Select
+                Dim larBaseNodeParameter = From QueryEdge In aarParameterArray
+                                           Where QueryEdge.BaseNode.HasIdentifier
+                                           Select QueryEdge.BaseNode
 
-                    For Each lrSubParseNode In lrParseNode.Nodes
-                        lsSQL &= walkDerivationFormulaTree(lrSubParseNode)
-                    Next
+                Dim larTargetNodeParameter = From QueryEdge In aarParameterArray
+                                             Where QueryEdge.TargetNode.HasIdentifier
+                                             Select QueryEdge.TargetNode
+
+                Dim larQueryNodeParameters As List(Of FactEngine.QueryNode) = larBaseNodeParameter.ToList
+                larQueryNodeParameters.AddRange(larTargetNodeParameter.ToList)
+
+                lsSQL &= Me.processNode(arDerivationFormula, larQueryNodeParameters)
+
+                For Each lrParseNode In arDerivationFormula.Nodes
+                    lsSQL &= walkDerivationFormulaTree(lrParseNode, aarParameterArray)
                 Next
+
+                Return lsSQL
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return lsSQL
+            End Try
+
+        End Function
+
+        Public Function processNode(ByRef arParseNode As FEQL.ParseNode,
+                                    ByRef aarQueryNodeParameters As List(Of FactEngine.QueryNode)) As String
+
+            Dim lsSQL As String = ""
+            Dim lsTokenText As String
+            Try
+                lsTokenText = Nothing
+
+                Select Case arParseNode.Token.Type
+                    Case Is = FEQL.TokenType.MODELELEMENTNAME,
+                              FEQL.TokenType.EQUALS,
+                              FEQL.TokenType.KEYWDLESSTHAN,
+                              FEQL.TokenType.KEYWDGREATERTHAN,
+                              FEQL.TokenType.PLUS,
+                              FEQL.TokenType.MINUS,
+                              FEQL.TokenType.TIMES,
+                              FEQL.TokenType.DIVIDE,
+                              FEQL.TokenType.NUMBER,
+                              FEQL.TokenType.BROPEN,
+                              FEQL.TokenType.BRCLOSE
+                        lsTokenText = Trim(arParseNode.Token.Text)
+                    Case Is = FEQL.TokenType.KEYWDTODAY 'Reserved Words
+                        lsTokenText = Trim(arParseNode.Token.Text)
+                    Case Else
+                        Return ""
+                End Select
+
+                Dim lrModelElement As FBM.ModelObject
+                Select Case arParseNode.Token.Type
+                    Case Is = FEQL.TokenType.MODELELEMENTNAME
+                        lrModelElement = Me.Model.GetModelObjectByName(lsTokenText)
+                        Select Case lrModelElement.GetType
+                            Case GetType(FBM.ValueType)
+                                Select Case CType(lrModelElement, FBM.ValueType).DataType
+                                    Case Is = pcenumORMDataType.TemporalDate
+                                        lsTokenText = "julianday(" & lsTokenText & ")"
+                                End Select
+                        End Select
+                End Select
+
+                If lsTokenText IsNot Nothing Then
+
+                    Dim lasParameter = From QueryNode In aarQueryNodeParameters
+                                       Where QueryNode.FBMModelObject.Id = lsTokenText
+                                       Select QueryNode.IdentifierList(0)
+                    'Where NullVal(QueryNode.Alias,"") = 'ToDo
+
+                    If lasParameter.Count > 0 Then
+                        lsTokenText = lasParameter.First
+                    End If
+
+                    Select Case LCase(lsTokenText)
+                        Case Is = "today" 'Reserved word
+                            lsTokenText = "julianday('now') "
+                        Case Else
+                            lsTokenText &= " "
+                    End Select
+                End If
+
+                lsSQL &= lsTokenText
 
                 Return lsSQL
             Catch ex As Exception

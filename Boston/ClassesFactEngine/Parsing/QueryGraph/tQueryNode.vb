@@ -93,7 +93,8 @@
 
         Public Shadows Function Equals(other As QueryNode) As Boolean Implements IEquatable(Of QueryNode).Equals
 
-            Return Me.FBMModelObject.Id = other.FBMModelObject.Id And Me.Alias = other.Alias
+            Return Me.FBMModelObject.Id = other.FBMModelObject.Id And NullVal(Me.Alias, "") = NullVal(other.Alias, "")
+
         End Function
 
         Public Function IsPGSRelationByDefacto() As Boolean

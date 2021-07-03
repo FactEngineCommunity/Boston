@@ -286,6 +286,7 @@
             For Each lsIdentifier In Me.WHICHCLAUSE.NODE(0).NODEPROPERTYIDENTIFICATION.IDENTIFIER
                 arQueryEdge.IdentifierList.Add(lsIdentifier)
                 arQueryEdge.TargetNode.HasIdentifier = True
+                arQueryEdge.TargetNode.IdentifierList.Add(lsIdentifier)
             Next
 
             If arQueryGraph.QueryEdges.Count > 0 Then

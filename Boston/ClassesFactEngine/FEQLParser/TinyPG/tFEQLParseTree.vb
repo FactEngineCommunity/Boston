@@ -249,6 +249,9 @@ Namespace FEQL
                 Case TokenType.FORMULA
                     Value = EvalFORMULA(tree, paramlist)
                     Exit Select
+                Case TokenType.RESERVEDWORD
+                    Value = EvalRESERVEDWORD(tree, paramlist)
+                    Exit Select
                 Case TokenType.ADDITIONALMODELELEMENT
                     Value = EvalADDITIONALMODELELEMENT(tree, paramlist)
                     Exit Select
@@ -653,6 +656,10 @@ Namespace FEQL
         End Function
 
         Protected Overridable Function EvalFORMULA(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalRESERVEDWORD(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
             Throw New NotImplementedException()
         End Function
 

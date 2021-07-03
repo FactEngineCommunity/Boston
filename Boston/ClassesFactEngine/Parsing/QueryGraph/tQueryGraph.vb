@@ -421,8 +421,17 @@
                 Dim lasAlias As New List(Of String)
                 For Each lrQueryEdge In larDerivedFactType 'Me.QueryEdges.FindAll(Function(x) x.FBMFactType.IsDerived)
                     If Not lasAlias.Contains(lrQueryEdge.FBMFactType.Id & NullVal(lrQueryEdge.Alias, "")) Then
+
+                        Dim larQueryEdge = (From QueryEdge In Me.QueryEdges
+                                            Where QueryEdge.FBMFactType Is lrQueryEdge.FBMFactType
+                                            Where NullVal(QueryEdge.Alias, "") = NullVal(lrQueryEdge.Alias, "")
+                                            Select QueryEdge).ToArray
+
                         lsSQLQuery &= "," & vbCrLf
-                        lsSQLQuery &= lrDerivationProcessor.processDerivationText((lrQueryEdge.FBMFactType.DerivationText).Replace(vbCr, " "), lrQueryEdge.FBMFactType)
+                        lsSQLQuery &= lrDerivationProcessor.processDerivationText((lrQueryEdge.FBMFactType.DerivationText).Replace(vbCr, " "),
+                                                                                   lrQueryEdge.FBMFactType,
+                                                                                   larQueryEdge)
+
                         lasAlias.Add(lrQueryEdge.FBMFactType.Id & NullVal(lrQueryEdge.Alias, ""))
                     End If
                 Next
@@ -469,11 +478,12 @@
 
 
                 Dim larConditionalQueryEdges As New List(Of FactEngine.QueryEdge)
-                larConditionalQueryEdges = larEdgesWithTargetNode.ToList.FindAll(Function(x) x.IdentifierList.Count > 0 Or
-                                                                             x.TargetNode.MathFunction <> pcenumMathFunction.None)
+                larConditionalQueryEdges = larEdgesWithTargetNode.ToList.FindAll(Function(x) (x.IdentifierList.Count > 0 Or
+                                                                                              x.TargetNode.MathFunction <> pcenumMathFunction.None) And
+                                                                                              (Not (x.FBMFactType.IsDerived And x.TargetNode.FBMModelObject.GetType Is GetType(FBM.ValueType))))
 
                 'BooleanPredicate edges. E.g. Protein is enzyme
-                larConditionalQueryEdges.AddRange(Me.QueryEdges.FindAll(Function(x) x.TargetNode Is Nothing))
+                larConditionalQueryEdges.AddRange(Me.QueryEdges.FindAll(Function(x) x.TargetNode Is Nothing And Not (x.FBMFactType.IsDerived And x.TargetNode.FBMModelObject.GetType Is GetType(FBM.ValueType))))
 
                 'ShortestPath conditionals are excluded.
                 '  E.g. For '(Account:1) made [SHORTEST PATH 0..10] WHICH Transaction THAT was made to (Account 2:4) '
