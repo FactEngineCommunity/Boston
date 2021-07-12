@@ -4,6 +4,7 @@ Imports System.IO
 Imports System.Reflection
 Imports System.Configuration
 Imports System.Data.SQLite
+Imports ADOX
 
 Public Class frmCRUDModel
 
@@ -147,26 +148,27 @@ Public Class frmCRUDModel
         End If
 
         Try
+
             Dim lrSQLConnectionStringBuilder As System.Data.Common.DbConnectionStringBuilder = Nothing
 
-            Try
-                lrSQLConnectionStringBuilder = New System.Data.Common.DbConnectionStringBuilder(True) With {
-                   .ConnectionString = lsConnectionString
-                }
+                    Try
+                        lrSQLConnectionStringBuilder = New System.Data.Common.DbConnectionStringBuilder(True) With {
+                           .ConnectionString = lsConnectionString
+                        }
 
-                lsDatabaseLocation = lrSQLConnectionStringBuilder("Data Source")
+                        lsDatabaseLocation = lrSQLConnectionStringBuilder("Data Source")
 
-            Catch ex As Exception
-                asReturnMessage = "Please fix the Database Connection String and try again." & vbCrLf & vbCrLf & ex.Message
-                Return False
-            End Try
+                    Catch ex As Exception
+                        asReturnMessage = "Please fix the Database Connection String and try again." & vbCrLf & vbCrLf & ex.Message
+                        Return False
+                    End Try
 
-            If Not System.IO.File.Exists(lsDatabaseLocation) Then
-                asReturnMessage = "The database source of the Database Connection String you provided points to a file that does not exist."
-                asReturnMessage &= vbCrLf & vbCrLf
-                asReturnMessage &= "Please fix the Database Connection String and try again."
-                Return False
-            End If
+                    If Not System.IO.File.Exists(lsDatabaseLocation) Then
+                        asReturnMessage = "The database source of the Database Connection String you provided points to a file that does not exist."
+                        asReturnMessage &= vbCrLf & vbCrLf
+                        asReturnMessage &= "Please fix the Database Connection String and try again."
+                        Return False
+                    End If
 
             Try
                 Select Case Me.ComboBoxDatabaseType.SelectedItem.Tag
@@ -174,7 +176,7 @@ Public Class frmCRUDModel
                         If Database.SQLiteDatabase.CreateConnection(lsConnectionString) Is Nothing Then
                             Throw New Exception("Can't connect to the database with that connection string.")
                         End If
-                    Case Is = "MSJet"
+                    Case Is = pcenumDatabaseType.MSJet
                         Dim ldbConnection As New ADODB.Connection
                         Call ldbConnection.Open(lsConnectionString)
                 End Select
@@ -182,7 +184,6 @@ Public Class frmCRUDModel
                 asReturnMessage &= "Please fix the Database Connection String and try again." & vbCrLf & vbCrLf & ex.Message
                 Return False
             End Try
-
 
             Return True
 
@@ -221,8 +222,20 @@ Public Class frmCRUDModel
                             Me.LabelOpenSuccessfull.Text = "Success"
                         End If
 
-                    Case Is = pcenumDatabaseType.MSJet, pcenumDatabaseType.SQLServer
+                    Case Is = pcenumDatabaseType.MSJet
 
+                        Dim ldbConnection As New ADODB.Connection
+                        Me.LabelOpenSuccessfull.Text = "Testing Connection"
+                        Me.LabelOpenSuccessfull.Visible = True
+
+                        ldbConnection.Open(Me.TextBoxDatabaseConnectionString.Text)
+
+                        Me.LabelOpenSuccessfull.ForeColor = Color.Green
+                        Me.LabelOpenSuccessfull.Text = "Success"
+
+                        ldbConnection.Close()
+
+                    Case Is = pcenumDatabaseType.SQLServer
                         Dim lrODBCConnection As New System.Data.Odbc.OdbcConnection(Me.TextBoxDatabaseConnectionString.Text)
 
                         Me.LabelOpenSuccessfull.Text = "Testing Connection"
@@ -723,7 +736,8 @@ Public Class frmCRUDModel
     Private Sub ComboBoxDatabaseType_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ComboBoxDatabaseType.SelectedIndexChanged
 
         Select Case Me.ComboBoxDatabaseType.SelectedItem.Tag
-            Case Is = pcenumDatabaseType.SQLite
+            Case Is = pcenumDatabaseType.SQLite,
+                      pcenumDatabaseType.MSJet
                 Me.ButtonCreateDatabase.Visible = True
                 Me.ButtonFileSelect.Visible = True
                 If Trim(Me.TextBoxDatabaseConnectionString.Text) = "" Then
@@ -743,18 +757,37 @@ Public Class frmCRUDModel
 
         Dim lrSaveFileDialog As New SaveFileDialog()
 
-        lrSaveFileDialog.Filter = "SQLite database file (*.db)|*.db"
-        lrSaveFileDialog.FilterIndex = 0
-        lrSaveFileDialog.RestoreDirectory = True
+        Select Case ComboBoxDatabaseType.SelectedItem.Tag
+            Case Is = pcenumDatabaseType.SQLite
+                lrSaveFileDialog.Filter = "SQLite database file (*.db)|*.db"
+                lrSaveFileDialog.FilterIndex = 0
+                lrSaveFileDialog.RestoreDirectory = True
 
-        If (lrSaveFileDialog.ShowDialog() = DialogResult.OK) Then
-            If Not System.IO.File.Exists(lrSaveFileDialog.FileName()) Then
-                SQLiteConnection.CreateFile(lrSaveFileDialog.FileName)
-                Dim lsConnectionString = "Data Source=" & lrSaveFileDialog.FileName & ";Version=3;"
-                Me.TextBoxDatabaseConnectionString.Text = lsConnectionString
-                Me.ButtonCreateDatabase.Enabled = False
-            End If
-        End If
+                If (lrSaveFileDialog.ShowDialog() = DialogResult.OK) Then
+                    If Not System.IO.File.Exists(lrSaveFileDialog.FileName()) Then
+                        SQLiteConnection.CreateFile(lrSaveFileDialog.FileName)
+                        Dim lsConnectionString = "Data Source=" & lrSaveFileDialog.FileName & ";Version=3;"
+                        Me.TextBoxDatabaseConnectionString.Text = lsConnectionString
+                        Me.ButtonCreateDatabase.Enabled = False
+                    End If
+                End If
+            Case Is = pcenumDatabaseType.MSJet
+                lrSaveFileDialog.Filter = "MSJet database file (*.mdb)|*.mdb"
+                lrSaveFileDialog.FilterIndex = 0
+                lrSaveFileDialog.RestoreDirectory = True
+
+                If (lrSaveFileDialog.ShowDialog() = DialogResult.OK) Then
+                    If Not System.IO.File.Exists(lrSaveFileDialog.FileName()) Then
+
+                        Call System.IO.File.Copy(Richmond.MyPath & "\emptydatabases\emptymdbdatabase.mdb", lrSaveFileDialog.FileName)
+
+                        Dim lsConnectionString = "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" & lrSaveFileDialog.FileName
+
+                        Me.TextBoxDatabaseConnectionString.Text = lsConnectionString
+                        Me.ButtonCreateDatabase.Enabled = False
+                    End If
+                End If
+        End Select
 
     End Sub
 
@@ -768,6 +801,8 @@ Public Class frmCRUDModel
                     Me.ButtonFileSelect.Visible = True
             End Select
         End If
+
+        Me.LabelOpenSuccessfull.Text = ""
 
     End Sub
 
@@ -788,8 +823,21 @@ Public Class frmCRUDModel
                     End If
 
                 End Using
-        End Select
+            Case Is = pcenumDatabaseType.MSJet
+                Using lrOpenFileDialog As New OpenFileDialog
 
+                    If lrOpenFileDialog.ShowDialog = DialogResult.OK Then
+                        Dim lsReturnMessage As String = Nothing
+                        Dim lsConnectionString = "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" & lrOpenFileDialog.FileName
+                        If Me.checkDatabaseConnectionString(lsReturnMessage, lsConnectionString) Then
+                            Me.TextBoxDatabaseConnectionString.Text = lsConnectionString
+                        Else
+                            MsgBox("The file you selected is not a MSJet database.")
+                        End If
+                    End If
+
+                End Using
+        End Select
 
     End Sub
 
