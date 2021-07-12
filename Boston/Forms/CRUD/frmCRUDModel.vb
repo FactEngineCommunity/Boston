@@ -134,17 +134,24 @@ Public Class frmCRUDModel
 
     End Sub
 
-    Private Function checkDatabaseConnectionString(ByRef asReturnMessage As String) As Boolean
+    Private Function checkDatabaseConnectionString(ByRef asReturnMessage As String,
+                                                   Optional ByVal asConnectionString As String = Nothing) As Boolean
 
         Dim lsDatabaseLocation As String
-        'Dim lsDataProvider as string
+        Dim lsConnectionString As String
+
+        If asConnectionString IsNot Nothing Then
+            lsConnectionString = asConnectionString
+        Else
+            lsConnectionString = Trim(Me.TextBoxDatabaseConnectionString.Text)
+        End If
 
         Try
             Dim lrSQLConnectionStringBuilder As System.Data.Common.DbConnectionStringBuilder = Nothing
 
             Try
                 lrSQLConnectionStringBuilder = New System.Data.Common.DbConnectionStringBuilder(True) With {
-                   .ConnectionString = Trim(Me.TextBoxDatabaseConnectionString.Text)
+                   .ConnectionString = lsConnectionString
                 }
 
                 lsDatabaseLocation = lrSQLConnectionStringBuilder("Data Source")
@@ -164,12 +171,12 @@ Public Class frmCRUDModel
             Try
                 Select Case Me.ComboBoxDatabaseType.SelectedItem.Tag
                     Case Is = pcenumDatabaseType.SQLite
-                        If Database.SQLiteDatabase.CreateConnection(Me.TextBoxDatabaseConnectionString.Text) Is Nothing Then
+                        If Database.SQLiteDatabase.CreateConnection(lsConnectionString) Is Nothing Then
                             Throw New Exception("Can't connect to the database with that connection string.")
                         End If
                     Case Is = "MSJet"
                         Dim ldbConnection As New ADODB.Connection
-                        Call ldbConnection.Open(Trim(Me.TextBoxDatabaseConnectionString.Text))
+                        Call ldbConnection.Open(lsConnectionString)
                 End Select
             Catch ex As Exception
                 asReturnMessage &= "Please fix the Database Connection String and try again." & vbCrLf & vbCrLf & ex.Message
@@ -718,6 +725,7 @@ Public Class frmCRUDModel
         Select Case Me.ComboBoxDatabaseType.SelectedItem.Tag
             Case Is = pcenumDatabaseType.SQLite
                 Me.ButtonCreateDatabase.Visible = True
+                Me.ButtonFileSelect.Visible = True
                 If Trim(Me.TextBoxDatabaseConnectionString.Text) = "" Then
                     Me.ButtonCreateDatabase.Enabled = True
                 Else
@@ -757,8 +765,31 @@ Public Class frmCRUDModel
                 Case Is = pcenumDatabaseType.SQLite
                     Me.ButtonCreateDatabase.Visible = True
                     Me.ButtonCreateDatabase.Enabled = True
+                    Me.ButtonFileSelect.Visible = True
             End Select
         End If
+
+    End Sub
+
+    Private Sub ButtonFileSelect_Click(sender As Object, e As EventArgs) Handles ButtonFileSelect.Click
+
+        Select Case Me.ComboBoxDatabaseType.SelectedItem.Tag
+            Case Is = pcenumDatabaseType.SQLite
+                Using lrOpenFileDialog As New OpenFileDialog
+
+                    If lrOpenFileDialog.ShowDialog = DialogResult.OK Then
+                        Dim lsReturnMessage As String = Nothing
+                        Dim lsConnectionString = "Data Source=" & lrOpenFileDialog.FileName & ";Version=3;"
+                        If Me.checkDatabaseConnectionString(lsReturnMessage, lsConnectionString) Then
+                            Me.TextBoxDatabaseConnectionString.Text = lsConnectionString
+                        Else
+                            MsgBox("The file you selected is not a SQLite database.")
+                        End If
+                    End If
+
+                End Using
+        End Select
+
 
     End Sub
 
