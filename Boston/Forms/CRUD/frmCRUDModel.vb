@@ -3,6 +3,7 @@ Imports System.Xml.Linq
 Imports System.IO
 Imports System.Reflection
 Imports System.Configuration
+Imports System.Data.SQLite
 
 Public Class frmCRUDModel
 
@@ -708,6 +709,55 @@ Public Class frmCRUDModel
 
         If Me.ComboBoxSchema.SelectedIndex >= 0 Then
             Me.ErrorProvider.SetError(Me.ComboBoxSchema, "")
+        End If
+
+    End Sub
+
+    Private Sub ComboBoxDatabaseType_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ComboBoxDatabaseType.SelectedIndexChanged
+
+        Select Case Me.ComboBoxDatabaseType.SelectedItem.Tag
+            Case Is = pcenumDatabaseType.SQLite
+                Me.ButtonCreateDatabase.Visible = True
+                If Trim(Me.TextBoxDatabaseConnectionString.Text) = "" Then
+                    Me.ButtonCreateDatabase.Enabled = True
+                Else
+                    Me.ButtonCreateDatabase.Enabled = False
+                End If
+            Case Else
+                Me.ButtonCreateDatabase.Visible = False
+                Me.ButtonCreateDatabase.Enabled = False
+        End Select
+
+
+    End Sub
+
+    Private Sub ButtonCreateDatabase_Click(sender As Object, e As EventArgs) Handles ButtonCreateDatabase.Click
+
+        Dim lrSaveFileDialog As New SaveFileDialog()
+
+        lrSaveFileDialog.Filter = "SQLite database file (*.db)|*.db"
+        lrSaveFileDialog.FilterIndex = 0
+        lrSaveFileDialog.RestoreDirectory = True
+
+        If (lrSaveFileDialog.ShowDialog() = DialogResult.OK) Then
+            If Not System.IO.File.Exists(lrSaveFileDialog.FileName()) Then
+                SQLiteConnection.CreateFile(lrSaveFileDialog.FileName)
+                Dim lsConnectionString = "Data Source=" & lrSaveFileDialog.FileName & ";Version=3;"
+                Me.TextBoxDatabaseConnectionString.Text = lsConnectionString
+                Me.ButtonCreateDatabase.Enabled = False
+            End If
+        End If
+
+    End Sub
+
+    Private Sub TextBoxDatabaseConnectionString_TextChanged(sender As Object, e As EventArgs) Handles TextBoxDatabaseConnectionString.TextChanged
+
+        If Trim(Me.TextBoxDatabaseConnectionString.Text) = "" Then
+            Select Case Me.ComboBoxDatabaseType.SelectedItem.Tag
+                Case Is = pcenumDatabaseType.SQLite
+                    Me.ButtonCreateDatabase.Visible = True
+                    Me.ButtonCreateDatabase.Enabled = True
+            End Select
         End If
 
     End Sub

@@ -26,6 +26,8 @@ Partial Class frmCRUDModel
         Me.Button_Cancel = New System.Windows.Forms.Button()
         Me.button_okay = New System.Windows.Forms.Button()
         Me.GroupBox_main = New System.Windows.Forms.GroupBox()
+        Me.LabelCoreVersion = New System.Windows.Forms.Label()
+        Me.LabelPromptCoreVersion = New System.Windows.Forms.Label()
         Me.GroupBoxReverseEngineering = New System.Windows.Forms.GroupBox()
         Me.Button2 = New System.Windows.Forms.Button()
         Me.LabelSchema = New System.Windows.Forms.Label()
@@ -34,6 +36,7 @@ Partial Class frmCRUDModel
         Me.LabelModelName = New System.Windows.Forms.Label()
         Me.LabelModel = New System.Windows.Forms.Label()
         Me.GroupBoxDatabase = New System.Windows.Forms.GroupBox()
+        Me.ButtonCreateDatabase = New System.Windows.Forms.Button()
         Me.LabelOpenSuccessfull = New System.Windows.Forms.Label()
         Me.ButtonTestConnection = New System.Windows.Forms.Button()
         Me.ComboBoxDatabaseType = New System.Windows.Forms.ComboBox()
@@ -48,8 +51,6 @@ Partial Class frmCRUDModel
         Me.Tab1 = New System.Windows.Forms.TabPage()
         Me.Advanced = New System.Windows.Forms.TabPage()
         Me.LabelPromptIsDatabaseSynchronised = New System.Windows.Forms.Label()
-        Me.LabelPromptCoreVersion = New System.Windows.Forms.Label()
-        Me.LabelCoreVersion = New System.Windows.Forms.Label()
         Me.GroupBox_main.SuspendLayout()
         Me.GroupBoxReverseEngineering.SuspendLayout()
         Me.GroupBoxDatabase.SuspendLayout()
@@ -90,6 +91,24 @@ Partial Class frmCRUDModel
         Me.GroupBox_main.Size = New System.Drawing.Size(595, 329)
         Me.GroupBox_main.TabIndex = 6
         Me.GroupBox_main.TabStop = False
+        '
+        'LabelCoreVersion
+        '
+        Me.LabelCoreVersion.AutoSize = True
+        Me.LabelCoreVersion.Location = New System.Drawing.Point(540, 24)
+        Me.LabelCoreVersion.Name = "LabelCoreVersion"
+        Me.LabelCoreVersion.Size = New System.Drawing.Size(90, 13)
+        Me.LabelCoreVersion.TabIndex = 17
+        Me.LabelCoreVersion.Text = "LabelCoreVersion"
+        '
+        'LabelPromptCoreVersion
+        '
+        Me.LabelPromptCoreVersion.AutoSize = True
+        Me.LabelPromptCoreVersion.Location = New System.Drawing.Point(474, 24)
+        Me.LabelPromptCoreVersion.Name = "LabelPromptCoreVersion"
+        Me.LabelPromptCoreVersion.Size = New System.Drawing.Size(69, 13)
+        Me.LabelPromptCoreVersion.TabIndex = 16
+        Me.LabelPromptCoreVersion.Text = "Core version:"
         '
         'GroupBoxReverseEngineering
         '
@@ -161,6 +180,7 @@ Partial Class frmCRUDModel
         '
         'GroupBoxDatabase
         '
+        Me.GroupBoxDatabase.Controls.Add(Me.ButtonCreateDatabase)
         Me.GroupBoxDatabase.Controls.Add(Me.LabelOpenSuccessfull)
         Me.GroupBoxDatabase.Controls.Add(Me.ButtonTestConnection)
         Me.GroupBoxDatabase.Controls.Add(Me.ComboBoxDatabaseType)
@@ -174,11 +194,25 @@ Partial Class frmCRUDModel
         Me.GroupBoxDatabase.TabStop = False
         Me.GroupBoxDatabase.Text = "Database:"
         '
+        'ButtonCreateDatabase
+        '
+        Me.ButtonCreateDatabase.BackColor = System.Drawing.Color.White
+        Me.ButtonCreateDatabase.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None
+        Me.ButtonCreateDatabase.DialogResult = System.Windows.Forms.DialogResult.Cancel
+        Me.ButtonCreateDatabase.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.ButtonCreateDatabase.ForeColor = System.Drawing.Color.White
+        Me.ButtonCreateDatabase.Image = Global.Boston.My.Resources.Resources.Add16x16
+        Me.ButtonCreateDatabase.Location = New System.Drawing.Point(255, 19)
+        Me.ButtonCreateDatabase.Name = "ButtonCreateDatabase"
+        Me.ButtonCreateDatabase.Size = New System.Drawing.Size(23, 23)
+        Me.ButtonCreateDatabase.TabIndex = 7
+        Me.ButtonCreateDatabase.UseVisualStyleBackColor = False
+        '
         'LabelOpenSuccessfull
         '
         Me.LabelOpenSuccessfull.Location = New System.Drawing.Point(128, 110)
         Me.LabelOpenSuccessfull.Name = "LabelOpenSuccessfull"
-        Me.LabelOpenSuccessfull.Size = New System.Drawing.Size(410, 26)
+        Me.LabelOpenSuccessfull.Size = New System.Drawing.Size(121, 26)
         Me.LabelOpenSuccessfull.TabIndex = 6
         Me.LabelOpenSuccessfull.Text = "LabelOpenSuccessfull"
         Me.LabelOpenSuccessfull.Visible = False
@@ -231,7 +265,7 @@ Partial Class frmCRUDModel
         '
         Me.CheckBoxIsDatabaseSynchronised.AutoSize = True
         Me.CheckBoxIsDatabaseSynchronised.Location = New System.Drawing.Point(13, 15)
-        Me.CheckBoxIsDatabaseSynchronised.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.CheckBoxIsDatabaseSynchronised.Margin = New System.Windows.Forms.Padding(2)
         Me.CheckBoxIsDatabaseSynchronised.Name = "CheckBoxIsDatabaseSynchronised"
         Me.CheckBoxIsDatabaseSynchronised.Size = New System.Drawing.Size(150, 17)
         Me.CheckBoxIsDatabaseSynchronised.TabIndex = 7
@@ -251,7 +285,7 @@ Partial Class frmCRUDModel
         Me.TabControl1.Controls.Add(Me.Tab1)
         Me.TabControl1.Controls.Add(Me.Advanced)
         Me.TabControl1.Location = New System.Drawing.Point(8, 8)
-        Me.TabControl1.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.TabControl1.Margin = New System.Windows.Forms.Padding(2)
         Me.TabControl1.Name = "TabControl1"
         Me.TabControl1.SelectedIndex = 0
         Me.TabControl1.Size = New System.Drawing.Size(629, 381)
@@ -261,9 +295,9 @@ Partial Class frmCRUDModel
         '
         Me.Tab1.Controls.Add(Me.GroupBox_main)
         Me.Tab1.Location = New System.Drawing.Point(4, 22)
-        Me.Tab1.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.Tab1.Margin = New System.Windows.Forms.Padding(2)
         Me.Tab1.Name = "Tab1"
-        Me.Tab1.Padding = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.Tab1.Padding = New System.Windows.Forms.Padding(2)
         Me.Tab1.Size = New System.Drawing.Size(621, 355)
         Me.Tab1.TabIndex = 0
         Me.Tab1.Text = "Database"
@@ -274,9 +308,9 @@ Partial Class frmCRUDModel
         Me.Advanced.Controls.Add(Me.LabelPromptIsDatabaseSynchronised)
         Me.Advanced.Controls.Add(Me.CheckBoxIsDatabaseSynchronised)
         Me.Advanced.Location = New System.Drawing.Point(4, 22)
-        Me.Advanced.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.Advanced.Margin = New System.Windows.Forms.Padding(2)
         Me.Advanced.Name = "Advanced"
-        Me.Advanced.Padding = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.Advanced.Padding = New System.Windows.Forms.Padding(2)
         Me.Advanced.Size = New System.Drawing.Size(621, 355)
         Me.Advanced.TabIndex = 1
         Me.Advanced.Text = "Advanced"
@@ -292,24 +326,6 @@ Partial Class frmCRUDModel
         Me.LabelPromptIsDatabaseSynchronised.TabIndex = 8
         Me.LabelPromptIsDatabaseSynchronised.Text = "Warning: When 'Is Database Synchronised' is checked, Boston will modify the datab" &
     "ase when you change the ORM Model within the Model."
-        '
-        'LabelPromptCoreVersion
-        '
-        Me.LabelPromptCoreVersion.AutoSize = True
-        Me.LabelPromptCoreVersion.Location = New System.Drawing.Point(474, 24)
-        Me.LabelPromptCoreVersion.Name = "LabelPromptCoreVersion"
-        Me.LabelPromptCoreVersion.Size = New System.Drawing.Size(69, 13)
-        Me.LabelPromptCoreVersion.TabIndex = 16
-        Me.LabelPromptCoreVersion.Text = "Core version:"
-        '
-        'LabelCoreVersion
-        '
-        Me.LabelCoreVersion.AutoSize = True
-        Me.LabelCoreVersion.Location = New System.Drawing.Point(540, 24)
-        Me.LabelCoreVersion.Name = "LabelCoreVersion"
-        Me.LabelCoreVersion.Size = New System.Drawing.Size(90, 13)
-        Me.LabelCoreVersion.TabIndex = 17
-        Me.LabelCoreVersion.Text = "LabelCoreVersion"
         '
         'frmCRUDModel
         '
@@ -364,4 +380,5 @@ Partial Class frmCRUDModel
     Friend WithEvents LabelPromptIsDatabaseSynchronised As Label
     Friend WithEvents LabelCoreVersion As Label
     Friend WithEvents LabelPromptCoreVersion As Label
+    Friend WithEvents ButtonCreateDatabase As Button
 End Class

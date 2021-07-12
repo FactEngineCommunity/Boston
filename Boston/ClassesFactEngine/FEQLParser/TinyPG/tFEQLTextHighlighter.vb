@@ -220,7 +220,7 @@ Namespace FEQL
         ClearUndo()
 
         AddHandler Textbox.TextChanged, AddressOf Textbox_TextChanged
-        AddHandler textbox.KeyDown, AddressOf textbox_KeyDown
+        AddHandler textbox.KeyUp, AddressOf textbox_KeyDown
         AddHandler Textbox.SelectionChanged, AddressOf Textbox_SelectionChanged
         AddHandler Textbox.Disposed, AddressOf Textbox_Disposed
 
@@ -338,7 +338,7 @@ Namespace FEQL
     Public Sub HighlightText()
         SyncLock treelock
             textChanged = True
-            currentText = Textbox.Text
+            currentText = Trim(Textbox.Text)
         End SyncLock
     End Sub
 

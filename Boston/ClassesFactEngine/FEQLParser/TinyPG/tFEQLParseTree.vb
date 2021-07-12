@@ -17,7 +17,7 @@ Namespace FEQL
         End Sub
     End Class
 
-    <Serializable()>
+    <Serializable()> _
     Public Class ParseError 
         Private m_message As String
         Private m_code As Integer
@@ -63,46 +63,28 @@ Namespace FEQL
             End Get
         End Property
 
-        Public Property ExpectedToken As String
+        Public Property ExpectedToken as String
             Get
-                Return Me.m_expected_token
+                Return me.m_expected_token
             End Get
             Set(ByVal value As String)
-                Me.m_expected_token = value
+                me.m_expected_token = value
             End Set
         End Property
 
-        ''' <summary>
-        ''' Parameterless constructor.
-        ''' </summary>
-        Public Sub New()
+        Public Sub New(ByVal message As String, ByVal code As Integer, ByVal node As ParseNode)
+            Me.New(message, code, 0, node.Token.StartPos, node.Token.StartPos, node.Token.Length)
         End Sub
 
-        Public Sub New(ByVal message As Integer,
-                       ByVal code As Integer)
-
-        End Sub
-
-        Public Sub New(ByVal message As String,
-                       ByVal code As Integer,
-                       ByVal line As Integer,
-                       ByVal col As Integer,
-                       ByVal pos As Integer,
-                       ByVal length As Integer,
-                       Optional ByVal asExpectedToken As String = "")
+        Public Sub New(ByVal message As String, ByVal code As Integer, ByVal line As Integer, ByVal col As Integer, ByVal pos As Integer, ByVal length As Integer, Optional ByVal asExpectedToken as String = "")
             m_message = message
             m_code = code
             m_line = line
             m_col = col
             m_pos = pos
             m_length = length
-            m_expected_token = asExpectedToken
+	    m_expected_token = asExpectedToken
         End Sub
-
-        Public Sub New(ByVal message As String, ByVal code As Integer, ByVal node As ParseNode)
-            Me.New(message, code, 0, node.Token.StartPos, node.Token.StartPos, node.Token.Length)
-        End Sub
-
     End Class
 
     ' rootlevel of the node tree
@@ -121,7 +103,7 @@ Namespace FEQL
             Token.Text = "Root"
             Skipped = New List(Of Token)()
             Errors = New ParseErrors()
-            Optionals = New ParseErrors()
+	    Optionals = New ParseErrors()
         End Sub
 
         Public Function PrintTree() As String
@@ -155,12 +137,10 @@ Namespace FEQL
 #End Region
 
 #Region "ParseNode"
-    <Serializable()>
+    <Serializable()> _
     Partial Public Class ParseNode 
-        Implements IEquatable(Of ParseNode)
         Protected m_text As String
         Protected m_nodes As List(Of ParseNode)
-        Protected GUID As String = System.Guid.NewGuid.ToString
         
 
         Public ReadOnly Property Nodes() As List(Of ParseNode)
@@ -170,11 +150,11 @@ Namespace FEQL
         End Property
 
         
-        <XMLIgnore()>
+        <XMLIgnore()> _
         Public Parent As ParseNode
         Public Token As Token
         ' the token/rule
-        <XmlIgnore()>
+        <XmlIgnore()> _
         Public Property Text() As String
             ' text to display in parse tree 
             Get
@@ -185,9 +165,9 @@ Namespace FEQL
             End Set
         End Property
 
-        Public Sub New()
+	Public Sub New()
 
-        End Sub
+	End Sub 
 
         Public Overridable Function CreateNode(ByVal token As Token, ByVal text As String) As ParseNode
             Dim node As New ParseNode(token, text)
@@ -212,7 +192,7 @@ Namespace FEQL
             End If
 
             ' left to right
-            For Each node As ParseNode In Nodes
+            For Each node As ParseNode In nodes
                 If node.Token.Type = type Then
                     System.Math.Max(System.Threading.Interlocked.Decrement(index), index + 1)
                     If index < 0 Then
@@ -293,9 +273,6 @@ Namespace FEQL
                     Exit Select
                 Case TokenType.FACTPREDICATE
                     Value = EvalFACTPREDICATE(tree, paramlist)
-                    Exit Select
-                Case TokenType.FACTREADING
-                    Value = EvalFACTREADING(tree, paramlist)
                     Exit Select
                 Case TokenType.FACTTYPENAMESTR
                     Value = EvalFACTTYPENAMESTR(tree, paramlist)
@@ -498,6 +475,18 @@ Namespace FEQL
                 Case TokenType.DERIVEDFACTTYPESTMT
                     Value = EvalDERIVEDFACTTYPESTMT(tree, paramlist)
                     Exit Select
+                Case TokenType.FACTREADING
+                    Value = EvalFACTREADING(tree, paramlist)
+                    Exit Select
+                Case TokenType.DERIVATIONFACTREADING
+                    Value = EvalDERIVATIONFACTREADING(tree, paramlist)
+                    Exit Select
+                Case TokenType.DERIVATIONWHICHCLAUSE
+                    Value = EvalDERIVATIONWHICHCLAUSE(tree, paramlist)
+                    Exit Select
+                Case TokenType.DERIVATIONWHICHTHATCLAUSE
+                    Value = EvalDERIVATIONWHICHTHATCLAUSE(tree, paramlist)
+                    Exit Select
                 Case TokenType.DESCRIBESTMT
                     Value = EvalDESCRIBESTMT(tree, paramlist)
                     Exit Select
@@ -635,11 +624,7 @@ Namespace FEQL
             Return Value
         End Function
 
-        Public Function Equals(other As ParseNode) As Boolean Implements IEquatable(Of ParseNode).Equals
-            Return Me.GUID = other.GUID
-        End Function
-
-                Protected Overridable Function EvalCOMPARITOR(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+        Protected Overridable Function EvalCOMPARITOR(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
             Throw New NotImplementedException()
         End Function
 
@@ -716,10 +701,6 @@ Namespace FEQL
         End Function
 
         Protected Overridable Function EvalFACTPREDICATE(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
-            Throw New NotImplementedException()
-        End Function
-
-        Protected Overridable Function EvalFACTREADING(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
             Throw New NotImplementedException()
         End Function
 
@@ -988,6 +969,22 @@ Namespace FEQL
         End Function
 
         Protected Overridable Function EvalDERIVEDFACTTYPESTMT(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalFACTREADING(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalDERIVATIONFACTREADING(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalDERIVATIONWHICHCLAUSE(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalDERIVATIONWHICHTHATCLAUSE(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
             Throw New NotImplementedException()
         End Function
 
