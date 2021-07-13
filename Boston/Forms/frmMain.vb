@@ -774,7 +774,6 @@ Public Class frmMain
             prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
-
     End Sub
 
 

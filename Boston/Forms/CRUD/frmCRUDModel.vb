@@ -203,6 +203,12 @@ Public Class frmCRUDModel
     Private Sub ButtonTestConnection_Click(sender As Object, e As EventArgs) Handles ButtonTestConnection.Click
 
         Try
+            If Trim(Me.TextBoxDatabaseConnectionString.Text) = "" Then
+                MsgBox("Please provide a Connection String")
+                Exit Sub
+            End If
+
+
             With New WaitCursor
                 Select Case Me.ComboBoxDatabaseType.SelectedItem.Tag
                     Case Is = pcenumDatabaseType.SQLite
