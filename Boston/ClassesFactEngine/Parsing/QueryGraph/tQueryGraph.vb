@@ -369,6 +369,9 @@
                             lsSQLQuery &= vbCrLf & ", (With RECURSIVE nodes(" & lsColumnNames & ",depth) As ("
                             lsSQLQuery &= vbCrLf & " Select [" & lrRDSTable.Name & "]." & Strings.Join(lasColumnName.ToArray, ",[" & lrRDSTable.Name & "].") & ",0"
                             lsSQLQuery &= vbCrLf & " FROM [" & lrRDSTable.Name & "]"
+                            If lrQueryEdge.TargetNode.HasIdentifier Then
+                                lsSQLQuery &= vbCrLf & "," & "[" & lrQueryEdge.TargetNode.RDSTable.Name & "]"
+                            End If
                             If lrQueryEdge.BaseNode.IdentifierList.Count > 0 Then
                                 Dim lrTargetTable As RDS.Table = larLeftColumn(0).Relation.Find(Function(x) x.OriginTable.Name = lrRDSTable.Name).DestinationTable
                                 lsSQLQuery &= "," & lrTargetTable.Name & vbCrLf & " WHERE "
@@ -381,10 +384,28 @@
                                 Next
                                 lsSQLQuery &= vbCrLf & " AND [" & lrRDSTable.Name & "]." & larLeftColumn(0).Name & " = [" & lrTargetTable.Name & "]." & lrTargetTable.getPrimaryKeyColumns(0).Name
                             End If
+                            If lrQueryEdge.TargetNode.HasIdentifier Then
+                                Dim lrTargetTable As RDS.Table = lrQueryEdge.TargetNode.RDSTable
+                                lsSQLQuery &= vbCrLf & " WHERE [" & lrRDSTable.Name & "]." & larRightColumn(0).Name & " = [" & lrTargetTable.Name & "]." & lrTargetTable.getPrimaryKeyColumns(0).Name
+                                liInd = 0
+                                For Each lrColumn In lrTargetTable.getFirstUniquenessConstraintColumns
+                                    lsSQLQuery &= vbCrLf & " AND "
+                                    lsSQLQuery &= "[" & lrTargetTable.Name & "]." & lrColumn.Name & " = '"
+                                    lsSQLQuery &= lrQueryEdge.TargetNode.IdentifierList(liInd) & "'" & vbCrLf
+                                    liInd += 1
+                                Next
+                                lrQueryEdge.TargetNode.IsExcludedConditional = True
+                            End If
                             lsSQLQuery &= vbCrLf & " UNION "
                             lsSQLQuery &= vbCrLf & " SELECT [" & lrRDSTable.Name & "]." & Strings.Join(lasColumnName.ToArray, ",[" & lrRDSTable.Name & "].") & ",depth + 1"
                             lsSQLQuery &= vbCrLf & " FROM nodes, [" & lrRDSTable.Name & "]"
-                            lsSQLQuery &= vbCrLf & " WHERE Nodes." & larRightColumn(0).Name & " = [" & lrRDSTable.Name & "]." & larLeftColumn(0).Name
+                            lsSQLQuery &= vbCrLf & " WHERE "
+                            If lrQueryEdge.TargetNode.HasIdentifier Then
+                                lsSQLQuery &= "Nodes." & larLeftColumn(0).Name & " = [" & lrRDSTable.Name & "]." & larRightColumn(0).Name
+                            Else
+                                lsSQLQuery &= "Nodes." & larRightColumn(0).Name & " = [" & lrRDSTable.Name & "]." & larLeftColumn(0).Name
+                            End If
+
                             If My.Settings.FactEngineDefaultQueryResultLimit > 0 Then
                                 lsSQLQuery &= vbCrLf & " LIMIT " & My.Settings.FactEngineDefaultQueryResultLimit
                             End If
@@ -392,7 +413,7 @@
                             lsSQLQuery &= vbCrLf & " SELECT " & Strings.Join(lasColumnName.ToArray, ",") & ",depth"
                             lsSQLQuery &= vbCrLf & " FROM nodes"
                             If lrQueryEdge.RecursiveNumber1 IsNot Nothing And lrQueryEdge.RecursiveNumber2 IsNot Nothing Then
-                                lsSQLQuery &= vbCrLf & " WHERE depth BETWEEN " & lrQueryEdge.RecursiveNumber1 & " AND " & lrQueryEdge.RecursiveNumber2
+                                lsSQLQuery &= vbCrLf & " WHERE depth BETWEEN " & lrQueryEdge.RecursiveNumber1 & " And " & lrQueryEdge.RecursiveNumber2
                             ElseIf lrQueryEdge.RecursiveNumber2 Is Nothing Then
                                 lsSQLQuery &= vbCrLf & " WHERE depth >= " & lrQueryEdge.RecursiveNumber1
                             End If
@@ -490,6 +511,9 @@
                 '  the second QueryEdge conditional is taken care of in the FROM clause processing for the recursive query.
                 larConditionalQueryEdges.RemoveAll(Function(x) x.TargetNode.IsExcludedConditional)
 
+                'Recursive NodePropertyIdentification conditionals are excluded.
+                larConditionalQueryEdges.RemoveAll(Function(x) x.TargetNode.IsExcludedConditional)
+
                 If larWhereEdges.Count = 0 And larConditionalQueryEdges.Count = 0 And (Not Me.HeadNode.HasIdentifier) Then
                     Return lsSQLQuery
                 End If
@@ -505,7 +529,7 @@
                 For Each lrQueryEdge In larWhereEdges.FindAll(Function(x) Not (x.IsSubQueryLeader Or x.IsPartOfSubQuery))
 
                     If lbAddedAND Or liInd > 1 Then
-                        lsSQLQuery &= "AND "
+                        lsSQLQuery &= "And "
                         lbAddedAND = True
                     Else
                         lbAddedAND = False
@@ -518,7 +542,7 @@
                         Dim lrNaryTable As RDS.Table = lrQueryEdge.FBMFactType.getCorrespondingRDSTable
                         If lrQueryEdge.BaseNode.FBMModelObject.GetType IsNot GetType(FBM.ValueType) Then
                             For Each lrColumn In lrQueryEdge.BaseNode.RDSTable.getPrimaryKeyColumns
-                                If liInd2 > 0 Then lsSQLQuery &= Richmond.returnIfTrue(lbAddedAND, "", " AND ")
+                                If liInd2 > 0 Then lsSQLQuery &= Richmond.returnIfTrue(lbAddedAND, "", " And ")
                                 lsSQLQuery &= "[" & lrNaryTable.Name & "]." & lrNaryTable.Column.Find(Function(x) x.ActiveRole Is lrColumn.ActiveRole).Name
                                 lsSQLQuery &= "=" & "[" & lrColumn.Table.Name & "]." & lrColumn.Name & vbCrLf
                                 liInd2 += 1
@@ -526,10 +550,10 @@
                             Next
                         End If
                         If lrQueryEdge.TargetNode.FBMModelObject.GetType <> GetType(FBM.ValueType) Then
-                            If Not lbAddedAND Then lsSQLQuery &= Richmond.returnIfTrue(lbAddedAND, "", " AND ")
+                            If Not lbAddedAND Then lsSQLQuery &= Richmond.returnIfTrue(lbAddedAND, "", " And ")
                             liInd2 = 0
                             For Each lrColumn In lrQueryEdge.TargetNode.RDSTable.getPrimaryKeyColumns
-                                If liInd2 > 0 Then lsSQLQuery &= " AND "
+                                If liInd2 > 0 Then lsSQLQuery &= " And "
                                 lsSQLQuery &= "[" & lrNaryTable.Name & "]." & lrNaryTable.Column.Find(Function(x) x.ActiveRole Is lrColumn.ActiveRole).Name
                                 lsSQLQuery &= "=" & "[" & lrColumn.Table.Name & "]." & lrColumn.Name & vbCrLf
                                 liInd2 += 1
@@ -679,14 +703,14 @@
                                 Dim lrOriginColumn = lrRelation.OriginColumns.Find(Function(x) x.ActiveRole Is lrColumn.ActiveRole)
                                 lsSQLQuery &= "[" & lrQueryEdge.TargetNode.Name & Viev.NullVal(lrQueryEdge.TargetNode.Alias, "") & "]." & lrOriginColumn.Name
                                 lsSQLQuery &= " = " & "[" & lrQueryEdge.BaseNode.Name & "]." & lrColumn.Name
-                                If liInd2 < larTargetColumn.Count Then lsSQLQuery &= vbCrLf & "AND "
+                                If liInd2 < larTargetColumn.Count Then lsSQLQuery &= vbCrLf & "And "
                                 liInd2 += 1
                             Next
                         End If
                     End If
 
                     'CodeSafe Remove wayward ANDs
-                    If Trim(lsSQLQuery).EndsWith("AND") Then
+                    If Trim(lsSQLQuery).EndsWith("And") Then
                         lsSQLQuery = Trim(lsSQLQuery).Substring(0, lsSQLQuery.Length - 4)
                     End If
 
@@ -702,7 +726,7 @@
                 If (Not lbAddedAND And lbIntialWhere Is Nothing And
                     (larConditionalQueryEdges.Count > 0 And larWhereEdges.Count > 0)) Or
                     (Me.HeadNode.HasIdentifier And Not Me.QueryEdges(0).IsRecursive And larWhereEdges.Count > 0) Then
-                    lsSQLQuery &= "AND "
+                    lsSQLQuery &= "And "
                     lbIntialWhere = Nothing
                 End If
 

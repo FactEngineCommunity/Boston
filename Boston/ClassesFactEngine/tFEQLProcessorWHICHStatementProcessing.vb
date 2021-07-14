@@ -281,6 +281,29 @@
                 arQueryGraph.Nodes.AddUnique(arQueryEdge.TargetNode)
             End If
 
+            If arWHICHCLAUSE.RECURSIVECLAUSE IsNot Nothing Then
+                If arWHICHCLAUSE.RECURSIVECLAUSE.KEYWDCIRCULAR IsNot Nothing Then
+                    arQueryEdge.TargetNode.Alias = "RND" & 100.ToString & New Random().Next(10).ToString
+                    arQueryEdge.IsCircular = True
+                ElseIf arWHICHCLAUSE.RECURSIVECLAUSE.KEYWDSHORTESTPATH IsNot Nothing Then
+                    arQueryEdge.TargetNode.Alias = "RND" & 100.ToString & New Random().Next(10).ToString
+                    arQueryEdge.IsShortestPath = True
+                ElseIf arQueryEdge.TargetNode.RDSTable.isCircularToTable(arQueryEdge.BaseNode.RDSTable) Then
+                    arQueryEdge.TargetNode.Alias = "RND" & 100.ToString & New Random().Next(10).ToString
+                End If
+
+                arQueryEdge.IsRecursive = True
+                If arWHICHCLAUSE.RECURSIVECLAUSE.NUMBER1 IsNot Nothing Then
+                    arQueryEdge.RecursiveNumber1 = arWHICHCLAUSE.RECURSIVECLAUSE.NUMBER(0)
+                    If arWHICHCLAUSE.RECURSIVECLAUSE.NUMBER2 IsNot Nothing Then
+                        arQueryEdge.RecursiveNumber2 = arWHICHCLAUSE.RECURSIVECLAUSE.NUMBER(1)
+                    End If
+                ElseIf arWHICHCLAUSE.RECURSIVECLAUSE.NUMBER2 IsNot Nothing Then
+                    arQueryEdge.RecursiveNumber1 = "0"
+                    arQueryEdge.RecursiveNumber2 = arWHICHCLAUSE.RECURSIVECLAUSE.NUMBER(0)
+                End If
+            End If
+
             '---------------------------------------------------------
             'Set the Identification
             For Each lsIdentifier In Me.WHICHCLAUSE.NODE(0).NODEPROPERTYIDENTIFICATION.IDENTIFIER
