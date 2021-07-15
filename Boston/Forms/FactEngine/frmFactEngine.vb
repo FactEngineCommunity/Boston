@@ -1318,7 +1318,6 @@ Public Class frmFactEngine
                     Case Else
                         Me.AutoComplete.ListBox.Items.Clear()
                 End Select
-
             End If
 
             Dim laiExpectedToken As New List(Of FEQL.TokenType)
@@ -1909,6 +1908,18 @@ Public Class frmFactEngine
         For Each lrParseError In aarParseErrors
             liTokenType = DirectCast([Enum].Parse(GetType(FEQL.TokenType), lrParseError.ExpectedToken), FEQL.TokenType)
             Select Case liTokenType
+                Case Is = FEQL.TokenType.COLUMNNAMESTR
+                    'Nothing to do here.
+                    Dim lrModelElement As FBM.ModelObject
+                    Dim lsModelElementName As String
+                    lsModelElementName = Me.TextBoxInput.Text.Trim.Split(" ").Last
+                    lrModelElement = prApplication.WorkingModel.GetModelObjectByName(lsModelElementName)
+                    Dim lrTable As RDS.Table = lrModelElement.getCorrespondingRDSTable
+                    For Each lrColumn In lrTable.Column
+                        Me.AddEnterpriseAwareItem(lrColumn.Name)
+                    Next
+                Case Is = FEQL.TokenType.KEYWDCOUNTSTAR
+                    Me.AddEnterpriseAwareItem("COUNT(*)", liTokenType)
                 Case Is = FEQL.TokenType.EMAILADDRESS
                     'Nothing to do here.
                 Case Is = FEQL.TokenType.MODELELEMENTSUFFIX
