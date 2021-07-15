@@ -1010,19 +1010,31 @@
 
                         If lrReturnColumn.MODELELEMENTNAME IsNot Nothing Then
 
-                            Dim larReturnColumn = From Table In Me.Model.RDS.Table
-                                                  From Column In Table.Column
-                                                  Where Table.Name = lrReturnColumn.MODELELEMENTNAME
-                                                  Where Column.Name = lrReturnColumn.COLUMNNAMESTR
-                                                  Select Column
+                            If lrReturnColumn.COLUMNNAMESTR Is Nothing Then
+                                'Must be * (as in Lecturer.*)
+                                Try
+                                    Dim lrTable As RDS.Table = Me.Model.RDS.Table.Find(Function(x) x.Name = lrReturnColumn.MODELELEMENTNAME)
+                                    For Each lrColumn In lrTable.Column
+                                        larColumn.Add(lrColumn.Clone(Nothing, Nothing))
+                                    Next
+                                Catch ex As Exception
+                                    Throw New Exception("Column, " & lrReturnColumn.MODELELEMENTNAME & ".*, not found. Check your RETURN clause.")
+                                End Try
+                            Else
+                                Dim larReturnColumn = From Table In Me.Model.RDS.Table
+                                                      From Column In Table.Column
+                                                      Where Table.Name = lrReturnColumn.MODELELEMENTNAME
+                                                      Where Column.Name = lrReturnColumn.COLUMNNAMESTR
+                                                      Select Column
 
-                            Try
-                                Dim lrColumn As RDS.Column = larReturnColumn.First.Clone(Nothing, Nothing)
-                                lrColumn.TemporaryAlias = lrReturnColumn.MODELELEMENTSUFFIX
-                                larColumn.Add(lrColumn)
-                            Catch ex As Exception
-                                Throw New Exception("Column, " & lrReturnColumn.MODELELEMENTNAME & "." & lrReturnColumn.COLUMNNAMESTR & ", not found. Check your RETURN clause.")
-                            End Try
+                                Try
+                                    Dim lrColumn As RDS.Column = larReturnColumn.First.Clone(Nothing, Nothing)
+                                    lrColumn.TemporaryAlias = lrReturnColumn.MODELELEMENTSUFFIX
+                                    larColumn.Add(lrColumn)
+                                Catch ex As Exception
+                                    Throw New Exception("Column, " & lrReturnColumn.MODELELEMENTNAME & "." & lrReturnColumn.COLUMNNAMESTR & ", not found. Check your RETURN clause.")
+                                End Try
+                            End If
 
                         ElseIf lrReturnColumn.KEYWDCOUNTSTAR IsNot Nothing Then
                             'COUNT(*) is added in GenerateSQL

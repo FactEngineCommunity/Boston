@@ -1919,6 +1919,8 @@ Public Class frmFactEngine
                     'Nothing to do here.
                 Case Is = FEQL.TokenType.FOLLOWINGREADINGTEXT
                     'Nothing to do here.
+                Case Is = FEQL.TokenType.STAR
+                    Me.AddEnterpriseAwareItem("*", liTokenType)
                 Case Is = FEQL.TokenType.BROPEN
                     Call Me.AddEnterpriseAwareItem("(", liTokenType)
                 Case Is = FEQL.TokenType.PREDICATE
