@@ -1,7 +1,6 @@
 ﻿Imports System.Reflection
 
 Namespace FEQL
-
     Public Class ASSERTStatement
 
         Private _NODEPROPERTYNAMEIDENTIFICATION As New List(Of NODEPROPERTYNAMEIDENTIFICATION)
@@ -334,6 +333,16 @@ Namespace FEQL
     End Class
 
     Public Class RETURNCLAUSE
+
+        Private _KEYWDDISTINCT As String = Nothing
+        Public Property KEYWDDISTINCT As String
+            Get
+                Return Me._KEYWDDISTINCT
+            End Get
+            Set(value As String)
+                Me._KEYWDDISTINCT = value
+            End Set
+        End Property
 
         Private _RETURNCOLUMN As New List(Of RETURNCOLUMN)
         Public Property RETURNCOLUMN As List(Of RETURNCOLUMN)

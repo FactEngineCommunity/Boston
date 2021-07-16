@@ -4393,6 +4393,31 @@ Namespace FEQL
             End If
 
              ' Concat Rule
+            tok = m_scanner.LookAhead(TokenType.KEYWDDISTINCT) ' Option Rule
+            If tok.Type = TokenType.KEYWDDISTINCT Then
+                tok = m_scanner.Scan(TokenType.KEYWDDISTINCT) ' Terminal Rule: KEYWDDISTINCT
+                n = node.CreateNode(tok, tok.ToString() )
+                node.Token.UpdateRange(tok)
+                node.Nodes.Add(n)
+                If tok.Type <> TokenType.KEYWDDISTINCT Then
+                    m_tree.Errors.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDDISTINCT.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDDISTINCT"))
+                    Return
+
+                End If
+
+            If m_tree.Errors.Count > 0 Then
+                            parent.Token.UpdateRange(node.Token)
+                            Exit Sub
+            End If
+            Else
+                            m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDDISTINCT.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDDISTINCT"))
+            End If
+            If m_tree.Errors.Count > 0 Then
+                        parent.Token.UpdateRange(node.Token)
+                        Exit Sub
+            End If
+
+             ' Concat Rule
             ParseRETURNCOLUMN(node) ' NonTerminal Rule: RETURNCOLUMN
             If m_tree.Errors.Count > 0 Then
                         parent.Token.UpdateRange(node.Token)

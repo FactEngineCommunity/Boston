@@ -75,6 +75,11 @@
 
                 If Not abIsCountStarSubQuery Then
                     lsSQLQuery = "SELECT "
+                    If arWhichSelectStatement.RETURNCLAUSE IsNot Nothing Then
+                        If arWhichSelectStatement.RETURNCLAUSE.KEYWDDISTINCT IsNot Nothing Then
+                            lsSQLQuery &= "DISTINCT "
+                        End If
+                    End If
 #Region "ProjectionColums"
                     liInd = 1
                     Dim larProjectionColumn = Me.getProjectionColumns(arWhichSelectStatement)
