@@ -858,7 +858,14 @@
                                                 Select Column).First
 
                                 lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") & "[" & lrQueryEdge.BaseNode.RDSTable.Name & Viev.NullVal(lrQueryEdge.BaseNode.Alias, "") & "]." & lrColumn.Name & " = "
-                                lsSQLQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lrQueryEdge.IdentifierList(0) & Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
+                                Select Case lrColumn.getMetamodelDataType
+                                    Case Is = pcenumORMDataType.TemporalDateAndTime
+                                        Dim lsDateTime As String = Me.Model.DatabaseConnection.FormatDateTime(lrQueryEdge.IdentifierList(0))
+                                        lsSQLQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lsDateTime & Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
+                                    Case Else
+                                        lsSQLQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lrQueryEdge.IdentifierList(0) & Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
+                                End Select
+
                             End If
 
                             lbIntialWhere = "AND "

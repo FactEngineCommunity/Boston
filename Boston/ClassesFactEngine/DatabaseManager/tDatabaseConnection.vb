@@ -69,6 +69,10 @@
         Public Overridable Sub createTable(ByRef arTable As RDS.Table, ByRef arColumn As RDS.Column)
         End Sub
 
+        Public Overridable Function FormatDateTime(ByVal asOriginalDate As String) As String
+            Return ""
+        End Function
+
         Public Overridable Function generateSQLColumnDefinition(ByRef arColumn As RDS.Column) As String
             Return ""
         End Function

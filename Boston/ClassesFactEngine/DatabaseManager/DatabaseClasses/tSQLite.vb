@@ -320,6 +320,27 @@ Namespace FactEngine
 
         End Sub
 
+        Public Overrides Function FormatDateTime(ByVal asOriginalDate As String) As String
+
+            Try
+
+                Dim lsPattern As String = "yyyy-MM-dd HH:mm:ss"
+
+                Return Convert.ToDateTime(asOriginalDate, System.Threading.Thread.CurrentThread.CurrentUICulture).ToString(lsPattern)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return ""
+            End Try
+
+        End Function
+
         Public Overrides Function generateSQLColumnDefinition(ByRef arColumn As RDS.Column) As String
             Try
 
@@ -507,7 +528,13 @@ Namespace FactEngine
                                 End If
 
                             Case Else
-                                loFieldValue = lrSQLiteDataReader.GetValue(liInd)
+                                Try
+                                    loFieldValue = lrSQLiteDataReader.GetValue(liInd)
+                                Catch ex As Exception
+                                    'Sometimes DateTime values are not in the correct format. None the less they are stored in SQLite.
+                                    loFieldValue = lrSQLiteDataReader.GetString(liInd)
+                                End Try
+
                         End Select
 
                         Try
