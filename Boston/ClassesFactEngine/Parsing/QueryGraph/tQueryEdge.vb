@@ -163,7 +163,7 @@ Namespace FactEngine
                                     Case Is = pcenumConceptType.FactType
                                         lrRDSFactType = CType(Me.BaseNode.FBMModelObject, FBM.FactType)
                                     Case Else
-                                        Throw New Exception("There is not Fact Type, '" & arBaseNode.FBMModelObject.Id & " " & asPredicate & " " & arTargetNode.FBMModelObject.Id & "', in the Model.")
+                                        Throw New Exception("There is no Fact Type, '" & arBaseNode.FBMModelObject.Id & " " & asPredicate & " " & arTargetNode.FBMModelObject.Id & "', in the Model.")
                                 End Select
 
                                 'Still thinks it is a RDS Table
@@ -326,9 +326,29 @@ Namespace FactEngine
                                                                                                                                lrFactTypeReading)
 
                             If Me.FBMPossibleFactTypes.Count = 0 Then
+                                '----------------------------------------------------------------
+                                'Try and get another BaseNode in the query using the followig:
+                                '  [querygraph].FindPreviousQueryEdgeBaseNodeByModelElementName
+                                '  [Model].getFactTypeReadingByPartialPredicateReading                                
+                                Dim larPredicatePart As New List(Of FBM.PredicatePart)
+                                lrFactTypeReading = Me.QueryGraph.Model.getFactTypeReadingByPartialPredicateReading(asPredicate, Me.TargetNode.Name, larPredicatePart)
+                                If lrFactTypeReading Is Nothing Then
+                                    lsMessage = "There is no Fact Type Reading in the Model, '" & arBaseNode.FBMModelObject.Id & " " & asPredicate & " " & arTargetNode.Name & "'"
+                                    Throw New Exception(lsMessage)
+                                Else
+                                    Me.FBMFactType = lrFactTypeReading.FactType
+                                    Me.FBMPredicatePart = larPredicatePart(0)
+                                    Me.FBMFactTypeReading = Me.FBMPredicatePart.FactTypeReading
+                                    'Set the new BaseNode because the original one was fruitless.
+                                    Dim lrBaseNode = Me.QueryGraph.FindPreviousQueryEdgeBaseNodeByModelElementName(Me.FBMPredicatePart.Role.JoinedORMObject.Id)
+                                    If lrBaseNode IsNot Nothing Then
+                                        Me.BaseNode = lrBaseNode
+                                    Else
+                                        lsMessage = "There is no Fact Type Reading in the Model, '" & arBaseNode.FBMModelObject.Id & " " & asPredicate & " " & arTargetNode.Name & "'"
+                                        Throw New Exception(lsMessage)
+                                    End If
+                                End If
 
-                                lsMessage = "There is no Fact Type Reading in the Model, '" & arBaseNode.FBMModelObject.Id & " " & asPredicate & " " & arTargetNode.Name & "'"
-                                Throw New Exception(lsMessage)
                             ElseIf Me.FBMPossibleFactTypes.Count = 1 Then
                                 'Check if is PartialPredicate of a FactTypeReading with more than 2 PredicateParts
                                 If Me.FBMPossibleFactTypes.First.RoleGroup.Count > 2 Then

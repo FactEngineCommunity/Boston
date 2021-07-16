@@ -34,6 +34,26 @@
             Me.Model = arFBMModel
         End Sub
 
+        Public Function FindPreviousQueryEdgeBaseNodeByModelElementName(ByVal asModelElementName As String) As FactEngine.QueryNode
+
+            Try
+                Dim liInd As Integer = Me.QueryEdges.Count - 1
+
+                For Each lrQueryEdge In Me.QueryEdges.ToArray.Reverse
+                    If lrQueryEdge.BaseNode.Name = asModelElementName Then
+                        Return lrQueryEdge.BaseNode
+                    End If
+                Next
+
+                Return Nothing
+
+            Catch ex As Exception
+                Debugger.Break()
+                Return Nothing
+            End Try
+
+        End Function
+
         ''' <summary>
         ''' Generates SQL to run against the database for this QueryGraph
         ''' </summary>

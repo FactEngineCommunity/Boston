@@ -1979,6 +1979,41 @@ Namespace FBM
 
         End Function
 
+        Public Function getFactTypeReadingByPartialPredicateReading(ByVal asPredicatePart As String,
+                                                                    ByVal asModelElementName As String,
+                                                                    ByRef aarPredicatePart As List(Of FBM.PredicatePart)) As FBM.FactTypeReading
+
+            Try
+                Dim larPredicatePartReturn As New List(Of FBM.PredicatePart)
+
+                Dim larPredicatePart = From FactType In Me.FactType.FindAll(Function(x) x.Arity > 1)
+                                       From FactTypeReading In FactType.FactTypeReading
+                                       Where FactTypeReading.PredicatePart(0).PredicatePartText = asPredicatePart
+                                       Where FactTypeReading.PredicatePart(1).Role.JoinedORMObject.Id = asModelElementName
+                                       Select FactTypeReading.PredicatePart(0)
+
+
+                If larPredicatePart.Count = 1 Then
+                    larPredicatePartReturn.Add(larPredicatePart.First)
+                    aarPredicatePart = larPredicatePartReturn
+                    Return larPredicatePart.First.FactTypeReading
+                Else
+                    aarPredicatePart = larPredicatePart.ToList
+                    Return Nothing
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return Nothing
+            End Try
+        End Function
+
 
         ''' <summary>
         ''' Creates a random fact for the specified FactType.
