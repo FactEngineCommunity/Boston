@@ -176,6 +176,10 @@
 
                                     lrPreviousQueryEdge.ErrorMessage = Nothing
                                 End If
+                            Else
+                                If lrQueryEdge.FBMFactTypeReading Is Nothing Then
+                                    lrQueryEdge.FBMFactTypeReading = lrPreviousQueryEdge.FBMFactTypeReading
+                                End If
                             End If
                         End If
                     End If

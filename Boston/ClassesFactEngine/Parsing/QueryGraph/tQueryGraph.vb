@@ -807,7 +807,11 @@
                                     End If
                                 End If
                             Else
-                                lrPredicatePart = larPredicatePart.First 'For now...need to consider PreboundReadingText/s
+                                If lrQueryEdge.FBMFactTypeReading IsNot Nothing Then
+                                    lrPredicatePart = larPredicatePart.Find(Function(x) x.FactTypeReading Is lrQueryEdge.FBMFactTypeReading)
+                                Else
+                                    lrPredicatePart = larPredicatePart.First 'For now...need to consider PreboundReadingText/s
+                                End If
                             End If
 
                             Dim lrResponsibleRole As FBM.Role
@@ -848,7 +852,14 @@
                                                 Select Column).First
 
                                 lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") & "[" & lrTable.Name & Viev.NullVal(lrQueryEdge.Alias, "") & "]." & lrColumn.Name & " = "
-                                lsSQLQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lrQueryEdge.IdentifierList(0) & Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
+                                Select Case lrColumn.getMetamodelDataType
+                                    Case Is = pcenumORMDataType.TemporalDateAndTime
+                                        Dim lsDateTime As String = Me.Model.DatabaseConnection.FormatDateTime(lrQueryEdge.IdentifierList(0))
+                                        lsSQLQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lsDateTime & Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
+                                    Case Else
+                                        lsSQLQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lrQueryEdge.IdentifierList(0) & Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
+                                End Select
+
                             Else
                                 lrTable = lrQueryEdge.BaseNode.RDSTable
 
@@ -1218,6 +1229,12 @@
                                     Select QueryEdge.TargetNode
 
             larBaseNodes.AddRange(larAANTargetNodes)
+
+            'Implied BaseNodes
+            For Each lrQueryEdge In Me.QueryEdges.FindAll(Function(x) x.IsPartialFactTypeMatch)
+                Dim lrNewQueryNode As New FactEngine.QueryNode(lrQueryEdge.FBMFactType, lrQueryEdge, False)
+                larBaseNodes.Add(lrNewQueryNode)
+            Next
 
 
             For Each lrQueryEdge In Me.QueryEdges.FindAll(Function(x) Not larBaseNodes.Contains(x.TargetNode))
