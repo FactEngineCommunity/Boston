@@ -1781,6 +1781,13 @@ Public Class frmFactEngine
                                   FEQL.TokenType.PREDICATESPACE
                             Me.AutoComplete.Enabled = True
                             Call Me.AddFactTypePredicatePartsToEnterpriseAware()
+                        Case Is = FEQL.TokenType.RETURNCOLUMN
+                            Me.AutoComplete.Enabled = True
+                            Dim larModelElementParseNodes As New List(Of FEQL.ParseNode)
+                            Call Me.GetMODELELEMENTParseNodes(Me.zrTextHighlighter.Tree.Nodes(0), larModelElementParseNodes)
+                            For Each lrModelElementParseNode In larModelElementParseNodes
+                                Call Me.AddEnterpriseAwareItem(lrModelElementParseNode.Token.Text, Nothing, False, lrModelElementParseNode.Token.Text, True)
+                            Next
                     End Select
                 End If
 
