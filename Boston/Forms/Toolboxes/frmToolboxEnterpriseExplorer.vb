@@ -1507,6 +1507,10 @@ Public Class frmToolboxEnterpriseExplorer
                     Me.zrToolTip.Show(lsMessage, Me, loNode.Bounds.X, loNode.Bounds.Y + loNode.Bounds.Height, 4000)
                 End If
 
+                loNode.EnsureVisible()
+                Call Me.TreeView.ForceSelectedNode(loNode)
+                loNode.BeginEdit()
+
 
             End With
 
