@@ -460,6 +460,12 @@
             arQueryEdge.TargetNode.Alias = Me.WHICHCLAUSE.NODE(0).MODELELEMENTSUFFIX
             arQueryGraph.Nodes.AddUnique(arQueryEdge.TargetNode)
 
+            If arQueryGraph.QueryEdges.Count > 0 Then
+                If arQueryGraph.QueryEdges.Last.IsPartOfSubQuery Or arQueryGraph.QueryEdges.Last.IsSubQueryLeader Then
+                    arQueryEdge.IsPartOfSubQuery = True
+                    arQueryEdge.SubQueryAlias = arQueryGraph.QueryEdges.Last.SubQueryAlias
+                End If
+            End If
 
             '-----------------------------------------
             'Get the relevant FBM.FactType
