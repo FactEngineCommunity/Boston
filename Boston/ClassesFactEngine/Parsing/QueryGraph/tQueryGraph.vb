@@ -1192,7 +1192,7 @@
                                     larColumn.Add(lrTempColumn)
                                 Next
                         End Select
-
+                        lrRole = Nothing
                     Next
 
                 End If
