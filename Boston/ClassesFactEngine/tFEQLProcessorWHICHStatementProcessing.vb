@@ -333,16 +333,13 @@
             If arQueryEdge.FBMFactType IsNot Nothing Then
                 If arQueryEdge.FBMFactType.Arity = 2 Then
                     If Not arQueryEdge.FBMFactType.getPrimaryFactTypeReading.PredicatePart(0).PredicatePartText = arQueryEdge.Predicate Then
-                        '    'Switch the Base and Target nodes
-                        '    Dim lrTempQueryNode As New FactEngine.QueryNode
-                        '    lrTempQueryNode = arQueryEdge.BaseNode
-                        '    arQueryEdge.BaseNode = arQueryEdge.TargetNode
-                        '    arQueryEdge.TargetNode = lrTempQueryNode
                         If arQueryEdge.FBMFactType.IsManyTo1BinaryFactType Then
                             If arQueryEdge.BaseNode.Name <> arQueryEdge.FBMFactType.RoleGroup(0).JoinedORMObject.Id Then
-                                arQueryEdge.IsReciprocal = True
+                                If arQueryEdge.FBMFactType.InternalUniquenessConstraint(0).Role(0).JoinedORMObject.Id <> arQueryEdge.BaseNode.Name Then
+                                    arQueryEdge.IsReciprocal = True
+                                End If
                             ElseIf arQueryEdge.BaseNode.Name = arQueryEdge.TargetNode.Name Then
-                                arQueryEdge.IsReciprocal = True
+                                    arQueryEdge.IsReciprocal = True
                             End If
                         End If
                     End If
@@ -648,7 +645,7 @@
             'Call Me.GetParseTreeTokensReflection(Me.MODELELEMENTCLAUSE, Me.WHICHCLAUSE.MODELELEMENT(0))
             lrFBMModelObject = Me.Model.GetModelObjectByName(Me.WHICHCLAUSE.NODE(0).MODELELEMENTNAME)
             If lrFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & Me.WHICHCLAUSE.NODE(0).MODELELEMENTNAME & "'.")
-            arQueryEdge.TargetNode = New FactEngine.QueryNode(lrFBMModelObject)
+            arQueryEdge.TargetNode = New FactEngine.QueryNode(lrFBMModelObject, arQueryEdge)
             arQueryEdge.TargetNode.Alias = Me.WHICHCLAUSE.NODE(0).MODELELEMENTSUFFIX
             arQueryEdge.TargetNode.PreboundText = arWHICHCLAUSE.NODE(0).PREBOUNDREADINGTEXT
             arQueryEdge.TargetNode.PostboundText = arWHICHCLAUSE.NODE(0).POSTBOUNDREADINGTEXT
@@ -671,6 +668,24 @@
             '    arQueryGraph.Nodes.AddUnique(arQueryEdge.TargetNode)
             'End If
             '==========================================================================
+
+            'Subquery
+            If arWHICHCLAUSE.KEYWDNO IsNot Nothing Then
+                arQueryEdge.IsSubQueryLeader = True
+                arQueryEdge.SubQueryAlias = Richmond.RandomString(5)
+            ElseIf arQueryGraph.QueryEdges.Count > 0 Then
+                If arQueryGraph.QueryEdges.Last.IsPartOfSubQuery Or arQueryGraph.QueryEdges.Last.IsSubQueryLeader Then
+                    arQueryEdge.IsPartOfSubQuery = True
+                    arQueryEdge.SubQueryAlias = arQueryGraph.QueryEdges.Last.SubQueryAlias
+                End If
+            End If
+
+            If arQueryGraph.QueryEdges.Count > 0 Then
+                If arQueryGraph.QueryEdges.Last.IsPartOfSubQuery Or arQueryGraph.QueryEdges.Last.IsSubQueryLeader Then
+                    arQueryEdge.IsPartOfSubQuery = True
+                    arQueryEdge.SubQueryAlias = arQueryGraph.QueryEdges.Last.SubQueryAlias
+                End If
+            End If
 
             '-----------------------------------------
             'Get the relevant FBM.FactType
@@ -1305,8 +1320,10 @@
             ElseIf Me.WHICHCLAUSE.KEYWDAND IsNot Nothing And
                    Me.WHICHCLAUSE.MODELELEMENTNAME IsNot Nothing Then
 
-                'E.g. "AND is in A School"                
-                Return FactEngine.Constants.pcenumWhichClauseType.AndThatModelElementPredicateThatModelElement
+                'E.g. "AND is in A School"            
+                Return FactEngine.Constants.pcenumWhichClauseType.AndPredicateWhichModelElement
+                '20210724-VM-Was below for some reason
+                'Return FactEngine.Constants.pcenumWhichClauseType.AndThatModelElementPredicateThatModelElement
 
             End If
         End Function

@@ -72,7 +72,6 @@
                 Call Me.setNodeAliases()
                 Call Me.setQueryEdgeAliases()
 
-
                 If Not abIsCountStarSubQuery Then
                     lsSQLQuery = "SELECT "
                     If arWhichSelectStatement.RETURNCLAUSE IsNot Nothing Then
@@ -549,6 +548,7 @@
                 liInd = 1
                 Dim lbAddedAND = False
                 Dim lbIntialWhere = Nothing
+                Dim lbHasWhereClause As Boolean = False
 
 #Region "WhereJoins"
                 For Each lrQueryEdge In larWhereEdges.FindAll(Function(x) Not (x.IsSubQueryLeader Or x.IsPartOfSubQuery))
@@ -745,6 +745,7 @@
                     lbIntialWhere = Nothing
 
                     liInd += 1
+                    lbHasWhereClause = True
                 Next
 
 #End Region
@@ -766,7 +767,6 @@
                     Next
                     lbIntialWhere = "AND "
                 End If
-
 
                 For Each lrQueryEdge In larConditionalQueryEdges.FindAll(Function(x) Not (x.IsSubQueryLeader Or x.IsPartOfSubQuery))
                     Select Case lrQueryEdge.WhichClauseSubType
@@ -978,11 +978,10 @@
                                     End If
                             End Select
                     End Select
-
+                    lbHasWhereClause = True
                 Next
 #End Region
 #End Region
-
                 'CodeSafe Remove wayward ANDs
                 If Trim(lsSQLQuery).EndsWith("AND") Then
                     lsSQLQuery = Trim(lsSQLQuery).Substring(0, lsSQLQuery.Length - 4)
@@ -1006,7 +1005,9 @@
                     For Each lrQueryEdge In lrSubQueryGraph.QueryEdges
                         lrSubQueryGraph.Nodes.Add(lrQueryEdge.TargetNode)
                     Next
-                    lsSQLQuery &= Richmond.returnIfTrue(lbAddedAND, "", " AND ") & lrSubQueryGraph.generateSQL(arWhichSelectStatement, True)
+
+                    If lbIntialWhere IsNot Nothing Then lbHasWhereClause = True
+                    lsSQLQuery &= Richmond.returnIfTrue(lbAddedAND Or Not lbHasWhereClause, "", " AND ") & lrSubQueryGraph.generateSQL(arWhichSelectStatement, True)
 
                     lsSQLQuery &= ")"
                 Next
