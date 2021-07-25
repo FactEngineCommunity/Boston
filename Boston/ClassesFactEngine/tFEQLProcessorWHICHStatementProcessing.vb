@@ -421,14 +421,8 @@
                                                   arPreviousTargetNode)
 
             If Not arQueryEdge.AmbiguousFactTypeMatches.Count > 0 Then
-                If Not arQueryEdge.FBMFactType.getPrimaryFactTypeReading.PredicatePart(0).PredicatePartText = arQueryEdge.Predicate Then
-                    '    'Switch the Base and Target nodes
-                    '    Dim lrTempQueryNode As New FactEngine.QueryNode
-                    '    lrTempQueryNode = arQueryEdge.BaseNode
-                    '    arQueryEdge.BaseNode = arQueryEdge.TargetNode
-                    '    arQueryEdge.TargetNode = lrTempQueryNode
-                    '    arQueryGraph.HeadNode = arQueryEdge.BaseNode
-                    If arQueryEdge.FBMFactType.IsManyTo1BinaryFactType And arQueryEdge.BaseNode.Name <> arQueryEdge.FBMFactType.RoleGroup(0).JoinedORMObject.Id Then
+                If arQueryEdge.FBMFactType.IsManyTo1BinaryFactType Then
+                    If arQueryEdge.BaseNode.Name <> arQueryEdge.FBMFactType.InternalUniquenessConstraint(0).Role(0).JoinedORMObject.Id Then
                         arQueryEdge.IsReciprocal = True
                     End If
                 End If
