@@ -1002,9 +1002,29 @@
                     lrSubQueryGraph.QueryEdges.AddRange(larSubQueryEdge)
                     lrSubQueryGraph.QueryEdges.ForEach(Sub(x) x.IsSubQueryLeader = False)
                     lrSubQueryGraph.QueryEdges.ForEach(Sub(x) x.IsPartOfSubQuery = False)
+
                     For Each lrQueryEdge In lrSubQueryGraph.QueryEdges
                         lrSubQueryGraph.Nodes.Add(lrQueryEdge.TargetNode)
                     Next
+
+                    '----------------------------------------------------------------------------------------------
+                    'Remove Nodes that clearly are correlated. E.g. Session in 
+                    '"WHICH Cinema is showing (Film:'Rocky') at (DateTime:'1/5/2021 10:00') 
+                    '"AND contains WHICH Row THAT contains A Seat THAT has NO Booking THAT Is for THAT Session "
+                    Dim lrNode As FactEngine.QueryNode
+                    Dim lbKeep As Boolean = False
+                    For liInd = 0 To lrSubQueryGraph.Nodes.Count - 1
+                        lrNode = lrSubQueryGraph.Nodes(liInd)
+                        If lrNode.IsThatReferencedTargetNode And liInd > 0 Then
+                            For liInd2 = 0 To liInd - 1
+                                If lrSubQueryGraph.Nodes(liInd2).Name = lrNode.Name And lrSubQueryGraph.Nodes(liInd2).Alias = lrNode.Alias Then
+                                    lbKeep = True
+                                End If
+                            Next
+                            If Not lbKeep Then lrSubQueryGraph.Nodes.Remove(lrNode)
+                        End If
+                    Next
+                    'lrSubQueryGraph.Nodes.RemoveAll(Function(x) x.IsThatReferencedTargetNode)
 
                     If lbIntialWhere IsNot Nothing Then lbHasWhereClause = True
                     lsSQLQuery &= Richmond.returnIfTrue(lbAddedAND Or Not lbHasWhereClause, "", " AND ") & lrSubQueryGraph.generateSQL(arWhichSelectStatement, True)
@@ -1137,13 +1157,21 @@
                     Dim lrQueryEdge As FactEngine.QueryEdge
                     Dim lrRole As FBM.Role = Nothing
                     For Each lrQueryEdge In Me.getProjectQueryEdges()
-                        If lrQueryEdge.FBMFactType.IsBinaryFactType And lrQueryEdge.BaseNode.RelativeFBMModelObject.Id = lrQueryEdge.FBMFactType.RoleGroup(0).JoinedORMObject.Id Then
-                            liRoleInd = 1 'Other side of a BinaryFactType
+                        If lrQueryEdge.FBMFactType.IsManyTo1BinaryFactType And lrQueryEdge.BaseNode.RelativeFBMModelObject.Id = lrQueryEdge.FBMFactType.InternalUniquenessConstraint(0).Role(0).JoinedORMObject.Id Then
+                            '20210724-VM-Was the below, which is wrong.
+                            'If lrQueryEdge.FBMFactType.IsBinaryFactType And lrQueryEdge.BaseNode.RelativeFBMModelObject.Id = lrQueryEdge.FBMFactType.RoleGroup(0).JoinedORMObject.Id Then
+                            liRoleInd = 0 'TargetNode is for other side of ManyToOne BinaryFactType
+                            lrRole = lrQueryEdge.FBMFactType.GetOtherRoleOfBinaryFactType(lrQueryEdge.FBMFactType.InternalUniquenessConstraint(0).Role(0).Id)
+
                         ElseIf lrQueryEdge.IsPartialFactTypeMatch Then
                             lrRole = lrQueryEdge.FBMFactTypeReading.PredicatePart(lrQueryEdge.FBMFactTypeReading.PredicatePart.IndexOf(lrQueryEdge.FBMPredicatePart) + 1).Role
                             liRoleInd = lrQueryEdge.FBMFactType.RoleGroup.IndexOf(lrRole)
                         Else
-                            liRoleInd = 0 'First Role of a BinaryFactType
+                            liRoleInd = 1
+                            If lrQueryEdge.FBMFactType.IsManyTo1BinaryFactType Then
+                                'TargetNode is Many side of ManyToOne BinaryFactType
+                                lrRole = lrQueryEdge.FBMFactType.InternalUniquenessConstraint(0).Role(0)
+                            End If
                         End If
                         Select Case lrQueryEdge.FBMFactType.RoleGroup(liRoleInd).JoinedORMObject.ConceptType
                             Case Is = pcenumConceptType.ValueType

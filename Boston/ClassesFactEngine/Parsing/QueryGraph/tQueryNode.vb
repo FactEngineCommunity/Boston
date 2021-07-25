@@ -1,4 +1,6 @@
-﻿Namespace FactEngine
+﻿Imports System.Reflection
+
+Namespace FactEngine
     Public Class QueryNode
         Implements IEquatable(Of FactEngine.QueryNode)
 
@@ -121,6 +123,40 @@
             Catch ex As Exception
                 Return ex.Message
             End Try
+        End Function
+
+        ''' <summary>
+        ''' Used in SubQueries.
+        ''' TRUE if the Node is a TargetNode and the QueryEdge for the node has a reading like "...THAT ModelElement" and the ModelElement hasn't previously been referenced.
+        ''' E.g. Session in
+        ''' WHICH Cinema is showing (Film:'Rocky') at (DateTime:'1/5/2021 10:00') 
+        ''' AND contains WHICH Row THAT contains A Seat THAT has NO Booking THAT Is for THAT Session 
+        ''' </summary>
+        ''' <returns></returns>
+        Public Function IsThatReferencedTargetNode() As Boolean
+
+            Try
+                If Not Me.IsTargetNode Then Return False
+
+                Select Case Me.QueryEdge.WhichClauseType
+                    Case Is = FactEngine.pcenumWhichClauseType.AndThatPredicateThatModelElement,
+                              FactEngine.pcenumWhichClauseType.AndThatModelElementPredicateThatModelElement
+                        Return True
+                End Select
+
+                Return False
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return False
+            End Try
+
         End Function
 
     End Class
