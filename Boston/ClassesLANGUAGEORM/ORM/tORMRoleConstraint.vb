@@ -1520,23 +1520,40 @@ Namespace FBM
                                                  Optional arArgument As FBM.RoleConstraintArgument = Nothing,
                                                  Optional arSubtypeRelationshipInstance As FBM.SubtypeRelationshipInstance = Nothing) As FBM.RoleConstraintRole
 
-            Dim lrRoleConstraintRole As New FBM.RoleConstraintRole(arRole, Me, False, False, Me.RoleConstraintRole.Count + 1, True)
+            Try
+                Dim lrRoleConstraintRole As New FBM.RoleConstraintRole(arRole, Me, False, False, Me.RoleConstraintRole.Count + 1, True)
 
-            If arArgument IsNot Nothing Then
-                lrRoleConstraintRole.RoleConstraintArgument = arArgument
-            End If
+                If arArgument IsNot Nothing Then
+                    lrRoleConstraintRole.RoleConstraintArgument = arArgument
+                End If
 
-            '--------------------------------------------------------------------
-            'Add the RoleConstraintRole and do RDS processing at the same time.
-            Me.AddRoleConstraintRole(lrRoleConstraintRole, arSubtypeRelationshipInstance.SubtypeRelationship)
+                '--------------------------------------------------------------------
+                'Add the RoleConstraintRole and do RDS processing at the same time.
+                If arSubtypeRelationshipInstance Is Nothing Then
+                    Me.AddRoleConstraintRole(lrRoleConstraintRole)
+                Else
+                    Me.AddRoleConstraintRole(lrRoleConstraintRole, arSubtypeRelationshipInstance.SubtypeRelationship)
+                End If
 
-            If arArgument IsNot Nothing Then
-                arArgument.AddRoleConstraintRole(lrRoleConstraintRole)
-            End If
 
-            Me.Model.MakeDirty(False, True)
+                If arArgument IsNot Nothing Then
+                    arArgument.AddRoleConstraintRole(lrRoleConstraintRole)
+                End If
 
-            Return lrRoleConstraintRole
+                Me.Model.MakeDirty(False, True)
+
+                Return lrRoleConstraintRole
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return Nothing
+            End Try
 
         End Function
 
