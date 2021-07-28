@@ -405,14 +405,16 @@ Namespace FEQL
         Public Function getDerivationType(ByRef arDerivationClause As FEQL.DERIVATIONCLAUSE) As FactEngine.pcenumFEQLDerivationType
 
             If arDerivationClause.DERIVATIONSUBCLAUSE.Count = 2 And
-               arDerivationClause.DERIVATIONSUBCLAUSE(0).FBMFactType.hasTransitiveRingConstraint Then
+               arDerivationClause.DERIVATIONSUBCLAUSE(0).FBMFactType IsNot Nothing Then
+                If arDerivationClause.DERIVATIONSUBCLAUSE(0).FBMFactType.hasTransitiveRingConstraint Then
 
-                Return FactEngine.pcenumFEQLDerivationType.TransitiveRingConstraintJoin
+                    Return FactEngine.pcenumFEQLDerivationType.TransitiveRingConstraintJoin
+                End If
 
             ElseIf arDerivationClause.DERIVATIONSUBCLAUSE.Count = 1 And
                    arDerivationClause.KEYWDCOUNT IsNot Nothing Then
 
-                arDerivationClause.DERIVATIONSUBCLAUSE(0).FBMFactType.DerivationType = FactEngine.Constants.pcenumFEQLDerivationType.Count
+                    arDerivationClause.DERIVATIONSUBCLAUSE(0).FBMFactType.DerivationType = FactEngine.Constants.pcenumFEQLDerivationType.Count
                 Return FactEngine.pcenumFEQLDerivationType.Count
 
             End If

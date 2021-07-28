@@ -249,9 +249,9 @@ Namespace FBM
             Dim liInd As Integer = 0
 
             For Each lrPredicatePart In other.PredicatePart
-                If (lrPredicatePart.PredicatePartText = other.PredicatePart(liInd).PredicatePartText) And
-                     (lrPredicatePart.PreBoundText = other.PredicatePart(liInd).PreBoundText) Or
-                     (lrPredicatePart.PostBoundText = other.PredicatePart(liInd).PostBoundText) Then
+                If (lrPredicatePart.PredicatePartText = Me.PredicatePart(0).PredicatePartText) And
+                     (lrPredicatePart.PreBoundText = Me.PredicatePart(0).PreBoundText) And
+                     (lrPredicatePart.PostBoundText = Me.PredicatePart(0).PostBoundText) Then
                     'Only need one match for this to function to return True.
                     Return True
                 End If

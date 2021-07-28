@@ -246,6 +246,58 @@
 
 #End Region
 
+#Region "getModelElmentByBaseNodePredicate"
+        Private Function getModelElmentByBaseNodePredicate(ByVal arBaseNode As FactEngine.QueryNode,
+                                                           ByVal asPredicate As String) As FBM.ModelObject
+            Try
+
+                Dim larPRedicatePart = From FactType In Me.Model.FactType
+                                       From FactTypeReading In FactType.FactTypeReading
+                                       From PredicatePart In FactTypeReading.PredicatePart
+                                       Where PredicatePart.Role.JoinedORMObject.Id = arBaseNode.Name
+                                       Where PredicatePart.PredicatePartText = asPredicate
+                                       Select PredicatePart
+
+                If larPRedicatePart.Count = 1 Then
+                    Dim lrFactTypeReading As FBM.FactTypeReading = larPRedicatePart.First.FactTypeReading
+                    Try
+                        Dim lrPredicatePart As FBM.PredicatePart = lrFactTypeReading.PredicatePart(larPRedicatePart.First.SequenceNr)
+                        Return lrPredicatePart.Role.JoinedORMObject
+                    Catch
+                        Return Nothing
+                    End Try
+                Else
+                    Try
+                        Dim larReducedPredicatePart = From PredicatePart In larPRedicatePart
+                                                      Where PredicatePart.FactTypeReading.PredicatePart(1).Role.JoinedORMObject.GetType <> GetType(FBM.FactType)
+                                                      Select PredicatePart
+
+                        If larReducedPredicatePart.Count = 1 Then
+                            Dim lrFactTypeReading As FBM.FactTypeReading = larReducedPredicatePart.First.FactTypeReading
+                            Try
+                                Dim lrPredicatePart As FBM.PredicatePart = lrFactTypeReading.PredicatePart(larReducedPredicatePart.First.SequenceNr)
+                                Return lrPredicatePart.Role.JoinedORMObject
+                            Catch
+                                Return Nothing
+                            End Try
+                        Else
+                            Return Nothing
+                        End If
+                    Catch ex As Exception
+                        Return Nothing
+                    End Try
+                End If
+
+                Return Nothing
+
+            Catch ex As Exception
+                Return Nothing
+            End Try
+
+        End Function
+
+#End Region
+
         '1
 #Region "analysePredicatePropertyNodeIdentification"
         Private Sub analyseWhichPredicateNodePropertyIdentification(ByRef arWHICHCLAUSE As FEQL.WHICHCLAUSE,
@@ -517,6 +569,7 @@
                                                      ByRef arPreviousTargetNode As FactEngine.QueryNode)
 
             Dim lrFBMModelObject As FBM.ModelObject
+            Dim lbIdentityCreatedTargetNode As Boolean = False
 
             arQueryEdge.WhichClauseType = FactEngine.Constants.pcenumWhichClauseType.UnkownPredicateWhichModelElement
             arQueryEdge.IsProjectColumn = True
@@ -536,11 +589,20 @@
             'Me.MODELELEMENTCLAUSE = New FEQL.MODELELEMENTClause
             'Call Me.GetParseTreeTokensReflection(Me.MODELELEMENTCLAUSE, Me.WHICHCLAUSE.MODELELEMENT(0))
             lrFBMModelObject = Me.Model.GetModelObjectByName(Me.WHICHCLAUSE.MODELELEMENTNAME(0))
+            If lrFBMModelObject Is Nothing Then
+                lrFBMModelObject = Me.getModelElmentByBaseNodePredicate(arQueryEdge.BaseNode, arQueryEdge.Predicate)
+                If lrFBMModelObject IsNot Nothing Then lbIdentityCreatedTargetNode = True
+            End If
             If lrFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & Me.WHICHCLAUSE.MODELELEMENTNAME(0) & "'.")
             arQueryEdge.TargetNode = New FactEngine.QueryNode(lrFBMModelObject, arQueryEdge)
             arQueryEdge.TargetNode.Alias = Me.WHICHCLAUSE.NODE(0).MODELELEMENTSUFFIX
             arQueryEdge.TargetNode.PreboundText = arWHICHCLAUSE.NODE(0).PREBOUNDREADINGTEXT
             arQueryEdge.TargetNode.PostboundText = arWHICHCLAUSE.NODE(0).POSTBOUNDREADINGTEXT
+            If lbIdentityCreatedTargetNode Then
+                arQueryEdge.TargetNode.IdentifierList.Add(Me.WHICHCLAUSE.MODELELEMENTNAME(0))
+                arQueryEdge.IdentifierList.Add(Me.WHICHCLAUSE.MODELELEMENTNAME(0))
+                arQueryEdge.TargetNode.HasIdentifier = True
+            End If
             arQueryGraph.Nodes.AddUnique(arQueryEdge.TargetNode) '20200808-VM-Was AddUnique
 
             If arWHICHCLAUSE.RECURSIVECLAUSE IsNot Nothing Then
@@ -616,6 +678,7 @@
                                                         ByRef arPreviousTopicNode As FactEngine.QueryNode)
 
             Dim lrFBMModelObject As FBM.ModelObject
+            Dim lbIdentityCreatedTargetNode As Boolean = False
 
             arQueryEdge.WhichClauseType = FactEngine.Constants.pcenumWhichClauseType.AndPredicateWhichModelElement
             arQueryEdge.IsProjectColumn = True
@@ -638,11 +701,20 @@
             'Me.MODELELEMENTCLAUSE = New FEQL.MODELELEMENTClause
             'Call Me.GetParseTreeTokensReflection(Me.MODELELEMENTCLAUSE, Me.WHICHCLAUSE.MODELELEMENT(0))
             lrFBMModelObject = Me.Model.GetModelObjectByName(Me.WHICHCLAUSE.NODE(0).MODELELEMENTNAME)
+            If lrFBMModelObject Is Nothing Then
+                lrFBMModelObject = Me.getModelElmentByBaseNodePredicate(arQueryEdge.BaseNode, arQueryEdge.Predicate)
+                If lrFBMModelObject IsNot Nothing Then lbIdentityCreatedTargetNode = True
+            End If
             If lrFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & Me.WHICHCLAUSE.NODE(0).MODELELEMENTNAME & "'.")
             arQueryEdge.TargetNode = New FactEngine.QueryNode(lrFBMModelObject, arQueryEdge)
             arQueryEdge.TargetNode.Alias = Me.WHICHCLAUSE.NODE(0).MODELELEMENTSUFFIX
             arQueryEdge.TargetNode.PreboundText = arWHICHCLAUSE.NODE(0).PREBOUNDREADINGTEXT
             arQueryEdge.TargetNode.PostboundText = arWHICHCLAUSE.NODE(0).POSTBOUNDREADINGTEXT
+            If lbIdentityCreatedTargetNode Then
+                arQueryEdge.TargetNode.IdentifierList.Add(Me.WHICHCLAUSE.MODELELEMENTNAME(0))
+                arQueryEdge.IdentifierList.Add(Me.WHICHCLAUSE.MODELELEMENTNAME(0))
+                arQueryEdge.TargetNode.HasIdentifier = True
+            End If
             arQueryGraph.Nodes.Add(arQueryEdge.TargetNode) 'Was AddUnique, but WHICH implies that we are talking of a different TargetNode, as where TargeNode has been referenced before
 
             '---------------------------------------------------------
