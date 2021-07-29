@@ -57,9 +57,14 @@
         ''' <summary>
         ''' Generates SQL to run against the database for this QueryGraph
         ''' </summary>
+        ''' <param name="arWhichSelectStatement">The WhichSelectStatement from which the SQL is generated.
+        ''' NB Subqueries are generated using this same function. For a subquery, contains the WhichSelectStatement if the subquery.</param>
+        ''' <param name="abIsCountStarSubQuery">? TBA</param>
+        ''' <param name="abIsStraightDerivationClause">TRUE if called to generate the SQL for a DerivedFactType. A specialised set of ProjectColumns is returned, using PKs rather than UCs.</param>
         ''' <returns></returns>
         Public Function generateSQL(ByRef arWhichSelectStatement As FEQL.WHICHSELECTStatement,
-                                    Optional ByVal abIsCountStarSubQuery As Boolean = False) As String
+                                    Optional ByVal abIsCountStarSubQuery As Boolean = False,
+                                    Optional ByVal abIsStraightDerivationClause As Boolean = False) As String
 
             Dim lsSQLQuery As String = ""
             Dim liInd As Integer
@@ -81,7 +86,7 @@
                     End If
 #Region "ProjectionColums"
                     liInd = 1
-                    Dim larProjectionColumn = Me.getProjectionColumns(arWhichSelectStatement)
+                    Dim larProjectionColumn = Me.getProjectionColumns(arWhichSelectStatement, abIsStraightDerivationClause)
                     Me.ProjectionColumn = larProjectionColumn
 
 
@@ -1062,7 +1067,8 @@
 
         End Function
 
-        Public Function getProjectionColumns(ByRef arWhichSelectStatement As FEQL.WHICHSELECTStatement) As List(Of RDS.Column)
+        Public Function getProjectionColumns(ByRef arWhichSelectStatement As FEQL.WHICHSELECTStatement,
+                                             Optional ByVal abIsStraightDerivationClause As Boolean = False) As List(Of RDS.Column)
 
             Dim larColumn As New List(Of RDS.Column)
 
@@ -1112,7 +1118,8 @@
                             Next
                         End If
                     Next
-
+                ElseIf abIsStraightDerivationClause Then
+                    Throw New NotImplementedException("Not yet implemented. Using abIsStraightDerivationClause = True")
                 Else
                     'Head Column/s
                     Dim larHeadColumn As New List(Of RDS.Column)
