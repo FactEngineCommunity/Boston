@@ -18,14 +18,14 @@ Namespace FEQL
 
                 Me.Parsetree = Me.Parser.Parse(asDerivationText)
 
-                Dim lrDerivationClause As New FEQL.DERIVATIONCLAUSE
+                Dim lrDerivationStatement As New FEQL.DERIVATIONSTMT
 
 
                 If Me.Parsetree.Errors.Count > 0 Then
                     Throw New Exception("Error in Derivation Text for Fact Type, '" & arFactType.Id & "'.")
                 End If
 
-                Call Me.GetParseTreeTokensReflection(lrDerivationClause, Me.Parsetree.Nodes(0))
+                Call Me.GetParseTreeTokensReflection(lrDerivationStatement, Me.Parsetree.Nodes(0))
 
                 'PSEUDOCODE
                 'Get the FactTypes for the DerivationSubClauses
@@ -34,7 +34,7 @@ Namespace FEQL
 
 #Region "Get Fact Types For Each DerivationSubClause"
 
-                For Each lrDerivationSubClause In lrDerivationClause.DERIVATIONSUBCLAUSE
+                For Each lrDerivationSubClause In lrDerivationStatement.DERIVATIONSUBCLAUSE
 
                     If lrDerivationSubClause.isFactTypeOnly Then
 #Region "FACTREADING"
@@ -81,17 +81,17 @@ Namespace FEQL
 
 #End Region
 
-                Select Case Me.getDerivationType(lrDerivationClause)
+                Select Case Me.getDerivationType(lrDerivationStatement)
                     Case Is = FactEngine.pcenumFEQLDerivationType.TransitiveRingConstraintJoin
 
-                        Return Me.getTransitiveRingConstraintJoinSQL(lrDerivationClause, arFactType)
+                        Return Me.getTransitiveRingConstraintJoinSQL(lrDerivationStatement, arFactType)
 
                     Case Is = FactEngine.pcenumFEQLDerivationType.Count
                         arFactType.DerivationType = FactEngine.Constants.pcenumFEQLDerivationType.Count
-                        Return Me.getCountDerivationSQL(lrDerivationClause, arFactType)
+                        Return Me.getCountDerivationSQL(lrDerivationStatement, arFactType)
 
                     Case Else
-                        Return Me.getStraightDerivationSQL(lrDerivationClause, arFactType, aarParameterArray)
+                        Return Me.getStraightDerivationSQL(lrDerivationStatement, arFactType, aarParameterArray)
 
                 End Select
 
@@ -103,7 +103,7 @@ Namespace FEQL
 
         End Function
 
-        Private Function getStraightDerivationSQL(ByRef arDerivationClause As FEQL.DERIVATIONCLAUSE,
+        Private Function getStraightDerivationSQL(ByRef arDerivationClause As FEQL.DERIVATIONSTMT,
                                                   ByRef arFactType As FBM.FactType,
                                                   ByVal ParamArray aarParameterArray As FactEngine.QueryEdge()) As String
 
@@ -114,8 +114,8 @@ Namespace FEQL
 
                 Dim lsColumnNames As String = ""
 
-                Dim larFactReading = From DerivationClause In arDerivationClause.DERIVATIONSUBCLAUSE.FindAll(Function(x) x.FACTREADING IsNot Nothing)
-                                     Select DerivationClause.FACTREADING
+                Dim larFactReading = New List(Of FEQL.FACTREADINGClause)
+                larFactReading.Add(arDerivationClause.FACTREADING)
 
                 Dim liInd As Integer = 0
                 For Each lrFactReading In larFactReading
@@ -137,28 +137,45 @@ Namespace FEQL
                     Next
                 Next
 
-                lsSQL &= "SELECT " & lsColumnNames & vbCrLf
-                lsSQL &= " FROM "
-                liInd = 0
-                For Each lrDerivationSubClause In arDerivationClause.DERIVATIONSUBCLAUSE.FindAll(Function(x) x.isFactTypeOnly)
-                    If liInd > 0 Then lsSQL &= "," & vbCrLf
-                    Dim lrTable = lrDerivationSubClause.FBMFactType.getCorrespondingRDSTable
-                    If lrTable IsNot Nothing Then
-                        lsSQL &= lrTable.Name
-                    End If
-                    liInd += 1
-                Next
+                Dim cut_at As String = "IS WHERE"
+                Dim liCutPoint As Integer = InStr(arFactType.DerivationText, cut_at)
 
-                lsSQL &= vbCrLf & "WHERE "
+                Dim string_after As String = arFactType.DerivationText.Substring(liCutPoint + cut_at.Length - 1)
+                string_after = "WHICH " & string_after
+                string_after = string_after.Replace(vbCr, "").Replace(vbLf, "")
 
-                For Each lrDerivationSubClause In arDerivationClause.DERIVATIONSUBCLAUSE.FindAll(Function(x) Not x.isFactTypeOnly)
-                    Dim lrDerivationFormula = lrDerivationSubClause.DERIVATIONFORMULA
-                    lsSQL &= Me.walkDerivationFormulaTree(lrDerivationFormula, aarParameterArray)
-                Next
-
+                Me.Parsetree = Me.Parser.Parse(Trim(string_after))
+                Dim lrQueryGraph As FactEngine.QueryGraph
+                lrQueryGraph = Me.getQueryGraph()
+                Dim lrWhichSelectStatement As New FEQL.WHICHSELECTStatement
+                Call Me.GetParseTreeTokensReflection(lrWhichSelectStatement, Me.Parsetree.Nodes(0))
+                lsSQL &= lrQueryGraph.generateSQL(lrWhichSelectStatement, False, True, arFactType)
                 lsSQL &= ") AS " & arFactType.Name & vbCrLf
 
                 Return lsSQL
+
+                'lsSQL &= "SELECT " & lsColumnNames & vbCrLf
+                'lsSQL &= " FROM "
+                'liInd = 0
+                'For Each lrDerivationSubClause In arDerivationClause.DERIVATIONSUBCLAUSE.FindAll(Function(x) x.isFactTypeOnly)
+                '    If liInd > 0 Then lsSQL &= "," & vbCrLf
+                '    Dim lrTable = lrDerivationSubClause.FBMFactType.getCorrespondingRDSTable
+                '    If lrTable IsNot Nothing Then
+                '        lsSQL &= lrTable.Name
+                '    End If
+                '    liInd += 1
+                'Next
+
+                'lsSQL &= vbCrLf & "WHERE "
+
+                'For Each lrDerivationSubClause In arDerivationClause.DERIVATIONSUBCLAUSE.FindAll(Function(x) Not x.isFactTypeOnly)
+                '    Dim lrDerivationFormula = lrDerivationSubClause.DERIVATIONFORMULA
+                '    lsSQL &= Me.walkDerivationFormulaTree(lrDerivationFormula, aarParameterArray)
+                'Next
+
+                'lsSQL &= ") AS " & arFactType.Name & vbCrLf
+
+                'Return lsSQL
 
             Catch ex As Exception
                 Dim lsMessage As String
@@ -285,7 +302,7 @@ Namespace FEQL
 
         End Function
 
-        Private Function getCountDerivationSQL(ByRef arDerivationClause As FEQL.DERIVATIONCLAUSE,
+        Private Function getCountDerivationSQL(ByRef arDerivationClause As FEQL.DERIVATIONSTMT,
                                                ByRef arFactType As FBM.FactType) As String
 
             Dim lsSQL As String = ""
@@ -308,7 +325,7 @@ Namespace FEQL
 
         End Function
 
-        Private Function getTransitiveRingConstraintJoinSQL(ByRef arDerivationClause As FEQL.DERIVATIONCLAUSE,
+        Private Function getTransitiveRingConstraintJoinSQL(ByRef arDerivationClause As FEQL.DERIVATIONSTMT,
                                                             ByRef arFactType As FBM.FactType) As String
 
             ''(
@@ -402,7 +419,7 @@ Namespace FEQL
         ''' </summary>
         ''' <param name="arDerivationClause"></param>
         ''' <returns></returns>
-        Public Function getDerivationType(ByRef arDerivationClause As FEQL.DERIVATIONCLAUSE) As FactEngine.pcenumFEQLDerivationType
+        Public Function getDerivationType(ByRef arDerivationClause As FEQL.DERIVATIONSTMT) As FactEngine.pcenumFEQLDerivationType
 
             If arDerivationClause.DERIVATIONSUBCLAUSE.Count = 2 And
                arDerivationClause.DERIVATIONSUBCLAUSE(0).FBMFactType IsNot Nothing Then
@@ -414,7 +431,7 @@ Namespace FEQL
             ElseIf arDerivationClause.DERIVATIONSUBCLAUSE.Count = 1 And
                    arDerivationClause.KEYWDCOUNT IsNot Nothing Then
 
-                    arDerivationClause.DERIVATIONSUBCLAUSE(0).FBMFactType.DerivationType = FactEngine.Constants.pcenumFEQLDerivationType.Count
+                arDerivationClause.DERIVATIONSUBCLAUSE(0).FBMFactType.DerivationType = FactEngine.Constants.pcenumFEQLDerivationType.Count
                 Return FactEngine.pcenumFEQLDerivationType.Count
 
             End If

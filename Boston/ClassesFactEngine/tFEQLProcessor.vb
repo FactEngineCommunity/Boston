@@ -1128,7 +1128,17 @@ Namespace FEQL
         'Private _DERIVATIONCLAUSE
     End Class
 
-    Public Class DERIVATIONCLAUSE
+    Public Class DERIVATIONSTMT
+
+        Private _FACTREADING As FEQL.FACTREADINGClause
+        Public Property FACTREADING As FACTREADINGClause
+            Get
+                Return Me._FACTREADING
+            End Get
+            Set(value As FACTREADINGClause)
+                Me._FACTREADING = value
+            End Set
+        End Property
 
         Private _KEYWDISWHERE As String = Nothing
         Public Property KEYWDISWHERE As String
@@ -1139,6 +1149,8 @@ Namespace FEQL
                 Me._KEYWDISWHERE = value
             End Set
         End Property
+
+
 
         Private _KEYWDCOUNT As String = Nothing
         Public Property KEYWDCOUNT As String

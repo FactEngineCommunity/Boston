@@ -9,12 +9,60 @@
             lrRecordset.StatementType = FactEngine.Constants.pcenumFEQLStatementType.WHICHSELECTStatement
 
             Try
+                Dim lrQueryGraph As New FactEngine.QueryGraph(Me.Model)
+
+                lrQueryGraph = Me.getQueryGraph()
+
+                '==========================================================================
+                'Get the records
+                lsSQLQuery = lrQueryGraph.generateSQL(Me.WHICHSELECTStatement)
+
+                If Me.DatabaseManager.Connection Is Nothing Then
+                    'Try and establish a connection
+                    Call Me.DatabaseManager.establishConnection(prApplication.WorkingModel.TargetDatabaseType, prApplication.WorkingModel.TargetDatabaseConnectionString)
+                    If Me.DatabaseManager.Connection Is Nothing Then
+                        Throw New Exception("No database connection has been established.")
+                    End If
+                ElseIf Me.DatabaseManager.Connection.Connected = False Then
+                    Throw New Exception("The database is not connected.")
+                End If
+
+                Dim lrTestRecordset = Me.DatabaseManager.GO(lsSQLQuery)
+                lrTestRecordset.Warning = lrQueryGraph.Warning
+                lrTestRecordset.QueryGraph = lrQueryGraph
+
+                If Me.ParseTreeContainsTokenType(Me.Parsetree, FEQL.TokenType.KEYWDDID) Then
+                    lrTestRecordset.StatementType = FactEngine.Constants.pcenumFEQLStatementType.DIDStatement
+                End If
+
+                Return lrTestRecordset
+
+            Catch ex As Exception
+                If ex.InnerException Is Nothing Then
+                    lrRecordset.ErrorString = ex.Message
+                    lrRecordset.Query = lsSQLQuery
+                Else
+                    lrRecordset.ErrorString = ex.InnerException.Message
+                End If
+
+                Return lrRecordset
+            End Try
+
+        End Function
+
+#End Region
+
+#Region "getQueryGraph"
+
+        Private Function getQueryGraph() As FactEngine.QueryGraph
+
+            Dim lrQueryGraph As New FactEngine.QueryGraph(Me.Model)
+
+            Try
                 'Richmond.WriteToStatusBar("Processsing WHICH Statement.", True)
                 Me.WHICHSELECTStatement = New FEQL.WHICHSELECTStatement
 
                 Call Me.GetParseTreeTokensReflection(Me.WHICHSELECTStatement, Me.Parsetree.Nodes(0))
-
-                Dim lrQueryGraph As New FactEngine.QueryGraph(Me.Model)
 
                 '----------------------------------------
                 'Create the HeadNode for the QueryGraph
@@ -184,14 +232,6 @@
                         End If
                     End If
 
-                    ''Derivation Clauses
-                    'If lrQueryEdge.FBMFactType.IsDerived Then
-                    '    Dim lrDerivationClause = New FEQL.DERIVATIONCLAUSE
-
-                    '    Dim lrParseTree = Me.Parser.Parse(lrQueryEdge.FBMFactType.DerivationText)
-                    '    Call Me.GetParseTreeTokensReflection(lrDerivationClause, lrParseTree.Nodes(0).Nodes(0))
-                    'End If
-
                 Next
 
                 'Richmond.WriteToStatusBar("Generating SQL", True)
@@ -207,43 +247,14 @@
 
                 Call lrQueryGraph.checkNodeAliases()
 
-                '==========================================================================
-                'Get the records
-                lsSQLQuery = lrQueryGraph.generateSQL(Me.WHICHSELECTStatement)
+                Return lrQueryGraph
 
-                If Me.DatabaseManager.Connection Is Nothing Then
-                    'Try and establish a connection
-                    Call Me.DatabaseManager.establishConnection(prApplication.WorkingModel.TargetDatabaseType, prApplication.WorkingModel.TargetDatabaseConnectionString)
-                    If Me.DatabaseManager.Connection Is Nothing Then
-                        Throw New Exception("No database connection has been established.")
-                    End If
-                ElseIf Me.DatabaseManager.Connection.Connected = False Then
-                    Throw New Exception("The database is not connected.")
-                End If
-
-                Dim lrTestRecordset = Me.DatabaseManager.GO(lsSQLQuery)
-                lrTestRecordset.Warning = lrQueryGraph.Warning
-                lrTestRecordset.QueryGraph = lrQueryGraph
-
-                If Me.ParseTreeContainsTokenType(Me.Parsetree, FEQL.TokenType.KEYWDDID) Then
-                    lrTestRecordset.StatementType = FactEngine.Constants.pcenumFEQLStatementType.DIDStatement
-                End If
-
-                Return lrTestRecordset
 
             Catch ex As Exception
-                If ex.InnerException Is Nothing Then
-                    lrRecordset.ErrorString = ex.Message
-                    lrRecordset.Query = lsSQLQuery
-                Else
-                    lrRecordset.ErrorString = ex.InnerException.Message
-                End If
-
-                Return lrRecordset
+                Return Nothing
             End Try
 
         End Function
-
 #End Region
 
 #Region "getModelElmentByBaseNodePredicate"

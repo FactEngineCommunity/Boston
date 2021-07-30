@@ -61,10 +61,12 @@
         ''' NB Subqueries are generated using this same function. For a subquery, contains the WhichSelectStatement if the subquery.</param>
         ''' <param name="abIsCountStarSubQuery">? TBA</param>
         ''' <param name="abIsStraightDerivationClause">TRUE if called to generate the SQL for a DerivedFactType. A specialised set of ProjectColumns is returned, using PKs rather than UCs.</param>
+        ''' <param name="arDerivationFactType">The DerivedFactType if is called to generate the SQL for a DerivedFactType.</param>
         ''' <returns></returns>
         Public Function generateSQL(ByRef arWhichSelectStatement As FEQL.WHICHSELECTStatement,
                                     Optional ByVal abIsCountStarSubQuery As Boolean = False,
-                                    Optional ByVal abIsStraightDerivationClause As Boolean = False) As String
+                                    Optional ByVal abIsStraightDerivationClause As Boolean = False,
+                                    Optional ByRef arDerivedFactType As FBM.FactType = Nothing) As String
 
             Dim lsSQLQuery As String = ""
             Dim liInd As Integer
@@ -86,7 +88,7 @@
                     End If
 #Region "ProjectionColums"
                     liInd = 1
-                    Dim larProjectionColumn = Me.getProjectionColumns(arWhichSelectStatement, abIsStraightDerivationClause)
+                    Dim larProjectionColumn = Me.getProjectionColumns(arWhichSelectStatement, abIsStraightDerivationClause, arDerivedFactType)
                     Me.ProjectionColumn = larProjectionColumn
 
 
@@ -1068,7 +1070,8 @@
         End Function
 
         Public Function getProjectionColumns(ByRef arWhichSelectStatement As FEQL.WHICHSELECTStatement,
-                                             Optional ByVal abIsStraightDerivationClause As Boolean = False) As List(Of RDS.Column)
+                                             Optional ByVal abIsStraightDerivationClause As Boolean = False,
+                                             Optional ByVal arDerivedFactType As FBM.FactType = Nothing) As List(Of RDS.Column)
 
             Dim larColumn As New List(Of RDS.Column)
 
@@ -1119,10 +1122,26 @@
                         End If
                     Next
                 ElseIf abIsStraightDerivationClause Then
-                    Throw New NotImplementedException("Not yet implemented. Using abIsStraightDerivationClause = True")
+
+                    If arDerivedFactType.isRDSTable Then
+                        For Each lrRole In arDerivedFactType.RoleGroup
+                            Select Case lrRole.JoinedORMObject.GetType
+                                Case Is = GetType(FBM.ValueType)
+                                    Throw New NotImplementedException("No implemented for DerivedFactTypes that are RDS Tables with ValueType joined Roles.")
+                                Case Else
+                                    For Each lrColumn In lrRole.JoinedORMObject.getCorrespondingRDSTable.getPrimaryKeyColumns
+                                        larColumn.Add(lrColumn.Clone(Nothing, Nothing))
+                                    Next
+                            End Select
+                        Next
+                    Else
+                        Throw New NotImplementedException("No implemented for DerivedFactTypes that are not RDS Tables.")
+                    End If
+
                 Else
                     'Head Column/s
                     Dim larHeadColumn As New List(Of RDS.Column)
+
                     Select Case Me.HeadNode.FBMModelObject.ConceptType
                         Case Is = pcenumConceptType.ValueType
                             Dim lrVTColumn As RDS.Column
