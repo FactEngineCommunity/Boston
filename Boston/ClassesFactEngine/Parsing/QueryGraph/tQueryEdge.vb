@@ -227,6 +227,9 @@ Namespace FactEngine
                             Dim larFactType = From FactTypeReading In larFinalFactTypeReading
                                               Select FactTypeReading.FactType Distinct
 
+                            Me.FBMPossibleFactTypes = Me.QueryGraph.Model.getFactTypeByPartialMatchModelObjectsFactTypeReading(larModelObject,
+                                                                                                                               lrFactTypeReading)
+
                             If larFactType.Count > 1 Then
                                 lsMessage = "More than one Fact Type has a Predicate Part, '" & asPredicate & "', for Model Elements, '" & arBaseNode.FBMModelObject.Id & " and " & arTargetNode.FBMModelObject.Id & "."
                                 lsMessage &= vbCrLf & vbCrLf & "Try referencing the following Fact Types directly in your query:"
@@ -237,14 +240,16 @@ Namespace FactEngine
                                 Throw New Exception(lsMessage)
                             Else
                                 If larFinalFactTypeReading.Count = 1 Then
-                                    Me.FBMFactType = larFinalFactTypeReading(0).FactType
-                                    If larFinalFactTypeReading(0).FactType.Arity > 2 Then
+                                    If Me.FBMPossibleFactTypes.Count > 0 Then
+                                        Me.FBMFactType = Me.FBMPossibleFactTypes.First
                                         Me.IsPartialFactTypeMatch = True
+                                    Else
+                                        Me.FBMFactType = larFinalFactTypeReading(0).FactType
+                                        If larFinalFactTypeReading(0).FactType.Arity > 2 Then
+                                            Me.IsPartialFactTypeMatch = True
+                                        End If
                                     End If
                                 Else
-                                    Me.FBMPossibleFactTypes = Me.QueryGraph.Model.getFactTypeByPartialMatchModelObjectsFactTypeReading(larModelObject,
-                                                                                                                                       lrFactTypeReading)
-
                                     If Me.FBMPossibleFactTypes.Count = 0 Then
                                         lsMessage = "There is no Predicate Part for any Fact Type that has a Predicate Part, '" & asPredicate & "', for Model Elements, '" & arBaseNode.FBMModelObject.Id & " and " & arTargetNode.FBMModelObject.Id & ". Try revising your query."
                                         Throw New Exception(lsMessage)
