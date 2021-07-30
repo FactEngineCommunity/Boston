@@ -251,7 +251,7 @@
 
 
             Catch ex As Exception
-                Return Nothing
+                Throw New Exception(ex.Message)
             End Try
 
         End Function
@@ -591,6 +591,8 @@
                 arQueryEdge.BaseNode = arPreviousTargetNode
             ElseIf (arPreviousTargetNode IsNot Nothing) And Me.WHICHCLAUSE.KEYWDTHAT.Count = 1 And
                                (Me.WHICHCLAUSE.KEYWDWHICH Is Nothing And Me.WHICHCLAUSE.KEYWDA Is Nothing) Then
+                arQueryEdge.BaseNode = arPreviousTargetNode
+            ElseIf (arPreviousTargetNode IsNot Nothing) And arWHICHCLAUSE.KEYWDA IsNot Nothing Then
                 arQueryEdge.BaseNode = arPreviousTargetNode
             Else
                 arQueryEdge.BaseNode = arQueryGraph.HeadNode
