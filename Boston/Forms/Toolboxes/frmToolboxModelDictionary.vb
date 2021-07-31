@@ -454,6 +454,16 @@ Public Class frmToolboxModelDictionary
                     If IsSomething(lrORMToolboxVerbalisation) Then
                         lrORMToolboxVerbalisation.VerbaliseTable(e.Node.Tag)
                     End If
+                Case Is = GetType(FBM.RoleConstraint).ToString
+                    If lrORMToolboxVerbalisation IsNot Nothing Then
+                        Dim lrRoleConstraint As FBM.RoleConstraint = e.Node.Tag
+                        Select Case lrRoleConstraint.RoleConstraintType
+                            Case = pcenumRoleConstraintType.InternalUniquenessConstraint
+                                lrORMToolboxVerbalisation.VerbaliseRoleConstraintUniquenessConstraint(e.Node.Tag)
+                            Case Else
+                                'not implemented
+                        End Select
+                    End If
             End Select
 
         Catch ex As Exception

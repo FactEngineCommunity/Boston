@@ -1,4 +1,6 @@
-﻿Public Class frmToolboxTableData
+﻿Imports System.Reflection
+
+Public Class frmToolboxTableData
 
     Public mrModel As FBM.Model
     Public mrTable As RDS.Table = Nothing
@@ -14,7 +16,7 @@
 
     Private Sub frmToolboxTableData_Load(sender As Object, e As EventArgs) Handles Me.Load
 
-        Call Me.SetupForm
+        Call Me.SetupForm()
 
     End Sub
 
@@ -83,7 +85,12 @@
             End If
 
         Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Sub
@@ -140,6 +147,7 @@
                 lsSQLQuery &= ")"
 
                 Dim lrRecordset = Me.mrModel.DatabaseConnection.GO(lsSQLQuery)
+
                 If Not lrRecordset.ErrorReturned Then
                     Me.ToolStripButtonCommit.Enabled = False
                     Me.ToolStripStatusLabel.Text = lrRecordset.ErrorString
@@ -151,7 +159,12 @@
             Next
 
         Catch ex As Exception
-            Debugger.Break()
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
     End Sub
 
@@ -177,7 +190,12 @@
             Me.ToolStripButtonUndo.Enabled = False
             Me.ToolStripButtonCommit.Enabled = False
         Catch ex As Exception
-            Debugger.Break()
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Sub
@@ -194,13 +212,49 @@
         If e.KeyCode = Keys.Delete Then
             If Me.DataGridView.SelectedRows.Count > 0 Then
                 If MsgBox("Are you sure you want to delete this row from the database?", MsgBoxStyle.YesNo) = MsgBoxResult.Yes Then
-                    Me.mrRecordset.Facts.RemoveAt(Me.DataGridView.SelectedRows(0).Index)
+
+                    Dim lrFact As FBM.Fact = Me.mrRecordset.Facts(Me.DataGridView.SelectedRows(0).Index)
                     '20210608-VM-Put in code here to remove the record from the database
+                    '=========================================================================
+                    Dim lsSQLQuery As String = ""
+                    lsSQLQuery.AppendString("DELETE FROM " & Me.mrTable.Name & vbCrLf & " WHERE ")
+                    Dim liInd = 0
+                    For Each lrColumn In Me.mrTable.getPrimaryKeyColumns
+                        If liInd > 0 Then lsSQLQuery &= " AND "
+                        lsSQLQuery.AppendString(lrColumn.Name & " = ")
+                        Dim liValueColumnIndex = mrRecordset.Columns.IndexOf(lrColumn.Name)
+                        lsSQLQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsText, "'", "")
+                        lsSQLQuery &= lrFact.Data(liValueColumnIndex).Data
+                        lsSQLQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsText, "'", "")
+                        liInd += 1
+                    Next
+                    Dim lrRecordset = Me.mrModel.DatabaseConnection.GO(lsSQLQuery)
+                    '=========================================================================
+                    'Remove the Fact
+                    Me.mrRecordset.Facts.RemoveAt(Me.DataGridView.SelectedRows(0).Index)
+
                     Me.DataGridView.DataSource = Nothing
                     Me.DataGridView.DataSource = Me.mrDataGridList
                 End If
             End If
         End If
+
+    End Sub
+
+    Private Sub DataGridView_UserDeletingRow(sender As Object, e As DataGridViewRowCancelEventArgs) Handles DataGridView.UserDeletingRow
+
+        Try
+
+            Debugger.Break()
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 End Class

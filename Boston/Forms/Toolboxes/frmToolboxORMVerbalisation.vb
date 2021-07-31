@@ -2446,6 +2446,7 @@ Public Class frmToolboxORMVerbalisation
         Me.WebBrowser.DocumentText = lrVerbaliser.Verbalise
 
     End Sub
+
     Public Sub VerbaliseValueType(ByVal arValueType As FBM.ValueType)
         '------------------------------------------------------
         'PSEUDOCODE
