@@ -459,7 +459,7 @@ Public Class frmToolboxModelDictionary
                         Dim lrRoleConstraint As FBM.RoleConstraint = e.Node.Tag
                         Select Case lrRoleConstraint.RoleConstraintType
                             Case = pcenumRoleConstraintType.InternalUniquenessConstraint
-                                lrORMToolboxVerbalisation.VerbaliseRoleConstraintUniquenessConstraint(e.Node.Tag)
+                                lrORMToolboxVerbalisation.VerbaliseRoleConstraintInternalUniquenessConstraint(e.Node.Tag)
                             Case Else
                                 'not implemented
                         End Select

@@ -1966,6 +1966,8 @@ Public Class frmDiagramORM
                                 Call lrToolboxForm.VerbaliseRoleConstraintExclusionConstraint(lrRoleConstraintInstance.RoleConstraint)
                             Case Is = pcenumRoleConstraintType.InclusiveORConstraint
                                 Call lrToolboxForm.VerbaliseRoleConstraintInclusiveORConstraint(lrRoleConstraintInstance.RoleConstraint)
+                            Case Is = pcenumRoleConstraintType.InternalUniquenessConstraint
+                                Call lrToolboxForm.VerbaliseRoleConstraintInternalUniquenessConstraint(lrRoleConstraintInstance.RoleConstraint)
                             Case Is = pcenumRoleConstraintType.ExclusiveORConstraint
                                 Call lrToolboxForm.VerbaliseRoleConstraintExclusiveORConstraint(lrRoleConstraintInstance.RoleConstraint)
                             Case Is = pcenumRoleConstraintType.ExternalUniquenessConstraint
@@ -4561,6 +4563,8 @@ Public Class frmDiagramORM
                                 Call lrToolboxForm.VerbaliseRoleConstraintExclusionConstraint(lrRoleConstraintInstance.RoleConstraint)
                             Case Is = pcenumRoleConstraintType.InclusiveORConstraint
                                 Call lrToolboxForm.VerbaliseRoleConstraintInclusiveORConstraint(lrRoleConstraintInstance.RoleConstraint)
+                            Case Is = pcenumRoleConstraintType.InternalUniquenessConstraint
+                                Call lrToolboxForm.VerbaliseRoleConstraintInternalUniquenessConstraint(lrRoleConstraintInstance.RoleConstraint)
                             Case Is = pcenumRoleConstraintType.ExclusiveORConstraint
                                 Call lrToolboxForm.VerbaliseRoleConstraintExclusiveORConstraint(lrRoleConstraintInstance.RoleConstraint)
                             Case Is = pcenumRoleConstraintType.ExternalUniquenessConstraint
@@ -4652,8 +4656,13 @@ Public Class frmDiagramORM
                         For Each lrRoleConstraintRoleInstance In lrRoleConstraintInstance.RoleConstraintRole
                             lrRoleConstraintRoleInstance.Shape.Pen.Color = Color.Blue
                             Me.zrPage.AddSelectedObject(lrRoleConstraintRoleInstance)
+                            '20210801-VM-Removed below so can verbalise an IUC.
                             If lrRoleConstraintInstance.RoleConstraintType = pcenumRoleConstraintType.InternalUniquenessConstraint Then
-                                lrRoleConstraintRoleInstance.Role.FactType.Shape.Selected = True
+                                lrToolboxForm = prApplication.GetToolboxForm(frmToolboxORMVerbalisation.Name)
+                                If IsSomething(lrToolboxForm) Then
+                                    'Special VerbalisationProcess
+                                    Call lrToolboxForm.VerbaliseRoleConstraintInternalUniquenessConstraint(lrRoleConstraintInstance.RoleConstraint)
+                                End If
                             End If
                             Me.Diagram.Invalidate()
                         Next
