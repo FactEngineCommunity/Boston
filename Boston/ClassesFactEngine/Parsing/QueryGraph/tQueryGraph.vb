@@ -95,7 +95,13 @@
                     For Each lrProjectColumn In larProjectionColumn.FindAll(Function(x) x IsNot Nothing)
 
                         If lrProjectColumn.Role.FactType.IsDerived Then
-                            lsSelectClause &= "[" & lrProjectColumn.Role.FactType.Id & Viev.NullVal(lrProjectColumn.TemporaryAlias, "") & "]." & lrProjectColumn.Name
+                            If lrProjectColumn.Role.JoinedORMObject.GetType = GetType(FBM.ValueType) Then
+                                'for now
+                                lsSelectClause &= lrProjectColumn.Name
+                            Else
+                                lsSelectClause &= "[" & lrProjectColumn.Role.FactType.Id & Viev.NullVal(lrProjectColumn.TemporaryAlias, "") & "]." & lrProjectColumn.Name
+                            End If
+
                         Else
                             lsSelectClause &= "[" & lrProjectColumn.Table.DatabaseName & Viev.NullVal(lrProjectColumn.TemporaryAlias, "") & "]." & lrProjectColumn.Name
                         End If
@@ -1127,7 +1133,9 @@
                         For Each lrRole In arDerivedFactType.RoleGroup
                             Select Case lrRole.JoinedORMObject.GetType
                                 Case Is = GetType(FBM.ValueType)
-                                    Throw New NotImplementedException("No implemented for DerivedFactTypes that are RDS Tables with ValueType joined Roles.")
+                                    Dim lrVTColumn As New RDS.Column(arDerivedFactType.getCorrespondingRDSTable, lrRole.JoinedORMObject.Id, lrRole, lrRole, False)
+                                    lrVTColumn = lrVTColumn.Clone(Nothing, Nothing)
+                                    larColumn.Add(lrVTColumn)
                                 Case Else
                                     For Each lrColumn In lrRole.JoinedORMObject.getCorrespondingRDSTable.getPrimaryKeyColumns
                                         larColumn.Add(lrColumn.Clone(Nothing, Nothing))

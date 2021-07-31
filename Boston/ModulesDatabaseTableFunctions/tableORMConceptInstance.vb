@@ -66,6 +66,7 @@ Namespace TableConceptInstance
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
+                pdbConnection.RollbackTrans()
                 prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
@@ -89,6 +90,7 @@ Namespace TableConceptInstance
                 Dim lsMessage As String
                 lsMessage = "Error: TableconceptInstance.DeleteConceptInstanceForPage"
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
+                pdbConnection.RollbackTrans()
                 prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
@@ -219,6 +221,7 @@ Namespace TableConceptInstance
                 Dim lsMessage As String
                 lsMessage = "Error: TableConceptInstance.ModifyKey"
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
+                pdbConnection.RollbackTrans()
                 prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
@@ -251,6 +254,7 @@ Namespace TableConceptInstance
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                pdbConnection.RollbackTrans()
                 prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
@@ -283,6 +287,7 @@ Namespace TableConceptInstance
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                pdbConnection.RollbackTrans()
                 prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
@@ -318,9 +323,8 @@ Namespace TableConceptInstance
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
-
                 pdbConnection.RollbackTrans()
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
