@@ -216,7 +216,8 @@ Namespace FBM
 
         End Function
 
-        Public Function EqualsByPredicatePartText(ByVal other As FBM.FactTypeReading) As Boolean
+        Public Function EqualsByPredicatePartText(ByVal other As FBM.FactTypeReading,
+                                                  Optional abUseFastenshtein As Boolean = False) As Boolean
 
             Dim liInd As Integer = 0
 
@@ -225,10 +226,18 @@ Namespace FBM
             End If
 
             For Each lrPredicatePart In Me.PredicatePart
-                If (lrPredicatePart.PredicatePartText <> other.PredicatePart(liInd).PredicatePartText) Or
+                If abUseFastenshtein Then
+                    If (Fastenshtein.Levenshtein.Distance(lrPredicatePart.PredicatePartText, other.PredicatePart(liInd).PredicatePartText) > 4) Or
                      (lrPredicatePart.PreBoundText <> other.PredicatePart(liInd).PreBoundText) Or
                      (lrPredicatePart.PostBoundText <> other.PredicatePart(liInd).PostBoundText) Then
-                    Return False
+                        Return False
+                    End If
+                Else
+                    If (lrPredicatePart.PredicatePartText <> other.PredicatePart(liInd).PredicatePartText) Or
+                     (lrPredicatePart.PreBoundText <> other.PredicatePart(liInd).PreBoundText) Or
+                     (lrPredicatePart.PostBoundText <> other.PredicatePart(liInd).PostBoundText) Then
+                        Return False
+                    End If
                 End If
                 liInd += 1
             Next

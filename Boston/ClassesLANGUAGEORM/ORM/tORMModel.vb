@@ -1857,7 +1857,8 @@ Namespace FBM
         ''' <param name="arFactTypeReading"></param>
         ''' <returns></returns>
         Public Function getFactTypeByModelObjectsFactTypeReading(ByVal aarModelObject As List(Of FBM.ModelObject),
-                                                                 ByVal arFactTypeReading As FBM.FactTypeReading) As FBM.FactType
+                                                                 ByVal arFactTypeReading As FBM.FactTypeReading,
+                                                                 Optional abUseFastenshtein As Boolean = False) As FBM.FactType
 
             Try
                 '------------------------------------------------------
@@ -1875,9 +1876,8 @@ Namespace FBM
                     Dim larFTRFactType = From FactType In larFactType
                                          From FactTypeReading In FactType.FactTypeReading
                                          Where arFactTypeReading.EqualsByRoleJoinedModelObjectSequence(FactTypeReading)
-                                         Where arFactTypeReading.EqualsByPredicatePartText(FactTypeReading)
+                                         Where arFactTypeReading.EqualsByPredicatePartText(FactTypeReading, abUseFastenshtein)
                                          Select FactType
-
 
                     If larFTRFactType.Count = 0 Then
                         Return Nothing

@@ -131,9 +131,10 @@ Namespace FactEngine
 
             Dim lsMessage As String = ""
             Try
-                If Me.WhichClauseSubType = pcenumWhichClauseType.IsPredicateNodePropertyIdentification Then
+                Dim larModelObject As New List(Of FBM.ModelObject)
 
-                    Dim larModelObject As New List(Of FBM.ModelObject)
+                If Me.WhichClauseSubType = pcenumWhichClauseType.IsPredicateNodePropertyIdentification Then
+#Region "With NodePropertyIdentification"
                     larModelObject.Add(arBaseNode.RelativeFBMModelObject)
                     larModelObject.Add(arTargetNode.FBMModelObject)
                     Dim lasPredicatePart As New List(Of String)
@@ -265,10 +266,8 @@ Namespace FactEngine
                             End If
 
                     End Select
-
+#End Region
                 Else
-
-                    Dim larModelObject As New List(Of FBM.ModelObject)
                     Dim larRole As New List(Of FBM.Role)
                     Dim lrDummyFactType As New FBM.FactType
                     Dim lasPredicatePart As New List(Of String)
@@ -292,6 +291,13 @@ Namespace FactEngine
                     'Get the FactType
                     Me.FBMFactType = Me.QueryGraph.Model.getFactTypeByModelObjectsFactTypeReading(larModelObject,
                                                                                                   lrFactTypeReading)
+
+                    If Me.FBMFactType Is Nothing Then
+                        'Try Fastenshtein
+                        Me.FBMFactType = Me.QueryGraph.Model.getFactTypeByModelObjectsFactTypeReading(larModelObject,
+                                                                                                      lrFactTypeReading, True)
+                    End If
+
                     If Me.FBMFactType Is Nothing Then
 
                         Dim larFactType As New List(Of FBM.FactType)
@@ -404,6 +410,10 @@ Namespace FactEngine
 
                     If Me.FBMFactTypeReading Is Nothing And Me.FBMFactType IsNot Nothing Then
                         Me.FBMFactTypeReading = Me.FBMFactType.FactTypeReading.Find(AddressOf lrFactTypeReading.EqualsByPredicatePartText)
+                        If Me.FBMFactTypeReading Is Nothing Then
+                            Me.FBMFactTypeReading = Me.FBMFactType.FactTypeReading.Find(Function(x) lrFactTypeReading.EqualsByPredicatePartText(x, True) And
+                                                                                                    lrFactTypeReading.EqualsByRoleJoinedModelObjectSequence(x))
+                        End If
                     ElseIf Me.AmbiguousFactTypeMatches.Count > 0 Then
                         Me.AmbiguousFactTypeReading = lrFactTypeReading
                     End If
