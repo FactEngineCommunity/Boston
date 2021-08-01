@@ -730,6 +730,7 @@
     <Compile Include="ClassesLANGUAGEORM\ORMModelValidator\tErrorChecker.vb" />
     <Compile Include="ClassesLANGUAGEORM\ORMModelValidator\tErrorChecker100PopulationUniquenessError.vb" />
     <Compile Include="ClassesLANGUAGEORM\ORMModelValidator\tModelValidator.vb" />
+    <Compile Include="ClassesODBCDatabaseReverseEngineer\tODBCDatabaseReverseEngineer.vb" />
     <Compile Include="ClassesParserFTR\TinyPG\tFTRParser.vb" />
     <Compile Include="ClassesParserFTR\TinyPG\tFTRParseTree.vb" />
     <Compile Include="ClassesParserFTR\TinyPG\tFTRScanner.vb" />
