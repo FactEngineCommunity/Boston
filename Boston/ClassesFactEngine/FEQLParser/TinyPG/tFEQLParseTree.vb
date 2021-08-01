@@ -630,6 +630,9 @@ Namespace FEQL
                 Case TokenType.WITHCLAUSE
                     Value = EvalWITHCLAUSE(tree, paramlist)
                     Exit Select
+                Case TokenType.QUERYBEGINNING
+                    Value = EvalQUERYBEGINNING(tree, paramlist)
+                    Exit Select
                 Case TokenType.WHICHSELECTSTMT
                     Value = EvalWHICHSELECTSTMT(tree, paramlist)
                     Exit Select
@@ -1182,6 +1185,10 @@ Namespace FEQL
         End Function
 
         Protected Overridable Function EvalWITHCLAUSE(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalQUERYBEGINNING(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
             Throw New NotImplementedException()
         End Function
 
