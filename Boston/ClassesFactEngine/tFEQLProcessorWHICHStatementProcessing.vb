@@ -78,6 +78,15 @@
                     End If
                 Else
                     lrFBMModelObject = Me.Model.GetModelObjectByName(Me.WHICHSELECTStatement.NODE(0).MODELELEMENTNAME) 'MODELELEMENTNAME
+
+                    If lrFBMModelObject Is Nothing Then
+                        Dim lsModelObjectName As String = Me.WHICHSELECTStatement.NODE(0).MODELELEMENTNAME
+                        Dim larModelObject = From ModelObject In Me.Model.getModelObjects
+                                             Select New With {ModelObject, .Lev = Fastenshtein.Levenshtein.Distance(ModelObject.Id, lsModelObjectName)}
+
+                        lrFBMModelObject = larModelObject.OrderBy(Function(X) X.Lev).First.ModelObject
+                    End If
+
                 End If
 
                 If lrFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & Me.WHICHSELECTStatement.MODELELEMENTNAME(0) & "'.")
