@@ -25,15 +25,14 @@ Public Class frmCRUDModel
         Me.LabelModelName.Text = Me.zrModel.Name
         Me.LabelCoreVersion.Text = Me.zrModel.CoreVersionNumber
 
-        Me.GroupBoxReverseEngineering.Visible = False ' My.Settings.SuperuserMode
-
         Call Me.LoadDatabaseTypes()
 
         Me.TextBoxDatabaseConnectionString.Text = Me.zrModel.TargetDatabaseConnectionString
         Me.CheckBoxIsDatabaseSynchronised.Checked = Me.zrModel.IsDatabaseSynchronised
 
         If Me.zrModel.IsEmpty Then
-            Me.Button1.Enabled = True
+            Me.GroupBoxReverseEngineering.Visible = True
+            Me.Button2.Enabled = True
         End If
 
     End Sub
@@ -293,57 +292,7 @@ Public Class frmCRUDModel
 
         End Try
 
-
-
     End Sub
-
-    Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
-
-        Try
-            Me.mrODBCConnection = New System.Data.Odbc.OdbcConnection(Me.TextBoxDatabaseConnectionString.Text)
-
-            With New WaitCursor
-
-                Me.mrODBCConnection.Open()
-
-                Me.LabelOpenSuccessfull.Text = "Success"
-                Me.LabelOpenSuccessfull.Visible = True
-                Me.Invalidate()
-
-                'Dim lrODBCTable As System.Data.DataTable
-                'lrODBCTable = lrODBCConnection.GetSchema("Restrictions")
-                'Call Me.DisplayData(lrODBCTable)
-
-                Me.zrModel.RDS = New RDS.Model(Me.zrModel)
-
-
-                Me.ErrorProvider.SetError(Me.ComboBoxSchema, "Select a Schema from which to import Tables.")
-
-                Me.Button1.Enabled = False
-                Me.Button2.Enabled = True
-
-            End With
-
-        Catch ex As Exception
-
-            Me.LabelOpenSuccessfull.Text = "Fail"
-            Me.LabelOpenSuccessfull.Visible = True
-
-        End Try
-
-    End Sub
-
-    Private Sub DisplayData(ByRef table As DataTable)
-
-        For Each row As DataRow In table.Rows
-            For Each col As DataColumn In table.Columns
-                MsgBox(col.ColumnName & " = " & row(col))
-            Next
-        Next
-
-    End Sub
-
-
 
 
     Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click
@@ -351,14 +300,16 @@ Public Class frmCRUDModel
         Try
             Dim lasSchemaName As New List(Of String)
 
-
             With New WaitCursor
 
                 Me.zrModel.RDS.TargetDatabaseType = Me.ComboBoxDatabaseType.SelectedItem.Tag 'DirectCast(System.[Enum].Parse(GetType(pcenumDatabaseType), Me.ComboBoxDatabaseType.SelectedItem), pcenumDatabaseType)
 
-                Dim lrReverseEngineer As New ODBCDatabaseReverseEngineer(Me.zrModel)
+                Dim lrReverseEngineer As New ODBCDatabaseReverseEngineer(Me.zrModel, Trim(Me.TextBoxDatabaseConnectionString.Text), True)
 
-                Call lrReverseEngineer.ReverseEngineerDatabase()
+                Dim lsErrorMessage As String = ""
+                If Not lrReverseEngineer.ReverseEngineerDatabase(lsErrorMessage) Then
+                    Me.ErrorProvider.SetError(Me.Button2, lsErrorMessage)
+                End If
 
             End With
 
@@ -372,13 +323,6 @@ Public Class frmCRUDModel
         End Try
     End Sub
 
-    Private Sub ComboBoxSchema_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ComboBoxSchema.SelectedIndexChanged
-
-        If Me.ComboBoxSchema.SelectedIndex >= 0 Then
-            Me.ErrorProvider.SetError(Me.ComboBoxSchema, "")
-        End If
-
-    End Sub
 
     Private Sub ComboBoxDatabaseType_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ComboBoxDatabaseType.SelectedIndexChanged
 
