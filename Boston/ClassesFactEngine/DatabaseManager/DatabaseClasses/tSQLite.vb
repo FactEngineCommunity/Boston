@@ -470,6 +470,66 @@ Namespace FactEngine
 
         End Function
 
+        Public Overrides Function getForeignKeyRelationshipsByTable(ByRef arTable As RDS.Table) As List(Of RDS.Relation)
+
+            Dim larRelation As New List(Of RDS.Relation)
+            Try
+                Dim lsSQL As String
+                Dim lrRecordset As ORMQL.Recordset
+
+                lsSQL = "PRAGMA foreign_key_list(" & arTable.Name & ")"
+
+                lrRecordset = Me.GO(lsSQL)
+
+                While Not lrRecordset.EOF
+                    'https://stackoverflow.com/questions/48508140/how-do-i-get-information-about-foreign-keys-in-sqlite
+                    'Columns
+                    '====================
+                    'id
+                    'seq
+                    'table
+                    'from
+                    'to
+                    'on_update  ('NO ACTION')
+                    'on_delete
+                    'match
+
+                    lrRecordset.MoveNext()
+                End While
+
+                Return larRelation
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return New List(Of RDS.Relation)
+            End Try
+        End Function
+
+        ''' <summary>
+        ''' Returns a list of the Indexes in the database. As used in Reverse Engineering a database.
+        ''' </summary>
+        ''' <param name="arTable"></param>
+        ''' <returns></returns>
+        Public Overrides Function getIndexesByTable(ByRef arTable As RDS.Table) As List(Of RDS.Index)
+            Return New List(Of RDS.Index)
+        End Function
+
+        ''' <summary>
+        ''' Returns a list of the Tables in the database. As used in Reverse Engineering a database.
+        ''' </summary>
+        ''' <returns></returns>
+        Public Overrides Function getTables() As List(Of RDS.Table)
+            Return New List(Of RDS.Table)
+        End Function
+
+
+
         Public Overrides Function GO(asQuery As String) As ORMQL.Recordset Implements iDatabaseConnection.GO
 
             Dim lrRecordset As New ORMQL.Recordset

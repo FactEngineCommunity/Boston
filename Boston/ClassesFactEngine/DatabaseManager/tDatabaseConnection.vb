@@ -34,7 +34,6 @@
         Public Overridable Sub AddForeignKey(ByRef arRelation As RDS.Relation)
         End Sub
 
-
         ''' <summary>
         ''' Changes the data type of the nominated column.
         ''' </summary>
@@ -86,6 +85,32 @@
         Public Overridable Function generateSQLCREATETABLEStatement(ByRef arTable As RDS.Table,
                                                                      Optional asTableName As String = Nothing) As String
             Return ""
+        End Function
+
+        ''' <summary>
+        ''' Returns a list of the Relations/ForeignKeys in the database. As used in Reverse Engineering a database.
+        ''' </summary>
+        ''' <param name="arTable"></param>
+        ''' <returns></returns>
+        Public Overridable Function getForeignKeyRelationshipsByTable(ByRef arTable As RDS.Table) As List(Of RDS.Relation)
+            Return New List(Of RDS.Relation)
+        End Function
+
+        ''' <summary>
+        ''' Returns a list of the Indexes in the database. As used in Reverse Engineering a database.
+        ''' </summary>
+        ''' <param name="arTable"></param>
+        ''' <returns></returns>
+        Public Overridable Function getIndexesByTable(ByRef arTable As RDS.Table) As List(Of RDS.Index)
+            Return New List(Of RDS.Index)
+        End Function
+
+        ''' <summary>
+        ''' Returns a list of the Tables in the database. As used in Reverse Engineering a database.
+        ''' </summary>
+        ''' <returns></returns>
+        Public Overridable Function getTables() As List(Of RDS.Table)
+            Return New List(Of RDS.Table)
         End Function
 
         ''' <summary>

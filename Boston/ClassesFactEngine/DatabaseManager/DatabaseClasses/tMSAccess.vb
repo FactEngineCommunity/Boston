@@ -50,6 +50,32 @@ Namespace FactEngine
 
         End Sub
 
+        ''' <summary>
+        ''' Returns a list of the Relations/ForeignKeys in the database. As used in Reverse Engineering a database.
+        ''' </summary>
+        ''' <param name="arTable"></param>
+        ''' <returns></returns>
+        Public Overrides Function getForeignKeyRelationshipsByTable(ByRef arTable As RDS.Table) As List(Of RDS.Relation)
+            Return New List(Of RDS.Relation)
+        End Function
+
+        ''' <summary>
+        ''' Returns a list of the Indexes in the database. As used in Reverse Engineering a database.
+        ''' </summary>
+        ''' <param name="arTable"></param>
+        ''' <returns></returns>
+        Public Overrides Function getIndexesByTable(ByRef arTable As RDS.Table) As List(Of RDS.Index)
+            Return New List(Of RDS.Index)
+        End Function
+
+        ''' <summary>
+        ''' Returns a list of the Tables in the database. As used in Reverse Engineering a database.
+        ''' </summary>
+        ''' <returns></returns>
+        Public Overrides Function getTables() As List(Of RDS.Table)
+            Return New List(Of RDS.Table)
+        End Function
+
         Public Overrides Function GO(asQuery As String) As Recordset Implements iDatabaseConnection.GO
 
             Dim lrRecordset As New ORMQL.Recordset

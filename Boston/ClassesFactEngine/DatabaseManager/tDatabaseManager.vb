@@ -56,6 +56,8 @@ Namespace FactEngine
                         Me.Connection = New FactEngine.SQLiteConnection(Me.FBMModel, asDatabaseConnectionString, My.Settings.FactEngineDefaultQueryResultLimit)
                     Case Is = pcenumDatabaseType.MongoDB
                         Me.Connection = New FactEngine.MongoDbConnection(Me.FBMModel, asDatabaseConnectionString, My.Settings.FactEngineDefaultQueryResultLimit)
+                    Case Is = pcenumDatabaseType.ODBC
+                        Me.Connection = New FactEngine.ODBCConnection(Me.FBMModel, asDatabaseConnectionString, My.Settings.FactEngineDefaultQueryResultLimit)
                 End Select
 
                 Me.FBMModel.DatabaseConnection = Me.Connection
