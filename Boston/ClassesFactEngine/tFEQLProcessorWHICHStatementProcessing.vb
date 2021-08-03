@@ -204,6 +204,15 @@
                     '-------------------------------------------------
                     'Add the QueryEdge to the QueryGraph
                     lrQueryGraph.QueryEdges.Add(lrQueryEdge)
+                    If lrQueryEdge.InjectsQueryEdge IsNot Nothing Then
+                        If lrQueryEdge.InjectsQueryEdge.TargetNode.HasIdentifier Then
+                            lrQueryEdge.InjectsQueryEdge.WhichClauseType = FactEngine.Constants.pcenumWhichClauseType.IsPredicateNodePropertyIdentification
+                        Else
+                            lrQueryEdge.InjectsQueryEdge.WhichClauseType = FactEngine.Constants.pcenumWhichClauseType.ThatPredicateWhichModelElement
+                        End If
+                        lrQueryGraph.QueryEdges.Add(lrQueryEdge.InjectsQueryEdge)
+                        lrQueryGraph.Nodes.AddUnique(lrQueryEdge.InjectsQueryEdge.BaseNode)
+                    End If
 
                     lrPreviousTargetNode = lrQueryEdge.TargetNode
                     lrPreviousTopicNode = lrQueryEdge.BaseNode

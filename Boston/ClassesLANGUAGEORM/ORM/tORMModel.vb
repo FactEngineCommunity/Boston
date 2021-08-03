@@ -1986,7 +1986,7 @@ Namespace FBM
             Try
                 Dim larPredicatePartReturn As New List(Of FBM.PredicatePart)
 
-                Dim larPredicatePart = From FactType In Me.FactType.FindAll(Function(x) x.Arity > 1)
+                Dim larPredicatePart = From FactType In Me.FactType.FindAll(Function(x) x.Arity > 2)
                                        From FactTypeReading In FactType.FactTypeReading
                                        Where FactTypeReading.PredicatePart(0).PredicatePartText = asPredicatePart
                                        Where FactTypeReading.PredicatePart(1).Role.JoinedORMObject.Id = asModelElementName
@@ -4315,7 +4315,7 @@ Namespace FBM
 
                 Dim liCount = (From FactType In Me.FactType
                                Where FactType.Arity = 2
-                               Where FactType.RoleGroup.All(Function(x) larModelElement.Contains(x))
+                               Where FactType.RoleGroup.All(Function(x) larModelElement.Contains(x.JoinedORMObject))
                                Select FactType).Count
 
                 Return liCount
@@ -4334,17 +4334,35 @@ Namespace FBM
         End Function
 
         Public Function getFactTypeByPredicateFarSideModelElement(ByVal asPredicate As String,
-                                                                  ByVal arModelElement As FBM.ModelObject) As FBM.FactType
+                                                                  ByVal arModelElement As FBM.ModelObject,
+                                                                  Optional ByVal abUseFastenshtein As Boolean = False) As FBM.FactType
 
             Try
-                Dim larFactType = From FactType In Me.FactType
-                                  From FactTypeReading In FactType.FactTypeReading
-                                  Where FactType.Arity = 2
-                                  Where FactTypeReading.PredicatePart.Last.Role.JoinedORMObject.Id = arModelElement.Id
-                                  Where FactTypeReading.PredicatePart(0).PredicatePartText = asPredicate
-                                  Select FactType
+                Dim larFactType As List(Of FBM.FactType)
+                If abUseFastenshtein Then
 
-                Return larFactType.First
+                    larFactType = (From FactType In Me.FactType
+                                   From FactTypeReading In FactType.FactTypeReading
+                                   Where FactType.Arity = 2
+                                   Where FactTypeReading.PredicatePart.Last.Role.JoinedORMObject.Id = arModelElement.Id
+                                   Where Fastenshtein.Levenshtein.Distance(FactTypeReading.PredicatePart(0).PredicatePartText, asPredicate) < 4
+                                   Select FactType).ToList
+
+                Else
+                    larFactType = (From FactType In Me.FactType
+                                   From FactTypeReading In FactType.FactTypeReading
+                                   Where FactType.Arity = 2
+                                   Where FactTypeReading.PredicatePart.Last.Role.JoinedORMObject.Id = arModelElement.Id
+                                   Where FactTypeReading.PredicatePart(0).PredicatePartText = asPredicate
+                                   Select FactType).ToList
+                End If
+
+
+                If larFactType.Count = 0 Then
+                    Return Nothing
+                Else
+                    Return larFactType.First
+                End If
 
             Catch ex As Exception
                 Dim lsMessage As String
