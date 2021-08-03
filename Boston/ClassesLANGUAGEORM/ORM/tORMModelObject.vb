@@ -645,6 +645,35 @@ Namespace FBM
             Return New List(Of ModelObject)
         End Function
 
+        Public Overridable Function hasPredicateToModelElement(ByVal asPredicate As String,
+                                                               ByVal arModelElement As FBM.ModelObject) As Boolean
+
+            Try
+                Dim liCount = (From FactType In Me.Model.FactType
+                               From Role1 In FactType.RoleGroup
+                               From Role2 In FactType.RoleGroup
+                               Where FactType.Arity = 2
+                               Where Role1.JoinedORMObject Is Me
+                               Where Role2 Is FactType.GetOtherRoleOfBinaryFactType(Role1.Id)
+                               Where Role2.JoinedORMObject.Id = arModelElement.Id
+                               Where FactType.FactTypeReading.Any(Function(x) x.PredicatePart.Any(Function(y) y.PredicatePartText = Trim(asPredicate)))
+                               Select FactType).Count
+
+                Return liCount > 0
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return False
+            End Try
+
+        End Function
+
         Public Overridable Function HasPrimaryReferenceScheme() As Boolean
 
             If Me.ConceptType = pcenumConceptType.ValueType Then

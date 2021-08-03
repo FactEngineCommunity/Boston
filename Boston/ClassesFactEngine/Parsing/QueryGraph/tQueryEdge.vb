@@ -99,6 +99,13 @@ Namespace FactEngine
         Public WhichClauseSubType As pcenumWhichClauseType = pcenumWhichClauseType.None 'Used predominantly for IsPredicateNodePropertyIdentification so that the main Type is not changed
 
         ''' <summary>
+        ''' A query such as "WHICH Seat has A Booking THAT is to watch (Film:'Rocky')" will inject a QueryEdge "Session is to watch Film"
+        '''   where the model is "Seat has Booking THAT is for Session THAT is to watch (Film:'Rocky')" where Session is an ObjectifiedFactType over
+        '''   Film, Cinema and DateTime and where 'Session is to watch Film' is for the corresponding LinkFactType between Session and Film.
+        ''' </summary>
+        Public InjectsQueryEdge As FactEngine.QueryEdge = Nothing
+
+        ''' <summary>
         ''' Paremeterless New
         ''' </summary>
         Public Sub New()
@@ -132,7 +139,8 @@ Namespace FactEngine
             Dim lsMessage As String = ""
             Try
                 Dim larModelObject As New List(Of FBM.ModelObject)
-
+                Dim larRole As New List(Of FBM.Role)
+                Dim lrFactTypeReading As FBM.FactTypeReading
                 If Me.WhichClauseSubType = pcenumWhichClauseType.IsPredicateNodePropertyIdentification Then
 #Region "With NodePropertyIdentification"
                     larModelObject.Add(arBaseNode.RelativeFBMModelObject)
@@ -140,12 +148,12 @@ Namespace FactEngine
                     Dim lasPredicatePart As New List(Of String)
                     lasPredicatePart.Add(asPredicate)
                     lasPredicatePart.Add("")
-                    Dim larRole As New List(Of FBM.Role)
+
                     Dim lrDummyFactType As New FBM.FactType
                     larRole.Add(New FBM.Role(lrDummyFactType, larModelObject(0)))
                     larRole.Add(New FBM.Role(lrDummyFactType, larModelObject(1)))
 
-                    Dim lrFactTypeReading As New FBM.FactTypeReading(lrDummyFactType, larRole, lasPredicatePart)
+                    lrFactTypeReading = New FBM.FactTypeReading(lrDummyFactType, larRole, lasPredicatePart)
                     lrFactTypeReading.PredicatePart(1).PreBoundText = arTargetNode.PreboundText
 
                     Select Case Me.BaseNode.FBMModelObject.GetType
@@ -268,7 +276,6 @@ Namespace FactEngine
                     End Select
 #End Region
                 Else
-                    Dim larRole As New List(Of FBM.Role)
                     Dim lrDummyFactType As New FBM.FactType
                     Dim lasPredicatePart As New List(Of String)
 
@@ -284,7 +291,7 @@ Namespace FactEngine
                         larRole.Add(New FBM.Role(lrDummyFactType, larModelObject(1)))
                     End If
 
-                    Dim lrFactTypeReading As New FBM.FactTypeReading(lrDummyFactType, larRole, lasPredicatePart)
+                    lrFactTypeReading = New FBM.FactTypeReading(lrDummyFactType, larRole, lasPredicatePart)
                     lrFactTypeReading.PredicatePart(1).PreBoundText = arTargetNode.PreboundText
 
                     '---------------------------------------------------------------------------------------------
@@ -397,7 +404,36 @@ Namespace FactEngine
                     End If
 
                     If Me.FBMFactType Is Nothing And Me.FBMPossibleFactTypes.Count = 0 Then
-                        Throw New Exception("There is not Fact Type, '" & arBaseNode.FBMModelObject.Id & " " & asPredicate & " " & arTargetNode.FBMModelObject.Id & "', in the Model.")
+
+                        'See if it is a ReifiedFactType LinkFactType predicate requring an InjectedQueryEdge
+                        Dim lrPredicatePart As FBM.PredicatePart
+                        Dim lrQueryEdge As New FactEngine.QueryEdge
+                        lrQueryEdge.QueryGraph = Me.QueryGraph
+                        Dim lrFactType As FBM.FactType = Me.QueryGraph.Model.getFactTypeByPredicateFarSideModelElement(asPredicate, arTargetNode.FBMModelObject)
+                        If lrFactType IsNot Nothing Then
+                            Dim lrCandidateBaseNode As FactEngine.QueryNode
+                            lrPredicatePart = (From FactTypeReading In lrFactType.FactTypeReading
+                                               From PredicatePart In FactTypeReading.PredicatePart
+                                               Where PredicatePart.PredicatePartText = asPredicate
+                                               Select PredicatePart).First
+
+                            lrCandidateBaseNode = New FactEngine.QueryNode(lrPredicatePart.Role.JoinedORMObject, lrQueryEdge)
+
+                            If Me.QueryGraph.Model.hasCountFactTypesBetweenModelElements(arBaseNode.FBMModelObject, lrCandidateBaseNode.FBMModelObject) = 1 Then
+                                lrQueryEdge.BaseNode = lrCandidateBaseNode
+                                lrQueryEdge.TargetNode = New FactEngine.QueryNode(arTargetNode.FBMModelObject, lrQueryEdge, True)
+                                lrQueryEdge.FBMFactType = lrFactType
+                                'Change the TargetNode to the lrCandidateBaseNode
+                                arTargetNode = New FactEngine.QueryNode(lrCandidateBaseNode.FBMModelObject, Me, True)
+                                'get the FactType
+                                lrFactTypeReading.PredicatePart.Last.Role.JoinedORMObject = arTargetNode.FBMModelObject
+                                Me.FBMFactType = Me.QueryGraph.Model.getFactTypeByModelObjectsFactTypeReading(larModelObject, lrFactTypeReading)
+                            Else
+                                Throw New Exception("There is not Fact Type, '" & arBaseNode.FBMModelObject.Id & " " & asPredicate & " " & arTargetNode.FBMModelObject.Id & "', in the Model.")
+                            End If
+                        Else
+                            Throw New Exception("There is not Fact Type, '" & arBaseNode.FBMModelObject.Id & " " & asPredicate & " " & arTargetNode.FBMModelObject.Id & "', in the Model.")
+                        End If
 
                     ElseIf Me.FBMPossibleFactTypes.Count > 0 Then
                         'Is only a partial match

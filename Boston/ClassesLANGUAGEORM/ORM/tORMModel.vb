@@ -4302,6 +4302,65 @@ Namespace FBM
         End Function
 
         ''' <summary>
+        ''' Gets the count of FactTypes linking two ModelElements
+        ''' </summary>
+        ''' <param name="arModelElement1"></param>
+        ''' <param name="arModelElement2"></param>
+        ''' <returns></returns>
+        Public Function hasCountFactTypesBetweenModelElements(ByRef arModelElement1 As FBM.ModelObject,
+                                                             ByRef arModelElement2 As FBM.ModelObject) As Integer
+
+            Try
+                Dim larModelElement As New List(Of FBM.ModelObject) From {arModelElement1, arModelElement2}
+
+                Dim liCount = (From FactType In Me.FactType
+                               Where FactType.Arity = 2
+                               Where FactType.RoleGroup.All(Function(x) larModelElement.Contains(x))
+                               Select FactType).Count
+
+                Return liCount
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return 0
+            End Try
+
+        End Function
+
+        Public Function getFactTypeByPredicateFarSideModelElement(ByVal asPredicate As String,
+                                                                  ByVal arModelElement As FBM.ModelObject) As FBM.FactType
+
+            Try
+                Dim larFactType = From FactType In Me.FactType
+                                  From FactTypeReading In FactType.FactTypeReading
+                                  Where FactType.Arity = 2
+                                  Where FactTypeReading.PredicatePart.Last.Role.JoinedORMObject.Id = arModelElement.Id
+                                  Where FactTypeReading.PredicatePart(0).PredicatePartText = asPredicate
+                                  Select FactType
+
+                Return larFactType.First
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return Nothing
+            End Try
+
+        End Function
+
+
+        ''' <summary>
         ''' Deprecates the Realisations for a DictionaryEntry in the ModelDictionary
         ''' </summary>
         ''' <param name="arDictionaryEntry"></param>
