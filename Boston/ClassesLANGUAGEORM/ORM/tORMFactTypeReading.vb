@@ -295,36 +295,33 @@ Namespace FBM
         ''' <summary>
         ''' For QueryEdges in FactEngine queries where the QueryEdge is part of a larger FactType.
         ''' E.g. Where the FactType is ternary, but the QueryEdge is binary and where all QueryEdges are binary.
+        ''' Other can be longer than Me
         ''' </summary>
         ''' <param name="other"></param>
         ''' <returns></returns>
         Public Function EqualsPartiallyByRoleJoinedModelObjectSequence(ByVal other As FBM.FactTypeReading) As Boolean
 
-            Dim liInd As Integer = 0
-            Dim lrRole As FBM.Role
-
             Dim liMatchPosition = 0
-            Dim liFirstMatchPosition = -1
 
-            For Each lrRole In other.RoleList
+            'NB Other can be longer than Me
+            Try
+                For Each lrPredicatePart In other.PredicatePart
 
-                If lrRole.JoinedORMObject Is other.RoleList(liInd).JoinedORMObject Then
-                    liMatchPosition += 1
-                    If liFirstMatchPosition = -1 Then
-                        liFirstMatchPosition = liMatchPosition
+                    If lrPredicatePart.Role.JoinedORMObject Is Me.RoleList(liMatchPosition).JoinedORMObject Then
+                        liMatchPosition += 1
+                        If lrPredicatePart.SequenceNr < other.PredicatePart.Count Then
+                            If other.PredicatePart(lrPredicatePart.SequenceNr).Role.JoinedORMObject Is Me.RoleList(liMatchPosition).JoinedORMObject Then
+                                Return True
+                            End If
+                        End If
                     End If
-                End If
 
-                If liMatchPosition > 1 Then
-                    If liMatchPosition = liFirstMatchPosition + 1 Then
-                        Return True
-                    Else
-                        Return False
-                    End If
-                End If
+                    liMatchPosition = 0
+                Next
 
-                liInd += 1
-            Next
+            Catch ex As Exception
+                Return False
+            End Try
 
             Return False
 

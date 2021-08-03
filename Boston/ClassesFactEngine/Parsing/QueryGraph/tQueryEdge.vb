@@ -399,6 +399,12 @@ Namespace FactEngine
 
                                             Me.FBMFactType = Me.FBMFactTypeReading.FactType
 
+                                            'SubQuery
+                                            If Me.QueryGraph.QueryEdges.Last.IsPartOfSubQuery Or Me.QueryGraph.QueryEdges.Last.IsSubQueryLeader Then
+                                                lrQueryEdge.IsPartOfSubQuery = True
+                                                lrQueryEdge.SubQueryAlias = lrQueryEdge.QueryGraph.QueryEdges.Last.SubQueryAlias
+                                            End If
+
                                             Me.InjectsQueryEdge = lrQueryEdge
                                         Else
                                             Throw New Exception("There is not Fact Type, '" & arBaseNode.FBMModelObject.Id & " " & asPredicate & " " & arTargetNode.FBMModelObject.Id & "', in the Model.")

@@ -1909,11 +1909,10 @@ Namespace FBM
                 '------------------------------------------------------
                 'Check to see if the ModelObjects are in the FactType
                 Dim larFactType = From FactType In Me.FactType
-                                  Where FactType.RoleGroup.Count = aarModelObject.Count
-                                  From Role In FactType.RoleGroup
-                                  From ModelObject In aarModelObject
-                                  Where Role.JoinedORMObject.Id = ModelObject.Id
+                                  Where FactType.RoleGroup.FindAll(Function(x) aarModelObject.Contains(x.JoinedORMObject)).Count = aarModelObject.Count
                                   Select FactType Distinct
+
+                '20210803-VM-Removed Where FactType.RoleGroup.Count = aarModelObject.Count
 
                 If larFactType.Count = 0 Then
                     Return New List(Of FBM.FactType)
