@@ -708,14 +708,15 @@ Namespace FBM
 
                     '=====================================================================================
                     'RDS
-                    Dim lbRoleConstraintFactTypeIsDerived As Boolean = False
-                    If arRoleConstraint.Role.Count > 0 Then
-                        If arRoleConstraint.Role(0).FactType.IsDerived Then lbRoleConstraintFactTypeIsDerived = True
-                    End If
 
+                    '20210804-Removed below, because Boston needs RDS Tables for Derived Fact Types to make life easy in FactEngine query generation.
+                    'Dim lbRoleConstraintFactTypeIsDerived As Boolean = False
+                    'If arRoleConstraint.Role.Count > 0 Then
+                    '    If arRoleConstraint.Role(0).FactType.IsDerived Then lbRoleConstraintFactTypeIsDerived = True
+                    'End If
+                    'And Not (arRoleConstraint.RoleConstraintType = pcenumRoleConstraintType.InternalUniquenessConstraint And lbRoleConstraintFactTypeIsDerived)
 
                     If (Not arRoleConstraint.IsMDAModelElement) _
-                        And Not (arRoleConstraint.RoleConstraintType = pcenumRoleConstraintType.InternalUniquenessConstraint And lbRoleConstraintFactTypeIsDerived) _
                         And Me.RDSCreated Then 'For now, check this...because otherwise RDS may have no Tables.
 
                         If arRoleConstraint.RoleConstraintType = pcenumRoleConstraintType.InternalUniquenessConstraint _

@@ -1010,7 +1010,7 @@ Namespace FBM
                 Else
                     If Me.FactType.HasTotalRoleConstraint Or Me.FactType.HasPartialButMultiRoleConstraint Then
 
-                        Dim larRoleConstraint = From RoleConstraint In Me.FactType.InternalUniquenessConstraint _
+                        Dim larRoleConstraint = From RoleConstraint In Me.FactType.InternalUniquenessConstraint
                                                 Where RoleConstraint.Role.Contains(Me)
                                                 Select RoleConstraint
 
@@ -1303,6 +1303,7 @@ Namespace FBM
         ''' Used, for example, when reassigning a Role to another ModelObject.
         ''' PRECONDITION: Role is part of the RoleGroup of a FactType with a TotalInternalUniquenessConstraint or a PartialButMultiInternalUniquenessConstraint
         ''' </summary>
+        ''' <param name="aarCoveredRoles">Used for recursion. Start empty.</param>
         ''' <returns></returns>
         ''' <remarks></remarks>
         Public Function getDownstreamRoleActiveRoles(ByRef aarCoveredRoles As List(Of FBM.Role)) As List(Of FBM.Role)
@@ -1408,7 +1409,7 @@ Namespace FBM
 
                 Dim lrActiveRole As FBM.Role
                 If Me.JoinedORMObject.ConceptType = pcenumConceptType.FactType Then
-
+#Region "Joins FactType"
                     Dim lrFactType As FBM.FactType = Me.JoinedORMObject
 
                     Dim larPrimaryKeyRoles As New List(Of FBM.Role)
@@ -1454,8 +1455,21 @@ Namespace FBM
                                 larColumn.AddRange(lrRole.getColumns(arTable, arResponsibleRole))
                         End Select
                     Next
-
-                Else 'Joins ValueType or EntityType
+#End Region
+                ElseIf Me.JoinedORMObject.ConceptType = pcenumConceptType.EntityType Then '
+                    'Joins EntityType
+                    If Me.FactType.isRDSTable Then
+                        Dim lrEntityType As FBM.EntityType = Me.JoinsEntityType
+                        If lrEntityType.HasSimpleReferenceScheme Then
+                            larColumn.Add(Me.GetCorrespondingFactTypeColumn(arTable, arResponsibleRole))
+                        Else
+                            Call lrEntityType.getCompoundReferenceSchemeColumns(arTable, Me, larColumn)
+                        End If
+                    Else
+                        larColumn.Add(Me.GetCorrespondingUnaryOrBinaryFactTypeColumn(arTable))
+                    End If
+                ElseIf Me.JoinedORMObject.ConceptType = pcenumConceptType.ValueType Then
+                    'Joins ValueType
                     If Me.FactType.isRDSTable Then
                         larColumn.Add(Me.GetCorrespondingFactTypeColumn(arTable, arResponsibleRole))
                     Else
