@@ -1,5 +1,4 @@
 ﻿Imports System.Reflection
-Imports System.Data.OleDb
 
 Public Class ODBCDatabaseReverseEngineer
 
@@ -59,84 +58,27 @@ Public Class ODBCDatabaseReverseEngineer
 
             Call Me.getTables()
 
-            Try
-                Dim lrSQLConnectionStringBuilder As System.Data.Common.DbConnectionStringBuilder = Nothing
-
-                lrSQLConnectionStringBuilder = New System.Data.Common.DbConnectionStringBuilder(True) With {
-                           .ConnectionString = Me.Model.TargetDatabaseConnectionString
-                        }
-
-                Dim lsDatabaseLocation = lrSQLConnectionStringBuilder("DSN")
-
-                Dim lsConnectionString As String = ""
-                lsConnectionString = "Provider=MSDATASHAPE;DRIVER={SQLite3 ODBC Driver};DSN=" & lsDatabaseLocation
-                lsConnectionString = "Provider=MSDASQL;DRIVER={SQLite3 ODBC Driver};OPTION=3;FILEDSN=C:\Users\Victor\Desktop\Test.dsn"
-                lsConnectionString = "Provider={SQLite3 ODBC Driver};Database=C:\Users\Victor\OneDrive\00-FactEngine\01-Marketing\02-Product\01-Products\00-FactEngine\Research\SemanticParsing\SpiderChallenge\databases\database\academic\academic.sqlite"
-
-                'Have to use...'.Net Framework Data Provider for ODBC connection string
-                Dim connection As New System.Data.OleDb.OleDbConnection
-                Try
-                    connection = New System.Data.OleDb.OleDbConnection(lsConnectionString)
-                Catch ex As Exception
-                    Debugger.Break()
-                End Try
-
-                Try
-                    connection.Open()
-                Catch ex As Exception
-                    Debugger.Break()
-                End Try
-
-
-                Dim restrictions As String() = New String() {Nothing}
-                Dim schema As DataTable
-                schema = connection.GetOleDbSchemaTable(OleDbSchemaGuid.Foreign_Keys, restrictions)
-
-                For Each row As DataRow In schema.Rows
-                    Debugger.Break()
-                    'Dim dbForeignKey As ForeignKey = New ForeignKey()
-                    'dbForeignKey.Name = row("FK_NAME").ToString()
-                    'dbForeignKey.OriginalName = row("FK_NAME").ToString()
-                    'dbForeignKey.FKTableName = row("FK_TABLE_NAME").ToString()
-                    'Dim fkc As ForeignKeyColumn = New ForeignKeyColumn()
-                    'fkc.Name = row("FK_COLUMN_NAME").ToString()
-                    'dbForeignKey.FKColumns.Add(fkc)
-                    'dbForeignKey.FKTableSchema = schema.ToString()
-                    'dbForeignKey.PKTableName = row("PK_TABLE_NAME").ToString()
-                    'Dim pkc As ForeignKeyColumn = New ForeignKeyColumn()
-                    'pkc.Name = row("PK_COLUMN_NAME").ToString()
-                    'dbForeignKey.PKColumns.Add(pkc)
-                    'dbForeignKey.PKTableSchema = schema.ToString()
-                    'foreignKeys.Add(dbForeignKey)
-                Next
-
-            Catch ex As Exception
-                Debugger.Break()
-            End Try
-
-
-
-            'OLEDB Connection String
-            'Provider=MSDASQL;Persist Security Info=False;DSN=SQLiteTest
-
-            ''------------------------------------------------------------------------------
-            ''Get the Columns for the tables.
+            '------------------------------------------------------------------------------
+            'Get the Columns for the tables.
             'Call Me.GetColumns()
 
-            ''------------------------------------------------------------------------------
-            ''Get the Indexes for the tables.
+            '------------------------------------------------------------------------------
+            'Get the Indexes for the tables.
             'Call Me.GetIndexes()
+
+            Call Me.getRelations
+
+            Call Me.TempModel.RDS.orderTablesByRelations()
 
             '------------------------------------------------------------------------------
             'Create EntityTypes for each Table with a PrimaryKey with one Column.
 
-            Return True
-
-            Catch ex As Exception
-                Debugger.Break()
-
-            Return False
+        Catch ex As Exception
+            Debugger.Break()
         End Try
+
+        Return True
+
 
     End Function
 
@@ -149,6 +91,11 @@ Public Class ODBCDatabaseReverseEngineer
         Next
 
     End Sub
+
+    Private Sub getRelations()
+
+    End Sub
+
 
     Private Sub getTables()
 

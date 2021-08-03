@@ -255,6 +255,63 @@ Namespace RDS
 
         End Function
 
+        ''' <summary>
+        ''' Puts the tables in Relationship Order.
+        ''' </summary>
+        Public Sub orderTablesByRelations()
+
+            Dim lrTable As RDS.Table
+            Dim liInd2 As Integer
+            Dim lbTripped As Boolean = False
+            Try
+                'Put the Tables that are for FactTypes last
+                For liInd = 0 To Me.Table.Count - 1
+                    lrTable = Me.Table(liInd)
+                    If lrTable.FBMModelElement.GetType = GetType(FBM.FactType) Then
+                        Me.Table.Remove(lrTable)
+                        Me.Table.Insert(Me.Table.Count - 1, lrTable)
+                    End If
+                Next
+
+                'Order by number of outgoing relations
+                Me.Table.OrderBy(Function(x) x.getOutgoingRelations.Count)
+
+                For liInd = 0 To Me.Table.Count - 1
+
+                    lrTable = Me.Table(liInd)
+
+                    liInd2 = liInd
+                    lbTripped = False
+                    While lrTable.hasHigherReferencedTable
+
+                        Dim lrTempTable As RDS.Table = Me.Table(liInd2) 'Create a temporary Table
+
+                        'Swap the Table with the next Table in the list of tables in Me.Tables
+                        Me.Table(liInd2) = Me.Table(liInd2 + 1)
+                        Me.Table(liInd2 + 1) = lrTempTable
+
+                        liInd2 += 1
+                        lbTripped = True
+                    End While
+                    If lbTripped Then
+                        If Not liInd = 0 Then
+                            liInd -= 1
+                        End If
+                    End If
+                Next
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
+
         Public Sub removeIndex(ByRef arIndex As RDS.Index)
 
             Dim lrIndex As RDS.Index = arIndex

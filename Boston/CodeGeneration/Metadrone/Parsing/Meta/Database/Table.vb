@@ -335,7 +335,6 @@ Namespace Parser.Meta.Database
         End Sub
 
         ''' <summary>
-        ''' 20200705-VM
         ''' Used in sorting of Tables by Tables referenced by other Tables, as in when for creating output SQL in the propper Table order
         '''   such that Foreign Key reference constraints are created in the correct order.
         ''' NB Relies on the ListPos property of the Table being correct.

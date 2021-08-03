@@ -105,6 +105,10 @@
             Return New List(Of RDS.Index)
         End Function
 
+        Public Overridable Function getRelationsByTable(ByRef arTable As RDS.Table) As List(Of RDS.Relation)
+            Return New List(Of RDS.Relation)
+        End Function
+
         ''' <summary>
         ''' Returns a list of the Tables in the database. As used in Reverse Engineering a database.
         ''' </summary>

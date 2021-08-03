@@ -572,6 +572,47 @@ Namespace RDS
 
         End Function
 
+        ''' <summary>
+        ''' Used in sorting of Tables by Tables referenced by other Tables, as in when for creating output SQL in the propper Table order
+        '''   such that Foreign Key reference constraints are created in the correct order.
+        ''' NB Relies on the ListPos property of the Table being correct.
+        ''' </summary>
+        ''' <returns></returns>
+        Public Function hasHigherReferencedTable() As Boolean
+
+            Dim liInd As Integer
+            Dim lrComparisonTable As RDS.Table
+            Try
+                If Me.Model.Table.IndexOf(Me) = Me.Model.Table.Count - 1 Then Return False
+
+                For liInd = Me.Model.Table.IndexOf(Me) To Me.Model.Table.Count - 2
+                    For Each lrRelation In Me.getOutgoingRelations
+                        lrComparisonTable = Me.Model.Table(liInd + 1)
+
+                        If lrRelation.DestinationTable Is lrComparisonTable Then
+                            If lrComparisonTable.getOutgoingRelations.Find(Function(x) x.DestinationTable Is Me) Is Nothing Then
+                                'Tables that don't reference themselves in a loop
+                                Return True
+                            End If
+                        End If
+                    Next
+                Next
+
+                Return False
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return False
+            End Try
+
+        End Function
+
 
         ''' <summary>
         ''' Returns TRUE if the Table has a PrimaryKey with one Column, 

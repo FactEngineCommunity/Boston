@@ -520,6 +520,25 @@ Namespace FactEngine
             Return New List(Of RDS.Index)
         End Function
 
+        Public Overrides Function getRelationsByTable(ByRef arTable As RDS.Table) As List(Of RDS.Relation)
+
+            Dim larRelation As New List(Of RDS.Relation)
+
+            Try
+                Return larRelation
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return New List(Of RDS.Relation)
+            End Try
+
+        End Function
+
         ''' <summary>
         ''' Returns a list of the Tables in the database. As used in Reverse Engineering a database.
         ''' </summary>
