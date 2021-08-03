@@ -212,10 +212,15 @@
                         End If
                         lrQueryGraph.QueryEdges.Add(lrQueryEdge.InjectsQueryEdge)
                         lrQueryGraph.Nodes.AddUnique(lrQueryEdge.InjectsQueryEdge.BaseNode)
+
+                        lrPreviousTargetNode = lrQueryEdge.InjectsQueryEdge.TargetNode
+                        lrPreviousTopicNode = lrQueryEdge.InjectsQueryEdge.BaseNode
+                    Else
+                        lrPreviousTargetNode = lrQueryEdge.TargetNode
+                        lrPreviousTopicNode = lrQueryEdge.BaseNode
                     End If
 
-                    lrPreviousTargetNode = lrQueryEdge.TargetNode
-                    lrPreviousTopicNode = lrQueryEdge.BaseNode
+
 
                     '-------------------------------------------------
                     'PartialFactTypeMatch processing
