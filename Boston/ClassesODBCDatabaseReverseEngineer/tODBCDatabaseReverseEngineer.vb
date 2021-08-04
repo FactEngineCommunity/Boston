@@ -41,9 +41,29 @@ Public Class ODBCDatabaseReverseEngineer
         'PSEUDOCODE
         '
         ' * Connect to the ODBC database
-        ' * Get the ODBC DataTypes for the database
-        ' * Get the ODBC referenced tables...and put them into TempModel
-        ' * 
+        ' * Get the DataTypes for the database
+        ' * Get the Tables...and put them into TempModel
+        ' * Get the Columns for the TempModel Tables
+        ' * Get the Indexes for the TempModel Tables
+        ' * Get the Relations for the TempModel Tables
+        ' * Order the TempModel Tables by their relations. Those that have no relations first.
+        ' * Create EntityTypes for those Tables that have a Single Column PrimaryKey.
+        ' * For each Table in TempModel Tables (by their sorted order)
+        '     * Create the ValueTypes for Columns that that are ValueTypes (even if they are referenced by a Relation)
+        '         Value Types are, in this instance,:
+        '           1. Not the ValueTypes created for ReferenceShemes of EntityTypes created for Tables with single Column PrimaryKeys.
+        '              a) Including those Columns/ValueTypes that are referenced by a Column that references an EntityType for a Table with a single column PrimaryKey.
+        '           2. Are Columns/ValueTypes where the Column has no Relation/reference to another table.
+        '     * If the Table's ModelElement has not been created, create it.
+        '         Can be an EntityType or an ObjectifiedFactType.
+        '     * If the Table is an EntityType that has a Compound Reference Scheme, create the ReferenceScheme for EntityTypee/Table.
+        '         NB The referenced ModelElements should have already been created.
+        '     * If the Table is an ObjectifiedFactType then create the ObjectifiedFactTyhpe.
+        '         NB The referenced ModelElements should have already been created.
+        '   Loop
+        ' * For each Table in the TempModel Tables (by their sorted order)
+        '    * Create the ExternalUniquenessConstraints for Indexes of the Table
+        '   Loop
         '=====================================================================================================================
         Try
             Me.TempModel.TargetDatabaseType = Me.Model.TargetDatabaseType
