@@ -576,6 +576,7 @@
                     Dim lrOriginTable As RDS.Table
 
                     If lrQueryEdge.IsPartialFactTypeMatch Then 'And lrQueryEdge.TargetNode.FBMModelObject.GetType IsNot GetType(FBM.ValueType) Then
+#Region "Partial FactType match"
                         Dim liInd2 = 0
                         Dim lrNaryTable As RDS.Table = lrQueryEdge.FBMFactType.getCorrespondingRDSTable
                         If lrQueryEdge.BaseNode.FBMModelObject.GetType IsNot GetType(FBM.ValueType) Then
@@ -597,8 +598,11 @@
                                 liInd2 += 1
                             Next
                         End If
+#End Region
                     ElseIf lrQueryEdge.WhichClauseType = pcenumWhichClauseType.AndThatIdentityCompatitor Then
                         'E.g. Of the type "Person 1 Is Not Person 2" or "Person 1 Is Person 2"
+#Region "AndThatIdentityComparitor. 'E.g. Of the type 'Person 1 Is Not Person 2' or 'Person 1 Is Person 2'"
+
 
                         lsSQLQuery &= "("
                         For Each lrColumn In lrQueryEdge.BaseNode.RDSTable.getPrimaryKeyColumns
@@ -611,9 +615,10 @@
                             lsSQLQuery &= "[" & lrQueryEdge.TargetNode.Name & Viev.NullVal(lrQueryEdge.TargetNode.Alias, "") & "]." & lrColumn.Name
                         Next
                         lsSQLQuery &= ")"
-
+#End Region
                     ElseIf lrQueryEdge.FBMFactType.isRDSTable And lrQueryEdge.FBMFactType.Arity = 2 Then
                         'RDSTable
+#Region "PGSNodeTable/RDSTable"
                         lrOriginTable = lrQueryEdge.FBMFactType.getCorrespondingRDSTable
 
                         Dim larRelation = lrOriginTable.getRelations
@@ -685,15 +690,17 @@
                         '            lsSQLQuery &= lrOriginTable.Name & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrTargetColumn.Name 'lrOriginTable.getColumnByOrdingalPosition(2).Name
                         '        Next
                         'End Select
-
+#End Region
                     ElseIf lrQueryEdge.FBMFactType.DerivationType = pcenumFEQLDerivationType.Count Then
-
+#Region "DerivationType = COUNT"
                         Dim lrBaseNode, lrTargetNode As FactEngine.QueryNode
                         lrBaseNode = lrQueryEdge.BaseNode
                         lrTargetNode = New FactEngine.QueryNode(lrQueryEdge.FBMFactType, lrQueryEdge)
 
                         lsSQLQuery &= "[" & lrBaseNode.Name & "]." & lrBaseNode.RDSTable.getPrimaryKeyColumns.First.Name & " = " & "[" & lrTargetNode.Name & "]." & lrBaseNode.RDSTable.getPrimaryKeyColumns.First.Name
+#End Region
                     Else
+#Region "Other/Else"
                         Dim lrBaseNode, lrTargetNode As FactEngine.QueryNode
                         If lrQueryEdge.IsReciprocal Then
                             lrBaseNode = lrQueryEdge.TargetNode
@@ -745,6 +752,7 @@
                                 liInd2 += 1
                             Next
                         End If
+#End Region
                     End If
 
                     'CodeSafe Remove wayward ANDs

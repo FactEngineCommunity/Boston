@@ -1358,6 +1358,11 @@ Public Class frmToolboxEnterpriseExplorer
                     Call prDuplexServiceClient.SendBroadcast([Interface].pcenumBroadcastType.ModelAddPage, lrBroadcast)
                 End If
 
+                lrEnterpriseView.TreeNode.EnsureVisible()
+                Call Me.TreeView.ForceSelectedNode(lrEnterpriseView.TreeNode)
+                Me.TreeView.SelectedNode = lrEnterpriseView.TreeNode
+                lrEnterpriseView.TreeNode.BeginEdit()
+
             End With
 
         Catch ex As Exception
@@ -1506,11 +1511,6 @@ Public Class frmToolboxEnterpriseExplorer
                     Me.zrToolTip.ToolTipIcon = ToolTipIcon.None
                     Me.zrToolTip.Show(lsMessage, Me, loNode.Bounds.X, loNode.Bounds.Y + loNode.Bounds.Height, 4000)
                 End If
-
-                loNode.EnsureVisible()
-                Call Me.TreeView.ForceSelectedNode(loNode)
-                loNode.BeginEdit()
-
 
             End With
 

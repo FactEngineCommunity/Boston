@@ -481,18 +481,60 @@ Namespace FactEngine
 
                 lrRecordset = Me.GO(lsSQL)
 
+                Dim lrRelation As RDS.Relation = Nothing
+                Dim lrDestinationTable As RDS.Table = Nothing
+                Dim lrOriginColumn As RDS.Column = Nothing
+                Dim lrDestinationColumn As RDS.Column = Nothing
+                Dim lasToTableNames As New List(Of String)
+
                 While Not lrRecordset.EOF
                     'https://stackoverflow.com/questions/48508140/how-do-i-get-information-about-foreign-keys-in-sqlite
                     'Columns
                     '====================
                     'id
-                    'seq
-                    'table
-                    'from
-                    'to
+                    'seq (0 based by table)
+                    'table  (To Table)
+                    'from   (Column)
+                    'to     (To Column)
                     'on_update  ('NO ACTION')
                     'on_delete
                     'match
+                    lrDestinationTable = Me.FBMModel.RDS.getTableByName(lrRecordset("table").Data)
+
+                    If lrDestinationTable Is Nothing Then debugger.break
+                    While Not lrRecordset.EOF
+
+                        lrOriginColumn = arTable.Column.Find(Function(x) x.Name = lrRecordset("from").Data)
+                        lrDestinationColumn = lrDestinationTable.Column.Find(Function(x) x.Name = lrRecordset("to").Data)
+
+                        If Not lasToTableNames.Contains(lrRecordset("table").Data) Then
+                            lrRelation = New RDS.Relation(System.Guid.NewGuid.ToString,
+                                                  arTable,
+                                                  pcenumCMMLMultiplicity.Many,
+                                                  True,
+                                                  lrOriginColumn.isPartOfPrimaryKey,
+                                                  "involves",
+                                                  lrDestinationTable,
+                                                  pcenumCMMLMultiplicity.One,
+                                                  lrDestinationColumn.IsMandatory,
+                                                  "is involed in",
+                                                  Nothing)
+                        End If
+
+                        lrRelation.OriginColumns.Add(lrOriginColumn)
+                        lrRelation.DestinationColumns.Add(lrDestinationColumn)
+
+                        lrRecordset.MoveNext()
+
+                        If Not lrRecordset.EOF Then
+                            If lrRecordset("table").Data <> lrDestinationTable.Name Then
+                                lasToTableNames.AddUnique(lrDestinationTable.Name)
+                                lrRecordset.CurrentFactIndex -= 1
+                                Exit While
+                            End If
+                        End If
+
+                    End While
 
                     lrRecordset.MoveNext()
                 End While
@@ -511,13 +553,150 @@ Namespace FactEngine
             End Try
         End Function
 
+        Public Overrides Function getColumnsByTable(ByRef arTable As RDS.Table) As List(Of RDS.Column)
+
+            Dim larColumn As New List(Of RDS.Column)
+            Try
+                Dim lsSQL As String = "PRAGMA table_info('" & arTable.Name & "')"
+                Dim lrRecordset As ORMQL.Recordset = Me.GO(lsSQL)
+
+                Dim lsColumnName As String
+                Dim lbIsMandatory As Boolean
+                Dim lrColumn As New RDS.Column
+
+                While Not lrRecordset.EOF
+                    'name
+                    'type
+                    'notnull
+                    'dflt_value
+                    'pk  (0 if not part of the PK, else integer value)
+                    lsColumnName = lrRecordset("name").Data
+                    lbIsMandatory = CInt(NullVal(lrRecordset("notnull").Data, 0)) > 0
+                    lrColumn = New RDS.Column(arTable, lsColumnName, Nothing, Nothing, lbIsMandatory)
+
+                    larColumn.Add(lrColumn)
+
+                    lrRecordset.MoveNext()
+                End While
+
+                Return larColumn
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return New List(Of RDS.Column)
+            End Try
+
+        End Function
+
         ''' <summary>
         ''' Returns a list of the Indexes in the database. As used in Reverse Engineering a database.
         ''' </summary>
         ''' <param name="arTable"></param>
         ''' <returns></returns>
         Public Overrides Function getIndexesByTable(ByRef arTable As RDS.Table) As List(Of RDS.Index)
-            Return New List(Of RDS.Index)
+
+            Dim larIndex As New List(Of RDS.Index)
+            Try
+                Dim lsSQL As String = "SELECT DISTINCT m.name AS 'table', ii.name AS 'column', ii.cid + 1 AS 'sequencenr', il.*
+                                         FROM sqlite_master AS m,
+                                              pragma_index_list(m.name) AS il,
+                                              pragma_index_info(il.name) AS ii
+                                        WHERE m.type = 'table'
+                                          AND m.name = '" & arTable.Name & "'
+                                        ORDER BY 1;"
+
+                Dim lrRecordset As ORMQL.Recordset = Me.GO(lsSQL)
+
+                Dim lsIndexName As String = ""
+                Dim lbIsUnique As Boolean = False
+                Dim lbIsPrimaryKey As Boolean = False
+                Dim lrIndex As New RDS.Index
+                Dim lsQualifier As String = ""
+                Dim liIndexSequence As Integer = 1
+                Dim lbIgnoreNulls As Boolean = False
+                Dim lsColumnName As String = ""
+                Dim larColumn As New List(Of RDS.Column)
+                Dim lrColumn As RDS.Column = Nothing
+
+                Dim lasIndexNames As New List(Of String)
+
+                While Not lrRecordset.EOF
+                    'table
+                    'column
+                    'sequencenr (of Column in Index)
+                    'seq (sequence of Index in Table, I think)
+                    'name
+                    'unique (1 if unique)
+                    'origin (pk if PrimaryKey)
+                    'partial
+                    larColumn.Clear()
+
+                    While Not lrRecordset.EOF
+
+                        lsIndexName = lrRecordset("name").Data
+                        lbIsUnique = CInt(NullVal(lrRecordset("unique").Data, 0)) > 0
+                        If lrRecordset("origin").Data = "pk" Then
+                            lsQualifier = "PK"
+                            lbIsPrimaryKey = True
+                        Else
+                            lsQualifier = "UC"
+                            lbIsPrimaryKey = False
+                        End If
+
+                        liIndexSequence = CInt(NullVal(lrRecordset("unique").Data, 1))
+                        lbIgnoreNulls = CInt(NullVal(lrRecordset("partial").Data, 0)) = 0
+                        lsColumnName = lrRecordset("column").Data
+
+                        lrColumn = arTable.Column.Find(Function(x) x.Name = lsColumnName)
+                        larColumn.Add(lrColumn)
+
+                        lrRecordset.MoveNext()
+
+                        If Not lrRecordset.EOF Then
+                            If lrRecordset("name").Data <> lsIndexName Then
+                                lasIndexNames.AddUnique(lsIndexName)
+                                lrRecordset.CurrentFactIndex -= 1
+                                Exit While
+                            End If
+                        End If
+
+                    End While
+
+                    lrIndex = New RDS.Index(arTable,
+                                            lsIndexName,
+                                            lsQualifier,
+                                            pcenumODBCAscendingOrDescending.Ascending,
+                                            lbIsPrimaryKey,
+                                            lbIsUnique,
+                                            lbIgnoreNulls,
+                                            larColumn,
+                                            True,
+                                            True)
+
+                    larIndex.Add(lrIndex)
+
+                    lrRecordset.MoveNext()
+                End While
+
+                Return larIndex
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return New List(Of RDS.Index)
+            End Try
+
         End Function
 
         Public Overrides Function getRelationsByTable(ByRef arTable As RDS.Table) As List(Of RDS.Relation)
@@ -544,7 +723,39 @@ Namespace FactEngine
         ''' </summary>
         ''' <returns></returns>
         Public Overrides Function getTables() As List(Of RDS.Table)
-            Return New List(Of RDS.Table)
+
+            Dim larTable As New List(Of RDS.Table)
+            Try
+                Dim lsSQL As String = "SELECT name FROM sqlite_master WHERE type='table'"
+                Dim lrRecordset As ORMQL.Recordset = Me.GO(lsSQL)
+
+                Dim lsTableName As String
+                Dim lrTable As New RDS.Table
+
+                While Not lrRecordset.EOF
+
+                    lsTableName = lrRecordset("name").Data
+                    lrTable = New RDS.Table(Me.FBMModel.RDS, lsTableName, Nothing)
+
+                    larTable.Add(lrTable)
+
+                    lrRecordset.MoveNext()
+                End While
+
+                Return larTable
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return New List(Of RDS.Table)
+            End Try
+
+
         End Function
 
 

@@ -87,6 +87,10 @@
             Return ""
         End Function
 
+        Public Overridable Function getColumnsByTable(ByRef arTable As RDS.Table) As List(Of RDS.Column)
+            Return New List(Of RDS.Column)
+        End Function
+
         ''' <summary>
         ''' Returns a list of the Relations/ForeignKeys in the database. As used in Reverse Engineering a database.
         ''' </summary>

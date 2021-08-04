@@ -258,20 +258,22 @@ Namespace RDS
         ''' <summary>
         ''' Puts the tables in Relationship Order.
         ''' </summary>
-        Public Sub orderTablesByRelations()
+        Public Sub orderTablesByRelations(Optional ByVal abOrderByFactTypesLast As Boolean = False)
 
             Dim lrTable As RDS.Table
             Dim liInd2 As Integer
             Dim lbTripped As Boolean = False
             Try
                 'Put the Tables that are for FactTypes last
-                For liInd = 0 To Me.Table.Count - 1
-                    lrTable = Me.Table(liInd)
-                    If lrTable.FBMModelElement.GetType = GetType(FBM.FactType) Then
-                        Me.Table.Remove(lrTable)
-                        Me.Table.Insert(Me.Table.Count - 1, lrTable)
-                    End If
-                Next
+                If abOrderByFactTypesLast Then
+                    For liInd = 0 To Me.Table.Count - 1
+                        lrTable = Me.Table(liInd)
+                        If lrTable.FBMModelElement.GetType = GetType(FBM.FactType) Then
+                            Me.Table.Remove(lrTable)
+                            Me.Table.Insert(Me.Table.Count - 1, lrTable)
+                        End If
+                    Next
+                End If
 
                 'Order by number of outgoing relations
                 Me.Table.OrderBy(Function(x) x.getOutgoingRelations.Count)

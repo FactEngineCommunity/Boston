@@ -46,29 +46,29 @@ Public Class ODBCDatabaseReverseEngineer
         ' * 
         '=====================================================================================================================
         Try
-            If Not Me.ODBCConnection.State = ConnectionState.Open Then
-                Me.ODBCConnection.Open()
-            End If
+            Me.TempModel.TargetDatabaseType = Me.Model.TargetDatabaseType
+            Me.TempModel.TargetDatabaseConnectionString = Me.Model.TargetDatabaseConnectionString
 
-            Call Me.GetDataTypes()
+            Me.Model.connectToDatabase()
+            Me.TempModel.connectToDatabase()
 
+            'Call Me.GetDataTypes()
 
-            'Could be important. Don't know what 'Restrictions' are.
-            'lrODBCTable = lrODBCConnection.GetSchema("Restrictions")
 
             Call Me.getTables()
 
-            '------------------------------------------------------------------------------
-            'Get the Columns for the tables.
-            'Call Me.GetColumns()
+            Call Me.GetColumns()
 
-            '------------------------------------------------------------------------------
-            'Get the Indexes for the tables.
-            'Call Me.GetIndexes()
+            Call Me.GetIndexes()
 
-            Call Me.getRelations
+            Call Me.getRelations()
 
             Call Me.TempModel.RDS.orderTablesByRelations()
+
+            Call Me.createTablesForSingleColumnPKTables()
+
+
+            Debugger.Break()
 
             '------------------------------------------------------------------------------
             'Create EntityTypes for each Table with a PrimaryKey with one Column.
@@ -94,67 +94,47 @@ Public Class ODBCDatabaseReverseEngineer
 
     Private Sub getRelations()
 
+        Try
+            For Each lrTable In Me.TempModel.RDS.Table
+                For Each lrRelation In Me.TempModel.DatabaseConnection.getForeignKeyRelationshipsByTable(lrTable)
+                    Me.TempModel.RDS.Relation.Add(lrRelation)
+                Next
+            Next
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
     End Sub
 
 
     Private Sub getTables()
 
-        Dim lrODBCTable As System.Data.DataTable
         Dim lrTable As RDS.Table
-        Dim lrPage As FBM.Page
 
         Try
-            Try
-                lrODBCTable = Me.ODBCConnection.GetSchema("Tables")
-            Catch ex1 As Exception
-                Debugger.Break()
-            End Try
 
-            'Dim blah = System.Data.Odbc.OdbcMetaDataCollectionNames.
+            For Each lrTable In Me.Model.DatabaseConnection.getTables()
+                Me.TempModel.RDS.Table.Add(lrTable)
+            Next
 
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
-            Select Case Me.ODBCConnection.DataSource
-                    Case Is = "ACCESS"
-                        For Each lrRow As DataRow In lrODBCTable.Rows
-                            lrTable = New RDS.Table(Me.TempModel.RDS, lrRow(lrODBCTable.Columns("TABLE_NAME")), Nothing)
-                            Select Case lrRow(lrODBCTable.Columns("TABLE_TYPE"))
-                                Case Is = "SYSTEM TABLE"
-                                    lrTable.IsSystemTable = True
-                                Case Else
-                                    lrTable.IsSystemTable = False
-                            End Select
-
-                            If Not lrTable.IsSystemTable Then
-                                Me.TempModel.RDS.Table.AddUnique(lrTable)
-
-                            If Not Me.CreatePagePerTable Then
-                                lrPage = New FBM.Page(Me.Model, Nothing, lrRow(lrODBCTable.Columns("TABLE_NAME")), pcenumLanguage.ORMModel)
-                                frmMain.zfrmModelExplorer.AddPageToModel(Me.Model.TreeNode, lrPage, True)
-                            End If
-                        End If
-                        Next
-                    Case Else
-                        For Each lrRow As DataRow In lrODBCTable.Rows
-                            'Create the Table into the TempModel
-                            Me.TempModel.RDS.Table.Add(New RDS.Table(Me.TempModel.RDS, lrRow(lrODBCTable.Columns("TABLE_NAME")), Nothing))
-
-                        If Not Me.CreatePagePerTable Then
-                            lrPage = New FBM.Page(Me.Model, Nothing, lrRow(lrODBCTable.Columns("TABLE_NAME")), pcenumLanguage.ORMModel) '(lrODBCTable.Columns("TABLE_NAME"))
-                            If frmMain.zfrmModelExplorer IsNot Nothing Then
-                                frmMain.zfrmModelExplorer.AddPageToModel(Me.Model.TreeNode, lrPage, True)
-                            End If
-                        End If
-                        'End If
-                    Next
-                End Select
-
-            Catch ex As Exception
-                Debugger.Break()
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Sub
 
-    Private Sub createTablesForSingleColumnPKODBCTables()
+    Private Sub createTablesForSingleColumnPKTables()
 
         Dim lrPage As FBM.Page
 
@@ -253,64 +233,23 @@ Public Class ODBCDatabaseReverseEngineer
 
     End Sub
 
-
     Private Sub GetIndexes()
+
+        Dim lrTable As RDS.Table
+
         Try
-            Dim lrODBCTable As System.Data.DataTable
-            Dim lrTable As RDS.Table
-            Dim lrIndex As RDS.Index
+            Dim larIndex As New List(Of RDS.Index)
 
-            If Not Me.ODBCConnection.State = ConnectionState.Open Then
-                Me.ODBCConnection.Open()
-            End If
+            For Each lrTable In Me.TempModel.RDS.Table
+                larIndex = Me.TempModel.DatabaseConnection.getIndexesByTable(lrTable)
+                If larIndex.Count = 0 Then
+                    'Need an alternate route for SQLite where a PK can be created that has no index.
+                Else
+                    For Each lrIndex In larIndex
+                        lrTable.Index.Add(lrIndex)
+                    Next
+                End If
 
-            For Each lrTable In Me.Model.RDS.Table
-                'lrODBCTable = Me.ODBCConnection.GetSchema("Indexes", New String() {Nothing, Me.ComboBoxSchema.SelectedItem, lrTable.Name, Nothing})
-
-                'Call Me.DisplayData(lrODBCTable)
-
-                For Each lrRow As DataRow In lrODBCTable.Rows
-                    lrIndex = lrTable.Index.Find(Function(x) x.Name = lrRow(lrODBCTable.Columns("INDEX_NAME")))
-
-                    If lrIndex Is Nothing Then
-                        lrIndex = New RDS.Index(lrTable, lrRow(lrODBCTable.Columns("INDEX_NAME")))
-                        lrTable.Index.AddUnique(lrIndex)
-                        lrIndex.NonUnique = CBool(lrRow(lrODBCTable.Columns("NON_UNIQUE")))
-                        lrIndex.IndexQualifier = Viev.NullVal(lrRow(lrODBCTable.Columns("INDEX_QUALIFIER")), "")
-
-                        Select Case lrRow(lrODBCTable.Columns("TYPE"))
-                            Case Is = 1
-                                lrIndex.IsPrimaryKey = True
-                        End Select
-
-                        If lrIndex.Name = "PRIMARY" Then
-                            lrIndex.IsPrimaryKey = True
-                        End If
-
-                        If Me.Model.RDS.TargetDatabaseType = pcenumDatabaseType.MSJet Then
-                            If lrIndex.Name = "PrimaryKey" Then
-                                lrIndex.IsPrimaryKey = True
-                            End If
-                        End If
-
-                        lrIndex.Type = lrRow(lrODBCTable.Columns("TYPE"))
-
-                        Select Case lrRow(lrODBCTable.Columns("ASC_OR_DESC"))
-                            Case Is = "A"
-                                lrIndex.AscendingOrDescending = pcenumODBCAscendingOrDescending.Ascending
-                            Case Is = "D"
-                                lrIndex.AscendingOrDescending = pcenumODBCAscendingOrDescending.Descending
-                        End Select
-                        lrIndex.Cardinality = NullVal(lrRow(lrODBCTable.Columns("CARDINALITY")), 0)
-                        lrIndex.Pages = NullVal(lrRow(lrODBCTable.Columns("PAGES")), 0)
-                        lrIndex.FilterCondition = NullVal(lrRow(lrODBCTable.Columns("FILTER_CONDITION")), "")
-
-                        Me.Model.RDS.Index.AddUnique(lrIndex)
-
-                    End If
-
-                    lrIndex.Column.Add(lrTable.Column.Find(Function(x) x.Name = lrRow(lrODBCTable.Columns("COLUMN_NAME"))))
-                Next
             Next
 
         Catch ex As Exception
@@ -380,52 +319,12 @@ Public Class ODBCDatabaseReverseEngineer
     Private Sub GetColumns()
 
         Try
-            Dim lrODBCTable As System.Data.DataTable
-            Dim lrTable As RDS.Table
-            Dim lrColumn As RDS.Column
 
-            If Not Me.ODBCConnection.State = ConnectionState.Open Then
-                Me.ODBCConnection.Open()
-            End If
-
-            'lrODBCTable = Me.ODBCConnection.GetSchema("Columns", New String() {Nothing, Me.ComboBoxSchema.SelectedItem, Nothing, Nothing})
-
-            Dim lsTableName As String
-
-            For Each lrRow As DataRow In lrODBCTable.Rows
-                lsTableName = Trim(lrRow(lrODBCTable.Columns("TABLE_NAME")))
-                lrTable = Me.Model.RDS.Table.Find(Function(x) x.Name = lsTableName)
-                If lrTable IsNot Nothing Then
-                    lrColumn = New RDS.Column(lrTable, lrRow(lrODBCTable.Columns("COLUMN_NAME")), Nothing, Nothing)
-
-                    lrColumn.OrdinalPosition = lrRow(lrODBCTable.Columns("ORDINAL_POSITION"))
-                    lrColumn.DataType = Me.Model.RDS.DataType.Find(Function(x) x.ProviderDBType = CInt(lrRow(lrODBCTable.Columns("DATA_TYPE"))))
-                    lrColumn.ODBCDataType = lrRow(lrODBCTable.Columns("DATA_TYPE"))
-                    lrColumn.DataTypeName = lrRow(lrODBCTable.Columns("TYPE_NAME"))
-                    lrColumn.Nullable = CBool(lrRow(lrODBCTable.Columns("NULLABLE")))
-                    lrColumn.IsNullable = lrRow(lrODBCTable.Columns("IS_NULLABLE")) = "YES"
-
-                    lrColumn.TableCategory = lrRow(lrODBCTable.Columns("TABLE_CAT"))
-                    lrColumn.TableSchema = NullVal(lrRow(lrODBCTable.Columns("TABLE_SCHEM")), "")
-                    lrColumn.ColumnSize = CInt(lrRow(lrODBCTable.Columns("COLUMN_SIZE")))
-                    lrColumn.BufferLength = CInt(NullVal(lrRow(lrODBCTable.Columns("BUFFER_LENGTH")), 0))
-                    lrColumn.DecimalDigits = CInt(NullVal(lrRow(lrODBCTable.Columns("DECIMAL_DIGITS")), 0))
-                    lrColumn.NumPrecRadix = CInt(NullVal(lrRow(lrODBCTable.Columns("NUM_PREC_RADIX")), 0))
-
-                    lrColumn.Remarks = NullVal(lrRow(lrODBCTable.Columns("REMARKS")), "")
-                    lrColumn.ColumnDef = NullVal(lrRow(lrODBCTable.Columns("COLUMN_DEF")), "")
-                    lrColumn.SQLDataType = NullVal(lrRow(lrODBCTable.Columns("SQL_DATA_TYPE")), 0)
-                    lrColumn.SQLDateTimeSub = NullVal(lrRow(lrODBCTable.Columns("SQL_DATETIME_SUB")), "")
-                    lrColumn.CharOctetLength = NullVal(lrRow(lrODBCTable.Columns("CHAR_OCTET_LENGTH")), 0)
-                    lrColumn.SSDataType = NullVal(lrRow(lrODBCTable.Columns("SQL_DATA_TYPE")), 0)
-
+            For Each lrTable In Me.TempModel.RDS.Table
+                For Each lrColumn In Me.Model.DatabaseConnection.getColumnsByTable(lrTable)
                     lrTable.Column.Add(lrColumn)
-                Else
-                    lrTable = New RDS.Table(Me.Model.RDS, lsTableName, Nothing)
-                    Me.Model.RDS.addTable(lrTable)
-                End If
+                Next
             Next
-
         Catch ex As Exception
             Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
