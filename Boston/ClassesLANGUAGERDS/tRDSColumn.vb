@@ -495,6 +495,23 @@ Namespace RDS
 
         End Function
 
+        Public Function hasOutboundRelation() As Boolean
+
+            Try
+
+                Return Me.Relation.Find(Function(x) x.OriginTable Is Me.Table) IsNot Nothing
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Function
+
         Public Function hasNonPrimaryKeyColumnsAboveIt() As Boolean
 
             Dim liNonPrimaryKeyCount = Aggregate Column In Me.Table.Column

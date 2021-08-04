@@ -521,6 +521,7 @@ Namespace FactEngine
                                                   Nothing)
                         End If
 
+                        lrOriginColumn.Relation.Add(lrRelation)
                         lrRelation.OriginColumns.Add(lrOriginColumn)
                         lrRelation.DestinationColumns.Add(lrDestinationColumn)
 
