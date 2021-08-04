@@ -138,7 +138,7 @@ Public Class ODBCDatabaseReverseEngineer
 
         Dim lrPage As FBM.Page
 
-        For Each lrTable In Me.Model.RDS.Table
+        For Each lrTable In Me.TempModel.RDS.Table
             If lrTable.hasSingleColumnPrimaryKey Then
                 Dim lrEntityType As FBM.EntityType
                 lrEntityType = New FBM.EntityType(Me.Model, pcenumLanguage.ORMModel, lrTable.Name, lrTable.Name)
@@ -165,67 +165,69 @@ Public Class ODBCDatabaseReverseEngineer
                 '-----------------------------------------------------------------------------
                 'Create an EntityTypeInstance for the new EntityType and put it on the Page.
                 lrPage = Me.Model.Page.Find(Function(x) x.Name = lrEntityType.Name)
-                Call lrPage.DropEntityTypeAtPoint(lrEntityType, New PointF(50, 50))
+                If lrPage IsNot Nothing Then
+                    Call lrPage.DropEntityTypeAtPoint(lrEntityType, New PointF(50, 50))
+                End If
 
                 lrEntityType.SetReferenceMode(lsReferenceMode, False, lsValueTypeName)
 
-                '=================================================================================================================
-                'Create joined FactTypes.
-                Dim lrFactType As FBM.FactType
-                Dim lrColumn As RDS.Column
-                Dim larModelObject As New List(Of FBM.ModelObject)
+                ''=================================================================================================================
+                ''Create joined FactTypes.
+                'Dim lrFactType As FBM.FactType
+                'Dim lrColumn As RDS.Column
+                'Dim larModelObject As New List(Of FBM.ModelObject)
 
-                For Each lrColumn In lrTable.Column.FindAll(Function(x) x.Name <> lrPrimaryKeyColumn.Name)
-                    larModelObject.Clear()
-                    larModelObject.Add(lrEntityType)
+                'For Each lrColumn In lrTable.Column.FindAll(Function(x) x.Name <> lrPrimaryKeyColumn.Name)
+                '    larModelObject.Clear()
+                '    larModelObject.Add(lrEntityType)
 
-                    Dim lrJoinedModelObject As FBM.ModelObject
+                '    Dim lrJoinedModelObject As FBM.ModelObject
 
-                    lrJoinedModelObject = Me.Model.FindEntityTypeByValueTypeId(lrColumn.Name)
-                    If lrJoinedModelObject Is Nothing Then
-                        lrJoinedModelObject = Me.Model.CreateValueType(lrColumn.Name)
-                    End If
+                '    lrJoinedModelObject = Me.Model.FindEntityTypeByValueTypeId(lrColumn.Name)
+                '    If lrJoinedModelObject Is Nothing Then
+                '        lrJoinedModelObject = Me.Model.CreateValueType(lrColumn.Name)
+                '    End If
 
-                    larModelObject.Add(lrJoinedModelObject)
+                '    larModelObject.Add(lrJoinedModelObject)
 
-                    Dim lrModelObject As FBM.ModelObject
-                    Dim lsFactTypeName As String = ""
+                '    Dim lrModelObject As FBM.ModelObject
+                '    Dim lsFactTypeName As String = ""
 
-                    For Each lrModelObject In larModelObject
-                        lsFactTypeName &= lrModelObject.Name
-                    Next
-                    lrFactType = Me.Model.CreateFactType(lsFactTypeName, larModelObject, False)
+                '    For Each lrModelObject In larModelObject
+                '        lsFactTypeName &= lrModelObject.Name
+                '    Next
+                '    lrFactType = Me.Model.CreateFactType(lsFactTypeName, larModelObject, False)
 
-                    Dim larRole As New List(Of FBM.Role)
-                    Dim lrRole As FBM.Role
+                '    Dim larRole As New List(Of FBM.Role)
+                '    Dim lrRole As FBM.Role
 
-                    For Each lrRole In lrFactType.RoleGroup
-                        larRole.Add(lrRole)
-                    Next
-                    Dim lasPredicatePart As New List(Of String)
-                    lasPredicatePart.Add("has")
-                    lasPredicatePart.Add("")
+                '    For Each lrRole In lrFactType.RoleGroup
+                '        larRole.Add(lrRole)
+                '    Next
+                '    Dim lasPredicatePart As New List(Of String)
+                '    lasPredicatePart.Add("has")
+                '    lasPredicatePart.Add("")
 
-                    Dim lrFactTypeReading As New FBM.FactTypeReading(lrFactType, larRole, lasPredicatePart)
+                '    Dim lrFactTypeReading As New FBM.FactTypeReading(lrFactType, larRole, lasPredicatePart)
 
-                    Call lrFactType.AddFactTypeReading(lrFactTypeReading, False, False)
+                '    Call lrFactType.AddFactTypeReading(lrFactTypeReading, False, False)
 
-                    lrRole = lrFactType.RoleGroup.Find(Function(x) x.JoinedORMObject.Id = lrEntityType.Id)
-                    larRole.Clear()
-                    larRole.Add(lrRole)
+                '    lrRole = lrFactType.RoleGroup.Find(Function(x) x.JoinedORMObject.Id = lrEntityType.Id)
+                '    larRole.Clear()
+                '    larRole.Add(lrRole)
 
-                    Dim lrRoleConstraint As FBM.RoleConstraint
+                '    Dim lrRoleConstraint As FBM.RoleConstraint
 
-                    lrRoleConstraint = Me.Model.CreateRoleConstraint(pcenumRoleConstraintType.InternalUniquenessConstraint,
-                                                                         larRole,
-                                                                         "InternalUniquenessConstraint",
-                                                                         1)
+                '    lrRoleConstraint = Me.Model.CreateRoleConstraint(pcenumRoleConstraintType.InternalUniquenessConstraint,
+                '                                                     larRole,
+                '                                                     "InternalUniquenessConstraint",
+                '                                                     1)
 
-                    lrFactType.AddInternalUniquenessConstraint(lrRoleConstraint)
+                '    lrFactType.AddInternalUniquenessConstraint(lrRoleConstraint)
 
-                    Dim lrFactTypeInstance As FBM.FactTypeInstance
-                    lrFactTypeInstance = lrPage.DropFactTypeAtPoint(lrFactType, New PointF(100, 100), False)
-                Next 'Column
+                '    Dim lrFactTypeInstance As FBM.FactTypeInstance
+                '    lrFactTypeInstance = lrPage.DropFactTypeAtPoint(lrFactType, New PointF(100, 100), False)
+                'Next 'Column
                 '=================================================================================================================
             End If
         Next
@@ -242,9 +244,13 @@ Public Class ODBCDatabaseReverseEngineer
 
             For Each lrTable In Me.TempModel.RDS.Table
                 larIndex = Me.TempModel.DatabaseConnection.getIndexesByTable(lrTable)
-                If larIndex.Count = 0 Then
+                For Each lrIndex In larIndex
+                    lrTable.Index.Add(lrIndex)
+                Next
+
+                If larIndex.FindAll(Function(x) x.IsPrimaryKey).Count = 0 Then
                     'Need an alternate route for SQLite where a PK can be created that has no index.
-                Else
+                    larIndex = Me.TempModel.DatabaseConnection.getIndexesByTableByAlternateMeans(lrTable)
                     For Each lrIndex In larIndex
                         lrTable.Index.Add(lrIndex)
                     Next

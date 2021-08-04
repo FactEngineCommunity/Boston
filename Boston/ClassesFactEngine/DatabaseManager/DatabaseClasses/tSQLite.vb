@@ -677,7 +677,7 @@ Namespace FactEngine
                                             lbIgnoreNulls,
                                             larColumn,
                                             True,
-                                            True)
+                                            False)
 
                     larIndex.Add(lrIndex)
 
@@ -697,6 +697,87 @@ Namespace FactEngine
                 Return New List(Of RDS.Index)
             End Try
 
+        End Function
+
+        ''' <summary>
+        ''' Gets PK Index by other means if primary GetIndexesByTable doesn't return PK Indexes.
+        '''   E.g. In SQLite you can create a Table with a PK and without an Index.
+        ''' </summary>
+        ''' <param name="arTable"></param>
+        ''' <returns></returns>
+        Public Overrides Function getIndexesByTableByAlternateMeans(ByRef arTable As RDS.Table) As List(Of RDS.Index)
+
+            Dim larIndex As New List(Of RDS.Index)
+
+            Try
+                Dim lsSQL As String = "SELECT * FROM pragma_table_info('" & arTable.Name & "') as l WHERE l.pk = 1;"
+
+                Dim lrRecordset As ORMQL.Recordset = Me.GO(lsSQL)
+
+                Dim lsIndexName As String = ""
+                Dim lbIsUnique As Boolean = False
+                Dim lbIsPrimaryKey As Boolean = False
+                Dim lrIndex As New RDS.Index
+                Dim lsQualifier As String = ""
+                Dim liIndexSequence As Integer = 1
+                Dim lbIgnoreNulls As Boolean = False
+                Dim lsColumnName As String = ""
+                Dim larColumn As New List(Of RDS.Column)
+                Dim lrColumn As RDS.Column = Nothing
+
+                Dim lasIndexNames As New List(Of String)
+
+                While Not lrRecordset.EOF
+                    'name (name of the Column)
+                    'type
+                    'notnull 
+                    'dflt value
+                    'pk (will be 1)
+                    larColumn.Clear()
+
+                    While Not lrRecordset.EOF
+
+                        lsIndexName = arTable.Name & "_PK"
+                        lbIsUnique = CInt(NullVal(lrRecordset("notnull").Data, 0)) > 0
+                        lsQualifier = "PK"
+                        lbIsPrimaryKey = True
+                        liIndexSequence = 1
+                        lbIgnoreNulls = CInt(NullVal(lrRecordset("notnull").Data, 0)) = 0
+                        lsColumnName = lrRecordset("name").Data
+
+                        lrColumn = arTable.Column.Find(Function(x) x.Name = lsColumnName)
+                        larColumn.Add(lrColumn)
+
+                        lrRecordset.MoveNext()
+                    End While
+
+                    lrIndex = New RDS.Index(arTable,
+                                            lsIndexName,
+                                            lsQualifier,
+                                            pcenumODBCAscendingOrDescending.Ascending,
+                                            lbIsPrimaryKey,
+                                            lbIsUnique,
+                                            lbIgnoreNulls,
+                                            larColumn,
+                                            True,
+                                            False)
+
+                    larIndex.Add(lrIndex)
+
+                    lrRecordset.MoveNext()
+                End While
+
+                Return larIndex
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return New List(Of RDS.Index)
+            End Try
         End Function
 
         Public Overrides Function getRelationsByTable(ByRef arTable As RDS.Table) As List(Of RDS.Relation)

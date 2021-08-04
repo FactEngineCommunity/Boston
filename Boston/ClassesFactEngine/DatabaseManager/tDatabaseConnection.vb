@@ -109,6 +109,16 @@
             Return New List(Of RDS.Index)
         End Function
 
+        ''' <summary>
+        ''' Gets PK Index by other means if primary GetIndexesByTable doesn't return PK Indexes.
+        '''   E.g. In SQLite you can create a Table with a PK and without an Index.
+        ''' </summary>
+        ''' <param name="arTable"></param>
+        ''' <returns></returns>
+        Public Overridable Function getIndexesByTableByAlternateMeans(ByRef arTable As RDS.Table) As List(Of RDS.Index)
+            Return New List(Of RDS.Index)
+        End Function
+
         Public Overridable Function getRelationsByTable(ByRef arTable As RDS.Table) As List(Of RDS.Relation)
             Return New List(Of RDS.Relation)
         End Function
