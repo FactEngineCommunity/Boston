@@ -139,6 +139,30 @@ Public Class ODBCDatabaseReverseEngineer
                             larRole.Add(lrRole)
                         Next
                         Call lrFactType.CreateInternalUniquenessConstraint(larRole)
+
+                        '-----------------------------------------------------------------------------------------------
+                        'Create the FactTypeReading
+                        Dim larRoleGroupPermutations As IEnumerable(Of IEnumerable(Of FBM.Role))
+
+                        larRoleGroupPermutations = lrFactType.RoleGroup.Permute
+
+                        Dim liInd = 1
+                        For Each larRoleGroup In larRoleGroupPermutations
+                            If liInd <= 3 Then
+                                Dim lrSentence As New Language.Sentence("random sentence")
+                                Dim liInd2 = 1
+                                For Each lrRole In larRoleGroup.ToList
+                                    If liInd2 < larRoleGroup.ToList.Count Then
+                                        lrSentence.PredicatePart.Add(New Language.PredicatePart("has"))
+                                    End If
+                                    liInd2 += 1
+                                Next
+                                Dim lrFactTypeReading As New FBM.FactTypeReading(lrFactType, larRoleGroup.ToList, lrSentence)
+                                lrFactType.FactTypeReading.Add(lrFactTypeReading)
+                            End If
+                            liInd += 1
+                        Next
+
                     End If
                 End If
 #End Region
@@ -171,10 +195,19 @@ Public Class ODBCDatabaseReverseEngineer
 
                 Call lrFactType.CreateInternalUniquenessConstraint(larRole)
 
+                '-----------------------------------------------------------------------------------------------
+                'Create the FactTypeReading
+                Dim lrSentence As New Language.Sentence("random sentence")
+                lrSentence.PredicatePart.Add(New Language.PredicatePart("has"))
+                lrSentence.PredicatePart.Add(New Language.PredicatePart("has"))
+
+                Dim lrFactTypeReading As New FBM.FactTypeReading(lrFactType, lrFactType.RoleGroup, lrSentence)
+                lrFactType.FactTypeReading.Add(lrFactTypeReading)
+
             Next
 
             '-----------------------------------------------------------------------------
-            'Create FactTypes straight to ValueTypes.
+            'Create FactTypes that are from a ModelElement straight to a ValueType.
             Dim lasNonReferenceModeValueTypeNames = From ValueType In Me.Model.ValueType
                                                     Where Not ValueType.isReferenceModeValueType
                                                     Select ValueType.Id
@@ -183,6 +216,7 @@ Public Class ODBCDatabaseReverseEngineer
 
                 Dim larValueTypeColumns = From Column In lrTable.Column
                                           Where lasNonReferenceModeValueTypeNames.Contains(Column.Name)
+                                          Where Not Column.isPartOfPrimaryKey
                                           Select Column
 
                 For Each lrColumn In larValueTypeColumns
@@ -207,12 +241,20 @@ Public Class ODBCDatabaseReverseEngineer
                     larRole.Add(lrFactType.RoleGroup(0))
 
                     Call lrFactType.CreateInternalUniquenessConstraint(larRole)
+
+                    '-----------------------------------------------------------------------------------------------
+                    'Create the FactTypeReading
+                    Dim lrSentence As New Language.Sentence("random sentence")
+                    lrSentence.PredicatePart.Add(New Language.PredicatePart("has"))
+                    lrSentence.PredicatePart.Add(New Language.PredicatePart("has"))
+
+                    Dim lrFactTypeReading As New FBM.FactTypeReading(lrFactType, lrFactType.RoleGroup, lrSentence)
+                    lrFactType.FactTypeReading.Add(lrFactTypeReading)
+
                 Next
             Next
 
-                Debugger.Break()
-
-
+            Debugger.Break()
 
         Catch ex As Exception
             Debugger.Break()

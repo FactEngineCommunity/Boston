@@ -165,4 +165,30 @@ Module MyMethodExtensions
 
     End Function
 
+    <Extension()>
+    Public Iterator Function Permute(Of T)(ByVal sequence As IEnumerable(Of T)) As IEnumerable(Of IEnumerable(Of T))
+        If sequence Is Nothing Then
+            Return
+        End If
+
+        Dim list = sequence.ToList()
+
+        If Not list.Any() Then
+            Yield Enumerable.Empty(Of T)()
+        Else
+            Dim startingElementIndex = 0
+
+            For Each startingElement In list
+                Dim index = startingElementIndex
+                Dim remainingItems = list.Where(Function(e, i) i <> index)
+
+                For Each permutationOfRemainder In remainingItems.Permute()
+                    Yield permutationOfRemainder.Prepend(startingElement)
+                Next
+
+                startingElementIndex += 1
+            Next
+        End If
+    End Function
+
 End Module
