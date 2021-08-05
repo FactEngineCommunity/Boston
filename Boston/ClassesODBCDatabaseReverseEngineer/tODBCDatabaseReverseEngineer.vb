@@ -85,13 +85,53 @@ Public Class ODBCDatabaseReverseEngineer
 
             Call Me.TempModel.RDS.orderTablesByRelations()
 
+            '------------------------------------------------------------------------------
+            'Create EntityTypes for each Table with a PrimaryKey with one Column.
             Call Me.createTablesForSingleColumnPKTables()
 
+            For Each lrTable In Me.TempModel.RDS.Table
+
+                'Create ValueTypes (that haven't already been created by virtue of being the ReferenceModeValueType of Simple Reference Scheme EntityTypes.
+                Call Me.createValueTypesByTable(lrTable)
+
+                If Me.Model.GetModelObjectByName(lrTable.Name) Is Nothing Then
+                    'The Table has no ModelElement, so create it.
+                    If lrTable.getPrimaryKeyColumns.Count = 1 Then
+                        'Is an EntityType, and should already be a ModelElement in the Model.
+                        Debugger.Break()
+                    Else
+                        'Create an ObjectifiedFactType
+                        Dim lrFactType As FBM.FactType
+
+                        Dim lrModelElement As FBM.ModelObject
+                        Dim larModelObject As New List(Of FBM.ModelObject)
+
+                        For Each lrColumn In lrTable.getPrimaryKeyColumns
+                            lrModelElement = Me.Model.GetModelObjectByName(lrColumn.Name)
+                            If lrModelElement Is Nothing Then
+                                Debugger.Break()
+                                If lrColumn.hasOutboundRelation Then
+                                    Dim lrRelation = lrColumn.Relation.Find(Function(x) x.OriginTable IsNot Nothing)
+                                    Dim lrDestinationTable As RDS.Table = Me.Model.RDS.getTableByName(lrRelation.DestinationTable.Name)
+                                    lrModelElement = lrDestinationTable.FBMModelElement
+                                End If
+                            End If
+                            If lrModelElement.isReferenceModeValueType Then
+                                lrModelElement = Me.Model.getEntityTypeByReferenceModeValueType(lrModelElement)
+                            End If
+                            larModelObject.Add(lrModelElement)
+                        Next
+
+                        lrFactType = Me.Model.CreateFactType(lrTable.Name, larModelObject, False, True, , , False, )
+                        Me.Model.AddFactType(lrFactType)
+                        lrFactType.Objectify() 'Add to model first, so LinkFactTypes have something to join to.
+                    End If
+                End If
+            Next
 
             Debugger.Break()
 
-            '------------------------------------------------------------------------------
-            'Create EntityTypes for each Table with a PrimaryKey with one Column.
+
 
         Catch ex As Exception
             Debugger.Break()
@@ -101,6 +141,50 @@ Public Class ODBCDatabaseReverseEngineer
 
 
     End Function
+
+
+    ''' <summary>
+    ''' Creates the ValueTypes for Columns that that are ValueTypes (even if they are referenced by a Relation)
+    '''   Value Types are, in this instance,:
+    '''     1. Not the ValueTypes created for ReferenceShemes of EntityTypes created for Tables with single Column PrimaryKeys.
+    '''        a) Including those Columns/ValueTypes that are referenced by a Column that references an EntityType for a Table with a single column PrimaryKey.
+    '''     2. Are Columns/ValueTypes where the Column has no Relation/reference to another table.
+    ''' </summary>
+    Private Sub createValueTypesByTable(ByRef arTable As RDS.Table)
+
+        Try
+            For Each lrColumn In arTable.Column
+
+                If Not (lrColumn.isPartOfPrimaryKey Or lrColumn.hasOutboundRelation) Or
+                    (lrColumn.isPartOfPrimaryKey And Not lrColumn.hasOutboundRelation) Then
+
+                    Dim lrModelElement = Me.Model.GetModelObjectByName(lrColumn.Name)
+
+                    Dim lsUniqueValueTypeName As String
+                    If lrModelElement IsNot Nothing Then
+                        lsUniqueValueTypeName = lrColumn.Name
+                        If lrModelElement.GetType <> GetType(FBM.ValueType) Then
+                            lsUniqueValueTypeName = Me.Model.CreateUniqueValueTypeName(lrColumn.Name, 0)
+                        End If
+                    Else
+                        lsUniqueValueTypeName = lrColumn.Name
+                    End If
+                    'Create the ValueType
+                    Dim lrValueType As FBM.ValueType
+
+                    lrValueType = New FBM.ValueType(Me.Model, pcenumLanguage.ORMModel, lrColumn.Name, True)
+                    lrValueType.DataType = pcenumORMDataType.TextVariableLength
+
+                    'Add the ValueType to the Model
+                    Me.Model.AddValueType(lrValueType)
+                End If
+
+            Next
+
+        Catch ex As Exception
+
+        End Try
+    End Sub
 
     Private Sub DisplayData(ByRef table As DataTable)
 

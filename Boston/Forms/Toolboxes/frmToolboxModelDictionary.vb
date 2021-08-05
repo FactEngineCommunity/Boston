@@ -952,9 +952,10 @@ Public Class frmToolboxModelDictionary
 
         Try
             If prApplication.WorkingPage IsNot Nothing Then
-
-                If prApplication.WorkingPage.Form.GetType.Name Is frmDiagramORM.GetType.Name Then
-                    Call prApplication.WorkingPage.Form.ResetNodeAndLinkColors()
+                If prApplication.WorkingPage.Form IsNot Nothing Then
+                    If prApplication.WorkingPage.Form.GetType.Name Is frmDiagramORM.GetType.Name Then
+                        Call prApplication.WorkingPage.Form.ResetNodeAndLinkColors()
+                    End If
                 End If
             End If
 

@@ -395,6 +395,8 @@ Public Class frmCRUDModel
 
         Me.LabelOpenSuccessfull.Text = ""
 
+        Me.ButtonApply.Enabled = True
+
     End Sub
 
     Private Sub ButtonFileSelect_Click(sender As Object, e As EventArgs) Handles ButtonFileSelect.Click
@@ -432,4 +434,50 @@ Public Class frmCRUDModel
 
     End Sub
 
+    Private Sub ButtonApply_Click(sender As Object, e As EventArgs) Handles ButtonApply.Click
+
+        Try
+            If Me.check_fields() Then
+
+                Me.zrModel.TargetDatabaseType = Me.ComboBoxDatabaseType.SelectedItem.Tag
+                Me.zrModel.TargetDatabaseConnectionString = Trim(Me.TextBoxDatabaseConnectionString.Text)
+                Me.zrModel.IsDatabaseSynchronised = Me.CheckBoxIsDatabaseSynchronised.Checked
+
+                Try
+                    If Me.zrModel.TreeNode IsNot Nothing Then
+                        If My.Settings.FactEngineShowDatabaseLogoInModelExplorer Then
+                            Select Case Me.zrModel.TargetDatabaseType
+                                Case Is = pcenumDatabaseType.MongoDB
+                                    Me.zrModel.TreeNode.ImageIndex = 6
+                                    Me.zrModel.TreeNode.SelectedImageIndex = 6
+                                Case Is = pcenumDatabaseType.SQLServer
+                                    Me.zrModel.TreeNode.ImageIndex = 9
+                                    Me.zrModel.TreeNode.SelectedImageIndex = 9
+                                Case Is = pcenumDatabaseType.MSJet
+                                    Me.zrModel.TreeNode.ImageIndex = 7
+                                    Me.zrModel.TreeNode.SelectedImageIndex = 7
+                                Case Is = pcenumDatabaseType.SQLite
+                                    Me.zrModel.TreeNode.ImageIndex = 8
+                                    Me.zrModel.TreeNode.SelectedImageIndex = 8
+                                Case Is = pcenumDatabaseType.ODBC
+                                    Me.zrModel.TreeNode.ImageIndex = 10
+                                    Me.zrModel.TreeNode.SelectedImageIndex = 10
+                                Case Is = pcenumDatabaseType.None
+                                    Me.zrModel.TreeNode.ImageIndex = 1
+                                    Me.zrModel.TreeNode.SelectedImageIndex = 1
+                            End Select
+                        End If
+                    End If
+                Catch ex As Exception
+                End Try
+
+                Me.zrModel.Save()
+
+            End If
+            Me.ButtonApply.Enabled = False
+
+        Catch ex As Exception
+
+        End Try
+    End Sub
 End Class

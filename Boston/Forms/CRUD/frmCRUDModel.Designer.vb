@@ -49,6 +49,7 @@ Partial Class frmCRUDModel
         Me.Tab1 = New System.Windows.Forms.TabPage()
         Me.Advanced = New System.Windows.Forms.TabPage()
         Me.LabelPromptIsDatabaseSynchronised = New System.Windows.Forms.Label()
+        Me.ButtonApply = New System.Windows.Forms.Button()
         Me.GroupBox_main.SuspendLayout()
         Me.GroupBoxReverseEngineering.SuspendLayout()
         Me.GroupBoxDatabase.SuspendLayout()
@@ -310,11 +311,22 @@ Partial Class frmCRUDModel
         Me.LabelPromptIsDatabaseSynchronised.Text = "Warning: When 'Is Database Synchronised' is checked, Boston will modify the datab" &
     "ase when you change the ORM Model within the Model."
         '
+        'ButtonApply
+        '
+        Me.ButtonApply.Enabled = False
+        Me.ButtonApply.Location = New System.Drawing.Point(649, 89)
+        Me.ButtonApply.Name = "ButtonApply"
+        Me.ButtonApply.Size = New System.Drawing.Size(70, 23)
+        Me.ButtonApply.TabIndex = 10
+        Me.ButtonApply.Text = "&Apply"
+        Me.ButtonApply.UseVisualStyleBackColor = True
+        '
         'frmCRUDModel
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(763, 402)
+        Me.Controls.Add(Me.ButtonApply)
         Me.Controls.Add(Me.TabControl1)
         Me.Controls.Add(Me.Button_Cancel)
         Me.Controls.Add(Me.button_okay)
@@ -361,4 +373,5 @@ Partial Class frmCRUDModel
     Friend WithEvents LabelPromptCoreVersion As Label
     Friend WithEvents ButtonCreateDatabase As Button
     Friend WithEvents ButtonFileSelect As Button
+    Friend WithEvents ButtonApply As Button
 End Class

@@ -692,6 +692,35 @@ Namespace FBM
             End If
         End Function
 
+        Public Function isReferenceModeValueType() As Boolean
+
+            Try
+
+                If Me.GetType = GetType(FBM.ValueType) Then
+
+                    Dim larEntitType = From EntityType In Me.Model.EntityType
+                                       Where EntityType.ReferenceModeValueType IsNot Nothing
+                                       Where EntityType.ReferenceModeValueType Is Me
+                                       Select EntityType
+
+                    Return larEntitType.count
+                Else
+                    Return False
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return False
+            End Try
+
+        End Function
+
         Public Function HasSubtype() As List(Of FBM.ModelObject)
 
             Try

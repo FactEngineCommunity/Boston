@@ -2420,7 +2420,7 @@ Namespace FBM
 
         End Function
 
-        Private Function CreateUniqueValueTypeName(ByVal asRootValueTypeName As String, ByVal aiCounter As Integer) As String
+        Public Function CreateUniqueValueTypeName(ByVal asRootValueTypeName As String, ByVal aiCounter As Integer) As String
 
             Dim lsTrialValueTypeName As String
             If aiCounter = 0 Then
@@ -2439,7 +2439,7 @@ Namespace FBM
                TableValueType.ExistsValueType(lrValueType) Or
                Me.ExistsModelElement(lsTrialValueTypeName) Then
                 CreateUniqueValueTypeName = Me.CreateUniqueValueTypeName(asRootValueTypeName, aiCounter + 1)
-            ElseIf Me.ModelDictionary.find(Function(x) x.Symbol = lrDictionaryEntry.Symbol And x.isValue) IsNot Nothing Then
+            ElseIf Me.ModelDictionary.Find(Function(x) x.Symbol = lrDictionaryEntry.Symbol And x.isValue) IsNot Nothing Then
                 Return lsTrialValueTypeName
             Else
                 Return lsTrialValueTypeName
@@ -4065,6 +4065,35 @@ Namespace FBM
             End Select
 
             Return larPage
+
+        End Function
+
+        Public Function getEntityTypeByReferenceModeValueType(ByVal arModelElement As FBM.ModelObject) As FBM.EntityType
+
+            Try
+
+                If arModelElement.GetType <> GetType(FBM.ValueType) Then
+                    Return Nothing
+                Else
+                    Dim larEntityType = From EntityType In Me.EntityType
+                                        Where EntityType.ReferenceModeValueType IsNot Nothing
+                                        Where EntityType.ReferenceModeValueType.Id = arModelElement.Id
+                                        Select EntityType
+
+                    If larEntityType.Count > 0 Then
+                        Return larEntityType.First
+                    Else
+                        Return Nothing
+                    End If
+                End If
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
         End Function
 

@@ -543,20 +543,28 @@ Namespace RDS
             Dim lrTable As RDS.Table
 
             Try
-                If Me.Role.JoinedORMObject.Id = Me.Table.Name Then
-                    lrTable = Me.Table
-                ElseIf Me.Role.FactType.Id = Me.Table.Name Then
-                    lrTable = Me.FactType.getCorrespondingRDSTable
-                Else
-                    'This is required because some Columns may be inherited by Not IsAbsorbed on corresponding ModelElement.
-                    lrTable = Me.Role.JoinedORMObject.getCorrespondingRDSTable
-                End If
+                Try
+                    If Me.Role.JoinedORMObject.Id = Me.Table.Name Then
+                        lrTable = Me.Table
+                    ElseIf Me.Role.FactType.Id = Me.Table.Name Then
+                        lrTable = Me.FactType.getCorrespondingRDSTable
+                    Else
+                        'This is required because some Columns may be inherited by Not IsAbsorbed on corresponding ModelElement.
+                        lrTable = Me.Role.JoinedORMObject.getCorrespondingRDSTable
+                    End If
 
-                Return lrTable.Index.Find(Function(x) x.IsPrimaryKey And (x.Column.Find(Function(y) y.Id = Me.Id) IsNot Nothing)) IsNot Nothing
+                    Return lrTable.Index.Find(Function(x) x.IsPrimaryKey And (x.Column.Find(Function(y) y.Id = Me.Id) IsNot Nothing)) IsNot Nothing
+                Catch ex1 As Exception
+                    Try
+                        Return Me.Table.Index.Find(Function(x) x.IsPrimaryKey And (x.Column.Find(Function(y) y.Id = Me.Id) IsNot Nothing)) IsNot Nothing
+                    Catch ex2 As Exception
+                        Return Nothing
+                    End Try
+                End Try
                 '20200427-VM-was Me.Table.Index.Find(Function(x) x.IsPrimaryKey And (x.Column.Find(Function(y) y.Id = Me.Id) IsNot Nothing)) IsNot Nothing
 
             Catch ex As Exception
-                Return False
+                    Return False
             End Try
 
         End Function
