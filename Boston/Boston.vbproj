@@ -2903,6 +2903,7 @@
     <None Include="Images\MenuImages\SaveAll16x16.jpg" />
     <None Include="Images\MenuImages\Tick-16x16.jpg" />
     <None Include="Images\MenuImages\Table.png" />
+    <None Include="Images\MenuImages\spyglass_icon.png" />
     <Content Include="Images\MenuImages\Toolbox16x16B&amp;W.jpg" />
     <None Include="Images\MenuImages\XML16x16.png" />
     <None Include="Images\Splash\Shutterstock-144487549.jpg" />

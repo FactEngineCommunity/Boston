@@ -35,6 +35,7 @@ Partial Class frmToolboxModelDictionary
         Me.ImageList = New System.Windows.Forms.ImageList(Me.components)
         Me.ContextMenuStrip1 = New System.Windows.Forms.ContextMenuStrip(Me.components)
         Me.ViewOnPageToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripMenuItemViewInDiagramSpy = New System.Windows.Forms.ToolStripMenuItem()
         Me.RemoveFromModelToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.StatusStrip1 = New System.Windows.Forms.StatusStrip()
         Me.ToolStripStatusLabelPromptRealisationsCount = New System.Windows.Forms.ToolStripStatusLabel()
@@ -159,7 +160,7 @@ Partial Class frmToolboxModelDictionary
         '
         'ContextMenuStrip1
         '
-        Me.ContextMenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ViewOnPageToolStripMenuItem, Me.RemoveFromModelToolStripMenuItem})
+        Me.ContextMenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ViewOnPageToolStripMenuItem, Me.ToolStripMenuItemViewInDiagramSpy, Me.RemoveFromModelToolStripMenuItem})
         Me.ContextMenuStrip1.Name = "ContextMenuStrip1"
         Me.ContextMenuStrip1.Size = New System.Drawing.Size(186, 70)
         '
@@ -168,6 +169,13 @@ Partial Class frmToolboxModelDictionary
         Me.ViewOnPageToolStripMenuItem.Name = "ViewOnPageToolStripMenuItem"
         Me.ViewOnPageToolStripMenuItem.Size = New System.Drawing.Size(185, 22)
         Me.ViewOnPageToolStripMenuItem.Text = "&View on Page..."
+        '
+        'ToolStripMenuItemViewInDiagramSpy
+        '
+        Me.ToolStripMenuItemViewInDiagramSpy.Image = Global.Boston.My.Resources.Resources.Spyglass16x16
+        Me.ToolStripMenuItemViewInDiagramSpy.Name = "ToolStripMenuItemViewInDiagramSpy"
+        Me.ToolStripMenuItemViewInDiagramSpy.Size = New System.Drawing.Size(185, 22)
+        Me.ToolStripMenuItemViewInDiagramSpy.Text = "View in Diagram Spy"
         '
         'RemoveFromModelToolStripMenuItem
         '
@@ -245,4 +253,5 @@ Partial Class frmToolboxModelDictionary
     Friend WithEvents CheckBoxShowCoreModelElements As System.Windows.Forms.CheckBox
     Friend WithEvents CheckBoxShowModelDictionary As System.Windows.Forms.CheckBox
     Friend WithEvents ButtonRefresh As Button
+    Friend WithEvents ToolStripMenuItemViewInDiagramSpy As ToolStripMenuItem
 End Class

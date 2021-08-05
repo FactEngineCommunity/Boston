@@ -93,7 +93,7 @@ Public Class ODBCDatabaseReverseEngineer
 
                 'Create ValueTypes (that haven't already been created by virtue of being the ReferenceModeValueType of Simple Reference Scheme EntityTypes.
                 Call Me.createValueTypesByTable(lrTable)
-
+#Region "Create ObjectifiedFactTypes"
                 If Me.Model.GetModelObjectByName(lrTable.Name) Is Nothing Then
                     'The Table has no ModelElement, so create it.
                     If lrTable.getPrimaryKeyColumns.Count = 1 Then
@@ -103,18 +103,23 @@ Public Class ODBCDatabaseReverseEngineer
                         'Create an ObjectifiedFactType
                         Dim lrFactType As FBM.FactType
 
-                        Dim lrModelElement As FBM.ModelObject
+                        Dim lrModelElement As FBM.ModelObject = Nothing
                         Dim larModelObject As New List(Of FBM.ModelObject)
 
                         For Each lrColumn In lrTable.getPrimaryKeyColumns
-                            lrModelElement = Me.Model.GetModelObjectByName(lrColumn.Name)
+                            If lrColumn.hasOutboundRelation Then
+                                Dim lrRelation = lrColumn.Relation.Find(Function(x) x.OriginTable IsNot Nothing)
+                                Dim lrDestinationTable As RDS.Table = Me.Model.RDS.getTableByName(lrRelation.DestinationTable.Name)
+                                lrModelElement = lrDestinationTable.FBMModelElement
+                                If lrModelElement Is Nothing Then
+                                    lrModelElement = Me.Model.GetModelObjectByName(lrColumn.Name)
+                                End If
+                            Else
+                                lrModelElement = Me.Model.GetModelObjectByName(lrColumn.Name)
+                            End If
+
                             If lrModelElement Is Nothing Then
                                 Debugger.Break()
-                                If lrColumn.hasOutboundRelation Then
-                                    Dim lrRelation = lrColumn.Relation.Find(Function(x) x.OriginTable IsNot Nothing)
-                                    Dim lrDestinationTable As RDS.Table = Me.Model.RDS.getTableByName(lrRelation.DestinationTable.Name)
-                                    lrModelElement = lrDestinationTable.FBMModelElement
-                                End If
                             End If
                             If lrModelElement.isReferenceModeValueType Then
                                 lrModelElement = Me.Model.getEntityTypeByReferenceModeValueType(lrModelElement)
@@ -125,11 +130,85 @@ Public Class ODBCDatabaseReverseEngineer
                         lrFactType = Me.Model.CreateFactType(lrTable.Name, larModelObject, False, True, , , False, )
                         Me.Model.AddFactType(lrFactType)
                         lrFactType.Objectify() 'Add to model first, so LinkFactTypes have something to join to.
+
+                        'Create the internalUniquenessConstraint.
+                        Dim larRole As New List(Of FBM.Role)
+                        For Each lrRole In lrFactType.RoleGroup
+                            larRole.Add(lrRole)
+                        Next
+                        Call lrFactType.CreateInternalUniquenessConstraint(larRole)
                     End If
                 End If
+#End Region
             Next
 
-            Debugger.Break()
+            '-----------------------------------------------------------------------------
+            'Create FactTypes for all other Relations.
+            For Each lrRelation In Me.TempModel.RDS.Relation.FindAll(Function(x) Not x.isPrimaryKeyBasedRelation)
+                'Relations to other Tables.
+                Dim larModelElement As New List(Of FBM.ModelObject)
+                Dim lrModelElement1 As FBM.ModelObject = Nothing
+                Dim lrModelElement2 As FBM.ModelObject = Nothing
+
+                lrModelElement1 = Me.Model.RDS.getTableByName(lrRelation.OriginTable.Name).FBMModelElement
+                lrModelElement2 = Me.Model.RDS.getTableByName(lrRelation.DestinationTable.Name).FBMModelElement
+
+                larModelElement.Add(lrModelElement1)
+                larModelElement.Add(lrModelElement2)
+
+                Dim lsFactTypeName As String = lrModelElement1.Id & lrModelElement2.Id
+                lsFactTypeName = Me.Model.CreateUniqueFactTypeName(lsFactTypeName, 0)
+
+                Dim lrFactType As FBM.FactType = Me.Model.CreateFactType(lsFactTypeName, larModelElement, False, True, , , False, )
+                Me.Model.AddFactType(lrFactType)
+
+
+                'Create the internalUniquenessConstraint.
+                Dim larRole As New List(Of FBM.Role)
+                larRole.Add(lrFactType.RoleGroup(0))
+
+                Call lrFactType.CreateInternalUniquenessConstraint(larRole)
+
+            Next
+
+            '-----------------------------------------------------------------------------
+            'Create FactTypes straight to ValueTypes.
+            Dim lasNonReferenceModeValueTypeNames = From ValueType In Me.Model.ValueType
+                                                    Where Not ValueType.isReferenceModeValueType
+                                                    Select ValueType.Id
+
+            For Each lrTable In Me.TempModel.RDS.Table
+
+                Dim larValueTypeColumns = From Column In lrTable.Column
+                                          Where lasNonReferenceModeValueTypeNames.Contains(Column.Name)
+                                          Select Column
+
+                For Each lrColumn In larValueTypeColumns
+                    Dim larModelElement As New List(Of FBM.ModelObject)
+                    Dim lrModelElement1 As FBM.ModelObject = Nothing
+                    Dim lrModelElement2 As FBM.ModelObject = Nothing
+
+                    lrModelElement1 = Me.Model.RDS.getTableByName(lrTable.Name).FBMModelElement
+                    lrModelElement2 = Me.Model.GetModelObjectByName(lrColumn.Name)
+
+                    larModelElement.Add(lrModelElement1)
+                    larModelElement.Add(lrModelElement2)
+
+                    Dim lsFactTypeName As String = lrModelElement1.Id & "Has" & lrModelElement2.Id
+                    lsFactTypeName = Me.Model.CreateUniqueFactTypeName(lsFactTypeName, 0)
+
+                    Dim lrFactType As FBM.FactType = Me.Model.CreateFactType(lsFactTypeName, larModelElement, False, True, , , False, )
+                    Me.Model.AddFactType(lrFactType)
+
+                    'Create the internalUniquenessConstraint.
+                    Dim larRole As New List(Of FBM.Role)
+                    larRole.Add(lrFactType.RoleGroup(0))
+
+                    Call lrFactType.CreateInternalUniquenessConstraint(larRole)
+                Next
+            Next
+
+                Debugger.Break()
 
 
 

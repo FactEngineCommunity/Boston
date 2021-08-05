@@ -880,6 +880,13 @@ Public Class frmToolboxModelDictionary
 
     Private Sub ContextMenuStrip1_Opening(ByVal sender As Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles ContextMenuStrip1.Opening
 
+        Select Case Me.TreeView1.SelectedNode.Tag.GetType
+            Case Is = GetType(FBM.EntityType)
+                Me.ToolStripMenuItemViewInDiagramSpy.Enabled = True
+            Case Else
+                Me.ToolStripMenuItemViewInDiagramSpy.Enabled = False
+        End Select
+
         '20200725-Remove if everything seems okay. Is covered in MouseDown
 
         'Dim larPage As List(Of FBM.Page)
@@ -1047,5 +1054,37 @@ Public Class frmToolboxModelDictionary
 
     End Sub
 
+    Private Sub ViewInDiagramSpyToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItemViewInDiagramSpy.Click
+
+        Try
+            If Me.zrLoadedModel Is Nothing Then Me.zrLoadedModel = Me.zrORMModel
+
+            Dim lrDiagramSpyPage As New FBM.DiagramSpyPage(Me.zrLoadedModel, "123", "Diagram Spy", pcenumLanguage.ORMModel)
+
+            Dim lrModelObject As FBM.ModelObject
+
+            Try
+                lrModelObject = Me.zrLoadedModel.GetModelObjectByName(Me.TreeView1.SelectedNode.Tag.Id)
+
+                If frmMain.IsDiagramSpyFormLoaded Then
+                    prApplication.ActivePages.Find(Function(x) x.Tag.GetType Is GetType(FBM.DiagramSpyPage)).Close()
+                End If
+
+                Call frmMain.LoadDiagramSpy(lrDiagramSpyPage, lrModelObject)
+            Catch ex As Exception
+
+            End Try
+
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
 
 End Class

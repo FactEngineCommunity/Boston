@@ -241,6 +241,25 @@ Namespace RDS
 
         End Function
 
+        ''' <summary>
+        ''' TRUE if the Relation is for a Column/Columns that are part of the PrimaryKey of the OriginTable.
+        ''' </summary>
+        ''' <returns></returns>
+        Public Function isPrimaryKeyBasedRelation() As Boolean
+
+            Try
+                Return Me.OriginColumns.First.isPartOfPrimaryKey
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+        End Function
+
 
         Public Sub setDestinationMandatory(ByVal abDestinationIsMandatory As Boolean)
 

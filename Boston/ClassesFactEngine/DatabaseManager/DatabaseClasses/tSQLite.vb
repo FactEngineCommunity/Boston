@@ -519,6 +519,7 @@ Namespace FactEngine
                                                   lrDestinationColumn.IsMandatory,
                                                   "is involed in",
                                                   Nothing)
+                            larRelation.Add(lrRelation)
                         End If
 
                         lrOriginColumn.Relation.Add(lrRelation)
