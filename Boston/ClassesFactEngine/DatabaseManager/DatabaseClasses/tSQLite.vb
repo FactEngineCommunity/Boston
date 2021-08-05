@@ -575,6 +575,8 @@ Namespace FactEngine
                     lsColumnName = lrRecordset("name").Data
                     lbIsMandatory = CInt(NullVal(lrRecordset("notnull").Data, 0)) > 0
                     lrColumn = New RDS.Column(arTable, lsColumnName, Nothing, Nothing, lbIsMandatory)
+                    lrColumn.DataType = New RDS.DataType
+                    lrColumn.DataType.DataType = lrRecordset("type").Data
 
                     larColumn.Add(lrColumn)
 
@@ -592,6 +594,60 @@ Namespace FactEngine
                 prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
                 Return New List(Of RDS.Column)
+            End Try
+
+        End Function
+
+        Public Overrides Sub getDatabaseTypes()
+
+            Try
+                Dim lsPath = Richmond.MyPath & "\database\databasedatatypes\bostondatabasedatattypes.csv"
+                Dim reader As System.IO.TextReader = New System.IO.StreamReader(lsPath)
+
+                Dim csvReader = New CsvHelper.CsvReader(reader, System.Globalization.CultureInfo.InvariantCulture)
+                Me.FBMModel.RDS.DatabaseDataType = csvReader.GetRecords(Of DatabaseDataType).ToList
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
+        Public Overrides Function getBostonDataTypeByDatabaseDataType(ByVal asDatabaseDataType As String) As pcenumORMDataType
+
+            Try
+                asDatabaseDataType = Trim(asDatabaseDataType)
+                Dim liIndex As Integer = asDatabaseDataType.IndexOf("(")
+                If (liIndex > 0) Then
+                    asDatabaseDataType = asDatabaseDataType.Substring(0, liIndex)
+                End If
+
+                Dim larDBDataType = From DatabaseDataType In Me.FBMModel.RDS.DatabaseDataType
+                                    Where DatabaseDataType.DataType = asDatabaseDataType
+                                    Where Me.FBMModel.TargetDatabaseType = DatabaseDataType.Database
+                                    Select DatabaseDataType.BostonDataType
+
+
+                If larDBDataType.Count > 0 Then
+                    Return larDBDataType.First
+                Else
+                    Return pcenumORMDataType.TextVariableLength
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return pcenumORMDataType.TextVariableLength
             End Try
 
         End Function

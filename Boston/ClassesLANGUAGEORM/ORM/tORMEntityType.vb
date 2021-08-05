@@ -2218,10 +2218,11 @@ Namespace FBM
         ''' <param name="abSimpleAssignment">True if just setting the ReferenceMode without creating references or changing anything, else False</param>
         ''' <param name="asValueTypeName">Provided if the name for the ValueType is known and need not be generated.</param>
         ''' <remarks></remarks>
-        Public Sub SetReferenceMode(ByVal asReferenceMode As String, _
-                                    Optional ByVal abSimpleAssignment As Boolean = False, _
+        Public Sub SetReferenceMode(ByVal asReferenceMode As String,
+                                    Optional ByVal abSimpleAssignment As Boolean = False,
                                     Optional ByVal asValueTypeName As String = Nothing,
-                                    Optional ByVal abBroadcastInterfaceEvent As Boolean = True)
+                                    Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
+                                    Optional ByVal aiORMDataType As pcenumORMDataType = pcenumORMDataType.TextVariableLength)
 
             Try
                 If IsSomething(Me.ReferenceModeValueType) Or IsSomething(Me.ReferenceModeFactType) Then
@@ -2233,6 +2234,7 @@ Namespace FBM
 
                     Me.ReferenceMode = asReferenceMode
                     lrValueType = Me.ReferenceModeValueType
+                    lrValueType.DataType = aiORMDataType
 
                     If Trim(asReferenceMode) = "" Then
                         '-------------------------------------------------------------------------------

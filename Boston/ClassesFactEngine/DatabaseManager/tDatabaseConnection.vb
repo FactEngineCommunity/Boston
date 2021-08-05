@@ -91,6 +91,13 @@
             Return New List(Of RDS.Column)
         End Function
 
+        Public Overridable Sub getDatabaseTypes()
+        End Sub
+
+        Public Overridable Function getBostonDataTypeByDatabaseDataType(ByVal asDatabaseDataType As String) As pcenumORMDataType
+            Return pcenumORMDataType.TextVariableLength
+        End Function
+
         ''' <summary>
         ''' Returns a list of the Relations/ForeignKeys in the database. As used in Reverse Engineering a database.
         ''' </summary>

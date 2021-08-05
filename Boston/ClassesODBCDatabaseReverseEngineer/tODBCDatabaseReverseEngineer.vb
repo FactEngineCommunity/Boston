@@ -72,8 +72,10 @@ Public Class ODBCDatabaseReverseEngineer
             Me.Model.connectToDatabase()
             Me.TempModel.connectToDatabase()
 
-            'Call Me.GetDataTypes()
+            'Load DatabaseTypes into memory.
+            Call Me.Model.DatabaseConnection.getDatabaseTypes()
 
+            'Call Me.GetDataTypes()
 
             Call Me.getTables()
 
@@ -252,7 +254,11 @@ Public Class ODBCDatabaseReverseEngineer
                     Dim lrValueType As FBM.ValueType
 
                     lrValueType = New FBM.ValueType(Me.Model, pcenumLanguage.ORMModel, lrColumn.Name, True)
-                    lrValueType.DataType = pcenumORMDataType.TextVariableLength
+                    Try
+                        lrValueType.DataType = Me.Model.DatabaseConnection.getBostonDataTypeByDatabaseDataType(lrColumn.DataType.DataType)
+                    Catch ex As Exception
+                        lrValueType.DataType = pcenumORMDataType.TextVariableLength
+                    End Try
 
                     'Add the ValueType to the Model
                     Me.Model.AddValueType(lrValueType)
@@ -352,7 +358,8 @@ Public Class ODBCDatabaseReverseEngineer
                     Call lrPage.DropEntityTypeAtPoint(lrEntityType, New PointF(50, 50))
                 End If
 
-                lrEntityType.SetReferenceMode(lsReferenceMode, False, lsValueTypeName)
+                Dim liBostonDataType As pcenumORMDataType = Me.Model.DatabaseConnection.getBostonDataTypeByDatabaseDataType(lrPrimaryKeyColumn.DataType.DataType)
+                lrEntityType.SetReferenceMode(lsReferenceMode, False, lsValueTypeName, False, liBostonDataType)
 
                 ''=================================================================================================================
                 ''Create joined FactTypes.
