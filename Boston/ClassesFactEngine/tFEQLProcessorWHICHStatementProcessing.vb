@@ -272,7 +272,8 @@
 
                 Return lrQueryGraph
 
-
+            Catch appex As ApplicationException
+                Throw appex
             Catch ex As Exception
                 Throw New Exception(ex.Message)
             End Try

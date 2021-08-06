@@ -706,6 +706,16 @@ Public Class frmFactEngine
                     Me.LabelError.Text = lrRecordset.ErrorString
                     Me.TabControl1.SelectedTab = Me.TabPageResults
                     Me.LabelError.ForeColor = Color.Orange
+
+                    If lrRecordset.ApplicationException IsNot Nothing Then
+                        'Put code here to engage the VirtualAnalyst to create a FactTypeReading
+                        '2021-VM-Use the following type of code for adding new FactTypeReadings
+                        'Call Me.loadVirtualAnalyst()
+                        'Call prApplication.Brain.processFactTypeReadingStatement
+
+                        'ex.Data.Add("CustomerId", custId)
+                        'Throw New Exception("Failure in processing Customer", ex)
+                    End If
                 Else
                     Select Case lrRecordset.StatementType
                         Case Is = FactEngine.pcenumFEQLStatementType.DESCRIBEStatement
@@ -1258,8 +1268,8 @@ Public Class frmFactEngine
                 Call Me.GetPredicateClauseNodes(Me.zrTextHighlighter.Tree.Nodes(0), larModelPredicateClauseParseNode)
                 Dim lsPredicatePartText As String
 
-
                 Dim larPredicateNode As List(Of FEQL.ParseNode)
+
                 For Each lrParseNode In larModelPredicateClauseParseNode
                     larPredicateNode = New List(Of FEQL.ParseNode)
                     Call Me.GetPredicateNodes(lrParseNode, larPredicateNode)
