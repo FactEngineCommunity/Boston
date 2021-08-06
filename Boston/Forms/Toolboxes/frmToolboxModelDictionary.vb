@@ -881,7 +881,9 @@ Public Class frmToolboxModelDictionary
     Private Sub ContextMenuStrip1_Opening(ByVal sender As Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles ContextMenuStrip1.Opening
 
         Select Case Me.TreeView1.SelectedNode.Tag.GetType
-            Case Is = GetType(FBM.EntityType)
+            Case Is = GetType(FBM.EntityType),
+                      GetType(FBM.ValueType),
+                      GetType(FBM.FactType)
                 Me.ToolStripMenuItemViewInDiagramSpy.Enabled = True
             Case Else
                 Me.ToolStripMenuItemViewInDiagramSpy.Enabled = False

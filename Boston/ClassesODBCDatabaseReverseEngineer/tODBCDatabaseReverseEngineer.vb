@@ -129,6 +129,18 @@ Public Class ODBCDatabaseReverseEngineer
                             larModelObject.Add(lrModelElement)
                         Next
 
+                        'FactTypes joining FactTypes only have one Role. See TimetableBookings FT in University model.
+                        Dim larFTModelElement = (From ModelElement In larModelObject
+                                                 Where ModelElement.GetType = GetType(FBM.FactType)
+                                                 Select ModelElement Distinct).ToList
+
+                        If larFTModelElement.Count > 0 Then
+                            While larModelObject.Contains(larFTModelElement.First) And larModelObject.FindAll(Function(x) x Is larFTModelElement.First).Count > 1
+                                larModelObject.Remove(larFTModelElement.First)
+                            End While
+                        End If
+
+
                         lrFactType = Me.Model.CreateFactType(lrTable.Name, larModelObject, False, True, , , False, )
                         Me.Model.AddFactType(lrFactType)
                         lrFactType.Objectify() 'Add to model first, so LinkFactTypes have something to join to.

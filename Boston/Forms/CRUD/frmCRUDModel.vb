@@ -8,7 +8,7 @@ Imports ADOX
 
 Public Class frmCRUDModel
 
-    Public zrModel As FBM.Model
+    Public WithEvents zrModel As FBM.Model
 
     Private mrODBCConnection As System.Data.Odbc.OdbcConnection
 
@@ -480,4 +480,12 @@ Public Class frmCRUDModel
 
         End Try
     End Sub
+
+    Private Sub zrModel_Deleting() Handles zrModel.Deleting
+
+        Me.Hide()
+        Me.Close()
+
+    End Sub
+
 End Class

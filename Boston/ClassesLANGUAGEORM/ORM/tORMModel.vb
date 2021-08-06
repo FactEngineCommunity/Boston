@@ -288,6 +288,8 @@ Namespace FBM
         <XmlIgnore()> _
         Private Parsetree As New TinyPG.ParseTree 'Used with the Parser, is populated during the parsing of text input into the Brain; especially ORMQL
 
+        <NonSerialized()>
+        Public Event Deleting()
         <NonSerialized()> _
         Public Event FinishedErrorChecking()
         <NonSerialized()> _
@@ -2775,6 +2777,7 @@ Namespace FBM
             '    TableModelDictionary.DeleteModelDictionaryEntry(lrDictionaryEntry)
             'Next
             'Me.ModelDictionary.Clear()
+            RaiseEvent Deleting()
 
             Call TableModel.DeleteModel(Me)
 

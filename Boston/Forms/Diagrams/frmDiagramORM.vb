@@ -11244,4 +11244,61 @@ Public Class frmDiagramORM
 
     End Sub
 
+    Private Sub AddAllAssociatedFactTypesToPageToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles AddAllAssociatedFactTypesToPageToolStripMenuItem.Click
+
+        Try
+            Dim lrEntityTypeInstance As FBM.EntityTypeInstance
+
+            lrEntityTypeInstance = Me.zrPage.SelectedObject(0)
+
+            For Each lrFactTypeReading In lrEntityTypeInstance.EntityType.getOutgoingFactTypeReadings
+
+                If Me.zrPage.FactTypeInstance.FindAll(Function(x) x.Id = lrFactTypeReading.FactType.Id).Count = 0 Then
+
+                    Call Me.zrPage.DropFactTypeAtPoint(lrFactTypeReading.FactType, New PointF(10, 10), False, False, True, False)
+                End If
+
+            Next
+
+            Call Me.AutoLayout()
+
+        Catch ex As Exception
+            Dim lsMessage1 As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
+    Private Sub AddAllAssociatedFactTypesToPageToolStripMenuItem1_Click(sender As Object, e As EventArgs) Handles AddAllAssociatedFactTypesToPageToolStripMenuItem1.Click
+
+        Try
+            Dim lrFactTypeInstance As FBM.FactTypeInstance
+
+            lrFactTypeInstance = Me.zrPage.SelectedObject(0)
+
+            For Each lrFactTypeReading In lrFactTypeInstance.FactType.getOutgoingFactTypeReadings
+
+                If Me.zrPage.FactTypeInstance.FindAll(Function(x) x.Id = lrFactTypeReading.FactType.Id).Count = 0 Then
+
+                    Call Me.zrPage.DropFactTypeAtPoint(lrFactTypeReading.FactType, New PointF(10, 10), False, False, True, False)
+                End If
+
+            Next
+
+            Call Me.AutoLayout()
+
+        Catch ex As Exception
+            Dim lsMessage1 As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
 End Class
