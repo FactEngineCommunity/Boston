@@ -478,6 +478,15 @@ Namespace FactEngine
                             Me.FBMFactTypeReading = Me.FBMFactType.FactTypeReading.Find(Function(x) lrFactTypeReading.EqualsByPredicatePartText(x, True) And
                                                                                                     lrFactTypeReading.EqualsByRoleJoinedModelObjectSequence(x))
                         End If
+                        If Me.FBMPredicatePart Is Nothing And Me.FBMFactTypeReading IsNot Nothing Then
+                            Dim larPredicatePart = From PredicatePart In Me.FBMFactTypeReading.PredicatePart
+                                                   Where PredicatePart.PredicatePartText = asPredicate
+                                                   Select PredicatePart
+
+                            If larPredicatePart.Count > 0 Then
+                                Me.FBMPredicatePart = larPredicatePart.First
+                            End If
+                        End If
                     ElseIf Me.AmbiguousFactTypeMatches.Count > 0 Then
                         Me.AmbiguousFactTypeReading = lrFactTypeReading
                     End If

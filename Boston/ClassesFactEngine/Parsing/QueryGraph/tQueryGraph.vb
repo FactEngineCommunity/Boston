@@ -1213,9 +1213,11 @@
                             If lrQueryEdge.FBMFactType.IsManyTo1BinaryFactType Then
                                 'TargetNode is Many side of ManyToOne BinaryFactType
                                 lrRole = lrQueryEdge.FBMFactType.InternalUniquenessConstraint(0).Role(0)
+                            ElseIf lrQueryEdge.FBMFactTypeReading IsNot Nothing Then
+                                lrRole = lrQueryEdge.FBMFactTypeReading.PredicatePart(lrQueryEdge.FBMFactTypeReading.PredicatePart.IndexOf(lrQueryEdge.FBMPredicatePart) + 1).Role
                             End If
                         End If
-                        Select Case lrQueryEdge.FBMFactType.RoleGroup(liRoleInd).JoinedORMObject.ConceptType
+                        Select Case lrRole.JoinedORMObject.ConceptType 'lrQueryEdge.FBMFactType.RoleGroup(liRoleInd).JoinedORMObject.ConceptType
                             Case Is = pcenumConceptType.ValueType
                                 Dim lrColumn As RDS.Column
                                 If lrQueryEdge.IsPartialFactTypeMatch Then
