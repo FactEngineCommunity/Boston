@@ -53,6 +53,11 @@ Public Class tBrain
     Public IncludeSenderInOutput As Boolean = False
     Private OutputBuffer As String
     Delegate Sub SendDataDelegate(ByVal as_string As String)
+    Delegate Sub SendDataDelegateAdvanced(ByVal as_string As String,
+                                          ByVal ab_is_echo As Boolean,
+                                          ByVal abSuppressLineLimit As Boolean,
+                                          ByVal abExpectingYesNoResponse As Boolean)
+
     Delegate Sub BrianaSpeakDelegate()
 
     Public ThoughtMode As pcenumBrainMode = pcenumBrainMode.ORMQL
@@ -124,6 +129,8 @@ Public Class tBrain
     Private WithEvents HelpProvider As New System.Windows.Forms.HelpProvider
 
     Private AutoLayoutOn As Boolean = False
+
+    Private ResponseButtons As New List(Of Button)
 
     Public Sub New()
 
@@ -280,7 +287,16 @@ Public Class tBrain
 
     End Sub
 
-    Public Sub send_data(ByVal asData As String, Optional ByVal ab_is_echo As Boolean = False, Optional abSuppressLineLimit As Boolean = False)
+    ''' <summary>
+    ''' See also: Me.OutOfTimeout
+    ''' </summary>
+    ''' <param name="asData"></param>
+    ''' <param name="ab_is_echo"></param>
+    ''' <param name="abSuppressLineLimit"></param>
+    Public Sub send_data(ByVal asData As String,
+                         Optional ByVal ab_is_echo As Boolean = False,
+                         Optional abSuppressLineLimit As Boolean = False,
+                         Optional abExpectingYesNoResponse As Boolean = False)
 
         Dim lsString As String = ""
 
@@ -322,12 +338,52 @@ Public Class tBrain
             End If
 
             Me.OutputChannel.AppendText(lsString & vbCrLf)
+
         Catch ex As Exception
             MsgBox("Cross thread concern.")
         End Try
 
+        'Buttons
+        Try
+            For Each lrButton In Me.ResponseButtons
+                Me.OutputChannel.Controls.Remove(lrButton)
+                lrButton.Dispose()
+            Next
+            If abExpectingYesNoResponse Then
+                Dim Button1 = New Button ' Create new instance
+                Button1.Size = New System.Drawing.Size(75, 27) ' give the button a size
+                Button1.Text = "Yes" ' set the button text
+                Button1.UseVisualStyleBackColor = True ' make it look windows like
+                Button1.Cursor = Cursors.Hand
+                Button1.Tag = "Yes"
 
+                AddHandler Button1.Click, AddressOf Me.ResponseButton_Click
 
+                Dim pos As Point = Me.OutputChannel.GetPositionFromCharIndex(Me.OutputChannel.SelectionStart)  'determine the button position
+                Me.OutputChannel.Controls.Add(Button1) ' get it inside the rich text box
+                Button1.Location = New Point(Me.OutputChannel.Left, pos.Y + Me.OutputChannel.Top) ' set the button position
+
+                Dim Button2 = New Button ' Create new instance
+                Button2.Size = New System.Drawing.Size(75, 27) ' give the button a size
+                Button2.Text = "No" ' set the button text
+                Button2.UseVisualStyleBackColor = True ' make it look windows like
+                Button2.Cursor = Cursors.Hand
+                Button2.Tag = "No"
+
+                AddHandler Button2.Click, AddressOf Me.ResponseButton_Click
+
+                Me.OutputChannel.Controls.Add(Button2) ' get it inside the rich text box
+                Button2.Location = New Point(Button1.Left + Button1.Width + 10, pos.Y + Me.OutputChannel.Top) ' set the button position
+
+                Me.ResponseButtons.Add(Button1)
+                Me.ResponseButtons.Add(Button2)
+
+                Dim lrRichTextBox As RichTextBox = Me.OutputChannel
+                lrRichTextBox.AutoScrollOffset = New Point(Button1.Left, Button1.Top + Button1.Height)
+            End If
+        Catch ex As Exception
+            Debugger.Break()
+        End Try
 
         '======================================================================
         '20200725-VM Test to see if can limit the number of lines in the textbox
@@ -2687,6 +2743,17 @@ Public Class tBrain
 
 #Region "HOUSEKEEPING"
 
+    Private Sub ResponseButton_Click(sender As Object, e As EventArgs)
+
+        Try
+            Me.InputBuffer = sender.Tag
+            Call Me.ResponceChecking()
+        Catch ex As Exception
+            Debugger.Break()
+        End Try
+
+    End Sub
+
     ''' <summary>
     ''' Primary Brain process for Processing 'Sentences', Asking 'Questions'.
     ''' Is called as a result of the trigger: Me->'AddHandler Timeout.Elapsed, AddressOf OutOfTimeOut'
@@ -2721,7 +2788,7 @@ Public Class tBrain
             Me.CurrentQuestion = Me.Question(0)
             Me.CurrentPlan = Me.CurrentQuestion.Plan
 
-            Me.OutputChannel.BeginInvoke(New SendDataDelegate(AddressOf Me.send_data), Me.OutputBuffer)
+            Me.OutputChannel.BeginInvoke(New SendDataDelegateAdvanced(AddressOf Me.send_data), Me.OutputBuffer, False, False, Me.CurrentQuestion.ExpectingYesNoResponse)
 
             Exit Sub
         ElseIf Not IsSomething(Me.CurrentQuestion) And Me.Question.Count > 0 Then
@@ -2732,7 +2799,9 @@ Public Class tBrain
             Me.AwaitingQuestionResponse = True
             Me.CurrentQuestion = Me.Question(0)
             Me.CurrentPlan = Me.CurrentQuestion.Plan
-            Me.OutputChannel.BeginInvoke(New SendDataDelegate(AddressOf Me.send_data), Me.OutputBuffer)
+            Me.OutputChannel.BeginInvoke(New SendDataDelegateAdvanced(AddressOf Me.send_data), Me.OutputBuffer, False, False, Me.CurrentQuestion.ExpectingYesNoResponse)
+
+
         Else
             'Me.OutputBuffer = "I don't have any questions at this time"
             'Me.OutputChannel.BeginInvoke(New SendDataDelegate(AddressOf Me.send_data), Me.OutputBuffer)

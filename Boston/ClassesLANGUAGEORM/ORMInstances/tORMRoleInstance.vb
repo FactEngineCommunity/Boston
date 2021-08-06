@@ -15,7 +15,6 @@ Namespace FBM
         'Implements IXmlSerializable
         Implements FBM.iRolePageObject
 
-
         <XmlIgnore()> _
         Public Shadows Model As FBM.Model 'WithEvents
 
@@ -1313,6 +1312,9 @@ Namespace FBM
 
         End Sub
 
+        Public Sub EnableSaveButton() Implements iPageObject.EnableSaveButton
+            Throw New NotImplementedException()
+        End Sub
     End Class
 
 End Namespace

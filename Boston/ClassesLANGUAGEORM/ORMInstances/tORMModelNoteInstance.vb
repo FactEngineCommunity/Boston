@@ -8,7 +8,6 @@ Namespace FBM
         Inherits FBM.ModelNote
         Implements FBM.iPageObject
 
-
         Public WithEvents ModelNote As FBM.ModelNote
 
         'Public Shadows JoinedObjectType As FBM.PageObject
@@ -313,6 +312,9 @@ Namespace FBM
 
         End Sub
 
+        Public Sub EnableSaveButton() Implements iPageObject.EnableSaveButton
+            Throw New NotImplementedException()
+        End Sub
     End Class
 
 End Namespace

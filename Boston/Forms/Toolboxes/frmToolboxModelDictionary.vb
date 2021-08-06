@@ -420,9 +420,9 @@ Public Class frmToolboxModelDictionary
                             lrRoleInstance = prApplication.WorkingPage.RoleInstance.Find(Function(x) x.Id = lrFactType.LinkFactTypeRole.Id)
 
                             If lrRoleInstance IsNot Nothing Then
-                                lrRoleInstance.Shape.Brush = _
-                                              New MindFusion.Drawing.SolidBrush(Color.FromArgb( _
-                                              [Enum].Parse(GetType(pcenumColourWheel), [Enum].GetName(GetType(pcenumColourWheel), pcenumColourWheel.LightPurple)) _
+                                lrRoleInstance.Shape.Brush =
+                                              New MindFusion.Drawing.SolidBrush(Color.FromArgb(
+                                              [Enum].Parse(GetType(pcenumColourWheel), [Enum].GetName(GetType(pcenumColourWheel), pcenumColourWheel.LightPurple))
                                               ))
                             End If
 
@@ -465,6 +465,26 @@ Public Class frmToolboxModelDictionary
                         End Select
                     End If
             End Select
+
+            '=====================================================================
+            'PropertyGrid
+            Dim lrPropertyGridForm As frmToolboxProperties
+            lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
+            If IsSomething(lrPropertyGridForm) Then
+
+                Dim myHiddenMiscAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
+
+                lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {myHiddenMiscAttribute})
+
+                Dim lrModelObjectInstance As FBM.ModelObject = Nothing
+                Select Case e.Node.Tag.GetType
+                    Case Is = GetType(FBM.EntityType)
+                        lrModelObjectInstance = CType(e.Node.Tag, FBM.EntityType).CloneInstance(New FBM.Page(Me.zrORMModel))
+                End Select
+                If lrModelObjectInstance IsNot Nothing Then
+                    lrPropertyGridForm.PropertyGrid.SelectedObject = lrModelObjectInstance
+                End If
+            End If
 
         Catch ex As Exception
             Dim lsMessage1 As String
