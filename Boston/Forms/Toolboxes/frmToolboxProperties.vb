@@ -67,6 +67,18 @@ Public Class frmToolboxProperties
 
     End Sub
 
+    Public Sub SetSelectedObject(ByRef arObject As Object)
+
+        Try
+            RemoveHandler PropertyGrid.SelectedGridItemChanged, AddressOf Me.PropertyGrid_SelectedGridItemChanged
+            Me.PropertyGrid.SelectedObject = arObject
+            AddHandler PropertyGrid.SelectedGridItemChanged, AddressOf Me.PropertyGrid_SelectedGridItemChanged
+
+        Catch ex As Exception
+            Debugger.Break()
+        End Try
+    End Sub
+
     Private Sub frm_properties_FormClosing(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
 
         prApplication.RightToolboxForms.RemoveAll(AddressOf Me.EqualsByName)
