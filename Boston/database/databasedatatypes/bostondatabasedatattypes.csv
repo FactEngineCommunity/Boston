@@ -2,7 +2,7 @@ Database,BostonDataType,DataType
 SQLite,Boolean,BIT
 SQLite,LogicalTrueFalse,BIT
 SQLite,LogicalYesNo,BIT
-SQLite,NumericAutoCounter,AUTOINCREMENT
+SQLite,NumericAutoCounter,INTEGER
 SQLite,NumericDecimal,NUMBER
 SQLite,NumericFloatCustomPrecision,NUMBER
 SQLite,NumericFloatDoublePrecision,NUMBER
@@ -29,3 +29,41 @@ SQLite,TemporalTime,DATETIME
 SQLite,TextFixedLength,TEXT
 SQLite,TextLargeLength,TEXT
 SQLite,TextVariableLength,TEXT
+PostgreSQL,NumericUnsignedBigInteger,abstime
+PostgreSQL,NumericUnsignedBigInteger,bigint
+PostgreSQL,LogicalTrueFalse,bit
+PostgreSQL,TextVariableLength,bit varying
+PostgreSQL,Boolean,boolean
+PostgreSQL,TextVariableLength,bytea
+PostgreSQL,TextFixedLength,char
+PostgreSQL,TextVariableLength,character
+PostgreSQL,TextVariableLength,character varying
+PostgreSQL,OtherObjectID,cid
+PostgreSQL,TextFixedLength,cidr
+PostgreSQL,TextVariableLength,cstring
+PostgreSQL,TemporalDate,date
+PostgreSQL,NumericFloatDoublePrecision,double precision
+PostgreSQL,TextVariableLength,inet
+PostgreSQL,NumericUnsignedBigInteger,integer
+PostgreSQL,NumericMoney,money
+PostgreSQL,TexFixedLength,name
+PostgreSQL,NumericFloatDoublePrecision,numeric
+PostgreSQL,OtherObjectId,oid,object identifier
+PostgreSQL,TextVariableLength,pg_node_tree
+PostgreSQL,NumericFloatSinglePrecision
+PostgreSQL,TextVariableLength,regconfig
+PostgreSQL,TextVariableLength,regnamespace
+PostgreSQL,NumericUnsignedBigInteger,reltime
+PostgreSQL,NumericUnsignedSmallInteger,smallint
+PostgreSQL,TextVariableLength,text
+PostgreSQL,OtherRowId,block
+PostgreSQL,TemporalDateAndTime,timestamp without time zone
+PostgreSQL,TemporalDateAndTime,timestamp with time zone
+PostgreSQL,TemporalDateAndTime,time without time zone
+PostgreSQL,TemporalDateAndTime,time with time zone
+PostgreSQL,TemporalDateAndTime,tinterval
+PostgreSQL,TextVariableLength,tsquery
+PostgreSQL,TextVariableLength,tsvector
+PostgreSQL,OtherObjectId,uuid
+PostgreSQL,OtherObjectId,xid
+PostgreSQL,TextVariableLength,xml

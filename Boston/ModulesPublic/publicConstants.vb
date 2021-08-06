@@ -87,6 +87,7 @@ Public Module publicConstants
         SQLite = 104
         MongoDB = 105
         ODBC = 106
+        PostgreSQL = 107
     End Enum
 
     Public Enum pcenumDebugMode
