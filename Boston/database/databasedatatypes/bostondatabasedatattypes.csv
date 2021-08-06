@@ -46,17 +46,16 @@ PostgreSQL,NumericFloatDoublePrecision,double precision
 PostgreSQL,TextVariableLength,inet
 PostgreSQL,NumericUnsignedBigInteger,integer
 PostgreSQL,NumericMoney,money
-PostgreSQL,TexFixedLength,name
+PostgreSQL,TextFixedLength,name
 PostgreSQL,NumericFloatDoublePrecision,numeric
-PostgreSQL,OtherObjectId,oid,object identifier
+PostgreSQL,OtherObjectID,oid
 PostgreSQL,TextVariableLength,pg_node_tree
-PostgreSQL,NumericFloatSinglePrecision
 PostgreSQL,TextVariableLength,regconfig
 PostgreSQL,TextVariableLength,regnamespace
 PostgreSQL,NumericUnsignedBigInteger,reltime
 PostgreSQL,NumericUnsignedSmallInteger,smallint
 PostgreSQL,TextVariableLength,text
-PostgreSQL,OtherRowId,block
+PostgreSQL,OtherRowID,block
 PostgreSQL,TemporalDateAndTime,timestamp without time zone
 PostgreSQL,TemporalDateAndTime,timestamp with time zone
 PostgreSQL,TemporalDateAndTime,time without time zone
@@ -64,6 +63,6 @@ PostgreSQL,TemporalDateAndTime,time with time zone
 PostgreSQL,TemporalDateAndTime,tinterval
 PostgreSQL,TextVariableLength,tsquery
 PostgreSQL,TextVariableLength,tsvector
-PostgreSQL,OtherObjectId,uuid
-PostgreSQL,OtherObjectId,xid
+PostgreSQL,OtherObjectID,uuid
+PostgreSQL,OtherObjectID,xid
 PostgreSQL,TextVariableLength,xml
