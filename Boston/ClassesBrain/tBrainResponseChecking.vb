@@ -19,8 +19,10 @@ Partial Public Class tBrain
                         '---------------------------------------------------------------
                         'Step out of the Brain and work on the WorkingModel/WorkingPage
                         '---------------------------------------------------------------
-                        Me.CurrentSentence.SentenceType.Add(pcenumSentenceType.Response)
-                        Me.CurrentSentence.SentenceType.Remove(pcenumSentenceType.Unknown)
+                        If Me.CurrentSentence IsNot Nothing Then
+                            Me.CurrentSentence.SentenceType.Add(pcenumSentenceType.Response)
+                            Me.CurrentSentence.SentenceType.Remove(pcenumSentenceType.Unknown)
+                        End If
 
                         Select Case Me.CurrentQuestion.QuestionType
                             Case Is = pcenumQuestionType.CreateConcept
@@ -167,6 +169,7 @@ Partial Public Class tBrain
                         End If
                 End Select
             End If
+
 
         Catch ex As Exception
             Dim lsMessage As String
