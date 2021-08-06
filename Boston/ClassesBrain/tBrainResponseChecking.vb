@@ -80,8 +80,10 @@ Partial Public Class tBrain
                         Call Me.CurrentQuestionAnswered()
                         Call Me.send_data("Okay")
                     Case Is = "no"
-                        Me.CurrentSentence.SentenceType.Add(pcenumSentenceType.Response)
-                        Me.CurrentSentence.SentenceType.Remove(pcenumSentenceType.Unknown)
+                        If Me.CurrentSentence IsNot Nothing Then
+                            Me.CurrentSentence.SentenceType.Add(pcenumSentenceType.Response)
+                            Me.CurrentSentence.SentenceType.Remove(pcenumSentenceType.Unknown)
+                        End If
                         Select Case Me.CurrentQuestion.QuestionType
                             Case Is = pcenumQuestionType.CreateValueType
                                 Me.CurrentSentence = Me.CurrentQuestion.sentence
