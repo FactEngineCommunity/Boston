@@ -284,6 +284,9 @@ Namespace FBM
 
         End Sub
 
+        Public Sub EnableSaveButton() Implements iPageObject.EnableSaveButton
+            Throw New NotImplementedException()
+        End Sub
     End Class
 
 End Namespace

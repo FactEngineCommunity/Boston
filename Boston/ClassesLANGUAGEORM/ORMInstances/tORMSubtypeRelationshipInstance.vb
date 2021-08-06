@@ -229,6 +229,10 @@ Namespace FBM
         Public Sub SetAppropriateColour() Implements iPageObject.SetAppropriateColour
             Throw New NotImplementedException()
         End Sub
+
+        Public Sub EnableSaveButton() Implements iPageObject.EnableSaveButton
+            Throw New NotImplementedException()
+        End Sub
     End Class
 
 End Namespace

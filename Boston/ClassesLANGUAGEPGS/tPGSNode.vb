@@ -4,6 +4,7 @@ Imports MindFusion.Diagramming
 Imports MindFusion.Drawing
 Imports System.Reflection
 Imports Boston.RDS
+Imports Boston.FBM
 
 Namespace PGS
 
@@ -458,6 +459,9 @@ Namespace PGS
 
         End Sub
 
+        Public Sub EnableSaveButton() Implements iPageObject.EnableSaveButton
+            Throw New NotImplementedException()
+        End Sub
     End Class
 
 End Namespace

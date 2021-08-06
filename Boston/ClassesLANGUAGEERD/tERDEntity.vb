@@ -3,30 +3,31 @@ Imports System.Xml.Serialization
 Imports MindFusion.Diagramming
 Imports MindFusion.Drawing
 Imports System.Reflection
+Imports Boston.FBM
 
 Namespace ERD
     ''' <summary>
     ''' Used to draw/store ERD Entities when drawing an ERDDiagram.
     ''' </summary>
     ''' <remarks></remarks>
-    <Serializable()> _
+    <Serializable()>
     Public Class Entity
         Inherits FBM.FactDataInstance
         Implements IEquatable(Of FBM.EntityTypeInstance)
         Implements FBM.iTableNodePageObject
 
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public NodeType As pcenumPGSEntityType = pcenumPGSEntityType.Node
 
         Public Shadows WithEvents FactData As New FBM.FactData
 
-        <CategoryAttribute("Entity"), _
-         Browsable(True), _
-         [ReadOnly](False), _
-         BindableAttribute(True), _
-         DefaultValueAttribute(""), _
-         DesignOnly(False), _
-         DescriptionAttribute("The name of the Entity")> _
+        <CategoryAttribute("Entity"),
+         Browsable(True),
+         [ReadOnly](False),
+         BindableAttribute(True),
+         DefaultValueAttribute(""),
+         DesignOnly(False),
+         DescriptionAttribute("The name of the Entity")>
         Public Overrides Property Name() As String
             Get
                 Return Me._Name
@@ -90,7 +91,7 @@ Namespace ERD
 
             Me.ConceptType = pcenumConceptType.Entity
             Me.Page = arPage
-            Me.Model = arPage.Model            
+            Me.Model = arPage.Model
             Me.FactData.Model = arPage.Model
             Me.FactData.Name = asEntityName
             Me.FactData.setData(asEntityName, pcenumConceptType.Value, False) 'Was Me.FactData.Data = asEntityName
@@ -565,7 +566,7 @@ Namespace ERD
                 Me.Attribute.Remove(lrAttribute)
                 Me.Page.ERDiagram.Attribute.RemoveAll(Function(x) x.Id = lrAttribute.Id)
 
-                If Me.TableShape IsNot Nothing Then                    
+                If Me.TableShape IsNot Nothing Then
                     Me.TableShape.DeleteRow(lrAttribute.OrdinalPosition - 1)
                 End If
 
@@ -586,8 +587,8 @@ Namespace ERD
 
             For Each lrColumn In arIndex.Column
 
-                Dim larAttribute = From Attribute In Me.Attribute _
-                                   Where Attribute.Column.Id = lrColumn.Id _
+                Dim larAttribute = From Attribute In Me.Attribute
+                                   Where Attribute.Column.Id = lrColumn.Id
                                    Select Attribute
 
                 For Each lrAttribute In larAttribute
@@ -604,8 +605,8 @@ Namespace ERD
 
             For Each lrColumn In arIndex.Column
 
-                Dim larAttribute = From Attribute In Me.Attribute _
-                                   Where Attribute.Column.Id = lrColumn.Id _
+                Dim larAttribute = From Attribute In Me.Attribute
+                                   Where Attribute.Column.Id = lrColumn.Id
                                    Select Attribute
 
                 For Each lrAttribute In larAttribute
@@ -665,5 +666,17 @@ Namespace ERD
 
         End Sub
 
+        Public Sub EnableSaveButton() Implements iPageObject.EnableSaveButton
+            If Me.Page IsNot Nothing Then
+                If Me.Page.Form IsNot Nothing Then
+                    Call Me.Page.Form.EnableSaveButton
+                End If
+            Else
+                Try
+                    frmMain.ToolStripButton_Save.Enabled = True
+                Catch ex As Exception
+                End Try
+            End If
+        End Sub
     End Class
 End Namespace

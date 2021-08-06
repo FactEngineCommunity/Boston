@@ -1751,6 +1751,10 @@ Namespace FBM
         Public Overloads Function Equals(other As RoleConstraintInstance) As Boolean Implements IEquatable(Of RoleConstraintInstance).Equals
             Return Me.Id = other.Id
         End Function
+
+        Public Sub EnableSaveButton() Implements iPageObject.EnableSaveButton
+            Throw New NotImplementedException()
+        End Sub
     End Class
 
 End Namespace

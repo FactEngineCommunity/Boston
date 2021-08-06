@@ -13,7 +13,6 @@ Namespace FBM
         Implements ICloneable
         Implements FBM.iPageObject
 
-
         <XmlAttribute()> _
         Public Shadows ConceptType As pcenumConceptType = pcenumConceptType.EntityType
 
@@ -1504,10 +1503,10 @@ Namespace FBM
                             Call Me.EntityType.SetIsDerived(Me.IsDerived, True)
                         Case Is = "IsIndependent"
                             Call Me.EntityType.SetIsIndependent(Me.IsIndependent, True)
-                            Call Me.Page.Form.EnableSaveButton()
+                            Call Me.EnableSaveButton()
                         Case Is = "IsPersonal"
                             Call Me.EntityType.SetIsPersonal(Me.IsPersonal)
-                            Call Me.Page.Form.EnableSaveButton()
+                            Call Me.EnableSaveButton()
                         Case Is = "IsAbsorbed"
 
                             If Me.IsAbsorbed Then
@@ -1524,15 +1523,15 @@ Namespace FBM
                             With New WaitCursor
                                 Call Me.EntityType.SetIsAbsorbed(Me.IsAbsorbed)
                             End With
-                            Call Me.Page.Form.EnableSaveButton()
+                            Call Me.EnableSaveButton()
                         Case Is = "ShortDescription"
                             Call Me.EntityType.SetShortDescription(Me.ShortDescription)
                             Me.Model.ModelDictionary.Find(Function(x) LCase(x.Symbol) = LCase(Me.Id)).ShortDescription = Me.ShortDescription
-                            Call Me.Page.Form.EnableSaveButton()
+                            Call Me.EnableSaveButton()
                         Case Is = "LongDescription"
                             Call Me.EntityType.SetLongDescription(Me.LongDescription)
                             Me.Model.ModelDictionary.Find(Function(x) LCase(x.Symbol) = LCase(Me.Id)).LongDescription = Me.LongDescription
-                            Call Me.Page.Form.EnableSaveButton()
+                            Call Me.EnableSaveButton()
                         Case Is = "ExpandReferenceMode" 'The name of the Property on the EntityType class related to this EntityTypeInstance
 
                             Dim larFactTypeInstance = From FactTypeInstance In Me.Page.FactTypeInstance
@@ -1638,7 +1637,7 @@ Namespace FBM
                     End Select
 
                     If IsSomething(Me.Page.Form) Then
-                        Call Me.Page.Form.EnableSaveButton()
+                        Call Me.EnableSaveButton()
                         Me.Page.Diagram.Invalidate()
                     End If
 
@@ -2545,6 +2544,19 @@ Namespace FBM
 
         Private Sub _EntityType_IsDatabaseReservedWordChanged(abIsDatabaseReservedWord As Boolean) Handles _EntityType.IsDatabaseReservedWordChanged
             Me.IsDatabaseReservedWord = abIsDatabaseReservedWord
+        End Sub
+
+        Public Sub EnableSaveButton() Implements iPageObject.EnableSaveButton
+            If Me.Page IsNot Nothing Then
+                If Me.Page.Form IsNot Nothing Then
+                    Call Me.Page.Form.EnableSaveButton
+                End If
+            Else
+                Try
+                    frmMain.ToolStripButton_Save.Enabled = True
+                Catch ex As Exception
+                End Try
+            End If
         End Sub
     End Class
 

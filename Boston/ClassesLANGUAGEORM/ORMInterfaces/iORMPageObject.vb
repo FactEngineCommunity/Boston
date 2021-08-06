@@ -13,6 +13,8 @@
         Sub RepellNeighbouringPageObjects(ByVal aiDepth As Integer)
         Sub SetAppropriateColour()
 
+        Sub EnableSaveButton()
+
         Property X As Integer
         Property Y As Integer
     End Interface
