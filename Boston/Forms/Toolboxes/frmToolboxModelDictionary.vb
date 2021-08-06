@@ -480,9 +480,13 @@ Public Class frmToolboxModelDictionary
                 Select Case e.Node.Tag.GetType
                     Case Is = GetType(FBM.EntityType)
                         lrModelObjectInstance = CType(e.Node.Tag, FBM.EntityType).CloneInstance(New FBM.Page(Me.zrORMModel))
+                    Case Is = GetType(FBM.ValueType)
+                        lrModelObjectInstance = CType(e.Node.Tag, FBM.ValueType).CloneInstance(New FBM.Page(Me.zrORMModel))
+                    Case Is = GetType(FBM.FactType)
+                        lrModelObjectInstance = CType(e.Node.Tag, FBM.FactType).CloneInstance(New FBM.Page(Me.zrORMModel))
                 End Select
                 If lrModelObjectInstance IsNot Nothing Then
-                    lrPropertyGridForm.PropertyGrid.SelectedObject = lrModelObjectInstance
+                    Call lrPropertyGridForm.SetSelectedObject(lrModelObjectInstance)
                 End If
             End If
 

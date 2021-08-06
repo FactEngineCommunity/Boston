@@ -65,6 +65,8 @@
 
         Public NumberOfRowsUpdated As Integer = 0
 
+        Public [ApplicationException] As ApplicationException = Nothing
+
         ''' <summary>
         ''' Parameterless New
         ''' </summary>
