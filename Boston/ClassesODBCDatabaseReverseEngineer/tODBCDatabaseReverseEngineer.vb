@@ -18,6 +18,8 @@ Public Class ODBCDatabaseReverseEngineer
     ''' </summary>
     Dim CreatePagePerTable As Boolean = False
 
+    Dim ProgressBar As ProgressBar = Nothing
+
     '=========================================================================================================================================================
     ''' <summary>
     ''' Constructor.
@@ -25,10 +27,12 @@ Public Class ODBCDatabaseReverseEngineer
     ''' <param name="arModel"></param>
     Public Sub New(ByRef arModel As FBM.Model,
                    ByVal asDatabaseConnectionString As String,
-                   ByVal abCreatePagePerTable As Boolean)
+                   ByVal abCreatePagePerTable As Boolean,
+                   Optional ByRef aoProgressBar As ProgressBar = Nothing)
         Me.Model = arModel
         Me.ODBCConnection = New System.Data.Odbc.OdbcConnection(asDatabaseConnectionString)
         Me.CreatePagePerTable = abCreatePagePerTable
+        Me.ProgressBar = aoProgressBar
     End Sub
 
     ''' <summary>
@@ -74,23 +78,31 @@ Public Class ODBCDatabaseReverseEngineer
 
             'Load DatabaseTypes into memory.
             Call Me.Model.DatabaseConnection.getDatabaseTypes()
+            Call Me.SetProgressBarValue(5)
 
             'Call Me.GetDataTypes()
 
             Call Me.getTables()
+            Call Me.SetProgressBarValue(10)
 
             Call Me.GetColumns()
+            Call Me.SetProgressBarValue(20)
 
             Call Me.GetIndexes()
+            Call Me.SetProgressBarValue(30)
 
             Call Me.getRelations()
+            Call Me.SetProgressBarValue(40)
 
             Call Me.TempModel.RDS.orderTablesByRelations()
+            Call Me.SetProgressBarValue(45)
 
             '------------------------------------------------------------------------------
             'Create EntityTypes for each Table with a PrimaryKey with one Column.
+            Call Me.SetProgressBarValue(60)
             Call Me.createTablesForSingleColumnPKTables()
 
+            Call Me.SetProgressBarValue(70)
             For Each lrTable In Me.TempModel.RDS.Table
 
                 'Create ValueTypes (that haven't already been created by virtue of being the ReferenceModeValueType of Simple Reference Scheme EntityTypes.
@@ -182,6 +194,7 @@ Public Class ODBCDatabaseReverseEngineer
 
             '-----------------------------------------------------------------------------
             'Create FactTypes for all other Relations.
+            Call Me.SetProgressBarValue(80)
             For Each lrRelation In Me.TempModel.RDS.Relation.FindAll(Function(x) Not x.isPrimaryKeyBasedRelation)
                 'Relations to other Tables.
                 Dim larModelElement As New List(Of FBM.ModelObject)
@@ -224,6 +237,7 @@ Public Class ODBCDatabaseReverseEngineer
                                                     Where Not ValueType.isReferenceModeValueType
                                                     Select ValueType.Id
 
+            Call Me.SetProgressBarValue(90)
             For Each lrTable In Me.TempModel.RDS.Table
 
                 Dim larValueTypeColumns = From Column In lrTable.Column
@@ -266,7 +280,7 @@ Public Class ODBCDatabaseReverseEngineer
                 Next
             Next
 
-            Debugger.Break()
+            Call Me.SetProgressBarValue(100)
 
         Catch ex As Exception
             Debugger.Break()
@@ -274,8 +288,19 @@ Public Class ODBCDatabaseReverseEngineer
 
         Return True
 
-
     End Function
+
+    Private Sub SetProgressBarValue(ByVal aiValue As Integer)
+
+        Try
+            If Me.ProgressBar IsNot Nothing Then
+                Me.ProgressBar.Value = aiValue
+            End If
+
+        Catch ex As Exception
+            Debugger.Break()
+        End Try
+    End Sub
 
 
     ''' <summary>

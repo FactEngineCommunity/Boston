@@ -32,7 +32,7 @@ Public Class frmCRUDModel
 
         If Me.zrModel.IsEmpty Then
             Me.GroupBoxReverseEngineering.Visible = True
-            Me.Button2.Enabled = True
+            Me.ButtonReverseEngineerDatabase.Enabled = True
         End If
 
     End Sub
@@ -202,9 +202,19 @@ Public Class frmCRUDModel
     Private Sub ButtonTestConnection_Click(sender As Object, e As EventArgs) Handles ButtonTestConnection.Click
 
         Try
+            Call Me.TestConnection
+        Catch ex As Exception
+
+        End Try
+
+    End Sub
+
+    Private Function TestConnection() As Boolean
+
+        Try
             If Trim(Me.TextBoxDatabaseConnectionString.Text) = "" Then
-                MsgBox("Please provide a Connection String")
-                Exit Sub
+                MsgBox("Please provide a Connection String for the database.")
+                Return False
             End If
 
 
@@ -214,7 +224,7 @@ Public Class frmCRUDModel
                         Dim lsReturnMessage As String = Nothing
                         If Not Me.checkDatabaseConnectionString(lsReturnMessage) Then
                             MsgBox(lsReturnMessage)
-                            Exit Sub
+                            Return False
                         End If
 
 
@@ -281,34 +291,65 @@ Public Class frmCRUDModel
                         Me.LabelOpenSuccessfull.Text = "Unknown database type, '" & prApplication.WorkingModel.TargetDatabaseType.ToString & "'."
                         Me.LabelOpenSuccessfull.Visible = True
 
-
                 End Select
             End With
+
+            Return True
         Catch ex As Exception
 
             Me.LabelOpenSuccessfull.ForeColor = Color.Red
             Me.LabelOpenSuccessfull.Text = "Fail: " & ex.Message
             Me.LabelOpenSuccessfull.Visible = True
 
+            Return False
         End Try
 
+    End Function
+
+
+
+    Private Sub AddREMessage(ByVal asMessage As String)
+
+        Try
+            Me.RichTextBoxREMessages.AppendText(vbCrLf & asMessage)
+        Catch ex As Exception
+            Debugger.Break()
+        End Try
     End Sub
 
 
-    Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click
+
+    Private Sub Button2_Click(sender As Object, e As EventArgs) Handles ButtonReverseEngineerDatabase.Click
 
         Try
             Dim lasSchemaName As New List(Of String)
 
             With New WaitCursor
 
+                Me.RichTextBoxREMessages.Clear()
+                Me.ProgressBarReverseEngineering.Value = 0
+
+                If Not Me.TestConnection Then
+                    Call Me.AddREMessage("- Failed to connect to database. Have you set the Database Type and its Connection String?")
+                    Exit Sub
+                End If
+
                 Me.zrModel.RDS.TargetDatabaseType = Me.ComboBoxDatabaseType.SelectedItem.Tag 'DirectCast(System.[Enum].Parse(GetType(pcenumDatabaseType), Me.ComboBoxDatabaseType.SelectedItem), pcenumDatabaseType)
 
-                Dim lrReverseEngineer As New ODBCDatabaseReverseEngineer(Me.zrModel, Trim(Me.TextBoxDatabaseConnectionString.Text), True)
+                Dim lrReverseEngineer As New ODBCDatabaseReverseEngineer(Me.zrModel,
+                                                                         Trim(Me.TextBoxDatabaseConnectionString.Text),
+                                                                         True,
+                                                                         Me.ProgressBarReverseEngineering)
 
+                Call Me.AddREMessage("- Reverse engineering started.")
                 Dim lsErrorMessage As String = ""
                 If Not lrReverseEngineer.ReverseEngineerDatabase(lsErrorMessage) Then
-                    Me.ErrorProvider.SetError(Me.Button2, lsErrorMessage)
+                    Me.ErrorProvider.SetError(Me.ButtonReverseEngineerDatabase, lsErrorMessage)
+                Else
+                    Call Me.AddREMessage("- Finished reverse engineering the database.")
+                    Call Me.AddREMessage("- Saving the model.")
+                    Call Me.zrModel.Save()
+                    Call Me.AddREMessage("- Complete.")
                 End If
 
             End With
