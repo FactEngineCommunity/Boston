@@ -715,6 +715,7 @@ Public Class frmFactEngine
 
                         'ex.Data.Add("CustomerId", custId)
                         'Throw New Exception("Failure in processing Customer", ex)
+                        'Brain.AskQuestionCreateFactTypeReading(ByRef arSentence As Language.Sentence)
                     End If
                 Else
                     Select Case lrRecordset.StatementType
