@@ -494,8 +494,9 @@ Namespace FactEngine
                 End If
 
             Catch ex As Exception
-                Throw New Exception(ex.Message)
-                'prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                Dim lrApplicationException As New ApplicationException(ex.Message)
+                lrApplicationException.Data.Add("QueryEdgeGetFBMFactTypeFail", Me)
+                Throw lrApplicationException
             End Try
 
             Return Nothing

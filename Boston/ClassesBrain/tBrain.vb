@@ -3221,7 +3221,7 @@ Public Class tBrain
         End If
     End Sub
 
-    Private Sub AskQuestionCreateFactTypeReading(ByRef arSentence As Language.Sentence)
+    Public Sub AskQuestionCreateFactTypeReading(ByRef arSentence As Language.Sentence)
 
         Dim lrQuestion As tQuestion
         Dim lrPlan As Brain.Plan
@@ -3230,13 +3230,13 @@ Public Class tBrain
         lrPlan = New Brain.Plan
         lrStep = New Brain.Step(pcenumActionType.CreateFactTypeReading, True, pcenumActionType.None, Nothing)
 
-        lrQuestion = New tQuestion("Would you like me to create a Fact Type Reading for '" & arSentence.Sentence & "'?", _
-                                 pcenumQuestionType.CreateFactTypeReading, _
-                                 True, _
-                                 Nothing, _
-                                 arSentence, _
-                                 Nothing, _
-                                 lrPlan, _
+        lrQuestion = New tQuestion("Would you like me to create a Fact Type Reading for '" & arSentence.Sentence & "'?",
+                                 pcenumQuestionType.CreateFactTypeReading,
+                                 True,
+                                 Nothing,
+                                 arSentence,
+                                 Nothing,
+                                 lrPlan,
                                  lrStep)
 
         If Me.QuestionHasBeenRaised(lrQuestion) Then

@@ -37,6 +37,18 @@
 
                 Return lrTestRecordset
 
+
+            Catch appex As ApplicationException
+
+                If appex.InnerException Is Nothing Then
+                    lrRecordset.ErrorString = appex.Message
+                    lrRecordset.Query = lsSQLQuery
+                Else
+                    lrRecordset.ErrorString = appex.InnerException.Message
+                End If
+                lrRecordset.ApplicationException = appex
+                Return lrRecordset
+
             Catch ex As Exception
                 If ex.InnerException Is Nothing Then
                     lrRecordset.ErrorString = ex.Message

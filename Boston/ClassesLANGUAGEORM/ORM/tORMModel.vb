@@ -1850,6 +1850,27 @@ Namespace FBM
             Next
         End Function
 
+        Public Function getFactTypeByModelObjects(ByVal aarModelObject As List(Of FBM.ModelObject)) As List(Of FBM.FactType)
+
+            Try
+                Dim larFactType = From FactType In Me.FactType
+                                  From Role In FactType.RoleGroup
+                                  Where FactType.RoleGroup.Count = aarModelObject.Count
+                                  Where aarModelObject.Contains(Role.JoinedORMObject)
+                                  Select FactType
+
+                'From ModelObject In aarModelObject
+                'Where Role.JoinedORMObject.Id = ModelObject.Id
+
+                Return larFactType.ToList
+
+            Catch ex As Exception
+                Debugger.Break()
+                Return New List(Of FactType)
+            End Try
+
+        End Function
+
         ''' <summary>
         ''' 202007-VM-Created
         ''' Returns a FactType, else Nothing, if the list of ModelObjects and FactTypeReading match.

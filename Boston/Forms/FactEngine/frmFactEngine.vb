@@ -710,12 +710,27 @@ Public Class frmFactEngine
                     If lrRecordset.ApplicationException IsNot Nothing Then
                         'Put code here to engage the VirtualAnalyst to create a FactTypeReading
                         '2021-VM-Use the following type of code for adding new FactTypeReadings
-                        'Call Me.loadVirtualAnalyst()
-                        'Call prApplication.Brain.processFactTypeReadingStatement
+                        If lrRecordset.ApplicationException.Data.Contains("QueryEdgeGetFBMFactTypeFail") Then
+                            Dim lrQueryEdge As FactEngine.QueryEdge
+                            lrQueryEdge = lrRecordset.ApplicationException.Data.Item("QueryEdgeGetFBMFactTypeFail")
 
-                        'ex.Data.Add("CustomerId", custId)
-                        'Throw New Exception("Failure in processing Customer", ex)
-                        'Brain.AskQuestionCreateFactTypeReading(ByRef arSentence As Language.Sentence)
+                            Dim larModelObject As New List(Of FBM.ModelObject)
+                            larModelObject.Add(lrQueryEdge.BaseNode.FBMModelObject)
+                            larModelObject.Add(lrQueryEdge.TargetNode.FBMModelObject)
+
+                            If prApplication.WorkingModel.getFactTypeByModelObjects(larModelObject).Count = 1 Then
+                                Dim lsSentence As String = lrQueryEdge.BaseNode.Name & " " & lrQueryEdge.Predicate & " " & lrQueryEdge.TargetNode.Name
+                                Dim lrSentence As New Language.Sentence(lsSentence)
+                                Dim lrPredicatePart As New Language.PredicatePart(lrQueryEdge.Predicate)
+                                lrSentence.PredicatePart.Add(lrPredicatePart)
+
+                                Call Me.loadVirtualAnalyst()
+                                'Call prApplication.Brain.processFactTypeReadingStatement
+
+                                Call prApplication.Brain.AskQuestionCreateFactTypeReading(lrSentence)
+                            End If
+                        End If
+
                     End If
                 Else
                     Select Case lrRecordset.StatementType
@@ -958,13 +973,16 @@ Public Class frmFactEngine
 
     End Sub
 
-    Private Sub loadVirtualAnalyst()
+    Private Function loadVirtualAnalyst() As frmToolboxBrainBox
         prApplication.WorkingPage = Nothing
         frmMain.Cursor = Cursors.WaitCursor
-        Call frmMain.loadToolboxRichmondBrainBox(Nothing, Me.DockPanel.ActivePane)
+        Dim lrFrmToolboxBrainBox As frmToolboxBrainBox
+        lrFrmToolboxBrainBox = frmMain.loadToolboxRichmondBrainBox(Nothing, Me.DockPanel.ActivePane)
         frmMain.Cursor = Cursors.Default
         Me.TextBoxInput.Focus()
-    End Sub
+
+        Return lrFrmToolboxBrainBox
+    End Function
 
     Private Sub Application_WorkingModelChanged() Handles Application.WorkingModelChanged
 

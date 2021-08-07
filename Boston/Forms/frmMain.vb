@@ -1939,7 +1939,8 @@ Public Class frmMain
     End Function
 
 
-    Sub loadToolboxRichmondBrainBox(ByRef arPage As FBM.Page, ByVal aoActivePane As WeifenLuo.WinFormsUI.Docking.DockPane)
+    Public Function loadToolboxRichmondBrainBox(ByRef arPage As FBM.Page,
+                                    ByVal aoActivePane As WeifenLuo.WinFormsUI.Docking.DockPane) As frmToolboxBrainBox
 
         Dim child As New frmToolboxBrainBox
 
@@ -1963,7 +1964,7 @@ Public Class frmMain
                     Dim lrDockpanel As WeifenLuo.WinFormsUI.Docking.DockPanel
 
                     prApplication.ToolboxForms(0).Focus()
-                    lrPane = prApplication.ToolboxForms(0).Pane                    
+                    lrPane = prApplication.ToolboxForms(0).Pane
                     lrDockpanel = prApplication.ToolboxForms(0).DockPanel
                     child.Show(lrPane, WeifenLuo.WinFormsUI.Docking.DockAlignment.Right, 0.3)
                     child.DockTo(lrPane, DockStyle.Fill, 0)
@@ -1979,6 +1980,8 @@ Public Class frmMain
                 End If
             End If
 
+            Return child
+
         Catch ex As Exception
             Dim lsMessage1 As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
@@ -1986,11 +1989,13 @@ Public Class frmMain
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
             prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+
+            Return Nothing
         End Try
 
-    End Sub
+    End Function
 
-    Sub LoadToolbox()
+    Public Sub LoadToolbox()
 
         Dim child As New frmToolbox
 
