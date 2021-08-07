@@ -1,6 +1,8 @@
 ﻿Imports System.Reflection
 
 Namespace FactEngine
+
+    <Serializable>
     Public Class QueryEdge
 
         Public Id As String = System.Guid.NewGuid.ToString

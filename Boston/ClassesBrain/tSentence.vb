@@ -80,6 +80,19 @@ Namespace Language
 
         End Sub
 
+        Public Sub addResolvedNounsByFBMModelObjectList(ByRef aarModelObject As List(Of FBM.ModelObject))
+
+            Try
+                For Each lrModelObject In aarModelObject
+                    Dim lrWordResolved = New Language.WordResolved(lrModelObject.Id, pcenumWordSense.Noun)
+                    Me.WordListResolved.Add(lrWordResolved)
+                Next
+            Catch ex As Exception
+                Debugger.Break()
+            End Try
+        End Sub
+
+
         Public Sub ResetSentence()
 
             Dim lasWord() As String

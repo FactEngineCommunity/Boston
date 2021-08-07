@@ -723,11 +723,12 @@ Public Class frmFactEngine
                                 Dim lrSentence As New Language.Sentence(lsSentence)
                                 Dim lrPredicatePart As New Language.PredicatePart(lrQueryEdge.Predicate)
                                 lrSentence.PredicatePart.Add(lrPredicatePart)
-
+                                lrSentence.addResolvedNounsByFBMModelObjectList(larModelObject)
                                 Call Me.loadVirtualAnalyst()
                                 'Call prApplication.Brain.processFactTypeReadingStatement
 
                                 Call prApplication.Brain.AskQuestionCreateFactTypeReading(lrSentence)
+                                Call prApplication.Brain.invokeTimeoutStart()
                             End If
                         End If
 

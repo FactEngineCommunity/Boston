@@ -91,6 +91,12 @@ Namespace FBM
         ''' <remarks></remarks>
         Public LinkFactTypeRole As FBM.Role
 
+        Public ReadOnly Property ModelObjects() As List(Of FBM.ModelObject)
+            Get
+                Return Me.RoleGroup.Select(Function(x) x.JoinedORMObject).ToList
+            End Get
+        End Property
+
         <XmlAttribute()>
         Public IsSubtypeRelationshipFactType As Boolean = False
 

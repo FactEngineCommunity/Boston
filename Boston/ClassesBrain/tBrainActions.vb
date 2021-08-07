@@ -489,6 +489,9 @@ Partial Public Class tBrain
             Next
 
             lrFactType = Me.Model.FactType.Find(AddressOf lrFactType.EqualsByModelElements)
+            For Each lrResolvedWord In Me.CurrentQuestion.sentence.WordListResolved.FindAll(Function(x) x.Sense = pcenumWordSense.Noun)
+                larRole.Add(lrFactType.RoleGroup.Find(Function(x) x.JoinedORMObject.Id = lrResolvedWord.Word))
+            Next
 
             Dim lrFactTypeReading As New FBM.FactTypeReading(lrFactType, larRole, Me.CurrentQuestion.sentence)
 

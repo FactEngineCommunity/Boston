@@ -1853,14 +1853,12 @@ Namespace FBM
         Public Function getFactTypeByModelObjects(ByVal aarModelObject As List(Of FBM.ModelObject)) As List(Of FBM.FactType)
 
             Try
-                Dim larFactType = From FactType In Me.FactType
-                                  From Role In FactType.RoleGroup
-                                  Where FactType.RoleGroup.Count = aarModelObject.Count
-                                  Where aarModelObject.Contains(Role.JoinedORMObject)
-                                  Select FactType
+                Dim [set] = New HashSet(Of FBM.ModelObject)(aarModelObject)
 
-                'From ModelObject In aarModelObject
-                'Where Role.JoinedORMObject.Id = ModelObject.Id
+                Dim larFactType = From FactType In Me.FactType
+                                  Where FactType.RoleGroup.Count = aarModelObject.Count
+                                  Where [set].SetEquals(FactType.ModelObjects)
+                                  Select FactType
 
                 Return larFactType.ToList
 

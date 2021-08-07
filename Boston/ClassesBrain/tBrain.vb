@@ -197,6 +197,15 @@ Public Class tBrain
 
     End Sub
 
+    Public Sub invokeTimeoutStart()
+
+        If Me.Question.Count > 0 Then
+            Me.Timeout.Start() 'Threading jumps to HOUSEKEEPING.OutOfTimeout
+        End If
+
+    End Sub
+
+
 #Region "INPUT"
     Public Sub receive_data(ByVal as_data As String)
 
