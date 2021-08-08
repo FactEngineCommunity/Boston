@@ -374,6 +374,12 @@ Namespace FactEngine
 
                                         lrCandidateBaseNode = New FactEngine.QueryNode(lrPredicatePart.Role.JoinedORMObject, lrQueryEdge)
 
+                                        If Me.QueryGraph.Model.hasCountFactTypesBetweenModelElements(arBaseNode.FBMModelObject, lrCandidateBaseNode.FBMModelObject) = 0 Then
+                                            If Me.QueryGraph.Model.hasCountFactTypesBetweenModelElements(arPreviousTargetNode.FBMModelObject, lrCandidateBaseNode.FBMModelObject) = 1 Then
+                                                arBaseNode = arPreviousTargetNode
+                                            End If
+                                        End If
+
                                         If Me.QueryGraph.Model.hasCountFactTypesBetweenModelElements(arBaseNode.FBMModelObject, lrCandidateBaseNode.FBMModelObject) = 1 Then
                                             lrQueryEdge.BaseNode = lrCandidateBaseNode
                                             lrQueryEdge.TargetNode = New FactEngine.QueryNode(arTargetNode.FBMModelObject, lrQueryEdge, True)

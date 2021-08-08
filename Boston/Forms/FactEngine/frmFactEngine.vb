@@ -963,6 +963,8 @@ Public Class frmFactEngine
                 End If
             End With
 
+            Call Me.hideAutoComplete()
+
         Catch ex As Exception
             Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
