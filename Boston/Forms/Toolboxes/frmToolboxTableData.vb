@@ -228,7 +228,7 @@ Public Class frmToolboxTableData
                         lsSQLQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsText, "'", "")
                         liInd += 1
                     Next
-                    Dim lrRecordset = Me.mrModel.DatabaseConnection.GO(lsSQLQuery)
+                    Dim lrRecordset = Me.mrModel.DatabaseConnection.GONonQuery(lsSQLQuery)
                     '=========================================================================
                     'Remove the Fact
                     Me.mrRecordset.Facts.RemoveAt(Me.DataGridView.SelectedRows(0).Index)

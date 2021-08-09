@@ -1488,6 +1488,8 @@ Namespace FBM
                             If Me.EntityType.HasSimpleReferenceScheme Then
                                 Me.EntityType.ReferenceModeValueType.SetDataTypePrecision(Me._DataTypePrecision)
                             End If
+                        Case Is = "DBName"
+                            Call Me.EntityType.SetDBName(Me.DBName)
                         Case Is = "DerivationText"
                             Call Me.EntityType.SetDerivationText(Me.DerivationText, True)
                         Case Is = "IsDatabaseReservedWord"
@@ -2557,6 +2559,12 @@ Namespace FBM
                 Catch ex As Exception
                 End Try
             End If
+        End Sub
+
+        Private Sub _EntityType_DBNameChanged(asDBName As String) Handles _EntityType.DBNameChanged
+
+            Me._DBName = asDBName
+
         End Sub
     End Class
 

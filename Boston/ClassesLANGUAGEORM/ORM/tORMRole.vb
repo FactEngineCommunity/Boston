@@ -1856,53 +1856,90 @@ Namespace FBM
                     If lrOriginallyJoinedTable IsNot Nothing Then
 #Region "RDS Processing"
                         If Me.HasInternalUniquenessConstraint And (Me.FactType.IsManyTo1BinaryFactType Or Me.FactType.Is1To1BinaryFactType) Then
-                            '=========================================================
-                            'PSEUDOCODE
-                            '  * Create the new Column on the newly joined Table
-                            '  * Get the Original Relation
-                            '  * Remove the OriginalRelation from the Original Table                        
-                            '  * Reassign the Role to the newly joined ModelObject
-                            '  * Create the New Relation and add to New Table
-                            '  * Remove the Original Column
-                            '---------------------------------------------------------
-                            Dim lrNewTable = arNewJoinedModelObject.getCorrespondingRDSTable
+                            Select Case arNewJoinedModelObject.GetType
+                                Case Is = GetType(FBM.ValueType)
 
-                            Dim larCoveredRoles As New List(Of FBM.Role)
-                            Dim larDownstreamActiveRoles = Me.getDownstreamRoleActiveRoles(larCoveredRoles) 'Returns all Roles joined ObjectifiedFactTypes and their Roles' JoinedORMObjects (recursively).
+                                    Dim lrOriginalJoinedORMObject = Me.JoinedORMObject
 
-                            'Create the new Column/s in the newly joined Table
-                            Dim lrNewColumn As New RDS.Column
-                            For Each lrActiveRole In larDownstreamActiveRoles
-                                'Dim lrOriginalColumn = larOriginalColumn.Find(Function(x) x.ActiveRole Is lrActiveRole)
-                                lrNewColumn = New RDS.Column(lrNewTable,
-                                                         lrActiveRole.JoinedORMObject.Id,
-                                                         Me,
-                                                         lrActiveRole,
-                                                         Me.Mandatory)
-                                If lrNewTable.Column.Find(Function(x) x.Role.Id = Me.Id) Is Nothing Then
-                                    lrNewTable.addColumn(lrNewColumn)
-                                End If
-                            Next
+                                    Me.JoinedORMObject = arNewJoinedModelObject
+                                    Me.makeDirty()
 
-                            'Remove the Original Relation
-                            If larOriginalColumn(0).Relation.Count > 0 Then
-                                Dim lrRelation = larOriginalColumn(0).Relation(0)
-                                Call Me.Model.RDS.removeRelation(lrRelation)
-                            End If
+                                    Dim lrOtherRole As FBM.Role = Me.FactType.GetOtherRoleOfBinaryFactType(Me.Id)
+                                    Dim lrTable As RDS.Table = lrOtherRole.JoinedORMObject.getCorrespondingRDSTable
+                                    Dim larColumn = From Column In lrTable.Column
+                                                    Where Column.ActiveRole Is Me
+                                                    Select Column
 
-                            'Reassign the Role
-                            Me.JoinedORMObject = arNewJoinedModelObject
+                                    Dim lrColumn As RDS.Column = larColumn.First
 
-                            Me.makeDirty()
+                                    Dim lsColumnName As String = lrTable.createUniqueColumnName(lrColumn, Me.JoinedORMObject.Id, 0)
+
+                                    Call lrColumn.setName(lsColumnName)
+
+                                    '-----------------------------------------------------------------------------------------------
+                                    'Pages
+                                    Dim larPage = From Page In Me.Model.Page
+                                                  From FactTypeInstance In Page.FactTypeInstance
+                                                  Where FactTypeInstance.Id = Me.FactType.Id
+                                                  Select Page
+
+                                    For Each lrPage In larPage
+                                        Dim asNewJoinedModelObjectId As String = arNewJoinedModelObject.Id
+                                        If lrPage.ValueTypeInstance.FindAll(Function(x) x.Id = asNewJoinedModelObjectId).Count = 0 Then
+                                            lrPage.DropValueTypeAtPoint(arNewJoinedModelObject, New PointF(10, 10), True)
+                                        End If
+                                    Next
+
+                                Case Else
+                                    '=========================================================
+                                    'PSEUDOCODE
+                                    '  * Create the new Column on the newly joined Table
+                                    '  * Get the Original Relation
+                                    '  * Remove the OriginalRelation from the Original Table                        
+                                    '  * Reassign the Role to the newly joined ModelObject
+                                    '  * Create the New Relation and add to New Table
+                                    '  * Remove the Original Column
+                                    '---------------------------------------------------------
+
+                                    Dim lrNewTable = arNewJoinedModelObject.getCorrespondingRDSTable
+
+                                    Dim larCoveredRoles As New List(Of FBM.Role)
+                                    Dim larDownstreamActiveRoles = Me.getDownstreamRoleActiveRoles(larCoveredRoles) 'Returns all Roles joined ObjectifiedFactTypes and their Roles' JoinedORMObjects (recursively).
+
+                                    'Create the new Column/s in the newly joined Table
+                                    Dim lrNewColumn As New RDS.Column
+                                    For Each lrActiveRole In larDownstreamActiveRoles
+                                        'Dim lrOriginalColumn = larOriginalColumn.Find(Function(x) x.ActiveRole Is lrActiveRole)
+                                        lrNewColumn = New RDS.Column(lrNewTable,
+                                                                 lrActiveRole.JoinedORMObject.Id,
+                                                                 Me,
+                                                                 lrActiveRole,
+                                                                 Me.Mandatory)
+                                        If lrNewTable.Column.Find(Function(x) x.Role.Id = Me.Id) Is Nothing Then
+                                            lrNewTable.addColumn(lrNewColumn)
+                                        End If
+                                    Next
+
+                                    'Remove the Original Relation
+                                    If larOriginalColumn(0).Relation.Count > 0 Then
+                                        Dim lrRelation = larOriginalColumn(0).Relation(0)
+                                        Call Me.Model.RDS.removeRelation(lrRelation)
+                                    End If
+
+                                    'Reassign the Role
+                                    Me.JoinedORMObject = arNewJoinedModelObject
+
+                                    Me.makeDirty()
 
 
-                            'Create a Relation for the reassigned Role
-                            Call Me.Model.generateRelationForReassignedRole(Me)
+                                    'Create a Relation for the reassigned Role
+                                    Call Me.Model.generateRelationForReassignedRole(Me)
 
-                            'Remove the orginal Column from the Originally Joined Table
-                            For Each lrColumn In larOriginalColumn
-                                Call lrOriginallyJoinedTable.removeColumn(lrColumn)
-                            Next
+                                    'Remove the orginal Column from the Originally Joined Table
+                                    For Each lrColumn In larOriginalColumn
+                                        Call lrOriginallyJoinedTable.removeColumn(lrColumn)
+                                    Next
+                            End Select
 
                         Else
                             '==========================================================================

@@ -64,6 +64,27 @@ Namespace FBM
             End Set
         End Property
 
+        <XmlAttribute()>
+        <System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Public _DBName As String = ""
+        <XmlIgnore()>
+        <CategoryAttribute("DBName"),
+        DefaultValueAttribute(GetType(String), ""),
+        DescriptionAttribute("A unique Name for the model object in the underlying target database.")>
+        Public Overridable Property DBName() As String
+            Get
+                Return _DBName
+            End Get
+            Set(ByVal value As String)
+                '------------------------------------------------------
+                'See Me.SetName for management of Me.Id and Me.Symbol
+                '------------------------------------------------------
+                _DBName = value
+            End Set
+        End Property
+
+
         ''' <summary>
         ''' FactEngine specific. Used to change names like 'Order' to '[Order]'. See Me.DatabaseName
         ''' </summary>
@@ -71,10 +92,22 @@ Namespace FBM
 
         Public ReadOnly Property DatabaseName As String
             Get
+                Dim lsName As String
                 If Me.IsDatabaseReservedWord Then
-                    Return "[" & Me.Id & "]"
+                    lsName = "["
+                    If Me.DBName = "" Then
+                        lsName &= Me.DBName & "]"
+                    Else
+                        lsName &= Me.Id & "]"
+                    End If
+                    Return lsName
                 Else
-                    Return Me.Id
+                    If Me.DBName = "" Then
+                        Return Me.Id
+                    Else
+                        Return Me.DBName
+                    End If
+
                 End If
             End Get
         End Property
@@ -280,6 +313,7 @@ Namespace FBM
         Public PostboundReadingText As String = ""
 
         Public Event ConceptSwitched(ByRef arConcept As FBM.Concept)
+        Public Event DBNameChanged(ByVal asDBName As String)
         Public Event LongDescriptionChanged(ByVal asLongDescription As String)
         Public Event NameChanged(ByVal asNewName As String)
         Public Event ShortDescriptionChanged(ByVal asShortDescription As String)
@@ -915,6 +949,25 @@ Namespace FBM
             Me.isDirty = True
             Me.Model.MakeDirty(False, False)
         End Sub
+
+        Public Sub SetDBName(ByVal asDBName As String)
+
+            Dim lrDictionaryEntry = Me.Model.ModelDictionary.Find(Function(x) x.Symbol = Me.Id)
+
+            If lrDictionaryEntry IsNot Nothing Then
+                lrDictionaryEntry.DBName = asDBName
+                lrDictionaryEntry.isDirty = True
+                Call lrDictionaryEntry.Save()
+            End If
+
+            Me.DBName = asDBName
+
+            RaiseEvent DBNameChanged(asDBName)
+
+            Me.isDirty = True
+            Me.Model.MakeDirty(False, False)
+        End Sub
+
 
         Public Overridable Function setName(ByVal asNewName As String, Optional ByVal abBroadcastInterfaceEvent As Boolean = True) As Boolean
             'See inherited Classes.

@@ -23,6 +23,7 @@ Namespace TableModelDictionary
                 lsSQLQuery &= "," & ar_dictionary_entry.isRoleConstraint
                 lsSQLQuery &= "," & ar_dictionary_entry.isModelNote
                 lsSQLQuery &= "," & ar_dictionary_entry.isGeneralConcept
+                lsSQLQuery &= ",'" & Trim(ar_dictionary_entry.DBName) & "'"
                 lsSQLQuery &= ")"
 
                 pdbConnection.Execute(lsSQLQuery)
@@ -245,6 +246,7 @@ Namespace TableModelDictionary
 
                         lrDictionaryEntry.ShortDescription = Trim(Viev.NullVal(lREcordset("ShortDescription").Value, ""))
                         lrDictionaryEntry.LongDescription = Trim(Viev.NullVal(lREcordset("LongDescription").Value, ""))
+                        lrDictionaryEntry.DBName = Trim(NullVal(lREcordset("DBName").Value, ""))
 
                         '--------------------------------------------------------------------------
                         'Create a KL Identity Letter for the Concept in the dictionary, in memory
@@ -262,8 +264,12 @@ Namespace TableModelDictionary
 
                 lREcordset.Close()
 
+                Return ar_model.ModelDictionary
+
             Catch ex As Exception
                 MsgBox("Error: GetConceptsByModel: " & ex.Message)
+
+                Return New List(Of FBM.DictionaryEntry)
             End Try
 
         End Function
@@ -385,6 +391,7 @@ Namespace TableModelDictionary
                 lsSQLQuery &= "   ,IsGeneralConcept = " & arModelDictionaryEntry.isGeneralConcept
                 lsSQLQuery &= "       ,StartDate = Now"
                 lsSQLQuery &= "       ,EndDate = #31/12/9999#"
+                lsSQLQuery &= "   ,DBName = '" & Trim(arModelDictionaryEntry.DBName) & "'"
                 lsSQLQuery &= " WHERE ModelId = '" & Trim(arModelDictionaryEntry.Model.ModelId) & "'"
                 lsSQLQuery &= "   AND Symbol = '" & Trim(Replace(arModelDictionaryEntry.Symbol, "'", "`")) & "'"
 

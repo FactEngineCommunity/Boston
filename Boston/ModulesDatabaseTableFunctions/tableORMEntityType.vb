@@ -341,6 +341,7 @@ Namespace TableEntityType
                         End If
 
                         lrEntityType.Concept = lrDictionaryEntry.Concept
+                        lrEntityType.DBName = lrDictionaryEntry.DBName
 
 
                         getEntityTypesByModel.Add(lrEntityType)

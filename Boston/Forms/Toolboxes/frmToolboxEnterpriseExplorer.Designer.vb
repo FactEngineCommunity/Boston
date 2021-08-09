@@ -209,6 +209,7 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.ImageList.Images.SetKeyName(8, "SQLiteLogo.png")
         Me.ImageList.Images.SetKeyName(9, "SQLServerLogo.png")
         Me.ImageList.Images.SetKeyName(10, "databaseODBC.jpg")
+        Me.ImageList.Images.SetKeyName(11, "PostgeSQL.png")
         '
         'CircularProgressBar
         '
@@ -295,7 +296,7 @@ Partial Class frmToolboxEnterpriseExplorer
         '
         Me.ContextMenuStrip_ORMModel.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ViewModelDictionaryToolStripMenuItem, Me.ViewGlossaryToolStripMenuItem, Me.GenerateDocumentationToolStripMenuItem, Me.CodeGenerationToolStripMenuItem, Me.FactEngineToolStripMenuItem, Me.ToolStripSeparator7, Me.AddPageToolStripMenuItem1, Me.ToolStripMenuItemPastePage, Me.ToolStripMenuItemLanguage, Me.ToolStripSeparator1, Me.EmptyModelToolStripMenuItem, Me.HideToolStripMenuItem, Me.HideAllotherModelsToolStripMenuItem, Me.RenameToolStripMenuItem, Me.DeleteModelToolStripMenuItem, Me.ToolStripSeparator3, Me.ToolStripMenuItemModelConfiguration, Me.ToolStripSeparator5, Me.ImportExportToolStripMenuItem, Me.ToolStripMenuItemFixModelErrors})
         Me.ContextMenuStrip_ORMModel.Name = "ContextMenuStrip_ORMModel"
-        Me.ContextMenuStrip_ORMModel.Size = New System.Drawing.Size(208, 402)
+        Me.ContextMenuStrip_ORMModel.Size = New System.Drawing.Size(208, 380)
         '
         'ViewModelDictionaryToolStripMenuItem
         '

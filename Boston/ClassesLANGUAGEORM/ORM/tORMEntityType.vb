@@ -829,6 +829,7 @@ Namespace FBM
                     lrEntityTypeInstance.IsIndependent = .IsIndependent
                     lrEntityTypeInstance.IsPersonal = .IsPersonal
                     lrEntityTypeInstance.IsAbsorbed = .IsAbsorbed
+                    lrEntityTypeInstance.DBName = .DBName
 
                     lrEntityTypeInstance.IsObjectifyingEntityType = .IsObjectifyingEntityType
 

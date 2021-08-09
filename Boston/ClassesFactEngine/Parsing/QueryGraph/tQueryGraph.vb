@@ -103,7 +103,7 @@
                             End If
 
                         Else
-                            lsSelectClause &= "[" & lrProjectColumn.Table.DatabaseName & Viev.NullVal(lrProjectColumn.TemporaryAlias, "") & "]." & lrProjectColumn.Name
+                            lsSelectClause &= lrProjectColumn.Table.DatabaseName & Viev.NullVal(lrProjectColumn.TemporaryAlias, "") & "." & lrProjectColumn.Name
                         End If
                         If liInd < larProjectionColumn.Count Then lsSelectClause &= ","
                         liInd += 1
@@ -200,7 +200,7 @@
 
                 For Each lrQueryNode In larFromNodes
                     If lrQueryNode.Alias Is Nothing Then
-                        lsSQLQuery &= "[" & lrQueryNode.RDSTable.Name & "]" 'FBMModelObject.getCorrespondingRDSTable.Name
+                        lsSQLQuery &= lrQueryNode.RDSTable.DatabaseName  'FBMModelObject.getCorrespondingRDSTable.Name
                     Else
                         'FBMModelObject.getCorrespondingRDSTable.Name
                         lsSQLQuery &= lrQueryNode.Name & " " & lrQueryNode.Name & Viev.NullVal(lrQueryNode.Alias, "")

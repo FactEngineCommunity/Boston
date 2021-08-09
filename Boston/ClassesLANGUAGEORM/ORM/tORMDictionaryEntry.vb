@@ -93,6 +93,9 @@ Namespace FBM
             End Set
         End Property
 
+        <XmlAttribute()>
+        Public DBName As String = ""
+
         <XmlIgnore()>
         Public KLIdentityLetter As String = ""
 

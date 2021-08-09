@@ -244,6 +244,9 @@ Public Class frmToolboxEnterpriseExplorer
                 Case Is = pcenumDatabaseType.ODBC
                     loNode.ImageIndex = 10
                     loNode.SelectedImageIndex = 10
+                Case Is = pcenumDatabaseType.PostgreSQL
+                    loNode.ImageIndex = 11
+                    loNode.SelectedImageIndex = 11
             End Select
         End If
 

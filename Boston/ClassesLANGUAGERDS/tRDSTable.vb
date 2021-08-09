@@ -18,9 +18,9 @@ Namespace RDS
         Public ReadOnly Property DatabaseName As String
             Get
                 If Me.FBMModelElement.IsDatabaseReservedWord Then
-                    Return "[" & Me.FBMModelElement.Id & "]"
+                    Return "[" & Me.FBMModelElement.DatabaseName & "]"
                 Else
-                    Return Me.FBMModelElement.Id
+                    Return Me.FBMModelElement.DatabaseName
                 End If
 
             End Get

@@ -95,6 +95,7 @@ Namespace TableEntityTypeInstance
                         lrEntityTypeInstance.IsAbsorbed = CBool(lREcordset("IsAbsorbed").Value)
                         lrEntityTypeInstance.IsDerived = CBool(lREcordset("IsDerived").Value)
                         lrEntityTypeInstance.DerivationText = lrEntityTypeInstance.EntityType.DerivationText
+                        lrEntityTypeInstance.DBName = lrEntityTypeInstance.EntityType.DBName
 
                         lrEntityTypeInstance.X = lREcordset("x").Value
                         lrEntityTypeInstance.Y = lREcordset("y").Value
