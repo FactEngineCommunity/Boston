@@ -221,6 +221,7 @@
                             lrQueryEdge.InjectsQueryEdge.WhichClauseType = FactEngine.Constants.pcenumWhichClauseType.IsPredicateNodePropertyIdentification
                         Else
                             lrQueryEdge.InjectsQueryEdge.WhichClauseType = FactEngine.Constants.pcenumWhichClauseType.ThatPredicateWhichModelElement
+                            lrQueryEdge.IsProjectColumn = True
                         End If
                         lrQueryGraph.QueryEdges.Add(lrQueryEdge.InjectsQueryEdge)
                         lrQueryGraph.Nodes.AddUnique(lrQueryEdge.InjectsQueryEdge.BaseNode)

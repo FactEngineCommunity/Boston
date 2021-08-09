@@ -340,6 +340,7 @@ Namespace FactEngine
 
                             larFactType = larAltFactType.ToList
                         End If
+                        Dim lrBaseNode As FactEngine.QueryNode = Nothing
 
                         If larFactType.Count > 1 Then
                             lsMessage = "There is more than one Fact Type Reading that is or starts, '" & arBaseNode.FBMModelObject.Id & " " & asPredicate & " " & arTargetNode.Name & "'"
@@ -357,12 +358,41 @@ Namespace FactEngine
                                 '  [Model].getFactTypeReadingByPartialPredicateReading                                
                                 Dim larPredicatePart As New List(Of FBM.PredicatePart)
                                 lrFactTypeReading = Me.QueryGraph.Model.getFactTypeReadingByPartialPredicateReading(asPredicate, Me.TargetNode.Name, larPredicatePart)
+
+                                Dim lrFactType As FBM.FactType
+                                lrFactType = Me.QueryGraph.Model.getFactTypeByPredicateFarSideModelElement(asPredicate, arTargetNode.FBMModelObject, True)
+
+                                If lrFactType IsNot Nothing Then
+                                    Dim lrModelElement As FBM.ModelObject = arTargetNode.FBMModelObject
+                                    Dim larFactTypeReading = From FactTypeReading In lrFactType.FactTypeReading
+                                                             Where FactTypeReading.PredicatePart(1).Role.JoinedORMObject.Id = lrModelElement.Id
+                                                             Select FactTypeReading
+
+                                    lrFactTypeReading = larFactTypeReading.First
+                                    Me.FBMFactType = lrFactTypeReading.FactType
+                                    Me.FBMFactTypeReading = lrFactTypeReading
+                                    Me.FBMPredicatePart = Me.FBMFactTypeReading.PredicatePart(0)
+                                    lrBaseNode = Me.QueryGraph.FindPreviousQueryEdgeBaseNodeByModelElementName(Me.FBMPredicatePart.Role.JoinedORMObject.Id)
+                                    If lrBaseNode IsNot Nothing Then
+                                        Me.BaseNode = lrBaseNode
+                                    Else
+                                        Me.FBMFactType = Nothing
+                                        Me.FBMFactTypeReading = Nothing
+                                        Me.FBMPredicatePart = Nothing
+                                        lrFactTypeReading = Nothing
+                                    End If
+                                End If
+                                lrBaseNode = Me.QueryGraph.FindPreviousQueryEdgeBaseNodeByModelElementName(Me.FBMPredicatePart.Role.JoinedORMObject.Id)
+                                If lrBaseNode IsNot Nothing Then
+                                    Me.BaseNode = lrBaseNode
+                                End If
+
                                 If lrFactTypeReading Is Nothing Then
                                     'See if it is a ReifiedFactType LinkFactType predicate requring an InjectedQueryEdge
                                     Dim lrPredicatePart As FBM.PredicatePart
                                     Dim lrQueryEdge As New FactEngine.QueryEdge
                                     lrQueryEdge.QueryGraph = Me.QueryGraph
-                                    Dim lrFactType As FBM.FactType = Me.QueryGraph.Model.getFactTypeByPredicateFarSideModelElement(asPredicate, arTargetNode.FBMModelObject)
+                                    lrFactType = Me.QueryGraph.Model.getFactTypeByPredicateFarSideModelElement(asPredicate, arTargetNode.FBMModelObject)
                                     If lrFactType Is Nothing Then
                                         lrFactType = Me.QueryGraph.Model.getFactTypeByPredicateFarSideModelElement(asPredicate, arTargetNode.FBMModelObject, True)
                                     End If
@@ -418,18 +448,18 @@ Namespace FactEngine
                                             End If
 
                                             Me.InjectsQueryEdge = lrQueryEdge
-                                            Else
-                                                Throw New Exception("There is not Fact Type, '" & arBaseNode.FBMModelObject.Id & " " & asPredicate & " " & arTargetNode.FBMModelObject.Id & "', in the Model.")
+                                        Else
+                                            Throw New Exception("There is not Fact Type, '" & arBaseNode.FBMModelObject.Id & " " & asPredicate & " " & arTargetNode.FBMModelObject.Id & "', in the Model.")
                                         End If
                                     Else
                                         Throw New Exception("There is not Fact Type, '" & arBaseNode.FBMModelObject.Id & " " & asPredicate & " " & arTargetNode.FBMModelObject.Id & "', in the Model.")
                                     End If
-                                Else
+                                ElseIf Me.FBMFactType Is Nothing Then
                                     Me.FBMFactType = lrFactTypeReading.FactType
                                     Me.FBMPredicatePart = larPredicatePart(0)
                                     Me.FBMFactTypeReading = Me.FBMPredicatePart.FactTypeReading
                                     'Set the new BaseNode because the original one was fruitless.
-                                    Dim lrBaseNode = Me.QueryGraph.FindPreviousQueryEdgeBaseNodeByModelElementName(Me.FBMPredicatePart.Role.JoinedORMObject.Id)
+                                    lrBaseNode = Me.QueryGraph.FindPreviousQueryEdgeBaseNodeByModelElementName(Me.FBMPredicatePart.Role.JoinedORMObject.Id)
                                     If lrBaseNode IsNot Nothing Then
                                         Me.BaseNode = lrBaseNode
                                     Else
