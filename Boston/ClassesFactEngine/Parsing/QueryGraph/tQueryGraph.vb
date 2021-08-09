@@ -552,6 +552,9 @@
                 larConditionalQueryEdges.RemoveAll(Function(x) x.TargetNode.IsExcludedConditional)
 
                 If larWhereEdges.Count = 0 And larConditionalQueryEdges.Count = 0 And (Not Me.HeadNode.HasIdentifier) Then
+                    If NullVal(My.Settings.FactEngineDefaultQueryResultLimit, 0) > 0 Then
+                        lsSQLQuery &= vbCrLf & "LIMIT " & My.Settings.FactEngineDefaultQueryResultLimit
+                    End If
                     Return lsSQLQuery
                 End If
 
@@ -648,18 +651,18 @@
                                             Case = pcenumConceptType.ValueType
                                                 'Nothing to do here
                                             Case Else
-                                                lsSQLQuery &= "[" & lrRelation.OriginTable.Name & Viev.NullVal(lrQueryEdge.Alias, "") & "]." & lrRelation.OriginColumns(liColumnCounter).Name & " = "
+                                                lsSQLQuery &= lrRelation.OriginTable.DatabaseName & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrRelation.OriginColumns(liColumnCounter).Name & " = "
                                                 Dim lrTargetColumn = lrRelation.DestinationColumns.Find(Function(x) x.ActiveRole Is lrRelation.OriginColumns(liColumnCounter).ActiveRole)
-                                                lsSQLQuery &= "[" & lrRelation.DestinationTable.Name & Viev.NullVal(lrQueryEdge.BaseNode.Alias, "") & "]." & lrTargetColumn.Name & vbCrLf
+                                                lsSQLQuery &= lrRelation.DestinationTable.DatabaseName & Viev.NullVal(lrQueryEdge.BaseNode.Alias, "") & "." & lrTargetColumn.Name & vbCrLf
                                         End Select
                                     Case Else
                                         Select Case lrQueryEdge.TargetNode.FBMModelObject.ConceptType
                                             Case = pcenumConceptType.ValueType
                                                 'Nothing to do here
                                             Case Else
-                                                lsSQLQuery &= "[" & lrRelation.OriginTable.Name & Viev.NullVal(lrQueryEdge.Alias, "") & "]." & lrRelation.OriginColumns(liColumnCounter).Name & " = "
+                                                lsSQLQuery &= lrRelation.OriginTable.DatabaseName & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrRelation.OriginColumns(liColumnCounter).Name & " = "
                                                 Dim lrTargetColumn = lrRelation.DestinationColumns.Find(Function(x) x.ActiveRole Is lrRelation.OriginColumns(liColumnCounter).ActiveRole)
-                                                lsSQLQuery &= "[" & lrRelation.DestinationTable.Name & Viev.NullVal(lrQueryEdge.TargetNode.Alias, "") & "]." & lrTargetColumn.Name & vbCrLf
+                                                lsSQLQuery &= lrRelation.DestinationTable.DatabaseName & Viev.NullVal(lrQueryEdge.TargetNode.Alias, "") & "." & lrTargetColumn.Name & vbCrLf
                                         End Select
                                 End Select
 
@@ -737,8 +740,8 @@
                                 'was
                                 'lsSQLQuery &= lrQueryEdge.BaseNode.FBMModelObject.Id & "." & lrColumn.Name
                                 'lsSQLQuery &= " = " & lrQueryEdge.TargetNode.Name & Viev.NullVal(lrQueryEdge.TargetNode.Alias, "") & "." & lrColumn.Name
-                                lsSQLQuery &= "[" & lrColumn.Table.Name & Viev.NullVal(lrBaseNode.Alias, "") & "]." & lrColumn.Name
-                                lsSQLQuery &= " = [" & larTargetColumn(liInd2 - 1).Table.Name & Viev.NullVal(lrTargetNode.Alias, "") & "]." & larTargetColumn(liInd2 - 1).Name
+                                lsSQLQuery &= lrColumn.Table.DatabaseName & Viev.NullVal(lrBaseNode.Alias, "") & "." & lrColumn.Name
+                                lsSQLQuery &= " = " & larTargetColumn(liInd2 - 1).Table.DatabaseName & Viev.NullVal(lrTargetNode.Alias, "") & "." & larTargetColumn(liInd2 - 1).Name
                                 If liInd2 < larTargetColumn.Count Then lsSQLQuery &= vbCrLf & "AND "
                                 liInd2 += 1
                             Next
@@ -914,7 +917,7 @@
                                                 Where Column.ActiveRole.JoinedORMObject Is lrQueryEdge.TargetNode.FBMModelObject
                                                 Select Column).First
 
-                                lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") & "[" & lrQueryEdge.BaseNode.RDSTable.Name & Viev.NullVal(lrQueryEdge.BaseNode.Alias, "") & "]." & lrColumn.Name & " = "
+                                lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") & lrQueryEdge.BaseNode.RDSTable.DatabaseName & Viev.NullVal(lrQueryEdge.BaseNode.Alias, "") & "." & lrColumn.Name & " = "
                                 Select Case lrColumn.getMetamodelDataType
                                     Case Is = pcenumORMDataType.TemporalDateAndTime
                                         Dim lsDateTime As String = Me.Model.DatabaseConnection.FormatDateTime(lrQueryEdge.IdentifierList(0))
@@ -970,9 +973,18 @@
                                             If lrQueryEdge.FBMFactType.IsLinkFactType Then
                                                 lrColumn = lrQueryEdge.BaseNode.RDSTable.Column.Find(Function(x) x.Role Is lrQueryEdge.FBMFactType.LinkFactTypeRole)
                                             Else
-                                                Throw New NotImplementedException("Unkown condition in query. Contact support.")
+                                                lrColumn = lrQueryEdge.BaseNode.RDSTable.Column.Find(Function(x) x.Role.FactType Is lrQueryEdge.FBMFactType)
+                                                lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") & lrQueryEdge.BaseNode.RDSTable.DatabaseName & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrColumn.Name & " = "
+                                                Select Case lrColumn.getMetamodelDataType
+                                                    Case Is = pcenumORMDataType.TemporalDateAndTime,
+                                                              pcenumORMDataType.TemporalDate
+                                                        Dim lsDateTime As String = Me.Model.DatabaseConnection.FormatDateTime(lrQueryEdge.IdentifierList(0))
+                                                        lsSQLQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lsDateTime & Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
+                                                    Case Else
+                                                        lsSQLQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lrQueryEdge.IdentifierList(0) & Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
+                                                End Select
                                             End If
-                                            lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") & "[" & lrTargetTable.Name & lsAlias & "]." & lrColumn.Name & " = '" & lrQueryEdge.IdentifierList(0) & "'" & vbCrLf
+
                                         Else
                                             If lrQueryEdge.TargetNode.HasIdentifier Then
                                                 lrTargetTable = lrQueryEdge.TargetNode.RDSTable
@@ -1003,6 +1015,10 @@
                 Next
 #End Region
 #End Region
+                If NullVal(My.Settings.FactEngineDefaultQueryResultLimit, 0) > 0 Then
+                    lsSQLQuery &= "LIMIT " & My.Settings.FactEngineDefaultQueryResultLimit
+                End If
+
                 'CodeSafe Remove wayward ANDs
                 If Trim(lsSQLQuery).EndsWith("AND") Then
                     lsSQLQuery = Trim(lsSQLQuery).Substring(0, lsSQLQuery.Length - 4)

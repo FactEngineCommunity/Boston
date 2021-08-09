@@ -247,9 +247,11 @@ Namespace FactEngine
                                 If larFinalFactTypeReading.Count = 1 Then
                                     If Me.FBMPossibleFactTypes.Count > 0 Then
                                         Me.FBMFactType = Me.FBMPossibleFactTypes.First
-                                        Me.IsPartialFactTypeMatch = True
+                                        If Me.FBMFactType.Arity > 2 Then
+                                            Me.IsPartialFactTypeMatch = True
+                                        End If
                                     Else
-                                        Me.FBMFactType = larFinalFactTypeReading(0).FactType
+                                            Me.FBMFactType = larFinalFactTypeReading(0).FactType
                                         If larFinalFactTypeReading(0).FactType.Arity > 2 Then
                                             Me.IsPartialFactTypeMatch = True
                                         End If

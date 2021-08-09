@@ -383,9 +383,9 @@ Start 		 ->
 //                | EXTERNALUNIQUENESSCONSTRAINTSTMT
 //                | EXISTSSTMT
                   | MATCHSELECTSTMT
-                  | WHICHSELECTSTMT
                   | FACTTYPEPRODUCTION
                   | DERIVATIONSTMT
+                  | WHICHSELECTSTMT
 //                | GETSUPERTYPESTMT
 //                | INSERTSTMT 
 //                | ITISMANDATORYTHATSTMNT

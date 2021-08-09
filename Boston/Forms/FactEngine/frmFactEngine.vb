@@ -2229,6 +2229,12 @@ Public Class frmFactEngine
                     Exit Sub
                 End If
 
+                If Not prApplication.WorkingModel.DatabaseConnection.Connected Or prApplication.WorkingModel.DatabaseManager.Connection Is Nothing Then
+                    prApplication.WorkingModel.connectToDatabase()
+                End If
+
+                Me.FEQLProcessor.DatabaseManager = prApplication.WorkingModel.DatabaseManager
+
                 Me.LabelError.Text = ""
 
                 'Get the Query from the SQL/Cypher/etc query textbox
