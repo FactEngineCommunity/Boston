@@ -91,7 +91,8 @@ Namespace RDS
                        ByVal abIndexIgnoresNulls As Boolean,
                        ByVal aarColumn As List(Of RDS.Column),
                        ByVal abAddToTable As Boolean,
-                       Optional ByVal abAddIndexToColumns As Boolean = False)
+                       Optional ByVal abAddIndexToColumns As Boolean = False,
+                       Optional ByVal abJustAddTheIndex As Boolean = False)
 
             Me.Model = arTable.Model
             Me.Table = arTable
@@ -116,7 +117,12 @@ Namespace RDS
             Next
 
             If abAddToTable Then
-                arTable.Index.AddUnique(Me)
+                If abJustAddTheIndex Then
+                    arTable.Index.Add(Me)
+                Else
+                    arTable.Index.AddUnique(Me)
+                End If
+
             End If
 
         End Sub

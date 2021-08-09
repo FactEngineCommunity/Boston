@@ -293,10 +293,9 @@ Partial Class frmToolboxEnterpriseExplorer
         '
         'ContextMenuStrip_ORMModel
         '
-        Me.ContextMenuStrip_ORMModel.AutoSize = False
         Me.ContextMenuStrip_ORMModel.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ViewModelDictionaryToolStripMenuItem, Me.ViewGlossaryToolStripMenuItem, Me.GenerateDocumentationToolStripMenuItem, Me.CodeGenerationToolStripMenuItem, Me.FactEngineToolStripMenuItem, Me.ToolStripSeparator7, Me.AddPageToolStripMenuItem1, Me.ToolStripMenuItemPastePage, Me.ToolStripMenuItemLanguage, Me.ToolStripSeparator1, Me.EmptyModelToolStripMenuItem, Me.HideToolStripMenuItem, Me.HideAllotherModelsToolStripMenuItem, Me.RenameToolStripMenuItem, Me.DeleteModelToolStripMenuItem, Me.ToolStripSeparator3, Me.ToolStripMenuItemModelConfiguration, Me.ToolStripSeparator5, Me.ImportExportToolStripMenuItem, Me.ToolStripMenuItemFixModelErrors})
         Me.ContextMenuStrip_ORMModel.Name = "ContextMenuStrip_ORMModel"
-        Me.ContextMenuStrip_ORMModel.Size = New System.Drawing.Size(216, 530)
+        Me.ContextMenuStrip_ORMModel.Size = New System.Drawing.Size(208, 402)
         '
         'ViewModelDictionaryToolStripMenuItem
         '
@@ -336,7 +335,7 @@ Partial Class frmToolboxEnterpriseExplorer
         'ToolStripSeparator7
         '
         Me.ToolStripSeparator7.Name = "ToolStripSeparator7"
-        Me.ToolStripSeparator7.Size = New System.Drawing.Size(212, 6)
+        Me.ToolStripSeparator7.Size = New System.Drawing.Size(204, 6)
         '
         'AddPageToolStripMenuItem1
         '
@@ -406,7 +405,7 @@ Partial Class frmToolboxEnterpriseExplorer
         'ToolStripSeparator1
         '
         Me.ToolStripSeparator1.Name = "ToolStripSeparator1"
-        Me.ToolStripSeparator1.Size = New System.Drawing.Size(212, 6)
+        Me.ToolStripSeparator1.Size = New System.Drawing.Size(204, 6)
         '
         'EmptyModelToolStripMenuItem
         '
@@ -444,7 +443,7 @@ Partial Class frmToolboxEnterpriseExplorer
         'ToolStripSeparator3
         '
         Me.ToolStripSeparator3.Name = "ToolStripSeparator3"
-        Me.ToolStripSeparator3.Size = New System.Drawing.Size(212, 6)
+        Me.ToolStripSeparator3.Size = New System.Drawing.Size(204, 6)
         '
         'ToolStripMenuItemModelConfiguration
         '
@@ -456,7 +455,7 @@ Partial Class frmToolboxEnterpriseExplorer
         'ToolStripSeparator5
         '
         Me.ToolStripSeparator5.Name = "ToolStripSeparator5"
-        Me.ToolStripSeparator5.Size = New System.Drawing.Size(212, 6)
+        Me.ToolStripSeparator5.Size = New System.Drawing.Size(204, 6)
         '
         'ImportExportToolStripMenuItem
         '

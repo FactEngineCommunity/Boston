@@ -97,6 +97,7 @@
 
         Me.Plan = arPlan
         Me.PlanStep = arStep
+        Me.Plan.Step.AddUnique(arStep)
         If IsSomething(arStep) Then
             arStep.Question = Me
         End If

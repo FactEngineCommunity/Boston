@@ -116,6 +116,7 @@ Public Module publicConstants
     <Serializable()> _
     Public Enum pcenumORMDataType
         <DataType("DataTypeNotSet")> <Description("<Data Type Not Set>")> DataTypeNotSet
+        <DataType("Boolean")> <Description("Boolean")> [Boolean]
         <DataType("LogicalTrueFalse")> <Description("Logical: True | False.")> LogicalTrueFalse
         <DataType("LogicalYesNo")> <Description("Logical: Yes | No.")> LogicalYesNo
         <DataType("AutoCounter")> <Description("Numeric: Auto Counter")> NumericAutoCounter

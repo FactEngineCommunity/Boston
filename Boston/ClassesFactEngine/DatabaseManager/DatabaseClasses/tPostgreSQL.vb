@@ -596,7 +596,7 @@ Namespace FactEngine
                                               interval_precision,
                                               maximum_cardinality,
                                               is_generated,
-                                              is_updatable FROM INFORMATION_SCHEMA. COLUMNS WHERE TABLE_NAME = '" & arTable.Name & "')"
+                                              is_updatable FROM INFORMATION_SCHEMA. COLUMNS WHERE TABLE_NAME = '" & arTable.Name & "'"
                 Dim lrRecordset As ORMQL.Recordset = Me.GO(lsSQL)
 
                 Dim lsColumnName As String
@@ -796,7 +796,8 @@ Namespace FactEngine
                                             lbIgnoreNulls,
                                             larColumn,
                                             True,
-                                            False)
+                                            False,
+                                            True)
 
                     larIndex.Add(lrIndex)
 
@@ -938,7 +939,7 @@ Namespace FactEngine
 
                 While Not lrRecordset.EOF
 
-                    lsTableName = lrRecordset("name").Data
+                    lsTableName = lrRecordset("table_name").Data
                     lrTable = New RDS.Table(Me.FBMModel.RDS, lsTableName, Nothing)
 
                     larTable.Add(lrTable)
