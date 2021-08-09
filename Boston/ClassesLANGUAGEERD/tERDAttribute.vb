@@ -11,9 +11,9 @@ Namespace ERD
         Public Entity As ERD.Entity
 
         <CategoryAttribute("Name"),
-        [ReadOnly](True),
+        [ReadOnly](False),
         DefaultValueAttribute(GetType(String), ""),
-        DescriptionAttribute("A unique Name for the model object.")>
+        DescriptionAttribute("A unique Name for the Attribute.")>
         Public Overrides Property Name() As String
             Get
                 Return Me._AttributeName
@@ -22,7 +22,7 @@ Namespace ERD
                 '------------------------------------------------------
                 'See Me.SetName for management of Me.Id and Me.Symbol
                 '------------------------------------------------------
-                _Name = value
+                _AttributeName = value
             End Set
         End Property
 
@@ -323,13 +323,17 @@ Namespace ERD
                 If IsSomething(aoChangedPropertyItem) Then
                     Select Case aoChangedPropertyItem.ChangedItem.PropertyDescriptor.Name
                         Case Is = "Name"
-
                             '-----------------------------------------------------------------------------------------------------------------
                             'If the Attribute is not part of a Relation, the the Attribute has a corresponding ValueType at the Model level.
                             '  The Name/Id of that ValueType must be updated as well.
                             '  This is done automatically when the Concept of the Attribute is updated/switchec.
                             '-----------------------------------------------------------------------------------------------------------------
-
+                            If Me.Name.Length > 0 Then
+                                Call Me.Column.setName(Me.Name)
+                            Else
+                                Me.AttributeName = Me.Column.Name
+                                MsgBox("You can't have a zero length Attribute name.")
+                            End If
                     End Select
                 End If
 
