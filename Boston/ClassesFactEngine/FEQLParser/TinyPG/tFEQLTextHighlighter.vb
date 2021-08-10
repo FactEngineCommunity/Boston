@@ -306,8 +306,8 @@ Namespace FEQL
     ''' </summary>
     ''' <returns></returns>
     Public Function GetCurrentContext() As ParseNode
-            Dim node As ParseNode = FindNode(Me.Tree, Textbox.SelectionStart)
-            Return node
+        Dim node As ParseNode = FindNode(Tree, Textbox.SelectionStart)
+        Return node
     End Function
 
     Private Function FindNode(ByVal node As ParseNode, ByVal posstart As Integer) As ParseNode
@@ -316,29 +316,20 @@ Namespace FEQL
             Return Nothing
         End If
 
-            If node.Nodes.Count > 0 Then
-                If node.Nodes.Count > 1 And
-                       node.Nodes(node.Nodes.Count - 1).Token.Type = TokenType._UNDETERMINED_ Then
-                    Return FindNode(node.Nodes(node.Nodes.Count - 2), 0)
-                ElseIf node.Nodes(0).token.type = TokenType.start Then
-                    If node.Nodes(0).Nodes.Count > 0 Then
-                        Return FindNode(node.Nodes(0).Nodes(0), 0)
-                    Else
-                        Return node.Nodes(0)
-                    End If
-                Else
-                    If node.Nodes(node.Nodes.Count - 1).Nodes.Count > 0 Then
-                        Return FindNode(node.Nodes(node.Nodes.Count - 1), 0)
-                    Else
-                        Return node.Nodes(node.Nodes.Count - 1)
-                    End If
-                End If
+        If node.Nodes.Count > 0 Then
+            If node.Nodes.Count > 1 And _
+                   node.Nodes(node.Nodes.Count - 1).Token.Type = TokenType._UNDETERMINED_ Then
+                Return FindNode(node.Nodes(node.Nodes.Count - 2), 0)
+            ElseIf node.Nodes(node.Nodes.Count - 1).Nodes.Count > 0 Then
+                Return FindNode(node.Nodes(node.Nodes.Count - 1), 0)
             Else
-                Return node
+                Return node.Nodes(node.Nodes.Count - 1)
             End If
+        Else
+            Return node
+        End If
 
-
-        End Function
+    End Function
 
     ''' <summary>
     ''' use HighlighText to start the text highlight process from the caller's thread.

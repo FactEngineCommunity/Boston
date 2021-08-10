@@ -1640,12 +1640,12 @@ Public Class frmFactEngine
 
                                 lsSQLQuery &= lrModelElement.Id
                                 If lrQueryEdge.IsPartialFactTypeMatch Then
-                                    lsSQLQuery &= " FROM " & lrQueryEdge.FBMFactType.Id
+                                    lsSQLQuery &= " FROM " & lrQueryEdge.FBMFactType.getCorrespondingRDSTable.DatabaseName
                                 Else
-                                    lsSQLQuery &= " FROM " & lrBaseNode.Name
+                                    lsSQLQuery &= " FROM " & lrBaseNode.RDSTable.DatabaseName
                                 End If
 
-                                If Me.zrTextHighlighter.GetCurrentContext.Token.Type = FEQL.TokenType.IDENTIFIER Then
+                                If (Me.zrTextHighlighter.GetCurrentContext.Token.Type = FEQL.TokenType.IDENTIFIER) Then 'Or laiExpectedToken.Contains(FEQL.TokenType.IDENTIFIER
                                     Try
                                         Dim lsDatabaseWildcardOperator = Database.gerLikeWildcardOperator(prApplication.WorkingModel.TargetDatabaseType)
                                         lsSQLQuery &= vbCrLf & "WHERE " & lrModelElement.Id & " LIKE '" & Me.zrTextHighlighter.GetCurrentContext.Token.Text & lsDatabaseWildcardOperator & "'"
