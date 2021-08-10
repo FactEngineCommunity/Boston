@@ -26,7 +26,7 @@ EOF           -> @"^$";
 FACTTYPENAME -> @"[aA-zZ]+";
 [Color(227, 143, 247)]  FILELOCATIONNAME	-> @"^[a-zA-Z]:\\((?:[^/]*/)*)([aA-zZ0-9\-\.]*)"; //@"^([aA-zZ]+)\/([^\/]+)$";
 [Color(227, 143, 247)] FOLLOWINGREADINGTEXT -> @"([a-z]+[\s]?)+$";
-[Color(216, 127, 178)]	IDENTIFIER -> @"[aA-zZ0-9 \-\:/]+";
+[Color(216, 127, 178)]	IDENTIFIER -> @"^(?!\s)[aA-zZ0-9 \-\:/]+";
 [Color(216, 127, 178)]	MATHFUNCTION -> @"<=|<|=|>=|>";
 MODELNAME     -> @"[aA-zZ]+";
 [Color(94, 213, 165)]	MODELELEMENTNAME -> @"(([A-Z0-9][a-z0-9]+)+[_|\s]?)+";  //@"(([A-Z]+[a-z]+)+[_|\s]?)+";//@"[aA-zZ]+";

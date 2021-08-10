@@ -1243,7 +1243,6 @@ Public Class frmFactEngine
         Dim lsCurrentTokenType As Object
 
         Try
-
             '-------------------
             'Get the ParseTree
             '-------------------
@@ -1357,11 +1356,10 @@ Public Class frmFactEngine
                 If Me.zrTextHighlighter.Tree.Errors(0).ExpectedToken <> "" Then
                     laiExpectedToken.Add(DirectCast([Enum].Parse(GetType(FEQL.TokenType), Me.zrTextHighlighter.Tree.Errors(0).ExpectedToken), FEQL.TokenType))
                 End If
-
-                For Each lrParseError In Me.zrTextHighlighter.Tree.Optionals
-                    laiExpectedToken.Add(DirectCast([Enum].Parse(GetType(FEQL.TokenType), lrParseError.ExpectedToken), FEQL.TokenType))
-                Next
             End If
+            For Each lrParseError In Me.zrTextHighlighter.Tree.Optionals
+                laiExpectedToken.Add(DirectCast([Enum].Parse(GetType(FEQL.TokenType), lrParseError.ExpectedToken), FEQL.TokenType))
+            Next
 
             Dim lrLastModelElementNameParseNode As FEQL.ParseNode
 
