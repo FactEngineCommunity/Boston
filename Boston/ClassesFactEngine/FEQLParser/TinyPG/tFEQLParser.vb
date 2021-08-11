@@ -3535,14 +3535,14 @@ Namespace FEQL
 
 
              ' Concat Rule
-                                tok = m_scanner.LookAhead(TokenType.COLON, TokenType.CARRET, TokenType.BANG) ' ZeroOrMore Rule
-                    While tok.Type = TokenType.COLON Or tok.Type = TokenType.CARRET Or tok.Type = TokenType.BANG
+                                tok = m_scanner.LookAhead(TokenType.COLON, TokenType.CARRET, TokenType.BANG, TokenType.LIKECOMPARITOR) ' ZeroOrMore Rule
+                    While tok.Type = TokenType.COLON Or tok.Type = TokenType.CARRET Or tok.Type = TokenType.BANG Or tok.Type = TokenType.LIKECOMPARITOR
                     m_tree.Errors.Clear
                         ParseQUOTEDIDENTIFIERLIST(node) ' NonTerminal Rule: QUOTEDIDENTIFIERLIST
             If m_tree.Errors.Count > 0 Then
                           lbProblemSolved = False
             End If
-                    tok = m_scanner.LookAhead(TokenType.COLON, TokenType.CARRET, TokenType.BANG) ' ZeroOrMore Rule
+                    tok = m_scanner.LookAhead(TokenType.COLON, TokenType.CARRET, TokenType.BANG, TokenType.LIKECOMPARITOR) ' ZeroOrMore Rule
                     If Not lbProblemSolved Then Exit While
                     End While
             If m_tree.Errors.Count > 0 Then
@@ -3643,13 +3643,14 @@ Namespace FEQL
 
 
                      ' Concat Rule
-                                                tok = m_scanner.LookAhead({TokenType.OPENPARENTHESIS, TokenType.COLON, TokenType.CARRET, TokenType.BANG}) ' Choice Rule
+                                                tok = m_scanner.LookAhead({TokenType.OPENPARENTHESIS, TokenType.COLON, TokenType.CARRET, TokenType.BANG, TokenType.LIKECOMPARITOR}) ' Choice Rule
                             
                                 m_tree.Optionals.Clear
                                 m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.OPENPARENTHESIS.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "OPENPARENTHESIS"))
                                 m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.OPENPARENTHESIS.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "COLON"))
                                 m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.OPENPARENTHESIS.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "CARRET"))
                                 m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.OPENPARENTHESIS.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "BANG"))
+                                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.OPENPARENTHESIS.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "LIKECOMPARITOR"))
                             Select Case tok.Type
                              ' Choice Rule
                                 Case TokenType.OPENPARENTHESIS
@@ -3751,6 +3752,34 @@ Namespace FEQL
                                           Return False
             End If
 
+                                Case TokenType.LIKECOMPARITOR
+                            
+                                     ' Concat Rule
+                                    lbProblemSolved =                                             ParseQUOTEDIDENTIFIERLIST(node) ' NonTerminal Rule: QUOTEDIDENTIFIERLIST
+            If m_tree.Errors.Count > 0 Then
+                                              lbProblemSolved = False
+            End If
+
+
+                                     ' Concat Rule
+                                                                                tok = m_scanner.LookAhead(TokenType.OPENPARENTHESIS) ' ZeroOrMore Rule
+                                            While tok.Type = TokenType.OPENPARENTHESIS
+                                            m_tree.Errors.Clear
+                                                ParseQUOTEDPROPERTYIDENTIFIERLIST(node) ' NonTerminal Rule: QUOTEDPROPERTYIDENTIFIERLIST
+            If m_tree.Errors.Count > 0 Then
+                                                  lbProblemSolved = False
+            End If
+                                            tok = m_scanner.LookAhead(TokenType.OPENPARENTHESIS) ' ZeroOrMore Rule
+                                            If Not lbProblemSolved Then Exit While
+                                            End While
+            If m_tree.Errors.Count > 0 Then
+                                                        Return False
+            End If
+
+            If m_tree.Errors.Count > 0 Then
+                                          Return False
+            End If
+
                                 Case Else
                                 If m_tree.Errors.Count = 0 Then
                                 m_tree.Optionals.Clear
@@ -3758,6 +3787,7 @@ Namespace FEQL
                                 m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.OPENPARENTHESIS.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "COLON"))
                                 m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.OPENPARENTHESIS.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "CARRET"))
                                 m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.OPENPARENTHESIS.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "BANG"))
+                                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.OPENPARENTHESIS.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "LIKECOMPARITOR"))
                                 End If
                                     m_tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found.", &H0002, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos))
                                     Exit Select
@@ -4224,12 +4254,13 @@ Namespace FEQL
 
 
              ' Concat Rule
-                                tok = m_scanner.LookAhead({TokenType.COLON, TokenType.CARRET, TokenType.BANG}) ' Choice Rule
+                                tok = m_scanner.LookAhead({TokenType.COLON, TokenType.CARRET, TokenType.BANG, TokenType.LIKECOMPARITOR}) ' Choice Rule
                     
                         m_tree.Optionals.Clear
                         m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.COLON.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "COLON"))
                         m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.COLON.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "CARRET"))
                         m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.COLON.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "BANG"))
+                        m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.COLON.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "LIKECOMPARITOR"))
                     Select Case tok.Type
                      ' Choice Rule
                         Case TokenType.COLON
@@ -4274,12 +4305,27 @@ Namespace FEQL
                             End If
 
 
+                        Case TokenType.LIKECOMPARITOR
+                                                lbProblemSolved = True
+                            tok = m_scanner.Scan(TokenType.LIKECOMPARITOR) ' Terminal Rule: LIKECOMPARITOR
+                            n = node.CreateNode(tok, tok.ToString() )
+                            node.Token.UpdateRange(tok)
+                            node.Nodes.Add(n)
+                            If tok.Type <> TokenType.LIKECOMPARITOR Then
+                              m_tree.Errors.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.LIKECOMPARITOR.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "LIKECOMPARITOR"))
+                              lbProblemSolved = False
+                              Return False
+
+                            End If
+
+
                         Case Else
                         If m_tree.Errors.Count = 0 Then
                         m_tree.Optionals.Clear
                         m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.COLON.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "COLON"))
                         m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.COLON.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "CARRET"))
                         m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.COLON.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "BANG"))
+                        m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.COLON.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "LIKECOMPARITOR"))
                         End If
                             m_tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found.", &H0002, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos))
                             Exit Select

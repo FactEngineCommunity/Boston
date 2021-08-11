@@ -5,6 +5,7 @@
             Bang
             Carret
             Colon
+            LikeComparitor
         End Enum
 
     End Module

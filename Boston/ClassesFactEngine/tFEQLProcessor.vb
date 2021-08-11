@@ -849,6 +849,8 @@ Namespace FEQL
                 Return pcenumFEQLComparitor.Carret
             ElseIf Me.COLON IsNot Nothing Then
                 Return pcenumFEQLComparitor.Colon
+            ElseIf Me.LIKECOMPARITOR IsNot Nothing Then
+                Return pcenumFEQLComparitor.LikeComparitor
             End If
 
         End Function
@@ -882,6 +884,17 @@ Namespace FEQL
                 Me._COLON = value
             End Set
         End Property
+
+        Private _LIKECOMPARITOR As String = Nothing
+        Public Property LIKECOMPARITOR As String
+            Get
+                Return Me._LIKECOMPARITOR
+            End Get
+            Set(value As String)
+                Me._LIKECOMPARITOR = value
+            End Set
+        End Property
+
 
         Private _MODELELEMENT As New Object
         Public Property MODELELEMENT As Object

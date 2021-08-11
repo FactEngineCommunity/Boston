@@ -927,6 +927,8 @@
                                     Case Is = FEQL.pcenumFEQLComparitor.Colon,
                                               FEQL.pcenumFEQLComparitor.Carret
                                         lsSQLQuery &= " = "
+                                    Case Is = FEQL.pcenumFEQLComparitor.LikeComparitor
+                                        lsSQLQuery &= " LIKE "
                                 End Select
 
                                 Select Case lrColumn.getMetamodelDataType
