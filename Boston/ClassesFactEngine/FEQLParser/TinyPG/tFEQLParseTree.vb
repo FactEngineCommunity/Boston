@@ -128,7 +128,6 @@ Namespace FEQL
     <Serializable()> _
     Partial Public Class ParseTree
         Inherits ParseNode
-        Implements ICloneable
 
         Public Errors As ParseErrors
         Public Optionals As ParseErrors
@@ -172,8 +171,11 @@ Namespace FEQL
         Return Nodes(0).Eval(Me, paramlist)
         End Function
 
-        Public Overloads Function Clone() As Object Implements ICloneable.Clone
+        Public Overloads Function Clone() As Object
             Dim lrTree As New ParseTree
+            Dim lrParseError As ParseError
+            Dim lrToken As Token
+            Dim lrNode As ParseNode
 
             With Me
                 For Each lrNode In .Nodes
@@ -718,6 +720,8 @@ Namespace FEQL
 
         Public Function Clone() As Object Implements ICloneable.Clone
             Dim lrParseNode As New ParseNode
+            Dim lrSubParseNode As ParseNode
+
             With Me
                 lrParseNode.m_text = .m_text
                 lrParseNode.m_nodes = New List(Of ParseNode)

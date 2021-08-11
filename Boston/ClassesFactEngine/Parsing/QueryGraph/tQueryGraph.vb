@@ -920,7 +920,15 @@
                                                 Where Column.ActiveRole.JoinedORMObject Is lrQueryEdge.TargetNode.FBMModelObject
                                                 Select Column).First
 
-                                lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") & lrQueryEdge.BaseNode.RDSTable.DatabaseName & Viev.NullVal(lrQueryEdge.BaseNode.Alias, "") & "." & lrColumn.Name & " = "
+                                lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") & lrQueryEdge.BaseNode.RDSTable.DatabaseName & Viev.NullVal(lrQueryEdge.BaseNode.Alias, "") & "." & lrColumn.Name
+                                Select Case lrQueryEdge.TargetNode.Comparitor
+                                    Case Is = FEQL.pcenumFEQLComparitor.Bang
+                                        lsSQLQuery &= " <> "
+                                    Case Is = FEQL.pcenumFEQLComparitor.Colon,
+                                              FEQL.pcenumFEQLComparitor.Carret
+                                        lsSQLQuery &= " = "
+                                End Select
+
                                 Select Case lrColumn.getMetamodelDataType
                                     Case Is = pcenumORMDataType.TemporalDateAndTime
                                         Dim lsDateTime As String = Me.Model.DatabaseConnection.FormatDateTime(lrQueryEdge.IdentifierList(0))
