@@ -379,7 +379,7 @@ Public Class frmFactEngine
                 Next
             End If
 
-            Call Me.showAutoCompleteForm()
+            'Call Me.showAutoCompleteForm()
 
         Catch ex As Exception
             Dim lsMessage As String
@@ -1375,7 +1375,7 @@ Public Class frmFactEngine
                 Dim lrFirstModelElement = prApplication.WorkingModel.GetModelObjectByName(lrFirstModelElementNameParseNode.Token.Text)
                 Dim lrlastModelElement = prApplication.WorkingModel.GetModelObjectByName(lrLastModelElementNameParseNode.Token.Text)
 
-                lrModelElement = prApplication.WorkingModel.GetModelObjectByName(lrLastModelElementNameParseNode.Token.Text)
+                lrModelElement = prApplication.WorkingModel.GetModelObjectByName(Trim(lrLastModelElementNameParseNode.Token.Text))
 
                 If lrModelElement Is Nothing Then
                     'Nothing to do here
@@ -1427,36 +1427,48 @@ Public Class frmFactEngine
                                 Dim lrLastWhichClause As New FEQL.WHICHCLAUSE
                                 Call Me.FEQLProcessor.GetParseTreeTokensReflection(lrLastWhichClause, loLastWhichClauseObject)
 
-                                '==========================================================
-                                'ModelElement 
-                                Dim lsPredicateText As String = ""
-                                For Each lsPredicatePart In lrLastWhichClause.PREDICATE
-                                    lsPredicateText = Trim(lsPredicateText & " " & Trim(lsPredicatePart))
-                                Next
+                                Dim larPredicatePart As IEnumerable(Of FBM.PredicatePart)
 
-                                Dim larPredicatePart = From FactType In prApplication.WorkingModel.FactType
+                                Dim lbUseSecondLastWhichClause As Boolean = False
+                                If lrLastWhichClause.MODELELEMENTNAME.Count = 0 And lrLastWhichClause.MODELELEMENT.Count = 0 Then
+                                    If lrWHICHSELECTStatement.WHICHCLAUSE.Count - 2 >= 0 Then
+                                        loLastWhichClauseObject = lrWHICHSELECTStatement.WHICHCLAUSE(lrWHICHSELECTStatement.WHICHCLAUSE.Count - 2)
+                                        lrLastWhichClause = New FEQL.WHICHCLAUSE
+                                        Call Me.FEQLProcessor.GetParseTreeTokensReflection(lrLastWhichClause, loLastWhichClauseObject)
+                                        lbUseSecondLastWhichClause = True
+                                    End If
+                                Else
+                                    '==========================================================
+                                    'ModelElement 
+                                    Dim lsPredicateText As String = ""
+                                    For Each lsPredicatePart In lrLastWhichClause.PREDICATE
+                                        lsPredicateText = Trim(lsPredicateText & " " & Trim(lsPredicatePart))
+                                    Next
+
+                                    larPredicatePart = From FactType In prApplication.WorkingModel.FactType
                                                        From FactTypeReading In FactType.FactTypeReading
                                                        From PredicatePart In FactTypeReading.PredicatePart
                                                        Where PredicatePart.Role.JoinedORMObject.Id = lrModelElement.Id
                                                        Where PredicatePart.PredicatePartText = lsPredicateText
                                                        Select PredicatePart
 
-                                If larPredicatePart.Count = 0 Then
-                                    'nothing to do here
-                                Else
-                                    Me.AutoComplete.ListBox.Items.Clear()
-                                    Dim lrPredicatePart = larPredicatePart.First
-                                    If lrPredicatePart.FactTypeReading.PredicatePart.Count > 1 Then
-                                        If Me.TextBoxInput.Text.Trim.Split(" ").Last <> lrPredicatePart.FactTypeReading.PredicatePart(1).Role.JoinedORMObject.Id Then
-                                            Dim lsPreboundPart As String = ""
-                                            If lrPredicatePart.FactTypeReading.PredicatePart(1).PreBoundText <> "" Then
-                                                lsPreboundPart = lrPredicatePart.FactTypeReading.PredicatePart(1).PreBoundText & "-"
-                                            End If
-                                            Dim lsFullModelElementReference = lsPreboundPart & lrPredicatePart.FactTypeReading.PredicatePart(1).Role.JoinedORMObject.Id
-                                            Call Me.AddEnterpriseAwareItem(lsFullModelElementReference, FEQL.TokenType.MODELELEMENTNAME, False, lrPredicatePart.FactTypeReading.PredicatePart(1).Role.JoinedORMObject.Id)
-                                            If Me.AutoComplete.Visible = False Then
-                                                Me.showAutoCompleteForm()
-                                                Exit Sub
+                                    If larPredicatePart.Count = 0 Then
+                                        'nothing to do here
+                                    Else
+                                        Me.AutoComplete.ListBox.Items.Clear()
+                                        Dim lrPredicatePart = larPredicatePart.First
+                                        If lrPredicatePart.FactTypeReading.PredicatePart.Count > 1 Then
+                                            If Me.TextBoxInput.Text.Trim.Split(" ").Last <> lrPredicatePart.FactTypeReading.PredicatePart(1).Role.JoinedORMObject.Id Then
+                                                Dim lsPreboundPart As String = ""
+                                                If lrPredicatePart.FactTypeReading.PredicatePart(1).PreBoundText <> "" Then
+                                                    lsPreboundPart = lrPredicatePart.FactTypeReading.PredicatePart(1).PreBoundText & "-"
+                                                End If
+                                                Dim lsFullModelElementReference = lsPreboundPart & lrPredicatePart.FactTypeReading.PredicatePart(1).Role.JoinedORMObject.Id
+                                                Call Me.AddEnterpriseAwareItem(lsFullModelElementReference, FEQL.TokenType.MODELELEMENTNAME, False, lrPredicatePart.FactTypeReading.PredicatePart(1).Role.JoinedORMObject.Id)
+                                                If Me.AutoComplete.Visible = False Then
+                                                    Me.showAutoCompleteForm()
+                                                    Exit Sub
+                                                End If
                                             End If
                                         End If
                                     End If
@@ -1465,7 +1477,7 @@ Public Class frmFactEngine
                                 'Predicates
                                 Dim lrPredicateModelObject As FBM.ModelObject
                                 If lrLastWhichClause.KEYWDAND IsNot Nothing And lrLastWhichClause.KEYWDTHAT.Count = 1 Then
-                                    lrModelElement = prApplication.WorkingModel.GetModelObjectByName(lrLastModelElementNameParseNode.Token.Text)
+                                    lrModelElement = prApplication.WorkingModel.GetModelObjectByName(Trim(lrLastModelElementNameParseNode.Token.Text))
                                 End If
                                 If lrLastWhichClause.KEYWDWHICH IsNot Nothing Then
                                     lrPredicateModelObject = lrlastModelElement
@@ -1473,6 +1485,9 @@ Public Class frmFactEngine
                                     lrPredicateModelObject = lrlastModelElement
                                 Else
                                     lrPredicateModelObject = lrFirstModelElement
+                                End If
+                                If lbUseSecondLastWhichClause Then
+                                    lrPredicateModelObject = lrlastModelElement
                                 End If
 
                                 Dim larFactTypeReading2 = lrModelElement.getPartialFactTypeReadings()
