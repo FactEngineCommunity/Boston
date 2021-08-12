@@ -144,14 +144,16 @@ Namespace FBM
                 'RDS
                 Dim lrTable = CType(Me.EntityType, FBM.EntityType).getCorrespondingRDSTable
 
-                If lrTable.getPrimaryKeyColumns.Count > 0 Then
-                    If lrTable.getPrimaryKeyColumns(0).Role.JoinedORMObject IsNot Me Then
-                        'Must have got the Primary Key from a Supertype.
-                        Call lrTable.removeExistingPrimaryKeyColumnsAndIndex(True)
+                If lrTable IsNot Nothing Then
+                    If lrTable.getPrimaryKeyColumns.Count > 0 Then
+                        If lrTable.getPrimaryKeyColumns(0).Role.JoinedORMObject IsNot Me Then
+                            'Must have got the Primary Key from a Supertype.
+                            Call lrTable.removeExistingPrimaryKeyColumnsAndIndex(True)
+                        End If
                     End If
-                End If
 
-                Call lrTable.removeSupertypeColumns(Me)
+                    Call lrTable.removeSupertypeColumns(Me)
+                End If
 
             Catch ex As Exception
                 Dim lsMessage As String

@@ -410,6 +410,64 @@ Namespace ERD
         Public Overrides Function getCorrespondingRDSTable() As RDS.Table
             Return Me.RDSTable
         End Function
+
+        Public Sub GetAttributesFromRDSColumns(Optional ByVal abAddToPage As Boolean = False)
+
+            Try
+                If Me.Attribute.Count > 0 Then
+                    Throw New Exception("Method called for Entity, '" & Me.Name & "', that already has Attributes loaded.")
+                ElseIf Me.Page Is Nothing Then
+                    Throw New Exception("Method called for Entity, '" & Me.Name & "', that has no Page.")
+                End If
+
+                Dim lrERAttribute As ERD.Attribute
+
+                For Each lrColumn In Me.RDSTable.Column
+
+                    lrERAttribute = New ERD.Attribute
+                    lrERAttribute.Column = lrColumn
+                    lrERAttribute.Model = Me.Page.Model
+                    lrERAttribute.Id = lrColumn.Id
+                    lrERAttribute.Entity = Me
+                    lrERAttribute.AttributeName = lrColumn.Name
+                    lrERAttribute.ResponsibleRole = lrColumn.Role
+                    lrERAttribute.ActiveRole = lrColumn.ActiveRole
+                    lrERAttribute.ResponsibleFactType = lrERAttribute.ResponsibleRole.FactType
+                    lrERAttribute.Mandatory = lrColumn.IsMandatory
+                    'lrERAttribute.OrdinalPosition = lrColumn.OrdinalPosition
+                    lrERAttribute.PartOfPrimaryKey = lrColumn.isPartOfPrimaryKey
+                    lrERAttribute.Page = Me.Page
+
+                    lrERAttribute.Column = lrColumn
+
+                    Me.Attribute.Add(lrERAttribute)
+
+                    If abAddToPage Then
+                        Me.Page.ERDiagram.Attribute.Add(lrERAttribute)
+                    End If
+                Next
+
+                Dim liInd As Integer
+                Dim larSupertypeTable = Me.RDSTable.getSupertypeTables
+                If larSupertypeTable.Count > 0 Then
+                    larSupertypeTable.Reverse()
+                    larSupertypeTable.Add(Me.RDSTable)
+                    liInd = 0
+                    For Each lrSupertypeTable In larSupertypeTable
+                        For Each lrAttrubute In Me.Attribute.FindAll(Function(x) x.Column.Role.JoinedORMObject.Id = lrSupertypeTable.Name).OrderBy(Function(x) x.OrdinalPosition)
+                            Me.Attribute.Remove(lrAttrubute)
+                            Me.Attribute.Insert(liInd, lrAttrubute)
+                            liInd += 1
+                        Next
+                    Next
+                End If
+
+            Catch ex As Exception
+                Debugger.Break()
+            End Try
+
+        End Sub
+
         Public Sub MouseDown() Implements FBM.iPageObject.MouseDown
 
         End Sub

@@ -1122,6 +1122,10 @@ Namespace RDS
                     Call Me.Model.Model.DatabaseConnection.removeColumn(arColumn)
                 End If
 
+                If Me.Column.Count = 0 Then
+                    Call Me.Model.removeTable(Me)
+                End If
+
             Catch ex As Exception
                 Dim lsMessage1 As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()

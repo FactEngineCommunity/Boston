@@ -1318,7 +1318,15 @@ Namespace FBM
 
                 Me.SubtypeRelationship.Add(lrSubtypeRelationship)
 
-                Call Me.getCorrespondingRDSTable.triggerSubtypeRelationshipAdded()
+                If Me.getCorrespondingRDSTable Is Nothing Then
+                    If Not Me.IsAbsorbed Then
+                        'Create a Table for the EntityType.
+                        Dim lrTable As New RDS.Table(Me.Model.RDS, Me.Id, Me)
+                        Call Me.Model.RDS.addTable(lrTable)
+                    End If
+                Else
+                    Call Me.getCorrespondingRDSTable.triggerSubtypeRelationshipAdded()
+                End If
 
                 RaiseEvent SubtypeRelationshipAdded(lrSubtypeRelationship)
 
@@ -1328,14 +1336,13 @@ Namespace FBM
                 '  * Need to pull the Primary Reference Scheme from the Supertype if this EntityType is not absorbed.
                 Call Me.getRDSPrimaryReferenceSchemeFromSupertypeIfNecessary()
 
-                If Not Me.IsAbsorbed Then
-                    Call Me.getCorrespondingRDSTable.absorbSupertypeColumns()
-                    'Supertype needs to get Columns from this subtype
-                Else
+                If Me.IsAbsorbed Then
                     Dim lrSupertypeTable = arParentEntityType.GetTopmostNonAbsorbedSupertype.getCorrespondingRDSTable
                     Call lrSupertypeTable.absorbSubtypeColumns(Me.getCorrespondingRDSTable)
+                ElseIf Me.getCorrespondingRDSTable IsNot Nothing Then
+                    Call Me.getCorrespondingRDSTable.absorbSupertypeColumns()
+                    'Supertype needs to get Columns from this subtype
                 End If 'Not Absorbed
-
 
                 Call Me.Model.MakeDirty()
 
