@@ -163,7 +163,12 @@ Namespace FBM
                     lrPredicatePart = New FBM.PredicatePart(Me.Model, Me, Nothing, True)
                     lrPredicatePart.SequenceNr = liInd
                     lrPredicatePart.Role = aarRole(liInd - 1)
-                    If liInd = aarRole.Count Then
+                    If liInd = 1 And Me.FactType.Arity = 1 Then
+                        'Unary FactType
+                        lrPredicatePart.PredicatePartText = arSentence.PredicatePart(liInd - 1).PredicatePartText
+                        lrPredicatePart.PreBoundText = ""
+                        lrPredicatePart.PostBoundText = ""
+                    ElseIf liInd = aarRole.Count Then
                         lrPredicatePart.PredicatePartText = ""
                         lrPredicatePart.PreBoundText = ""
                         lrPredicatePart.PostBoundText = ""

@@ -1693,61 +1693,82 @@ Namespace FBM
 
                     lrORMRecordset2 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
+                    Dim lsColumnId As String = "" 'Used also for Debugging/ErrorThrowing.
+
                     While Not lrORMRecordset2.EOF
 
-                        'Column Name
-                        lsSQLQuery = "SELECT *"
-                        lsSQLQuery &= " FROM CorePropertyHasPropertyName" '(Property, PropertyName)
-                        lsSQLQuery &= " WHERE Property = '" & lrORMRecordset2("Attribute").Data & "'"
+                        Try
+                            lsColumnId = lrORMRecordset2("Attribute").Data
 
-                        lrORMRecordset3 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-                        lsColumnName = lrORMRecordset3("PropertyName").Data
+                            'Column Name
+                            lsSQLQuery = "SELECT *"
+                            lsSQLQuery &= " FROM CorePropertyHasPropertyName" '(Property, PropertyName)
+                            lsSQLQuery &= " WHERE Property = '" & lrORMRecordset2("Attribute").Data & "'"
 
-                        'Responsible Role
-                        lsSQLQuery = "SELECT *"
-                        lsSQLQuery &= " FROM " & pcenumCMMLRelations.CorePropertyIsForRole.ToString
-                        lsSQLQuery &= " WHERE Property = '" & lrORMRecordset2("Attribute").Data & "'"
+                            lrORMRecordset3 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                            lsColumnName = lrORMRecordset3("PropertyName").Data
 
-                        lrORMRecordset3 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-                        lrResponsibleRole = Me.Role.Find(Function(x) x.Id = lrORMRecordset3("Role").Data)
+                            'Responsible Role
+                            lsSQLQuery = "SELECT *"
+                            lsSQLQuery &= " FROM " & pcenumCMMLRelations.CorePropertyIsForRole.ToString
+                            lsSQLQuery &= " WHERE Property = '" & lrORMRecordset2("Attribute").Data & "'"
 
-                        'Active Role
-                        lsSQLQuery = "SELECT *"
-                        lsSQLQuery &= " FROM " & pcenumCMMLRelations.CorePropertyHasActiveRole.ToString
-                        lsSQLQuery &= " WHERE Property = '" & lrORMRecordset2("Attribute").Data & "'"
+                            lrORMRecordset3 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                            lrResponsibleRole = Me.Role.Find(Function(x) x.Id = lrORMRecordset3("Role").Data)
 
-                        lrORMRecordset3 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-                        lrActiveRole = Me.Role.Find(Function(x) x.Id = lrORMRecordset3("Role").Data)
+                            'Active Role
+                            lsSQLQuery = "SELECT *"
+                            lsSQLQuery &= " FROM " & pcenumCMMLRelations.CorePropertyHasActiveRole.ToString
+                            lsSQLQuery &= " WHERE Property = '" & lrORMRecordset2("Attribute").Data & "'"
 
-                        'New Column
-                        lrColumn = New RDS.Column(lrTable, lsColumnName, lrResponsibleRole, lrActiveRole)
-                        lrColumn.Id = lrORMRecordset2("Attribute").Data
+                            lrORMRecordset3 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                            lrActiveRole = Me.Role.Find(Function(x) x.Id = lrORMRecordset3("Role").Data)
 
-                        'IsMandatory
-                        lsSQLQuery = "SELECT *"
-                        lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreIsMandatory.ToString
-                        lsSQLQuery &= " WHERE IsMandatory = '" & lrColumn.Id & "'"
+                            'New Column
+                            lrColumn = New RDS.Column(lrTable, lsColumnName, lrResponsibleRole, lrActiveRole)
+                            lrColumn.Id = lsColumnId
 
-                        lrORMRecordset3 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-                        lrColumn.IsMandatory = Not lrORMRecordset3.EOF
+                            'IsMandatory
+                            lsSQLQuery = "SELECT *"
+                            lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreIsMandatory.ToString
+                            lsSQLQuery &= " WHERE IsMandatory = '" & lrColumn.Id & "'"
 
-                        'Fact Type
-                        lsSQLQuery = "SELECT *"
-                        lsSQLQuery &= " FROM " & pcenumCMMLRelations.CorePropertyIsForFactType.ToString
-                        lsSQLQuery &= " WHERE Property = '" & lrColumn.Id & "'"
+                            lrORMRecordset3 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                            lrColumn.IsMandatory = Not lrORMRecordset3.EOF
 
-                        lrORMRecordset3 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-                        lrColumn.FactType = Me.FactType.Find(Function(x) x.Id = lrORMRecordset3("FactType").Data)
+                            'Fact Type
+                            lsSQLQuery = "SELECT *"
+                            lsSQLQuery &= " FROM " & pcenumCMMLRelations.CorePropertyIsForFactType.ToString
+                            lsSQLQuery &= " WHERE Property = '" & lrColumn.Id & "'"
 
-                        'Ordinal Position
-                        lsSQLQuery = "SELECT *"
-                        lsSQLQuery &= " FROM " & pcenumCMMLRelations.CorePropertyHasOrdinalPosition.ToString
-                        lsSQLQuery &= " WHERE Property = '" & lrColumn.Id & "'"
+                            lrORMRecordset3 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                            lrColumn.FactType = Me.FactType.Find(Function(x) x.Id = lrORMRecordset3("FactType").Data)
 
-                        lrORMRecordset3 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-                        lrColumn.OrdinalPosition = lrORMRecordset3("Position").Data
+                            'Ordinal Position
+                            lsSQLQuery = "SELECT *"
+                            lsSQLQuery &= " FROM " & pcenumCMMLRelations.CorePropertyHasOrdinalPosition.ToString
+                            lsSQLQuery &= " WHERE Property = '" & lrColumn.Id & "'"
 
-                        lrTable.Column.Add(lrColumn)
+                            lrORMRecordset3 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                            lrColumn.OrdinalPosition = lrORMRecordset3("Position").Data
+
+                            lrTable.Column.Add(lrColumn)
+                        Catch ex As Exception
+                            Dim lsErrorMessage As String = "Trouble loading Column for Table, " & lrTable.Name & ". Column.Id = " & lsColumnId
+                            lsErrorMessage &= vbCrLf & vbCrLf & "Removing the Column from the ORM model (only) as a precaution."
+                            If Me.IsDatabaseSynchronised Then
+                                lsErrorMessage &= " Not from the database. Contact support for instructions how to fix this problem."
+                            End If
+
+                            Dim lbDatabaseSynchronisation As Boolean = Me.IsDatabaseSynchronised
+                            Me.IsDatabaseSynchronised = False
+                            Call Me.removeCMMLAttribute(lrTable.Name, lsColumnId)
+                            Me.IsDatabaseSynchronised = lbDatabaseSynchronisation
+
+                            lsErrorMessage &= vbCrLf & vbCrLf & ex.StackTrace
+                            prApplication.ThrowErrorMessage(lsErrorMessage, pcenumErrorType.Critical, ex.StackTrace)
+                            'Throw New Exception(lsErrorMessage)
+                        End Try
 
                         lrORMRecordset2.MoveNext()
                     End While

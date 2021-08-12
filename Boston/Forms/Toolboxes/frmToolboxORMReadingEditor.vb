@@ -739,6 +739,10 @@ Public Class frmToolboxORMReadingEditor
 
                         Call Me.zrFactTypeInstance.FactType.setName(lsNewName, True)
 
+                        If lrFactTypeReading.FactType.Arity = 1 Then
+
+                        End If
+
                         '---------------------------------------------------------------------------------------------
                         'CMML
                         Dim lrRecordset As ORMQL.Recordset
@@ -758,6 +762,21 @@ Public Class frmToolboxORMReadingEditor
                             Call lrRecordset("FactType").SwitchConcept(lrNewDictionaryEntry.Concept, pcenumConceptType.FactType)
                         End If
 
+                    End If
+
+                    '=============================================================================
+                    'RDS - Change Column.Name if need be.
+                    Dim larColumn = From Table In Me.zrFactType.Model.RDS.Table
+                                    From Column In Table.Column
+                                    Where Column.FactType Is Me.zrFactType
+                                    Select Column
+
+                    If larColumn.Count > 0 Then 'CodeSafe. Must have found a Column.
+                        If lrFactTypeReading.PredicatePart(0).Role.JoinedORMObject.Id = larColumn.First.Table.Name Then
+                            Dim lrColumn = larColumn.First
+                            Dim lsNewColumnName As String = lrColumn.getAttributeName
+                            Call lrColumn.setName(lsNewColumnName)
+                        End If
                     End If
 
                     Me.zrFactTypeInstance.Model.MakeDirty()

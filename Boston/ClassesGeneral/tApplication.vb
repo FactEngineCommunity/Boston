@@ -417,7 +417,6 @@ Public Class tApplication
             'CurrentFunctionName
             ' = new System.Diagnostics.StackTrace().GetFrame(0).GetMethod().Name;
 
-
             If My.Settings.DebugMode = pcenumDebugMode.Debug.ToString Then
                 '-----------------------
                 'Write to the ErrorLog

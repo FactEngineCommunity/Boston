@@ -1041,7 +1041,6 @@ Namespace FBM
             '  is done at the RDS Level.
             '----------------------------------------------------------------------------------
             '20180606-VM-ToDo: Maybe already done. Check this
-
         End Sub
 
         Public Sub removeCMMLAttributeFromTableOnly(ByRef arColumn As RDS.Column, arTable As RDS.Table)

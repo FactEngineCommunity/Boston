@@ -3146,9 +3146,24 @@ Public Class frmToolboxORMVerbalisation
                                 lrVerbaliser.VerbaliseModelObject(arAttribute.Column.ActiveRole.JoinedORMObject)
                         End Select
                 End Select
+            Else
+                'Is UnaryFactType Column/Attribute
+                lrVerbaliser.HTW.WriteBreak()
+                lrVerbaliser.VerbaliseHeading("ORM Level")
+                lrVerbaliser.HTW.WriteBreak()
+
+                lrFactTypeReading = arAttribute.Column.Role.FactType.FactTypeReading(0)
+                lrVerbaliser.HTW.WriteBreak()
+
+                lrFactTypeReading.GetReadingText(lrVerbaliser)
+                'lrVerbaliser.VerbaliseModelObject(lrFactType.RoleGroup(0).JoinedORMObject)
+                'lrVerbaliser.VerbalisePredicateText(" " & lrFactTypeReading.PredicatePart(0).PredicatePartText)
+
+
+                lrVerbaliser.HTW.WriteBreak()
+
             End If
 
-            lrVerbaliser.HTW.WriteBreak()
             lrVerbaliser.HTW.WriteBreak()
             lrVerbaliser.VerbaliseHeading("Value Constraints:")
             lrVerbaliser.HTW.WriteBreak()
@@ -3180,7 +3195,7 @@ Public Class frmToolboxORMVerbalisation
             End If
 
             If My.Settings.SuperuserMode Then
-                If arAttribute.ActiveRole.JoinedORMObject.GetType = GetType(FBM.EntityType) Then
+                If arAttribute.ActiveRole.JoinedORMObject.GetType = GetType(FBM.EntityType) And Not arAttribute.ActiveRole.FactType.Arity = 1 Then
                     lrVerbaliser.HTW.WriteBreak()
                     lrVerbaliser.HTW.WriteBreak()
                     lrVerbaliser.VerbaliseError("Error: This Attribute is joined to an EntityType (" & arAttribute.ActiveRole.JoinedORMObject.Id & ") rather than the Entity Type's Reference Scheme's Value Type.")
@@ -3189,7 +3204,7 @@ Public Class frmToolboxORMVerbalisation
                 End If
             End If
 
-                Me.WebBrowser.DocumentText = lrVerbaliser.Verbalise
+            Me.WebBrowser.DocumentText = lrVerbaliser.Verbalise
 
         Catch ex As Exception
             Dim lsMessage1 As String
