@@ -1052,10 +1052,10 @@ Namespace FBM
                 Dim lasTableName = From Table In Me.Model.RDS.Table
                                    Select Table.Name
 
-                If lasTableName.ToList.Contains(Me.JoinedORMObject.Id) Then
-                    Return Me.JoinedORMObject.getCorrespondingRDSTable()
-                ElseIf lasTableName.ToList.Contains(Me.FactType.Id) Then
+                If lasTableName.ToList.Contains(Me.FactType.Id) Then
                     Return Me.FactType.getCorrespondingRDSTable
+                ElseIf lasTableName.ToList.Contains(Me.JoinedORMObject.Id) Then
+                    Return Me.JoinedORMObject.getCorrespondingRDSTable()
                 End If
 
 

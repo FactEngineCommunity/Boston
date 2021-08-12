@@ -1118,8 +1118,10 @@ Namespace RDS
 
                 'Database synchronisation
                 If abRemoveFromDatabase Then
-                    Call Me.Model.Model.connectToDatabase()
-                    Call Me.Model.Model.DatabaseConnection.removeColumn(arColumn)
+                    If Me.Model.Model.IsDatabaseSynchronised Then
+                        Call Me.Model.Model.connectToDatabase()
+                        Call Me.Model.Model.DatabaseConnection.removeColumn(arColumn)
+                    End If
                 End If
 
                 If Me.Column.Count = 0 Then
@@ -1268,7 +1270,7 @@ Namespace RDS
                     For Each lrSupertypeColumn In lrTable.Column
                         Dim lrColumn = Me.Column.Find(AddressOf lrSupertypeColumn.EqualsByRoleActiveRole)
                         If lrColumn IsNot Nothing Then
-                            Call Me.removeColumn(lrColumn)
+                            Call Me.removeColumn(lrColumn, True, False)
                         End If
                     Next
                 Next

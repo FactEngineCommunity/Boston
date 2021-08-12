@@ -1689,11 +1689,11 @@ Namespace FBM
 
                 End While 'Stepping through Tables
 
-                Me.RDS.Table.OrderBy(Function(x) x.getSupertypeTables.Count)
+                Dim larSortedTables = Me.RDS.Table.OrderBy(Function(x) x.getSupertypeTables.Count)
 
-                For Each lrTable In Me.RDS.Table
+                For Each lrTable In larSortedTables
 
-                    If {"Person", "Actor"}.Contains(lrTable.Name) Then Debugger.Break()
+                    'If {"Movie", "Actor"}.Contains(lrTable.Name) Then Debugger.Break()
 
                     '==========================================================================================================
                     'Columns
@@ -1718,10 +1718,10 @@ Namespace FBM
                             lrORMRecordset3 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
                             lrResponsibleRole = Me.Role.Find(Function(x) x.Id = lrORMRecordset3("Role").Data)
 
-                            Dim lrSupertypeTable As RDS.Table = lrResponsibleRole.getCorrespondingRDSTable
-                            If lrTable Is lrSupertypeTable Then
+                            Dim lrResponsibleRoleTable As RDS.Table = lrResponsibleRole.getCorrespondingRDSTable
+                            If lrTable IsNot lrResponsibleRoleTable And lrResponsibleRoleTable.Column.Count > 0 Then
 
-                                Dim lrSupertypeColumn As RDS.Column = lrSupertypeTable.Column.Find(Function(x) x.Id = lsColumnId)
+                                Dim lrSupertypeColumn As RDS.Column = lrResponsibleRoleTable.Column.Find(Function(x) x.Id = lsColumnId)
 
                                 Dim lrNewColumn = lrSupertypeColumn.Clone(lrTable, Nothing)
 
@@ -1779,15 +1779,15 @@ Namespace FBM
 
                         Catch ex As Exception
                             Dim lsErrorMessage As String = "Trouble loading Column for Table, " & lrTable.Name & ". Column.Id = " & lsColumnId
-                            lsErrorMessage &= vbCrLf & vbCrLf & "Removing the Column from the ORM model (only) as a precaution."
+                            lsErrorMessage &= vbCrLf & vbCrLf & "Skipping loading of the Column from the ORM model (only) as a precaution."
                             If Me.IsDatabaseSynchronised Then
-                                lsErrorMessage &= " Not from the database. Contact support for instructions how to fix this problem."
+                                lsErrorMessage &= " Contact support for instructions how to fix this problem."
                             End If
 
-                            Dim lbDatabaseSynchronisation As Boolean = Me.IsDatabaseSynchronised
-                            Me.IsDatabaseSynchronised = False
-                            Call Me.removeCMMLAttribute(lrTable.Name, lsColumnId)
-                            Me.IsDatabaseSynchronised = lbDatabaseSynchronisation
+                            'Dim lbDatabaseSynchronisation As Boolean = Me.IsDatabaseSynchronised
+                            'Me.IsDatabaseSynchronised = False
+                            'Call Me.removeCMMLAttribute(lrTable.Name, lsColumnId)
+                            'Me.IsDatabaseSynchronised = lbDatabaseSynchronisation
 
                             lsErrorMessage &= vbCrLf & vbCrLf & ex.StackTrace
                             prApplication.ThrowErrorMessage(lsErrorMessage, pcenumErrorType.Critical, ex.StackTrace)
@@ -2125,6 +2125,7 @@ Namespace FBM
 
                     lrOriginTable = New RDS.Table
                     lrOriginTable.Name = lrRecordset("Entity").Data
+
 
                     lsRelationId = lrRecordset("Relation").Data
 

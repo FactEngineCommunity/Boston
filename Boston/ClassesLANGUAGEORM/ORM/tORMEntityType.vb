@@ -2081,13 +2081,13 @@ Namespace FBM
 
         End Sub
 
-        Public Overrides Sub RemoveSubtypeRelationship(ByRef arSubtypeConstraint As FBM.tSubtypeRelationship)
+        Public Overrides Sub RemoveSubtypeRelationship(ByRef arSubtypeRelationship As FBM.tSubtypeRelationship)
 
-            Me.parentModelObjectList.Remove(arSubtypeConstraint.parentEntityType)
-            arSubtypeConstraint.parentEntityType.childModelObjectList.Remove(Me)
-            Me.SubtypeRelationship.Remove(arSubtypeConstraint)
+            Me.parentModelObjectList.Remove(arSubtypeRelationship.parentEntityType)
+            arSubtypeRelationship.parentEntityType.childModelObjectList.Remove(Me)
+            Me.SubtypeRelationship.Remove(arSubtypeRelationship)
             '--------------------------------------------------------------------------------
-            'Deletion from the database is handled in FBM.SubtypeConstraint.RemoveFromModel
+            'Deletion from the database is handled in FBM.SubtypeRelationship.RemoveFromModel
             '--------------------------------------------------------------------------------
 
             If Me.SubtypeRelationship.Count = 0 Then
@@ -2095,7 +2095,7 @@ Namespace FBM
                 Me.IsAbsorbed = False
             End If
 
-            RaiseEvent SubtypeConstraintRemoved(arSubtypeConstraint)
+            RaiseEvent SubtypeConstraintRemoved(arSubtypeRelationship)
 
         End Sub
 
