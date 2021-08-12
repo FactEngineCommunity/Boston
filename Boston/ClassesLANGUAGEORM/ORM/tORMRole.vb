@@ -1043,6 +1043,36 @@ Namespace FBM
         End Function
 
         ''' <summary>
+        ''' PRECONDITION: Role is a ResponsibeRole of a Column in a RDS Table.
+        ''' </summary>
+        ''' <returns></returns>
+        Public Overrides Function getCorrespondingRDSTable() As RDS.Table
+
+            Try
+                Dim lasTableName = From Table In Me.Model.RDS.Table
+                                   Select Table.Name
+
+                If lasTableName.ToList.Contains(Me.JoinedORMObject.Id) Then
+                    Return Me.JoinedORMObject.getCorrespondingRDSTable()
+                ElseIf lasTableName.ToList.Contains(Me.FactType.Id) Then
+                    Return Me.FactType.getCorrespondingRDSTable
+                End If
+
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return Nothing
+            End Try
+
+        End Function
+
+        ''' <summary>
         ''' Used in, for instance, Me.getResponsibleColumns() to make sure that upstream Columns for a ReassignedRole are actually for the reassigned Role.
         ''' </summary>
         ''' <param name="arTargetRole"></param>

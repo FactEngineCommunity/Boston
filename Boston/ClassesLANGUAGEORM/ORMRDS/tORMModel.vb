@@ -1718,8 +1718,18 @@ Namespace FBM
                             lrORMRecordset3 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
                             lrResponsibleRole = Me.Role.Find(Function(x) x.Id = lrORMRecordset3("Role").Data)
 
-                            If lrResponsibleRole.JoinedORMObject.Id = lrTable.Name Then
+                            Dim lrSupertypeTable As RDS.Table = lrResponsibleRole.getCorrespondingRDSTable
+                            If lrTable Is lrSupertypeTable Then
 
+                                Dim lrSupertypeColumn As RDS.Column = lrSupertypeTable.Column.Find(Function(x) x.Id = lsColumnId)
+
+                                Dim lrNewColumn = lrSupertypeColumn.Clone(lrTable, Nothing)
+
+                                Dim lrExistingColumn = lrTable.Column.Find(Function(x) x.Role Is lrNewColumn.Role And x.ActiveRole Is lrNewColumn.ActiveRole)
+                                If lrExistingColumn Is Nothing Then
+                                    Call lrTable.Column.Add(lrNewColumn)
+                                End If
+                            Else
                                 'Column Name
                                 lsSQLQuery = "SELECT *"
                                 lsSQLQuery &= " FROM CorePropertyHasPropertyName" '(Property, PropertyName)
