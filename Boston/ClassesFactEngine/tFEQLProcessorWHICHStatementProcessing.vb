@@ -208,6 +208,9 @@
                         Case Is = FactEngine.pcenumWhichClauseType.BooleanPredicate  '14. E.g. Protein is enzyme
                             Call Me.analystBooleanPredicateClause(Me.WHICHCLAUSE, lrQueryGraph, lrQueryEdge, lrPreviousTargetNode)
 
+                        Case Is = FactEngine.pcenumWhichClauseType.ThatModelElementPredicate  '15. E.g. THAT James Dean Played in (as in "SHOW ME Movies THAT James Dean played in")
+                            Call Me.analyseThatModelElementPredicate(Me.WHICHCLAUSE, lrQueryGraph, lrQueryEdge, lrPreviousTargetNode)
+
                         Case Else 'CodeSafe
                             Throw New Exception("Unknown WhichClauseType.")
 
@@ -880,7 +883,6 @@
 
 #End Region
 
-
         '7
 #Region "analyseANDTHATWHICHClause"
         '7
@@ -1312,6 +1314,55 @@
 
 #End Region
 
+        '15
+#Region "analyseThatModelElementPredicate"
+
+        Public Sub analyseThatModelElementPredicate(ByRef arWHICHCLAUSE As FEQL.WHICHCLAUSE,
+                                              ByRef arQueryGraph As FactEngine.QueryGraph,
+                                              ByRef arQueryEdge As FactEngine.QueryEdge,
+                                              ByRef arPreviousTargetNode As FactEngine.QueryNode)
+
+            arQueryEdge.WhichClauseType = FactEngine.Constants.pcenumWhichClauseType.ThatPredicateWhichModelElement
+            arQueryEdge.IsProjectColumn = True
+
+            'Set the BaseNode
+            arQueryEdge.BaseNode = Nothing
+
+            'Get the TargetNode                        
+            Dim lrTargetFBMModelObject = Me.Model.GetModelObjectByName(arWHICHCLAUSE.MODELELEMENTNAME(0))
+            If lrTargetFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & arWHICHCLAUSE.MODELELEMENTNAME(0) & "'.")
+            arQueryEdge.TargetNode = New FactEngine.QueryNode(lrTargetFBMModelObject, arQueryEdge, True)
+            'arQueryEdge.TargetNode.Alias = Me.WHICHCLAUSE.NODE(0).MODELELEMENTSUFFIX
+            'arQueryEdge.TargetNode.PreboundText = arWHICHCLAUSE.NODE(0).PREBOUNDREADINGTEXT
+            'arQueryEdge.TargetNode.PostboundText = arWHICHCLAUSE.NODE(0).POSTBOUNDREADINGTEXT
+            arQueryGraph.Nodes.AddUnique(arQueryEdge.TargetNode)
+
+            arQueryEdge.FBMFactType = Me.Model.getFactTypeByPredicateFarSideModelElement(arQueryEdge.Predicate, arQueryEdge.TargetNode.FBMModelObject, True)
+
+            If arQueryEdge.FBMFactType Is Nothing Then
+                Throw New Exception("Couldn't find a Fact Type that ends '" & arQueryEdge.Predicate & " " & arWHICHCLAUSE.MODELELEMENTNAME(0) & "'")
+            End If
+            Dim lsTargetNodeName As String = arQueryEdge.TargetNode.Name
+            Dim larRole = From Role In arQueryEdge.FBMFactType.RoleGroup
+                          Where Role.JoinedORMObject.Id <> lsTargetNodeName
+                          Select Role
+
+
+            Dim lrBaseFBMModelObject = larRole.First.JoinedORMObject
+            If lrBaseFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & Me.WHICHCLAUSE.MODELELEMENTNAME(0) & "'.")
+
+            arQueryEdge.BaseNode = New FactEngine.QueryNode(lrBaseFBMModelObject, arQueryEdge)
+
+
+            '-----------------------------------------
+            'Get the relevant FBM.FactType
+            Call arQueryEdge.getAndSetFBMFactType(arQueryEdge.BaseNode,
+                                                  arQueryEdge.TargetNode,
+                                                  arQueryEdge.Predicate)
+        End Sub
+#End Region
+
+
 #Region "getWHICHClauseType"
         Public Function getWHICHClauseType(ByRef arWHICHClause As FEQL.WHICHCLAUSE,
                                            ByRef arWhichClauseNode As FEQL.ParseNode) As FactEngine.pcenumWhichClauseType
@@ -1387,6 +1438,15 @@
 
                 'E.g. "AND THAT Lecturer works for THAT Faculty"
                 Return FactEngine.Constants.pcenumWhichClauseType.AndThatModelElementPredicateThatModelElement
+
+                '15
+            ElseIf Me.WHICHCLAUSE.KEYWDTHAT IsNot Nothing And
+                   Me.WHICHCLAUSE.MODELELEMENTNAME IsNot Nothing And
+                   Me.WHICHCLAUSE.PREDICATE IsNot Nothing And
+                   (Me.WHICHCLAUSE.KEYWDWHICH Is Nothing Or Me.WHICHCLAUSE.KEYWDA Is Nothing) Then
+
+                'E.g. "AND is in A School"            
+                Return FactEngine.Constants.pcenumWhichClauseType.ThatModelElementPredicate
 
                 '5
             ElseIf Me.WHICHCLAUSE.KEYWDAND Is Nothing Then

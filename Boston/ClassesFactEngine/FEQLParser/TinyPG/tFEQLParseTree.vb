@@ -292,6 +292,9 @@ Namespace FEQL
             Dim Value As Object = Nothing
 
             Select Case Token.Type
+                Case TokenType.FOLLOWINGREADINGTEXT
+                    Value = EvalFOLLOWINGREADINGTEXT(tree, paramlist)
+                    Exit Select
                 Case TokenType.COMPARITOR
                     Value = EvalCOMPARITOR(tree, paramlist)
                     Exit Select
@@ -734,7 +737,11 @@ Namespace FEQL
             Return lrParseNode
         End Function
 
-                Protected Overridable Function EvalCOMPARITOR(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+                Protected Overridable Function EvalFOLLOWINGREADINGTEXT(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalCOMPARITOR(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
             Throw New NotImplementedException()
         End Function
 

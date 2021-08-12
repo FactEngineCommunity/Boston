@@ -21,6 +21,7 @@
             ISNOTClause = 131 '                                 E.g. Person 1 IS NOT Person 2
             ISClause = 132 '                                    E.g. Person 1 IS Person 2
             BooleanPredicate = 14 '                             E.g. Protein is ensyme
+            ThatModelElementPredicate = 15 '                    E.g. THAT James Dean played in (as in "SHOW ME Movies THAT James Dean played in")
 
             '?? below
             'AndThatModelElementPredicateWhichModelElement '    E.g. AND THAT Faculty has WHICH School. Currently unused.Checked.
