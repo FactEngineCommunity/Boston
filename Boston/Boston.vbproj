@@ -392,6 +392,7 @@
     <Compile Include="ClassesFactEngine\FEQLParser\TinyPG\tFEQLScanner.vb" />
     <Compile Include="ClassesFactEngine\FEQLParser\TinyPG\tFEQLTextHighlighter.vb" />
     <Compile Include="ClassesFactEngine\FEQLParser\TinyPG\tTextMarker.vb" />
+    <Compile Include="ClassesFactEngine\Processor\tFEQLConstants.vb" />
     <Compile Include="ClassesFactEngine\Processor\tFEQLProcessor-DerivationFormula.vb" />
     <Compile Include="ClassesFactEngine\Processor\tFEQLProcessor-FactReading.vb" />
     <Compile Include="ClassesFactEngine\tFEQLProcessor.vb" />

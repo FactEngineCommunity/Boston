@@ -841,6 +841,40 @@ Namespace FEQL
 
     Public Class NODEPROPERTYIDENTIFICATION
 
+        Public Function getComparitorType() As pcenumFEQLComparitor
+
+            If Me.BANG IsNot Nothing Then
+                Return pcenumFEQLComparitor.Bang
+            ElseIf Me.CARRET IsNot Nothing Then
+                Return pcenumFEQLComparitor.Carret
+            ElseIf Me.COLON IsNot Nothing Then
+                Return pcenumFEQLComparitor.Colon
+            ElseIf Me.LIKECOMPARITOR IsNot Nothing Then
+                Return pcenumFEQLComparitor.LikeComparitor
+            End If
+
+        End Function
+
+        Private _BANG As String = Nothing
+        Public Property BANG As String
+            Get
+                Return Me._BANG
+            End Get
+            Set(value As String)
+                Me._BANG = value
+            End Set
+        End Property
+
+        Private _CARRET As String = Nothing
+        Public Property CARRET As String
+            Get
+                Return Me._CARRET
+            End Get
+            Set(value As String)
+                Me._CARRET = value
+            End Set
+        End Property
+
         Private _COLON As String = Nothing
         Public Property COLON As String
             Get
@@ -850,6 +884,17 @@ Namespace FEQL
                 Me._COLON = value
             End Set
         End Property
+
+        Private _LIKECOMPARITOR As String = Nothing
+        Public Property LIKECOMPARITOR As String
+            Get
+                Return Me._LIKECOMPARITOR
+            End Get
+            Set(value As String)
+                Me._LIKECOMPARITOR = value
+            End Set
+        End Property
+
 
         Private _MODELELEMENT As New Object
         Public Property MODELELEMENT As Object

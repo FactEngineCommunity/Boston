@@ -33,6 +33,10 @@ Namespace FEQL
             SkipList = New List(Of TokenType)()
             SkipList.Add(TokenType.WHITESPACE)
 
+            regex = new Regex("\!", RegexOptions.Compiled)
+            Patterns.Add(TokenType.BANG, regex)
+            Tokens.Add(TokenType.BANG)
+
             regex = new Regex("\(+", RegexOptions.Compiled)
             Patterns.Add(TokenType.BROPEN, regex)
             Tokens.Add(TokenType.BROPEN)
@@ -109,9 +113,13 @@ Namespace FEQL
             Patterns.Add(TokenType.FOLLOWINGREADINGTEXT, regex)
             Tokens.Add(TokenType.FOLLOWINGREADINGTEXT)
 
-            regex = new Regex("[aA-zZ0-9 \-\:/]+", RegexOptions.Compiled)
+            regex = new Regex("^(?!\s)[aA-zZ0-9% \-\:/]+", RegexOptions.Compiled)
             Patterns.Add(TokenType.IDENTIFIER, regex)
             Tokens.Add(TokenType.IDENTIFIER)
+
+            regex = new Regex("~", RegexOptions.Compiled)
+            Patterns.Add(TokenType.LIKECOMPARITOR, regex)
+            Tokens.Add(TokenType.LIKECOMPARITOR)
 
             regex = new Regex("<=|<|=|>=|>", RegexOptions.Compiled)
             Patterns.Add(TokenType.MATHFUNCTION, regex)
@@ -205,7 +213,7 @@ Namespace FEQL
             Patterns.Add(TokenType.VALUE, regex)
             Tokens.Add(TokenType.VALUE)
 
-            regex = new Regex("A ", RegexOptions.Compiled)
+            regex = new Regex("A", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDA, regex)
             Tokens.Add(TokenType.KEYWDA)
 
@@ -745,6 +753,10 @@ Namespace FEQL
             Patterns.Add(TokenType.KEYWDWHAT, regex)
             Tokens.Add(TokenType.KEYWDWHAT)
 
+            regex = new Regex("WHERE ALSO", RegexOptions.Compiled)
+            Patterns.Add(TokenType.KEYWDWHEREALSO, regex)
+            Tokens.Add(TokenType.KEYWDWHEREALSO)
+
             regex = new Regex("WHICH", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDWHICH, regex)
             Tokens.Add(TokenType.KEYWDWHICH)
@@ -1047,198 +1059,203 @@ Namespace FEQL
         Start       = 139
 
         'Terminal tokens:
-        BROPEN      = 140
-        BRCLOSE     = 141
-        CARRET      = 142
-        CLOSEPARENTHESIS= 143
-        CLOSESQUAREBRACKET= 144
-        COLON       = 145
-        COLUMNNAMESTR= 146
-        COMMA       = 147
-        CURLYBRACKETCLOSE= 148
-        CURLYBRACKETOPEN= 149
-        DATABASENAME= 150
-        DATABASETYPE= 151
-        DOUBLEQUOTE = 152
-        EMAILADDRESS= 153
-        EOF         = 154
-        EQUALS      = 155
-        FACTTYPENAME= 156
-        FILELOCATIONNAME= 157
-        FOLLOWINGREADINGTEXT= 158
-        IDENTIFIER  = 159
-        MATHFUNCTION= 160
-        MODELNAME   = 161
-        MODELELEMENTNAME= 162
-        MODELELEMENTSUFFIX= 163
-        MODELID     = 164
-        NUMBER      = 165
-        PAGENAME    = 166
-        OPENPARENTHESIS= 167
-        OPENSQUAREBRACKET= 168
-        PERIOD      = 169
-        PREBOUNDREADINGTEXT= 170
-        POSTBOUNDREADINGTEXT= 171
-        PREDICATE   = 172
-        PREDICATESPACE= 173
-        REFERENCEMODE= 174
-        ROLENAME    = 175
-        SEMICOLON   = 176
-        SINGLEQUOTE = 177
-        SPACE       = 178
-        STAR        = 179
-        USERTABLENAME= 180
-        WHERECLAUSECOLUMNNAMESTR= 181
-        VALUE       = 182
-        KEYWDA      = 183
-        KEYWDAN     = 184
-        KEYWDAND    = 185
-        KEYWDADD    = 186
-        KEYWDADDFACT= 187
-        KEYWDADDFACTTYPE= 188
-        KEYWDASSERT = 189
-        KEYWDATMOSTONE= 190
-        KEYWDBUTNOTBOTH= 191
-        KEYWDCIRCULAR= 192
-        KEYWDCOMBINATION= 193
-        KEYWDCOUNT  = 194
-        KEYWDCOUNTSTAR= 195
-        KEYWDCREATE = 196
-        KEYWDCREATECONCEPT= 197
-        KEYWDCONNECTTOMODEL= 198
-        KEYWDDATABASE= 199
-        KEYWDCREATEENTITYTYPE= 200
-        KEYWDCREATEFACTTYPE= 201
-        KEYWDCREATEMODEL= 202
-        KEYWDCREATEVALUETYPE= 203
-        KEYWDDATATYPELOGICALTRUEFALSE= 204
-        KEYWDDATATYPELOGICALYESNO= 205
-        KEYWDDATATYPEAUTOCOUNTER= 206
-        KEYWDDATATYPEDECIMAL= 207
-        KEYWDDATATYPEFLOATCUSTOMPRECISION= 208
-        KEYWDDATATYPEFLOATDOUBLEPRECISION= 209
-        KEYWDDATATYPEFLOATSINGLEPRECISION= 210
-        KEYWDDATATYPEMONEY= 211
-        KEYWDDATATYPESIGNEDBIGINTEGER= 212
-        KEYWDDATATYPESIGNEDINTEGER= 213
-        KEYWDDATATYPESIGNEDSMALLINTEGER= 214
-        KEYWDDATATYPEUNSIGNEDBIGINTEGER= 215
-        KEYWDDATATYPEUNSIGNEDINTEGER= 216
-        KEYWDDATATYPEUNSIGNEDSMALLINTEGER= 217
-        KEYWDDATATYPEUNSIGNEDTINYINTEGER= 218
-        KEYWDDATATYPEOBJECTID= 219
-        KEYWDDATATYPEROWID= 220
-        KEYWDDATATYPERAWDATAFIXEDLENGTH= 221
-        KEYWDDATATYPERAWDATALARGELENGTH= 222
-        KEYWDDATATYPERAWDATAOLEOBJECT= 223
-        KEYWDDATATYPERAWDATA= 224
-        KEYWDDATATYPERAWDATAVARIABLELENGTH= 225
-        KEYWDDATATYPEAUTOTIMESTAMP= 226
-        KEYWDDATATYPEDATE= 227
-        KEYWDDATATYPEDATETIME= 228
-        KEYWDDATATYPETIME= 229
-        KEYWDDATATYPESTRINGFIXEDLENGTH= 230
-        KEYWDDATATYPESTRINGLARGELENGTH= 231
-        KEYWDDATATYPESTRINGVARIABLELENGTH= 232
-        KEYWDDELETE = 233
-        KEYWDDELETEALL= 234
-        KEYWDDELETEFACT= 235
-        KEYWDDESCRIBE= 236
-        KEYWDDID    = 237
-        KEYWDDISTINCT= 238
-        KEYWDEACH   = 239
-        KEYWDEITHER = 240
-        KEYWDENTITY = 241
-        KEYWDENTITYTYPE= 242
-        KEYWDENTITYTYPES= 243
-        KEYWDENUMERATE= 244
-        KEYWDEXISTS = 245
-        KEYWDFACT   = 246
-        KEYWDFACTTYPE= 247
-        KEYWDFACTTYPES= 248
-        KEYWDFOR    = 249
-        KEYWDFOREACH= 250
-        KEYWDFROM   = 251
-        KEYWDGET    = 252
-        KEYWDIFANDONLYIF= 253
-        KEYWDIN     = 254
-        KEYWDINSERT = 255
-        KEYWDINTO   = 256
-        KEYWDIS     = 257
-        KEYWDISA    = 258
-        KEYWDISAKINDOF= 259
-        KEYWDISIDENTIFIEDBYITS= 260
-        KEYWDISNOT  = 261
-        KEYWDISWHERE= 262
-        KEYWDISWRITTENAS= 263
-        KEYWDITISMANDATORYTHAT= 264
-        KEYWDJOINING= 265
-        KEYWDINDEX  = 266
-        KEYWDLANGUAGE= 267
-        KEYWDLANGUAGEDFD= 268
-        KEYWDLANGUAGEERD= 269
-        KEYWDLANGUAGEETD= 270
-        KEYWDLANGUAGEORM= 271
-        KEYWDLANGUAGESTD= 272
-        KEYWDLANGUAGEUCD= 273
-        KEYWDLOCATION= 274
-        KEYWDLIST   = 275
-        KEYWDMAX    = 276
-        KEYWDMATCH  = 277
-        KEYWDMIN    = 278
-        KEYWDMODEL  = 279
-        KEYWDMODELNOTES= 280
-        KEYWDMODELDICTIONARY= 281
-        KEYWDNO     = 282
-        KEYWDNULL   = 283
-        KEYWDOBJECT = 284
-        KEYWDOCCURSATLEASTONETIME= 285
-        KEYWDOCCURSATLEASTONETIMEINEACHOF= 286
-        KEYWDOF     = 287
-        KEYWDON     = 288
-        KEYWDONE    = 289
-        KEYWDONPAGE = 290
-        KEYWDOPEN   = 291
-        KEYWDOR     = 292
-        KEYWDORDERBY= 293
-        KEYWDPAGE   = 294
-        KEYWDPREDICATE= 295
-        KEYWDRETURN = 296
-        KEYWDROLE   = 297
-        KEYWDSELECT = 298
-        KEYWDRESTRICTEDTO= 299
-        KEYWDROLECONSTRAINTS= 300
-        KEYWDSET    = 301
-        KEYWDSHORTESTPATH= 302
-        KEYWDSHOW   = 303
-        KEYWDSHOWME = 304
-        KEYWDSUPERTYPE= 305
-        KEYWDTODAY  = 306
-        KEYWDTHAT   = 307
-        KEYWDTO     = 308
-        KEYWDTYPE   = 309
-        KEYWDUPDATE = 310
-        KEYWDVALUES = 311
-        KEYWDVALUETYPE= 312
-        KEYWDVALUETYPES= 313
-        KEYWDWHEN   = 314
-        KEYWDWHERE  = 315
-        KEYWDWITH   = 316
-        KEYWDWHAT   = 317
-        KEYWDWHICH  = 318
-        KEYWDWRITTENAS= 319
-        PLUS        = 320
-        MINUS       = 321
-        DIVIDE      = 322
-        TIMES       = 323
-        EXPRESSIONSYMBOL= 324
-        KEYWDLESSTHAN= 325
-        KEYWDGREATERTHAN= 326
-        WHITESPACE  = 327
+        BANG        = 140
+        BROPEN      = 141
+        BRCLOSE     = 142
+        CARRET      = 143
+        CLOSEPARENTHESIS= 144
+        CLOSESQUAREBRACKET= 145
+        COLON       = 146
+        COLUMNNAMESTR= 147
+        COMMA       = 148
+        CURLYBRACKETCLOSE= 149
+        CURLYBRACKETOPEN= 150
+        DATABASENAME= 151
+        DATABASETYPE= 152
+        DOUBLEQUOTE = 153
+        EMAILADDRESS= 154
+        EOF         = 155
+        EQUALS      = 156
+        FACTTYPENAME= 157
+        FILELOCATIONNAME= 158
+        FOLLOWINGREADINGTEXT= 159
+        IDENTIFIER  = 160
+        LIKECOMPARITOR= 161
+        MATHFUNCTION= 162
+        MODELNAME   = 163
+        MODELELEMENTNAME= 164
+        MODELELEMENTSUFFIX= 165
+        MODELID     = 166
+        NUMBER      = 167
+        PAGENAME    = 168
+        OPENPARENTHESIS= 169
+        OPENSQUAREBRACKET= 170
+        PERIOD      = 171
+        PREBOUNDREADINGTEXT= 172
+        POSTBOUNDREADINGTEXT= 173
+        PREDICATE   = 174
+        PREDICATESPACE= 175
+        REFERENCEMODE= 176
+        ROLENAME    = 177
+        SEMICOLON   = 178
+        SINGLEQUOTE = 179
+        SPACE       = 180
+        STAR        = 181
+        USERTABLENAME= 182
+        WHERECLAUSECOLUMNNAMESTR= 183
+        VALUE       = 184
+        KEYWDA      = 185
+        KEYWDAN     = 186
+        KEYWDAND    = 187
+        KEYWDADD    = 188
+        KEYWDADDFACT= 189
+        KEYWDADDFACTTYPE= 190
+        KEYWDASSERT = 191
+        KEYWDATMOSTONE= 192
+        KEYWDBUTNOTBOTH= 193
+        KEYWDCIRCULAR= 194
+        KEYWDCOMBINATION= 195
+        KEYWDCOUNT  = 196
+        KEYWDCOUNTSTAR= 197
+        KEYWDCREATE = 198
+        KEYWDCREATECONCEPT= 199
+        KEYWDCONNECTTOMODEL= 200
+        KEYWDDATABASE= 201
+        KEYWDCREATEENTITYTYPE= 202
+        KEYWDCREATEFACTTYPE= 203
+        KEYWDCREATEMODEL= 204
+        KEYWDCREATEVALUETYPE= 205
+        KEYWDDATATYPELOGICALTRUEFALSE= 206
+        KEYWDDATATYPELOGICALYESNO= 207
+        KEYWDDATATYPEAUTOCOUNTER= 208
+        KEYWDDATATYPEDECIMAL= 209
+        KEYWDDATATYPEFLOATCUSTOMPRECISION= 210
+        KEYWDDATATYPEFLOATDOUBLEPRECISION= 211
+        KEYWDDATATYPEFLOATSINGLEPRECISION= 212
+        KEYWDDATATYPEMONEY= 213
+        KEYWDDATATYPESIGNEDBIGINTEGER= 214
+        KEYWDDATATYPESIGNEDINTEGER= 215
+        KEYWDDATATYPESIGNEDSMALLINTEGER= 216
+        KEYWDDATATYPEUNSIGNEDBIGINTEGER= 217
+        KEYWDDATATYPEUNSIGNEDINTEGER= 218
+        KEYWDDATATYPEUNSIGNEDSMALLINTEGER= 219
+        KEYWDDATATYPEUNSIGNEDTINYINTEGER= 220
+        KEYWDDATATYPEOBJECTID= 221
+        KEYWDDATATYPEROWID= 222
+        KEYWDDATATYPERAWDATAFIXEDLENGTH= 223
+        KEYWDDATATYPERAWDATALARGELENGTH= 224
+        KEYWDDATATYPERAWDATAOLEOBJECT= 225
+        KEYWDDATATYPERAWDATA= 226
+        KEYWDDATATYPERAWDATAVARIABLELENGTH= 227
+        KEYWDDATATYPEAUTOTIMESTAMP= 228
+        KEYWDDATATYPEDATE= 229
+        KEYWDDATATYPEDATETIME= 230
+        KEYWDDATATYPETIME= 231
+        KEYWDDATATYPESTRINGFIXEDLENGTH= 232
+        KEYWDDATATYPESTRINGLARGELENGTH= 233
+        KEYWDDATATYPESTRINGVARIABLELENGTH= 234
+        KEYWDDELETE = 235
+        KEYWDDELETEALL= 236
+        KEYWDDELETEFACT= 237
+        KEYWDDESCRIBE= 238
+        KEYWDDID    = 239
+        KEYWDDISTINCT= 240
+        KEYWDEACH   = 241
+        KEYWDEITHER = 242
+        KEYWDENTITY = 243
+        KEYWDENTITYTYPE= 244
+        KEYWDENTITYTYPES= 245
+        KEYWDENUMERATE= 246
+        KEYWDEXISTS = 247
+        KEYWDFACT   = 248
+        KEYWDFACTTYPE= 249
+        KEYWDFACTTYPES= 250
+        KEYWDFOR    = 251
+        KEYWDFOREACH= 252
+        KEYWDFROM   = 253
+        KEYWDGET    = 254
+        KEYWDIFANDONLYIF= 255
+        KEYWDIN     = 256
+        KEYWDINSERT = 257
+        KEYWDINTO   = 258
+        KEYWDIS     = 259
+        KEYWDISA    = 260
+        KEYWDISAKINDOF= 261
+        KEYWDISIDENTIFIEDBYITS= 262
+        KEYWDISNOT  = 263
+        KEYWDISWHERE= 264
+        KEYWDISWRITTENAS= 265
+        KEYWDITISMANDATORYTHAT= 266
+        KEYWDJOINING= 267
+        KEYWDINDEX  = 268
+        KEYWDLANGUAGE= 269
+        KEYWDLANGUAGEDFD= 270
+        KEYWDLANGUAGEERD= 271
+        KEYWDLANGUAGEETD= 272
+        KEYWDLANGUAGEORM= 273
+        KEYWDLANGUAGESTD= 274
+        KEYWDLANGUAGEUCD= 275
+        KEYWDLOCATION= 276
+        KEYWDLIST   = 277
+        KEYWDMAX    = 278
+        KEYWDMATCH  = 279
+        KEYWDMIN    = 280
+        KEYWDMODEL  = 281
+        KEYWDMODELNOTES= 282
+        KEYWDMODELDICTIONARY= 283
+        KEYWDNO     = 284
+        KEYWDNULL   = 285
+        KEYWDOBJECT = 286
+        KEYWDOCCURSATLEASTONETIME= 287
+        KEYWDOCCURSATLEASTONETIMEINEACHOF= 288
+        KEYWDOF     = 289
+        KEYWDON     = 290
+        KEYWDONE    = 291
+        KEYWDONPAGE = 292
+        KEYWDOPEN   = 293
+        KEYWDOR     = 294
+        KEYWDORDERBY= 295
+        KEYWDPAGE   = 296
+        KEYWDPREDICATE= 297
+        KEYWDRETURN = 298
+        KEYWDROLE   = 299
+        KEYWDSELECT = 300
+        KEYWDRESTRICTEDTO= 301
+        KEYWDROLECONSTRAINTS= 302
+        KEYWDSET    = 303
+        KEYWDSHORTESTPATH= 304
+        KEYWDSHOW   = 305
+        KEYWDSHOWME = 306
+        KEYWDSUPERTYPE= 307
+        KEYWDTODAY  = 308
+        KEYWDTHAT   = 309
+        KEYWDTO     = 310
+        KEYWDTYPE   = 311
+        KEYWDUPDATE = 312
+        KEYWDVALUES = 313
+        KEYWDVALUETYPE= 314
+        KEYWDVALUETYPES= 315
+        KEYWDWHEN   = 316
+        KEYWDWHERE  = 317
+        KEYWDWITH   = 318
+        KEYWDWHAT   = 319
+        KEYWDWHEREALSO= 320
+        KEYWDWHICH  = 321
+        KEYWDWRITTENAS= 322
+        PLUS        = 323
+        MINUS       = 324
+        DIVIDE      = 325
+        TIMES       = 326
+        EXPRESSIONSYMBOL= 327
+        KEYWDLESSTHAN= 328
+        KEYWDGREATERTHAN= 329
+        WHITESPACE  = 330
     End Enum
 
-    <Serializable()> _
+    <Serializable()>
     Public Class Token 
+        Implements ICloneable
+
         Private m_startPos As Integer
         Private m_endPos As Integer
         Private m_text As String
@@ -1299,7 +1316,7 @@ Namespace FEQL
             End Set
         End Property
 
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Type As TokenType
 
         Public Sub New()
@@ -1331,6 +1348,29 @@ Namespace FEQL
                 Return Type.ToString()
             End If
         End Function
+
+        Public Function Clone() As Object Implements ICloneable.Clone
+            Dim lrToken As New Token
+            Dim lrSkippedToken As Token
+            With Me
+                lrToken.m_startPos = .m_startPos
+                lrToken.m_endPos = .m_endPos
+                lrToken.m_text = .m_text
+                lrToken.m_value = .m_value
+                lrToken.Type = .Type
+
+                ' contains all prior skipped symbols
+                If .m_skipped IsNot Nothing Then
+                    lrToken.m_skipped = New List(Of Token)
+                    For Each lrSkippedToken In .m_skipped
+                        lrToken.m_skipped.Add(lrSkippedToken.Clone)
+                    Next
+                End If
+            End With
+
+            Return lrToken
+        End Function
+
     End Class
 #End Region
 End Namespace

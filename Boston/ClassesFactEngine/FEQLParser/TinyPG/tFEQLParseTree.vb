@@ -13,12 +13,14 @@ Namespace FEQL
         Inherits List(Of ParseError)
 
         Public Sub New()
-
         End Sub
+
     End Class
 
     <Serializable()>
     Public Class ParseError 
+        Implements ICloneable
+
         Private m_message As String
         Private m_code As Integer
         Private m_line As Integer
@@ -103,6 +105,23 @@ Namespace FEQL
             Me.New(message, code, 0, node.Token.StartPos, node.Token.StartPos, node.Token.Length)
         End Sub
 
+        Public Function Clone() As Object Implements ICloneable.Clone
+
+            Dim lrParseError As New ParseError
+
+            With Me
+                lrParseError.m_message = .m_message
+                lrParseError.m_code = .m_code
+                lrParseError.m_line = .m_line
+                lrParseError.m_col = .m_col
+                lrParseError.m_pos = .m_pos
+                lrParseError.m_length = .m_length
+                lrParseError.m_expected_token = m_expected_token
+            End With
+
+            Return lrParseError
+
+        End Function
     End Class
 
     ' rootlevel of the node tree
@@ -111,7 +130,7 @@ Namespace FEQL
         Inherits ParseNode
 
         Public Errors As ParseErrors
-	Public Optionals As ParseErrors
+        Public Optionals As ParseErrors
 
         Public Skipped As List(Of Token)
 
@@ -126,37 +145,76 @@ Namespace FEQL
 
         Public Function PrintTree() As String
     Dim sb As New StringBuilder()
-    Dim indent As Integer = 0
+            Dim indent As Integer = 0
             PrintNode(sb, Me, indent)
             Return sb.ToString()
         End Function
 
-    Private Sub PrintNode(ByVal sb As StringBuilder, ByVal node As ParseNode, ByVal indent As Integer)
+        Private Sub PrintNode(ByVal sb As StringBuilder, ByVal node As ParseNode, ByVal indent As Integer)
 
-        Dim space As String = "".PadLeft(indent, " "c)
+            Dim space As String = "".PadLeft(indent, " "c)
 
-        sb.Append(space)
-        sb.AppendLine(node.Text)
+            sb.Append(space)
+            sb.AppendLine(node.Text)
 
-        For Each n As ParseNode In node.Nodes
-            PrintNode(sb, n, indent + 2)
-        Next
-    End Sub
+            For Each n As ParseNode In node.Nodes
+                PrintNode(sb, n, indent + 2)
+            Next
+        End Sub
 
-    ''' <summary>
-    ''' this is the entry point for executing and evaluating the parse tree.
-    ''' </summary>
-    ''' <param name="paramlist">additional optional input parameters</param>
-    ''' <returns>the output of the evaluation function</returns>
-    Public Overloads Function Eval(ByVal ParamArray paramlist As Object()) As Object
+        ''' <summary>
+        ''' this is the entry point for executing and evaluating the parse tree.
+        ''' </summary>
+        ''' <param name="paramlist">additional optional input parameters</param>
+        ''' <returns>the output of the evaluation function</returns>
+        Public Overloads Function Eval(ByVal ParamArray paramlist As Object()) As Object
         Return Nodes(0).Eval(Me, paramlist)
-    End Function
+        End Function
+
+        Public Overloads Function Clone() As Object
+            Dim lrTree As New ParseTree
+            Dim lrParseError As ParseError
+            Dim lrToken As Token
+            Dim lrNode As ParseNode
+
+            With Me
+                For Each lrNode In .Nodes
+                    lrTree.m_nodes.Add(lrNode.Clone)
+                Next
+
+                lrTree.Errors = New ParseErrors
+                For Each lrParseError In .Errors
+                    lrTree.Errors.Add(lrParseError.Clone)
+                Next
+
+                lrTree.Optionals = New ParseErrors
+                For Each lrParseError In .Optionals
+                    lrTree.Optionals.Add(lrParseError.Clone)
+                Next
+
+                lrTree.Skipped = New List(Of Token)
+                For Each lrToken In .Skipped
+                    lrTree.Skipped.Add(lrToken.Clone)
+                Next
+
+                lrTree.GUID = .GUID
+                lrTree.Text = .Text
+                If .Parent IsNot Nothing Then
+                    lrTree.Parent = .Parent.Clone
+                End If
+                lrTree.Token = .Token.Clone
+            End With
+
+            Return lrTree
+
+        End Function
     End Class
 #End Region
 
 #Region "ParseNode"
     <Serializable()>
     Partial Public Class ParseNode 
+        Implements ICloneable
         Implements IEquatable(Of ParseNode)
         Protected m_text As String
         Protected m_nodes As List(Of ParseNode)
@@ -658,6 +716,22 @@ Namespace FEQL
 
         Public Function Equals(other As ParseNode) As Boolean Implements IEquatable(Of ParseNode).Equals
             Return Me.GUID = other.GUID
+        End Function
+
+        Public Function Clone() As Object Implements ICloneable.Clone
+            Dim lrParseNode As New ParseNode
+            Dim lrSubParseNode As ParseNode
+
+            With Me
+                lrParseNode.m_text = .m_text
+                lrParseNode.m_nodes = New List(Of ParseNode)
+                For Each lrSubParseNode In .m_nodes
+                    lrParseNode.m_nodes.Add(lrSubParseNode.Clone)
+                Next
+                lrParseNode.Token = .Token.Clone
+                lrParseNode.GUID = .GUID
+            End With
+            Return lrParseNode
         End Function
 
                 Protected Overridable Function EvalCOMPARITOR(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object

@@ -285,6 +285,12 @@ Namespace FBM
                     If Me.DatabaseConnection Is Nothing Then
                         Throw New Exception("No database connection has been established. Please check the database connection settings for the Model in the Model Configuration Form.")
                     End If
+                ElseIf Me.DatabaseManager.Connection Is Nothing Then
+                    'Try and establish a connection
+                    Call Me.DatabaseManager.establishConnection(Me.TargetDatabaseType, Me.TargetDatabaseConnectionString)
+                    If Me.DatabaseConnection Is Nothing Then
+                        Throw New Exception("No database connection has been established. Please check the database connection settings for the Model in the Model Configuration Form.")
+                    End If
                 ElseIf Me.DatabaseConnection.Connected = False Then
                     Throw New Exception("The database is not connected.")
                 End If

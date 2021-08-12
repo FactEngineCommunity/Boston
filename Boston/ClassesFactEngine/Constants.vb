@@ -44,7 +44,6 @@
             TransitiveRingConstraintJoin
         End Enum
 
-
     End Module
 
 End Namespace

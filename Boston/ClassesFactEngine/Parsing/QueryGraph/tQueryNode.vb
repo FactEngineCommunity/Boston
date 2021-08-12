@@ -76,6 +76,14 @@ Namespace FactEngine
         End Property
 
         ''' <summary>
+        ''' Used for TargetNodes. Used for when generating SQL for Conditional Where Clauses.
+        '''   Bang is for != (not equals)
+        '''   Colon is for = (equals)
+        '''   Carret is for when to use the PK of the Table rather than the first Unique Identifier.
+        ''' </summary>
+        Public Comparitor As FEQL.pcenumFEQLComparitor = FEQL.pcenumFEQLComparitor.Colon
+
+        ''' <summary>
         ''' Parameterless New
         ''' </summary>
         Public Sub New()
