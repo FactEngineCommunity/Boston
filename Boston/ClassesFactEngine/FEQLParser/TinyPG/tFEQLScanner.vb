@@ -213,7 +213,7 @@ Namespace FEQL
             Patterns.Add(TokenType.VALUE, regex)
             Tokens.Add(TokenType.VALUE)
 
-            regex = new Regex("A ", RegexOptions.Compiled)
+            regex = new Regex("A", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDA, regex)
             Tokens.Add(TokenType.KEYWDA)
 
@@ -753,6 +753,10 @@ Namespace FEQL
             Patterns.Add(TokenType.KEYWDWHAT, regex)
             Tokens.Add(TokenType.KEYWDWHAT)
 
+            regex = new Regex("WHERE ALSO", RegexOptions.Compiled)
+            Patterns.Add(TokenType.KEYWDWHEREALSO, regex)
+            Tokens.Add(TokenType.KEYWDWHEREALSO)
+
             regex = new Regex("WHICH", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDWHICH, regex)
             Tokens.Add(TokenType.KEYWDWHICH)
@@ -1235,16 +1239,17 @@ Namespace FEQL
         KEYWDWHERE  = 317
         KEYWDWITH   = 318
         KEYWDWHAT   = 319
-        KEYWDWHICH  = 320
-        KEYWDWRITTENAS= 321
-        PLUS        = 322
-        MINUS       = 323
-        DIVIDE      = 324
-        TIMES       = 325
-        EXPRESSIONSYMBOL= 326
-        KEYWDLESSTHAN= 327
-        KEYWDGREATERTHAN= 328
-        WHITESPACE  = 329
+        KEYWDWHEREALSO= 320
+        KEYWDWHICH  = 321
+        KEYWDWRITTENAS= 322
+        PLUS        = 323
+        MINUS       = 324
+        DIVIDE      = 325
+        TIMES       = 326
+        EXPRESSIONSYMBOL= 327
+        KEYWDLESSTHAN= 328
+        KEYWDGREATERTHAN= 329
+        WHITESPACE  = 330
     End Enum
 
     <Serializable()>

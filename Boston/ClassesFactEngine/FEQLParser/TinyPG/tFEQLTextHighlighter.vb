@@ -992,32 +992,35 @@ Namespace FEQL
                     Case TokenType.KEYWDWHAT:
                         sb.Append("{{\cf169 ")
                         Exit Select
-                    Case TokenType.KEYWDWHICH:
+                    Case TokenType.KEYWDWHEREALSO:
                         sb.Append("{{\cf170 ")
                         Exit Select
-                    Case TokenType.KEYWDWRITTENAS:
+                    Case TokenType.KEYWDWHICH:
                         sb.Append("{{\cf171 ")
                         Exit Select
-                    Case TokenType.PLUS:
+                    Case TokenType.KEYWDWRITTENAS:
                         sb.Append("{{\cf172 ")
                         Exit Select
-                    Case TokenType.MINUS:
+                    Case TokenType.PLUS:
                         sb.Append("{{\cf173 ")
                         Exit Select
-                    Case TokenType.DIVIDE:
+                    Case TokenType.MINUS:
                         sb.Append("{{\cf174 ")
                         Exit Select
-                    Case TokenType.TIMES:
+                    Case TokenType.DIVIDE:
                         sb.Append("{{\cf175 ")
                         Exit Select
-                    Case TokenType.EXPRESSIONSYMBOL:
+                    Case TokenType.TIMES:
                         sb.Append("{{\cf176 ")
                         Exit Select
-                    Case TokenType.KEYWDLESSTHAN:
+                    Case TokenType.EXPRESSIONSYMBOL:
                         sb.Append("{{\cf177 ")
                         Exit Select
-                    Case TokenType.KEYWDGREATERTHAN:
+                    Case TokenType.KEYWDLESSTHAN:
                         sb.Append("{{\cf178 ")
+                        Exit Select
+                    Case TokenType.KEYWDGREATERTHAN:
+                        sb.Append("{{\cf179 ")
                         Exit Select
 
             Case Else
@@ -1028,7 +1031,7 @@ Namespace FEQL
 
     ' define the color palette to be used here
     Private Sub AddRtfHeader(ByVal sb As StringBuilder)
-        sb.Insert(0, "{\rtf1\ansi\deff0{\fonttbl{\f0\fnil\fcharset0 Tahoma;}}{\colortbl;\red94\green213\blue165;\red94\green213\blue165;\red94\green213\blue165;\red94\green213\blue165;\red227\green143\blue247;\red227\green143\blue247;\red94\green213\blue165;\red255\green171\blue26;\red135\green207\blue243;\red227\green143\blue247;\red227\green143\blue247;\red216\green127\blue178;\red135\green207\blue243;\red227\green143\blue247;\red227\green143\blue247;\red216\green127\blue178;\red94\green213\blue165;\red216\green127\blue178;\red94\green213\blue165;\red94\green213\blue165;\red216\green127\blue178;\red227\green143\blue247;\red227\green143\blue247;\red135\green207\blue243;\red94\green213\blue165;\red94\green213\blue165;\red227\green143\blue247;\red76\green153\blue0;\red153\green76\blue0;\red227\green143\blue247;\red216\green127\blue178;\red0\green0\blue255;\red255\green171\blue26;\red153\green0\blue0;\red115\green217\blue243;\red115\green217\blue243;\red115\green217\blue243;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red135\green207\blue243;\red0\green0\blue255;\red135\green207\blue243;\red135\green207\blue243;\red0\green0\blue255;\red115\green217\blue243;\red135\green207\blue243;\red135\green207\blue243;\red0\green0\blue255;\red135\green207\blue243;\red135\green207\blue243;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red135\green207\blue243;\red115\green217\blue243;\red135\green207\blue243;\red135\green207\blue243;\red135\green207\blue243;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red135\green207\blue243;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red135\green207\blue243;\red0\green0\blue255;\red135\green207\blue243;\red135\green207\blue243;\red135\green207\blue243;\red135\green207\blue243;\red135\green207\blue243;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red135\green207\blue243;\red0\green0\blue255;\red135\green207\blue243;\red0\green0\blue255;\red135\green207\blue243;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red115\green217\blue243;\red0\green0\blue255;\red0\green0\blue255;\red135\green207\blue243;\red135\green207\blue243;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red135\green207\blue243;\red135\green207\blue243;\red0\green0\blue255;\red0\green0\blue255;\red135\green207\blue243;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red135\green207\blue243;\red135\green207\blue243;\red135\green207\blue243;\red0\green0\blue255;\red94\green213\blue165;\red135\green207\blue243;\red0\green0\blue255;\red135\green207\blue243;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red135\green207\blue243;\red135\green207\blue243;\red135\green207\blue243;\red135\green207\blue243;\red255\green171\blue26;\red255\green171\blue26;\red255\green171\blue26;\red255\green171\blue26;\red94\green213\blue165;\red255\green171\blue26;\red255\green171\blue26;}\viewkind4\uc1\pard\lang1033\f0\fs20")
+        sb.Insert(0, "{\rtf1\ansi\deff0{\fonttbl{\f0\fnil\fcharset0 Tahoma;}}{\colortbl;\red94\green213\blue165;\red94\green213\blue165;\red94\green213\blue165;\red94\green213\blue165;\red227\green143\blue247;\red227\green143\blue247;\red94\green213\blue165;\red255\green171\blue26;\red135\green207\blue243;\red227\green143\blue247;\red227\green143\blue247;\red216\green127\blue178;\red135\green207\blue243;\red227\green143\blue247;\red227\green143\blue247;\red216\green127\blue178;\red94\green213\blue165;\red216\green127\blue178;\red94\green213\blue165;\red94\green213\blue165;\red216\green127\blue178;\red227\green143\blue247;\red227\green143\blue247;\red135\green207\blue243;\red94\green213\blue165;\red94\green213\blue165;\red227\green143\blue247;\red76\green153\blue0;\red153\green76\blue0;\red227\green143\blue247;\red216\green127\blue178;\red0\green0\blue255;\red255\green171\blue26;\red153\green0\blue0;\red115\green217\blue243;\red115\green217\blue243;\red115\green217\blue243;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red135\green207\blue243;\red0\green0\blue255;\red135\green207\blue243;\red135\green207\blue243;\red0\green0\blue255;\red115\green217\blue243;\red135\green207\blue243;\red135\green207\blue243;\red0\green0\blue255;\red135\green207\blue243;\red135\green207\blue243;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red135\green207\blue243;\red115\green217\blue243;\red135\green207\blue243;\red135\green207\blue243;\red135\green207\blue243;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red135\green207\blue243;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red135\green207\blue243;\red0\green0\blue255;\red135\green207\blue243;\red135\green207\blue243;\red135\green207\blue243;\red135\green207\blue243;\red135\green207\blue243;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red135\green207\blue243;\red0\green0\blue255;\red135\green207\blue243;\red0\green0\blue255;\red135\green207\blue243;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red115\green217\blue243;\red0\green0\blue255;\red0\green0\blue255;\red135\green207\blue243;\red135\green207\blue243;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red135\green207\blue243;\red135\green207\blue243;\red0\green0\blue255;\red0\green0\blue255;\red135\green207\blue243;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red135\green207\blue243;\red135\green207\blue243;\red135\green207\blue243;\red0\green0\blue255;\red94\green213\blue165;\red135\green207\blue243;\red0\green0\blue255;\red135\green207\blue243;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red135\green207\blue243;\red135\green207\blue243;\red115\green217\blue243;\red135\green207\blue243;\red135\green207\blue243;\red255\green171\blue26;\red255\green171\blue26;\red255\green171\blue26;\red255\green171\blue26;\red94\green213\blue165;\red255\green171\blue26;\red255\green171\blue26;}\viewkind4\uc1\pard\lang1033\f0\fs20")
     End Sub
 
     Private Sub AddRtfEnd(ByVal sb As StringBuilder)
