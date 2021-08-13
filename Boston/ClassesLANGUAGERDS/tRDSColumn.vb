@@ -337,6 +337,15 @@ Namespace RDS
                 End Select
 
                 lsAttributeName = Viev.Strings.MakeCapCamelCase(Viev.Strings.RemoveWhiteSpace(lsAttributeName))
+
+                Dim larRole = New List(Of FBM.Role)
+                larRole.Add(Me.Role)
+                larRole.Add(Me.ActiveRole)
+                Dim lrFactTypeReading As FBM.FactTypeReading = Me.FactType.FindSuitableFactTypeReadingByRoles(larRole, True)
+                If lrFactTypeReading IsNot Nothing Then
+                    lsAttributeName = lrFactTypeReading.PredicatePart(1).PreBoundText.Replace("-", "") & lsAttributeName
+                End If
+                lsAttributeName = MakeCapCamelCase(lsAttributeName)
                 lsAttributeName = Me.Table.createUniqueColumnName(Me, lsAttributeName, 0)
 
                 Return lsAttributeName

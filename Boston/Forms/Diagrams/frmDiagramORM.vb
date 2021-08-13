@@ -3022,6 +3022,7 @@ Public Class frmDiagramORM
                 End If
 
             Case Is = Keys.R
+#Region "R-For Role"
                 '-----------------------------------------------------------
                 'The User has elected to add a Role to the Model.
                 'Create a FactType (RoleGroup) linking the selected Objects.
@@ -3241,6 +3242,7 @@ Public Class frmDiagramORM
                         Me.Diagram.Invalidate()
                     End If
                 End If
+#End Region
             Case Is = Keys.M
                 If Me.zrPage.AreAllSelectedObjectsRoles Then
                     Dim loObject As Object
@@ -3254,6 +3256,7 @@ Public Class frmDiagramORM
             Case Is = (e.Alt + Keys.X)
                 'See the PreviewKeyDown Event for this event
             Case Is = Keys.G
+#Region "G-For Ring Constraint"
                 If Me.zrPage.SelectedObject.Count > 2 Then
                     '--------------------------------------------------------
                     'Ring Constraints can only be added to Binary FactTypes
@@ -3276,7 +3279,7 @@ Public Class frmDiagramORM
                 Else
                     Exit Sub
                 End If
-
+#End Region
             Case Is = Keys.O
                 If Me.zrPage.AreAllSelectedObjectsRoles Then
                     Dim lo_point As PointF = Me.zrPage.GetMidOfSelectedObjects
@@ -8287,7 +8290,24 @@ Public Class frmDiagramORM
 
     Private Sub ToolStripMenuItem1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripMenuItem1.Click
 
-        Call frmMain.loadToolboxORMReadingEditor(Me.zrPage, Me.DockPanel.ActivePane)
+        Try
+            Dim lrFactTypeInstance As FBM.FactTypeInstance
+
+            '------------------------------------------------------
+            'Get the Selected FactTypeInstance
+            '------------------------------------------------------                    
+            lrFactTypeInstance = Me.zrPage.SelectedObject(0)
+
+            Call frmMain.loadToolboxORMReadingEditor(Me.zrPage, Me.DockPanel.ActivePane, lrFactTypeInstance)
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 
