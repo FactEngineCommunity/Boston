@@ -10054,6 +10054,15 @@ Public Class frmDiagramORM
                 End If
             Next
 
+
+            '----------------------------------------------------------------------------------
+            'Provide and option for the User to create a PGS Page for the current Page.
+            Dim lsMessage As String = "Add an &ORM Diagram for the selected Entity Type."
+            lo_menu_option = Me.ORMDiagramToolStripMenuItem.DropDownItems.Add(lsMessage, My.Resources.MenuImages.ORM16x16)
+            lo_menu_option.Tag = lrEntityTypeInstance.EntityType
+            AddHandler lo_menu_option.Click, AddressOf Me.createORMDiagramPageForEntityType
+
+
             '====================================================================================
             'Load the ERDiagrams that relate to the EntityType as selectable menuOptions
             '--------------------------------------------------------        
@@ -10091,7 +10100,7 @@ Public Class frmDiagramORM
             If larPage_list.Count = 0 Then
                 '----------------------------------------------------------------------------------
                 'Provide and option for the User to create a PGS Page for the current Page.
-                Dim lsMessage As String = "Create an Entity Relationship Diagram for this current Page. No ERD Page currently exists for the model element you have selected."
+                lsMessage = "Create an Entity Relationship Diagram for this current Page. No ERD Page currently exists for the model element you have selected."
                 lo_menu_option = Me.ERDiagramToolStripMenu.DropDownItems.Add(lsMessage, My.Resources.MenuImages.ERD16x16)
                 lo_menu_option.Tag = True
                 AddHandler lo_menu_option.Click, AddressOf Me.createEntityRelationshipDiagramPageForCurrentPage
@@ -10129,7 +10138,7 @@ Public Class frmDiagramORM
             If larPage_list.Count = 0 Then
                 '----------------------------------------------------------------------------------
                 'Provide and option for the User to create a PGS Page for the current Page.
-                Dim lsMessage As String = "Create a Property Graph Schema for this current Page. No PGS Page currently exists for the model element you have selected."
+                lsMessage = "Create a Property Graph Schema for this current Page. No PGS Page currently exists for the model element you have selected."
                 lo_menu_option = Me.ToolStripMenuItemPropertyGraphSchema.DropDownItems.Add(lsMessage, My.Resources.MenuImages.PGS16x16)
                 lo_menu_option.Tag = True
                 AddHandler lo_menu_option.Click, AddressOf Me.createPropertyGraphSchemaPageFromCurrentPage
@@ -10214,6 +10223,54 @@ Public Class frmDiagramORM
         Me.Animator1.Visible = False
 
     End Sub
+
+    Private Sub createORMDiagramPageForEntityType(ByVal sender As Object, ByVal e As EventArgs)
+
+        Dim lrPage As FBM.Page
+
+        With New WaitCursor
+
+            Try
+                Dim loToolStripItem As ToolStripItem = CType(sender, ToolStripItem)
+                Dim lsPageName As String = "New ORM Model Page"
+                If loToolStripItem.Tag IsNot Nothing Then
+                    lsPageName = CType(loToolStripItem.Tag, FBM.EntityType).Id
+                End If
+                lsPageName = Me.zrPage.Model.CreateUniquePageName(lsPageName, 0)
+                lrPage = New FBM.Page(Me.zrPage.Model, Nothing, lsPageName, pcenumLanguage.ORMModel)
+
+                lrPage.Loaded = True
+                Me.zrPage.Model.Page.Add(lrPage)
+                lrPage.Save(True, True)
+
+                Me.zrPage.Model.AllowCheckForErrors = True
+                frmMain.Cursor = Cursors.Default
+
+                Dim lrEnterpriseView As tEnterpriseEnterpriseView = Nothing
+
+                lrEnterpriseView = frmMain.zfrmModelExplorer.AddExistingPageToModel(lrPage, lrPage.Model, lrPage.Model.TreeNode, True)
+
+                MsgBox("Added the new ORM Diagram Page, '" & lrPage.Name & "' to the Model.")
+
+                If loToolStripItem.Tag IsNot Nothing Then
+                    Dim lrEntityType As FBM.EntityType = loToolStripItem.Tag
+                    Call lrPage.DropEntityTypeAtPoint(lrEntityType, New PointF(10, 10), True)
+                    Dim lrToolstripItem As New tDummyToolStripItem(lrEnterpriseView)
+                    Call Me.morphToORMDiagram(lrToolstripItem, lrEnterpriseView)
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+        End With
+
+    End Sub
+
 
     Private Sub createEntityRelationshipDiagramPageForCurrentPage(ByVal sender As Object, ByVal e As EventArgs)
 
