@@ -1239,7 +1239,16 @@ Namespace FBM
         End Sub
 
         Public Sub EnableSaveButton() Implements iPageObject.EnableSaveButton
-            Throw New NotImplementedException()
+            If Me.Page IsNot Nothing Then
+                If Me.Page.Form IsNot Nothing Then
+                    Call Me.Page.Form.EnableSaveButton()
+                End If
+            Else
+                Try
+                    frmMain.ToolStripButton_Save.Enabled = True
+                Catch ex As Exception
+                End Try
+            End If
         End Sub
     End Class
 

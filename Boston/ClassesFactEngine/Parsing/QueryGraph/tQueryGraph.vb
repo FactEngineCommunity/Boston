@@ -1242,6 +1242,12 @@
                             If lrQueryEdge.FBMFactType.IsManyTo1BinaryFactType Then
                                 'TargetNode is Many side of ManyToOne BinaryFactType
                                 lrRole = lrQueryEdge.FBMFactType.InternalUniquenessConstraint(0).Role(0)
+                            ElseIf lrqueryedge.FBMFactType.HasTotalRoleConstraint And lrQueryEdge.FBMFactType.Arity = 2 Then
+                                If lrQueryEdge.FBMFactTypeReading IsNot Nothing Then
+                                    lrRole = lrQueryEdge.FBMFactTypeReading.PredicatePart(lrQueryEdge.FBMFactTypeReading.PredicatePart.IndexOf(lrQueryEdge.FBMPredicatePart)).Role
+                                Else
+                                    lrRole = lrQueryEdge.FBMFactTypeReading.PredicatePart(1).Role
+                                End If
                             ElseIf lrQueryEdge.FBMFactTypeReading IsNot Nothing Then
                                 lrRole = lrQueryEdge.FBMFactTypeReading.PredicatePart(lrQueryEdge.FBMFactTypeReading.PredicatePart.IndexOf(lrQueryEdge.FBMPredicatePart) + 1).Role
                             End If

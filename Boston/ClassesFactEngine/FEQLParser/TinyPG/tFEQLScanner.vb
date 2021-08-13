@@ -209,7 +209,7 @@ Namespace FEQL
             Patterns.Add(TokenType.VALUE, regex)
             Tokens.Add(TokenType.VALUE)
 
-            regex = new Regex("A ", RegexOptions.Compiled)
+            regex = new Regex("A|A$", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDA, regex)
             Tokens.Add(TokenType.KEYWDA)
 

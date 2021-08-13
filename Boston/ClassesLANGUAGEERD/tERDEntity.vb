@@ -724,10 +724,10 @@ Namespace ERD
 
         End Sub
 
-        Public Sub EnableSaveButton() Implements iPageObject.EnableSaveButton
+        Public Overloads Sub EnableSaveButton() Implements iPageObject.EnableSaveButton
             If Me.Page IsNot Nothing Then
                 If Me.Page.Form IsNot Nothing Then
-                    Call Me.EnableSaveButton()
+                    Call Me.Page.Form.EnableSaveButton()
                 End If
             Else
                 Try

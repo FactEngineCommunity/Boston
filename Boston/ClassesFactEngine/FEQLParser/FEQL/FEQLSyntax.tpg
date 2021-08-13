@@ -55,7 +55,7 @@ WHERECLAUSECOLUMNNAMESTR -> @"[aA-zZ0-9]+";
 [Color(153, 0, 0)]	VALUE         -> @"[aA-zZ0-9\-\s+\#\*\?]*";
 
 //Keywords
-[Color(115, 217, 243)]	KEYWDA		-> @"A ";
+[Color(115, 217, 243)]	KEYWDA		-> @"A|A$";
 [Color(115, 217, 243)]	KEYWDAN	-> @"AN ";
 [Color(115, 217, 243)]	KEYWDAND	-> "AND";
 [Color(0, 0, 255)]	KEYWDADD	-> "ADD";

@@ -737,31 +737,28 @@ Public Class frmToolboxORMReadingEditor
                     Dim lsOldName As String = Me.zrFactTypeInstance.FactType.Id
                     If lsNewName <> lsOldName Then
 
-                        Call Me.zrFactTypeInstance.FactType.setName(lsNewName, True)
+                        If MsgBox("Do you want to change the name of the Fact Type to, " & lsNewName, MsgBoxStyle.YesNo + MsgBoxStyle.DefaultButton2) = DialogResult.Yes Then
+                            Call Me.zrFactTypeInstance.FactType.setName(lsNewName, True)
 
-                        If lrFactTypeReading.FactType.Arity = 1 Then
+                            '---------------------------------------------------------------------------------------------
+                            'CMML
+                            Dim lrRecordset As ORMQL.Recordset
+                            Dim lsSQLQuery As String = ""
 
+                            lsSQLQuery = "SELECT *"
+                            lsSQLQuery.AppendString(" FROM " & pcenumCMMLRelations.CoreRelationIsForFactType.ToString)
+                            lsSQLQuery.AppendString(" WHERE FactType = '" & lsOldName & "'")
+
+                            lrRecordset = Me.zrFactTypeInstance.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                            If Not lrRecordset.EOF Then
+                                '20180611-VM-If the code never reaches this breakpoint....then FactType.SetName is modifying the appropriate FactData entries.
+                                '  so can delete this.
+                                Dim lrNewDictionaryEntry As New FBM.DictionaryEntry(Me.zrFactTypeInstance.Model, lsNewName, pcenumConceptType.FactType)
+                                lrNewDictionaryEntry = Me.zrFactTypeInstance.Model.AddModelDictionaryEntry(lrNewDictionaryEntry)
+                                Call lrRecordset("FactType").SwitchConcept(lrNewDictionaryEntry.Concept, pcenumConceptType.FactType)
+                            End If
                         End If
-
-                        '---------------------------------------------------------------------------------------------
-                        'CMML
-                        Dim lrRecordset As ORMQL.Recordset
-                        Dim lsSQLQuery As String = ""
-
-                        lsSQLQuery = "SELECT *"
-                        lsSQLQuery.AppendString(" FROM " & pcenumCMMLRelations.CoreRelationIsForFactType.ToString)
-                        lsSQLQuery.AppendString(" WHERE FactType = '" & lsOldName & "'")
-
-                        lrRecordset = Me.zrFactTypeInstance.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-                        If Not lrRecordset.EOF Then
-                            '20180611-VM-If the code never reaches this breakpoint....then FactType.SetName is modifying the appropriate FactData entries.
-                            '  so can delete this.
-                            Dim lrNewDictionaryEntry As New FBM.DictionaryEntry(Me.zrFactTypeInstance.Model, lsNewName, pcenumConceptType.FactType)
-                            lrNewDictionaryEntry = Me.zrFactTypeInstance.Model.AddModelDictionaryEntry(lrNewDictionaryEntry)
-                            Call lrRecordset("FactType").SwitchConcept(lrNewDictionaryEntry.Concept, pcenumConceptType.FactType)
-                        End If
-
                     End If
 
                     '=============================================================================
