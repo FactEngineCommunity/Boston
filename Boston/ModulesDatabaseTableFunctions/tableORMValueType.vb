@@ -213,7 +213,7 @@ Namespace TableValueType
                         lrValueType.isDirty = False
                         lrValueType.Model = arModel
                         lrValueType.Id = lREcordset("ValueTypeId").Value
-                        lrValueType.Name = lREcordset("ValueTypeName").Value
+                        lrValueType.Name = lrValueType.Id '20210813-VM-Was lREcordset("ValueTypeName").Value  NB Can remove this after time, because Name must be Id in Boston. FOL.
                         lrValueType.ShortDescription = Trim(Viev.NullVal(lREcordset("ShortDescription").Value, ""))
                         lrValueType.LongDescription = Trim(Viev.NullVal(lREcordset("LongDescription").Value, ""))
                         lrValueType.ConceptType = pcenumConceptType.ValueType

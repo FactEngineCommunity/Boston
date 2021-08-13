@@ -43,6 +43,10 @@ Public Class frmToolboxTableData
 
         Me.DataGridView.RowTemplate.Height = Me.DataGridView.Font.Height + 8
 
+        If Me.mrTable IsNot Nothing Then
+            Me.GroupBox1.Text = "Table Name: " & Me.mrTable.Name
+        End If
+
         'AddHandler Me.DataGridView.RowsRemoved, AddressOf DataGridView_RowsRemoved
 
     End Sub

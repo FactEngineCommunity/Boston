@@ -152,41 +152,46 @@ Public Class ODBCDatabaseReverseEngineer
                             End While
                         End If
 
+                        If larModelObject.Count > 0 Then
 
-                        lrFactType = Me.Model.CreateFactType(lrTable.Name, larModelObject, False, True, , , False, )
-                        Me.Model.AddFactType(lrFactType)
-                        lrFactType.Objectify() 'Add to model first, so LinkFactTypes have something to join to.
+                            lrFactType = Me.Model.CreateFactType(lrTable.Name, larModelObject, False, True, , , False, )
+                            Me.Model.AddFactType(lrFactType)
+                            lrFactType.Objectify() 'Add to model first, so LinkFactTypes have something to join to.
 
-                        'Create the internalUniquenessConstraint.
-                        Dim larRole As New List(Of FBM.Role)
-                        For Each lrRole In lrFactType.RoleGroup
-                            larRole.Add(lrRole)
-                        Next
-                        Call lrFactType.CreateInternalUniquenessConstraint(larRole)
+                            'Create the internalUniquenessConstraint.
+                            Dim larRole As New List(Of FBM.Role)
+                            For Each lrRole In lrFactType.RoleGroup
+                                larRole.Add(lrRole)
+                            Next
+                            Call lrFactType.CreateInternalUniquenessConstraint(larRole)
 
-                        '-----------------------------------------------------------------------------------------------
-                        'Create the FactTypeReading
-                        Dim larRoleGroupPermutations As IEnumerable(Of IEnumerable(Of FBM.Role))
+                            '-----------------------------------------------------------------------------------------------
+                            'Create the FactTypeReading
+                            Dim larRoleGroupPermutations As IEnumerable(Of IEnumerable(Of FBM.Role))
 
-                        larRoleGroupPermutations = lrFactType.RoleGroup.Permute
+                            larRoleGroupPermutations = lrFactType.RoleGroup.Permute
 
-                        Dim liInd = 1
-                        For Each larRoleGroup In larRoleGroupPermutations
-                            If liInd <= 3 Then
-                                Dim lrSentence As New Language.Sentence("random sentence")
-                                Dim liInd2 = 1
-                                For Each lrRole In larRoleGroup.ToList
-                                    If liInd2 < larRoleGroup.ToList.Count Then
-                                        lrSentence.PredicatePart.Add(New Language.PredicatePart("has"))
-                                    End If
-                                    liInd2 += 1
-                                Next
-                                Dim lrFactTypeReading As New FBM.FactTypeReading(lrFactType, larRoleGroup.ToList, lrSentence)
-                                lrFactType.FactTypeReading.Add(lrFactTypeReading)
-                            End If
-                            liInd += 1
-                        Next
-
+                            Dim liInd = 1
+                            For Each larRoleGroup In larRoleGroupPermutations
+                                If liInd <= 3 Then
+                                    Dim lrSentence As New Language.Sentence("random sentence")
+                                    Dim liInd2 = 1
+                                    For Each lrRole In larRoleGroup.ToList
+                                        If liInd2 < larRoleGroup.ToList.Count Then
+                                            lrSentence.PredicatePart.Add(New Language.PredicatePart("has"))
+                                        Else
+                                            lrSentence.PredicatePart.Add(New Language.PredicatePart(""))
+                                        End If
+                                        liInd2 += 1
+                                    Next
+                                    Dim lrFactTypeReading As New FBM.FactTypeReading(lrFactType, larRoleGroup.ToList, lrSentence)
+                                    lrFactType.FactTypeReading.Add(lrFactTypeReading)
+                                End If
+                                liInd += 1
+                            Next
+                        Else
+                            'Throw warning.
+                        End If
                     End If
                 End If
 #End Region
@@ -235,13 +240,13 @@ Public Class ODBCDatabaseReverseEngineer
             'Create FactTypes that are from a ModelElement straight to a ValueType.
             Dim lasNonReferenceModeValueTypeNames = From ValueType In Me.Model.ValueType
                                                     Where Not ValueType.isReferenceModeValueType
-                                                    Select ValueType.Id
+                                                    Select LCase(ValueType.Id)
 
             Call Me.SetProgressBarValue(90)
             For Each lrTable In Me.TempModel.RDS.Table
 
                 Dim larValueTypeColumns = From Column In lrTable.Column
-                                          Where lasNonReferenceModeValueTypeNames.Contains(Column.Name)
+                                          Where lasNonReferenceModeValueTypeNames.Contains(LCase(Column.Name))
                                           Where Not Column.isPartOfPrimaryKey
                                           Select Column
 
@@ -250,32 +255,38 @@ Public Class ODBCDatabaseReverseEngineer
                     Dim lrModelElement1 As FBM.ModelObject = Nothing
                     Dim lrModelElement2 As FBM.ModelObject = Nothing
 
-                    lrModelElement1 = Me.Model.RDS.getTableByName(lrTable.Name).FBMModelElement
-                    lrModelElement2 = Me.Model.GetModelObjectByName(lrColumn.Name)
+                    Dim lrModelTable As RDS.Table = Me.Model.RDS.getTableByName(lrTable.Name)
+                    If lrModelTable IsNot Nothing Then
+                        lrModelElement1 = lrModelTable.FBMModelElement
 
-                    larModelElement.Add(lrModelElement1)
-                    larModelElement.Add(lrModelElement2)
+                        lrModelElement2 = Me.Model.GetModelObjectByName(lrColumn.Name)
 
-                    Dim lsFactTypeName As String = lrModelElement1.Id & "Has" & lrModelElement2.Id
-                    lsFactTypeName = Me.Model.CreateUniqueFactTypeName(lsFactTypeName, 0)
+                        larModelElement.Add(lrModelElement1)
+                        larModelElement.Add(lrModelElement2)
 
-                    Dim lrFactType As FBM.FactType = Me.Model.CreateFactType(lsFactTypeName, larModelElement, False, True, , , False, )
-                    Me.Model.AddFactType(lrFactType)
+                        Dim lsFactTypeName As String = lrModelElement1.Id & "Has" & lrModelElement2.Id
+                        lsFactTypeName = Me.Model.CreateUniqueFactTypeName(lsFactTypeName, 0)
 
-                    'Create the internalUniquenessConstraint.
-                    Dim larRole As New List(Of FBM.Role)
-                    larRole.Add(lrFactType.RoleGroup(0))
+                        Dim lrFactType As FBM.FactType = Me.Model.CreateFactType(lsFactTypeName, larModelElement, False, True, , , False, )
+                        Me.Model.AddFactType(lrFactType)
 
-                    Call lrFactType.CreateInternalUniquenessConstraint(larRole)
+                        'Create the internalUniquenessConstraint.
+                        Dim larRole As New List(Of FBM.Role)
+                        larRole.Add(lrFactType.RoleGroup(0))
 
-                    '-----------------------------------------------------------------------------------------------
-                    'Create the FactTypeReading
-                    Dim lrSentence As New Language.Sentence("random sentence")
-                    lrSentence.PredicatePart.Add(New Language.PredicatePart("has"))
-                    lrSentence.PredicatePart.Add(New Language.PredicatePart("has"))
+                        Call lrFactType.CreateInternalUniquenessConstraint(larRole)
 
-                    Dim lrFactTypeReading As New FBM.FactTypeReading(lrFactType, lrFactType.RoleGroup, lrSentence)
-                    lrFactType.FactTypeReading.Add(lrFactTypeReading)
+                        '-----------------------------------------------------------------------------------------------
+                        'Create the FactTypeReading
+                        Dim lrSentence As New Language.Sentence("random sentence")
+                        lrSentence.PredicatePart.Add(New Language.PredicatePart("has"))
+                        lrSentence.PredicatePart.Add(New Language.PredicatePart("has"))
+
+                        Dim lrFactTypeReading As New FBM.FactTypeReading(lrFactType, lrFactType.RoleGroup, lrSentence)
+                        lrFactType.FactTypeReading.Add(lrFactTypeReading)
+                    Else
+                        'Throw warning
+                    End If
 
                 Next
             Next

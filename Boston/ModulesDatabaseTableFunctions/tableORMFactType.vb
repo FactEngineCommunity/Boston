@@ -370,7 +370,11 @@ Namespace TableFactType
                               Select Role
 
                 For Each lrRole In larRole
-                    lrRole.JoinedORMObject = arModel.FactType.Find(Function(x) x.Id = lrRole.JoinsFactType.Id)
+                    Try
+                        lrRole.JoinedORMObject = arModel.FactType.Find(Function(x) x.Id = lrRole.JoinsFactType.Id)
+                    Catch ex As Exception
+                        'Throw warning
+                    End Try
                 Next
                 'For Each lrFactType In arModel.FactType
                 '    For Each lrRole In lrFactType.RoleGroup.FindAll(Function(p) p.TypeOfJoin = pcenumRoleJoinType.FactType)
