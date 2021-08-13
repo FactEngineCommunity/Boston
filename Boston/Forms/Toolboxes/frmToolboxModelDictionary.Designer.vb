@@ -42,6 +42,7 @@ Partial Class frmToolboxModelDictionary
         Me.ToolStripStatusLabelRealisationsCount = New System.Windows.Forms.ToolStripStatusLabel()
         Me.ToolStripStatusLabelPromptModelElementTypeCount = New System.Windows.Forms.ToolStripStatusLabel()
         Me.ToolStripStatusLabelModelElementTypeCount = New System.Windows.Forms.ToolStripStatusLabel()
+        Me.MakeNewPageForThisModelElementToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.GroupBox_Main.SuspendLayout()
         Me.ContextMenuStrip1.SuspendLayout()
         Me.StatusStrip1.SuspendLayout()
@@ -160,28 +161,28 @@ Partial Class frmToolboxModelDictionary
         '
         'ContextMenuStrip1
         '
-        Me.ContextMenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ViewOnPageToolStripMenuItem, Me.ToolStripMenuItemViewInDiagramSpy, Me.RemoveFromModelToolStripMenuItem})
+        Me.ContextMenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ViewOnPageToolStripMenuItem, Me.ToolStripMenuItemViewInDiagramSpy, Me.RemoveFromModelToolStripMenuItem, Me.MakeNewPageForThisModelElementToolStripMenuItem})
         Me.ContextMenuStrip1.Name = "ContextMenuStrip1"
-        Me.ContextMenuStrip1.Size = New System.Drawing.Size(186, 70)
+        Me.ContextMenuStrip1.Size = New System.Drawing.Size(281, 114)
         '
         'ViewOnPageToolStripMenuItem
         '
         Me.ViewOnPageToolStripMenuItem.Name = "ViewOnPageToolStripMenuItem"
-        Me.ViewOnPageToolStripMenuItem.Size = New System.Drawing.Size(185, 22)
+        Me.ViewOnPageToolStripMenuItem.Size = New System.Drawing.Size(280, 22)
         Me.ViewOnPageToolStripMenuItem.Text = "&View on Page..."
         '
         'ToolStripMenuItemViewInDiagramSpy
         '
         Me.ToolStripMenuItemViewInDiagramSpy.Image = Global.Boston.My.Resources.Resources.Spyglass16x16
         Me.ToolStripMenuItemViewInDiagramSpy.Name = "ToolStripMenuItemViewInDiagramSpy"
-        Me.ToolStripMenuItemViewInDiagramSpy.Size = New System.Drawing.Size(185, 22)
+        Me.ToolStripMenuItemViewInDiagramSpy.Size = New System.Drawing.Size(280, 22)
         Me.ToolStripMenuItemViewInDiagramSpy.Text = "View in Diagram Spy"
         '
         'RemoveFromModelToolStripMenuItem
         '
         Me.RemoveFromModelToolStripMenuItem.Image = Global.Boston.My.Resources.MenuImages.Remove16x16
         Me.RemoveFromModelToolStripMenuItem.Name = "RemoveFromModelToolStripMenuItem"
-        Me.RemoveFromModelToolStripMenuItem.Size = New System.Drawing.Size(185, 22)
+        Me.RemoveFromModelToolStripMenuItem.Size = New System.Drawing.Size(280, 22)
         Me.RemoveFromModelToolStripMenuItem.Text = "&Remove From Model"
         '
         'StatusStrip1
@@ -216,6 +217,12 @@ Partial Class frmToolboxModelDictionary
         Me.ToolStripStatusLabelModelElementTypeCount.Name = "ToolStripStatusLabelModelElementTypeCount"
         Me.ToolStripStatusLabelModelElementTypeCount.Size = New System.Drawing.Size(13, 17)
         Me.ToolStripStatusLabelModelElementTypeCount.Text = "0"
+        '
+        'MakeNewPageForThisModelElementToolStripMenuItem
+        '
+        Me.MakeNewPageForThisModelElementToolStripMenuItem.Name = "MakeNewPageForThisModelElementToolStripMenuItem"
+        Me.MakeNewPageForThisModelElementToolStripMenuItem.Size = New System.Drawing.Size(280, 22)
+        Me.MakeNewPageForThisModelElementToolStripMenuItem.Text = "&Make new Page for this model element"
         '
         'frmToolboxModelDictionary
         '
@@ -254,4 +261,5 @@ Partial Class frmToolboxModelDictionary
     Friend WithEvents CheckBoxShowModelDictionary As System.Windows.Forms.CheckBox
     Friend WithEvents ButtonRefresh As Button
     Friend WithEvents ToolStripMenuItemViewInDiagramSpy As ToolStripMenuItem
+    Friend WithEvents MakeNewPageForThisModelElementToolStripMenuItem As ToolStripMenuItem
 End Class

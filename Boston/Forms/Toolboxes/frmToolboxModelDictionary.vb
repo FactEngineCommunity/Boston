@@ -1113,4 +1113,55 @@ Public Class frmToolboxModelDictionary
 
     End Sub
 
+    Private Sub MakeNewPageForThisModelElementToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles MakeNewPageForThisModelElementToolStripMenuItem.Click
+
+        If Me.zrLoadedModel Is Nothing Then Me.zrLoadedModel = Me.zrORMModel
+
+        Dim lrDiagramSpyPage As New FBM.DiagramSpyPage(Me.zrLoadedModel, "123", "Diagram Spy", pcenumLanguage.ORMModel)
+
+        Dim lrModelObject As FBM.ModelObject
+
+        Try
+            lrModelObject = Me.zrLoadedModel.GetModelObjectByName(Me.TreeView1.SelectedNode.Tag.Id)
+
+            Dim lsPageName As String = "New ORM Model Page"
+            If lrModelObject IsNot Nothing Then
+                lsPageName = CType(lrModelObject, FBM.EntityType).Id
+            Else
+                Exit Sub
+            End If
+            lsPageName = Me.zrORMModel.CreateUniquePageName(lsPageName, 0)
+            Dim lrPage = New FBM.Page(Me.zrORMModel, Nothing, lsPageName, pcenumLanguage.ORMModel)
+
+            lrPage.Loaded = True
+            Me.zrORMModel.Page.Add(lrPage)
+            lrPage.Save(True, True)
+
+            Me.zrORMModel.AllowCheckForErrors = True
+            frmMain.Cursor = Cursors.Default
+
+            Dim lrEnterpriseView As tEnterpriseEnterpriseView = Nothing
+
+            lrEnterpriseView = frmMain.zfrmModelExplorer.AddExistingPageToModel(lrPage, lrPage.Model, lrPage.Model.TreeNode, True)
+
+            MsgBox("Added the new ORM Diagram Page, '" & lrPage.Name & "' to the Model.")
+
+            Select Case lrModelObject.GetType
+                Case Is = GetType(FBM.EntityType)
+                    Dim lrEntityType As FBM.EntityType = lrModelObject
+                    Call lrPage.DropEntityTypeAtPoint(lrEntityType, New PointF(10, 10), True)
+            End Select
+
+
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
 End Class
