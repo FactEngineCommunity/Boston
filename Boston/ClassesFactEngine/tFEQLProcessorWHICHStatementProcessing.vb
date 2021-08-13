@@ -1440,9 +1440,9 @@
                 Return FactEngine.Constants.pcenumWhichClauseType.AndThatModelElementPredicateThatModelElement
 
                 '15
-            ElseIf Me.WHICHCLAUSE.KEYWDTHAT IsNot Nothing And
-                   Me.WHICHCLAUSE.MODELELEMENTNAME IsNot Nothing And
-                   Me.WHICHCLAUSE.PREDICATE IsNot Nothing And
+            ElseIf Me.WHICHCLAUSE.KEYWDTHAT.Count > 0 And
+                   Me.WHICHCLAUSE.MODELELEMENTNAME.Count = 1 And
+                   Me.WHICHCLAUSE.PREDICATE.Count > 0 And
                    (Me.WHICHCLAUSE.KEYWDWHICH Is Nothing Or Me.WHICHCLAUSE.KEYWDA Is Nothing) Then
 
                 'E.g. "AND is in A School"            
