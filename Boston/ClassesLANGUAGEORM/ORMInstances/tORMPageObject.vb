@@ -3,9 +3,10 @@ Imports System.Xml.Serialization
 
 Namespace FBM
 
-    <Serializable()> _
+    <Serializable()>
     Public Class PageObject
         Inherits FBM.ModelObject
+        Implements iPageObject
 
         <XmlIgnore()>
         Public Page As FBM.Page
@@ -16,6 +17,24 @@ Namespace FBM
 
         Public X As Integer
         Public Y As Integer
+
+        Private Property iPageObject_X As Integer Implements iPageObject.X
+            Get
+                Throw New NotImplementedException()
+            End Get
+            Set(value As Integer)
+                Throw New NotImplementedException()
+            End Set
+        End Property
+
+        Private Property iPageObject_Y As Integer Implements iPageObject.Y
+            Get
+                Throw New NotImplementedException()
+            End Get
+            Set(value As Integer)
+                Throw New NotImplementedException()
+            End Set
+        End Property
 
         Public Sub New()
 
@@ -80,7 +99,7 @@ Namespace FBM
                             ' 1 for the stickfigure, the other for the name of the Actor.
                             '---------------------------------------------------------------------------------
                             Me.Shape.Text = Trim(Me.Name)
-                            Call Me.Page.Form.EnableSaveButton()
+                            Call Me.EnableSaveButton()
                             Me.Page.Diagram.Invalidate()
                         End If
                     End If
@@ -90,6 +109,53 @@ Namespace FBM
             End Try
         End Sub
 
+        Public Sub MouseDown() Implements iPageObject.MouseDown
+            Throw New NotImplementedException()
+        End Sub
+
+        Public Sub MouseMove() Implements iPageObject.MouseMove
+            Throw New NotImplementedException()
+        End Sub
+
+        Public Sub MouseUp() Implements iPageObject.MouseUp
+            Throw New NotImplementedException()
+        End Sub
+
+        Public Sub NodeDeleting() Implements iPageObject.NodeDeleting
+            Throw New NotImplementedException()
+        End Sub
+
+        Public Sub NodeDeselected() Implements iPageObject.NodeDeselected
+            Throw New NotImplementedException()
+        End Sub
+
+        Public Sub NodeModified() Implements iPageObject.NodeModified
+            Throw New NotImplementedException()
+        End Sub
+
+        Public Sub NodeSelected() Implements iPageObject.NodeSelected
+            Throw New NotImplementedException()
+        End Sub
+
+        Public Sub Move(aiNewX As Integer, aiNewY As Integer, abBroadcastInterfaceEvent As Boolean) Implements iPageObject.Move
+            Throw New NotImplementedException()
+        End Sub
+
+        Public Sub Moved() Implements iPageObject.Moved
+            Throw New NotImplementedException()
+        End Sub
+
+        Public Sub RepellNeighbouringPageObjects(aiDepth As Integer) Implements iPageObject.RepellNeighbouringPageObjects
+            Throw New NotImplementedException()
+        End Sub
+
+        Public Sub SetAppropriateColour() Implements iPageObject.SetAppropriateColour
+            Throw New NotImplementedException()
+        End Sub
+
+        Public Sub EnableSaveButton() Implements iPageObject.EnableSaveButton
+            Throw New NotImplementedException()
+        End Sub
     End Class
 
 End Namespace

@@ -7,6 +7,8 @@ Namespace FBM
     Public Class FactDataInstance
         Inherits FBM.FactData
         Implements IEquatable(Of FBM.FactDataInstance)
+        Implements iPageObject
+
         '--------------------------------------------------------------------------
         'Every cell in a FactTable (SamplePopulationSet)as seen
         '  on an ORM type page, is linked back to the FactData
@@ -18,27 +20,27 @@ Namespace FBM
         '  then the (same) Value as it appears in the FactTable in the 
         '  FactType within the CoreActorToProcessRelation model must change too.
         '--------------------------------------------------------------------------
-        <XmlIgnore()> _
+        <XmlIgnore()>
         Public Shadows Role As FBM.RoleInstance
 
         ''' <summary>
         ''' References the tFactData instance within the Model layer of the MVC pattern.
         ''' </summary>
         ''' <remarks></remarks>
-        <XmlIgnore()> _
+        <XmlIgnore()>
         Public WithEvents FactData As New FBM.FactData
 
         ''' <summary>
         ''' The ObjectType joined by the Role to which this FactDataInstance relates.
         ''' </summary>
         ''' <remarks></remarks>
-        <XmlIgnore()> _
+        <XmlIgnore()>
         Public WithEvents JoinedObjectType As FBM.ModelObject
 
-        <XmlIgnore()> _
+        <XmlIgnore()>
         Public Shadows Fact As FBM.FactInstance
 
-        <XmlIgnore()> _
+        <XmlIgnore()>
         Public FactDataInstance As FBM.FactDataInstance 'Used to refer to original object when cloned for convenience.
         'e.g. If working with a tActor or CMML.Process object (as a clone of a tFactDataInstance object), 'FactDataInstance'
         '  refers back to the FactDataInstance from where the clone was made. This is so that any changes made to the tActor/CMML.Process object
@@ -52,15 +54,15 @@ Namespace FBM
         '  - See CloneActor, CloneEntity, CloneClass etc below.
         '----------------------------------------------------------------------------------------------------------------------------------------
 
-        <XmlIgnore()> _
+        <XmlIgnore()>
         Public Page As FBM.Page
 
         <NonSerialized()>
         <XmlIgnore()>
         Public Shape As New ShapeNode
 
-        <NonSerialized(), _
-        XmlIgnore()> _
+        <NonSerialized(),
+        XmlIgnore()>
         Public TableShape As TableNode
         '<XmlIgnore()> _
         'Public Overridable Property TableShape() As TableNode 'Used in FactTypeInstances, ERDiagrams
@@ -76,8 +78,8 @@ Namespace FBM
         ''' Refers to the Cell within a Mindfusion TableNode and is only set when the FactDataInstance is displayed on a Diagram.
         ''' </summary>
         ''' <remarks></remarks>
-        <NonSerialized()> _
-        <XmlIgnore()> _
+        <NonSerialized()>
+        <XmlIgnore()>
         Public Cell As MindFusion.Diagramming.TableNode.Cell 'Used in FactTypeInstances
 
         ''' <summary>
@@ -162,7 +164,7 @@ Namespace FBM
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public _Y As Integer
         Public Overridable Property Y() As Integer
             Get
@@ -173,6 +175,24 @@ Namespace FBM
                 If IsSomething(Me.FactDataInstance) Then
                     Me.FactDataInstance._Y = value
                 End If
+            End Set
+        End Property
+
+        Private Property iPageObject_X As Integer Implements iPageObject.X
+            Get
+                Throw New NotImplementedException()
+            End Get
+            Set(value As Integer)
+                Throw New NotImplementedException()
+            End Set
+        End Property
+
+        Private Property iPageObject_Y As Integer Implements iPageObject.Y
+            Get
+                Throw New NotImplementedException()
+            End Get
+            Set(value As Integer)
+                Throw New NotImplementedException()
             End Set
         End Property
 
@@ -296,8 +316,8 @@ Namespace FBM
             Dim lrFactDataInstance As New FBM.FactDataInstance
 
             Try
-                With Me                    
-                    lrFactDataInstance.Model = arPage.Model                    
+                With Me
+                    lrFactDataInstance.Model = arPage.Model
                     lrFactDataInstance.Page = arPage
                     lrFactDataInstance.Id = .Id
                     lrFactDataInstance.Name = .Concept.Symbol
@@ -378,7 +398,7 @@ Namespace FBM
                 lr_actor.Role = .Role
                 lr_actor.X = .X
                 lr_actor.Y = .Y
-                lr_actor.shape = .shape
+                lr_actor.Shape = .Shape
                 lr_actor.TableShape = .TableShape
             End With
 
@@ -403,7 +423,7 @@ Namespace FBM
                 lrAttribute.Role = .Role
                 lrAttribute.X = .X
                 lrAttribute.Y = .Y
-                lrAttribute.shape = .shape
+                lrAttribute.Shape = .Shape
                 lrAttribute.TableShape = .TableShape
             End With
 
@@ -509,7 +529,7 @@ Namespace FBM
             '----------------------------------------------------
             Dim lrEntity As New ERD.Entity
 
-            With Me                
+            With Me
                 lrEntity.Model = .Model
                 lrEntity.Page = arPage
                 lrEntity.Fact = .Fact
@@ -1016,6 +1036,53 @@ Namespace FBM
 
         End Sub
 
+        Public Sub MouseDown() Implements iPageObject.MouseDown
+            Throw New NotImplementedException()
+        End Sub
+
+        Public Sub MouseMove() Implements iPageObject.MouseMove
+            Throw New NotImplementedException()
+        End Sub
+
+        Public Sub MouseUp() Implements iPageObject.MouseUp
+            Throw New NotImplementedException()
+        End Sub
+
+        Public Sub NodeDeleting() Implements iPageObject.NodeDeleting
+            Throw New NotImplementedException()
+        End Sub
+
+        Public Sub NodeDeselected() Implements iPageObject.NodeDeselected
+            Throw New NotImplementedException()
+        End Sub
+
+        Public Sub NodeModified() Implements iPageObject.NodeModified
+            Throw New NotImplementedException()
+        End Sub
+
+        Public Sub NodeSelected() Implements iPageObject.NodeSelected
+            Throw New NotImplementedException()
+        End Sub
+
+        Public Sub Move(aiNewX As Integer, aiNewY As Integer, abBroadcastInterfaceEvent As Boolean) Implements iPageObject.Move
+            Throw New NotImplementedException()
+        End Sub
+
+        Public Sub Moved() Implements iPageObject.Moved
+            Throw New NotImplementedException()
+        End Sub
+
+        Public Sub RepellNeighbouringPageObjects(aiDepth As Integer) Implements iPageObject.RepellNeighbouringPageObjects
+            Throw New NotImplementedException()
+        End Sub
+
+        Public Sub SetAppropriateColour() Implements iPageObject.SetAppropriateColour
+            Throw New NotImplementedException()
+        End Sub
+
+        Public Sub EnableSaveButton() Implements iPageObject.EnableSaveButton
+            Throw New NotImplementedException()
+        End Sub
     End Class
 
 End Namespace

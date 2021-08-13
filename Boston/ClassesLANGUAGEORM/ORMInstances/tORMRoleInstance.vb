@@ -1200,7 +1200,7 @@ Namespace FBM
                 Call Me.ResetLink()
                 Call Me.Page.MakeDirty()
                 If Me.Page.Form IsNot Nothing Then
-                    Call Me.Page.Form.EnableSaveButton()
+                    Call Me.EnableSaveButton()
                 End If
 
             Catch ex As Exception

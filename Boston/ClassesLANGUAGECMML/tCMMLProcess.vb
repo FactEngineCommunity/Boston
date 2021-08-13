@@ -258,7 +258,7 @@ Namespace CMML
                             ' 1 for the stickfigure, the other for the name of the Actor.
                             '---------------------------------------------------------------------------------
                             Me.shape.Text = Trim(Me.FactData.Data)
-                            Call Me.Page.Form.EnableSaveButton()
+                            Call Me.EnableSaveButton()
                             Me.Page.Diagram.Invalidate()
                         End If
                     End If
