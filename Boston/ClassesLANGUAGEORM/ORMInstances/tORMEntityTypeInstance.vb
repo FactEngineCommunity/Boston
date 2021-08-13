@@ -1633,7 +1633,7 @@ Namespace FBM
                                 Dim lrFactTypeDictionaryEntry As New FBM.DictionaryEntry(Me.Model, Me.Name, pcenumConceptType.FactType)
                                 Dim lrRoleConstraintDictionaryEntry As New FBM.DictionaryEntry(Me.Model, Me.Name, pcenumConceptType.RoleConstraint)
 
-                                If Me.Model.ModelDictionary.Exists(AddressOf lrEntityTypeDictionaryEntry.Equals) Then
+                                If Me.Model.ModelDictionary.Exists(AddressOf lrEntityTypeDictionaryEntry.EqualsCase) Then
                                     MsgBox("An Entity Type with the name, '" & lrEntityTypeDictionaryEntry.Symbol & "', already exists in the Model, '" & Me.Model.Name & "'.", MsgBoxStyle.Exclamation, "Model Object Conflict")
                                     Me.Name = Me.EntityType.Name
                                 ElseIf Me.Model.ModelDictionary.Exists(AddressOf lrValueTypeDictionaryEntry.Equals) Then

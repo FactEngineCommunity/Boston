@@ -714,6 +714,8 @@ Namespace FactEngine
                         lrColumn = arTable.Column.Find(Function(x) x.Name = lsColumnName)
                         larColumn.Add(lrColumn)
 
+                        lasIndexNames.AddUnique(lsIndexName)
+
                         lrRecordset.MoveNext()
 
                         If Not lrRecordset.EOF Then
@@ -735,7 +737,8 @@ Namespace FactEngine
                                             lbIgnoreNulls,
                                             larColumn,
                                             True,
-                                            False)
+                                            False,
+                                            True)
 
                     larIndex.Add(lrIndex)
 
@@ -818,7 +821,8 @@ Namespace FactEngine
                                             lbIgnoreNulls,
                                             larColumn,
                                             True,
-                                            False)
+                                            False,
+                                            True)
 
                     larIndex.Add(lrIndex)
 
