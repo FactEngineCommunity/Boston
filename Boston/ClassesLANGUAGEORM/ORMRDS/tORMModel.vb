@@ -1653,7 +1653,7 @@ Namespace FBM
                 Dim lrActiveRole As FBM.Role
 
                 While Not lrORMRecordset.EOF
-
+#Region "Tables"
                     '-----------------------------------------------------
                     'Get the underlying ModelElement
                     lrModelElement = Me.GetModelObjectByName(lrORMRecordset("Element").Data)
@@ -1686,14 +1686,14 @@ Namespace FBM
                     End If
 
                     lrORMRecordset.MoveNext()
-
+#End Region
                 End While 'Stepping through Tables
 
                 Dim larSortedTables = Me.RDS.Table.OrderBy(Function(x) x.getSupertypeTables.Count)
 
                 For Each lrTable In larSortedTables
 
-                    'If {"Movie", "Actor"}.Contains(lrTable.Name) Then Debugger.Break()
+                    'If {"Car"}.Contains(lrTable.Name) Then Debugger.Break()
 
                     '==========================================================================================================
                     'Columns
@@ -1783,6 +1783,8 @@ Namespace FBM
                             If Me.IsDatabaseSynchronised Then
                                 lsErrorMessage &= " Contact support for instructions how to fix this problem."
                             End If
+                            lsErrorMessage.AppendDoubleLineBreak("Optionally you can delete the Column from the database altogether. Click [Yes] to delete the Column, or [No] to keep the Column.")
+                            lsErrorMessage.AppendString(" You should only delete the Column if you know what you are doing or as advised by support. Backup your database before deleting core elements.")
 
                             'Dim lbDatabaseSynchronisation As Boolean = Me.IsDatabaseSynchronised
                             'Me.IsDatabaseSynchronised = False
@@ -1790,7 +1792,15 @@ Namespace FBM
                             'Me.IsDatabaseSynchronised = lbDatabaseSynchronisation
 
                             lsErrorMessage &= vbCrLf & vbCrLf & ex.StackTrace
-                            prApplication.ThrowErrorMessage(lsErrorMessage, pcenumErrorType.Critical, ex.StackTrace)
+                            If prApplication.ThrowErrorMessage(lsErrorMessage, pcenumErrorType.Information,
+                                                               ex.StackTrace,
+                                                               False,
+                                                               False,
+                                                               True,
+                                                               MessageBoxButtons.YesNo) = DialogResult.Yes Then
+                                '20210813-VM-If this gets out of hand, remove this functionality.
+                                Call Me.removeCMMLAttribute(lrTable.Name, lsColumnId)
+                            End If
                             'Throw New Exception(lsErrorMessage)
                         End Try
 
@@ -2296,9 +2306,10 @@ Namespace FBM
                         For Each lrDictionaryEntry In lrDictionary
 
                             lrColumn = New RDS.Column
-                            lrColumn = (From Table In Me.RDS.Table _
-                                        From Column In Table.Column _
-                                        Where Column.Id = lrDictionaryEntry.Value _
+                            lrColumn = (From Table In Me.RDS.Table
+                                        From Column In Table.Column
+                                        Where Column.Table.Name = lrRelation.OriginTable.Name
+                                        Where Column.Id = lrDictionaryEntry.Value
                                         Select Column).First
 
                             lrColumn.Relation.Add(lrRelation)
@@ -2330,9 +2341,10 @@ Namespace FBM
                         For Each lrDictionaryEntry In lrDictionary
 
                             lrColumn = New RDS.Column
-                            lrColumn = (From Table In Me.RDS.Table _
-                                        From Column In Table.Column _
-                                        Where Column.Id = lrDictionaryEntry.Value _
+                            lrColumn = (From Table In Me.RDS.Table
+                                        From Column In Table.Column
+                                        Where Column.Table.Name = lrRelation.DestinationTable.Name
+                                        Where Column.Id = lrDictionaryEntry.Value
                                         Select Column).First
 
                             lrColumn.Relation.Add(lrRelation)

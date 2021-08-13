@@ -396,12 +396,13 @@ Public Class tApplication
 
     End Sub
 
-    Public Sub ThrowErrorMessage(ByVal asErrorMessage As String,
-                                 ByVal aiMessageType As pcenumErrorType,
-                                 Optional ByVal asStackTrace As String = Nothing,
-                                 Optional ByVal abShowStackTrace As Boolean = True,
-                                 Optional ByVal abAbortApplication As Boolean = False,
-                                 Optional ByVal abThrowtoMSGBox As Boolean = False)
+    Public Function ThrowErrorMessage(ByVal asErrorMessage As String,
+                                      ByVal aiMessageType As pcenumErrorType,
+                                      Optional ByVal asStackTrace As String = Nothing,
+                                      Optional ByVal abShowStackTrace As Boolean = True,
+                                      Optional ByVal abAbortApplication As Boolean = False,
+                                      Optional ByVal abThrowtoMSGBox As Boolean = False,
+                                      Optional ByRef aiMessageBoxButtons As MessageBoxButtons = MessageBoxButtons.OK) As DialogResult
 
         Dim lsStackTrace As String = ""
 
@@ -444,10 +445,10 @@ Public Class tApplication
                             '-----------------------
                             'Write to the ErrorLog
                             '-----------------------
-                            Call prLogger.WriteToErrorLog(asErrorMessage, "", "Critial Error")
+                            Call prLogger.WriteToErrorLog(asErrorMessage, "", "Information")
                         Else
                             If abThrowtoMSGBox Then
-                                MsgBox(asErrorMessage)
+                                Return MsgBox(asErrorMessage, aiMessageBoxButtons)
                             Else
                                 '-----------------------------
                                 'Do nothing
@@ -492,7 +493,7 @@ Public Class tApplication
             MsgBox(lsMessage)
         End Try
 
-    End Sub
+    End Function
 
     Public Sub setWorkingModel(ByRef arModel As FBM.Model)
 

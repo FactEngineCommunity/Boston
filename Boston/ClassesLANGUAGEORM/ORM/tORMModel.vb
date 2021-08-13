@@ -953,8 +953,17 @@ Namespace FBM
 
                                     larIndexColumn.Add(larColumn.First)
 
-                                    Dim lsQualifier As String = lrTable.generateUniqueQualifier("UC")
-                                    Dim lbIsPrimaryKey As Boolean = False
+                                    Dim lsQualifier As String
+                                    Dim lbIsPrimaryKey As Boolean
+                                    If arRoleConstraint.IsPreferredIdentifier Then
+                                        lsQualifier = "PK"
+                                        lbIsPrimaryKey = True
+                                    Else
+                                        lsQualifier = lrTable.generateUniqueQualifier("UC")
+                                        lbIsPrimaryKey = False
+                                    End If
+
+
                                     Dim lsIndexName As String = lrTable.Name & "_" & Trim(lsQualifier)
 
                                     'Add the new Index

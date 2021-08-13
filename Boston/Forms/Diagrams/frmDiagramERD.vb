@@ -248,6 +248,9 @@ Public Class frmDiagramERD
                     Call lrERAttribute.RefreshShape()
 
                     lrEREntity.TableShape.ResizeToFitText(False)
+
+                    'Add the Attribute to the Page
+                    Me.zrPage.ERDiagram.Attribute.Add(lrERAttribute)
                 Next
 
             Next
@@ -2148,8 +2151,13 @@ Public Class frmDiagramERD
                 Me.zrPage.ERDiagram.Attribute.RemoveAll(Function(x) x.Column Is Nothing)
 
                 lrAttribute = Me.zrPage.ERDiagram.Attribute.Find(Function(x) x.Column.Id = lrOriginColumn.Id)
-                lrAttribute.Cell.TextColor = Color.White
-                lrAttribute.Cell.Brush = New MindFusion.Drawing.SolidBrush(Color.LightGray)
+                Try
+                    lrAttribute.Cell.TextColor = Color.White
+                    lrAttribute.Cell.Brush = New MindFusion.Drawing.SolidBrush(Color.LightGray)
+                Catch ex As Exception
+                    'Not a biggie.
+                End Try
+
 
                 If lrERDLink.Relation.RelationFactType.Is1To1BinaryFactType Then
                     'Highlight the reverse Attributes
@@ -2162,8 +2170,12 @@ Public Class frmDiagramERD
 
             For Each lrDestinationColumn In lrERDLink.Relation.RDSRelation.DestinationColumns
                 lrAttribute = Me.zrPage.ERDiagram.Attribute.Find(Function(x) x.Column.Id = lrDestinationColumn.Id)
-                lrAttribute.Cell.TextColor = Color.White
-                lrAttribute.Cell.Brush = New MindFusion.Drawing.SolidBrush(Color.LightGray)
+                Try
+                    lrAttribute.Cell.TextColor = Color.White
+                    lrAttribute.Cell.Brush = New MindFusion.Drawing.SolidBrush(Color.LightGray)
+                Catch ex As Exception
+                    'Not a biggie.
+                End Try
 
                 If lrERDLink.Relation.RelationFactType.Is1To1BinaryFactType Then
                     'Highlight the reverse Attributes
