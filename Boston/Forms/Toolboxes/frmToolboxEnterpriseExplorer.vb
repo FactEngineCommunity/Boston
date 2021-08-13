@@ -2663,23 +2663,36 @@ Public Class frmToolboxEnterpriseExplorer
 
                 If My.Settings.UseClientServer And My.Settings.UseVirtualUI Then
                     lsFolderLocation = My.Computer.FileSystem.SpecialDirectories.AllUsersApplicationData
-                Else
-                    If DialogFolderBrowser.ShowDialog() = Windows.Forms.DialogResult.OK Then
-                        lsFolderLocation = DialogFolderBrowser.SelectedPath
-                    Else
-                        Exit Sub
-                    End If
-                End If
-
-                If My.Settings.UseClientServer And My.Settings.UseVirtualUI And (prApplication.User IsNot Nothing) Then
                     lsFileName = prApplication.User.Id & "-" & lrModel.Name & ".fbm"
                     lsFileLocationName = lsFolderLocation & "\" & lsFileName
                 Else
+                    Dim lrSaveFileDialog As New SaveFileDialog()
+
                     lsFileName = lrModel.Name & ".fbm"
-                    lsFileLocationName = lsFolderLocation & "\" & lsFileName
+                    lsFileLocationName = lsFileName
+
+
+                    lrSaveFileDialog.Filter = "Fact-Based Model file (*.fbm)|*.fbm"
+                    lrSaveFileDialog.FilterIndex = 0
+                    lrSaveFileDialog.RestoreDirectory = True
+                    lrSaveFileDialog.FileName = lsFileLocationName
+
+                    If (lrSaveFileDialog.ShowDialog() = DialogResult.OK) Then
+                        If Not System.IO.File.Exists(lrSaveFileDialog.FileName()) Then
+                            lsFileLocationName = lrSaveFileDialog.FileName
+                        End If
+                    Else
+                        Exit Sub
+                    End If
+
+                    'If DialogFolderBrowser.ShowDialog() = Windows.Forms.DialogResult.OK Then
+                    '    lsFolderLocation = DialogFolderBrowser.SelectedPath
+                    'Else
+                    '    Exit Sub
+                    'End If
                 End If
 
-                loStreamWriter = New StreamWriter(lsFolderLocation & "\" & lsFileName)
+                loStreamWriter = New StreamWriter(lsFileLocationName) 'lsFolderLocation & "\" & lsFileName)
 
                 'loXMLSerialiser = New XmlSerializer(GetType(FBM.tORMModel))
                 loXMLSerialiser = New XmlSerializer(GetType(XMLModel.Model))
