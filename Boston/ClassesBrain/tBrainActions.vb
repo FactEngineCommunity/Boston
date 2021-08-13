@@ -493,6 +493,16 @@ Partial Public Class tBrain
                 larRole.Add(lrFactType.RoleGroup.Find(Function(x) x.JoinedORMObject.Id = lrResolvedWord.Word))
             Next
 
+            'CodeSafe
+#Region "CodeSafe: Make sure the Sentence has the right number of PredicateParts"
+            If Me.CurrentQuestion.sentence.PredicatePart.Count < lrFactType.RoleGroup.Count Then
+                For liInd = 1 To lrFactType.RoleGroup.Count - Me.CurrentQuestion.sentence.PredicatePart.Count
+                    Dim lrPredicatePart = New Language.PredicatePart("")
+                    Me.CurrentQuestion.sentence.PredicatePart.Add(lrPredicatePart)
+                Next
+            End If
+#End Region
+
             Dim lrFactTypeReading As New FBM.FactTypeReading(lrFactType, larRole, Me.CurrentQuestion.sentence)
 
             Call lrFactType.AddFactTypeReading(lrFactTypeReading, False, True)

@@ -158,6 +158,24 @@ Module MyMethodExtensions
     End Function
 
     <Extension()>
+    Public Function AppendStringInColor(ByRef aoRichtextbox As RichTextBox,
+                                        ByVal asStringExtension As String,
+                                        ByVal aiColor As Color) As RichTextBox
+
+        Dim liOriginalColor As Color = aoRichtextbox.SelectionColor
+        aoRichtextbox.Select(aoRichtextbox.TextLength, 0)
+        aoRichtextbox.SelectionColor = aiColor
+        aoRichtextbox.AppendText(asStringExtension)
+
+        'Return back to original color
+        aoRichtextbox.Select(aoRichtextbox.TextLength, 0)
+        aoRichtextbox.SelectionColor = liOriginalColor
+
+        Return aoRichtextbox
+
+    End Function
+
+    <Extension()>
     Public Function AppendLine(ByRef asString As String, ByVal asStringExtension As String) As String
 
         asString = asString & asStringExtension

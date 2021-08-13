@@ -319,10 +319,17 @@ Public Class frmCRUDModel
 
 
 
-    Private Sub AddREMessage(ByVal asMessage As String)
+    Private Sub AddREMessage(ByVal asMessage As String,
+                             Optional ByVal aiColor As Color = Nothing)
 
         Try
-            Me.RichTextBoxREMessages.AppendText(vbCrLf & asMessage)
+            If aiColor = Nothing Then
+                Me.RichTextBoxREMessages.AppendText(vbCrLf & asMessage)
+            Else
+                Me.RichTextBoxREMessages.AppendStringInColor(vbCrLf & asMessage, aiColor)
+            End If
+
+
         Catch ex As Exception
             Debugger.Break()
         End Try
@@ -360,7 +367,7 @@ Public Class frmCRUDModel
                     Call Me.AddREMessage("- Finished reverse engineering the database.")
                     Call Me.AddREMessage("- Saving the model.")
                     Call Me.zrModel.Save()
-                    Call Me.AddREMessage("- Complete.")
+                    Call Me.AddREMessage("- Complete.", Color.Green)
                 End If
 
             End With

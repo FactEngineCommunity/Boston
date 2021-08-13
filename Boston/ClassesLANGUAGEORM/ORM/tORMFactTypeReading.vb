@@ -508,11 +508,29 @@ Namespace FBM
             arPredicatePart.isDirty = True
             arPredicatePart.SequenceNr = Me.PredicatePart.Count + 1
 
+            Call Me.ReSequencePredicateParts
+
             Me.makeDirty()
             Me.FactType.makeDirty()
 
             Me.PredicatePart.Add(arPredicatePart)
 
+        End Sub
+
+        Public Sub ReSequencePredicateParts()
+
+            Try
+                Me.PredicatePart = Me.PredicatePart.OrderBy(Function(x) x.SequenceNr)
+
+                Dim liInd As Integer = 1
+                For Each lrPredicatePart In Me.PredicatePart
+                    lrPredicatePart.SequenceNr = liInd
+                    liInd += 1
+                Next
+
+            Catch ex As Exception
+
+            End Try
         End Sub
 
         Public Function GetPredicatePart(ByVal asRoleId As String) As FBM.PredicatePart

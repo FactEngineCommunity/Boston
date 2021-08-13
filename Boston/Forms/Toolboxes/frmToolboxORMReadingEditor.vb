@@ -688,6 +688,29 @@ Public Class frmToolboxORMReadingEditor
             lrFactTypeReading = New FBM.FactTypeReading(Me.zrFactTypeInstance.FactType, Me.DataGrid_Readings.Rows(e.RowIndex).Tag.Id)
 
             Dim lrExistingFactTypeReading As FBM.FactTypeReading = Me.DataGrid_Readings.Rows(e.RowIndex).Tag
+
+            'CodeSafe
+#Region "CodeSafe: Make sure the FactTypeReading has the right number of PredicateParts"
+            If lrExistingFactTypeReading.PredicatePart.Count < Me.zrFactTypeInstance.FactType.RoleGroup.Count Then
+                For Each lrRole In Me.zrFactTypeInstance.FactType.RoleGroup
+                    If lrExistingFactTypeReading.PredicatePart.Find(Function(x) x.Role Is lrRole) Is Nothing Then
+                        Dim lrPredicatePart As New FBM.PredicatePart(Me.zrFactTypeInstance.Model,
+                                                                     lrExistingFactTypeReading,
+                                                                     lrRole, True)
+                        lrExistingFactTypeReading.AddPredicatePart(lrPredicatePart)
+                    End If
+                Next
+            End If
+            If lrExistingFactTypeReading.PredicatePart.Count > Me.zrFactTypeInstance.FactType.RoleGroup.Count Then
+                For Each lrRole In Me.zrFactTypeInstance.FactType.RoleGroup
+                    If lrExistingFactTypeReading.PredicatePart.Find(Function(x) x.Role Is lrRole) Is Nothing Then
+                        Dim lrOffendingPredicatePart = lrExistingFactTypeReading.PredicatePart.Find(Function(x) x.Role Is lrRole)
+                        lrExistingFactTypeReading.PredicatePart.Remove(lrOffendingPredicatePart)
+                    End If
+                Next
+            End If
+#End Region
+
             Dim larRoleOrder As New List(Of FBM.Role)
             For Each lrPredicatePart In lrExistingFactTypeReading.PredicatePart
                 larRoleOrder.Add(lrPredicatePart.Role)
