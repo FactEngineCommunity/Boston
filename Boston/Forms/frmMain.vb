@@ -1768,7 +1768,9 @@ Public Class frmMain
 
     End Sub
 
-    Sub loadToolboxORMReadingEditor(ByRef arPage As FBM.Page, ByVal aoActivePane As WeifenLuo.WinFormsUI.Docking.DockPane)
+    Sub loadToolboxORMReadingEditor(ByRef arPage As FBM.Page,
+                                    ByVal aoActivePane As WeifenLuo.WinFormsUI.Docking.DockPane,
+                                    Optional ByRef arFactTypeInstance As FBM.FactTypeInstance = Nothing)
 
         Dim child As New frmToolboxORMReadingEditor
 
@@ -1797,6 +1799,11 @@ Public Class frmMain
                     child.DockTo(lrPane, DockStyle.Fill, 0)
 
                     child.zrPage = arPage
+
+                    If arFactTypeInstance IsNot Nothing Then
+                        child.zrFactTypeInstance = arFactTypeInstance
+                        child.zrFactType = arFactTypeInstance.FactType
+                    End If
                     Call child.SetupForm()
                 Else
                     '--------------------------------------------------
@@ -1804,8 +1811,11 @@ Public Class frmMain
                     '--------------------------------------------------
                     child.Show(aoActivePane, WeifenLuo.WinFormsUI.Docking.DockAlignment.Bottom, 0.3)
                     child.zrPage = arPage
+                    If arFactTypeInstance IsNot Nothing Then
+                        child.zrFactTypeInstance = arFactTypeInstance
+                        child.zrFactType = arFactTypeInstance.FactType
+                    End If
                     Call child.SetupForm()
-
 
                 End If
                 prApplication.ToolboxForms.Add(child)

@@ -661,6 +661,17 @@ Namespace FEQL
             End Set
         End Property
 
+        Private _KEYWDWHEREALSO As String = Nothing
+        Public Property KEYWDWHEREALSO As String
+            Get
+                Return Me._KEYWDWHEREALSO
+            End Get
+            Set(value As String)
+                Me._KEYWDWHEREALSO = value
+                Me.KEYWDAND = "AND" 'Because the FEQL processing is based on KEYWDAND, and does not include checks for KEYWDALSO.
+            End Set
+        End Property
+
         Private _WHICHTHATCLAUSE As Object = Nothing 'NB Is used to disambiguate where the THAT is in the WHICHCLAUSE
         Public Property WHICHTHATCLAUSE As Object
             Get

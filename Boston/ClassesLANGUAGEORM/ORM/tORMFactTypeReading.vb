@@ -170,8 +170,11 @@ Namespace FBM
                         lrPredicatePart.PostBoundText = ""
                     ElseIf liInd = aarRole.Count Then
                         lrPredicatePart.PredicatePartText = ""
-                        lrPredicatePart.PreBoundText = ""
-                        lrPredicatePart.PostBoundText = ""
+                        lrPredicatePart.PreBoundText = arSentence.PredicatePart(liInd - 1).PreboundText
+                        lrPredicatePart.PostBoundText = arSentence.PredicatePart(liInd - 1).PostboundText
+                        '20210814-VM-Was the below. Not sure why. "Street has ONE nick-Name" definitely has a PreboundReadingText.
+                        'lrPredicatePart.PreBoundText = ""
+                        'lrPredicatePart.PostBoundText = ""
                     Else
                         lrPredicatePart.PredicatePartText = arSentence.PredicatePart(liInd - 1).PredicatePartText
                         lrPredicatePart.PreBoundText = arSentence.PredicatePart(liInd - 1).PreboundText

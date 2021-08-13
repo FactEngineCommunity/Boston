@@ -46,7 +46,7 @@ Namespace FEQL
 
             ParsePREDICATECLAUSE(node) ' NonTerminal Rule: PREDICATECLAUSE
             If m_tree.Errors.Count > 0 Then
-              If m_scanner.StartPos >= Me.MaxDistance Then
+              If liOriginalRange >= Me.MaxDistance Then
                 Me.MaxDistance = m_scanner.StartPos
                 max_tree = m_tree.clone
               End If
@@ -143,7 +143,7 @@ Namespace FEQL
                 If Not lbProblemSolved Then
                   m_tree.Errors.Clear
                   m_scanner.StartPos = liOriginalRange
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
@@ -164,7 +164,7 @@ Namespace FEQL
                 If Not lbProblemSolved Then
                   m_tree.Errors.Clear
                   m_scanner.StartPos = liOriginalRange
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
@@ -215,7 +215,7 @@ Namespace FEQL
              ' Concat Rule
             lbProblemSolved =                     ParseMultExpr(node) ' NonTerminal Rule: MultExpr
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -280,7 +280,7 @@ Namespace FEQL
                                     If Not lbProblemSolved Then
                                       m_tree.Errors.Clear
                                       m_scanner.StartPos = liOriginalRange
-                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                      If liOriginalRange >= Me.MaxDistance Then
                                         Me.MaxDistance = m_scanner.StartPos
                                         max_tree = m_tree.clone
                                       End If
@@ -308,7 +308,7 @@ Namespace FEQL
                          ' Concat Rule
                         lbProblemSolved =                                 ParseMultExpr(node) ' NonTerminal Rule: MultExpr
                                 If m_tree.Errors.Count > 0 Then
-                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                  If liOriginalRange >= Me.MaxDistance Then
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
@@ -357,7 +357,7 @@ Namespace FEQL
              ' Concat Rule
             lbProblemSolved =                     ParseAtom(node) ' NonTerminal Rule: Atom
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -422,7 +422,7 @@ Namespace FEQL
                                     If Not lbProblemSolved Then
                                       m_tree.Errors.Clear
                                       m_scanner.StartPos = liOriginalRange
-                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                      If liOriginalRange >= Me.MaxDistance Then
                                         Me.MaxDistance = m_scanner.StartPos
                                         max_tree = m_tree.clone
                                       End If
@@ -450,7 +450,7 @@ Namespace FEQL
                          ' Concat Rule
                         lbProblemSolved =                                 ParseAtom(node) ' NonTerminal Rule: Atom
                                 If m_tree.Errors.Count > 0 Then
-                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                  If liOriginalRange >= Me.MaxDistance Then
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
@@ -516,7 +516,7 @@ Namespace FEQL
                         Case TokenType.KEYWDTODAY
                     lbProblemSolved =                             ParseRESERVEDWORD(node) ' NonTerminal Rule: RESERVEDWORD
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -568,7 +568,7 @@ Namespace FEQL
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
                           m_scanner.StartPos = liOriginalRange
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
@@ -589,7 +589,7 @@ Namespace FEQL
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
                           m_scanner.StartPos = liOriginalRange
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
@@ -625,7 +625,7 @@ Namespace FEQL
                         Case TokenType.KEYWDTODAY
                     lbProblemSolved =                             ParseRESERVEDWORD(node) ' NonTerminal Rule: RESERVEDWORD
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -677,7 +677,7 @@ Namespace FEQL
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
                           m_scanner.StartPos = liOriginalRange
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
@@ -698,7 +698,7 @@ Namespace FEQL
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
                           m_scanner.StartPos = liOriginalRange
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
@@ -734,7 +734,7 @@ Namespace FEQL
                         Case TokenType.KEYWDTODAY
                     lbProblemSolved =                             ParseRESERVEDWORD(node) ' NonTerminal Rule: RESERVEDWORD
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -786,7 +786,7 @@ Namespace FEQL
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
                           m_scanner.StartPos = liOriginalRange
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
@@ -807,7 +807,7 @@ Namespace FEQL
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
                           m_scanner.StartPos = liOriginalRange
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
@@ -851,7 +851,7 @@ Namespace FEQL
                      ' Concat Rule
                     lbProblemSolved =                             ParseAddExpr(node) ' NonTerminal Rule: AddExpr
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -895,7 +895,7 @@ Namespace FEQL
                 If Not lbProblemSolved Then
                   m_tree.Errors.Clear
                   m_scanner.StartPos = liOriginalRange
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
@@ -918,7 +918,7 @@ Namespace FEQL
              ' Concat Rule
             lbProblemSolved =                     ParseAddExpr(node) ' NonTerminal Rule: AddExpr
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -979,7 +979,7 @@ Namespace FEQL
              ' Concat Rule
             lbProblemSolved =                     ParseAddExpr(node) ' NonTerminal Rule: AddExpr
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -991,7 +991,7 @@ Namespace FEQL
              ' Concat Rule
             lbProblemSolved =                     ParseCOMPARITOR(node) ' NonTerminal Rule: COMPARITOR
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -1003,7 +1003,7 @@ Namespace FEQL
              ' Concat Rule
             lbProblemSolved =                     ParseAddExpr(node) ' NonTerminal Rule: AddExpr
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -1150,7 +1150,7 @@ Namespace FEQL
              ' Concat Rule
             lbProblemSolved =                     ParseCOLUMNNAME(node) ' NonTerminal Rule: COLUMNNAME
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -1204,7 +1204,7 @@ Namespace FEQL
              ' Concat Rule
             lbProblemSolved =                     ParseCOMPARISON(node) ' NonTerminal Rule: COMPARISON
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -1280,7 +1280,7 @@ Namespace FEQL
                         Case TokenType.SINGLEQUOTE
                     lbProblemSolved =                             ParseQUOTEDIDENTIFIER(node) ' NonTerminal Rule: QUOTEDIDENTIFIER
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -1303,13 +1303,13 @@ Namespace FEQL
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
                           m_scanner.StartPos = liOriginalRange
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
                     lbProblemSolved =                         ParseQUOTEDIDENTIFIER(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: QUOTEDIDENTIFIER
                         If m_tree.Errors.Count > 0 Then
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
@@ -1370,7 +1370,7 @@ Namespace FEQL
              ' Concat Rule
             lbProblemSolved =                     ParseVALUESTRING(node) ' NonTerminal Rule: VALUESTRING
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -1424,7 +1424,7 @@ Namespace FEQL
              ' Concat Rule
             lbProblemSolved =                     ParseCOLUMNLIST(node) ' NonTerminal Rule: COLUMNLIST
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -1478,7 +1478,7 @@ Namespace FEQL
              ' Concat Rule
             lbProblemSolved =                     ParseCOLUMNNAME(node) ' NonTerminal Rule: COLUMNNAME
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -1493,7 +1493,7 @@ Namespace FEQL
                     m_tree.Errors.Clear
                         ParseADDITIONALCOLUMNNAME(node) ' NonTerminal Rule: ADDITIONALCOLUMNNAME
                         If m_tree.Errors.Count > 0 Then
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
@@ -1609,7 +1609,7 @@ Namespace FEQL
                 If Not lbProblemSolved Then
                   m_tree.Errors.Clear
                   m_scanner.StartPos = liOriginalRange
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
@@ -1630,7 +1630,7 @@ Namespace FEQL
                 If Not lbProblemSolved Then
                   m_tree.Errors.Clear
                   m_scanner.StartPos = liOriginalRange
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
@@ -1711,7 +1711,7 @@ Namespace FEQL
              ' Concat Rule
             lbProblemSolved =                     ParseVALUESTRING(node) ' NonTerminal Rule: VALUESTRING
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -1750,7 +1750,7 @@ Namespace FEQL
              ' Concat Rule
             lbProblemSolved =                     ParseCOMPARISON(node) ' NonTerminal Rule: COMPARISON
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -1762,7 +1762,7 @@ Namespace FEQL
              ' Concat Rule
             lbProblemSolved =                     ParseADDITIONALCOMPARISON(node) ' NonTerminal Rule: ADDITIONALCOMPARISON
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -2135,7 +2135,7 @@ Namespace FEQL
                 If Not lbProblemSolved Then
                   m_tree.Errors.Clear
                   m_scanner.StartPos = liOriginalRange
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
@@ -2156,7 +2156,7 @@ Namespace FEQL
                 If Not lbProblemSolved Then
                   m_tree.Errors.Clear
                   m_scanner.StartPos = liOriginalRange
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
@@ -2177,7 +2177,7 @@ Namespace FEQL
                 If Not lbProblemSolved Then
                   m_tree.Errors.Clear
                   m_scanner.StartPos = liOriginalRange
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
@@ -2198,7 +2198,7 @@ Namespace FEQL
                 If Not lbProblemSolved Then
                   m_tree.Errors.Clear
                   m_scanner.StartPos = liOriginalRange
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
@@ -2219,7 +2219,7 @@ Namespace FEQL
                 If Not lbProblemSolved Then
                   m_tree.Errors.Clear
                   m_scanner.StartPos = liOriginalRange
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
@@ -2240,7 +2240,7 @@ Namespace FEQL
                 If Not lbProblemSolved Then
                   m_tree.Errors.Clear
                   m_scanner.StartPos = liOriginalRange
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
@@ -2261,7 +2261,7 @@ Namespace FEQL
                 If Not lbProblemSolved Then
                   m_tree.Errors.Clear
                   m_scanner.StartPos = liOriginalRange
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
@@ -2282,7 +2282,7 @@ Namespace FEQL
                 If Not lbProblemSolved Then
                   m_tree.Errors.Clear
                   m_scanner.StartPos = liOriginalRange
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
@@ -2303,7 +2303,7 @@ Namespace FEQL
                 If Not lbProblemSolved Then
                   m_tree.Errors.Clear
                   m_scanner.StartPos = liOriginalRange
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
@@ -2324,7 +2324,7 @@ Namespace FEQL
                 If Not lbProblemSolved Then
                   m_tree.Errors.Clear
                   m_scanner.StartPos = liOriginalRange
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
@@ -2345,7 +2345,7 @@ Namespace FEQL
                 If Not lbProblemSolved Then
                   m_tree.Errors.Clear
                   m_scanner.StartPos = liOriginalRange
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
@@ -2366,7 +2366,7 @@ Namespace FEQL
                 If Not lbProblemSolved Then
                   m_tree.Errors.Clear
                   m_scanner.StartPos = liOriginalRange
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
@@ -2387,7 +2387,7 @@ Namespace FEQL
                 If Not lbProblemSolved Then
                   m_tree.Errors.Clear
                   m_scanner.StartPos = liOriginalRange
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
@@ -2408,7 +2408,7 @@ Namespace FEQL
                 If Not lbProblemSolved Then
                   m_tree.Errors.Clear
                   m_scanner.StartPos = liOriginalRange
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
@@ -2429,7 +2429,7 @@ Namespace FEQL
                 If Not lbProblemSolved Then
                   m_tree.Errors.Clear
                   m_scanner.StartPos = liOriginalRange
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
@@ -2450,7 +2450,7 @@ Namespace FEQL
                 If Not lbProblemSolved Then
                   m_tree.Errors.Clear
                   m_scanner.StartPos = liOriginalRange
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
@@ -2471,7 +2471,7 @@ Namespace FEQL
                 If Not lbProblemSolved Then
                   m_tree.Errors.Clear
                   m_scanner.StartPos = liOriginalRange
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
@@ -2492,7 +2492,7 @@ Namespace FEQL
                 If Not lbProblemSolved Then
                   m_tree.Errors.Clear
                   m_scanner.StartPos = liOriginalRange
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
@@ -2513,7 +2513,7 @@ Namespace FEQL
                 If Not lbProblemSolved Then
                   m_tree.Errors.Clear
                   m_scanner.StartPos = liOriginalRange
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
@@ -2676,7 +2676,7 @@ Namespace FEQL
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
                           m_scanner.StartPos = liOriginalRange
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
@@ -2697,7 +2697,7 @@ Namespace FEQL
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
                           m_scanner.StartPos = liOriginalRange
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
@@ -2718,7 +2718,7 @@ Namespace FEQL
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
                           m_scanner.StartPos = liOriginalRange
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
@@ -2739,7 +2739,7 @@ Namespace FEQL
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
                           m_scanner.StartPos = liOriginalRange
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
@@ -2760,7 +2760,7 @@ Namespace FEQL
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
                           m_scanner.StartPos = liOriginalRange
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
@@ -2924,7 +2924,7 @@ Namespace FEQL
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
                           m_scanner.StartPos = liOriginalRange
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
@@ -2945,7 +2945,7 @@ Namespace FEQL
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
                           m_scanner.StartPos = liOriginalRange
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
@@ -3043,7 +3043,7 @@ Namespace FEQL
 
             ParseNODEPROPERTYNAMEIDENTIFICATION(node) ' NonTerminal Rule: NODEPROPERTYNAMEIDENTIFICATION
             If m_tree.Errors.Count > 0 Then
-              If m_scanner.StartPos >= Me.MaxDistance Then
+              If liOriginalRange >= Me.MaxDistance Then
                 Me.MaxDistance = m_scanner.StartPos
                 max_tree = m_tree.clone
               End If
@@ -3150,7 +3150,7 @@ Namespace FEQL
              ' Concat Rule
             lbProblemSolved =                     ParseNODEPROPERTYIDENTIFICATION(node) ' NonTerminal Rule: NODEPROPERTYIDENTIFICATION
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -3167,7 +3167,7 @@ Namespace FEQL
                          ' Concat Rule
                         lbProblemSolved =                                 ParsePREDICATECLAUSE(node) ' NonTerminal Rule: PREDICATECLAUSE
                                 If m_tree.Errors.Count > 0 Then
-                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                  If liOriginalRange >= Me.MaxDistance Then
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
@@ -3179,7 +3179,7 @@ Namespace FEQL
                          ' Concat Rule
                         lbProblemSolved =                                 ParseNODEPROPERTYIDENTIFICATION(node) ' NonTerminal Rule: NODEPROPERTYIDENTIFICATION
                                 If m_tree.Errors.Count > 0 Then
-                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                  If liOriginalRange >= Me.MaxDistance Then
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
@@ -3245,7 +3245,7 @@ Namespace FEQL
                          ' Concat Rule
                         lbProblemSolved =                                 ParsePREDICATECLAUSE(node) ' NonTerminal Rule: PREDICATECLAUSE
                                 If m_tree.Errors.Count > 0 Then
-                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                  If liOriginalRange >= Me.MaxDistance Then
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
@@ -3257,7 +3257,7 @@ Namespace FEQL
                          ' Concat Rule
                         lbProblemSolved =                                 ParseNODEPROPERTYIDENTIFICATION(node) ' NonTerminal Rule: NODEPROPERTYIDENTIFICATION
                                 If m_tree.Errors.Count > 0 Then
-                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                  If liOriginalRange >= Me.MaxDistance Then
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
@@ -3306,7 +3306,7 @@ Namespace FEQL
              ' Concat Rule
             lbProblemSolved =                     ParseNODEPROPERTYIDENTIFICATION(node) ' NonTerminal Rule: NODEPROPERTYIDENTIFICATION
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -3323,7 +3323,7 @@ Namespace FEQL
                          ' Concat Rule
                         lbProblemSolved =                                 ParsePREDICATECLAUSE(node) ' NonTerminal Rule: PREDICATECLAUSE
                                 If m_tree.Errors.Count > 0 Then
-                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                  If liOriginalRange >= Me.MaxDistance Then
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
@@ -3335,7 +3335,7 @@ Namespace FEQL
                          ' Concat Rule
                         lbProblemSolved =                                 ParseNODEPROPERTYIDENTIFICATION(node) ' NonTerminal Rule: NODEPROPERTYIDENTIFICATION
                                 If m_tree.Errors.Count > 0 Then
-                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                  If liOriginalRange >= Me.MaxDistance Then
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
@@ -3423,7 +3423,7 @@ Namespace FEQL
              ' Concat Rule
             lbProblemSolved =                     ParseCOLUMNNAME(node) ' NonTerminal Rule: COLUMNNAME
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -3438,7 +3438,7 @@ Namespace FEQL
                     m_tree.Errors.Clear
                         ParseADDITIONALCOLUMNNAME(node) ' NonTerminal Rule: ADDITIONALCOLUMNNAME
                         If m_tree.Errors.Count > 0 Then
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
@@ -3498,7 +3498,7 @@ Namespace FEQL
              ' Concat Rule
             lbProblemSolved =                     ParseNODEPROPERTYIDENTIFICATION(node) ' NonTerminal Rule: NODEPROPERTYIDENTIFICATION
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -3515,7 +3515,7 @@ Namespace FEQL
                          ' Concat Rule
                         lbProblemSolved =                                 ParsePREDICATECLAUSE(node) ' NonTerminal Rule: PREDICATECLAUSE
                                 If m_tree.Errors.Count > 0 Then
-                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                  If liOriginalRange >= Me.MaxDistance Then
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
@@ -3527,7 +3527,7 @@ Namespace FEQL
                          ' Concat Rule
                         lbProblemSolved =                                 ParseNODEPROPERTYIDENTIFICATION(node) ' NonTerminal Rule: NODEPROPERTYIDENTIFICATION
                                 If m_tree.Errors.Count > 0 Then
-                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                  If liOriginalRange >= Me.MaxDistance Then
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
@@ -3600,7 +3600,7 @@ Namespace FEQL
              ' Concat Rule
             lbProblemSolved =                     ParseNODEPROPERTYIDENTIFICATION(node) ' NonTerminal Rule: NODEPROPERTYIDENTIFICATION
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -3617,7 +3617,7 @@ Namespace FEQL
                          ' Concat Rule
                         lbProblemSolved =                                 ParsePREDICATECLAUSE(node) ' NonTerminal Rule: PREDICATECLAUSE
                                 If m_tree.Errors.Count > 0 Then
-                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                  If liOriginalRange >= Me.MaxDistance Then
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
@@ -3629,7 +3629,7 @@ Namespace FEQL
                          ' Concat Rule
                         lbProblemSolved =                                 ParseNODEPROPERTYIDENTIFICATION(node) ' NonTerminal Rule: NODEPROPERTYIDENTIFICATION
                                 If m_tree.Errors.Count > 0 Then
-                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                  If liOriginalRange >= Me.MaxDistance Then
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
@@ -3695,7 +3695,7 @@ Namespace FEQL
                          ' Concat Rule
                         lbProblemSolved =                                 ParsePREDICATECLAUSE(node) ' NonTerminal Rule: PREDICATECLAUSE
                                 If m_tree.Errors.Count > 0 Then
-                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                  If liOriginalRange >= Me.MaxDistance Then
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
@@ -3707,7 +3707,7 @@ Namespace FEQL
                          ' Concat Rule
                         lbProblemSolved =                                 ParseNODEPROPERTYIDENTIFICATION(node) ' NonTerminal Rule: NODEPROPERTYIDENTIFICATION
                                 If m_tree.Errors.Count > 0 Then
-                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                  If liOriginalRange >= Me.MaxDistance Then
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
@@ -3794,7 +3794,7 @@ Namespace FEQL
                      ' Concat Rule
                     lbProblemSolved =                             ParseRETURNCOLUMN(node) ' NonTerminal Rule: RETURNCOLUMN
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -3856,7 +3856,7 @@ Namespace FEQL
                      ' Concat Rule
                     lbProblemSolved =                             ParseRETURNCOLUMN(node) ' NonTerminal Rule: RETURNCOLUMN
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -3898,7 +3898,7 @@ Namespace FEQL
                 If Not lbProblemSolved Then
                   m_tree.Errors.Clear
                   m_scanner.StartPos = liOriginalRange
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
@@ -3936,7 +3936,7 @@ Namespace FEQL
              ' Concat Rule
             lbProblemSolved =                     ParseRETURNCOLUMN(node) ' NonTerminal Rule: RETURNCOLUMN
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -4205,7 +4205,7 @@ Namespace FEQL
                 If Not lbProblemSolved Then
                   m_tree.Errors.Clear
                   m_scanner.StartPos = liOriginalRange
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
@@ -4226,7 +4226,7 @@ Namespace FEQL
                 If Not lbProblemSolved Then
                   m_tree.Errors.Clear
                   m_scanner.StartPos = liOriginalRange
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
@@ -4247,7 +4247,7 @@ Namespace FEQL
                 If Not lbProblemSolved Then
                   m_tree.Errors.Clear
                   m_scanner.StartPos = liOriginalRange
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
@@ -4268,7 +4268,7 @@ Namespace FEQL
                 If Not lbProblemSolved Then
                   m_tree.Errors.Clear
                   m_scanner.StartPos = liOriginalRange
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
@@ -4453,7 +4453,7 @@ Namespace FEQL
                 If Not lbProblemSolved Then
                   m_tree.Errors.Clear
                   m_scanner.StartPos = liOriginalRange
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
@@ -4474,7 +4474,7 @@ Namespace FEQL
                 If Not lbProblemSolved Then
                   m_tree.Errors.Clear
                   m_scanner.StartPos = liOriginalRange
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
@@ -4650,171 +4650,172 @@ Namespace FEQL
             Dim node As ParseNode = parent.CreateNode(m_scanner.GetToken(TokenType.NODE), "NODE")
             Dim lbProblemSolved As Boolean = True
 
-            Dim liOriginalRange as Integer = m_scanner.StartPos
+            Dim liOriginalRange As Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
 
-             ' Concat Rule
-                                tok = m_scanner.LookAhead({TokenType.PREBOUNDREADINGTEXT}) ' Option Rule
-                    If tok.Type = TokenType.PREBOUNDREADINGTEXT Then
+            ' Concat Rule
+            tok = m_scanner.LookAhead({TokenType.PREBOUNDREADINGTEXT}) ' Option Rule
+            If tok.Type = TokenType.PREBOUNDREADINGTEXT Then
+                lbProblemSolved = True
+                tok = m_scanner.Scan(TokenType.PREBOUNDREADINGTEXT) ' Terminal Rule: PREBOUNDREADINGTEXT
+                n = node.CreateNode(tok, tok.ToString())
+                node.Token.UpdateRange(tok)
+                node.Nodes.Add(n)
+                If tok.Type <> TokenType.PREBOUNDREADINGTEXT Then
+                    m_tree.Errors.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PREBOUNDREADINGTEXT.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "PREBOUNDREADINGTEXT"))
+                    lbProblemSolved = False
+                    Return False
+
+                End If
+
+
+            Else
+                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PREBOUNDREADINGTEXT.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "PREBOUNDREADINGTEXT"))
+            End If
+            If m_tree.Errors.Count > 0 Then
+                Return False
+            End If
+
+
+            ' Concat Rule
+            tok = m_scanner.LookAhead({TokenType.MODELELEMENTNAME, TokenType.BROPEN}) ' Choice Rule
+
+            m_tree.Optionals.Clear()
+            m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.MODELELEMENTNAME.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MODELELEMENTNAME"))
+            m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.MODELELEMENTNAME.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "BROPEN"))
+            Select Case tok.Type
+                     ' Choice Rule
+                Case TokenType.MODELELEMENTNAME
+
+                    ' Concat Rule
+                    lbProblemSolved = True
+                    tok = m_scanner.Scan(TokenType.MODELELEMENTNAME) ' Terminal Rule: MODELELEMENTNAME
+                    n = node.CreateNode(tok, tok.ToString())
+                    node.Token.UpdateRange(tok)
+                    node.Nodes.Add(n)
+                    If tok.Type <> TokenType.MODELELEMENTNAME Then
+                        m_tree.Errors.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.MODELELEMENTNAME.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MODELELEMENTNAME"))
+                        lbProblemSolved = False
+                        Return False
+
+                    End If
+
+
+
+                    ' Concat Rule
+                    tok = m_scanner.LookAhead({TokenType.MODELELEMENTSUFFIX}) ' Option Rule
+                    If tok.Type = TokenType.MODELELEMENTSUFFIX Then
                         lbProblemSolved = True
-                                                tok = m_scanner.Scan(TokenType.PREBOUNDREADINGTEXT) ' Terminal Rule: PREBOUNDREADINGTEXT
-                        n = node.CreateNode(tok, tok.ToString() )
+                        tok = m_scanner.Scan(TokenType.MODELELEMENTSUFFIX) ' Terminal Rule: MODELELEMENTSUFFIX
+                        n = node.CreateNode(tok, tok.ToString())
                         node.Token.UpdateRange(tok)
                         node.Nodes.Add(n)
-                        If tok.Type <> TokenType.PREBOUNDREADINGTEXT Then
-                          m_tree.Errors.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PREBOUNDREADINGTEXT.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "PREBOUNDREADINGTEXT"))
-                          lbProblemSolved = False
-                          Return False
+                        If tok.Type <> TokenType.MODELELEMENTSUFFIX Then
+                            m_tree.Errors.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.MODELELEMENTSUFFIX.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MODELELEMENTSUFFIX"))
+                            lbProblemSolved = False
+                            Return False
 
                         End If
 
 
                     Else
-                                            m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PREBOUNDREADINGTEXT.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "PREBOUNDREADINGTEXT"))
+                        m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.MODELELEMENTSUFFIX.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MODELELEMENTSUFFIX"))
                     End If
-            If m_tree.Errors.Count > 0 Then
-                                Return False
-            End If
+                    If m_tree.Errors.Count > 0 Then
+                        Return False
+                    End If
 
+                    If m_tree.Errors.Count > 0 Then
+                        Return False
+                    End If
 
-             ' Concat Rule
-                                tok = m_scanner.LookAhead({TokenType.MODELELEMENTNAME, TokenType.BROPEN}) ' Choice Rule
-                    
-                        m_tree.Optionals.Clear
-                        m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.MODELELEMENTNAME.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MODELELEMENTNAME"))
-                        m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.MODELELEMENTNAME.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "BROPEN"))
-                    Select Case tok.Type
-                     ' Choice Rule
-                        Case TokenType.MODELELEMENTNAME
-                    
-                             ' Concat Rule
-                                                                lbProblemSolved = True
-                                                                        tok = m_scanner.Scan(TokenType.MODELELEMENTNAME) ' Terminal Rule: MODELELEMENTNAME
-                                    n = node.CreateNode(tok, tok.ToString() )
-                                    node.Token.UpdateRange(tok)
-                                    node.Nodes.Add(n)
-                                    If tok.Type <> TokenType.MODELELEMENTNAME Then
-                                      m_tree.Errors.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.MODELELEMENTNAME.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MODELELEMENTNAME"))
-                                      lbProblemSolved = False
-                                      Return False
+                Case TokenType.BROPEN
+                    lbProblemSolved = ParseNODEPROPERTYIDENTIFICATION(node) ' NonTerminal Rule: NODEPROPERTYIDENTIFICATION
+                    If m_tree.Errors.Count > 0 Then
+                        If liOriginalRange >= Me.MaxDistance Then
+                            Me.MaxDistance = m_scanner.StartPos
+                            max_tree = m_tree.Clone
+                        End If
+                        If node.Nodes.Count > 0 Then node.Nodes.RemoveAt(node.Nodes.Count - 1)
+                        lbProblemSolved = False
+                    End If
 
-                                    End If
-
-
-
-                             ' Concat Rule
-                                                                tok = m_scanner.LookAhead({TokenType.MODELELEMENTSUFFIX}) ' Option Rule
-                                    If tok.Type = TokenType.MODELELEMENTSUFFIX Then
-                                        lbProblemSolved = True
-                                                                                tok = m_scanner.Scan(TokenType.MODELELEMENTSUFFIX) ' Terminal Rule: MODELELEMENTSUFFIX
-                                        n = node.CreateNode(tok, tok.ToString() )
-                                        node.Token.UpdateRange(tok)
-                                        node.Nodes.Add(n)
-                                        If tok.Type <> TokenType.MODELELEMENTSUFFIX Then
-                                          m_tree.Errors.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.MODELELEMENTSUFFIX.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MODELELEMENTSUFFIX"))
-                                          lbProblemSolved = False
-                                          Return False
-
-                                        End If
-
-
-                                    Else
-                                                                            m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.MODELELEMENTSUFFIX.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MODELELEMENTSUFFIX"))
-                                    End If
-            If m_tree.Errors.Count > 0 Then
-                                                Return False
-            End If
-
-                               If m_tree.Errors.Count > 0 Then
-                                  Return False
-                               End If
-
-                        Case TokenType.BROPEN
-                    lbProblemSolved =                             ParseNODEPROPERTYIDENTIFICATION(node) ' NonTerminal Rule: NODEPROPERTYIDENTIFICATION
-                            If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
-                                Me.MaxDistance = m_scanner.StartPos
-                                max_tree = m_tree.clone
-                              End If
-                              If node.Nodes.Count > 0 Then node.Nodes.RemoveAt(node.Nodes.Count - 1)
-                              lbProblemSolved = False
-                            End If
-
-                        Case Else
-                        If m_tree.Errors.Count = 0 Then
-                        m_tree.Optionals.Clear
+                Case Else
+                    If m_tree.Errors.Count = 0 Then
+                        m_tree.Optionals.Clear()
                         lbProblemSolved = False
                         m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.MODELELEMENTNAME.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MODELELEMENTNAME"))
                         m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.MODELELEMENTNAME.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "BROPEN"))
-                        End If
-                            m_tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found.", &H0002, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos))
-                            Exit Select
-                    End Select ' Choice Rule
-                        If Not lbProblemSolved Then
-                           m_tree.Errors.Clear
-                        If Not lbProblemSolved Then
-                          m_tree.Errors.Clear
-                          m_scanner.StartPos = liOriginalRange
-                          If m_scanner.StartPos >= Me.MaxDistance Then
-                            Me.MaxDistance = m_scanner.StartPos
-                            max_tree = m_tree.clone
-                          End If
-                    lbProblemSolved =                         ParseNODEPROPERTYIDENTIFICATION(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: NODEPROPERTYIDENTIFICATION
-                        If m_tree.Errors.Count > 0 Then
-                          If m_scanner.StartPos >= Me.MaxDistance Then
-                            Me.MaxDistance = m_scanner.StartPos
-                            max_tree = m_tree.clone
-                          End If
-                          If parent.Nodes(parent.Nodes.Count-1).Nodes.Count > 0 Then parent.Nodes(parent.Nodes.Count-1).Nodes.RemoveAt(Parent.Nodes(parent.Nodes.Count-1).Nodes.Count - 1)
-                          lbProblemSolved = False
-                        End If
-
-                        End If
-                        End If
-                     If (m_tree.Errors.Count > 0) Or Not lbProblemSolved Then
-                         parent.Nodes.Remove(node)
-                         Return False
-                     End If
-
-
-             ' Concat Rule
-                                tok = m_scanner.LookAhead({TokenType.POSTBOUNDREADINGTEXT}) ' Option Rule
-                    If tok.Type = TokenType.POSTBOUNDREADINGTEXT Then
-                        lbProblemSolved = True
-                                                tok = m_scanner.Scan(TokenType.POSTBOUNDREADINGTEXT) ' Terminal Rule: POSTBOUNDREADINGTEXT
-                        n = node.CreateNode(tok, tok.ToString() )
-                        node.Token.UpdateRange(tok)
-                        node.Nodes.Add(n)
-                        If tok.Type <> TokenType.POSTBOUNDREADINGTEXT Then
-                          m_tree.Errors.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.POSTBOUNDREADINGTEXT.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "POSTBOUNDREADINGTEXT"))
-                          lbProblemSolved = False
-                          Return False
-
-                        End If
-
-
-                    Else
-                                            m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.POSTBOUNDREADINGTEXT.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "POSTBOUNDREADINGTEXT"))
                     End If
-            If m_tree.Errors.Count > 0 Then
-                                Return False
+                    m_tree.Errors.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found.", &H2, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos))
+                    Exit Select
+            End Select ' Choice Rule
+            If Not lbProblemSolved Then
+                m_tree.Errors.Clear()
+
+                If Not lbProblemSolved Then
+                    m_tree.Errors.Clear()
+                    m_scanner.StartPos = liOriginalRange
+                    If liOriginalRange >= Me.MaxDistance Then
+                        Me.MaxDistance = m_scanner.StartPos
+                        max_tree = m_tree.Clone
+                    End If
+                    lbProblemSolved = ParseNODEPROPERTYIDENTIFICATION(parent.Nodes(parent.Nodes.Count - 1)) ' NonTerminal Rule: NODEPROPERTYIDENTIFICATION
+                    If m_tree.Errors.Count > 0 Then
+                        If liOriginalRange >= Me.MaxDistance Then
+                            Me.MaxDistance = m_scanner.StartPos
+                            max_tree = m_tree.Clone
+                        End If
+                        If parent.Nodes(parent.Nodes.Count - 1).Nodes.Count > 0 Then parent.Nodes(parent.Nodes.Count - 1).Nodes.RemoveAt(parent.Nodes(parent.Nodes.Count - 1).Nodes.Count - 1)
+                        lbProblemSolved = False
+                    End If
+
+                End If
+            End If
+            If (m_tree.Errors.Count > 0) Or Not lbProblemSolved Then
+                parent.Nodes.Remove(node)
+                Return False
             End If
 
-               If m_tree.Errors.Count > 0 Then
-                  Return False
-               End If
+
+            ' Concat Rule
+            tok = m_scanner.LookAhead({TokenType.POSTBOUNDREADINGTEXT}) ' Option Rule
+            If tok.Type = TokenType.POSTBOUNDREADINGTEXT Then
+                lbProblemSolved = True
+                tok = m_scanner.Scan(TokenType.POSTBOUNDREADINGTEXT) ' Terminal Rule: POSTBOUNDREADINGTEXT
+                n = node.CreateNode(tok, tok.ToString())
+                node.Token.UpdateRange(tok)
+                node.Nodes.Add(n)
+                If tok.Type <> TokenType.POSTBOUNDREADINGTEXT Then
+                    m_tree.Errors.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.POSTBOUNDREADINGTEXT.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "POSTBOUNDREADINGTEXT"))
+                    lbProblemSolved = False
+                    Return False
+
+                End If
+
+
+            Else
+                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.POSTBOUNDREADINGTEXT.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "POSTBOUNDREADINGTEXT"))
+            End If
+            If m_tree.Errors.Count > 0 Then
+                Return False
+            End If
+
+            If m_tree.Errors.Count > 0 Then
+                Return False
+            End If
 
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
-              m_tree.Optionals.Clear()
+                m_tree.Optionals.Clear()
             End If
             If lbProblemSolved Then
-              parent.Token.UpdateRange(node.Token)
-              Me.MaxDistance = node.Token.EndPos
-              max_tree = m_tree.Clone
+                parent.Token.UpdateRange(node.Token)
+                Me.MaxDistance = node.Token.EndPos
+                max_tree = m_tree.Clone
             Else
-              m_scanner.StartPos = liOriginalRange
-              parent.Nodes.Remove(node)
+                m_scanner.StartPos = liOriginalRange
+                parent.Nodes.Remove(node)
             End If
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: NODE
@@ -4825,113 +4826,113 @@ Namespace FEQL
             Dim node As ParseNode = parent.CreateNode(m_scanner.GetToken(TokenType.NODEPROPERTYIDENTIFICATION), "NODEPROPERTYIDENTIFICATION")
             Dim lbProblemSolved As Boolean = True
 
-            Dim liOriginalRange as Integer = m_scanner.StartPos
+            Dim liOriginalRange As Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
 
-             ' Concat Rule
-                                lbProblemSolved = True
-                                        tok = m_scanner.Scan(TokenType.BROPEN) ' Terminal Rule: BROPEN
-                    n = node.CreateNode(tok, tok.ToString() )
-                    node.Token.UpdateRange(tok)
-                    node.Nodes.Add(n)
-                    If tok.Type <> TokenType.BROPEN Then
-                      m_tree.Errors.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.BROPEN.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "BROPEN"))
-                      lbProblemSolved = False
-                      Return False
+            ' Concat Rule
+            lbProblemSolved = True
+            tok = m_scanner.Scan(TokenType.BROPEN) ' Terminal Rule: BROPEN
+            n = node.CreateNode(tok, tok.ToString())
+            node.Token.UpdateRange(tok)
+            node.Nodes.Add(n)
+            If tok.Type <> TokenType.BROPEN Then
+                m_tree.Errors.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.BROPEN.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "BROPEN"))
+                lbProblemSolved = False
+                Return False
 
-                    End If
-
-
-
-             ' Concat Rule
-                                lbProblemSolved = True
-                                        tok = m_scanner.Scan(TokenType.MODELELEMENTNAME) ' Terminal Rule: MODELELEMENTNAME
-                    n = node.CreateNode(tok, tok.ToString() )
-                    node.Token.UpdateRange(tok)
-                    node.Nodes.Add(n)
-                    If tok.Type <> TokenType.MODELELEMENTNAME Then
-                      m_tree.Errors.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.MODELELEMENTNAME.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MODELELEMENTNAME"))
-                      lbProblemSolved = False
-                      Return False
-
-                    End If
-
-
-
-             ' Concat Rule
-                                tok = m_scanner.LookAhead({TokenType.MODELELEMENTSUFFIX}) ' Option Rule
-                    If tok.Type = TokenType.MODELELEMENTSUFFIX Then
-                        lbProblemSolved = True
-                                                tok = m_scanner.Scan(TokenType.MODELELEMENTSUFFIX) ' Terminal Rule: MODELELEMENTSUFFIX
-                        n = node.CreateNode(tok, tok.ToString() )
-                        node.Token.UpdateRange(tok)
-                        node.Nodes.Add(n)
-                        If tok.Type <> TokenType.MODELELEMENTSUFFIX Then
-                          m_tree.Errors.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.MODELELEMENTSUFFIX.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MODELELEMENTSUFFIX"))
-                          lbProblemSolved = False
-                          Return False
-
-                        End If
-
-
-                    Else
-                                            m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.MODELELEMENTSUFFIX.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MODELELEMENTSUFFIX"))
-                    End If
-            If m_tree.Errors.Count > 0 Then
-                                Return False
             End If
 
 
-             ' Concat Rule
-                                tok = m_scanner.LookAhead(TokenType.COLON, TokenType.CARRET, TokenType.BANG, TokenType.LIKECOMPARITOR) ' ZeroOrMore Rule
-                    While tok.Type = TokenType.COLON Or tok.Type = TokenType.CARRET Or tok.Type = TokenType.BANG Or tok.Type = TokenType.LIKECOMPARITOR
-                    m_tree.Errors.Clear
-                        ParseQUOTEDIDENTIFIERLIST(node) ' NonTerminal Rule: QUOTEDIDENTIFIERLIST
-                        If m_tree.Errors.Count > 0 Then
-                          If m_scanner.StartPos >= Me.MaxDistance Then
-                            Me.MaxDistance = m_scanner.StartPos
-                            max_tree = m_tree.clone
-                          End If
-                          If node.Nodes.Count > 0 Then node.Nodes.RemoveAt(node.Nodes.Count - 1)
-                          lbProblemSolved = False
-                        End If
-                    tok = m_scanner.LookAhead(TokenType.COLON, TokenType.CARRET, TokenType.BANG, TokenType.LIKECOMPARITOR) ' ZeroOrMore Rule
-                    If Not lbProblemSolved Then Exit While
-                    End While
-            If m_tree.Errors.Count > 0 Then
-                                Return False
+
+            ' Concat Rule
+            lbProblemSolved = True
+            tok = m_scanner.Scan(TokenType.MODELELEMENTNAME) ' Terminal Rule: MODELELEMENTNAME
+            n = node.CreateNode(tok, tok.ToString())
+            node.Token.UpdateRange(tok)
+            node.Nodes.Add(n)
+            If tok.Type <> TokenType.MODELELEMENTNAME Then
+                m_tree.Errors.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.MODELELEMENTNAME.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MODELELEMENTNAME"))
+                lbProblemSolved = False
+                Return False
+
             End If
 
 
-             ' Concat Rule
-                                lbProblemSolved = True
-                                        tok = m_scanner.Scan(TokenType.BRCLOSE) ' Terminal Rule: BRCLOSE
-                    n = node.CreateNode(tok, tok.ToString() )
-                    node.Token.UpdateRange(tok)
-                    node.Nodes.Add(n)
-                    If tok.Type <> TokenType.BRCLOSE Then
-                      m_tree.Errors.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.BRCLOSE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "BRCLOSE"))
-                      lbProblemSolved = False
-                      Return False
 
+            ' Concat Rule
+            tok = m_scanner.LookAhead({TokenType.MODELELEMENTSUFFIX}) ' Option Rule
+            If tok.Type = TokenType.MODELELEMENTSUFFIX Then
+                lbProblemSolved = True
+                tok = m_scanner.Scan(TokenType.MODELELEMENTSUFFIX) ' Terminal Rule: MODELELEMENTSUFFIX
+                n = node.CreateNode(tok, tok.ToString())
+                node.Token.UpdateRange(tok)
+                node.Nodes.Add(n)
+                If tok.Type <> TokenType.MODELELEMENTSUFFIX Then
+                    m_tree.Errors.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.MODELELEMENTSUFFIX.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MODELELEMENTSUFFIX"))
+                    lbProblemSolved = False
+                    Return False
+
+                End If
+
+
+            Else
+                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.MODELELEMENTSUFFIX.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MODELELEMENTSUFFIX"))
+            End If
+            If m_tree.Errors.Count > 0 Then
+                Return False
+            End If
+
+
+            ' Concat Rule
+            tok = m_scanner.LookAhead(TokenType.COLON, TokenType.CARRET, TokenType.BANG, TokenType.LIKECOMPARITOR) ' ZeroOrMore Rule
+            While tok.Type = TokenType.COLON Or tok.Type = TokenType.CARRET Or tok.Type = TokenType.BANG Or tok.Type = TokenType.LIKECOMPARITOR
+                m_tree.Errors.Clear()
+                ParseQUOTEDIDENTIFIERLIST(node) ' NonTerminal Rule: QUOTEDIDENTIFIERLIST
+                If m_tree.Errors.Count > 0 Then
+                    If liOriginalRange >= Me.MaxDistance Then
+                        Me.MaxDistance = m_scanner.StartPos
+                        max_tree = m_tree.Clone
                     End If
+                    If node.Nodes.Count > 0 Then node.Nodes.RemoveAt(node.Nodes.Count - 1)
+                    lbProblemSolved = False
+                End If
+                tok = m_scanner.LookAhead(TokenType.COLON, TokenType.CARRET, TokenType.BANG, TokenType.LIKECOMPARITOR) ' ZeroOrMore Rule
+                If Not lbProblemSolved Then Exit While
+            End While
+            If m_tree.Errors.Count > 0 Then
+                Return False
+            End If
 
 
-               If m_tree.Errors.Count > 0 Then
-                  Return False
-               End If
+            ' Concat Rule
+            lbProblemSolved = True
+            tok = m_scanner.Scan(TokenType.BRCLOSE) ' Terminal Rule: BRCLOSE
+            n = node.CreateNode(tok, tok.ToString())
+            node.Token.UpdateRange(tok)
+            node.Nodes.Add(n)
+            If tok.Type <> TokenType.BRCLOSE Then
+                m_tree.Errors.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.BRCLOSE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "BRCLOSE"))
+                lbProblemSolved = False
+                Return False
+
+            End If
+
+
+            If m_tree.Errors.Count > 0 Then
+                Return False
+            End If
 
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
-              m_tree.Optionals.Clear()
+                m_tree.Optionals.Clear()
             End If
             If lbProblemSolved Then
-              parent.Token.UpdateRange(node.Token)
-              Me.MaxDistance = node.Token.EndPos
-              max_tree = m_tree.Clone
+                parent.Token.UpdateRange(node.Token)
+                Me.MaxDistance = node.Token.EndPos
+                max_tree = m_tree.Clone
             Else
-              m_scanner.StartPos = liOriginalRange
-              parent.Nodes.Remove(node)
+                m_scanner.StartPos = liOriginalRange
+                parent.Nodes.Remove(node)
             End If
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: NODEPROPERTYIDENTIFICATION
@@ -5015,7 +5016,7 @@ Namespace FEQL
                                     m_tree.Errors.Clear
                                         ParseQUOTEDPROPERTYIDENTIFIERLIST(node) ' NonTerminal Rule: QUOTEDPROPERTYIDENTIFIERLIST
                                         If m_tree.Errors.Count > 0 Then
-                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                          If liOriginalRange >= Me.MaxDistance Then
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
@@ -5034,7 +5035,7 @@ Namespace FEQL
                                      ' Concat Rule
                                     lbProblemSolved =                                             ParseQUOTEDIDENTIFIERLIST(node) ' NonTerminal Rule: QUOTEDIDENTIFIERLIST
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -5049,7 +5050,7 @@ Namespace FEQL
                                             m_tree.Errors.Clear
                                                 ParseQUOTEDPROPERTYIDENTIFIERLIST(node) ' NonTerminal Rule: QUOTEDPROPERTYIDENTIFIERLIST
                                                 If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -5072,7 +5073,7 @@ Namespace FEQL
                                      ' Concat Rule
                                     lbProblemSolved =                                             ParseQUOTEDIDENTIFIERLIST(node) ' NonTerminal Rule: QUOTEDIDENTIFIERLIST
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -5087,7 +5088,7 @@ Namespace FEQL
                                             m_tree.Errors.Clear
                                                 ParseQUOTEDPROPERTYIDENTIFIERLIST(node) ' NonTerminal Rule: QUOTEDPROPERTYIDENTIFIERLIST
                                                 If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -5110,7 +5111,7 @@ Namespace FEQL
                                      ' Concat Rule
                                     lbProblemSolved =                                             ParseQUOTEDIDENTIFIERLIST(node) ' NonTerminal Rule: QUOTEDIDENTIFIERLIST
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -5125,7 +5126,7 @@ Namespace FEQL
                                             m_tree.Errors.Clear
                                                 ParseQUOTEDPROPERTYIDENTIFIERLIST(node) ' NonTerminal Rule: QUOTEDPROPERTYIDENTIFIERLIST
                                                 If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -5148,7 +5149,7 @@ Namespace FEQL
                                      ' Concat Rule
                                     lbProblemSolved =                                             ParseQUOTEDIDENTIFIERLIST(node) ' NonTerminal Rule: QUOTEDIDENTIFIERLIST
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -5163,7 +5164,7 @@ Namespace FEQL
                                             m_tree.Errors.Clear
                                                 ParseQUOTEDPROPERTYIDENTIFIERLIST(node) ' NonTerminal Rule: QUOTEDPROPERTYIDENTIFIERLIST
                                                 If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -5199,7 +5200,7 @@ Namespace FEQL
                                 If Not lbProblemSolved Then
                                   m_tree.Errors.Clear
                                   m_scanner.StartPos = liOriginalRange
-                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                  If liOriginalRange >= Me.MaxDistance Then
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
@@ -5207,7 +5208,7 @@ Namespace FEQL
                              ' Concat Rule
                             lbProblemSolved =                                     ParseQUOTEDIDENTIFIERLIST(node) ' NonTerminal Rule: QUOTEDIDENTIFIERLIST
                                     If m_tree.Errors.Count > 0 Then
-                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                      If liOriginalRange >= Me.MaxDistance Then
                                         Me.MaxDistance = m_scanner.StartPos
                                         max_tree = m_tree.clone
                                       End If
@@ -5222,7 +5223,7 @@ Namespace FEQL
                                     m_tree.Errors.Clear
                                         ParseQUOTEDPROPERTYIDENTIFIERLIST(node) ' NonTerminal Rule: QUOTEDPROPERTYIDENTIFIERLIST
                                         If m_tree.Errors.Count > 0 Then
-                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                          If liOriginalRange >= Me.MaxDistance Then
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
@@ -5281,7 +5282,7 @@ Namespace FEQL
                 If Not lbProblemSolved Then
                   m_tree.Errors.Clear
                   m_scanner.StartPos = liOriginalRange
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
@@ -5333,7 +5334,7 @@ Namespace FEQL
                             m_tree.Errors.Clear
                                 ParseQUOTEDPROPERTYIDENTIFIERLIST(node) ' NonTerminal Rule: QUOTEDPROPERTYIDENTIFIERLIST
                                 If m_tree.Errors.Count > 0 Then
-                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                  If liOriginalRange >= Me.MaxDistance Then
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
@@ -5352,7 +5353,7 @@ Namespace FEQL
                              ' Concat Rule
                             lbProblemSolved =                                     ParseQUOTEDIDENTIFIERLIST(node) ' NonTerminal Rule: QUOTEDIDENTIFIERLIST
                                     If m_tree.Errors.Count > 0 Then
-                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                      If liOriginalRange >= Me.MaxDistance Then
                                         Me.MaxDistance = m_scanner.StartPos
                                         max_tree = m_tree.clone
                                       End If
@@ -5367,7 +5368,7 @@ Namespace FEQL
                                     m_tree.Errors.Clear
                                         ParseQUOTEDPROPERTYIDENTIFIERLIST(node) ' NonTerminal Rule: QUOTEDPROPERTYIDENTIFIERLIST
                                         If m_tree.Errors.Count > 0 Then
-                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                          If liOriginalRange >= Me.MaxDistance Then
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
@@ -5390,7 +5391,7 @@ Namespace FEQL
                              ' Concat Rule
                             lbProblemSolved =                                     ParseQUOTEDIDENTIFIERLIST(node) ' NonTerminal Rule: QUOTEDIDENTIFIERLIST
                                     If m_tree.Errors.Count > 0 Then
-                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                      If liOriginalRange >= Me.MaxDistance Then
                                         Me.MaxDistance = m_scanner.StartPos
                                         max_tree = m_tree.clone
                                       End If
@@ -5405,7 +5406,7 @@ Namespace FEQL
                                     m_tree.Errors.Clear
                                         ParseQUOTEDPROPERTYIDENTIFIERLIST(node) ' NonTerminal Rule: QUOTEDPROPERTYIDENTIFIERLIST
                                         If m_tree.Errors.Count > 0 Then
-                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                          If liOriginalRange >= Me.MaxDistance Then
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
@@ -5428,7 +5429,7 @@ Namespace FEQL
                              ' Concat Rule
                             lbProblemSolved =                                     ParseQUOTEDIDENTIFIERLIST(node) ' NonTerminal Rule: QUOTEDIDENTIFIERLIST
                                     If m_tree.Errors.Count > 0 Then
-                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                      If liOriginalRange >= Me.MaxDistance Then
                                         Me.MaxDistance = m_scanner.StartPos
                                         max_tree = m_tree.clone
                                       End If
@@ -5443,7 +5444,7 @@ Namespace FEQL
                                     m_tree.Errors.Clear
                                         ParseQUOTEDPROPERTYIDENTIFIERLIST(node) ' NonTerminal Rule: QUOTEDPROPERTYIDENTIFIERLIST
                                         If m_tree.Errors.Count > 0 Then
-                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                          If liOriginalRange >= Me.MaxDistance Then
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
@@ -5466,7 +5467,7 @@ Namespace FEQL
                              ' Concat Rule
                             lbProblemSolved =                                     ParseQUOTEDIDENTIFIERLIST(node) ' NonTerminal Rule: QUOTEDIDENTIFIERLIST
                                     If m_tree.Errors.Count > 0 Then
-                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                      If liOriginalRange >= Me.MaxDistance Then
                                         Me.MaxDistance = m_scanner.StartPos
                                         max_tree = m_tree.clone
                                       End If
@@ -5481,7 +5482,7 @@ Namespace FEQL
                                     m_tree.Errors.Clear
                                         ParseQUOTEDPROPERTYIDENTIFIERLIST(node) ' NonTerminal Rule: QUOTEDPROPERTYIDENTIFIERLIST
                                         If m_tree.Errors.Count > 0 Then
-                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                          If liOriginalRange >= Me.MaxDistance Then
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
@@ -5517,7 +5518,7 @@ Namespace FEQL
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
                           m_scanner.StartPos = liOriginalRange
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
@@ -5525,7 +5526,7 @@ Namespace FEQL
                      ' Concat Rule
                     lbProblemSolved =                             ParseQUOTEDIDENTIFIERLIST(node) ' NonTerminal Rule: QUOTEDIDENTIFIERLIST
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -5540,7 +5541,7 @@ Namespace FEQL
                             m_tree.Errors.Clear
                                 ParseQUOTEDPROPERTYIDENTIFIERLIST(node) ' NonTerminal Rule: QUOTEDPROPERTYIDENTIFIERLIST
                                 If m_tree.Errors.Count > 0 Then
-                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                  If liOriginalRange >= Me.MaxDistance Then
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
@@ -5624,7 +5625,7 @@ Namespace FEQL
                 Case TokenType.BROPEN
             lbProblemSolved =                     ParseMATCHPREDICATE(node) ' NonTerminal Rule: MATCHPREDICATE
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -5635,7 +5636,7 @@ Namespace FEQL
                 Case TokenType.BROPEN
             lbProblemSolved =                     ParseNODEPROPERTYIDENTIFICATION(node) ' NonTerminal Rule: NODEPROPERTYIDENTIFICATION
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -5658,13 +5659,13 @@ Namespace FEQL
                 If Not lbProblemSolved Then
                   m_tree.Errors.Clear
                   m_scanner.StartPos = liOriginalRange
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
             lbProblemSolved =                 ParseNODEPROPERTYIDENTIFICATION(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: NODEPROPERTYIDENTIFICATION
                 If m_tree.Errors.Count > 0 Then
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
@@ -5872,7 +5873,7 @@ Namespace FEQL
                         Case TokenType.SINGLEQUOTE
                     lbProblemSolved =                             ParseQUOTEDIDENTIFIER(node) ' NonTerminal Rule: QUOTEDIDENTIFIER
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -5895,13 +5896,13 @@ Namespace FEQL
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
                           m_scanner.StartPos = liOriginalRange
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
                     lbProblemSolved =                         ParseQUOTEDIDENTIFIER(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: QUOTEDIDENTIFIER
                         If m_tree.Errors.Count > 0 Then
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
@@ -6010,7 +6011,7 @@ Namespace FEQL
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
                           m_scanner.StartPos = liOriginalRange
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
@@ -6160,7 +6161,7 @@ Namespace FEQL
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
                           m_scanner.StartPos = liOriginalRange
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
@@ -6181,7 +6182,7 @@ Namespace FEQL
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
                           m_scanner.StartPos = liOriginalRange
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
@@ -6202,7 +6203,7 @@ Namespace FEQL
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
                           m_scanner.StartPos = liOriginalRange
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
@@ -6252,7 +6253,7 @@ Namespace FEQL
                         Case TokenType.SINGLEQUOTE
                     lbProblemSolved =                             ParseQUOTEDIDENTIFIER(node) ' NonTerminal Rule: QUOTEDIDENTIFIER
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -6275,13 +6276,13 @@ Namespace FEQL
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
                           m_scanner.StartPos = liOriginalRange
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
                     lbProblemSolved =                         ParseQUOTEDIDENTIFIER(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: QUOTEDIDENTIFIER
                         If m_tree.Errors.Count > 0 Then
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
@@ -6303,7 +6304,7 @@ Namespace FEQL
                     m_tree.Errors.Clear
                         ParseADDITIONALQUOTEDIDENTIFIER(node) ' NonTerminal Rule: ADDITIONALQUOTEDIDENTIFIER
                         If m_tree.Errors.Count > 0 Then
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
@@ -6363,7 +6364,7 @@ Namespace FEQL
              ' Concat Rule
             lbProblemSolved =                     ParsePROPERTYIDENTIFIER(node) ' NonTerminal Rule: PROPERTYIDENTIFIER
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -6395,7 +6396,7 @@ Namespace FEQL
                          ' Concat Rule
                         lbProblemSolved =                                 ParsePROPERTYIDENTIFIER(node) ' NonTerminal Rule: PROPERTYIDENTIFIER
                                 If m_tree.Errors.Count > 0 Then
-                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                  If liOriginalRange >= Me.MaxDistance Then
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
@@ -6502,7 +6503,7 @@ Namespace FEQL
                                     If tok.Type = TokenType.NUMBER Then
 lbProblemSolved =                                         ParseNUMBER1(node) ' NonTerminal Rule: NUMBER1
                                         If m_tree.Errors.Count > 0 Then
-                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                          If liOriginalRange >= Me.MaxDistance Then
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
@@ -6553,7 +6554,7 @@ lbProblemSolved =                                         ParseNUMBER1(node) ' N
                                     If tok.Type = TokenType.NUMBER Then
 lbProblemSolved =                                         ParseNUMBER2(node) ' NonTerminal Rule: NUMBER2
                                         If m_tree.Errors.Count > 0 Then
-                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                          If liOriginalRange >= Me.MaxDistance Then
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
@@ -6579,7 +6580,7 @@ lbProblemSolved =                                         ParseNUMBER2(node) ' N
                                     If tok.Type = TokenType.NUMBER Then
 lbProblemSolved =                                         ParseNUMBER1(node) ' NonTerminal Rule: NUMBER1
                                         If m_tree.Errors.Count > 0 Then
-                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                          If liOriginalRange >= Me.MaxDistance Then
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
@@ -6630,7 +6631,7 @@ lbProblemSolved =                                         ParseNUMBER1(node) ' N
                                     If tok.Type = TokenType.NUMBER Then
 lbProblemSolved =                                         ParseNUMBER2(node) ' NonTerminal Rule: NUMBER2
                                         If m_tree.Errors.Count > 0 Then
-                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                          If liOriginalRange >= Me.MaxDistance Then
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
@@ -6671,7 +6672,7 @@ lbProblemSolved =                                         ParseNUMBER2(node) ' N
                                     If tok.Type = TokenType.NUMBER Then
 lbProblemSolved =                                         ParseNUMBER1(node) ' NonTerminal Rule: NUMBER1
                                         If m_tree.Errors.Count > 0 Then
-                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                          If liOriginalRange >= Me.MaxDistance Then
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
@@ -6722,7 +6723,7 @@ lbProblemSolved =                                         ParseNUMBER1(node) ' N
                                     If tok.Type = TokenType.NUMBER Then
 lbProblemSolved =                                         ParseNUMBER2(node) ' NonTerminal Rule: NUMBER2
                                         If m_tree.Errors.Count > 0 Then
-                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                          If liOriginalRange >= Me.MaxDistance Then
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
@@ -6758,7 +6759,7 @@ lbProblemSolved =                                         ParseNUMBER2(node) ' N
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
                           m_scanner.StartPos = liOriginalRange
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
@@ -6768,7 +6769,7 @@ lbProblemSolved =                                         ParseNUMBER2(node) ' N
                             If tok.Type = TokenType.NUMBER Then
 lbProblemSolved =                                 ParseNUMBER1(node) ' NonTerminal Rule: NUMBER1
                                 If m_tree.Errors.Count > 0 Then
-                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                  If liOriginalRange >= Me.MaxDistance Then
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
@@ -6819,7 +6820,7 @@ lbProblemSolved =                                 ParseNUMBER1(node) ' NonTermin
                             If tok.Type = TokenType.NUMBER Then
 lbProblemSolved =                                 ParseNUMBER2(node) ' NonTerminal Rule: NUMBER2
                                 If m_tree.Errors.Count > 0 Then
-                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                  If liOriginalRange >= Me.MaxDistance Then
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
@@ -6842,7 +6843,7 @@ lbProblemSolved =                                 ParseNUMBER2(node) ' NonTermin
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
                           m_scanner.StartPos = liOriginalRange
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
@@ -6867,7 +6868,7 @@ lbProblemSolved =                                 ParseNUMBER2(node) ' NonTermin
                             If tok.Type = TokenType.NUMBER Then
 lbProblemSolved =                                 ParseNUMBER1(node) ' NonTerminal Rule: NUMBER1
                                 If m_tree.Errors.Count > 0 Then
-                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                  If liOriginalRange >= Me.MaxDistance Then
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
@@ -6918,7 +6919,7 @@ lbProblemSolved =                                 ParseNUMBER1(node) ' NonTermin
                             If tok.Type = TokenType.NUMBER Then
 lbProblemSolved =                                 ParseNUMBER2(node) ' NonTerminal Rule: NUMBER2
                                 If m_tree.Errors.Count > 0 Then
-                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                  If liOriginalRange >= Me.MaxDistance Then
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
@@ -7054,7 +7055,7 @@ lbProblemSolved =                                 ParseNUMBER2(node) ' NonTermin
                          ' Concat Rule
                         lbProblemSolved =                                 ParseVALUESTRING(node) ' NonTerminal Rule: VALUESTRING
                                 If m_tree.Errors.Count > 0 Then
-                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                  If liOriginalRange >= Me.MaxDistance Then
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
@@ -7086,7 +7087,7 @@ lbProblemSolved =                                 ParseNUMBER2(node) ' NonTermin
                                      ' Concat Rule
                                     lbProblemSolved =                                             ParseVALUESTRING(node) ' NonTerminal Rule: VALUESTRING
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -7184,7 +7185,7 @@ lbProblemSolved =                                 ParseNUMBER2(node) ' NonTermin
                 Case TokenType.KEYWDMIN
             lbProblemSolved =                     ParseMINMAXELEMENT(node) ' NonTerminal Rule: MINMAXELEMENT
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -7195,7 +7196,7 @@ lbProblemSolved =                                 ParseNUMBER2(node) ' NonTermin
                 Case TokenType.KEYWDMAX
             lbProblemSolved =                     ParseMINMAXELEMENT(node) ' NonTerminal Rule: MINMAXELEMENT
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -7324,7 +7325,7 @@ lbProblemSolved =                                 ParseNUMBER2(node) ' NonTermin
                                 If Not lbProblemSolved Then
                                   m_tree.Errors.Clear
                                   m_scanner.StartPos = liOriginalRange
-                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                  If liOriginalRange >= Me.MaxDistance Then
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
@@ -7370,13 +7371,13 @@ lbProblemSolved =                                 ParseNUMBER2(node) ' NonTermin
                 If Not lbProblemSolved Then
                   m_tree.Errors.Clear
                   m_scanner.StartPos = liOriginalRange
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
             lbProblemSolved =                 ParseMINMAXELEMENT(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: MINMAXELEMENT
                 If m_tree.Errors.Count > 0 Then
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
@@ -7388,7 +7389,7 @@ lbProblemSolved =                                 ParseNUMBER2(node) ' NonTermin
                 If Not lbProblemSolved Then
                   m_tree.Errors.Clear
                   m_scanner.StartPos = liOriginalRange
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
@@ -7409,7 +7410,7 @@ lbProblemSolved =                                 ParseNUMBER2(node) ' NonTermin
                 If Not lbProblemSolved Then
                   m_tree.Errors.Clear
                   m_scanner.StartPos = liOriginalRange
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
@@ -7519,7 +7520,7 @@ lbProblemSolved =                                 ParseNUMBER2(node) ' NonTermin
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
                           m_scanner.StartPos = liOriginalRange
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
@@ -7620,7 +7621,7 @@ lbProblemSolved =                                 ParseNUMBER2(node) ' NonTermin
              ' Concat Rule
             lbProblemSolved =                     ParseRETURNCOLUMN(node) ' NonTerminal Rule: RETURNCOLUMN
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -7652,7 +7653,7 @@ lbProblemSolved =                                 ParseNUMBER2(node) ' NonTermin
                          ' Concat Rule
                         lbProblemSolved =                                 ParseRETURNCOLUMN(node) ' NonTerminal Rule: RETURNCOLUMN
                                 If m_tree.Errors.Count > 0 Then
-                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                  If liOriginalRange >= Me.MaxDistance Then
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
@@ -7701,7 +7702,7 @@ lbProblemSolved =                                 ParseNUMBER2(node) ' NonTermin
              ' Concat Rule
             lbProblemSolved =                     ParseNODEPROPERTYIDENTIFICATION(node) ' NonTerminal Rule: NODEPROPERTYIDENTIFICATION
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -7718,7 +7719,7 @@ lbProblemSolved =                                 ParseNUMBER2(node) ' NonTermin
                          ' Concat Rule
                         lbProblemSolved =                                 ParsePREDICATECLAUSE(node) ' NonTerminal Rule: PREDICATECLAUSE
                                 If m_tree.Errors.Count > 0 Then
-                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                  If liOriginalRange >= Me.MaxDistance Then
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
@@ -7730,7 +7731,7 @@ lbProblemSolved =                                 ParseNUMBER2(node) ' NonTermin
                          ' Concat Rule
                         lbProblemSolved =                                 ParseNODEPROPERTYIDENTIFICATION(node) ' NonTerminal Rule: NODEPROPERTYIDENTIFICATION
                                 If m_tree.Errors.Count > 0 Then
-                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                  If liOriginalRange >= Me.MaxDistance Then
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
@@ -7796,7 +7797,7 @@ lbProblemSolved =                                 ParseNUMBER2(node) ' NonTermin
                          ' Concat Rule
                         lbProblemSolved =                                 ParsePREDICATECLAUSE(node) ' NonTerminal Rule: PREDICATECLAUSE
                                 If m_tree.Errors.Count > 0 Then
-                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                  If liOriginalRange >= Me.MaxDistance Then
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
@@ -7808,7 +7809,7 @@ lbProblemSolved =                                 ParseNUMBER2(node) ' NonTermin
                          ' Concat Rule
                         lbProblemSolved =                                 ParseNODEPROPERTYIDENTIFICATION(node) ' NonTerminal Rule: NODEPROPERTYIDENTIFICATION
                                 If m_tree.Errors.Count > 0 Then
-                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                  If liOriginalRange >= Me.MaxDistance Then
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
@@ -7857,7 +7858,7 @@ lbProblemSolved =                                 ParseNUMBER2(node) ' NonTermin
              ' Concat Rule
             lbProblemSolved =                     ParseNODEPROPERTYIDENTIFICATION(node) ' NonTerminal Rule: NODEPROPERTYIDENTIFICATION
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -7874,7 +7875,7 @@ lbProblemSolved =                                 ParseNUMBER2(node) ' NonTermin
                          ' Concat Rule
                         lbProblemSolved =                                 ParsePREDICATECLAUSE(node) ' NonTerminal Rule: PREDICATECLAUSE
                                 If m_tree.Errors.Count > 0 Then
-                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                  If liOriginalRange >= Me.MaxDistance Then
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
@@ -7886,7 +7887,7 @@ lbProblemSolved =                                 ParseNUMBER2(node) ' NonTermin
                          ' Concat Rule
                         lbProblemSolved =                                 ParseNODEPROPERTYIDENTIFICATION(node) ' NonTerminal Rule: NODEPROPERTYIDENTIFICATION
                                 If m_tree.Errors.Count > 0 Then
-                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                  If liOriginalRange >= Me.MaxDistance Then
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
@@ -7952,7 +7953,7 @@ lbProblemSolved =                                 ParseNUMBER2(node) ' NonTermin
                          ' Concat Rule
                         lbProblemSolved =                                 ParsePREDICATECLAUSE(node) ' NonTerminal Rule: PREDICATECLAUSE
                                 If m_tree.Errors.Count > 0 Then
-                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                  If liOriginalRange >= Me.MaxDistance Then
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
@@ -7964,7 +7965,7 @@ lbProblemSolved =                                 ParseNUMBER2(node) ' NonTermin
                          ' Concat Rule
                         lbProblemSolved =                                 ParseNODEPROPERTYIDENTIFICATION(node) ' NonTerminal Rule: NODEPROPERTYIDENTIFICATION
                                 If m_tree.Errors.Count > 0 Then
-                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                  If liOriginalRange >= Me.MaxDistance Then
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
@@ -8100,7 +8101,7 @@ lbProblemSolved =                                 ParseNUMBER2(node) ' NonTermin
              ' Concat Rule
             lbProblemSolved =                     ParseMATCHFACTTYPEPREDICATE(node) ' NonTerminal Rule: MATCHFACTTYPEPREDICATE
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -8154,7 +8155,7 @@ lbProblemSolved =                                 ParseNUMBER2(node) ' NonTermin
              ' Concat Rule
             lbProblemSolved =                     ParseVALUESTRING(node) ' NonTerminal Rule: VALUESTRING
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -8169,7 +8170,7 @@ lbProblemSolved =                                 ParseNUMBER2(node) ' NonTermin
                     m_tree.Errors.Clear
                         ParseADDITIONALVALUE(node) ' NonTerminal Rule: ADDITIONALVALUE
                         If m_tree.Errors.Count > 0 Then
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
@@ -8448,7 +8449,7 @@ lbProblemSolved =                                 ParseNUMBER2(node) ' NonTermin
              ' Concat Rule
             lbProblemSolved =                     ParseVALUESTRING(node) ' NonTerminal Rule: VALUESTRING
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -8739,7 +8740,7 @@ lbProblemSolved =                                 ParseNUMBER2(node) ' NonTermin
              ' Concat Rule
             lbProblemSolved =                     ParseROLENAMESTR(node) ' NonTerminal Rule: ROLENAMESTR
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -8811,7 +8812,7 @@ lbProblemSolved =                                 ParseNUMBER2(node) ' NonTermin
              ' Concat Rule
             lbProblemSolved =                     ParseMODELELEMENT(node) ' NonTerminal Rule: MODELELEMENT
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -8891,7 +8892,7 @@ lbProblemSolved =                                 ParseNUMBER2(node) ' NonTermin
                         Case TokenType.KEYWDENTITYTYPE
                     lbProblemSolved =                             ParseADDENTITYTYPESTMT(node) ' NonTerminal Rule: ADDENTITYTYPESTMT
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -8902,7 +8903,7 @@ lbProblemSolved =                                 ParseNUMBER2(node) ' NonTermin
                         Case TokenType.KEYWDADDFACT
                     lbProblemSolved =                             ParseADDFACTSTMT(node) ' NonTerminal Rule: ADDFACTSTMT
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -8913,7 +8914,7 @@ lbProblemSolved =                                 ParseNUMBER2(node) ' NonTermin
                         Case TokenType.KEYWDFACTTYPE
                     lbProblemSolved =                             ParseADDFACTTYPESTMT(node) ' NonTerminal Rule: ADDFACTTYPESTMT
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -8924,7 +8925,7 @@ lbProblemSolved =                                 ParseNUMBER2(node) ' NonTermin
                         Case TokenType.KEYWDVALUETYPE
                     lbProblemSolved =                             ParseADDVALUETYPESTMT(node) ' NonTerminal Rule: ADDVALUETYPESTMT
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -8935,7 +8936,7 @@ lbProblemSolved =                                 ParseNUMBER2(node) ' NonTermin
                         Case TokenType.KEYWDROLE
                     lbProblemSolved =                             ParseADDROLESTMT(node) ' NonTerminal Rule: ADDROLESTMT
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -8961,13 +8962,13 @@ lbProblemSolved =                                 ParseNUMBER2(node) ' NonTermin
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
                           m_scanner.StartPos = liOriginalRange
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
                     lbProblemSolved =                         ParseADDFACTSTMT(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: ADDFACTSTMT
                         If m_tree.Errors.Count > 0 Then
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
@@ -8979,13 +8980,13 @@ lbProblemSolved =                                 ParseNUMBER2(node) ' NonTermin
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
                           m_scanner.StartPos = liOriginalRange
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
                     lbProblemSolved =                         ParseADDFACTTYPESTMT(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: ADDFACTTYPESTMT
                         If m_tree.Errors.Count > 0 Then
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
@@ -8997,13 +8998,13 @@ lbProblemSolved =                                 ParseNUMBER2(node) ' NonTermin
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
                           m_scanner.StartPos = liOriginalRange
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
                     lbProblemSolved =                         ParseADDVALUETYPESTMT(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: ADDVALUETYPESTMT
                         If m_tree.Errors.Count > 0 Then
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
@@ -9015,13 +9016,13 @@ lbProblemSolved =                                 ParseNUMBER2(node) ' NonTermin
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
                           m_scanner.StartPos = liOriginalRange
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
                     lbProblemSolved =                         ParseADDROLESTMT(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: ADDROLESTMT
                         If m_tree.Errors.Count > 0 Then
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
@@ -9223,7 +9224,7 @@ lbProblemSolved =                                 ParseNUMBER2(node) ' NonTermin
                         Case TokenType.KEYWDISWRITTENAS
                     lbProblemSolved =                             ParseVALUETYPEISWRITTENASSTMT(node) ' NonTerminal Rule: VALUETYPEISWRITTENASSTMT
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -9234,7 +9235,7 @@ lbProblemSolved =                                 ParseNUMBER2(node) ' NonTermin
                         Case TokenType.MODELELEMENTNAME
                     lbProblemSolved =                             ParseFACTSTMT(node) ' NonTerminal Rule: FACTSTMT
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -9245,7 +9246,7 @@ lbProblemSolved =                                 ParseNUMBER2(node) ' NonTermin
                         Case TokenType.BROPEN
                     lbProblemSolved =                             ParseFACTSTMT(node) ' NonTerminal Rule: FACTSTMT
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -9269,13 +9270,13 @@ lbProblemSolved =                                 ParseNUMBER2(node) ' NonTermin
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
                           m_scanner.StartPos = liOriginalRange
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
                     lbProblemSolved =                         ParseFACTSTMT(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: FACTSTMT
                         If m_tree.Errors.Count > 0 Then
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
@@ -9459,7 +9460,7 @@ lbProblemSolved =                                 ParseNUMBER2(node) ' NonTermin
              ' Concat Rule
             lbProblemSolved =                     ParseFACTTYPESTMT(node) ' NonTerminal Rule: FACTTYPESTMT
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -9486,7 +9487,7 @@ lbProblemSolved =                                 ParseNUMBER2(node) ' NonTermin
              ' Concat Rule
             lbProblemSolved =                     ParseFACTTYPESTMT(node) ' NonTerminal Rule: FACTTYPESTMT
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -9549,7 +9550,7 @@ lbProblemSolved =                                 ParseNUMBER2(node) ' NonTermin
              ' Concat Rule
             lbProblemSolved =                     ParseSUBTYPESTMT(node) ' NonTerminal Rule: SUBTYPESTMT
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -9576,7 +9577,7 @@ lbProblemSolved =                                 ParseNUMBER2(node) ' NonTermin
              ' Concat Rule
             lbProblemSolved =                     ParseSUBTYPESTMT(node) ' NonTerminal Rule: SUBTYPESTMT
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -9662,7 +9663,7 @@ lbProblemSolved =                                 ParseNUMBER2(node) ' NonTermin
                         Case TokenType.MODELELEMENTNAME
                     lbProblemSolved =                             ParseCONSTRAINTEITHEROREXTERNAL(node) ' NonTerminal Rule: CONSTRAINTEITHEROREXTERNAL
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -9673,7 +9674,7 @@ lbProblemSolved =                                 ParseNUMBER2(node) ' NonTermin
                         Case TokenType.MODELELEMENTNAME
                     lbProblemSolved =                             ParseCONSTRAINTEITHERORSUBTYPE(node) ' NonTerminal Rule: CONSTRAINTEITHERORSUBTYPE
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -9696,13 +9697,13 @@ lbProblemSolved =                                 ParseNUMBER2(node) ' NonTermin
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
                           m_scanner.StartPos = liOriginalRange
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
                     lbProblemSolved =                         ParseCONSTRAINTEITHERORSUBTYPE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: CONSTRAINTEITHERORSUBTYPE
                         If m_tree.Errors.Count > 0 Then
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
@@ -9883,7 +9884,7 @@ lbProblemSolved =                                 ParseNUMBER2(node) ' NonTermin
              ' Concat Rule
             lbProblemSolved =                     ParseFACTTYPESTMT(node) ' NonTerminal Rule: FACTTYPESTMT
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -9910,7 +9911,7 @@ lbProblemSolved =                                 ParseNUMBER2(node) ' NonTermin
              ' Concat Rule
             lbProblemSolved =                     ParseFACTTYPESTMT(node) ' NonTerminal Rule: FACTTYPESTMT
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -9942,7 +9943,7 @@ lbProblemSolved =                                 ParseNUMBER2(node) ' NonTermin
                          ' Concat Rule
                         lbProblemSolved =                                 ParseFACTTYPESTMT(node) ' NonTerminal Rule: FACTTYPESTMT
                                 If m_tree.Errors.Count > 0 Then
-                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                  If liOriginalRange >= Me.MaxDistance Then
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
@@ -10036,7 +10037,7 @@ lbProblemSolved =                                 ParseNUMBER2(node) ' NonTermin
              ' Concat Rule
             lbProblemSolved =                     ParseFACTTYPESTMT(node) ' NonTerminal Rule: FACTTYPESTMT
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -10063,7 +10064,7 @@ lbProblemSolved =                                 ParseNUMBER2(node) ' NonTermin
              ' Concat Rule
             lbProblemSolved =                     ParseFACTTYPESTMT(node) ' NonTerminal Rule: FACTTYPESTMT
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -10095,7 +10096,7 @@ lbProblemSolved =                                 ParseNUMBER2(node) ' NonTermin
                          ' Concat Rule
                         lbProblemSolved =                                 ParseFACTTYPESTMT(node) ' NonTerminal Rule: FACTTYPESTMT
                                 If m_tree.Errors.Count > 0 Then
-                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                  If liOriginalRange >= Me.MaxDistance Then
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
@@ -10167,7 +10168,7 @@ lbProblemSolved =                                 ParseNUMBER2(node) ' NonTermin
                         Case TokenType.KEYWDCOMBINATION
                     lbProblemSolved =                             ParseCONSTRAINTEXTERNALUNIQUENESS(node) ' NonTerminal Rule: CONSTRAINTEXTERNALUNIQUENESS
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -10178,7 +10179,7 @@ lbProblemSolved =                                 ParseNUMBER2(node) ' NonTermin
                         Case TokenType.KEYWDNULL
                     lbProblemSolved =                             ParseCONSTRAINTINCLUSIVEOR(node) ' NonTerminal Rule: CONSTRAINTINCLUSIVEOR
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -10201,13 +10202,13 @@ lbProblemSolved =                                 ParseNUMBER2(node) ' NonTermin
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
                           m_scanner.StartPos = liOriginalRange
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
                     lbProblemSolved =                         ParseCONSTRAINTINCLUSIVEOR(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: CONSTRAINTINCLUSIVEOR
                         If m_tree.Errors.Count > 0 Then
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
@@ -10298,7 +10299,7 @@ lbProblemSolved =                                 ParseNUMBER2(node) ' NonTermin
              ' Concat Rule
             lbProblemSolved =                     ParsePREDICATECLAUSE(node) ' NonTerminal Rule: PREDICATECLAUSE
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -10340,7 +10341,7 @@ lbProblemSolved =                                 ParseNUMBER2(node) ' NonTermin
              ' Concat Rule
             lbProblemSolved =                     ParseSUBTYPESTMT(node) ' NonTerminal Rule: SUBTYPESTMT
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -10394,7 +10395,7 @@ lbProblemSolved =                                 ParseNUMBER2(node) ' NonTermin
              ' Concat Rule
             lbProblemSolved =                     ParseVALUESTRING(node) ' NonTerminal Rule: VALUESTRING
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -10481,7 +10482,7 @@ lbProblemSolved =                                 ParseNUMBER2(node) ' NonTermin
                          ' Concat Rule
                         lbProblemSolved =                                 ParseDATABASECREATECLAUSE(node) ' NonTerminal Rule: DATABASECREATECLAUSE
                                 If m_tree.Errors.Count > 0 Then
-                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                  If liOriginalRange >= Me.MaxDistance Then
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
@@ -10559,7 +10560,7 @@ lbProblemSolved =                                 ParseNUMBER2(node) ' NonTermin
              ' Concat Rule
             lbProblemSolved =                     ParseVALUESTRING(node) ' NonTerminal Rule: VALUESTRING
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -10615,7 +10616,7 @@ lbProblemSolved =                                 ParseNUMBER2(node) ' NonTermin
                     If tok.Type = TokenType.SINGLEQUOTE Then
 lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTerminal Rule: FACTTYPENAMESTR
                         If m_tree.Errors.Count > 0 Then
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
@@ -10664,7 +10665,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
              ' Concat Rule
             lbProblemSolved =                     ParseFACTTYPESTMT(node) ' NonTerminal Rule: FACTTYPESTMT
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -10733,7 +10734,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
              ' Concat Rule
             lbProblemSolved =                     ParseVALUESTRING(node) ' NonTerminal Rule: VALUESTRING
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -10779,7 +10780,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                 Case TokenType.KEYWDENTITYTYPE
             lbProblemSolved =                     ParseCREATEENTITYTYPESTMT(node) ' NonTerminal Rule: CREATEENTITYTYPESTMT
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -10790,7 +10791,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                 Case TokenType.KEYWDFACTTYPE
             lbProblemSolved =                     ParseCREATEFACTTYPESTMT(node) ' NonTerminal Rule: CREATEFACTTYPESTMT
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -10801,7 +10802,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                 Case TokenType.KEYWDVALUETYPE
             lbProblemSolved =                     ParseCREATEVALUETYPESTMT(node) ' NonTerminal Rule: CREATEVALUETYPESTMT
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -10825,13 +10826,13 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                 If Not lbProblemSolved Then
                   m_tree.Errors.Clear
                   m_scanner.StartPos = liOriginalRange
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
             lbProblemSolved =                 ParseCREATEFACTTYPESTMT(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: CREATEFACTTYPESTMT
                 If m_tree.Errors.Count > 0 Then
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
@@ -10843,13 +10844,13 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                 If Not lbProblemSolved Then
                   m_tree.Errors.Clear
                   m_scanner.StartPos = liOriginalRange
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
             lbProblemSolved =                 ParseCREATEVALUETYPESTMT(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: CREATEVALUETYPESTMT
                 If m_tree.Errors.Count > 0 Then
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
@@ -10918,7 +10919,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                         Case TokenType.KEYWDDATABASE
                     lbProblemSolved =                             ParseCREATEDATABASESTMT(node) ' NonTerminal Rule: CREATEDATABASESTMT
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -10942,7 +10943,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                                         Case TokenType.MODELELEMENTNAME
                                     lbProblemSolved =                                             ParseFACTPREDICATE(node) ' NonTerminal Rule: FACTPREDICATE
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -10953,7 +10954,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                                         Case TokenType.BROPEN
                                     lbProblemSolved =                                             ParseFACTPREDICATE(node) ' NonTerminal Rule: FACTPREDICATE
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -10964,7 +10965,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                                         Case TokenType.KEYWDENTITYTYPE
                                     lbProblemSolved =                                             ParseCREATEMODELELEMENTSTMT(node) ' NonTerminal Rule: CREATEMODELELEMENTSTMT
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -10975,7 +10976,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                                         Case TokenType.KEYWDFACTTYPE
                                     lbProblemSolved =                                             ParseCREATEMODELELEMENTSTMT(node) ' NonTerminal Rule: CREATEMODELELEMENTSTMT
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -10986,7 +10987,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                                         Case TokenType.KEYWDVALUETYPE
                                     lbProblemSolved =                                             ParseCREATEMODELELEMENTSTMT(node) ' NonTerminal Rule: CREATEMODELELEMENTSTMT
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -11012,13 +11013,13 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                                         If Not lbProblemSolved Then
                                           m_tree.Errors.Clear
                                           m_scanner.StartPos = liOriginalRange
-                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                          If liOriginalRange >= Me.MaxDistance Then
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
                                     lbProblemSolved =                                         ParseCREATEMODELELEMENTSTMT(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: CREATEMODELELEMENTSTMT
                                         If m_tree.Errors.Count > 0 Then
-                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                          If liOriginalRange >= Me.MaxDistance Then
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
@@ -11048,7 +11049,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                                             m_tree.Errors.Clear
                                                 ParsePREDICATENODEPROPERTYIDENTIFICATION(node) ' NonTerminal Rule: PREDICATENODEPROPERTYIDENTIFICATION
                                                 If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -11084,7 +11085,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                                                  ' Concat Rule
                                                 lbProblemSolved =                                                         ParsePREDICATENODEPROPERTYIDENTIFICATION(node) ' NonTerminal Rule: PREDICATENODEPROPERTYIDENTIFICATION
                                                         If m_tree.Errors.Count > 0 Then
-                                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                                          If liOriginalRange >= Me.MaxDistance Then
                                                             Me.MaxDistance = m_scanner.StartPos
                                                             max_tree = m_tree.clone
                                                           End If
@@ -11116,7 +11117,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                                                              ' Concat Rule
                                                             lbProblemSolved =                                                                     ParsePREDICATENODEPROPERTYIDENTIFICATION(node) ' NonTerminal Rule: PREDICATENODEPROPERTYIDENTIFICATION
                                                                     If m_tree.Errors.Count > 0 Then
-                                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                                      If liOriginalRange >= Me.MaxDistance Then
                                                                         Me.MaxDistance = m_scanner.StartPos
                                                                         max_tree = m_tree.clone
                                                                       End If
@@ -11160,7 +11161,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                                         If Not lbProblemSolved Then
                                           m_tree.Errors.Clear
                                           m_scanner.StartPos = liOriginalRange
-                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                          If liOriginalRange >= Me.MaxDistance Then
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
@@ -11185,7 +11186,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                                          ' Concat Rule
                                         lbProblemSolved =                                                 ParsePREDICATENODEPROPERTYIDENTIFICATION(node) ' NonTerminal Rule: PREDICATENODEPROPERTYIDENTIFICATION
                                                 If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -11217,7 +11218,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                                                      ' Concat Rule
                                                     lbProblemSolved =                                                             ParsePREDICATENODEPROPERTYIDENTIFICATION(node) ' NonTerminal Rule: PREDICATENODEPROPERTYIDENTIFICATION
                                                             If m_tree.Errors.Count > 0 Then
-                                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                                              If liOriginalRange >= Me.MaxDistance Then
                                                                 Me.MaxDistance = m_scanner.StartPos
                                                                 max_tree = m_tree.clone
                                                               End If
@@ -11273,7 +11274,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                                         Case TokenType.MODELELEMENTNAME
                                     lbProblemSolved =                                             ParseFACTPREDICATE(node) ' NonTerminal Rule: FACTPREDICATE
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -11284,7 +11285,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                                         Case TokenType.BROPEN
                                     lbProblemSolved =                                             ParseFACTPREDICATE(node) ' NonTerminal Rule: FACTPREDICATE
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -11295,7 +11296,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                                         Case TokenType.KEYWDENTITYTYPE
                                     lbProblemSolved =                                             ParseCREATEMODELELEMENTSTMT(node) ' NonTerminal Rule: CREATEMODELELEMENTSTMT
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -11306,7 +11307,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                                         Case TokenType.KEYWDFACTTYPE
                                     lbProblemSolved =                                             ParseCREATEMODELELEMENTSTMT(node) ' NonTerminal Rule: CREATEMODELELEMENTSTMT
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -11317,7 +11318,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                                         Case TokenType.KEYWDVALUETYPE
                                     lbProblemSolved =                                             ParseCREATEMODELELEMENTSTMT(node) ' NonTerminal Rule: CREATEMODELELEMENTSTMT
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -11343,13 +11344,13 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                                         If Not lbProblemSolved Then
                                           m_tree.Errors.Clear
                                           m_scanner.StartPos = liOriginalRange
-                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                          If liOriginalRange >= Me.MaxDistance Then
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
                                     lbProblemSolved =                                         ParseCREATEMODELELEMENTSTMT(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: CREATEMODELELEMENTSTMT
                                         If m_tree.Errors.Count > 0 Then
-                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                          If liOriginalRange >= Me.MaxDistance Then
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
@@ -11379,7 +11380,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                                             m_tree.Errors.Clear
                                                 ParsePREDICATENODEPROPERTYIDENTIFICATION(node) ' NonTerminal Rule: PREDICATENODEPROPERTYIDENTIFICATION
                                                 If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -11415,7 +11416,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                                                  ' Concat Rule
                                                 lbProblemSolved =                                                         ParsePREDICATENODEPROPERTYIDENTIFICATION(node) ' NonTerminal Rule: PREDICATENODEPROPERTYIDENTIFICATION
                                                         If m_tree.Errors.Count > 0 Then
-                                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                                          If liOriginalRange >= Me.MaxDistance Then
                                                             Me.MaxDistance = m_scanner.StartPos
                                                             max_tree = m_tree.clone
                                                           End If
@@ -11447,7 +11448,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                                                              ' Concat Rule
                                                             lbProblemSolved =                                                                     ParsePREDICATENODEPROPERTYIDENTIFICATION(node) ' NonTerminal Rule: PREDICATENODEPROPERTYIDENTIFICATION
                                                                     If m_tree.Errors.Count > 0 Then
-                                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                                      If liOriginalRange >= Me.MaxDistance Then
                                                                         Me.MaxDistance = m_scanner.StartPos
                                                                         max_tree = m_tree.clone
                                                                       End If
@@ -11491,7 +11492,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                                         If Not lbProblemSolved Then
                                           m_tree.Errors.Clear
                                           m_scanner.StartPos = liOriginalRange
-                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                          If liOriginalRange >= Me.MaxDistance Then
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
@@ -11516,7 +11517,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                                          ' Concat Rule
                                         lbProblemSolved =                                                 ParsePREDICATENODEPROPERTYIDENTIFICATION(node) ' NonTerminal Rule: PREDICATENODEPROPERTYIDENTIFICATION
                                                 If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -11548,7 +11549,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                                                      ' Concat Rule
                                                     lbProblemSolved =                                                             ParsePREDICATENODEPROPERTYIDENTIFICATION(node) ' NonTerminal Rule: PREDICATENODEPROPERTYIDENTIFICATION
                                                             If m_tree.Errors.Count > 0 Then
-                                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                                              If liOriginalRange >= Me.MaxDistance Then
                                                                 Me.MaxDistance = m_scanner.StartPos
                                                                 max_tree = m_tree.clone
                                                               End If
@@ -11604,7 +11605,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                                         Case TokenType.MODELELEMENTNAME
                                     lbProblemSolved =                                             ParseFACTPREDICATE(node) ' NonTerminal Rule: FACTPREDICATE
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -11615,7 +11616,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                                         Case TokenType.BROPEN
                                     lbProblemSolved =                                             ParseFACTPREDICATE(node) ' NonTerminal Rule: FACTPREDICATE
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -11626,7 +11627,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                                         Case TokenType.KEYWDENTITYTYPE
                                     lbProblemSolved =                                             ParseCREATEMODELELEMENTSTMT(node) ' NonTerminal Rule: CREATEMODELELEMENTSTMT
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -11637,7 +11638,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                                         Case TokenType.KEYWDFACTTYPE
                                     lbProblemSolved =                                             ParseCREATEMODELELEMENTSTMT(node) ' NonTerminal Rule: CREATEMODELELEMENTSTMT
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -11648,7 +11649,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                                         Case TokenType.KEYWDVALUETYPE
                                     lbProblemSolved =                                             ParseCREATEMODELELEMENTSTMT(node) ' NonTerminal Rule: CREATEMODELELEMENTSTMT
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -11674,13 +11675,13 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                                         If Not lbProblemSolved Then
                                           m_tree.Errors.Clear
                                           m_scanner.StartPos = liOriginalRange
-                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                          If liOriginalRange >= Me.MaxDistance Then
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
                                     lbProblemSolved =                                         ParseCREATEMODELELEMENTSTMT(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: CREATEMODELELEMENTSTMT
                                         If m_tree.Errors.Count > 0 Then
-                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                          If liOriginalRange >= Me.MaxDistance Then
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
@@ -11710,7 +11711,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                                             m_tree.Errors.Clear
                                                 ParsePREDICATENODEPROPERTYIDENTIFICATION(node) ' NonTerminal Rule: PREDICATENODEPROPERTYIDENTIFICATION
                                                 If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -11746,7 +11747,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                                                  ' Concat Rule
                                                 lbProblemSolved =                                                         ParsePREDICATENODEPROPERTYIDENTIFICATION(node) ' NonTerminal Rule: PREDICATENODEPROPERTYIDENTIFICATION
                                                         If m_tree.Errors.Count > 0 Then
-                                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                                          If liOriginalRange >= Me.MaxDistance Then
                                                             Me.MaxDistance = m_scanner.StartPos
                                                             max_tree = m_tree.clone
                                                           End If
@@ -11778,7 +11779,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                                                              ' Concat Rule
                                                             lbProblemSolved =                                                                     ParsePREDICATENODEPROPERTYIDENTIFICATION(node) ' NonTerminal Rule: PREDICATENODEPROPERTYIDENTIFICATION
                                                                     If m_tree.Errors.Count > 0 Then
-                                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                                      If liOriginalRange >= Me.MaxDistance Then
                                                                         Me.MaxDistance = m_scanner.StartPos
                                                                         max_tree = m_tree.clone
                                                                       End If
@@ -11822,7 +11823,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                                         If Not lbProblemSolved Then
                                           m_tree.Errors.Clear
                                           m_scanner.StartPos = liOriginalRange
-                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                          If liOriginalRange >= Me.MaxDistance Then
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
@@ -11847,7 +11848,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                                          ' Concat Rule
                                         lbProblemSolved =                                                 ParsePREDICATENODEPROPERTYIDENTIFICATION(node) ' NonTerminal Rule: PREDICATENODEPROPERTYIDENTIFICATION
                                                 If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -11879,7 +11880,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                                                      ' Concat Rule
                                                     lbProblemSolved =                                                             ParsePREDICATENODEPROPERTYIDENTIFICATION(node) ' NonTerminal Rule: PREDICATENODEPROPERTYIDENTIFICATION
                                                             If m_tree.Errors.Count > 0 Then
-                                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                                              If liOriginalRange >= Me.MaxDistance Then
                                                                 Me.MaxDistance = m_scanner.StartPos
                                                                 max_tree = m_tree.clone
                                                               End If
@@ -11935,7 +11936,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                                         Case TokenType.MODELELEMENTNAME
                                     lbProblemSolved =                                             ParseFACTPREDICATE(node) ' NonTerminal Rule: FACTPREDICATE
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -11946,7 +11947,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                                         Case TokenType.BROPEN
                                     lbProblemSolved =                                             ParseFACTPREDICATE(node) ' NonTerminal Rule: FACTPREDICATE
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -11957,7 +11958,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                                         Case TokenType.KEYWDENTITYTYPE
                                     lbProblemSolved =                                             ParseCREATEMODELELEMENTSTMT(node) ' NonTerminal Rule: CREATEMODELELEMENTSTMT
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -11968,7 +11969,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                                         Case TokenType.KEYWDFACTTYPE
                                     lbProblemSolved =                                             ParseCREATEMODELELEMENTSTMT(node) ' NonTerminal Rule: CREATEMODELELEMENTSTMT
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -11979,7 +11980,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                                         Case TokenType.KEYWDVALUETYPE
                                     lbProblemSolved =                                             ParseCREATEMODELELEMENTSTMT(node) ' NonTerminal Rule: CREATEMODELELEMENTSTMT
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -12005,13 +12006,13 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                                         If Not lbProblemSolved Then
                                           m_tree.Errors.Clear
                                           m_scanner.StartPos = liOriginalRange
-                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                          If liOriginalRange >= Me.MaxDistance Then
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
                                     lbProblemSolved =                                         ParseCREATEMODELELEMENTSTMT(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: CREATEMODELELEMENTSTMT
                                         If m_tree.Errors.Count > 0 Then
-                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                          If liOriginalRange >= Me.MaxDistance Then
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
@@ -12041,7 +12042,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                                             m_tree.Errors.Clear
                                                 ParsePREDICATENODEPROPERTYIDENTIFICATION(node) ' NonTerminal Rule: PREDICATENODEPROPERTYIDENTIFICATION
                                                 If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -12077,7 +12078,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                                                  ' Concat Rule
                                                 lbProblemSolved =                                                         ParsePREDICATENODEPROPERTYIDENTIFICATION(node) ' NonTerminal Rule: PREDICATENODEPROPERTYIDENTIFICATION
                                                         If m_tree.Errors.Count > 0 Then
-                                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                                          If liOriginalRange >= Me.MaxDistance Then
                                                             Me.MaxDistance = m_scanner.StartPos
                                                             max_tree = m_tree.clone
                                                           End If
@@ -12109,7 +12110,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                                                              ' Concat Rule
                                                             lbProblemSolved =                                                                     ParsePREDICATENODEPROPERTYIDENTIFICATION(node) ' NonTerminal Rule: PREDICATENODEPROPERTYIDENTIFICATION
                                                                     If m_tree.Errors.Count > 0 Then
-                                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                                      If liOriginalRange >= Me.MaxDistance Then
                                                                         Me.MaxDistance = m_scanner.StartPos
                                                                         max_tree = m_tree.clone
                                                                       End If
@@ -12153,7 +12154,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                                         If Not lbProblemSolved Then
                                           m_tree.Errors.Clear
                                           m_scanner.StartPos = liOriginalRange
-                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                          If liOriginalRange >= Me.MaxDistance Then
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
@@ -12178,7 +12179,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                                          ' Concat Rule
                                         lbProblemSolved =                                                 ParsePREDICATENODEPROPERTYIDENTIFICATION(node) ' NonTerminal Rule: PREDICATENODEPROPERTYIDENTIFICATION
                                                 If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -12210,7 +12211,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                                                      ' Concat Rule
                                                     lbProblemSolved =                                                             ParsePREDICATENODEPROPERTYIDENTIFICATION(node) ' NonTerminal Rule: PREDICATENODEPROPERTYIDENTIFICATION
                                                             If m_tree.Errors.Count > 0 Then
-                                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                                              If liOriginalRange >= Me.MaxDistance Then
                                                                 Me.MaxDistance = m_scanner.StartPos
                                                                 max_tree = m_tree.clone
                                                               End If
@@ -12266,7 +12267,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                                         Case TokenType.MODELELEMENTNAME
                                     lbProblemSolved =                                             ParseFACTPREDICATE(node) ' NonTerminal Rule: FACTPREDICATE
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -12277,7 +12278,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                                         Case TokenType.BROPEN
                                     lbProblemSolved =                                             ParseFACTPREDICATE(node) ' NonTerminal Rule: FACTPREDICATE
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -12288,7 +12289,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                                         Case TokenType.KEYWDENTITYTYPE
                                     lbProblemSolved =                                             ParseCREATEMODELELEMENTSTMT(node) ' NonTerminal Rule: CREATEMODELELEMENTSTMT
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -12299,7 +12300,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                                         Case TokenType.KEYWDFACTTYPE
                                     lbProblemSolved =                                             ParseCREATEMODELELEMENTSTMT(node) ' NonTerminal Rule: CREATEMODELELEMENTSTMT
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -12310,7 +12311,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                                         Case TokenType.KEYWDVALUETYPE
                                     lbProblemSolved =                                             ParseCREATEMODELELEMENTSTMT(node) ' NonTerminal Rule: CREATEMODELELEMENTSTMT
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -12336,13 +12337,13 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                                         If Not lbProblemSolved Then
                                           m_tree.Errors.Clear
                                           m_scanner.StartPos = liOriginalRange
-                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                          If liOriginalRange >= Me.MaxDistance Then
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
                                     lbProblemSolved =                                         ParseCREATEMODELELEMENTSTMT(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: CREATEMODELELEMENTSTMT
                                         If m_tree.Errors.Count > 0 Then
-                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                          If liOriginalRange >= Me.MaxDistance Then
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
@@ -12372,7 +12373,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                                             m_tree.Errors.Clear
                                                 ParsePREDICATENODEPROPERTYIDENTIFICATION(node) ' NonTerminal Rule: PREDICATENODEPROPERTYIDENTIFICATION
                                                 If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -12408,7 +12409,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                                                  ' Concat Rule
                                                 lbProblemSolved =                                                         ParsePREDICATENODEPROPERTYIDENTIFICATION(node) ' NonTerminal Rule: PREDICATENODEPROPERTYIDENTIFICATION
                                                         If m_tree.Errors.Count > 0 Then
-                                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                                          If liOriginalRange >= Me.MaxDistance Then
                                                             Me.MaxDistance = m_scanner.StartPos
                                                             max_tree = m_tree.clone
                                                           End If
@@ -12440,7 +12441,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                                                              ' Concat Rule
                                                             lbProblemSolved =                                                                     ParsePREDICATENODEPROPERTYIDENTIFICATION(node) ' NonTerminal Rule: PREDICATENODEPROPERTYIDENTIFICATION
                                                                     If m_tree.Errors.Count > 0 Then
-                                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                                      If liOriginalRange >= Me.MaxDistance Then
                                                                         Me.MaxDistance = m_scanner.StartPos
                                                                         max_tree = m_tree.clone
                                                                       End If
@@ -12484,7 +12485,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                                         If Not lbProblemSolved Then
                                           m_tree.Errors.Clear
                                           m_scanner.StartPos = liOriginalRange
-                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                          If liOriginalRange >= Me.MaxDistance Then
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
@@ -12509,7 +12510,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                                          ' Concat Rule
                                         lbProblemSolved =                                                 ParsePREDICATENODEPROPERTYIDENTIFICATION(node) ' NonTerminal Rule: PREDICATENODEPROPERTYIDENTIFICATION
                                                 If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -12541,7 +12542,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                                                      ' Concat Rule
                                                     lbProblemSolved =                                                             ParsePREDICATENODEPROPERTYIDENTIFICATION(node) ' NonTerminal Rule: PREDICATENODEPROPERTYIDENTIFICATION
                                                             If m_tree.Errors.Count > 0 Then
-                                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                                              If liOriginalRange >= Me.MaxDistance Then
                                                                 Me.MaxDistance = m_scanner.StartPos
                                                                 max_tree = m_tree.clone
                                                               End If
@@ -12600,7 +12601,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
                           m_scanner.StartPos = liOriginalRange
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
@@ -12619,7 +12620,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                                 Case TokenType.MODELELEMENTNAME
                             lbProblemSolved =                                     ParseFACTPREDICATE(node) ' NonTerminal Rule: FACTPREDICATE
                                     If m_tree.Errors.Count > 0 Then
-                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                      If liOriginalRange >= Me.MaxDistance Then
                                         Me.MaxDistance = m_scanner.StartPos
                                         max_tree = m_tree.clone
                                       End If
@@ -12630,7 +12631,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                                 Case TokenType.BROPEN
                             lbProblemSolved =                                     ParseFACTPREDICATE(node) ' NonTerminal Rule: FACTPREDICATE
                                     If m_tree.Errors.Count > 0 Then
-                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                      If liOriginalRange >= Me.MaxDistance Then
                                         Me.MaxDistance = m_scanner.StartPos
                                         max_tree = m_tree.clone
                                       End If
@@ -12641,7 +12642,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                                 Case TokenType.KEYWDENTITYTYPE
                             lbProblemSolved =                                     ParseCREATEMODELELEMENTSTMT(node) ' NonTerminal Rule: CREATEMODELELEMENTSTMT
                                     If m_tree.Errors.Count > 0 Then
-                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                      If liOriginalRange >= Me.MaxDistance Then
                                         Me.MaxDistance = m_scanner.StartPos
                                         max_tree = m_tree.clone
                                       End If
@@ -12652,7 +12653,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                                 Case TokenType.KEYWDFACTTYPE
                             lbProblemSolved =                                     ParseCREATEMODELELEMENTSTMT(node) ' NonTerminal Rule: CREATEMODELELEMENTSTMT
                                     If m_tree.Errors.Count > 0 Then
-                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                      If liOriginalRange >= Me.MaxDistance Then
                                         Me.MaxDistance = m_scanner.StartPos
                                         max_tree = m_tree.clone
                                       End If
@@ -12663,7 +12664,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                                 Case TokenType.KEYWDVALUETYPE
                             lbProblemSolved =                                     ParseCREATEMODELELEMENTSTMT(node) ' NonTerminal Rule: CREATEMODELELEMENTSTMT
                                     If m_tree.Errors.Count > 0 Then
-                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                      If liOriginalRange >= Me.MaxDistance Then
                                         Me.MaxDistance = m_scanner.StartPos
                                         max_tree = m_tree.clone
                                       End If
@@ -12689,13 +12690,13 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                                 If Not lbProblemSolved Then
                                   m_tree.Errors.Clear
                                   m_scanner.StartPos = liOriginalRange
-                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                  If liOriginalRange >= Me.MaxDistance Then
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
                             lbProblemSolved =                                 ParseCREATEMODELELEMENTSTMT(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: CREATEMODELELEMENTSTMT
                                 If m_tree.Errors.Count > 0 Then
-                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                  If liOriginalRange >= Me.MaxDistance Then
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
@@ -12725,7 +12726,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                                     m_tree.Errors.Clear
                                         ParsePREDICATENODEPROPERTYIDENTIFICATION(node) ' NonTerminal Rule: PREDICATENODEPROPERTYIDENTIFICATION
                                         If m_tree.Errors.Count > 0 Then
-                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                          If liOriginalRange >= Me.MaxDistance Then
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
@@ -12761,7 +12762,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                                          ' Concat Rule
                                         lbProblemSolved =                                                 ParsePREDICATENODEPROPERTYIDENTIFICATION(node) ' NonTerminal Rule: PREDICATENODEPROPERTYIDENTIFICATION
                                                 If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -12793,7 +12794,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                                                      ' Concat Rule
                                                     lbProblemSolved =                                                             ParsePREDICATENODEPROPERTYIDENTIFICATION(node) ' NonTerminal Rule: PREDICATENODEPROPERTYIDENTIFICATION
                                                             If m_tree.Errors.Count > 0 Then
-                                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                                              If liOriginalRange >= Me.MaxDistance Then
                                                                 Me.MaxDistance = m_scanner.StartPos
                                                                 max_tree = m_tree.clone
                                                               End If
@@ -12837,7 +12838,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                                 If Not lbProblemSolved Then
                                   m_tree.Errors.Clear
                                   m_scanner.StartPos = liOriginalRange
-                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                  If liOriginalRange >= Me.MaxDistance Then
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
@@ -12862,7 +12863,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                                  ' Concat Rule
                                 lbProblemSolved =                                         ParsePREDICATENODEPROPERTYIDENTIFICATION(node) ' NonTerminal Rule: PREDICATENODEPROPERTYIDENTIFICATION
                                         If m_tree.Errors.Count > 0 Then
-                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                          If liOriginalRange >= Me.MaxDistance Then
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
@@ -12894,7 +12895,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                                              ' Concat Rule
                                             lbProblemSolved =                                                     ParsePREDICATENODEPROPERTYIDENTIFICATION(node) ' NonTerminal Rule: PREDICATENODEPROPERTYIDENTIFICATION
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -13002,7 +13003,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
              ' Concat Rule
             lbProblemSolved =                     ParseVALUESTRING(node) ' NonTerminal Rule: VALUESTRING
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -13047,7 +13048,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                 Case TokenType.KEYWDLOCATION
             lbProblemSolved =                     ParseDATABASELOCATIONCLAUSE(node) ' NonTerminal Rule: DATABASELOCATIONCLAUSE
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -13058,7 +13059,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                 Case TokenType.KEYWDTYPE
             lbProblemSolved =                     ParseDATABASETYPECLAUSE(node) ' NonTerminal Rule: DATABASETYPECLAUSE
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -13081,13 +13082,13 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                 If Not lbProblemSolved Then
                   m_tree.Errors.Clear
                   m_scanner.StartPos = liOriginalRange
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
             lbProblemSolved =                 ParseDATABASETYPECLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: DATABASETYPECLAUSE
                 If m_tree.Errors.Count > 0 Then
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
@@ -13296,7 +13297,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                         Case TokenType.BROPEN
                     lbProblemSolved =                             ParseNODEPROPERTYIDENTIFICATION(node) ' NonTerminal Rule: NODEPROPERTYIDENTIFICATION
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -13307,7 +13308,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                         Case TokenType.KEYWDFROM
                     lbProblemSolved =                             ParseDELETEFROMCLAUSE(node) ' NonTerminal Rule: DELETEFROMCLAUSE
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -13330,13 +13331,13 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
                           m_scanner.StartPos = liOriginalRange
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
                     lbProblemSolved =                         ParseDELETEFROMCLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: DELETEFROMCLAUSE
                         If m_tree.Errors.Count > 0 Then
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
@@ -13414,7 +13415,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                     If tok.Type = TokenType.KEYWDON Then
 lbProblemSolved =                         ParseONPAGESTMT(node) ' NonTerminal Rule: ONPAGESTMT
                         If m_tree.Errors.Count > 0 Then
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
@@ -13448,7 +13449,7 @@ lbProblemSolved =                         ParseONPAGESTMT(node) ' NonTerminal Ru
              ' Concat Rule
             lbProblemSolved =                     ParseCOMPARISON(node) ' NonTerminal Rule: COMPARISON
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -13463,7 +13464,7 @@ lbProblemSolved =                         ParseONPAGESTMT(node) ' NonTerminal Ru
                     m_tree.Errors.Clear
                         ParseADDITIONALCOMPARISON(node) ' NonTerminal Rule: ADDITIONALCOMPARISON
                         If m_tree.Errors.Count > 0 Then
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
@@ -13553,7 +13554,7 @@ lbProblemSolved =                         ParseONPAGESTMT(node) ' NonTerminal Ru
              ' Concat Rule
             lbProblemSolved =                     ParseONPAGESTMT(node) ' NonTerminal Rule: ONPAGESTMT
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -13607,7 +13608,7 @@ lbProblemSolved =                         ParseONPAGESTMT(node) ' NonTerminal Ru
              ' Concat Rule
             lbProblemSolved =                     ParseVALUESTRING(node) ' NonTerminal Rule: VALUESTRING
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -13651,7 +13652,7 @@ lbProblemSolved =                         ParseONPAGESTMT(node) ' NonTerminal Ru
                     If tok.Type = TokenType.KEYWDON Then
 lbProblemSolved =                         ParseONPAGESTMT(node) ' NonTerminal Rule: ONPAGESTMT
                         If m_tree.Errors.Count > 0 Then
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
@@ -13712,7 +13713,7 @@ lbProblemSolved =                         ParseONPAGESTMT(node) ' NonTerminal Ru
              ' Concat Rule
             lbProblemSolved =                     ParseDERIVATIONSUBCLAUSE(node) ' NonTerminal Rule: DERIVATIONSUBCLAUSE
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -13744,7 +13745,7 @@ lbProblemSolved =                         ParseONPAGESTMT(node) ' NonTerminal Ru
                          ' Concat Rule
                         lbProblemSolved =                                 ParseDERIVATIONSUBCLAUSE(node) ' NonTerminal Rule: DERIVATIONSUBCLAUSE
                                 If m_tree.Errors.Count > 0 Then
-                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                  If liOriginalRange >= Me.MaxDistance Then
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
@@ -13806,7 +13807,7 @@ lbProblemSolved =                         ParseONPAGESTMT(node) ' NonTerminal Ru
                      ' Concat Rule
                     lbProblemSolved =                             ParseMODELELEMENT(node) ' NonTerminal Rule: MODELELEMENT
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -13821,7 +13822,7 @@ lbProblemSolved =                         ParseONPAGESTMT(node) ' NonTerminal Ru
                             m_tree.Errors.Clear
                                 ParseDERIVATIONWHICHCLAUSE(node) ' NonTerminal Rule: DERIVATIONWHICHCLAUSE
                                 If m_tree.Errors.Count > 0 Then
-                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                  If liOriginalRange >= Me.MaxDistance Then
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
@@ -13844,7 +13845,7 @@ lbProblemSolved =                         ParseONPAGESTMT(node) ' NonTerminal Ru
                      ' Concat Rule
                     lbProblemSolved =                             ParseMODELELEMENT(node) ' NonTerminal Rule: MODELELEMENT
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -13859,7 +13860,7 @@ lbProblemSolved =                         ParseONPAGESTMT(node) ' NonTerminal Ru
                             m_tree.Errors.Clear
                                 ParseDERIVATIONWHICHCLAUSE(node) ' NonTerminal Rule: DERIVATIONWHICHCLAUSE
                                 If m_tree.Errors.Count > 0 Then
-                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                  If liOriginalRange >= Me.MaxDistance Then
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
@@ -13880,7 +13881,7 @@ lbProblemSolved =                         ParseONPAGESTMT(node) ' NonTerminal Ru
                 Case TokenType.MODELELEMENTNAME
             lbProblemSolved =                     ParseDERIVATIONFACTREADING(node) ' NonTerminal Rule: DERIVATIONFACTREADING
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -13891,7 +13892,7 @@ lbProblemSolved =                         ParseONPAGESTMT(node) ' NonTerminal Ru
                 Case TokenType.KEYWDTODAY
             lbProblemSolved =                     ParseDERIVATIONFORMULA(node) ' NonTerminal Rule: DERIVATIONFORMULA
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -13902,7 +13903,7 @@ lbProblemSolved =                         ParseONPAGESTMT(node) ' NonTerminal Ru
                 Case TokenType.NUMBER
             lbProblemSolved =                     ParseDERIVATIONFORMULA(node) ' NonTerminal Rule: DERIVATIONFORMULA
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -13913,7 +13914,7 @@ lbProblemSolved =                         ParseONPAGESTMT(node) ' NonTerminal Ru
                 Case TokenType.MODELELEMENTNAME
             lbProblemSolved =                     ParseDERIVATIONFORMULA(node) ' NonTerminal Rule: DERIVATIONFORMULA
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -13924,7 +13925,7 @@ lbProblemSolved =                         ParseONPAGESTMT(node) ' NonTerminal Ru
                 Case TokenType.BROPEN
             lbProblemSolved =                     ParseDERIVATIONFORMULA(node) ' NonTerminal Rule: DERIVATIONFORMULA
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -13952,13 +13953,13 @@ lbProblemSolved =                         ParseONPAGESTMT(node) ' NonTerminal Ru
                 If Not lbProblemSolved Then
                   m_tree.Errors.Clear
                   m_scanner.StartPos = liOriginalRange
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
             lbProblemSolved =                 ParseDERIVATIONFACTREADING(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: DERIVATIONFACTREADING
                 If m_tree.Errors.Count > 0 Then
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
@@ -13970,13 +13971,13 @@ lbProblemSolved =                         ParseONPAGESTMT(node) ' NonTerminal Ru
                 If Not lbProblemSolved Then
                   m_tree.Errors.Clear
                   m_scanner.StartPos = liOriginalRange
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
             lbProblemSolved =                 ParseDERIVATIONFORMULA(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: DERIVATIONFORMULA
                 If m_tree.Errors.Count > 0 Then
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
@@ -14016,7 +14017,7 @@ lbProblemSolved =                         ParseONPAGESTMT(node) ' NonTerminal Ru
 
             ParseFORMULA(node) ' NonTerminal Rule: FORMULA
             If m_tree.Errors.Count > 0 Then
-              If m_scanner.StartPos >= Me.MaxDistance Then
+              If liOriginalRange >= Me.MaxDistance Then
                 Me.MaxDistance = m_scanner.StartPos
                 max_tree = m_tree.clone
               End If
@@ -14099,7 +14100,7 @@ lbProblemSolved =                         ParseONPAGESTMT(node) ' NonTerminal Ru
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
                           m_scanner.StartPos = liOriginalRange
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
@@ -14142,7 +14143,7 @@ lbProblemSolved =                         ParseONPAGESTMT(node) ' NonTerminal Ru
              ' Concat Rule
             lbProblemSolved =                     ParsePREDICATECLAUSE(node) ' NonTerminal Rule: PREDICATECLAUSE
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -14154,7 +14155,7 @@ lbProblemSolved =                         ParseONPAGESTMT(node) ' NonTerminal Ru
              ' Concat Rule
             lbProblemSolved =                     ParseNODEPROPERTYIDENTIFICATION(node) ' NonTerminal Rule: NODEPROPERTYIDENTIFICATION
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -14181,7 +14182,7 @@ lbProblemSolved =                         ParseONPAGESTMT(node) ' NonTerminal Ru
              ' Concat Rule
             lbProblemSolved =                     ParseFACTTYPESIMPLEPREDICATE(node) ' NonTerminal Rule: FACTTYPESIMPLEPREDICATE
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -14213,7 +14214,7 @@ lbProblemSolved =                         ParseONPAGESTMT(node) ' NonTerminal Ru
                          ' Concat Rule
                         lbProblemSolved =                                 ParseFACTTYPESIMPLEPREDICATE(node) ' NonTerminal Rule: FACTTYPESIMPLEPREDICATE
                                 If m_tree.Errors.Count > 0 Then
-                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                  If liOriginalRange >= Me.MaxDistance Then
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
@@ -14262,7 +14263,7 @@ lbProblemSolved =                         ParseONPAGESTMT(node) ' NonTerminal Ru
              ' Concat Rule
             lbProblemSolved =                     ParseMODELELEMENT(node) ' NonTerminal Rule: MODELELEMENT
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -14277,7 +14278,7 @@ lbProblemSolved =                         ParseONPAGESTMT(node) ' NonTerminal Ru
                          ' Concat Rule
                         lbProblemSolved =                                 ParsePREDICATECLAUSE(node) ' NonTerminal Rule: PREDICATECLAUSE
                                 If m_tree.Errors.Count > 0 Then
-                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                  If liOriginalRange >= Me.MaxDistance Then
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
@@ -14291,7 +14292,7 @@ lbProblemSolved =                         ParseONPAGESTMT(node) ' NonTerminal Ru
                                 If tok.Type = TokenType.PREBOUNDREADINGTEXT Or tok.Type = TokenType.MODELELEMENTNAME Then
 lbProblemSolved =                                     ParseMODELELEMENT(node) ' NonTerminal Rule: MODELELEMENT
                                     If m_tree.Errors.Count > 0 Then
-                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                      If liOriginalRange >= Me.MaxDistance Then
                                         Me.MaxDistance = m_scanner.StartPos
                                         max_tree = m_tree.clone
                                       End If
@@ -14364,7 +14365,7 @@ lbProblemSolved =                                     ParseMODELELEMENT(node) ' 
                          ' Concat Rule
                         lbProblemSolved =                                 ParsePREDICATECLAUSE(node) ' NonTerminal Rule: PREDICATECLAUSE
                                 If m_tree.Errors.Count > 0 Then
-                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                  If liOriginalRange >= Me.MaxDistance Then
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
@@ -14447,7 +14448,7 @@ lbProblemSolved =                                     ParseMODELELEMENT(node) ' 
                                         If Not lbProblemSolved Then
                                           m_tree.Errors.Clear
                                           m_scanner.StartPos = liOriginalRange
-                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                          If liOriginalRange >= Me.MaxDistance Then
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
@@ -14589,7 +14590,7 @@ lbProblemSolved =                                     ParseMODELELEMENT(node) ' 
                             If Not lbProblemSolved Then
                               m_tree.Errors.Clear
                               m_scanner.StartPos = liOriginalRange
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -14651,7 +14652,7 @@ lbProblemSolved =                                     ParseMODELELEMENT(node) ' 
                             Case TokenType.KEYWDWITH
                         lbProblemSolved =                                 ParseWITHCLAUSE(node) ' NonTerminal Rule: WITHCLAUSE
                                 If m_tree.Errors.Count > 0 Then
-                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                  If liOriginalRange >= Me.MaxDistance Then
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
@@ -14662,7 +14663,7 @@ lbProblemSolved =                                     ParseMODELELEMENT(node) ' 
                             Case TokenType.KEYWDTODAY
                         lbProblemSolved =                                 ParseFORMULA(node) ' NonTerminal Rule: FORMULA
                                 If m_tree.Errors.Count > 0 Then
-                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                  If liOriginalRange >= Me.MaxDistance Then
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
@@ -14673,7 +14674,7 @@ lbProblemSolved =                                     ParseMODELELEMENT(node) ' 
                             Case TokenType.NUMBER
                         lbProblemSolved =                                 ParseFORMULA(node) ' NonTerminal Rule: FORMULA
                                 If m_tree.Errors.Count > 0 Then
-                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                  If liOriginalRange >= Me.MaxDistance Then
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
@@ -14684,7 +14685,7 @@ lbProblemSolved =                                     ParseMODELELEMENT(node) ' 
                             Case TokenType.MODELELEMENTNAME
                         lbProblemSolved =                                 ParseFORMULA(node) ' NonTerminal Rule: FORMULA
                                 If m_tree.Errors.Count > 0 Then
-                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                  If liOriginalRange >= Me.MaxDistance Then
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
@@ -14695,7 +14696,7 @@ lbProblemSolved =                                     ParseMODELELEMENT(node) ' 
                             Case TokenType.BROPEN
                         lbProblemSolved =                                 ParseFORMULA(node) ' NonTerminal Rule: FORMULA
                                 If m_tree.Errors.Count > 0 Then
-                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                  If liOriginalRange >= Me.MaxDistance Then
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
@@ -14710,7 +14711,7 @@ lbProblemSolved =                                     ParseMODELELEMENT(node) ' 
                                         If tok.Type = TokenType.KEYWDIS Or tok.Type = TokenType.PREDICATE Or tok.Type = TokenType.KEYWDTHAT Or tok.Type = TokenType.PREBOUNDREADINGTEXT Or tok.Type = TokenType.MODELELEMENTNAME Then
 lbProblemSolved =                                             ParseWHICHTHATCLAUSE(node) ' NonTerminal Rule: WHICHTHATCLAUSE
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -14843,7 +14844,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -14864,7 +14865,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -14885,7 +14886,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -14906,7 +14907,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -14927,7 +14928,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -14975,7 +14976,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.NUMBER
                                             lbProblemSolved =                                                     ParseINDIVIDUALIDENTIFIER(node) ' NonTerminal Rule: INDIVIDUALIDENTIFIER
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -14986,7 +14987,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.SINGLEQUOTE
                                             lbProblemSolved =                                                     ParseINDIVIDUALIDENTIFIER(node) ' NonTerminal Rule: INDIVIDUALIDENTIFIER
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -14997,7 +14998,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.PREBOUNDREADINGTEXT
                                             lbProblemSolved =                                                     ParseNODE(node) ' NonTerminal Rule: NODE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -15008,7 +15009,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.MODELELEMENTNAME
                                             lbProblemSolved =                                                     ParseNODE(node) ' NonTerminal Rule: NODE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -15019,7 +15020,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.BROPEN
                                             lbProblemSolved =                                                     ParseNODE(node) ' NonTerminal Rule: NODE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -15045,13 +15046,13 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
                                             lbProblemSolved =                                                 ParseNODE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: NODE
                                                 If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -15087,7 +15088,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.PREDICATE
                                             lbProblemSolved =                                                     ParseFOLLOWINGREADINGTEXT(node) ' NonTerminal Rule: FOLLOWINGREADINGTEXT
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -15098,7 +15099,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.MATHFUNCTION
                                             lbProblemSolved =                                                     ParseMATHCLAUSE(node) ' NonTerminal Rule: MATHCLAUSE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -15121,13 +15122,13 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
                                             lbProblemSolved =                                                 ParseMATHCLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: MATHCLAUSE
                                                 If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -15160,7 +15161,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                         If tok.Type = TokenType.KEYWDIS Or tok.Type = TokenType.PREDICATE Or tok.Type = TokenType.KEYWDTHAT Or tok.Type = TokenType.PREBOUNDREADINGTEXT Or tok.Type = TokenType.MODELELEMENTNAME Then
 lbProblemSolved =                                             ParseWHICHTHATCLAUSE(node) ' NonTerminal Rule: WHICHTHATCLAUSE
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -15293,7 +15294,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -15314,7 +15315,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -15335,7 +15336,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -15356,7 +15357,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -15377,7 +15378,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -15425,7 +15426,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.NUMBER
                                             lbProblemSolved =                                                     ParseINDIVIDUALIDENTIFIER(node) ' NonTerminal Rule: INDIVIDUALIDENTIFIER
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -15436,7 +15437,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.SINGLEQUOTE
                                             lbProblemSolved =                                                     ParseINDIVIDUALIDENTIFIER(node) ' NonTerminal Rule: INDIVIDUALIDENTIFIER
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -15447,7 +15448,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.PREBOUNDREADINGTEXT
                                             lbProblemSolved =                                                     ParseNODE(node) ' NonTerminal Rule: NODE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -15458,7 +15459,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.MODELELEMENTNAME
                                             lbProblemSolved =                                                     ParseNODE(node) ' NonTerminal Rule: NODE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -15469,7 +15470,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.BROPEN
                                             lbProblemSolved =                                                     ParseNODE(node) ' NonTerminal Rule: NODE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -15495,13 +15496,13 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
                                             lbProblemSolved =                                                 ParseNODE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: NODE
                                                 If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -15537,7 +15538,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.PREDICATE
                                             lbProblemSolved =                                                     ParseFOLLOWINGREADINGTEXT(node) ' NonTerminal Rule: FOLLOWINGREADINGTEXT
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -15548,7 +15549,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.MATHFUNCTION
                                             lbProblemSolved =                                                     ParseMATHCLAUSE(node) ' NonTerminal Rule: MATHCLAUSE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -15571,13 +15572,13 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
                                             lbProblemSolved =                                                 ParseMATHCLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: MATHCLAUSE
                                                 If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -15610,7 +15611,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                         If tok.Type = TokenType.KEYWDIS Or tok.Type = TokenType.PREDICATE Or tok.Type = TokenType.KEYWDTHAT Or tok.Type = TokenType.PREBOUNDREADINGTEXT Or tok.Type = TokenType.MODELELEMENTNAME Then
 lbProblemSolved =                                             ParseWHICHTHATCLAUSE(node) ' NonTerminal Rule: WHICHTHATCLAUSE
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -15743,7 +15744,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -15764,7 +15765,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -15785,7 +15786,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -15806,7 +15807,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -15827,7 +15828,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -15875,7 +15876,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.NUMBER
                                             lbProblemSolved =                                                     ParseINDIVIDUALIDENTIFIER(node) ' NonTerminal Rule: INDIVIDUALIDENTIFIER
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -15886,7 +15887,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.SINGLEQUOTE
                                             lbProblemSolved =                                                     ParseINDIVIDUALIDENTIFIER(node) ' NonTerminal Rule: INDIVIDUALIDENTIFIER
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -15897,7 +15898,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.PREBOUNDREADINGTEXT
                                             lbProblemSolved =                                                     ParseNODE(node) ' NonTerminal Rule: NODE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -15908,7 +15909,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.MODELELEMENTNAME
                                             lbProblemSolved =                                                     ParseNODE(node) ' NonTerminal Rule: NODE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -15919,7 +15920,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.BROPEN
                                             lbProblemSolved =                                                     ParseNODE(node) ' NonTerminal Rule: NODE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -15945,13 +15946,13 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
                                             lbProblemSolved =                                                 ParseNODE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: NODE
                                                 If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -15987,7 +15988,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.PREDICATE
                                             lbProblemSolved =                                                     ParseFOLLOWINGREADINGTEXT(node) ' NonTerminal Rule: FOLLOWINGREADINGTEXT
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -15998,7 +15999,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.MATHFUNCTION
                                             lbProblemSolved =                                                     ParseMATHCLAUSE(node) ' NonTerminal Rule: MATHCLAUSE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -16021,13 +16022,13 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
                                             lbProblemSolved =                                                 ParseMATHCLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: MATHCLAUSE
                                                 If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -16060,7 +16061,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                         If tok.Type = TokenType.KEYWDIS Or tok.Type = TokenType.PREDICATE Or tok.Type = TokenType.KEYWDTHAT Or tok.Type = TokenType.PREBOUNDREADINGTEXT Or tok.Type = TokenType.MODELELEMENTNAME Then
 lbProblemSolved =                                             ParseWHICHTHATCLAUSE(node) ' NonTerminal Rule: WHICHTHATCLAUSE
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -16193,7 +16194,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -16214,7 +16215,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -16235,7 +16236,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -16256,7 +16257,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -16277,7 +16278,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -16325,7 +16326,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.NUMBER
                                             lbProblemSolved =                                                     ParseINDIVIDUALIDENTIFIER(node) ' NonTerminal Rule: INDIVIDUALIDENTIFIER
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -16336,7 +16337,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.SINGLEQUOTE
                                             lbProblemSolved =                                                     ParseINDIVIDUALIDENTIFIER(node) ' NonTerminal Rule: INDIVIDUALIDENTIFIER
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -16347,7 +16348,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.PREBOUNDREADINGTEXT
                                             lbProblemSolved =                                                     ParseNODE(node) ' NonTerminal Rule: NODE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -16358,7 +16359,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.MODELELEMENTNAME
                                             lbProblemSolved =                                                     ParseNODE(node) ' NonTerminal Rule: NODE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -16369,7 +16370,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.BROPEN
                                             lbProblemSolved =                                                     ParseNODE(node) ' NonTerminal Rule: NODE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -16395,13 +16396,13 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
                                             lbProblemSolved =                                                 ParseNODE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: NODE
                                                 If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -16437,7 +16438,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.PREDICATE
                                             lbProblemSolved =                                                     ParseFOLLOWINGREADINGTEXT(node) ' NonTerminal Rule: FOLLOWINGREADINGTEXT
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -16448,7 +16449,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.MATHFUNCTION
                                             lbProblemSolved =                                                     ParseMATHCLAUSE(node) ' NonTerminal Rule: MATHCLAUSE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -16471,13 +16472,13 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
                                             lbProblemSolved =                                                 ParseMATHCLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: MATHCLAUSE
                                                 If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -16510,7 +16511,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                         If tok.Type = TokenType.KEYWDIS Or tok.Type = TokenType.PREDICATE Or tok.Type = TokenType.KEYWDTHAT Or tok.Type = TokenType.PREBOUNDREADINGTEXT Or tok.Type = TokenType.MODELELEMENTNAME Then
 lbProblemSolved =                                             ParseWHICHTHATCLAUSE(node) ' NonTerminal Rule: WHICHTHATCLAUSE
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -16643,7 +16644,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -16664,7 +16665,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -16685,7 +16686,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -16706,7 +16707,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -16727,7 +16728,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -16775,7 +16776,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.NUMBER
                                             lbProblemSolved =                                                     ParseINDIVIDUALIDENTIFIER(node) ' NonTerminal Rule: INDIVIDUALIDENTIFIER
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -16786,7 +16787,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.SINGLEQUOTE
                                             lbProblemSolved =                                                     ParseINDIVIDUALIDENTIFIER(node) ' NonTerminal Rule: INDIVIDUALIDENTIFIER
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -16797,7 +16798,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.PREBOUNDREADINGTEXT
                                             lbProblemSolved =                                                     ParseNODE(node) ' NonTerminal Rule: NODE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -16808,7 +16809,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.MODELELEMENTNAME
                                             lbProblemSolved =                                                     ParseNODE(node) ' NonTerminal Rule: NODE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -16819,7 +16820,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.BROPEN
                                             lbProblemSolved =                                                     ParseNODE(node) ' NonTerminal Rule: NODE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -16845,13 +16846,13 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
                                             lbProblemSolved =                                                 ParseNODE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: NODE
                                                 If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -16887,7 +16888,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.PREDICATE
                                             lbProblemSolved =                                                     ParseFOLLOWINGREADINGTEXT(node) ' NonTerminal Rule: FOLLOWINGREADINGTEXT
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -16898,7 +16899,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.MATHFUNCTION
                                             lbProblemSolved =                                                     ParseMATHCLAUSE(node) ' NonTerminal Rule: MATHCLAUSE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -16921,13 +16922,13 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
                                             lbProblemSolved =                                                 ParseMATHCLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: MATHCLAUSE
                                                 If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -16960,7 +16961,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                         If tok.Type = TokenType.KEYWDIS Or tok.Type = TokenType.PREDICATE Or tok.Type = TokenType.KEYWDTHAT Or tok.Type = TokenType.PREBOUNDREADINGTEXT Or tok.Type = TokenType.MODELELEMENTNAME Then
 lbProblemSolved =                                             ParseWHICHTHATCLAUSE(node) ' NonTerminal Rule: WHICHTHATCLAUSE
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -17093,7 +17094,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -17114,7 +17115,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -17135,7 +17136,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -17156,7 +17157,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -17177,7 +17178,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -17225,7 +17226,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.NUMBER
                                             lbProblemSolved =                                                     ParseINDIVIDUALIDENTIFIER(node) ' NonTerminal Rule: INDIVIDUALIDENTIFIER
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -17236,7 +17237,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.SINGLEQUOTE
                                             lbProblemSolved =                                                     ParseINDIVIDUALIDENTIFIER(node) ' NonTerminal Rule: INDIVIDUALIDENTIFIER
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -17247,7 +17248,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.PREBOUNDREADINGTEXT
                                             lbProblemSolved =                                                     ParseNODE(node) ' NonTerminal Rule: NODE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -17258,7 +17259,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.MODELELEMENTNAME
                                             lbProblemSolved =                                                     ParseNODE(node) ' NonTerminal Rule: NODE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -17269,7 +17270,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.BROPEN
                                             lbProblemSolved =                                                     ParseNODE(node) ' NonTerminal Rule: NODE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -17295,13 +17296,13 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
                                             lbProblemSolved =                                                 ParseNODE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: NODE
                                                 If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -17337,7 +17338,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.PREDICATE
                                             lbProblemSolved =                                                     ParseFOLLOWINGREADINGTEXT(node) ' NonTerminal Rule: FOLLOWINGREADINGTEXT
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -17348,7 +17349,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.MATHFUNCTION
                                             lbProblemSolved =                                                     ParseMATHCLAUSE(node) ' NonTerminal Rule: MATHCLAUSE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -17371,13 +17372,13 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
                                             lbProblemSolved =                                                 ParseMATHCLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: MATHCLAUSE
                                                 If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -17410,7 +17411,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                         If tok.Type = TokenType.KEYWDIS Or tok.Type = TokenType.PREDICATE Or tok.Type = TokenType.KEYWDTHAT Or tok.Type = TokenType.PREBOUNDREADINGTEXT Or tok.Type = TokenType.MODELELEMENTNAME Then
 lbProblemSolved =                                             ParseWHICHTHATCLAUSE(node) ' NonTerminal Rule: WHICHTHATCLAUSE
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -17543,7 +17544,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -17564,7 +17565,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -17585,7 +17586,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -17606,7 +17607,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -17627,7 +17628,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -17675,7 +17676,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.NUMBER
                                             lbProblemSolved =                                                     ParseINDIVIDUALIDENTIFIER(node) ' NonTerminal Rule: INDIVIDUALIDENTIFIER
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -17686,7 +17687,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.SINGLEQUOTE
                                             lbProblemSolved =                                                     ParseINDIVIDUALIDENTIFIER(node) ' NonTerminal Rule: INDIVIDUALIDENTIFIER
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -17697,7 +17698,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.PREBOUNDREADINGTEXT
                                             lbProblemSolved =                                                     ParseNODE(node) ' NonTerminal Rule: NODE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -17708,7 +17709,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.MODELELEMENTNAME
                                             lbProblemSolved =                                                     ParseNODE(node) ' NonTerminal Rule: NODE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -17719,7 +17720,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.BROPEN
                                             lbProblemSolved =                                                     ParseNODE(node) ' NonTerminal Rule: NODE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -17745,13 +17746,13 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
                                             lbProblemSolved =                                                 ParseNODE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: NODE
                                                 If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -17787,7 +17788,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.PREDICATE
                                             lbProblemSolved =                                                     ParseFOLLOWINGREADINGTEXT(node) ' NonTerminal Rule: FOLLOWINGREADINGTEXT
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -17798,7 +17799,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.MATHFUNCTION
                                             lbProblemSolved =                                                     ParseMATHCLAUSE(node) ' NonTerminal Rule: MATHCLAUSE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -17821,13 +17822,13 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
                                             lbProblemSolved =                                                 ParseMATHCLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: MATHCLAUSE
                                                 If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -17860,7 +17861,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                         If tok.Type = TokenType.KEYWDIS Or tok.Type = TokenType.PREDICATE Or tok.Type = TokenType.KEYWDTHAT Or tok.Type = TokenType.PREBOUNDREADINGTEXT Or tok.Type = TokenType.MODELELEMENTNAME Then
 lbProblemSolved =                                             ParseWHICHTHATCLAUSE(node) ' NonTerminal Rule: WHICHTHATCLAUSE
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -17993,7 +17994,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -18014,7 +18015,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -18035,7 +18036,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -18056,7 +18057,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -18077,7 +18078,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -18125,7 +18126,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.NUMBER
                                             lbProblemSolved =                                                     ParseINDIVIDUALIDENTIFIER(node) ' NonTerminal Rule: INDIVIDUALIDENTIFIER
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -18136,7 +18137,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.SINGLEQUOTE
                                             lbProblemSolved =                                                     ParseINDIVIDUALIDENTIFIER(node) ' NonTerminal Rule: INDIVIDUALIDENTIFIER
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -18147,7 +18148,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.PREBOUNDREADINGTEXT
                                             lbProblemSolved =                                                     ParseNODE(node) ' NonTerminal Rule: NODE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -18158,7 +18159,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.MODELELEMENTNAME
                                             lbProblemSolved =                                                     ParseNODE(node) ' NonTerminal Rule: NODE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -18169,7 +18170,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.BROPEN
                                             lbProblemSolved =                                                     ParseNODE(node) ' NonTerminal Rule: NODE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -18195,13 +18196,13 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
                                             lbProblemSolved =                                                 ParseNODE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: NODE
                                                 If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -18237,7 +18238,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.PREDICATE
                                             lbProblemSolved =                                                     ParseFOLLOWINGREADINGTEXT(node) ' NonTerminal Rule: FOLLOWINGREADINGTEXT
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -18248,7 +18249,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.MATHFUNCTION
                                             lbProblemSolved =                                                     ParseMATHCLAUSE(node) ' NonTerminal Rule: MATHCLAUSE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -18271,13 +18272,13 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
                                             lbProblemSolved =                                                 ParseMATHCLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: MATHCLAUSE
                                                 If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -18310,7 +18311,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                         If tok.Type = TokenType.KEYWDIS Or tok.Type = TokenType.PREDICATE Or tok.Type = TokenType.KEYWDTHAT Or tok.Type = TokenType.PREBOUNDREADINGTEXT Or tok.Type = TokenType.MODELELEMENTNAME Then
 lbProblemSolved =                                             ParseWHICHTHATCLAUSE(node) ' NonTerminal Rule: WHICHTHATCLAUSE
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -18443,7 +18444,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -18464,7 +18465,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -18485,7 +18486,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -18506,7 +18507,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -18527,7 +18528,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -18575,7 +18576,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.NUMBER
                                             lbProblemSolved =                                                     ParseINDIVIDUALIDENTIFIER(node) ' NonTerminal Rule: INDIVIDUALIDENTIFIER
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -18586,7 +18587,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.SINGLEQUOTE
                                             lbProblemSolved =                                                     ParseINDIVIDUALIDENTIFIER(node) ' NonTerminal Rule: INDIVIDUALIDENTIFIER
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -18597,7 +18598,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.PREBOUNDREADINGTEXT
                                             lbProblemSolved =                                                     ParseNODE(node) ' NonTerminal Rule: NODE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -18608,7 +18609,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.MODELELEMENTNAME
                                             lbProblemSolved =                                                     ParseNODE(node) ' NonTerminal Rule: NODE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -18619,7 +18620,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.BROPEN
                                             lbProblemSolved =                                                     ParseNODE(node) ' NonTerminal Rule: NODE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -18645,13 +18646,13 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
                                             lbProblemSolved =                                                 ParseNODE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: NODE
                                                 If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -18687,7 +18688,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.PREDICATE
                                             lbProblemSolved =                                                     ParseFOLLOWINGREADINGTEXT(node) ' NonTerminal Rule: FOLLOWINGREADINGTEXT
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -18698,7 +18699,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.MATHFUNCTION
                                             lbProblemSolved =                                                     ParseMATHCLAUSE(node) ' NonTerminal Rule: MATHCLAUSE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -18721,13 +18722,13 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
                                             lbProblemSolved =                                                 ParseMATHCLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: MATHCLAUSE
                                                 If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -18760,7 +18761,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                         If tok.Type = TokenType.KEYWDIS Or tok.Type = TokenType.PREDICATE Or tok.Type = TokenType.KEYWDTHAT Or tok.Type = TokenType.PREBOUNDREADINGTEXT Or tok.Type = TokenType.MODELELEMENTNAME Then
 lbProblemSolved =                                             ParseWHICHTHATCLAUSE(node) ' NonTerminal Rule: WHICHTHATCLAUSE
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -18893,7 +18894,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -18914,7 +18915,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -18935,7 +18936,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -18956,7 +18957,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -18977,7 +18978,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -19025,7 +19026,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.NUMBER
                                             lbProblemSolved =                                                     ParseINDIVIDUALIDENTIFIER(node) ' NonTerminal Rule: INDIVIDUALIDENTIFIER
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -19036,7 +19037,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.SINGLEQUOTE
                                             lbProblemSolved =                                                     ParseINDIVIDUALIDENTIFIER(node) ' NonTerminal Rule: INDIVIDUALIDENTIFIER
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -19047,7 +19048,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.PREBOUNDREADINGTEXT
                                             lbProblemSolved =                                                     ParseNODE(node) ' NonTerminal Rule: NODE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -19058,7 +19059,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.MODELELEMENTNAME
                                             lbProblemSolved =                                                     ParseNODE(node) ' NonTerminal Rule: NODE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -19069,7 +19070,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.BROPEN
                                             lbProblemSolved =                                                     ParseNODE(node) ' NonTerminal Rule: NODE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -19095,13 +19096,13 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
                                             lbProblemSolved =                                                 ParseNODE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: NODE
                                                 If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -19137,7 +19138,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.PREDICATE
                                             lbProblemSolved =                                                     ParseFOLLOWINGREADINGTEXT(node) ' NonTerminal Rule: FOLLOWINGREADINGTEXT
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -19148,7 +19149,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.MATHFUNCTION
                                             lbProblemSolved =                                                     ParseMATHCLAUSE(node) ' NonTerminal Rule: MATHCLAUSE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -19171,13 +19172,13 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
                                             lbProblemSolved =                                                 ParseMATHCLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: MATHCLAUSE
                                                 If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -19210,7 +19211,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                         If tok.Type = TokenType.KEYWDIS Or tok.Type = TokenType.PREDICATE Or tok.Type = TokenType.KEYWDTHAT Or tok.Type = TokenType.PREBOUNDREADINGTEXT Or tok.Type = TokenType.MODELELEMENTNAME Then
 lbProblemSolved =                                             ParseWHICHTHATCLAUSE(node) ' NonTerminal Rule: WHICHTHATCLAUSE
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -19343,7 +19344,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -19364,7 +19365,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -19385,7 +19386,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -19406,7 +19407,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -19427,7 +19428,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -19475,7 +19476,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.NUMBER
                                             lbProblemSolved =                                                     ParseINDIVIDUALIDENTIFIER(node) ' NonTerminal Rule: INDIVIDUALIDENTIFIER
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -19486,7 +19487,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.SINGLEQUOTE
                                             lbProblemSolved =                                                     ParseINDIVIDUALIDENTIFIER(node) ' NonTerminal Rule: INDIVIDUALIDENTIFIER
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -19497,7 +19498,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.PREBOUNDREADINGTEXT
                                             lbProblemSolved =                                                     ParseNODE(node) ' NonTerminal Rule: NODE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -19508,7 +19509,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.MODELELEMENTNAME
                                             lbProblemSolved =                                                     ParseNODE(node) ' NonTerminal Rule: NODE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -19519,7 +19520,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.BROPEN
                                             lbProblemSolved =                                                     ParseNODE(node) ' NonTerminal Rule: NODE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -19545,13 +19546,13 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
                                             lbProblemSolved =                                                 ParseNODE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: NODE
                                                 If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -19587,7 +19588,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.PREDICATE
                                             lbProblemSolved =                                                     ParseFOLLOWINGREADINGTEXT(node) ' NonTerminal Rule: FOLLOWINGREADINGTEXT
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -19598,7 +19599,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.MATHFUNCTION
                                             lbProblemSolved =                                                     ParseMATHCLAUSE(node) ' NonTerminal Rule: MATHCLAUSE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -19621,13 +19622,13 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
                                             lbProblemSolved =                                                 ParseMATHCLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: MATHCLAUSE
                                                 If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -19660,7 +19661,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                         If tok.Type = TokenType.KEYWDIS Or tok.Type = TokenType.PREDICATE Or tok.Type = TokenType.KEYWDTHAT Or tok.Type = TokenType.PREBOUNDREADINGTEXT Or tok.Type = TokenType.MODELELEMENTNAME Then
 lbProblemSolved =                                             ParseWHICHTHATCLAUSE(node) ' NonTerminal Rule: WHICHTHATCLAUSE
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -19793,7 +19794,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -19814,7 +19815,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -19835,7 +19836,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -19856,7 +19857,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -19877,7 +19878,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -19925,7 +19926,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.NUMBER
                                             lbProblemSolved =                                                     ParseINDIVIDUALIDENTIFIER(node) ' NonTerminal Rule: INDIVIDUALIDENTIFIER
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -19936,7 +19937,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.SINGLEQUOTE
                                             lbProblemSolved =                                                     ParseINDIVIDUALIDENTIFIER(node) ' NonTerminal Rule: INDIVIDUALIDENTIFIER
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -19947,7 +19948,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.PREBOUNDREADINGTEXT
                                             lbProblemSolved =                                                     ParseNODE(node) ' NonTerminal Rule: NODE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -19958,7 +19959,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.MODELELEMENTNAME
                                             lbProblemSolved =                                                     ParseNODE(node) ' NonTerminal Rule: NODE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -19969,7 +19970,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.BROPEN
                                             lbProblemSolved =                                                     ParseNODE(node) ' NonTerminal Rule: NODE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -19995,13 +19996,13 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
                                             lbProblemSolved =                                                 ParseNODE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: NODE
                                                 If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -20037,7 +20038,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.PREDICATE
                                             lbProblemSolved =                                                     ParseFOLLOWINGREADINGTEXT(node) ' NonTerminal Rule: FOLLOWINGREADINGTEXT
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -20048,7 +20049,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.MATHFUNCTION
                                             lbProblemSolved =                                                     ParseMATHCLAUSE(node) ' NonTerminal Rule: MATHCLAUSE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -20071,13 +20072,13 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
                                             lbProblemSolved =                                                 ParseMATHCLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: MATHCLAUSE
                                                 If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -20110,7 +20111,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                         If tok.Type = TokenType.KEYWDIS Or tok.Type = TokenType.PREDICATE Or tok.Type = TokenType.KEYWDTHAT Or tok.Type = TokenType.PREBOUNDREADINGTEXT Or tok.Type = TokenType.MODELELEMENTNAME Then
 lbProblemSolved =                                             ParseWHICHTHATCLAUSE(node) ' NonTerminal Rule: WHICHTHATCLAUSE
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -20243,7 +20244,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -20264,7 +20265,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -20285,7 +20286,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -20306,7 +20307,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -20327,7 +20328,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -20375,7 +20376,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.NUMBER
                                             lbProblemSolved =                                                     ParseINDIVIDUALIDENTIFIER(node) ' NonTerminal Rule: INDIVIDUALIDENTIFIER
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -20386,7 +20387,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.SINGLEQUOTE
                                             lbProblemSolved =                                                     ParseINDIVIDUALIDENTIFIER(node) ' NonTerminal Rule: INDIVIDUALIDENTIFIER
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -20397,7 +20398,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.PREBOUNDREADINGTEXT
                                             lbProblemSolved =                                                     ParseNODE(node) ' NonTerminal Rule: NODE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -20408,7 +20409,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.MODELELEMENTNAME
                                             lbProblemSolved =                                                     ParseNODE(node) ' NonTerminal Rule: NODE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -20419,7 +20420,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.BROPEN
                                             lbProblemSolved =                                                     ParseNODE(node) ' NonTerminal Rule: NODE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -20445,13 +20446,13 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
                                             lbProblemSolved =                                                 ParseNODE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: NODE
                                                 If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -20487,7 +20488,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.PREDICATE
                                             lbProblemSolved =                                                     ParseFOLLOWINGREADINGTEXT(node) ' NonTerminal Rule: FOLLOWINGREADINGTEXT
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -20498,7 +20499,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.MATHFUNCTION
                                             lbProblemSolved =                                                     ParseMATHCLAUSE(node) ' NonTerminal Rule: MATHCLAUSE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -20521,13 +20522,13 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
                                             lbProblemSolved =                                                 ParseMATHCLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: MATHCLAUSE
                                                 If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -20560,7 +20561,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                         If tok.Type = TokenType.KEYWDIS Or tok.Type = TokenType.PREDICATE Or tok.Type = TokenType.KEYWDTHAT Or tok.Type = TokenType.PREBOUNDREADINGTEXT Or tok.Type = TokenType.MODELELEMENTNAME Then
 lbProblemSolved =                                             ParseWHICHTHATCLAUSE(node) ' NonTerminal Rule: WHICHTHATCLAUSE
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -20693,7 +20694,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -20714,7 +20715,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -20735,7 +20736,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -20756,7 +20757,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -20777,7 +20778,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -20825,7 +20826,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.NUMBER
                                             lbProblemSolved =                                                     ParseINDIVIDUALIDENTIFIER(node) ' NonTerminal Rule: INDIVIDUALIDENTIFIER
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -20836,7 +20837,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.SINGLEQUOTE
                                             lbProblemSolved =                                                     ParseINDIVIDUALIDENTIFIER(node) ' NonTerminal Rule: INDIVIDUALIDENTIFIER
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -20847,7 +20848,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.PREBOUNDREADINGTEXT
                                             lbProblemSolved =                                                     ParseNODE(node) ' NonTerminal Rule: NODE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -20858,7 +20859,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.MODELELEMENTNAME
                                             lbProblemSolved =                                                     ParseNODE(node) ' NonTerminal Rule: NODE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -20869,7 +20870,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.BROPEN
                                             lbProblemSolved =                                                     ParseNODE(node) ' NonTerminal Rule: NODE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -20895,13 +20896,13 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
                                             lbProblemSolved =                                                 ParseNODE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: NODE
                                                 If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -20937,7 +20938,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.PREDICATE
                                             lbProblemSolved =                                                     ParseFOLLOWINGREADINGTEXT(node) ' NonTerminal Rule: FOLLOWINGREADINGTEXT
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -20948,7 +20949,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.MATHFUNCTION
                                             lbProblemSolved =                                                     ParseMATHCLAUSE(node) ' NonTerminal Rule: MATHCLAUSE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -20971,13 +20972,13 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
                                             lbProblemSolved =                                                 ParseMATHCLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: MATHCLAUSE
                                                 If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -21035,13 +21036,13 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                             If Not lbProblemSolved Then
                               m_tree.Errors.Clear
                               m_scanner.StartPos = liOriginalRange
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
                         lbProblemSolved =                             ParseFORMULA(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: FORMULA
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -21053,7 +21054,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                             If Not lbProblemSolved Then
                               m_tree.Errors.Clear
                               m_scanner.StartPos = liOriginalRange
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -21063,7 +21064,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                 If tok.Type = TokenType.KEYWDIS Or tok.Type = TokenType.PREDICATE Or tok.Type = TokenType.KEYWDTHAT Or tok.Type = TokenType.PREBOUNDREADINGTEXT Or tok.Type = TokenType.MODELELEMENTNAME Then
 lbProblemSolved =                                     ParseWHICHTHATCLAUSE(node) ' NonTerminal Rule: WHICHTHATCLAUSE
                                     If m_tree.Errors.Count > 0 Then
-                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                      If liOriginalRange >= Me.MaxDistance Then
                                         Me.MaxDistance = m_scanner.StartPos
                                         max_tree = m_tree.clone
                                       End If
@@ -21196,7 +21197,7 @@ lbProblemSolved =                                     ParseWHICHTHATCLAUSE(node)
                                         If Not lbProblemSolved Then
                                           m_tree.Errors.Clear
                                           m_scanner.StartPos = liOriginalRange
-                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                          If liOriginalRange >= Me.MaxDistance Then
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
@@ -21217,7 +21218,7 @@ lbProblemSolved =                                     ParseWHICHTHATCLAUSE(node)
                                         If Not lbProblemSolved Then
                                           m_tree.Errors.Clear
                                           m_scanner.StartPos = liOriginalRange
-                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                          If liOriginalRange >= Me.MaxDistance Then
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
@@ -21238,7 +21239,7 @@ lbProblemSolved =                                     ParseWHICHTHATCLAUSE(node)
                                         If Not lbProblemSolved Then
                                           m_tree.Errors.Clear
                                           m_scanner.StartPos = liOriginalRange
-                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                          If liOriginalRange >= Me.MaxDistance Then
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
@@ -21259,7 +21260,7 @@ lbProblemSolved =                                     ParseWHICHTHATCLAUSE(node)
                                         If Not lbProblemSolved Then
                                           m_tree.Errors.Clear
                                           m_scanner.StartPos = liOriginalRange
-                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                          If liOriginalRange >= Me.MaxDistance Then
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
@@ -21280,7 +21281,7 @@ lbProblemSolved =                                     ParseWHICHTHATCLAUSE(node)
                                         If Not lbProblemSolved Then
                                           m_tree.Errors.Clear
                                           m_scanner.StartPos = liOriginalRange
-                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                          If liOriginalRange >= Me.MaxDistance Then
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
@@ -21328,7 +21329,7 @@ lbProblemSolved =                                     ParseWHICHTHATCLAUSE(node)
                                         Case TokenType.NUMBER
                                     lbProblemSolved =                                             ParseINDIVIDUALIDENTIFIER(node) ' NonTerminal Rule: INDIVIDUALIDENTIFIER
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -21339,7 +21340,7 @@ lbProblemSolved =                                     ParseWHICHTHATCLAUSE(node)
                                         Case TokenType.SINGLEQUOTE
                                     lbProblemSolved =                                             ParseINDIVIDUALIDENTIFIER(node) ' NonTerminal Rule: INDIVIDUALIDENTIFIER
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -21350,7 +21351,7 @@ lbProblemSolved =                                     ParseWHICHTHATCLAUSE(node)
                                         Case TokenType.PREBOUNDREADINGTEXT
                                     lbProblemSolved =                                             ParseNODE(node) ' NonTerminal Rule: NODE
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -21361,7 +21362,7 @@ lbProblemSolved =                                     ParseWHICHTHATCLAUSE(node)
                                         Case TokenType.MODELELEMENTNAME
                                     lbProblemSolved =                                             ParseNODE(node) ' NonTerminal Rule: NODE
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -21372,7 +21373,7 @@ lbProblemSolved =                                     ParseWHICHTHATCLAUSE(node)
                                         Case TokenType.BROPEN
                                     lbProblemSolved =                                             ParseNODE(node) ' NonTerminal Rule: NODE
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -21398,13 +21399,13 @@ lbProblemSolved =                                     ParseWHICHTHATCLAUSE(node)
                                         If Not lbProblemSolved Then
                                           m_tree.Errors.Clear
                                           m_scanner.StartPos = liOriginalRange
-                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                          If liOriginalRange >= Me.MaxDistance Then
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
                                     lbProblemSolved =                                         ParseNODE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: NODE
                                         If m_tree.Errors.Count > 0 Then
-                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                          If liOriginalRange >= Me.MaxDistance Then
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
@@ -21440,7 +21441,7 @@ lbProblemSolved =                                     ParseWHICHTHATCLAUSE(node)
                                         Case TokenType.PREDICATE
                                     lbProblemSolved =                                             ParseFOLLOWINGREADINGTEXT(node) ' NonTerminal Rule: FOLLOWINGREADINGTEXT
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -21451,7 +21452,7 @@ lbProblemSolved =                                     ParseWHICHTHATCLAUSE(node)
                                         Case TokenType.MATHFUNCTION
                                     lbProblemSolved =                                             ParseMATHCLAUSE(node) ' NonTerminal Rule: MATHCLAUSE
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -21474,13 +21475,13 @@ lbProblemSolved =                                     ParseWHICHTHATCLAUSE(node)
                                         If Not lbProblemSolved Then
                                           m_tree.Errors.Clear
                                           m_scanner.StartPos = liOriginalRange
-                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                          If liOriginalRange >= Me.MaxDistance Then
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
                                     lbProblemSolved =                                         ParseMATHCLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: MATHCLAUSE
                                         If m_tree.Errors.Count > 0 Then
-                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                          If liOriginalRange >= Me.MaxDistance Then
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
@@ -21605,7 +21606,7 @@ lbProblemSolved =                                     ParseWHICHTHATCLAUSE(node)
                              ' Concat Rule
                             lbProblemSolved =                                     ParsePREDICATECLAUSE(node) ' NonTerminal Rule: PREDICATECLAUSE
                                     If m_tree.Errors.Count > 0 Then
-                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                      If liOriginalRange >= Me.MaxDistance Then
                                         Me.MaxDistance = m_scanner.StartPos
                                         max_tree = m_tree.clone
                                       End If
@@ -21619,7 +21620,7 @@ lbProblemSolved =                                     ParseWHICHTHATCLAUSE(node)
                                     If tok.Type = TokenType.OPENSQUAREBRACKET Then
 lbProblemSolved =                                         ParseRECURSIVECLAUSE(node) ' NonTerminal Rule: RECURSIVECLAUSE
                                         If m_tree.Errors.Count > 0 Then
-                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                          If liOriginalRange >= Me.MaxDistance Then
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
@@ -21653,7 +21654,7 @@ lbProblemSolved =                                         ParseRECURSIVECLAUSE(n
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
                           m_scanner.StartPos = liOriginalRange
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
@@ -21661,7 +21662,7 @@ lbProblemSolved =                                         ParseRECURSIVECLAUSE(n
                      ' Concat Rule
                     lbProblemSolved =                             ParsePREDICATECLAUSE(node) ' NonTerminal Rule: PREDICATECLAUSE
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -21675,7 +21676,7 @@ lbProblemSolved =                                         ParseRECURSIVECLAUSE(n
                             If tok.Type = TokenType.OPENSQUAREBRACKET Then
 lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' NonTerminal Rule: RECURSIVECLAUSE
                                 If m_tree.Errors.Count > 0 Then
-                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                  If liOriginalRange >= Me.MaxDistance Then
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
@@ -21749,7 +21750,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                              ' Concat Rule
                             lbProblemSolved =                                     ParsePREDICATECLAUSE(node) ' NonTerminal Rule: PREDICATECLAUSE
                                     If m_tree.Errors.Count > 0 Then
-                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                      If liOriginalRange >= Me.MaxDistance Then
                                         Me.MaxDistance = m_scanner.StartPos
                                         max_tree = m_tree.clone
                                       End If
@@ -21763,7 +21764,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                     If tok.Type = TokenType.OPENSQUAREBRACKET Then
 lbProblemSolved =                                         ParseRECURSIVECLAUSE(node) ' NonTerminal Rule: RECURSIVECLAUSE
                                         If m_tree.Errors.Count > 0 Then
-                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                          If liOriginalRange >= Me.MaxDistance Then
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
@@ -21797,7 +21798,7 @@ lbProblemSolved =                                         ParseRECURSIVECLAUSE(n
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
                           m_scanner.StartPos = liOriginalRange
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
@@ -21805,7 +21806,7 @@ lbProblemSolved =                                         ParseRECURSIVECLAUSE(n
                      ' Concat Rule
                     lbProblemSolved =                             ParsePREDICATECLAUSE(node) ' NonTerminal Rule: PREDICATECLAUSE
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -21819,7 +21820,7 @@ lbProblemSolved =                                         ParseRECURSIVECLAUSE(n
                             If tok.Type = TokenType.OPENSQUAREBRACKET Then
 lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' NonTerminal Rule: RECURSIVECLAUSE
                                 If m_tree.Errors.Count > 0 Then
-                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                  If liOriginalRange >= Me.MaxDistance Then
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
@@ -21874,7 +21875,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                 Case TokenType.PREDICATE
                             lbProblemSolved =                                     ParsePREDICATECLAUSE(node) ' NonTerminal Rule: PREDICATECLAUSE
                                     If m_tree.Errors.Count > 0 Then
-                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                      If liOriginalRange >= Me.MaxDistance Then
                                         Me.MaxDistance = m_scanner.StartPos
                                         max_tree = m_tree.clone
                                       End If
@@ -21887,7 +21888,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                      ' Concat Rule
                                     lbProblemSolved =                                             ParseMODELELEMENT(node) ' NonTerminal Rule: MODELELEMENT
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -21956,7 +21957,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                                         If Not lbProblemSolved Then
                                                           m_tree.Errors.Clear
                                                           m_scanner.StartPos = liOriginalRange
-                                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                                          If liOriginalRange >= Me.MaxDistance Then
                                                             Me.MaxDistance = m_scanner.StartPos
                                                             max_tree = m_tree.clone
                                                           End If
@@ -22031,7 +22032,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                                         If Not lbProblemSolved Then
                                                           m_tree.Errors.Clear
                                                           m_scanner.StartPos = liOriginalRange
-                                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                                          If liOriginalRange >= Me.MaxDistance Then
                                                             Me.MaxDistance = m_scanner.StartPos
                                                             max_tree = m_tree.clone
                                                           End If
@@ -22058,7 +22059,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                                 Case TokenType.PREDICATE
                                             lbProblemSolved =                                                     ParsePREDICATECLAUSE(node) ' NonTerminal Rule: PREDICATECLAUSE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -22082,13 +22083,13 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
                                             lbProblemSolved =                                                 ParsePREDICATECLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: PREDICATECLAUSE
                                                 If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -22112,7 +22113,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                      ' Concat Rule
                                     lbProblemSolved =                                             ParseMODELELEMENT(node) ' NonTerminal Rule: MODELELEMENT
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -22181,7 +22182,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                                         If Not lbProblemSolved Then
                                                           m_tree.Errors.Clear
                                                           m_scanner.StartPos = liOriginalRange
-                                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                                          If liOriginalRange >= Me.MaxDistance Then
                                                             Me.MaxDistance = m_scanner.StartPos
                                                             max_tree = m_tree.clone
                                                           End If
@@ -22256,7 +22257,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                                         If Not lbProblemSolved Then
                                                           m_tree.Errors.Clear
                                                           m_scanner.StartPos = liOriginalRange
-                                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                                          If liOriginalRange >= Me.MaxDistance Then
                                                             Me.MaxDistance = m_scanner.StartPos
                                                             max_tree = m_tree.clone
                                                           End If
@@ -22283,7 +22284,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                                 Case TokenType.PREDICATE
                                             lbProblemSolved =                                                     ParsePREDICATECLAUSE(node) ' NonTerminal Rule: PREDICATECLAUSE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -22307,13 +22308,13 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
                                             lbProblemSolved =                                                 ParsePREDICATECLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: PREDICATECLAUSE
                                                 If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -22348,7 +22349,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                 If Not lbProblemSolved Then
                                   m_tree.Errors.Clear
                                   m_scanner.StartPos = liOriginalRange
-                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                  If liOriginalRange >= Me.MaxDistance Then
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
@@ -22356,7 +22357,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                              ' Concat Rule
                             lbProblemSolved =                                     ParseMODELELEMENT(node) ' NonTerminal Rule: MODELELEMENT
                                     If m_tree.Errors.Count > 0 Then
-                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                      If liOriginalRange >= Me.MaxDistance Then
                                         Me.MaxDistance = m_scanner.StartPos
                                         max_tree = m_tree.clone
                                       End If
@@ -22425,7 +22426,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -22500,7 +22501,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -22527,7 +22528,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                         Case TokenType.PREDICATE
                                     lbProblemSolved =                                             ParsePREDICATECLAUSE(node) ' NonTerminal Rule: PREDICATECLAUSE
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -22551,13 +22552,13 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                         If Not lbProblemSolved Then
                                           m_tree.Errors.Clear
                                           m_scanner.StartPos = liOriginalRange
-                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                          If liOriginalRange >= Me.MaxDistance Then
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
                                     lbProblemSolved =                                         ParsePREDICATECLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: PREDICATECLAUSE
                                         If m_tree.Errors.Count > 0 Then
-                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                          If liOriginalRange >= Me.MaxDistance Then
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
@@ -22592,7 +22593,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                      ' Concat Rule
                     lbProblemSolved =                             ParseMODELELEMENT(node) ' NonTerminal Rule: MODELELEMENT
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -22626,7 +22627,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                 Case TokenType.PREDICATE
                             lbProblemSolved =                                     ParsePREDICATECLAUSE(node) ' NonTerminal Rule: PREDICATECLAUSE
                                     If m_tree.Errors.Count > 0 Then
-                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                      If liOriginalRange >= Me.MaxDistance Then
                                         Me.MaxDistance = m_scanner.StartPos
                                         max_tree = m_tree.clone
                                       End If
@@ -22649,13 +22650,13 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                 If Not lbProblemSolved Then
                                   m_tree.Errors.Clear
                                   m_scanner.StartPos = liOriginalRange
-                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                  If liOriginalRange >= Me.MaxDistance Then
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
                             lbProblemSolved =                                 ParsePREDICATECLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: PREDICATECLAUSE
                                 If m_tree.Errors.Count > 0 Then
-                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                  If liOriginalRange >= Me.MaxDistance Then
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
@@ -22679,7 +22680,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                      ' Concat Rule
                     lbProblemSolved =                             ParseMODELELEMENT(node) ' NonTerminal Rule: MODELELEMENT
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -22713,7 +22714,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                 Case TokenType.PREDICATE
                             lbProblemSolved =                                     ParsePREDICATECLAUSE(node) ' NonTerminal Rule: PREDICATECLAUSE
                                     If m_tree.Errors.Count > 0 Then
-                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                      If liOriginalRange >= Me.MaxDistance Then
                                         Me.MaxDistance = m_scanner.StartPos
                                         max_tree = m_tree.clone
                                       End If
@@ -22736,13 +22737,13 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                 If Not lbProblemSolved Then
                                   m_tree.Errors.Clear
                                   m_scanner.StartPos = liOriginalRange
-                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                  If liOriginalRange >= Me.MaxDistance Then
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
                             lbProblemSolved =                                 ParsePREDICATECLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: PREDICATECLAUSE
                                 If m_tree.Errors.Count > 0 Then
-                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                  If liOriginalRange >= Me.MaxDistance Then
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
@@ -22779,7 +22780,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                 If Not lbProblemSolved Then
                   m_tree.Errors.Clear
                   m_scanner.StartPos = liOriginalRange
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
@@ -22811,7 +22812,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                         Case TokenType.PREDICATE
                     lbProblemSolved =                             ParsePREDICATECLAUSE(node) ' NonTerminal Rule: PREDICATECLAUSE
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -22824,7 +22825,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                              ' Concat Rule
                             lbProblemSolved =                                     ParseMODELELEMENT(node) ' NonTerminal Rule: MODELELEMENT
                                     If m_tree.Errors.Count > 0 Then
-                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                      If liOriginalRange >= Me.MaxDistance Then
                                         Me.MaxDistance = m_scanner.StartPos
                                         max_tree = m_tree.clone
                                       End If
@@ -22893,7 +22894,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -22968,7 +22969,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -22995,7 +22996,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                         Case TokenType.PREDICATE
                                     lbProblemSolved =                                             ParsePREDICATECLAUSE(node) ' NonTerminal Rule: PREDICATECLAUSE
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -23019,13 +23020,13 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                         If Not lbProblemSolved Then
                                           m_tree.Errors.Clear
                                           m_scanner.StartPos = liOriginalRange
-                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                          If liOriginalRange >= Me.MaxDistance Then
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
                                     lbProblemSolved =                                         ParsePREDICATECLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: PREDICATECLAUSE
                                         If m_tree.Errors.Count > 0 Then
-                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                          If liOriginalRange >= Me.MaxDistance Then
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
@@ -23049,7 +23050,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                              ' Concat Rule
                             lbProblemSolved =                                     ParseMODELELEMENT(node) ' NonTerminal Rule: MODELELEMENT
                                     If m_tree.Errors.Count > 0 Then
-                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                      If liOriginalRange >= Me.MaxDistance Then
                                         Me.MaxDistance = m_scanner.StartPos
                                         max_tree = m_tree.clone
                                       End If
@@ -23118,7 +23119,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -23193,7 +23194,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -23220,7 +23221,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                         Case TokenType.PREDICATE
                                     lbProblemSolved =                                             ParsePREDICATECLAUSE(node) ' NonTerminal Rule: PREDICATECLAUSE
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -23244,13 +23245,13 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                         If Not lbProblemSolved Then
                                           m_tree.Errors.Clear
                                           m_scanner.StartPos = liOriginalRange
-                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                          If liOriginalRange >= Me.MaxDistance Then
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
                                     lbProblemSolved =                                         ParsePREDICATECLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: PREDICATECLAUSE
                                         If m_tree.Errors.Count > 0 Then
-                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                          If liOriginalRange >= Me.MaxDistance Then
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
@@ -23285,7 +23286,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
                           m_scanner.StartPos = liOriginalRange
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
@@ -23293,7 +23294,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                      ' Concat Rule
                     lbProblemSolved =                             ParseMODELELEMENT(node) ' NonTerminal Rule: MODELELEMENT
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -23362,7 +23363,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                         If Not lbProblemSolved Then
                                           m_tree.Errors.Clear
                                           m_scanner.StartPos = liOriginalRange
-                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                          If liOriginalRange >= Me.MaxDistance Then
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
@@ -23437,7 +23438,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                         If Not lbProblemSolved Then
                                           m_tree.Errors.Clear
                                           m_scanner.StartPos = liOriginalRange
-                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                          If liOriginalRange >= Me.MaxDistance Then
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
@@ -23464,7 +23465,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                 Case TokenType.PREDICATE
                             lbProblemSolved =                                     ParsePREDICATECLAUSE(node) ' NonTerminal Rule: PREDICATECLAUSE
                                     If m_tree.Errors.Count > 0 Then
-                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                      If liOriginalRange >= Me.MaxDistance Then
                                         Me.MaxDistance = m_scanner.StartPos
                                         max_tree = m_tree.clone
                                       End If
@@ -23488,13 +23489,13 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                 If Not lbProblemSolved Then
                                   m_tree.Errors.Clear
                                   m_scanner.StartPos = liOriginalRange
-                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                  If liOriginalRange >= Me.MaxDistance Then
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
                             lbProblemSolved =                                 ParsePREDICATECLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: PREDICATECLAUSE
                                 If m_tree.Errors.Count > 0 Then
-                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                  If liOriginalRange >= Me.MaxDistance Then
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
@@ -23528,7 +23529,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                 If Not lbProblemSolved Then
                   m_tree.Errors.Clear
                   m_scanner.StartPos = liOriginalRange
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
@@ -23536,7 +23537,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
              ' Concat Rule
             lbProblemSolved =                     ParseMODELELEMENT(node) ' NonTerminal Rule: MODELELEMENT
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -23570,7 +23571,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                         Case TokenType.PREDICATE
                     lbProblemSolved =                             ParsePREDICATECLAUSE(node) ' NonTerminal Rule: PREDICATECLAUSE
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -23593,13 +23594,13 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
                           m_scanner.StartPos = liOriginalRange
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
                     lbProblemSolved =                         ParsePREDICATECLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: PREDICATECLAUSE
                         If m_tree.Errors.Count > 0 Then
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
@@ -23789,7 +23790,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                         Case TokenType.PREBOUNDREADINGTEXT
                     lbProblemSolved =                             ParseMODELELEMENT(node) ' NonTerminal Rule: MODELELEMENT
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -23800,7 +23801,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                         Case TokenType.MODELELEMENTNAME
                     lbProblemSolved =                             ParseMODELELEMENT(node) ' NonTerminal Rule: MODELELEMENT
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -23811,7 +23812,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                         Case TokenType.PREBOUNDREADINGTEXT
                     lbProblemSolved =                             ParseNODE(node) ' NonTerminal Rule: NODE
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -23822,7 +23823,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                         Case TokenType.MODELELEMENTNAME
                     lbProblemSolved =                             ParseNODE(node) ' NonTerminal Rule: NODE
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -23833,7 +23834,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                         Case TokenType.BROPEN
                     lbProblemSolved =                             ParseNODE(node) ' NonTerminal Rule: NODE
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -23859,13 +23860,13 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
                           m_scanner.StartPos = liOriginalRange
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
                     lbProblemSolved =                         ParseNODE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: NODE
                         If m_tree.Errors.Count > 0 Then
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
@@ -23887,7 +23888,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                     m_tree.Errors.Clear
                         ParseWHICHCLAUSE(node) ' NonTerminal Rule: WHICHCLAUSE
                         If m_tree.Errors.Count > 0 Then
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
@@ -23979,7 +23980,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                     If tok.Type = TokenType.KEYWDWRITTENAS Then
 lbProblemSolved =                         ParseWRITTENASCLAUSE(node) ' NonTerminal Rule: WRITTENASCLAUSE
                         If m_tree.Errors.Count > 0 Then
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
@@ -24214,7 +24215,7 @@ lbProblemSolved =                         ParseWRITTENASCLAUSE(node) ' NonTermin
              ' Concat Rule
             lbProblemSolved =                     ParseMODELELEMENT(node) ' NonTerminal Rule: MODELELEMENT
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -24228,7 +24229,7 @@ lbProblemSolved =                         ParseWRITTENASCLAUSE(node) ' NonTermin
                     If tok.Type = TokenType.MATHFUNCTION Then
 lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Rule: MATHCLAUSE
                         If m_tree.Errors.Count > 0 Then
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
@@ -24289,7 +24290,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
              ' Concat Rule
             lbProblemSolved =                     ParseMODELELEMENT(node) ' NonTerminal Rule: MODELELEMENT
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -24301,7 +24302,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
              ' Concat Rule
             lbProblemSolved =                     ParseVALUESTRING(node) ' NonTerminal Rule: VALUESTRING
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -24373,7 +24374,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
                     m_tree.Errors.Clear
                         ParseADDITIONALMODELELEMENT(node) ' NonTerminal Rule: ADDITIONALMODELELEMENT
                         If m_tree.Errors.Count > 0 Then
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
@@ -24598,7 +24599,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
              ' Concat Rule
             lbProblemSolved =                     ParseFACTTYPESTMT(node) ' NonTerminal Rule: FACTTYPESTMT
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -24625,7 +24626,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
              ' Concat Rule
             lbProblemSolved =                     ParseFACTTYPESTMT(node) ' NonTerminal Rule: FACTTYPESTMT
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -24664,7 +24665,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
              ' Concat Rule
             lbProblemSolved =                     ParseFACTTYPEIDENTIFICATION(node) ' NonTerminal Rule: FACTTYPEIDENTIFICATION
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -24696,7 +24697,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
                          ' Concat Rule
                         lbProblemSolved =                                 ParsePREDICATECLAUSE(node) ' NonTerminal Rule: PREDICATECLAUSE
                                 If m_tree.Errors.Count > 0 Then
-                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                  If liOriginalRange >= Me.MaxDistance Then
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
@@ -24783,7 +24784,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
                         Case TokenType.PREDICATE
                     lbProblemSolved =                             ParsePREDICATECLAUSE(node) ' NonTerminal Rule: PREDICATECLAUSE
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -24820,7 +24821,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
                           m_scanner.StartPos = liOriginalRange
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
@@ -24878,7 +24879,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
                  ' Concat Rule
                 lbProblemSolved =                         ParsePREDICATECLAUSE(node) ' NonTerminal Rule: PREDICATECLAUSE
                         If m_tree.Errors.Count > 0 Then
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
@@ -25022,7 +25023,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
                         Case TokenType.KEYWDISWRITTENAS
                     lbProblemSolved =                             ParseVALUETYPEISWRITTENASSTMT(node) ' NonTerminal Rule: VALUETYPEISWRITTENASSTMT
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -25033,7 +25034,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
                         Case TokenType.KEYWDISIDENTIFIEDBYITS
                     lbProblemSolved =                             ParseENTITYTYPEISIDENTIFIEDBYITSCLAUSE(node) ' NonTerminal Rule: ENTITYTYPEISIDENTIFIEDBYITSCLAUSE
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -25044,7 +25045,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
                         Case TokenType.KEYWDISIDENTIFIEDBYITS
                     lbProblemSolved =                             ParseREFERENCEMODECLAUSE(node) ' NonTerminal Rule: REFERENCEMODECLAUSE
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -25072,7 +25073,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
                              ' Concat Rule
                             lbProblemSolved =                                     ParseFACTTYPESTMT(node) ' NonTerminal Rule: FACTTYPESTMT
                                     If m_tree.Errors.Count > 0 Then
-                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                      If liOriginalRange >= Me.MaxDistance Then
                                         Me.MaxDistance = m_scanner.StartPos
                                         max_tree = m_tree.clone
                                       End If
@@ -25104,7 +25105,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
                                          ' Concat Rule
                                         lbProblemSolved =                                                 ParseFACTTYPESTMT(node) ' NonTerminal Rule: FACTTYPESTMT
                                                 If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -25131,7 +25132,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
                              ' Concat Rule
                             lbProblemSolved =                                     ParsePREDICATECLAUSE(node) ' NonTerminal Rule: PREDICATECLAUSE
                                     If m_tree.Errors.Count > 0 Then
-                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                      If liOriginalRange >= Me.MaxDistance Then
                                         Me.MaxDistance = m_scanner.StartPos
                                         max_tree = m_tree.clone
                                       End If
@@ -25152,7 +25153,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
                                         Case TokenType.KEYWDATMOSTONE
                                     lbProblemSolved =                                             ParseBINARYFACTTYPECLAUSE(node) ' NonTerminal Rule: BINARYFACTTYPECLAUSE
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -25163,7 +25164,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
                                         Case TokenType.KEYWDONE
                                     lbProblemSolved =                                             ParseBINARYFACTTYPEMANYTOONEDEFINITIONSTMT(node) ' NonTerminal Rule: BINARYFACTTYPEMANYTOONEDEFINITIONSTMT
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -25196,7 +25197,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
                                                          ' Concat Rule
                                                         lbProblemSolved =                                                                 ParsePREDICATECLAUSE(node) ' NonTerminal Rule: PREDICATECLAUSE
                                                                 If m_tree.Errors.Count > 0 Then
-                                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                                  If liOriginalRange >= Me.MaxDistance Then
                                                                     Me.MaxDistance = m_scanner.StartPos
                                                                     max_tree = m_tree.clone
                                                                   End If
@@ -25258,13 +25259,13 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
                                         If Not lbProblemSolved Then
                                           m_tree.Errors.Clear
                                           m_scanner.StartPos = liOriginalRange
-                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                          If liOriginalRange >= Me.MaxDistance Then
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
                                     lbProblemSolved =                                         ParseBINARYFACTTYPEMANYTOONEDEFINITIONSTMT(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: BINARYFACTTYPEMANYTOONEDEFINITIONSTMT
                                         If m_tree.Errors.Count > 0 Then
-                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                          If liOriginalRange >= Me.MaxDistance Then
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
@@ -25276,7 +25277,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
                                         If Not lbProblemSolved Then
                                           m_tree.Errors.Clear
                                           m_scanner.StartPos = liOriginalRange
-                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                          If liOriginalRange >= Me.MaxDistance Then
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
@@ -25304,7 +25305,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
                                                  ' Concat Rule
                                                 lbProblemSolved =                                                         ParsePREDICATECLAUSE(node) ' NonTerminal Rule: PREDICATECLAUSE
                                                         If m_tree.Errors.Count > 0 Then
-                                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                                          If liOriginalRange >= Me.MaxDistance Then
                                                             Me.MaxDistance = m_scanner.StartPos
                                                             max_tree = m_tree.clone
                                                           End If
@@ -25364,7 +25365,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
                         Case TokenType.KEYWDISAKINDOF
                     lbProblemSolved =                             ParseSUBTYPECLAUSE(node) ' NonTerminal Rule: SUBTYPECLAUSE
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -25391,13 +25392,13 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
                           m_scanner.StartPos = liOriginalRange
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
                     lbProblemSolved =                         ParseENTITYTYPEISIDENTIFIEDBYITSCLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: ENTITYTYPEISIDENTIFIEDBYITSCLAUSE
                         If m_tree.Errors.Count > 0 Then
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
@@ -25409,13 +25410,13 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
                           m_scanner.StartPos = liOriginalRange
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
                     lbProblemSolved =                         ParseREFERENCEMODECLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: REFERENCEMODECLAUSE
                         If m_tree.Errors.Count > 0 Then
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
@@ -25427,7 +25428,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
                           m_scanner.StartPos = liOriginalRange
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
@@ -25450,7 +25451,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
                      ' Concat Rule
                     lbProblemSolved =                             ParseFACTTYPESTMT(node) ' NonTerminal Rule: FACTTYPESTMT
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -25482,7 +25483,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
                                  ' Concat Rule
                                 lbProblemSolved =                                         ParseFACTTYPESTMT(node) ' NonTerminal Rule: FACTTYPESTMT
                                         If m_tree.Errors.Count > 0 Then
-                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                          If liOriginalRange >= Me.MaxDistance Then
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
@@ -25508,7 +25509,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
                           m_scanner.StartPos = liOriginalRange
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
@@ -25516,7 +25517,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
                      ' Concat Rule
                     lbProblemSolved =                             ParsePREDICATECLAUSE(node) ' NonTerminal Rule: PREDICATECLAUSE
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -25537,7 +25538,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
                                 Case TokenType.KEYWDATMOSTONE
                             lbProblemSolved =                                     ParseBINARYFACTTYPECLAUSE(node) ' NonTerminal Rule: BINARYFACTTYPECLAUSE
                                     If m_tree.Errors.Count > 0 Then
-                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                      If liOriginalRange >= Me.MaxDistance Then
                                         Me.MaxDistance = m_scanner.StartPos
                                         max_tree = m_tree.clone
                                       End If
@@ -25548,7 +25549,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
                                 Case TokenType.KEYWDONE
                             lbProblemSolved =                                     ParseBINARYFACTTYPEMANYTOONEDEFINITIONSTMT(node) ' NonTerminal Rule: BINARYFACTTYPEMANYTOONEDEFINITIONSTMT
                                     If m_tree.Errors.Count > 0 Then
-                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                      If liOriginalRange >= Me.MaxDistance Then
                                         Me.MaxDistance = m_scanner.StartPos
                                         max_tree = m_tree.clone
                                       End If
@@ -25581,7 +25582,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
                                                  ' Concat Rule
                                                 lbProblemSolved =                                                         ParsePREDICATECLAUSE(node) ' NonTerminal Rule: PREDICATECLAUSE
                                                         If m_tree.Errors.Count > 0 Then
-                                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                                          If liOriginalRange >= Me.MaxDistance Then
                                                             Me.MaxDistance = m_scanner.StartPos
                                                             max_tree = m_tree.clone
                                                           End If
@@ -25643,13 +25644,13 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
                                 If Not lbProblemSolved Then
                                   m_tree.Errors.Clear
                                   m_scanner.StartPos = liOriginalRange
-                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                  If liOriginalRange >= Me.MaxDistance Then
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
                             lbProblemSolved =                                 ParseBINARYFACTTYPEMANYTOONEDEFINITIONSTMT(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: BINARYFACTTYPEMANYTOONEDEFINITIONSTMT
                                 If m_tree.Errors.Count > 0 Then
-                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                  If liOriginalRange >= Me.MaxDistance Then
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
@@ -25661,7 +25662,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
                                 If Not lbProblemSolved Then
                                   m_tree.Errors.Clear
                                   m_scanner.StartPos = liOriginalRange
-                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                  If liOriginalRange >= Me.MaxDistance Then
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
@@ -25689,7 +25690,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
                                          ' Concat Rule
                                         lbProblemSolved =                                                 ParsePREDICATECLAUSE(node) ' NonTerminal Rule: PREDICATECLAUSE
                                                 If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -25750,13 +25751,13 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
                           m_scanner.StartPos = liOriginalRange
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
                     lbProblemSolved =                         ParseSUBTYPECLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: SUBTYPECLAUSE
                         If m_tree.Errors.Count > 0 Then
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
@@ -25817,7 +25818,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
              ' Concat Rule
             lbProblemSolved =                     ParseNODEPROPERTYNAMEIDENTIFICATION(node) ' NonTerminal Rule: NODEPROPERTYNAMEIDENTIFICATION
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -25834,7 +25835,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
                          ' Concat Rule
                         lbProblemSolved =                                 ParsePREDICATECLAUSE(node) ' NonTerminal Rule: PREDICATECLAUSE
                                 If m_tree.Errors.Count > 0 Then
-                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                  If liOriginalRange >= Me.MaxDistance Then
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
@@ -25846,7 +25847,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
                          ' Concat Rule
                         lbProblemSolved =                                 ParseNODEPROPERTYIDENTIFICATION(node) ' NonTerminal Rule: NODEPROPERTYIDENTIFICATION
                                 If m_tree.Errors.Count > 0 Then
-                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                  If liOriginalRange >= Me.MaxDistance Then
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
@@ -26002,7 +26003,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
                 Case TokenType.SINGLEQUOTE
             lbProblemSolved =                     ParseQUOTEDIDENTIFIER(node) ' NonTerminal Rule: QUOTEDIDENTIFIER
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -26025,13 +26026,13 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
                 If Not lbProblemSolved Then
                   m_tree.Errors.Clear
                   m_scanner.StartPos = liOriginalRange
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
             lbProblemSolved =                 ParseQUOTEDIDENTIFIER(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: QUOTEDIDENTIFIER
                 If m_tree.Errors.Count > 0 Then
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
@@ -26222,7 +26223,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
                     If tok.Type = TokenType.BROPEN Then
 lbProblemSolved =                         ParseINSERTCOLUMNLIST(node) ' NonTerminal Rule: INSERTCOLUMNLIST
                         If m_tree.Errors.Count > 0 Then
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
@@ -26243,7 +26244,7 @@ lbProblemSolved =                         ParseINSERTCOLUMNLIST(node) ' NonTermi
                     If tok.Type = TokenType.KEYWDON Then
 lbProblemSolved =                         ParseONPAGESTMT(node) ' NonTerminal Rule: ONPAGESTMT
                         If m_tree.Errors.Count > 0 Then
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
@@ -26264,7 +26265,7 @@ lbProblemSolved =                         ParseONPAGESTMT(node) ' NonTerminal Ru
                     If tok.Type = TokenType.KEYWDIN Then
 lbProblemSolved =                         ParseINMODELSTMT(node) ' NonTerminal Rule: INMODELSTMT
                         If m_tree.Errors.Count > 0 Then
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
@@ -26298,7 +26299,7 @@ lbProblemSolved =                         ParseINMODELSTMT(node) ' NonTerminal R
              ' Concat Rule
             lbProblemSolved =                     ParseVALUELIST(node) ' NonTerminal Rule: VALUELIST
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -26352,7 +26353,7 @@ lbProblemSolved =                         ParseINMODELSTMT(node) ' NonTerminal R
              ' Concat Rule
             lbProblemSolved =                     ParseFACTREADING(node) ' NonTerminal Rule: FACTREADING
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -26406,7 +26407,7 @@ lbProblemSolved =                         ParseINMODELSTMT(node) ' NonTerminal R
              ' Concat Rule
             lbProblemSolved =                     ParseMODELELEMENTPLURAL(node) ' NonTerminal Rule: MODELELEMENTPLURAL
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -26460,7 +26461,7 @@ lbProblemSolved =                         ParseINMODELSTMT(node) ' NonTerminal R
              ' Concat Rule
             lbProblemSolved =                     ParseMATCHFACTTYPEPREDICATE(node) ' NonTerminal Rule: MATCHFACTTYPEPREDICATE
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -26472,7 +26473,7 @@ lbProblemSolved =                         ParseINMODELSTMT(node) ' NonTerminal R
              ' Concat Rule
             lbProblemSolved =                     ParseSETCLAUSE(node) ' NonTerminal Rule: SETCLAUSE
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -26526,7 +26527,7 @@ lbProblemSolved =                         ParseINMODELSTMT(node) ' NonTerminal R
              ' Concat Rule
             lbProblemSolved =                     ParseMATCHFACTTYPEPREDICATE(node) ' NonTerminal Rule: MATCHFACTTYPEPREDICATE
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -26538,7 +26539,7 @@ lbProblemSolved =                         ParseINMODELSTMT(node) ' NonTerminal R
              ' Concat Rule
             lbProblemSolved =                     ParseSETCLAUSE(node) ' NonTerminal Rule: SETCLAUSE
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -26615,7 +26616,7 @@ lbProblemSolved =                         ParseINMODELSTMT(node) ' NonTerminal R
                         Case TokenType.PREBOUNDREADINGTEXT
                     lbProblemSolved =                             ParseMODELELEMENT(node) ' NonTerminal Rule: MODELELEMENT
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -26626,7 +26627,7 @@ lbProblemSolved =                         ParseINMODELSTMT(node) ' NonTerminal R
                         Case TokenType.MODELELEMENTNAME
                     lbProblemSolved =                             ParseMODELELEMENT(node) ' NonTerminal Rule: MODELELEMENT
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -26650,13 +26651,13 @@ lbProblemSolved =                         ParseINMODELSTMT(node) ' NonTerminal R
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
                           m_scanner.StartPos = liOriginalRange
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
                     lbProblemSolved =                         ParseMODELELEMENT(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: MODELELEMENT
                         If m_tree.Errors.Count > 0 Then
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
@@ -26678,7 +26679,7 @@ lbProblemSolved =                         ParseINMODELSTMT(node) ' NonTerminal R
                     m_tree.Errors.Clear
                         ParseEXPRESSION(node) ' NonTerminal Rule: EXPRESSION
                         If m_tree.Errors.Count > 0 Then
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
@@ -26738,7 +26739,7 @@ lbProblemSolved =                         ParseINMODELSTMT(node) ' NonTerminal R
              ' Concat Rule
             lbProblemSolved =                     ParseMATCHFACTTYPEPREDICATE(node) ' NonTerminal Rule: MATCHFACTTYPEPREDICATE
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -26758,7 +26759,7 @@ lbProblemSolved =                         ParseINMODELSTMT(node) ' NonTerminal R
                         Case TokenType.KEYWDSET
                     lbProblemSolved =                             ParseSETCLAUSE(node) ' NonTerminal Rule: SETCLAUSE
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -26769,7 +26770,7 @@ lbProblemSolved =                         ParseINMODELSTMT(node) ' NonTerminal R
                         Case TokenType.KEYWDRETURN
                     lbProblemSolved =                             ParseRETURNCLAUSE(node) ' NonTerminal Rule: RETURNCLAUSE
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -26792,13 +26793,13 @@ lbProblemSolved =                         ParseINMODELSTMT(node) ' NonTerminal R
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
                           m_scanner.StartPos = liOriginalRange
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
                     lbProblemSolved =                         ParseRETURNCLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: RETURNCLAUSE
                         If m_tree.Errors.Count > 0 Then
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
@@ -27033,7 +27034,7 @@ lbProblemSolved =                         ParseINMODELSTMT(node) ' NonTerminal R
              ' Concat Rule
             lbProblemSolved =                     ParseRETURNCOLUMN(node) ' NonTerminal Rule: RETURNCOLUMN
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -27065,7 +27066,7 @@ lbProblemSolved =                         ParseINMODELSTMT(node) ' NonTerminal R
                          ' Concat Rule
                         lbProblemSolved =                                 ParseRETURNCOLUMN(node) ' NonTerminal Rule: RETURNCOLUMN
                                 If m_tree.Errors.Count > 0 Then
-                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                  If liOriginalRange >= Me.MaxDistance Then
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
@@ -27114,7 +27115,7 @@ lbProblemSolved =                         ParseINMODELSTMT(node) ' NonTerminal R
              ' Concat Rule
             lbProblemSolved =                     ParsePREDICATECLAUSE(node) ' NonTerminal Rule: PREDICATECLAUSE
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -27126,7 +27127,7 @@ lbProblemSolved =                         ParseINMODELSTMT(node) ' NonTerminal R
              ' Concat Rule
             lbProblemSolved =                     ParseNODE(node) ' NonTerminal Rule: NODE
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -27204,7 +27205,7 @@ lbProblemSolved =                         ParseINMODELSTMT(node) ' NonTerminal R
              ' Concat Rule
             lbProblemSolved =                     ParseCOLUMNLIST(node) ' NonTerminal Rule: COLUMNLIST
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -27248,7 +27249,7 @@ lbProblemSolved =                         ParseINMODELSTMT(node) ' NonTerminal R
                     If tok.Type = TokenType.KEYWDON Then
 lbProblemSolved =                         ParseONPAGESTMT(node) ' NonTerminal Rule: ONPAGESTMT
                         If m_tree.Errors.Count > 0 Then
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
@@ -27269,7 +27270,7 @@ lbProblemSolved =                         ParseONPAGESTMT(node) ' NonTerminal Ru
                     If tok.Type = TokenType.KEYWDWHERE Then
 lbProblemSolved =                         ParseWHERESTMT(node) ' NonTerminal Rule: WHERESTMT
                         If m_tree.Errors.Count > 0 Then
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
@@ -27444,7 +27445,7 @@ lbProblemSolved =                         ParseWHERESTMT(node) ' NonTerminal Rul
              ' Concat Rule
             lbProblemSolved =                     ParseFACTTYPEIDENTIFICATION(node) ' NonTerminal Rule: FACTTYPEIDENTIFICATION
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -27589,7 +27590,7 @@ lbProblemSolved =                         ParseWHERESTMT(node) ' NonTerminal Rul
                                     Case TokenType.BROPEN
                                 lbProblemSolved =                                         ParseNODEIDENTIFICATION(node) ' NonTerminal Rule: NODEIDENTIFICATION
                                         If m_tree.Errors.Count > 0 Then
-                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                          If liOriginalRange >= Me.MaxDistance Then
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
@@ -27647,7 +27648,7 @@ lbProblemSolved =                         ParseWHERESTMT(node) ' NonTerminal Rul
                                     If Not lbProblemSolved Then
                                       m_tree.Errors.Clear
                                       m_scanner.StartPos = liOriginalRange
-                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                      If liOriginalRange >= Me.MaxDistance Then
                                         Me.MaxDistance = m_scanner.StartPos
                                         max_tree = m_tree.clone
                                       End If
@@ -27778,7 +27779,7 @@ lbProblemSolved =                         ParseWHERESTMT(node) ' NonTerminal Rul
              ' Concat Rule
             lbProblemSolved =                     ParseCOLUMNNAME(node) ' NonTerminal Rule: COLUMNNAME
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -27805,7 +27806,7 @@ lbProblemSolved =                         ParseWHERESTMT(node) ' NonTerminal Rul
              ' Concat Rule
             lbProblemSolved =                     ParseVALUESTRING(node) ' NonTerminal Rule: VALUESTRING
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -27832,7 +27833,7 @@ lbProblemSolved =                         ParseWHERESTMT(node) ' NonTerminal Rul
              ' Concat Rule
             lbProblemSolved =                     ParseCOLUMNNAME(node) ' NonTerminal Rule: COLUMNNAME
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -27859,7 +27860,7 @@ lbProblemSolved =                         ParseWHERESTMT(node) ' NonTerminal Rul
              ' Concat Rule
             lbProblemSolved =                     ParseVALUESTRING(node) ' NonTerminal Rule: VALUESTRING
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -27948,7 +27949,7 @@ lbProblemSolved =                         ParseWHERESTMT(node) ' NonTerminal Rul
                         Case TokenType.KEYWDDATATYPELOGICALTRUEFALSE
                     lbProblemSolved =                             ParseDATATYPE(node) ' NonTerminal Rule: DATATYPE
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -27959,7 +27960,7 @@ lbProblemSolved =                         ParseWHERESTMT(node) ' NonTerminal Rul
                         Case TokenType.KEYWDDATATYPELOGICALYESNO
                     lbProblemSolved =                             ParseDATATYPE(node) ' NonTerminal Rule: DATATYPE
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -27970,7 +27971,7 @@ lbProblemSolved =                         ParseWHERESTMT(node) ' NonTerminal Rul
                         Case TokenType.KEYWDDATATYPEAUTOCOUNTER
                     lbProblemSolved =                             ParseDATATYPE(node) ' NonTerminal Rule: DATATYPE
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -27981,7 +27982,7 @@ lbProblemSolved =                         ParseWHERESTMT(node) ' NonTerminal Rul
                         Case TokenType.KEYWDDATATYPEFLOATDOUBLEPRECISION
                     lbProblemSolved =                             ParseDATATYPE(node) ' NonTerminal Rule: DATATYPE
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -27992,7 +27993,7 @@ lbProblemSolved =                         ParseWHERESTMT(node) ' NonTerminal Rul
                         Case TokenType.KEYWDDATATYPEFLOATSINGLEPRECISION
                     lbProblemSolved =                             ParseDATATYPE(node) ' NonTerminal Rule: DATATYPE
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -28003,7 +28004,7 @@ lbProblemSolved =                         ParseWHERESTMT(node) ' NonTerminal Rul
                         Case TokenType.KEYWDDATATYPESIGNEDBIGINTEGER
                     lbProblemSolved =                             ParseDATATYPE(node) ' NonTerminal Rule: DATATYPE
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -28014,7 +28015,7 @@ lbProblemSolved =                         ParseWHERESTMT(node) ' NonTerminal Rul
                         Case TokenType.KEYWDDATATYPESIGNEDINTEGER
                     lbProblemSolved =                             ParseDATATYPE(node) ' NonTerminal Rule: DATATYPE
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -28025,7 +28026,7 @@ lbProblemSolved =                         ParseWHERESTMT(node) ' NonTerminal Rul
                         Case TokenType.KEYWDDATATYPESIGNEDSMALLINTEGER
                     lbProblemSolved =                             ParseDATATYPE(node) ' NonTerminal Rule: DATATYPE
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -28036,7 +28037,7 @@ lbProblemSolved =                         ParseWHERESTMT(node) ' NonTerminal Rul
                         Case TokenType.KEYWDDATATYPEUNSIGNEDBIGINTEGER
                     lbProblemSolved =                             ParseDATATYPE(node) ' NonTerminal Rule: DATATYPE
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -28047,7 +28048,7 @@ lbProblemSolved =                         ParseWHERESTMT(node) ' NonTerminal Rul
                         Case TokenType.KEYWDDATATYPEUNSIGNEDINTEGER
                     lbProblemSolved =                             ParseDATATYPE(node) ' NonTerminal Rule: DATATYPE
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -28058,7 +28059,7 @@ lbProblemSolved =                         ParseWHERESTMT(node) ' NonTerminal Rul
                         Case TokenType.KEYWDDATATYPEUNSIGNEDSMALLINTEGER
                     lbProblemSolved =                             ParseDATATYPE(node) ' NonTerminal Rule: DATATYPE
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -28069,7 +28070,7 @@ lbProblemSolved =                         ParseWHERESTMT(node) ' NonTerminal Rul
                         Case TokenType.KEYWDDATATYPEUNSIGNEDTINYINTEGER
                     lbProblemSolved =                             ParseDATATYPE(node) ' NonTerminal Rule: DATATYPE
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -28080,7 +28081,7 @@ lbProblemSolved =                         ParseWHERESTMT(node) ' NonTerminal Rul
                         Case TokenType.KEYWDDATATYPEOBJECTID
                     lbProblemSolved =                             ParseDATATYPE(node) ' NonTerminal Rule: DATATYPE
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -28091,7 +28092,7 @@ lbProblemSolved =                         ParseWHERESTMT(node) ' NonTerminal Rul
                         Case TokenType.KEYWDDATATYPEROWID
                     lbProblemSolved =                             ParseDATATYPE(node) ' NonTerminal Rule: DATATYPE
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -28102,7 +28103,7 @@ lbProblemSolved =                         ParseWHERESTMT(node) ' NonTerminal Rul
                         Case TokenType.KEYWDDATATYPERAWDATAOLEOBJECT
                     lbProblemSolved =                             ParseDATATYPE(node) ' NonTerminal Rule: DATATYPE
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -28113,7 +28114,7 @@ lbProblemSolved =                         ParseWHERESTMT(node) ' NonTerminal Rul
                         Case TokenType.KEYWDDATATYPERAWDATA
                     lbProblemSolved =                             ParseDATATYPE(node) ' NonTerminal Rule: DATATYPE
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -28124,7 +28125,7 @@ lbProblemSolved =                         ParseWHERESTMT(node) ' NonTerminal Rul
                         Case TokenType.KEYWDDATATYPEAUTOTIMESTAMP
                     lbProblemSolved =                             ParseDATATYPE(node) ' NonTerminal Rule: DATATYPE
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -28135,7 +28136,7 @@ lbProblemSolved =                         ParseWHERESTMT(node) ' NonTerminal Rul
                         Case TokenType.KEYWDDATATYPEDATE
                     lbProblemSolved =                             ParseDATATYPE(node) ' NonTerminal Rule: DATATYPE
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -28146,7 +28147,7 @@ lbProblemSolved =                         ParseWHERESTMT(node) ' NonTerminal Rul
                         Case TokenType.KEYWDDATATYPEDATETIME
                     lbProblemSolved =                             ParseDATATYPE(node) ' NonTerminal Rule: DATATYPE
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -28157,7 +28158,7 @@ lbProblemSolved =                         ParseWHERESTMT(node) ' NonTerminal Rul
                         Case TokenType.KEYWDDATATYPETIME
                     lbProblemSolved =                             ParseDATATYPE(node) ' NonTerminal Rule: DATATYPE
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -28168,7 +28169,7 @@ lbProblemSolved =                         ParseWHERESTMT(node) ' NonTerminal Rul
                         Case TokenType.KEYWDDATATYPERAWDATAFIXEDLENGTH
                     lbProblemSolved =                             ParseDATATYPELENGTH(node) ' NonTerminal Rule: DATATYPELENGTH
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -28179,7 +28180,7 @@ lbProblemSolved =                         ParseWHERESTMT(node) ' NonTerminal Rul
                         Case TokenType.KEYWDDATATYPERAWDATALARGELENGTH
                     lbProblemSolved =                             ParseDATATYPELENGTH(node) ' NonTerminal Rule: DATATYPELENGTH
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -28190,7 +28191,7 @@ lbProblemSolved =                         ParseWHERESTMT(node) ' NonTerminal Rul
                         Case TokenType.KEYWDDATATYPERAWDATAVARIABLELENGTH
                     lbProblemSolved =                             ParseDATATYPELENGTH(node) ' NonTerminal Rule: DATATYPELENGTH
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -28201,7 +28202,7 @@ lbProblemSolved =                         ParseWHERESTMT(node) ' NonTerminal Rul
                         Case TokenType.KEYWDDATATYPESTRINGFIXEDLENGTH
                     lbProblemSolved =                             ParseDATATYPELENGTH(node) ' NonTerminal Rule: DATATYPELENGTH
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -28212,7 +28213,7 @@ lbProblemSolved =                         ParseWHERESTMT(node) ' NonTerminal Rul
                         Case TokenType.KEYWDDATATYPESTRINGLARGELENGTH
                     lbProblemSolved =                             ParseDATATYPELENGTH(node) ' NonTerminal Rule: DATATYPELENGTH
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -28223,7 +28224,7 @@ lbProblemSolved =                         ParseWHERESTMT(node) ' NonTerminal Rul
                         Case TokenType.KEYWDDATATYPESTRINGVARIABLELENGTH
                     lbProblemSolved =                             ParseDATATYPELENGTH(node) ' NonTerminal Rule: DATATYPELENGTH
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -28234,7 +28235,7 @@ lbProblemSolved =                         ParseWHERESTMT(node) ' NonTerminal Rul
                         Case TokenType.KEYWDDATATYPEFLOATCUSTOMPRECISION
                     lbProblemSolved =                             ParseDATATYPEPRECISION(node) ' NonTerminal Rule: DATATYPEPRECISION
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -28245,7 +28246,7 @@ lbProblemSolved =                         ParseWHERESTMT(node) ' NonTerminal Rul
                         Case TokenType.KEYWDDATATYPEDECIMAL
                     lbProblemSolved =                             ParseDATATYPEPRECISION(node) ' NonTerminal Rule: DATATYPEPRECISION
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -28256,7 +28257,7 @@ lbProblemSolved =                         ParseWHERESTMT(node) ' NonTerminal Rul
                         Case TokenType.KEYWDDATATYPEMONEY
                     lbProblemSolved =                             ParseDATATYPEPRECISION(node) ' NonTerminal Rule: DATATYPEPRECISION
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -28306,13 +28307,13 @@ lbProblemSolved =                         ParseWHERESTMT(node) ' NonTerminal Rul
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
                           m_scanner.StartPos = liOriginalRange
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
                     lbProblemSolved =                         ParseDATATYPELENGTH(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: DATATYPELENGTH
                         If m_tree.Errors.Count > 0 Then
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
@@ -28324,13 +28325,13 @@ lbProblemSolved =                         ParseWHERESTMT(node) ' NonTerminal Rul
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
                           m_scanner.StartPos = liOriginalRange
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
                     lbProblemSolved =                         ParseDATATYPEPRECISION(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: DATATYPEPRECISION
                         If m_tree.Errors.Count > 0 Then
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
@@ -28391,7 +28392,7 @@ lbProblemSolved =                         ParseWHERESTMT(node) ' NonTerminal Rul
              ' Concat Rule
             lbProblemSolved =                     ParseCOMPARISON(node) ' NonTerminal Rule: COMPARISON
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -28406,7 +28407,7 @@ lbProblemSolved =                         ParseWHERESTMT(node) ' NonTerminal Rul
                     m_tree.Errors.Clear
                         ParseADDITIONALCOMPARISON(node) ' NonTerminal Rule: ADDITIONALCOMPARISON
                         If m_tree.Errors.Count > 0 Then
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
@@ -28505,7 +28506,7 @@ lbProblemSolved =                         ParseWHERESTMT(node) ' NonTerminal Rul
                              ' Concat Rule
                             lbProblemSolved =                                     ParsePREDICATECLAUSE(node) ' NonTerminal Rule: PREDICATECLAUSE
                                     If m_tree.Errors.Count > 0 Then
-                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                      If liOriginalRange >= Me.MaxDistance Then
                                         Me.MaxDistance = m_scanner.StartPos
                                         max_tree = m_tree.clone
                                       End If
@@ -28519,7 +28520,7 @@ lbProblemSolved =                         ParseWHERESTMT(node) ' NonTerminal Rul
                                     If tok.Type = TokenType.OPENSQUAREBRACKET Then
 lbProblemSolved =                                         ParseRECURSIVECLAUSE(node) ' NonTerminal Rule: RECURSIVECLAUSE
                                         If m_tree.Errors.Count > 0 Then
-                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                          If liOriginalRange >= Me.MaxDistance Then
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
@@ -28553,7 +28554,7 @@ lbProblemSolved =                                         ParseRECURSIVECLAUSE(n
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
                           m_scanner.StartPos = liOriginalRange
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
@@ -28561,7 +28562,7 @@ lbProblemSolved =                                         ParseRECURSIVECLAUSE(n
                      ' Concat Rule
                     lbProblemSolved =                             ParsePREDICATECLAUSE(node) ' NonTerminal Rule: PREDICATECLAUSE
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -28575,7 +28576,7 @@ lbProblemSolved =                                         ParseRECURSIVECLAUSE(n
                             If tok.Type = TokenType.OPENSQUAREBRACKET Then
 lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' NonTerminal Rule: RECURSIVECLAUSE
                                 If m_tree.Errors.Count > 0 Then
-                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                  If liOriginalRange >= Me.MaxDistance Then
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
@@ -28649,7 +28650,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                              ' Concat Rule
                             lbProblemSolved =                                     ParsePREDICATECLAUSE(node) ' NonTerminal Rule: PREDICATECLAUSE
                                     If m_tree.Errors.Count > 0 Then
-                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                      If liOriginalRange >= Me.MaxDistance Then
                                         Me.MaxDistance = m_scanner.StartPos
                                         max_tree = m_tree.clone
                                       End If
@@ -28663,7 +28664,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                     If tok.Type = TokenType.OPENSQUAREBRACKET Then
 lbProblemSolved =                                         ParseRECURSIVECLAUSE(node) ' NonTerminal Rule: RECURSIVECLAUSE
                                         If m_tree.Errors.Count > 0 Then
-                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                          If liOriginalRange >= Me.MaxDistance Then
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
@@ -28697,7 +28698,7 @@ lbProblemSolved =                                         ParseRECURSIVECLAUSE(n
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
                           m_scanner.StartPos = liOriginalRange
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
@@ -28705,7 +28706,7 @@ lbProblemSolved =                                         ParseRECURSIVECLAUSE(n
                      ' Concat Rule
                     lbProblemSolved =                             ParsePREDICATECLAUSE(node) ' NonTerminal Rule: PREDICATECLAUSE
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -28719,7 +28720,7 @@ lbProblemSolved =                                         ParseRECURSIVECLAUSE(n
                             If tok.Type = TokenType.OPENSQUAREBRACKET Then
 lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' NonTerminal Rule: RECURSIVECLAUSE
                                 If m_tree.Errors.Count > 0 Then
-                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                  If liOriginalRange >= Me.MaxDistance Then
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
@@ -28774,7 +28775,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                 Case TokenType.PREDICATE
                             lbProblemSolved =                                     ParsePREDICATECLAUSE(node) ' NonTerminal Rule: PREDICATECLAUSE
                                     If m_tree.Errors.Count > 0 Then
-                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                      If liOriginalRange >= Me.MaxDistance Then
                                         Me.MaxDistance = m_scanner.StartPos
                                         max_tree = m_tree.clone
                                       End If
@@ -28787,7 +28788,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                      ' Concat Rule
                                     lbProblemSolved =                                             ParseMODELELEMENT(node) ' NonTerminal Rule: MODELELEMENT
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -28856,7 +28857,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                                         If Not lbProblemSolved Then
                                                           m_tree.Errors.Clear
                                                           m_scanner.StartPos = liOriginalRange
-                                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                                          If liOriginalRange >= Me.MaxDistance Then
                                                             Me.MaxDistance = m_scanner.StartPos
                                                             max_tree = m_tree.clone
                                                           End If
@@ -28931,7 +28932,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                                         If Not lbProblemSolved Then
                                                           m_tree.Errors.Clear
                                                           m_scanner.StartPos = liOriginalRange
-                                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                                          If liOriginalRange >= Me.MaxDistance Then
                                                             Me.MaxDistance = m_scanner.StartPos
                                                             max_tree = m_tree.clone
                                                           End If
@@ -28958,7 +28959,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                                 Case TokenType.PREDICATE
                                             lbProblemSolved =                                                     ParsePREDICATECLAUSE(node) ' NonTerminal Rule: PREDICATECLAUSE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -28982,13 +28983,13 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
                                             lbProblemSolved =                                                 ParsePREDICATECLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: PREDICATECLAUSE
                                                 If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -29012,7 +29013,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                      ' Concat Rule
                                     lbProblemSolved =                                             ParseMODELELEMENT(node) ' NonTerminal Rule: MODELELEMENT
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -29081,7 +29082,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                                         If Not lbProblemSolved Then
                                                           m_tree.Errors.Clear
                                                           m_scanner.StartPos = liOriginalRange
-                                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                                          If liOriginalRange >= Me.MaxDistance Then
                                                             Me.MaxDistance = m_scanner.StartPos
                                                             max_tree = m_tree.clone
                                                           End If
@@ -29156,7 +29157,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                                         If Not lbProblemSolved Then
                                                           m_tree.Errors.Clear
                                                           m_scanner.StartPos = liOriginalRange
-                                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                                          If liOriginalRange >= Me.MaxDistance Then
                                                             Me.MaxDistance = m_scanner.StartPos
                                                             max_tree = m_tree.clone
                                                           End If
@@ -29183,7 +29184,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                                 Case TokenType.PREDICATE
                                             lbProblemSolved =                                                     ParsePREDICATECLAUSE(node) ' NonTerminal Rule: PREDICATECLAUSE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -29207,13 +29208,13 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
                                             lbProblemSolved =                                                 ParsePREDICATECLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: PREDICATECLAUSE
                                                 If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -29248,7 +29249,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                 If Not lbProblemSolved Then
                                   m_tree.Errors.Clear
                                   m_scanner.StartPos = liOriginalRange
-                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                  If liOriginalRange >= Me.MaxDistance Then
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
@@ -29256,7 +29257,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                              ' Concat Rule
                             lbProblemSolved =                                     ParseMODELELEMENT(node) ' NonTerminal Rule: MODELELEMENT
                                     If m_tree.Errors.Count > 0 Then
-                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                      If liOriginalRange >= Me.MaxDistance Then
                                         Me.MaxDistance = m_scanner.StartPos
                                         max_tree = m_tree.clone
                                       End If
@@ -29325,7 +29326,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -29400,7 +29401,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -29427,7 +29428,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                         Case TokenType.PREDICATE
                                     lbProblemSolved =                                             ParsePREDICATECLAUSE(node) ' NonTerminal Rule: PREDICATECLAUSE
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -29451,13 +29452,13 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                         If Not lbProblemSolved Then
                                           m_tree.Errors.Clear
                                           m_scanner.StartPos = liOriginalRange
-                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                          If liOriginalRange >= Me.MaxDistance Then
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
                                     lbProblemSolved =                                         ParsePREDICATECLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: PREDICATECLAUSE
                                         If m_tree.Errors.Count > 0 Then
-                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                          If liOriginalRange >= Me.MaxDistance Then
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
@@ -29492,7 +29493,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                      ' Concat Rule
                     lbProblemSolved =                             ParseMODELELEMENT(node) ' NonTerminal Rule: MODELELEMENT
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -29526,7 +29527,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                 Case TokenType.PREDICATE
                             lbProblemSolved =                                     ParsePREDICATECLAUSE(node) ' NonTerminal Rule: PREDICATECLAUSE
                                     If m_tree.Errors.Count > 0 Then
-                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                      If liOriginalRange >= Me.MaxDistance Then
                                         Me.MaxDistance = m_scanner.StartPos
                                         max_tree = m_tree.clone
                                       End If
@@ -29549,13 +29550,13 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                 If Not lbProblemSolved Then
                                   m_tree.Errors.Clear
                                   m_scanner.StartPos = liOriginalRange
-                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                  If liOriginalRange >= Me.MaxDistance Then
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
                             lbProblemSolved =                                 ParsePREDICATECLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: PREDICATECLAUSE
                                 If m_tree.Errors.Count > 0 Then
-                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                  If liOriginalRange >= Me.MaxDistance Then
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
@@ -29579,7 +29580,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                      ' Concat Rule
                     lbProblemSolved =                             ParseMODELELEMENT(node) ' NonTerminal Rule: MODELELEMENT
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -29613,7 +29614,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                 Case TokenType.PREDICATE
                             lbProblemSolved =                                     ParsePREDICATECLAUSE(node) ' NonTerminal Rule: PREDICATECLAUSE
                                     If m_tree.Errors.Count > 0 Then
-                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                      If liOriginalRange >= Me.MaxDistance Then
                                         Me.MaxDistance = m_scanner.StartPos
                                         max_tree = m_tree.clone
                                       End If
@@ -29636,13 +29637,13 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                 If Not lbProblemSolved Then
                                   m_tree.Errors.Clear
                                   m_scanner.StartPos = liOriginalRange
-                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                  If liOriginalRange >= Me.MaxDistance Then
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
                             lbProblemSolved =                                 ParsePREDICATECLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: PREDICATECLAUSE
                                 If m_tree.Errors.Count > 0 Then
-                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                  If liOriginalRange >= Me.MaxDistance Then
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
@@ -29679,7 +29680,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                 If Not lbProblemSolved Then
                   m_tree.Errors.Clear
                   m_scanner.StartPos = liOriginalRange
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
@@ -29711,7 +29712,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                         Case TokenType.PREDICATE
                     lbProblemSolved =                             ParsePREDICATECLAUSE(node) ' NonTerminal Rule: PREDICATECLAUSE
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -29724,7 +29725,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                              ' Concat Rule
                             lbProblemSolved =                                     ParseMODELELEMENT(node) ' NonTerminal Rule: MODELELEMENT
                                     If m_tree.Errors.Count > 0 Then
-                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                      If liOriginalRange >= Me.MaxDistance Then
                                         Me.MaxDistance = m_scanner.StartPos
                                         max_tree = m_tree.clone
                                       End If
@@ -29793,7 +29794,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -29868,7 +29869,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -29895,7 +29896,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                         Case TokenType.PREDICATE
                                     lbProblemSolved =                                             ParsePREDICATECLAUSE(node) ' NonTerminal Rule: PREDICATECLAUSE
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -29919,13 +29920,13 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                         If Not lbProblemSolved Then
                                           m_tree.Errors.Clear
                                           m_scanner.StartPos = liOriginalRange
-                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                          If liOriginalRange >= Me.MaxDistance Then
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
                                     lbProblemSolved =                                         ParsePREDICATECLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: PREDICATECLAUSE
                                         If m_tree.Errors.Count > 0 Then
-                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                          If liOriginalRange >= Me.MaxDistance Then
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
@@ -29949,7 +29950,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                              ' Concat Rule
                             lbProblemSolved =                                     ParseMODELELEMENT(node) ' NonTerminal Rule: MODELELEMENT
                                     If m_tree.Errors.Count > 0 Then
-                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                      If liOriginalRange >= Me.MaxDistance Then
                                         Me.MaxDistance = m_scanner.StartPos
                                         max_tree = m_tree.clone
                                       End If
@@ -30018,7 +30019,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -30093,7 +30094,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -30120,7 +30121,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                         Case TokenType.PREDICATE
                                     lbProblemSolved =                                             ParsePREDICATECLAUSE(node) ' NonTerminal Rule: PREDICATECLAUSE
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -30144,13 +30145,13 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                         If Not lbProblemSolved Then
                                           m_tree.Errors.Clear
                                           m_scanner.StartPos = liOriginalRange
-                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                          If liOriginalRange >= Me.MaxDistance Then
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
                                     lbProblemSolved =                                         ParsePREDICATECLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: PREDICATECLAUSE
                                         If m_tree.Errors.Count > 0 Then
-                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                          If liOriginalRange >= Me.MaxDistance Then
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
@@ -30185,7 +30186,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
                           m_scanner.StartPos = liOriginalRange
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
@@ -30193,7 +30194,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                      ' Concat Rule
                     lbProblemSolved =                             ParseMODELELEMENT(node) ' NonTerminal Rule: MODELELEMENT
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -30262,7 +30263,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                         If Not lbProblemSolved Then
                                           m_tree.Errors.Clear
                                           m_scanner.StartPos = liOriginalRange
-                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                          If liOriginalRange >= Me.MaxDistance Then
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
@@ -30337,7 +30338,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                         If Not lbProblemSolved Then
                                           m_tree.Errors.Clear
                                           m_scanner.StartPos = liOriginalRange
-                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                          If liOriginalRange >= Me.MaxDistance Then
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
@@ -30364,7 +30365,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                 Case TokenType.PREDICATE
                             lbProblemSolved =                                     ParsePREDICATECLAUSE(node) ' NonTerminal Rule: PREDICATECLAUSE
                                     If m_tree.Errors.Count > 0 Then
-                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                      If liOriginalRange >= Me.MaxDistance Then
                                         Me.MaxDistance = m_scanner.StartPos
                                         max_tree = m_tree.clone
                                       End If
@@ -30388,13 +30389,13 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                 If Not lbProblemSolved Then
                                   m_tree.Errors.Clear
                                   m_scanner.StartPos = liOriginalRange
-                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                  If liOriginalRange >= Me.MaxDistance Then
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
                             lbProblemSolved =                                 ParsePREDICATECLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: PREDICATECLAUSE
                                 If m_tree.Errors.Count > 0 Then
-                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                  If liOriginalRange >= Me.MaxDistance Then
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
@@ -30428,7 +30429,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                 If Not lbProblemSolved Then
                   m_tree.Errors.Clear
                   m_scanner.StartPos = liOriginalRange
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
@@ -30436,7 +30437,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
              ' Concat Rule
             lbProblemSolved =                     ParseMODELELEMENT(node) ' NonTerminal Rule: MODELELEMENT
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -30470,7 +30471,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                         Case TokenType.PREDICATE
                     lbProblemSolved =                             ParsePREDICATECLAUSE(node) ' NonTerminal Rule: PREDICATECLAUSE
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -30493,13 +30494,13 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
                           m_scanner.StartPos = liOriginalRange
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
                     lbProblemSolved =                         ParsePREDICATECLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: PREDICATECLAUSE
                         If m_tree.Errors.Count > 0 Then
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
@@ -30618,7 +30619,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                             If Not lbProblemSolved Then
                               m_tree.Errors.Clear
                               m_scanner.StartPos = liOriginalRange
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -30639,7 +30640,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                             If Not lbProblemSolved Then
                               m_tree.Errors.Clear
                               m_scanner.StartPos = liOriginalRange
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -30697,7 +30698,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                             Case TokenType.KEYWDWITH
                         lbProblemSolved =                                 ParseWITHCLAUSE(node) ' NonTerminal Rule: WITHCLAUSE
                                 If m_tree.Errors.Count > 0 Then
-                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                  If liOriginalRange >= Me.MaxDistance Then
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
@@ -30712,7 +30713,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                         If tok.Type = TokenType.KEYWDIS Or tok.Type = TokenType.PREDICATE Or tok.Type = TokenType.KEYWDTHAT Or tok.Type = TokenType.PREBOUNDREADINGTEXT Or tok.Type = TokenType.MODELELEMENTNAME Then
 lbProblemSolved =                                             ParseWHICHTHATCLAUSE(node) ' NonTerminal Rule: WHICHTHATCLAUSE
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -30845,7 +30846,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -30866,7 +30867,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -30887,7 +30888,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -30908,7 +30909,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -30929,7 +30930,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -30977,7 +30978,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.NUMBER
                                             lbProblemSolved =                                                     ParseINDIVIDUALIDENTIFIER(node) ' NonTerminal Rule: INDIVIDUALIDENTIFIER
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -30988,7 +30989,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.SINGLEQUOTE
                                             lbProblemSolved =                                                     ParseINDIVIDUALIDENTIFIER(node) ' NonTerminal Rule: INDIVIDUALIDENTIFIER
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -30999,7 +31000,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.PREBOUNDREADINGTEXT
                                             lbProblemSolved =                                                     ParseNODE(node) ' NonTerminal Rule: NODE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -31010,7 +31011,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.MODELELEMENTNAME
                                             lbProblemSolved =                                                     ParseNODE(node) ' NonTerminal Rule: NODE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -31021,7 +31022,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.BROPEN
                                             lbProblemSolved =                                                     ParseNODE(node) ' NonTerminal Rule: NODE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -31047,13 +31048,13 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
                                             lbProblemSolved =                                                 ParseNODE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: NODE
                                                 If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -31089,7 +31090,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.PREDICATE
                                             lbProblemSolved =                                                     ParseFOLLOWINGREADINGTEXT(node) ' NonTerminal Rule: FOLLOWINGREADINGTEXT
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -31100,7 +31101,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.MATHFUNCTION
                                             lbProblemSolved =                                                     ParseMATHCLAUSE(node) ' NonTerminal Rule: MATHCLAUSE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -31123,13 +31124,13 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
                                             lbProblemSolved =                                                 ParseMATHCLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: MATHCLAUSE
                                                 If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -31162,7 +31163,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                         If tok.Type = TokenType.KEYWDIS Or tok.Type = TokenType.PREDICATE Or tok.Type = TokenType.KEYWDTHAT Or tok.Type = TokenType.PREBOUNDREADINGTEXT Or tok.Type = TokenType.MODELELEMENTNAME Then
 lbProblemSolved =                                             ParseWHICHTHATCLAUSE(node) ' NonTerminal Rule: WHICHTHATCLAUSE
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -31295,7 +31296,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -31316,7 +31317,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -31337,7 +31338,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -31358,7 +31359,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -31379,7 +31380,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -31427,7 +31428,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.NUMBER
                                             lbProblemSolved =                                                     ParseINDIVIDUALIDENTIFIER(node) ' NonTerminal Rule: INDIVIDUALIDENTIFIER
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -31438,7 +31439,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.SINGLEQUOTE
                                             lbProblemSolved =                                                     ParseINDIVIDUALIDENTIFIER(node) ' NonTerminal Rule: INDIVIDUALIDENTIFIER
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -31449,7 +31450,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.PREBOUNDREADINGTEXT
                                             lbProblemSolved =                                                     ParseNODE(node) ' NonTerminal Rule: NODE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -31460,7 +31461,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.MODELELEMENTNAME
                                             lbProblemSolved =                                                     ParseNODE(node) ' NonTerminal Rule: NODE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -31471,7 +31472,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.BROPEN
                                             lbProblemSolved =                                                     ParseNODE(node) ' NonTerminal Rule: NODE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -31497,13 +31498,13 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
                                             lbProblemSolved =                                                 ParseNODE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: NODE
                                                 If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -31539,7 +31540,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.PREDICATE
                                             lbProblemSolved =                                                     ParseFOLLOWINGREADINGTEXT(node) ' NonTerminal Rule: FOLLOWINGREADINGTEXT
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -31550,7 +31551,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.MATHFUNCTION
                                             lbProblemSolved =                                                     ParseMATHCLAUSE(node) ' NonTerminal Rule: MATHCLAUSE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -31573,13 +31574,13 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
                                             lbProblemSolved =                                                 ParseMATHCLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: MATHCLAUSE
                                                 If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -31612,7 +31613,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                         If tok.Type = TokenType.KEYWDIS Or tok.Type = TokenType.PREDICATE Or tok.Type = TokenType.KEYWDTHAT Or tok.Type = TokenType.PREBOUNDREADINGTEXT Or tok.Type = TokenType.MODELELEMENTNAME Then
 lbProblemSolved =                                             ParseWHICHTHATCLAUSE(node) ' NonTerminal Rule: WHICHTHATCLAUSE
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -31745,7 +31746,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -31766,7 +31767,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -31787,7 +31788,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -31808,7 +31809,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -31829,7 +31830,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -31877,7 +31878,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.NUMBER
                                             lbProblemSolved =                                                     ParseINDIVIDUALIDENTIFIER(node) ' NonTerminal Rule: INDIVIDUALIDENTIFIER
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -31888,7 +31889,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.SINGLEQUOTE
                                             lbProblemSolved =                                                     ParseINDIVIDUALIDENTIFIER(node) ' NonTerminal Rule: INDIVIDUALIDENTIFIER
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -31899,7 +31900,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.PREBOUNDREADINGTEXT
                                             lbProblemSolved =                                                     ParseNODE(node) ' NonTerminal Rule: NODE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -31910,7 +31911,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.MODELELEMENTNAME
                                             lbProblemSolved =                                                     ParseNODE(node) ' NonTerminal Rule: NODE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -31921,7 +31922,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.BROPEN
                                             lbProblemSolved =                                                     ParseNODE(node) ' NonTerminal Rule: NODE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -31947,13 +31948,13 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
                                             lbProblemSolved =                                                 ParseNODE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: NODE
                                                 If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -31989,7 +31990,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.PREDICATE
                                             lbProblemSolved =                                                     ParseFOLLOWINGREADINGTEXT(node) ' NonTerminal Rule: FOLLOWINGREADINGTEXT
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -32000,7 +32001,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.MATHFUNCTION
                                             lbProblemSolved =                                                     ParseMATHCLAUSE(node) ' NonTerminal Rule: MATHCLAUSE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -32023,13 +32024,13 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
                                             lbProblemSolved =                                                 ParseMATHCLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: MATHCLAUSE
                                                 If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -32062,7 +32063,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                         If tok.Type = TokenType.KEYWDIS Or tok.Type = TokenType.PREDICATE Or tok.Type = TokenType.KEYWDTHAT Or tok.Type = TokenType.PREBOUNDREADINGTEXT Or tok.Type = TokenType.MODELELEMENTNAME Then
 lbProblemSolved =                                             ParseWHICHTHATCLAUSE(node) ' NonTerminal Rule: WHICHTHATCLAUSE
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -32195,7 +32196,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -32216,7 +32217,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -32237,7 +32238,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -32258,7 +32259,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -32279,7 +32280,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -32327,7 +32328,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.NUMBER
                                             lbProblemSolved =                                                     ParseINDIVIDUALIDENTIFIER(node) ' NonTerminal Rule: INDIVIDUALIDENTIFIER
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -32338,7 +32339,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.SINGLEQUOTE
                                             lbProblemSolved =                                                     ParseINDIVIDUALIDENTIFIER(node) ' NonTerminal Rule: INDIVIDUALIDENTIFIER
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -32349,7 +32350,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.PREBOUNDREADINGTEXT
                                             lbProblemSolved =                                                     ParseNODE(node) ' NonTerminal Rule: NODE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -32360,7 +32361,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.MODELELEMENTNAME
                                             lbProblemSolved =                                                     ParseNODE(node) ' NonTerminal Rule: NODE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -32371,7 +32372,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.BROPEN
                                             lbProblemSolved =                                                     ParseNODE(node) ' NonTerminal Rule: NODE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -32397,13 +32398,13 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
                                             lbProblemSolved =                                                 ParseNODE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: NODE
                                                 If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -32439,7 +32440,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.PREDICATE
                                             lbProblemSolved =                                                     ParseFOLLOWINGREADINGTEXT(node) ' NonTerminal Rule: FOLLOWINGREADINGTEXT
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -32450,7 +32451,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.MATHFUNCTION
                                             lbProblemSolved =                                                     ParseMATHCLAUSE(node) ' NonTerminal Rule: MATHCLAUSE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -32473,13 +32474,13 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
                                             lbProblemSolved =                                                 ParseMATHCLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: MATHCLAUSE
                                                 If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -32512,7 +32513,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                         If tok.Type = TokenType.KEYWDIS Or tok.Type = TokenType.PREDICATE Or tok.Type = TokenType.KEYWDTHAT Or tok.Type = TokenType.PREBOUNDREADINGTEXT Or tok.Type = TokenType.MODELELEMENTNAME Then
 lbProblemSolved =                                             ParseWHICHTHATCLAUSE(node) ' NonTerminal Rule: WHICHTHATCLAUSE
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -32645,7 +32646,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -32666,7 +32667,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -32687,7 +32688,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -32708,7 +32709,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -32729,7 +32730,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -32777,7 +32778,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.NUMBER
                                             lbProblemSolved =                                                     ParseINDIVIDUALIDENTIFIER(node) ' NonTerminal Rule: INDIVIDUALIDENTIFIER
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -32788,7 +32789,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.SINGLEQUOTE
                                             lbProblemSolved =                                                     ParseINDIVIDUALIDENTIFIER(node) ' NonTerminal Rule: INDIVIDUALIDENTIFIER
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -32799,7 +32800,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.PREBOUNDREADINGTEXT
                                             lbProblemSolved =                                                     ParseNODE(node) ' NonTerminal Rule: NODE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -32810,7 +32811,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.MODELELEMENTNAME
                                             lbProblemSolved =                                                     ParseNODE(node) ' NonTerminal Rule: NODE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -32821,7 +32822,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.BROPEN
                                             lbProblemSolved =                                                     ParseNODE(node) ' NonTerminal Rule: NODE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -32847,13 +32848,13 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
                                             lbProblemSolved =                                                 ParseNODE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: NODE
                                                 If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -32889,7 +32890,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.PREDICATE
                                             lbProblemSolved =                                                     ParseFOLLOWINGREADINGTEXT(node) ' NonTerminal Rule: FOLLOWINGREADINGTEXT
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -32900,7 +32901,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.MATHFUNCTION
                                             lbProblemSolved =                                                     ParseMATHCLAUSE(node) ' NonTerminal Rule: MATHCLAUSE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -32923,13 +32924,13 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
                                             lbProblemSolved =                                                 ParseMATHCLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: MATHCLAUSE
                                                 If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -32962,7 +32963,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                         If tok.Type = TokenType.KEYWDIS Or tok.Type = TokenType.PREDICATE Or tok.Type = TokenType.KEYWDTHAT Or tok.Type = TokenType.PREBOUNDREADINGTEXT Or tok.Type = TokenType.MODELELEMENTNAME Then
 lbProblemSolved =                                             ParseWHICHTHATCLAUSE(node) ' NonTerminal Rule: WHICHTHATCLAUSE
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -33095,7 +33096,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -33116,7 +33117,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -33137,7 +33138,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -33158,7 +33159,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -33179,7 +33180,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -33227,7 +33228,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.NUMBER
                                             lbProblemSolved =                                                     ParseINDIVIDUALIDENTIFIER(node) ' NonTerminal Rule: INDIVIDUALIDENTIFIER
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -33238,7 +33239,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.SINGLEQUOTE
                                             lbProblemSolved =                                                     ParseINDIVIDUALIDENTIFIER(node) ' NonTerminal Rule: INDIVIDUALIDENTIFIER
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -33249,7 +33250,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.PREBOUNDREADINGTEXT
                                             lbProblemSolved =                                                     ParseNODE(node) ' NonTerminal Rule: NODE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -33260,7 +33261,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.MODELELEMENTNAME
                                             lbProblemSolved =                                                     ParseNODE(node) ' NonTerminal Rule: NODE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -33271,7 +33272,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.BROPEN
                                             lbProblemSolved =                                                     ParseNODE(node) ' NonTerminal Rule: NODE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -33297,13 +33298,13 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
                                             lbProblemSolved =                                                 ParseNODE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: NODE
                                                 If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -33339,7 +33340,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.PREDICATE
                                             lbProblemSolved =                                                     ParseFOLLOWINGREADINGTEXT(node) ' NonTerminal Rule: FOLLOWINGREADINGTEXT
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -33350,7 +33351,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.MATHFUNCTION
                                             lbProblemSolved =                                                     ParseMATHCLAUSE(node) ' NonTerminal Rule: MATHCLAUSE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -33373,13 +33374,13 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
                                             lbProblemSolved =                                                 ParseMATHCLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: MATHCLAUSE
                                                 If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -33412,7 +33413,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                         If tok.Type = TokenType.KEYWDIS Or tok.Type = TokenType.PREDICATE Or tok.Type = TokenType.KEYWDTHAT Or tok.Type = TokenType.PREBOUNDREADINGTEXT Or tok.Type = TokenType.MODELELEMENTNAME Then
 lbProblemSolved =                                             ParseWHICHTHATCLAUSE(node) ' NonTerminal Rule: WHICHTHATCLAUSE
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -33545,7 +33546,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -33566,7 +33567,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -33587,7 +33588,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -33608,7 +33609,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -33629,7 +33630,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -33677,7 +33678,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.NUMBER
                                             lbProblemSolved =                                                     ParseINDIVIDUALIDENTIFIER(node) ' NonTerminal Rule: INDIVIDUALIDENTIFIER
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -33688,7 +33689,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.SINGLEQUOTE
                                             lbProblemSolved =                                                     ParseINDIVIDUALIDENTIFIER(node) ' NonTerminal Rule: INDIVIDUALIDENTIFIER
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -33699,7 +33700,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.PREBOUNDREADINGTEXT
                                             lbProblemSolved =                                                     ParseNODE(node) ' NonTerminal Rule: NODE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -33710,7 +33711,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.MODELELEMENTNAME
                                             lbProblemSolved =                                                     ParseNODE(node) ' NonTerminal Rule: NODE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -33721,7 +33722,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.BROPEN
                                             lbProblemSolved =                                                     ParseNODE(node) ' NonTerminal Rule: NODE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -33747,13 +33748,13 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
                                             lbProblemSolved =                                                 ParseNODE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: NODE
                                                 If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -33789,7 +33790,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.PREDICATE
                                             lbProblemSolved =                                                     ParseFOLLOWINGREADINGTEXT(node) ' NonTerminal Rule: FOLLOWINGREADINGTEXT
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -33800,7 +33801,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.MATHFUNCTION
                                             lbProblemSolved =                                                     ParseMATHCLAUSE(node) ' NonTerminal Rule: MATHCLAUSE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -33823,13 +33824,13 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
                                             lbProblemSolved =                                                 ParseMATHCLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: MATHCLAUSE
                                                 If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -33862,7 +33863,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                         If tok.Type = TokenType.KEYWDIS Or tok.Type = TokenType.PREDICATE Or tok.Type = TokenType.KEYWDTHAT Or tok.Type = TokenType.PREBOUNDREADINGTEXT Or tok.Type = TokenType.MODELELEMENTNAME Then
 lbProblemSolved =                                             ParseWHICHTHATCLAUSE(node) ' NonTerminal Rule: WHICHTHATCLAUSE
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -33995,7 +33996,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -34016,7 +34017,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -34037,7 +34038,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -34058,7 +34059,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -34079,7 +34080,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -34127,7 +34128,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.NUMBER
                                             lbProblemSolved =                                                     ParseINDIVIDUALIDENTIFIER(node) ' NonTerminal Rule: INDIVIDUALIDENTIFIER
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -34138,7 +34139,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.SINGLEQUOTE
                                             lbProblemSolved =                                                     ParseINDIVIDUALIDENTIFIER(node) ' NonTerminal Rule: INDIVIDUALIDENTIFIER
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -34149,7 +34150,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.PREBOUNDREADINGTEXT
                                             lbProblemSolved =                                                     ParseNODE(node) ' NonTerminal Rule: NODE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -34160,7 +34161,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.MODELELEMENTNAME
                                             lbProblemSolved =                                                     ParseNODE(node) ' NonTerminal Rule: NODE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -34171,7 +34172,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.BROPEN
                                             lbProblemSolved =                                                     ParseNODE(node) ' NonTerminal Rule: NODE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -34197,13 +34198,13 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
                                             lbProblemSolved =                                                 ParseNODE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: NODE
                                                 If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -34239,7 +34240,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.PREDICATE
                                             lbProblemSolved =                                                     ParseFOLLOWINGREADINGTEXT(node) ' NonTerminal Rule: FOLLOWINGREADINGTEXT
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -34250,7 +34251,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.MATHFUNCTION
                                             lbProblemSolved =                                                     ParseMATHCLAUSE(node) ' NonTerminal Rule: MATHCLAUSE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -34273,13 +34274,13 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
                                             lbProblemSolved =                                                 ParseMATHCLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: MATHCLAUSE
                                                 If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -34312,7 +34313,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                         If tok.Type = TokenType.KEYWDIS Or tok.Type = TokenType.PREDICATE Or tok.Type = TokenType.KEYWDTHAT Or tok.Type = TokenType.PREBOUNDREADINGTEXT Or tok.Type = TokenType.MODELELEMENTNAME Then
 lbProblemSolved =                                             ParseWHICHTHATCLAUSE(node) ' NonTerminal Rule: WHICHTHATCLAUSE
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -34445,7 +34446,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -34466,7 +34467,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -34487,7 +34488,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -34508,7 +34509,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -34529,7 +34530,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -34577,7 +34578,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.NUMBER
                                             lbProblemSolved =                                                     ParseINDIVIDUALIDENTIFIER(node) ' NonTerminal Rule: INDIVIDUALIDENTIFIER
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -34588,7 +34589,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.SINGLEQUOTE
                                             lbProblemSolved =                                                     ParseINDIVIDUALIDENTIFIER(node) ' NonTerminal Rule: INDIVIDUALIDENTIFIER
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -34599,7 +34600,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.PREBOUNDREADINGTEXT
                                             lbProblemSolved =                                                     ParseNODE(node) ' NonTerminal Rule: NODE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -34610,7 +34611,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.MODELELEMENTNAME
                                             lbProblemSolved =                                                     ParseNODE(node) ' NonTerminal Rule: NODE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -34621,7 +34622,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.BROPEN
                                             lbProblemSolved =                                                     ParseNODE(node) ' NonTerminal Rule: NODE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -34647,13 +34648,13 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
                                             lbProblemSolved =                                                 ParseNODE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: NODE
                                                 If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -34689,7 +34690,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.PREDICATE
                                             lbProblemSolved =                                                     ParseFOLLOWINGREADINGTEXT(node) ' NonTerminal Rule: FOLLOWINGREADINGTEXT
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -34700,7 +34701,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.MATHFUNCTION
                                             lbProblemSolved =                                                     ParseMATHCLAUSE(node) ' NonTerminal Rule: MATHCLAUSE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -34723,13 +34724,13 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
                                             lbProblemSolved =                                                 ParseMATHCLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: MATHCLAUSE
                                                 If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -34762,7 +34763,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                         If tok.Type = TokenType.KEYWDIS Or tok.Type = TokenType.PREDICATE Or tok.Type = TokenType.KEYWDTHAT Or tok.Type = TokenType.PREBOUNDREADINGTEXT Or tok.Type = TokenType.MODELELEMENTNAME Then
 lbProblemSolved =                                             ParseWHICHTHATCLAUSE(node) ' NonTerminal Rule: WHICHTHATCLAUSE
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -34895,7 +34896,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -34916,7 +34917,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -34937,7 +34938,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -34958,7 +34959,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -34979,7 +34980,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -35027,7 +35028,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.NUMBER
                                             lbProblemSolved =                                                     ParseINDIVIDUALIDENTIFIER(node) ' NonTerminal Rule: INDIVIDUALIDENTIFIER
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -35038,7 +35039,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.SINGLEQUOTE
                                             lbProblemSolved =                                                     ParseINDIVIDUALIDENTIFIER(node) ' NonTerminal Rule: INDIVIDUALIDENTIFIER
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -35049,7 +35050,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.PREBOUNDREADINGTEXT
                                             lbProblemSolved =                                                     ParseNODE(node) ' NonTerminal Rule: NODE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -35060,7 +35061,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.MODELELEMENTNAME
                                             lbProblemSolved =                                                     ParseNODE(node) ' NonTerminal Rule: NODE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -35071,7 +35072,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.BROPEN
                                             lbProblemSolved =                                                     ParseNODE(node) ' NonTerminal Rule: NODE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -35097,13 +35098,13 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
                                             lbProblemSolved =                                                 ParseNODE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: NODE
                                                 If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -35139,7 +35140,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.PREDICATE
                                             lbProblemSolved =                                                     ParseFOLLOWINGREADINGTEXT(node) ' NonTerminal Rule: FOLLOWINGREADINGTEXT
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -35150,7 +35151,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.MATHFUNCTION
                                             lbProblemSolved =                                                     ParseMATHCLAUSE(node) ' NonTerminal Rule: MATHCLAUSE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -35173,13 +35174,13 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
                                             lbProblemSolved =                                                 ParseMATHCLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: MATHCLAUSE
                                                 If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -35212,7 +35213,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                         If tok.Type = TokenType.KEYWDIS Or tok.Type = TokenType.PREDICATE Or tok.Type = TokenType.KEYWDTHAT Or tok.Type = TokenType.PREBOUNDREADINGTEXT Or tok.Type = TokenType.MODELELEMENTNAME Then
 lbProblemSolved =                                             ParseWHICHTHATCLAUSE(node) ' NonTerminal Rule: WHICHTHATCLAUSE
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -35345,7 +35346,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -35366,7 +35367,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -35387,7 +35388,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -35408,7 +35409,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -35429,7 +35430,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -35477,7 +35478,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.NUMBER
                                             lbProblemSolved =                                                     ParseINDIVIDUALIDENTIFIER(node) ' NonTerminal Rule: INDIVIDUALIDENTIFIER
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -35488,7 +35489,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.SINGLEQUOTE
                                             lbProblemSolved =                                                     ParseINDIVIDUALIDENTIFIER(node) ' NonTerminal Rule: INDIVIDUALIDENTIFIER
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -35499,7 +35500,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.PREBOUNDREADINGTEXT
                                             lbProblemSolved =                                                     ParseNODE(node) ' NonTerminal Rule: NODE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -35510,7 +35511,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.MODELELEMENTNAME
                                             lbProblemSolved =                                                     ParseNODE(node) ' NonTerminal Rule: NODE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -35521,7 +35522,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.BROPEN
                                             lbProblemSolved =                                                     ParseNODE(node) ' NonTerminal Rule: NODE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -35547,13 +35548,13 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
                                             lbProblemSolved =                                                 ParseNODE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: NODE
                                                 If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -35589,7 +35590,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.PREDICATE
                                             lbProblemSolved =                                                     ParseFOLLOWINGREADINGTEXT(node) ' NonTerminal Rule: FOLLOWINGREADINGTEXT
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -35600,7 +35601,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.MATHFUNCTION
                                             lbProblemSolved =                                                     ParseMATHCLAUSE(node) ' NonTerminal Rule: MATHCLAUSE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -35623,13 +35624,13 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
                                             lbProblemSolved =                                                 ParseMATHCLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: MATHCLAUSE
                                                 If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -35662,7 +35663,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                         If tok.Type = TokenType.KEYWDIS Or tok.Type = TokenType.PREDICATE Or tok.Type = TokenType.KEYWDTHAT Or tok.Type = TokenType.PREBOUNDREADINGTEXT Or tok.Type = TokenType.MODELELEMENTNAME Then
 lbProblemSolved =                                             ParseWHICHTHATCLAUSE(node) ' NonTerminal Rule: WHICHTHATCLAUSE
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -35795,7 +35796,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -35816,7 +35817,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -35837,7 +35838,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -35858,7 +35859,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -35879,7 +35880,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -35927,7 +35928,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.NUMBER
                                             lbProblemSolved =                                                     ParseINDIVIDUALIDENTIFIER(node) ' NonTerminal Rule: INDIVIDUALIDENTIFIER
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -35938,7 +35939,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.SINGLEQUOTE
                                             lbProblemSolved =                                                     ParseINDIVIDUALIDENTIFIER(node) ' NonTerminal Rule: INDIVIDUALIDENTIFIER
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -35949,7 +35950,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.PREBOUNDREADINGTEXT
                                             lbProblemSolved =                                                     ParseNODE(node) ' NonTerminal Rule: NODE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -35960,7 +35961,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.MODELELEMENTNAME
                                             lbProblemSolved =                                                     ParseNODE(node) ' NonTerminal Rule: NODE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -35971,7 +35972,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.BROPEN
                                             lbProblemSolved =                                                     ParseNODE(node) ' NonTerminal Rule: NODE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -35997,13 +35998,13 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
                                             lbProblemSolved =                                                 ParseNODE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: NODE
                                                 If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -36039,7 +36040,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.PREDICATE
                                             lbProblemSolved =                                                     ParseFOLLOWINGREADINGTEXT(node) ' NonTerminal Rule: FOLLOWINGREADINGTEXT
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -36050,7 +36051,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.MATHFUNCTION
                                             lbProblemSolved =                                                     ParseMATHCLAUSE(node) ' NonTerminal Rule: MATHCLAUSE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -36073,13 +36074,13 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
                                             lbProblemSolved =                                                 ParseMATHCLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: MATHCLAUSE
                                                 If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -36112,7 +36113,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                         If tok.Type = TokenType.KEYWDIS Or tok.Type = TokenType.PREDICATE Or tok.Type = TokenType.KEYWDTHAT Or tok.Type = TokenType.PREBOUNDREADINGTEXT Or tok.Type = TokenType.MODELELEMENTNAME Then
 lbProblemSolved =                                             ParseWHICHTHATCLAUSE(node) ' NonTerminal Rule: WHICHTHATCLAUSE
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -36245,7 +36246,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -36266,7 +36267,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -36287,7 +36288,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -36308,7 +36309,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -36329,7 +36330,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -36377,7 +36378,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.NUMBER
                                             lbProblemSolved =                                                     ParseINDIVIDUALIDENTIFIER(node) ' NonTerminal Rule: INDIVIDUALIDENTIFIER
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -36388,7 +36389,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.SINGLEQUOTE
                                             lbProblemSolved =                                                     ParseINDIVIDUALIDENTIFIER(node) ' NonTerminal Rule: INDIVIDUALIDENTIFIER
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -36399,7 +36400,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.PREBOUNDREADINGTEXT
                                             lbProblemSolved =                                                     ParseNODE(node) ' NonTerminal Rule: NODE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -36410,7 +36411,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.MODELELEMENTNAME
                                             lbProblemSolved =                                                     ParseNODE(node) ' NonTerminal Rule: NODE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -36421,7 +36422,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.BROPEN
                                             lbProblemSolved =                                                     ParseNODE(node) ' NonTerminal Rule: NODE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -36447,13 +36448,13 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
                                             lbProblemSolved =                                                 ParseNODE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: NODE
                                                 If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -36489,7 +36490,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.PREDICATE
                                             lbProblemSolved =                                                     ParseFOLLOWINGREADINGTEXT(node) ' NonTerminal Rule: FOLLOWINGREADINGTEXT
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -36500,7 +36501,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.MATHFUNCTION
                                             lbProblemSolved =                                                     ParseMATHCLAUSE(node) ' NonTerminal Rule: MATHCLAUSE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -36523,13 +36524,13 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
                                             lbProblemSolved =                                                 ParseMATHCLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: MATHCLAUSE
                                                 If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -36562,7 +36563,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                         If tok.Type = TokenType.KEYWDIS Or tok.Type = TokenType.PREDICATE Or tok.Type = TokenType.KEYWDTHAT Or tok.Type = TokenType.PREBOUNDREADINGTEXT Or tok.Type = TokenType.MODELELEMENTNAME Then
 lbProblemSolved =                                             ParseWHICHTHATCLAUSE(node) ' NonTerminal Rule: WHICHTHATCLAUSE
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -36695,7 +36696,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -36716,7 +36717,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -36737,7 +36738,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -36758,7 +36759,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -36779,7 +36780,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -36827,7 +36828,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.NUMBER
                                             lbProblemSolved =                                                     ParseINDIVIDUALIDENTIFIER(node) ' NonTerminal Rule: INDIVIDUALIDENTIFIER
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -36838,7 +36839,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.SINGLEQUOTE
                                             lbProblemSolved =                                                     ParseINDIVIDUALIDENTIFIER(node) ' NonTerminal Rule: INDIVIDUALIDENTIFIER
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -36849,7 +36850,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.PREBOUNDREADINGTEXT
                                             lbProblemSolved =                                                     ParseNODE(node) ' NonTerminal Rule: NODE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -36860,7 +36861,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.MODELELEMENTNAME
                                             lbProblemSolved =                                                     ParseNODE(node) ' NonTerminal Rule: NODE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -36871,7 +36872,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.BROPEN
                                             lbProblemSolved =                                                     ParseNODE(node) ' NonTerminal Rule: NODE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -36897,13 +36898,13 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
                                             lbProblemSolved =                                                 ParseNODE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: NODE
                                                 If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -36939,7 +36940,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.PREDICATE
                                             lbProblemSolved =                                                     ParseFOLLOWINGREADINGTEXT(node) ' NonTerminal Rule: FOLLOWINGREADINGTEXT
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -36950,7 +36951,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 Case TokenType.MATHFUNCTION
                                             lbProblemSolved =                                                     ParseMATHCLAUSE(node) ' NonTerminal Rule: MATHCLAUSE
                                                     If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                                      If liOriginalRange >= Me.MaxDistance Then
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
@@ -36973,13 +36974,13 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                 If Not lbProblemSolved Then
                                                   m_tree.Errors.Clear
                                                   m_scanner.StartPos = liOriginalRange
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
                                             lbProblemSolved =                                                 ParseMATHCLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: MATHCLAUSE
                                                 If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.StartPos >= Me.MaxDistance Then
+                                                  If liOriginalRange >= Me.MaxDistance Then
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
@@ -37033,7 +37034,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                             If Not lbProblemSolved Then
                               m_tree.Errors.Clear
                               m_scanner.StartPos = liOriginalRange
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -37043,7 +37044,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                 If tok.Type = TokenType.KEYWDIS Or tok.Type = TokenType.PREDICATE Or tok.Type = TokenType.KEYWDTHAT Or tok.Type = TokenType.PREBOUNDREADINGTEXT Or tok.Type = TokenType.MODELELEMENTNAME Then
 lbProblemSolved =                                     ParseWHICHTHATCLAUSE(node) ' NonTerminal Rule: WHICHTHATCLAUSE
                                     If m_tree.Errors.Count > 0 Then
-                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                      If liOriginalRange >= Me.MaxDistance Then
                                         Me.MaxDistance = m_scanner.StartPos
                                         max_tree = m_tree.clone
                                       End If
@@ -37176,7 +37177,7 @@ lbProblemSolved =                                     ParseWHICHTHATCLAUSE(node)
                                         If Not lbProblemSolved Then
                                           m_tree.Errors.Clear
                                           m_scanner.StartPos = liOriginalRange
-                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                          If liOriginalRange >= Me.MaxDistance Then
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
@@ -37197,7 +37198,7 @@ lbProblemSolved =                                     ParseWHICHTHATCLAUSE(node)
                                         If Not lbProblemSolved Then
                                           m_tree.Errors.Clear
                                           m_scanner.StartPos = liOriginalRange
-                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                          If liOriginalRange >= Me.MaxDistance Then
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
@@ -37218,7 +37219,7 @@ lbProblemSolved =                                     ParseWHICHTHATCLAUSE(node)
                                         If Not lbProblemSolved Then
                                           m_tree.Errors.Clear
                                           m_scanner.StartPos = liOriginalRange
-                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                          If liOriginalRange >= Me.MaxDistance Then
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
@@ -37239,7 +37240,7 @@ lbProblemSolved =                                     ParseWHICHTHATCLAUSE(node)
                                         If Not lbProblemSolved Then
                                           m_tree.Errors.Clear
                                           m_scanner.StartPos = liOriginalRange
-                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                          If liOriginalRange >= Me.MaxDistance Then
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
@@ -37260,7 +37261,7 @@ lbProblemSolved =                                     ParseWHICHTHATCLAUSE(node)
                                         If Not lbProblemSolved Then
                                           m_tree.Errors.Clear
                                           m_scanner.StartPos = liOriginalRange
-                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                          If liOriginalRange >= Me.MaxDistance Then
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
@@ -37308,7 +37309,7 @@ lbProblemSolved =                                     ParseWHICHTHATCLAUSE(node)
                                         Case TokenType.NUMBER
                                     lbProblemSolved =                                             ParseINDIVIDUALIDENTIFIER(node) ' NonTerminal Rule: INDIVIDUALIDENTIFIER
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -37319,7 +37320,7 @@ lbProblemSolved =                                     ParseWHICHTHATCLAUSE(node)
                                         Case TokenType.SINGLEQUOTE
                                     lbProblemSolved =                                             ParseINDIVIDUALIDENTIFIER(node) ' NonTerminal Rule: INDIVIDUALIDENTIFIER
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -37330,7 +37331,7 @@ lbProblemSolved =                                     ParseWHICHTHATCLAUSE(node)
                                         Case TokenType.PREBOUNDREADINGTEXT
                                     lbProblemSolved =                                             ParseNODE(node) ' NonTerminal Rule: NODE
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -37341,7 +37342,7 @@ lbProblemSolved =                                     ParseWHICHTHATCLAUSE(node)
                                         Case TokenType.MODELELEMENTNAME
                                     lbProblemSolved =                                             ParseNODE(node) ' NonTerminal Rule: NODE
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -37352,7 +37353,7 @@ lbProblemSolved =                                     ParseWHICHTHATCLAUSE(node)
                                         Case TokenType.BROPEN
                                     lbProblemSolved =                                             ParseNODE(node) ' NonTerminal Rule: NODE
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -37378,13 +37379,13 @@ lbProblemSolved =                                     ParseWHICHTHATCLAUSE(node)
                                         If Not lbProblemSolved Then
                                           m_tree.Errors.Clear
                                           m_scanner.StartPos = liOriginalRange
-                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                          If liOriginalRange >= Me.MaxDistance Then
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
                                     lbProblemSolved =                                         ParseNODE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: NODE
                                         If m_tree.Errors.Count > 0 Then
-                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                          If liOriginalRange >= Me.MaxDistance Then
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
@@ -37420,7 +37421,7 @@ lbProblemSolved =                                     ParseWHICHTHATCLAUSE(node)
                                         Case TokenType.PREDICATE
                                     lbProblemSolved =                                             ParseFOLLOWINGREADINGTEXT(node) ' NonTerminal Rule: FOLLOWINGREADINGTEXT
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -37431,7 +37432,7 @@ lbProblemSolved =                                     ParseWHICHTHATCLAUSE(node)
                                         Case TokenType.MATHFUNCTION
                                     lbProblemSolved =                                             ParseMATHCLAUSE(node) ' NonTerminal Rule: MATHCLAUSE
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -37454,13 +37455,13 @@ lbProblemSolved =                                     ParseWHICHTHATCLAUSE(node)
                                         If Not lbProblemSolved Then
                                           m_tree.Errors.Clear
                                           m_scanner.StartPos = liOriginalRange
-                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                          If liOriginalRange >= Me.MaxDistance Then
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
                                     lbProblemSolved =                                         ParseMATHCLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: MATHCLAUSE
                                         If m_tree.Errors.Count > 0 Then
-                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                          If liOriginalRange >= Me.MaxDistance Then
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
@@ -37596,7 +37597,7 @@ lbProblemSolved =                                     ParseWHICHTHATCLAUSE(node)
                             If Not lbProblemSolved Then
                               m_tree.Errors.Clear
                               m_scanner.StartPos = liOriginalRange
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -37640,7 +37641,7 @@ lbProblemSolved =                                     ParseWHICHTHATCLAUSE(node)
                         Case TokenType.PREBOUNDREADINGTEXT
                     lbProblemSolved =                             ParseMODELELEMENT(node) ' NonTerminal Rule: MODELELEMENT
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -37651,7 +37652,7 @@ lbProblemSolved =                                     ParseWHICHTHATCLAUSE(node)
                         Case TokenType.MODELELEMENTNAME
                     lbProblemSolved =                             ParseMODELELEMENT(node) ' NonTerminal Rule: MODELELEMENT
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -37662,7 +37663,7 @@ lbProblemSolved =                                     ParseWHICHTHATCLAUSE(node)
                         Case TokenType.BROPEN
                     lbProblemSolved =                             ParseNODEPROPERTYIDENTIFICATION(node) ' NonTerminal Rule: NODEPROPERTYIDENTIFICATION
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -37686,13 +37687,13 @@ lbProblemSolved =                                     ParseWHICHTHATCLAUSE(node)
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
                           m_scanner.StartPos = liOriginalRange
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
                     lbProblemSolved =                         ParseNODEPROPERTYIDENTIFICATION(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: NODEPROPERTYIDENTIFICATION
                         If m_tree.Errors.Count > 0 Then
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
@@ -37784,7 +37785,7 @@ lbProblemSolved =                                     ParseWHICHTHATCLAUSE(node)
                 If Not lbProblemSolved Then
                   m_tree.Errors.Clear
                   m_scanner.StartPos = liOriginalRange
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
@@ -37846,7 +37847,7 @@ lbProblemSolved =                                     ParseWHICHTHATCLAUSE(node)
                              ' Concat Rule
                             lbProblemSolved =                                     ParseQUERYBEGINNING(node) ' NonTerminal Rule: QUERYBEGINNING
                                     If m_tree.Errors.Count > 0 Then
-                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                      If liOriginalRange >= Me.MaxDistance Then
                                         Me.MaxDistance = m_scanner.StartPos
                                         max_tree = m_tree.clone
                                       End If
@@ -37869,7 +37870,7 @@ lbProblemSolved =                                     ParseWHICHTHATCLAUSE(node)
                                         Case TokenType.PREBOUNDREADINGTEXT
                                     lbProblemSolved =                                             ParseNODE(node) ' NonTerminal Rule: NODE
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -37880,7 +37881,7 @@ lbProblemSolved =                                     ParseWHICHTHATCLAUSE(node)
                                         Case TokenType.MODELELEMENTNAME
                                     lbProblemSolved =                                             ParseNODE(node) ' NonTerminal Rule: NODE
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -37891,7 +37892,7 @@ lbProblemSolved =                                     ParseWHICHTHATCLAUSE(node)
                                         Case TokenType.BROPEN
                                     lbProblemSolved =                                             ParseNODE(node) ' NonTerminal Rule: NODE
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -37902,7 +37903,7 @@ lbProblemSolved =                                     ParseWHICHTHATCLAUSE(node)
                                         Case TokenType.PREBOUNDREADINGTEXT
                                     lbProblemSolved =                                             ParseMODELELEMENT(node) ' NonTerminal Rule: MODELELEMENT
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -37913,7 +37914,7 @@ lbProblemSolved =                                     ParseWHICHTHATCLAUSE(node)
                                         Case TokenType.MODELELEMENTNAME
                                     lbProblemSolved =                                             ParseMODELELEMENT(node) ' NonTerminal Rule: MODELELEMENT
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -37939,13 +37940,13 @@ lbProblemSolved =                                     ParseWHICHTHATCLAUSE(node)
                                         If Not lbProblemSolved Then
                                           m_tree.Errors.Clear
                                           m_scanner.StartPos = liOriginalRange
-                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                          If liOriginalRange >= Me.MaxDistance Then
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
                                     lbProblemSolved =                                         ParseMODELELEMENT(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: MODELELEMENT
                                         If m_tree.Errors.Count > 0 Then
-                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                          If liOriginalRange >= Me.MaxDistance Then
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
@@ -37969,7 +37970,7 @@ lbProblemSolved =                                     ParseWHICHTHATCLAUSE(node)
                              ' Concat Rule
                             lbProblemSolved =                                     ParseQUERYBEGINNING(node) ' NonTerminal Rule: QUERYBEGINNING
                                     If m_tree.Errors.Count > 0 Then
-                                      If m_scanner.StartPos >= Me.MaxDistance Then
+                                      If liOriginalRange >= Me.MaxDistance Then
                                         Me.MaxDistance = m_scanner.StartPos
                                         max_tree = m_tree.clone
                                       End If
@@ -37992,7 +37993,7 @@ lbProblemSolved =                                     ParseWHICHTHATCLAUSE(node)
                                         Case TokenType.PREBOUNDREADINGTEXT
                                     lbProblemSolved =                                             ParseNODE(node) ' NonTerminal Rule: NODE
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -38003,7 +38004,7 @@ lbProblemSolved =                                     ParseWHICHTHATCLAUSE(node)
                                         Case TokenType.MODELELEMENTNAME
                                     lbProblemSolved =                                             ParseNODE(node) ' NonTerminal Rule: NODE
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -38014,7 +38015,7 @@ lbProblemSolved =                                     ParseWHICHTHATCLAUSE(node)
                                         Case TokenType.BROPEN
                                     lbProblemSolved =                                             ParseNODE(node) ' NonTerminal Rule: NODE
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -38025,7 +38026,7 @@ lbProblemSolved =                                     ParseWHICHTHATCLAUSE(node)
                                         Case TokenType.PREBOUNDREADINGTEXT
                                     lbProblemSolved =                                             ParseMODELELEMENT(node) ' NonTerminal Rule: MODELELEMENT
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -38036,7 +38037,7 @@ lbProblemSolved =                                     ParseWHICHTHATCLAUSE(node)
                                         Case TokenType.MODELELEMENTNAME
                                     lbProblemSolved =                                             ParseMODELELEMENT(node) ' NonTerminal Rule: MODELELEMENT
                                             If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.StartPos >= Me.MaxDistance Then
+                                              If liOriginalRange >= Me.MaxDistance Then
                                                 Me.MaxDistance = m_scanner.StartPos
                                                 max_tree = m_tree.clone
                                               End If
@@ -38062,13 +38063,13 @@ lbProblemSolved =                                     ParseWHICHTHATCLAUSE(node)
                                         If Not lbProblemSolved Then
                                           m_tree.Errors.Clear
                                           m_scanner.StartPos = liOriginalRange
-                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                          If liOriginalRange >= Me.MaxDistance Then
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
                                     lbProblemSolved =                                         ParseMODELELEMENT(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: MODELELEMENT
                                         If m_tree.Errors.Count > 0 Then
-                                          If m_scanner.StartPos >= Me.MaxDistance Then
+                                          If liOriginalRange >= Me.MaxDistance Then
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
@@ -38090,7 +38091,7 @@ lbProblemSolved =                                     ParseWHICHTHATCLAUSE(node)
                         Case TokenType.BROPEN
                     lbProblemSolved =                             ParseNODEPROPERTYIDENTIFICATION(node) ' NonTerminal Rule: NODEPROPERTYIDENTIFICATION
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -38114,13 +38115,13 @@ lbProblemSolved =                                     ParseWHICHTHATCLAUSE(node)
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
                           m_scanner.StartPos = liOriginalRange
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
                     lbProblemSolved =                         ParseNODEPROPERTYIDENTIFICATION(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: NODEPROPERTYIDENTIFICATION
                         If m_tree.Errors.Count > 0 Then
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
@@ -38142,7 +38143,7 @@ lbProblemSolved =                                     ParseWHICHTHATCLAUSE(node)
                     m_tree.Errors.Clear
                         ParseWHICHCLAUSE(node) ' NonTerminal Rule: WHICHCLAUSE
                         If m_tree.Errors.Count > 0 Then
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
@@ -38162,7 +38163,7 @@ lbProblemSolved =                                     ParseWHICHTHATCLAUSE(node)
                     If tok.Type = TokenType.KEYWDRETURN Then
 lbProblemSolved =                         ParseRETURNCLAUSE(node) ' NonTerminal Rule: RETURNCLAUSE
                         If m_tree.Errors.Count > 0 Then
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
@@ -38183,7 +38184,7 @@ lbProblemSolved =                         ParseRETURNCLAUSE(node) ' NonTerminal 
                     If tok.Type = TokenType.KEYWDORDERBY Then
 lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal Rule: ORDERBYCLAUSE
                         If m_tree.Errors.Count > 0 Then
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
@@ -38274,7 +38275,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
              ' Concat Rule
             lbProblemSolved =                     ParseBRACKTEDCOLMNLIST(node) ' NonTerminal Rule: BRACKTEDCOLMNLIST
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -38286,7 +38287,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
              ' Concat Rule
             lbProblemSolved =                     ParseVALUELIST(node) ' NonTerminal Rule: VALUELIST
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -38375,7 +38376,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                         Case TokenType.KEYWDDATATYPELOGICALTRUEFALSE
                     lbProblemSolved =                             ParseDATATYPE(node) ' NonTerminal Rule: DATATYPE
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -38386,7 +38387,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                         Case TokenType.KEYWDDATATYPELOGICALYESNO
                     lbProblemSolved =                             ParseDATATYPE(node) ' NonTerminal Rule: DATATYPE
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -38397,7 +38398,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                         Case TokenType.KEYWDDATATYPEAUTOCOUNTER
                     lbProblemSolved =                             ParseDATATYPE(node) ' NonTerminal Rule: DATATYPE
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -38408,7 +38409,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                         Case TokenType.KEYWDDATATYPEFLOATDOUBLEPRECISION
                     lbProblemSolved =                             ParseDATATYPE(node) ' NonTerminal Rule: DATATYPE
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -38419,7 +38420,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                         Case TokenType.KEYWDDATATYPEFLOATSINGLEPRECISION
                     lbProblemSolved =                             ParseDATATYPE(node) ' NonTerminal Rule: DATATYPE
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -38430,7 +38431,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                         Case TokenType.KEYWDDATATYPESIGNEDBIGINTEGER
                     lbProblemSolved =                             ParseDATATYPE(node) ' NonTerminal Rule: DATATYPE
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -38441,7 +38442,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                         Case TokenType.KEYWDDATATYPESIGNEDINTEGER
                     lbProblemSolved =                             ParseDATATYPE(node) ' NonTerminal Rule: DATATYPE
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -38452,7 +38453,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                         Case TokenType.KEYWDDATATYPESIGNEDSMALLINTEGER
                     lbProblemSolved =                             ParseDATATYPE(node) ' NonTerminal Rule: DATATYPE
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -38463,7 +38464,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                         Case TokenType.KEYWDDATATYPEUNSIGNEDBIGINTEGER
                     lbProblemSolved =                             ParseDATATYPE(node) ' NonTerminal Rule: DATATYPE
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -38474,7 +38475,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                         Case TokenType.KEYWDDATATYPEUNSIGNEDINTEGER
                     lbProblemSolved =                             ParseDATATYPE(node) ' NonTerminal Rule: DATATYPE
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -38485,7 +38486,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                         Case TokenType.KEYWDDATATYPEUNSIGNEDSMALLINTEGER
                     lbProblemSolved =                             ParseDATATYPE(node) ' NonTerminal Rule: DATATYPE
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -38496,7 +38497,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                         Case TokenType.KEYWDDATATYPEUNSIGNEDTINYINTEGER
                     lbProblemSolved =                             ParseDATATYPE(node) ' NonTerminal Rule: DATATYPE
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -38507,7 +38508,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                         Case TokenType.KEYWDDATATYPEOBJECTID
                     lbProblemSolved =                             ParseDATATYPE(node) ' NonTerminal Rule: DATATYPE
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -38518,7 +38519,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                         Case TokenType.KEYWDDATATYPEROWID
                     lbProblemSolved =                             ParseDATATYPE(node) ' NonTerminal Rule: DATATYPE
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -38529,7 +38530,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                         Case TokenType.KEYWDDATATYPERAWDATAOLEOBJECT
                     lbProblemSolved =                             ParseDATATYPE(node) ' NonTerminal Rule: DATATYPE
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -38540,7 +38541,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                         Case TokenType.KEYWDDATATYPERAWDATA
                     lbProblemSolved =                             ParseDATATYPE(node) ' NonTerminal Rule: DATATYPE
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -38551,7 +38552,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                         Case TokenType.KEYWDDATATYPEAUTOTIMESTAMP
                     lbProblemSolved =                             ParseDATATYPE(node) ' NonTerminal Rule: DATATYPE
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -38562,7 +38563,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                         Case TokenType.KEYWDDATATYPEDATE
                     lbProblemSolved =                             ParseDATATYPE(node) ' NonTerminal Rule: DATATYPE
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -38573,7 +38574,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                         Case TokenType.KEYWDDATATYPEDATETIME
                     lbProblemSolved =                             ParseDATATYPE(node) ' NonTerminal Rule: DATATYPE
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -38584,7 +38585,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                         Case TokenType.KEYWDDATATYPETIME
                     lbProblemSolved =                             ParseDATATYPE(node) ' NonTerminal Rule: DATATYPE
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -38595,7 +38596,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                         Case TokenType.KEYWDDATATYPERAWDATAFIXEDLENGTH
                     lbProblemSolved =                             ParseDATATYPELENGTH(node) ' NonTerminal Rule: DATATYPELENGTH
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -38606,7 +38607,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                         Case TokenType.KEYWDDATATYPERAWDATALARGELENGTH
                     lbProblemSolved =                             ParseDATATYPELENGTH(node) ' NonTerminal Rule: DATATYPELENGTH
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -38617,7 +38618,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                         Case TokenType.KEYWDDATATYPERAWDATAVARIABLELENGTH
                     lbProblemSolved =                             ParseDATATYPELENGTH(node) ' NonTerminal Rule: DATATYPELENGTH
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -38628,7 +38629,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                         Case TokenType.KEYWDDATATYPESTRINGFIXEDLENGTH
                     lbProblemSolved =                             ParseDATATYPELENGTH(node) ' NonTerminal Rule: DATATYPELENGTH
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -38639,7 +38640,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                         Case TokenType.KEYWDDATATYPESTRINGLARGELENGTH
                     lbProblemSolved =                             ParseDATATYPELENGTH(node) ' NonTerminal Rule: DATATYPELENGTH
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -38650,7 +38651,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                         Case TokenType.KEYWDDATATYPESTRINGVARIABLELENGTH
                     lbProblemSolved =                             ParseDATATYPELENGTH(node) ' NonTerminal Rule: DATATYPELENGTH
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -38661,7 +38662,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                         Case TokenType.KEYWDDATATYPEFLOATCUSTOMPRECISION
                     lbProblemSolved =                             ParseDATATYPEPRECISION(node) ' NonTerminal Rule: DATATYPEPRECISION
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -38672,7 +38673,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                         Case TokenType.KEYWDDATATYPEDECIMAL
                     lbProblemSolved =                             ParseDATATYPEPRECISION(node) ' NonTerminal Rule: DATATYPEPRECISION
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -38683,7 +38684,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                         Case TokenType.KEYWDDATATYPEMONEY
                     lbProblemSolved =                             ParseDATATYPEPRECISION(node) ' NonTerminal Rule: DATATYPEPRECISION
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -38733,13 +38734,13 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
                           m_scanner.StartPos = liOriginalRange
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
                     lbProblemSolved =                         ParseDATATYPELENGTH(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: DATATYPELENGTH
                         If m_tree.Errors.Count > 0 Then
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
@@ -38751,13 +38752,13 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
                           m_scanner.StartPos = liOriginalRange
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
                     lbProblemSolved =                         ParseDATATYPEPRECISION(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: DATATYPEPRECISION
                         If m_tree.Errors.Count > 0 Then
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
@@ -38803,7 +38804,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
              ' Concat Rule
             lbProblemSolved =                     ParseFACTREADING(node) ' NonTerminal Rule: FACTREADING
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -38816,7 +38817,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                                 Do ' OneOrMore Rule
                         ParseDERIVATIONCLAUSE(node) ' NonTerminal Rule: DERIVATIONCLAUSE
                         If m_tree.Errors.Count > 0 Then
-                          If m_scanner.StartPos >= Me.MaxDistance Then
+                          If liOriginalRange >= Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
@@ -38887,7 +38888,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                 Case TokenType.KEYWDCONNECTTOMODEL
             lbProblemSolved =                     ParseCONNECTTOMODELSTMT(node) ' NonTerminal Rule: CONNECTTOMODELSTMT
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -38898,7 +38899,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                 Case TokenType.KEYWDADDFACT
             lbProblemSolved =                     ParseADDFACTSTMT(node) ' NonTerminal Rule: ADDFACTSTMT
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -38909,7 +38910,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                 Case TokenType.KEYWDASSERT
             lbProblemSolved =                     ParseASSERTSTMT(node) ' NonTerminal Rule: ASSERTSTMT
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -38920,7 +38921,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                 Case TokenType.KEYWDDATABASE
             lbProblemSolved =                     ParseCREATEDATABASESTMT(node) ' NonTerminal Rule: CREATEDATABASESTMT
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -38931,7 +38932,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                 Case TokenType.KEYWDCREATE
             lbProblemSolved =                     ParseCREATESTMT(node) ' NonTerminal Rule: CREATESTMT
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -38942,7 +38943,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                 Case TokenType.KEYWDDELETE
             lbProblemSolved =                     ParseDELETESTMT(node) ' NonTerminal Rule: DELETESTMT
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -38953,7 +38954,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                 Case TokenType.KEYWDDELETEALL
             lbProblemSolved =                     ParseDELETEALLSTMT(node) ' NonTerminal Rule: DELETEALLSTMT
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -38964,7 +38965,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                 Case TokenType.KEYWDDELETEFACT
             lbProblemSolved =                     ParseDELETEFACTSTMT(node) ' NonTerminal Rule: DELETEFACTSTMT
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -38975,7 +38976,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                 Case TokenType.KEYWDDESCRIBE
             lbProblemSolved =                     ParseDESCRIBESTMT(node) ' NonTerminal Rule: DESCRIBESTMT
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -38986,7 +38987,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                 Case TokenType.KEYWDDID
             lbProblemSolved =                     ParseDIDSELECTSTMT(node) ' NonTerminal Rule: DIDSELECTSTMT
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -38997,7 +38998,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                 Case TokenType.KEYWDSHOW
             lbProblemSolved =                     ParseSHOWSTMT(node) ' NonTerminal Rule: SHOWSTMT
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -39008,7 +39009,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                 Case TokenType.KEYWDEACH
             lbProblemSolved =                     ParseCONSTRAINTEXTERNALSTMT(node) ' NonTerminal Rule: CONSTRAINTEXTERNALSTMT
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -39019,7 +39020,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                 Case TokenType.KEYWDEITHER
             lbProblemSolved =                     ParseCONSTRAINTEITHEROR(node) ' NonTerminal Rule: CONSTRAINTEITHEROR
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -39030,7 +39031,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                 Case TokenType.KEYWDA
             lbProblemSolved =                     ParseDERIVEDFACTTYPESTMT(node) ' NonTerminal Rule: DERIVEDFACTTYPESTMT
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -39041,7 +39042,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                 Case TokenType.KEYWDAN
             lbProblemSolved =                     ParseDERIVEDFACTTYPESTMT(node) ' NonTerminal Rule: DERIVEDFACTTYPESTMT
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -39052,7 +39053,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                 Case TokenType.KEYWDENUMERATE
             lbProblemSolved =                     ParseENUMERATESTMT(node) ' NonTerminal Rule: ENUMERATESTMT
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -39063,7 +39064,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                 Case TokenType.KEYWDMATCH
             lbProblemSolved =                     ParseMATCHSELECTSTMT(node) ' NonTerminal Rule: MATCHSELECTSTMT
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -39074,7 +39075,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                 Case TokenType.MODELELEMENTNAME
             lbProblemSolved =                     ParseFACTTYPEPRODUCTION(node) ' NonTerminal Rule: FACTTYPEPRODUCTION
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -39085,7 +39086,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                 Case TokenType.PREBOUNDREADINGTEXT
             lbProblemSolved =                     ParseDERIVATIONSTMT(node) ' NonTerminal Rule: DERIVATIONSTMT
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -39096,7 +39097,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                 Case TokenType.MODELELEMENTNAME
             lbProblemSolved =                     ParseDERIVATIONSTMT(node) ' NonTerminal Rule: DERIVATIONSTMT
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If
@@ -39109,7 +39110,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                      ' Concat Rule
                     lbProblemSolved =                             ParseWHICHSELECTSTMT(node) ' NonTerminal Rule: WHICHSELECTSTMT
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -39141,7 +39142,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                      ' Concat Rule
                     lbProblemSolved =                             ParseWHICHSELECTSTMT(node) ' NonTerminal Rule: WHICHSELECTSTMT
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -39173,7 +39174,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                      ' Concat Rule
                     lbProblemSolved =                             ParseWHICHSELECTSTMT(node) ' NonTerminal Rule: WHICHSELECTSTMT
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.StartPos >= Me.MaxDistance Then
+                              If liOriginalRange >= Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
@@ -39236,13 +39237,13 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                 If Not lbProblemSolved Then
                   m_tree.Errors.Clear
                   m_scanner.StartPos = liOriginalRange
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
             lbProblemSolved =                 ParseADDFACTSTMT(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: ADDFACTSTMT
                 If m_tree.Errors.Count > 0 Then
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
@@ -39254,13 +39255,13 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                 If Not lbProblemSolved Then
                   m_tree.Errors.Clear
                   m_scanner.StartPos = liOriginalRange
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
             lbProblemSolved =                 ParseASSERTSTMT(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: ASSERTSTMT
                 If m_tree.Errors.Count > 0 Then
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
@@ -39272,13 +39273,13 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                 If Not lbProblemSolved Then
                   m_tree.Errors.Clear
                   m_scanner.StartPos = liOriginalRange
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
             lbProblemSolved =                 ParseCREATEDATABASESTMT(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: CREATEDATABASESTMT
                 If m_tree.Errors.Count > 0 Then
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
@@ -39290,13 +39291,13 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                 If Not lbProblemSolved Then
                   m_tree.Errors.Clear
                   m_scanner.StartPos = liOriginalRange
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
             lbProblemSolved =                 ParseCREATESTMT(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: CREATESTMT
                 If m_tree.Errors.Count > 0 Then
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
@@ -39308,13 +39309,13 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                 If Not lbProblemSolved Then
                   m_tree.Errors.Clear
                   m_scanner.StartPos = liOriginalRange
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
             lbProblemSolved =                 ParseDELETESTMT(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: DELETESTMT
                 If m_tree.Errors.Count > 0 Then
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
@@ -39326,13 +39327,13 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                 If Not lbProblemSolved Then
                   m_tree.Errors.Clear
                   m_scanner.StartPos = liOriginalRange
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
             lbProblemSolved =                 ParseDELETEALLSTMT(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: DELETEALLSTMT
                 If m_tree.Errors.Count > 0 Then
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
@@ -39344,13 +39345,13 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                 If Not lbProblemSolved Then
                   m_tree.Errors.Clear
                   m_scanner.StartPos = liOriginalRange
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
             lbProblemSolved =                 ParseDELETEFACTSTMT(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: DELETEFACTSTMT
                 If m_tree.Errors.Count > 0 Then
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
@@ -39362,13 +39363,13 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                 If Not lbProblemSolved Then
                   m_tree.Errors.Clear
                   m_scanner.StartPos = liOriginalRange
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
             lbProblemSolved =                 ParseDESCRIBESTMT(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: DESCRIBESTMT
                 If m_tree.Errors.Count > 0 Then
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
@@ -39380,13 +39381,13 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                 If Not lbProblemSolved Then
                   m_tree.Errors.Clear
                   m_scanner.StartPos = liOriginalRange
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
             lbProblemSolved =                 ParseDIDSELECTSTMT(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: DIDSELECTSTMT
                 If m_tree.Errors.Count > 0 Then
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
@@ -39398,13 +39399,13 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                 If Not lbProblemSolved Then
                   m_tree.Errors.Clear
                   m_scanner.StartPos = liOriginalRange
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
             lbProblemSolved =                 ParseSHOWSTMT(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: SHOWSTMT
                 If m_tree.Errors.Count > 0 Then
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
@@ -39416,13 +39417,13 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                 If Not lbProblemSolved Then
                   m_tree.Errors.Clear
                   m_scanner.StartPos = liOriginalRange
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
             lbProblemSolved =                 ParseCONSTRAINTEXTERNALSTMT(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: CONSTRAINTEXTERNALSTMT
                 If m_tree.Errors.Count > 0 Then
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
@@ -39434,13 +39435,13 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                 If Not lbProblemSolved Then
                   m_tree.Errors.Clear
                   m_scanner.StartPos = liOriginalRange
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
             lbProblemSolved =                 ParseCONSTRAINTEITHEROR(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: CONSTRAINTEITHEROR
                 If m_tree.Errors.Count > 0 Then
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
@@ -39452,13 +39453,13 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                 If Not lbProblemSolved Then
                   m_tree.Errors.Clear
                   m_scanner.StartPos = liOriginalRange
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
             lbProblemSolved =                 ParseDERIVEDFACTTYPESTMT(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: DERIVEDFACTTYPESTMT
                 If m_tree.Errors.Count > 0 Then
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
@@ -39470,13 +39471,13 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                 If Not lbProblemSolved Then
                   m_tree.Errors.Clear
                   m_scanner.StartPos = liOriginalRange
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
             lbProblemSolved =                 ParseENUMERATESTMT(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: ENUMERATESTMT
                 If m_tree.Errors.Count > 0 Then
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
@@ -39488,13 +39489,13 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                 If Not lbProblemSolved Then
                   m_tree.Errors.Clear
                   m_scanner.StartPos = liOriginalRange
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
             lbProblemSolved =                 ParseMATCHSELECTSTMT(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: MATCHSELECTSTMT
                 If m_tree.Errors.Count > 0 Then
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
@@ -39506,13 +39507,13 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                 If Not lbProblemSolved Then
                   m_tree.Errors.Clear
                   m_scanner.StartPos = liOriginalRange
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
             lbProblemSolved =                 ParseFACTTYPEPRODUCTION(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: FACTTYPEPRODUCTION
                 If m_tree.Errors.Count > 0 Then
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
@@ -39524,13 +39525,13 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                 If Not lbProblemSolved Then
                   m_tree.Errors.Clear
                   m_scanner.StartPos = liOriginalRange
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
             lbProblemSolved =                 ParseDERIVATIONSTMT(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: DERIVATIONSTMT
                 If m_tree.Errors.Count > 0 Then
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
@@ -39542,7 +39543,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                 If Not lbProblemSolved Then
                   m_tree.Errors.Clear
                   m_scanner.StartPos = liOriginalRange
-                  If m_scanner.StartPos >= Me.MaxDistance Then
+                  If liOriginalRange >= Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
@@ -39550,7 +39551,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
              ' Concat Rule
             lbProblemSolved =                     ParseWHICHSELECTSTMT(node) ' NonTerminal Rule: WHICHSELECTSTMT
                     If m_tree.Errors.Count > 0 Then
-                      If m_scanner.StartPos >= Me.MaxDistance Then
+                      If liOriginalRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
                         max_tree = m_tree.clone
                       End If

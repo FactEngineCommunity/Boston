@@ -158,6 +158,24 @@ Module MyMethodExtensions
     End Function
 
     <Extension()>
+    Public Function AppendLine(ByRef asString As String, ByVal asStringExtension As String) As String
+
+        asString = asString & asStringExtension
+        Return asString
+
+    End Function
+
+    <Extension()>
+    Public Function AppendDoubleLineBreak(ByRef asString As String, ByVal asStringExtension As String) As String
+
+        asString = asString & vbCrLf & vbCrLf & asStringExtension
+        Return asString
+
+    End Function
+
+
+
+    <Extension()>
     Public Function IsNumeric(ByRef asString As String) As Boolean
 
         Dim number As Integer
