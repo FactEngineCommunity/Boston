@@ -2207,7 +2207,7 @@ Namespace FBM
                             Call Me.FactType.SetIsSubtypeStateControlling(Me.IsSubtypeStateControlling, True)
                     End Select
 
-                    Call Me.Page.Form.EnableSaveButton()
+                    Call Me.EnableSaveButton()
                 End If
 
                 '--------------------------------------------------
@@ -3439,7 +3439,7 @@ Namespace FBM
         Public Sub EnableSaveButton() Implements iPageObject.EnableSaveButton
             If Me.Page IsNot Nothing Then
                 If Me.Page.Form IsNot Nothing Then
-                    Call Me.Page.Form.EnableSaveButton
+                    Call Me.EnableSaveButton()
                 End If
             Else
                 Try

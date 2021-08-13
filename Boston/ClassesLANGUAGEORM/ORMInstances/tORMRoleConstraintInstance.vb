@@ -1179,7 +1179,7 @@ Namespace FBM
 
                     If IsSomething(Me.Page.Form) Then
                         Me.Page.Diagram.Invalidate()
-                        Call Me.Page.Form.EnableSaveButton()
+                        Call Me.EnableSaveButton()
                     End If
                 End If
 

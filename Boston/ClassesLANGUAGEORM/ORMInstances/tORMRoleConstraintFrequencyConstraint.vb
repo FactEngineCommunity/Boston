@@ -192,9 +192,9 @@ Namespace FBM
                                 Me.Symbol = Me.Name
                             End If
                         Case Is = "MinimumFrequencyCount"
-                            Call Me.Page.Form.EnableSaveButton()
+                            Call Me.EnableSaveButton()
                         Case Is = "MaximumFrequencyCount"
-                            Call Me.Page.Form.EnableSaveButton()
+                            Call Me.EnableSaveButton()
                     End Select
                 End If
 

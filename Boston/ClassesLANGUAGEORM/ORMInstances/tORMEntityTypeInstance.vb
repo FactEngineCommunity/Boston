@@ -2170,7 +2170,7 @@ Namespace FBM
                 Call Me.Page.MakeDirty()
 
                 If Me.Page.Form IsNot Nothing Then
-                    Call Me.Page.Form.EnableSaveButton()
+                    Call Me.EnableSaveButton()
                 End If
 
             Catch ex As Exception
@@ -2197,7 +2197,7 @@ Namespace FBM
                     Call lrSubtypeConstraintInstance.RemoveFromPage()
                     Me.SubtypeRelationship.Remove(lrSubtypeConstraintInstance)
                     If Me.Page.Form IsNot Nothing Then
-                        Call Me.Page.Form.EnableSaveButton()
+                        Call Me.EnableSaveButton()
                     End If
                 End If
 
@@ -2572,7 +2572,7 @@ Namespace FBM
         Public Sub EnableSaveButton() Implements iPageObject.EnableSaveButton
             If Me.Page IsNot Nothing Then
                 If Me.Page.Form IsNot Nothing Then
-                    Call Me.Page.Form.EnableSaveButton
+                    Call Me.EnableSaveButton()
                 End If
             Else
                 Try

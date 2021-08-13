@@ -146,7 +146,7 @@ Namespace PGS
                     If IsSomething(Me.Link) Then
                         'If Me.Link.Text <> "" Then
                         '    Me.Link.Text = Trim(Me.FactData.Data)
-                        '    Call Me.Page.Form.EnableSaveButton()
+                        '    Call Me.EnableSaveButton()
                         '    Me.Page.Diagram.Invalidate()
                         'End If
                     End If

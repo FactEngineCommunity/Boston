@@ -210,7 +210,7 @@ Namespace CMML
 
                             Me.Page.Diagram.Invalidate()
 
-                            Call Me.Page.Form.EnableSaveButton()
+                            Call Me.EnableSaveButton()
                         End If
                     End If
                 End If

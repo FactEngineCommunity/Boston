@@ -396,7 +396,7 @@ Namespace ERD
                             ' 1 for the stickfigure, the other for the name of the Actor.
                             '---------------------------------------------------------------------------------
                             Me.TableShape.Caption = "<B>" & " " & Trim(Me.FactData.Data) & " "
-                            Call Me.Page.Form.EnableSaveButton()
+                            Call Me.EnableSaveButton()
                             Me.Page.Diagram.Invalidate()
                         End If
                     End If
@@ -727,7 +727,7 @@ Namespace ERD
         Public Sub EnableSaveButton() Implements iPageObject.EnableSaveButton
             If Me.Page IsNot Nothing Then
                 If Me.Page.Form IsNot Nothing Then
-                    Call Me.Page.Form.EnableSaveButton
+                    Call Me.EnableSaveButton()
                 End If
             Else
                 Try
