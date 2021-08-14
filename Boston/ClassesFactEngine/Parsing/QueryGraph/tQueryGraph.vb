@@ -1244,7 +1244,12 @@
                                 lrRole = lrQueryEdge.FBMFactType.InternalUniquenessConstraint(0).Role(0)
                             ElseIf lrqueryedge.FBMFactType.HasTotalRoleConstraint And lrQueryEdge.FBMFactType.Arity = 2 Then
                                 If lrQueryEdge.FBMFactTypeReading IsNot Nothing Then
-                                    lrRole = lrQueryEdge.FBMFactTypeReading.PredicatePart(lrQueryEdge.FBMFactTypeReading.PredicatePart.IndexOf(lrQueryEdge.FBMPredicatePart)).Role
+                                    liRoleInd = lrQueryEdge.FBMFactTypeReading.PredicatePart.IndexOf(lrQueryEdge.FBMPredicatePart)
+                                    lrRole = lrQueryEdge.FBMFactTypeReading.PredicatePart(liRoleInd).Role
+                                    If lrRole.JoinedORMObject.Id <> lrQueryEdge.TargetNode.Name And liRoleInd = 0 Then
+                                        liRoleInd = 1
+                                        lrRole = lrQueryEdge.FBMFactType.RoleGroup.Find(Function(x) x IsNot lrRole)
+                                    End If
                                 Else
                                     lrRole = lrQueryEdge.FBMFactTypeReading.PredicatePart(1).Role
                                 End If

@@ -555,15 +555,12 @@ Public Class frmCRUDModel
 
             Dim lrProgressObject As ProgressObject = CType(e.UserState, ProgressObject)
 
-            If e.UserState Is Nothing Then
-                Me.RichTextBoxREMessages.AppendStringInColor(lrProgressObject.Message, Color.Black)
-            Else
+            If lrProgressObject.Message IsNot Nothing Then
                 If lrProgressObject.IsError Then
-                    Me.RichTextBoxREErrorMessages.AppendStringInColor("- " & lrProgressObject.Message, Color.Orange)
+                    Me.RichTextBoxREErrorMessages.AppendStringInColor(vbCrLf & "- " & lrProgressObject.Message, Color.Orange)
                 Else
-                    Me.RichTextBoxREMessages.AppendStringInColor(lrProgressObject.Message, Color.Black)
+                    Me.RichTextBoxREMessages.AppendStringInColor(vbCrLf & lrProgressObject.Message, Color.Black)
                 End If
-
             End If
         Catch ex As Exception
 

@@ -103,24 +103,24 @@ Public Class ODBCDatabaseReverseEngineer
             'Call Me.GetDataTypes()
 
             Call Me.getTables()
-            Call Me.SetProgressBarValue(10)
+            Call Me.SetProgressBarValue(10, "Loaded Tables.")
 
             Call Me.GetColumns()
-            Call Me.SetProgressBarValue(20)
+            Call Me.SetProgressBarValue(20, "Loaded Columns for Tables.")
 
             Call Me.GetIndexes()
-            Call Me.SetProgressBarValue(30)
+            Call Me.SetProgressBarValue(30, "Loaded Indexes for Tables.")
 
             Call Me.getRelations()
-            Call Me.SetProgressBarValue(40)
+            Call Me.SetProgressBarValue(40, "Loaded Relations for Tables.")
 
             Call Me.TempModel.RDS.orderTablesByRelations()
             Call Me.SetProgressBarValue(45)
 
             '------------------------------------------------------------------------------
             'Create EntityTypes for each Table with a PrimaryKey with one Column.
-            Call Me.SetProgressBarValue(60)
             Call Me.createTablesForSingleColumnPKTables()
+            Call Me.SetProgressBarValue(60, "Created Tables for Single Primary Key Column Tables.")
 
             Call Me.SetProgressBarValue(70)
             For Each lrTable In Me.TempModel.RDS.Table
@@ -302,7 +302,8 @@ Public Class ODBCDatabaseReverseEngineer
                         Throw New Exception("Couldn't find Origin Table, " & lrRelation.OriginTable.Name & ", in the Model.")
                     End If
                     lrModelElement1 = lrOriginTable.FBMModelElement
-                    lrModelElement2 = Me.Model.RDS.getTableByName(lrRelation.DestinationTable.Name).FBMModelElement
+                    Dim lrDestinationTable = Me.Model.RDS.getTableByName(lrRelation.DestinationTable.Name)
+                    lrModelElement2 = lrDestinationTable.FBMModelElement
 
                     larModelElement.Add(lrModelElement1)
                     larModelElement.Add(lrModelElement2)
@@ -319,6 +320,24 @@ Public Class ODBCDatabaseReverseEngineer
                     larRole.Add(lrFactType.RoleGroup(0))
 
                     Call lrFactType.CreateInternalUniquenessConstraint(larRole)
+
+                    '-----------------------------------------------------------------------------------------------
+                    'Name the Column based on the OriginColumn from the TempTable, because creating the 
+                    '  RoleConstraint/ IUC(above) does not preserve the Column name, but names it after what it points to.
+                    '  This may be a Column with a different name, in the DestinationTable.
+                    Try
+                        For Each lrColumn In lrOriginTable.Column.FindAll(Function(x) larRole.Contains(x.Role))
+                            Dim lrDestinationColumn As RDS.Column = lrDestinationTable.Column.Find(Function(x) x.ActiveRole Is lrColumn.ActiveRole)
+                            Dim lrTempDestinationColumn = lrRelation.DestinationColumns.Find(Function(x) LCase(x.Name) = LCase(lrDestinationColumn.Name))
+                            Dim liSequenceNr As Integer = lrRelation.DestinationColumns.IndexOf(lrTempDestinationColumn)
+                            Dim lsColumnName As String = lrRelation.OriginColumns(liSequenceNr).Name
+                            Call lrColumn.setName(lsColumnName)
+                        Next
+
+                    Catch ex As Exception
+                        'Not a biggie at this stage.
+                        Debugger.Break()
+                    End Try
 
                     '-----------------------------------------------------------------------------------------------
                     'Create the FactTypeReading
@@ -352,7 +371,7 @@ Public Class ODBCDatabaseReverseEngineer
             End If
 
         Catch ex As Exception
-            Call Me.SetProgressBarValue(Me.ProgressPercentage, ex.Message)
+            Debugger.Break()
         End Try
     End Sub
 
