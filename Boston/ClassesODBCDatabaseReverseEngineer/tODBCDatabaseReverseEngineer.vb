@@ -127,6 +127,7 @@ Public Class ODBCDatabaseReverseEngineer
 
                 'Create ValueTypes (that haven't already been created by virtue of being the ReferenceModeValueType of Simple Reference Scheme EntityTypes.
                 Call Me.createValueTypesByTable(lrTable)
+
 #Region "Create ObjectifiedFactTypes"
                 If Me.Model.GetModelObjectByName(lrTable.Name) Is Nothing Then
                     'The Table has no ModelElement, so create it.
@@ -221,6 +222,7 @@ Public Class ODBCDatabaseReverseEngineer
             'Create FactTypes for all other Relations.
             Call Me.SetProgressBarValue(80)
             Call Me.createFactTypesForAllOtherRelations()
+            Call Me.SetProgressBarValue(85, "Created Fact Types for all other Relations.")
 
             '-----------------------------------------------------------------------------
             'Create FactTypes that are from a ModelElement straight to a ValueType.
@@ -290,7 +292,7 @@ Public Class ODBCDatabaseReverseEngineer
     Private Sub createFactTypesForAllOtherRelations()
 
         Try
-            For Each lrRelation In Me.TempModel.RDS.Relation.FindAll(Function(x) Not x.isPrimaryKeyBasedRelation)
+            For Each lrRelation In Me.TempModel.RDS.Relation.FindAll(Function(x) Not x.isPrimaryKeyBasedRelation).ToArray
                 'Relations to other Tables.
                 Dim larModelElement As New List(Of FBM.ModelObject)
                 Dim lrModelElement1 As FBM.ModelObject = Nothing
@@ -356,7 +358,8 @@ Public Class ODBCDatabaseReverseEngineer
 
         Catch ex As Exception
             Dim lsMessage As String = ""
-            lsMessage = "Creating Fact Types for all other Relations:" & ex.Message
+            lsMessage = "Creating Fact Types for all other Relations: " & ex.Message & "...Check to see that the relevant Table/s have a Primary Key set in the database."
+            Throw New Exception(lsMessage)
         End Try
 
     End Sub
