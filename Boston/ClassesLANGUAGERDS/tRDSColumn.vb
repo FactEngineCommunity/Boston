@@ -553,7 +553,14 @@ Namespace RDS
 
             Try
                 Try
-                    If Me.Role.JoinedORMObject.Id = Me.Table.Name Then
+                    If Me.Role Is Nothing Then
+                        'CodeSafe
+                        If Me.Table Is Nothing Then
+                            Return False
+                        Else
+                            lrTable = Me.Table
+                        End If
+                    ElseIf Me.Role.JoinedORMObject.Id = Me.Table.Name Then
                         lrTable = Me.Table
                     ElseIf Me.Role.FactType.Id = Me.Table.Name Then
                         lrTable = Me.FactType.getCorrespondingRDSTable

@@ -4,7 +4,7 @@ Imports System.IO
 Imports System.Reflection
 Imports System.Configuration
 Imports System.Data.SQLite
-Imports ADOX
+Imports System.ComponentModel
 
 Public Class frmCRUDModel
 
@@ -150,24 +150,24 @@ Public Class frmCRUDModel
 
             Dim lrSQLConnectionStringBuilder As System.Data.Common.DbConnectionStringBuilder = Nothing
 
-                    Try
-                        lrSQLConnectionStringBuilder = New System.Data.Common.DbConnectionStringBuilder(True) With {
-                           .ConnectionString = lsConnectionString
-                        }
+            Try
+                lrSQLConnectionStringBuilder = New System.Data.Common.DbConnectionStringBuilder(True) With {
+                   .ConnectionString = lsConnectionString
+                }
 
-                        lsDatabaseLocation = lrSQLConnectionStringBuilder("Data Source")
+                lsDatabaseLocation = lrSQLConnectionStringBuilder("Data Source")
 
-                    Catch ex As Exception
-                        asReturnMessage = "Please fix the Database Connection String and try again." & vbCrLf & vbCrLf & ex.Message
-                        Return False
-                    End Try
+            Catch ex As Exception
+                asReturnMessage = "Please fix the Database Connection String and try again." & vbCrLf & vbCrLf & ex.Message
+                Return False
+            End Try
 
-                    If Not System.IO.File.Exists(lsDatabaseLocation) Then
-                        asReturnMessage = "The database source of the Database Connection String you provided points to a file that does not exist."
-                        asReturnMessage &= vbCrLf & vbCrLf
-                        asReturnMessage &= "Please fix the Database Connection String and try again."
-                        Return False
-                    End If
+            If Not System.IO.File.Exists(lsDatabaseLocation) Then
+                asReturnMessage = "The database source of the Database Connection String you provided points to a file that does not exist."
+                asReturnMessage &= vbCrLf & vbCrLf
+                asReturnMessage &= "Please fix the Database Connection String and try again."
+                Return False
+            End If
 
             Try
                 Select Case Me.ComboBoxDatabaseType.SelectedItem.Tag
@@ -202,7 +202,7 @@ Public Class frmCRUDModel
     Private Sub ButtonTestConnection_Click(sender As Object, e As EventArgs) Handles ButtonTestConnection.Click
 
         Try
-            Call Me.TestConnection
+            Call Me.TestConnection()
         Catch ex As Exception
 
         End Try
@@ -357,7 +357,8 @@ Public Class frmCRUDModel
                 Dim lrReverseEngineer As New ODBCDatabaseReverseEngineer(Me.zrModel,
                                                                          Trim(Me.TextBoxDatabaseConnectionString.Text),
                                                                          True,
-                                                                         Me.ProgressBarReverseEngineering)
+                                                                         Me.ProgressBarReverseEngineering,
+                                                                         Me.BackgroundWorker)
 
                 Call Me.AddREMessage("- Reverse engineering started.")
                 Dim lsErrorMessage As String = ""
@@ -544,6 +545,29 @@ Public Class frmCRUDModel
 
         Me.Hide()
         Me.Close()
+
+    End Sub
+
+    Private Sub BackgroundWorker_ProgressChanged(sender As Object, e As ProgressChangedEventArgs) Handles BackgroundWorker.ProgressChanged
+
+        Try
+            Me.ProgressBarReverseEngineering.Value = e.ProgressPercentage
+
+            Dim lrProgressObject As ProgressObject = CType(e.UserState, ProgressObject)
+
+            If e.UserState Is Nothing Then
+                Me.RichTextBoxREMessages.AppendStringInColor(lrProgressObject.Message, Color.Black)
+            Else
+                If lrProgressObject.IsError Then
+                    Me.RichTextBoxREErrorMessages.AppendStringInColor("- " & lrProgressObject.Message, Color.Orange)
+                Else
+                    Me.RichTextBoxREMessages.AppendStringInColor(lrProgressObject.Message, Color.Black)
+                End If
+
+            End If
+        Catch ex As Exception
+
+        End Try
 
     End Sub
 

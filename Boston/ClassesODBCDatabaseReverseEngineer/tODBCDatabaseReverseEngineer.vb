@@ -1,8 +1,23 @@
 ﻿Imports System.Reflection
 
+Public Class ProgressObject
+
+    Public IsError As Boolean
+    Public Message As String
+
+    Public Sub New()
+    End Sub
+
+    Public Sub New(ByVal abIsError As Boolean, ByVal asMessage As String)
+        Me.IsError = abIsError
+        Me.Message = asMessage
+    End Sub
+
+End Class
+
 Public Class ODBCDatabaseReverseEngineer
 
-    Dim Model As FBM.Model 'The model to which the database schema is to be mapped.
+    Private Model As FBM.Model 'The model to which the database schema is to be mapped.
 
     Private ODBCConnection As System.Data.Odbc.OdbcConnection
 
@@ -11,14 +26,17 @@ Public Class ODBCDatabaseReverseEngineer
     '''   NB Have to do this because creating the ModelElements in Me.Model will actually create the RDS structure for that Model.
     '''   The database structure is first loaded into TempModel, then the ModelElements created in Me.Model from TempModel.
     ''' </summary>
-    Dim TempModel As New FBM.Model
+    Private TempModel As New FBM.Model
 
     ''' <summary>
     ''' True if the user elects to create a Page in the Model for each Table.
     ''' </summary>
-    Dim CreatePagePerTable As Boolean = False
+    Private CreatePagePerTable As Boolean = False
 
-    Dim ProgressBar As ProgressBar = Nothing
+    Private ProgressBar As ProgressBar = Nothing
+    Private ProgressPercentage As Integer = 0
+
+    Private [BackgroundWorker] As System.ComponentModel.BackgroundWorker = Nothing
 
     '=========================================================================================================================================================
     ''' <summary>
@@ -28,11 +46,13 @@ Public Class ODBCDatabaseReverseEngineer
     Public Sub New(ByRef arModel As FBM.Model,
                    ByVal asDatabaseConnectionString As String,
                    ByVal abCreatePagePerTable As Boolean,
-                   Optional ByRef aoProgressBar As ProgressBar = Nothing)
+                   Optional ByRef aoProgressBar As ProgressBar = Nothing,
+                   Optional ByRef arBackgroundWorker As System.ComponentModel.BackgroundWorker = Nothing)
         Me.Model = arModel
         Me.ODBCConnection = New System.Data.Odbc.OdbcConnection(asDatabaseConnectionString)
         Me.CreatePagePerTable = abCreatePagePerTable
         Me.ProgressBar = aoProgressBar
+        Me.BackgroundWorker = arBackgroundWorker
     End Sub
 
     ''' <summary>
@@ -78,7 +98,7 @@ Public Class ODBCDatabaseReverseEngineer
 
             'Load DatabaseTypes into memory.
             Call Me.Model.DatabaseConnection.getDatabaseTypes()
-            Call Me.SetProgressBarValue(5)
+            Call Me.SetProgressBarValue(5, "Loaded Data Types.")
 
             'Call Me.GetDataTypes()
 
@@ -200,41 +220,7 @@ Public Class ODBCDatabaseReverseEngineer
             '-----------------------------------------------------------------------------
             'Create FactTypes for all other Relations.
             Call Me.SetProgressBarValue(80)
-            For Each lrRelation In Me.TempModel.RDS.Relation.FindAll(Function(x) Not x.isPrimaryKeyBasedRelation)
-                'Relations to other Tables.
-                Dim larModelElement As New List(Of FBM.ModelObject)
-                Dim lrModelElement1 As FBM.ModelObject = Nothing
-                Dim lrModelElement2 As FBM.ModelObject = Nothing
-
-                lrModelElement1 = Me.Model.RDS.getTableByName(lrRelation.OriginTable.Name).FBMModelElement
-                lrModelElement2 = Me.Model.RDS.getTableByName(lrRelation.DestinationTable.Name).FBMModelElement
-
-                larModelElement.Add(lrModelElement1)
-                larModelElement.Add(lrModelElement2)
-
-                Dim lsFactTypeName As String = lrModelElement1.Id & lrModelElement2.Id
-                lsFactTypeName = Me.Model.CreateUniqueFactTypeName(lsFactTypeName, 0)
-
-                Dim lrFactType As FBM.FactType = Me.Model.CreateFactType(lsFactTypeName, larModelElement, False, True, , , False, )
-                Me.Model.AddFactType(lrFactType)
-
-
-                'Create the internalUniquenessConstraint.
-                Dim larRole As New List(Of FBM.Role)
-                larRole.Add(lrFactType.RoleGroup(0))
-
-                Call lrFactType.CreateInternalUniquenessConstraint(larRole)
-
-                '-----------------------------------------------------------------------------------------------
-                'Create the FactTypeReading
-                Dim lrSentence As New Language.Sentence("random sentence")
-                lrSentence.PredicatePart.Add(New Language.PredicatePart("has"))
-                lrSentence.PredicatePart.Add(New Language.PredicatePart("has"))
-
-                Dim lrFactTypeReading As New FBM.FactTypeReading(lrFactType, lrFactType.RoleGroup, lrSentence)
-                lrFactType.FactTypeReading.Add(lrFactTypeReading)
-
-            Next
+            Call Me.createFactTypesForAllOtherRelations()
 
             '-----------------------------------------------------------------------------
             'Create FactTypes that are from a ModelElement straight to a ValueType.
@@ -294,22 +280,79 @@ Public Class ODBCDatabaseReverseEngineer
             Call Me.SetProgressBarValue(100)
 
         Catch ex As Exception
-            Debugger.Break()
+            Me.ReportError(ex.Message)
         End Try
 
         Return True
 
     End Function
 
-    Private Sub SetProgressBarValue(ByVal aiValue As Integer)
+    Private Sub createFactTypesForAllOtherRelations()
 
         Try
-            If Me.ProgressBar IsNot Nothing Then
-                Me.ProgressBar.Value = aiValue
+            For Each lrRelation In Me.TempModel.RDS.Relation.FindAll(Function(x) Not x.isPrimaryKeyBasedRelation)
+                'Relations to other Tables.
+                Dim larModelElement As New List(Of FBM.ModelObject)
+                Dim lrModelElement1 As FBM.ModelObject = Nothing
+                Dim lrModelElement2 As FBM.ModelObject = Nothing
+
+                Try
+                    Dim lrOriginTable As RDS.Table = Me.Model.RDS.getTableByName(lrRelation.OriginTable.Name)
+                    If lrOriginTable Is Nothing Then
+                        Throw New Exception("Couldn't find Origin Table, " & lrRelation.OriginTable.Name & ", in the Model.")
+                    End If
+                    lrModelElement1 = lrOriginTable.FBMModelElement
+                    lrModelElement2 = Me.Model.RDS.getTableByName(lrRelation.DestinationTable.Name).FBMModelElement
+
+                    larModelElement.Add(lrModelElement1)
+                    larModelElement.Add(lrModelElement2)
+
+                    Dim lsFactTypeName As String = lrModelElement1.Id & lrModelElement2.Id
+                    lsFactTypeName = Me.Model.CreateUniqueFactTypeName(lsFactTypeName, 0)
+
+                    Dim lrFactType As FBM.FactType = Me.Model.CreateFactType(lsFactTypeName, larModelElement, False, True, , , False, )
+                    Me.Model.AddFactType(lrFactType)
+
+
+                    'Create the internalUniquenessConstraint.
+                    Dim larRole As New List(Of FBM.Role)
+                    larRole.Add(lrFactType.RoleGroup(0))
+
+                    Call lrFactType.CreateInternalUniquenessConstraint(larRole)
+
+                    '-----------------------------------------------------------------------------------------------
+                    'Create the FactTypeReading
+                    Dim lrSentence As New Language.Sentence("random sentence")
+                    lrSentence.PredicatePart.Add(New Language.PredicatePart("has"))
+                    lrSentence.PredicatePart.Add(New Language.PredicatePart("has"))
+
+                    Dim lrFactTypeReading As New FBM.FactTypeReading(lrFactType, lrFactType.RoleGroup, lrSentence)
+                    lrFactType.FactTypeReading.Add(lrFactTypeReading)
+
+                Catch ex As Exception
+                    Throw New Exception("Error creating Fact Type" & ex.Message)
+                End Try
+
+            Next
+
+        Catch ex As Exception
+            Dim lsMessage As String = ""
+            lsMessage = "Creating Fact Types for all other Relations:" & ex.Message
+        End Try
+
+    End Sub
+
+    Private Sub SetProgressBarValue(ByVal aiValue As Integer, Optional asMessage As String = Nothing)
+
+        Try
+            Dim lrProgressObject As New ProgressObject(False, asMessage)
+            Me.ProgressPercentage = aiValue
+            If Me.BackgroundWorker IsNot Nothing Then
+                Me.BackgroundWorker.ReportProgress(aiValue, lrProgressObject)
             End If
 
         Catch ex As Exception
-            Debugger.Break()
+            Call Me.SetProgressBarValue(Me.ProgressPercentage, ex.Message)
         End Try
     End Sub
 
@@ -357,7 +400,7 @@ Public Class ODBCDatabaseReverseEngineer
             Next
 
         Catch ex As Exception
-
+            Debugger.Break()
         End Try
     End Sub
 
@@ -375,7 +418,14 @@ Public Class ODBCDatabaseReverseEngineer
 
         Try
             For Each lrTable In Me.TempModel.RDS.Table
-                For Each lrRelation In Me.TempModel.DatabaseConnection.getForeignKeyRelationshipsByTable(lrTable)
+                Dim larRelation As New List(Of RDS.Relation)
+                Try
+                    larRelation = Me.TempModel.DatabaseConnection.getForeignKeyRelationshipsByTable(lrTable)
+                Catch ex As Exception
+                    Me.ReportError(ex.Message)
+                End Try
+
+                For Each lrRelation In larRelation
                     Me.TempModel.RDS.Relation.Add(lrRelation)
                 Next
             Next
@@ -544,7 +594,7 @@ Public Class ODBCDatabaseReverseEngineer
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            Call Me.ReportError(lsMessage)
         End Try
 
     End Sub
@@ -597,7 +647,7 @@ Public Class ODBCDatabaseReverseEngineer
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            Call Me.ReportError(lsMessage)
         End Try
 
     End Sub
@@ -620,6 +670,12 @@ Public Class ODBCDatabaseReverseEngineer
             prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
+    End Sub
+
+    Private Sub ReportError(asErrorMessage As String)
+
+        Dim lrProgressObject As New ProgressObject(True, asErrorMessage)
+        Me.BackgroundWorker.ReportProgress(Me.ProgressPercentage, lrProgressObject)
     End Sub
 
 

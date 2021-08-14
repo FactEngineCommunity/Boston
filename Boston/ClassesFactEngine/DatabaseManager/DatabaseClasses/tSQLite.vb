@@ -506,8 +506,20 @@ Namespace FactEngine
 
                         lrOriginColumn = arTable.Column.Find(Function(x) x.Name = lrRecordset("from").Data)
                         lrDestinationColumn = lrDestinationTable.Column.Find(Function(x) x.Name = lrRecordset("to").Data)
+                        If lrDestinationColumn Is Nothing Then
+                            'Try and find the DestinationColumn another way.
+                            If lrDestinationTable.Index.Find(Function(x) x.IsPrimaryKey) IsNot Nothing Then
+                                If lrDestinationTable.Index.Find(Function(x) x.IsPrimaryKey).Column.Count = 1 Then
+                                    lrDestinationColumn = lrDestinationTable.Index.Find(Function(x) x.IsPrimaryKey).Column.First
+                                Else
+                                    Throw New Exception("Foreign key from Table, '" & arTable.Name & "', to table, '" & lrDestinationTable.Name & "', has a Column that can not be found in the referenced table. Try making the Column in '" & lrDestinationTable.Name & "' match those in table, " & arTable.Name)
+                                End If
+                            End If
+
+                        End If
 
                         If Not lasToTableNames.Contains(lrRecordset("table").Data) Then
+
                             lrRelation = New RDS.Relation(System.Guid.NewGuid.ToString,
                                                   arTable,
                                                   pcenumCMMLMultiplicity.Many,
@@ -547,11 +559,12 @@ Namespace FactEngine
                 Dim lsMessage As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
-                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
-                lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                lsMessage = "Error: " & arTable.Name & ":" & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message & ex.StackTrace
+                'prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
-                Return New List(Of RDS.Relation)
+                'Return New List(Of RDS.Relation)
+                Throw New Exception(lsMessage)
             End Try
         End Function
 
