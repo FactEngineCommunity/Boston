@@ -468,31 +468,31 @@ Namespace ERD
 
         End Sub
 
-        Public Sub MouseDown() Implements FBM.iPageObject.MouseDown
+        Public Overloads Sub MouseDown() Implements FBM.iPageObject.MouseDown
 
         End Sub
 
-        Public Sub MouseMove() Implements FBM.iPageObject.MouseMove
+        Public Overloads Sub MouseMove() Implements FBM.iPageObject.MouseMove
 
         End Sub
 
-        Public Sub MouseUp() Implements FBM.iPageObject.MouseUp
+        Public Overloads Sub MouseUp() Implements FBM.iPageObject.MouseUp
 
         End Sub
 
-        Public Sub Moved() Implements FBM.iPageObject.Moved
+        Public Overloads Sub Moved() Implements FBM.iPageObject.Moved
 
         End Sub
 
-        Public Sub NodeDeleting() Implements FBM.iPageObject.NodeDeleting
+        Public Overloads Sub NodeDeleting() Implements FBM.iPageObject.NodeDeleting
 
         End Sub
 
-        Public Sub NodeModified() Implements FBM.iPageObject.NodeModified
+        Public Overloads Sub NodeModified() Implements FBM.iPageObject.NodeModified
 
         End Sub
 
-        Public Sub NodeSelected() Implements FBM.iPageObject.NodeSelected
+        Public Overloads Sub NodeSelected() Implements FBM.iPageObject.NodeSelected
 
             Me.TableShape.Pen.Color = Color.Blue
 
@@ -502,7 +502,7 @@ Namespace ERD
 
         End Sub
 
-        Public Sub NodeDeselected() Implements FBM.iTableNodePageObject.NodeDeselected
+        Public Overloads Sub NodeDeselected() Implements FBM.iTableNodePageObject.NodeDeselected
 
             Me.TableShape.Pen.Color = Color.Black
 
@@ -513,15 +513,15 @@ Namespace ERD
 
         End Sub
 
-        Public Sub SetAppropriateColour() Implements FBM.iPageObject.SetAppropriateColour
+        Public Overloads Sub SetAppropriateColour() Implements FBM.iPageObject.SetAppropriateColour
 
         End Sub
 
-        Public Sub RepellNeighbouringPageObjects(ByVal aiDepth As Integer) Implements FBM.iPageObject.RepellNeighbouringPageObjects
+        Public Overloads Sub RepellNeighbouringPageObjects(ByVal aiDepth As Integer) Implements FBM.iPageObject.RepellNeighbouringPageObjects
 
         End Sub
 
-        Public Sub Move(ByVal aiNewX As Integer, ByVal aiNewY As Integer, ByVal abBroadcastInterfaceEvent As Boolean) Implements FBM.iPageObject.Move
+        Public Overloads Sub Move(ByVal aiNewX As Integer, ByVal aiNewY As Integer, ByVal abBroadcastInterfaceEvent As Boolean) Implements FBM.iPageObject.Move
 
             Me.X = aiNewX
             Me.Y = aiNewY

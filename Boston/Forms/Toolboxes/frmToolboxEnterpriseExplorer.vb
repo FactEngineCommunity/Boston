@@ -1627,9 +1627,10 @@ Public Class frmToolboxEnterpriseExplorer
                                         Optional arCreateDatabaseStatement As FEQL.CREATEDATABASEStatement = Nothing) As FBM.Model
 
         Try
+            Dim lrModel As FBM.Model = Nothing
+
             With New WaitCursor
                 Dim lrNewTreeNode As TreeNode = Nothing
-                Dim lrModel As FBM.Model
 
                 If Me.TreeView.Nodes(0).Nodes.Count > 0 Then
                     Me.TreeView.Nodes(0).Nodes(Me.TreeView.Nodes(0).Nodes.Count - 1).EnsureVisible()
@@ -1697,9 +1698,9 @@ Public Class frmToolboxEnterpriseExplorer
 
                 Call Me.TreeView.Nodes(0).Expand()
 
-                Return lrModel
-
             End With 'WaitCursor
+
+            Return lrModel
 
         Catch ex As Exception
             Dim lsMessage1 As String

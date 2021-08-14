@@ -549,24 +549,26 @@ Public Class frmToolboxModelDictionary
                         Me.TreeView1.ContextMenuStrip = Nothing
                     Else
                         loModelObject = Me.TreeView1.SelectedNode.Tag
-                        Me.ViewOnPageToolStripMenuItem.DropDownItems.Clear()
+                        Me.ToolStripMenuItemViewOnPage.DropDownItems.Clear()
                         If IsSomething(loModelObject) Then
                             '-----------------------------------------------
                             'Establish the ContextMenu for the SelectedNode
                             '-----------------------------------------------
-                            Select Case loModelObject.ConceptType
-                                Case Is = pcenumConceptType.EntityType
+                            Select Case loModelObject.GetType
+                                Case Is = GetType(FBM.EntityType)
                                     Me.TreeView1.ContextMenuStrip = Me.ContextMenuStrip1
-                                    Call LoadPagesForEntityType(Me.ViewOnPageToolStripMenuItem, loModelObject.Id)
-                                Case Is = pcenumConceptType.ValueType
+                                    Call LoadPagesForEntityType(Me.ToolStripMenuItemViewOnPage, loModelObject.Id)
+                                Case Is = GetType(FBM.ValueType)
                                     Me.TreeView1.ContextMenuStrip = Me.ContextMenuStrip1
-                                    Call LoadPagesForValueType(Me.ViewOnPageToolStripMenuItem, loModelObject.Id)
-                                Case Is = pcenumConceptType.FactType
+                                    Call LoadPagesForValueType(Me.ToolStripMenuItemViewOnPage, loModelObject.Id)
+                                Case Is = GetType(FBM.FactType)
                                     Me.TreeView1.ContextMenuStrip = Me.ContextMenuStrip1
-                                    Call LoadPagesForFactType(Me.ViewOnPageToolStripMenuItem, loModelObject.Id)
-                                Case Is = pcenumConceptType.RoleConstraint
+                                    Call LoadPagesForFactType(Me.ToolStripMenuItemViewOnPage, loModelObject.Id)
+                                Case Is = GetType(FBM.RoleConstraint)
                                     Me.TreeView1.ContextMenuStrip = Me.ContextMenuStrip1
-                                    Call LoadPagesForRoleConstraint(Me.ViewOnPageToolStripMenuItem, loModelObject.Id)
+                                    Call LoadPagesForRoleConstraint(Me.ToolStripMenuItemViewOnPage, loModelObject.Id)
+                                Case Is = GetType(RDS.Table)
+                                    Me.TreeView1.ContextMenuStrip = Me.ContextMenuStrip1
                                 Case Else
                                     Me.TreeView1.ContextMenuStrip = Nothing
                             End Select
@@ -844,7 +846,7 @@ Public Class frmToolboxModelDictionary
 
     End Sub
 
-    Private Sub RemoveFromModelToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles RemoveFromModelToolStripMenuItem.Click
+    Private Sub RemoveFromModelToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripMenuItemRemoveFromModel.Click
 
         Dim lsMessage As String = ""
         Dim lrModelObject As FBM.ModelObject
@@ -909,8 +911,13 @@ Public Class frmToolboxModelDictionary
                       GetType(FBM.ValueType),
                       GetType(FBM.FactType)
                 Me.ToolStripMenuItemViewInDiagramSpy.Enabled = True
+            Case Is = GetType(RDS.Table)
+                Me.ToolStripMenuItemViewInDiagramSpy.Enabled = False
+                Me.ToolStripMenuItemRemoveFromModel.Enabled = False
+                Me.ToolStripMenuItemViewOnPage.Enabled = False
             Case Else
                 Me.ToolStripMenuItemViewInDiagramSpy.Enabled = False
+
         End Select
 
         '20200725-Remove if everything seems okay. Is covered in MouseDown
@@ -1113,46 +1120,80 @@ Public Class frmToolboxModelDictionary
 
     End Sub
 
-    Private Sub MakeNewPageForThisModelElementToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles MakeNewPageForThisModelElementToolStripMenuItem.Click
+    Private Sub MakeNewPageForThisModelElementToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItemMakeNewPageForThisModelElement.Click
 
         If Me.zrLoadedModel Is Nothing Then Me.zrLoadedModel = Me.zrORMModel
 
         Dim lrDiagramSpyPage As New FBM.DiagramSpyPage(Me.zrLoadedModel, "123", "Diagram Spy", pcenumLanguage.ORMModel)
 
-        Dim lrModelObject As FBM.ModelObject
+        Dim lrModelObject As Object = Me.TreeView1.SelectedNode.Tag
 
         Try
-            lrModelObject = Me.zrLoadedModel.GetModelObjectByName(Me.TreeView1.SelectedNode.Tag.Id)
+            With New WaitCursor
 
-            Dim lsPageName As String = "New ORM Model Page"
-            If lrModelObject IsNot Nothing Then
-                lsPageName = CType(lrModelObject, FBM.EntityType).Id
-            Else
-                Exit Sub
-            End If
-            lsPageName = Me.zrORMModel.CreateUniquePageName(lsPageName, 0)
-            Dim lrPage = New FBM.Page(Me.zrORMModel, Nothing, lsPageName, pcenumLanguage.ORMModel)
+                Dim lsPageName As String = "New Page"
+                If lrModelObject Is Nothing Then
+                    Exit Sub
+                End If
 
-            lrPage.Loaded = True
-            Me.zrORMModel.Page.Add(lrPage)
-            lrPage.Save(True, True)
-
-            Me.zrORMModel.AllowCheckForErrors = True
-            frmMain.Cursor = Cursors.Default
-
-            Dim lrEnterpriseView As tEnterpriseEnterpriseView = Nothing
-
-            lrEnterpriseView = frmMain.zfrmModelExplorer.AddExistingPageToModel(lrPage, lrPage.Model, lrPage.Model.TreeNode, True)
-
-            MsgBox("Added the new ORM Diagram Page, '" & lrPage.Name & "' to the Model.")
-
-            Select Case lrModelObject.GetType
-                Case Is = GetType(FBM.EntityType)
-                    Dim lrEntityType As FBM.EntityType = lrModelObject
-                    Call lrPage.DropEntityTypeAtPoint(lrEntityType, New PointF(10, 10), True)
-            End Select
+                '===============================================================================
+                'Create the Page
+                Dim lrPage As FBM.Page = Nothing
 
 
+                Select Case lrModelObject.GetType
+                    Case Is = GetType(FBM.EntityType)
+
+                        lrModelObject = Me.zrLoadedModel.GetModelObjectByName(Me.TreeView1.SelectedNode.Tag.Id)
+                        lsPageName = CType(lrModelObject, FBM.EntityType).Id
+                        lsPageName = Me.zrORMModel.CreateUniquePageName(lsPageName, 0)
+
+                        lrPage = New FBM.Page(Me.zrORMModel, Nothing, lsPageName, pcenumLanguage.ORMModel)
+
+                    Case = GetType(RDS.Table)
+
+                        lsPageName = Me.zrORMModel.CreateUniquePageName(lrModelObject.Name, 0)
+                        'Clone the Core EntityRelationshipDiagram Page
+                        Dim lrCorePage As New FBM.Page(prApplication.CMML.Core,
+                                   pcenumCMMLCorePage.CoreEntityRelationshipDiagram.ToString,
+                                   pcenumCMMLCorePage.CoreEntityRelationshipDiagram.ToString,
+                                   pcenumLanguage.ORMModel)
+
+                        lrCorePage = prApplication.CMML.Core.Page.Find(AddressOf lrCorePage.EqualsByName)
+
+                        If lrCorePage Is Nothing Then
+                            Throw New Exception("Couldn't find Page, '" & pcenumCMMLCorePage.CoreEntityRelationshipDiagram.ToString & "', in the Core Model.")
+                        End If
+
+                        '----------------------------------------------------
+                        'Create the Page for the EntityRelationshipDiagram.
+                        '----------------------------------------------------
+                        lrPage = lrCorePage.Clone(prApplication.WorkingModel)
+                        lrPage.Language = pcenumLanguage.EntityRelationshipDiagram
+                End Select
+
+                lrPage.Name = lsPageName
+                lrPage.Loaded = True
+                Me.zrORMModel.Page.Add(lrPage)
+                lrPage.Save(True, True)
+
+                Me.zrORMModel.AllowCheckForErrors = True
+
+                Dim lrEnterpriseView As tEnterpriseEnterpriseView = Nothing
+
+                lrEnterpriseView = frmMain.zfrmModelExplorer.AddExistingPageToModel(lrPage, lrPage.Model, lrPage.Model.TreeNode, True)
+
+                MsgBox("Added the new ORM Diagram Page, '" & lrPage.Name & "' to the Model.")
+
+                Select Case lrModelObject.GetType
+                    Case Is = GetType(FBM.EntityType)
+                        Dim lrEntityType As FBM.EntityType = lrModelObject
+                        Call lrPage.DropEntityTypeAtPoint(lrEntityType, New PointF(10, 10), True)
+                    Case Is = GetType(RDS.Table)
+                        Call lrPage.dropRDSTableAtPoint(lrModelObject, New PointF(10, 10))
+                End Select
+
+            End With
 
         Catch ex As Exception
             Dim lsMessage As String

@@ -1911,6 +1911,60 @@ Namespace FBM
 
         End Sub
 
+        Public Function dropRDSTableAtPoint(ByRef arTable As RDS.Table, ByVal aoPointF As PointF) As ERD.Entity
+
+            Try
+                Dim lsSQLQuery As String = ""
+                Dim lrFactInstance As FBM.FactInstance
+                Dim lrRecordset As ORMQL.Recordset
+                Dim lsMessage As String = ""
+
+                lsSQLQuery = "SELECT *"
+                lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreElementHasElementType.ToString
+                lsSQLQuery &= " WHERE Element = '" & arTable.Name & "'"
+
+                lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                If lrRecordset.EOF Then
+                    lsMessage = "The Entity, '" & arTable.Name & "', does not seem to have any Attributes at this stage. Make sure that the corresponding Model Element in your Object-Role Model at least has a Primary Reference Scheme."
+                    lsMessage &= vbCrLf & vbCrLf & "Entities in Entity-Relationship Diagrams in Boston have their Attributes created by the relative relations of the corresponding Model Element in your Object-Role Model."
+
+                    If Me.Model.GetModelObjectByName(arTable.Name).ConceptType = pcenumConceptType.EntityType Then
+                        lsMessage &= vbCrLf & vbCrLf & "i.e. Make sure the Entity Type, '" & arTable.Name & "', at least has a Primary Reference Scheme in your Object-Role Model."
+                    End If
+                    Call prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Information, Nothing, False, False, True)
+                    Return Nothing
+                Else
+
+                    lsSQLQuery = "ADD FACT '" & lrRecordset.CurrentFact.Id & "'"
+                    lsSQLQuery &= " TO " & pcenumCMMLRelations.CoreElementHasElementType.ToString
+                    lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
+
+                    lrFactInstance = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                    Dim lrEntity As ERD.Entity = lrFactInstance.GetFactDataInstanceByRoleName(pcenumCMML.Element.ToString).CloneEntity(Me)
+                    lrEntity.RDSTable = arTable
+                    Me.ERDiagram.Entity.AddUnique(lrEntity)
+                    '===================================================================================================================
+
+                    Call Me.Save(False, False)
+
+                    Return lrEntity
+                End If
+
+
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Function
+
         ''' <summary>
         ''' Empties the Page of objects. Used particularly when deleting a Page.
         ''' </summary>

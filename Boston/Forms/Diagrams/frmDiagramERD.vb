@@ -19,31 +19,42 @@ Public Class frmDiagramERD
 
         '---------------------------------------------------------------------------------------
         ' Create the layouter object
-        Dim layout As New MindFusion.Diagramming.Layout.SpringLayout
+        '20210814-VM-Was
+        'Dim layout As New MindFusion.Diagramming.Layout.SpringLayout
+
+        Dim layout = New OrthogonalLayout().Arrange(Diagram)
+
+        Dim ll = New LayeredLayout()
+        ll.Orientation = MindFusion.Diagramming.Layout.Orientation.Horizontal
+        ll.Arrange(Diagram)
+
+        For Each lrEntity As ERD.Entity In Me.zrPage.ERDiagram.Entity
+            Call lrEntity.Move(lrEntity.TableShape.Bounds.X, lrEntity.TableShape.Bounds.Y, True)
+        Next
 
 
         ' Adjust the attributes of the layouter
-        layout.MultipleGraphsPlacement = MultipleGraphsPlacement.Horizontal
-        layout.KeepGroupLayout = True
-        layout.NodeDistance = 40
-        layout.RandomSeed = 50
-        layout.MinimizeCrossings = True
-        layout.RepulsionFactor = 50
-        layout.EnableClusters = True
-        layout.IterationCount = 100
+        'layout.MultipleGraphsPlacement = MultipleGraphsPlacement.Horizontal
+        'layout.KeepGroupLayout = True
+        'layout.NodeDistance = 40
+        'layout.RandomSeed = 50
+        'layout.MinimizeCrossings = True
+        'layout.RepulsionFactor = 50
+        'layout.EnableClusters = True
+        'layout.IterationCount = 100
         'layout.GridSize = 20 'Not part of SpringLayout.
 
-        layout.Arrange(Diagram)
+        'Dim loLayout = New OrthogonalLayout().Arrange(Diagram)
 
-        Dim SecondLayout = New MindFusion.Diagramming.Layout.OrthogonalLayout
-        SecondLayout.Arrange(Me.Diagram)
-        Me.Diagram.RouteAllLinks()
+        'Dim SecondLayout = New MindFusion.Diagramming.Layout.OrthogonalLayout
+        'SecondLayout.Arrange(Me.Diagram)
+        'Me.Diagram.RouteAllLinks()
 
-        For Each lrTable In Me.zrPage.Diagram.Nodes
-            Dim lrEntity As ERD.Entity
-            lrEntity = lrTable.Tag
-            lrEntity.Move(lrTable.Bounds.X, lrTable.Bounds.Y, False)
-        Next
+        'For Each lrTable In Me.zrPage.Diagram.Nodes
+        '    Dim lrEntity As ERD.Entity
+        '    lrEntity = lrTable.Tag
+        '    lrEntity.Move(lrTable.Bounds.X, lrTable.Bounds.Y, False)
+        'Next
 
     End Sub
 
@@ -2948,5 +2959,56 @@ Public Class frmDiagramERD
 
     End Sub
 
+    Private Sub AddRelatedEntitiesToThisPageToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles AddRelatedEntitiesToThisPageToolStripMenuItem.Click
 
+        Try
+            Dim lrEntity As ERD.Entity = Nothing
+
+            Dim lrTableNode As ERD.TableNode = Me.Diagram.Selection.Items(0)
+            lrEntity = lrTableNode.Tag '(above) = Me.Diagram.Selection.Items(0)
+
+            If lrEntity IsNot Nothing Then
+
+                For Each lrRelation In lrEntity.RDSTable.getOutgoingRelations
+                    If Me.zrPage.ERDiagram.Entity.Find(Function(x) x.Name = lrRelation.DestinationTable.Name) Is Nothing Then
+                        Dim lrRelatedEntity = Me.zrPage.dropRDSTableAtPoint(lrRelation.DestinationTable, New PointF(10, 10))
+                        Call lrRelatedEntity.DisplayAndAssociate()
+                        Call lrRelatedEntity.GetAttributesFromRDSColumns()
+                        lrRelatedEntity.Attribute.Sort(AddressOf ERD.Attribute.ComparerOrdinalPosition)
+
+                        For Each lrERAttribute In lrRelatedEntity.Attribute
+                            lrRelatedEntity.TableShape.RowCount += 1
+                            lrERAttribute.Cell = lrRelatedEntity.TableShape.Item(0, lrRelatedEntity.TableShape.RowCount - 1)
+                            lrRelatedEntity.TableShape.Item(0, lrRelatedEntity.TableShape.RowCount - 1).Tag = lrERAttribute
+                            Call lrERAttribute.RefreshShape()
+
+                            lrRelatedEntity.TableShape.ResizeToFitText(False)
+
+                            'Add the Attribute to the Page
+                            Me.zrPage.ERDiagram.Attribute.Add(lrERAttribute)
+                        Next
+                    End If
+                Next
+
+                Call Me.zrPage.loadRelationsForEntity(lrEntity, False)
+                Call Me.mapSupertypeRelationshipsForEntity(lrEntity)
+                Call Me.zrPage.Save(False, False)
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
+    Private Sub AutoLayoutToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles AutoLayoutToolStripMenuItem.Click
+
+        Call Me.autoLayout()
+
+    End Sub
 End Class
