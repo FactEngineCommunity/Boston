@@ -305,6 +305,7 @@ Partial Class frmCRUDModel
         Me.ProgressBarReverseEngineering.Name = "ProgressBarReverseEngineering"
         Me.ProgressBarReverseEngineering.Size = New System.Drawing.Size(153, 20)
         Me.ProgressBarReverseEngineering.TabIndex = 4
+        Me.ProgressBarReverseEngineering.Visible = False
         '
         'ButtonReverseEngineerDatabase
         '

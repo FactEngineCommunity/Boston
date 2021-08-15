@@ -328,7 +328,7 @@ Public Class frmCRUDModel
             Else
                 Me.RichTextBoxREMessages.AppendStringInColor(vbCrLf & asMessage, aiColor)
             End If
-
+            Me.RichTextBoxREMessages.ScrollToCaret()
 
         Catch ex As Exception
             Debugger.Break()
@@ -343,6 +343,8 @@ Public Class frmCRUDModel
             Dim lasSchemaName As New List(Of String)
 
             With New WaitCursor
+
+                Me.ProgressBarReverseEngineering.Visible = True
 
                 Me.RichTextBoxREMessages.Clear()
                 Me.ProgressBarReverseEngineering.Value = 0
@@ -371,6 +373,7 @@ Public Class frmCRUDModel
                     Call Me.AddREMessage("- Complete.", Color.Green)
                 End If
 
+                Me.ButtonReverseEngineerDatabase.Enabled = False
             End With
 
         Catch ex As Exception
@@ -559,9 +562,12 @@ Public Class frmCRUDModel
                 If lrProgressObject.IsError Then
                     Me.RichTextBoxREErrorMessages.AppendStringInColor(vbCrLf & "- " & lrProgressObject.Message, Color.Orange)
                 Else
-                    Me.RichTextBoxREMessages.AppendStringInColor(vbCrLf & lrProgressObject.Message, Color.Black)
+                    Me.RichTextBoxREMessages.AppendStringInColor(vbCrLf & "- " & lrProgressObject.Message, Color.Black)
                 End If
             End If
+
+            Me.RichTextBoxREMessages.ScrollToCaret()
+
         Catch ex As Exception
 
         End Try

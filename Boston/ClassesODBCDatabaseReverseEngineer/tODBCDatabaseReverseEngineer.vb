@@ -279,6 +279,50 @@ Public Class ODBCDatabaseReverseEngineer
                 Next
             Next
 
+            'Create External Uniqueness Constraints
+#Region "Create External Uniqueness Constraints"
+            For Each lrTempTable In Me.TempModel.RDS.Table
+
+                For Each lrUniqueNonPKIndex In lrTempTable.Index.FindAll(Function(x) Not x.IsPrimaryKey And x.Unique)
+
+                    If lrUniqueNonPKIndex.Column.Count > 1 Then
+
+                        Try
+                            Dim larRole As New List(Of FBM.Role)
+
+                            Dim lrColumn As RDS.Column
+                            For Each lrTempColumn In lrUniqueNonPKIndex.Column
+
+                                Dim lrTable As RDS.Table = Me.Model.RDS.getTableByName(lrTempTable.Name)
+
+                                lrColumn = lrTable.Column.Find(Function(x) LCase(x.Name) = LCase(lrTempColumn.Name))
+                                larRole.Add(lrColumn.ActiveRole)
+                            Next
+
+                            'Add the RoleConstraint without any RoleConstraintRoles, so that Index is created when the RoleConstraintRoles are added.
+                            Dim lrRoleConstraint As New FBM.RoleConstraint(Me.Model,
+                                                                           pcenumRoleConstraintType.ExternalUniquenessConstraint,
+                                                                           New List(Of FBM.Role),
+                                                                           True,,
+                                                                           True)
+
+                            Dim liInd As Integer = 1
+                            For Each lrRole In larRole
+                                Dim lrRoleConstraintRole As New FBM.RoleConstraintRole(lrRole, lrRoleConstraint,,, liInd, True)
+                                Call lrRoleConstraint.AddRoleConstraintRole(lrRoleConstraintRole)
+                                liInd += 1
+                            Next
+                        Catch ex As Exception
+                            'Don't fail the reverse engineering, just report the error and move on.
+                            Call Me.ReportError("Failed to make Unique Index, " & lrUniqueNonPKIndex.Name & ", on Table," & lrTempTable.Name & ".")
+                        End Try
+                    End If
+
+                Next
+            Next
+
+#End Region
+
             Call Me.SetProgressBarValue(100)
 
         Catch ex As Exception

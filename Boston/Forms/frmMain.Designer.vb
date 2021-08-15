@@ -268,7 +268,7 @@ Partial Class frmMain
         '
         Me.CopyToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.Copy16x16
         Me.CopyToolStripMenuItem.Name = "CopyToolStripMenuItem"
-        Me.CopyToolStripMenuItem.Size = New System.Drawing.Size(221, 22)
+        Me.CopyToolStripMenuItem.Size = New System.Drawing.Size(229, 30)
         Me.CopyToolStripMenuItem.Text = "&Copy"
         '
         'PasteToolStripMenuItem
@@ -276,7 +276,7 @@ Partial Class frmMain
         Me.PasteToolStripMenuItem.Enabled = False
         Me.PasteToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.Paste16x16
         Me.PasteToolStripMenuItem.Name = "PasteToolStripMenuItem"
-        Me.PasteToolStripMenuItem.Size = New System.Drawing.Size(221, 22)
+        Me.PasteToolStripMenuItem.Size = New System.Drawing.Size(229, 30)
         Me.PasteToolStripMenuItem.Text = "&Paste"
         '
         'ToolStripMenuItemUndo
@@ -285,7 +285,7 @@ Partial Class frmMain
         Me.ToolStripMenuItemUndo.Image = Global.Boston.My.Resources.Resources.Undo16x16
         Me.ToolStripMenuItemUndo.Name = "ToolStripMenuItemUndo"
         Me.ToolStripMenuItemUndo.ShortcutKeys = CType((System.Windows.Forms.Keys.Control Or System.Windows.Forms.Keys.Z), System.Windows.Forms.Keys)
-        Me.ToolStripMenuItemUndo.Size = New System.Drawing.Size(221, 22)
+        Me.ToolStripMenuItemUndo.Size = New System.Drawing.Size(229, 30)
         Me.ToolStripMenuItemUndo.Text = "&Undo"
         '
         'ToolStripMenuItemRedo
@@ -294,21 +294,21 @@ Partial Class frmMain
         Me.ToolStripMenuItemRedo.Image = Global.Boston.My.Resources.Resources.Redo16x16
         Me.ToolStripMenuItemRedo.Name = "ToolStripMenuItemRedo"
         Me.ToolStripMenuItemRedo.ShortcutKeys = CType((System.Windows.Forms.Keys.Control Or System.Windows.Forms.Keys.Y), System.Windows.Forms.Keys)
-        Me.ToolStripMenuItemRedo.Size = New System.Drawing.Size(221, 22)
+        Me.ToolStripMenuItemRedo.Size = New System.Drawing.Size(229, 30)
         Me.ToolStripMenuItemRedo.Text = "&Redo"
         '
         'SelectAllToolStripMenuItem
         '
         Me.SelectAllToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.SelectAll
         Me.SelectAllToolStripMenuItem.Name = "SelectAllToolStripMenuItem"
-        Me.SelectAllToolStripMenuItem.Size = New System.Drawing.Size(221, 22)
+        Me.SelectAllToolStripMenuItem.Size = New System.Drawing.Size(229, 30)
         Me.SelectAllToolStripMenuItem.Text = "Select &All"
         '
         'CopyAsImageToClipboardToolStripMenuItem
         '
         Me.CopyAsImageToClipboardToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.Camera16x16
         Me.CopyAsImageToClipboardToolStripMenuItem.Name = "CopyAsImageToClipboardToolStripMenuItem"
-        Me.CopyAsImageToClipboardToolStripMenuItem.Size = New System.Drawing.Size(221, 22)
+        Me.CopyAsImageToClipboardToolStripMenuItem.Size = New System.Drawing.Size(229, 30)
         Me.CopyAsImageToClipboardToolStripMenuItem.Text = "Copy as &Image to Clipboard"
         '
         'ToolStripMenuItemView
