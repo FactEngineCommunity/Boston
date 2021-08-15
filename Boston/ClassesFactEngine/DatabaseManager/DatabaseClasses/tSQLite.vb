@@ -641,8 +641,8 @@ Namespace FactEngine
                 End If
 
                 Dim larDBDataType = From DatabaseDataType In Me.FBMModel.RDS.DatabaseDataType
-                                    Where DatabaseDataType.DataType = asDatabaseDataType
-                                    Where Me.FBMModel.TargetDatabaseType = DatabaseDataType.Database
+                                    Where UCase(DatabaseDataType.DataType) = UCase(asDatabaseDataType)
+                                    Where Me.FBMModel.TargetDatabaseType.ToString = DatabaseDataType.Database.ToString
                                     Select DatabaseDataType.BostonDataType
 
 

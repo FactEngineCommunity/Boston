@@ -208,11 +208,16 @@ Namespace FBM
             Me.isDirty = True
         End Sub
 
-        Public Sub New(ByRef arModel As FBM.Model, ByVal aiLanguageId As pcenumLanguage, ByVal asValueTypeName As String, ByVal abUseValueTypeName As Boolean)
+        Public Sub New(ByRef arModel As FBM.Model,
+                       ByVal aiLanguageId As pcenumLanguage,
+                       ByVal asValueTypeName As String,
+                       ByVal abUseValueTypeName As Boolean,
+                       Optional aiORMDataType As pcenumORMDataType = pcenumORMDataType.DataTypeNotSet)
 
             Me.New()
 
             Me.Model = arModel
+            Me.DataType = aiORMDataType
 
             If IsSomething(asValueTypeName) Then
                 Me.Name = asValueTypeName

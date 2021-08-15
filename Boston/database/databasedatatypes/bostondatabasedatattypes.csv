@@ -29,6 +29,7 @@ SQLite,TemporalTime,DATETIME
 SQLite,TextFixedLength,TEXT
 SQLite,TextLargeLength,TEXT
 SQLite,TextVariableLength,TEXT
+SQLite,TextVariableLength,VARCHAR
 PostgreSQL,NumericUnsignedBigInteger,abstime
 PostgreSQL,NumericUnsignedBigInteger,bigint
 PostgreSQL,LogicalTrueFalse,bit

@@ -934,8 +934,9 @@ Namespace FBM
         '''              ReferenceModeRoleConstraint,
         '''              PreferredIdentifierRCId.
         ''' </remarks>
-        Public Sub CreateReferenceMode(ByVal asReferenceMode As String, _
+        Public Sub CreateReferenceMode(ByVal asReferenceMode As String,
                                        Optional ByVal asValueTypeName As String = Nothing,
+                                       Optional ByVal aiORMDataType As pcenumORMDataType = pcenumORMDataType.DataTypeNotSet,
                                        Optional ByVal abBroadcastInterfaceEvent As Boolean = True)
 
             Dim lsMessage As String = ""
@@ -989,8 +990,8 @@ Namespace FBM
                     lrValueType = Me.Model.GetModelObjectByName(lsActualModelElementName)
 
                     If Not lrValueType.IsIndependent And abBroadcastInterfaceEvent Then
-                        Dim laoRole = From Role In Me.Model.Role _
-                                      Where Role.JoinedORMObject Is lrValueType _
+                        Dim laoRole = From Role In Me.Model.Role
+                                      Where Role.JoinedORMObject Is lrValueType
                                       Select Role
 
                         Dim lrRole As FBM.Role
@@ -1004,7 +1005,7 @@ Namespace FBM
                     '------------------------------------------------
                     'Add the ValueType to the Model/ModelDictionary
                     '------------------------------------------------
-                    lrValueType = New FBM.ValueType(Me.Model, pcenumLanguage.ORMModel, lsValueTypeName, True)
+                    lrValueType = New FBM.ValueType(Me.Model, pcenumLanguage.ORMModel, lsValueTypeName, True, aiORMDataType)
                     Me.Model.AddValueType(lrValueType, True, abBroadcastInterfaceEvent)
                 End If
 
@@ -1134,9 +1135,9 @@ Namespace FBM
                 Next
 
                 'Reassign the ActiveRole of respective Columns
-                Dim larColumn = From Table In Me.Model.RDS.Table _
-                                From Column In Table.Column _
-                                Where Column.ActiveRole.JoinedORMObject Is Me _
+                Dim larColumn = From Table In Me.Model.RDS.Table
+                                From Column In Table.Column
+                                Where Column.ActiveRole.JoinedORMObject Is Me
                                 Select Column
 
                 For Each lrColumn In larColumn.ToList
@@ -2288,7 +2289,7 @@ Namespace FBM
                     '  VM-20151014-See the comments below. Setting the long name of the ValueType may (and likely should) be moved to
                     '  Me.CreateReferenceMode (below), rather than at the EntityTypeInstance level.
                     '--------------------------------------------------------------------------------------------------------------------
-                    Me.CreateReferenceMode(asReferenceMode, asValueTypeName, abBroadcastInterfaceEvent)
+                    Me.CreateReferenceMode(asReferenceMode, asValueTypeName, aiORMDataType, abBroadcastInterfaceEvent)
                 End If
 
                 Me.ReferenceMode = asReferenceMode
