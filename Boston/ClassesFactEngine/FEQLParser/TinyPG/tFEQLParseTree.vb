@@ -143,6 +143,23 @@ Namespace FEQL
             Optionals = New ParseErrors()
         End Sub
 
+        Public Function MaxDistance() As Integer
+
+            Dim lrNode As ParseNode = Nothing
+            Dim liMaxDistance As Integer = 0
+            Dim liTempMaxDistance As Integer = 0
+
+            For Each lrNode In Me.Nodes
+                liTempMaxDistance = lrNode.MaxDistance()
+                If liTempMaxDistance > liMaxDistance Then
+                    liMaxDistance = liTempMaxDistance
+                End If
+            Next
+
+            Return liMaxDistance
+
+        End Function
+
         Public Function PrintTree() As String
     Dim sb As New StringBuilder()
             Dim indent As Integer = 0
@@ -258,6 +275,23 @@ Namespace FEQL
             m_text = text
             m_nodes = New List(Of ParseNode)()
         End Sub
+
+        Public Function MaxDistance() As Integer
+
+            Dim lrNode As ParseNode = Nothing
+            Dim liTempMaxDistance As Integer = 0
+            Dim liMaxDistance As Integer = Me.Token.EndPos
+
+            For Each lrNode In Me.Nodes
+                liTempMaxDistance = lrNode.MaxDistance()
+                If liTempMaxDistance > liMaxDistance Then
+                    liMaxDistance = liTempMaxDistance
+                End If
+            Next
+
+            Return liMaxDistance
+
+        End Function
 
         Protected Function GetValue(ByVal tree As ParseTree, ByVal type As TokenType, ByVal index As Integer) As Object
             Return GetValueByRef(tree, type, index)

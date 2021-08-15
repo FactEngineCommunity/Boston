@@ -881,30 +881,36 @@ Namespace FBM
                                 Dim lrFactTypeDictionaryEntry As New FBM.DictionaryEntry(Me.Model, Me.Name, pcenumConceptType.FactType)
                                 Dim lrRoleConstraintDictionaryEntry As New FBM.DictionaryEntry(Me.Model, Me.Name, pcenumConceptType.RoleConstraint)
 
-                                If Me.Model.ModelDictionary.Exists(AddressOf lrValueTypeDictionaryEntry.EqualsBySymbolConceptType) Then
-                                    MsgBox("An Value Type with the name, '" & lrValueTypeDictionaryEntry.Symbol & "', already exists in the Model, '" & Me.Model.Name & "'.", MsgBoxStyle.Exclamation, "Model Object Conflict")
-                                    Me.Name = Me.ValueType.Name
-                                ElseIf Me.Model.ModelDictionary.Exists(AddressOf lrEntityTypeDictionaryEntry.EqualsBySymbolConceptType) Then
-                                    MsgBox("The name, '" & lrValueTypeDictionaryEntry.Symbol & "', conflicts with a Entity Type of the same name in the Model, '" & Me.Model.Name & "'.", MsgBoxStyle.Exclamation, "Model Object Conflict")
-                                    Me.Name = Me.ValueType.Name
-                                ElseIf Me.Model.ModelDictionary.Exists(AddressOf lrFactTypeDictionaryEntry.EqualsBySymbolConceptType) Then
-                                    MsgBox("The name, '" & lrValueTypeDictionaryEntry.Symbol & "', conflicts with a Fact Type of the same name in the Model, '" & Me.Model.Name & "'.", MsgBoxStyle.Exclamation, "Model Object Conflict")
-                                    Me.Name = Me.ValueType.Name
-                                ElseIf Me.Model.ModelDictionary.Exists(AddressOf lrRoleConstraintDictionaryEntry.EqualsBySymbolConceptType) Then
-                                    MsgBox("The name, '" & lrValueTypeDictionaryEntry.Symbol & "', conflicts with a Role Constraint of the same name in the Model, '" & Me.Model.Name & "'.", MsgBoxStyle.Exclamation, "Model Object Conflict")
-                                    Me.Name = Me.ValueType.Name
-                                ElseIf Me.Name.Contains("'") Then
-                                    MsgBox("The name of an Value Type cannot contain a ' (single quote).")
-                                    Me.Name = Me.ValueType.Name
-                                ElseIf Not FBM.IsAcceptableObjectTypeName(Me.Name) Then
-                                    MsgBox("The name of an Value Type can only contain the characters [a-zA-Z0-9].")
-                                    Me.Name = Me.ValueType.Name
+                                If LCase(Me.Name) = LCase(Me.ValueType.Name) Then
+                                    Me.ValueType.SetName(Me.Name)
+                                    Me.Id = Me.Name
+                                    Me.Symbol = Me.Name
                                 Else
-                                    With New WaitCursor
-                                        Me.ValueType.SetName(Me.Name)
-                                        Me.Id = Me.Name
-                                        Me.Symbol = Me.Name
-                                    End With
+                                    If Me.Model.ModelDictionary.Exists(AddressOf lrValueTypeDictionaryEntry.EqualsBySymbolConceptType) Then
+                                        MsgBox("An Value Type with the name, '" & lrValueTypeDictionaryEntry.Symbol & "', already exists in the Model, '" & Me.Model.Name & "'.", MsgBoxStyle.Exclamation, "Model Object Conflict")
+                                        Me.Name = Me.ValueType.Name
+                                    ElseIf Me.Model.ModelDictionary.Exists(AddressOf lrEntityTypeDictionaryEntry.EqualsBySymbolConceptType) Then
+                                        MsgBox("The name, '" & lrValueTypeDictionaryEntry.Symbol & "', conflicts with a Entity Type of the same name in the Model, '" & Me.Model.Name & "'.", MsgBoxStyle.Exclamation, "Model Object Conflict")
+                                        Me.Name = Me.ValueType.Name
+                                    ElseIf Me.Model.ModelDictionary.Exists(AddressOf lrFactTypeDictionaryEntry.EqualsBySymbolConceptType) Then
+                                        MsgBox("The name, '" & lrValueTypeDictionaryEntry.Symbol & "', conflicts with a Fact Type of the same name in the Model, '" & Me.Model.Name & "'.", MsgBoxStyle.Exclamation, "Model Object Conflict")
+                                        Me.Name = Me.ValueType.Name
+                                    ElseIf Me.Model.ModelDictionary.Exists(AddressOf lrRoleConstraintDictionaryEntry.EqualsBySymbolConceptType) Then
+                                        MsgBox("The name, '" & lrValueTypeDictionaryEntry.Symbol & "', conflicts with a Role Constraint of the same name in the Model, '" & Me.Model.Name & "'.", MsgBoxStyle.Exclamation, "Model Object Conflict")
+                                        Me.Name = Me.ValueType.Name
+                                    ElseIf Me.Name.Contains("'") Then
+                                        MsgBox("The name of an Value Type cannot contain a ' (single quote).")
+                                        Me.Name = Me.ValueType.Name
+                                    ElseIf Not FBM.IsAcceptableObjectTypeName(Me.Name) Then
+                                        MsgBox("The name of an Value Type can only contain the characters [a-zA-Z0-9].")
+                                        Me.Name = Me.ValueType.Name
+                                    Else
+                                        With New WaitCursor
+                                            Me.ValueType.SetName(Me.Name)
+                                            Me.Id = Me.Name
+                                            Me.Symbol = Me.Name
+                                        End With
+                                    End If
                                 End If
 
                                 If IsSomething(Me.Shape) Then

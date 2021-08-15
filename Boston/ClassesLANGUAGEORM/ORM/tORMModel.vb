@@ -1897,7 +1897,7 @@ Namespace FBM
                                   Where FactType.RoleGroup.Count = aarModelObject.Count
                                   From Role In FactType.RoleGroup
                                   From ModelObject In aarModelObject
-                                  Where Role.JoinedORMObject.Id = ModelObject.Id
+                                  Where Role.JoinedORMObject Is ModelObject
                                   Select FactType Distinct
 
                 If larFactType.Count = 0 Then
