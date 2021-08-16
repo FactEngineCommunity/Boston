@@ -218,7 +218,17 @@ Public Class ODBCDatabaseReverseEngineer
                             Next
 
                         Else
-                            Call Me.ReportError("Error")
+                            Dim lsMessage As String = "Error: Creating Objectified Fact Types: For Table, " & lrTable.Name & "."
+                            If lrTable.getPrimaryKeyColumns.Count > 0 Then
+                                lsMessage.AppendString(" Can't find Model Elements for the following: ")
+                                For Each lrColumn In lrTable.getPrimaryKeyColumns
+                                    lsMessage.AppendLine(lrColumn.Name)
+                                Next
+                            Else
+                                lsMessage.AppendString(" Table has not primary key columns")
+                            End If
+
+                            Call Me.ReportError(lsMessage)
                         End If
                     End If
                 End If

@@ -378,7 +378,7 @@ Namespace FactEngine
                                     Else
                                         Me.FBMFactType = Nothing
                                         Me.FBMFactTypeReading = Nothing
-                                        Me.FBMPredicatePart = Nothing
+                                        'Me.FBMPredicatePart = Nothing
                                         lrFactTypeReading = Nothing
                                     End If
                                 End If

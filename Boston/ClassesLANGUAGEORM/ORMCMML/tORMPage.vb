@@ -335,7 +335,8 @@ Namespace FBM
 
         End Sub
 
-        Public Function CreateORMDiagrm(ByRef aoBackgroundWorker As System.ComponentModel.BackgroundWorker) As FBM.Page
+        Public Function CreateORMDiagrm(ByRef aoBackgroundWorker As System.ComponentModel.BackgroundWorker,
+                                        Optional ByRef arEntity As ERD.Entity = Nothing) As FBM.Page
 
             Dim lrPage As FBM.Page = Nothing
 
@@ -352,16 +353,24 @@ Namespace FBM
                         Me.Model.Page.Add(lrPage)
                         lrPage.Save(True, True)
 
-                        For Each lrEntity In Me.ERDiagram.Entity
+                        If arEntity Is Nothing Then
+                            For Each lrEntity In Me.ERDiagram.Entity
 
-                            Select Case lrEntity.getCorrespondingRDSTable.FBMModelElement.GetType
+                                Select Case lrEntity.getCorrespondingRDSTable.FBMModelElement.GetType
+                                    Case Is = GetType(FBM.EntityType)
+
+                                        Call lrPage.DropEntityTypeAtPoint(lrEntity.getCorrespondingRDSTable.FBMModelElement, New PointF(10, 10), False)
+
+                                End Select
+                            Next
+                        Else
+                            Select Case arEntity.getCorrespondingRDSTable.FBMModelElement.GetType
                                 Case Is = GetType(FBM.EntityType)
 
-                                    Call lrPage.DropEntityTypeAtPoint(lrEntity.getCorrespondingRDSTable.FBMModelElement, New PointF(10, 10), False)
+                                    Call lrPage.DropEntityTypeAtPoint(arEntity.getCorrespondingRDSTable.FBMModelElement, New PointF(10, 10), False)
 
                             End Select
-
-                        Next
+                        End If
 
                 End Select
 

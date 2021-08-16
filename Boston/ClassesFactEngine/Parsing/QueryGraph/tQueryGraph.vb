@@ -585,8 +585,8 @@
                         If lrQueryEdge.BaseNode.FBMModelObject.GetType IsNot GetType(FBM.ValueType) Then
                             For Each lrColumn In lrQueryEdge.BaseNode.RDSTable.getPrimaryKeyColumns
                                 If liInd2 > 0 Then lsSQLQuery &= Richmond.returnIfTrue(lbAddedAND, "", " AND ")
-                                lsSQLQuery &= "[" & lrNaryTable.Name & "]." & lrNaryTable.Column.Find(Function(x) x.ActiveRole Is lrColumn.ActiveRole).Name
-                                lsSQLQuery &= "=" & "[" & lrColumn.Table.Name & "]." & lrColumn.Name & vbCrLf
+                                lsSQLQuery &= lrNaryTable.DatabaseName & "." & lrNaryTable.Column.Find(Function(x) x.ActiveRole Is lrColumn.ActiveRole).Name
+                                lsSQLQuery &= "=" & lrColumn.Table.DatabaseName & "." & lrColumn.Name & vbCrLf
                                 liInd2 += 1
                                 lbAddedAND = False
                             Next
@@ -596,8 +596,8 @@
                             liInd2 = 0
                             For Each lrColumn In lrQueryEdge.TargetNode.RDSTable.getPrimaryKeyColumns
                                 If liInd2 > 0 Then lsSQLQuery &= " AND "
-                                lsSQLQuery &= "[" & lrNaryTable.Name & "]." & lrNaryTable.Column.Find(Function(x) x.ActiveRole Is lrColumn.ActiveRole).Name
-                                lsSQLQuery &= "=" & "[" & lrColumn.Table.Name & "]." & lrColumn.Name & vbCrLf
+                                lsSQLQuery &= lrNaryTable.DatabaseName & "." & lrNaryTable.Column.Find(Function(x) x.ActiveRole Is lrColumn.ActiveRole).Name
+                                lsSQLQuery &= "=" & lrColumn.Table.Name & "." & lrColumn.Name & vbCrLf
                                 liInd2 += 1
                             Next
                         End If

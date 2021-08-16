@@ -45826,75 +45826,20 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                    End If
 
                                  ' Concat Rule
-                                                                        tok = m_scanner.LookAhead({TokenType.PREDICATE, TokenType.MATHFUNCTION}) ' Option Rule
-                                        If tok.Type = TokenType.PREDICATE Or tok.Type = TokenType.MATHFUNCTION Then
-                                            tok = m_scanner.LookAhead({TokenType.PREDICATE, TokenType.MATHFUNCTION}) ' Choice Rule
-                                            
-                                                m_tree.Optionals.Clear
-                                                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PREDICATE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "PREDICATE"))
-                                                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PREDICATE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MATHFUNCTION"))
-                                            Select Case tok.Type
-                                             ' Choice Rule
-                                                Case TokenType.PREDICATE
-                                            lbProblemSolved =                                                     ParseFOLLOWINGREADINGTEXT(node) ' NonTerminal Rule: FOLLOWINGREADINGTEXT
-                                                    If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.EndPos > Me.MaxDistance Then
-                                                        Me.MaxDistance = m_scanner.StartPos
-                                                        max_tree = m_tree.clone
-                                                      End If
-                                                      If node.Nodes.Count > 0 Then node.Nodes.RemoveAt(node.Nodes.Count - 1)
-                                                      lbProblemSolved = False
-                                                    End If
-
-                                                Case TokenType.MATHFUNCTION
-                                            lbProblemSolved =                                                     ParseMATHCLAUSE(node) ' NonTerminal Rule: MATHCLAUSE
-                                                    If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.EndPos > Me.MaxDistance Then
-                                                        Me.MaxDistance = m_scanner.StartPos
-                                                        max_tree = m_tree.clone
-                                                      End If
-                                                      If node.Nodes.Count > 0 Then node.Nodes.RemoveAt(node.Nodes.Count - 1)
-                                                      lbProblemSolved = False
-                                                    End If
-
-                                                Case Else
-                                                If m_tree.Errors.Count = 0 Then
-                                                m_tree.Optionals.Clear
-                                                lbProblemSolved = False
-                                                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PREDICATE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "PREDICATE"))
-                                                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PREDICATE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MATHFUNCTION"))
-                                                End If
-                                                    m_tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found.", &H0002, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos))
-                                                    Exit Select
-                                            End Select ' Choice Rule
-                                                If Not lbProblemSolved Then
-                                                   m_tree.Errors.Clear
-                                                If Not lbProblemSolved Then
-                                                  m_tree.Errors.Clear
-                                                  m_scanner.StartPos = liOriginalRange
-                                                  If liOriginalRange > Me.MaxDistance Then
-                                                    Me.MaxDistance = m_scanner.StartPos
-                                                    max_tree = m_tree.clone
-                                                  End If
-                                            lbProblemSolved =                                                 ParseMATHCLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: MATHCLAUSE
-                                                If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.EndPos > Me.MaxDistance Then
-                                                    Me.MaxDistance = m_scanner.StartPos
-                                                    max_tree = m_tree.clone
-                                                  End If
-                                                  If parent.Nodes(parent.Nodes.Count-1).Nodes.Count > 0 Then parent.Nodes(parent.Nodes.Count-1).Nodes.RemoveAt(Parent.Nodes(parent.Nodes.Count-1).Nodes.Count - 1)
-                                                  lbProblemSolved = False
-                                                End If
-
-                                                End If
-                                                End If
-                                             If (m_tree.Errors.Count > 0) Or Not lbProblemSolved Then
-                                                 parent.Nodes.Remove(node)
-                                                 Return False
-                                             End If
+                                                                        tok = m_scanner.LookAhead({TokenType.MATHFUNCTION}) ' Option Rule
+                                        If tok.Type = TokenType.MATHFUNCTION Then
+lbProblemSolved =                                             ParseMATHCLAUSE(node) ' NonTerminal Rule: MATHCLAUSE
+                                            If m_tree.Errors.Count > 0 Then
+                                              If m_scanner.EndPos > Me.MaxDistance Then
+                                                Me.MaxDistance = m_scanner.StartPos
+                                                max_tree = m_tree.clone
+                                              End If
+                                              If node.Nodes.Count > 0 Then node.Nodes.RemoveAt(node.Nodes.Count - 1)
+                                              lbProblemSolved = False
+                                            End If
 
                                         Else
-                                                                                    m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PREDICATE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "PREDICATE"))
+                                                                                    m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.MATHFUNCTION.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MATHFUNCTION"))
                                         End If
                                         If m_tree.Errors.Count > 0 Then
                                           Return False
@@ -46376,75 +46321,20 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                    End If
 
                                  ' Concat Rule
-                                                                        tok = m_scanner.LookAhead({TokenType.PREDICATE, TokenType.MATHFUNCTION}) ' Option Rule
-                                        If tok.Type = TokenType.PREDICATE Or tok.Type = TokenType.MATHFUNCTION Then
-                                            tok = m_scanner.LookAhead({TokenType.PREDICATE, TokenType.MATHFUNCTION}) ' Choice Rule
-                                            
-                                                m_tree.Optionals.Clear
-                                                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PREDICATE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "PREDICATE"))
-                                                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PREDICATE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MATHFUNCTION"))
-                                            Select Case tok.Type
-                                             ' Choice Rule
-                                                Case TokenType.PREDICATE
-                                            lbProblemSolved =                                                     ParseFOLLOWINGREADINGTEXT(node) ' NonTerminal Rule: FOLLOWINGREADINGTEXT
-                                                    If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.EndPos > Me.MaxDistance Then
-                                                        Me.MaxDistance = m_scanner.StartPos
-                                                        max_tree = m_tree.clone
-                                                      End If
-                                                      If node.Nodes.Count > 0 Then node.Nodes.RemoveAt(node.Nodes.Count - 1)
-                                                      lbProblemSolved = False
-                                                    End If
-
-                                                Case TokenType.MATHFUNCTION
-                                            lbProblemSolved =                                                     ParseMATHCLAUSE(node) ' NonTerminal Rule: MATHCLAUSE
-                                                    If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.EndPos > Me.MaxDistance Then
-                                                        Me.MaxDistance = m_scanner.StartPos
-                                                        max_tree = m_tree.clone
-                                                      End If
-                                                      If node.Nodes.Count > 0 Then node.Nodes.RemoveAt(node.Nodes.Count - 1)
-                                                      lbProblemSolved = False
-                                                    End If
-
-                                                Case Else
-                                                If m_tree.Errors.Count = 0 Then
-                                                m_tree.Optionals.Clear
-                                                lbProblemSolved = False
-                                                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PREDICATE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "PREDICATE"))
-                                                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PREDICATE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MATHFUNCTION"))
-                                                End If
-                                                    m_tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found.", &H0002, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos))
-                                                    Exit Select
-                                            End Select ' Choice Rule
-                                                If Not lbProblemSolved Then
-                                                   m_tree.Errors.Clear
-                                                If Not lbProblemSolved Then
-                                                  m_tree.Errors.Clear
-                                                  m_scanner.StartPos = liOriginalRange
-                                                  If liOriginalRange > Me.MaxDistance Then
-                                                    Me.MaxDistance = m_scanner.StartPos
-                                                    max_tree = m_tree.clone
-                                                  End If
-                                            lbProblemSolved =                                                 ParseMATHCLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: MATHCLAUSE
-                                                If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.EndPos > Me.MaxDistance Then
-                                                    Me.MaxDistance = m_scanner.StartPos
-                                                    max_tree = m_tree.clone
-                                                  End If
-                                                  If parent.Nodes(parent.Nodes.Count-1).Nodes.Count > 0 Then parent.Nodes(parent.Nodes.Count-1).Nodes.RemoveAt(Parent.Nodes(parent.Nodes.Count-1).Nodes.Count - 1)
-                                                  lbProblemSolved = False
-                                                End If
-
-                                                End If
-                                                End If
-                                             If (m_tree.Errors.Count > 0) Or Not lbProblemSolved Then
-                                                 parent.Nodes.Remove(node)
-                                                 Return False
-                                             End If
+                                                                        tok = m_scanner.LookAhead({TokenType.MATHFUNCTION}) ' Option Rule
+                                        If tok.Type = TokenType.MATHFUNCTION Then
+lbProblemSolved =                                             ParseMATHCLAUSE(node) ' NonTerminal Rule: MATHCLAUSE
+                                            If m_tree.Errors.Count > 0 Then
+                                              If m_scanner.EndPos > Me.MaxDistance Then
+                                                Me.MaxDistance = m_scanner.StartPos
+                                                max_tree = m_tree.clone
+                                              End If
+                                              If node.Nodes.Count > 0 Then node.Nodes.RemoveAt(node.Nodes.Count - 1)
+                                              lbProblemSolved = False
+                                            End If
 
                                         Else
-                                                                                    m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PREDICATE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "PREDICATE"))
+                                                                                    m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.MATHFUNCTION.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MATHFUNCTION"))
                                         End If
                                         If m_tree.Errors.Count > 0 Then
                                           Return False
@@ -46926,75 +46816,20 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                    End If
 
                                  ' Concat Rule
-                                                                        tok = m_scanner.LookAhead({TokenType.PREDICATE, TokenType.MATHFUNCTION}) ' Option Rule
-                                        If tok.Type = TokenType.PREDICATE Or tok.Type = TokenType.MATHFUNCTION Then
-                                            tok = m_scanner.LookAhead({TokenType.PREDICATE, TokenType.MATHFUNCTION}) ' Choice Rule
-                                            
-                                                m_tree.Optionals.Clear
-                                                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PREDICATE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "PREDICATE"))
-                                                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PREDICATE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MATHFUNCTION"))
-                                            Select Case tok.Type
-                                             ' Choice Rule
-                                                Case TokenType.PREDICATE
-                                            lbProblemSolved =                                                     ParseFOLLOWINGREADINGTEXT(node) ' NonTerminal Rule: FOLLOWINGREADINGTEXT
-                                                    If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.EndPos > Me.MaxDistance Then
-                                                        Me.MaxDistance = m_scanner.StartPos
-                                                        max_tree = m_tree.clone
-                                                      End If
-                                                      If node.Nodes.Count > 0 Then node.Nodes.RemoveAt(node.Nodes.Count - 1)
-                                                      lbProblemSolved = False
-                                                    End If
-
-                                                Case TokenType.MATHFUNCTION
-                                            lbProblemSolved =                                                     ParseMATHCLAUSE(node) ' NonTerminal Rule: MATHCLAUSE
-                                                    If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.EndPos > Me.MaxDistance Then
-                                                        Me.MaxDistance = m_scanner.StartPos
-                                                        max_tree = m_tree.clone
-                                                      End If
-                                                      If node.Nodes.Count > 0 Then node.Nodes.RemoveAt(node.Nodes.Count - 1)
-                                                      lbProblemSolved = False
-                                                    End If
-
-                                                Case Else
-                                                If m_tree.Errors.Count = 0 Then
-                                                m_tree.Optionals.Clear
-                                                lbProblemSolved = False
-                                                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PREDICATE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "PREDICATE"))
-                                                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PREDICATE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MATHFUNCTION"))
-                                                End If
-                                                    m_tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found.", &H0002, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos))
-                                                    Exit Select
-                                            End Select ' Choice Rule
-                                                If Not lbProblemSolved Then
-                                                   m_tree.Errors.Clear
-                                                If Not lbProblemSolved Then
-                                                  m_tree.Errors.Clear
-                                                  m_scanner.StartPos = liOriginalRange
-                                                  If liOriginalRange > Me.MaxDistance Then
-                                                    Me.MaxDistance = m_scanner.StartPos
-                                                    max_tree = m_tree.clone
-                                                  End If
-                                            lbProblemSolved =                                                 ParseMATHCLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: MATHCLAUSE
-                                                If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.EndPos > Me.MaxDistance Then
-                                                    Me.MaxDistance = m_scanner.StartPos
-                                                    max_tree = m_tree.clone
-                                                  End If
-                                                  If parent.Nodes(parent.Nodes.Count-1).Nodes.Count > 0 Then parent.Nodes(parent.Nodes.Count-1).Nodes.RemoveAt(Parent.Nodes(parent.Nodes.Count-1).Nodes.Count - 1)
-                                                  lbProblemSolved = False
-                                                End If
-
-                                                End If
-                                                End If
-                                             If (m_tree.Errors.Count > 0) Or Not lbProblemSolved Then
-                                                 parent.Nodes.Remove(node)
-                                                 Return False
-                                             End If
+                                                                        tok = m_scanner.LookAhead({TokenType.MATHFUNCTION}) ' Option Rule
+                                        If tok.Type = TokenType.MATHFUNCTION Then
+lbProblemSolved =                                             ParseMATHCLAUSE(node) ' NonTerminal Rule: MATHCLAUSE
+                                            If m_tree.Errors.Count > 0 Then
+                                              If m_scanner.EndPos > Me.MaxDistance Then
+                                                Me.MaxDistance = m_scanner.StartPos
+                                                max_tree = m_tree.clone
+                                              End If
+                                              If node.Nodes.Count > 0 Then node.Nodes.RemoveAt(node.Nodes.Count - 1)
+                                              lbProblemSolved = False
+                                            End If
 
                                         Else
-                                                                                    m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PREDICATE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "PREDICATE"))
+                                                                                    m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.MATHFUNCTION.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MATHFUNCTION"))
                                         End If
                                         If m_tree.Errors.Count > 0 Then
                                           Return False
@@ -47476,75 +47311,20 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                    End If
 
                                  ' Concat Rule
-                                                                        tok = m_scanner.LookAhead({TokenType.PREDICATE, TokenType.MATHFUNCTION}) ' Option Rule
-                                        If tok.Type = TokenType.PREDICATE Or tok.Type = TokenType.MATHFUNCTION Then
-                                            tok = m_scanner.LookAhead({TokenType.PREDICATE, TokenType.MATHFUNCTION}) ' Choice Rule
-                                            
-                                                m_tree.Optionals.Clear
-                                                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PREDICATE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "PREDICATE"))
-                                                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PREDICATE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MATHFUNCTION"))
-                                            Select Case tok.Type
-                                             ' Choice Rule
-                                                Case TokenType.PREDICATE
-                                            lbProblemSolved =                                                     ParseFOLLOWINGREADINGTEXT(node) ' NonTerminal Rule: FOLLOWINGREADINGTEXT
-                                                    If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.EndPos > Me.MaxDistance Then
-                                                        Me.MaxDistance = m_scanner.StartPos
-                                                        max_tree = m_tree.clone
-                                                      End If
-                                                      If node.Nodes.Count > 0 Then node.Nodes.RemoveAt(node.Nodes.Count - 1)
-                                                      lbProblemSolved = False
-                                                    End If
-
-                                                Case TokenType.MATHFUNCTION
-                                            lbProblemSolved =                                                     ParseMATHCLAUSE(node) ' NonTerminal Rule: MATHCLAUSE
-                                                    If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.EndPos > Me.MaxDistance Then
-                                                        Me.MaxDistance = m_scanner.StartPos
-                                                        max_tree = m_tree.clone
-                                                      End If
-                                                      If node.Nodes.Count > 0 Then node.Nodes.RemoveAt(node.Nodes.Count - 1)
-                                                      lbProblemSolved = False
-                                                    End If
-
-                                                Case Else
-                                                If m_tree.Errors.Count = 0 Then
-                                                m_tree.Optionals.Clear
-                                                lbProblemSolved = False
-                                                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PREDICATE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "PREDICATE"))
-                                                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PREDICATE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MATHFUNCTION"))
-                                                End If
-                                                    m_tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found.", &H0002, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos))
-                                                    Exit Select
-                                            End Select ' Choice Rule
-                                                If Not lbProblemSolved Then
-                                                   m_tree.Errors.Clear
-                                                If Not lbProblemSolved Then
-                                                  m_tree.Errors.Clear
-                                                  m_scanner.StartPos = liOriginalRange
-                                                  If liOriginalRange > Me.MaxDistance Then
-                                                    Me.MaxDistance = m_scanner.StartPos
-                                                    max_tree = m_tree.clone
-                                                  End If
-                                            lbProblemSolved =                                                 ParseMATHCLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: MATHCLAUSE
-                                                If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.EndPos > Me.MaxDistance Then
-                                                    Me.MaxDistance = m_scanner.StartPos
-                                                    max_tree = m_tree.clone
-                                                  End If
-                                                  If parent.Nodes(parent.Nodes.Count-1).Nodes.Count > 0 Then parent.Nodes(parent.Nodes.Count-1).Nodes.RemoveAt(Parent.Nodes(parent.Nodes.Count-1).Nodes.Count - 1)
-                                                  lbProblemSolved = False
-                                                End If
-
-                                                End If
-                                                End If
-                                             If (m_tree.Errors.Count > 0) Or Not lbProblemSolved Then
-                                                 parent.Nodes.Remove(node)
-                                                 Return False
-                                             End If
+                                                                        tok = m_scanner.LookAhead({TokenType.MATHFUNCTION}) ' Option Rule
+                                        If tok.Type = TokenType.MATHFUNCTION Then
+lbProblemSolved =                                             ParseMATHCLAUSE(node) ' NonTerminal Rule: MATHCLAUSE
+                                            If m_tree.Errors.Count > 0 Then
+                                              If m_scanner.EndPos > Me.MaxDistance Then
+                                                Me.MaxDistance = m_scanner.StartPos
+                                                max_tree = m_tree.clone
+                                              End If
+                                              If node.Nodes.Count > 0 Then node.Nodes.RemoveAt(node.Nodes.Count - 1)
+                                              lbProblemSolved = False
+                                            End If
 
                                         Else
-                                                                                    m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PREDICATE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "PREDICATE"))
+                                                                                    m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.MATHFUNCTION.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MATHFUNCTION"))
                                         End If
                                         If m_tree.Errors.Count > 0 Then
                                           Return False
@@ -48026,75 +47806,20 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                    End If
 
                                  ' Concat Rule
-                                                                        tok = m_scanner.LookAhead({TokenType.PREDICATE, TokenType.MATHFUNCTION}) ' Option Rule
-                                        If tok.Type = TokenType.PREDICATE Or tok.Type = TokenType.MATHFUNCTION Then
-                                            tok = m_scanner.LookAhead({TokenType.PREDICATE, TokenType.MATHFUNCTION}) ' Choice Rule
-                                            
-                                                m_tree.Optionals.Clear
-                                                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PREDICATE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "PREDICATE"))
-                                                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PREDICATE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MATHFUNCTION"))
-                                            Select Case tok.Type
-                                             ' Choice Rule
-                                                Case TokenType.PREDICATE
-                                            lbProblemSolved =                                                     ParseFOLLOWINGREADINGTEXT(node) ' NonTerminal Rule: FOLLOWINGREADINGTEXT
-                                                    If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.EndPos > Me.MaxDistance Then
-                                                        Me.MaxDistance = m_scanner.StartPos
-                                                        max_tree = m_tree.clone
-                                                      End If
-                                                      If node.Nodes.Count > 0 Then node.Nodes.RemoveAt(node.Nodes.Count - 1)
-                                                      lbProblemSolved = False
-                                                    End If
-
-                                                Case TokenType.MATHFUNCTION
-                                            lbProblemSolved =                                                     ParseMATHCLAUSE(node) ' NonTerminal Rule: MATHCLAUSE
-                                                    If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.EndPos > Me.MaxDistance Then
-                                                        Me.MaxDistance = m_scanner.StartPos
-                                                        max_tree = m_tree.clone
-                                                      End If
-                                                      If node.Nodes.Count > 0 Then node.Nodes.RemoveAt(node.Nodes.Count - 1)
-                                                      lbProblemSolved = False
-                                                    End If
-
-                                                Case Else
-                                                If m_tree.Errors.Count = 0 Then
-                                                m_tree.Optionals.Clear
-                                                lbProblemSolved = False
-                                                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PREDICATE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "PREDICATE"))
-                                                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PREDICATE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MATHFUNCTION"))
-                                                End If
-                                                    m_tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found.", &H0002, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos))
-                                                    Exit Select
-                                            End Select ' Choice Rule
-                                                If Not lbProblemSolved Then
-                                                   m_tree.Errors.Clear
-                                                If Not lbProblemSolved Then
-                                                  m_tree.Errors.Clear
-                                                  m_scanner.StartPos = liOriginalRange
-                                                  If liOriginalRange > Me.MaxDistance Then
-                                                    Me.MaxDistance = m_scanner.StartPos
-                                                    max_tree = m_tree.clone
-                                                  End If
-                                            lbProblemSolved =                                                 ParseMATHCLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: MATHCLAUSE
-                                                If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.EndPos > Me.MaxDistance Then
-                                                    Me.MaxDistance = m_scanner.StartPos
-                                                    max_tree = m_tree.clone
-                                                  End If
-                                                  If parent.Nodes(parent.Nodes.Count-1).Nodes.Count > 0 Then parent.Nodes(parent.Nodes.Count-1).Nodes.RemoveAt(Parent.Nodes(parent.Nodes.Count-1).Nodes.Count - 1)
-                                                  lbProblemSolved = False
-                                                End If
-
-                                                End If
-                                                End If
-                                             If (m_tree.Errors.Count > 0) Or Not lbProblemSolved Then
-                                                 parent.Nodes.Remove(node)
-                                                 Return False
-                                             End If
+                                                                        tok = m_scanner.LookAhead({TokenType.MATHFUNCTION}) ' Option Rule
+                                        If tok.Type = TokenType.MATHFUNCTION Then
+lbProblemSolved =                                             ParseMATHCLAUSE(node) ' NonTerminal Rule: MATHCLAUSE
+                                            If m_tree.Errors.Count > 0 Then
+                                              If m_scanner.EndPos > Me.MaxDistance Then
+                                                Me.MaxDistance = m_scanner.StartPos
+                                                max_tree = m_tree.clone
+                                              End If
+                                              If node.Nodes.Count > 0 Then node.Nodes.RemoveAt(node.Nodes.Count - 1)
+                                              lbProblemSolved = False
+                                            End If
 
                                         Else
-                                                                                    m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PREDICATE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "PREDICATE"))
+                                                                                    m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.MATHFUNCTION.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MATHFUNCTION"))
                                         End If
                                         If m_tree.Errors.Count > 0 Then
                                           Return False
@@ -48576,75 +48301,20 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                    End If
 
                                  ' Concat Rule
-                                                                        tok = m_scanner.LookAhead({TokenType.PREDICATE, TokenType.MATHFUNCTION}) ' Option Rule
-                                        If tok.Type = TokenType.PREDICATE Or tok.Type = TokenType.MATHFUNCTION Then
-                                            tok = m_scanner.LookAhead({TokenType.PREDICATE, TokenType.MATHFUNCTION}) ' Choice Rule
-                                            
-                                                m_tree.Optionals.Clear
-                                                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PREDICATE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "PREDICATE"))
-                                                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PREDICATE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MATHFUNCTION"))
-                                            Select Case tok.Type
-                                             ' Choice Rule
-                                                Case TokenType.PREDICATE
-                                            lbProblemSolved =                                                     ParseFOLLOWINGREADINGTEXT(node) ' NonTerminal Rule: FOLLOWINGREADINGTEXT
-                                                    If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.EndPos > Me.MaxDistance Then
-                                                        Me.MaxDistance = m_scanner.StartPos
-                                                        max_tree = m_tree.clone
-                                                      End If
-                                                      If node.Nodes.Count > 0 Then node.Nodes.RemoveAt(node.Nodes.Count - 1)
-                                                      lbProblemSolved = False
-                                                    End If
-
-                                                Case TokenType.MATHFUNCTION
-                                            lbProblemSolved =                                                     ParseMATHCLAUSE(node) ' NonTerminal Rule: MATHCLAUSE
-                                                    If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.EndPos > Me.MaxDistance Then
-                                                        Me.MaxDistance = m_scanner.StartPos
-                                                        max_tree = m_tree.clone
-                                                      End If
-                                                      If node.Nodes.Count > 0 Then node.Nodes.RemoveAt(node.Nodes.Count - 1)
-                                                      lbProblemSolved = False
-                                                    End If
-
-                                                Case Else
-                                                If m_tree.Errors.Count = 0 Then
-                                                m_tree.Optionals.Clear
-                                                lbProblemSolved = False
-                                                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PREDICATE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "PREDICATE"))
-                                                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PREDICATE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MATHFUNCTION"))
-                                                End If
-                                                    m_tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found.", &H0002, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos))
-                                                    Exit Select
-                                            End Select ' Choice Rule
-                                                If Not lbProblemSolved Then
-                                                   m_tree.Errors.Clear
-                                                If Not lbProblemSolved Then
-                                                  m_tree.Errors.Clear
-                                                  m_scanner.StartPos = liOriginalRange
-                                                  If liOriginalRange > Me.MaxDistance Then
-                                                    Me.MaxDistance = m_scanner.StartPos
-                                                    max_tree = m_tree.clone
-                                                  End If
-                                            lbProblemSolved =                                                 ParseMATHCLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: MATHCLAUSE
-                                                If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.EndPos > Me.MaxDistance Then
-                                                    Me.MaxDistance = m_scanner.StartPos
-                                                    max_tree = m_tree.clone
-                                                  End If
-                                                  If parent.Nodes(parent.Nodes.Count-1).Nodes.Count > 0 Then parent.Nodes(parent.Nodes.Count-1).Nodes.RemoveAt(Parent.Nodes(parent.Nodes.Count-1).Nodes.Count - 1)
-                                                  lbProblemSolved = False
-                                                End If
-
-                                                End If
-                                                End If
-                                             If (m_tree.Errors.Count > 0) Or Not lbProblemSolved Then
-                                                 parent.Nodes.Remove(node)
-                                                 Return False
-                                             End If
+                                                                        tok = m_scanner.LookAhead({TokenType.MATHFUNCTION}) ' Option Rule
+                                        If tok.Type = TokenType.MATHFUNCTION Then
+lbProblemSolved =                                             ParseMATHCLAUSE(node) ' NonTerminal Rule: MATHCLAUSE
+                                            If m_tree.Errors.Count > 0 Then
+                                              If m_scanner.EndPos > Me.MaxDistance Then
+                                                Me.MaxDistance = m_scanner.StartPos
+                                                max_tree = m_tree.clone
+                                              End If
+                                              If node.Nodes.Count > 0 Then node.Nodes.RemoveAt(node.Nodes.Count - 1)
+                                              lbProblemSolved = False
+                                            End If
 
                                         Else
-                                                                                    m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PREDICATE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "PREDICATE"))
+                                                                                    m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.MATHFUNCTION.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MATHFUNCTION"))
                                         End If
                                         If m_tree.Errors.Count > 0 Then
                                           Return False
@@ -49126,75 +48796,20 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                    End If
 
                                  ' Concat Rule
-                                                                        tok = m_scanner.LookAhead({TokenType.PREDICATE, TokenType.MATHFUNCTION}) ' Option Rule
-                                        If tok.Type = TokenType.PREDICATE Or tok.Type = TokenType.MATHFUNCTION Then
-                                            tok = m_scanner.LookAhead({TokenType.PREDICATE, TokenType.MATHFUNCTION}) ' Choice Rule
-                                            
-                                                m_tree.Optionals.Clear
-                                                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PREDICATE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "PREDICATE"))
-                                                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PREDICATE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MATHFUNCTION"))
-                                            Select Case tok.Type
-                                             ' Choice Rule
-                                                Case TokenType.PREDICATE
-                                            lbProblemSolved =                                                     ParseFOLLOWINGREADINGTEXT(node) ' NonTerminal Rule: FOLLOWINGREADINGTEXT
-                                                    If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.EndPos > Me.MaxDistance Then
-                                                        Me.MaxDistance = m_scanner.StartPos
-                                                        max_tree = m_tree.clone
-                                                      End If
-                                                      If node.Nodes.Count > 0 Then node.Nodes.RemoveAt(node.Nodes.Count - 1)
-                                                      lbProblemSolved = False
-                                                    End If
-
-                                                Case TokenType.MATHFUNCTION
-                                            lbProblemSolved =                                                     ParseMATHCLAUSE(node) ' NonTerminal Rule: MATHCLAUSE
-                                                    If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.EndPos > Me.MaxDistance Then
-                                                        Me.MaxDistance = m_scanner.StartPos
-                                                        max_tree = m_tree.clone
-                                                      End If
-                                                      If node.Nodes.Count > 0 Then node.Nodes.RemoveAt(node.Nodes.Count - 1)
-                                                      lbProblemSolved = False
-                                                    End If
-
-                                                Case Else
-                                                If m_tree.Errors.Count = 0 Then
-                                                m_tree.Optionals.Clear
-                                                lbProblemSolved = False
-                                                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PREDICATE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "PREDICATE"))
-                                                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PREDICATE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MATHFUNCTION"))
-                                                End If
-                                                    m_tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found.", &H0002, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos))
-                                                    Exit Select
-                                            End Select ' Choice Rule
-                                                If Not lbProblemSolved Then
-                                                   m_tree.Errors.Clear
-                                                If Not lbProblemSolved Then
-                                                  m_tree.Errors.Clear
-                                                  m_scanner.StartPos = liOriginalRange
-                                                  If liOriginalRange > Me.MaxDistance Then
-                                                    Me.MaxDistance = m_scanner.StartPos
-                                                    max_tree = m_tree.clone
-                                                  End If
-                                            lbProblemSolved =                                                 ParseMATHCLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: MATHCLAUSE
-                                                If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.EndPos > Me.MaxDistance Then
-                                                    Me.MaxDistance = m_scanner.StartPos
-                                                    max_tree = m_tree.clone
-                                                  End If
-                                                  If parent.Nodes(parent.Nodes.Count-1).Nodes.Count > 0 Then parent.Nodes(parent.Nodes.Count-1).Nodes.RemoveAt(Parent.Nodes(parent.Nodes.Count-1).Nodes.Count - 1)
-                                                  lbProblemSolved = False
-                                                End If
-
-                                                End If
-                                                End If
-                                             If (m_tree.Errors.Count > 0) Or Not lbProblemSolved Then
-                                                 parent.Nodes.Remove(node)
-                                                 Return False
-                                             End If
+                                                                        tok = m_scanner.LookAhead({TokenType.MATHFUNCTION}) ' Option Rule
+                                        If tok.Type = TokenType.MATHFUNCTION Then
+lbProblemSolved =                                             ParseMATHCLAUSE(node) ' NonTerminal Rule: MATHCLAUSE
+                                            If m_tree.Errors.Count > 0 Then
+                                              If m_scanner.EndPos > Me.MaxDistance Then
+                                                Me.MaxDistance = m_scanner.StartPos
+                                                max_tree = m_tree.clone
+                                              End If
+                                              If node.Nodes.Count > 0 Then node.Nodes.RemoveAt(node.Nodes.Count - 1)
+                                              lbProblemSolved = False
+                                            End If
 
                                         Else
-                                                                                    m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PREDICATE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "PREDICATE"))
+                                                                                    m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.MATHFUNCTION.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MATHFUNCTION"))
                                         End If
                                         If m_tree.Errors.Count > 0 Then
                                           Return False
@@ -49676,75 +49291,20 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                    End If
 
                                  ' Concat Rule
-                                                                        tok = m_scanner.LookAhead({TokenType.PREDICATE, TokenType.MATHFUNCTION}) ' Option Rule
-                                        If tok.Type = TokenType.PREDICATE Or tok.Type = TokenType.MATHFUNCTION Then
-                                            tok = m_scanner.LookAhead({TokenType.PREDICATE, TokenType.MATHFUNCTION}) ' Choice Rule
-                                            
-                                                m_tree.Optionals.Clear
-                                                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PREDICATE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "PREDICATE"))
-                                                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PREDICATE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MATHFUNCTION"))
-                                            Select Case tok.Type
-                                             ' Choice Rule
-                                                Case TokenType.PREDICATE
-                                            lbProblemSolved =                                                     ParseFOLLOWINGREADINGTEXT(node) ' NonTerminal Rule: FOLLOWINGREADINGTEXT
-                                                    If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.EndPos > Me.MaxDistance Then
-                                                        Me.MaxDistance = m_scanner.StartPos
-                                                        max_tree = m_tree.clone
-                                                      End If
-                                                      If node.Nodes.Count > 0 Then node.Nodes.RemoveAt(node.Nodes.Count - 1)
-                                                      lbProblemSolved = False
-                                                    End If
-
-                                                Case TokenType.MATHFUNCTION
-                                            lbProblemSolved =                                                     ParseMATHCLAUSE(node) ' NonTerminal Rule: MATHCLAUSE
-                                                    If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.EndPos > Me.MaxDistance Then
-                                                        Me.MaxDistance = m_scanner.StartPos
-                                                        max_tree = m_tree.clone
-                                                      End If
-                                                      If node.Nodes.Count > 0 Then node.Nodes.RemoveAt(node.Nodes.Count - 1)
-                                                      lbProblemSolved = False
-                                                    End If
-
-                                                Case Else
-                                                If m_tree.Errors.Count = 0 Then
-                                                m_tree.Optionals.Clear
-                                                lbProblemSolved = False
-                                                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PREDICATE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "PREDICATE"))
-                                                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PREDICATE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MATHFUNCTION"))
-                                                End If
-                                                    m_tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found.", &H0002, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos))
-                                                    Exit Select
-                                            End Select ' Choice Rule
-                                                If Not lbProblemSolved Then
-                                                   m_tree.Errors.Clear
-                                                If Not lbProblemSolved Then
-                                                  m_tree.Errors.Clear
-                                                  m_scanner.StartPos = liOriginalRange
-                                                  If liOriginalRange > Me.MaxDistance Then
-                                                    Me.MaxDistance = m_scanner.StartPos
-                                                    max_tree = m_tree.clone
-                                                  End If
-                                            lbProblemSolved =                                                 ParseMATHCLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: MATHCLAUSE
-                                                If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.EndPos > Me.MaxDistance Then
-                                                    Me.MaxDistance = m_scanner.StartPos
-                                                    max_tree = m_tree.clone
-                                                  End If
-                                                  If parent.Nodes(parent.Nodes.Count-1).Nodes.Count > 0 Then parent.Nodes(parent.Nodes.Count-1).Nodes.RemoveAt(Parent.Nodes(parent.Nodes.Count-1).Nodes.Count - 1)
-                                                  lbProblemSolved = False
-                                                End If
-
-                                                End If
-                                                End If
-                                             If (m_tree.Errors.Count > 0) Or Not lbProblemSolved Then
-                                                 parent.Nodes.Remove(node)
-                                                 Return False
-                                             End If
+                                                                        tok = m_scanner.LookAhead({TokenType.MATHFUNCTION}) ' Option Rule
+                                        If tok.Type = TokenType.MATHFUNCTION Then
+lbProblemSolved =                                             ParseMATHCLAUSE(node) ' NonTerminal Rule: MATHCLAUSE
+                                            If m_tree.Errors.Count > 0 Then
+                                              If m_scanner.EndPos > Me.MaxDistance Then
+                                                Me.MaxDistance = m_scanner.StartPos
+                                                max_tree = m_tree.clone
+                                              End If
+                                              If node.Nodes.Count > 0 Then node.Nodes.RemoveAt(node.Nodes.Count - 1)
+                                              lbProblemSolved = False
+                                            End If
 
                                         Else
-                                                                                    m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PREDICATE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "PREDICATE"))
+                                                                                    m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.MATHFUNCTION.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MATHFUNCTION"))
                                         End If
                                         If m_tree.Errors.Count > 0 Then
                                           Return False
@@ -50226,75 +49786,20 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                    End If
 
                                  ' Concat Rule
-                                                                        tok = m_scanner.LookAhead({TokenType.PREDICATE, TokenType.MATHFUNCTION}) ' Option Rule
-                                        If tok.Type = TokenType.PREDICATE Or tok.Type = TokenType.MATHFUNCTION Then
-                                            tok = m_scanner.LookAhead({TokenType.PREDICATE, TokenType.MATHFUNCTION}) ' Choice Rule
-                                            
-                                                m_tree.Optionals.Clear
-                                                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PREDICATE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "PREDICATE"))
-                                                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PREDICATE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MATHFUNCTION"))
-                                            Select Case tok.Type
-                                             ' Choice Rule
-                                                Case TokenType.PREDICATE
-                                            lbProblemSolved =                                                     ParseFOLLOWINGREADINGTEXT(node) ' NonTerminal Rule: FOLLOWINGREADINGTEXT
-                                                    If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.EndPos > Me.MaxDistance Then
-                                                        Me.MaxDistance = m_scanner.StartPos
-                                                        max_tree = m_tree.clone
-                                                      End If
-                                                      If node.Nodes.Count > 0 Then node.Nodes.RemoveAt(node.Nodes.Count - 1)
-                                                      lbProblemSolved = False
-                                                    End If
-
-                                                Case TokenType.MATHFUNCTION
-                                            lbProblemSolved =                                                     ParseMATHCLAUSE(node) ' NonTerminal Rule: MATHCLAUSE
-                                                    If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.EndPos > Me.MaxDistance Then
-                                                        Me.MaxDistance = m_scanner.StartPos
-                                                        max_tree = m_tree.clone
-                                                      End If
-                                                      If node.Nodes.Count > 0 Then node.Nodes.RemoveAt(node.Nodes.Count - 1)
-                                                      lbProblemSolved = False
-                                                    End If
-
-                                                Case Else
-                                                If m_tree.Errors.Count = 0 Then
-                                                m_tree.Optionals.Clear
-                                                lbProblemSolved = False
-                                                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PREDICATE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "PREDICATE"))
-                                                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PREDICATE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MATHFUNCTION"))
-                                                End If
-                                                    m_tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found.", &H0002, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos))
-                                                    Exit Select
-                                            End Select ' Choice Rule
-                                                If Not lbProblemSolved Then
-                                                   m_tree.Errors.Clear
-                                                If Not lbProblemSolved Then
-                                                  m_tree.Errors.Clear
-                                                  m_scanner.StartPos = liOriginalRange
-                                                  If liOriginalRange > Me.MaxDistance Then
-                                                    Me.MaxDistance = m_scanner.StartPos
-                                                    max_tree = m_tree.clone
-                                                  End If
-                                            lbProblemSolved =                                                 ParseMATHCLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: MATHCLAUSE
-                                                If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.EndPos > Me.MaxDistance Then
-                                                    Me.MaxDistance = m_scanner.StartPos
-                                                    max_tree = m_tree.clone
-                                                  End If
-                                                  If parent.Nodes(parent.Nodes.Count-1).Nodes.Count > 0 Then parent.Nodes(parent.Nodes.Count-1).Nodes.RemoveAt(Parent.Nodes(parent.Nodes.Count-1).Nodes.Count - 1)
-                                                  lbProblemSolved = False
-                                                End If
-
-                                                End If
-                                                End If
-                                             If (m_tree.Errors.Count > 0) Or Not lbProblemSolved Then
-                                                 parent.Nodes.Remove(node)
-                                                 Return False
-                                             End If
+                                                                        tok = m_scanner.LookAhead({TokenType.MATHFUNCTION}) ' Option Rule
+                                        If tok.Type = TokenType.MATHFUNCTION Then
+lbProblemSolved =                                             ParseMATHCLAUSE(node) ' NonTerminal Rule: MATHCLAUSE
+                                            If m_tree.Errors.Count > 0 Then
+                                              If m_scanner.EndPos > Me.MaxDistance Then
+                                                Me.MaxDistance = m_scanner.StartPos
+                                                max_tree = m_tree.clone
+                                              End If
+                                              If node.Nodes.Count > 0 Then node.Nodes.RemoveAt(node.Nodes.Count - 1)
+                                              lbProblemSolved = False
+                                            End If
 
                                         Else
-                                                                                    m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PREDICATE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "PREDICATE"))
+                                                                                    m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.MATHFUNCTION.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MATHFUNCTION"))
                                         End If
                                         If m_tree.Errors.Count > 0 Then
                                           Return False
@@ -50776,75 +50281,20 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                    End If
 
                                  ' Concat Rule
-                                                                        tok = m_scanner.LookAhead({TokenType.PREDICATE, TokenType.MATHFUNCTION}) ' Option Rule
-                                        If tok.Type = TokenType.PREDICATE Or tok.Type = TokenType.MATHFUNCTION Then
-                                            tok = m_scanner.LookAhead({TokenType.PREDICATE, TokenType.MATHFUNCTION}) ' Choice Rule
-                                            
-                                                m_tree.Optionals.Clear
-                                                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PREDICATE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "PREDICATE"))
-                                                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PREDICATE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MATHFUNCTION"))
-                                            Select Case tok.Type
-                                             ' Choice Rule
-                                                Case TokenType.PREDICATE
-                                            lbProblemSolved =                                                     ParseFOLLOWINGREADINGTEXT(node) ' NonTerminal Rule: FOLLOWINGREADINGTEXT
-                                                    If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.EndPos > Me.MaxDistance Then
-                                                        Me.MaxDistance = m_scanner.StartPos
-                                                        max_tree = m_tree.clone
-                                                      End If
-                                                      If node.Nodes.Count > 0 Then node.Nodes.RemoveAt(node.Nodes.Count - 1)
-                                                      lbProblemSolved = False
-                                                    End If
-
-                                                Case TokenType.MATHFUNCTION
-                                            lbProblemSolved =                                                     ParseMATHCLAUSE(node) ' NonTerminal Rule: MATHCLAUSE
-                                                    If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.EndPos > Me.MaxDistance Then
-                                                        Me.MaxDistance = m_scanner.StartPos
-                                                        max_tree = m_tree.clone
-                                                      End If
-                                                      If node.Nodes.Count > 0 Then node.Nodes.RemoveAt(node.Nodes.Count - 1)
-                                                      lbProblemSolved = False
-                                                    End If
-
-                                                Case Else
-                                                If m_tree.Errors.Count = 0 Then
-                                                m_tree.Optionals.Clear
-                                                lbProblemSolved = False
-                                                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PREDICATE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "PREDICATE"))
-                                                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PREDICATE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MATHFUNCTION"))
-                                                End If
-                                                    m_tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found.", &H0002, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos))
-                                                    Exit Select
-                                            End Select ' Choice Rule
-                                                If Not lbProblemSolved Then
-                                                   m_tree.Errors.Clear
-                                                If Not lbProblemSolved Then
-                                                  m_tree.Errors.Clear
-                                                  m_scanner.StartPos = liOriginalRange
-                                                  If liOriginalRange > Me.MaxDistance Then
-                                                    Me.MaxDistance = m_scanner.StartPos
-                                                    max_tree = m_tree.clone
-                                                  End If
-                                            lbProblemSolved =                                                 ParseMATHCLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: MATHCLAUSE
-                                                If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.EndPos > Me.MaxDistance Then
-                                                    Me.MaxDistance = m_scanner.StartPos
-                                                    max_tree = m_tree.clone
-                                                  End If
-                                                  If parent.Nodes(parent.Nodes.Count-1).Nodes.Count > 0 Then parent.Nodes(parent.Nodes.Count-1).Nodes.RemoveAt(Parent.Nodes(parent.Nodes.Count-1).Nodes.Count - 1)
-                                                  lbProblemSolved = False
-                                                End If
-
-                                                End If
-                                                End If
-                                             If (m_tree.Errors.Count > 0) Or Not lbProblemSolved Then
-                                                 parent.Nodes.Remove(node)
-                                                 Return False
-                                             End If
+                                                                        tok = m_scanner.LookAhead({TokenType.MATHFUNCTION}) ' Option Rule
+                                        If tok.Type = TokenType.MATHFUNCTION Then
+lbProblemSolved =                                             ParseMATHCLAUSE(node) ' NonTerminal Rule: MATHCLAUSE
+                                            If m_tree.Errors.Count > 0 Then
+                                              If m_scanner.EndPos > Me.MaxDistance Then
+                                                Me.MaxDistance = m_scanner.StartPos
+                                                max_tree = m_tree.clone
+                                              End If
+                                              If node.Nodes.Count > 0 Then node.Nodes.RemoveAt(node.Nodes.Count - 1)
+                                              lbProblemSolved = False
+                                            End If
 
                                         Else
-                                                                                    m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PREDICATE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "PREDICATE"))
+                                                                                    m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.MATHFUNCTION.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MATHFUNCTION"))
                                         End If
                                         If m_tree.Errors.Count > 0 Then
                                           Return False
@@ -51326,75 +50776,20 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                    End If
 
                                  ' Concat Rule
-                                                                        tok = m_scanner.LookAhead({TokenType.PREDICATE, TokenType.MATHFUNCTION}) ' Option Rule
-                                        If tok.Type = TokenType.PREDICATE Or tok.Type = TokenType.MATHFUNCTION Then
-                                            tok = m_scanner.LookAhead({TokenType.PREDICATE, TokenType.MATHFUNCTION}) ' Choice Rule
-                                            
-                                                m_tree.Optionals.Clear
-                                                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PREDICATE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "PREDICATE"))
-                                                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PREDICATE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MATHFUNCTION"))
-                                            Select Case tok.Type
-                                             ' Choice Rule
-                                                Case TokenType.PREDICATE
-                                            lbProblemSolved =                                                     ParseFOLLOWINGREADINGTEXT(node) ' NonTerminal Rule: FOLLOWINGREADINGTEXT
-                                                    If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.EndPos > Me.MaxDistance Then
-                                                        Me.MaxDistance = m_scanner.StartPos
-                                                        max_tree = m_tree.clone
-                                                      End If
-                                                      If node.Nodes.Count > 0 Then node.Nodes.RemoveAt(node.Nodes.Count - 1)
-                                                      lbProblemSolved = False
-                                                    End If
-
-                                                Case TokenType.MATHFUNCTION
-                                            lbProblemSolved =                                                     ParseMATHCLAUSE(node) ' NonTerminal Rule: MATHCLAUSE
-                                                    If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.EndPos > Me.MaxDistance Then
-                                                        Me.MaxDistance = m_scanner.StartPos
-                                                        max_tree = m_tree.clone
-                                                      End If
-                                                      If node.Nodes.Count > 0 Then node.Nodes.RemoveAt(node.Nodes.Count - 1)
-                                                      lbProblemSolved = False
-                                                    End If
-
-                                                Case Else
-                                                If m_tree.Errors.Count = 0 Then
-                                                m_tree.Optionals.Clear
-                                                lbProblemSolved = False
-                                                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PREDICATE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "PREDICATE"))
-                                                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PREDICATE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MATHFUNCTION"))
-                                                End If
-                                                    m_tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found.", &H0002, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos))
-                                                    Exit Select
-                                            End Select ' Choice Rule
-                                                If Not lbProblemSolved Then
-                                                   m_tree.Errors.Clear
-                                                If Not lbProblemSolved Then
-                                                  m_tree.Errors.Clear
-                                                  m_scanner.StartPos = liOriginalRange
-                                                  If liOriginalRange > Me.MaxDistance Then
-                                                    Me.MaxDistance = m_scanner.StartPos
-                                                    max_tree = m_tree.clone
-                                                  End If
-                                            lbProblemSolved =                                                 ParseMATHCLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: MATHCLAUSE
-                                                If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.EndPos > Me.MaxDistance Then
-                                                    Me.MaxDistance = m_scanner.StartPos
-                                                    max_tree = m_tree.clone
-                                                  End If
-                                                  If parent.Nodes(parent.Nodes.Count-1).Nodes.Count > 0 Then parent.Nodes(parent.Nodes.Count-1).Nodes.RemoveAt(Parent.Nodes(parent.Nodes.Count-1).Nodes.Count - 1)
-                                                  lbProblemSolved = False
-                                                End If
-
-                                                End If
-                                                End If
-                                             If (m_tree.Errors.Count > 0) Or Not lbProblemSolved Then
-                                                 parent.Nodes.Remove(node)
-                                                 Return False
-                                             End If
+                                                                        tok = m_scanner.LookAhead({TokenType.MATHFUNCTION}) ' Option Rule
+                                        If tok.Type = TokenType.MATHFUNCTION Then
+lbProblemSolved =                                             ParseMATHCLAUSE(node) ' NonTerminal Rule: MATHCLAUSE
+                                            If m_tree.Errors.Count > 0 Then
+                                              If m_scanner.EndPos > Me.MaxDistance Then
+                                                Me.MaxDistance = m_scanner.StartPos
+                                                max_tree = m_tree.clone
+                                              End If
+                                              If node.Nodes.Count > 0 Then node.Nodes.RemoveAt(node.Nodes.Count - 1)
+                                              lbProblemSolved = False
+                                            End If
 
                                         Else
-                                                                                    m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PREDICATE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "PREDICATE"))
+                                                                                    m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.MATHFUNCTION.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MATHFUNCTION"))
                                         End If
                                         If m_tree.Errors.Count > 0 Then
                                           Return False
@@ -51876,75 +51271,20 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                    End If
 
                                  ' Concat Rule
-                                                                        tok = m_scanner.LookAhead({TokenType.PREDICATE, TokenType.MATHFUNCTION}) ' Option Rule
-                                        If tok.Type = TokenType.PREDICATE Or tok.Type = TokenType.MATHFUNCTION Then
-                                            tok = m_scanner.LookAhead({TokenType.PREDICATE, TokenType.MATHFUNCTION}) ' Choice Rule
-                                            
-                                                m_tree.Optionals.Clear
-                                                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PREDICATE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "PREDICATE"))
-                                                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PREDICATE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MATHFUNCTION"))
-                                            Select Case tok.Type
-                                             ' Choice Rule
-                                                Case TokenType.PREDICATE
-                                            lbProblemSolved =                                                     ParseFOLLOWINGREADINGTEXT(node) ' NonTerminal Rule: FOLLOWINGREADINGTEXT
-                                                    If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.EndPos > Me.MaxDistance Then
-                                                        Me.MaxDistance = m_scanner.StartPos
-                                                        max_tree = m_tree.clone
-                                                      End If
-                                                      If node.Nodes.Count > 0 Then node.Nodes.RemoveAt(node.Nodes.Count - 1)
-                                                      lbProblemSolved = False
-                                                    End If
-
-                                                Case TokenType.MATHFUNCTION
-                                            lbProblemSolved =                                                     ParseMATHCLAUSE(node) ' NonTerminal Rule: MATHCLAUSE
-                                                    If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.EndPos > Me.MaxDistance Then
-                                                        Me.MaxDistance = m_scanner.StartPos
-                                                        max_tree = m_tree.clone
-                                                      End If
-                                                      If node.Nodes.Count > 0 Then node.Nodes.RemoveAt(node.Nodes.Count - 1)
-                                                      lbProblemSolved = False
-                                                    End If
-
-                                                Case Else
-                                                If m_tree.Errors.Count = 0 Then
-                                                m_tree.Optionals.Clear
-                                                lbProblemSolved = False
-                                                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PREDICATE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "PREDICATE"))
-                                                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PREDICATE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MATHFUNCTION"))
-                                                End If
-                                                    m_tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found.", &H0002, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos))
-                                                    Exit Select
-                                            End Select ' Choice Rule
-                                                If Not lbProblemSolved Then
-                                                   m_tree.Errors.Clear
-                                                If Not lbProblemSolved Then
-                                                  m_tree.Errors.Clear
-                                                  m_scanner.StartPos = liOriginalRange
-                                                  If liOriginalRange > Me.MaxDistance Then
-                                                    Me.MaxDistance = m_scanner.StartPos
-                                                    max_tree = m_tree.clone
-                                                  End If
-                                            lbProblemSolved =                                                 ParseMATHCLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: MATHCLAUSE
-                                                If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.EndPos > Me.MaxDistance Then
-                                                    Me.MaxDistance = m_scanner.StartPos
-                                                    max_tree = m_tree.clone
-                                                  End If
-                                                  If parent.Nodes(parent.Nodes.Count-1).Nodes.Count > 0 Then parent.Nodes(parent.Nodes.Count-1).Nodes.RemoveAt(Parent.Nodes(parent.Nodes.Count-1).Nodes.Count - 1)
-                                                  lbProblemSolved = False
-                                                End If
-
-                                                End If
-                                                End If
-                                             If (m_tree.Errors.Count > 0) Or Not lbProblemSolved Then
-                                                 parent.Nodes.Remove(node)
-                                                 Return False
-                                             End If
+                                                                        tok = m_scanner.LookAhead({TokenType.MATHFUNCTION}) ' Option Rule
+                                        If tok.Type = TokenType.MATHFUNCTION Then
+lbProblemSolved =                                             ParseMATHCLAUSE(node) ' NonTerminal Rule: MATHCLAUSE
+                                            If m_tree.Errors.Count > 0 Then
+                                              If m_scanner.EndPos > Me.MaxDistance Then
+                                                Me.MaxDistance = m_scanner.StartPos
+                                                max_tree = m_tree.clone
+                                              End If
+                                              If node.Nodes.Count > 0 Then node.Nodes.RemoveAt(node.Nodes.Count - 1)
+                                              lbProblemSolved = False
+                                            End If
 
                                         Else
-                                                                                    m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PREDICATE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "PREDICATE"))
+                                                                                    m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.MATHFUNCTION.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MATHFUNCTION"))
                                         End If
                                         If m_tree.Errors.Count > 0 Then
                                           Return False
@@ -52426,75 +51766,20 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                    End If
 
                                  ' Concat Rule
-                                                                        tok = m_scanner.LookAhead({TokenType.PREDICATE, TokenType.MATHFUNCTION}) ' Option Rule
-                                        If tok.Type = TokenType.PREDICATE Or tok.Type = TokenType.MATHFUNCTION Then
-                                            tok = m_scanner.LookAhead({TokenType.PREDICATE, TokenType.MATHFUNCTION}) ' Choice Rule
-                                            
-                                                m_tree.Optionals.Clear
-                                                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PREDICATE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "PREDICATE"))
-                                                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PREDICATE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MATHFUNCTION"))
-                                            Select Case tok.Type
-                                             ' Choice Rule
-                                                Case TokenType.PREDICATE
-                                            lbProblemSolved =                                                     ParseFOLLOWINGREADINGTEXT(node) ' NonTerminal Rule: FOLLOWINGREADINGTEXT
-                                                    If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.EndPos > Me.MaxDistance Then
-                                                        Me.MaxDistance = m_scanner.StartPos
-                                                        max_tree = m_tree.clone
-                                                      End If
-                                                      If node.Nodes.Count > 0 Then node.Nodes.RemoveAt(node.Nodes.Count - 1)
-                                                      lbProblemSolved = False
-                                                    End If
-
-                                                Case TokenType.MATHFUNCTION
-                                            lbProblemSolved =                                                     ParseMATHCLAUSE(node) ' NonTerminal Rule: MATHCLAUSE
-                                                    If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.EndPos > Me.MaxDistance Then
-                                                        Me.MaxDistance = m_scanner.StartPos
-                                                        max_tree = m_tree.clone
-                                                      End If
-                                                      If node.Nodes.Count > 0 Then node.Nodes.RemoveAt(node.Nodes.Count - 1)
-                                                      lbProblemSolved = False
-                                                    End If
-
-                                                Case Else
-                                                If m_tree.Errors.Count = 0 Then
-                                                m_tree.Optionals.Clear
-                                                lbProblemSolved = False
-                                                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PREDICATE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "PREDICATE"))
-                                                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PREDICATE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MATHFUNCTION"))
-                                                End If
-                                                    m_tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found.", &H0002, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos))
-                                                    Exit Select
-                                            End Select ' Choice Rule
-                                                If Not lbProblemSolved Then
-                                                   m_tree.Errors.Clear
-                                                If Not lbProblemSolved Then
-                                                  m_tree.Errors.Clear
-                                                  m_scanner.StartPos = liOriginalRange
-                                                  If liOriginalRange > Me.MaxDistance Then
-                                                    Me.MaxDistance = m_scanner.StartPos
-                                                    max_tree = m_tree.clone
-                                                  End If
-                                            lbProblemSolved =                                                 ParseMATHCLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: MATHCLAUSE
-                                                If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.EndPos > Me.MaxDistance Then
-                                                    Me.MaxDistance = m_scanner.StartPos
-                                                    max_tree = m_tree.clone
-                                                  End If
-                                                  If parent.Nodes(parent.Nodes.Count-1).Nodes.Count > 0 Then parent.Nodes(parent.Nodes.Count-1).Nodes.RemoveAt(Parent.Nodes(parent.Nodes.Count-1).Nodes.Count - 1)
-                                                  lbProblemSolved = False
-                                                End If
-
-                                                End If
-                                                End If
-                                             If (m_tree.Errors.Count > 0) Or Not lbProblemSolved Then
-                                                 parent.Nodes.Remove(node)
-                                                 Return False
-                                             End If
+                                                                        tok = m_scanner.LookAhead({TokenType.MATHFUNCTION}) ' Option Rule
+                                        If tok.Type = TokenType.MATHFUNCTION Then
+lbProblemSolved =                                             ParseMATHCLAUSE(node) ' NonTerminal Rule: MATHCLAUSE
+                                            If m_tree.Errors.Count > 0 Then
+                                              If m_scanner.EndPos > Me.MaxDistance Then
+                                                Me.MaxDistance = m_scanner.StartPos
+                                                max_tree = m_tree.clone
+                                              End If
+                                              If node.Nodes.Count > 0 Then node.Nodes.RemoveAt(node.Nodes.Count - 1)
+                                              lbProblemSolved = False
+                                            End If
 
                                         Else
-                                                                                    m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PREDICATE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "PREDICATE"))
+                                                                                    m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.MATHFUNCTION.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MATHFUNCTION"))
                                         End If
                                         If m_tree.Errors.Count > 0 Then
                                           Return False
@@ -52976,75 +52261,20 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                    End If
 
                                  ' Concat Rule
-                                                                        tok = m_scanner.LookAhead({TokenType.PREDICATE, TokenType.MATHFUNCTION}) ' Option Rule
-                                        If tok.Type = TokenType.PREDICATE Or tok.Type = TokenType.MATHFUNCTION Then
-                                            tok = m_scanner.LookAhead({TokenType.PREDICATE, TokenType.MATHFUNCTION}) ' Choice Rule
-                                            
-                                                m_tree.Optionals.Clear
-                                                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PREDICATE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "PREDICATE"))
-                                                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PREDICATE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MATHFUNCTION"))
-                                            Select Case tok.Type
-                                             ' Choice Rule
-                                                Case TokenType.PREDICATE
-                                            lbProblemSolved =                                                     ParseFOLLOWINGREADINGTEXT(node) ' NonTerminal Rule: FOLLOWINGREADINGTEXT
-                                                    If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.EndPos > Me.MaxDistance Then
-                                                        Me.MaxDistance = m_scanner.StartPos
-                                                        max_tree = m_tree.clone
-                                                      End If
-                                                      If node.Nodes.Count > 0 Then node.Nodes.RemoveAt(node.Nodes.Count - 1)
-                                                      lbProblemSolved = False
-                                                    End If
-
-                                                Case TokenType.MATHFUNCTION
-                                            lbProblemSolved =                                                     ParseMATHCLAUSE(node) ' NonTerminal Rule: MATHCLAUSE
-                                                    If m_tree.Errors.Count > 0 Then
-                                                      If m_scanner.EndPos > Me.MaxDistance Then
-                                                        Me.MaxDistance = m_scanner.StartPos
-                                                        max_tree = m_tree.clone
-                                                      End If
-                                                      If node.Nodes.Count > 0 Then node.Nodes.RemoveAt(node.Nodes.Count - 1)
-                                                      lbProblemSolved = False
-                                                    End If
-
-                                                Case Else
-                                                If m_tree.Errors.Count = 0 Then
-                                                m_tree.Optionals.Clear
-                                                lbProblemSolved = False
-                                                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PREDICATE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "PREDICATE"))
-                                                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PREDICATE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MATHFUNCTION"))
-                                                End If
-                                                    m_tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found.", &H0002, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos))
-                                                    Exit Select
-                                            End Select ' Choice Rule
-                                                If Not lbProblemSolved Then
-                                                   m_tree.Errors.Clear
-                                                If Not lbProblemSolved Then
-                                                  m_tree.Errors.Clear
-                                                  m_scanner.StartPos = liOriginalRange
-                                                  If liOriginalRange > Me.MaxDistance Then
-                                                    Me.MaxDistance = m_scanner.StartPos
-                                                    max_tree = m_tree.clone
-                                                  End If
-                                            lbProblemSolved =                                                 ParseMATHCLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: MATHCLAUSE
-                                                If m_tree.Errors.Count > 0 Then
-                                                  If m_scanner.EndPos > Me.MaxDistance Then
-                                                    Me.MaxDistance = m_scanner.StartPos
-                                                    max_tree = m_tree.clone
-                                                  End If
-                                                  If parent.Nodes(parent.Nodes.Count-1).Nodes.Count > 0 Then parent.Nodes(parent.Nodes.Count-1).Nodes.RemoveAt(Parent.Nodes(parent.Nodes.Count-1).Nodes.Count - 1)
-                                                  lbProblemSolved = False
-                                                End If
-
-                                                End If
-                                                End If
-                                             If (m_tree.Errors.Count > 0) Or Not lbProblemSolved Then
-                                                 parent.Nodes.Remove(node)
-                                                 Return False
-                                             End If
+                                                                        tok = m_scanner.LookAhead({TokenType.MATHFUNCTION}) ' Option Rule
+                                        If tok.Type = TokenType.MATHFUNCTION Then
+lbProblemSolved =                                             ParseMATHCLAUSE(node) ' NonTerminal Rule: MATHCLAUSE
+                                            If m_tree.Errors.Count > 0 Then
+                                              If m_scanner.EndPos > Me.MaxDistance Then
+                                                Me.MaxDistance = m_scanner.StartPos
+                                                max_tree = m_tree.clone
+                                              End If
+                                              If node.Nodes.Count > 0 Then node.Nodes.RemoveAt(node.Nodes.Count - 1)
+                                              lbProblemSolved = False
+                                            End If
 
                                         Else
-                                                                                    m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PREDICATE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "PREDICATE"))
+                                                                                    m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.MATHFUNCTION.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MATHFUNCTION"))
                                         End If
                                         If m_tree.Errors.Count > 0 Then
                                           Return False
@@ -53557,75 +52787,20 @@ lbProblemSolved =                                     ParseWHICHTHATCLAUSE(node)
                            End If
 
                          ' Concat Rule
-                                                        tok = m_scanner.LookAhead({TokenType.PREDICATE, TokenType.MATHFUNCTION}) ' Option Rule
-                                If tok.Type = TokenType.PREDICATE Or tok.Type = TokenType.MATHFUNCTION Then
-                                    tok = m_scanner.LookAhead({TokenType.PREDICATE, TokenType.MATHFUNCTION}) ' Choice Rule
-                                    
-                                        m_tree.Optionals.Clear
-                                        m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PREDICATE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "PREDICATE"))
-                                        m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PREDICATE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MATHFUNCTION"))
-                                    Select Case tok.Type
-                                     ' Choice Rule
-                                        Case TokenType.PREDICATE
-                                    lbProblemSolved =                                             ParseFOLLOWINGREADINGTEXT(node) ' NonTerminal Rule: FOLLOWINGREADINGTEXT
-                                            If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.EndPos > Me.MaxDistance Then
-                                                Me.MaxDistance = m_scanner.StartPos
-                                                max_tree = m_tree.clone
-                                              End If
-                                              If node.Nodes.Count > 0 Then node.Nodes.RemoveAt(node.Nodes.Count - 1)
-                                              lbProblemSolved = False
-                                            End If
-
-                                        Case TokenType.MATHFUNCTION
-                                    lbProblemSolved =                                             ParseMATHCLAUSE(node) ' NonTerminal Rule: MATHCLAUSE
-                                            If m_tree.Errors.Count > 0 Then
-                                              If m_scanner.EndPos > Me.MaxDistance Then
-                                                Me.MaxDistance = m_scanner.StartPos
-                                                max_tree = m_tree.clone
-                                              End If
-                                              If node.Nodes.Count > 0 Then node.Nodes.RemoveAt(node.Nodes.Count - 1)
-                                              lbProblemSolved = False
-                                            End If
-
-                                        Case Else
-                                        If m_tree.Errors.Count = 0 Then
-                                        m_tree.Optionals.Clear
-                                        lbProblemSolved = False
-                                        m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PREDICATE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "PREDICATE"))
-                                        m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PREDICATE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MATHFUNCTION"))
-                                        End If
-                                            m_tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found.", &H0002, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos))
-                                            Exit Select
-                                    End Select ' Choice Rule
-                                        If Not lbProblemSolved Then
-                                           m_tree.Errors.Clear
-                                        If Not lbProblemSolved Then
-                                          m_tree.Errors.Clear
-                                          m_scanner.StartPos = liOriginalRange
-                                          If liOriginalRange > Me.MaxDistance Then
-                                            Me.MaxDistance = m_scanner.StartPos
-                                            max_tree = m_tree.clone
-                                          End If
-                                    lbProblemSolved =                                         ParseMATHCLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: MATHCLAUSE
-                                        If m_tree.Errors.Count > 0 Then
-                                          If m_scanner.EndPos > Me.MaxDistance Then
-                                            Me.MaxDistance = m_scanner.StartPos
-                                            max_tree = m_tree.clone
-                                          End If
-                                          If parent.Nodes(parent.Nodes.Count-1).Nodes.Count > 0 Then parent.Nodes(parent.Nodes.Count-1).Nodes.RemoveAt(Parent.Nodes(parent.Nodes.Count-1).Nodes.Count - 1)
-                                          lbProblemSolved = False
-                                        End If
-
-                                        End If
-                                        End If
-                                     If (m_tree.Errors.Count > 0) Or Not lbProblemSolved Then
-                                         parent.Nodes.Remove(node)
-                                         Return False
-                                     End If
+                                                        tok = m_scanner.LookAhead({TokenType.MATHFUNCTION}) ' Option Rule
+                                If tok.Type = TokenType.MATHFUNCTION Then
+lbProblemSolved =                                     ParseMATHCLAUSE(node) ' NonTerminal Rule: MATHCLAUSE
+                                    If m_tree.Errors.Count > 0 Then
+                                      If m_scanner.EndPos > Me.MaxDistance Then
+                                        Me.MaxDistance = m_scanner.StartPos
+                                        max_tree = m_tree.clone
+                                      End If
+                                      If node.Nodes.Count > 0 Then node.Nodes.RemoveAt(node.Nodes.Count - 1)
+                                      lbProblemSolved = False
+                                    End If
 
                                 Else
-                                                                    m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PREDICATE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "PREDICATE"))
+                                                                    m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.MATHFUNCTION.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MATHFUNCTION"))
                                 End If
                                 If m_tree.Errors.Count > 0 Then
                                   Return False
