@@ -213,7 +213,7 @@ Namespace FEQL
             Patterns.Add(TokenType.KEYWDA, regex)
             Tokens.Add(TokenType.KEYWDA)
 
-            regex = new Regex("AN ", RegexOptions.Compiled)
+            regex = new Regex("AN\s|AN$", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDAN, regex)
             Tokens.Add(TokenType.KEYWDAN)
 

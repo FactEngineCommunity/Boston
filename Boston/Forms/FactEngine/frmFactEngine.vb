@@ -1690,7 +1690,8 @@ Public Class frmFactEngine
                             Try
                                 If lrModelElement.getCorrespondingRDSTable.getFirstUniquenessConstraintColumns.Count > 0 Then
                                     Dim lsDatabaseWildcardOperator = Database.gerLikeWildcardOperator(prApplication.WorkingModel.TargetDatabaseType)
-                                    lsSQLQuery &= vbCrLf & "WHERE " & lrModelElement.getCorrespondingRDSTable.getFirstUniquenessConstraintColumns(0).Name & " LIKE '" & Me.zrTextHighlighter.GetCurrentContext.Token.Text & lsDatabaseWildcardOperator & "'"
+                                    Dim lsCurrentToken As String = Trim(Me.zrTextHighlighter.GetCurrentContext.Token.Text)
+                                    lsSQLQuery &= vbCrLf & "WHERE " & lrModelElement.getCorrespondingRDSTable.getFirstUniquenessConstraintColumns(0).Name & " LIKE '" & lsCurrentToken & lsDatabaseWildcardOperator & "'"
                                 End If
                             Catch ex As Exception
                                 'Do nothing. Just don't add anything to the SQL.

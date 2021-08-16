@@ -418,13 +418,23 @@ Public Class ODBCDatabaseReverseEngineer
                     End Try
 
                     '-----------------------------------------------------------------------------------------------
-                    'Create the FactTypeReading
-                    Dim lrSentence As New Language.Sentence("random sentence")
-                    lrSentence.PredicatePart.Add(New Language.PredicatePart("has"))
-                    lrSentence.PredicatePart.Add(New Language.PredicatePart(""))
+                    'Create the FactTypeReadings
+                    For liInd = 1 To 2
+                        Dim lrSentence As New Language.Sentence("random sentence")
+                        lrSentence.PredicatePart.Add(New Language.PredicatePart("has"))
+                        lrSentence.PredicatePart.Add(New Language.PredicatePart(""))
 
-                    Dim lrFactTypeReading As New FBM.FactTypeReading(lrFactType, lrFactType.RoleGroup, lrSentence)
-                    lrFactType.FactTypeReading.Add(lrFactTypeReading)
+                        Dim larRoleGroup As New List(Of FBM.Role)
+                        If liInd = 1 Then
+                            larRoleGroup.Add(lrFactType.RoleGroup(0))
+                            larRoleGroup.Add(lrFactType.RoleGroup(1))
+                        Else
+                            larRoleGroup.Add(lrFactType.RoleGroup(1))
+                            larRoleGroup.Add(lrFactType.RoleGroup(0))
+                        End If
+                        Dim lrFactTypeReading As New FBM.FactTypeReading(lrFactType, larRoleGroup, lrSentence)
+                        lrFactType.FactTypeReading.Add(lrFactTypeReading)
+                    Next
                     For Each lrFactTypeReading In lrFactType.FactTypeReading.ToArray
                         Call lrFactType.SetFactTypeReading(lrFactTypeReading, False)
                     Next

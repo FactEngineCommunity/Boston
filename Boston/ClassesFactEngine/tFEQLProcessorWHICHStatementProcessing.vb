@@ -1387,7 +1387,7 @@
                     If arWhichClauseNode.Nodes(0).Nodes.Count > 0 Then
                         If Me.WHICHCLAUSE.KEYWDAND Is Nothing And
                            arWhichClauseNode.Nodes(0).Nodes(0).Token.Type = FEQL.TokenType.KEYWDTHAT And
-                           arWhichClauseNode.Nodes(1).Token.Type = FEQL.TokenType.KEYWDWHICH Then
+                           {FEQL.TokenType.KEYWDWHICH, FEQL.TokenType.KEYWDA}.Contains(arWhichClauseNode.Nodes(1).Token.Type) Then
                             'E.g. WHICH involves THAT Lecturer
                             Return FactEngine.Constants.pcenumWhichClauseType.ThatPredicateWhichModelElement
                         End If
