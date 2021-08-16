@@ -185,7 +185,7 @@ Partial Class frmCRUDModel
         '
         Me.LabelOpenSuccessfull.Location = New System.Drawing.Point(128, 110)
         Me.LabelOpenSuccessfull.Name = "LabelOpenSuccessfull"
-        Me.LabelOpenSuccessfull.Size = New System.Drawing.Size(121, 26)
+        Me.LabelOpenSuccessfull.Size = New System.Drawing.Size(410, 26)
         Me.LabelOpenSuccessfull.TabIndex = 6
         Me.LabelOpenSuccessfull.Text = "LabelOpenSuccessfull"
         Me.LabelOpenSuccessfull.Visible = False
@@ -284,6 +284,7 @@ Partial Class frmCRUDModel
         Me.LabelPromptErrorMessages.Size = New System.Drawing.Size(37, 13)
         Me.LabelPromptErrorMessages.TabIndex = 6
         Me.LabelPromptErrorMessages.Text = "Errors:"
+        Me.LabelPromptErrorMessages.Visible = False
         '
         'RichTextBoxREMessages
         '

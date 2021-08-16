@@ -160,11 +160,18 @@ Module MyMethodExtensions
     <Extension()>
     Public Function AppendStringInColor(ByRef aoRichtextbox As RichTextBox,
                                         ByVal asStringExtension As String,
-                                        ByVal aiColor As Color) As RichTextBox
+                                        ByVal aiColor As Color,
+                                        Optional ByVal abInBold As Boolean = False) As RichTextBox
 
         Dim liOriginalColor As Color = aoRichtextbox.SelectionColor
         aoRichtextbox.Select(aoRichtextbox.TextLength, 0)
         aoRichtextbox.SelectionColor = aiColor
+
+        If abInBold Then
+            aoRichtextbox.SelectionFont = New Font(aoRichtextbox.Font, FontStyle.Bold)
+        Else
+            aoRichtextbox.SelectionFont = New Font(aoRichtextbox.Font, FontStyle.Regular)
+        End If
         aoRichtextbox.AppendText(asStringExtension)
 
         'Return back to original color

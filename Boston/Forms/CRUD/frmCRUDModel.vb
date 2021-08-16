@@ -12,6 +12,8 @@ Public Class frmCRUDModel
 
     Private mrODBCConnection As System.Data.Odbc.OdbcConnection
 
+    Private ErrorCount As Integer = 0
+
     'Sample ConnectionStrings
     '   "Driver={SQL Server};Server=(local);Trusted_Connection=Yes;Database=AdventureWorks;"
     '   "Driver={Microsoft ODBC for Oracle};Server=ORACLE8i7;Persist Security Info=False;Trusted_Connection=Yes"
@@ -286,6 +288,17 @@ Public Class frmCRUDModel
 
                         lrODBCConnection.Close()
 
+                    Case Is = pcenumDatabaseType.Snowflake
+                        Dim lrODBCConnection As New System.Data.Odbc.OdbcConnection(Me.TextBoxDatabaseConnectionString.Text)
+
+                        lrODBCConnection.Open()
+
+                        Me.LabelOpenSuccessfull.ForeColor = Color.Green
+                        Me.LabelOpenSuccessfull.Text = "Success"
+                        Me.LabelOpenSuccessfull.Visible = True
+
+                        lrODBCConnection.Close()
+
                     Case Is = pcenumDatabaseType.ODBC
                         Dim lrODBCConnection As New System.Data.Odbc.OdbcConnection(Me.TextBoxDatabaseConnectionString.Text)
 
@@ -320,13 +333,14 @@ Public Class frmCRUDModel
 
 
     Private Sub AddREMessage(ByVal asMessage As String,
-                             Optional ByVal aiColor As Color = Nothing)
+                             Optional ByVal aiColor As Color = Nothing,
+                             Optional ByVal abInBold As Boolean = False)
 
         Try
             If aiColor = Nothing Then
                 Me.RichTextBoxREMessages.AppendText(vbCrLf & asMessage)
             Else
-                Me.RichTextBoxREMessages.AppendStringInColor(vbCrLf & asMessage, aiColor)
+                Me.RichTextBoxREMessages.AppendStringInColor(vbCrLf & asMessage, aiColor, abInBold)
             End If
             Me.RichTextBoxREMessages.ScrollToCaret()
 
@@ -370,7 +384,7 @@ Public Class frmCRUDModel
                     Call Me.AddREMessage("- Finished reverse engineering the database.")
                     Call Me.AddREMessage("- Saving the model.")
                     Call Me.zrModel.Save()
-                    Call Me.AddREMessage("- Complete.", Color.Green)
+                    Call Me.AddREMessage("- Complete.", Color.Green, True)
                 End If
 
                 Me.ButtonReverseEngineerDatabase.Enabled = False
@@ -561,6 +575,10 @@ Public Class frmCRUDModel
             If lrProgressObject.Message IsNot Nothing Then
                 If lrProgressObject.IsError Then
                     Me.RichTextBoxREErrorMessages.AppendStringInColor(vbCrLf & "- " & lrProgressObject.Message, Color.Orange)
+                    Me.ErrorCount += 1
+                    If Me.ErrorCount > 0 Then
+                        Me.LabelPromptErrorMessages.Visible = True
+                    End If
                 Else
                     Me.RichTextBoxREMessages.AppendStringInColor(vbCrLf & "- " & lrProgressObject.Message, Color.Black)
                 End If

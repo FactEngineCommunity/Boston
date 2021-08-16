@@ -209,6 +209,9 @@
     <Reference Include="MTGCCombobox">
       <HintPath>..\Dependencies\MTGCCombobox.dll</HintPath>
     </Reference>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="NotificationBar">
       <HintPath>..\Dependencies\NotificationBar.dll</HintPath>
     </Reference>
@@ -380,6 +383,7 @@
     <Compile Include="ClassesFactEngine\DatabaseManager\DatabaseClasses\tMSAccess.vb" />
     <Compile Include="ClassesFactEngine\DatabaseManager\DatabaseClasses\tMongoDb.vb" />
     <Compile Include="ClassesFactEngine\DatabaseManager\DatabaseClasses\tPostgreSQL.vb" />
+    <Compile Include="ClassesFactEngine\DatabaseManager\DatabaseClasses\tSnowflake.vb" />
     <Compile Include="ClassesFactEngine\DatabaseManager\DatabaseClasses\tSQLite.vb" />
     <Compile Include="ClassesFactEngine\DatabaseManager\Interfaces\iDatabaseConnection.vb" />
     <Compile Include="ClassesFactEngine\DatabaseManager\tDatabaseConnection.vb" />
