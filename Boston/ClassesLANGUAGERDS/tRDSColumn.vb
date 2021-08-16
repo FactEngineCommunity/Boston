@@ -21,8 +21,14 @@ Namespace RDS
 
         Public Relation As New List(Of RDS.Relation)
 
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Id As String = System.Guid.NewGuid.ToString
+
+        ''' <summary>
+        ''' Used in reverse engineering.
+        ''' </summary>
+        <XmlIgnore>
+        Public DatabaseName As String = ""
 
         <XmlAttribute()> _
         Public Name As String = ""

@@ -6647,6 +6647,11 @@ Public Class frmDiagramORM
                 lrEntityTypeInstance.Shape.Move(lrEntityTypeInstance.X, lrEntityTypeInstance.Y)
             Next
 
+
+            For Each lrLink As MindFusion.Diagramming.DiagramLink In Me.Diagram.Links
+                Call lrLink.ReassignAnchorPoints()
+            Next
+
         Catch ex As Exception
             Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
@@ -10298,7 +10303,6 @@ Public Class frmDiagramORM
                 Me.CircularProgressBar.SendToBack()
 
                 Me.zrPage.Model.AllowCheckForErrors = True
-                frmMain.Cursor = Cursors.Default
 
                 Dim lrEnterpriseView As tEnterpriseEnterpriseView = Nothing
                 If IsSomething(lrPage) Then

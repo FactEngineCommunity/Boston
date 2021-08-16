@@ -335,6 +335,51 @@ Namespace FBM
 
         End Sub
 
+        Public Function CreateORMDiagrm(ByRef aoBackgroundWorker As System.ComponentModel.BackgroundWorker) As FBM.Page
+
+            Dim lrPage As FBM.Page = Nothing
+
+            Try
+                Select Case Me.Language
+                    Case Is = pcenumLanguage.ORMModel
+                        Throw New Exception("Tried to create a ORM Diagram Page from an ORM Diagram")
+                    Case Is = pcenumLanguage.EntityRelationshipDiagram
+
+                        Dim lsPageName As String = "New ORM Diagram Page"
+                        lsPageName = Me.Model.CreateUniquePageName(lsPageName, 0)
+                        lrPage = New FBM.Page(Me.Model, Nothing, lsPageName, pcenumLanguage.ORMModel)
+                        lrPage.Loaded = True
+                        Me.Model.Page.Add(lrPage)
+                        lrPage.Save(True, True)
+
+                        For Each lrEntity In Me.ERDiagram.Entity
+
+                            Select Case lrEntity.getCorrespondingRDSTable.FBMModelElement.GetType
+                                Case Is = GetType(FBM.EntityType)
+
+                                    Call lrPage.DropEntityTypeAtPoint(lrEntity.getCorrespondingRDSTable.FBMModelElement, New PointF(10, 10), False)
+
+                            End Select
+
+                        Next
+
+                End Select
+
+                Return lrPage
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return Nothing
+            End Try
+
+        End Function
+
         ''' <summary>
         ''' Creates an Entity Relationship Diagram from an ORM-Diagram Page.
         ''' Puts the ERD on a Page under the same Richmond.Model as the ORM-Diagram of the Page,

@@ -687,6 +687,16 @@ Public Class frmDiagramERD
 
             Next
 
+            Dim lsMessage As String = ""
+            If larPage_list.Count = 0 Then
+                '----------------------------------------------------------------------------------
+                'Provide and option for the User to create a PGS Page for the current Page.
+                lsMessage = "Create an ORM Diagram for this current Page. No ORM Diagram currently exists for the model element you have selected."
+                lo_menu_option = Me.ToolStripMenuItemORMDiagram.DropDownItems.Add(lsMessage, My.Resources.MenuImages.ERD16x16)
+                lo_menu_option.Tag = True
+                AddHandler lo_menu_option.Click, AddressOf Me.createORMDiagramPageForCurrentPage
+            End If
+
             '--------------------------------------------------------------------------------------------------------
             'Get the PGS Diagrams for the selected Node.
             larPage_list = prApplication.CMML.getPGSDiagramPagesForModelElementName(lrEntity.Model, lrEntity.Id)
@@ -717,6 +727,49 @@ Public Class frmDiagramERD
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
             prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
+    Private Sub createORMDiagramPageForCurrentPage(ByVal sender As Object, ByVal e As EventArgs)
+
+        Dim lrPage As FBM.Page = Nothing
+
+        Try
+            With New WaitCursor
+
+                Me.zrPage.Model.AllowCheckForErrors = False
+
+                lrPage = Me.zrPage.CreateORMDiagrm(Me.BackgroundWorker)
+                lrPage.Loaded = True
+                lrPage.Save(True, True)
+
+                Me.zrPage.Model.AllowCheckForErrors = True
+
+                Dim lrEnterpriseView As tEnterpriseEnterpriseView = Nothing
+                If IsSomething(lrPage) Then
+                    lrEnterpriseView = frmMain.zfrmModelExplorer.AddExistingPageToModel(lrPage, lrPage.Model, lrPage.Model.TreeNode, True)
+
+                    MsgBox("Added the new ORM Diagram Page, '" & lrPage.Name & "' to the Model.")
+
+                    Dim loToolStripItem As ToolStripItem = CType(sender, ToolStripItem)
+
+                    If loToolStripItem.Tag = True Then
+                        Dim lrToolstripItem As New tDummyToolStripItem(lrEnterpriseView)
+                        Call Me.morphToORMDiagram(lrToolstripItem, lrEnterpriseView)
+                    End If
+
+                End If
+
+            End With
+
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Sub

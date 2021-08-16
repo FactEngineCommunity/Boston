@@ -15,17 +15,27 @@ Namespace RDS
         <XmlAttribute()>
         Public Name As String
 
-        Public ReadOnly Property DatabaseName As String
+        <XmlIgnore()>
+        Private _DatabaseName As String = ""
+
+        Public Property DatabaseName As String
             Get
-                If Me.FBMModelElement.IsDatabaseReservedWord Then
-                    Return "[" & Me.FBMModelElement.DatabaseName & "]"
+                If Me.FBMModelElement Is Nothing Then
+                    'Should only be used when reverse engineering and where the TempModel that is initially populated from the database does not have FBMModelElements.
+                    Return Me._DatabaseName
                 Else
-                    Return Me.FBMModelElement.DatabaseName
+                    If Me.FBMModelElement.IsDatabaseReservedWord Then
+                        Return "[" & Me.FBMModelElement.DatabaseName & "]"
+                    Else
+                        Return Me.FBMModelElement.DatabaseName
+                    End If
                 End If
-
             End Get
+            Set(value As String)
+                'Only used when reverse engineering at this stage.
+                Me._DatabaseName = value
+            End Set
         End Property
-
         <XmlElement()>
         Public Column As New List(Of RDS.Column)
 

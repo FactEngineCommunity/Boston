@@ -114,6 +114,8 @@ Public Class ODBCDatabaseReverseEngineer
             Call Me.getRelations()
             Call Me.SetProgressBarValue(40, "Loaded Relations for Tables.")
 
+            Call Me.makeCapCamelCaseNames
+
             Call Me.TempModel.RDS.orderTablesByRelations()
             Call Me.SetProgressBarValue(45)
 
@@ -458,6 +460,7 @@ Public Class ODBCDatabaseReverseEngineer
                     Catch ex As Exception
                         lrValueType.DataType = pcenumORMDataType.TextVariableLength
                     End Try
+                    lrValueType.DBName = lrColumn.DatabaseName
 
                     'Add the ValueType to the Model
                     Me.Model.AddValueType(lrValueType)
@@ -537,6 +540,7 @@ Public Class ODBCDatabaseReverseEngineer
             If lrTable.hasSingleColumnPrimaryKey Then
                 Dim lrEntityType As FBM.EntityType
                 lrEntityType = New FBM.EntityType(Me.Model, pcenumLanguage.ORMModel, lrTable.Name, lrTable.Name)
+                lrEntityType.DBName = lrTable.DatabaseName
                 Me.Model.AddEntityType(lrEntityType, True)
 
                 Dim lsValueTypeName As String
@@ -566,65 +570,8 @@ Public Class ODBCDatabaseReverseEngineer
 
                 Dim liBostonDataType As pcenumORMDataType = Me.Model.DatabaseConnection.getBostonDataTypeByDatabaseDataType(lrPrimaryKeyColumn.DataType.DataType)
                 lrEntityType.SetReferenceMode(lsReferenceMode, False, lsValueTypeName, False, liBostonDataType)
+                lrEntityType.ReferenceModeValueType.DBName = lrPrimaryKeyColumn.DatabaseName
 
-                ''=================================================================================================================
-                ''Create joined FactTypes.
-                'Dim lrFactType As FBM.FactType
-                'Dim lrColumn As RDS.Column
-                'Dim larModelObject As New List(Of FBM.ModelObject)
-
-                'For Each lrColumn In lrTable.Column.FindAll(Function(x) x.Name <> lrPrimaryKeyColumn.Name)
-                '    larModelObject.Clear()
-                '    larModelObject.Add(lrEntityType)
-
-                '    Dim lrJoinedModelObject As FBM.ModelObject
-
-                '    lrJoinedModelObject = Me.Model.FindEntityTypeByValueTypeId(lrColumn.Name)
-                '    If lrJoinedModelObject Is Nothing Then
-                '        lrJoinedModelObject = Me.Model.CreateValueType(lrColumn.Name)
-                '    End If
-
-                '    larModelObject.Add(lrJoinedModelObject)
-
-                '    Dim lrModelObject As FBM.ModelObject
-                '    Dim lsFactTypeName As String = ""
-
-                '    For Each lrModelObject In larModelObject
-                '        lsFactTypeName &= lrModelObject.Name
-                '    Next
-                '    lrFactType = Me.Model.CreateFactType(lsFactTypeName, larModelObject, False)
-
-                '    Dim larRole As New List(Of FBM.Role)
-                '    Dim lrRole As FBM.Role
-
-                '    For Each lrRole In lrFactType.RoleGroup
-                '        larRole.Add(lrRole)
-                '    Next
-                '    Dim lasPredicatePart As New List(Of String)
-                '    lasPredicatePart.Add("has")
-                '    lasPredicatePart.Add("")
-
-                '    Dim lrFactTypeReading As New FBM.FactTypeReading(lrFactType, larRole, lasPredicatePart)
-
-                '    Call lrFactType.AddFactTypeReading(lrFactTypeReading, False, False)
-
-                '    lrRole = lrFactType.RoleGroup.Find(Function(x) x.JoinedORMObject.Id = lrEntityType.Id)
-                '    larRole.Clear()
-                '    larRole.Add(lrRole)
-
-                '    Dim lrRoleConstraint As FBM.RoleConstraint
-
-                '    lrRoleConstraint = Me.Model.CreateRoleConstraint(pcenumRoleConstraintType.InternalUniquenessConstraint,
-                '                                                     larRole,
-                '                                                     "InternalUniquenessConstraint",
-                '                                                     1)
-
-                '    lrFactType.AddInternalUniquenessConstraint(lrRoleConstraint)
-
-                '    Dim lrFactTypeInstance As FBM.FactTypeInstance
-                '    lrFactTypeInstance = lrPage.DropFactTypeAtPoint(lrFactType, New PointF(100, 100), False)
-                'Next 'Column
-                '=================================================================================================================
             End If
         Next
 
@@ -734,6 +681,32 @@ Public Class ODBCDatabaseReverseEngineer
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
             prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
+
+    ''' <summary>
+    ''' Only to be used on the TempModel.
+    ''' </summary>
+    Private Sub makeCapCamelCaseNames()
+
+        Try
+            'Tables
+            For Each lrTable In Me.TempModel.RDS.Table
+                lrTable.DatabaseName = lrTable.Name
+                lrTable.Name = Viev.Strings.MakeCapCamelCase(lrTable.Name)
+
+                'Columns 
+                For Each lrColumn In lrTable.Column
+                    lrColumn.DatabaseName = lrColumn.Name
+                    lrColumn.Name = Viev.Strings.MakeCapCamelCase(lrColumn.Name)
+                Next
+            Next
+
+
+        Catch ex As Exception
+            Call Me.ReportError("makeCapCamelCaseNames: " & ex.Message)
         End Try
 
     End Sub

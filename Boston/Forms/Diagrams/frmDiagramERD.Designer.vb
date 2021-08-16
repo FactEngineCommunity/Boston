@@ -80,6 +80,7 @@ Partial Class frmDiagramERD
         Me.Diagram1 = New MindFusion.Diagramming.Diagram()
         Me.HiddenDiagramView = New MindFusion.Diagramming.WinForms.DiagramView()
         Me.Diagram2 = New MindFusion.Diagramming.Diagram()
+        Me.BackgroundWorker = New System.ComponentModel.BackgroundWorker()
         Me.ContextMenuStrip_Entity.SuspendLayout()
         Me.ContextMenuStrip_Diagram.SuspendLayout()
         Me.ContextMenuStripAttribute.SuspendLayout()
@@ -220,7 +221,7 @@ Partial Class frmDiagramERD
         Me.ContextMenuStrip_Diagram.ImageScalingSize = New System.Drawing.Size(24, 24)
         Me.ContextMenuStrip_Diagram.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ViewToolStripMenuItem, Me.ShowHideToolStripMenuItem, Me.ToolStripSeparator5, Me.AutoLayoutToolStripMenuItem, Me.CopyToolStripMenuItem})
         Me.ContextMenuStrip_Diagram.Name = "ContextMenuStrip_Diagram"
-        Me.ContextMenuStrip_Diagram.Size = New System.Drawing.Size(216, 152)
+        Me.ContextMenuStrip_Diagram.Size = New System.Drawing.Size(216, 130)
         '
         'ViewToolStripMenuItem
         '
@@ -539,4 +540,5 @@ Partial Class frmDiagramERD
     Friend WithEvents Diagram2 As MindFusion.Diagramming.Diagram
     Friend WithEvents ViewTableDataToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents AddRelatedEntitiesToThisPageToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents BackgroundWorker As System.ComponentModel.BackgroundWorker
 End Class
