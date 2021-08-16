@@ -1415,10 +1415,20 @@ Public Class frmToolboxEnterpriseExplorer
 
     End Sub
 
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="arModelNode"></param>
+    ''' <param name="arPage"></param>
+    ''' <param name="abLoadPage"></param>
+    ''' <param name="abToolTipNewPage"></param>
+    ''' <param name="abMakeVisible">Ensure the the Page is visible within the Tree after it has been added to the tree.</param>
+    ''' <returns></returns>
     Public Function AddPageToModel(ByRef arModelNode As cTreeNode,
                                    Optional ByRef arPage As FBM.Page = Nothing,
                                    Optional ByVal abLoadPage As Boolean = False,
-                                   Optional ByVal abToolTipNewPage As Boolean = False) As tEnterpriseEnterpriseView
+                                   Optional ByVal abToolTipNewPage As Boolean = False,
+                                   Optional ByVal abMakeVisible As Boolean = False) As tEnterpriseEnterpriseView
 
         Try
             Dim loNode As cTreeNode = Nothing
@@ -1506,6 +1516,10 @@ Public Class frmToolboxEnterpriseExplorer
                 '  i.e. 'Walking the model via LS', then the TreeNode within the Tree can be found
                 '----------------------------------------------------------------------------------------
                 prPageNodes.Add(loNode.Tag)
+
+                If abMakeVisible Then
+                    Call loNode.EnsureVisible()
+                End If
 
                 If abToolTipNewPage Then
 
@@ -3452,7 +3466,7 @@ Public Class frmToolboxEnterpriseExplorer
                 lrPage.Name = prApplication.WorkingModel.CreateUniquePageName("NewEntityRelationshipDiagram", 0)
                 lrPage.Language = pcenumLanguage.EntityRelationshipDiagram
 
-                Call Me.AddPageToModel(Me.TreeView.SelectedNode, lrPage, False)
+                Call Me.AddPageToModel(Me.TreeView.SelectedNode, lrPage, False,, True)
 
                 Call lrPage.Save()
 
