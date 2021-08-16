@@ -16,6 +16,27 @@ Namespace Language
 
         End Sub
 
+        Public Function GetNounOverviewForWord(ByVal asWord As String) As String
+
+
+            Dim lbIsNoun As Boolean = False
+            Dim lrSearchSet As Wnlib.SearchSet = Nothing
+            Dim larArrayList As New ArrayList
+
+            Me.hasmatch = False
+
+            Call Me.OverviewFor(asWord, "noun", lbIsNoun, lrSearchSet, larArrayList)
+
+            If lbIsNoun Then
+                Return larArrayList(0).word
+            End If
+
+            Return Nothing
+
+        End Function
+
+
+
         Public Function WordIsNoun(ByVal asWord As String) As Boolean
 
             Dim lbIsNoun As Boolean = False

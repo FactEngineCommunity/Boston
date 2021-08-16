@@ -39,6 +39,22 @@ Namespace ERD
             End Set
         End Property
 
+        <XmlIgnore()>
+        <CategoryAttribute("DBName"),
+        DefaultValueAttribute(GetType(String), ""),
+        DescriptionAttribute("A unique Name for the model object in the underlying target database.")>
+        Public Overrides Property DBName() As String
+            Get
+                Return Me.RDSTable.FBMModelElement.DatabaseName
+            End Get
+            Set(ByVal value As String)
+                '------------------------------------------------------
+                'See Me.SetName for management of Me.Id and Me.Symbol
+                '------------------------------------------------------
+                Me.RDSTable.FBMModelElement.SetDBName(value)
+            End Set
+        End Property
+
 
         Public Attribute As New List(Of ERD.Attribute)
         Public Relation As New List(Of ERD.Relation)

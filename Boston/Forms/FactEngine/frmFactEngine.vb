@@ -1660,7 +1660,8 @@ Public Class frmFactEngine
                                     lsSQLQuery &= " FROM " & lrBaseNode.RDSTable.DatabaseName
                                 End If
 
-                                If (Me.zrTextHighlighter.GetCurrentContext.Token.Type = FEQL.TokenType.IDENTIFIER) Then 'Or laiExpectedToken.Contains(FEQL.TokenType.IDENTIFIER
+                                If (Me.zrTextHighlighter.GetCurrentContext.Token.Type = FEQL.TokenType.IDENTIFIER) Or
+                                    laiExpectedToken.Contains(FEQL.TokenType.IDENTIFIER) Then 'Or laiExpectedToken.Contains(FEQL.TokenType.IDENTIFIER
                                     Try
                                         Dim lsDatabaseWildcardOperator = Database.gerLikeWildcardOperator(prApplication.WorkingModel.TargetDatabaseType)
                                         lsSQLQuery &= vbCrLf & "WHERE " & lrModelElement.Id & " LIKE '" & Me.zrTextHighlighter.GetCurrentContext.Token.Text & lsDatabaseWildcardOperator & "'"
@@ -1683,7 +1684,7 @@ Public Class frmFactEngine
                             liInd += 1
                         Next
 
-                        lsSQLQuery &= vbCrLf & "FROM " & lrModelElement.Id
+                        lsSQLQuery &= vbCrLf & "FROM " & lrModelElement.DBName
 
                         If Me.zrTextHighlighter.GetCurrentContext.Token.Type = FEQL.TokenType.IDENTIFIER Then
                             Try
@@ -1710,7 +1711,7 @@ Public Class frmFactEngine
                                 lsString &= lrData.Data
                                 liInd += 1
                             Next
-                            Call Me.AddEnterpriseAwareItem(lsString)
+                            Call Me.AddEnterpriseAwareItem(lsString,,,, True)
                         Next
                     Catch ex As Exception
                         Me.LabelError.Text = ex.Message

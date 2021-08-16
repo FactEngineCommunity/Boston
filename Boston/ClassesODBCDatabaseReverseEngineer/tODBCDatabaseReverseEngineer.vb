@@ -212,8 +212,13 @@ Public Class ODBCDatabaseReverseEngineer
                                 End If
                                 liInd += 1
                             Next
+
+                            For Each lrFactTypeReading In lrFactType.FactTypeReading.ToArray
+                                Call lrFactType.SetFactTypeReading(lrFactTypeReading, False)
+                            Next
+
                         Else
-                            'Throw warning.
+                            Call Me.ReportError("Error")
                         End If
                     End If
                 End If
@@ -267,13 +272,26 @@ Public Class ODBCDatabaseReverseEngineer
                         Call lrFactType.CreateInternalUniquenessConstraint(larRole)
 
                         '-----------------------------------------------------------------------------------------------
-                        'Create the FactTypeReading
-                        Dim lrSentence As New Language.Sentence("random sentence")
-                        lrSentence.PredicatePart.Add(New Language.PredicatePart("has"))
-                        lrSentence.PredicatePart.Add(New Language.PredicatePart("has"))
+                        'Create the FactTypeReadings
+                        For liInd = 1 To 2
+                            Dim lrSentence As New Language.Sentence("random sentence")
+                            lrSentence.PredicatePart.Add(New Language.PredicatePart("has"))
+                            lrSentence.PredicatePart.Add(New Language.PredicatePart(""))
 
-                        Dim lrFactTypeReading As New FBM.FactTypeReading(lrFactType, lrFactType.RoleGroup, lrSentence)
-                        lrFactType.FactTypeReading.Add(lrFactTypeReading)
+                            Dim larRoleGroup As New List(Of FBM.Role)
+                            If liInd = 1 Then
+                                larRoleGroup.Add(lrFactType.RoleGroup(0))
+                                larRoleGroup.Add(lrFactType.RoleGroup(1))
+                            Else
+                                larRoleGroup.Add(lrFactType.RoleGroup(1))
+                                larRoleGroup.Add(lrFactType.RoleGroup(0))
+                            End If
+                            Dim lrFactTypeReading As New FBM.FactTypeReading(lrFactType, larRoleGroup, lrSentence)
+                            lrFactType.FactTypeReading.Add(lrFactTypeReading)
+                        Next
+                        For Each lrFactTypeReading In lrFactType.FactTypeReading.ToArray
+                            Call lrFactType.SetFactTypeReading(lrFactTypeReading, False)
+                        Next
                     Else
                         'Throw warning
                     End If
@@ -324,6 +342,18 @@ Public Class ODBCDatabaseReverseEngineer
             Next
 
 #End Region
+
+            'Change names to Singular, rather than Plural
+            For Each lrTable In Me.Model.RDS.Table
+
+                Dim loLanguageGeneric As New Language.LanguageGeneric(My.Settings.WordNetDictionaryEnglishPath)
+
+                Dim lsNewName As String = ""
+                lsNewName = loLanguageGeneric.GetNounOverviewForWord(lrTable.Name)
+                If lsNewName IsNot Nothing Then
+                    Call lrTable.FBMModelElement.setName(MakeCapCamelCase(lsNewName))
+                End If
+            Next
 
             Call Me.SetProgressBarValue(100)
 
@@ -391,10 +421,13 @@ Public Class ODBCDatabaseReverseEngineer
                     'Create the FactTypeReading
                     Dim lrSentence As New Language.Sentence("random sentence")
                     lrSentence.PredicatePart.Add(New Language.PredicatePart("has"))
-                    lrSentence.PredicatePart.Add(New Language.PredicatePart("has"))
+                    lrSentence.PredicatePart.Add(New Language.PredicatePart(""))
 
                     Dim lrFactTypeReading As New FBM.FactTypeReading(lrFactType, lrFactType.RoleGroup, lrSentence)
                     lrFactType.FactTypeReading.Add(lrFactTypeReading)
+                    For Each lrFactTypeReading In lrFactType.FactTypeReading.ToArray
+                        Call lrFactType.SetFactTypeReading(lrFactTypeReading, False)
+                    Next
 
                 Catch ex As Exception
                     Throw New Exception("Error creating Fact Type" & ex.Message)
@@ -460,10 +493,10 @@ Public Class ODBCDatabaseReverseEngineer
                     Catch ex As Exception
                         lrValueType.DataType = pcenumORMDataType.TextVariableLength
                     End Try
-                    lrValueType.DBName = lrColumn.DatabaseName
 
                     'Add the ValueType to the Model
                     Me.Model.AddValueType(lrValueType)
+                    lrValueType.SetDBName(lrColumn.DatabaseName)
                 End If
 
             Next
@@ -540,8 +573,8 @@ Public Class ODBCDatabaseReverseEngineer
             If lrTable.hasSingleColumnPrimaryKey Then
                 Dim lrEntityType As FBM.EntityType
                 lrEntityType = New FBM.EntityType(Me.Model, pcenumLanguage.ORMModel, lrTable.Name, lrTable.Name)
-                lrEntityType.DBName = lrTable.DatabaseName
                 Me.Model.AddEntityType(lrEntityType, True)
+                lrEntityType.SetDBName(lrTable.DatabaseName)
 
                 Dim lsValueTypeName As String
                 Dim lsReferenceMode As String = ""
@@ -570,7 +603,7 @@ Public Class ODBCDatabaseReverseEngineer
 
                 Dim liBostonDataType As pcenumORMDataType = Me.Model.DatabaseConnection.getBostonDataTypeByDatabaseDataType(lrPrimaryKeyColumn.DataType.DataType)
                 lrEntityType.SetReferenceMode(lsReferenceMode, False, lsValueTypeName, False, liBostonDataType)
-                lrEntityType.ReferenceModeValueType.DBName = lrPrimaryKeyColumn.DatabaseName
+                lrEntityType.ReferenceModeValueType.SetDBName(lrPrimaryKeyColumn.DatabaseName)
 
             End If
         Next

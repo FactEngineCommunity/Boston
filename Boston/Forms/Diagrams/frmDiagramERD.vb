@@ -3064,4 +3064,11 @@ Public Class frmDiagramERD
         Call Me.autoLayout()
 
     End Sub
+
+    Private Sub ToolStripMenuItem2_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItem2.Click
+
+        prApplication.WorkingPage = Me.zrPage
+        Call frmMain.loadToolboxORMReadingEditor(Me.zrPage, Me.DockPanel.ActivePane)
+
+    End Sub
 End Class

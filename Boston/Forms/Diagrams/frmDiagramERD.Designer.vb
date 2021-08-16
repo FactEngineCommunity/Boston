@@ -1,9 +1,9 @@
-﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
+﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()>
 Partial Class frmDiagramERD
     Inherits WeifenLuo.WinFormsUI.Docking.DockContent
 
     'Form overrides dispose to clean up the component list.
-    <System.Diagnostics.DebuggerNonUserCode()> _
+    <System.Diagnostics.DebuggerNonUserCode()>
     Protected Overrides Sub Dispose(ByVal disposing As Boolean)
         Try
             If disposing AndAlso components IsNot Nothing Then
@@ -20,7 +20,7 @@ Partial Class frmDiagramERD
     'NOTE: The following procedure is required by the Windows Form Designer
     'It can be modified using the Windows Form Designer.  
     'Do not modify it using the code editor.
-    <System.Diagnostics.DebuggerStepThrough()> _
+    <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmDiagramERD))
@@ -51,6 +51,7 @@ Partial Class frmDiagramERD
         Me.PropertiesToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripSeparator3 = New System.Windows.Forms.ToolStripSeparator()
         Me.IndexEditorToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripMenuItem2 = New System.Windows.Forms.ToolStripMenuItem()
         Me.ORMVerbalisationViewToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.PageAsORMMetamodelToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ShowHideToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
@@ -218,16 +219,15 @@ Partial Class frmDiagramERD
         '
         'ContextMenuStrip_Diagram
         '
-        Me.ContextMenuStrip_Diagram.ImageScalingSize = New System.Drawing.Size(24, 24)
         Me.ContextMenuStrip_Diagram.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ViewToolStripMenuItem, Me.ShowHideToolStripMenuItem, Me.ToolStripSeparator5, Me.AutoLayoutToolStripMenuItem, Me.CopyToolStripMenuItem})
         Me.ContextMenuStrip_Diagram.Name = "ContextMenuStrip_Diagram"
-        Me.ContextMenuStrip_Diagram.Size = New System.Drawing.Size(216, 130)
+        Me.ContextMenuStrip_Diagram.Size = New System.Drawing.Size(208, 120)
         '
         'ViewToolStripMenuItem
         '
-        Me.ViewToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ModelDictionaryToolStripMenuItem, Me.PropertiesToolStripMenuItem, Me.ToolStripSeparator3, Me.IndexEditorToolStripMenuItem, Me.ORMVerbalisationViewToolStripMenuItem, Me.PageAsORMMetamodelToolStripMenuItem})
+        Me.ViewToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ModelDictionaryToolStripMenuItem, Me.PropertiesToolStripMenuItem, Me.ToolStripSeparator3, Me.IndexEditorToolStripMenuItem, Me.ToolStripMenuItem2, Me.ORMVerbalisationViewToolStripMenuItem, Me.PageAsORMMetamodelToolStripMenuItem})
         Me.ViewToolStripMenuItem.Name = "ViewToolStripMenuItem"
-        Me.ViewToolStripMenuItem.Size = New System.Drawing.Size(215, 30)
+        Me.ViewToolStripMenuItem.Size = New System.Drawing.Size(207, 22)
         Me.ViewToolStripMenuItem.Text = "&View"
         '
         'ModelDictionaryToolStripMenuItem
@@ -256,6 +256,13 @@ Partial Class frmDiagramERD
         Me.IndexEditorToolStripMenuItem.Size = New System.Drawing.Size(208, 22)
         Me.IndexEditorToolStripMenuItem.Text = "&Index Editor"
         '
+        'ToolStripMenuItem2
+        '
+        Me.ToolStripMenuItem2.Image = Global.Boston.My.Resources.MenuImages.FactTypeReading16x16
+        Me.ToolStripMenuItem2.Name = "ToolStripMenuItem2"
+        Me.ToolStripMenuItem2.Size = New System.Drawing.Size(208, 22)
+        Me.ToolStripMenuItem2.Text = "Fact Type &Reading Editor"
+        '
         'ORMVerbalisationViewToolStripMenuItem
         '
         Me.ORMVerbalisationViewToolStripMenuItem.Image = CType(resources.GetObject("ORMVerbalisationViewToolStripMenuItem.Image"), System.Drawing.Image)
@@ -275,7 +282,7 @@ Partial Class frmDiagramERD
         '
         Me.ShowHideToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuOption_ViewGrid})
         Me.ShowHideToolStripMenuItem.Name = "ShowHideToolStripMenuItem"
-        Me.ShowHideToolStripMenuItem.Size = New System.Drawing.Size(215, 30)
+        Me.ShowHideToolStripMenuItem.Size = New System.Drawing.Size(207, 22)
         Me.ShowHideToolStripMenuItem.Text = "&Show/Hide"
         '
         'mnuOption_ViewGrid
@@ -288,20 +295,20 @@ Partial Class frmDiagramERD
         'ToolStripSeparator5
         '
         Me.ToolStripSeparator5.Name = "ToolStripSeparator5"
-        Me.ToolStripSeparator5.Size = New System.Drawing.Size(212, 6)
+        Me.ToolStripSeparator5.Size = New System.Drawing.Size(204, 6)
         '
         'AutoLayoutToolStripMenuItem
         '
         Me.AutoLayoutToolStripMenuItem.Image = Global.Boston.My.Resources.MenuImagesMain.Layout16x16
         Me.AutoLayoutToolStripMenuItem.Name = "AutoLayoutToolStripMenuItem"
-        Me.AutoLayoutToolStripMenuItem.Size = New System.Drawing.Size(215, 30)
+        Me.AutoLayoutToolStripMenuItem.Size = New System.Drawing.Size(207, 22)
         Me.AutoLayoutToolStripMenuItem.Text = "&AutoLayout"
         '
         'CopyToolStripMenuItem
         '
         Me.CopyToolStripMenuItem.Image = Global.Boston.My.Resources.MenuImagesMain.Camera16x16
         Me.CopyToolStripMenuItem.Name = "CopyToolStripMenuItem"
-        Me.CopyToolStripMenuItem.Size = New System.Drawing.Size(215, 30)
+        Me.CopyToolStripMenuItem.Size = New System.Drawing.Size(207, 22)
         Me.CopyToolStripMenuItem.Text = "&Copy Image to Clipboard"
         '
         'ContextMenuStripAttribute
@@ -541,4 +548,5 @@ Partial Class frmDiagramERD
     Friend WithEvents ViewTableDataToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents AddRelatedEntitiesToThisPageToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents BackgroundWorker As System.ComponentModel.BackgroundWorker
+    Friend WithEvents ToolStripMenuItem2 As ToolStripMenuItem
 End Class
