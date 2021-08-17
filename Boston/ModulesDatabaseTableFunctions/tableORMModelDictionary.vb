@@ -247,7 +247,6 @@ Namespace TableModelDictionary
                         lrDictionaryEntry.ShortDescription = Trim(Viev.NullVal(lREcordset("ShortDescription").Value, ""))
                         lrDictionaryEntry.LongDescription = Trim(Viev.NullVal(lREcordset("LongDescription").Value, ""))
                         lrDictionaryEntry.DBName = Trim(NullVal(lREcordset("DBName").Value, ""))
-
                         '--------------------------------------------------------------------------
                         'Create a KL Identity Letter for the Concept in the dictionary, in memory
                         '  such that KL Theorems can be written.

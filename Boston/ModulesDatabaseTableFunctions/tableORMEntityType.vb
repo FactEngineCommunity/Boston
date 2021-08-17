@@ -343,7 +343,6 @@ Namespace TableEntityType
                         lrEntityType.Concept = lrDictionaryEntry.Concept
                         lrEntityType.DBName = lrDictionaryEntry.DBName
 
-
                         getEntityTypesByModel.Add(lrEntityType)
                         lREcordset.MoveNext()
                     End While

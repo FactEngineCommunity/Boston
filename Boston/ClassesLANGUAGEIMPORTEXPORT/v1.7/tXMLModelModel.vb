@@ -82,6 +82,7 @@ Namespace XMLModel
                     lrXMLEntityType.LongDescription = lrEntityType.LongDescription
                     lrXMLEntityType.ShortDescription = lrEntityType.ShortDescription
                     lrXMLEntityType.IsMDAModelElement = lrEntityType.IsMDAModelElement
+                    lrXMLEntityType.DBName = lrEntityType.DBName
 
                     If IsSomething(lrEntityType.ReferenceModeRoleConstraint) Then
                         lrXMLEntityType.ReferenceSchemeRoleConstraintId = lrEntityType.ReferenceModeRoleConstraint.Id
@@ -138,6 +139,7 @@ Namespace XMLModel
                     lrXMLFactType.IsMDAModelElement = lrFactType.IsMDAModelElement
                     lrXMLFactType.IsSubtypeStateControlling = lrFactType.IsSubtypeStateControlling
                     lrXMLFactType.StoreFactCoordinates = lrFactType.StoreFactCoordinates
+                    lrXMLFactType.DBName = lrFactType.DBName
 
                     '---------------
                     'Map the Roles
@@ -565,6 +567,7 @@ Namespace XMLModel
                     'lrEntityType.LongDescription = 
                     lrEntityType.IsObjectifyingEntityType = lrXMLEntityType.IsObjectifyingEntityType
                     lrEntityType.IsMDAModelElement = lrXMLEntityType.IsMDAModelElement
+                    lrEntityType.DBName = lrXMLEntityType.DBName
 
                     If lrXMLEntityType.ReferenceModeValueTypeId = "" Then
                         lrEntityType.ReferenceModeValueType = Nothing
@@ -579,7 +582,7 @@ Namespace XMLModel
                     '------------------------------------------------
                     'Link to the Concept within the ModelDictionary
                     '------------------------------------------------
-                    Dim lrDictionaryEntry As New FBM.DictionaryEntry(lrModel, lrEntityType.Name, pcenumConceptType.EntityType, , , True, True)
+                    Dim lrDictionaryEntry As New FBM.DictionaryEntry(lrModel, lrEntityType.Name, pcenumConceptType.EntityType, , , True, True, lrEntityType.DBName)
                     lrDictionaryEntry = lrModel.AddModelDictionaryEntry(lrDictionaryEntry, , True,, True,, True)
 
                     lrEntityType.Concept = lrDictionaryEntry.Concept
@@ -933,6 +936,7 @@ Namespace XMLModel
                         lrEntityTypeInstance.IsAbsorbed = lrEntityTypeInstance.EntityType.IsAbsorbed
                         lrEntityTypeInstance.IsDerived = lrEntityTypeInstance.EntityType.IsDerived
                         lrEntityTypeInstance.DerivationText = lrEntityTypeInstance.EntityType.DerivationText
+                        lrEntityTypeInstance.DBName = lrEntityTypeInstance.EntityType.DBName
 
                         If lrEntityTypeInstance.EntityType.ReferenceModeValueType Is Nothing Then
                             lrEntityTypeInstance.ReferenceModeValueType = Nothing
@@ -968,6 +972,7 @@ Namespace XMLModel
                         lrFactTypeInstance = lrFactType.CloneInstance(lrPage, True)
                         lrFactTypeInstance.X = lrConceptInstance.X
                         lrFactTypeInstance.Y = lrConceptInstance.Y
+                        lrFactTypeInstance.DBName = lrFactType.DBName
 
                         If lrFactType.IsDerived Then
                             Dim lrDerivationTextConceptInstance As FBM.ConceptInstance
@@ -1278,6 +1283,7 @@ Namespace XMLModel
             arFactType.IsMDAModelElement = lrXMLFactType.IsMDAModelElement
             arFactType.IsSubtypeStateControlling = lrXMLFactType.IsSubtypeStateControlling
             arFactType.StoreFactCoordinates = lrXMLFactType.StoreFactCoordinates
+            arFactType.DBName = lrXMLFactType.DBName
 
             If lrXMLFactType.ObjectifyingEntityTypeId = "" Then
                 arFactType.ObjectifyingEntityType = Nothing
@@ -1351,9 +1357,16 @@ Namespace XMLModel
             '------------------------------------------------
             'Link to the Concept within the ModelDictionary
             '------------------------------------------------
-            Dim lrDictionaryEntry As New FBM.DictionaryEntry(arFactType.Model, arFactType.Id, pcenumConceptType.FactType, arFactType.ShortDescription, arFactType.LongDescription, True, True)
-            lrDictionaryEntry = arFactType.Model.AddModelDictionaryEntry(lrDictionaryEntry, ,,, False,, True)
+            Dim lrDictionaryEntry As New FBM.DictionaryEntry(arFactType.Model,
+                                                             arFactType.Id,
+                                                             pcenumConceptType.FactType,
+                                                             arFactType.ShortDescription,
+                                                             arFactType.LongDescription,
+                                                             True,
+                                                             True,
+                                                             arFactType.DBName)
 
+            lrDictionaryEntry = arFactType.Model.AddModelDictionaryEntry(lrDictionaryEntry, ,,, False,, True)
 
             arFactType.Concept = lrDictionaryEntry.Concept
 

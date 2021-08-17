@@ -31,13 +31,25 @@ Namespace XMLModel
 
         <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
         Private _Name As String
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property Name() As String
             Get
                 Return Me._Name
             End Get
             Set(ByVal value As String)
                 Me._Name = value
+            End Set
+        End Property
+
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Private _DBName As String = ""
+        <XmlAttribute()>
+        Public Property DBName() As String
+            Get
+                Return Me._DBName
+            End Get
+            Set(ByVal value As String)
+                Me._DBName = value
             End Set
         End Property
 

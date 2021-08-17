@@ -473,7 +473,7 @@ Namespace FBM
             '------------------------------------------------------------------------------------------------
             Dim asSymbol As String = arEntityType.Id
 
-            lrDictionaryEntry = Me.AddModelDictionaryEntry(New FBM.DictionaryEntry(Me, arEntityType.Id, pcenumConceptType.EntityType,,, abMakeModelDirty, abMakeModelDirty))
+            lrDictionaryEntry = Me.AddModelDictionaryEntry(New FBM.DictionaryEntry(Me, arEntityType.Id, pcenumConceptType.EntityType,,, abMakeModelDirty, abMakeModelDirty, arEntityType.DBName))
 
 
             arEntityType.Concept = lrDictionaryEntry.Concept
@@ -1553,7 +1553,7 @@ Namespace FBM
             'Add a new DictionaryEntry to the ModelDictionary if the DictionaryEntry doesn't already exist.
             '------------------------------------------------------------------------------------------------
             Dim asSymbol As String = arFactType.Id
-            lrDictionaryEntry = Me.AddModelDictionaryEntry(New FBM.DictionaryEntry(Me, arFactType.Id, pcenumConceptType.FactType), , abMakeModelDirty)
+            lrDictionaryEntry = Me.AddModelDictionaryEntry(New FBM.DictionaryEntry(Me, arFactType.Id, pcenumConceptType.FactType,,,,, arFactType.DBName), , abMakeModelDirty)
 
             arFactType.Concept = lrDictionaryEntry.Concept
             arFactType.ShortDescription = lrDictionaryEntry.ShortDescription
@@ -1710,7 +1710,7 @@ Namespace FBM
 
                 If lrDictionaryEntry IsNot Nothing Then
                     '-------------------------------------------------------------------------------------------------------
-                    'Concept already exists in the ModelDictionary.
+                    'Concept already exists in the ModelDictionary. Effectively we are updating the DictionaryEntry.
                     ' Make sure the DictionaryEntry contains the ConceptType of the DictionaryEntry attempted to be added.
                     '-------------------------------------------------------------------------------------------------------                    
                     lrDictionaryEntry.AddConceptType(arDictionaryEntry.GetConceptType)
@@ -1718,6 +1718,19 @@ Namespace FBM
                         'CodeSafe - Only allow multiple Value realisations.
                         lrDictionaryEntry.AddRealisation(arDictionaryEntry.ConceptType, arDictionaryEntry.ConceptType <> pcenumConceptType.Value)
                     End If
+                    'Update the DBName.
+                    Select Case arDictionaryEntry.ConceptType
+                        Case Is = pcenumConceptType.EntityType,
+                                  pcenumConceptType.FactType
+                            Select Case lrDictionaryEntry.ConceptType
+                                Case Is = pcenumConceptType.EntityType,
+                                          pcenumConceptType.FactType,
+                                          pcenumConceptType.GeneralConcept
+                                Case Else
+                                    lrDictionaryEntry.DBName = arDictionaryEntry.DBName
+                            End Select
+                    End Select
+
                 Else
                     '----------------------------------------------
                     'Add a the new Concept to the ModelDictionary
@@ -4535,8 +4548,6 @@ Namespace FBM
             '-------------------------------------------------------
             'Load the ModelDictionary (Concepts for the Model)
             '-------------------------------------------------------
-            'Richmond.WriteToStatusBar("Loading the ModelDictionary")
-
             If TableModelDictionary.GetModelDictionaryCountByModel(Me) > 0 Then
                 Call TableModelDictionary.GetDictionaryEntriesByModel(Me)
             End If

@@ -53,7 +53,7 @@ Namespace FBM
             End Get
             Set(ByVal value As Integer)
                 Me._X = value
-                If IsSomething(Me.FactInstance) Then
+                If Me.FactInstance IsNot Nothing Then
                     Me.FactInstance._X = value
                 End If
             End Set

@@ -149,10 +149,12 @@ Namespace FBM
                        Optional ByVal asShortDescription As String = "",
                        Optional ByVal asLongDescription As String = "",
                        Optional ByVal abMakeConceptDirty As Boolean = True,
-                       Optional ByVal abMakeDictionaryEntryDirty As Boolean = False)
+                       Optional ByVal abMakeDictionaryEntryDirty As Boolean = False,
+                       Optional ByVal asDBName As String = "")
 
             Me.Model = arModel
             Me.Symbol = asSymbol
+            Me.DBName = asDBName
 
             '-------------------------------------------------------------------------------
             'NB Only used in Model.AddModelDictionaryEntry and Me.EqualsByOtherConceptType
