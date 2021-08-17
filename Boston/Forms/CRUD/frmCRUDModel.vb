@@ -383,6 +383,7 @@ Public Class frmCRUDModel
                 Else
                     Call Me.AddREMessage("- Finished reverse engineering the database.")
                     Call Me.AddREMessage("- Saving the model.")
+                    Call Me.zrModel.MakeDirty(False, False)
                     Call Me.zrModel.Save()
                     Call Me.AddREMessage("- Complete.", Color.Green, True)
                 End If

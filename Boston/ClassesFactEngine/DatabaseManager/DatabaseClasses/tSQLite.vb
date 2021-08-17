@@ -590,6 +590,7 @@ Namespace FactEngine
                     lrColumn = New RDS.Column(arTable, lsColumnName, Nothing, Nothing, lbIsMandatory)
                     lrColumn.DataType = New RDS.DataType
                     lrColumn.DataType.DataType = lrRecordset("type").Data
+                    lrColumn.DatabaseName = lrColumn.Name
 
                     larColumn.Add(lrColumn)
 

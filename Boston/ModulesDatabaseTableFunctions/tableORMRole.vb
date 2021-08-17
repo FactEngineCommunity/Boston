@@ -169,37 +169,35 @@ Namespace TableRole
                                 End If
                         End Select
 
+                        lrRole.Mandatory = lREcordset("IsMandatory").Value
+                        lrRole.IsArray = lREcordset("IsArray").Value
+                        lrRole.isDirty = False
+
                         If (lrRole.JoinedORMObject Is Nothing) And Not (lrRole.TypeOfJoin = pcenumRoleJoinType.FactType) Then
                             Dim lsMissingId As String = ""
                             lsMessage = "No ModelObject (" & lrRole.TypeOfJoin.ToString & ") with Id: '"
-                            'Select Case lrRole.TypeOfJoin
-                            '    Case Is = pcenumRoleJoinType.EntityType
-                            '        lsMissingId = Trim(Viev.NullVal(lREcordset("JoinsEntityTypeId").Value, ""))
-                            '        lsMessage &= lsMissingId
-                            '    Case Is = pcenumRoleJoinType.ValueType
-                            '        lsMissingId = Trim(Viev.NullVal(lREcordset("JoinsValueTypeId").Value, ""))
-                            '        lsMessage &= lsMissingId
-                            '    Case Is = pcenumRoleJoinType.FactType
-                            '        lsMissingId = Trim(Viev.NullVal(lREcordset("JoinsNestedFactTypeId").Value, ""))
-                            '        lsMessage &= lsMissingId
-                            'End Select
-
                             lsMissingId = Trim(Viev.NullVal(lREcordset("JoinsModelelementId").Value, ""))
                             lsMessage &= lsMissingId
-
                             lsMessage &= "', exists in the Model"
                             lsMessage &= vbCrLf & "Model.Id: " & arFactType.Model.ModelId
                             lsMessage &= vbCrLf & "FactType.Id: " & arFactType.Id
                             lsMessage &= vbCrLf & "Role.Id: " & lrRole.Id & vbCrLf
 
-                            Select Case lrRole.TypeOfJoin
-                                Case Is = pcenumRoleJoinType.ValueType
-                                    lsMessage &= vbCrLf & vbCrLf
-                                    lsMessage &= "To keep the show on the road, a Value Type with Id: " & lsMissingId & " will be created in the model."
-                                    Dim lrValueType As New FBM.ValueType(arFactType.Model, pcenumLanguage.ORMModel, lsMissingId, True)
-                                    arFactType.Model.AddValueType(lrValueType, False, True, Nothing)
-                                    lrRole.JoinedORMObject = lrValueType
-                                    MsgBox(lsMessage)
+                            Select Case lREcordset("TypeOfJoin").Value
+                                Case Is = 2
+                                    Dim lrDictionaryEntry As New FBM.DictionaryEntry(arFactType.Model, lsMissingId, pcenumConceptType.ValueType,,, True, True)
+                                    If arFactType.Model.ModelDictionary.Find(AddressOf lrDictionaryEntry.EqualsLowercase) Is Nothing Then
+                                        lsMessage &= vbCrLf & vbCrLf
+                                        lsMessage &= "To keep the show on the road, a Value Type with Id: " & lsMissingId & " will be created in the model."
+                                        Dim lrValueType As New FBM.ValueType(arFactType.Model, pcenumLanguage.ORMModel, lsMissingId, True)
+                                        arFactType.Model.AddValueType(lrValueType, False, True, Nothing)
+                                        lrRole.JoinedORMObject = lrValueType
+                                        MsgBox(lsMessage)
+                                    Else
+                                        lrRole.JoinedORMObject = arFactType.Model.ValueType.Find(Function(x) LCase(x.Id) = LCase(lsMissingId))
+                                        Call lrRole.makeDirty()
+                                        Call arFactType.makeDirty()
+                                    End If
                                 Case Is = pcenumRoleJoinType.EntityType
                                     lsMessage &= vbCrLf & vbCrLf
                                     lsMessage &= "To keep the show on the road, a Value Type with Id: " & lsMissingId & " will be created in the model."
@@ -211,10 +209,6 @@ Namespace TableRole
                                     Throw New Exception(lsMessage)
                             End Select
                         End If
-
-                        lrRole.Mandatory = lREcordset("IsMandatory").Value
-                        lrRole.IsArray = lREcordset("IsArray").Value
-                        lrRole.isDirty = False
 
                         '--------------------------------------------------
                         'Add the Role to the Model (list of Role) as well

@@ -213,8 +213,36 @@ Public Class ODBCDatabaseReverseEngineer
                                 liInd += 1
                             Next
 
-                            For Each lrFactTypeReading In lrFactType.FactTypeReading.ToArray
-                                Call lrFactType.SetFactTypeReading(lrFactTypeReading, False)
+
+                            'Make sure the new Column Names (in Model rather than TempModel) are the same as what they are in the origin database.
+                            'PSEUDOCODE
+                            ' * For Each lrColumn in Model Table.GetPrimaryKeyColumns
+                            '     * Find the Relation for that Column in the TempModel.
+                            '     * If the Relation exists (i.e. is not a Column to a ValueType, but rather another ET or Objectified FT)
+                            '         * Get the original OriginColumn Name and give it to lrColumn
+                            '       End If
+                            '   Next Column
+                            Dim lrModelTable As RDS.Table = Me.Model.RDS.getTableByName(lrTable.Name)
+                            Dim larCoveredColumn As New List(Of RDS.Column)
+                            For Each lrTempColumn In lrTable.getPrimaryKeyColumns
+
+                                If lrTempColumn.hasOutboundRelation Then
+                                    Dim lrTempColumPointsToTable As RDS.Table = lrTempColumn.Relation.Find(Function(x) x.OriginTable Is lrTempColumn.Table).DestinationTable
+                                    Dim lrTempRelation As RDS.Relation = lrTempColumn.Relation.Find(Function(x) x.OriginTable Is lrTempColumn.Table)
+
+                                    Dim larColumn = From Relation In Me.Model.RDS.Relation
+                                                    From Column In Relation.OriginColumns
+                                                    Where Relation.OriginTable.Name = lrTable.Name
+                                                    Where Relation.OriginColumns(0).isPartOfPrimaryKey
+                                                    Where Relation.DestinationTable.Name = lrTempColumPointsToTable.Name
+                                                    Where Not larCoveredColumn.Contains(Column)
+                                                    Select Column
+
+                                    Dim lrColumn = larColumn.First
+                                    lrColumn.setName(lrTempColumn.Name)
+
+                                    larCoveredColumn.Add(lrColumn)
+                                End If
                             Next
 
                         Else
@@ -225,7 +253,7 @@ Public Class ODBCDatabaseReverseEngineer
                                     lsMessage.AppendLine(lrColumn.Name)
                                 Next
                             Else
-                                lsMessage.AppendString(" Table has not primary key columns")
+                                lsMessage.AppendString(" Table has no primary key columns")
                             End If
 
                             Call Me.ReportError(lsMessage)
@@ -237,9 +265,7 @@ Public Class ODBCDatabaseReverseEngineer
 
             '-----------------------------------------------------------------------------
             'Create FactTypes for all other Relations.
-            Call Me.SetProgressBarValue(80)
             Call Me.createFactTypesForAllOtherRelations()
-            Call Me.SetProgressBarValue(85, "Created Fact Types for all other Relations.")
 
             '-----------------------------------------------------------------------------
             'Create FactTypes that are from a ModelElement straight to a ValueType.
@@ -361,6 +387,7 @@ Public Class ODBCDatabaseReverseEngineer
                 Dim lsNewName As String = ""
                 lsNewName = loLanguageGeneric.GetNounOverviewForWord(lrTable.Name)
                 If lsNewName IsNot Nothing Then
+                    If lsNewName.StartsWith("L") Then Debugger.Break()
                     Call lrTable.FBMModelElement.setName(MakeCapCamelCase(lsNewName))
                 End If
             Next
@@ -378,6 +405,9 @@ Public Class ODBCDatabaseReverseEngineer
     Private Sub createFactTypesForAllOtherRelations()
 
         Try
+            Call Me.SetProgressBarValue(80)
+
+
             For Each lrRelation In Me.TempModel.RDS.Relation.FindAll(Function(x) Not x.isPrimaryKeyBasedRelation).ToArray
                 'Relations to other Tables.
                 Dim larModelElement As New List(Of FBM.ModelObject)
@@ -410,24 +440,6 @@ Public Class ODBCDatabaseReverseEngineer
                     Call lrFactType.CreateInternalUniquenessConstraint(larRole)
 
                     '-----------------------------------------------------------------------------------------------
-                    'Name the Column based on the OriginColumn from the TempTable, because creating the 
-                    '  RoleConstraint/ IUC(above) does not preserve the Column name, but names it after what it points to.
-                    '  This may be a Column with a different name, in the DestinationTable.
-                    Try
-                        For Each lrColumn In lrOriginTable.Column.FindAll(Function(x) larRole.Contains(x.Role))
-                            Dim lrDestinationColumn As RDS.Column = lrDestinationTable.Column.Find(Function(x) x.ActiveRole Is lrColumn.ActiveRole)
-                            Dim lrTempDestinationColumn = lrRelation.DestinationColumns.Find(Function(x) LCase(x.Name) = LCase(lrDestinationColumn.Name))
-                            Dim liSequenceNr As Integer = lrRelation.DestinationColumns.IndexOf(lrTempDestinationColumn)
-                            Dim lsColumnName As String = lrRelation.OriginColumns(liSequenceNr).Name
-                            Call lrColumn.setName(lsColumnName)
-                        Next
-
-                    Catch ex As Exception
-                        'Not a biggie at this stage.
-                        Debugger.Break()
-                    End Try
-
-                    '-----------------------------------------------------------------------------------------------
                     'Create the FactTypeReadings
                     For liInd = 1 To 2
                         Dim lrSentence As New Language.Sentence("random sentence")
@@ -449,11 +461,31 @@ Public Class ODBCDatabaseReverseEngineer
                         Call lrFactType.SetFactTypeReading(lrFactTypeReading, False)
                     Next
 
+                    '-----------------------------------------------------------------------------------------------
+                    'Name the Column based on the OriginColumn from the TempTable, because creating the 
+                    '  RoleConstraint/ IUC(above) does not preserve the Column name, but names it after what it points to.
+                    '  This may be a Column with a different name, in the DestinationTable.
+                    Try
+                        For Each lrColumn In lrOriginTable.Column.FindAll(Function(x) larRole.Contains(x.Role))
+                            Dim lrDestinationColumn As RDS.Column = lrDestinationTable.Column.Find(Function(x) x.ActiveRole Is lrColumn.ActiveRole)
+                            Dim lrTempDestinationColumn = lrRelation.DestinationColumns.Find(Function(x) LCase(x.Name) = LCase(lrDestinationColumn.Name))
+                            Dim liSequenceNr As Integer = lrRelation.DestinationColumns.IndexOf(lrTempDestinationColumn)
+                            Dim lsColumnName As String = lrRelation.OriginColumns(liSequenceNr).Name
+                            Call lrColumn.setName(lsColumnName)
+                        Next
+
+                    Catch ex As Exception
+                        'Not a biggie at this stage.
+                        Debugger.Break()
+                    End Try
+
                 Catch ex As Exception
                     Throw New Exception("Error creating Fact Type" & ex.Message)
                 End Try
 
-            Next
+            Next 'Relation in TempModel
+
+            Call Me.SetProgressBarValue(85, "Created Fact Types for all other Relations.")
 
         Catch ex As Exception
             Dim lsMessage As String = ""

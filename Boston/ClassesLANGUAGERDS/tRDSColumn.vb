@@ -347,9 +347,11 @@ Namespace RDS
                 Dim larRole = New List(Of FBM.Role)
                 larRole.Add(Me.Role)
                 larRole.Add(Me.ActiveRole)
-                Dim lrFactTypeReading As FBM.FactTypeReading = Me.FactType.FindSuitableFactTypeReadingByRoles(larRole, True)
-                If lrFactTypeReading IsNot Nothing Then
-                    lsAttributeName = lrFactTypeReading.PredicatePart(1).PreBoundText.Replace("-", "") & lsAttributeName
+                If Me.FactType IsNot Nothing Then
+                    Dim lrFactTypeReading As FBM.FactTypeReading = Me.FactType.FindSuitableFactTypeReadingByRoles(larRole, True)
+                    If lrFactTypeReading IsNot Nothing Then
+                        lsAttributeName = lrFactTypeReading.PredicatePart(1).PreBoundText.Replace("-", "") & lsAttributeName
+                    End If
                 End If
                 lsAttributeName = MakeCapCamelCase(lsAttributeName)
                 lsAttributeName = Me.Table.createUniqueColumnName(Me, lsAttributeName, 0)
