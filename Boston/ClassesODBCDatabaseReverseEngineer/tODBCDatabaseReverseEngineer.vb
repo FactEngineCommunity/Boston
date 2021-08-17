@@ -407,7 +407,6 @@ Public Class ODBCDatabaseReverseEngineer
         Try
             Call Me.SetProgressBarValue(80)
 
-
             For Each lrRelation In Me.TempModel.RDS.Relation.FindAll(Function(x) Not x.isPrimaryKeyBasedRelation).ToArray
                 'Relations to other Tables.
                 Dim larModelElement As New List(Of FBM.ModelObject)
@@ -420,6 +419,7 @@ Public Class ODBCDatabaseReverseEngineer
                         Throw New Exception("Couldn't find Origin Table, " & lrRelation.OriginTable.Name & ", in the Model.")
                     End If
                     lrModelElement1 = lrOriginTable.FBMModelElement
+
                     Dim lrDestinationTable = Me.Model.RDS.getTableByName(lrRelation.DestinationTable.Name)
                     lrModelElement2 = lrDestinationTable.FBMModelElement
 
@@ -476,7 +476,7 @@ Public Class ODBCDatabaseReverseEngineer
 
                     Catch ex As Exception
                         'Not a biggie at this stage.
-                        Debugger.Break()
+                        Call Me.ReportError("Information: Couldn't rename column/s in Table, " & lrOriginTable.Name & ". Sticking with the name/s generated.")
                     End Try
 
                 Catch ex As Exception

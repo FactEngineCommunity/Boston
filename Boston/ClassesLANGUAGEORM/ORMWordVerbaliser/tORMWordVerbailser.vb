@@ -328,7 +328,7 @@ Namespace FBM
                                 Case Is = pcenumLanguage.ORMModel
                                     lrForm = frmMain.loadORMModelPage(lrPage, Nothing, False)
                                 Case Is = pcenumLanguage.EntityRelationshipDiagram
-                                    lrForm = frmMain.load_ER_diagram_view(lrPage, Nothing)
+                                    lrForm = frmMain.loadERDiagramView(lrPage, Nothing)
                                 Case Is = pcenumLanguage.PropertyGraphSchema
                                     lrForm = frmMain.load_PGS_diagram_view(lrPage, Nothing)
                             End Select
@@ -522,7 +522,7 @@ Namespace FBM
                         Case Is = pcenumLanguage.ORMModel
                             lrForm = frmMain.loadORMModelPage(lrPage, Nothing, False)
                         Case Is = pcenumLanguage.EntityRelationshipDiagram
-                            lrForm = frmMain.load_ER_diagram_view(lrPage, Nothing)
+                            lrForm = frmMain.loadERDiagramView(lrPage, Nothing)
                         Case Is = pcenumLanguage.PropertyGraphSchema
                             lrForm = frmMain.load_PGS_diagram_view(lrPage, Nothing)
                     End Select

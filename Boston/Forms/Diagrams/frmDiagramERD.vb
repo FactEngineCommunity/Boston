@@ -405,7 +405,7 @@ Public Class frmDiagramERD
                     '-------------------------------------
                     lsSQLQuery = "SELECT *"
                     lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreOriginPredicate.ToString
-                    lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
+                    'lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
                     lsSQLQuery &= " WHERE Relation = '" & lrRecordset("Relation").Data & "'"
 
                     lrRecordset1 = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
@@ -419,6 +419,7 @@ Public Class frmDiagramERD
                             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                             lsMessage &= vbCrLf & vbCrLf & ex.Message
                             prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
                         End Try
                     End If
 

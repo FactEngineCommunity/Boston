@@ -175,6 +175,7 @@ Namespace TableFactTypeInstance
 
                             lrFactTypeInstance.ShortDescription = lrFactTypeInstance.FactType.ShortDescription
                             lrFactTypeInstance.LongDescription = lrFactTypeInstance.FactType.LongDescription
+                            lrFactTypeInstance.DBName = lrFactTypeInstance.FactType.DBName
 
                             If lrFactTypeInstance.FactType Is Nothing Then
                                 Throw New Exception("Cannot find FactType for FactTypeInstance with FactTypeId: " & lrFactTypeInstance.Id)

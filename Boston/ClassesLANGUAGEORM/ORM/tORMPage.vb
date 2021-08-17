@@ -235,6 +235,8 @@ Namespace FBM
             End Set
         End Property
 
+        Public Event PageDeleted()
+
         '----------------------------------------------------------------------------------
 
 
@@ -2267,6 +2269,8 @@ Namespace FBM
                 Dim lrEnterpriseView = prPageNodes.Find(Function(x) x.PageId = Me.PageId)
                 lrEnterpriseView.TreeNode.Remove()
 
+                RaiseEvent PageDeleted()
+
             Catch ex As Exception
                 Dim lsMessage As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
@@ -2691,6 +2695,10 @@ Namespace FBM
             ' Do not change this code. Put cleanup code in 'Dispose(disposing As Boolean)' method
             Dispose(disposing:=True)
             GC.SuppressFinalize(Me)
+        End Sub
+
+        Public Sub triggerPageDeleted()
+            RaiseEvent PageDeleted()
         End Sub
 
     End Class

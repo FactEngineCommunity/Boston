@@ -3165,6 +3165,7 @@ Public Class frmToolboxORMVerbalisation
             End If
 
             lrVerbaliser.HTW.WriteBreak()
+            lrVerbaliser.HTW.WriteBreak()
             lrVerbaliser.VerbaliseHeading("Value Constraints:")
             lrVerbaliser.HTW.WriteBreak()
             lrVerbaliser.HTW.WriteBreak()

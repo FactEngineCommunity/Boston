@@ -28,7 +28,7 @@ Public Class tApplication
     Public Language As Language.LanguageGeneric
 
     Public WithEvents WorkingModel As FBM.Model = Nothing
-    Public WorkingPage As FBM.Page = Nothing
+    Public WithEvents WorkingPage As FBM.Page = Nothing
     Public WorkingValueType As FBM.ValueType = Nothing
     Public WorkingProject As ClientServer.Project = Nothing
     Public WorkingNamespace As ClientServer.Namespace
@@ -531,4 +531,11 @@ Public Class tApplication
     Private Sub WorkingModel_Saved() Handles WorkingModel.Saved
         frmMain.ToolStripButton_Save.Enabled = False
     End Sub
+
+    Private Sub WorkingPage_PageDeleted() Handles WorkingPage.PageDeleted
+
+        Me.WorkingPage = Nothing
+
+    End Sub
+
 End Class

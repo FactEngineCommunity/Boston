@@ -1991,7 +1991,7 @@ Public Class frmToolboxEnterpriseExplorer
                             lr_enterprise_view = New tEnterpriseEnterpriseView(pcenumMenuType.pageORMModel,
                                                                        lrPage,
                                                                        lrPage.Model.ModelId,
-                                                                       pcenumLanguage.ORMModel,
+                                                                       lrPage.Language,
                                                                        Nothing, lrPage.PageId)
 
 
@@ -3164,7 +3164,7 @@ Public Class frmToolboxEnterpriseExplorer
                     Case Is = pcenumLanguage.ORMModel
                         Call frmMain.loadORMModelPage(lrPage, Me.TreeView.SelectedNode)
                     Case Is = pcenumLanguage.EntityRelationshipDiagram
-                        Call frmMain.load_ER_diagram_view(lrPage, Me.TreeView.SelectedNode)
+                        Call frmMain.loadERDiagramView(lrPage, Me.TreeView.SelectedNode)
                     Case Is = pcenumLanguage.PropertyGraphSchema
                         Call frmMain.load_PGS_diagram_view(lrPage, Me.TreeView.SelectedNode, asSelectModelElementId)
                     Case Is = pcenumLanguage.StateTransitionDiagram

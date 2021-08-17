@@ -288,7 +288,8 @@ Namespace TableFactType
                 lREcordset.Close()
 
                 If abAddFactTypeToModel Then
-                    arFactType.Model.AddModelDictionaryEntry(New FBM.DictionaryEntry(arFactType.Model, arFactType.Id, pcenumConceptType.FactType))
+                    Dim lrDictionaryEntry As FBM.DictionaryEntry = arFactType.Model.AddModelDictionaryEntry(New FBM.DictionaryEntry(arFactType.Model, arFactType.Id, pcenumConceptType.FactType))
+                    arFactType.DBName = lrDictionaryEntry.DBName
                     arFactType.Model.AddFactType(arFactType, False, False)
                 End If
 
@@ -340,7 +341,7 @@ Namespace TableFactType
                         lrFactType.Model = arModel
                         lrFactType.Id = lREcordset("FactTypeId").Value
 
-                        Call TableFactType.GetFactTypeDetailsByModel(lrFactType, False)
+                        Call TableFactType.GetFactTypeDetailsByModel(lrFactType, abAddToModel)
 
                         GetFactTypesByModel.Add(lrFactType)
 

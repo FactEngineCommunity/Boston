@@ -2163,6 +2163,8 @@ Namespace FBM
                                     Me.Symbol = Me.Name
                                 End If
                             End If
+                        Case Is = "DBName"
+                            Call Me.FactType.SetDBName(Me.DBName)
                         Case Is = "IsObjectified"
                             If Not Me.IsObjectified And Me.FactType.IsObjectified And Me.FactType.hasAssociatedFactTypes Then
                                 lsMessage = "Remove all links to Fact Types linked to this Fact Type before removing the objectification of this Fact Type."

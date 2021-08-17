@@ -542,16 +542,17 @@ Namespace FactEngine
 
                         If Not lrRecordset.EOF Then
                             If lrRecordset("table").Data <> lrDestinationTable.Name Then
-                                lasToTableNames.AddUnique(lrDestinationTable.Name)
                                 lrRecordset.CurrentFactIndex -= 1
                                 Exit While
                             End If
+                            lasToTableNames.AddUnique(lrDestinationTable.Name)
                         End If
 
                     End While
 
                     lrRecordset.MoveNext()
                 End While
+
 
                 Return larRelation
 

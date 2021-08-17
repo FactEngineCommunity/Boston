@@ -656,6 +656,14 @@ Public Class frmMain
                         lfrmToolboxForm.ShapeListBox.Update()
                     End If
 
+                ElseIf TypeOf (prApplication.ActivePages(0)) Is frmDiagramERD Then
+                    Dim lfrmERDiagram As frmDiagramERD
+                    lfrmERDiagram = prApplication.ActivePages(0)
+                    Call Me.loadToolboxORMReadingEditor(lfrmERDiagram.zrPage, prApplication.ActivePages(0).Pane)
+                    Call Me.loadToolboxORMVerbalisationForm(lfrmERDiagram.zrPage.Model, prApplication.ActivePages(0).Pane)
+                    Call Me.LoadToolboxModelDictionary()
+                    Call Me.LoadToolboxPropertyWindow(prApplication.ActivePages(0).Pane)
+
                 ElseIf TypeOf prApplication.ActivePages(0) Is frmStateTransitionDiagram Then
 
                     Call Me.LoadToolboxPropertyWindow(prApplication.ActivePages(0).Pane)
@@ -1352,7 +1360,7 @@ Public Class frmMain
 
     End Sub
 
-    Public Function load_ER_diagram_view(ByRef arPage As FBM.Page, ByVal ao_tree_node As TreeNode) As Object
+    Public Function loadERDiagramView(ByRef arPage As FBM.Page, ByVal ao_tree_node As TreeNode) As Object
 
         Dim child As New frmDiagramERD
 
@@ -1384,10 +1392,14 @@ Public Class frmMain
         arPage.DiagramView = child.DiagramView
         child.zrPage = arPage
 
+        Call Me.ShowHideToolboxes(True)
+
         '---------------------------------------------------------------
         'Setup the 'Page' (i.e. Load the Event Trace Diagram)
         '---------------------------------------------------------------        
         Call child.LoadERDDiagramPage(arPage, ao_tree_node)
+
+
 
         Return child
 

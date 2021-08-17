@@ -844,7 +844,7 @@ Namespace FBM
                     If .IsObjectified Then
                         lrFactTypeInstance.ShowFactTypeName = True
                     End If
-
+                    lrFactTypeInstance.DBName = .DBName
                     lrFactTypeInstance.IsDerived = .IsDerived
                     lrFactTypeInstance.IsStored = .IsStored
                     lrFactTypeInstance.DerivationText = .DerivationText

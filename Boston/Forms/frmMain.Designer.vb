@@ -174,66 +174,66 @@ Partial Class frmMain
         '
         Me.SaveToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.Save16x16
         Me.SaveToolStripMenuItem.Name = "SaveToolStripMenuItem"
-        Me.SaveToolStripMenuItem.Size = New System.Drawing.Size(194, 22)
+        Me.SaveToolStripMenuItem.Size = New System.Drawing.Size(202, 30)
         Me.SaveToolStripMenuItem.Text = "&Save"
         '
         'SaveAllToolStripMenuItem
         '
         Me.SaveAllToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.SaveAll16x16
         Me.SaveAllToolStripMenuItem.Name = "SaveAllToolStripMenuItem"
-        Me.SaveAllToolStripMenuItem.Size = New System.Drawing.Size(194, 22)
-        Me.SaveAllToolStripMenuItem.Text = "&Save All"
+        Me.SaveAllToolStripMenuItem.Size = New System.Drawing.Size(202, 30)
+        Me.SaveAllToolStripMenuItem.Text = "Save &All"
         '
         'ToolStripSeparator10
         '
         Me.ToolStripSeparator10.Name = "ToolStripSeparator10"
-        Me.ToolStripSeparator10.Size = New System.Drawing.Size(191, 6)
+        Me.ToolStripSeparator10.Size = New System.Drawing.Size(199, 6)
         '
         'ToolStripMenuItemNewModel
         '
         Me.ToolStripMenuItemNewModel.Image = Global.Boston.My.Resources.Resources.ModelAdd16x16
         Me.ToolStripMenuItemNewModel.Name = "ToolStripMenuItemNewModel"
-        Me.ToolStripMenuItemNewModel.Size = New System.Drawing.Size(194, 22)
+        Me.ToolStripMenuItemNewModel.Size = New System.Drawing.Size(202, 30)
         Me.ToolStripMenuItemNewModel.Text = "&New Model"
         '
         'ToolStripSeparator5
         '
         Me.ToolStripSeparator5.Name = "ToolStripSeparator5"
-        Me.ToolStripSeparator5.Size = New System.Drawing.Size(191, 6)
+        Me.ToolStripSeparator5.Size = New System.Drawing.Size(199, 6)
         '
         'ToolStripMenuItemRecentNodes
         '
         Me.ToolStripMenuItemRecentNodes.Name = "ToolStripMenuItemRecentNodes"
-        Me.ToolStripMenuItemRecentNodes.Size = New System.Drawing.Size(194, 22)
+        Me.ToolStripMenuItemRecentNodes.Size = New System.Drawing.Size(202, 30)
         Me.ToolStripMenuItemRecentNodes.Text = "Recent Models / Pages"
         '
         'ToolStripSeparator11
         '
         Me.ToolStripSeparator11.Name = "ToolStripSeparator11"
-        Me.ToolStripSeparator11.Size = New System.Drawing.Size(191, 6)
+        Me.ToolStripSeparator11.Size = New System.Drawing.Size(199, 6)
         '
         'ToolStripMenuItemLogIn
         '
         Me.ToolStripMenuItemLogIn.Name = "ToolStripMenuItemLogIn"
-        Me.ToolStripMenuItemLogIn.Size = New System.Drawing.Size(194, 22)
+        Me.ToolStripMenuItemLogIn.Size = New System.Drawing.Size(202, 30)
         Me.ToolStripMenuItemLogIn.Text = "&Log in"
         '
         'ToolStripMenuItemLogOut
         '
         Me.ToolStripMenuItemLogOut.Name = "ToolStripMenuItemLogOut"
-        Me.ToolStripMenuItemLogOut.Size = New System.Drawing.Size(194, 22)
+        Me.ToolStripMenuItemLogOut.Size = New System.Drawing.Size(202, 30)
         Me.ToolStripMenuItemLogOut.Text = "Log &out"
         Me.ToolStripMenuItemLogOut.Visible = False
         '
         'ToolStripSeparator6
         '
         Me.ToolStripSeparator6.Name = "ToolStripSeparator6"
-        Me.ToolStripSeparator6.Size = New System.Drawing.Size(191, 6)
+        Me.ToolStripSeparator6.Size = New System.Drawing.Size(199, 6)
         '
         'mnuOption_EndSession
         '
         Me.mnuOption_EndSession.Name = "mnuOption_EndSession"
-        Me.mnuOption_EndSession.Size = New System.Drawing.Size(194, 22)
+        Me.mnuOption_EndSession.Size = New System.Drawing.Size(202, 30)
         Me.mnuOption_EndSession.Text = "&End Session"
         '
         'ToolStripMenuItemPage
@@ -268,7 +268,7 @@ Partial Class frmMain
         '
         Me.CopyToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.Copy16x16
         Me.CopyToolStripMenuItem.Name = "CopyToolStripMenuItem"
-        Me.CopyToolStripMenuItem.Size = New System.Drawing.Size(229, 30)
+        Me.CopyToolStripMenuItem.Size = New System.Drawing.Size(221, 22)
         Me.CopyToolStripMenuItem.Text = "&Copy"
         '
         'PasteToolStripMenuItem
@@ -276,7 +276,7 @@ Partial Class frmMain
         Me.PasteToolStripMenuItem.Enabled = False
         Me.PasteToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.Paste16x16
         Me.PasteToolStripMenuItem.Name = "PasteToolStripMenuItem"
-        Me.PasteToolStripMenuItem.Size = New System.Drawing.Size(229, 30)
+        Me.PasteToolStripMenuItem.Size = New System.Drawing.Size(221, 22)
         Me.PasteToolStripMenuItem.Text = "&Paste"
         '
         'ToolStripMenuItemUndo
@@ -285,7 +285,7 @@ Partial Class frmMain
         Me.ToolStripMenuItemUndo.Image = Global.Boston.My.Resources.Resources.Undo16x16
         Me.ToolStripMenuItemUndo.Name = "ToolStripMenuItemUndo"
         Me.ToolStripMenuItemUndo.ShortcutKeys = CType((System.Windows.Forms.Keys.Control Or System.Windows.Forms.Keys.Z), System.Windows.Forms.Keys)
-        Me.ToolStripMenuItemUndo.Size = New System.Drawing.Size(229, 30)
+        Me.ToolStripMenuItemUndo.Size = New System.Drawing.Size(221, 22)
         Me.ToolStripMenuItemUndo.Text = "&Undo"
         '
         'ToolStripMenuItemRedo
@@ -294,21 +294,21 @@ Partial Class frmMain
         Me.ToolStripMenuItemRedo.Image = Global.Boston.My.Resources.Resources.Redo16x16
         Me.ToolStripMenuItemRedo.Name = "ToolStripMenuItemRedo"
         Me.ToolStripMenuItemRedo.ShortcutKeys = CType((System.Windows.Forms.Keys.Control Or System.Windows.Forms.Keys.Y), System.Windows.Forms.Keys)
-        Me.ToolStripMenuItemRedo.Size = New System.Drawing.Size(229, 30)
+        Me.ToolStripMenuItemRedo.Size = New System.Drawing.Size(221, 22)
         Me.ToolStripMenuItemRedo.Text = "&Redo"
         '
         'SelectAllToolStripMenuItem
         '
         Me.SelectAllToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.SelectAll
         Me.SelectAllToolStripMenuItem.Name = "SelectAllToolStripMenuItem"
-        Me.SelectAllToolStripMenuItem.Size = New System.Drawing.Size(229, 30)
+        Me.SelectAllToolStripMenuItem.Size = New System.Drawing.Size(221, 22)
         Me.SelectAllToolStripMenuItem.Text = "Select &All"
         '
         'CopyAsImageToClipboardToolStripMenuItem
         '
         Me.CopyAsImageToClipboardToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.Camera16x16
         Me.CopyAsImageToClipboardToolStripMenuItem.Name = "CopyAsImageToClipboardToolStripMenuItem"
-        Me.CopyAsImageToClipboardToolStripMenuItem.Size = New System.Drawing.Size(229, 30)
+        Me.CopyAsImageToClipboardToolStripMenuItem.Size = New System.Drawing.Size(221, 22)
         Me.CopyAsImageToClipboardToolStripMenuItem.Text = "Copy as &Image to Clipboard"
         '
         'ToolStripMenuItemView

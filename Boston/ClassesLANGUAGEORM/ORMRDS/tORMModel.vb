@@ -1347,8 +1347,13 @@ Namespace FBM
                                 Next
                         End Select
 
+                        'CodeSafe
+                        'Get rid of Columns that are Nothing
+                        larOriginColumn.RemoveAll(Function(x) x Is Nothing)
+
                         'Origin Columns
                         lrRelation.OriginColumns = larOriginColumn
+
                         For Each lrColumn In lrRelation.OriginColumns
                             lrColumn.Relation.Add(lrRelation) 'Only need to do this on the Origin side. The Origin Column 'has' the Relation.
                         Next

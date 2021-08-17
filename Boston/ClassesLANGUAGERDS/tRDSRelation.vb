@@ -184,6 +184,24 @@ Namespace RDS
 
         End Function
 
+        Public Function EqualsByOriginColumnsDesinationTableReverseEngineering(other As RDS.Relation) As Boolean
+
+            Dim abReturnValue As Boolean = True
+
+            If Me.DestinationTable.Name <> other.DestinationTable.Name Then
+                abReturnValue = False
+            End If
+
+            For Each lrOriginColumn In Me.OriginColumns
+                If other.OriginColumns.Find(Function(x) x.Name = lrOriginColumn.Name) Is Nothing Then
+                    Return False
+                End If
+            Next
+
+            Return abReturnValue
+
+        End Function
+
 
         Public Sub changeResponsibleFactType(ByRef arFactType As FBM.FactType)
 
