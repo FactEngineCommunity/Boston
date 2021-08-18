@@ -168,6 +168,24 @@ Namespace Richmond
 
         End Function
 
+        Public Sub CompactAccessDB(ByVal sFilePath As String, ByVal sNewFilePath As String)
+            Try
+                Dim sCompactError As String = ""
+                Dim oParams As Object()
+                Dim oJRO As Object = Activator.CreateInstance(Type.GetTypeFromProgID("JRO.JetEngine"))
+                oParams = New Object() {String.Format("Provider=Microsoft.Jet.OLEDB.4.0;Data Source={0}", sFilePath), String.Format("Provider=Microsoft.Jet.OLEDB.4.0;Data Source={0};Jet OLEDB:Engine Type=5", sNewFilePath)}
+                oJRO.[GetType]().InvokeMember("CompactDatabase", System.Reflection.BindingFlags.InvokeMethod, Nothing, oJRO, oParams)
+                System.IO.File.Delete(sFilePath)
+                System.IO.File.Move(sNewFilePath, sFilePath)
+                System.Runtime.InteropServices.Marshal.ReleaseComObject(oJRO)
+                oJRO = Nothing
+                sCompactError = String.Format("{0} database file successfully compacted.", sFilePath)
+
+            Catch ex As System.Exception
+                Throw New Exception(ex.Message)
+            End Try
+        End Sub
+
         Public Function PageDataExistsInClipboard(ByRef arPage As FBM.Page) As Boolean
 
             Dim RichmondPage As DataFormats.Format = DataFormats.GetFormat("RichmondPage")
