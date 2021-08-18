@@ -356,6 +356,15 @@ Public Class frmCRUDModel
         Try
             Dim lasSchemaName As New List(Of String)
 
+            '------------------------------------------------------------------------------------------
+            'Check to see that Reverse Engineering is supported for the datatabase type of the model.
+            Dim larSupportedDatabases = {pcenumDatabaseType.SQLite, pcenumDatabaseType.Snowflake}
+
+            If Not larSupportedDatabases.Contains(Me.zrModel.TargetDatabaseType) Then
+                MsgBox("The database type of this model is not supported. Please contact support.")
+                Exit Sub
+            End If
+
             With New WaitCursor
 
                 Me.ProgressBarReverseEngineering.Visible = True
@@ -416,7 +425,11 @@ Public Class frmCRUDModel
             Case Else
                 Me.ButtonCreateDatabase.Visible = False
                 Me.ButtonCreateDatabase.Enabled = False
+                Me.ButtonFileSelect.Visible = False
+                Me.ButtonFileSelect.Enabled = False
         End Select
+
+        Me.ButtonApply.Enabled = True
 
 
     End Sub

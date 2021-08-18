@@ -737,7 +737,7 @@ Namespace FBM
                                        Where EntityType.ReferenceModeValueType Is Me
                                        Select EntityType
 
-                    Return larEntitType.count
+                    Return larEntitType.Count > 0
                 Else
                     Return False
                 End If

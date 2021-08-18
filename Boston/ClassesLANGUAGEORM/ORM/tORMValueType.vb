@@ -535,6 +535,32 @@ Namespace FBM
 
         End Function
 
+        Public Function getReferringEntityType() As FBM.EntityType
+
+            Try
+                Dim larEntityType = From EntityType In Me.Model.EntityType
+                                    Where EntityType.ReferenceModeValueType IsNot Nothing
+                                    Where EntityType.ReferenceModeValueType Is Me
+                                    Select EntityType
+
+                If larEntityType.Count > 0 Then
+                    Return larEntityType.First
+                Else
+                    Return Nothing
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return Nothing
+            End Try
+        End Function
+
         ''' <summary>
         ''' Returns the unique Signature of the ValueType
         ''' </summary>

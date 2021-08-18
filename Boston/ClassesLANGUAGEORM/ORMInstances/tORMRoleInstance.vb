@@ -1192,7 +1192,52 @@ Namespace FBM
                         End If
 
                     Case Is = pcenumConceptType.ValueType
-                        Me.JoinedORMObject = Me.Page.ValueTypeInstance.Find(AddressOf arModelObject.Equals)
+
+                        If Me.JoinedORMObject.GetType = GetType(FBM.ValueTypeInstance) Then
+
+                            Dim lrValueType As FBM.ValueType = arModelObject
+                            If lrValueType.IsReferenceMode Then
+                                Dim lrValueTypeInstance As FBM.ValueTypeInstance = Me.JoinedORMObject
+                                If lrValueTypeInstance.Shape IsNot Nothing Then
+                                    lrValueTypeInstance.Shape.Move(10, 10)
+                                    lrValueTypeInstance.Shape.Visible = True
+                                End If
+                            End If
+                        End If
+
+                            Me.JoinedORMObject = Me.Page.ValueTypeInstance.Find(AddressOf arModelObject.Equals)
+
+
+                        '---------------------------------------------------------------------------------------------------------
+                        'The EntityTypeInstance might not be on the Page, especially if a ValueType has just been converted to
+                        '  an EntityType. In that instance, load the EntityTypeInstance to the Page if the EntityType exists
+                        '  in the Model.
+                        '---------------------------------------------------------------------------------------------------------
+                        If Me.JoinedORMObject Is Nothing Then
+                            If Me.Model.ExistsModelElement(arModelObject.Id) Then
+                                If Me.Model.GetModelObjectByName(arModelObject.Id).GetType Is GetType(FBM.EntityType) Then
+                                    Dim lrValueType As FBM.ValueType
+                                    lrValueType = Me.Model.GetModelObjectByName(arModelObject.Id)
+                                    If IsSomething(Me.Page.Diagram) Then
+                                        Dim loPointClient As Point
+                                        Dim loPoint As PointF
+
+                                        loPointClient = New Point(Me.width / 2, Me.height / 2)
+                                        loPoint = Me.Page.DiagramView.ClientToDoc(New Point(loPointClient.X, loPointClient.Y))
+                                        Me.JoinedORMObject = Me.Page.DropValueTypeAtPoint(lrValueType, loPoint, True)
+                                    Else
+                                        Dim lrValueTypeInstance As FBM.ValueTypeInstance
+                                        lrValueTypeInstance = lrValueType.CloneInstance(Me.Page, True)
+                                        lrValueTypeInstance.X = 5
+                                        lrValueTypeInstance.Y = 5
+                                    End If
+                                    If Me.Model.Page.Contains(Me.Page) Then
+                                        Call Me.Page.Save()
+                                    End If
+                                End If
+                            End If
+                        End If
+
                     Case Is = pcenumConceptType.FactType
                         Me.JoinedORMObject = Me.Page.FactTypeInstance.Find(AddressOf arModelObject.Equals)
                 End Select

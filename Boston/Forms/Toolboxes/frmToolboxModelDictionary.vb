@@ -372,7 +372,7 @@ Public Class frmToolboxModelDictionary
             Select Case e.Node.Tag.GetType.ToString
                 Case Is = GetType(FBM.ValueType).ToString
                     lrDictionaryEntry = New FBM.DictionaryEntry(Me.zrLoadedModel, e.Node.Tag.Id, pcenumConceptType.ValueType)
-                    lrDictionaryEntry = Me.zrLoadedModel.ModelDictionary.Find(AddressOf lrDictionaryEntry.Equals)
+                    lrDictionaryEntry = Me.zrLoadedModel.AddModelDictionaryEntry(lrDictionaryEntry)
 
                     Me.ToolStripStatusLabelRealisationsCount.Text = lrDictionaryEntry.Realisations.Count
                     Me.ToolStripStatusLabelModelElementTypeCount.Text = lrDictionaryEntry.ModelElementTypeCount

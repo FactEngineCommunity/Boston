@@ -1877,13 +1877,30 @@ Namespace FBM
                 If arNewJoinedModelObject Is Me.JoinedORMObject Then
                     Exit Sub
                 Else
-                    '==============================================================================================
-                    'Simple case first, for where Role is Many on ManyToOne FactType linked
-                    '  to a ModelObject that is a table. I.e. Linked to an EntityType or an Objectified Fact Type
-                    '===================================
+                    Select Case Me.JoinedORMObject.GetType
+                        Case Is = GetType(FBM.ValueType)
+                            Dim lrValueType As FBM.ValueType = Me.JoinedORMObject
+
+                            If lrValueType.isReferenceModeValueType Then
+                                Dim lrEntityType As FBM.EntityType = lrValueType.getReferringEntityType
+                                If Not arNewJoinedModelObject.GetType = GetType(FBM.ValueType) Then
+                                    lrEntityType.RemoveSimpleReferenceScheme()
+                                Else
+                                    lrEntityType.ReferenceModeValueType = arNewJoinedModelObject
+                                End If
+
+                            End If
+
+                    End Select
+
                     Me.JoinedORMObject = arNewJoinedModelObject
 
                     If lrOriginallyJoinedTable IsNot Nothing Then
+
+                        '==============================================================================================
+                        'Simple case first, for where Role is Many on ManyToOne FactType linked
+                        '  to a ModelObject that is a table. I.e. Linked to an EntityType or an Objectified Fact Type
+                        '===================================
 #Region "RDS Processing"
                         If Me.HasInternalUniquenessConstraint And (Me.FactType.IsManyTo1BinaryFactType Or Me.FactType.Is1To1BinaryFactType) Then
                             Select Case arNewJoinedModelObject.GetType
