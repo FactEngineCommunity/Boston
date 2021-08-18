@@ -417,6 +417,7 @@ Public Class frmCRUDModel
                       pcenumDatabaseType.MSJet
                 Me.ButtonCreateDatabase.Visible = True
                 Me.ButtonFileSelect.Visible = True
+                Me.ButtonFileSelect.Enabled = True
                 If Trim(Me.TextBoxDatabaseConnectionString.Text) = "" Then
                     Me.ButtonCreateDatabase.Enabled = True
                 Else
