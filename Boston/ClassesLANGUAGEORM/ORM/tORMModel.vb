@@ -2452,10 +2452,15 @@ Namespace FBM
 
             CreateUniqueRoleConstraintName = lsTrialRoleConstraintName
 
-            If Me.RoleConstraint.Exists(AddressOf lrRoleConstraint.EqualsByName) Or _
-               TableRoleConstraint.ExistsRoleConstraint(lrRoleConstraint) Or _
-               Me.ExistsModelElement(lsTrialRoleConstraintName) Or _
+            If Me.RoleConstraint.Exists(AddressOf lrRoleConstraint.EqualsByName) Or
+               TableRoleConstraint.ExistsRoleConstraint(lrRoleConstraint) Or
+               Me.ExistsModelElement(lsTrialRoleConstraintName) Or
                Me.ModelDictionary.Exists(AddressOf lrDictionaryEntry.EqualsBySymbol) Then
+
+                'Shortcut
+                Dim liCounter = Me.RoleConstraint.FindAll(Function(x) x.Id.StartsWith(asRootRoleConstraintName)).Count
+                aiCounter = liCounter + 1
+
                 CreateUniqueRoleConstraintName = Me.CreateUniqueRoleConstraintName(asRootRoleConstraintName, aiCounter + 1)
             Else
                 Return lsTrialRoleConstraintName
