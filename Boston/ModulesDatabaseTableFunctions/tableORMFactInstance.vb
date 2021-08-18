@@ -49,11 +49,21 @@
 
             lRecordset.Open(lsSQLQuery)
 
+            Dim lsSuccessFactId As String = ""
             If Not lRecordset.EOF Then
                 lRecordset.MoveFirst()
                 While Not lRecordset.EOF
-                    lsFactId = lRecordset("Symbol").Value
+
+                    While Not lRecordset.EOF
+                        lsFactId = lRecordset("Symbol").Value
+                        If lsSuccessFactId = lsFactId Then
+                            lRecordset.MoveNext()
+                        Else
+                            Exit While
+                        End If
+                    End While
                     lrFactInstance = New FBM.FactInstance(lsFactId, arFactTypeInstance)
+                    lsSuccessFactId = ""
 
                     lrFactInstance.X = lRecordset("fci.x").Value
                     lrFactInstance.Y = lRecordset("fci.y").Value
@@ -62,6 +72,7 @@
                     '-----------------------------------
                     'Find the RoleInstance for the Data
                     '-----------------------------------
+                    Dim liSuccessInd As Integer = 0
                     For liInd = 1 To arFactTypeInstance.Arity
 
                         If Not lRecordset.EOF Then
@@ -102,8 +113,11 @@
                                     arFactTypeInstance.Page.ValueInstance.Add(lrFactDataInstance)
                                     'End SyncLock
 
+                                    liSuccessInd += 1
+
                                     If Not lRecordset.EOF Then lRecordset.MoveNext()
                                 Catch ex As Exception
+#Region "Exception"
                                     'Probaly a EOF Error on lRecordset.MoveNext
                                     'Get the FactInstance from the Database
                                     lrFactInstance = arFactTypeInstance.FactType.Fact.Find(Function(x) x.Id = lsFactId).CloneInstance(arFactTypeInstance.Page)
@@ -131,6 +145,7 @@
                                     lsMessage &= "Fact Type: " & arFactTypeInstance.Id
                                     lsMessage &= "Fact :" & lsFactId
                                     MsgBox(lsMessage)
+#End Region
                                 End Try
                             Else
                                 Try
@@ -139,10 +154,14 @@
                                     lrFactInstance.isDirty = True
                                     arFactTypeInstance.isDirty = True
                                     arFactTypeInstance.Page.IsDirty = True
-                                    For Each lrFactDataInstance In lrFactInstance.Data
-                                        arFactTypeInstance.Page.ValueInstance.Add(lrFactDataInstance)
-                                        lrFactDataInstance.Role.Data.AddUnique(lrFactDataInstance)
+                                    For Each lrTempFactDataInstance In lrFactInstance.Data
+                                        arFactTypeInstance.Page.ValueInstance.AddUnique(lrTempFactDataInstance)
+                                        lrTempFactDataInstance.Role.Data.AddUnique(lrTempFactDataInstance)
                                     Next
+                                    liSuccessInd = arFactTypeInstance.FactType.Arity
+                                    lsSuccessFactId = lsFactId
+                                    lRecordset.MoveNext()
+                                    Exit For
                                 Catch ex As Exception
                                     Dim lsMessage As String
                                     lsMessage = "Error: GetFactsForFactTypeInstance:"
@@ -153,6 +172,20 @@
                             End If
                         End If
                     Next liInd
+
+                    If liSuccessInd < arFactTypeInstance.FactType.Arity Then
+                        'Get the FactInstance from the Model level.
+                        lrFact = arFactTypeInstance.FactType.Fact.Find(Function(x) x.Id = lsFactId)
+                        lrFactInstance = lrFact.CloneInstance(arFactTypeInstance.Page, True)
+                        lrFactInstance.isDirty = True
+                        arFactTypeInstance.isDirty = True
+                        arFactTypeInstance.Page.IsDirty = True
+                        For Each lrFactDataInstance In lrFactInstance.Data
+                            arFactTypeInstance.Page.ValueInstance.Add(lrFactDataInstance)
+                            lrFactDataInstance.Role.Data.AddUnique(lrFactDataInstance)
+                        Next
+                    End If
+                    lsSuccessFactId = lsFactId
 
                     'SyncLock arFactTypeInstance.Page.FactInstance
                     arFactTypeInstance.Page.FactInstance.Add(lrFactInstance)

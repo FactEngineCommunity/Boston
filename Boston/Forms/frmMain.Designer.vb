@@ -146,6 +146,7 @@ Partial Class frmMain
         Me.HelpProvider = New System.Windows.Forms.HelpProvider()
         Me.NotifyIcon = New System.Windows.Forms.NotifyIcon(Me.components)
         Me.TimerNotifications = New System.Windows.Forms.Timer(Me.components)
+        Me.ToolStripMenuItem2 = New System.Windows.Forms.ToolStripMenuItem()
         Me.MenuStrip_main.SuspendLayout()
         Me.ToolStrip_main.SuspendLayout()
         Me.StatusBar_main.SuspendLayout()
@@ -165,7 +166,7 @@ Partial Class frmMain
         '
         'mnu_Session
         '
-        Me.mnu_Session.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.SaveToolStripMenuItem, Me.SaveAllToolStripMenuItem, Me.ToolStripSeparator10, Me.ToolStripMenuItemNewModel, Me.ToolStripSeparator5, Me.ToolStripMenuItemRecentNodes, Me.ToolStripSeparator11, Me.ToolStripMenuItemLogIn, Me.ToolStripMenuItemLogOut, Me.ToolStripSeparator6, Me.mnuOption_EndSession})
+        Me.mnu_Session.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.SaveToolStripMenuItem, Me.SaveAllToolStripMenuItem, Me.ToolStripSeparator10, Me.ToolStripMenuItemNewModel, Me.ToolStripMenuItem2, Me.ToolStripSeparator5, Me.ToolStripMenuItemRecentNodes, Me.ToolStripSeparator11, Me.ToolStripMenuItemLogIn, Me.ToolStripMenuItemLogOut, Me.ToolStripSeparator6, Me.mnuOption_EndSession})
         Me.mnu_Session.Name = "mnu_Session"
         Me.mnu_Session.Size = New System.Drawing.Size(58, 22)
         Me.mnu_Session.Text = "&Session"
@@ -174,66 +175,66 @@ Partial Class frmMain
         '
         Me.SaveToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.Save16x16
         Me.SaveToolStripMenuItem.Name = "SaveToolStripMenuItem"
-        Me.SaveToolStripMenuItem.Size = New System.Drawing.Size(202, 30)
+        Me.SaveToolStripMenuItem.Size = New System.Drawing.Size(194, 22)
         Me.SaveToolStripMenuItem.Text = "&Save"
         '
         'SaveAllToolStripMenuItem
         '
         Me.SaveAllToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.SaveAll16x16
         Me.SaveAllToolStripMenuItem.Name = "SaveAllToolStripMenuItem"
-        Me.SaveAllToolStripMenuItem.Size = New System.Drawing.Size(202, 30)
+        Me.SaveAllToolStripMenuItem.Size = New System.Drawing.Size(194, 22)
         Me.SaveAllToolStripMenuItem.Text = "Save &All"
         '
         'ToolStripSeparator10
         '
         Me.ToolStripSeparator10.Name = "ToolStripSeparator10"
-        Me.ToolStripSeparator10.Size = New System.Drawing.Size(199, 6)
+        Me.ToolStripSeparator10.Size = New System.Drawing.Size(191, 6)
         '
         'ToolStripMenuItemNewModel
         '
         Me.ToolStripMenuItemNewModel.Image = Global.Boston.My.Resources.Resources.ModelAdd16x16
         Me.ToolStripMenuItemNewModel.Name = "ToolStripMenuItemNewModel"
-        Me.ToolStripMenuItemNewModel.Size = New System.Drawing.Size(202, 30)
+        Me.ToolStripMenuItemNewModel.Size = New System.Drawing.Size(194, 22)
         Me.ToolStripMenuItemNewModel.Text = "&New Model"
         '
         'ToolStripSeparator5
         '
         Me.ToolStripSeparator5.Name = "ToolStripSeparator5"
-        Me.ToolStripSeparator5.Size = New System.Drawing.Size(199, 6)
+        Me.ToolStripSeparator5.Size = New System.Drawing.Size(191, 6)
         '
         'ToolStripMenuItemRecentNodes
         '
         Me.ToolStripMenuItemRecentNodes.Name = "ToolStripMenuItemRecentNodes"
-        Me.ToolStripMenuItemRecentNodes.Size = New System.Drawing.Size(202, 30)
+        Me.ToolStripMenuItemRecentNodes.Size = New System.Drawing.Size(194, 22)
         Me.ToolStripMenuItemRecentNodes.Text = "Recent Models / Pages"
         '
         'ToolStripSeparator11
         '
         Me.ToolStripSeparator11.Name = "ToolStripSeparator11"
-        Me.ToolStripSeparator11.Size = New System.Drawing.Size(199, 6)
+        Me.ToolStripSeparator11.Size = New System.Drawing.Size(191, 6)
         '
         'ToolStripMenuItemLogIn
         '
         Me.ToolStripMenuItemLogIn.Name = "ToolStripMenuItemLogIn"
-        Me.ToolStripMenuItemLogIn.Size = New System.Drawing.Size(202, 30)
+        Me.ToolStripMenuItemLogIn.Size = New System.Drawing.Size(194, 22)
         Me.ToolStripMenuItemLogIn.Text = "&Log in"
         '
         'ToolStripMenuItemLogOut
         '
         Me.ToolStripMenuItemLogOut.Name = "ToolStripMenuItemLogOut"
-        Me.ToolStripMenuItemLogOut.Size = New System.Drawing.Size(202, 30)
+        Me.ToolStripMenuItemLogOut.Size = New System.Drawing.Size(194, 22)
         Me.ToolStripMenuItemLogOut.Text = "Log &out"
         Me.ToolStripMenuItemLogOut.Visible = False
         '
         'ToolStripSeparator6
         '
         Me.ToolStripSeparator6.Name = "ToolStripSeparator6"
-        Me.ToolStripSeparator6.Size = New System.Drawing.Size(199, 6)
+        Me.ToolStripSeparator6.Size = New System.Drawing.Size(191, 6)
         '
         'mnuOption_EndSession
         '
         Me.mnuOption_EndSession.Name = "mnuOption_EndSession"
-        Me.mnuOption_EndSession.Size = New System.Drawing.Size(202, 30)
+        Me.mnuOption_EndSession.Size = New System.Drawing.Size(194, 22)
         Me.mnuOption_EndSession.Text = "&End Session"
         '
         'ToolStripMenuItemPage
@@ -881,6 +882,13 @@ Partial Class frmMain
         '
         Me.TimerNotifications.Interval = 5000
         '
+        'ToolStripMenuItem2
+        '
+        Me.ToolStripMenuItem2.Image = Global.Boston.My.Resources.Resources.XML16x16
+        Me.ToolStripMenuItem2.Name = "ToolStripMenuItem2"
+        Me.ToolStripMenuItem2.Size = New System.Drawing.Size(202, 30)
+        Me.ToolStripMenuItem2.Text = "&Import .fbm File"
+        '
         'frmMain
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -1016,4 +1024,5 @@ Partial Class frmMain
     Friend WithEvents ToolStripButton1 As ToolStripButton
     Friend WithEvents CodeGeneratorToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents ToolStripMenuItemFactEngine As ToolStripMenuItem
+    Friend WithEvents ToolStripMenuItem2 As ToolStripMenuItem
 End Class

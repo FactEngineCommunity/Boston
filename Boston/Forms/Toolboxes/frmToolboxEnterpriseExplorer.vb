@@ -2742,6 +2742,12 @@ Public Class frmToolboxEnterpriseExplorer
 
     Private Sub ToolStripMenuItem1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripMenuItem1.Click
 
+        Call Me.ImportFBMXMLFile
+
+    End Sub
+
+    Public Sub ImportFBMXMLFile()
+
         Dim lsMessage As String
         Me.DialogOpenFile.DefaultExt = "xml"
         Me.DialogOpenFile.Filter = "FBM Files (*.fbm)|*.fbm"

@@ -696,6 +696,13 @@ Public Class frmDiagramORM
         frmMain.ToolStripButton_Save.Enabled = False
         frmMain.ToolStripButtonPrint.Enabled = False
 
+        prApplication.ActivePages.Remove(Me)
+        If prApplication.ActivePages.Count = 0 Then
+            For Each lrFrm In prApplication.ToolboxForms.ToArray
+                Call lrFrm.Close()
+            Next
+        End If
+
     End Sub
 
 

@@ -2710,45 +2710,56 @@ Namespace FBM
 
         Private Sub _FactType_RoleAdded(ByRef arRole As FBM.Role) Handles _FactType.RoleAdded
 
-            Dim lrRoleInstance As FBM.RoleInstance
+            Try
+                Dim lrRoleInstance As FBM.RoleInstance
 
-            lrRoleInstance = arRole.CloneInstance(Me.Page, True)
-            Me.AddRoleInstance(lrRoleInstance)
+                lrRoleInstance = arRole.CloneInstance(Me.Page, True)
+                Me.AddRoleInstance(lrRoleInstance)
 
-            '----------------------------------------------------------------------------------------------------
-            'Clone a New FBM.FactDataInstance for each (if any) FactData in each Fact for the FactType of the Role
-            '----------------------------------------------------------------------------------------------------                        
-            Dim lrFact As New FBM.Fact
-            Dim lrFactData As New FBM.FactData
-            Dim lrFactInstance As New FBM.FactInstance
-            Dim lrFactDataInstance As New FBM.FactDataInstance
-            For Each lrFact In Me.FactType.Fact
-                lrFactData = New FBM.FactData
-                lrFactData.Role = New FBM.Role(Me.FactType, lrRoleInstance.Role.JoinedORMObject)
-                lrFactData.Role.Id = arRole.Id
-                lrFactData.Fact.Symbol = lrFact.Symbol
-                lrFactData = lrFact.Data.Find(AddressOf lrFactData.EqualsByRole)
-                lrFactDataInstance = lrFactData.CloneInstance(Me.Page)
-                lrFactInstance = New FBM.FactInstance
-                lrFactInstance.Id = lrFact.Id
-                lrFactInstance.Symbol = lrFact.Symbol
-                lrFactInstance = Me.Fact.Find(AddressOf lrFactInstance.EqualsById)
-                If IsSomething(lrFactInstance) Then
-                    lrFactInstance.Data.Add(lrFactDataInstance)
+                '----------------------------------------------------------------------------------------------------
+                'Clone a New FBM.FactDataInstance for each (if any) FactData in each Fact for the FactType of the Role
+                '----------------------------------------------------------------------------------------------------                        
+                Dim lrFact As New FBM.Fact
+                Dim lrFactData As New FBM.FactData
+                Dim lrFactInstance As New FBM.FactInstance
+                Dim lrFactDataInstance As New FBM.FactDataInstance
+                For Each lrFact In Me.FactType.Fact
+                    lrFactData = New FBM.FactData
+                    lrFactData.Fact = lrFact
+                    lrFactData.Role = New FBM.Role(Me.FactType, lrRoleInstance.Role.JoinedORMObject)
+                    lrFactData.Role.Id = arRole.Id
+                    lrFactData.Fact.Symbol = lrFact.Symbol
+                    lrFactData = lrFact.Data.Find(AddressOf lrFactData.EqualsByRole)
+                    lrFactDataInstance = lrFactData.CloneInstance(Me.Page)
+                    lrFactInstance = New FBM.FactInstance
+                    lrFactInstance.Id = lrFact.Id
+                    lrFactInstance.Symbol = lrFact.Symbol
+                    lrFactInstance = Me.Fact.Find(AddressOf lrFactInstance.EqualsById)
+                    If IsSomething(lrFactInstance) Then
+                        lrFactInstance.Data.Add(lrFactDataInstance)
+                    End If
+                Next
+
+                '-------------------------------------------------------------------------
+                ' Create a new RoleInstance.Shape to be attached to the FactTypeInstance
+                '  of the selected RoleInstance.
+                '-------------------------------------------------------------------------
+                If Me.Shape IsNot Nothing Then
+                    Call lrRoleInstance.DisplayAndAssociate(Me)
+
+                    If Me.RoleGroup.FindAll(Function(x) x.JoinedORMObject Is Nothing).Count = 0 Then
+                        Call Me.SortRoleGroup()
+                    End If
                 End If
-            Next
 
-            '-------------------------------------------------------------------------
-            ' Create a new RoleInstance.Shape to be attached to the FactTypeInstance
-            '  of the selected RoleInstance.
-            '-------------------------------------------------------------------------
-            If Me.Shape IsNot Nothing Then
-                Call lrRoleInstance.DisplayAndAssociate(Me)
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
-                If Me.RoleGroup.FindAll(Function(x) x.JoinedORMObject Is Nothing).Count = 0 Then
-                    Call Me.SortRoleGroup()
-                End If
-            End If
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
         End Sub
 

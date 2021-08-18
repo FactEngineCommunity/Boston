@@ -661,8 +661,8 @@ Public Class frmMain
                     lfrmERDiagram = prApplication.ActivePages(0)
                     Call Me.loadToolboxORMReadingEditor(lfrmERDiagram.zrPage, prApplication.ActivePages(0).Pane)
                     Call Me.loadToolboxORMVerbalisationForm(lfrmERDiagram.zrPage.Model, prApplication.ActivePages(0).Pane)
-                    Call Me.LoadToolboxModelDictionary()
                     Call Me.LoadToolboxPropertyWindow(prApplication.ActivePages(0).Pane)
+                    Call Me.LoadToolboxModelDictionary()
 
                 ElseIf TypeOf prApplication.ActivePages(0) Is frmStateTransitionDiagram Then
 
@@ -1292,7 +1292,7 @@ Public Class frmMain
     End Sub
 
 
-    Sub LoadEnterpriseTreeViewer()
+    Public Sub LoadEnterpriseTreeViewer()
 
         Try
             If pbLogStartup Then
@@ -4235,6 +4235,46 @@ Public Class frmMain
     Private Sub ConfigurationToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ConfigurationToolStripMenuItem.Click
 
         Call Me.LoadCRUDRichmondConfiguration()
+
+    End Sub
+
+    Private Sub ToolStripMenuItem2_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItem2.Click
+
+        Try
+
+#Region "Open ModelExplorer"
+
+            If Me.MenuItem_ShowEnterpriseTreeView.Checked Then
+                If IsSomething(zfrmModelExplorer) Then
+                    '---------------------------------------
+                    'Enterprise TreeView is already loaded
+                    '---------------------------------------
+                Else
+                    Call LoadEnterpriseTreeViewer()
+                End If
+            Else
+                '------------------------------------------------
+                'EnterpriseTreeViewer is not meant to be open
+                '------------------------------------------------
+                If IsSomething(zfrmModelExplorer) Then
+                    'Nothing to do here.
+                Else
+                    Call LoadEnterpriseTreeViewer()
+                End If
+                Me.MenuItem_ShowEnterpriseTreeView.Checked = True
+            End If
+#End Region
+
+            Call zfrmModelExplorer.ImportFBMXMLFile()
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 
