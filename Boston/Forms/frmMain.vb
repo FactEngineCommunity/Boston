@@ -819,6 +819,12 @@ Public Class frmMain
                 End Select
             Next
 
+            Try
+                pdbConnection.Close()
+            Catch ex As Exception
+                'Not a biggie.
+            End Try
+
             Me.Close()
 
             Application.Exit()
@@ -4238,6 +4244,7 @@ Public Class frmMain
 
     End Sub
 
+
     Private Sub ToolStripMenuItem2_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItem2.Click
 
         Try
@@ -4274,6 +4281,38 @@ Public Class frmMain
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
             prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
+    Private Sub CompactAndRepairToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles CompactAndRepairToolStripMenuItem.Click
+
+        Try
+            With New WaitCursor
+                Try
+                    pdbConnection.Close()
+                    pdb_OLEDB_connection.Close()
+                Catch
+                End Try
+
+                Dim lrSQLConnectionStringBuilder As New System.Data.Common.DbConnectionStringBuilder(True)
+                lrSQLConnectionStringBuilder.ConnectionString = My.Settings.DatabaseConnectionString
+
+                Dim lsDatabaseLocationName As String = lrSQLConnectionStringBuilder("Data Source")
+
+                Dim lsCompactedDatabaseLocationName As String
+
+                lsCompactedDatabaseLocationName = New FileInfo(lsDatabaseLocationName).DirectoryName & "\BostonCompacted.vdb"
+
+                Call Richmond.CompactAccessDB(lsDatabaseLocationName, lsCompactedDatabaseLocationName)
+
+                Call Richmond.OpenDatabase()
+            End With
+
+            MsgBox("The Boston database has successfully been compacted and repaired.")
+
+        Catch ex As Exception
+            MsgBox("Failed to compact and repair the Boston database. Please contact support.")
         End Try
 
     End Sub

@@ -4,11 +4,12 @@ Public Class ProgressObject
 
     Public IsError As Boolean
     Public Message As String
-
+    Public SimpleAppend As Boolean = False 'As when adding a .
     Public Sub New()
     End Sub
 
-    Public Sub New(ByVal abIsError As Boolean, ByVal asMessage As String)
+    Public Sub New(ByVal abIsError As Boolean, ByVal asMessage As String, Optional ByVal abSimpleAppend As Boolean = False)
+        Me.SimpleAppend = abSimpleAppend
         Me.IsError = abIsError
         Me.Message = asMessage
     End Sub
@@ -33,7 +34,6 @@ Public Class ODBCDatabaseReverseEngineer
     ''' </summary>
     Private CreatePagePerTable As Boolean = False
 
-    Private ProgressBar As ProgressBar = Nothing
     Private ProgressPercentage As Integer = 0
 
     Private [BackgroundWorker] As System.ComponentModel.BackgroundWorker = Nothing
@@ -46,12 +46,10 @@ Public Class ODBCDatabaseReverseEngineer
     Public Sub New(ByRef arModel As FBM.Model,
                    ByVal asDatabaseConnectionString As String,
                    ByVal abCreatePagePerTable As Boolean,
-                   Optional ByRef aoProgressBar As ProgressBar = Nothing,
                    Optional ByRef arBackgroundWorker As System.ComponentModel.BackgroundWorker = Nothing)
         Me.Model = arModel
         Me.ODBCConnection = New System.Data.Odbc.OdbcConnection(asDatabaseConnectionString)
         Me.CreatePagePerTable = abCreatePagePerTable
-        Me.ProgressBar = aoProgressBar
         Me.BackgroundWorker = arBackgroundWorker
     End Sub
 
@@ -124,13 +122,15 @@ Public Class ODBCDatabaseReverseEngineer
             Call Me.createTablesForSingleColumnPKTables()
             Call Me.SetProgressBarValue(60, "Created Tables for Single Primary Key Column Tables.")
 
-            Call Me.SetProgressBarValue(70)
+            Call Me.SetProgressBarValue(70, "Creating other Value Types.")
             For Each lrTable In Me.TempModel.RDS.Table
 
                 'Create ValueTypes (that haven't already been created by virtue of being the ReferenceModeValueType of Simple Reference Scheme EntityTypes.
+                Call Me.AppendProgress(".")
                 Call Me.createValueTypesByTable(lrTable)
 
 #Region "Create ObjectifiedFactTypes"
+                Call Me.AppendProgress(".")
                 If Me.Model.GetModelObjectByName(lrTable.Name) Is Nothing Then
                     'The Table has no ModelElement, so create it.
                     If lrTable.getPrimaryKeyColumns.Count = 1 Then
@@ -260,6 +260,7 @@ Public Class ODBCDatabaseReverseEngineer
                         End If
                     End If
                 End If
+                Call Me.AppendProgress(".")
 #End Region
             Next
 
@@ -273,7 +274,7 @@ Public Class ODBCDatabaseReverseEngineer
                                                     Where Not ValueType.isReferenceModeValueType
                                                     Select LCase(ValueType.Id)
 
-            Call Me.SetProgressBarValue(90)
+            Call Me.SetProgressBarValue(90, "Creating Fact Types straight to Value Types.")
             For Each lrTable In Me.TempModel.RDS.Table
 
                 Dim larValueTypeColumns = From Column In lrTable.Column
@@ -333,6 +334,7 @@ Public Class ODBCDatabaseReverseEngineer
                     End If
 
                 Next
+                Call Me.AppendProgress(".")
             Next
 
             'Create External Uniqueness Constraints
@@ -380,16 +382,18 @@ Public Class ODBCDatabaseReverseEngineer
 #End Region
 
             'Change names to Singular, rather than Plural
+            Call Me.SetProgressBarValue(95, "Changing plural model element names to singular.")
             For Each lrTable In Me.Model.RDS.Table
 
                 Dim loLanguageGeneric As New Language.LanguageGeneric(My.Settings.WordNetDictionaryEnglishPath)
 
                 Dim lsNewName As String = ""
                 lsNewName = loLanguageGeneric.GetNounOverviewForWord(lrTable.Name)
-                If lsNewName IsNot Nothing Then
+                If lsNewName IsNot Nothing And lsNewName <> lrTable.Name Then
                     If lsNewName.StartsWith("L") Then Debugger.Break()
                     Call lrTable.FBMModelElement.setName(MakeCapCamelCase(lsNewName))
                 End If
+                Call Me.AppendProgress(".")
             Next
 
             Call Me.SetProgressBarValue(100)
@@ -483,6 +487,7 @@ Public Class ODBCDatabaseReverseEngineer
                     Throw New Exception("Error creating Fact Type" & ex.Message)
                 End Try
 
+                Call Me.AppendProgress(".")
             Next 'Relation in TempModel
 
             Call Me.SetProgressBarValue(85, "Created Fact Types for all other Relations.")
@@ -494,21 +499,6 @@ Public Class ODBCDatabaseReverseEngineer
         End Try
 
     End Sub
-
-    Private Sub SetProgressBarValue(ByVal aiValue As Integer, Optional asMessage As String = Nothing)
-
-        Try
-            Dim lrProgressObject As New ProgressObject(False, asMessage)
-            Me.ProgressPercentage = aiValue
-            If Me.BackgroundWorker IsNot Nothing Then
-                Me.BackgroundWorker.ReportProgress(aiValue, lrProgressObject)
-            End If
-
-        Catch ex As Exception
-            Debugger.Break()
-        End Try
-    End Sub
-
 
     ''' <summary>
     ''' Creates the ValueTypes for Columns that that are ValueTypes (even if they are referenced by a Relation)
@@ -537,6 +527,7 @@ Public Class ODBCDatabaseReverseEngineer
                         lsUniqueValueTypeName = lrColumn.Name
                     End If
                     'Create the ValueType
+
                     Dim lrValueType As FBM.ValueType
 
                     lrValueType = New FBM.ValueType(Me.Model, pcenumLanguage.ORMModel, lrColumn.Name, True)
@@ -658,6 +649,7 @@ Public Class ODBCDatabaseReverseEngineer
                 lrEntityType.ReferenceModeValueType.SetDBName(lrPrimaryKeyColumn.DatabaseName)
 
             End If
+            Call Me.AppendProgress(".")
         Next
 
 
@@ -800,6 +792,31 @@ Public Class ODBCDatabaseReverseEngineer
 
         Dim lrProgressObject As New ProgressObject(True, asErrorMessage)
         Me.BackgroundWorker.ReportProgress(Me.ProgressPercentage, lrProgressObject)
+    End Sub
+
+    Private Sub SetProgressBarValue(ByVal aiValue As Integer, Optional asMessage As String = Nothing)
+
+        Try
+            Dim lrProgressObject As New ProgressObject(False, asMessage)
+            Me.ProgressPercentage = aiValue
+            If Me.BackgroundWorker IsNot Nothing Then
+                Me.BackgroundWorker.ReportProgress(aiValue, lrProgressObject)
+            End If
+
+        Catch ex As Exception
+            Debugger.Break()
+        End Try
+    End Sub
+
+    Private Sub AppendProgress(ByVal asAppendString As String)
+
+        Try
+            Dim lrProgressObject As New ProgressObject(False, asAppendString, True)
+            Me.BackgroundWorker.ReportProgress(Me.ProgressPercentage, lrProgressObject)
+
+        Catch ex As Exception
+            Debugger.Break()
+        End Try
     End Sub
 
 

@@ -373,7 +373,6 @@ Public Class frmCRUDModel
                 Dim lrReverseEngineer As New ODBCDatabaseReverseEngineer(Me.zrModel,
                                                                          Trim(Me.TextBoxDatabaseConnectionString.Text),
                                                                          True,
-                                                                         Me.ProgressBarReverseEngineering,
                                                                          Me.BackgroundWorker)
 
                 Call Me.AddREMessage("- Reverse engineering started.")
@@ -574,9 +573,13 @@ Public Class frmCRUDModel
             Dim lrProgressObject As ProgressObject = CType(e.UserState, ProgressObject)
 
             If lrProgressObject.Message IsNot Nothing Then
-                If lrProgressObject.IsError Then
+                If lrProgressObject.SimpleAppend Then
+                    Me.RichTextBoxREMessages.AppendText(lrProgressObject.Message)
+
+                ElseIf lrProgressObject.IsError Then
                     Me.RichTextBoxREErrorMessages.AppendStringInColor(vbCrLf & "- " & lrProgressObject.Message, Color.Orange)
                     Me.ErrorCount += 1
+
                     If Me.ErrorCount > 0 Then
                         Me.LabelPromptErrorMessages.Visible = True
                     End If
