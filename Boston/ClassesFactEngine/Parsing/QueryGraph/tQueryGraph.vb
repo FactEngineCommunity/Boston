@@ -886,7 +886,7 @@
                                 If lrFactType.IsLinkFactType Then
                                     'Want the Role from the actual FactType
                                     lrResponsibleRole = lrFactType.LinkFactTypeRole
-                                ElseIf lrQueryEdge.IsPartialFactTypeMatch Then
+                                ElseIf lrQueryEdge.IsPartialFactTypeMatch Or lrqueryedge.FBMFactType.isRDSTable Then
                                     lrResponsibleRole = lrPredicatePart.FactTypeReading.PredicatePart(lrPredicatePart.SequenceNr).Role
                                 Else
                                     lrResponsibleRole = lrPredicatePart.Role
@@ -895,7 +895,7 @@
                             End If
 
                             Dim lrTable As RDS.Table
-                            If lrQueryEdge.IsPartialFactTypeMatch Then
+                            If lrQueryEdge.IsPartialFactTypeMatch Or lrQueryEdge.FBMFactType.isRDSTable Then
                                 lrTable = lrQueryEdge.FBMFactType.getCorrespondingRDSTable
 
                                 Dim lrColumn = (From Column In lrTable.Column
@@ -903,7 +903,7 @@
                                                 Where Column.ActiveRole.JoinedORMObject Is lrQueryEdge.TargetNode.FBMModelObject
                                                 Select Column).First
 
-                                lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") & "[" & lrTable.Name & Viev.NullVal(lrQueryEdge.Alias, "") & "]." & lrColumn.Name & " = "
+                                lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") & lrTable.DatabaseName & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrColumn.Name & lrQueryEdge.getTargetSQLComparator
                                 Select Case lrColumn.getMetamodelDataType
                                     Case Is = pcenumORMDataType.TemporalDateAndTime
                                         Dim lsDateTime As String = Me.Model.DatabaseConnection.FormatDateTime(lrQueryEdge.IdentifierList(0))

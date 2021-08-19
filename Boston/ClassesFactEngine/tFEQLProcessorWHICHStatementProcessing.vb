@@ -226,11 +226,20 @@
                             lrQueryEdge.InjectsQueryEdge.WhichClauseType = FactEngine.Constants.pcenumWhichClauseType.ThatPredicateWhichModelElement
                             lrQueryEdge.IsProjectColumn = True
                         End If
+
+                        If Me.WHICHCLAUSE.MATHCLAUSE IsNot Nothing Then
+                            lrQueryEdge.InjectsQueryEdge.TargetNode.MathFunction = Richmond.GetEnumFromDescriptionAttribute(Of pcenumMathFunction)(Me.WHICHCLAUSE.MATHCLAUSE.MATHFUNCTION)
+                            If Me.WHICHCLAUSE.MATHCLAUSE.NUMBER IsNot Nothing Then
+                                lrQueryEdge.InjectsQueryEdge.TargetNode.MathNumber = CDbl(Me.WHICHCLAUSE.MATHCLAUSE.NUMBER)
+                            End If
+                        End If
+
                         lrQueryGraph.QueryEdges.Add(lrQueryEdge.InjectsQueryEdge)
                         lrQueryGraph.Nodes.AddUnique(lrQueryEdge.InjectsQueryEdge.BaseNode)
 
                         lrPreviousTargetNode = lrQueryEdge.InjectsQueryEdge.TargetNode
                         lrPreviousTopicNode = lrQueryEdge.InjectsQueryEdge.BaseNode
+
                     Else
                         lrPreviousTargetNode = lrQueryEdge.TargetNode
                         lrPreviousTopicNode = lrQueryEdge.BaseNode

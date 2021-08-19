@@ -247,6 +247,9 @@ Namespace FactEngine
                                 If larFinalFactTypeReading.Count = 1 Then
                                     If Me.FBMPossibleFactTypes.Count > 0 Then
                                         Me.FBMFactType = Me.FBMPossibleFactTypes.First
+                                        If larFinalFactTypeReading.Count = 1 Then
+                                            Me.FBMFactTypeReading = larFinalFactTypeReading(0)
+                                        End If
                                         If Me.FBMFactType.Arity > 2 Then
                                             Me.IsPartialFactTypeMatch = True
                                         End If
@@ -588,6 +591,28 @@ Namespace FactEngine
                 Return Nothing
             End Try
 
+        End Function
+
+        Public Function getTargetSQLComparator() As String
+
+            Try
+
+                Select Case Me.TargetNode.Comparitor
+                    Case Is = FEQL.pcenumFEQLComparitor.Bang
+                        Return " <> "
+                    Case Is = FEQL.pcenumFEQLComparitor.Colon,
+                              FEQL.pcenumFEQLComparitor.Carret
+                        Return " = "
+                    Case Is = FEQL.pcenumFEQLComparitor.LikeComparitor
+                        Return " LIKE "
+                End Select
+
+
+            Catch ex As Exception
+                Throw New Exception(ex.Message)
+            End Try
+
+            Return " = "
         End Function
 
         Public Function HasPreviousQueryEdge() As Boolean
