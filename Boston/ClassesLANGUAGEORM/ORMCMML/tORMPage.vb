@@ -366,9 +366,9 @@ Namespace FBM
                         Else
                             Select Case arEntity.getCorrespondingRDSTable.FBMModelElement.GetType
                                 Case Is = GetType(FBM.EntityType)
-
                                     Call lrPage.DropEntityTypeAtPoint(arEntity.getCorrespondingRDSTable.FBMModelElement, New PointF(10, 10), False)
-
+                                Case Is = GetType(FBM.FactType)
+                                    Call lrPage.DropFactTypeAtPoint(arEntity.getCorrespondingRDSTable.FBMModelElement, New PointF(10, 10), False)
                             End Select
                         End If
 
