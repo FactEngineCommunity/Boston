@@ -862,6 +862,20 @@ Public Class frmDiagramORM
 
                             Call lrEntityTypeInstance.showSubtypeRelationships()
 
+
+                            '======================================================================
+                            'Create an Error for the Entity Type
+                            Dim lsErrorMessage As String = "Entity Type Requires Reference Scheme Error - Entity Type '" & lrEntityTypeInstance.Id & "'."
+                            Dim lrModelError As New FBM.ModelError(pcenumModelErrors.EntityTypeRequiresReferenceSchemeError,
+                                                                    lsErrorMessage,
+                                                                    Nothing,
+                                                                    lrEntityType)
+
+                            lrEntityTypeInstance.EntityType.ModelError.Add(lrModelError)
+                            Me.zrPage.Model.AddModelError(lrModelError)
+
+                            '======================================================================
+                            'Save the Page
                             Me.zrPage.Save()
                             '---------------------------------------
                             'Create the UserAction for the UndoLog
@@ -2026,7 +2040,9 @@ Public Class frmDiagramORM
 
                         If lrTargetModelObject Is Nothing Then
                             lrRoleInstance = lrModelObject
-                            lrRoleInstance.Link.Pen.Color = Color.Black
+                            If lrRoleInstance.Link IsNot Nothing Then
+                                lrRoleInstance.Link.Pen.Color = Color.Black
+                            End If
 
                             Exit Sub
                         Else
@@ -3852,6 +3868,7 @@ Public Class frmDiagramORM
                 '-----------------------------------------------------------------------------------------------------------------------
                 'If the PropertiesForm is loaded, set the 'SelectedObject' property of the PropertyGrid to the ORMModel object selected
                 '-----------------------------------------------------------------------------------------------------------------------
+#Region "Propery Grid"
                 Dim lrPropertyGridForm As frmToolboxProperties
                 lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
 
@@ -3999,7 +4016,7 @@ Public Class frmDiagramORM
                     End Select
 
                 End If
-
+#End Region
                 Me.Diagram.Invalidate()
 
             Else
@@ -4466,6 +4483,7 @@ Public Class frmDiagramORM
             '------------------------------------------------------
             'Set the ContextMenuStrip menu for the selected item.
             '------------------------------------------------------
+#Region "Context Menu Strip"
             Select Case e.Node.Tag.ConceptType 'Me.Diagram.Selection.Items(0).Tag.ConceptType
                 Case Is = pcenumConceptType.Role
                     Dim lrRoleInstance As FBM.RoleInstance
@@ -4536,10 +4554,12 @@ Public Class frmDiagramORM
                 Case Else
                     Me.DiagramView.ContextMenuStrip = ContextMenuStrip_Diagram
             End Select
+#End Region
 
             '-------------------------------------------------------
             'ORM Verbalisation
             '-------------------------------------------------------
+#Region "ORM Verbalisation"
             Dim lrToolboxForm As frmToolboxORMVerbalisation
             lrToolboxForm = prApplication.GetToolboxForm(frmToolboxORMVerbalisation.Name)
             If IsSomething(lrToolboxForm) Then
@@ -4586,7 +4606,7 @@ Public Class frmDiagramORM
                         End Select
                 End Select
             End If
-
+#End Region
             '---------------------------------------------
             'Do specific Object/ConceptType processing
             '---------------------------------------------
@@ -4685,6 +4705,7 @@ Public Class frmDiagramORM
                 '-----------
                 'Hint Text
                 '-----------
+#Region "Hint Text"
                 Me.LabelHelp.Text = ""
 
                 If Me.zrPage.AreSelectedObjectsMultipleObjectTypes Then
@@ -4746,7 +4767,7 @@ Public Class frmDiagramORM
                     Case Is = pcenumConceptType.RoleConstraintRole
                     Case Else
                 End Select
-
+#End Region
             ElseIf TypeOf (e.Node) Is TableNode Then
                 Dim lo_table_node As TableNode = e.Node
                 lo_table_node.CellFrameStyle = MindFusion.Diagramming.CellFrameStyle.Simple
@@ -5545,7 +5566,7 @@ Public Class frmDiagramORM
 
                 lrValueTypeInstance = e.Node.Tag
 
-                If e.NewText = lrValueTypeInstance.ValueType.Name Then
+                If e.NewText = lrValueTypeInstance.ValueType.Id Then
                     '------------------------------------------------------------
                     'Nothing to do. Name of the ValueType has not been changed.
                     '------------------------------------------------------------

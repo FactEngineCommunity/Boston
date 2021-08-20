@@ -356,13 +356,7 @@ Namespace FBM
                     For Each lrDictionaryEntry In Me.Model.ModelDictionary
                         Dim lrClonedDictionaryEntry As New FBM.DictionaryEntry
                         lrClonedDictionaryEntry = lrDictionaryEntry.Clone(arModel)
-                        If arModel.ModelDictionary.Exists(AddressOf lrClonedDictionaryEntry.Equals) Then
-                            '-----------------------------------------------
-                            'No need to add a clone of the DictionaryEntry
-                            '-----------------------------------------------
-                        Else
-                            arModel.ModelDictionary.Add(lrClonedDictionaryEntry)
-                        End If
+                        arModel.AddModelDictionaryEntry(lrClonedDictionaryEntry,,,,,, True)
                     Next
 
                     '----------------------

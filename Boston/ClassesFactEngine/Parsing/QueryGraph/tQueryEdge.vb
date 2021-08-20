@@ -395,6 +395,8 @@ Namespace FactEngine
                                     Dim lrPredicatePart As FBM.PredicatePart
                                     Dim lrQueryEdge As New FactEngine.QueryEdge
                                     lrQueryEdge.QueryGraph = Me.QueryGraph
+                                    lrQueryEdge.WhichClause = Me.WhichClause
+                                    lrQueryEdge.WhichClauseType = Me.WhichClauseType
                                     lrFactType = Me.QueryGraph.Model.getFactTypeByPredicateFarSideModelElement(asPredicate, arTargetNode.FBMModelObject)
                                     If lrFactType Is Nothing Then
                                         lrFactType = Me.QueryGraph.Model.getFactTypeByPredicateFarSideModelElement(asPredicate, arTargetNode.FBMModelObject, True)

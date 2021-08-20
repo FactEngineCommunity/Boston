@@ -169,6 +169,9 @@ Namespace TableValueType
                     Dim lsMessage As String = "Error: GetValueTypeDetailsById: No ValueType returned for ValueTypeId: " & arValueType.Id
                     Throw New Exception(lsMessage)
                 End If
+
+                lREcordset.Close()
+
             Catch ex As Exception
                 Dim lsMessage As String
                 lsMessage = "Error: TableValueType.GetValueTypeDetailsById"

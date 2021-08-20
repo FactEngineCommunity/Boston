@@ -1697,9 +1697,6 @@ Namespace FBM
                 Dim larSortedTables = Me.RDS.Table.OrderBy(Function(x) x.getSupertypeTables.Count)
 
                 For Each lrTable In larSortedTables
-
-                    'If {"Car"}.Contains(lrTable.Name) Then Debugger.Break()
-
                     '==========================================================================================================
                     'Columns
                     lsSQLQuery = " SELECT *"
@@ -1841,20 +1838,6 @@ Namespace FBM
                         Next
                     End If
                 Next
-
-                '================================
-                'CodeSafe
-                '20210505-VM-Not needed because IsPartOfPrimaryKey is a function of Table Indexes
-                'For Each lrTable In Me.RDS.Table
-                '    For Each lrColumn In lrTable.Column
-                '        Try
-                '            lrColumn.ContributesToPrimaryKey = lrColumn.isPartOfPrimaryKey
-                '        Catch ex As Exception
-                '            Debugger.Break()
-                '        End Try
-                '    Next
-                'Next
-
 
                 '==========================================================================================================
                 'Relations                

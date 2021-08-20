@@ -242,9 +242,7 @@ Namespace TableFactType
                     '----------------------------------------------
                     'Get the Facts (FactTypeData) for the FactType
                     '----------------------------------------------
-                    arFactType.GetFactsFromDatabase()
-                    'Dim loFactThread As New System.Threading.Thread(AddressOf arFactType.GetFactsFromDatabase)
-                    'loFactThread.Start()
+                    TableFact.GetFactsForFactType(arFactType)
 
                     '---------------------------------------------
                     'ObjectifyingEntityType
@@ -417,6 +415,8 @@ Namespace TableFactType
             lREcordset.Open(lsSQLQuery)
 
             getFactTypeCountByModel = lREcordset(0).Value
+
+            lREcordset.Close()
 
         End Function
 

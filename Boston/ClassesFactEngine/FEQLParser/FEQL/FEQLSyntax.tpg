@@ -12,7 +12,7 @@
 [Color(227, 143, 247)]	CLOSEPARENTHESIS	-> @"}";
 [Color(227, 143, 247)]	CLOSESQUAREBRACKET	-> @"]";
 [Color(94, 213, 165)]  COLON		-> ":";
-[Color(255, 171, 26)]	COLUMNNAMESTR -> @"(([A-Z0-9][a-z0-9]+)+[_|\s]?)+";  //@"(([A-Z]+[a-z]+)+[_|\s]?)+";//@"[aA-zZ]+";
+[Color(255, 171, 26)]	COLUMNNAMESTR -> @"(([A-Z0-9][_a-z0-9]+)+[_|\s]?)+";  //@"(([A-Z]+[a-z]+)+[_|\s]?)+";//@"[aA-zZ]+";
 ///COLUMNNAMESTR -> @"[aA-zZ0-9]+";
 [Color(135, 207, 243)]	COMMA         -> ",";
 CURLYBRACKETCLOSE -> @"\}+";
@@ -30,7 +30,7 @@ FOLLOWINGREADINGTEXT -> PREDICATECLAUSE; //[Color(227, 143, 247)]  //@"([a-z]+[\
 [Color(94, 213, 165)] LIKECOMPARITOR		-> "~";
 [Color(216, 127, 178)]	MATHFUNCTION -> @"<=|<|=|>=|>";
 MODELNAME     -> @"[aA-zZ]+";
-[Color(94, 213, 165)]	MODELELEMENTNAME -> @"(([A-Z0-9][a-z0-9]+)+[_|\s]?)+";  //@"(([A-Z]+[a-z]+)+[_|\s]?)+";//@"[aA-zZ]+";
+[Color(94, 213, 165)]	MODELELEMENTNAME -> @"(([A-Z0-9][_a-z0-9]+)+[_|\s]?)+";  //@"(([A-Z]+[a-z]+)+[_|\s]?)+";//@"[aA-zZ]+";
 [Color(94, 213, 165)]	MODELELEMENTSUFFIX ->@"([0-9])+";
 MODELID	-> @"[aA-zZ0-9\-]+";
 [Color(216, 127, 178)]	NUMBER 	-> @"[0-9]+";

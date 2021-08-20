@@ -152,13 +152,13 @@ Namespace FactEngine
             '    Try
             '        connection = New System.Data.OleDb.OleDbConnection(lsConnectionString)
             '    Catch ex As Exception
-            '        Debugger.Break()
+
             '    End Try
 
             '    Try
             '        connection.Open()
             '    Catch ex As Exception
-            '        Debugger.Break()
+
             '    End Try
 
 
@@ -167,7 +167,7 @@ Namespace FactEngine
             '    schema = connection.GetOleDbSchemaTable(OleDbSchemaGuid.Foreign_Keys, restrictions)
 
             '    For Each row As DataRow In schema.Rows
-            '        Debugger.Break()
+
             '        'Dim dbForeignKey As ForeignKey = New ForeignKey()
             '        'dbForeignKey.Name = row("FK_NAME").ToString()
             '        'dbForeignKey.OriginalName = row("FK_NAME").ToString()
@@ -253,7 +253,7 @@ Namespace FactEngine
             'Try
             '    lrODBCTable = Me.ODBCConnection.GetSchema("Tables")
             'Catch ex1 As Exception
-            '    Debugger.Break()
+
             'End Try
 
             ''Dim blah = System.Data.Odbc.OdbcMetaDataCollectionNames.

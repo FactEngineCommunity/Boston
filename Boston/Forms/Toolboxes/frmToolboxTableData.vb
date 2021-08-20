@@ -249,7 +249,7 @@ Public Class frmToolboxTableData
 
         Try
 
-            Debugger.Break()
+
 
         Catch ex As Exception
             Dim lsMessage As String

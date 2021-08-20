@@ -94,15 +94,14 @@ Namespace TableFact
         Public Sub GetFactsForFactType(ByRef arFactType As FBM.FactType) 'As List(Of FBM.Fact)
 
             Dim lrDictionaryEntry As FBM.DictionaryEntry
-            Dim ls_Symbol_list As String = ""
-            Dim ls_tuple_field_name As String = ""
-            Dim ls_FactSymbol As String = Nothing 'The unique identifier for a Tuple (like an ORACLE 'RowId')
+            Dim lrFactDictionaryEntry As FBM.DictionaryEntry = New FBM.DictionaryEntry(arFactType.Model, "DummyFactId", pcenumConceptType.Fact)
             Dim lrFact As FBM.Fact
-            Dim liInd As Integer = 0
+            Dim liInd As Integer
             Dim lrRole As FBM.Role
-            Dim lsSQLQuery As String = ""
+            Dim lsSQLQuery As String
             Dim lRecordset As New ADODB.Recordset
-            Dim lsMessage As String = ""
+            Dim lrModel As FBM.Model = arFactType.Model 'For time savings
+            Dim larRoleGroup As List(Of FBM.Role) = arFactType.RoleGroup
 
             Try
 
@@ -130,28 +129,13 @@ Namespace TableFact
                         lrFact = New FBM.Fact(lRecordset("Symbol").Value, arFactType, False)
                         For liInd = 1 To arFactType.Arity
 
-                            lrRole = arFactType.RoleGroup(lrRoleDictionary(lRecordset("RoleId").Value)) '.Find(Function(x) x.Id = lRecordset("RoleId").Value)
+                            lrRole = larRoleGroup(lrRoleDictionary(lRecordset("RoleId").Value)) '.Find(Function(x) x.Id = lRecordset("RoleId").Value)
 
                             '--------------------------------------------------------------------------------------------------
                             'Get the Concept from the ModelDictionary so that FactData objects are linked directly to the Concept/Value in the ModelDictionary
                             '--------------------------------------------------------------------------------------------------
-                            lrDictionaryEntry = New FBM.DictionaryEntry(arFactType.Model, lRecordset("ValueSymbol").Value, pcenumConceptType.Value)
-                            lrDictionaryEntry = arFactType.Model.AddModelDictionaryEntry(lrDictionaryEntry, , False, False, False, True, True)
-
-                            If lrDictionaryEntry Is Nothing Then
-                                lsMessage = "Missing ModelDictionary (IsValue) entry for:"
-                                lsMessage &= vbCrLf & " FactData: " & lRecordset("ValueSymbol").Value
-                                lsMessage &= vbCrLf & " FactId: " & lrFact.Symbol
-                                lsMessage &= vbCrLf & vbCrLf
-                                lsMessage &= vbCrLf & " Creating a new Dictionary Entry for the Concept in the Model and database."
-                                lsMessage &= vbCrLf & vbCrLf
-                                lsMessage &= vbCrLf & " Reload the Model for the changes to make effect."
-
-                                lrDictionaryEntry = New FBM.DictionaryEntry(arFactType.Model, lRecordset("ValueSymbol").Value, pcenumConceptType.Value)
-                                lrDictionaryEntry.Save()
-
-                                Throw New Exception(lsMessage)
-                            End If
+                            lrDictionaryEntry = lrModel.AddModelDictionaryEntry(New FBM.DictionaryEntry(arFactType.Model, lRecordset("ValueSymbol").Value, pcenumConceptType.Value),
+                                                                                , False,,, True, True)
 
                             Dim lrFactData As New FBM.FactData(lrRole, lrDictionaryEntry.Concept, lrFact, False)
                             '-----------------------------
@@ -163,65 +147,23 @@ Namespace TableFact
                             '-------------------------------------
                             lrRole.Data.Add(lrFactData)
 
-                            'If Not lrRole.JoinedORMObject.Instance.Exists(Function(x) x = lrFactData.Data) Then
                             lrRole.JoinedORMObject.Instance.AddUnique(lrFactData.Data)
-                            'End If
+
                             lRecordset.MoveNext()
                         Next liInd
-
-
-                        '20200514-VM-This requires review and might not be necessary, as can be generaed on the fly in the verbalisation toolbox
-                        ''-----------------------------------------------------------------
-                        ''Set the LongDescription to the FactTypeReading for the FactType
-                        ''-----------------------------------------------------------------
-                        'If arFactType.FactTypeReading.Count > 0 Then
-
-                        '    Dim lrPredictaePart As FBM.PredicatePart
-                        '    liInd = 0
-                        '    Dim lsFactReading As String = ""
-                        '    Dim lrFactTypeReading As New FBM.FactTypeReading
-                        '    lrFactTypeReading = arFactType.FactTypeReading.Find(AddressOf lrFactTypeReading.MatchesByRoles)
-                        '    'arFactType.RoleGroup.Sort(
-                        '    If IsSomething(lrFactTypeReading) Then
-                        '        For Each lrPredictaePart In lrFactTypeReading.PredicatePart
-                        '            'lsFactReading &= arFactType.RoleGroup(liInd).JoinedORMObject.Id & "(" & lrFact.Data(liInd).Data & ") "
-                        '            lsFactReading &= arFactType.RoleGroup(liInd).JoinedORMObject.Id & "(" & lrFact.Data(liInd).Data & ") "
-                        '            lsFactReading &= lrPredictaePart.PredicatePartText & " "
-                        '            liInd += 1
-                        '            If (liInd = arFactType.FactTypeReading(0).PredicatePart.Count) And _
-                        '               arFactType.FactTypeReading(0).PredicatePart.Count > 1 Then
-                        '                'lsFactReading &= arFactType.RoleGroup(liInd).JoinedORMObject.Id & "(" & lrFact.Data(liInd).Data & ") "
-                        '                lsFactReading &= arFactType.RoleGroup(liInd).JoinedORMObject.Id & "(" & lrFact.Data(liInd).Data & ") "
-                        '            End If
-                        '        Next
-                        '        lrFact.LongDescription = lsFactReading
-                        '    End If
-                        'End If
 
                         '--------------------------------------------------------------------------------------------------
                         'Get the Concept from the ModelDictionary so that Facts are linked directly to the Concept/Value.
                         '--------------------------------------------------------------------------------------------------
-                        lrDictionaryEntry = New FBM.DictionaryEntry(arFactType.Model, lrFact.Id, pcenumConceptType.Fact)
-                        lrDictionaryEntry = arFactType.Model.AddModelDictionaryEntry(lrDictionaryEntry, True, True, False, False, True, True)
+                        lrFactDictionaryEntry = arFactType.Model.AddModelDictionaryEntry(New FBM.DictionaryEntry(arFactType.Model, lrFact.Id, pcenumConceptType.Fact),
+                                                                                         True,
+                                                                                         False,
+                                                                                         False,
+                                                                                         False,'Not straight save. Because should have been loaded with the ModelDictionary
+                                                                                         True,
+                                                                                         True)
+                        lrFactDictionaryEntry.LongDescription = lrFact.LongDescription
 
-                        If lrDictionaryEntry IsNot Nothing Then
-                            lrDictionaryEntry.LongDescription = lrFact.LongDescription
-                        Else
-                            lsMessage = "TableFact.getFactsForFactType:" & vbCrLf
-                            lsMessage &= "FactType.Id: " & arFactType.Id & vbCrLf
-                            lsMessage &= "Can't find Dictionary Entry for Fact with Fact.Id: " & lrFact.Id
-
-                            Dim lsFixMessage As String = "" 'How to fix the problem
-                            lsFixMessage = "INSERT INTO MetaModelModelDictionary VALUES "
-                            lsFixMessage &= "(Now, Now,"
-                            lsFixMessage &= "'" & arFactType.Model.ModelId & "',"
-                            lsFixMessage &= "'" & lrFact.Id & "',"
-                            lsFixMessage &= "'',"
-                            lsFixMessage &= "'',"
-                            lsFixMessage &= "False, False, False, True, False, False) "
-                            lsFixMessage &= vbCrLf & vbCrLf & "Attempting to fix the problem"
-                            prApplication.ThrowErrorMessage(lsMessage & vbCrLf & "Fix to apply:" & lsFixMessage, pcenumErrorType.Critical)
-                        End If
 
                         '----------------------------------------------------------------------------------------------------------
                         'If the FactType of the Fact is Objectified, add the Fact.Id as an instance of the ObjectifyingEntityType

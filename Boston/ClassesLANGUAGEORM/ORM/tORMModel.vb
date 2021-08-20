@@ -1686,15 +1686,16 @@ Namespace FBM
                                                 Optional ByVal abMakeDirtyIfNotExists As Boolean = False) As FBM.DictionaryEntry
 
             Dim lrDictionaryEntry As FBM.DictionaryEntry = Nothing
+            Dim liInd As Integer
 
             Try
+
                 If abStraightSave Then
                     lrDictionaryEntry = arDictionaryEntry
                     Me.ModelDictionary.Add(arDictionaryEntry)
                     If abMakeModelDirty Then
                         Me.MakeDirty(False, abCheckForErrors)
                     End If
-                    lrDictionaryEntry = arDictionaryEntry
                     Try
                         Me.Dictionary.Add(lrDictionaryEntry.Symbol, Me.ModelDictionary.Count - 1)
                     Catch ex As Exception
@@ -1705,7 +1706,19 @@ Namespace FBM
                     End If
                     'lrDictionaryEntry = Me.ModelDictionary.Find(AddressOf arDictionaryEntry.EqualsCase)
                 Else
-                    lrDictionaryEntry = Me.ModelDictionary.Find(AddressOf arDictionaryEntry.Equals)
+                    Try
+                        liInd = Me.Dictionary(arDictionaryEntry.Symbol) '20210820-VM-Trying to speed things up a lot.
+                        lrDictionaryEntry = Me.ModelDictionary(liInd)
+                    Catch
+                        lrDictionaryEntry = Nothing
+                    End Try
+                    If lrDictionaryEntry IsNot Nothing Then
+                        '.Find(AddressOf arDictionaryEntry.Equals)
+                        If LCase(lrDictionaryEntry.Symbol) <> LCase(arDictionaryEntry.Symbol) Then
+                            '20210820-VM-If never get here then remove this
+                            lrDictionaryEntry = Me.ModelDictionary.Find(AddressOf arDictionaryEntry.Equals)
+                        End If
+                    End If
                 End If
 
                 If lrDictionaryEntry IsNot Nothing Then
@@ -1751,10 +1764,11 @@ Namespace FBM
                     Try
                         Me.Dictionary.Add(lrDictionaryEntry.Symbol, Me.ModelDictionary.Count - 1)
                     Catch ex As Exception
+                        'Can ignore at this stagef
+                        'Debugger.Break()
                     End Try
 
                 End If
-
 
                 Return lrDictionaryEntry
 
@@ -1885,7 +1899,6 @@ Namespace FBM
                 Return larFactType.ToList
 
             Catch ex As Exception
-                Debugger.Break()
                 Return New List(Of FactType)
             End Try
 
@@ -4595,15 +4608,7 @@ Namespace FBM
             '------------------------------------
             'Richmond.WriteToStatusBar("Loading the Fact Types")
             prApplication.ThrowErrorMessage("Loading FactTypes", pcenumErrorType.Information)
-            If TableFactType.getFactTypeCountByModel(Me.ModelId) > 0 Then
-                '-----------------------------------------------
-                'There are FactTypes within the ORMModel
-                '-----------------------------------------------
-                '--------------------------------------------------
-                'Get the list of FactTypes within the ORMDiagram
-                '--------------------------------------------------
-                TableFactType.GetFactTypesByModel(Me, True)
-            End If
+            TableFactType.GetFactTypesByModel(Me, True)
 
             If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(30)
 

@@ -285,4 +285,10 @@ Public Class frmToolboxErrorList
 
     End Sub
 
+    Private Sub zrModel_ModelErrorAdded() Handles zrModel.ModelErrorAdded
+
+        Call Me.UpdateErrorList()
+
+    End Sub
+
 End Class

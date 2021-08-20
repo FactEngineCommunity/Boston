@@ -1193,19 +1193,21 @@ Namespace FBM
 
                     Case Is = pcenumConceptType.ValueType
 
-                        If Me.JoinedORMObject.GetType = GetType(FBM.ValueTypeInstance) Then
+                        If Me.JoinedORMObject IsNot Nothing Then
+                            If Me.JoinedORMObject.GetType = GetType(FBM.ValueTypeInstance) Then
 
-                            Dim lrValueType As FBM.ValueType = arModelObject
-                            If lrValueType.IsReferenceMode Then
-                                Dim lrValueTypeInstance As FBM.ValueTypeInstance = Me.JoinedORMObject
-                                If lrValueTypeInstance.Shape IsNot Nothing Then
-                                    lrValueTypeInstance.Shape.Move(10, 10)
-                                    lrValueTypeInstance.Shape.Visible = True
+                                Dim lrValueType As FBM.ValueType = arModelObject
+                                If lrValueType.IsReferenceMode Then
+                                    Dim lrValueTypeInstance As FBM.ValueTypeInstance = Me.JoinedORMObject
+                                    If lrValueTypeInstance.Shape IsNot Nothing Then
+                                        lrValueTypeInstance.Shape.Move(10, 10)
+                                        lrValueTypeInstance.Shape.Visible = True
+                                    End If
                                 End If
                             End If
                         End If
 
-                            Me.JoinedORMObject = Me.Page.ValueTypeInstance.Find(AddressOf arModelObject.Equals)
+                        Me.JoinedORMObject = Me.Page.ValueTypeInstance.Find(AddressOf arModelObject.Equals)
 
 
                         '---------------------------------------------------------------------------------------------------------

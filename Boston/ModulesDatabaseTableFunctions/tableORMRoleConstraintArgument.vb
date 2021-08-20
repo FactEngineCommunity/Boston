@@ -149,6 +149,8 @@ Namespace TableRoleConstraintArgument
                     lREcordset.MoveNext()
                 End While
 
+                lREcordset.Close()
+
                 Return larRoleConstraintArgument
 
             Catch ex As Exception

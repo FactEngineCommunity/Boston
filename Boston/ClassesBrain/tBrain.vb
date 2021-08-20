@@ -391,7 +391,12 @@ Public Class tBrain
                 lrRichTextBox.AutoScrollOffset = New Point(Button1.Left, Button1.Top + Button1.Height)
             End If
         Catch ex As Exception
-            Debugger.Break()
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
         '======================================================================
@@ -2758,7 +2763,12 @@ Public Class tBrain
             Me.InputBuffer = sender.Tag
             Call Me.ResponceChecking()
         Catch ex As Exception
-            Debugger.Break()
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Sub

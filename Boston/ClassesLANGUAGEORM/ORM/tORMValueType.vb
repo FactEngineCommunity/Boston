@@ -992,8 +992,8 @@ Namespace FBM
 
                     Me.Model.MakeDirty()
 
+                    Call Me.RaiseEventNameChanged(asNewName) 'Needs to be before Updated so that the ConceptInstance in the database is modified/updated.
                     RaiseEvent updated()
-                    Call Me.RaiseEventNameChanged(asNewName)
 
                     '------------------------------------------------------------------------------------
                     'Must save the Model because Roles that reference the ValueType must be saved.

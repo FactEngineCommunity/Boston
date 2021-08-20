@@ -153,6 +153,7 @@ Public Class frmDiagramERD
     Sub SetupForm()
 
         Me.PageAsORMMetamodelToolStripMenuItem.Visible = My.Settings.SuperuserMode
+        Me.ToolStripMenuItemDeleteAttribute.Visible = My.Settings.SuperuserMode
 
     End Sub
 
@@ -2598,7 +2599,7 @@ Public Class frmDiagramERD
 
     End Sub
 
-    Private Sub DeleteAttributeToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripMenuItemDeleteAttribute.Click
+    Private Sub ToolStripMenuItemDeleteAttribute_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripMenuItemDeleteAttribute.Click
 
         Dim lrAttribute As ERD.Attribute
 
@@ -3062,7 +3063,12 @@ Public Class frmDiagramERD
             Call lfrmToolboxTableData.SetupForm()
 
         Catch ex As Exception
-            Debugger.Break()
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Sub

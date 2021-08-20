@@ -135,7 +135,7 @@ Public Class ODBCDatabaseReverseEngineer
                     'The Table has no ModelElement, so create it.
                     If lrTable.getPrimaryKeyColumns.Count = 1 Then
                         'Is an EntityType, and should already be a ModelElement in the Model.
-                        Debugger.Break()
+                        Call Me.ReportError("Error: " & lrTable.Name & " should already be a Model Element/Entity Type in the Model.")
                     Else
                         'Create an ObjectifiedFactType
                         Dim lrFactType As FBM.FactType
@@ -155,9 +155,6 @@ Public Class ODBCDatabaseReverseEngineer
                                 lrModelElement = Me.Model.GetModelObjectByName(lrColumn.Name)
                             End If
 
-                            If lrModelElement Is Nothing Then
-                                Debugger.Break()
-                            End If
                             If lrModelElement.isReferenceModeValueType Then
                                 lrModelElement = Me.Model.getEntityTypeByReferenceModeValueType(lrModelElement)
                             End If
@@ -390,7 +387,6 @@ Public Class ODBCDatabaseReverseEngineer
                 Dim lsNewName As String = ""
                 lsNewName = loLanguageGeneric.GetNounOverviewForWord(lrTable.Name)
                 If lsNewName IsNot Nothing And lsNewName <> lrTable.Name Then
-                    If lsNewName.StartsWith("L") Then Debugger.Break()
                     Call lrTable.FBMModelElement.setName(MakeCapCamelCase(lsNewName))
                 End If
                 Call Me.AppendProgress(".")
@@ -545,7 +541,7 @@ Public Class ODBCDatabaseReverseEngineer
             Next
 
         Catch ex As Exception
-            Debugger.Break()
+            Call Me.ReportError(ex.Message)
         End Try
     End Sub
 
@@ -804,7 +800,7 @@ Public Class ODBCDatabaseReverseEngineer
             End If
 
         Catch ex As Exception
-            Debugger.Break()
+            Call Me.ReportError(ex.Message)
         End Try
     End Sub
 
@@ -815,7 +811,7 @@ Public Class ODBCDatabaseReverseEngineer
             Me.BackgroundWorker.ReportProgress(Me.ProgressPercentage, lrProgressObject)
 
         Catch ex As Exception
-            Debugger.Break()
+            Call Me.ReportError(ex.Message)
         End Try
     End Sub
 

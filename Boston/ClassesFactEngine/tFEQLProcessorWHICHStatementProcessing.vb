@@ -226,6 +226,10 @@
                             lrQueryEdge.InjectsQueryEdge.WhichClauseType = FactEngine.Constants.pcenumWhichClauseType.ThatPredicateWhichModelElement
                             lrQueryEdge.IsProjectColumn = True
                         End If
+                        Select Case lrQueryEdge.InjectsQueryEdge.WhichClauseType
+                            Case Is = FactEngine.Constants.pcenumWhichClauseType.ThatPredicateWhichModelElement
+                                lrQueryEdge.InjectsQueryEdge.IsProjectColumn = True
+                        End Select
 
                         If Me.WHICHCLAUSE.MATHCLAUSE IsNot Nothing Then
                             lrQueryEdge.InjectsQueryEdge.TargetNode.MathFunction = Richmond.GetEnumFromDescriptionAttribute(Of pcenumMathFunction)(Me.WHICHCLAUSE.MATHCLAUSE.MATHFUNCTION)
@@ -523,6 +527,13 @@
                 ElseIf arWHICHCLAUSE.RECURSIVECLAUSE.NUMBER2 IsNot Nothing Then
                     arQueryEdge.RecursiveNumber1 = "0"
                     arQueryEdge.RecursiveNumber2 = arWHICHCLAUSE.RECURSIVECLAUSE.NUMBER(0)
+                End If
+            End If
+
+            If Me.WHICHCLAUSE.MATHCLAUSE IsNot Nothing Then
+                arQueryEdge.TargetNode.MathFunction = Richmond.GetEnumFromDescriptionAttribute(Of pcenumMathFunction)(Me.WHICHCLAUSE.MATHCLAUSE.MATHFUNCTION)
+                If Me.WHICHCLAUSE.MATHCLAUSE.NUMBER IsNot Nothing Then
+                    arQueryEdge.TargetNode.MathNumber = CDbl(Me.WHICHCLAUSE.MATHCLAUSE.NUMBER)
                 End If
             End If
 

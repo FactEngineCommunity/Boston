@@ -501,7 +501,6 @@ Namespace FactEngine
                     'match
                     lrDestinationTable = Me.FBMModel.RDS.getTableByName(lrRecordset("table").Data)
 
-                    If lrDestinationTable Is Nothing Then debugger.break
                     While Not lrRecordset.EOF
 
                         lrOriginColumn = arTable.Column.Find(Function(x) x.Name = lrRecordset("from").Data)
