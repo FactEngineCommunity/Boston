@@ -1704,18 +1704,21 @@ Namespace FBM
                     If Me.Dictionary.ContainsKey(arDictionaryEntry.Symbol) Then
                         lrDictionaryEntry = Me.ModelDictionary(Me.Dictionary(arDictionaryEntry.Symbol))
                     End If
-                    'lrDictionaryEntry = Me.ModelDictionary.Find(AddressOf arDictionaryEntry.EqualsCase)
                 Else
-                    Try
-                        liInd = Me.Dictionary(arDictionaryEntry.Symbol) '20210820-VM-Trying to speed things up a lot.
-                        lrDictionaryEntry = Me.ModelDictionary(liInd)
-                    Catch
+                    If Me.Dictionary.TryGetValue(arDictionaryEntry.Symbol, liInd) Then
+                        Try
+                            lrDictionaryEntry = Me.ModelDictionary(liInd)
+                        Catch ex As Exception
+                            lrDictionaryEntry = Nothing
+                        End Try
+                    Else
                         lrDictionaryEntry = Nothing
-                    End Try
+                    End If
+
                     If lrDictionaryEntry IsNot Nothing Then
-                        '.Find(AddressOf arDictionaryEntry.Equals)
                         If LCase(lrDictionaryEntry.Symbol) <> LCase(arDictionaryEntry.Symbol) Then
-                            '20210820-VM-If never get here then remove this
+                            'Will sometimes get here because removing dictionary entries does not change their value (in Key/Value pair).
+                            '  The bonus of this strategy is that when initially loading a model, cuts load time by 2/3rds.
                             lrDictionaryEntry = Me.ModelDictionary.Find(AddressOf arDictionaryEntry.Equals)
                         End If
                     End If
