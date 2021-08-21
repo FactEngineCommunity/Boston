@@ -2475,11 +2475,13 @@ Namespace FBM
 
                 'Shortcut
                 Dim liCounter = Me.RoleConstraint.FindAll(Function(x) x.Id.StartsWith(asRootRoleConstraintName)).Count
-                aiCounter = liCounter + 1
+                If liCounter >= aiCounter Then
+                    aiCounter = liCounter + 1
+                End If
 
                 CreateUniqueRoleConstraintName = Me.CreateUniqueRoleConstraintName(asRootRoleConstraintName, aiCounter + 1)
-            Else
-                Return lsTrialRoleConstraintName
+                Else
+                    Return lsTrialRoleConstraintName
             End If
 
         End Function
