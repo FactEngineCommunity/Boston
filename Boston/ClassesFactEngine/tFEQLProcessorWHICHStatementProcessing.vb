@@ -1161,6 +1161,14 @@
             Call arQueryEdge.getAndSetFBMFactType(arQueryEdge.BaseNode,
                                                   arQueryEdge.TargetNode,
                                                   arQueryEdge.Predicate)
+
+            If arQueryGraph.QueryEdges.Count > 0 Then
+                If arQueryGraph.QueryEdges.Last.IsPartOfSubQuery Or arQueryGraph.QueryEdges.Last.IsSubQueryLeader Then
+                    arQueryEdge.IsPartOfSubQuery = True
+                    arQueryEdge.SubQueryAlias = arQueryGraph.QueryEdges.Last.SubQueryAlias
+                End If
+            End If
+
         End Sub
 #End Region
 

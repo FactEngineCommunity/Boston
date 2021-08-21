@@ -65,7 +65,8 @@
         Public Function generateSQL(ByRef arWhichSelectStatement As FEQL.WHICHSELECTStatement,
                                     Optional ByVal abIsCountStarSubQuery As Boolean = False,
                                     Optional ByVal abIsStraightDerivationClause As Boolean = False,
-                                    Optional ByRef arDerivedFactType As FBM.FactType = Nothing) As String
+                                    Optional ByRef arDerivedFactType As FBM.FactType = Nothing,
+                                    Optional ByRef abIsSubQuery As Boolean = False) As String
 
             Dim lsSQLQuery As String = ""
             Dim liInd As Integer
@@ -885,7 +886,7 @@
                                 If lrFactType.IsLinkFactType Then
                                     'Want the Role from the actual FactType
                                     lrResponsibleRole = lrFactType.LinkFactTypeRole
-                                ElseIf lrQueryEdge.IsPartialFactTypeMatch Or lrqueryedge.FBMFactType.isRDSTable Then
+                                ElseIf lrQueryEdge.IsPartialFactTypeMatch Or lrQueryEdge.FBMFactType.isRDSTable Then
                                     lrResponsibleRole = lrPredicatePart.FactTypeReading.PredicatePart(lrPredicatePart.SequenceNr).Role
                                 Else
                                     lrResponsibleRole = lrPredicatePart.Role
@@ -1037,9 +1038,6 @@
                 Next
 #End Region
 #End Region
-                If NullVal(My.Settings.FactEngineDefaultQueryResultLimit, 0) > 0 Then
-                    lsSQLQuery &= vbCrLf & "LIMIT " & My.Settings.FactEngineDefaultQueryResultLimit
-                End If
 
                 'CodeSafe Remove wayward ANDs
                 If Trim(lsSQLQuery).EndsWith("AND") Then
@@ -1086,8 +1084,8 @@
                     'lrSubQueryGraph.Nodes.RemoveAll(Function(x) x.IsThatReferencedTargetNode)
 
                     If lbIntialWhere IsNot Nothing Then lbHasWhereClause = True
-                    lsSQLQuery &= Richmond.returnIfTrue(lbAddedAND Or Not lbHasWhereClause, "", " AND ") & lrSubQueryGraph.generateSQL(arWhichSelectStatement, True)
-
+                    lsSQLQuery &= Richmond.returnIfTrue(lbAddedAND Or Not lbHasWhereClause, "", " AND ") & lrSubQueryGraph.generateSQL(arWhichSelectStatement,
+                                                                                                                                       True,,, True)
                     lsSQLQuery &= ")"
                 Next
                 '=====================================================================================
@@ -1096,6 +1094,10 @@
                 'Group By clause
                 If lbRequiresGroupByClause Then
                     lsSQLQuery &= "GROUP BY" & lsSelectClause
+                End If
+
+                If Not abIsSubQuery And NullVal(My.Settings.FactEngineDefaultQueryResultLimit, 0) > 0 Then
+                    lsSQLQuery &= vbCrLf & "LIMIT " & My.Settings.FactEngineDefaultQueryResultLimit
                 End If
 
                 Return lsSQLQuery
