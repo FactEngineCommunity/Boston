@@ -56,7 +56,7 @@ Namespace My
         
         <Global.System.Configuration.UserScopedSettingAttribute(),  _
          Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("1.27")>  _
+         Global.System.Configuration.DefaultSettingValueAttribute("1.28")>  _
         Public Property DatabaseVersionNumber() As String
             Get
                 Return CType(Me("DatabaseVersionNumber"),String)
@@ -320,7 +320,7 @@ Namespace My
         
         <Global.System.Configuration.UserScopedSettingAttribute(),  _
          Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("True")>  _
+         Global.System.Configuration.DefaultSettingValueAttribute("False")>  _
         Public Property DisplayCoreMetaModel() As Boolean
             Get
                 Return CType(Me("DisplayCoreMetaModel"),Boolean)
