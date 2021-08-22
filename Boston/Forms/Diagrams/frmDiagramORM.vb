@@ -2396,7 +2396,7 @@ Public Class frmDiagramORM
         End If
 
         Select Case lrPageObject.GetType
-            Case GetType(FBM.RoleConstraintRole)
+            Case GetType(FBM.RoleConstraintRoleInstance)
                 Dim lrRoleConstraint As FBM.RoleConstraint
                 Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
                 Dim lrRoleConstraintRoleInstance As FBM.RoleConstraintRoleInstance
@@ -2417,12 +2417,13 @@ Public Class frmDiagramORM
                     '-----------------------------------------------------------------------
                     'Remove the RoleConstraintRoleInstance from the RoleConstraintInstance
                     '-----------------------------------------------------------------------
-                    lrRoleConstraintInstance.RoleConstraintRole.Remove(lrRoleConstraintRoleInstance)
+                    'lrRoleConstraintInstance.RoleConstraintRole.Remove(lrRoleConstraintRoleInstance)
 
                     '-------------------------------------------------------
                     'Remove the RoleConstraintRole from the RoleConstraint
                     '-------------------------------------------------------
-                    lrRoleConstraint.RoleConstraintRole.Remove(lrRoleConstraintRole)
+                    'lrRoleConstraint.RoleConstraintRole.Remove(lrRoleConstraintRole)
+                    lrRoleConstraint.RemoveRoleConstraintRole(lrRoleConstraintRole)
 
                     Call TableRoleConstraintRole.DeleteRoleConstraintRole(lrRoleConstraintRole)
                 End If

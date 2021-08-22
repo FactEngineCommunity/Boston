@@ -1689,6 +1689,17 @@ Namespace FBM
 
 
                 Me.RoleConstraintRole.Remove(arRoleConstraintRole)
+
+                Dim lrRoleConstraintRole As FBM.RoleConstraintRole = arRoleConstraintRole
+                Dim larArgument = From Argument In Me.Argument
+                                  From RoleConstraintRole In Argument.RoleConstraintRole
+                                  Where lrRoleConstraintRole.Equals(RoleConstraintRole)
+                                  Select Argument
+
+                If larArgument.Count > 0 Then
+                    Me.Argument.Remove(larArgument.First)
+                End If
+
                 Me.Role.Remove(arRoleConstraintRole.Role)
 
                 TableRoleConstraintRole.DeleteRoleConstraintRole(arRoleConstraintRole)
@@ -1831,6 +1842,11 @@ Namespace FBM
                 Me.RoleConstraintRole.Remove(lrRoleConstraintRole)
                 Call lrRoleConstraintRole.Delete()
                 RaiseEvent RoleConstraintRoleRemoved(lrRoleConstraintRole)
+            Next
+
+            For Each lrArgument In Me.Argument.ToArray
+                Me.Argument.Remove(lrArgument)
+                RaiseEvent ArgumentRemoved(lrArgument)
             Next
 
         End Sub
