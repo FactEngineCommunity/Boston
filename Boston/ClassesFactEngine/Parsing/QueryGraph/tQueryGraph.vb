@@ -1037,10 +1037,8 @@
                 Next
 #End Region
 #End Region
-                If NullVal(My.Settings.FactEngineDefaultQueryResultLimit, 0) > 0 Then
-                    lsSQLQuery &= vbCrLf & "LIMIT " & My.Settings.FactEngineDefaultQueryResultLimit
-                End If
 
+#Region "Subqueries"
                 'CodeSafe Remove wayward ANDs
                 If Trim(lsSQLQuery).EndsWith("AND") Then
                     lsSQLQuery = Trim(lsSQLQuery).Substring(0, lsSQLQuery.Length - 4)
@@ -1091,11 +1089,16 @@
                     lsSQLQuery &= ")"
                 Next
                 '=====================================================================================
+#End Region
 
                 '=====================================
                 'Group By clause
                 If lbRequiresGroupByClause Then
                     lsSQLQuery &= "GROUP BY" & lsSelectClause
+                End If
+
+                If NullVal(My.Settings.FactEngineDefaultQueryResultLimit, 0) > 0 Then
+                    lsSQLQuery &= vbCrLf & "LIMIT " & My.Settings.FactEngineDefaultQueryResultLimit
                 End If
 
                 Return lsSQLQuery

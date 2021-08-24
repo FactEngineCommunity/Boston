@@ -3428,7 +3428,9 @@ Namespace FBM
 
                     Call Me.Model.RDS.addTable(lrTable)
 
+                    Dim lrColumn As RDS.Column
                     For Each lrColumn In larColumn
+                        lrColumn.Name = lrTable.createUniqueColumnName(Nothing, lrColumn.Name, 0)
                         Call lrTable.addColumn(lrColumn)
                     Next
 
@@ -3443,6 +3445,13 @@ Namespace FBM
                             Call Me.Model.generateRelationForManyTo1BinaryFactType(lrLinkFactTypeRole)
                         Next
                     Next
+
+                    'Remove the existing Column on the original Table
+                    Dim lrResponsibleRole As FBM.Role = Me.RoleGroup.Find(Function(x) x.HasInternalUniquenessConstraint)
+                    Dim lrOriginalTable As RDS.Table = Me.Model.RDS.Table.Find(Function(x) x.Name = lrResponsibleRole.JoinedORMObject.Id)
+                    lrColumn = lrOriginalTable.Column.Find(Function(x) x.Role Is lrResponsibleRole)
+                    Call lrOriginalTable.removeColumn(lrColumn)
+
 
                 Else
                     Dim lrTable As RDS.Table = Me.Model.RDS.Table.Find(Function(x) x.Name = Me.Id)
