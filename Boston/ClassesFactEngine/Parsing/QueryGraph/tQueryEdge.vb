@@ -133,10 +133,20 @@ Namespace FactEngine
 
         End Sub
 
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <param name="arBaseNode"></param>
+        ''' <param name="arTargetNode"></param>
+        ''' <param name="asPredicate"></param>
+        ''' <param name="arPreviousTargetNode"></param>
+        ''' <param name="abUsePreviousFoundBaseNodeIfFound">Predominantly used from within the FactEngine form itself when retrieving Identifiers, before QueryGraph has been created.</param>
+        ''' <returns></returns>
         Public Function getAndSetFBMFactType(ByRef arBaseNode As FactEngine.QueryNode,
                                              ByRef arTargetNode As FactEngine.QueryNode,
                                              ByVal asPredicate As String,
-                                             Optional ByVal arPreviousTargetNode As FactEngine.QueryNode = Nothing) As Exception
+                                             Optional ByVal arPreviousTargetNode As FactEngine.QueryNode = Nothing,
+                                             Optional ByVal abUsePreviousFoundBaseNodeIfFound As Boolean = False) As Exception
 
             Dim lsMessage As String = ""
             Try
@@ -213,73 +223,77 @@ Namespace FactEngine
                             End If
                         Case Else
 
-                            Dim larFactTypeReading = From FactType In Me.QueryGraph.Model.FactType
-                                                     From FactTypeReading In FactType.FactTypeReading
-                                                     Where FactType.Arity = 2
-                                                     Where FactTypeReading.PredicatePart.All(Function(x) larModelObject.Contains(x.Role.JoinedORMObject))
-                                                     Select FactTypeReading
+                            Me.FBMFactType = Me.QueryGraph.Model.getFactTypeByModelObjectsFactTypeReading(larModelObject,
+                                                                                                          lrFactTypeReading)
+                            If Me.FBMFactType Is Nothing Then
+                                Dim larFactTypeReading = From FactType In Me.QueryGraph.Model.FactType
+                                                         From FactTypeReading In FactType.FactTypeReading
+                                                         Where FactType.Arity = 2
+                                                         Where FactTypeReading.PredicatePart.All(Function(x) larModelObject.Contains(x.Role.JoinedORMObject))
+                                                         Select FactTypeReading
 
-                            Dim larFinalFactTypeReading As New List(Of FBM.FactTypeReading)
+                                Dim larFinalFactTypeReading As New List(Of FBM.FactTypeReading)
 
-                            For Each lrFactTypeReading2 In larFactTypeReading
-                                If lrFactTypeReading2.PredicatePart(0).Role.JoinedORMObject.Id = larRole(0).JoinedORMObject.Id And
+                                For Each lrFactTypeReading2 In larFactTypeReading
+                                    If lrFactTypeReading2.PredicatePart(0).Role.JoinedORMObject.Id = larRole(0).JoinedORMObject.Id And
                                    lrFactTypeReading2.PredicatePart(1).Role.JoinedORMObject.Id = larRole(1).JoinedORMObject.Id And
                                    lrFactTypeReading2.PredicatePart(1).PreBoundText = Viev.NullVal(arTargetNode.PreboundText, "") Then
-                                    larFinalFactTypeReading.Add(lrFactTypeReading2)
-                                End If
-                            Next
+                                        larFinalFactTypeReading.Add(lrFactTypeReading2)
+                                    End If
+                                Next
 
-                            Dim larFactType = From FactTypeReading In larFinalFactTypeReading
-                                              Select FactTypeReading.FactType Distinct
+                                Dim larFactType = From FactTypeReading In larFinalFactTypeReading
+                                                  Select FactTypeReading.FactType Distinct
 
-                            Me.FBMPossibleFactTypes = Me.QueryGraph.Model.getFactTypeByPartialMatchModelObjectsFactTypeReading(larModelObject,
+                                Me.FBMPossibleFactTypes = Me.QueryGraph.Model.getFactTypeByPartialMatchModelObjectsFactTypeReading(larModelObject,
                                                                                                                                lrFactTypeReading)
 
-                            If larFactType.Count > 1 Then
-                                lsMessage = "More than one Fact Type has a Predicate Part, '" & asPredicate & "', for Model Elements, '" & arBaseNode.FBMModelObject.Id & " and " & arTargetNode.FBMModelObject.Id & "."
-                                lsMessage &= vbCrLf & vbCrLf & "Try referencing the following Fact Types directly in your query:"
-                                lsMessage &= vbCrLf & vbCrLf
-                                For Each lrFactTypeReading In larFinalFactTypeReading
-                                    lsMessage &= "- " & lrFactTypeReading.FactType.Id & vbCrLf
-                                Next
-                                Throw New Exception(lsMessage)
-                            Else
-                                If larFinalFactTypeReading.Count = 1 Then
-                                    If Me.FBMPossibleFactTypes.Count > 0 Then
-                                        Me.FBMFactType = Me.FBMPossibleFactTypes.First
-                                        If larFinalFactTypeReading.Count = 1 Then
-                                            Me.FBMFactTypeReading = larFinalFactTypeReading(0)
-                                        End If
-                                        If Me.FBMFactType.Arity > 2 Then
-                                            Me.IsPartialFactTypeMatch = True
-                                        End If
-                                    Else
-                                            Me.FBMFactType = larFinalFactTypeReading(0).FactType
-                                        If larFinalFactTypeReading(0).FactType.Arity > 2 Then
-                                            Me.IsPartialFactTypeMatch = True
-                                        End If
-                                    End If
+                                If larFactType.Count > 1 Then
+                                    lsMessage = "More than one Fact Type has a Predicate Part, '" & asPredicate & "', for Model Elements, '" & arBaseNode.FBMModelObject.Id & " and " & arTargetNode.FBMModelObject.Id & "."
+                                    lsMessage &= vbCrLf & vbCrLf & "Try referencing the following Fact Types directly in your query:"
+                                    lsMessage &= vbCrLf & vbCrLf
+                                    For Each lrFactTypeReading In larFinalFactTypeReading
+                                        lsMessage &= "- " & lrFactTypeReading.FactType.Id & vbCrLf
+                                    Next
+                                    Throw New Exception(lsMessage)
                                 Else
-                                    If Me.FBMPossibleFactTypes.Count = 0 Then
-                                        lsMessage = "There is no Predicate Part for any Fact Type that has a Predicate Part, '" & asPredicate & "', for Model Elements, '" & arBaseNode.FBMModelObject.Id & " and " & arTargetNode.FBMModelObject.Id & ". Try revising your query."
-                                        Throw New Exception(lsMessage)
-                                    ElseIf Me.FBMPossibleFactTypes.Count = 1 Then
-                                        Me.FBMFactType = Me.FBMPossibleFactTypes.First
-                                        Me.IsPartialFactTypeMatch = True
-                                    ElseIf Me.FBMPossibleFactTypes.Count > 1 And Me.FBMFactType Is Nothing Then
-                                        lsMessage = "More than one Fact Type has a Predicate Part, '" & asPredicate & "', for Model Elements, '" & arBaseNode.FBMModelObject.Id & " and " & arTargetNode.FBMModelObject.Id & "."
-                                        lsMessage &= vbCrLf & vbCrLf & "Try referencing the following Fact Types directly in your query:"
-                                        lsMessage &= vbCrLf & vbCrLf
-                                        For Each lrFactType In Me.FBMPossibleFactTypes
-                                            lsMessage &= "- " & lrFactType.Id & vbCrLf
-                                        Next
-                                        Throw New Exception(lsMessage)
+                                    If larFinalFactTypeReading.Count = 1 Then
+                                        If Me.FBMPossibleFactTypes.Count > 0 Then
+                                            Me.FBMFactType = Me.FBMPossibleFactTypes.First
+                                            If larFinalFactTypeReading.Count = 1 Then
+                                                Me.FBMFactTypeReading = larFinalFactTypeReading(0)
+                                            End If
+                                            If Me.FBMFactType.Arity > 2 Then
+                                                Me.IsPartialFactTypeMatch = True
+                                            End If
+                                        Else
+                                            Me.FBMFactType = larFinalFactTypeReading(0).FactType
+                                            If larFinalFactTypeReading(0).FactType.Arity > 2 Then
+                                                Me.IsPartialFactTypeMatch = True
+                                            End If
+                                        End If
                                     Else
-                                        Me.IsPartialFactTypeMatch = True
+                                        If Me.FBMPossibleFactTypes.Count = 0 Then
+                                            lsMessage = "There is no Predicate Part for any Fact Type that has a Predicate Part, '" & asPredicate & "', for Model Elements, '" & arBaseNode.FBMModelObject.Id & " and " & arTargetNode.FBMModelObject.Id & ". Try revising your query."
+                                            Throw New Exception(lsMessage)
+                                        ElseIf Me.FBMPossibleFactTypes.Count = 1 Then
+                                            Me.FBMFactType = Me.FBMPossibleFactTypes.First
+                                            Me.IsPartialFactTypeMatch = True
+                                        ElseIf Me.FBMPossibleFactTypes.Count > 1 And Me.FBMFactType Is Nothing Then
+                                            lsMessage = "More than one Fact Type has a Predicate Part, '" & asPredicate & "', for Model Elements, '" & arBaseNode.FBMModelObject.Id & " and " & arTargetNode.FBMModelObject.Id & "."
+                                            lsMessage &= vbCrLf & vbCrLf & "Try referencing the following Fact Types directly in your query:"
+                                            lsMessage &= vbCrLf & vbCrLf
+                                            For Each lrFactType In Me.FBMPossibleFactTypes
+                                                lsMessage &= "- " & lrFactType.Id & vbCrLf
+                                            Next
+                                            Throw New Exception(lsMessage)
+                                        Else
+                                            Me.IsPartialFactTypeMatch = True
+                                        End If
+
                                     End If
 
                                 End If
-
                             End If
 
                     End Select
@@ -378,6 +392,8 @@ Namespace FactEngine
                                     lrBaseNode = Me.QueryGraph.FindPreviousQueryEdgeBaseNodeByModelElementName(Me.FBMPredicatePart.Role.JoinedORMObject.Id)
                                     If lrBaseNode IsNot Nothing Then
                                         Me.BaseNode = lrBaseNode
+                                    ElseIf lrBaseNode Is Nothing And abUsePreviousFoundBaseNodeIfFound Then
+                                        Me.BaseNode = New FactEngine.QueryNode(Me.FBMFactTypeReading.PredicatePart(0).Role.JoinedORMObject, Me, False)
                                     Else
                                         Me.FBMFactType = Nothing
                                         Me.FBMFactTypeReading = Nothing

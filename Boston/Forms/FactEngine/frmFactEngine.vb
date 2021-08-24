@@ -1631,7 +1631,7 @@ Public Class frmFactEngine
                         End If
                     End If
 
-                    Dim lsSQLQuery = "SELECT "
+                    Dim lsSQLQuery = "SELECT DISTINCT "
                     Dim liInd As Integer
                     If lrModelElement.ConceptType = pcenumConceptType.ValueType Then
                         'Try and find the FactType that belongs to the PreviousModelElement/PredicateClause/ValueType
@@ -1651,20 +1651,31 @@ Public Class frmFactEngine
                                                     Select Trim(PredicateNode.Token.Text)).ToArray
                                 Dim lsPredicatePartText = Trim(Strings.Join(lasPredicate, " "))
                                 lrQueryEdge.Predicate = lsPredicatePartText
-                                Call lrQueryEdge.getAndSetFBMFactType(lrBaseNode, lrTargetNode, lsPredicatePartText)
+                                Call lrQueryEdge.getAndSetFBMFactType(lrBaseNode, lrTargetNode, lsPredicatePartText,, True)
 
-                                lsSQLQuery &= lrModelElement.Id
+                                Dim lrColumn As RDS.Column = lrQueryEdge.BaseNode.RDSTable.Column.Find(Function(x) x.Role.FactType Is lrQueryEdge.FBMFactType)
+                                If lrColumn IsNot Nothing Then
+                                    lsSQLQuery &= lrColumn.Name
+                                Else
+                                    lsSQLQuery &= lrModelElement.Id
+                                End If
+
                                 If lrQueryEdge.IsPartialFactTypeMatch Then
                                     lsSQLQuery &= " FROM " & lrQueryEdge.FBMFactType.getCorrespondingRDSTable.DatabaseName
                                 Else
-                                    lsSQLQuery &= " FROM " & lrBaseNode.RDSTable.DatabaseName
+                                    lsSQLQuery &= " FROM " & lrQueryEdge.BaseNode.RDSTable.DatabaseName
                                 End If
 
                                 If (Me.zrTextHighlighter.GetCurrentContext.Token.Type = FEQL.TokenType.IDENTIFIER) Then 'Or laiExpectedToken.Contains(FEQL.TokenType.IDENTIFIER)
                                     Try
                                         Dim lsDatabaseWildcardOperator = Database.gerLikeWildcardOperator(prApplication.WorkingModel.TargetDatabaseType)
-                                        lsSQLQuery &= vbCrLf & "WHERE " & lrModelElement.Id
-                                        If CType(lrModelElement, FBM.ValueType).DataType = pcenumORMDataType.TemporalDate Then
+                                        If lrColumn IsNot Nothing Then
+                                            lsSQLQuery &= vbCrLf & "WHERE " & lrColumn.Name
+                                        Else
+                                            lsSQLQuery &= vbCrLf & "WHERE " & lrModelElement.Id
+                                        End If
+                                        Dim larTemporalDataTypes = {pcenumORMDataType.TemporalDate, pcenumORMDataType.TemporalDateAndTime}
+                                        If larTemporalDataTypes.Contains(CType(lrModelElement, FBM.ValueType).DataType) Then
                                             lsSQLQuery &= prApplication.WorkingModel.DatabaseConnection.dateToTextOperator
                                         End If
                                         lsSQLQuery &= " LIKE '" & Me.zrTextHighlighter.GetCurrentContext.Token.Text & lsDatabaseWildcardOperator & "'"
@@ -1674,7 +1685,7 @@ Public Class frmFactEngine
                                 End If
                                 lsSQLQuery &= vbCrLf & " LIMIT 20"
                             Catch ex As Exception
-
+                                Me.LabelError.Text = ex.Message
                             End Try
                         End If
 
