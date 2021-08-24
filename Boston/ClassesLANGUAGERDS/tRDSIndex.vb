@@ -168,6 +168,16 @@ Namespace RDS
             Me.Column.Add(arColumn)
             arColumn.addIndex(Me)
 
+            'CodeSafe
+            'If Table has incoming Relation and Index is PK, then need to add the Column to the Destination Columns of the Relation.
+            Dim larRelation = From Relation In Me.Model.Relation
+                              Where Relation.DestinationTable Is Me.Table
+                              Select Relation
+
+            For Each lrRelation In larRelation
+                Call lrRelation.DestinationColumns.AddUnique(arColumn)
+            Next
+
             'CMML
             Call Me.Model.Model.addCMMLColumnToIndex(Me, arColumn)
 

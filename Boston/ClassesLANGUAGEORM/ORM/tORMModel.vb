@@ -789,7 +789,7 @@ Namespace FBM
                             'Only interested in InternalUniquenessConstraints for forming Columns.
 
                             Dim lrTable As RDS.Table
-                            Dim lrColumn As RDS.Column
+                            Dim lrColumn As RDS.Column = Nothing
                             Dim lsTableName As String
 
                             If arRoleConstraint.impliesSingleColumnForRDSTable Then
@@ -831,8 +831,50 @@ Namespace FBM
                                         lrTable.addColumn(lrColumn, Me.IsDatabaseSynchronised)
                                     End If
 
-                                    'Relation
-                                    If lrRole.FactType.Arity = 2 _
+                                    'There may be a case where an Index should have already contained the columns.
+#Region "Check...An Index should have already contained the New Columns.A"
+                                    Dim larExistingIndexRoleConstraint = From RoleConstraint In Me.RoleConstraint
+                                                                         From RoleConsraintRole In RoleConstraint.RoleConstraintRole
+                                                                         Where lrRole.FactType.RoleGroup.Contains(RoleConsraintRole.Role)
+                                                                         Select RoleConstraint
+
+                                    If larExistingIndexRoleConstraint.Count > 0 Then
+                                        Dim lrResponsibleRoleConstraint = larExistingIndexRoleConstraint.First
+                                        Dim lrIndex As RDS.Index = Nothing
+                                        Dim larExistingIndex = From Index In Me.RDS.Index
+                                                               From Column In Index.Column
+                                                               Where Index.ResponsibleRoleConstraint Is lrResponsibleRoleConstraint
+                                                               Select Index
+
+                                        'ResponsibleRoleConstraint not implemented at CMML level, so need other way of finding Index.
+                                        If larExistingIndex.Count = 0 Then
+                                            Dim larRCFactTypes = (From Role In lrResponsibleRoleConstraint.Role
+                                                                  Select Role.FactType).ToList
+
+                                            larExistingIndex = From Index In Me.RDS.Index
+                                                               From Column In Index.Column
+                                                               Where larRCFactTypes.Contains(Column.Role.FactType)
+                                                               Select Index
+
+                                            If larExistingIndex.Count > 0 Then
+                                                lrIndex = larExistingIndex.First
+                                            Else
+                                                'Not a biggie at this stage, but do need to fix this.
+                                            End If
+                                        Else
+                                            lrIndex = larExistingIndex.First
+                                        End If
+
+                                        If lrIndex IsNot Nothing Then
+                                            Call lrIndex.addColumn(lrColumn)
+                                        End If
+
+                                    End If
+#End Region
+
+
+                                        'Relation
+                                        If lrRole.FactType.Arity = 2 _
                                         And lrRole.FactType.InternalUniquenessConstraint.Count = 1 _
                                         And Not (lrRole.FactType.GetOtherRoleOfBinaryFactType(lrRole.Id).ConceptType = pcenumConceptType.ValueType) Then
 

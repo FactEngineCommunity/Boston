@@ -68,6 +68,14 @@
         Public Overridable Sub createTable(ByRef arTable As RDS.Table, ByRef arColumn As RDS.Column)
         End Sub
 
+        ''' <summary>
+        ''' Some databases, like PostgreSQL use a date to string operator for use in LIKE clauses.
+        ''' </summary>
+        ''' <returns></returns>
+        Public Overridable Function dateToTextOperator() As String
+            Return ""
+        End Function
+
         Public Overridable Function FormatDateTime(ByVal asOriginalDate As String) As String
             Return ""
         End Function

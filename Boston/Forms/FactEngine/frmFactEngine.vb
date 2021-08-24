@@ -1660,11 +1660,14 @@ Public Class frmFactEngine
                                     lsSQLQuery &= " FROM " & lrBaseNode.RDSTable.DatabaseName
                                 End If
 
-                                If (Me.zrTextHighlighter.GetCurrentContext.Token.Type = FEQL.TokenType.IDENTIFIER) Or
-                                    laiExpectedToken.Contains(FEQL.TokenType.IDENTIFIER) Then 'Or laiExpectedToken.Contains(FEQL.TokenType.IDENTIFIER
+                                If (Me.zrTextHighlighter.GetCurrentContext.Token.Type = FEQL.TokenType.IDENTIFIER) Then 'Or laiExpectedToken.Contains(FEQL.TokenType.IDENTIFIER)
                                     Try
                                         Dim lsDatabaseWildcardOperator = Database.gerLikeWildcardOperator(prApplication.WorkingModel.TargetDatabaseType)
-                                        lsSQLQuery &= vbCrLf & "WHERE " & lrModelElement.Id & " LIKE '" & Me.zrTextHighlighter.GetCurrentContext.Token.Text & lsDatabaseWildcardOperator & "'"
+                                        lsSQLQuery &= vbCrLf & "WHERE " & lrModelElement.Id
+                                        If CType(lrModelElement, FBM.ValueType).DataType = pcenumORMDataType.TemporalDate Then
+                                            lsSQLQuery &= prApplication.WorkingModel.DatabaseConnection.dateToTextOperator
+                                        End If
+                                        lsSQLQuery &= " LIKE '" & Me.zrTextHighlighter.GetCurrentContext.Token.Text & lsDatabaseWildcardOperator & "'"
                                     Catch ex As Exception
                                         'Do nothing. Just don't add anything to the SQL.
                                     End Try

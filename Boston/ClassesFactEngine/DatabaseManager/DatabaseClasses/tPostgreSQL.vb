@@ -323,6 +323,14 @@ Namespace FactEngine
 
         End Sub
 
+        ''' <summary>
+        ''' Some databases, like PostgreSQL use a date to string operator for use in LIKE clauses.
+        ''' </summary>
+        ''' <returns></returns>
+        Public Overrides Function dateToTextOperator() As String
+            Return "::text"
+        End Function
+
         Public Overrides Function FormatDateTime(ByVal asOriginalDate As String) As String
 
             Try
