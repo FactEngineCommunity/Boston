@@ -1039,6 +1039,7 @@
 #End Region
 #End Region
 
+#Region "Subqueries"
                 'CodeSafe Remove wayward ANDs
                 If Trim(lsSQLQuery).EndsWith("AND") Then
                     lsSQLQuery = Trim(lsSQLQuery).Substring(0, lsSQLQuery.Length - 4)
@@ -1089,12 +1090,14 @@
                     lsSQLQuery &= ")"
                 Next
                 '=====================================================================================
+#End Region
 
                 '=====================================
                 'Group By clause
                 If lbRequiresGroupByClause Then
                     lsSQLQuery &= "GROUP BY" & lsSelectClause
                 End If
+
 
                 If Not abIsSubQuery And NullVal(My.Settings.FactEngineDefaultQueryResultLimit, 0) > 0 Then
                     lsSQLQuery &= vbCrLf & "LIMIT " & My.Settings.FactEngineDefaultQueryResultLimit

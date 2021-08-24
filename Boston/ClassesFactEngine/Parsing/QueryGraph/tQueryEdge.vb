@@ -385,7 +385,11 @@ Namespace FactEngine
                                         lrFactTypeReading = Nothing
                                     End If
                                 End If
-                                lrBaseNode = Me.QueryGraph.FindPreviousQueryEdgeBaseNodeByModelElementName(Me.FBMPredicatePart.Role.JoinedORMObject.Id)
+                                Try
+                                    lrBaseNode = Me.QueryGraph.FindPreviousQueryEdgeBaseNodeByModelElementName(Me.FBMPredicatePart.Role.JoinedORMObject.Id)
+                                Catch
+                                    lrBaseNode = Nothing
+                                End Try
                                 If lrBaseNode IsNot Nothing Then
                                     Me.BaseNode = lrBaseNode
                                 End If
