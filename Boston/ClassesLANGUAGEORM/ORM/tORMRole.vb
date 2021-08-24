@@ -1361,8 +1361,8 @@ Namespace FBM
                                 larRolesToReturn.Add(lrOtherRoleInFactType.JoinsEntityType.ReferenceModeFactType.RoleGroup(1))
 
                             ElseIf Me.JoinsEntityType.HasCompoundReferenceMode Then
-
-                                larRolesToReturn.AddRange(Me.JoinsEntityType.getDownstreamActiveRoles(aarCoveredRoles))
+                                '20210824-VM-Was me.JoinsEntityType, which is wrong...want what is checked in Select above.
+                                larRolesToReturn.AddRange(lrOtherRoleInFactType.JoinsEntityType.getDownstreamActiveRoles(aarCoveredRoles))
                             Else
                                 larRolesToReturn.AddUnique(lrOtherRoleInFactType)
                             End If

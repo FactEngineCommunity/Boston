@@ -1534,6 +1534,8 @@ Namespace FBM
 
                 If Me.HasSimpleReferenceScheme Then
 
+                    '20210824-VM-Needed when need to get the Active Role of a downstream EntityType with Simple Reference Scheme.
+                    larRolesToReturn.Add(Me.ReferenceModeRoleConstraint.Role(0))
                     'Throw New Exception("This function not called for EntityTypes that have a SimpleReferenceScheme.")
 
                 ElseIf Me.HasCompoundReferenceMode Then
@@ -1552,15 +1554,17 @@ Namespace FBM
                                 aarCoveredRoles.Add(lrRoleConstraintRole.Role.FactType.GetOtherRoleOfBinaryFactType(lrRoleConstraintRole.Role.Id))
 
                                 larRolesToReturn.Add(lrRoleConstraintRole.Role)
-                                larRolesToReturn.Add(lrRoleConstraintRole.Role.FactType.GetOtherRoleOfBinaryFactType(lrRoleConstraintRole.Role.Id))
+                                '20210824-VM-Commented out below, because Only want ActiveRole. Not sure why this was included in RolesToReturn (below)
+                                'larRolesToReturn.Add(lrRoleConstraintRole.Role.FactType.GetOtherRoleOfBinaryFactType(lrRoleConstraintRole.Role.Id))
 
                             Case Is = pcenumConceptType.EntityType
 
                                 aarCoveredRoles.Add(lrRoleConstraintRole.Role)
                                 aarCoveredRoles.Add(lrRoleConstraintRole.Role.FactType.GetOtherRoleOfBinaryFactType(lrRoleConstraintRole.Role.Id))
 
-                                larRolesToReturn.Add(lrRoleConstraintRole.Role)
-                                larRolesToReturn.Add(lrRoleConstraintRole.Role.FactType.GetOtherRoleOfBinaryFactType(lrRoleConstraintRole.Role.Id))
+                                '20210824-VM-Removed the below, because was returning Roles not part of ActiveRoles.
+                                'larRolesToReturn.Add(lrRoleConstraintRole.Role)
+                                'larRolesToReturn.Add(lrRoleConstraintRole.Role.FactType.GetOtherRoleOfBinaryFactType(lrRoleConstraintRole.Role.Id))
 
                                 larRolesToReturn.AddRange(lrRoleConstraintRole.Role.JoinsEntityType.getDownstreamActiveRoles(aarCoveredRoles))
 

@@ -920,6 +920,8 @@ Namespace FBM
                                 Dim larCoveredRoles As New List(Of FBM.Role)
                                 Dim larDownstreamActiveRoles = lrRoleConstraintRole.getDownstreamRoleActiveRoles(larCoveredRoles) 'Returns all Roles joined ObjectifiedFactTypes and their Roles' JoinedORMObjects (recursively).
 
+                                Dim larAddedColumns As New List(Of RDS.Column)
+
                                 'Create the new Column/s in the newly joined Table
                                 For Each lrActiveRole In larDownstreamActiveRoles
                                     Dim lrNewColumn As New RDS.Column(lrTable,
@@ -928,7 +930,48 @@ Namespace FBM
                                                                       lrActiveRole,
                                                                       lrRoleConstraintRole.Mandatory)
                                     lrTable.addColumn(lrNewColumn, Me.IsDatabaseSynchronised)
+                                    larAddedColumns.Add(lrNewColumn)
                                 Next
+
+                                'There may be a case where an Index should have already contained the columns.
+#Region "Check...An Index should have already contained the New Columns"
+                                Dim larExistingIndexRoleConstraint = From RoleConstraint In Me.RoleConstraint
+                                                                     From RoleConsraintRole In RoleConstraint.RoleConstraintRole
+                                                                     Where lrRoleConstraintRole.FactType.RoleGroup.Contains(RoleConsraintRole.Role)
+                                                                     Select RoleConstraint
+
+                                If larExistingIndexRoleConstraint.Count > 0 Then
+                                    Dim lrResponsibleRoleConstraint = larExistingIndexRoleConstraint.First
+                                    Dim lrIndex As RDS.Index = Nothing
+                                    Dim larExistingIndex = From Index In Me.RDS.Index
+                                                           From Column In Index.Column
+                                                           Where Index.ResponsibleRoleConstraint Is lrResponsibleRoleConstraint
+                                                           Select Index
+
+                                    'ResponsibleRoleConstraint not implemented at CMML level, so need other way of finding Index.
+                                    If larExistingIndex.Count = 0 Then
+                                        Dim larRCFactTypes = (From Role In lrResponsibleRoleConstraint.Role
+                                                              Select Role.FactType).ToList
+
+                                        larExistingIndex = From Index In Me.RDS.Index
+                                                           From Column In Index.Column
+                                                           Where larRCFactTypes.Contains(Column.Role.FactType)
+                                                           Select Index
+
+                                        If larExistingIndex.Count > 0 Then
+                                            lrIndex = larExistingIndex.First
+                                        Else
+                                            'Not a biggie at this stage, but do need to fix this.
+                                        End If
+                                    Else
+                                        lrIndex = larExistingIndex.First
+                                    End If
+
+                                    For Each lrColumn In larAddedColumns
+                                        Call lrIndex.addColumn(lrColumn)
+                                    Next
+                                End If
+#End Region
 
                                 'Relation
                                 Call Me.generateRelationForManyTo1BinaryFactType(lrRoleConstraintRole)
