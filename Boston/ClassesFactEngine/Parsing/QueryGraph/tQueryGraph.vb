@@ -1025,7 +1025,7 @@
                                                     lsSQLQuery &= "AND "
                                                     lbIntialWhere = ""
                                                 End If
-                                                lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") & lrTargetTable.DatabaseName & lsAlias & "." & larIndexColumns(liInd).Name & " = '" & lsIdentifier & "'" & vbCrLf
+                                                lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") & lrTargetTable.DatabaseName & lsAlias & "." & larIndexColumns(liInd).Name & lrQueryEdge.getTargetSQLComparator & "'" & lsIdentifier & "'" & vbCrLf
                                                 liInd += 1
                                             Next
                                         End If
