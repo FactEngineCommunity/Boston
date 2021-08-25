@@ -377,7 +377,7 @@ Namespace FactEngine
                                 lrFactTypeReading = Me.QueryGraph.Model.getFactTypeReadingByPartialPredicateReading(asPredicate, Me.TargetNode.Name, larPredicatePart)
 
                                 Dim lrFactType As FBM.FactType
-                                lrFactType = Me.QueryGraph.Model.getFactTypeByPredicateFarSideModelElement(asPredicate, arTargetNode.FBMModelObject, True)
+                                lrFactType = Me.QueryGraph.Model.getFactTypeByPredicateFarSideModelElement(asPredicate, arTargetNode.FBMModelObject, True, Me.QueryGraph.getNodeModelElementList)
 
                                 If lrFactType IsNot Nothing Then
                                     Dim lrModelElement As FBM.ModelObject = arTargetNode.FBMModelObject

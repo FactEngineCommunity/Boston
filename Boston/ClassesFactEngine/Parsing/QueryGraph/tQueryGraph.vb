@@ -1126,6 +1126,27 @@
 
         End Function
 
+        Public Function getNodeModelElementList() As List(Of FBM.ModelObject)
+
+            Dim larModelElement As New List(Of FBM.ModelObject)
+
+            Try
+                For Each lrQueryEdge In Me.QueryEdges
+                    If lrQueryEdge.BaseNode.FBMModelObject IsNot Nothing Then
+                        larModelElement.AddUnique(lrQueryEdge.BaseNode.FBMModelObject)
+                    End If
+                    If lrQueryEdge.TargetNode.FBMModelObject IsNot Nothing Then
+                        larModelElement.AddUnique(lrQueryEdge.TargetNode.FBMModelObject)
+                    End If
+                Next
+
+                Return larModelElement
+
+            Catch ex As Exception
+                Throw New Exception(ex.Message)
+            End Try
+        End Function
+
         Public Function getProjectionColumns(ByRef arWhichSelectStatement As FEQL.WHICHSELECTStatement,
                                              Optional ByVal abIsStraightDerivationClause As Boolean = False,
                                              Optional ByVal arDerivedFactType As FBM.FactType = Nothing) As List(Of RDS.Column)

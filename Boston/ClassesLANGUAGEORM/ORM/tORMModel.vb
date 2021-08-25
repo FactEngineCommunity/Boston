@@ -4515,11 +4515,21 @@ Namespace FBM
 
         Public Function getFactTypeByPredicateFarSideModelElement(ByVal asPredicate As String,
                                                                   ByVal arModelElement As FBM.ModelObject,
-                                                                  Optional ByVal abUseFastenshtein As Boolean = False) As FBM.FactType
+                                                                  Optional ByVal abUseFastenshtein As Boolean = False,
+                                                                  Optional ByRef aarModelElement As List(Of FBM.ModelObject) = Nothing) As FBM.FactType
 
             Try
                 Dim larFactType As List(Of FBM.FactType)
-                If abUseFastenshtein Then
+
+                larFactType = (From FactType In Me.FactType
+                               From FactTypeReading In FactType.FactTypeReading
+                               Where FactType.Arity = 2
+                               Where FactTypeReading.PredicatePart.Last.Role.JoinedORMObject.Id = arModelElement.Id
+                               Where FactTypeReading.PredicatePart(0).PredicatePartText = asPredicate
+                               Select FactType).ToList
+
+                If larFactType.Count = 0 And abUseFastenshtein Then
+
 
                     larFactType = (From FactType In Me.FactType
                                    From FactTypeReading In FactType.FactTypeReading
@@ -4528,15 +4538,20 @@ Namespace FBM
                                    Where Fastenshtein.Levenshtein.Distance(FactTypeReading.PredicatePart(0).PredicatePartText, asPredicate) < 4
                                    Select FactType).ToList
 
-                Else
-                    larFactType = (From FactType In Me.FactType
-                                   From FactTypeReading In FactType.FactTypeReading
-                                   Where FactType.Arity = 2
-                                   Where FactTypeReading.PredicatePart.Last.Role.JoinedORMObject.Id = arModelElement.Id
-                                   Where FactTypeReading.PredicatePart(0).PredicatePartText = asPredicate
-                                   Select FactType).ToList
                 End If
 
+                aarModelElement.AddUnique(arModelElement)
+                If aarModelElement IsNot Nothing Then
+                    'Used by FactEngine to make sure the ModelElement is in the QueryGraph
+                    For Each lrFactType In larFactType.ToArray
+                        If aarModelElement.Contains(lrFactType.FactTypeReading(0).RoleList(0).JoinedORMObject) And
+                           aarModelElement.Contains(lrFactType.FactTypeReading(0).RoleList(1).JoinedORMObject) Then
+                            'Nothing to do here.
+                        Else
+                            larFactType.Remove(lrFactType)
+                        End If
+                    Next
+                End If
 
                 If larFactType.Count = 0 Then
                     Return Nothing

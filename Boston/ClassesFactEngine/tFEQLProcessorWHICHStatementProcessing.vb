@@ -791,7 +791,10 @@
                 arQueryEdge.IdentifierList.Add(Me.WHICHCLAUSE.MODELELEMENTNAME(0))
                 arQueryEdge.TargetNode.HasIdentifier = True
             End If
-            arQueryEdge.TargetNode.Comparitor = arWHICHCLAUSE.NODE(0).NODEPROPERTYIDENTIFICATION.getComparitorType
+            Try
+                arQueryEdge.TargetNode.Comparitor = arWHICHCLAUSE.NODE(0).NODEPROPERTYIDENTIFICATION.getComparitorType
+            Catch 'Not a biggie if not exists.
+            End Try
             arQueryGraph.Nodes.Add(arQueryEdge.TargetNode) 'Was AddUnique, but WHICH implies that we are talking of a different TargetNode, as where TargeNode has been referenced before
 
             '---------------------------------------------------------
