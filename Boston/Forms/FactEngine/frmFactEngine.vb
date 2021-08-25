@@ -1638,20 +1638,28 @@ Public Class frmFactEngine
 
                         If larModelElementNameParseNode.Count > 1 Then
                             Try
-                                Dim lrQueryEdge As New FactEngine.QueryEdge(New FactEngine.QueryGraph(prApplication.WorkingModel), Nothing)
-                                Dim lrBaseModelElement = prApplication.WorkingModel.GetModelObjectByName(Trim(larModelElementNameParseNode(larModelElementNameParseNode.Count - 2).Token.Text))
-                                Dim lrBaseNode = New FactEngine.QueryNode(lrBaseModelElement, lrQueryEdge)
-                                Dim lrTargetNode = New FactEngine.QueryNode(lrModelElement, lrQueryEdge, True)
-                                lrQueryEdge.BaseNode = lrBaseNode
-                                lrQueryEdge.TargetNode = lrTargetNode
-                                Dim lrPredicateClauseNode = larModelPredicateClauseParseNode.Last
-                                Dim larPredicateNode = New List(Of FEQL.ParseNode)
-                                Call Me.GetPredicateNodes(lrPredicateClauseNode, larPredicateNode)
-                                Dim lasPredicate = (From PredicateNode In larPredicateNode
-                                                    Select Trim(PredicateNode.Token.Text)).ToArray
-                                Dim lsPredicatePartText = Trim(Strings.Join(lasPredicate, " "))
-                                lrQueryEdge.Predicate = lsPredicatePartText
-                                Call lrQueryEdge.getAndSetFBMFactType(lrBaseNode, lrTargetNode, lsPredicatePartText,, True)
+                                Dim lrWhichSelectStatement As New FEQL.WHICHSELECTStatement
+                                Call Me.FEQLProcessor.GetParseTreeTokensReflection(lrWhichSelectStatement, Me.zrTextHighlighter.Tree.Nodes(0))
+                                Dim lrQueryGraph As FactEngine.QueryGraph = Me.FEQLProcessor.getQueryGraph(lrWhichSelectStatement)
+                                Dim lrQueryEdge As FactEngine.QueryEdge = Nothing
+                                If lrQueryGraph.QueryEdges.Count > 0 Then
+                                    lrQueryEdge = lrQueryGraph.QueryEdges.Last
+                                Else
+                                    'Dim lrQueryEdge As New FactEngine.QueryEdge(New FactEngine.QueryGraph(prApplication.WorkingModel), Nothing)
+                                    'Dim lrBaseModelElement = prApplication.WorkingModel.GetModelObjectByName(Trim(larModelElementNameParseNode(larModelElementNameParseNode.Count - 2).Token.Text))
+                                    'Dim lrBaseNode = New FactEngine.QueryNode(lrBaseModelElement, lrQueryEdge)
+                                    'Dim lrTargetNode = New FactEngine.QueryNode(lrModelElement, lrQueryEdge, True)
+                                    'lrQueryEdge.BaseNode = lrBaseNode
+                                    'lrQueryEdge.TargetNode = lrTargetNode
+                                    'Dim lrPredicateClauseNode = larModelPredicateClauseParseNode.Last
+                                    'Dim larPredicateNode = New List(Of FEQL.ParseNode)
+                                    'Call Me.GetPredicateNodes(lrPredicateClauseNode, larPredicateNode)
+                                    'Dim lasPredicate = (From PredicateNode In larPredicateNode
+                                    '                    Select Trim(PredicateNode.Token.Text)).ToArray
+                                    'Dim lsPredicatePartText = Trim(Strings.Join(lasPredicate, " "))
+                                    'lrQueryEdge.Predicate = lsPredicatePartText
+                                    'Call lrQueryEdge.getAndSetFBMFactType(lrBaseNode, lrTargetNode, lsPredicatePartText,, True)
+                                End If
 
                                 Dim lrColumn As RDS.Column = lrQueryEdge.BaseNode.RDSTable.Column.Find(Function(x) x.Role.FactType Is lrQueryEdge.FBMFactType)
                                 If lrColumn IsNot Nothing Then

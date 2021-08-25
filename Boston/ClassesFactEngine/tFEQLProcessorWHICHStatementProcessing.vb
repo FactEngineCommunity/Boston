@@ -66,15 +66,17 @@
 
 #Region "getQueryGraph"
 
-        Private Function getQueryGraph() As FactEngine.QueryGraph
+        Public Function getQueryGraph(Optional ByRef arWHICHSelectStatement As FEQL.WHICHSELECTStatement = Nothing) As FactEngine.QueryGraph
 
             Dim lrQueryGraph As New FactEngine.QueryGraph(Me.Model)
 
             Try
-                'Richmond.WriteToStatusBar("Processsing WHICH Statement.", True)
-                Me.WHICHSELECTStatement = New FEQL.WHICHSELECTStatement
-
-                Call Me.GetParseTreeTokensReflection(Me.WHICHSELECTStatement, Me.Parsetree.Nodes(0))
+                If arWHICHSelectStatement Is Nothing Then
+                    Me.WHICHSELECTStatement = New FEQL.WHICHSELECTStatement
+                    Call Me.GetParseTreeTokensReflection(Me.WHICHSELECTStatement, Me.Parsetree.Nodes(0))
+                Else
+                    Me.WHICHSELECTStatement = arWHICHSelectStatement
+                End If
 
                 '----------------------------------------
                 'Create the HeadNode for the QueryGraph
