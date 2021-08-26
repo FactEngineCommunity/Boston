@@ -4540,8 +4540,8 @@ Namespace FBM
 
                 End If
 
-                aarModelElement.AddUnique(arModelElement)
                 If aarModelElement IsNot Nothing Then
+                    aarModelElement.AddUnique(arModelElement)
                     'Used by FactEngine to make sure the ModelElement is in the QueryGraph
                     For Each lrFactType In larFactType.ToArray
                         If aarModelElement.Contains(lrFactType.FactTypeReading(0).RoleList(0).JoinedORMObject) And

@@ -146,6 +146,7 @@ Namespace FEQL
 
                 Me.Parsetree = Me.Parser.Parse(Trim(string_after))
                 Dim lrQueryGraph As FactEngine.QueryGraph
+
                 lrQueryGraph = Me.getQueryGraph()
                 Dim lrWhichSelectStatement As New FEQL.WHICHSELECTStatement
                 Call Me.GetParseTreeTokensReflection(lrWhichSelectStatement, Me.Parsetree.Nodes(0))

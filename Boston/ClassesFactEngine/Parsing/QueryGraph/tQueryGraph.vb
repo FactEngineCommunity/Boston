@@ -104,6 +104,9 @@
 
                         Else
                             lsSelectClause &= lrProjectColumn.Table.DatabaseName & Viev.NullVal(lrProjectColumn.TemporaryAlias, "") & "." & lrProjectColumn.Name
+                            If lrProjectColumn.AsName IsNot Nothing Then
+                                lsSelectClause &= " AS " & lrProjectColumn.AsName
+                            End If
                         End If
                         If liInd < larProjectionColumn.Count Then lsSelectClause &= ","
                         liInd += 1
@@ -619,7 +622,7 @@
                         Next
                         lsSQLQuery &= ")"
 #End Region
-                    ElseIf lrQueryEdge.FBMFactType.isRDSTable And lrQueryEdge.FBMFactType.Arity = 2 Then
+                    ElseIf (lrQueryEdge.FBMFactType.isRDSTable And lrQueryEdge.FBMFactType.Arity = 2) Or lrQueryEdge.FBMFactType.IsDerived Then
                         'RDSTable
 #Region "PGSNodeTable/RDSTable"
                         lrOriginTable = lrQueryEdge.FBMFactType.getCorrespondingRDSTable
@@ -1201,6 +1204,26 @@
                 ElseIf abIsStraightDerivationClause Then
 
                     If arDerivedFactType.isRDSTable Then
+                        Dim lrProjectionColumn As RDS.Column = Nothing
+                        'For Each lrColumn In arDerivedFactType.getCorrespondingRDSTable.Column
+                        '    lrProjectionColumn = lrColumn.Clone(Nothing, Nothing)
+                        '    larColumn.Add(lrProjectionColumn)
+                        'Next
+                        For Each lrRole In arDerivedFactType.RoleGroup
+                            Select Case lrRole.JoinedORMObject.GetType
+                                Case Is = GetType(FBM.ValueType)
+                                    Dim lrVTColumn As New RDS.Column(arDerivedFactType.getCorrespondingRDSTable, lrRole.JoinedORMObject.Id, lrRole, lrRole, False)
+                                    lrVTColumn = lrVTColumn.Clone(Nothing, Nothing)
+                                    larColumn.Add(lrVTColumn)
+                                Case Else
+                                    For Each lrColumn In lrRole.JoinedORMObject.getCorrespondingRDSTable.getPrimaryKeyColumns
+                                        lrProjectionColumn = lrColumn.Clone(Nothing, Nothing)
+                                        lrProjectionColumn.AsName = arDerivedFactType.getCorrespondingRDSTable.Column.Find(Function(x) x.ActiveRole Is lrColumn.ActiveRole).Name
+                                        larColumn.Add(lrProjectionColumn)
+                                    Next
+                            End Select
+                        Next
+                    Else
                         For Each lrRole In arDerivedFactType.RoleGroup
                             Select Case lrRole.JoinedORMObject.GetType
                                 Case Is = GetType(FBM.ValueType)
@@ -1213,8 +1236,6 @@
                                     Next
                             End Select
                         Next
-                    Else
-                        Throw New NotImplementedException("No implemented for DerivedFactTypes that are not RDS Tables.")
                     End If
 
                 Else

@@ -1175,6 +1175,13 @@
                 End If
             End If
 
+            If Me.WHICHCLAUSE.MATHCLAUSE IsNot Nothing Then
+                arQueryEdge.TargetNode.MathFunction = Richmond.GetEnumFromDescriptionAttribute(Of pcenumMathFunction)(Me.WHICHCLAUSE.MATHCLAUSE.MATHFUNCTION)
+                If Me.WHICHCLAUSE.MATHCLAUSE.NUMBER IsNot Nothing Then
+                    arQueryEdge.TargetNode.MathNumber = CDbl(Me.WHICHCLAUSE.MATHCLAUSE.NUMBER)
+                End If
+            End If
+
         End Sub
 #End Region
 
@@ -1421,7 +1428,7 @@
                     If arWhichClauseNode.Nodes(0).Nodes.Count > 0 Then
                         If Me.WHICHCLAUSE.KEYWDAND Is Nothing And
                            arWhichClauseNode.Nodes(0).Nodes(0).Token.Type = FEQL.TokenType.KEYWDTHAT And
-                           {FEQL.TokenType.KEYWDWHICH, FEQL.TokenType.KEYWDA}.Contains(arWhichClauseNode.Nodes(1).Token.Type) Then
+                           {FEQL.TokenType.KEYWDWHICH, FEQL.TokenType.KEYWDA, FEQL.TokenType.NODE}.Contains(arWhichClauseNode.Nodes(1).Token.Type) Then
                             'E.g. WHICH involves THAT Lecturer
                             Return FactEngine.Constants.pcenumWhichClauseType.ThatPredicateWhichModelElement
                         End If

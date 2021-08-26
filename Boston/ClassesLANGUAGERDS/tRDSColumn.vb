@@ -30,8 +30,14 @@ Namespace RDS
         <XmlIgnore>
         Public DatabaseName As String = ""
 
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Name As String = ""
+
+        ''' <summary>
+        ''' As when "SELECT Horse.Id AS Horse_Id"
+        ''' </summary>
+        <XmlIgnore()>
+        Public AsName As String = Nothing
 
         <XmlAttribute()> _
         Public OrdinalPosition As Integer = 1

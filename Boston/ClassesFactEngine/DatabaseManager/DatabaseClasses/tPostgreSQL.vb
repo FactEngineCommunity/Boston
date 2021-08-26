@@ -978,12 +978,14 @@ Namespace FactEngine
 
                 '==========================================================
                 'Populate the lrRecordset with results from the database
-                'Richmond.WriteToStatusBar("Connecting to database.", True)
 
-                Dim adapter As OdbcDataAdapter = New OdbcDataAdapter(asQuery, Me.ODBCConnection)
-                Dim lrDataSet As New DataSet
+                Dim command As OdbcCommand = New OdbcCommand(asQuery, Me.ODBCConnection)
+                Dim reader As OdbcDataReader = command.ExecuteReader()
 
-                adapter.Fill(lrDataSet)
+                'Dim adapter As OdbcDataAdapter = New OdbcDataAdapter(asQuery, Me.ODBCConnection)
+                'Dim lrDataSet As New DataSet
+
+                'adapter.Fill(lrDataSet)
 
                 Dim larFact As New List(Of FBM.Fact)
                 Dim lrFactType = New FBM.FactType(Me.FBMModel, "DummyFactType", True)
@@ -991,20 +993,20 @@ Namespace FactEngine
 
                 '=====================================================
                 'Column Names   
-
-                For Each lrColumn In lrDataSet.Tables(0).Columns
-                    Dim lrRole = New FBM.Role(lrFactType, lrColumn.ToString, True, Nothing)
+                For liColumn = 0 To reader.FieldCount - 1
+                    Dim lrRole = New FBM.Role(lrFactType, System.Guid.NewGuid.ToString, False, Nothing)
+                    lrRole.Name = reader.GetName(liColumn)
                     lrFactType.RoleGroup.AddUnique(lrRole)
-                    lrRecordset.Columns.Add(lrColumn.ToString)
+                    lrRecordset.Columns.Add(reader.GetName(liColumn))
                 Next
 
-                For Each lrRow As DataRow In lrDataSet.Tables(0).Rows
+                While reader.Read
 
                     lrFact = New FBM.Fact(lrFactType, False)
                     Dim loFieldValue As Object = Nothing
                     Dim liInd As Integer
-                    For liInd = 0 To lrRow.ItemArray.Count - 1
-                        loFieldValue = lrRow.Item(liInd).ToString
+                    For liInd = 0 To reader.FieldCount - 1
+                        loFieldValue = reader(liInd).ToString
 
                         Try
                             lrFact.Data.Add(New FBM.FactData(lrFactType.RoleGroup(liInd), New FBM.Concept(loFieldValue), lrFact))
@@ -1018,10 +1020,41 @@ Namespace FactEngine
 
                     If larFact.Count = Me.DefaultQueryLimit Then
                         lrRecordset.Warning.Add("Query limit of " & Me.DefaultQueryLimit.ToString & " reached.")
-                        Exit For
+                        Exit While
                     End If
 
-                Next
+                End While
+
+                'For Each lrColumn In lrDataSet.Tables(0).Columns
+                '    Dim lrRole = New FBM.Role(lrFactType, lrColumn.ToString, True, Nothing)
+                '    lrFactType.RoleGroup.AddUnique(lrRole)
+                '    lrRecordset.Columns.Add(lrColumn.ToString)
+                'Next
+
+                'For Each lrRow As DataRow In lrDataSet.Tables(0).Rows
+
+                '    lrFact = New FBM.Fact(lrFactType, False)
+                '    Dim loFieldValue As Object = Nothing
+                '    Dim liInd As Integer
+                '    For liInd = 0 To lrRow.ItemArray.Count - 1
+                '        loFieldValue = lrRow.Item(liInd).ToString
+
+                '        Try
+                '            lrFact.Data.Add(New FBM.FactData(lrFactType.RoleGroup(liInd), New FBM.Concept(loFieldValue), lrFact))
+                '            '=====================================================
+                '        Catch
+                '            Throw New Exception("Tried to add a recordset Column that is not in the Project Columns. Column Index: " & liInd)
+                '        End Try
+                '    Next
+
+                '    larFact.Add(lrFact)
+
+                '    If larFact.Count = Me.DefaultQueryLimit Then
+                '        lrRecordset.Warning.Add("Query limit of " & Me.DefaultQueryLimit.ToString & " reached.")
+                '        Exit For
+                '    End If
+
+                'Next
 
                 lrRecordset.Facts = larFact
 
