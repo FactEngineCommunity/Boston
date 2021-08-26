@@ -120,6 +120,9 @@
 
                         If larCountStarColumn.Count > 0 Then
                             lsSQLQuery &= ", COUNT(*)"
+                            If larCountStarColumn(0).ASClause IsNot Nothing Then
+                                lsSQLQuery &= " AS " & larCountStarColumn(0).ASClause.COLUMNNAMESTR
+                            End If
                             lbRequiresGroupByClause = True
                         End If
                     End If
@@ -528,7 +531,7 @@
                 'WhereEdges are Where joins, rather than ConditionalQueryEdges which test for values by identifiers.
                 Dim larWhereEdges = larEdgesWithTargetNode.ToList.FindAll(Function(x) (x.TargetNode.FBMModelObject.ConceptType <> pcenumConceptType.ValueType And
                                                                                        x.BaseNode.FBMModelObject.ConceptType <> pcenumConceptType.ValueType) Or
-                                                                                       x.FBMFactType.isRDSTable)
+                                                                                       x.FBMFactType.isRDSTable Or x.FBMFactType.IsDerived)
                 'And
                 'Not (x.IsPartialFactTypeMatch And
                 'x.TargetNode.FBMModelObject.GetType Is GetType(FBM.ValueType))
@@ -540,8 +543,9 @@
 
                 Dim larConditionalQueryEdges As New List(Of FactEngine.QueryEdge)
                 larConditionalQueryEdges = larEdgesWithTargetNode.ToList.FindAll(Function(x) (x.IdentifierList.Count > 0 Or
-                                                                                              x.TargetNode.MathFunction <> pcenumMathFunction.None) And
-                                                                                              (Not (x.FBMFactType.IsDerived And x.TargetNode.FBMModelObject.GetType Is GetType(FBM.ValueType))))
+                                                                                              x.TargetNode.MathFunction <> pcenumMathFunction.None))
+                '20210826-VM-Removed
+                'And (Not (x.FBMFactType.IsDerived And x.TargetNode.FBMModelObject.GetType Is GetType(FBM.ValueType))))
 
                 'BooleanPredicate edges. E.g. Protein is enzyme
                 larConditionalQueryEdges.AddRange(Me.QueryEdges.FindAll(Function(x) x.TargetNode Is Nothing And Not (x.FBMFactType.IsDerived And x.TargetNode.FBMModelObject.GetType Is GetType(FBM.ValueType))))
@@ -622,10 +626,29 @@
                         Next
                         lsSQLQuery &= ")"
 #End Region
-                    ElseIf (lrQueryEdge.FBMFactType.isRDSTable And lrQueryEdge.FBMFactType.Arity = 2) Or lrQueryEdge.FBMFactType.IsDerived Then
-                        'RDSTable
+                    ElseIf lrQueryEdge.FBMFactType.IsDerived Then
+
+                        lrOriginTable = New RDS.Table(Me.Model.RDS, lrQueryEdge.FBMFactType.Id, lrQueryEdge.FBMFactType)
+                        liInd = 0
+                        For Each lrRole In lrQueryEdge.FBMFactType.RoleGroup.FindAll(Function(x) x.JoinedORMObject.GetType <> GetType(FBM.ValueType))
+                            If liInd > 0 Then lsSQLQuery &= "AND "
+                            Dim lrDestinationTable As RDS.Table = lrRole.JoinedORMObject.getCorrespondingRDSTable
+
+                            Dim liInd2 As Integer = 0
+                            For Each lrColumn In lrDestinationTable.getPrimaryKeyColumns
+                                If liInd2 > 0 Then lsSQLQuery &= "AND "
+                                lsSQLQuery &= lrOriginTable.Name & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrColumn.Name & " = "
+                                lsSQLQuery &= lrDestinationTable.DatabaseName & Viev.NullVal(lrQueryEdge.BaseNode.Alias, "") & "." & lrColumn.Name & vbCrLf
+                                liInd2 += 1
+                            Next
+                            liInd += 1
+                        Next
+
+                    ElseIf (lrQueryEdge.FBMFactType.isRDSTable And lrQueryEdge.FBMFactType.Arity = 2) Then
+
+                            'RDSTable
 #Region "PGSNodeTable/RDSTable"
-                        lrOriginTable = lrQueryEdge.FBMFactType.getCorrespondingRDSTable
+                            lrOriginTable = lrQueryEdge.FBMFactType.getCorrespondingRDSTable
 
                         Dim larRelation = lrOriginTable.getRelations
 
@@ -962,19 +985,33 @@
 
                                     If lrQueryEdge.TargetNode.MathFunction <> pcenumMathFunction.None Then
 
-                                        'Math function
-                                        Dim lrTargetTable = lrQueryEdge.BaseNode.RDSTable
-                                        Dim lrTargetColumn = lrTargetTable.Column.Find(Function(x) x.FactType Is lrQueryEdge.FBMFactType)
-                                        lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") &
+                                        If lrQueryEdge.FBMFactType.IsDerived Then
+
+                                            lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") &
+                                              lrQueryEdge.FBMFactType.Id &
+                                              Viev.NullVal(lrQueryEdge.TargetNode.Alias, "") &
+                                              "." &
+                                              CType(lrQueryEdge.TargetNode.PreboundText & lrQueryEdge.TargetNode.Name, String).Replace("-", "")
+
+                                            lsSQLQuery &= " " & Viev.GetEnumDescription(lrQueryEdge.TargetNode.MathFunction)
+                                            lsSQLQuery &= " " & lrQueryEdge.TargetNode.MathNumber.ToString & vbCrLf
+
+                                        Else
+
+
+                                            'Math function
+                                            Dim lrTargetTable = lrQueryEdge.BaseNode.RDSTable
+                                            Dim lrTargetColumn = lrTargetTable.Column.Find(Function(x) x.FactType Is lrQueryEdge.FBMFactType)
+                                            lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") &
                                               lrTargetTable.DatabaseName &
                                               Viev.NullVal(lrQueryEdge.TargetNode.Alias, "") &
                                               "." &
                                               lrTargetColumn.Name
 
-                                        lsSQLQuery &= " " & Viev.GetEnumDescription(lrQueryEdge.TargetNode.MathFunction)
-                                        lsSQLQuery &= " " & lrQueryEdge.TargetNode.MathNumber.ToString & vbCrLf
+                                            lsSQLQuery &= " " & Viev.GetEnumDescription(lrQueryEdge.TargetNode.MathFunction)
+                                            lsSQLQuery &= " " & lrQueryEdge.TargetNode.MathNumber.ToString & vbCrLf
 
-
+                                        End If
                                         lbIntialWhere = "AND "
                                     Else
                                         Dim lrTargetTable As RDS.Table = Nothing
@@ -1097,11 +1134,11 @@
                 '=====================================
                 'Group By clause
                 If lbRequiresGroupByClause Then
-                    lsSQLQuery &= "GROUP BY" & lsSelectClause
+                    lsSQLQuery &= "GROUP BY " & lsSelectClause
                 End If
 
 
-                If Not abIsSubQuery And NullVal(My.Settings.FactEngineDefaultQueryResultLimit, 0) > 0 Then
+                If Not abIsStraightDerivationClause And Not abIsSubQuery And NullVal(My.Settings.FactEngineDefaultQueryResultLimit, 0) > 0 Then
                     lsSQLQuery &= vbCrLf & "LIMIT " & My.Settings.FactEngineDefaultQueryResultLimit
                 End If
 
@@ -1202,9 +1239,8 @@
                         End If
                     Next
                 ElseIf abIsStraightDerivationClause Then
-
+                    Dim lrProjectionColumn As RDS.Column = Nothing
                     If arDerivedFactType.isRDSTable Then
-                        Dim lrProjectionColumn As RDS.Column = Nothing
                         'For Each lrColumn In arDerivedFactType.getCorrespondingRDSTable.Column
                         '    lrProjectionColumn = lrColumn.Clone(Nothing, Nothing)
                         '    larColumn.Add(lrProjectionColumn)
@@ -1232,7 +1268,9 @@
                                     larColumn.Add(lrVTColumn)
                                 Case Else
                                     For Each lrColumn In lrRole.JoinedORMObject.getCorrespondingRDSTable.getPrimaryKeyColumns
-                                        larColumn.Add(lrColumn.Clone(Nothing, Nothing))
+                                        lrProjectionColumn = lrColumn.Clone(Nothing, Nothing)
+                                        lrProjectionColumn.AsName = arDerivedFactType.getCorrespondingRDSTable.Column.Find(Function(x) x.ActiveRole Is lrColumn.ActiveRole).Name
+                                        larColumn.Add(lrProjectionColumn)
                                     Next
                             End Select
                         Next

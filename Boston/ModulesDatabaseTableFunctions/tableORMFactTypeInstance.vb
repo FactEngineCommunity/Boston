@@ -245,7 +245,8 @@ Namespace TableFactTypeInstance
                                     If lrRoleInstance.JoinedORMObject Is Nothing Then
                                         lrRoleInstance.JoinedORMObject = TableFactTypeInstance.GetFactTypeInstanceByPage(lrRoleInstance.Role.JoinsFactType.Id, arPage)
 
-                                        'Load facts from the database, because cloning the RoleInstance above loads the FactTypeInstance, but not the Factsf
+                                        'Load facts from the database, because cloning the RoleInstance above loads the FactTypeInstance, but not the Facts.
+                                        '20210826-VM-Can't see why this doesn't double up the FactInstances, because GetFactTypeInstanceByPage (above) should get the Fact Instances.
                                         lrRoleInstance.JoinsFactType.GetFactInstancesFromDatabase()
                                     End If
                                 End If

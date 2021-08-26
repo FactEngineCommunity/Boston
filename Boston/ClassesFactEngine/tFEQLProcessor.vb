@@ -1,6 +1,21 @@
 ﻿Imports System.Reflection
 
 Namespace FEQL
+
+    Public Class ASClause
+
+        Private _COLUMNNAMESTR As String = Nothing
+        Public Property COLUMNNAMESTR As String
+            Get
+                Return Me._COLUMNNAMESTR
+            End Get
+            Set(value As String)
+                Me._COLUMNNAMESTR = value
+            End Set
+        End Property
+
+    End Class
+
     Public Class ASSERTStatement
 
         Private _NODEPROPERTYNAMEIDENTIFICATION As New List(Of NODEPROPERTYNAMEIDENTIFICATION)
@@ -327,6 +342,16 @@ Namespace FEQL
             End Get
             Set(value As String)
                 Me._COLUMNNAMESTR = value
+            End Set
+        End Property
+
+        Private _ASCLAUSE As FEQL.ASClause = Nothing
+        Public Property ASCLAUSE As FEQL.ASClause
+            Get
+                Return Me._ASCLAUSE
+            End Get
+            Set(value As FEQL.ASClause)
+                Me._ASCLAUSE = value
             End Set
         End Property
 

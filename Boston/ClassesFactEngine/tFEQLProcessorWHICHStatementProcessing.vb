@@ -496,6 +496,7 @@
             lrFBMModelObject = Me.Model.GetModelObjectByName(Me.WHICHCLAUSE.NODE(0).MODELELEMENTNAME)
             If lrFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & Me.WHICHCLAUSE.MODELELEMENTNAME(0) & "'.")
             arQueryEdge.TargetNode = New FactEngine.QueryNode(lrFBMModelObject, arQueryEdge, True)
+            arQueryEdge.TargetNode.PreboundText = Me.WHICHCLAUSE.NODE(0).PREBOUNDREADINGTEXT
             arQueryEdge.TargetNode.Alias = Me.WHICHCLAUSE.NODE(0).MODELELEMENTSUFFIX
 
             If arWHICHCLAUSE.RECURSIVECLAUSE IsNot Nothing Then

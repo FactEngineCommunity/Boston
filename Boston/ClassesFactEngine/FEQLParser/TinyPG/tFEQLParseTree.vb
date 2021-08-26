@@ -362,6 +362,9 @@ Namespace FEQL
                 Case TokenType.ADDITIONALVALUE
                     Value = EvalADDITIONALVALUE(tree, paramlist)
                     Exit Select
+                Case TokenType.ASCLAUSE
+                    Value = EvalASCLAUSE(tree, paramlist)
+                    Exit Select
                 Case TokenType.BRACKTEDCOLMNLIST
                     Value = EvalBRACKTEDCOLMNLIST(tree, paramlist)
                     Exit Select
@@ -822,6 +825,10 @@ Namespace FEQL
         End Function
 
         Protected Overridable Function EvalADDITIONALVALUE(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalASCLAUSE(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
             Throw New NotImplementedException()
         End Function
 
