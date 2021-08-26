@@ -4765,10 +4765,10 @@ Namespace FBM
             prApplication.ThrowErrorMessage("Loading Pages", pcenumErrorType.Information)
 
             If abLoadPages Then
-                If abUseThreading Then
+                If abUseThreading And TablePage.GetPageCountByModel(Me.ModelId) < 30 Then
                     Call TablePage.GetPagesByModel(Me, True, True, aoBackgroundWorker)
                 Else
-                    Call TablePage.GetPagesByModel(Me, True, False, aoBackgroundWorker)
+                    Call TablePage.GetPagesByModel(Me, True, False, aoBackgroundWorker, True)
                 End If
             Else
                 Call TablePage.GetPagesByModel(Me, False)

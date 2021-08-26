@@ -1381,7 +1381,8 @@ Public Class frmFactEngine
                     'Nothing to do here
                 Else
                     Select Case Me.FEQLProcessor.getWhichStatementType(Trim(Me.TextBoxInput.Text), True)
-                        Case Is = FactEngine.pcenumFEQLStatementType.WHICHSELECTStatement
+                        Case Is = FactEngine.pcenumFEQLStatementType.WHICHSELECTStatement,
+                                  FactEngine.pcenumFEQLStatementType.DIDStatement
                             Dim lrWHICHSELECTStatement As New FEQL.WHICHSELECTStatement
                             Call Me.FEQLProcessor.GetParseTreeTokensReflection(lrWHICHSELECTStatement, Me.zrTextHighlighter.Tree.Nodes(0))
 

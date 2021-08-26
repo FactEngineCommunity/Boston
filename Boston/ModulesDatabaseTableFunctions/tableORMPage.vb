@@ -120,10 +120,11 @@ Namespace TablePage
         End Function
 
 
-        Public Function GetPagesByModel(ByRef ar_model As FBM.Model, _
-                                        Optional ByVal abLoadPage As Boolean = False, _
-                                        Optional ByVal abUseThreading As Boolean = False, _
-                                        Optional ByRef aoBackgroundWorker As System.ComponentModel.BackgroundWorker = Nothing) _
+        Public Function GetPagesByModel(ByRef ar_model As FBM.Model,
+                                        Optional ByVal abLoadPage As Boolean = False,
+                                        Optional ByVal abUseThreading As Boolean = False,
+                                        Optional ByRef aoBackgroundWorker As System.ComponentModel.BackgroundWorker = Nothing,
+                                        Optional ByRef abThreadAfter30pages As Boolean = False) _
                                         As List(Of FBM.Page)
 
             Try
@@ -176,7 +177,7 @@ Namespace TablePage
                             If abLoadPage Then
                                 lrPage = ar_model.Page.Find(AddressOf lrPage.Equals)
                                 If Not lrPage.Loaded Then
-                                    If abUseThreading Then
+                                    If abUseThreading Or (ar_model.Page.Count > 30 And abThreadAfter30pages) Then
                                         loPageLoadThread = New System.Threading.Thread(AddressOf lrPage.Load)
                                         loPageLoadThread.Start(False)
                                     Else

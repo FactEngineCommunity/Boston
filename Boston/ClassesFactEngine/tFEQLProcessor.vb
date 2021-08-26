@@ -1678,6 +1678,8 @@ Namespace FEQL
                             Return FactEngine.pcenumFEQLStatementType.ENUMERATEStatement
                         Case Is = FEQL.TokenType.DESCRIBESTMT
                             Return FactEngine.pcenumFEQLStatementType.DESCRIBEStatement
+                        Case Is = FEQL.TokenType.DIDSELECTSTMT
+                            Return FactEngine.pcenumFEQLStatementType.DIDStatement
                     End Select
                 End SyncLock
             Catch ex As Exception

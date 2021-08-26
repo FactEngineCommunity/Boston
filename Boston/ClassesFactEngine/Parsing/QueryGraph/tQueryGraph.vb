@@ -99,7 +99,7 @@
                                 'for now
                                 lsSelectClause &= lrProjectColumn.Name
                             Else
-                                lsSelectClause &= "[" & lrProjectColumn.Role.FactType.Id & Viev.NullVal(lrProjectColumn.TemporaryAlias, "") & "]." & lrProjectColumn.Name
+                                lsSelectClause &= lrProjectColumn.Role.FactType.Id & Viev.NullVal(lrProjectColumn.TemporaryAlias, "") & "." & lrProjectColumn.Name
                             End If
 
                         Else
@@ -263,8 +263,8 @@
 
                             Dim lsColumnNames = Strings.Join(lasColumnName.ToArray, ",")
                             lsSQLQuery &= vbCrLf & ", (WITH RECURSIVE nodes(" & lsColumnNames & ",depth) As ("
-                            lsSQLQuery &= vbCrLf & " SELECT [" & lrPGSRelationTable.Name & "]." & Strings.Join(lasColumnName.ToArray, ",[" & lrPGSRelationTable.Name & "].") & ",0"
-                            lsSQLQuery &= vbCrLf & " FROM [" & lrPGSRelationTable.Name & "]"
+                            lsSQLQuery &= vbCrLf & " SELECT " & lrPGSRelationTable.DatabaseName & "." & Strings.Join(lasColumnName.ToArray, "," & lrPGSRelationTable.DatabaseName & ".") & ",0"
+                            lsSQLQuery &= vbCrLf & " FROM " & lrPGSRelationTable.DatabaseName
                             If lrQueryEdge.BaseNode.HasIdentifier Then
                                 lsSQLQuery &= " WHERE "
 
@@ -279,14 +279,14 @@
                                                               Select Column
                                                               Order By Column.OrdinalPosition
 
-                                    lsSQLQuery &= "[" & lrPGSRelationTable.Name & "]." & lrPGSRelationColumn.First.Name & " = " & lrQueryEdge.BaseNode.IdentifierList(liInd)
+                                    lsSQLQuery &= lrPGSRelationTable.DatabaseName & "." & lrPGSRelationColumn.First.Name & " = " & lrQueryEdge.BaseNode.IdentifierList(liInd)
                                     liInd += 1
                                 Next
                             End If
                             lsSQLQuery &= vbCrLf & " UNION"
-                            lsSQLQuery &= " SELECT [" & lrPGSRelationTable.Name & "]." & Strings.Join(lasColumnName.ToArray, ",[" & lrPGSRelationTable.Name & "].") & ",depth+1"
-                            lsSQLQuery &= vbCrLf & " FROM nodes, [" & lrPGSRelationTable.Name & "]"
-                            lsSQLQuery &= vbCrLf & " WHERE nodes." & larJoinColumn(1).Name & " = [" & lrPGSRelationTable.Name & "]." & larJoinColumn(0).Name
+                            lsSQLQuery &= " SELECT " & lrPGSRelationTable.DatabaseName & "." & Strings.Join(lasColumnName.ToArray, "," & lrPGSRelationTable.DatabaseName & ".") & ",depth+1"
+                            lsSQLQuery &= vbCrLf & " FROM nodes, " & lrPGSRelationTable.DatabaseName
+                            lsSQLQuery &= vbCrLf & " WHERE nodes." & larJoinColumn(1).Name & " = " & lrPGSRelationTable.DatabaseName & "." & larJoinColumn(0).Name
                             lsSQLQuery &= vbCrLf & " LIMIT 100"
                             lsSQLQuery &= vbCrLf & ")"
                             lsSQLQuery &= vbCrLf & " SELECT " & Strings.Join(lasColumnName.ToArray, ",") & ",depth"
@@ -320,8 +320,8 @@
                             Dim lsColumnNames = Strings.Join(lasColumnName.ToArray, ",")
 
                             lsSQLQuery &= vbCrLf & ", (WITH RECURSIVE nodes(" & lsColumnNames & ",level,path) As ("
-                            lsSQLQuery &= vbCrLf & " SELECT [" & lrPGSRelationTable.Name & "]." & Strings.Join(lasColumnName.ToArray, ",[" & lrPGSRelationTable.Name & "].") & ",1 as level,(" & larJoinColumn(0).Name & " || '->' || " & larJoinColumn(1).Name & ") AS path"
-                            lsSQLQuery &= vbCrLf & " FROM [" & lrPGSRelationTable.Name & "]"
+                            lsSQLQuery &= vbCrLf & " SELECT " & lrPGSRelationTable.DatabaseName & "." & Strings.Join(lasColumnName.ToArray, "," & lrPGSRelationTable.DatabaseName & ".") & ",1 as level,(" & larJoinColumn(0).Name & " || '->' || " & larJoinColumn(1).Name & ") AS path"
+                            lsSQLQuery &= vbCrLf & " FROM " & lrPGSRelationTable.DatabaseName
                             If lrQueryEdge.BaseNode.HasIdentifier Then
                                 lsSQLQuery &= " WHERE "
 
@@ -336,15 +336,15 @@
                                                               Select Column
                                                               Order By Column.OrdinalPosition
 
-                                    lsSQLQuery &= "[" & lrPGSRelationTable.Name & "]." & lrPGSRelationColumn.First.Name & " = " & lrQueryEdge.BaseNode.IdentifierList(liInd)
+                                    lsSQLQuery &= lrPGSRelationTable.DatabaseName & "." & lrPGSRelationColumn.First.Name & " = " & lrQueryEdge.BaseNode.IdentifierList(liInd)
                                     liInd += 1
                                 Next
                             End If
                             lsSQLQuery &= vbCrLf & " UNION ALL"
-                            lsSQLQuery &= " SELECT [" & lrPGSRelationTable.Name & "]." & Strings.Join(lasColumnName.ToArray, ",[" & lrPGSRelationTable.Name & "].") & ",level+1, (nodes.path || '->' || [" & lrPGSRelationTable.Name & "]." & larJoinColumn(1).Name & ") AS path"
-                            lsSQLQuery &= vbCrLf & " FROM nodes JOIN [" & lrPGSRelationTable.Name & "]"
-                            lsSQLQuery &= vbCrLf & " ON [" & lrPGSRelationTable.Name & "]." & larJoinColumn(0).Name & " = nodes." & larJoinColumn(1).Name
-                            lsSQLQuery &= vbCrLf & " WHERE ([" & lrPGSRelationTable.Name & "]." & larJoinColumn(1).Name & " = " & lrQueryEdge.GetNextQueryEdge.IdentifierList(0) & " OR level<10)"
+                            lsSQLQuery &= " SELECT " & lrPGSRelationTable.DatabaseName & "." & Strings.Join(lasColumnName.ToArray, "," & lrPGSRelationTable.DatabaseName & ".") & ",level+1, (nodes.path || '->' || " & lrPGSRelationTable.DatabaseName & "." & larJoinColumn(1).Name & ") AS path"
+                            lsSQLQuery &= vbCrLf & " FROM nodes JOIN " & lrPGSRelationTable.DatabaseName
+                            lsSQLQuery &= vbCrLf & " ON " & lrPGSRelationTable.DatabaseName & "." & larJoinColumn(0).Name & " = nodes." & larJoinColumn(1).Name
+                            lsSQLQuery &= vbCrLf & " WHERE (" & lrPGSRelationTable.DatabaseName & "." & larJoinColumn(1).Name & " = " & lrQueryEdge.GetNextQueryEdge.IdentifierList(0) & " OR level<10)"
                             lsSQLQuery &= vbCrLf & " AND NOT nodes.path LIKE '%->' || " & lrQueryEdge.GetNextQueryEdge.IdentifierList(0)
                             lsSQLQuery &= vbCrLf & ")"
                             lsSQLQuery &= vbCrLf & " SELECT DISTINCT nodes.*" ' & Strings.Join(lasColumnName.ToArray, ",") & ",depth"
@@ -404,43 +404,43 @@
                                                 Select Column.Name
                             Dim lsColumnNames = Strings.Join(lasColumnName.ToArray, ",")
                             lsSQLQuery &= vbCrLf & ", (With RECURSIVE nodes(" & lsColumnNames & ",depth) As ("
-                            lsSQLQuery &= vbCrLf & " Select [" & lrRDSTable.Name & "]." & Strings.Join(lasColumnName.ToArray, ",[" & lrRDSTable.Name & "].") & ",0"
-                            lsSQLQuery &= vbCrLf & " FROM [" & lrRDSTable.Name & "]"
+                            lsSQLQuery &= vbCrLf & " Select " & lrRDSTable.DatabaseName & "." & Strings.Join(lasColumnName.ToArray, "," & lrRDSTable.DatabaseName & ".") & ",0"
+                            lsSQLQuery &= vbCrLf & " FROM " & lrRDSTable.DatabaseName
                             If lrQueryEdge.TargetNode.HasIdentifier Then
-                                lsSQLQuery &= vbCrLf & "," & "[" & lrQueryEdge.TargetNode.RDSTable.Name & "]"
+                                lsSQLQuery &= vbCrLf & "," & "" & lrQueryEdge.TargetNode.RDSTable.DatabaseName
                             End If
                             If lrQueryEdge.BaseNode.IdentifierList.Count > 0 Then
                                 Dim lrTargetTable As RDS.Table = larLeftColumn(0).Relation.Find(Function(x) x.OriginTable.Name = lrRDSTable.Name).DestinationTable
                                 lsSQLQuery &= "," & lrTargetTable.Name & vbCrLf & " WHERE "
                                 liInd = 0
                                 For Each lrColumn In lrTargetTable.getFirstUniquenessConstraintColumns
-                                    lsSQLQuery &= "[" & lrTargetTable.Name & Viev.NullVal(lrQueryEdge.Alias, "") & "]." & lrColumn.Name & " = '"
+                                    lsSQLQuery &= lrTargetTable.DatabaseName & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrColumn.Name & " = '"
                                     lsSQLQuery &= lrQueryEdge.BaseNode.IdentifierList(liInd) & "'" & vbCrLf
                                     If liInd < Me.HeadNode.RDSTable.getFirstUniquenessConstraintColumns.Count - 1 Then lsSQLQuery &= "AND "
                                     liInd += 1
                                 Next
-                                lsSQLQuery &= vbCrLf & " AND [" & lrRDSTable.Name & "]." & larLeftColumn(0).Name & " = [" & lrTargetTable.Name & "]." & lrTargetTable.getPrimaryKeyColumns(0).Name
+                                lsSQLQuery &= vbCrLf & " AND " & lrRDSTable.DatabaseName & "." & larLeftColumn(0).Name & " = " & lrTargetTable.DatabaseName & "." & lrTargetTable.getPrimaryKeyColumns(0).Name
                             End If
                             If lrQueryEdge.TargetNode.HasIdentifier Then
                                 Dim lrTargetTable As RDS.Table = lrQueryEdge.TargetNode.RDSTable
-                                lsSQLQuery &= vbCrLf & " WHERE [" & lrRDSTable.Name & "]." & larRightColumn(0).Name & " = [" & lrTargetTable.Name & "]." & lrTargetTable.getPrimaryKeyColumns(0).Name
+                                lsSQLQuery &= vbCrLf & " WHERE " & lrRDSTable.DatabaseName & "." & larRightColumn(0).Name & " = " & lrTargetTable.DatabaseName & "." & lrTargetTable.getPrimaryKeyColumns(0).Name
                                 liInd = 0
                                 For Each lrColumn In lrTargetTable.getFirstUniquenessConstraintColumns
                                     lsSQLQuery &= vbCrLf & " AND "
-                                    lsSQLQuery &= "[" & lrTargetTable.Name & "]." & lrColumn.Name & " = '"
+                                    lsSQLQuery &= lrTargetTable.DatabaseName & "." & lrColumn.Name & " = '"
                                     lsSQLQuery &= lrQueryEdge.TargetNode.IdentifierList(liInd) & "'" & vbCrLf
                                     liInd += 1
                                 Next
                                 lrQueryEdge.TargetNode.IsExcludedConditional = True
                             End If
                             lsSQLQuery &= vbCrLf & " UNION "
-                            lsSQLQuery &= vbCrLf & " SELECT [" & lrRDSTable.Name & "]." & Strings.Join(lasColumnName.ToArray, ",[" & lrRDSTable.Name & "].") & ",depth + 1"
-                            lsSQLQuery &= vbCrLf & " FROM nodes, [" & lrRDSTable.Name & "]"
+                            lsSQLQuery &= vbCrLf & " SELECT " & lrRDSTable.DatabaseName & "." & Strings.Join(lasColumnName.ToArray, "," & lrRDSTable.DatabaseName & ".") & ",depth + 1"
+                            lsSQLQuery &= vbCrLf & " FROM nodes, " & lrRDSTable.DatabaseName
                             lsSQLQuery &= vbCrLf & " WHERE "
                             If lrQueryEdge.TargetNode.HasIdentifier Then
-                                lsSQLQuery &= "Nodes." & larLeftColumn(0).Name & " = [" & lrRDSTable.Name & "]." & larRightColumn(0).Name
+                                lsSQLQuery &= "Nodes." & larLeftColumn(0).Name & " = " & lrRDSTable.DatabaseName & "." & larRightColumn(0).Name
                             Else
-                                lsSQLQuery &= "Nodes." & larRightColumn(0).Name & " = [" & lrRDSTable.Name & "]." & larLeftColumn(0).Name
+                                lsSQLQuery &= "Nodes." & larRightColumn(0).Name & " = " & lrRDSTable.DatabaseName & "." & larLeftColumn(0).Name
                             End If
 
                             If My.Settings.FactEngineDefaultQueryResultLimit > 0 Then
@@ -609,13 +609,13 @@
 
                         lsSQLQuery &= "("
                         For Each lrColumn In lrQueryEdge.BaseNode.RDSTable.getPrimaryKeyColumns
-                            lsSQLQuery &= "[" & lrQueryEdge.BaseNode.Name & Viev.NullVal(lrQueryEdge.BaseNode.Alias, "") & "]." & lrColumn.Name
+                            lsSQLQuery &= lrQueryEdge.BaseNode.RDSTable.DatabaseName & Viev.NullVal(lrQueryEdge.BaseNode.Alias, "") & "." & lrColumn.Name
                             If lrQueryEdge.WhichClauseSubType = pcenumWhichClauseType.ISClause Then
                                 lsSQLQuery &= " = "
                             Else
                                 lsSQLQuery &= " <> "
                             End If
-                            lsSQLQuery &= "[" & lrQueryEdge.TargetNode.Name & Viev.NullVal(lrQueryEdge.TargetNode.Alias, "") & "]." & lrColumn.Name
+                            lsSQLQuery &= lrQueryEdge.TargetNode.RDSTable.DatabaseName & Viev.NullVal(lrQueryEdge.TargetNode.Alias, "") & "." & lrColumn.Name
                         Next
                         lsSQLQuery &= ")"
 #End Region
@@ -700,7 +700,7 @@
                         lrBaseNode = lrQueryEdge.BaseNode
                         lrTargetNode = New FactEngine.QueryNode(lrQueryEdge.FBMFactType, lrQueryEdge)
 
-                        lsSQLQuery &= "[" & lrBaseNode.Name & "]." & lrBaseNode.RDSTable.getPrimaryKeyColumns.First.Name & " = " & "[" & lrTargetNode.Name & "]." & lrBaseNode.RDSTable.getPrimaryKeyColumns.First.Name
+                        lsSQLQuery &= lrBaseNode.RDSTable.DatabaseName & "." & lrBaseNode.RDSTable.getPrimaryKeyColumns.First.Name & " = " & lrTargetNode.RDSTable.DatabaseName & "." & lrBaseNode.RDSTable.getPrimaryKeyColumns.First.Name
 #End Region
                     Else
 #Region "Other/Else"
@@ -785,14 +785,13 @@
                     Dim lrTargetTable = Me.HeadNode.RDSTable
                     liInd = 0
                     For Each lrColumn In Me.HeadNode.RDSTable.getFirstUniquenessConstraintColumns
-                        lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") & "[" & lrTargetTable.Name & Viev.NullVal(Me.HeadNode.Alias, "") & "]." & lrColumn.Name & " = '" & Me.HeadNode.IdentifierList(liInd) & "'" & vbCrLf
+                        lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") & lrTargetTable.DatabaseName & Viev.NullVal(Me.HeadNode.Alias, "") & "." & lrColumn.Name & " = '" & Me.HeadNode.IdentifierList(liInd) & "'" & vbCrLf
                         If liInd < Me.HeadNode.RDSTable.getFirstUniquenessConstraintColumns.Count - 1 Then
                             lsSQLQuery &= "AND "
-                            lbIntialWhere = ""
                         End If
                         liInd += 1
                     Next
-
+                    lbIntialWhere = "AND "
                 End If
 
                 For Each lrQueryEdge In larConditionalQueryEdges.FindAll(Function(x) Not (x.IsSubQueryLeader Or x.IsPartOfSubQuery))
