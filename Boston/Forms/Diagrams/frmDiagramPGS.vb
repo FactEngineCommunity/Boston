@@ -344,287 +344,354 @@ Public Class frmDiagramPGS
                 lrRecordset.MoveNext()
             End While
 
-
-            '=======================================
-            ' Map the Relations - Link the Nodes
-            '=======================================
+            '=======================================================
+            ' Map the Relations - Link the Nodes. From Model level
+            '=======================================================
             Dim larLoadedRelationNodes As New List(Of PGS.Node)
-
-            lsSQLQuery = "SELECT *"
-            lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreRelationIsForEntity.ToString
-            lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
-
-            lrRecordset = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-            While Not lrRecordset.EOF
-
-                '------------------------
-                'Find the Origin Entity
-                '------------------------
-                Dim lrOriginatingNode As New PGS.Node
-                Dim lsRelationId As String = ""
-
-                lrOriginatingNode.Symbol = lrRecordset("Entity").Data
-
-                lsRelationId = lrRecordset("Relation").Data
-
-                lrOriginatingNode = Me.zrPage.ERDiagram.Entity.Find(AddressOf lrOriginatingNode.EqualsBySymbol)
-
-                If (lrOriginatingNode.NodeType = pcenumPGSEntityType.Relationship) And
-                    (lrOriginatingNode.RDSTable.Arity < 3) Then
+            Dim lrOriginNode As PGS.Node = Nothing
+            Dim lrDestinationNode As PGS.Node
 
 
-                    'For binary-manyToMany relations, the ORM relationship is actually a PGS relation, rather than a PGS Node.
-                    If Not larLoadedRelationNodes.Contains(lrOriginatingNode) Then
+            For Each lrNode As PGS.Node In Me.zrPage.ERDiagram.Entity
 
-                        Dim lrRDSRelation = Me.zrPage.Model.RDS.Relation.Find(Function(x) x.Id = lsRelationId)
-                        Call Me.zrPage.displayPGSRelationNodeLink(lrOriginatingNode, lrRDSRelation)
+                For Each lrRDSRelation In lrNode.RDSTable.getOutgoingRelations
 
-                        larLoadedRelationNodes.Add(lrOriginatingNode)
+                    lrDestinationNode = Me.zrPage.ERDiagram.Entity.Find(Function(x) x.Name = lrRDSRelation.DestinationTable.Name)
 
-                        '    lsSQLQuery = "SELECT *"
-                        '    lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreRelationIsForEntity.ToString
-                        '    lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
-                        '    lsSQLQuery &= " WHERE Entity = '" & lrOriginatingNode.Name & "'"
+                    If lrDestinationNode IsNot Nothing Then
+                        'The Destination Table is on the Page.
+                        lrOriginNode = lrNode
 
-                        '    lrRecordset1 = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                        If (lrOriginNode.NodeType = pcenumPGSEntityType.Relationship) And (lrOriginNode.RDSTable.Arity < 3) Then
 
-                        '    If lrRecordset1.Facts.Count > 2 Then
-                        '        'Ignore for now. Won't happen that much. Most relations of this type are binary.
-                        '        'For ORM/PGS binary-manyToMany relations, the ORM relationship is actually a PGS relation, rather than a PGS Node.
-                        '        'For ORM FactTypes that have 3 or more Roles, within the PGS diagram, the FT is a Node.
-                        '        'NB See DiagramView.MouseDown for how the Predicates are shown for the Link of a Binary PGSRelationNode-come-Relation.
-                        '        '  Must get the Predicates from the ResponsibleFactType rather than the actual Relations which are likely on/from the LinkFactTypes.
-                        '    Else
-                        '        Dim liInd As Integer = 1
-                        '        Dim lrNode1 As PGS.Node = Nothing
-                        '        Dim lrNode2 As PGS.Node = Nothing
 
-                        '        While Not lrRecordset1.EOF
-                        '            lsSQLQuery = "SELECT *"
-                        '            lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreRelationHasDestinationEntity.ToString
-                        '            lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
-                        '            lsSQLQuery &= " WHERE Relation = '" & lrRecordset1("Relation").Data & "'"
+                            'For binary-manyToMany relations, the ORM relationship is actually a PGS relation, rather than a PGS Node.
+                            If Not larLoadedRelationNodes.Contains(lrOriginNode) Then
 
-                        '            lrRecordset2 = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                                Dim lrPGSRelation = Me.zrPage.Model.RDS.Relation.Find(Function(x) x.Id = lrRDSRelation.Id)
+                                Call Me.zrPage.displayPGSRelationNodeLink(lrOriginNode, lrRDSRelation)
 
-                        '            If liInd = 1 Then
-                        '                lrNode2 = Me.zrPage.ERDiagram.Entity.Find(Function(x) x.Name = lrRecordset2("Entity").Data)
-                        '            Else
-                        '                lrNode1 = Me.zrPage.ERDiagram.Entity.Find(Function(x) x.Name = lrRecordset2("Entity").Data)
-                        '            End If
+                                larLoadedRelationNodes.Add(lrOriginNode)
+                            End If
+                        Else 'Is Not a PGSRelation
 
-                        '            liInd += 1
-                        '            lrRecordset1.MoveNext()
-                        '        End While
+                            Dim lrPGSRelation As New ERD.Relation(Me.zrPage.Model,
+                                                              Me.zrPage,
+                                                              lrRDSRelation.Id,
+                                                              lrOriginNode,
+                                                              lrRDSRelation.OriginMultiplicity,
+                                                              lrRDSRelation.RelationOriginIsMandatory,
+                                                              lrRDSRelation.ContributesToPrimaryKey,
+                                                              lrDestinationNode,
+                                                              lrRDSRelation.DestinationMultiplicity,
+                                                              lrRDSRelation.RelationDestinationIsMandatory)
 
-                        '        Dim lrRelation As New ERD.Relation(Me.zrPage.Model,
-                        '                                           Me.zrPage,
-                        '                                           lrRecordset("Relation").Data,
-                        '                                           lrNode1,
-                        '                                           pcenumCMMLMultiplicity.One,
-                        '                                           False,
-                        '                                           False,
-                        '                                           lrNode2,
-                        '                                           pcenumCMMLMultiplicity.One,
-                        '                                           False,
-                        '                                           lrOriginatingNode.RDSTable)
+                                lrPGSRelation.OriginPredicate = lrRDSRelation.OriginPredicate
+                                lrPGSRelation.DestinationPredicate = lrRDSRelation.DestinationPredicate
+                                lrPGSRelation.RelationFactType = lrRDSRelation.ResponsibleFactType
 
-                        '        lrRelation.IsPGSRelationNode = True
-                        '        lrRelation.ActualPGSNode = Me.zrPage.ERDiagram.Entity.Find(Function(x) x.Id = lrOriginatingNode.Id)
-                        '        lrRelation.ActualPGSNode.PGSRelation = lrRelation
+                                '====================================================================
+                                'RDS
+                                lrPGSRelation.RDSRelation = lrRDSRelation
 
-                        '        'NB Even though the RDSRelation is stored against the Link (below), the Predicates for the Link come from the ResponsibleFactType.
-                        '        '  because the relation is actually a PGSRelationNode.
-                        '        Dim lrRDSRelation As RDS.Relation = Me.zrPage.Model.RDS.Relation.Find(Function(x) x.Id = lrRecordset("Relation").Data)
-                        '        lrRelation.RelationFactType = lrRDSRelation.ResponsibleFactType
+                                Me.zrPage.ERDiagram.Relation.Add(lrPGSRelation)
 
-                        '        If lrRDSRelation.ResponsibleFactType.FactTypeReading.Count = 1 Then
-                        '            Dim lrFactTypeReading = lrRDSRelation.ResponsibleFactType.FactTypeReading(0)
-                        '            If Not lrFactTypeReading.PredicatePart(0).Role.JoinedORMObject.Id = lrNode1.Name Then
-                        '                'Swap the Origin and Desination nodes, for directed Graphs. i.e. The single FactTypeReading determines the direction.
-                        '                Dim lrTempNode = lrNode1
-                        '                lrNode1 = lrRelation.DestinationEntity
-                        '                lrNode2 = lrTempNode
-                        '            End If
-                        '        End If
+                                Dim lrLink As PGS.Link
+                                lrLink = New PGS.Link(Me.zrPage, lrFactInstance, lrOriginNode, lrDestinationNode, Nothing, Nothing, lrPGSRelation)
+                                lrLink.DisplayAndAssociate()
+                                lrPGSRelation.Link = lrLink
+                                lrOriginNode.Relation.Add(lrPGSRelation)
 
-                        '        Dim lrLink As PGS.Link
+                            End If
 
-                        '        lrLink = New PGS.Link(Me.zrPage, lrFactInstance, lrNode1, lrNode2, Nothing, Nothing, lrRelation)
-                        '        lrLink.RDSRelation = lrRDSRelation
-
-                        '        lrLink.DisplayAndAssociate()
-
-                        '        lrLink.Link.Text = lrRelation.ActualPGSNode.Id
-                        '        lrLink.Relation.Link = lrLink
-                        '        Me.zrPage.ERDiagram.Relation.Add(lrRelation)
-                        '        larLoadedRelationNodes.Add(lrRelation.ActualPGSNode)
-
-                        '        End If
-                    End If
-                Else 'Is Not a PGSRelation
-
-                    '-----------------------------
-                    'Find the Destination Entity
-                    '-----------------------------
-                    Dim lrDestinationNode As New PGS.Node
-
-                    lsSQLQuery = "SELECT *"
-                    lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreRelationHasDestinationEntity.ToString
-                    lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
-                    lsSQLQuery &= " WHERE Relation = '" & lsRelationId & "'"
-
-                    lrRecordset1 = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-                    lrDestinationNode.Symbol = lrRecordset1("Entity").Data
-
-                    lrDestinationNode = Me.zrPage.ERDiagram.Entity.Find(AddressOf lrDestinationNode.EqualsBySymbol)
-
-                    If Not lrDestinationNode Is Nothing Then
-
-                        '================================
-                        lsSQLQuery = "SELECT *"
-                        lsSQLQuery &= " FROM CoreOriginMultiplicity"
-                        lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
-                        lsSQLQuery &= " WHERE ERDRelation = '" & lrRecordset("Relation").Data & "'"
-
-                        lrRecordset1 = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-                        Dim lsOriginMultiplicity As String = lrRecordset1("Multiplicity").Data
-
-                        Dim liOriginMultiplicity As pcenumCMMLMultiplicity
-                        Select Case lsOriginMultiplicity
-                            Case Is = pcenumCMMLMultiplicity.One.ToString
-                                liOriginMultiplicity = pcenumCMMLMultiplicity.One
-                            Case Is = pcenumCMMLMultiplicity.Many.ToString
-                                liOriginMultiplicity = pcenumCMMLMultiplicity.Many
-                        End Select
-
-                        lsSQLQuery = "SELECT COUNT(*)"
-                        lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreOriginIsMandatory.ToString
-                        lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
-                        lsSQLQuery &= " WHERE OriginIsMandatory = '" & lrRecordset("Relation").Data & "'"
-
-                        lrRecordset1 = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-                        Dim lbRelationOriginIsMandatory As Boolean = False
-                        If CInt(lrRecordset1("Count").Data) > 0 Then
-                            lbRelationOriginIsMandatory = True
                         End If
 
-                        '================================
-                        lsSQLQuery = "SELECT *"
-                        lsSQLQuery &= " FROM CoreDestinationMultiplicity"
-                        lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
-                        lsSQLQuery &= " WHERE ERDRelation = '" & lrRecordset("Relation").Data & "'"
+                Next
 
-                        lrRecordset1 = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+            Next
 
-                        Dim lsDestinationMultiplicity As String = lrRecordset1("Multiplicity").Data
+#Region "Vitage Map Relations, based on CMML Page Instances"
+            ''=======================================
+            '' Map the Relations - Link the Nodes
+            ''=======================================
+            'Dim larLoadedRelationNodes As New List(Of PGS.Node)
 
-                        Dim liDestinationMultiplicity As pcenumCMMLMultiplicity
-                        Select Case lsDestinationMultiplicity
-                            Case Is = pcenumCMMLMultiplicity.One.ToString
-                                liDestinationMultiplicity = pcenumCMMLMultiplicity.One
-                            Case Is = pcenumCMMLMultiplicity.Many.ToString
-                                liDestinationMultiplicity = pcenumCMMLMultiplicity.Many
-                        End Select
+            'lsSQLQuery = "SELECT *"
+            'lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreRelationIsForEntity.ToString
+            'lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
 
-                        lsSQLQuery = "SELECT COUNT(*)"
-                        lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreDestinationIsMandatory.ToString
-                        lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
-                        lsSQLQuery &= " WHERE DestinationIsMandatory = '" & lrRecordset("Relation").Data & "'"
+            'lrRecordset = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
-                        lrRecordset1 = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+            'While Not lrRecordset.EOF
 
-                        Dim lbRelationDestinationIsMandatory As Boolean = False
-                        If CInt(lrRecordset1("Count").Data) > 0 Then
-                            lbRelationDestinationIsMandatory = True
-                        End If
+            '    '------------------------
+            '    'Find the Origin Entity
+            '    '------------------------
+            '    Dim lrOriginatingNode As New PGS.Node
+            '    Dim lsRelationId As String = ""
 
-                        '-------------------------------------------------------------------------------
-                        'Check to see whether the Relation contributes to the PrimaryKey of the Entity
-                        '-------------------------------------------------------------------------------
-                        lsSQLQuery = "SELECT COUNT(*)"
-                        lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreContributesToPrimaryKey.ToString
-                        lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
-                        lsSQLQuery &= " WHERE " & pcenumCMMLRelations.CoreContributesToPrimaryKey.ToString & " = '" & lrRecordset("Relation").Data & "'"
+            '    lrOriginatingNode.Symbol = lrRecordset("Entity").Data
 
-                        lrRecordset1 = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+            '    lsRelationId = lrRecordset("Relation").Data
 
-                        Dim lbContributesToPrimaryKey As Boolean = False
+            '    lrOriginatingNode = Me.zrPage.ERDiagram.Entity.Find(AddressOf lrOriginatingNode.EqualsBySymbol)
 
-                        If CInt(lrRecordset1("Count").Data) > 0 Then
-                            lbContributesToPrimaryKey = True
-                        End If
-
-                        Dim lrRelation As New ERD.Relation(Me.zrPage.Model,
-                                                           Me.zrPage,
-                                                           lrRecordset("Relation").Data,
-                                                           lrOriginatingNode, _
-                                                           liOriginMultiplicity, _
-                                                           lbRelationOriginIsMandatory, _
-                                                           lbContributesToPrimaryKey, _
-                                                           lrDestinationNode, _
-                                                           liDestinationMultiplicity, _
-                                                           lbRelationDestinationIsMandatory)
-
-                        '-------------------------------------
-                        'Get the Predicates for the Relation
-                        '-------------------------------------
-                        lsSQLQuery = "SELECT *"
-                        lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreOriginPredicate.ToString
-                        lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
-                        lsSQLQuery &= " WHERE Relation = '" & lrRecordset("Relation").Data & "'"
-
-                        lrRecordset1 = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-                        If Not lrRecordset1.EOF Then
-                            lrRelation.OriginPredicate = lrRecordset1("Predicate").Data
-                        End If
+            '    If (lrOriginatingNode.NodeType = pcenumPGSEntityType.Relationship) And
+            '        (lrOriginatingNode.RDSTable.Arity < 3) Then
 
 
-                        lsSQLQuery = "SELECT *"
-                        lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreDestinationPredicate.ToString
-                        lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
-                        lsSQLQuery &= " WHERE Relation = '" & lrRecordset("Relation").Data & "'"
+            '        'For binary-manyToMany relations, the ORM relationship is actually a PGS relation, rather than a PGS Node.
+            '        If Not larLoadedRelationNodes.Contains(lrOriginatingNode) Then
 
-                        lrRecordset1 = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-                        If Not lrRecordset1.EOF Then
-                            lrRelation.DestinationPredicate = lrRecordset1("Predicate").Data
-                        End If
+            '            Dim lrRDSRelation = Me.zrPage.Model.RDS.Relation.Find(Function(x) x.Id = lsRelationId)
+            '            Call Me.zrPage.displayPGSRelationNodeLink(lrOriginatingNode, lrRDSRelation)
 
-                        '-----------------------------------
-                        'Get the FactType for the Relation
-                        '-----------------------------------
-                        lsSQLQuery = "SELECT *"
-                        lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreRelationIsForFactType.ToString
-                        lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
-                        lsSQLQuery &= " WHERE Relation = '" & lrRecordset("Relation").Data & "'"
+            '            larLoadedRelationNodes.Add(lrOriginatingNode)
 
-                        lrRecordset1 = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+            '            '    lsSQLQuery = "SELECT *"
+            '            '    lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreRelationIsForEntity.ToString
+            '            '    lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
+            '            '    lsSQLQuery &= " WHERE Entity = '" & lrOriginatingNode.Name & "'"
 
-                        Dim lrFactType As New FBM.FactType(Me.zrPage.Model, lrRecordset1("FactType").Data, True)
-                        lrFactType = Me.zrPage.Model.FactType.Find(AddressOf lrFactType.Equals)
-                        lrRelation.RelationFactType = lrFactType
+            '            '    lrRecordset1 = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
-                        Me.zrPage.ERDiagram.Relation.Add(lrRelation)
+            '            '    If lrRecordset1.Facts.Count > 2 Then
+            '            '        'Ignore for now. Won't happen that much. Most relations of this type are binary.
+            '            '        'For ORM/PGS binary-manyToMany relations, the ORM relationship is actually a PGS relation, rather than a PGS Node.
+            '            '        'For ORM FactTypes that have 3 or more Roles, within the PGS diagram, the FT is a Node.
+            '            '        'NB See DiagramView.MouseDown for how the Predicates are shown for the Link of a Binary PGSRelationNode-come-Relation.
+            '            '        '  Must get the Predicates from the ResponsibleFactType rather than the actual Relations which are likely on/from the LinkFactTypes.
+            '            '    Else
+            '            '        Dim liInd As Integer = 1
+            '            '        Dim lrNode1 As PGS.Node = Nothing
+            '            '        Dim lrNode2 As PGS.Node = Nothing
 
-                        lrRelation.RDSRelation = Me.zrPage.Model.RDS.Relation.Find(Function(x) x.Id = lrRelation.Id)
+            '            '        While Not lrRecordset1.EOF
+            '            '            lsSQLQuery = "SELECT *"
+            '            '            lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreRelationHasDestinationEntity.ToString
+            '            '            lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
+            '            '            lsSQLQuery &= " WHERE Relation = '" & lrRecordset1("Relation").Data & "'"
 
-                        Dim lrLink As PGS.Link
-                        lrLink = New PGS.Link(Me.zrPage, lrFactInstance, lrOriginatingNode, lrDestinationNode, Nothing, Nothing, lrRelation)
-                        'lrLink.RDSRelation = lrRelation.RDSRelation '20180810-Shouldn't need this. Is in the New constructor.
-                        lrLink.DisplayAndAssociate()
+            '            '            lrRecordset2 = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
-                        lrRelation.Link = lrLink
-                        lrOriginatingNode.Relation.Add(lrRelation)
-                    End If
+            '            '            If liInd = 1 Then
+            '            '                lrNode2 = Me.zrPage.ERDiagram.Entity.Find(Function(x) x.Name = lrRecordset2("Entity").Data)
+            '            '            Else
+            '            '                lrNode1 = Me.zrPage.ERDiagram.Entity.Find(Function(x) x.Name = lrRecordset2("Entity").Data)
+            '            '            End If
 
-                End If
+            '            '            liInd += 1
+            '            '            lrRecordset1.MoveNext()
+            '            '        End While
 
-                lrRecordset.MoveNext()
-            End While
+            '            '        Dim lrRelation As New ERD.Relation(Me.zrPage.Model,
+            '            '                                           Me.zrPage,
+            '            '                                           lrRecordset("Relation").Data,
+            '            '                                           lrNode1,
+            '            '                                           pcenumCMMLMultiplicity.One,
+            '            '                                           False,
+            '            '                                           False,
+            '            '                                           lrNode2,
+            '            '                                           pcenumCMMLMultiplicity.One,
+            '            '                                           False,
+            '            '                                           lrOriginatingNode.RDSTable)
+
+            '            '        lrRelation.IsPGSRelationNode = True
+            '            '        lrRelation.ActualPGSNode = Me.zrPage.ERDiagram.Entity.Find(Function(x) x.Id = lrOriginatingNode.Id)
+            '            '        lrRelation.ActualPGSNode.PGSRelation = lrRelation
+
+            '            '        'NB Even though the RDSRelation is stored against the Link (below), the Predicates for the Link come from the ResponsibleFactType.
+            '            '        '  because the relation is actually a PGSRelationNode.
+            '            '        Dim lrRDSRelation As RDS.Relation = Me.zrPage.Model.RDS.Relation.Find(Function(x) x.Id = lrRecordset("Relation").Data)
+            '            '        lrRelation.RelationFactType = lrRDSRelation.ResponsibleFactType
+
+            '            '        If lrRDSRelation.ResponsibleFactType.FactTypeReading.Count = 1 Then
+            '            '            Dim lrFactTypeReading = lrRDSRelation.ResponsibleFactType.FactTypeReading(0)
+            '            '            If Not lrFactTypeReading.PredicatePart(0).Role.JoinedORMObject.Id = lrNode1.Name Then
+            '            '                'Swap the Origin and Desination nodes, for directed Graphs. i.e. The single FactTypeReading determines the direction.
+            '            '                Dim lrTempNode = lrNode1
+            '            '                lrNode1 = lrRelation.DestinationEntity
+            '            '                lrNode2 = lrTempNode
+            '            '            End If
+            '            '        End If
+
+            '            '        Dim lrLink As PGS.Link
+
+            '            '        lrLink = New PGS.Link(Me.zrPage, lrFactInstance, lrNode1, lrNode2, Nothing, Nothing, lrRelation)
+            '            '        lrLink.RDSRelation = lrRDSRelation
+
+            '            '        lrLink.DisplayAndAssociate()
+
+            '            '        lrLink.Link.Text = lrRelation.ActualPGSNode.Id
+            '            '        lrLink.Relation.Link = lrLink
+            '            '        Me.zrPage.ERDiagram.Relation.Add(lrRelation)
+            '            '        larLoadedRelationNodes.Add(lrRelation.ActualPGSNode)
+
+            '            '        End If
+            '        End If
+            '    Else 'Is Not a PGSRelation
+
+            '        '-----------------------------
+            '        'Find the Destination Entity
+            '        '-----------------------------
+            '        Dim lrDestinationNode As New PGS.Node
+
+            '        lsSQLQuery = "SELECT *"
+            '        lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreRelationHasDestinationEntity.ToString
+            '        lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
+            '        lsSQLQuery &= " WHERE Relation = '" & lsRelationId & "'"
+
+            '        lrRecordset1 = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+            '        lrDestinationNode.Symbol = lrRecordset1("Entity").Data
+
+            '        lrDestinationNode = Me.zrPage.ERDiagram.Entity.Find(AddressOf lrDestinationNode.EqualsBySymbol)
+
+            '        If Not lrDestinationNode Is Nothing Then
+
+            '            '================================
+            '            lsSQLQuery = "SELECT *"
+            '            lsSQLQuery &= " FROM CoreOriginMultiplicity"
+            '            lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
+            '            lsSQLQuery &= " WHERE ERDRelation = '" & lrRecordset("Relation").Data & "'"
+
+            '            lrRecordset1 = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+            '            Dim lsOriginMultiplicity As String = lrRecordset1("Multiplicity").Data
+
+            '            Dim liOriginMultiplicity As pcenumCMMLMultiplicity
+            '            Select Case lsOriginMultiplicity
+            '                Case Is = pcenumCMMLMultiplicity.One.ToString
+            '                    liOriginMultiplicity = pcenumCMMLMultiplicity.One
+            '                Case Is = pcenumCMMLMultiplicity.Many.ToString
+            '                    liOriginMultiplicity = pcenumCMMLMultiplicity.Many
+            '            End Select
+
+            '            lsSQLQuery = "SELECT COUNT(*)"
+            '            lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreOriginIsMandatory.ToString
+            '            lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
+            '            lsSQLQuery &= " WHERE OriginIsMandatory = '" & lrRecordset("Relation").Data & "'"
+
+            '            lrRecordset1 = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+            '            Dim lbRelationOriginIsMandatory As Boolean = False
+            '            If CInt(lrRecordset1("Count").Data) > 0 Then
+            '                lbRelationOriginIsMandatory = True
+            '            End If
+
+            '            '================================
+            '            lsSQLQuery = "SELECT *"
+            '            lsSQLQuery &= " FROM CoreDestinationMultiplicity"
+            '            lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
+            '            lsSQLQuery &= " WHERE ERDRelation = '" & lrRecordset("Relation").Data & "'"
+
+            '            lrRecordset1 = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+            '            Dim lsDestinationMultiplicity As String = lrRecordset1("Multiplicity").Data
+
+            '            Dim liDestinationMultiplicity As pcenumCMMLMultiplicity
+            '            Select Case lsDestinationMultiplicity
+            '                Case Is = pcenumCMMLMultiplicity.One.ToString
+            '                    liDestinationMultiplicity = pcenumCMMLMultiplicity.One
+            '                Case Is = pcenumCMMLMultiplicity.Many.ToString
+            '                    liDestinationMultiplicity = pcenumCMMLMultiplicity.Many
+            '            End Select
+
+            '            lsSQLQuery = "SELECT COUNT(*)"
+            '            lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreDestinationIsMandatory.ToString
+            '            lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
+            '            lsSQLQuery &= " WHERE DestinationIsMandatory = '" & lrRecordset("Relation").Data & "'"
+
+            '            lrRecordset1 = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+            '            Dim lbRelationDestinationIsMandatory As Boolean = False
+            '            If CInt(lrRecordset1("Count").Data) > 0 Then
+            '                lbRelationDestinationIsMandatory = True
+            '            End If
+
+            '            '-------------------------------------------------------------------------------
+            '            'Check to see whether the Relation contributes to the PrimaryKey of the Entity
+            '            '-------------------------------------------------------------------------------
+            '            lsSQLQuery = "SELECT COUNT(*)"
+            '            lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreContributesToPrimaryKey.ToString
+            '            lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
+            '            lsSQLQuery &= " WHERE " & pcenumCMMLRelations.CoreContributesToPrimaryKey.ToString & " = '" & lrRecordset("Relation").Data & "'"
+
+            '            lrRecordset1 = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+            '            Dim lbContributesToPrimaryKey As Boolean = False
+
+            '            If CInt(lrRecordset1("Count").Data) > 0 Then
+            '                lbContributesToPrimaryKey = True
+            '            End If
+
+            '            Dim lrRelation As New ERD.Relation(Me.zrPage.Model,
+            '                                               Me.zrPage,
+            '                                               lrRecordset("Relation").Data,
+            '                                               lrOriginatingNode, _
+            '                                               liOriginMultiplicity, _
+            '                                               lbRelationOriginIsMandatory, _
+            '                                               lbContributesToPrimaryKey, _
+            '                                               lrDestinationNode, _
+            '                                               liDestinationMultiplicity, _
+            '                                               lbRelationDestinationIsMandatory)
+
+            '            '-------------------------------------
+            '            'Get the Predicates for the Relation
+            '            '-------------------------------------
+            '            lsSQLQuery = "SELECT *"
+            '            lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreOriginPredicate.ToString
+            '            lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
+            '            lsSQLQuery &= " WHERE Relation = '" & lrRecordset("Relation").Data & "'"
+
+            '            lrRecordset1 = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+            '            If Not lrRecordset1.EOF Then
+            '                lrRelation.OriginPredicate = lrRecordset1("Predicate").Data
+            '            End If
+
+
+            '            lsSQLQuery = "SELECT *"
+            '            lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreDestinationPredicate.ToString
+            '            lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
+            '            lsSQLQuery &= " WHERE Relation = '" & lrRecordset("Relation").Data & "'"
+
+            '            lrRecordset1 = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+            '            If Not lrRecordset1.EOF Then
+            '                lrRelation.DestinationPredicate = lrRecordset1("Predicate").Data
+            '            End If
+
+            '            '-----------------------------------
+            '            'Get the FactType for the Relation
+            '            '-----------------------------------
+            '            lsSQLQuery = "SELECT *"
+            '            lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreRelationIsForFactType.ToString
+            '            lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
+            '            lsSQLQuery &= " WHERE Relation = '" & lrRecordset("Relation").Data & "'"
+
+            '            lrRecordset1 = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+            '            Dim lrFactType As New FBM.FactType(Me.zrPage.Model, lrRecordset1("FactType").Data, True)
+            '            lrFactType = Me.zrPage.Model.FactType.Find(AddressOf lrFactType.Equals)
+            '            lrRelation.RelationFactType = lrFactType
+
+            '            Me.zrPage.ERDiagram.Relation.Add(lrRelation)
+
+            '            lrRelation.RDSRelation = Me.zrPage.Model.RDS.Relation.Find(Function(x) x.Id = lrRelation.Id)
+
+            '            Dim lrLink As PGS.Link
+            '            lrLink = New PGS.Link(Me.zrPage, lrFactInstance, lrOriginatingNode, lrDestinationNode, Nothing, Nothing, lrRelation)
+            '            'lrLink.RDSRelation = lrRelation.RDSRelation '20180810-Shouldn't need this. Is in the New constructor.
+            '            lrLink.DisplayAndAssociate()
+
+            '            lrRelation.Link = lrLink
+            '            lrOriginatingNode.Relation.Add(lrRelation)
+            '        End If
+
+            '    End If
+
+            '    lrRecordset.MoveNext()
+            'End While
+#End Region
 
             '==================================================================
             'Subtype Relationships
