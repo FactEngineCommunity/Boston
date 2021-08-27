@@ -628,7 +628,11 @@
 #End Region
                     ElseIf lrQueryEdge.FBMFactType.IsDerived Then
 
-                        lrOriginTable = New RDS.Table(Me.Model.RDS, lrQueryEdge.FBMFactType.Id, lrQueryEdge.FBMFactType)
+                        lrOriginTable = lrQueryEdge.FBMFactType.getCorrespondingRDSTable(Nothing, True)
+
+                        If lrOriginTable Is Nothing Then
+                            lrOriginTable = New RDS.Table(Me.Model.RDS, lrQueryEdge.FBMFactType.Id, lrQueryEdge.FBMFactType)
+                        End If
                         liInd = 0
                         For Each lrRole In lrQueryEdge.FBMFactType.RoleGroup.FindAll(Function(x) x.JoinedORMObject.GetType <> GetType(FBM.ValueType))
                             If liInd > 0 Then lsSQLQuery &= "AND "
@@ -637,7 +641,12 @@
                             Dim liInd2 As Integer = 0
                             For Each lrColumn In lrDestinationTable.getPrimaryKeyColumns
                                 If liInd2 > 0 Then lsSQLQuery &= "AND "
-                                lsSQLQuery &= lrOriginTable.Name & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrColumn.Name & " = "
+                                Dim lrOriginColumn As RDS.Column = lrOriginTable.Column.Find(Function(x) x.ActiveRole Is lrColumn.ActiveRole)
+                                If lrOriginColumn Is Nothing Then
+                                    lsSQLQuery &= lrOriginTable.Name & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrColumn.Name & " = "
+                                Else
+                                    lsSQLQuery &= lrOriginTable.Name & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrOriginColumn.Name & " = "
+                                End If
                                 lsSQLQuery &= lrDestinationTable.DatabaseName & Viev.NullVal(lrQueryEdge.BaseNode.Alias, "") & "." & lrColumn.Name & vbCrLf
                                 liInd2 += 1
                             Next
@@ -650,87 +659,87 @@
 #Region "PGSNodeTable/RDSTable"
                             lrOriginTable = lrQueryEdge.FBMFactType.getCorrespondingRDSTable
 
-                        Dim larRelation = lrOriginTable.getRelations
+                            Dim larRelation = lrOriginTable.getRelations
 
-                        larRelation = larRelation.FindAll(Function(x) (x.DestinationTable.Name = lrQueryEdge.BaseNode.RelativeFBMModelObject.Id) Or
+                            larRelation = larRelation.FindAll(Function(x) (x.DestinationTable.Name = lrQueryEdge.BaseNode.RelativeFBMModelObject.Id) Or
                                                                        (x.DestinationTable.Name = lrQueryEdge.TargetNode.Name)).OrderBy(Function(x) x.OriginColumns(0).OrdinalPosition).ToList
 
-                        Dim liTempInd = 0
-                        Dim liRelationCounter = 1
+                            Dim liTempInd = 0
+                            Dim liRelationCounter = 1
 
-                        'Order the relations by the QueryEdge.FactTypeReading
-                        '  This way 'Lecturer likes Lecturer' is different from 'Lecturer is liked by Lecturer'
+                            'Order the relations by the QueryEdge.FactTypeReading
+                            '  This way 'Lecturer likes Lecturer' is different from 'Lecturer is liked by Lecturer'
 
-                        Dim lrColumn = lrOriginTable.Column.Find(Function(x) x.Role Is lrQueryEdge.FBMFactTypeReading.PredicatePart(0).Role)
-                        If Not larRelation(0).OriginColumns.Contains(lrColumn) Then
-                            larRelation.Reverse()
-                        End If
+                            Dim lrColumn = lrOriginTable.Column.Find(Function(x) x.Role Is lrQueryEdge.FBMFactTypeReading.PredicatePart(0).Role)
+                            If Not larRelation(0).OriginColumns.Contains(lrColumn) Then
+                                larRelation.Reverse()
+                            End If
 
-                        For Each lrRelation In larRelation
-                            Dim liColumnCounter = 0
-                            For Each lrColumn In lrRelation.DestinationColumns
-                                If liTempInd > 0 Then lsSQLQuery &= "AND "
+                            For Each lrRelation In larRelation
+                                Dim liColumnCounter = 0
+                                For Each lrColumn In lrRelation.DestinationColumns
+                                    If liTempInd > 0 Then lsSQLQuery &= "AND "
 
-                                Select Case liRelationCounter
-                                    Case Is = 1
-                                        Select Case lrQueryEdge.BaseNode.FBMModelObject.ConceptType
-                                            Case = pcenumConceptType.ValueType
-                                                'Nothing to do here
-                                            Case Else
-                                                lsSQLQuery &= lrRelation.OriginTable.DatabaseName & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrRelation.OriginColumns(liColumnCounter).Name & " = "
-                                                Dim lrTargetColumn = lrRelation.DestinationColumns.Find(Function(x) x.ActiveRole Is lrRelation.OriginColumns(liColumnCounter).ActiveRole)
-                                                lsSQLQuery &= lrRelation.DestinationTable.DatabaseName & Viev.NullVal(lrQueryEdge.BaseNode.Alias, "") & "." & lrTargetColumn.Name & vbCrLf
-                                        End Select
-                                    Case Else
-                                        Select Case lrQueryEdge.TargetNode.FBMModelObject.ConceptType
-                                            Case = pcenumConceptType.ValueType
-                                                'Nothing to do here
-                                            Case Else
-                                                lsSQLQuery &= lrRelation.OriginTable.DatabaseName & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrRelation.OriginColumns(liColumnCounter).Name & " = "
-                                                Dim lrTargetColumn = lrRelation.DestinationColumns.Find(Function(x) x.ActiveRole Is lrRelation.OriginColumns(liColumnCounter).ActiveRole)
-                                                lsSQLQuery &= lrRelation.DestinationTable.DatabaseName & Viev.NullVal(lrQueryEdge.TargetNode.Alias, "") & "." & lrTargetColumn.Name & vbCrLf
-                                        End Select
-                                End Select
+                                    Select Case liRelationCounter
+                                        Case Is = 1
+                                            Select Case lrQueryEdge.BaseNode.FBMModelObject.ConceptType
+                                                Case = pcenumConceptType.ValueType
+                                                    'Nothing to do here
+                                                Case Else
+                                                    lsSQLQuery &= lrRelation.OriginTable.DatabaseName & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrRelation.OriginColumns(liColumnCounter).Name & " = "
+                                                    Dim lrTargetColumn = lrRelation.DestinationColumns.Find(Function(x) x.ActiveRole Is lrRelation.OriginColumns(liColumnCounter).ActiveRole)
+                                                    lsSQLQuery &= lrRelation.DestinationTable.DatabaseName & Viev.NullVal(lrQueryEdge.BaseNode.Alias, "") & "." & lrTargetColumn.Name & vbCrLf
+                                            End Select
+                                        Case Else
+                                            Select Case lrQueryEdge.TargetNode.FBMModelObject.ConceptType
+                                                Case = pcenumConceptType.ValueType
+                                                    'Nothing to do here
+                                                Case Else
+                                                    lsSQLQuery &= lrRelation.OriginTable.DatabaseName & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrRelation.OriginColumns(liColumnCounter).Name & " = "
+                                                    Dim lrTargetColumn = lrRelation.DestinationColumns.Find(Function(x) x.ActiveRole Is lrRelation.OriginColumns(liColumnCounter).ActiveRole)
+                                                    lsSQLQuery &= lrRelation.DestinationTable.DatabaseName & Viev.NullVal(lrQueryEdge.TargetNode.Alias, "") & "." & lrTargetColumn.Name & vbCrLf
+                                            End Select
+                                    End Select
 
-                                'lsSQLQuery &= lrQueryEdge.BaseNode.Name & Viev.NullVal(lrQueryEdge.BaseNode.Alias, "") & "." & lrColumn.Name & " = "
-                                'lsSQLQuery &= lrOriginTable.Name & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrTargetColumn.Name & vbCrLf 'lrOriginTable.getColumnByOrdingalPosition(1).Name & vbCrLf
-                                liTempInd += 1
-                                liColumnCounter += 1
+                                    'lsSQLQuery &= lrQueryEdge.BaseNode.Name & Viev.NullVal(lrQueryEdge.BaseNode.Alias, "") & "." & lrColumn.Name & " = "
+                                    'lsSQLQuery &= lrOriginTable.Name & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrTargetColumn.Name & vbCrLf 'lrOriginTable.getColumnByOrdingalPosition(1).Name & vbCrLf
+                                    liTempInd += 1
+                                    liColumnCounter += 1
+                                Next
+                                liRelationCounter += 1
                             Next
-                            liRelationCounter += 1
-                        Next
 
-                        'For Each lrColumn In lrQueryEdge.BaseNode.RDSTable.getPrimaryKeyColumns
-                        '    If liTempInd > 0 Then lsSQLQuery &= "AND "
-                        '    Dim lrTargetColumn = lrOriginTable.Column.Find(Function(x) x.ActiveRole Is lrColumn.ActiveRole)
-                        '    lsSQLQuery &= lrQueryEdge.BaseNode.Name & Viev.NullVal(lrQueryEdge.BaseNode.Alias, "") & "." & lrColumn.Name & " = "
-                        '    lsSQLQuery &= lrOriginTable.Name & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrTargetColumn.Name & vbCrLf 'lrOriginTable.getColumnByOrdingalPosition(1).Name & vbCrLf
-                        '    liTempInd += 1
-                        'Next
+                            'For Each lrColumn In lrQueryEdge.BaseNode.RDSTable.getPrimaryKeyColumns
+                            '    If liTempInd > 0 Then lsSQLQuery &= "AND "
+                            '    Dim lrTargetColumn = lrOriginTable.Column.Find(Function(x) x.ActiveRole Is lrColumn.ActiveRole)
+                            '    lsSQLQuery &= lrQueryEdge.BaseNode.Name & Viev.NullVal(lrQueryEdge.BaseNode.Alias, "") & "." & lrColumn.Name & " = "
+                            '    lsSQLQuery &= lrOriginTable.Name & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrTargetColumn.Name & vbCrLf 'lrOriginTable.getColumnByOrdingalPosition(1).Name & vbCrLf
+                            '    liTempInd += 1
+                            'Next
 
-                        'Select Case lrQueryEdge.TargetNode.FBMModelObject.ConceptType
-                        '    Case = pcenumConceptType.ValueType
-                        '        'Nothing to do here
-                        '    Case Else
-                        '        liTempInd = 0
-                        '        For Each lrColumn In lrQueryEdge.BaseNode.RDSTable.getPrimaryKeyColumns
-                        '            Dim lrTargetColumn = lrOriginTable.Column.Find(Function(x) x.ActiveRole Is lrColumn.ActiveRole)
-                        '            lsSQLQuery &= vbCrLf & "AND " & lrQueryEdge.BaseNode.Name & Viev.NullVal(lrQueryEdge.TargetNode.Alias, "") & "." & lrColumn.Name & " = "
-                        '            lsSQLQuery &= lrOriginTable.Name & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrTargetColumn.Name 'lrOriginTable.getColumnByOrdingalPosition(2).Name
-                        '        Next
-                        'End Select
+                            'Select Case lrQueryEdge.TargetNode.FBMModelObject.ConceptType
+                            '    Case = pcenumConceptType.ValueType
+                            '        'Nothing to do here
+                            '    Case Else
+                            '        liTempInd = 0
+                            '        For Each lrColumn In lrQueryEdge.BaseNode.RDSTable.getPrimaryKeyColumns
+                            '            Dim lrTargetColumn = lrOriginTable.Column.Find(Function(x) x.ActiveRole Is lrColumn.ActiveRole)
+                            '            lsSQLQuery &= vbCrLf & "AND " & lrQueryEdge.BaseNode.Name & Viev.NullVal(lrQueryEdge.TargetNode.Alias, "") & "." & lrColumn.Name & " = "
+                            '            lsSQLQuery &= lrOriginTable.Name & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrTargetColumn.Name 'lrOriginTable.getColumnByOrdingalPosition(2).Name
+                            '        Next
+                            'End Select
 #End Region
-                    ElseIf lrQueryEdge.FBMFactType.DerivationType = pcenumFEQLDerivationType.Count Then
+                        ElseIf lrQueryEdge.FBMFactType.DerivationType = pcenumFEQLDerivationType.Count Then
 #Region "DerivationType = COUNT"
-                        Dim lrBaseNode, lrTargetNode As FactEngine.QueryNode
-                        lrBaseNode = lrQueryEdge.BaseNode
-                        lrTargetNode = New FactEngine.QueryNode(lrQueryEdge.FBMFactType, lrQueryEdge)
+                            Dim lrBaseNode, lrTargetNode As FactEngine.QueryNode
+                            lrBaseNode = lrQueryEdge.BaseNode
+                            lrTargetNode = New FactEngine.QueryNode(lrQueryEdge.FBMFactType, lrQueryEdge)
 
-                        lsSQLQuery &= lrBaseNode.RDSTable.DatabaseName & "." & lrBaseNode.RDSTable.getPrimaryKeyColumns.First.Name & " = " & lrTargetNode.RDSTable.DatabaseName & "." & lrBaseNode.RDSTable.getPrimaryKeyColumns.First.Name
+                            lsSQLQuery &= lrBaseNode.RDSTable.DatabaseName & "." & lrBaseNode.RDSTable.getPrimaryKeyColumns.First.Name & " = " & lrTargetNode.RDSTable.DatabaseName & "." & lrBaseNode.RDSTable.getPrimaryKeyColumns.First.Name
 #End Region
-                    Else
+                        Else
 #Region "Other/Else"
-                        Dim lrBaseNode, lrTargetNode As FactEngine.QueryNode
+                            Dim lrBaseNode, lrTargetNode As FactEngine.QueryNode
                         If lrQueryEdge.IsReciprocal Then
                             lrBaseNode = lrQueryEdge.TargetNode
                             lrTargetNode = lrQueryEdge.BaseNode

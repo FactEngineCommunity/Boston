@@ -2283,7 +2283,8 @@ Namespace FBM
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Shadows Function getCorrespondingRDSTable(Optional ByVal arModelObject As FBM.ModelObject = Nothing) As RDS.Table
+        Public Shadows Function getCorrespondingRDSTable(Optional ByVal arModelObject As FBM.ModelObject = Nothing,
+                                                         Optional ByVal abSuppressErrorMessage As Boolean = False) As RDS.Table
 
             Try
                 Dim lrTable As RDS.Table
@@ -2296,7 +2297,11 @@ Namespace FBM
 
 
                 If lrTable Is Nothing Then
-                    Throw New Exception("There is no corresponding table for FactType: '" & Me.Id & "'")
+                    If abSuppressErrorMessage Then
+                        Return Nothing
+                    Else
+                        Throw New Exception("There is no corresponding table for FactType: '" & Me.Id & "'")
+                    End If
                 Else
                     Return lrTable
                 End If

@@ -1707,7 +1707,7 @@ Public Class frmFactEngine
                             liInd += 1
                         Next
 
-                        lsSQLQuery &= vbCrLf & "FROM " & lrModelElement.DBName
+                        lsSQLQuery &= vbCrLf & "FROM " & lrModelElement.getCorrespondingRDSTable.DatabaseName
 
                         If Me.zrTextHighlighter.GetCurrentContext.Token.Type = FEQL.TokenType.IDENTIFIER Then
                             Try
