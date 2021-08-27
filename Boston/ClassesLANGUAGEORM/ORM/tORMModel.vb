@@ -2002,7 +2002,9 @@ Namespace FBM
         ''' <returns></returns>
         Public Function getFactTypeByModelObjectsFactTypeReading(ByVal aarModelObject As List(Of FBM.ModelObject),
                                                                  ByVal arFactTypeReading As FBM.FactTypeReading,
-                                                                 Optional abUseFastenshtein As Boolean = False) As FBM.FactType
+                                                                 Optional ByVal abUseFastenshtein As Boolean = False,
+                                                                 Optional ByRef arReturnFactTypeReading As FBM.FactTypeReading = Nothing,
+                                                                 Optional ByRef arReturnPredicatePart As FBM.PredicatePart = Nothing) As FBM.FactType
 
             Try
                 '------------------------------------------------------
@@ -2017,16 +2019,20 @@ Namespace FBM
                 If larFactType.Count = 0 Then
                     Return Nothing
                 Else
-                    Dim larFTRFactType = From FactType In larFactType
-                                         From FactTypeReading In FactType.FactTypeReading
-                                         Where arFactTypeReading.EqualsByRoleJoinedModelObjectSequence(FactTypeReading)
-                                         Where arFactTypeReading.EqualsByPredicatePartText(FactTypeReading, abUseFastenshtein)
-                                         Select FactType
+                    Dim larFTRFactTypeReading = From FactType In larFactType
+                                                From FactTypeReading In FactType.FactTypeReading
+                                                Where arFactTypeReading.EqualsByRoleJoinedModelObjectSequence(FactTypeReading)
+                                                Where arFactTypeReading.EqualsByPredicatePartText(FactTypeReading, abUseFastenshtein)
+                                                Select FactTypeReading
 
-                    If larFTRFactType.Count = 0 Then
+                    If larFTRFactTypeReading.Count = 0 Then
                         Return Nothing
                     Else
-                        Return larFTRFactType.First
+                        arReturnFactTypeReading = larFTRFactTypeReading.First
+                        If aarModelObject.Count = 2 Then
+                            arReturnPredicatePart = arReturnFactTypeReading.PredicatePart(0)
+                        End If
+                        Return larFTRFactTypeReading.First.FactType
                     End If
                 End If
 

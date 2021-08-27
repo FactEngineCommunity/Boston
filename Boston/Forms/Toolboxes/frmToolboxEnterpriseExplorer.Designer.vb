@@ -559,8 +559,9 @@ Partial Class frmToolboxEnterpriseExplorer
         'TreeView
         '
         Me.TreeView.AllowDrop = True
+        Me.TreeView.BackColor = System.Drawing.SystemColors.Window
         Me.TreeView.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.TreeView.ForeColor = System.Drawing.Color.FromArgb(CType(CType(5, Byte), Integer), CType(CType(5, Byte), Integer), CType(CType(5, Byte), Integer))
+        Me.TreeView.ForeColor = System.Drawing.Color.Black
         Me.TreeView.HideSelection = False
         Me.TreeView.ImageIndex = 0
         Me.TreeView.ImageList = Me.ImageList

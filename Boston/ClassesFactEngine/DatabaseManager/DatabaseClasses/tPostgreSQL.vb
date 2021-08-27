@@ -991,6 +991,10 @@ Namespace FactEngine
                 Dim lrFactType = New FBM.FactType(Me.FBMModel, "DummyFactType", True)
                 Dim lrFact As FBM.Fact
 
+                If asQuery.LastIndexOf("LIMIT") > asQuery.Length - 10 Then
+                    Me.DefaultQueryLimit = -1
+                End If
+
                 '=====================================================
                 'Column Names   
                 For liColumn = 0 To reader.FieldCount - 1
@@ -1024,6 +1028,8 @@ Namespace FactEngine
                     End If
 
                 End While
+
+                Me.DefaultQueryLimit = My.Settings.FactEngineDefaultQueryResultLimit
 
                 'For Each lrColumn In lrDataSet.Tables(0).Columns
                 '    Dim lrRole = New FBM.Role(lrFactType, lrColumn.ToString, True, Nothing)

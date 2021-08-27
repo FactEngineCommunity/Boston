@@ -223,8 +223,20 @@ Namespace FactEngine
                             End If
                         Case Else
 
+                            Dim lrReturnFactTypeReading = Nothing
+                            Dim lrPredicatePart As FBM.PredicatePart = Nothing
+
                             Me.FBMFactType = Me.QueryGraph.Model.getFactTypeByModelObjectsFactTypeReading(larModelObject,
-                                                                                                          lrFactTypeReading)
+                                                                                                          lrFactTypeReading, False, lrReturnFactTypeReading, lrPredicatePart)
+                            If Me.FBMFactType Is Nothing Then
+                                'Try Fastenshtein
+                                Me.FBMFactType = Me.QueryGraph.Model.getFactTypeByModelObjectsFactTypeReading(larModelObject,
+                                                                                                              lrFactTypeReading, True, lrReturnFactTypeReading, lrPredicatePart)
+                            End If
+
+                            Me.FBMFactTypeReading = lrReturnFactTypeReading
+                            Me.FBMPredicatePart = lrPredicatePart
+
                             If Me.FBMFactType Is Nothing Then
                                 Dim larFactTypeReading = From FactType In Me.QueryGraph.Model.FactType
                                                          From FactTypeReading In FactType.FactTypeReading

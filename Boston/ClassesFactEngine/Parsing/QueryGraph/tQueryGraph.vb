@@ -842,55 +842,58 @@
                                     End If
                             End Select
 
-                            Dim larPredicatePart As List(Of FBM.PredicatePart)
-                            If lrQueryEdge.Predicate = "" Then
-                                'Likely a "WITH WHAT Rating" or "WITH (Rating:'8')" as in "WHICH Lecturer likes WHICH Lecturer WITH WHAT RATING"
-                                larPredicatePart = (From FactTypeReading In lrFactType.FactTypeReading
-                                                    Select FactTypeReading.PredicatePart(0)).ToList
-                            Else
-                                larPredicatePart = (From FactTypeReading In lrFactType.FactTypeReading
-                                                    From PredicatePart In FactTypeReading.PredicatePart
-                                                    Where PredicatePart.PredicatePartText = Trim(lrQueryEdge.Predicate)
-                                                    Select PredicatePart).ToList
-                            End If
-
-
                             Dim lrPredicatePart As FBM.PredicatePart = Nothing
 
-                            If larPredicatePart.Count = 0 Then
+                            If lrQueryEdge.FBMPredicatePart IsNot Nothing Then
+                                lrPredicatePart = lrQueryEdge.FBMPredicatePart
+                            Else
 
-                                larPredicatePart = (From FactType In Me.Model.FactType
-                                                    From FactTypeReading In FactType.FactTypeReading
-                                                    From PredicatePart In FactTypeReading.PredicatePart
-                                                    Where FactType.RoleGroup.FindAll(Function(x) x.JoinedORMObject.Id = lrQueryEdge.BaseNode.Name _
-                                                       Or x.JoinedORMObject.Id = lrQueryEdge.TargetNode.Name).Count = 2
-                                                    Where PredicatePart.PredicatePartText = lrQueryEdge.Predicate
-                                                    Where lrQueryEdge.Predicate <> ""
-                                                    Select PredicatePart).ToList
-
-                                If larPredicatePart.Count > 0 Then
-                                    lrPredicatePart = larPredicatePart.First
-                                    lrFactType = lrPredicatePart.FactTypeReading.FactType
+                                Dim larPredicatePart As List(Of FBM.PredicatePart)
+                                If lrQueryEdge.Predicate = "" Then
+                                    'Likely a "WITH WHAT Rating" or "WITH (Rating:'8')" as in "WHICH Lecturer likes WHICH Lecturer WITH WHAT RATING"
+                                    larPredicatePart = (From FactTypeReading In lrFactType.FactTypeReading
+                                                        Select FactTypeReading.PredicatePart(0)).ToList
                                 Else
-                                    If lrFactType.IsObjectified Then
-                                        Dim larFactTypeReading = From FactType In lrFactType.getLinkFactTypes
-                                                                 From FactTypeReading In FactType.FactTypeReading
-                                                                 Where FactTypeReading.PredicatePart(0).Role.JoinedORMObject.Id = lrQueryEdge.BaseNode.Name
-                                                                 Where FactTypeReading.PredicatePart(1).Role.JoinedORMObject.Id = lrQueryEdge.TargetNode.Name
-                                                                 Select FactTypeReading
-                                        If larFactTypeReading.Count > 0 Then
-                                            lrFactType = larFactTypeReading.First.FactType
+                                    larPredicatePart = (From FactTypeReading In lrFactType.FactTypeReading
+                                                        From PredicatePart In FactTypeReading.PredicatePart
+                                                        Where PredicatePart.PredicatePartText = Trim(lrQueryEdge.Predicate)
+                                                        Select PredicatePart).ToList
+                                End If
+
+                                If larPredicatePart.Count = 0 Then
+
+                                    larPredicatePart = (From FactType In Me.Model.FactType
+                                                        From FactTypeReading In FactType.FactTypeReading
+                                                        From PredicatePart In FactTypeReading.PredicatePart
+                                                        Where FactType.RoleGroup.FindAll(Function(x) x.JoinedORMObject.Id = lrQueryEdge.BaseNode.Name _
+                                                           Or x.JoinedORMObject.Id = lrQueryEdge.TargetNode.Name).Count = 2
+                                                        Where PredicatePart.PredicatePartText = lrQueryEdge.Predicate
+                                                        Where lrQueryEdge.Predicate <> ""
+                                                        Select PredicatePart).ToList
+
+                                    If larPredicatePart.Count > 0 Then
+                                        lrPredicatePart = larPredicatePart.First
+                                        lrFactType = lrPredicatePart.FactTypeReading.FactType
+                                    Else
+                                        If lrFactType.IsObjectified Then
+                                            Dim larFactTypeReading = From FactType In lrFactType.getLinkFactTypes
+                                                                     From FactTypeReading In FactType.FactTypeReading
+                                                                     Where FactTypeReading.PredicatePart(0).Role.JoinedORMObject.Id = lrQueryEdge.BaseNode.Name
+                                                                     Where FactTypeReading.PredicatePart(1).Role.JoinedORMObject.Id = lrQueryEdge.TargetNode.Name
+                                                                     Select FactTypeReading
+                                            If larFactTypeReading.Count > 0 Then
+                                                lrFactType = larFactTypeReading.First.FactType
+                                            End If
                                         End If
                                     End If
-                                End If
-                            Else
-                                If lrQueryEdge.FBMFactTypeReading IsNot Nothing Then
-                                    lrPredicatePart = larPredicatePart.Find(Function(x) x.FactTypeReading Is lrQueryEdge.FBMFactTypeReading)
                                 Else
-                                    lrPredicatePart = larPredicatePart.First 'For now...need to consider PreboundReadingText/s
+                                    If lrQueryEdge.FBMFactTypeReading IsNot Nothing Then
+                                        lrPredicatePart = larPredicatePart.Find(Function(x) x.FactTypeReading Is lrQueryEdge.FBMFactTypeReading)
+                                    Else
+                                        lrPredicatePart = larPredicatePart.First 'For now...need to consider PreboundReadingText/s
+                                    End If
                                 End If
                             End If
-
                             Dim lrResponsibleRole As FBM.Role
 
                             If lrPredicatePart.Role.JoinedORMObject Is lrQueryEdge.BaseNode.FBMModelObject Then
@@ -1036,7 +1039,7 @@
                                                 End Select
                                             Else
                                                 lrColumn = lrQueryEdge.BaseNode.RDSTable.Column.Find(Function(x) x.Role.FactType Is lrQueryEdge.FBMFactType)
-                                                lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") & lrQueryEdge.BaseNode.RDSTable.DatabaseName & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrColumn.Name & " = "
+                                                lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") & lrQueryEdge.BaseNode.RDSTable.DatabaseName & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrColumn.Name & lrQueryEdge.getTargetSQLComparator
                                                 Select Case lrColumn.getMetamodelDataType
                                                     Case Is = pcenumORMDataType.TemporalDateAndTime,
                                                               pcenumORMDataType.TemporalDate
