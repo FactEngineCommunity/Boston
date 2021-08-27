@@ -171,6 +171,7 @@ Public Module tableORMPredicatePart
             End If
 
             lREcordset.Close()
+
         Catch ex As Exception
             Dim lsMessage1 As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()

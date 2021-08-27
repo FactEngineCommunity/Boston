@@ -109,6 +109,8 @@ Namespace TableJoinPathRole
                     lREcordset.MoveNext()
                 End While
 
+                lREcordset.Close()
+
                 Call lrJoinPath.ConstructFactTypePath()
 
                 Return lrJoinPath

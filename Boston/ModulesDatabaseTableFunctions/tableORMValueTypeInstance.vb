@@ -73,11 +73,9 @@ Namespace TableValueTypeInstance
 
                 lREcordset.Open(lsSQLQuery)
 
-                If Not lREcordset.EOF Then
-                    While Not lREcordset.EOF
+
+                While Not lREcordset.EOF
                         lrValueTypeInstance = New FBM.ValueTypeInstance
-                        lrValueTypeInstance.Model = lrPage.Model
-                        lrValueTypeInstance.Page = lrPage
                         lrValueTypeInstance.Id = lREcordset("ValueTypeId").Value
 
                         lrValueTypeInstance.ValueType = lrPage.Model.ValueType.Find(Function(x) x.Id = lrValueTypeInstance.Id)
@@ -94,33 +92,33 @@ Namespace TableValueTypeInstance
                         End If
 
 
-                        '-------------------------------------------------------------------------------------------
-                        'CodeSafe: Remove the ValueTypeInstance if it references a ValueType that no longer exists
-                        If lrValueTypeInstance.ValueType Is Nothing Then
-                            Call TableValueTypeInstance.DeleteValueTypeInstance(lrValueTypeInstance)
-                        Else
-                            lrValueTypeInstance.Name = lREcordset("ValueTypeName").Value
-                            lrValueTypeInstance.X = lREcordset("x").Value
-                            lrValueTypeInstance.Y = lREcordset("y").Value
-                            lrValueTypeInstance.DataType = CType([Enum].Parse(GetType(pcenumORMDataType), Trim(lREcordset("DataType").Value)), pcenumORMDataType)
-                            lrValueTypeInstance.DataTypeLength = lREcordset("DataTypeLength").Value
-                            lrValueTypeInstance.DataTypePrecision = lREcordset("DataTypePrecision").Value
-                            lrValueTypeInstance.ValueConstraint = lrValueTypeInstance.ValueType.ValueConstraint.Clone
-                            lrValueTypeInstance.ShortDescription = lrValueTypeInstance.ValueType.ShortDescription
-                            lrValueTypeInstance.LongDescription = lrValueTypeInstance.ValueType.LongDescription
-                            lrValueTypeInstance.GUID = lrValueTypeInstance.ValueType.GUID
-                            lrValueTypeInstance.IsIndependent = lrValueTypeInstance.ValueType.IsIndependent
+                    '-------------------------------------------------------------------------------------------
+                    'CodeSafe: Remove the ValueTypeInstance if it references a ValueType that no longer exists
+                    If lrValueTypeInstance.ValueType Is Nothing Then
+                        Call TableValueTypeInstance.DeleteValueTypeInstance(lrValueTypeInstance)
+                    Else
 
-                            getValueTypeInstances_by_page.Add(lrValueTypeInstance)
-                        End If
+                        lrValueTypeInstance.Model = lrPage.Model
+                        lrValueTypeInstance.Page = lrPage
+                        lrValueTypeInstance.Name = lREcordset("ValueTypeName").Value
+                        lrValueTypeInstance.DataType = CType([Enum].Parse(GetType(pcenumORMDataType), Trim(lREcordset("DataType").Value)), pcenumORMDataType)
+                        lrValueTypeInstance.DataTypeLength = lREcordset("DataTypeLength").Value
+                        lrValueTypeInstance.DataTypePrecision = lREcordset("DataTypePrecision").Value
+                        lrValueTypeInstance.ValueConstraint = lrValueTypeInstance.ValueType.ValueConstraint.Clone
+                        lrValueTypeInstance.ShortDescription = lrValueTypeInstance.ValueType.ShortDescription
+                        lrValueTypeInstance.LongDescription = lrValueTypeInstance.ValueType.LongDescription
+                        lrValueTypeInstance.GUID = lrValueTypeInstance.ValueType.GUID
+                        lrValueTypeInstance.IsIndependent = lrValueTypeInstance.ValueType.IsIndependent
 
-                        lREcordset.MoveNext()
-                    End While
-                Else
-                    '----------------------------------------
-                    'Nothing to add
-                    '-------------------
-                End If
+                        lrValueTypeInstance.X = lREcordset("x").Value
+                        lrValueTypeInstance.Y = lREcordset("y").Value
+
+                        getValueTypeInstances_by_page.Add(lrValueTypeInstance)
+                    End If
+
+                    lREcordset.MoveNext()
+
+                End While
 
                 lREcordset.Close()
 

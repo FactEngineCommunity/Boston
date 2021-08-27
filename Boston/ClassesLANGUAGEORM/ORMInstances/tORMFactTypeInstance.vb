@@ -1205,7 +1205,9 @@ Namespace FBM
 
         Sub GetFactInstancesFromDatabase()
 
-            Call GetFactsForFactTypeInstance(Me)
+            If Not Me.FactType.IsMDAModelElement Or Me.Id = pcenumCMMLRelations.CoreElementHasElementType.ToString Then
+                Call GetFactsForFactTypeInstance(Me)
+            End If
 
         End Sub
 

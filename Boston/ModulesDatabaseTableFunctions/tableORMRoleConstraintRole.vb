@@ -202,6 +202,8 @@ Namespace TableRoleConstraintRole
                     End While
                 End If
 
+                lREcordset.Close()
+
             Catch ex As Exception
                 Dim lsMessage As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()

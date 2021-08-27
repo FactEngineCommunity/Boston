@@ -92,42 +92,39 @@ Namespace TableModelNoteInstance
 
                 lREcordset.Open(lsSQLQuery)
 
-                If Not lREcordset.EOF Then
-                    While Not lREcordset.EOF
-                        lrModelNoteInstance = New FBM.ModelNoteInstance
-                        lrModelNoteInstance.Model = arPage.Model
-                        lrModelNoteInstance.Page = arPage
-                        lrModelNoteInstance.Id = lREcordset("ModelNoteId").Value
-                        lrModelNoteInstance.ModelNote.Id = lrModelNoteInstance.Id
-                        lrModelNoteInstance.ModelNote = arPage.Model.ModelNote.Find(AddressOf lrModelNoteInstance.ModelNote.Equals)
 
-                        lrModelNoteInstance.Text = Trim(lREcordset("Note").Value)
+                While Not lREcordset.EOF
+                    lrModelNoteInstance = New FBM.ModelNoteInstance
+                    lrModelNoteInstance.Model = arPage.Model
+                    lrModelNoteInstance.Page = arPage
+                    lrModelNoteInstance.Id = lREcordset("ModelNoteId").Value
+                    lrModelNoteInstance.ModelNote.Id = lrModelNoteInstance.Id
+                    lrModelNoteInstance.ModelNote = arPage.Model.ModelNote.Find(AddressOf lrModelNoteInstance.ModelNote.Equals)
 
-                        If IsSomething(lrModelNoteInstance.ModelNote.JoinedObjectType) Then
-                            lrModelNoteInstance.JoinedObjectType = New FBM.ModelObject
-                            Select Case lrModelNoteInstance.ModelNote.JoinedObjectType.ConceptType
-                                Case Is = pcenumConceptType.EntityType
-                                    lrModelNoteInstance.JoinedObjectType = arPage.EntityTypeInstance.Find(AddressOf lrModelNoteInstance.ModelNote.JoinedObjectType.Equals)
-                                Case Is = pcenumConceptType.ValueType
-                                    lrModelNoteInstance.JoinedObjectType = arPage.ValueTypeInstance.Find(AddressOf lrModelNoteInstance.ModelNote.JoinedObjectType.Equals)
-                                Case Is = pcenumConceptType.FactType
-                                    lrModelNoteInstance.JoinedObjectType = arPage.FactTypeInstance.Find(AddressOf lrModelNoteInstance.ModelNote.JoinedObjectType.Equals)
-                            End Select
-                        Else
-                            lrModelNoteInstance.JoinedObjectType = Nothing
-                        End If
+                    lrModelNoteInstance.Text = Trim(lREcordset("Note").Value)
 
-                        lrModelNoteInstance.X = lREcordset("x").Value
-                        lrModelNoteInstance.Y = lREcordset("y").Value
+                    If IsSomething(lrModelNoteInstance.ModelNote.JoinedObjectType) Then
+                        lrModelNoteInstance.JoinedObjectType = New FBM.ModelObject
+                        Select Case lrModelNoteInstance.ModelNote.JoinedObjectType.ConceptType
+                            Case Is = pcenumConceptType.EntityType
+                                lrModelNoteInstance.JoinedObjectType = arPage.EntityTypeInstance.Find(AddressOf lrModelNoteInstance.ModelNote.JoinedObjectType.Equals)
+                            Case Is = pcenumConceptType.ValueType
+                                lrModelNoteInstance.JoinedObjectType = arPage.ValueTypeInstance.Find(AddressOf lrModelNoteInstance.ModelNote.JoinedObjectType.Equals)
+                            Case Is = pcenumConceptType.FactType
+                                lrModelNoteInstance.JoinedObjectType = arPage.FactTypeInstance.Find(AddressOf lrModelNoteInstance.ModelNote.JoinedObjectType.Equals)
+                        End Select
+                    Else
+                        lrModelNoteInstance.JoinedObjectType = Nothing
+                    End If
 
-                        getModelNoteInstancesByPage.Add(lrModelNoteInstance)
-                        lREcordset.MoveNext()
-                    End While
-                Else
-                    '----------------------------------------
-                    'Nothing to add
-                    '-------------------
-                End If
+                    lrModelNoteInstance.X = lREcordset("x").Value
+                    lrModelNoteInstance.Y = lREcordset("y").Value
+
+                    getModelNoteInstancesByPage.Add(lrModelNoteInstance)
+                    lREcordset.MoveNext()
+                End While
+
+                lREcordset.Close()
 
             Catch ex As Exception
                 Dim lsMessage1 As String

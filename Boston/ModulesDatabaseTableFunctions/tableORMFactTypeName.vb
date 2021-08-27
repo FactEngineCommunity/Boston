@@ -29,7 +29,8 @@
             lrConceptInstance.Y = 0
 
             If TableConceptInstance.ExistsConceptInstance(lrConceptInstance) Then
-                Call TableConceptInstance.GetConceptInstanceDetails(lrConceptInstance)
+                '20210827-Removed below to vastly speed things up.
+                'Call TableConceptInstance.GetConceptInstanceDetails(lrConceptInstance)
                 arFactTypeName.X = lrConceptInstance.X
                 arFactTypeName.Y = lrConceptInstance.Y
                 If Not arFactTypeName.FactTypeInstance.IsObjectified Then

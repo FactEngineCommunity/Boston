@@ -143,6 +143,7 @@ Public Module tableClientServerUser
                 lREcordset.MoveNext()
             End While
 
+            lREcordset.Close()
         Catch ex As Exception
             Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()

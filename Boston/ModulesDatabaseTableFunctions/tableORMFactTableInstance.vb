@@ -57,7 +57,8 @@ Namespace TableFactTableInstance
             lrConceptInstance.Y = 0
 
             If TableConceptInstance.ExistsConceptInstance(lrConceptInstance) Then
-                Call TableConceptInstance.GetConceptInstanceDetails(lrConceptInstance)
+                '20210827-Removed the below to vastly speed things up.
+                'Call TableConceptInstance.GetConceptInstanceDetails(lrConceptInstance)
                 arFactTable.X = lrConceptInstance.X
                 arFactTable.Y = lrConceptInstance.Y
             Else
@@ -91,26 +92,25 @@ Namespace TableFactTableInstance
 
             getFactTablesByPage = New List(Of FBM.FactTable)
 
-            If Not lRecordset.EOF Then
-                While Not lRecordset.EOF
-                    lrFactTableInstance = New FBM.FactTable
-                    lrFactTableInstance.Model = ar_page.Model
-                    lrFactTableInstance.Page = ar_page
-                    lrFactTableInstance.Id = lRecordset("Symbol").Value
-                    lrFactTableInstance.Name = lRecordset("Symbol").Value
-                    lrFactTableInstance.FactTypeInstance = ar_page.FactTypeInstance.Find(Function(x) x.Id = lrFactTableInstance.Id)
 
-                    lrFactTableInstance.X = lRecordset("x").Value
-                    lrFactTableInstance.Y = lRecordset("y").Value
+            While Not lRecordset.EOF
+                lrFactTableInstance = New FBM.FactTable
+                lrFactTableInstance.Model = ar_page.Model
+                lrFactTableInstance.Page = ar_page
+                lrFactTableInstance.Id = lRecordset("Symbol").Value
+                lrFactTableInstance.Name = lRecordset("Symbol").Value
+                lrFactTableInstance.FactTypeInstance = ar_page.FactTypeInstance.Find(Function(x) x.Id = lrFactTableInstance.Id)
 
-                    getFactTablesByPage.Add(lrFactTableInstance)
-                    lRecordset.MoveNext()
-                End While
-            Else
-                '----------------------------------------
-                'Nothing to add
-                '-------------------
-            End If
+                lrFactTableInstance.X = lRecordset("x").Value
+                lrFactTableInstance.Y = lRecordset("y").Value
+
+                getFactTablesByPage.Add(lrFactTableInstance)
+
+                lRecordset.MoveNext()
+
+            End While
+
+            lRecordset.Close()
 
         End Function
 

@@ -29,7 +29,8 @@
             lrConceptInstance.Y = 0
 
             If TableConceptInstance.ExistsConceptInstance(lrConceptInstance) Then
-                Call TableConceptInstance.GetConceptInstanceDetails(lrConceptInstance)
+                '20210827-VM-Removed the below to vastly speed things up.
+                'Call TableConceptInstance.GetConceptInstanceDetails(lrConceptInstance)
                 arFactTypeDerivationText.X = lrConceptInstance.X
                 arFactTypeDerivationText.Y = lrConceptInstance.Y
             End If

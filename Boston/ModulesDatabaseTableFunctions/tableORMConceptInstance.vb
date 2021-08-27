@@ -125,7 +125,7 @@ Namespace TableConceptInstance
 
         End Sub
 
-        Public Function ExistsConceptInstance(ByVal arConceptInstance As FBM.ConceptInstance) As Boolean
+        Public Function ExistsConceptInstance(ByRef arConceptInstance As FBM.ConceptInstance) As Boolean
 
             Dim lsSQLQuery As String = ""
             Dim lREcordset As New ADODB.Recordset
@@ -133,7 +133,7 @@ Namespace TableConceptInstance
             lREcordset.ActiveConnection = pdbConnection
             lREcordset.CursorType = pcOpenStatic
 
-            lsSQLQuery = " SELECT COUNT(*)"
+            lsSQLQuery = " SELECT *"
             lsSQLQuery &= "  FROM ModelConceptInstance"
             lsSQLQuery &= " WHERE ModelId = '" & Trim(arConceptInstance.ModelId) & "'"
             lsSQLQuery &= "   AND PageId = '" & Trim(arConceptInstance.PageId) & "'"
@@ -143,10 +143,15 @@ Namespace TableConceptInstance
 
             lREcordset.Open(lsSQLQuery)
 
-            If lREcordset(0).Value = 0 Then
-                ExistsConceptInstance = False
+            If Not lREcordset.EOF Then
+                arConceptInstance.X = lREcordset("x").Value
+                arConceptInstance.Y = lREcordset("y").Value
+                arConceptInstance.Orientation = lREcordset("Orientation").Value
+                arConceptInstance.Visible = lREcordset("IsVisible").Value
+
+                Return True
             Else
-                ExistsConceptInstance = True
+                Return False
             End If
 
             lREcordset.Close()

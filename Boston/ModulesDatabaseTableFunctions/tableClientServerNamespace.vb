@@ -128,6 +128,8 @@ Public Module tableClientServerNamespace
                 lREcordset.MoveNext()
             End While
 
+            lREcordset.Close()
+
             Return larNamespace
         Catch ex As Exception
             Dim lsMessage As String

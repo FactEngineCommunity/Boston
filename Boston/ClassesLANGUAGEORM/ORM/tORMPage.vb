@@ -1840,12 +1840,14 @@ Namespace FBM
                 'CodeSafe
                 If Me.Loading Or Me.Loaded Then Exit Sub
 
+                'If Me.Name.StartsWith("ERD") Then Debugger.Break()
+
                 Me.Loading = True
                 '------------------------------------
                 'Get ValueTypes
                 '------------------------------------
-                Richmond.WriteToStatusBar("Loading Page: '" & Me.Name & "' Value Types")
-                prApplication.ThrowErrorMessage("Loading Page.ValueTypes", pcenumErrorType.Information)
+                'Richmond.WriteToStatusBar("Loading Page: '" & Me.Name & "' Value Types")
+                'prApplication.ThrowErrorMessage("Loading Page.ValueTypes", pcenumErrorType.Information)
                 'If TableValueTypeInstance.getValueTypeInstance_count_by_page(Me) > 0 Then
                 '-----------------------------------------------
                 'There are EntityTypes within the ORMDiagram
@@ -1859,8 +1861,8 @@ Namespace FBM
                 '-----------------
                 'Get EntityTypes
                 '-----------------
-                Richmond.WriteToStatusBar("Loading Page: '" & Me.Name & "' Entity Types")
-                prApplication.ThrowErrorMessage("Loading Page.EntityTypes", pcenumErrorType.Information)
+                'Richmond.WriteToStatusBar("Loading Page: '" & Me.Name & "' Entity Types")
+                'prApplication.ThrowErrorMessage("Loading Page.EntityTypes", pcenumErrorType.Information)
                 'If TableEntityTypeInstance.getEntityTypeInstance_count_by_page(Me) > 0 Then
                 '-----------------------------------------------
                 'There are EntityTypes within the ORMDiagram
@@ -1874,8 +1876,8 @@ Namespace FBM
                 '---------------
                 'Get FactTypes
                 '---------------
-                Richmond.WriteToStatusBar("Loading Page: '" & Me.Name & "' Fact Types")
-                prApplication.ThrowErrorMessage("Loading Page.FactTypes for Page.Name:" & Me.Name, pcenumErrorType.Information)
+                'Richmond.WriteToStatusBar("Loading Page: '" & Me.Name & "' Fact Types")
+                'prApplication.ThrowErrorMessage("Loading Page.FactTypes for Page.Name:" & Me.Name, pcenumErrorType.Information)
 
                 '-----------------------------------------------
                 'There are FactTypes within the ORMDiagram
@@ -1911,8 +1913,8 @@ Namespace FBM
                 '---------------------
                 'Get RoleConstraints
                 '---------------------
-                Richmond.WriteToStatusBar("Loading Page: '" & Me.Name & "' Role Constraints")
-                prApplication.ThrowErrorMessage("Loading Page.RoleConstraints", pcenumErrorType.Information)
+                'Richmond.WriteToStatusBar("Loading Page: '" & Me.Name & "' Role Constraints")
+                'prApplication.ThrowErrorMessage("Loading Page.RoleConstraints", pcenumErrorType.Information)
 
                 Me.RoleConstraintInstance = TableRoleConstraintInstance.GetRoleConstraintInstancesByPage(Me)
 
@@ -1930,13 +1932,13 @@ Namespace FBM
                 '----------------
                 'Get ModelNotes
                 '----------------
-                Richmond.WriteToStatusBar("Loading Page: '" & Me.Name & "' Model Notes")
-                prApplication.ThrowErrorMessage("Loading Page.ModelNotes", pcenumErrorType.Information)
+                'Richmond.WriteToStatusBar("Loading Page: '" & Me.Name & "' Model Notes")
+                'prApplication.ThrowErrorMessage("Loading Page.ModelNotes", pcenumErrorType.Information)
                 If TableModelNoteInstance.getModelNoteInstanceCountByPage(Me) > 0 Then
                     Me.ModelNote = TableModelNoteInstance.getModelNoteInstancesByPage(Me)
                 End If
 
-                Richmond.WriteToStatusBar(".")
+                'Richmond.WriteToStatusBar(".")
                 Me.Loaded = True
                 Me.IsDirty = False
 

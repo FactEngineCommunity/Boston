@@ -184,11 +184,13 @@ Namespace TableFactTypeReading
 
                         lREcordset.MoveNext()
                     End While
+
                 Else
                     GetFactTypeReadingsForFactType = New List(Of FBM.FactTypeReading)
                 End If
 
                 lREcordset.Close()
+
             Catch ex As Exception
                 Dim lsMessage1 As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
