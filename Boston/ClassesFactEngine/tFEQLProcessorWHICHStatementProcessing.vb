@@ -952,7 +952,17 @@
             If lrFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & Me.WHICHCLAUSE.NODE(0).MODELELEMENTNAME & "'.")
             arQueryEdge.TargetNode = New FactEngine.QueryNode(lrFBMModelObject)
             arQueryEdge.TargetNode.Alias = Me.WHICHCLAUSE.NODE(0).MODELELEMENTSUFFIX
+            If arWHICHCLAUSE.NODE(0).NODEPROPERTYIDENTIFICATION IsNot Nothing Then
+                arQueryEdge.TargetNode.Comparitor = arWHICHCLAUSE.NODE(0).NODEPROPERTYIDENTIFICATION.getComparitorType
 
+                '---------------------------------------------------------
+                'Set the Identification
+                For Each lsIdentifier In Me.WHICHCLAUSE.NODE(0).NODEPROPERTYIDENTIFICATION.IDENTIFIER
+                    arQueryEdge.IdentifierList.Add(lsIdentifier)
+                    arQueryEdge.TargetNode.HasIdentifier = True
+                    arQueryEdge.TargetNode.IdentifierList.Add(lsIdentifier)
+                Next
+            End If
 
             If arQueryEdge.TargetNode.Alias Is Nothing Then '20200810-VM-May need to revise this
                 arQueryGraph.Nodes.Add(arQueryEdge.TargetNode) 'was simply addUnique 20200807-VM
@@ -1033,6 +1043,7 @@
                 arQueryEdge.TargetNode.PostboundText = arWHICHCLAUSE.NODE(0).POSTBOUNDREADINGTEXT
                 arQueryEdge.TargetNode.Alias = arWHICHCLAUSE.NODE(0).MODELELEMENTSUFFIX
             End If
+            arQueryEdge.TargetNode.Comparitor = arWHICHCLAUSE.NODE(0).NODEPROPERTYIDENTIFICATION.getComparitorType
 
             If lrFBMModelObject.ConceptType = pcenumConceptType.ValueType Then
                 arQueryEdge.WhichClauseSubType = FactEngine.Constants.pcenumWhichClauseType.IsPredicateNodePropertyIdentification

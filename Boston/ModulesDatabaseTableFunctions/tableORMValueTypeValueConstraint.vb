@@ -112,13 +112,12 @@ Namespace TableValueTypeValueConstraint
                         Dim lrDictionaryEntry As FBM.DictionaryEntry = New FBM.DictionaryEntry(arValueType.Model, lREcordset("Symbol").Value, pcenumConceptType.Value)
 
                         '--------------------------------------------
-                        'Add the Concept/Symbol/Value to the Model
-                        '  if it does not already exist within the 
-                        '  ModelDictionary (e.g. The same 'Value'
-                        '  may be within many ValueConstraints/Facts
+                        'Add the Concept/Symbol/Value to the Model if it does not already exist within the 
+                        '  ModelDictionary (e.g. The same 'Value' may be within many ValueConstraints/Facts
+                        '  NB Needs to be CaseInsensitive because MSAccess/Jet is not case sensitive.
+                        '  This is because otherwise HORSE would override Horse on save back to database. This can be problematic for DBName where Horse is otherwise an Entity with a DBName and HORSE may just be a Value.
                         '--------------------------------------------
-                        lrDictionaryEntry = arValueType.Model.AddModelDictionaryEntry(lrDictionaryEntry, True, True, False, False, True, True)
-
+                        lrDictionaryEntry = arValueType.Model.AddModelDictionaryEntry(lrDictionaryEntry, True, True, False, False, False, True, True)
 
                         lREcordset.MoveNext()
                     End While

@@ -331,13 +331,23 @@ Namespace FactEngine
             Return "::text"
         End Function
 
-        Public Overrides Function FormatDateTime(ByVal asOriginalDate As String) As String
+        Public Overrides Function FormatDateTime(ByVal asOriginalDate As String,
+                                                 Optional ByVal abIgnoreError As Boolean = False) As String
 
             Try
 
                 Dim lsPattern As String = "yyyy-MM-dd HH:mm:ss"
 
-                Return Convert.ToDateTime(asOriginalDate, System.Threading.Thread.CurrentThread.CurrentUICulture).ToString(lsPattern)
+                Try
+                    Return Convert.ToDateTime(asOriginalDate, System.Threading.Thread.CurrentThread.CurrentUICulture).ToString(lsPattern)
+                Catch ex As Exception
+                    If abIgnoreError Then
+                        Return asOriginalDate
+                    Else
+                        Throw New Exception(ex.Message)
+                    End If
+                End Try
+
 
             Catch ex As Exception
                 Dim lsMessage As String

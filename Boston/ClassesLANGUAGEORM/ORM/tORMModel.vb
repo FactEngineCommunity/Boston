@@ -1768,13 +1768,13 @@ Namespace FBM
                                                 Optional ByVal abCheckForErrors As Boolean = False,
                                                 Optional ByVal abStraightSave As Boolean = False,
                                                 Optional ByVal abMatchCase As Boolean = False,
-                                                Optional ByVal abMakeDirtyIfNotExists As Boolean = False) As FBM.DictionaryEntry
+                                                Optional ByVal abMakeDirtyIfNotExists As Boolean = False,
+                                                Optional ByVal abCaseInsensitive As Boolean = False) As FBM.DictionaryEntry
 
             Dim lrDictionaryEntry As FBM.DictionaryEntry = Nothing
             Dim liInd As Integer
 
             Try
-
                 If abStraightSave Then
                     lrDictionaryEntry = arDictionaryEntry
                     Me.ModelDictionary.Add(arDictionaryEntry)
@@ -1789,6 +1789,8 @@ Namespace FBM
                     If Me.Dictionary.ContainsKey(arDictionaryEntry.Symbol) Then
                         lrDictionaryEntry = Me.ModelDictionary(Me.Dictionary(arDictionaryEntry.Symbol))
                     End If
+                ElseIf abCaseInsensitive Then
+                    lrDictionaryEntry = Me.ModelDictionary.Find(AddressOf arDictionaryEntry.EqualsLowercase)
                 Else
                     If Me.Dictionary.TryGetValue(arDictionaryEntry.Symbol, liInd) Then
                         Try
@@ -1819,19 +1821,6 @@ Namespace FBM
                         'CodeSafe - Only allow multiple Value realisations.
                         lrDictionaryEntry.AddRealisation(arDictionaryEntry.ConceptType, arDictionaryEntry.ConceptType <> pcenumConceptType.Value)
                     End If
-                    'Update the DBName.
-                    Select Case arDictionaryEntry.ConceptType
-                        Case Is = pcenumConceptType.EntityType,
-                                  pcenumConceptType.FactType
-                            Select Case lrDictionaryEntry.ConceptType
-                                Case Is = pcenumConceptType.EntityType,
-                                          pcenumConceptType.FactType,
-                                          pcenumConceptType.GeneralConcept
-                                Case Else
-                                    lrDictionaryEntry.DBName = arDictionaryEntry.DBName
-                            End Select
-                    End Select
-
                 Else
                     '----------------------------------------------
                     'Add a the new Concept to the ModelDictionary

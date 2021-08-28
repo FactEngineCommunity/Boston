@@ -21,7 +21,8 @@ Namespace RDS
         Public Property DatabaseName As String
             Get
                 If Me.FBMModelElement Is Nothing Then
-                    'Should only be used when reverse engineering and where the TempModel that is initially populated from the database does not have FBMModelElements.
+                    'Should only be used when reverse engineering and where the TempModel that is initially
+                    '  populated From the database does not have FBMModelElements.
                     Return Me._DatabaseName
                 Else
                     If Me.FBMModelElement.IsDatabaseReservedWord Then

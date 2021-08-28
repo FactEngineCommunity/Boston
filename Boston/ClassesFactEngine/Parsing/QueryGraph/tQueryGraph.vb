@@ -940,7 +940,13 @@
                                                 Where Column.ActiveRole.JoinedORMObject Is lrQueryEdge.TargetNode.FBMModelObject
                                                 Select Column).First
 
-                                lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") & lrTable.DatabaseName & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrColumn.Name & lrQueryEdge.getTargetSQLComparator
+                                lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") & lrTable.DatabaseName & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrColumn.Name
+                                Select Case lrColumn.getMetamodelDataType
+                                    Case Is = pcenumORMDataType.TemporalDate,
+                                              pcenumORMDataType.TemporalDateAndTime
+                                        lsSQLQuery &= prApplication.WorkingModel.DatabaseConnection.dateToTextOperator
+                                End Select
+                                lsSQLQuery &= lrQueryEdge.getTargetSQLComparator
                                 Select Case lrColumn.getMetamodelDataType
                                     Case Is = pcenumORMDataType.TemporalDateAndTime
                                         Dim lsDateTime As String = Me.Model.DatabaseConnection.FormatDateTime(lrQueryEdge.IdentifierList(0))
@@ -958,16 +964,12 @@
                                                 Select Column).First
 
                                 lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") & lrQueryEdge.BaseNode.RDSTable.DatabaseName & Viev.NullVal(lrQueryEdge.BaseNode.Alias, "") & "." & lrColumn.Name
-                                Select Case lrQueryEdge.TargetNode.Comparitor
-                                    Case Is = FEQL.pcenumFEQLComparitor.Bang
-                                        lsSQLQuery &= " <> "
-                                    Case Is = FEQL.pcenumFEQLComparitor.Colon,
-                                              FEQL.pcenumFEQLComparitor.Carret
-                                        lsSQLQuery &= " = "
-                                    Case Is = FEQL.pcenumFEQLComparitor.LikeComparitor
-                                        lsSQLQuery &= " LIKE "
+                                Select Case lrColumn.getMetamodelDataType
+                                    Case Is = pcenumORMDataType.TemporalDate,
+                                              pcenumORMDataType.TemporalDateAndTime
+                                        lsSQLQuery &= prApplication.WorkingModel.DatabaseConnection.dateToTextOperator
                                 End Select
-
+                                lsSQLQuery &= lrQueryEdge.getTargetSQLComparator
                                 Select Case lrColumn.getMetamodelDataType
                                     Case Is = pcenumORMDataType.TemporalDateAndTime
                                         Dim lsDateTime As String = Me.Model.DatabaseConnection.FormatDateTime(lrQueryEdge.IdentifierList(0))
@@ -1048,11 +1050,17 @@
                                                 End Select
                                             Else
                                                 lrColumn = lrQueryEdge.BaseNode.RDSTable.Column.Find(Function(x) x.Role.FactType Is lrQueryEdge.FBMFactType)
-                                                lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") & lrQueryEdge.BaseNode.RDSTable.DatabaseName & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrColumn.Name & lrQueryEdge.getTargetSQLComparator
+                                                lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") & lrQueryEdge.BaseNode.RDSTable.DatabaseName & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrColumn.Name
+                                                Select Case lrColumn.getMetamodelDataType
+                                                    Case Is = pcenumORMDataType.TemporalDate,
+                                                              pcenumORMDataType.TemporalDateAndTime
+                                                        lsSQLQuery &= prApplication.WorkingModel.DatabaseConnection.dateToTextOperator
+                                                End Select
+                                                lsSQLQuery &= lrQueryEdge.getTargetSQLComparator
                                                 Select Case lrColumn.getMetamodelDataType
                                                     Case Is = pcenumORMDataType.TemporalDateAndTime,
                                                               pcenumORMDataType.TemporalDate
-                                                        Dim lsDateTime As String = Me.Model.DatabaseConnection.FormatDateTime(lrQueryEdge.IdentifierList(0))
+                                                        Dim lsDateTime As String = Me.Model.DatabaseConnection.FormatDateTime(lrQueryEdge.IdentifierList(0), True)
                                                         lsSQLQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lsDateTime & Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
                                                     Case Else
                                                         lsSQLQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lrQueryEdge.IdentifierList(0) & Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf

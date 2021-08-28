@@ -331,7 +331,8 @@ Namespace FactEngine
 
         End Sub
 
-        Public Overrides Function FormatDateTime(ByVal asOriginalDate As String) As String
+        Public Overrides Function FormatDateTime(ByVal asOriginalDate As String,
+                                                 Optional ByVal abIgnoreError As Boolean = False) As String
 
             Try
 

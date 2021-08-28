@@ -2,28 +2,30 @@ Namespace TableModelDictionary
 
     Public Module TableModelDictionary
 
-        Public Sub AddModelDictionaryEntry(ByVal ar_dictionary_entry As FBM.DictionaryEntry)
+        Public Sub AddModelDictionaryEntry(ByVal arModelDictionaryEntry As FBM.DictionaryEntry)
 
             Dim lsSQLQuery As String = ""
+
+            If arModelDictionaryEntry.Symbol.StartsWith("Horse") Then Debugger.Break()
 
             Try
                 lsSQLQuery = "INSERT INTO MetaModelModelDictionary"
                 lsSQLQuery &= " VALUES ("
                 lsSQLQuery &= " #" & Now & "#"
                 lsSQLQuery &= " ,#" & Now & "#"
-                lsSQLQuery &= ",'" & Trim(ar_dictionary_entry.Model.ModelId) & "'"
-                lsSQLQuery &= ",'" & Trim(Replace(ar_dictionary_entry.Symbol, "'", "`")) & "'"
-                lsSQLQuery &= ",'" & Trim(Replace(ar_dictionary_entry.ShortDescription, "'", "`")) & "'"
-                lsSQLQuery &= ",'" & Trim(Replace(ar_dictionary_entry.LongDescription, "'", "`")) & "'"
-                lsSQLQuery &= "," & ar_dictionary_entry.isEntityType
-                lsSQLQuery &= "," & ar_dictionary_entry.isValueType
-                lsSQLQuery &= "," & ar_dictionary_entry.isFactType
-                lsSQLQuery &= "," & ar_dictionary_entry.isFact
-                lsSQLQuery &= "," & ar_dictionary_entry.isValue
-                lsSQLQuery &= "," & ar_dictionary_entry.isRoleConstraint
-                lsSQLQuery &= "," & ar_dictionary_entry.isModelNote
-                lsSQLQuery &= "," & ar_dictionary_entry.isGeneralConcept
-                lsSQLQuery &= ",'" & Trim(ar_dictionary_entry.DBName) & "'"
+                lsSQLQuery &= ",'" & Trim(arModelDictionaryEntry.Model.ModelId) & "'"
+                lsSQLQuery &= ",'" & Trim(Replace(arModelDictionaryEntry.Symbol, "'", "`")) & "'"
+                lsSQLQuery &= ",'" & Trim(Replace(arModelDictionaryEntry.ShortDescription, "'", "`")) & "'"
+                lsSQLQuery &= ",'" & Trim(Replace(arModelDictionaryEntry.LongDescription, "'", "`")) & "'"
+                lsSQLQuery &= "," & arModelDictionaryEntry.isEntityType
+                lsSQLQuery &= "," & arModelDictionaryEntry.isValueType
+                lsSQLQuery &= "," & arModelDictionaryEntry.isFactType
+                lsSQLQuery &= "," & arModelDictionaryEntry.isFact
+                lsSQLQuery &= "," & arModelDictionaryEntry.isValue
+                lsSQLQuery &= "," & arModelDictionaryEntry.isRoleConstraint
+                lsSQLQuery &= "," & arModelDictionaryEntry.isModelNote
+                lsSQLQuery &= "," & arModelDictionaryEntry.isGeneralConcept
+                lsSQLQuery &= ",'" & Trim(arModelDictionaryEntry.DBName) & "'"
                 lsSQLQuery &= ")"
 
                 pdbConnection.Execute(lsSQLQuery)
@@ -388,8 +390,8 @@ Namespace TableModelDictionary
                 lsSQLQuery &= "   ,IsRoleConstraint = " & arModelDictionaryEntry.isRoleConstraint
                 lsSQLQuery &= "   ,IsModelNote = " & arModelDictionaryEntry.isModelNote
                 lsSQLQuery &= "   ,IsGeneralConcept = " & arModelDictionaryEntry.isGeneralConcept
-                lsSQLQuery &= "       ,StartDate = Now"
-                lsSQLQuery &= "       ,EndDate = #31/12/9999#"
+                lsSQLQuery &= "   ,StartDate = Now"
+                lsSQLQuery &= "   ,EndDate = #31/12/9999#"
                 lsSQLQuery &= "   ,DBName = '" & Trim(arModelDictionaryEntry.DBName) & "'"
                 lsSQLQuery &= " WHERE ModelId = '" & Trim(arModelDictionaryEntry.Model.ModelId) & "'"
                 lsSQLQuery &= "   AND Symbol = '" & Trim(Replace(arModelDictionaryEntry.Symbol, "'", "`")) & "'"
