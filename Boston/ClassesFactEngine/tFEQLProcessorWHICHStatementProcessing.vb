@@ -1024,11 +1024,12 @@
             Else
                 Dim liModelElementInd = 0
                 Me.MODELELEMENTCLAUSE = New FEQL.MODELELEMENTClause
-                If Me.WHICHCLAUSE.MODELELEMENT.Count = 1 Then
+                If Me.WHICHCLAUSE.MODELELEMENTNAME.Count = 1 And Me.WHICHCLAUSE.NODE.Count = 0 Then
                     Call Me.GetParseTreeTokensReflection(Me.MODELELEMENTCLAUSE, Me.WHICHCLAUSE.MODELELEMENT(0))
                 Else
                     Me.MODELELEMENTCLAUSE.MODELELEMENTNAME = Me.WHICHCLAUSE.NODE(0).MODELELEMENTNAME
                     Me.MODELELEMENTCLAUSE.MODELELEMENTSUFFIX = Me.WHICHCLAUSE.NODE(0).MODELELEMENTSUFFIX
+                    liModelElementInd = 1
                 End If
                 If arWHICHCLAUSE.KEYWDTHAT.Count = 2 Then liModelElementInd = 1
                 lrFBMModelObject = Me.Model.GetModelObjectByName(Me.WHICHCLAUSE.MODELELEMENTNAME(liModelElementInd))
@@ -1043,7 +1044,9 @@
                 arQueryEdge.TargetNode.PostboundText = arWHICHCLAUSE.NODE(0).POSTBOUNDREADINGTEXT
                 arQueryEdge.TargetNode.Alias = arWHICHCLAUSE.NODE(0).MODELELEMENTSUFFIX
             End If
-            arQueryEdge.TargetNode.Comparitor = arWHICHCLAUSE.NODE(0).NODEPROPERTYIDENTIFICATION.getComparitorType
+            If arWHICHCLAUSE.NODE(0).NODEPROPERTYIDENTIFICATION IsNot Nothing Then
+                arQueryEdge.TargetNode.Comparitor = arWHICHCLAUSE.NODE(0).NODEPROPERTYIDENTIFICATION.getComparitorType
+            End If
 
             If lrFBMModelObject.ConceptType = pcenumConceptType.ValueType Then
                 arQueryEdge.WhichClauseSubType = FactEngine.Constants.pcenumWhichClauseType.IsPredicateNodePropertyIdentification
