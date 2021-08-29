@@ -340,21 +340,23 @@ Namespace ERD
                     Next
                 End If
 
-
-                Me.TableShape.RowCount = Me.Attribute.Count
-
                 'CodeSafe: Remove Attributes where Column is Nothing
                 Me.Attribute.RemoveAll(Function(x) x.Column Is Nothing)
 
-                liInd = 0
-                For Each lrERAttribute In Me.Attribute
-                    lrERAttribute.Cell = Me.TableShape.Item(0, liInd) 'lrERAttribute.Column.OrdinalPosition - 1)
-                    Me.TableShape.Item(0, liInd).Tag = lrERAttribute 'lrERAttribute.Column.OrdinalPosition - 1
-                    Call lrERAttribute.RefreshShape()
+                If Me.TableShape IsNot Nothing Then
 
-                    Me.TableShape.ResizeToFitText(False)
-                    liInd += 1
-                Next
+                    Me.TableShape.RowCount = Me.Attribute.Count
+
+                    liInd = 0
+                    For Each lrERAttribute In Me.Attribute
+                        lrERAttribute.Cell = Me.TableShape.Item(0, liInd) 'lrERAttribute.Column.OrdinalPosition - 1)
+                        Me.TableShape.Item(0, liInd).Tag = lrERAttribute 'lrERAttribute.Column.OrdinalPosition - 1
+                        Call lrERAttribute.RefreshShape()
+
+                        Me.TableShape.ResizeToFitText(False)
+                        liInd += 1
+                    Next
+                End If
 
             Catch ex As Exception
                 Dim lsMessage1 As String
@@ -706,8 +708,12 @@ Namespace ERD
 
         Private Sub RDSTable_NameChanged(asNewName As String) Handles RDSTable.NameChanged
 
-            Me.TableShape.Caption = asNewName
-            Call Me.Page.Diagram.Invalidate()
+            Try
+                Me.TableShape.Caption = asNewName
+                Call Me.Page.Diagram.Invalidate()
+            Catch
+                'ERD.Entities in the PropertyGrid may have no TableShape or Page.Diagram because were put there by simply selecting the Entity in the ModelDictionary.
+            End Try
 
         End Sub
 

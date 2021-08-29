@@ -476,7 +476,7 @@ Public Class frmToolboxModelDictionary
 
                 lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {myHiddenMiscAttribute})
 
-                Dim lrModelObjectInstance As FBM.ModelObject = Nothing
+                Dim lrModelObjectInstance As Object = Nothing
                 Select Case e.Node.Tag.GetType
                     Case Is = GetType(FBM.EntityType)
                         lrModelObjectInstance = CType(e.Node.Tag, FBM.EntityType).CloneInstance(New FBM.Page(Me.zrORMModel))
@@ -484,6 +484,8 @@ Public Class frmToolboxModelDictionary
                         lrModelObjectInstance = CType(e.Node.Tag, FBM.ValueType).CloneInstance(New FBM.Page(Me.zrORMModel))
                     Case Is = GetType(FBM.FactType)
                         lrModelObjectInstance = CType(e.Node.Tag, FBM.FactType).CloneInstance(New FBM.Page(Me.zrORMModel))
+                    Case Is = GetType(RDS.Table)
+                        lrModelObjectInstance = CType(e.Node.Tag, RDS.Table).CloneEntity(New FBM.Page(Me.zrORMModel))
                 End Select
                 If lrModelObjectInstance IsNot Nothing Then
                     Call lrPropertyGridForm.SetSelectedObject(lrModelObjectInstance)
@@ -1194,6 +1196,22 @@ Public Class frmToolboxModelDictionary
                 End Select
 
             End With
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
+    Private Sub PropertiesToolStripMenuItem1_Click(sender As Object, e As EventArgs) Handles PropertiesToolStripMenuItem1.Click
+
+        Try
+            Call frmMain.LoadToolboxPropertyWindow(frmMain.DockPanel.ActivePane)
 
         Catch ex As Exception
             Dim lsMessage As String

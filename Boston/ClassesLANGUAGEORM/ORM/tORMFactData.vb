@@ -466,8 +466,11 @@ Namespace FBM
         Public Overrides Sub makeDirty()
             Try
                 Me.isDirty = True
-                Me.Fact.isDirty = True
-                Me.Fact.FactType.isDirty = True
+                If Me.Fact IsNot Nothing Then
+                    'ERD.Entities shown in the PropertyGrid may have no Fact because they were selected from within the ModelDictionary.
+                    Me.Fact.isDirty = True
+                    Me.Fact.FactType.isDirty = True
+                End If
             Catch ex As Exception
                 Dim lsMessage1 As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()

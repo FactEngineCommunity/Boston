@@ -4968,6 +4968,18 @@ Namespace FBM
                         Call lrColumn.triggerForceRefreshEvent()
                     Next
 
+                    '================================================================================================
+                    'Remove FactTypeInstances from Page where FactTypeIntance has RoleInstance that Joins nothing
+
+                    Dim larFactTypeInstance = From Page In Me.Page
+                                              From FactTypeInstance In Page.FactTypeInstance
+                                              From RoleInstance In FactTypeInstance.RoleGroup
+                                              Where RoleInstance.JoinedORMObject Is Nothing
+                                              Select FactTypeInstance
+
+                    For Each lrFactTypeInstance In larFactTypeInstance.ToArray
+                        Call lrFactTypeInstance.RemoveFromPage(True)
+                    Next
 
                 End With
 

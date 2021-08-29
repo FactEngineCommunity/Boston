@@ -130,6 +130,17 @@ Namespace RDS
 
         End Function
 
+        Public Function CloneEntity(ByRef arPage As FBM.Page) As ERD.Entity
+
+            Dim lrEntity As New ERD.Entity(arPage, Me)
+            Try
+                Return lrEntity
+            Catch ex As Exception
+                Return Nothing
+            End Try
+
+        End Function
+
         Public Shadows Function Equals(other As Table) As Boolean Implements IEquatable(Of Table).Equals
 
             Return Me.Name = other.Name
