@@ -1860,11 +1860,20 @@ Public Class frmDiagramORM
                 If lrFactTable.FactTypeInstance.Fact.Count > 0 Then
                     lrFactDataInstance = lrFactTable.TableShape.Item(0, lrFactTable.SelectedRow - 1).Tag
                     lrFact = lrFactDataInstance.Fact.Fact
-                    Try
-                        Call lrToolboxForm.VerbaliseFact(lrFact)
-                    Catch ex As Exception
+                    If My.Settings.SuperuserMode Then
+                        Try
+                            Call lrToolboxForm.VerbaliseFactInstance(lrFactDataInstance.Fact)
+                        Catch ex As Exception
 
-                    End Try
+                        End Try
+                    Else
+                        Try
+                            Call lrToolboxForm.VerbaliseFact(lrFact)
+                        Catch ex As Exception
+
+                        End Try
+                    End If
+
 
                 End If
             End If
@@ -10207,28 +10216,32 @@ Public Class frmDiagramORM
                 Exit Sub
             End If
 
-            lrFactTable = Me.zrPage.SelectedObject(0)
+            Try
+                lrFactTable = Me.zrPage.SelectedObject(0)
+            Catch
+                Exit Sub
+            End Try
 
             Dim larFactsWithErrors As New List(Of FBM.Fact)
-            larFactsWithErrors = lrFactTable.FactTypeInstance.FactType.Fact.FindAll(Function(x) x.ModelError.Count > 0)
-            If larFactsWithErrors.Count > 0 Then
-                Me.ToolStripMenuItemFactModelErrors.Image = My.Resources.MenuImages.RainCloudRed16x16
-                Me.ToolStripMenuItemFactModelErrors.DropDownItems.Clear()
-                For Each lrFact In lrFactTable.FactTypeInstance.FactType.Fact
-                    For Each lrModelError In lrFact.ModelError
-                        lo_menu_option = Me.ToolStripMenuItemFactModelErrors.DropDownItems.Add(lrModelError.Description)
-                        lo_menu_option.Image = My.Resources.MenuImages.RainCloudRed16x16
+                larFactsWithErrors = lrFactTable.FactTypeInstance.FactType.Fact.FindAll(Function(x) x.ModelError.Count > 0)
+                If larFactsWithErrors.Count > 0 Then
+                    Me.ToolStripMenuItemFactModelErrors.Image = My.Resources.MenuImages.RainCloudRed16x16
+                    Me.ToolStripMenuItemFactModelErrors.DropDownItems.Clear()
+                    For Each lrFact In lrFactTable.FactTypeInstance.FactType.Fact
+                        For Each lrModelError In lrFact.ModelError
+                            lo_menu_option = Me.ToolStripMenuItemFactModelErrors.DropDownItems.Add(lrModelError.Description)
+                            lo_menu_option.Image = My.Resources.MenuImages.RainCloudRed16x16
+                        Next
                     Next
-                Next
-            Else
-                Me.ToolStripMenuItemFactModelErrors.Image = My.Resources.MenuImages.Cloud216x16
-                Me.ToolStripMenuItemFactModelErrors.DropDownItems.Clear()
-                lo_menu_option = Me.ToolStripMenuItemFactModelErrors.DropDownItems.Add("There are no Model Errors for the Facts of this Fact Type.")
-                lo_menu_option.Image = My.Resources.MenuImages.Cloud216x16
-            End If
+                Else
+                    Me.ToolStripMenuItemFactModelErrors.Image = My.Resources.MenuImages.Cloud216x16
+                    Me.ToolStripMenuItemFactModelErrors.DropDownItems.Clear()
+                    lo_menu_option = Me.ToolStripMenuItemFactModelErrors.DropDownItems.Add("There are no Model Errors for the Facts of this Fact Type.")
+                    lo_menu_option.Image = My.Resources.MenuImages.Cloud216x16
+                End If
 
-        Catch ex As Exception
-            Dim lsMessage As String
+            Catch ex As Exception
+                Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name

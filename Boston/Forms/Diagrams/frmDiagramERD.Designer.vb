@@ -60,10 +60,9 @@ Partial Class frmDiagramERD
         Me.AutoLayoutToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.CopyToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ContextMenuStripAttribute = New System.Windows.Forms.ContextMenuStrip(Me.components)
-        Me.ToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
-        Me.ToolStripSeparator4 = New System.Windows.Forms.ToolStripSeparator()
         Me.ToolStripMenuItemMoveUp = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItemMoveDown = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripSeparator4 = New System.Windows.Forms.ToolStripSeparator()
         Me.ToolStripSeparator6 = New System.Windows.Forms.ToolStripSeparator()
         Me.EditAttributeToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItemDeleteAttribute = New System.Windows.Forms.ToolStripMenuItem()
@@ -71,6 +70,7 @@ Partial Class frmDiagramERD
         Me.ToolStripMenuItemIsMandatory = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItemIsPartOfPrimaryKey = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItemAttributeModelErrors = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
         Me.ContextMenuStrip_Relation = New System.Windows.Forms.ContextMenuStrip(Me.components)
         Me.ToolStripMenuItemEditRelation = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItemDeleteRelation = New System.Windows.Forms.ToolStripMenuItem()
@@ -82,6 +82,7 @@ Partial Class frmDiagramERD
         Me.HiddenDiagramView = New MindFusion.Diagramming.WinForms.DiagramView()
         Me.Diagram2 = New MindFusion.Diagramming.Diagram()
         Me.BackgroundWorker = New System.ComponentModel.BackgroundWorker()
+        Me.ShowInDiagramSpyToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ContextMenuStrip_Entity.SuspendLayout()
         Me.ContextMenuStrip_Diagram.SuspendLayout()
         Me.ContextMenuStripAttribute.SuspendLayout()
@@ -313,22 +314,9 @@ Partial Class frmDiagramERD
         '
         'ContextMenuStripAttribute
         '
-        Me.ContextMenuStripAttribute.ImageScalingSize = New System.Drawing.Size(24, 24)
-        Me.ContextMenuStripAttribute.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItemMoveUp, Me.ToolStripMenuItemMoveDown, Me.ToolStripSeparator4, Me.ToolStripSeparator6, Me.EditAttributeToolStripMenuItem, Me.ToolStripMenuItemDeleteAttribute, Me.ToolStripSeparator1, Me.ToolStripMenuItemIsMandatory, Me.ToolStripMenuItemIsPartOfPrimaryKey, Me.ToolStripMenuItemAttributeModelErrors, Me.ToolStripMenuItem1})
+        Me.ContextMenuStripAttribute.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItemMoveUp, Me.ToolStripMenuItemMoveDown, Me.ToolStripSeparator4, Me.ShowInDiagramSpyToolStripMenuItem, Me.ToolStripSeparator6, Me.EditAttributeToolStripMenuItem, Me.ToolStripMenuItemDeleteAttribute, Me.ToolStripSeparator1, Me.ToolStripMenuItemIsMandatory, Me.ToolStripMenuItemIsPartOfPrimaryKey, Me.ToolStripMenuItemAttributeModelErrors, Me.ToolStripMenuItem1})
         Me.ContextMenuStripAttribute.Name = "ContextMenuStripAttribute"
-        Me.ContextMenuStripAttribute.Size = New System.Drawing.Size(195, 284)
-        '
-        'ToolStripMenuItem1
-        '
-        Me.ToolStripMenuItem1.Image = Global.Boston.My.Resources.MenuImages.Properties216x16
-        Me.ToolStripMenuItem1.Name = "ToolStripMenuItem1"
-        Me.ToolStripMenuItem1.Size = New System.Drawing.Size(194, 30)
-        Me.ToolStripMenuItem1.Text = "&Properties"
-        '
-        'ToolStripSeparator4
-        '
-        Me.ToolStripSeparator4.Name = "ToolStripSeparator4"
-        Me.ToolStripSeparator4.Size = New System.Drawing.Size(191, 6)
+        Me.ContextMenuStripAttribute.Size = New System.Drawing.Size(187, 242)
         '
         'ToolStripMenuItemMoveUp
         '
@@ -343,6 +331,11 @@ Partial Class frmDiagramERD
         Me.ToolStripMenuItemMoveDown.Name = "ToolStripMenuItemMoveDown"
         Me.ToolStripMenuItemMoveDown.Size = New System.Drawing.Size(194, 30)
         Me.ToolStripMenuItemMoveDown.Text = "Move &Down"
+        '
+        'ToolStripSeparator4
+        '
+        Me.ToolStripSeparator4.Name = "ToolStripSeparator4"
+        Me.ToolStripSeparator4.Size = New System.Drawing.Size(191, 6)
         '
         'ToolStripSeparator6
         '
@@ -393,6 +386,13 @@ Partial Class frmDiagramERD
         Me.ToolStripMenuItemAttributeModelErrors.Name = "ToolStripMenuItemAttributeModelErrors"
         Me.ToolStripMenuItemAttributeModelErrors.Size = New System.Drawing.Size(194, 30)
         Me.ToolStripMenuItemAttributeModelErrors.Text = "Model &Errors"
+        '
+        'ToolStripMenuItem1
+        '
+        Me.ToolStripMenuItem1.Image = Global.Boston.My.Resources.MenuImages.Properties216x16
+        Me.ToolStripMenuItem1.Name = "ToolStripMenuItem1"
+        Me.ToolStripMenuItem1.Size = New System.Drawing.Size(194, 30)
+        Me.ToolStripMenuItem1.Text = "&Properties"
         '
         'ContextMenuStrip_Relation
         '
@@ -472,6 +472,13 @@ Partial Class frmDiagramERD
         Me.HiddenDiagramView.TabIndex = 11
         Me.HiddenDiagramView.Text = "DiagramView1"
         '
+        'ShowInDiagramSpyToolStripMenuItem
+        '
+        Me.ShowInDiagramSpyToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.Spyglass16x16
+        Me.ShowInDiagramSpyToolStripMenuItem.Name = "ShowInDiagramSpyToolStripMenuItem"
+        Me.ShowInDiagramSpyToolStripMenuItem.Size = New System.Drawing.Size(186, 22)
+        Me.ShowInDiagramSpyToolStripMenuItem.Text = "Show in Diagram &Spy"
+        '
         'frmDiagramERD
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -549,4 +556,5 @@ Partial Class frmDiagramERD
     Friend WithEvents AddRelatedEntitiesToThisPageToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents BackgroundWorker As System.ComponentModel.BackgroundWorker
     Friend WithEvents ToolStripMenuItem2 As ToolStripMenuItem
+    Friend WithEvents ShowInDiagramSpyToolStripMenuItem As ToolStripMenuItem
 End Class

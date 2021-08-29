@@ -6,7 +6,6 @@ Namespace TableModelDictionary
 
             Dim lsSQLQuery As String = ""
 
-            If arModelDictionaryEntry.Symbol.StartsWith("Horse") Then Debugger.Break()
 
             Try
                 lsSQLQuery = "INSERT INTO MetaModelModelDictionary"

@@ -501,7 +501,7 @@ Namespace FBM
                         lrConceptInstance.ConceptType = pcenumConceptType.Value
 
                         'NB Don't use abRapidSave here because more than one Fact can use the same ConceptInstance for its FactData.
-                        If TableConceptInstance.ExistsConceptInstance(lrConceptInstance) Then
+                        If TableConceptInstance.ExistsConceptInstance(lrConceptInstance, False) Then
                             Call TableConceptInstance.UpdateConceptInstance(lrConceptInstance)
                         Else
                             Dim lrConcept As New FBM.Concept(lrFactDataInstance.Data, True)

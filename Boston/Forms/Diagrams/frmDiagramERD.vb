@@ -894,75 +894,122 @@ Public Class frmDiagramERD
         Me.zrPage.SelectedObject.Clear()
         Me.zrPage.SelectedObject.Add(lrAttribute)
 
-        If e.MouseButton = MouseButton.Right Then
-            'ContextMenuStripAttribute.Show(Me.ERDDiagramView, New Point((e.Table.Bounds.X + e.MousePosition.X), (e.Table.Bounds.Y + e.MousePosition.Y)))
+        Try
 
+            If e.MouseButton = MouseButton.Right Then
+                'ContextMenuStripAttribute.Show(Me.ERDDiagramView, New Point((e.Table.Bounds.X + e.MousePosition.X), (e.Table.Bounds.Y + e.MousePosition.Y)))
 
+                Me.ToolStripMenuItemIsMandatory.Checked = lrAttribute.Mandatory
 
+                ContextMenuStripAttribute.Show(Me.DiagramView, Me.DiagramView.DocToClient(e.MousePosition))
+                'Me.DiagramView.ContextMenuStrip = ContextMenuStrip_Role
+            Else
+                Dim lrTableNode As MindFusion.Diagramming.TableNode
 
-            Me.ToolStripMenuItemIsMandatory.Checked = lrAttribute.Mandatory
+                Call Me.reset_node_and_link_colors()
 
-            ContextMenuStripAttribute.Show(Me.DiagramView, Me.DiagramView.DocToClient(e.MousePosition))
-            'Me.DiagramView.ContextMenuStrip = ContextMenuStrip_Role
-        Else
-            Dim lrTableNode As MindFusion.Diagramming.TableNode
+                e.Cell.TextColor = Color.White
+                e.Cell.Brush = New MindFusion.Drawing.SolidBrush(Color.LightGray)
+                Me.Diagram.Invalidate()
 
-            Call Me.reset_node_and_link_colors()
+                For Each lrTableNode In Me.Diagram.Nodes
+                    Call lrTableNode.Tag.ResetAttributeCellColours()
+                Next
 
-            e.Cell.TextColor = Color.White
-            e.Cell.Brush = New MindFusion.Drawing.SolidBrush(Color.LightGray)
-            Me.Diagram.Invalidate()
+                '-----------------------------------------------
+                'Paint the cell again. First is for GUI speed.
+                '-----------------------------------------------
+                e.Cell.TextColor = Color.White
+                e.Cell.Brush = New MindFusion.Drawing.SolidBrush(Color.LightGray)
 
-            For Each lrTableNode In Me.Diagram.Nodes
-                Call lrTableNode.Tag.ResetAttributeCellColours()
-            Next
+                '--------------------------------------------------------------------
+                'Highlight the Relationships (if any) associated with the Attribute
+                '--------------------------------------------------------------------
+                For Each lrRelation In lrAttribute.Column.Relation
+                    Dim lrERDRelation As ERD.Relation = Me.zrPage.ERDiagram.Relation.Find(Function(x) x.Id = lrRelation.Id)
+                    If lrERDRelation IsNot Nothing Then
+                        lrERDRelation.Link.Color = Color.Blue
+                        Me.Diagram.Invalidate()
+                    End If
+                Next
 
-            '-----------------------------------------------
-            'Paint the cell again. First is for GUI speed.
-            '-----------------------------------------------
-            e.Cell.TextColor = Color.White
-            e.Cell.Brush = New MindFusion.Drawing.SolidBrush(Color.LightGray)
+                '--------------------------------------
+                'Set the PropertiesGrid.SeletedObject
+                '--------------------------------------
+                Dim lrPropertyGridForm As frmToolboxProperties
 
-            '--------------------------------------------------------------------
-            'Highlight the Relationships (if any) associated with the Attribute
-            '--------------------------------------------------------------------
-            For Each lrRelation In lrAttribute.Column.Relation
-                Dim lrERDRelation As ERD.Relation = Me.zrPage.ERDiagram.Relation.Find(Function(x) x.Id = lrRelation.Id)
-                If lrERDRelation IsNot Nothing Then
-                    lrERDRelation.Link.Color = Color.Blue
-                    Me.Diagram.Invalidate()
+                lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
+                If IsSomething(lrPropertyGridForm) Then
+                    Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
+                    lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute, loMiscFilterAttribute})
+                    lrPropertyGridForm.PropertyGrid.SelectedObject = lrAttribute
                 End If
-            Next
 
-            '--------------------------------------
-            'Set the PropertiesGrid.SeletedObject
-            '--------------------------------------
-            Dim lrPropertyGridForm As frmToolboxProperties
+                '-------------------------------------------------------
+                'ORM Reading Editor
+                '-------------------------------------------------------
+                Dim lrORMReadingEditor As frmToolboxORMReadingEditor
+                lrORMReadingEditor = prApplication.GetToolboxForm(frmToolboxORMReadingEditor.Name)
 
-            lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
-            If IsSomething(lrPropertyGridForm) Then
-                Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
-                lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute, loMiscFilterAttribute})
-                lrPropertyGridForm.PropertyGrid.SelectedObject = lrAttribute
+                If IsSomething(lrORMReadingEditor) Then
+
+                    lrORMReadingEditor.zrPage = Me.zrPage
+
+                    If lrORMReadingEditor.zrFactTypeInstance IsNot Me.zrPage.SelectedObject(0) Then
+
+                        Dim lrFactTypeInstance As FBM.FactTypeInstance
+                        If lrAttribute.Column.FactType IsNot Nothing Then
+                            lrFactTypeInstance = lrAttribute.Column.FactType.CloneInstance(Me.zrPage, False)
+                        Else
+                            lrFactTypeInstance = lrAttribute.Column.Role.FactType.CloneInstance(Me.zrPage, False)
+                        End If
+
+                        If lrAttribute.Column.FactType IsNot Nothing Then
+                            lrORMReadingEditor.zrFactTypeInstance = lrFactTypeInstance
+                            Call lrORMReadingEditor.SetupForm()
+                        Else
+                            '-------------------------------------------------------------------------
+                            'Tidy up the ORMFactTypeReading editor if the ORMFactTypeReading is open
+                            '-------------------------------------------------------------------------
+                            lrORMReadingEditor.zrFactTypeInstance = New FBM.FactTypeInstance()
+                            lrORMReadingEditor.zrFactTypeInstance = Nothing
+                            lrORMReadingEditor.DataGrid_Readings.DataSource = Nothing
+                            lrORMReadingEditor.DataGrid_Readings.Refresh()
+                            lrORMReadingEditor.DataGrid_Readings.RefreshEdit()
+                            lrORMReadingEditor.DataGrid_Readings.Rows.Clear()
+                            lrORMReadingEditor.LabelFactTypeName.Text = "No Fact Type Selected"
+                        End If
+                    End If
+
+                End If
+
+                '-------------------------------------------------------
+                'Verbalisation
+                '-------------------------------------------------------
+                Dim lrToolboxForm As frmToolboxORMVerbalisation
+                lrToolboxForm = prApplication.GetToolboxForm(frmToolboxORMVerbalisation.Name)
+                If IsSomething(lrToolboxForm) Then
+                    lrToolboxForm.zrModel = Me.zrPage.Model
+                    Call lrToolboxForm.VerbaliseAttribute(lrAttribute)
+                End If
+
+                lrAttribute.Entity.TableShape.ResizeToFitText(False)
+
+                Me.Diagram.RouteAllLinks()
+                Dim layout As New MindFusion.Diagramming.Layout.OrthogonalLayout
+                layout.Arrange(Me.Diagram)
+
             End If
 
-            '-------------------------------------------------------
-            'Verbalisation
-            '-------------------------------------------------------
-            Dim lrToolboxForm As frmToolboxORMVerbalisation
-            lrToolboxForm = prApplication.GetToolboxForm(frmToolboxORMVerbalisation.Name)
-            If IsSomething(lrToolboxForm) Then
-                lrToolboxForm.zrModel = Me.zrPage.Model
-                Call lrToolboxForm.VerbaliseAttribute(lrAttribute)
-            End If
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
-            lrAttribute.Entity.TableShape.ResizeToFitText(False)
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
-            Me.Diagram.RouteAllLinks()
-            Dim layout As New MindFusion.Diagramming.Layout.OrthogonalLayout
-            layout.Arrange(Me.Diagram)
-
-        End If
     End Sub
 
     Private Sub Diagram_LinkCreated(ByVal sender As Object, ByVal e As MindFusion.Diagramming.LinkEventArgs) Handles Diagram.LinkCreated
@@ -2037,6 +2084,61 @@ Public Class frmDiagramERD
         Next
 
         Me.Diagram.Invalidate()
+
+    End Sub
+
+    Public Sub ResetPropertiesGridToolbox(ByRef arModelObject As FBM.ModelObject)
+
+        Try
+
+            If IsSomething(arModelObject) Then
+                Dim lrPropertyGridForm As frmToolboxProperties
+                lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
+
+                If IsSomething(lrPropertyGridForm) Then
+                    lrPropertyGridForm.PropertyGrid.BrowsableAttributes = Nothing
+                    lrPropertyGridForm.PropertyGrid.HiddenAttributes = Nothing
+                    Select Case arModelObject.ConceptType
+                        Case Is = pcenumConceptType.EntityType
+                            Dim lrEntityTypeInstance As FBM.EntityTypeInstance
+                            lrEntityTypeInstance = arModelObject
+                            Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
+                            lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute})
+                            lrPropertyGridForm.PropertyGrid.SelectedObject = lrEntityTypeInstance
+                        Case Is = pcenumConceptType.EntityTypeName
+                            Dim lrEntityTypeName As FBM.EntityTypeName
+                            lrEntityTypeName = arModelObject
+                            lrPropertyGridForm.PropertyGrid.SelectedObject = lrEntityTypeName.EntityTypeInstance
+                        Case Is = pcenumConceptType.RoleConstraintRole
+                            Dim lrRoleConstraintRoleInstance As FBM.RoleConstraintRoleInstance
+                            lrRoleConstraintRoleInstance = arModelObject
+                            lrPropertyGridForm.PropertyGrid.SelectedObject = lrRoleConstraintRoleInstance.RoleConstraint
+                        Case Is = pcenumConceptType.RoleConstraint
+
+                            Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
+                            lrRoleConstraintInstance = arModelObject
+                            Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
+                            lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute})
+                            lrPropertyGridForm.PropertyGrid.SelectedObject = lrRoleConstraintInstance
+                        Case Else
+                            Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
+                            lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute})
+                            lrPropertyGridForm.PropertyGrid.SelectedObject = arModelObject
+                    End Select
+                End If
+            Else
+                Throw New Exception("No object passed as argument, 'arObject'")
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
 
     End Sub
 
@@ -3188,4 +3290,33 @@ Public Class frmDiagramERD
         Call frmMain.loadToolboxORMReadingEditor(Me.zrPage, Me.DockPanel.ActivePane)
 
     End Sub
+
+    Private Sub ShowInDiagramSpyToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ShowInDiagramSpyToolStripMenuItem.Click
+
+        Try
+            Dim lrAttribute As ERD.Attribute = Nothing
+            Dim lrDiagramSpyPage As New FBM.DiagramSpyPage(Me.zrPage.Model, "123", "Diagram Spy", pcenumLanguage.ORMModel)
+
+            lrAttribute = Me.zrPage.SelectedObject(0)
+            Dim lrFactType As FBM.FactType = Nothing
+
+            If lrAttribute.Column.FactType IsNot Nothing Then
+                lrFactType = lrAttribute.Column.FactType
+            Else
+                lrFactType = lrAttribute.Column.Role.FactType
+            End If
+
+            Call frmMain.LoadDiagramSpy(lrDiagramSpyPage, lrFactType)
+
+        Catch ex As Exception
+            Dim lsMessage1 As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
 End Class

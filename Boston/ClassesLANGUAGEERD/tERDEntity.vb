@@ -554,6 +554,12 @@ Namespace ERD
             Me.FactDataInstance.Fact.isDirty = True
             Me.FactDataInstance.isDirty = True
 
+            Try
+                Me.FactDataInstance.Page.MakeDirty()
+            Catch ex As Exception
+
+            End Try
+
         End Sub
 
         Private Sub RDSTable_ColumnAdded(ByRef arColumn As RDS.Column) Handles RDSTable.ColumnAdded

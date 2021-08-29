@@ -125,7 +125,8 @@ Namespace TableConceptInstance
 
         End Sub
 
-        Public Function ExistsConceptInstance(ByRef arConceptInstance As FBM.ConceptInstance) As Boolean
+        Public Function ExistsConceptInstance(ByRef arConceptInstance As FBM.ConceptInstance,
+                                              Optional ByVal abReturnExistingConceptInstance As Boolean = True) As Boolean
 
             Dim lsSQLQuery As String = ""
             Dim lREcordset As New ADODB.Recordset
@@ -144,10 +145,12 @@ Namespace TableConceptInstance
             lREcordset.Open(lsSQLQuery)
 
             If Not lREcordset.EOF Then
-                arConceptInstance.X = lREcordset("x").Value
-                arConceptInstance.Y = lREcordset("y").Value
-                arConceptInstance.Orientation = lREcordset("Orientation").Value
-                arConceptInstance.Visible = lREcordset("IsVisible").Value
+                If abReturnExistingConceptInstance Then
+                    arConceptInstance.X = lREcordset("x").Value
+                    arConceptInstance.Y = lREcordset("y").Value
+                    arConceptInstance.Orientation = lREcordset("Orientation").Value
+                    arConceptInstance.Visible = lREcordset("IsVisible").Value
+                End If
 
                 Return True
             Else

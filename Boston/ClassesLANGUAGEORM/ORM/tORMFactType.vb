@@ -2160,6 +2160,25 @@ Namespace FBM
 
         End Sub
 
+        Public Function getFactTypeReadingByModelElementOrder(ByRef aarModelElement As List(Of FBM.ModelObject)) As FBM.FactTypeReading
+
+            Try
+                Dim larRole As New List(Of FBM.Role)
+                Dim lasPredicate As New List(Of String)
+                For Each lrModelElement In aarModelElement
+                    larRole.Add(New FBM.Role(Me, lrModelElement))
+                    lasPredicate.Add("has")
+                Next
+                Dim lrFactTypeReading As New FBM.FactTypeReading(Me, larRole, lasPredicate)
+
+                Return Me.FactTypeReading.Find(AddressOf lrFactTypeReading.EqualsByRoleJoinedModelObjectSequence)
+
+            Catch ex As Exception
+                Return Nothing
+            End Try
+
+        End Function
+
         Public Function GetFirstRoleWithInternalUniquenessConstraint() As FBM.Role
 
             Try

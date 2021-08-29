@@ -1279,7 +1279,20 @@
             'Get the relevant FBM.FactType
             '  NB Predicate is nothing because the WITH clause is of the form "WITH WHAT Rating", so need to find the LinkFactType without using a Predicate
             '20200807-VM-Will need to fix this because might have more than one LinkFactType referencing the same ModelObject. Need to use PreboundReadingText etc and through FactTypeReadings.
-            arQueryEdge.FBMFactType = arQueryEdge.BaseNode.RDSTable.Column.Find(Function(x) x.ActiveRole.JoinedORMObject Is lrFBMModelObject).FactType
+            Try
+                arQueryEdge.FBMFactType = arQueryEdge.BaseNode.RDSTable.Column.Find(Function(x) x.ActiveRole.JoinedORMObject Is lrFBMModelObject).FactType
+            Catch ex As Exception
+                Dim lrTable As RDS.Table = arPreviousTargetNode.FBMModelObject.getCorrespondingRDSTable
+                arQueryEdge.BaseNode = New FactEngine.QueryNode(arPreviousTargetNode.FBMModelObject, arQueryEdge)
+                arQueryEdge.FBMFactType = lrTable.Column.Find(Function(x) x.ActiveRole.JoinedORMObject Is lrFBMModelObject).FactType
+
+                Dim larModelElement As New List(Of FBM.ModelObject)
+                larModelElement.Add(arQueryEdge.BaseNode.FBMModelObject)
+                larModelElement.Add(arQueryEdge.TargetNode.FBMModelObject)
+                arQueryEdge.FBMFactTypeReading = arQueryEdge.FBMFactType.getFactTypeReadingByModelElementOrder(larModelElement)
+
+            End Try
+
 
             'Call arQueryEdge.getAndSetFBMFactType(arQueryEdge.BaseNode,
             '                                      arQueryEdge.TargetNode,

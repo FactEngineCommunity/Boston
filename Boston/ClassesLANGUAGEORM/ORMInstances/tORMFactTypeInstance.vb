@@ -2513,7 +2513,11 @@ Namespace FBM
                 '----------------------------------------------------------
                 Dim lrRoleConstraintInstance As New FBM.RoleConstraintInstance
 
-                lrRoleConstraintInstance = arRoleConstraint.CloneUniquenessConstraintInstance(Me.Page, True)
+                'CodeSafe
+                'If the FactType of the IUC is not on the Page, do not add to Page.
+                Dim lbAddToPage As Boolean = Me.Page.FactTypeInstance.Contains(Me)
+
+                lrRoleConstraintInstance = arRoleConstraint.CloneUniquenessConstraintInstance(Me.Page, lbAddToPage)
 
                 Me.InternalUniquenessConstraint.Add(lrRoleConstraintInstance)
 

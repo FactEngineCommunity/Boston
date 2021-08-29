@@ -1324,7 +1324,7 @@ Namespace FBM
                     Call lrSubtypeRelationshipInstance.RemoveFromPage()
                 Next
 
-                If Me.HasSimpleReferenceScheme And Me.ReferenceModeFactType IsNot Nothing Then
+                If Me.HasSimpleReferenceScheme And Me.EntityType.ReferenceModeFactType IsNot Nothing Then
                     liFactTypeInstanceCount = Aggregate FactType In Me.Page.FactTypeInstance
                                                    From Role In FactType.RoleGroup
                                                   Where Role.JoinedORMObject.Id = Me.Id _

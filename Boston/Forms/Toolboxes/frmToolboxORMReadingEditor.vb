@@ -155,8 +155,13 @@ Public Class frmToolboxORMReadingEditor
                         Me.LabelFactTypeName.Text = Me.zrFactTypeInstance.Name
                         Me.LabelFactTypeName.ForeColor = Color.Blue
                     Case Else
-                        Me.LabelFactTypeName.Text = "No Fact Type Selected"
-                        Me.LabelFactTypeName.ForeColor = Color.Blue
+                        If Me.zrFactTypeInstance IsNot Nothing Then
+                            Me.LabelFactTypeName.Text = Me.zrFactTypeInstance.FactType.Id
+                            Me.LabelFactTypeName.ForeColor = Color.Blue
+                        Else
+                            Me.LabelFactTypeName.Text = "No Fact Type Selected"
+                            Me.LabelFactTypeName.ForeColor = Color.Blue
+                        End If
                 End Select
 
                 '20180419-VM-I don't think HashList is used any more
