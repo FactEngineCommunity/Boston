@@ -391,6 +391,9 @@ Namespace FactEngine
                                 Dim lrFactType As FBM.FactType
                                 lrFactType = Me.QueryGraph.Model.getFactTypeByPredicateFarSideModelElement(asPredicate, arTargetNode.FBMModelObject, True, Me.QueryGraph.getNodeModelElementList)
 
+                                '20210829-VM-Use the below for SubType predicates.
+                                'FBM.ModelObject.hasModelElementAsDownstreamSubtype
+
                                 If lrFactType IsNot Nothing Then
                                     Dim lrModelElement As FBM.ModelObject = arTargetNode.FBMModelObject
                                     Dim larFactTypeReading = From FactTypeReading In lrFactType.FactTypeReading

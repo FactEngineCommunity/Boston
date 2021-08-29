@@ -755,6 +755,28 @@ Namespace FBM
 
         End Function
 
+        Public Function hasModelElementAsDownstreamSubtype(ByRef arModelElement As FBM.ModelObject) As Boolean
+
+            Try
+                For Each lrModelElement In Me.HasSubtype
+                    If lrModelElement Is arModelElement Then
+                        Return True
+                    Else
+                        If lrModelElement.hasModelElementAsDownstreamSubtype(arModelElement) Then
+                            Return True
+                        End If
+                    End If
+                Next
+
+                Return False
+
+            Catch ex As Exception
+                Debugger.Break()
+
+            End Try
+
+        End Function
+
         Public Function HasSubtype() As List(Of FBM.ModelObject)
 
             Try
