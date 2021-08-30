@@ -3813,6 +3813,8 @@ Public Class frmDiagramORM
                                 loNode.Selected = True
                             Case Is = pcenumConceptType.FactTypeName
                                 loNode.Selected = True
+                            Case Is = pcenumConceptType.EntityTypeDerivationText
+                                loNode.Selected = True
                             Case Is = pcenumConceptType.FactTypeDerivationText
                                 loNode.Selected = True
                             Case Is = pcenumConceptType.RoleName

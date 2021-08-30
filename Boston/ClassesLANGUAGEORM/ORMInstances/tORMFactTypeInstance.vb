@@ -1387,7 +1387,7 @@ Namespace FBM
             If abRapidSave Then
                 Call TableFactTypeInstance.AddFactTypeInstance(Me)
             Else
-                If TableConceptInstance.ExistsConceptInstance(Me.CloneConceptInstance) Then
+                If TableConceptInstance.ExistsConceptInstance(Me.CloneConceptInstance, False) Then
                     Call TableFactTypeInstance.update_FactTypeInstance(Me)
                 Else
                     Call TableFactTypeInstance.AddFactTypeInstance(Me)

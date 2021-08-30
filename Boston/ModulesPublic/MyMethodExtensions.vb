@@ -185,7 +185,7 @@ Module MyMethodExtensions
     <Extension()>
     Public Function AppendLine(ByRef asString As String, ByVal asStringExtension As String) As String
 
-        asString = asString & asStringExtension
+        asString = asString & vbCrLf & asStringExtension
         Return asString
 
     End Function

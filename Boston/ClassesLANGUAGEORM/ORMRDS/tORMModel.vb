@@ -1247,10 +1247,11 @@ Namespace FBM
 
                         If (lrOriginTable Is Nothing) Or (lrDestinationTable Is Nothing) Then Exit Sub
 
-                        Dim larRelation = From Relation In Me.RDS.Relation _
+                        Dim larRelation = From Relation In Me.RDS.Relation
+                                          Where Relation.ResponsibleFactType IsNot Nothing
                                           Where Relation.ResponsibleFactType.Id = lrRole.FactType.Id _
                                           And Relation.OriginTable Is lrOriginTable _
-                                          And Relation.DestinationTable Is lrDestinationTable _
+                                          And Relation.DestinationTable Is lrDestinationTable
                                           Select Relation
 
                         If larRelation.Count > 0 Then
@@ -1706,6 +1707,7 @@ Namespace FBM
                     lrORMRecordset2 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
                     Dim lsColumnId As String = "" 'Used also for Debugging/ErrorThrowing.
+                    Dim lrSupertypeColumn As RDS.Column = Nothing
 
                     While Not lrORMRecordset2.EOF
 
@@ -1723,7 +1725,11 @@ Namespace FBM
                             Dim lrResponsibleRoleTable As RDS.Table = lrResponsibleRole.getCorrespondingRDSTable
                             If lrTable IsNot lrResponsibleRoleTable And lrResponsibleRoleTable.Column.Count > 0 Then
 
-                                Dim lrSupertypeColumn As RDS.Column = lrResponsibleRoleTable.Column.Find(Function(x) x.Id = lsColumnId)
+                                lrSupertypeColumn = lrResponsibleRoleTable.Column.Find(Function(x) x.Id = lsColumnId)
+                                If lrSupertypeColumn Is Nothing Then
+                                    'CodeSafe...fall back to ResponsibleRole
+                                    lrSupertypeColumn = lrResponsibleRoleTable.Column.Find(Function(x) x.Role.Id = lrResponsibleRole.Id)
+                                End If
 
                                 Dim lrNewColumn = lrSupertypeColumn.Clone(lrTable, Nothing)
 
@@ -2341,14 +2347,22 @@ Namespace FBM
                         For Each lrDictionaryEntry In lrDictionary
 
                             lrColumn = New RDS.Column
-                            lrColumn = (From Table In Me.RDS.Table
-                                        From Column In Table.Column
-                                        Where Column.Table.Name = lrRelation.DestinationTable.Name
-                                        Where Column.Id = lrDictionaryEntry.Value
-                                        Select Column).First
+                            Try
+                                lrColumn = (From Table In Me.RDS.Table
+                                            From Column In Table.Column
+                                            Where Column.Table.Name = lrRelation.DestinationTable.Name
+                                            Where Column.Id = lrDictionaryEntry.Value
+                                            Select Column).First
 
-                            lrColumn.Relation.Add(lrRelation)
-                            lrRelation.DestinationColumns.Add(lrColumn)
+                                lrColumn.Relation.Add(lrRelation)
+                                lrRelation.DestinationColumns.Add(lrColumn)
+                            Catch ex As Exception
+                                'CodeSafe
+                                Dim lsMessage As String = "Could not find Column in Destination Table, " & lrRelation.DestinationTable.Name
+                                lsMessage.AppendLine("Origin Table: " & lrRelation.OriginTable.Name)
+                                lsMessage.AppendLine("Column Id: " & lrDictionaryEntry.Value)
+                                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning, Nothing, False, False, True)
+                            End Try
                         Next
 
                         If lrRelation.is1To1BinaryRelation Then

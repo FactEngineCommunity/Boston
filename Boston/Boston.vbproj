@@ -509,6 +509,7 @@
     <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.7\tXMLModelValueType.vb" />
     <Compile Include="ClassesLANGUAGEORMQL\tORMQLRecordsetDataGridList.vb" />
     <Compile Include="ClassesLANGUAGEORM\ORMGlossaryWriter\tORMGlossaryMaker.vb" />
+    <Compile Include="ClassesLANGUAGEORM\ORMInstances\tORMEntityTypeDerivationText.vb" />
     <Compile Include="ClassesLANGUAGEORM\ORMSTM\tORMModel.vb" />
     <Compile Include="ClassesLANGUAGEORM\ORMSTM\tORMPage.vb" />
     <Compile Include="ClassesLANGUAGESTD\tCMMLSTDStartStateTransition.vb" />

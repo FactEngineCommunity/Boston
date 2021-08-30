@@ -99,6 +99,10 @@ Namespace FBM
 
         Public ValueConstraintInstance As ValueConstraintInstance
 
+        <NonSerialized(),
+        XmlIgnore()>
+        Public EntityTypeDerivationText As FBM.EntityTypeDerivationText
+
         <XmlIgnore()> _
         <XmlElementAttribute()> _
         <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
@@ -735,9 +739,11 @@ Namespace FBM
                     '---------------------------------------------
                     G = Me.Page.Form.CreateGraphics
                     Dim lsETNameText As String = Me.Name
-                    If Me.EntityType.IsIndependent Or Me.EntityType.IsDerived Then
-                        lsETNameText &= "M"
-                    End If
+
+                    '20210830-VM-Not sure why this was here. Remove after time if no light is shed on why it was here.
+                    'If Me.EntityType.IsIndependent Or Me.EntityType.IsDerived Then
+                    '    lsETNameText &= "M"
+                    'End If
 
                     If Me.EntityType.IsDerived Then
                         lsETNameText &= "*"
@@ -845,7 +851,7 @@ Namespace FBM
                         Me.ReferenceModeShape.SetRect(loRectangle, False)
                         Me.ReferenceModeShape.Visible = True
                         Me.ReferenceModeShape.Text = "(" & Me.ReferenceMode & ")"
-                        Me.ReferenceModeShape.Move(Me.X + (Me.Shape.Bounds.Width / 2) - (Me.ReferenceModeShape.Bounds.Width / 2), _
+                        Me.ReferenceModeShape.Move(Me.X + (Me.Shape.Bounds.Width / 2) - (Me.ReferenceModeShape.Bounds.Width / 2),
                                                    Me.Y + 6)
                     Else
                         loRectangle = New Rectangle(Me.X, Me.Y, loEntityWidth.Width, 8)
@@ -859,8 +865,59 @@ Namespace FBM
                     loRectangle = New Rectangle(Me.X + 2, Me.EntityTypeNameShape.Bounds.Y, loEntityNameWidth.Width, Me.EntityTypeNameShape.Bounds.Height)
                     Me.EntityTypeNameShape.SetRect(loRectangle, False)
 
+#Region "Derivation Text"
+                    '==========================================================================================================
+                    'EntityType DerivationText
 
-                End If 'IsObjectifyingEntityType
+                    Dim StringSize As New SizeF
+                    If Me.EntityType.IsDerived Then
+                        Dim loEntityTypeDerivationTextShape As ShapeNode
+                        Dim lsDerivationText As String = ""
+
+                        lsDerivationText = "* " & Me.DerivationText
+
+                        StringSize = Me.Page.Diagram.MeasureString(Trim(lsDerivationText), Me.Page.Diagram.Font, 1000, System.Drawing.StringFormat.GenericDefault)
+                        StringSize.Height += 2
+
+                        If StringSize.Width > 70 Then
+                            StringSize = New SizeF(70, (StringSize.Height + 2) * lsDerivationText.Length / 100)
+                        End If
+
+                        loEntityTypeDerivationTextShape = Me.Page.Diagram.Factory.CreateShapeNode(Me.X, Me.Y + Me.Shape.Bounds.Height + 5, StringSize.Width, StringSize.Height)
+                        loEntityTypeDerivationTextShape.Shape = MindFusion.Diagramming.Shapes.Rectangle
+                        loEntityTypeDerivationTextShape.HandlesStyle = HandlesStyle.MoveOnly
+                        loEntityTypeDerivationTextShape.EnableStyledText = True
+                        loEntityTypeDerivationTextShape.Locked = False
+                        loEntityTypeDerivationTextShape.TextFormat.Alignment = StringAlignment.Near
+                        loEntityTypeDerivationTextShape.Text = lsDerivationText
+                        Call loEntityTypeDerivationTextShape.ResizeToFitText(FitSize.KeepWidth)
+                        loEntityTypeDerivationTextShape.TextColor = Color.Black
+                        loEntityTypeDerivationTextShape.Transparent = True
+                        loEntityTypeDerivationTextShape.AllowIncomingLinks = False
+                        loEntityTypeDerivationTextShape.AllowOutgoingLinks = False
+                        loEntityTypeDerivationTextShape.ZTop()
+
+                        If Me.EntityTypeDerivationText Is Nothing Then
+                            Me.EntityTypeDerivationText = New FBM.EntityTypeDerivationText(Me.Model, Me.Page, Me)
+                        End If
+
+                        Me.EntityTypeDerivationText.Shape = loEntityTypeDerivationTextShape
+                        loEntityTypeDerivationTextShape.Tag = Me.EntityTypeDerivationText
+
+                        If Me.EntityTypeDerivationText.X = 0 Then Me.EntityTypeDerivationText.X = Me.X
+                        If Me.EntityTypeDerivationText.Y = 0 Then Me.EntityTypeDerivationText.Y = Me.Y + Me.Shape.Bounds.Height + 5
+
+                        Me.EntityTypeDerivationText.Shape.Move(Me.EntityTypeDerivationText.X,
+                                                             Me.EntityTypeDerivationText.Y)
+
+                        Me.Page.Diagram.Nodes.Add(Me.EntityTypeDerivationText.Shape)
+
+                        Me.EntityTypeDerivationText.Shape.Visible = Me.EntityType.IsDerived
+                        Call Me.EntityTypeDerivationText.Shape.ZBottom()
+                    End If
+#End Region
+
+                End If 'Is Not ObjectifyingEntityType
 
             Catch ex As Exception
                 Dim lsMessage As String
@@ -1237,7 +1294,7 @@ Namespace FBM
             If abRapidSave Then
                 Call TableConceptInstance.AddConceptInstance(lrConceptInstance)
             Else
-                If TableConceptInstance.ExistsConceptInstance(lrConceptInstance) Then
+                If TableConceptInstance.ExistsConceptInstance(lrConceptInstance, False) Then
                     Call TableConceptInstance.UpdateConceptInstance(lrConceptInstance)
                 Else
                     Call TableConceptInstance.AddConceptInstance(lrConceptInstance)
@@ -2551,7 +2608,8 @@ Namespace FBM
                 End If
                 '==============================================================================
 
-
+                Me.isDirty = True
+                Me.Page.IsDirty = True
             Catch ex As Exception
                 Dim lsMessage As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()

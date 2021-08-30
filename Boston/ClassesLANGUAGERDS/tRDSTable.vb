@@ -569,7 +569,6 @@ Namespace RDS
                                            Optional abIsRecursive As Boolean = True) As List(Of RDS.Table)
 
             Dim larSupertypeTable As New List(Of RDS.Table)
-
             Dim larSubtypeRelationship As New List(Of FBM.tSubtypeRelationship)
 
             If arSubtypeRelationship Is Nothing Then

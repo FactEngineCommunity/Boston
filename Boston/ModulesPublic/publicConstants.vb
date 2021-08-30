@@ -154,6 +154,7 @@ Public Module publicConstants
         Enterprise
         Entity
         EntityType
+        EntityTypeDerivationText
         EntityTypeName
         EnumerationSet 'Represents an Enumeration Set in a UML Class Diagram
         'EqualityConstraint
