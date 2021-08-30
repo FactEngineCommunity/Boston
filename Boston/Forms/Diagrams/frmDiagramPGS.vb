@@ -312,7 +312,6 @@ Public Class frmDiagramPGS
 
                 lsSQLQuery = "SELECT COUNT(*)"
                 lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreIsPGSRelation.ToString
-                'lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
                 lsSQLQuery &= " WHERE IsPGSRelation = '" & lrPGSNode.Name & "'"
 
                 Dim lrRecordsetIsPGSRelation As ORMQL.Recordset
@@ -334,7 +333,7 @@ Public Class frmDiagramPGS
                 End If
 
                 If lrPGSNode.RDSTable.FBMModelElement.ConceptType = pcenumConceptType.FactType Then
-                    If CType(lrPGSNode.RDSTable.FBMModelElement, FBM.FactType).Arity > 2 Then
+                    If lrPGSNode.RDSTable.CountNonValueTypeColumns > 2 Then
                         lrPGSNode.DisplayAndAssociate()
                     End If
                 End If
@@ -362,7 +361,7 @@ Public Class frmDiagramPGS
                         'The Destination Table is on the Page.
                         lrOriginNode = lrNode
 
-                        If (lrOriginNode.NodeType = pcenumPGSEntityType.Relationship) And (lrOriginNode.RDSTable.Arity < 3) Then
+                        If (lrOriginNode.NodeType = pcenumPGSEntityType.Relationship) And (lrOriginNode.RDSTable.CountNonValueTypeColumns < 3) Then
 
 
                             'For binary-manyToMany relations, the ORM relationship is actually a PGS relation, rather than a PGS Node.

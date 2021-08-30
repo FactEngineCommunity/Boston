@@ -316,6 +316,24 @@ Namespace RDS
 
         End Sub
 
+        Public Function CountNonValueTypeColumns() As Integer
+
+            Try
+                Return Me.Column.FindAll(Function(x) Not x.ActiveRole.HasInternalUniquenessConstraint _
+                                                     And x.ActiveRole.JoinedORMObject.GetType = GetType(FBM.ValueType) _
+                                                     And x.Role.FactType Is x.ActiveRole.FactType).Count
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Function
+
         Public Function getIncomingRelations() As List(Of RDS.Relation)
 
             Try
