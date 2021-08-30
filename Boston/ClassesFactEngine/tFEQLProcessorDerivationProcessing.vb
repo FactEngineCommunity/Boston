@@ -11,7 +11,7 @@ Namespace FEQL
         ''' <param name="arFactType">The FactType for the Derivation Text</param>
         ''' <returns></returns>
         Public Function processDerivationText(ByVal asDerivationText As String,
-                                              ByRef arFactType As FBM.FactType,
+                                              ByRef arModelElement As FBM.ModelObject,
                                               ByVal ParamArray aarParameterArray As FactEngine.QueryEdge()) As String
 
             Try
@@ -20,9 +20,8 @@ Namespace FEQL
 
                 Dim lrDerivationStatement As New FEQL.DERIVATIONSTMT
 
-
                 If Me.Parsetree.Errors.Count > 0 Then
-                    Throw New Exception("Error in Derivation Text for Fact Type, '" & arFactType.Id & "'.")
+                    Throw New Exception("Error in Derivation Text for Fact Type, '" & arModelElement.Id & "'.")
                 End If
 
                 Call Me.GetParseTreeTokensReflection(lrDerivationStatement, Me.Parsetree.Nodes(0))
@@ -84,14 +83,14 @@ Namespace FEQL
                 Select Case Me.getDerivationType(lrDerivationStatement)
                     Case Is = FactEngine.pcenumFEQLDerivationType.TransitiveRingConstraintJoin
 
-                        Return Me.getTransitiveRingConstraintJoinSQL(lrDerivationStatement, arFactType)
+                        Return Me.getTransitiveRingConstraintJoinSQL(lrDerivationStatement, arModelElement)
 
                     Case Is = FactEngine.pcenumFEQLDerivationType.Count
-                        arFactType.DerivationType = FactEngine.Constants.pcenumFEQLDerivationType.Count
-                        Return Me.getCountDerivationSQL(lrDerivationStatement, arFactType)
+                        arModelElement.DerivationType = FactEngine.Constants.pcenumFEQLDerivationType.Count
+                        Return Me.getCountDerivationSQL(lrDerivationStatement, arModelElement)
 
                     Case Else
-                        Return Me.getStraightDerivationSQL(lrDerivationStatement, arFactType, aarParameterArray)
+                        Return Me.getStraightDerivationSQL(lrDerivationStatement, arModelElement, aarParameterArray)
 
                 End Select
 
@@ -104,7 +103,7 @@ Namespace FEQL
         End Function
 
         Private Function getStraightDerivationSQL(ByRef arDerivationClause As FEQL.DERIVATIONSTMT,
-                                                  ByRef arFactType As FBM.FactType,
+                                                  ByRef arModelElement As FBM.ModelObject,
                                                   ByVal ParamArray aarParameterArray As FactEngine.QueryEdge()) As String
 
             Dim lsSQL As String = ""
@@ -112,35 +111,36 @@ Namespace FEQL
             Try
                 lsSQL = "(" & vbCrLf
 
-                Dim lsColumnNames As String = ""
+                '20210901-VM-Get rid of this at some stage. Does not seem to be used.
+                'Dim lsColumnNames As String = ""
 
-                Dim larFactReading = New List(Of FEQL.FACTREADINGClause)
-                larFactReading.Add(arDerivationClause.FACTREADING)
+                'Dim larFactReading = New List(Of FEQL.FACTREADINGClause)
+                'larFactReading.Add(arDerivationClause.FACTREADING)
 
-                Dim liInd As Integer = 0
-                For Each lrFactReading In larFactReading
-                    For Each lsModelElementName In lrFactReading.MODELELEMENTNAME
-                        If liInd > 0 Then lsColumnNames &= ", "
-                        Dim lrModelElement = arFactType.Model.GetModelObjectByName(lsModelElementName)
-                        Select Case lrModelElement.GetType
-                            Case GetType(FBM.ValueType)
-                                lsColumnNames &= lrModelElement.Id
-                            Case Else
-                                Dim liInd2 As Integer = 0
-                                For Each lrColumn In lrModelElement.getCorrespondingRDSTable.getPrimaryKeyColumns
-                                    If liInd2 > 0 Then lsColumnNames &= ", "
-                                    lsColumnNames &= lrColumn.Name
-                                    liInd2 += 1
-                                Next
-                        End Select
-                        liInd += 1
-                    Next
-                Next
+                'Dim liInd As Integer = 0
+                'For Each lrFactReading In larFactReading
+                '    For Each lsModelElementName In lrFactReading.MODELELEMENTNAME
+                '        If liInd > 0 Then lsColumnNames &= ", "
+                '        Dim lrModelElement = arModelElement.Model.GetModelObjectByName(lsModelElementName)
+                '        Select Case lrModelElement.GetType
+                '            Case GetType(FBM.ValueType)
+                '                lsColumnNames &= lrModelElement.Id
+                '            Case Else
+                '                Dim liInd2 As Integer = 0
+                '                For Each lrColumn In lrModelElement.getCorrespondingRDSTable.getPrimaryKeyColumns
+                '                    If liInd2 > 0 Then lsColumnNames &= ", "
+                '                    lsColumnNames &= lrColumn.Name
+                '                    liInd2 += 1
+                '                Next
+                '        End Select
+                '        liInd += 1
+                '    Next
+                'Next
 
                 Dim cut_at As String = "IS WHERE"
-                Dim liCutPoint As Integer = InStr(arFactType.DerivationText, cut_at)
+                Dim liCutPoint As Integer = InStr(arModelElement.DerivationText, cut_at)
 
-                Dim string_after As String = arFactType.DerivationText.Substring(liCutPoint + cut_at.Length - 1)
+                Dim string_after As String = arModelElement.DerivationText.Substring(liCutPoint + cut_at.Length - 1)
                 string_after = "WHICH " & string_after
                 string_after = string_after.Replace(vbCr, "").Replace(vbLf, "")
 
@@ -150,11 +150,12 @@ Namespace FEQL
                 lrQueryGraph = Me.getQueryGraph()
                 Dim lrWhichSelectStatement As New FEQL.WHICHSELECTStatement
                 Call Me.GetParseTreeTokensReflection(lrWhichSelectStatement, Me.Parsetree.Nodes(0))
-                lsSQL &= lrQueryGraph.generateSQL(lrWhichSelectStatement, False, True, arFactType)
-                lsSQL &= ") AS " & arFactType.Name & vbCrLf
+                lsSQL &= lrQueryGraph.generateSQL(lrWhichSelectStatement, False, True, arModelElement)
+                lsSQL &= ") AS " & arModelElement.Name & vbCrLf
 
                 Return lsSQL
 
+                '20210901-VM-Get rid of this at some stage. Not used at this date.
                 'lsSQL &= "SELECT " & lsColumnNames & vbCrLf
                 'lsSQL &= " FROM "
                 'liInd = 0

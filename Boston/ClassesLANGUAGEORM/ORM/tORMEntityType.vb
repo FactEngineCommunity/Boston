@@ -195,14 +195,12 @@ Namespace FBM
         <XmlIgnore()> _
         Public last_modified_user_id As String 'The Id of the Richmond User who last created/modified the EntityType.
 
-        <XmlIgnore()> _
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
-        Public _IsDerived As Boolean = False
+
         <XmlAttribute()> _
         <CategoryAttribute("Entity Type"), _
-        DefaultValueAttribute(False), _
-        DescriptionAttribute("True if the Entity Type is derived.")> _
-        Public Property IsDerived As Boolean
+        DefaultValueAttribute(False),
+        DescriptionAttribute("True if the Entity Type is derived.")>
+        Public Overrides Property IsDerived As Boolean
             Get
                 Return Me._IsDerived
             End Get
@@ -211,15 +209,12 @@ Namespace FBM
             End Set
         End Property
 
-        <XmlIgnore()> _
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
-        Public _DerivationText As String = ""
         <XmlAttribute()> _
         <CategoryAttribute("Derivation"), _
         Browsable(False), _
         DescriptionAttribute("The text for the derivation of the Entity Type when the Entity Type is derived."),
-        Editor(GetType(System.ComponentModel.Design.MultilineStringEditor), GetType(System.Drawing.Design.UITypeEditor))> _
-        Public Property DerivationText As String
+        Editor(GetType(System.ComponentModel.Design.MultilineStringEditor), GetType(System.Drawing.Design.UITypeEditor))>
+        Public Overrides Property DerivationText As String
             Get
                 Return Me._DerivationText
             End Get
@@ -751,8 +746,10 @@ Namespace FBM
                 End If
 
                 If lrTable Is Nothing Then
-                    Return Nothing
-                    'Throw New Exception("There is no corresponding table for FactType: '" & Me.Id & "'")
+                    'Try to get TopmostNonAbsorbedSuperType
+                    lrTable = Me.Model.RDS.Table.Find(Function(x) x.Name = Me.GetTopmostNonAbsorbedSupertype.Id)
+
+                    Return lrTable
                 Else
                     Return lrTable
                 End If

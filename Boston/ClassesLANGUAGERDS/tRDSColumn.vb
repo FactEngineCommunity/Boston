@@ -633,7 +633,7 @@ Namespace RDS
 
             Try
                 If aiNewOrdinalPosition > Me.Table.Column.Count Then
-                    Throw New Exception("Tried to move the Column to an Ordinal Position outside the range of Columns within the Table.")
+                    Throw New Exception("Tried to move the Column to an Ordinal Position outside the range of Columns within the Table." & vbCrLf & vbCrLf & "Boston will try and fix this. Try the operation again.")
                 End If
 
                 Dim larColumn = From Column In Me.Table.Column
@@ -658,6 +658,8 @@ Namespace RDS
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
                 prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+
+                Call Me.Table.resetColumnOrdinalPositions()
             End Try
 
         End Sub

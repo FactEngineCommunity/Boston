@@ -140,6 +140,38 @@ Namespace FBM
             End Set
         End Property
 
+        <XmlIgnore()>
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Public _IsDerived As Boolean = False
+
+        <XmlAttribute()>
+        Public Overridable Property IsDerived As Boolean
+            Get
+                Return Me._IsDerived
+            End Get
+            Set(value As Boolean)
+                Me._IsDerived = value
+            End Set
+        End Property
+
+        <XmlIgnore()>
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Public _DerivationText As String = ""
+
+        <XmlAttribute()>
+        Public Overridable Property DerivationText As String
+            Get
+                Return Me._DerivationText
+            End Get
+            Set(value As String)
+                Me._DerivationText = value
+            End Set
+        End Property
+
+        ''' <summary>
+        ''' Only set by the FactEngine FEQL Processor at query time, so that FBM objects are not coupled to the FactEngine.
+        ''' </summary>
+        Public DerivationType As FactEngine.pcenumFEQLDerivationType = FactEngine.Constants.pcenumFEQLDerivationType.None
 
         <XmlIgnore()> _
         <System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)> _

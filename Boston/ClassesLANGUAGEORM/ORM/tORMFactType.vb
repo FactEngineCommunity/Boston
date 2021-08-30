@@ -226,28 +226,6 @@ Namespace FBM
 
         <XmlIgnore()> _
         <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
-        Public _IsDerived As Boolean = False
-        <XmlAttribute()>
-        <CategoryAttribute("Fact Type"),
-        DefaultValueAttribute(False),
-        DescriptionAttribute("True if the Fact Type is derived.")>
-        Public Property IsDerived As Boolean
-            Get
-                Return Me._IsDerived
-            End Get
-            Set(value As Boolean)
-                Me._IsDerived = value
-            End Set
-        End Property
-
-        ''' <summary>
-        ''' Only set by the FactEngine FEQL Processor at query time, so that FBM objects are not coupled to the FactEngine.
-        ''' </summary>
-        Public DerivationType As FactEngine.pcenumFEQLDerivationType = FactEngine.Constants.pcenumFEQLDerivationType.None
-
-
-        <XmlIgnore()> _
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
         Public _IsStored As Boolean = False
         <XmlIgnore()> _
         <CategoryAttribute("Derivation"), _
@@ -266,10 +244,10 @@ Namespace FBM
         <XmlIgnore()> _
         <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
         Private _IsIndependent As Boolean
-        <XmlAttribute()> _
-        <CategoryAttribute("Model Object"), _
-        DefaultValueAttribute(False), _
-        DescriptionAttribute("True if the Model Object is independent.")> _
+        <XmlAttribute()>
+        <CategoryAttribute("Model Object"),
+        DefaultValueAttribute(False),
+        DescriptionAttribute("True if the Model Object is independent.")>
         Public Property IsIndependent As Boolean Implements iFBMIndependence.IsIndependent
             Get
                 Return Me._IsIndependent
@@ -279,15 +257,25 @@ Namespace FBM
             End Set
         End Property
 
-        <XmlIgnore()> _
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
-        Public _DerivationText As String = ""
+        <XmlAttribute()>
+        <CategoryAttribute("Fact Type"),
+        DefaultValueAttribute(False),
+        DescriptionAttribute("True if the Fact Type is derived.")>
+        Public Overrides Property IsDerived As Boolean
+            Get
+                Return Me._IsDerived
+            End Get
+            Set(value As Boolean)
+                Me._IsDerived = value
+            End Set
+        End Property
+
         <XmlAttribute()> _
         <CategoryAttribute("Derivation"), _
         Browsable(False), _
         DescriptionAttribute("The text for the derivation of the Fact Type when the Fact Type is derived."),
-        Editor(GetType(System.ComponentModel.Design.MultilineStringEditor), GetType(System.Drawing.Design.UITypeEditor))> _
-        Public Property DerivationText As String
+        Editor(GetType(System.ComponentModel.Design.MultilineStringEditor), GetType(System.Drawing.Design.UITypeEditor))>
+        Public Overrides Property DerivationText As String
             Get
                 Return Me._DerivationText
             End Get

@@ -129,17 +129,21 @@ Namespace RDS
 
         Public Shadows Function Equals(other As Index) As Boolean Implements IEquatable(Of Index).Equals
 
-            If Me.Column.Count = other.Column.Count Then
+            Try
+                If Me.Column.Count = other.Column.Count Then
 
-                For Each lrColumn In Me.Column
-                    If other.Column.Find(Function(x) x.Name = lrColumn.Name And x.ActiveRole.Id = lrColumn.ActiveRole.Id) Is Nothing Then
-                        Return False
-                    End If
-                Next
-                Return True
-            Else
+                    For Each lrColumn In Me.Column
+                        If other.Column.Find(Function(x) x.Name = lrColumn.Name And x.ActiveRole.Id = lrColumn.ActiveRole.Id) Is Nothing Then
+                            Return False
+                        End If
+                    Next
+                    Return True
+                Else
+                    Return False
+                End If
+            Catch ex As Exception
                 Return False
-            End If
+            End Try
 
         End Function
 

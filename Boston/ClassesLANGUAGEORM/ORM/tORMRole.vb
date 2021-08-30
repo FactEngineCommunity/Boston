@@ -1380,10 +1380,10 @@ Namespace FBM
 
                             If Me.JoinsEntityType.HasSimpleReferenceScheme Then
 
-                                aarCoveredRoles.AddUnique(Me.JoinsEntityType.ReferenceModeFactType.RoleGroup(0))
-                                aarCoveredRoles.AddUnique(Me.JoinsEntityType.ReferenceModeFactType.RoleGroup(1))
+                                aarCoveredRoles.AddUnique(CType(Me.JoinsEntityType.GetTopmostNonAbsorbedSupertype, FBM.EntityType).ReferenceModeFactType.RoleGroup(0))
+                                aarCoveredRoles.AddUnique(CType(Me.JoinsEntityType.GetTopmostNonAbsorbedSupertype, FBM.EntityType).ReferenceModeFactType.RoleGroup(1))
 
-                                larRolesToReturn.Add(Me.JoinsEntityType.ReferenceModeFactType.RoleGroup(1))
+                                larRolesToReturn.Add(CType(Me.JoinsEntityType.GetTopmostNonAbsorbedSupertype, FBM.EntityType).ReferenceModeFactType.RoleGroup(1))
 
                             ElseIf Me.JoinsEntityType.HasCompoundReferenceMode Then
 

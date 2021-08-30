@@ -3923,6 +3923,7 @@ Public Class frmDiagramORM
                             lrEntityTypeInstance = lrModelObject
                             Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
                             lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute})
+                            Call lrEntityTypeInstance.SetPropertyAttributes(Me, "DerivationText", True)
                             lrPropertyGridForm.zrSelectedObject = lrEntityTypeInstance
                             If lrEntityTypeInstance.EntityType.HasSimpleReferenceScheme Then
                                 Call lrEntityTypeInstance.SetPropertyAttributes(Me, "DataType", True)

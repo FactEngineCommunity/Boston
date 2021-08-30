@@ -4918,11 +4918,26 @@ Namespace FBM
                     Next
 
                     '----------------------------------------------------------
-                    'Fatal Columns. Columns where ActiveRole is Nothing
+                    'Try and Fix. Columns where ActiveRole is Nothing.
                     Dim larFatalColumn = From Table In Me.RDS.Table
                                          From Column In Table.Column
                                          Where Column.ActiveRole Is Nothing
                                          Select Column
+
+                    For Each lrColumn In larFatalColumn.ToArray
+                        Dim larCoveredRoles As New List(Of FBM.Role)
+                        Dim larRole As List(Of FBM.Role) = lrColumn.Role.getDownstreamRoleActiveRoles(larCoveredRoles)
+                        If larRole.Count = 1 Then
+                            lrColumn.setActiveRole(larRole(0))
+                        End If
+                    Next
+
+                    '----------------------------------------------------------
+                    'Fatal Columns. Columns where ActiveRole is Nothing
+                    larFatalColumn = From Table In Me.RDS.Table
+                                     From Column In Table.Column
+                                     Where Column.ActiveRole Is Nothing
+                                     Select Column
 
                     For Each lrColumn In larFatalColumn.ToArray
                         Call lrColumn.Table.removeColumn(lrColumn)
