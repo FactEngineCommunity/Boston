@@ -2132,7 +2132,7 @@ Namespace FBM
                     '-----------------------------
                     'Find the Destination Entity
                     '-----------------------------
-                    lrDestinationTable = Nothing
+                    lrDestinationTable = New RDS.Table 'So the name can be set.
 
                     lsSQLQuery = "SELECT *"
                     lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreRelationHasDestinationEntity.ToString
