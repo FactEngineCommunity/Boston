@@ -471,7 +471,11 @@ Public Class tApplication
                             If abAbortApplication Then Call Application.Exit()
 
                         End If
+                    Case Is = pcenumErrorType.Warning
 
+                        If abThrowtoMSGBox Then
+                            MsgBox(asErrorMessage, MsgBoxStyle.Exclamation)
+                        End If
                 End Select
 
             Else

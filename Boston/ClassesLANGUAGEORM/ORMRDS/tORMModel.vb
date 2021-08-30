@@ -2132,7 +2132,7 @@ Namespace FBM
                     '-----------------------------
                     'Find the Destination Entity
                     '-----------------------------
-                    lrDestinationTable = New RDS.Table
+                    lrDestinationTable = Nothing
 
                     lsSQLQuery = "SELECT *"
                     lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreRelationHasDestinationEntity.ToString
@@ -2140,9 +2140,21 @@ Namespace FBM
 
                     lrRecordset1 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
-                    lrDestinationTable.Name = lrRecordset1("Entity").Data
+                    Try
+                        lrDestinationTable.Name = lrRecordset1("Entity").Data
 
-                    lrDestinationTable = Me.RDS.Table.Find(AddressOf lrDestinationTable.Equals)
+                        lrDestinationTable = Me.RDS.Table.Find(AddressOf lrDestinationTable.Equals)
+                    Catch ex As Exception
+                        Dim lsMessage As String
+                        lsMessage = "Relation with Origin Entity, " & lrOriginTable.Name & ", has no Destination Entity"
+                        lsMessage.AppendDoubleLineBreak("Boston will remove this Relation from the Relational View as a precaution. Determine which Relation is missing and try and remake the Relation from the Object-Role Model view.")
+                        prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning, Nothing, False, False, True)
+                        Dim lrRelation As New RDS.Relation
+                        lrRelation.Id = lsRelationId
+                        Me.RDS.removeRelation(lrRelation)
+                    End Try
+
+
 
                     If lrDestinationTable IsNot Nothing Then
 
