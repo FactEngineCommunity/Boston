@@ -66,6 +66,7 @@ Partial Class frmFactEngine
         Me.ClearToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.Diagram = New MindFusion.Diagramming.Diagram()
         Me.Diagram1 = New MindFusion.Diagramming.Diagram()
+        Me.BackgroundWorker = New System.ComponentModel.BackgroundWorker()
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SplitContainer1.Panel1.SuspendLayout()
         Me.SplitContainer1.Panel2.SuspendLayout()
@@ -463,6 +464,10 @@ Partial Class frmFactEngine
         Me.Diagram.LinkStyle = MindFusion.Diagramming.LinkStyle.Bezier
         Me.Diagram.ShapeBrush = New MindFusion.Drawing.SolidBrush("#FFFFFFFF")
         '
+        'BackgroundWorker
+        '
+        Me.BackgroundWorker.WorkerReportsProgress = True
+        '
         'frmFactEngine
         '
         Me.AllowDrop = True
@@ -540,4 +545,5 @@ Partial Class frmFactEngine
     Friend WithEvents ToolStripSeparator1 As ToolStripSeparator
     Friend WithEvents Diagram1 As MindFusion.Diagramming.Diagram
     Friend WithEvents ClearToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents BackgroundWorker As System.ComponentModel.BackgroundWorker
 End Class

@@ -2,6 +2,7 @@
 Imports MindFusion.Diagramming.Layout
 Imports MindFusion.Diagramming
 Imports System.Runtime.InteropServices
+Imports System.ComponentModel
 
 Public Class frmFactEngine
 
@@ -83,7 +84,7 @@ Public Class frmFactEngine
             lrLink.SegmentCount = 1
         Next
 
-        Call Me.DisambiguateOverlappingLinks
+        Call Me.DisambiguateOverlappingLinks()
 
     End Sub
 
@@ -594,6 +595,7 @@ Public Class frmFactEngine
 
         Me.AutoComplete = New frmAutoComplete(Me.TextBoxInput)
         Me.AutoComplete.Owner = Me
+        Me.AutoComplete.moBackgroundWorker = Me.BackgroundWorker
 
         Me.TextBoxInput.AllowDrop = True
 
@@ -1019,7 +1021,7 @@ Public Class frmFactEngine
             End Try
 
         Catch ex As Exception
-                Dim lsMessage As String
+            Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
@@ -1290,16 +1292,49 @@ Public Class frmFactEngine
                 Dim lsPredicatePartText As String
 
                 Dim larPredicateNode As List(Of FEQL.ParseNode)
+                Dim lbMadeChanges As Boolean = False
 
                 For Each lrParseNode In larModelPredicateClauseParseNode
                     larPredicateNode = New List(Of FEQL.ParseNode)
                     Call Me.GetPredicateNodes(lrParseNode, larPredicateNode)
                     Dim lasPredicate = (From PredicateNode In larPredicateNode
                                         Select Trim(PredicateNode.Token.Text)).ToArray
+
                     lsPredicatePartText = Trim(Strings.Join(lasPredicate, " "))
-                    'For Each lrPredicateNode In larPredicateNode
-                    '    lsPredicatePartText &= Trim(lrPredicateNode.Token.Text) & " "
-                    'Next
+
+                    '========================================                    
+                    'Good FactEngine styling
+                    Dim lasToken As String() = {"A", "THAT"}
+
+                    For Each lsToken In lasToken
+                        If lsPredicatePartText.EndsWith(" " & LCase(lsToken)) Then
+                            lsPredicatePartText &= " "
+                        End If
+                        If lsPredicatePartText = LCase(lsToken) Then
+                            lsPredicatePartText = lsToken
+                            lbMadeChanges = True
+                        ElseIf lsPredicatePartText.Contains(" " & LCase(lsToken) & " ") Then
+                            lsPredicatePartText = lsPredicatePartText.Replace(" " & LCase(lsToken) & " ", " " & lsToken & " ")
+                            lbMadeChanges = True
+                        End If
+                        If lbMadeChanges Then
+                            Dim lsText As String = Me.TextBoxInput.Text.Remove(lrParseNode.Token.StartPos, lrParseNode.Token.Length)
+                            Me.TextBoxInput.Text = lsText.Insert(lrParseNode.Token.StartPos, lsPredicatePartText)
+                            Me.TextBoxInput.Text = Me.TextBoxInput.Text.Replace("  ", " ")
+                            Me.TextBoxInput.SelectionStart = Me.TextBoxInput.Text.Length
+                            Exit Sub
+                        End If
+                    Next
+
+                    Dim lastWord As String = Me.TextBoxInput.Text.Split(" ").ToList.FindLast(Function(x) x.Length > 0)
+                    If e.KeyCode = Keys.Space And Me.zrTextHighlighter.Tree.Optionals.Find(Function(x) x.ExpectedToken = FEQL.TokenType.MODELELEMENTNAME.ToString) IsNot Nothing Then
+                        If prApplication.WorkingModel.GetModelObjectByName(Viev.Strings.MakeCapCamelCase(lastWord)) IsNot Nothing Then
+                            Me.TextBoxInput.Text = Me.TextBoxInput.Text.Remove(Me.TextBoxInput.Text.Length - lastWord.Length)
+                            Me.TextBoxInput.Text &= Viev.Strings.MakeCapCamelCase(lastWord)
+                            Me.TextBoxInput.SelectionStart = Me.TextBoxInput.Text.Length
+                        End If
+                    End If
+
                     If Not prApplication.WorkingModel.existsPredicatePart(lsPredicatePartText) Then
                         Me.TextMarker.AddWord(lrParseNode.Token.StartPos, lrParseNode.Token.Length, Color.Red, "Uknown Predicate")
 
@@ -1313,6 +1348,7 @@ Public Class frmFactEngine
                         Next
                     End If
                 Next
+
 
                 Me.TextMarker.MarkWords()
 
@@ -2126,7 +2162,7 @@ Public Class frmFactEngine
             Me.AutoComplete.Owner = Me
             Call Me.populateHelpLabel()
         End If
-        'Me.AutoComplete.ListBox.Focus()
+
     End Sub
 
     Private Sub setAutoCompletePosition()
@@ -2331,11 +2367,11 @@ Public Class frmFactEngine
 
         Catch ex As Exception
             Dim lsMessage As String
-        Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
-        lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
-        lsMessage &= vbCrLf & vbCrLf & ex.Message
-        prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Sub
@@ -2706,4 +2742,26 @@ Public Class frmFactEngine
 
     End Sub
 
+    Private Sub BackgroundWorker_ProgressChanged(sender As Object, e As ProgressChangedEventArgs) Handles BackgroundWorker.ProgressChanged
+
+        Try
+
+            Dim lrProgressObject As ProgressObject = CType(e.UserState, ProgressObject)
+
+            If lrProgressObject.Message IsNot Nothing Then
+                If lrProgressObject.SimpleAppend Then
+                    Me.LabelHelp.Text = lrProgressObject.Message
+
+                ElseIf lrProgressObject.IsError Then
+                    Me.LabelHelp.Text = lrProgressObject.Message
+                Else
+                    Me.LabelHelp.Text = lrProgressObject.Message
+                End If
+            End If
+
+        Catch ex As Exception
+
+        End Try
+
+    End Sub
 End Class

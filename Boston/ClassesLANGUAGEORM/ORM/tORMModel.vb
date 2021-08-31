@@ -1841,7 +1841,7 @@ Namespace FBM
                     Try
                         Me.Dictionary.Add(lrDictionaryEntry.Symbol, Me.ModelDictionary.Count - 1)
                     Catch ex As Exception
-                        'Can ignore at this stagef
+                        'Can ignore at this stage
                         'Debugger.Break()
                     End Try
 

@@ -164,6 +164,7 @@ Namespace FEQL
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
+                  max_tree.Optionals.AddRange(m_tree.Optionals)
                         lbProblemSolved = True
                         tok = m_scanner.Scan(TokenType.KEYWDLESSTHAN) ' Terminal Rule: KEYWDLESSTHAN
             n = node.CreateNode(tok, tok.ToString() )
@@ -189,6 +190,7 @@ Namespace FEQL
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
+                  max_tree.Optionals.AddRange(m_tree.Optionals)
                         lbProblemSolved = True
                         tok = m_scanner.Scan(TokenType.KEYWDGREATERTHAN) ' Terminal Rule: KEYWDGREATERTHAN
             n = node.CreateNode(tok, tok.ToString() )
@@ -336,6 +338,7 @@ Namespace FEQL
                                         Me.MaxDistance = m_scanner.StartPos
                                         max_tree = m_tree.clone
                                       End If
+                                      max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                 lbProblemSolved = True
                                                                 tok = m_scanner.Scan(TokenType.MINUS) ' Terminal Rule: MINUS
                                 n = node.CreateNode(tok, tok.ToString() )
@@ -551,6 +554,7 @@ Namespace FEQL
                                         Me.MaxDistance = m_scanner.StartPos
                                         max_tree = m_tree.clone
                                       End If
+                                      max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                 lbProblemSolved = True
                                                                 tok = m_scanner.Scan(TokenType.DIVIDE) ' Terminal Rule: DIVIDE
                                 n = node.CreateNode(tok, tok.ToString() )
@@ -756,6 +760,7 @@ Namespace FEQL
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
+                          max_tree.Optionals.AddRange(m_tree.Optionals)
                                         lbProblemSolved = True
                                         tok = m_scanner.Scan(TokenType.NUMBER) ' Terminal Rule: NUMBER
                     n = node.CreateNode(tok, tok.ToString() )
@@ -781,6 +786,7 @@ Namespace FEQL
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
+                          max_tree.Optionals.AddRange(m_tree.Optionals)
                                         lbProblemSolved = True
                                         tok = m_scanner.Scan(TokenType.MODELELEMENTNAME) ' Terminal Rule: MODELELEMENTNAME
                     n = node.CreateNode(tok, tok.ToString() )
@@ -881,6 +887,7 @@ Namespace FEQL
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
+                          max_tree.Optionals.AddRange(m_tree.Optionals)
                                         lbProblemSolved = True
                                         tok = m_scanner.Scan(TokenType.NUMBER) ' Terminal Rule: NUMBER
                     n = node.CreateNode(tok, tok.ToString() )
@@ -906,6 +913,7 @@ Namespace FEQL
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
+                          max_tree.Optionals.AddRange(m_tree.Optionals)
                                         lbProblemSolved = True
                                         tok = m_scanner.Scan(TokenType.MODELELEMENTNAME) ' Terminal Rule: MODELELEMENTNAME
                     n = node.CreateNode(tok, tok.ToString() )
@@ -1006,6 +1014,7 @@ Namespace FEQL
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
+                          max_tree.Optionals.AddRange(m_tree.Optionals)
                                         lbProblemSolved = True
                                         tok = m_scanner.Scan(TokenType.NUMBER) ' Terminal Rule: NUMBER
                     n = node.CreateNode(tok, tok.ToString() )
@@ -1031,6 +1040,7 @@ Namespace FEQL
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
+                          max_tree.Optionals.AddRange(m_tree.Optionals)
                                         lbProblemSolved = True
                                         tok = m_scanner.Scan(TokenType.MODELELEMENTNAME) ' Terminal Rule: MODELELEMENTNAME
                     n = node.CreateNode(tok, tok.ToString() )
@@ -1173,6 +1183,7 @@ Namespace FEQL
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
+                  max_tree.Optionals.AddRange(m_tree.Optionals)
             
              ' Concat Rule
                                 lbProblemSolved = True
@@ -1829,6 +1840,7 @@ Namespace FEQL
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
+                          max_tree.Optionals.AddRange(m_tree.Optionals)
                     lbProblemSolved =                         ParseQUOTEDIDENTIFIER(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: QUOTEDIDENTIFIER
                         If m_tree.Errors.Count > 0 Then
                           If m_scanner.EndPos > Me.MaxDistance Then
@@ -2389,6 +2401,7 @@ Namespace FEQL
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
+                  max_tree.Optionals.AddRange(m_tree.Optionals)
                         lbProblemSolved = True
                         tok = m_scanner.Scan(TokenType.COLUMNNAMESTR) ' Terminal Rule: COLUMNNAMESTR
             n = node.CreateNode(tok, tok.ToString() )
@@ -2414,6 +2427,7 @@ Namespace FEQL
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
+                  max_tree.Optionals.AddRange(m_tree.Optionals)
                         lbProblemSolved = True
                         tok = m_scanner.Scan(TokenType.KEYWDCOUNTSTAR) ' Terminal Rule: KEYWDCOUNTSTAR
             n = node.CreateNode(tok, tok.ToString() )
@@ -3096,6 +3110,7 @@ Namespace FEQL
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
+                  max_tree.Optionals.AddRange(m_tree.Optionals)
                         lbProblemSolved = True
                         tok = m_scanner.Scan(TokenType.KEYWDDATATYPELOGICALYESNO) ' Terminal Rule: KEYWDDATATYPELOGICALYESNO
             n = node.CreateNode(tok, tok.ToString() )
@@ -3121,6 +3136,7 @@ Namespace FEQL
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
+                  max_tree.Optionals.AddRange(m_tree.Optionals)
                         lbProblemSolved = True
                         tok = m_scanner.Scan(TokenType.KEYWDDATATYPEAUTOCOUNTER) ' Terminal Rule: KEYWDDATATYPEAUTOCOUNTER
             n = node.CreateNode(tok, tok.ToString() )
@@ -3146,6 +3162,7 @@ Namespace FEQL
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
+                  max_tree.Optionals.AddRange(m_tree.Optionals)
                         lbProblemSolved = True
                         tok = m_scanner.Scan(TokenType.KEYWDDATATYPEFLOATDOUBLEPRECISION) ' Terminal Rule: KEYWDDATATYPEFLOATDOUBLEPRECISION
             n = node.CreateNode(tok, tok.ToString() )
@@ -3171,6 +3188,7 @@ Namespace FEQL
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
+                  max_tree.Optionals.AddRange(m_tree.Optionals)
                         lbProblemSolved = True
                         tok = m_scanner.Scan(TokenType.KEYWDDATATYPEFLOATSINGLEPRECISION) ' Terminal Rule: KEYWDDATATYPEFLOATSINGLEPRECISION
             n = node.CreateNode(tok, tok.ToString() )
@@ -3196,6 +3214,7 @@ Namespace FEQL
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
+                  max_tree.Optionals.AddRange(m_tree.Optionals)
                         lbProblemSolved = True
                         tok = m_scanner.Scan(TokenType.KEYWDDATATYPESIGNEDBIGINTEGER) ' Terminal Rule: KEYWDDATATYPESIGNEDBIGINTEGER
             n = node.CreateNode(tok, tok.ToString() )
@@ -3221,6 +3240,7 @@ Namespace FEQL
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
+                  max_tree.Optionals.AddRange(m_tree.Optionals)
                         lbProblemSolved = True
                         tok = m_scanner.Scan(TokenType.KEYWDDATATYPESIGNEDINTEGER) ' Terminal Rule: KEYWDDATATYPESIGNEDINTEGER
             n = node.CreateNode(tok, tok.ToString() )
@@ -3246,6 +3266,7 @@ Namespace FEQL
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
+                  max_tree.Optionals.AddRange(m_tree.Optionals)
                         lbProblemSolved = True
                         tok = m_scanner.Scan(TokenType.KEYWDDATATYPESIGNEDSMALLINTEGER) ' Terminal Rule: KEYWDDATATYPESIGNEDSMALLINTEGER
             n = node.CreateNode(tok, tok.ToString() )
@@ -3271,6 +3292,7 @@ Namespace FEQL
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
+                  max_tree.Optionals.AddRange(m_tree.Optionals)
                         lbProblemSolved = True
                         tok = m_scanner.Scan(TokenType.KEYWDDATATYPEUNSIGNEDBIGINTEGER) ' Terminal Rule: KEYWDDATATYPEUNSIGNEDBIGINTEGER
             n = node.CreateNode(tok, tok.ToString() )
@@ -3296,6 +3318,7 @@ Namespace FEQL
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
+                  max_tree.Optionals.AddRange(m_tree.Optionals)
                         lbProblemSolved = True
                         tok = m_scanner.Scan(TokenType.KEYWDDATATYPEUNSIGNEDINTEGER) ' Terminal Rule: KEYWDDATATYPEUNSIGNEDINTEGER
             n = node.CreateNode(tok, tok.ToString() )
@@ -3321,6 +3344,7 @@ Namespace FEQL
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
+                  max_tree.Optionals.AddRange(m_tree.Optionals)
                         lbProblemSolved = True
                         tok = m_scanner.Scan(TokenType.KEYWDDATATYPEUNSIGNEDSMALLINTEGER) ' Terminal Rule: KEYWDDATATYPEUNSIGNEDSMALLINTEGER
             n = node.CreateNode(tok, tok.ToString() )
@@ -3346,6 +3370,7 @@ Namespace FEQL
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
+                  max_tree.Optionals.AddRange(m_tree.Optionals)
                         lbProblemSolved = True
                         tok = m_scanner.Scan(TokenType.KEYWDDATATYPEUNSIGNEDTINYINTEGER) ' Terminal Rule: KEYWDDATATYPEUNSIGNEDTINYINTEGER
             n = node.CreateNode(tok, tok.ToString() )
@@ -3371,6 +3396,7 @@ Namespace FEQL
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
+                  max_tree.Optionals.AddRange(m_tree.Optionals)
                         lbProblemSolved = True
                         tok = m_scanner.Scan(TokenType.KEYWDDATATYPEOBJECTID) ' Terminal Rule: KEYWDDATATYPEOBJECTID
             n = node.CreateNode(tok, tok.ToString() )
@@ -3396,6 +3422,7 @@ Namespace FEQL
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
+                  max_tree.Optionals.AddRange(m_tree.Optionals)
                         lbProblemSolved = True
                         tok = m_scanner.Scan(TokenType.KEYWDDATATYPEROWID) ' Terminal Rule: KEYWDDATATYPEROWID
             n = node.CreateNode(tok, tok.ToString() )
@@ -3421,6 +3448,7 @@ Namespace FEQL
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
+                  max_tree.Optionals.AddRange(m_tree.Optionals)
                         lbProblemSolved = True
                         tok = m_scanner.Scan(TokenType.KEYWDDATATYPERAWDATAOLEOBJECT) ' Terminal Rule: KEYWDDATATYPERAWDATAOLEOBJECT
             n = node.CreateNode(tok, tok.ToString() )
@@ -3446,6 +3474,7 @@ Namespace FEQL
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
+                  max_tree.Optionals.AddRange(m_tree.Optionals)
                         lbProblemSolved = True
                         tok = m_scanner.Scan(TokenType.KEYWDDATATYPERAWDATA) ' Terminal Rule: KEYWDDATATYPERAWDATA
             n = node.CreateNode(tok, tok.ToString() )
@@ -3471,6 +3500,7 @@ Namespace FEQL
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
+                  max_tree.Optionals.AddRange(m_tree.Optionals)
                         lbProblemSolved = True
                         tok = m_scanner.Scan(TokenType.KEYWDDATATYPEAUTOTIMESTAMP) ' Terminal Rule: KEYWDDATATYPEAUTOTIMESTAMP
             n = node.CreateNode(tok, tok.ToString() )
@@ -3496,6 +3526,7 @@ Namespace FEQL
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
+                  max_tree.Optionals.AddRange(m_tree.Optionals)
                         lbProblemSolved = True
                         tok = m_scanner.Scan(TokenType.KEYWDDATATYPEDATE) ' Terminal Rule: KEYWDDATATYPEDATE
             n = node.CreateNode(tok, tok.ToString() )
@@ -3521,6 +3552,7 @@ Namespace FEQL
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
+                  max_tree.Optionals.AddRange(m_tree.Optionals)
                         lbProblemSolved = True
                         tok = m_scanner.Scan(TokenType.KEYWDDATATYPEDATETIME) ' Terminal Rule: KEYWDDATATYPEDATETIME
             n = node.CreateNode(tok, tok.ToString() )
@@ -3546,6 +3578,7 @@ Namespace FEQL
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
+                  max_tree.Optionals.AddRange(m_tree.Optionals)
                         lbProblemSolved = True
                         tok = m_scanner.Scan(TokenType.KEYWDDATATYPETIME) ' Terminal Rule: KEYWDDATATYPETIME
             n = node.CreateNode(tok, tok.ToString() )
@@ -3742,6 +3775,7 @@ Namespace FEQL
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
+                          max_tree.Optionals.AddRange(m_tree.Optionals)
                                         lbProblemSolved = True
                                         tok = m_scanner.Scan(TokenType.KEYWDDATATYPERAWDATALARGELENGTH) ' Terminal Rule: KEYWDDATATYPERAWDATALARGELENGTH
                     n = node.CreateNode(tok, tok.ToString() )
@@ -3767,6 +3801,7 @@ Namespace FEQL
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
+                          max_tree.Optionals.AddRange(m_tree.Optionals)
                                         lbProblemSolved = True
                                         tok = m_scanner.Scan(TokenType.KEYWDDATATYPERAWDATAVARIABLELENGTH) ' Terminal Rule: KEYWDDATATYPERAWDATAVARIABLELENGTH
                     n = node.CreateNode(tok, tok.ToString() )
@@ -3792,6 +3827,7 @@ Namespace FEQL
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
+                          max_tree.Optionals.AddRange(m_tree.Optionals)
                                         lbProblemSolved = True
                                         tok = m_scanner.Scan(TokenType.KEYWDDATATYPESTRINGFIXEDLENGTH) ' Terminal Rule: KEYWDDATATYPESTRINGFIXEDLENGTH
                     n = node.CreateNode(tok, tok.ToString() )
@@ -3817,6 +3853,7 @@ Namespace FEQL
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
+                          max_tree.Optionals.AddRange(m_tree.Optionals)
                                         lbProblemSolved = True
                                         tok = m_scanner.Scan(TokenType.KEYWDDATATYPESTRINGLARGELENGTH) ' Terminal Rule: KEYWDDATATYPESTRINGLARGELENGTH
                     n = node.CreateNode(tok, tok.ToString() )
@@ -3842,6 +3879,7 @@ Namespace FEQL
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
+                          max_tree.Optionals.AddRange(m_tree.Optionals)
                                         lbProblemSolved = True
                                         tok = m_scanner.Scan(TokenType.KEYWDDATATYPESTRINGVARIABLELENGTH) ' Terminal Rule: KEYWDDATATYPESTRINGVARIABLELENGTH
                     n = node.CreateNode(tok, tok.ToString() )
@@ -4095,6 +4133,7 @@ Namespace FEQL
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
+                          max_tree.Optionals.AddRange(m_tree.Optionals)
                                         lbProblemSolved = True
                                         tok = m_scanner.Scan(TokenType.KEYWDDATATYPEDECIMAL) ' Terminal Rule: KEYWDDATATYPEDECIMAL
                     n = node.CreateNode(tok, tok.ToString() )
@@ -4120,6 +4159,7 @@ Namespace FEQL
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
+                          max_tree.Optionals.AddRange(m_tree.Optionals)
                                         lbProblemSolved = True
                                         tok = m_scanner.Scan(TokenType.KEYWDDATATYPEMONEY) ' Terminal Rule: KEYWDDATATYPEMONEY
                     n = node.CreateNode(tok, tok.ToString() )
@@ -5855,6 +5895,7 @@ Namespace FEQL
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
+                  max_tree.Optionals.AddRange(m_tree.Optionals)
             
              ' Concat Rule
                                 lbProblemSolved = True
@@ -6332,6 +6373,7 @@ Namespace FEQL
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
+                  max_tree.Optionals.AddRange(m_tree.Optionals)
                         lbProblemSolved = True
                         tok = m_scanner.Scan(TokenType.KEYWDVALUETYPES) ' Terminal Rule: KEYWDVALUETYPES
             n = node.CreateNode(tok, tok.ToString() )
@@ -6357,6 +6399,7 @@ Namespace FEQL
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
+                  max_tree.Optionals.AddRange(m_tree.Optionals)
                         lbProblemSolved = True
                         tok = m_scanner.Scan(TokenType.KEYWDFACTTYPES) ' Terminal Rule: KEYWDFACTTYPES
             n = node.CreateNode(tok, tok.ToString() )
@@ -6382,6 +6425,7 @@ Namespace FEQL
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
+                  max_tree.Optionals.AddRange(m_tree.Optionals)
                         lbProblemSolved = True
                         tok = m_scanner.Scan(TokenType.KEYWDROLECONSTRAINTS) ' Terminal Rule: KEYWDROLECONSTRAINTS
             n = node.CreateNode(tok, tok.ToString() )
@@ -6407,6 +6451,7 @@ Namespace FEQL
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
+                  max_tree.Optionals.AddRange(m_tree.Optionals)
                         lbProblemSolved = True
                         tok = m_scanner.Scan(TokenType.KEYWDMODELNOTES) ' Terminal Rule: KEYWDMODELNOTES
             n = node.CreateNode(tok, tok.ToString() )
@@ -6672,6 +6717,7 @@ Namespace FEQL
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
+                  max_tree.Optionals.AddRange(m_tree.Optionals)
                         lbProblemSolved = True
                         tok = m_scanner.Scan(TokenType.KEYWDVALUETYPE) ' Terminal Rule: KEYWDVALUETYPE
             n = node.CreateNode(tok, tok.ToString() )
@@ -6697,6 +6743,7 @@ Namespace FEQL
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
+                  max_tree.Optionals.AddRange(m_tree.Optionals)
                         lbProblemSolved = True
                         tok = m_scanner.Scan(TokenType.KEYWDMODEL) ' Terminal Rule: KEYWDMODEL
             n = node.CreateNode(tok, tok.ToString() )
@@ -7173,6 +7220,7 @@ Namespace FEQL
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
+                          max_tree.Optionals.AddRange(m_tree.Optionals)
                     lbProblemSolved =                         ParseNODEPROPERTYIDENTIFICATION(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: NODEPROPERTYIDENTIFICATION
                         If m_tree.Errors.Count > 0 Then
                           If m_scanner.EndPos > Me.MaxDistance Then
@@ -7896,6 +7944,7 @@ Namespace FEQL
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
+                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                             
                              ' Concat Rule
                             lbProblemSolved =                                     ParseQUOTEDIDENTIFIERLIST(node) ' NonTerminal Rule: QUOTEDIDENTIFIERLIST
@@ -8038,6 +8087,7 @@ Namespace FEQL
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
+                  max_tree.Optionals.AddRange(m_tree.Optionals)
             
              ' Concat Rule
                                 lbProblemSolved = True
@@ -8422,6 +8472,7 @@ Namespace FEQL
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
+                          max_tree.Optionals.AddRange(m_tree.Optionals)
                     
                      ' Concat Rule
                     lbProblemSolved =                             ParseQUOTEDIDENTIFIERLIST(node) ' NonTerminal Rule: QUOTEDIDENTIFIERLIST
@@ -8628,6 +8679,7 @@ Namespace FEQL
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
+                  max_tree.Optionals.AddRange(m_tree.Optionals)
             lbProblemSolved =                 ParseNODEPROPERTYIDENTIFICATION(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: NODEPROPERTYIDENTIFICATION
                 If m_tree.Errors.Count > 0 Then
                   If m_scanner.EndPos > Me.MaxDistance Then
@@ -8937,6 +8989,7 @@ Namespace FEQL
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
+                          max_tree.Optionals.AddRange(m_tree.Optionals)
                     lbProblemSolved =                         ParseQUOTEDIDENTIFIER(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: QUOTEDIDENTIFIER
                         If m_tree.Errors.Count > 0 Then
                           If m_scanner.EndPos > Me.MaxDistance Then
@@ -9097,6 +9150,7 @@ Namespace FEQL
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
+                          max_tree.Optionals.AddRange(m_tree.Optionals)
                                         lbProblemSolved = True
                                         tok = m_scanner.Scan(TokenType.IDENTIFIER) ' Terminal Rule: IDENTIFIER
                     n = node.CreateNode(tok, tok.ToString() )
@@ -9304,6 +9358,7 @@ Namespace FEQL
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
+                          max_tree.Optionals.AddRange(m_tree.Optionals)
                                         lbProblemSolved = True
                                         tok = m_scanner.Scan(TokenType.CARRET) ' Terminal Rule: CARRET
                     n = node.CreateNode(tok, tok.ToString() )
@@ -9329,6 +9384,7 @@ Namespace FEQL
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
+                          max_tree.Optionals.AddRange(m_tree.Optionals)
                                         lbProblemSolved = True
                                         tok = m_scanner.Scan(TokenType.BANG) ' Terminal Rule: BANG
                     n = node.CreateNode(tok, tok.ToString() )
@@ -9354,6 +9410,7 @@ Namespace FEQL
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
+                          max_tree.Optionals.AddRange(m_tree.Optionals)
                                         lbProblemSolved = True
                                         tok = m_scanner.Scan(TokenType.LIKECOMPARITOR) ' Terminal Rule: LIKECOMPARITOR
                     n = node.CreateNode(tok, tok.ToString() )
@@ -9449,6 +9506,7 @@ Namespace FEQL
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
+                          max_tree.Optionals.AddRange(m_tree.Optionals)
                     lbProblemSolved =                         ParseQUOTEDIDENTIFIER(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: QUOTEDIDENTIFIER
                         If m_tree.Errors.Count > 0 Then
                           If m_scanner.EndPos > Me.MaxDistance Then
@@ -10298,6 +10356,7 @@ lbProblemSolved =                                         ParseNUMBER2(node) ' N
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
+                          max_tree.Optionals.AddRange(m_tree.Optionals)
                     
                      ' Concat Rule
                                                 tok = m_scanner.LookAhead({TokenType.NUMBER}) ' Option Rule
@@ -10446,6 +10505,7 @@ lbProblemSolved =                                 ParseNUMBER2(node) ' NonTermin
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
+                          max_tree.Optionals.AddRange(m_tree.Optionals)
                     
                      ' Concat Rule
                                                 lbProblemSolved = True
@@ -11341,6 +11401,7 @@ lbProblemSolved =                                 ParseASCLAUSE(node) ' NonTermi
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
+                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                                         lbProblemSolved = True
                                                         tok = m_scanner.Scan(TokenType.STAR) ' Terminal Rule: STAR
                             n = node.CreateNode(tok, tok.ToString() )
@@ -11440,6 +11501,7 @@ lbProblemSolved =                                 ParseASCLAUSE(node) ' NonTermi
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
+                  max_tree.Optionals.AddRange(m_tree.Optionals)
             lbProblemSolved =                 ParseMINMAXELEMENT(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: MINMAXELEMENT
                 If m_tree.Errors.Count > 0 Then
                   If m_scanner.EndPos > Me.MaxDistance Then
@@ -11458,6 +11520,7 @@ lbProblemSolved =                                 ParseASCLAUSE(node) ' NonTermi
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
+                  max_tree.Optionals.AddRange(m_tree.Optionals)
             
              ' Concat Rule
                                 lbProblemSolved = True
@@ -11538,6 +11601,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
+                  max_tree.Optionals.AddRange(m_tree.Optionals)
             
              ' Concat Rule
                                 lbProblemSolved = True
@@ -11710,6 +11774,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
+                          max_tree.Optionals.AddRange(m_tree.Optionals)
                                         lbProblemSolved = True
                                         tok = m_scanner.Scan(TokenType.STAR) ' Terminal Rule: STAR
                     n = node.CreateNode(tok, tok.ToString() )
@@ -14393,6 +14458,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
+                          max_tree.Optionals.AddRange(m_tree.Optionals)
                     lbProblemSolved =                         ParseADDFACTSTMT(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: ADDFACTSTMT
                         If m_tree.Errors.Count > 0 Then
                           If m_scanner.EndPos > Me.MaxDistance Then
@@ -14411,6 +14477,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
+                          max_tree.Optionals.AddRange(m_tree.Optionals)
                     lbProblemSolved =                         ParseADDFACTTYPESTMT(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: ADDFACTTYPESTMT
                         If m_tree.Errors.Count > 0 Then
                           If m_scanner.EndPos > Me.MaxDistance Then
@@ -14429,6 +14496,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
+                          max_tree.Optionals.AddRange(m_tree.Optionals)
                     lbProblemSolved =                         ParseADDVALUETYPESTMT(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: ADDVALUETYPESTMT
                         If m_tree.Errors.Count > 0 Then
                           If m_scanner.EndPos > Me.MaxDistance Then
@@ -14447,6 +14515,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
+                          max_tree.Optionals.AddRange(m_tree.Optionals)
                     lbProblemSolved =                         ParseADDROLESTMT(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: ADDROLESTMT
                         If m_tree.Errors.Count > 0 Then
                           If m_scanner.EndPos > Me.MaxDistance Then
@@ -14869,6 +14938,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
+                          max_tree.Optionals.AddRange(m_tree.Optionals)
                     lbProblemSolved =                         ParseFACTSTMT(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: FACTSTMT
                         If m_tree.Errors.Count > 0 Then
                           If m_scanner.EndPos > Me.MaxDistance Then
@@ -15571,6 +15641,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
+                          max_tree.Optionals.AddRange(m_tree.Optionals)
                     lbProblemSolved =                         ParseCONSTRAINTEITHERORSUBTYPE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: CONSTRAINTEITHERORSUBTYPE
                         If m_tree.Errors.Count > 0 Then
                           If m_scanner.EndPos > Me.MaxDistance Then
@@ -16519,6 +16590,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
+                          max_tree.Optionals.AddRange(m_tree.Optionals)
                     lbProblemSolved =                         ParseCONSTRAINTINCLUSIVEOR(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: CONSTRAINTINCLUSIVEOR
                         If m_tree.Errors.Count > 0 Then
                           If m_scanner.EndPos > Me.MaxDistance Then
@@ -17606,6 +17678,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
+                  max_tree.Optionals.AddRange(m_tree.Optionals)
             lbProblemSolved =                 ParseCREATEFACTTYPESTMT(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: CREATEFACTTYPESTMT
                 If m_tree.Errors.Count > 0 Then
                   If m_scanner.EndPos > Me.MaxDistance Then
@@ -17624,6 +17697,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
+                  max_tree.Optionals.AddRange(m_tree.Optionals)
             lbProblemSolved =                 ParseCREATEVALUETYPESTMT(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: CREATEVALUETYPESTMT
                 If m_tree.Errors.Count > 0 Then
                   If m_scanner.EndPos > Me.MaxDistance Then
@@ -17816,6 +17890,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
+                                          max_tree.Optionals.AddRange(m_tree.Optionals)
                                     lbProblemSolved =                                         ParseCREATEMODELELEMENTSTMT(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: CREATEMODELELEMENTSTMT
                                         If m_tree.Errors.Count > 0 Then
                                           If m_scanner.EndPos > Me.MaxDistance Then
@@ -18056,6 +18131,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
+                                          max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                         tok = m_scanner.LookAhead({TokenType.KEYWDTHAT}) ' Option Rule
                                     If tok.Type = TokenType.KEYWDTHAT Then
 
@@ -18331,6 +18407,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
+                                          max_tree.Optionals.AddRange(m_tree.Optionals)
                                     lbProblemSolved =                                         ParseCREATEMODELELEMENTSTMT(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: CREATEMODELELEMENTSTMT
                                         If m_tree.Errors.Count > 0 Then
                                           If m_scanner.EndPos > Me.MaxDistance Then
@@ -18571,6 +18648,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
+                                          max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                         tok = m_scanner.LookAhead({TokenType.KEYWDTHAT}) ' Option Rule
                                     If tok.Type = TokenType.KEYWDTHAT Then
 
@@ -18846,6 +18924,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
+                                          max_tree.Optionals.AddRange(m_tree.Optionals)
                                     lbProblemSolved =                                         ParseCREATEMODELELEMENTSTMT(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: CREATEMODELELEMENTSTMT
                                         If m_tree.Errors.Count > 0 Then
                                           If m_scanner.EndPos > Me.MaxDistance Then
@@ -19086,6 +19165,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
+                                          max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                         tok = m_scanner.LookAhead({TokenType.KEYWDTHAT}) ' Option Rule
                                     If tok.Type = TokenType.KEYWDTHAT Then
 
@@ -19361,6 +19441,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
+                                          max_tree.Optionals.AddRange(m_tree.Optionals)
                                     lbProblemSolved =                                         ParseCREATEMODELELEMENTSTMT(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: CREATEMODELELEMENTSTMT
                                         If m_tree.Errors.Count > 0 Then
                                           If m_scanner.EndPos > Me.MaxDistance Then
@@ -19601,6 +19682,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
+                                          max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                         tok = m_scanner.LookAhead({TokenType.KEYWDTHAT}) ' Option Rule
                                     If tok.Type = TokenType.KEYWDTHAT Then
 
@@ -19876,6 +19958,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
+                                          max_tree.Optionals.AddRange(m_tree.Optionals)
                                     lbProblemSolved =                                         ParseCREATEMODELELEMENTSTMT(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: CREATEMODELELEMENTSTMT
                                         If m_tree.Errors.Count > 0 Then
                                           If m_scanner.EndPos > Me.MaxDistance Then
@@ -20116,6 +20199,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
+                                          max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                         tok = m_scanner.LookAhead({TokenType.KEYWDTHAT}) ' Option Rule
                                     If tok.Type = TokenType.KEYWDTHAT Then
 
@@ -20324,6 +20408,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
+                          max_tree.Optionals.AddRange(m_tree.Optionals)
                     
                      ' Concat Rule
                                                 tok = m_scanner.LookAhead({TokenType.MODELELEMENTNAME, TokenType.BROPEN, TokenType.KEYWDENTITYTYPE, TokenType.KEYWDFACTTYPE, TokenType.KEYWDVALUETYPE}) ' Choice Rule
@@ -20413,6 +20498,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
+                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                             lbProblemSolved =                                 ParseCREATEMODELELEMENTSTMT(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: CREATEMODELELEMENTSTMT
                                 If m_tree.Errors.Count > 0 Then
                                   If m_scanner.EndPos > Me.MaxDistance Then
@@ -20653,6 +20739,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
+                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                                         tok = m_scanner.LookAhead({TokenType.KEYWDTHAT}) ' Option Rule
                             If tok.Type = TokenType.KEYWDTHAT Then
 
@@ -21063,6 +21150,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
+                  max_tree.Optionals.AddRange(m_tree.Optionals)
             lbProblemSolved =                 ParseDATABASETYPECLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: DATABASETYPECLAUSE
                 If m_tree.Errors.Count > 0 Then
                   If m_scanner.EndPos > Me.MaxDistance Then
@@ -21453,6 +21541,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
+                          max_tree.Optionals.AddRange(m_tree.Optionals)
                     lbProblemSolved =                         ParseDELETEFROMCLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: DELETEFROMCLAUSE
                         If m_tree.Errors.Count > 0 Then
                           If m_scanner.EndPos > Me.MaxDistance Then
@@ -22494,6 +22583,7 @@ lbProblemSolved =                         ParseONPAGESTMT(node) ' NonTerminal Ru
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
+                  max_tree.Optionals.AddRange(m_tree.Optionals)
             lbProblemSolved =                 ParseDERIVATIONFACTREADING(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: DERIVATIONFACTREADING
                 If m_tree.Errors.Count > 0 Then
                   If m_scanner.EndPos > Me.MaxDistance Then
@@ -22512,6 +22602,7 @@ lbProblemSolved =                         ParseONPAGESTMT(node) ' NonTerminal Ru
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
+                  max_tree.Optionals.AddRange(m_tree.Optionals)
             lbProblemSolved =                 ParseDERIVATIONFORMULA(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: DERIVATIONFORMULA
                 If m_tree.Errors.Count > 0 Then
                   If m_scanner.EndPos > Me.MaxDistance Then
@@ -22659,6 +22750,7 @@ lbProblemSolved =                         ParseONPAGESTMT(node) ' NonTerminal Ru
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
+                          max_tree.Optionals.AddRange(m_tree.Optionals)
                                         lbProblemSolved = True
                                         tok = m_scanner.Scan(TokenType.KEYWDAN) ' Terminal Rule: KEYWDAN
                     n = node.CreateNode(tok, tok.ToString() )
@@ -23287,6 +23379,7 @@ lbProblemSolved =                                     ParseMODELELEMENT(node) ' 
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
+                                          max_tree.Optionals.AddRange(m_tree.Optionals)
                                     
                                      ' Concat Rule
                                                                                 lbProblemSolved = True
@@ -23506,6 +23599,7 @@ lbProblemSolved =                                     ParseMODELELEMENT(node) ' 
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
+                              max_tree.Optionals.AddRange(m_tree.Optionals)
                                                 lbProblemSolved = True
                                                 tok = m_scanner.Scan(TokenType.KEYWDWHICH) ' Terminal Rule: KEYWDWHICH
                         n = node.CreateNode(tok, tok.ToString() )
@@ -23816,6 +23910,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                         lbProblemSolved = True
                                                                                         tok = m_scanner.Scan(TokenType.KEYWDTHAT) ' Terminal Rule: KEYWDTHAT
                                             n = node.CreateNode(tok, tok.ToString() )
@@ -23841,6 +23936,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                         lbProblemSolved = True
                                                                                         tok = m_scanner.Scan(TokenType.KEYWDAN) ' Terminal Rule: KEYWDAN
                                             n = node.CreateNode(tok, tok.ToString() )
@@ -23866,6 +23962,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                         lbProblemSolved = True
                                                                                         tok = m_scanner.Scan(TokenType.KEYWDA) ' Terminal Rule: KEYWDA
                                             n = node.CreateNode(tok, tok.ToString() )
@@ -23891,6 +23988,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                         lbProblemSolved = True
                                                                                         tok = m_scanner.Scan(TokenType.KEYWDNO) ' Terminal Rule: KEYWDNO
                                             n = node.CreateNode(tok, tok.ToString() )
@@ -23916,6 +24014,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                         lbProblemSolved = True
                                                                                         tok = m_scanner.Scan(TokenType.KEYWDCOUNT) ' Terminal Rule: KEYWDCOUNT
                                             n = node.CreateNode(tok, tok.ToString() )
@@ -24052,6 +24151,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                             lbProblemSolved =                                                 ParseNODE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: NODE
                                                 If m_tree.Errors.Count > 0 Then
                                                   If m_scanner.EndPos > Me.MaxDistance Then
@@ -24142,6 +24242,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                             lbProblemSolved =                                                 ParseMATHCLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: MATHCLAUSE
                                                 If m_tree.Errors.Count > 0 Then
                                                   If m_scanner.EndPos > Me.MaxDistance Then
@@ -24366,6 +24467,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                         lbProblemSolved = True
                                                                                         tok = m_scanner.Scan(TokenType.KEYWDTHAT) ' Terminal Rule: KEYWDTHAT
                                             n = node.CreateNode(tok, tok.ToString() )
@@ -24391,6 +24493,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                         lbProblemSolved = True
                                                                                         tok = m_scanner.Scan(TokenType.KEYWDAN) ' Terminal Rule: KEYWDAN
                                             n = node.CreateNode(tok, tok.ToString() )
@@ -24416,6 +24519,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                         lbProblemSolved = True
                                                                                         tok = m_scanner.Scan(TokenType.KEYWDA) ' Terminal Rule: KEYWDA
                                             n = node.CreateNode(tok, tok.ToString() )
@@ -24441,6 +24545,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                         lbProblemSolved = True
                                                                                         tok = m_scanner.Scan(TokenType.KEYWDNO) ' Terminal Rule: KEYWDNO
                                             n = node.CreateNode(tok, tok.ToString() )
@@ -24466,6 +24571,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                         lbProblemSolved = True
                                                                                         tok = m_scanner.Scan(TokenType.KEYWDCOUNT) ' Terminal Rule: KEYWDCOUNT
                                             n = node.CreateNode(tok, tok.ToString() )
@@ -24602,6 +24708,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                             lbProblemSolved =                                                 ParseNODE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: NODE
                                                 If m_tree.Errors.Count > 0 Then
                                                   If m_scanner.EndPos > Me.MaxDistance Then
@@ -24692,6 +24799,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                             lbProblemSolved =                                                 ParseMATHCLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: MATHCLAUSE
                                                 If m_tree.Errors.Count > 0 Then
                                                   If m_scanner.EndPos > Me.MaxDistance Then
@@ -24916,6 +25024,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                         lbProblemSolved = True
                                                                                         tok = m_scanner.Scan(TokenType.KEYWDTHAT) ' Terminal Rule: KEYWDTHAT
                                             n = node.CreateNode(tok, tok.ToString() )
@@ -24941,6 +25050,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                         lbProblemSolved = True
                                                                                         tok = m_scanner.Scan(TokenType.KEYWDAN) ' Terminal Rule: KEYWDAN
                                             n = node.CreateNode(tok, tok.ToString() )
@@ -24966,6 +25076,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                         lbProblemSolved = True
                                                                                         tok = m_scanner.Scan(TokenType.KEYWDA) ' Terminal Rule: KEYWDA
                                             n = node.CreateNode(tok, tok.ToString() )
@@ -24991,6 +25102,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                         lbProblemSolved = True
                                                                                         tok = m_scanner.Scan(TokenType.KEYWDNO) ' Terminal Rule: KEYWDNO
                                             n = node.CreateNode(tok, tok.ToString() )
@@ -25016,6 +25128,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                         lbProblemSolved = True
                                                                                         tok = m_scanner.Scan(TokenType.KEYWDCOUNT) ' Terminal Rule: KEYWDCOUNT
                                             n = node.CreateNode(tok, tok.ToString() )
@@ -25152,6 +25265,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                             lbProblemSolved =                                                 ParseNODE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: NODE
                                                 If m_tree.Errors.Count > 0 Then
                                                   If m_scanner.EndPos > Me.MaxDistance Then
@@ -25242,6 +25356,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                             lbProblemSolved =                                                 ParseMATHCLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: MATHCLAUSE
                                                 If m_tree.Errors.Count > 0 Then
                                                   If m_scanner.EndPos > Me.MaxDistance Then
@@ -25466,6 +25581,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                         lbProblemSolved = True
                                                                                         tok = m_scanner.Scan(TokenType.KEYWDTHAT) ' Terminal Rule: KEYWDTHAT
                                             n = node.CreateNode(tok, tok.ToString() )
@@ -25491,6 +25607,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                         lbProblemSolved = True
                                                                                         tok = m_scanner.Scan(TokenType.KEYWDAN) ' Terminal Rule: KEYWDAN
                                             n = node.CreateNode(tok, tok.ToString() )
@@ -25516,6 +25633,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                         lbProblemSolved = True
                                                                                         tok = m_scanner.Scan(TokenType.KEYWDA) ' Terminal Rule: KEYWDA
                                             n = node.CreateNode(tok, tok.ToString() )
@@ -25541,6 +25659,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                         lbProblemSolved = True
                                                                                         tok = m_scanner.Scan(TokenType.KEYWDNO) ' Terminal Rule: KEYWDNO
                                             n = node.CreateNode(tok, tok.ToString() )
@@ -25566,6 +25685,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                         lbProblemSolved = True
                                                                                         tok = m_scanner.Scan(TokenType.KEYWDCOUNT) ' Terminal Rule: KEYWDCOUNT
                                             n = node.CreateNode(tok, tok.ToString() )
@@ -25702,6 +25822,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                             lbProblemSolved =                                                 ParseNODE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: NODE
                                                 If m_tree.Errors.Count > 0 Then
                                                   If m_scanner.EndPos > Me.MaxDistance Then
@@ -25792,6 +25913,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                             lbProblemSolved =                                                 ParseMATHCLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: MATHCLAUSE
                                                 If m_tree.Errors.Count > 0 Then
                                                   If m_scanner.EndPos > Me.MaxDistance Then
@@ -26016,6 +26138,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                         lbProblemSolved = True
                                                                                         tok = m_scanner.Scan(TokenType.KEYWDTHAT) ' Terminal Rule: KEYWDTHAT
                                             n = node.CreateNode(tok, tok.ToString() )
@@ -26041,6 +26164,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                         lbProblemSolved = True
                                                                                         tok = m_scanner.Scan(TokenType.KEYWDAN) ' Terminal Rule: KEYWDAN
                                             n = node.CreateNode(tok, tok.ToString() )
@@ -26066,6 +26190,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                         lbProblemSolved = True
                                                                                         tok = m_scanner.Scan(TokenType.KEYWDA) ' Terminal Rule: KEYWDA
                                             n = node.CreateNode(tok, tok.ToString() )
@@ -26091,6 +26216,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                         lbProblemSolved = True
                                                                                         tok = m_scanner.Scan(TokenType.KEYWDNO) ' Terminal Rule: KEYWDNO
                                             n = node.CreateNode(tok, tok.ToString() )
@@ -26116,6 +26242,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                         lbProblemSolved = True
                                                                                         tok = m_scanner.Scan(TokenType.KEYWDCOUNT) ' Terminal Rule: KEYWDCOUNT
                                             n = node.CreateNode(tok, tok.ToString() )
@@ -26252,6 +26379,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                             lbProblemSolved =                                                 ParseNODE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: NODE
                                                 If m_tree.Errors.Count > 0 Then
                                                   If m_scanner.EndPos > Me.MaxDistance Then
@@ -26342,6 +26470,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                             lbProblemSolved =                                                 ParseMATHCLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: MATHCLAUSE
                                                 If m_tree.Errors.Count > 0 Then
                                                   If m_scanner.EndPos > Me.MaxDistance Then
@@ -26566,6 +26695,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                         lbProblemSolved = True
                                                                                         tok = m_scanner.Scan(TokenType.KEYWDTHAT) ' Terminal Rule: KEYWDTHAT
                                             n = node.CreateNode(tok, tok.ToString() )
@@ -26591,6 +26721,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                         lbProblemSolved = True
                                                                                         tok = m_scanner.Scan(TokenType.KEYWDAN) ' Terminal Rule: KEYWDAN
                                             n = node.CreateNode(tok, tok.ToString() )
@@ -26616,6 +26747,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                         lbProblemSolved = True
                                                                                         tok = m_scanner.Scan(TokenType.KEYWDA) ' Terminal Rule: KEYWDA
                                             n = node.CreateNode(tok, tok.ToString() )
@@ -26641,6 +26773,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                         lbProblemSolved = True
                                                                                         tok = m_scanner.Scan(TokenType.KEYWDNO) ' Terminal Rule: KEYWDNO
                                             n = node.CreateNode(tok, tok.ToString() )
@@ -26666,6 +26799,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                         lbProblemSolved = True
                                                                                         tok = m_scanner.Scan(TokenType.KEYWDCOUNT) ' Terminal Rule: KEYWDCOUNT
                                             n = node.CreateNode(tok, tok.ToString() )
@@ -26802,6 +26936,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                             lbProblemSolved =                                                 ParseNODE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: NODE
                                                 If m_tree.Errors.Count > 0 Then
                                                   If m_scanner.EndPos > Me.MaxDistance Then
@@ -26892,6 +27027,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                             lbProblemSolved =                                                 ParseMATHCLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: MATHCLAUSE
                                                 If m_tree.Errors.Count > 0 Then
                                                   If m_scanner.EndPos > Me.MaxDistance Then
@@ -27116,6 +27252,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                         lbProblemSolved = True
                                                                                         tok = m_scanner.Scan(TokenType.KEYWDTHAT) ' Terminal Rule: KEYWDTHAT
                                             n = node.CreateNode(tok, tok.ToString() )
@@ -27141,6 +27278,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                         lbProblemSolved = True
                                                                                         tok = m_scanner.Scan(TokenType.KEYWDAN) ' Terminal Rule: KEYWDAN
                                             n = node.CreateNode(tok, tok.ToString() )
@@ -27166,6 +27304,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                         lbProblemSolved = True
                                                                                         tok = m_scanner.Scan(TokenType.KEYWDA) ' Terminal Rule: KEYWDA
                                             n = node.CreateNode(tok, tok.ToString() )
@@ -27191,6 +27330,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                         lbProblemSolved = True
                                                                                         tok = m_scanner.Scan(TokenType.KEYWDNO) ' Terminal Rule: KEYWDNO
                                             n = node.CreateNode(tok, tok.ToString() )
@@ -27216,6 +27356,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                         lbProblemSolved = True
                                                                                         tok = m_scanner.Scan(TokenType.KEYWDCOUNT) ' Terminal Rule: KEYWDCOUNT
                                             n = node.CreateNode(tok, tok.ToString() )
@@ -27352,6 +27493,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                             lbProblemSolved =                                                 ParseNODE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: NODE
                                                 If m_tree.Errors.Count > 0 Then
                                                   If m_scanner.EndPos > Me.MaxDistance Then
@@ -27442,6 +27584,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                             lbProblemSolved =                                                 ParseMATHCLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: MATHCLAUSE
                                                 If m_tree.Errors.Count > 0 Then
                                                   If m_scanner.EndPos > Me.MaxDistance Then
@@ -27666,6 +27809,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                         lbProblemSolved = True
                                                                                         tok = m_scanner.Scan(TokenType.KEYWDTHAT) ' Terminal Rule: KEYWDTHAT
                                             n = node.CreateNode(tok, tok.ToString() )
@@ -27691,6 +27835,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                         lbProblemSolved = True
                                                                                         tok = m_scanner.Scan(TokenType.KEYWDAN) ' Terminal Rule: KEYWDAN
                                             n = node.CreateNode(tok, tok.ToString() )
@@ -27716,6 +27861,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                         lbProblemSolved = True
                                                                                         tok = m_scanner.Scan(TokenType.KEYWDA) ' Terminal Rule: KEYWDA
                                             n = node.CreateNode(tok, tok.ToString() )
@@ -27741,6 +27887,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                         lbProblemSolved = True
                                                                                         tok = m_scanner.Scan(TokenType.KEYWDNO) ' Terminal Rule: KEYWDNO
                                             n = node.CreateNode(tok, tok.ToString() )
@@ -27766,6 +27913,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                         lbProblemSolved = True
                                                                                         tok = m_scanner.Scan(TokenType.KEYWDCOUNT) ' Terminal Rule: KEYWDCOUNT
                                             n = node.CreateNode(tok, tok.ToString() )
@@ -27902,6 +28050,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                             lbProblemSolved =                                                 ParseNODE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: NODE
                                                 If m_tree.Errors.Count > 0 Then
                                                   If m_scanner.EndPos > Me.MaxDistance Then
@@ -27992,6 +28141,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                             lbProblemSolved =                                                 ParseMATHCLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: MATHCLAUSE
                                                 If m_tree.Errors.Count > 0 Then
                                                   If m_scanner.EndPos > Me.MaxDistance Then
@@ -28216,6 +28366,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                         lbProblemSolved = True
                                                                                         tok = m_scanner.Scan(TokenType.KEYWDTHAT) ' Terminal Rule: KEYWDTHAT
                                             n = node.CreateNode(tok, tok.ToString() )
@@ -28241,6 +28392,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                         lbProblemSolved = True
                                                                                         tok = m_scanner.Scan(TokenType.KEYWDAN) ' Terminal Rule: KEYWDAN
                                             n = node.CreateNode(tok, tok.ToString() )
@@ -28266,6 +28418,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                         lbProblemSolved = True
                                                                                         tok = m_scanner.Scan(TokenType.KEYWDA) ' Terminal Rule: KEYWDA
                                             n = node.CreateNode(tok, tok.ToString() )
@@ -28291,6 +28444,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                         lbProblemSolved = True
                                                                                         tok = m_scanner.Scan(TokenType.KEYWDNO) ' Terminal Rule: KEYWDNO
                                             n = node.CreateNode(tok, tok.ToString() )
@@ -28316,6 +28470,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                         lbProblemSolved = True
                                                                                         tok = m_scanner.Scan(TokenType.KEYWDCOUNT) ' Terminal Rule: KEYWDCOUNT
                                             n = node.CreateNode(tok, tok.ToString() )
@@ -28452,6 +28607,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                             lbProblemSolved =                                                 ParseNODE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: NODE
                                                 If m_tree.Errors.Count > 0 Then
                                                   If m_scanner.EndPos > Me.MaxDistance Then
@@ -28542,6 +28698,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                             lbProblemSolved =                                                 ParseMATHCLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: MATHCLAUSE
                                                 If m_tree.Errors.Count > 0 Then
                                                   If m_scanner.EndPos > Me.MaxDistance Then
@@ -28766,6 +28923,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                         lbProblemSolved = True
                                                                                         tok = m_scanner.Scan(TokenType.KEYWDTHAT) ' Terminal Rule: KEYWDTHAT
                                             n = node.CreateNode(tok, tok.ToString() )
@@ -28791,6 +28949,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                         lbProblemSolved = True
                                                                                         tok = m_scanner.Scan(TokenType.KEYWDAN) ' Terminal Rule: KEYWDAN
                                             n = node.CreateNode(tok, tok.ToString() )
@@ -28816,6 +28975,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                         lbProblemSolved = True
                                                                                         tok = m_scanner.Scan(TokenType.KEYWDA) ' Terminal Rule: KEYWDA
                                             n = node.CreateNode(tok, tok.ToString() )
@@ -28841,6 +29001,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                         lbProblemSolved = True
                                                                                         tok = m_scanner.Scan(TokenType.KEYWDNO) ' Terminal Rule: KEYWDNO
                                             n = node.CreateNode(tok, tok.ToString() )
@@ -28866,6 +29027,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                         lbProblemSolved = True
                                                                                         tok = m_scanner.Scan(TokenType.KEYWDCOUNT) ' Terminal Rule: KEYWDCOUNT
                                             n = node.CreateNode(tok, tok.ToString() )
@@ -29002,6 +29164,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                             lbProblemSolved =                                                 ParseNODE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: NODE
                                                 If m_tree.Errors.Count > 0 Then
                                                   If m_scanner.EndPos > Me.MaxDistance Then
@@ -29092,6 +29255,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                             lbProblemSolved =                                                 ParseMATHCLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: MATHCLAUSE
                                                 If m_tree.Errors.Count > 0 Then
                                                   If m_scanner.EndPos > Me.MaxDistance Then
@@ -29316,6 +29480,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                         lbProblemSolved = True
                                                                                         tok = m_scanner.Scan(TokenType.KEYWDTHAT) ' Terminal Rule: KEYWDTHAT
                                             n = node.CreateNode(tok, tok.ToString() )
@@ -29341,6 +29506,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                         lbProblemSolved = True
                                                                                         tok = m_scanner.Scan(TokenType.KEYWDAN) ' Terminal Rule: KEYWDAN
                                             n = node.CreateNode(tok, tok.ToString() )
@@ -29366,6 +29532,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                         lbProblemSolved = True
                                                                                         tok = m_scanner.Scan(TokenType.KEYWDA) ' Terminal Rule: KEYWDA
                                             n = node.CreateNode(tok, tok.ToString() )
@@ -29391,6 +29558,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                         lbProblemSolved = True
                                                                                         tok = m_scanner.Scan(TokenType.KEYWDNO) ' Terminal Rule: KEYWDNO
                                             n = node.CreateNode(tok, tok.ToString() )
@@ -29416,6 +29584,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                         lbProblemSolved = True
                                                                                         tok = m_scanner.Scan(TokenType.KEYWDCOUNT) ' Terminal Rule: KEYWDCOUNT
                                             n = node.CreateNode(tok, tok.ToString() )
@@ -29552,6 +29721,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                             lbProblemSolved =                                                 ParseNODE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: NODE
                                                 If m_tree.Errors.Count > 0 Then
                                                   If m_scanner.EndPos > Me.MaxDistance Then
@@ -29642,6 +29812,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                             lbProblemSolved =                                                 ParseMATHCLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: MATHCLAUSE
                                                 If m_tree.Errors.Count > 0 Then
                                                   If m_scanner.EndPos > Me.MaxDistance Then
@@ -29866,6 +30037,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                         lbProblemSolved = True
                                                                                         tok = m_scanner.Scan(TokenType.KEYWDTHAT) ' Terminal Rule: KEYWDTHAT
                                             n = node.CreateNode(tok, tok.ToString() )
@@ -29891,6 +30063,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                         lbProblemSolved = True
                                                                                         tok = m_scanner.Scan(TokenType.KEYWDAN) ' Terminal Rule: KEYWDAN
                                             n = node.CreateNode(tok, tok.ToString() )
@@ -29916,6 +30089,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                         lbProblemSolved = True
                                                                                         tok = m_scanner.Scan(TokenType.KEYWDA) ' Terminal Rule: KEYWDA
                                             n = node.CreateNode(tok, tok.ToString() )
@@ -29941,6 +30115,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                         lbProblemSolved = True
                                                                                         tok = m_scanner.Scan(TokenType.KEYWDNO) ' Terminal Rule: KEYWDNO
                                             n = node.CreateNode(tok, tok.ToString() )
@@ -29966,6 +30141,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                         lbProblemSolved = True
                                                                                         tok = m_scanner.Scan(TokenType.KEYWDCOUNT) ' Terminal Rule: KEYWDCOUNT
                                             n = node.CreateNode(tok, tok.ToString() )
@@ -30102,6 +30278,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                             lbProblemSolved =                                                 ParseNODE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: NODE
                                                 If m_tree.Errors.Count > 0 Then
                                                   If m_scanner.EndPos > Me.MaxDistance Then
@@ -30192,6 +30369,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                             lbProblemSolved =                                                 ParseMATHCLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: MATHCLAUSE
                                                 If m_tree.Errors.Count > 0 Then
                                                   If m_scanner.EndPos > Me.MaxDistance Then
@@ -30416,6 +30594,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                         lbProblemSolved = True
                                                                                         tok = m_scanner.Scan(TokenType.KEYWDTHAT) ' Terminal Rule: KEYWDTHAT
                                             n = node.CreateNode(tok, tok.ToString() )
@@ -30441,6 +30620,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                         lbProblemSolved = True
                                                                                         tok = m_scanner.Scan(TokenType.KEYWDAN) ' Terminal Rule: KEYWDAN
                                             n = node.CreateNode(tok, tok.ToString() )
@@ -30466,6 +30646,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                         lbProblemSolved = True
                                                                                         tok = m_scanner.Scan(TokenType.KEYWDA) ' Terminal Rule: KEYWDA
                                             n = node.CreateNode(tok, tok.ToString() )
@@ -30491,6 +30672,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                         lbProblemSolved = True
                                                                                         tok = m_scanner.Scan(TokenType.KEYWDNO) ' Terminal Rule: KEYWDNO
                                             n = node.CreateNode(tok, tok.ToString() )
@@ -30516,6 +30698,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                         lbProblemSolved = True
                                                                                         tok = m_scanner.Scan(TokenType.KEYWDCOUNT) ' Terminal Rule: KEYWDCOUNT
                                             n = node.CreateNode(tok, tok.ToString() )
@@ -30652,6 +30835,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                             lbProblemSolved =                                                 ParseNODE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: NODE
                                                 If m_tree.Errors.Count > 0 Then
                                                   If m_scanner.EndPos > Me.MaxDistance Then
@@ -30742,6 +30926,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                             lbProblemSolved =                                                 ParseMATHCLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: MATHCLAUSE
                                                 If m_tree.Errors.Count > 0 Then
                                                   If m_scanner.EndPos > Me.MaxDistance Then
@@ -30966,6 +31151,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                         lbProblemSolved = True
                                                                                         tok = m_scanner.Scan(TokenType.KEYWDTHAT) ' Terminal Rule: KEYWDTHAT
                                             n = node.CreateNode(tok, tok.ToString() )
@@ -30991,6 +31177,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                         lbProblemSolved = True
                                                                                         tok = m_scanner.Scan(TokenType.KEYWDAN) ' Terminal Rule: KEYWDAN
                                             n = node.CreateNode(tok, tok.ToString() )
@@ -31016,6 +31203,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                         lbProblemSolved = True
                                                                                         tok = m_scanner.Scan(TokenType.KEYWDA) ' Terminal Rule: KEYWDA
                                             n = node.CreateNode(tok, tok.ToString() )
@@ -31041,6 +31229,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                         lbProblemSolved = True
                                                                                         tok = m_scanner.Scan(TokenType.KEYWDNO) ' Terminal Rule: KEYWDNO
                                             n = node.CreateNode(tok, tok.ToString() )
@@ -31066,6 +31255,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                         lbProblemSolved = True
                                                                                         tok = m_scanner.Scan(TokenType.KEYWDCOUNT) ' Terminal Rule: KEYWDCOUNT
                                             n = node.CreateNode(tok, tok.ToString() )
@@ -31202,6 +31392,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                             lbProblemSolved =                                                 ParseNODE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: NODE
                                                 If m_tree.Errors.Count > 0 Then
                                                   If m_scanner.EndPos > Me.MaxDistance Then
@@ -31292,6 +31483,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                             lbProblemSolved =                                                 ParseMATHCLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: MATHCLAUSE
                                                 If m_tree.Errors.Count > 0 Then
                                                   If m_scanner.EndPos > Me.MaxDistance Then
@@ -31370,6 +31562,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
+                              max_tree.Optionals.AddRange(m_tree.Optionals)
                         lbProblemSolved =                             ParseFORMULA(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: FORMULA
                             If m_tree.Errors.Count > 0 Then
                               If m_scanner.EndPos > Me.MaxDistance Then
@@ -31388,6 +31581,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
+                              max_tree.Optionals.AddRange(m_tree.Optionals)
                         
                          ' Concat Rule
                                                         tok = m_scanner.LookAhead({TokenType.KEYWDIS, TokenType.PREDICATE, TokenType.KEYWDTHAT, TokenType.PREBOUNDREADINGTEXT, TokenType.MODELELEMENTNAME}) ' Option Rule
@@ -31569,6 +31763,7 @@ lbProblemSolved =                                     ParseWHICHTHATCLAUSE(node)
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
+                                          max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                         lbProblemSolved = True
                                                                         tok = m_scanner.Scan(TokenType.KEYWDTHAT) ' Terminal Rule: KEYWDTHAT
                                     n = node.CreateNode(tok, tok.ToString() )
@@ -31594,6 +31789,7 @@ lbProblemSolved =                                     ParseWHICHTHATCLAUSE(node)
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
+                                          max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                         lbProblemSolved = True
                                                                         tok = m_scanner.Scan(TokenType.KEYWDAN) ' Terminal Rule: KEYWDAN
                                     n = node.CreateNode(tok, tok.ToString() )
@@ -31619,6 +31815,7 @@ lbProblemSolved =                                     ParseWHICHTHATCLAUSE(node)
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
+                                          max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                         lbProblemSolved = True
                                                                         tok = m_scanner.Scan(TokenType.KEYWDA) ' Terminal Rule: KEYWDA
                                     n = node.CreateNode(tok, tok.ToString() )
@@ -31644,6 +31841,7 @@ lbProblemSolved =                                     ParseWHICHTHATCLAUSE(node)
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
+                                          max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                         lbProblemSolved = True
                                                                         tok = m_scanner.Scan(TokenType.KEYWDNO) ' Terminal Rule: KEYWDNO
                                     n = node.CreateNode(tok, tok.ToString() )
@@ -31669,6 +31867,7 @@ lbProblemSolved =                                     ParseWHICHTHATCLAUSE(node)
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
+                                          max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                         lbProblemSolved = True
                                                                         tok = m_scanner.Scan(TokenType.KEYWDCOUNT) ' Terminal Rule: KEYWDCOUNT
                                     n = node.CreateNode(tok, tok.ToString() )
@@ -31805,6 +32004,7 @@ lbProblemSolved =                                     ParseWHICHTHATCLAUSE(node)
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
+                                          max_tree.Optionals.AddRange(m_tree.Optionals)
                                     lbProblemSolved =                                         ParseNODE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: NODE
                                         If m_tree.Errors.Count > 0 Then
                                           If m_scanner.EndPos > Me.MaxDistance Then
@@ -31895,6 +32095,7 @@ lbProblemSolved =                                     ParseWHICHTHATCLAUSE(node)
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
+                                          max_tree.Optionals.AddRange(m_tree.Optionals)
                                     lbProblemSolved =                                         ParseMATHCLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: MATHCLAUSE
                                         If m_tree.Errors.Count > 0 Then
                                           If m_scanner.EndPos > Me.MaxDistance Then
@@ -32171,6 +32372,7 @@ lbProblemSolved =                                         ParseRECURSIVECLAUSE(n
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
+                          max_tree.Optionals.AddRange(m_tree.Optionals)
                     
                      ' Concat Rule
                     lbProblemSolved =                             ParsePREDICATECLAUSE(node) ' NonTerminal Rule: PREDICATECLAUSE
@@ -32407,6 +32609,7 @@ lbProblemSolved =                                         ParseRECURSIVECLAUSE(n
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
+                          max_tree.Optionals.AddRange(m_tree.Optionals)
                     
                      ' Concat Rule
                     lbProblemSolved =                             ParsePREDICATECLAUSE(node) ' NonTerminal Rule: PREDICATECLAUSE
@@ -32634,6 +32837,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                                             Me.MaxDistance = m_scanner.StartPos
                                                             max_tree = m_tree.clone
                                                           End If
+                                                          max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                                         lbProblemSolved = True
                                                                                                         tok = m_scanner.Scan(TokenType.KEYWDIS) ' Terminal Rule: KEYWDIS
                                                     n = node.CreateNode(tok, tok.ToString() )
@@ -32721,6 +32925,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                                             Me.MaxDistance = m_scanner.StartPos
                                                             max_tree = m_tree.clone
                                                           End If
+                                                          max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                                         lbProblemSolved = True
                                                                                                         tok = m_scanner.Scan(TokenType.KEYWDIS) ' Terminal Rule: KEYWDIS
                                                     n = node.CreateNode(tok, tok.ToString() )
@@ -32776,6 +32981,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                             lbProblemSolved =                                                 ParsePREDICATECLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: PREDICATECLAUSE
                                                 If m_tree.Errors.Count > 0 Then
                                                   If m_scanner.EndPos > Me.MaxDistance Then
@@ -32911,6 +33117,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                                             Me.MaxDistance = m_scanner.StartPos
                                                             max_tree = m_tree.clone
                                                           End If
+                                                          max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                                         lbProblemSolved = True
                                                                                                         tok = m_scanner.Scan(TokenType.KEYWDIS) ' Terminal Rule: KEYWDIS
                                                     n = node.CreateNode(tok, tok.ToString() )
@@ -32998,6 +33205,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                                             Me.MaxDistance = m_scanner.StartPos
                                                             max_tree = m_tree.clone
                                                           End If
+                                                          max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                                         lbProblemSolved = True
                                                                                                         tok = m_scanner.Scan(TokenType.KEYWDIS) ' Terminal Rule: KEYWDIS
                                                     n = node.CreateNode(tok, tok.ToString() )
@@ -33053,6 +33261,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                             lbProblemSolved =                                                 ParsePREDICATECLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: PREDICATECLAUSE
                                                 If m_tree.Errors.Count > 0 Then
                                                   If m_scanner.EndPos > Me.MaxDistance Then
@@ -33108,6 +33317,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
+                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                             
                              ' Concat Rule
                             lbProblemSolved =                                     ParseMODELELEMENT(node) ' NonTerminal Rule: MODELELEMENT
@@ -33207,6 +33417,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                         lbProblemSolved = True
                                                                                         tok = m_scanner.Scan(TokenType.KEYWDIS) ' Terminal Rule: KEYWDIS
                                             n = node.CreateNode(tok, tok.ToString() )
@@ -33294,6 +33505,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                         lbProblemSolved = True
                                                                                         tok = m_scanner.Scan(TokenType.KEYWDIS) ' Terminal Rule: KEYWDIS
                                             n = node.CreateNode(tok, tok.ToString() )
@@ -33349,6 +33561,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
+                                          max_tree.Optionals.AddRange(m_tree.Optionals)
                                     lbProblemSolved =                                         ParsePREDICATECLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: PREDICATECLAUSE
                                         If m_tree.Errors.Count > 0 Then
                                           If m_scanner.EndPos > Me.MaxDistance Then
@@ -33493,6 +33706,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
+                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                             lbProblemSolved =                                 ParsePREDICATECLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: PREDICATECLAUSE
                                 If m_tree.Errors.Count > 0 Then
                                   If m_scanner.EndPos > Me.MaxDistance Then
@@ -33612,6 +33826,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
+                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                             lbProblemSolved =                                 ParsePREDICATECLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: PREDICATECLAUSE
                                 If m_tree.Errors.Count > 0 Then
                                   If m_scanner.EndPos > Me.MaxDistance Then
@@ -33669,6 +33884,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
+                  max_tree.Optionals.AddRange(m_tree.Optionals)
             
              ' Concat Rule
                                 lbProblemSolved = True
@@ -33823,6 +34039,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                         lbProblemSolved = True
                                                                                         tok = m_scanner.Scan(TokenType.KEYWDIS) ' Terminal Rule: KEYWDIS
                                             n = node.CreateNode(tok, tok.ToString() )
@@ -33910,6 +34127,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                         lbProblemSolved = True
                                                                                         tok = m_scanner.Scan(TokenType.KEYWDIS) ' Terminal Rule: KEYWDIS
                                             n = node.CreateNode(tok, tok.ToString() )
@@ -33965,6 +34183,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
+                                          max_tree.Optionals.AddRange(m_tree.Optionals)
                                     lbProblemSolved =                                         ParsePREDICATECLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: PREDICATECLAUSE
                                         If m_tree.Errors.Count > 0 Then
                                           If m_scanner.EndPos > Me.MaxDistance Then
@@ -34100,6 +34319,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                         lbProblemSolved = True
                                                                                         tok = m_scanner.Scan(TokenType.KEYWDIS) ' Terminal Rule: KEYWDIS
                                             n = node.CreateNode(tok, tok.ToString() )
@@ -34187,6 +34407,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                         lbProblemSolved = True
                                                                                         tok = m_scanner.Scan(TokenType.KEYWDIS) ' Terminal Rule: KEYWDIS
                                             n = node.CreateNode(tok, tok.ToString() )
@@ -34242,6 +34463,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
+                                          max_tree.Optionals.AddRange(m_tree.Optionals)
                                     lbProblemSolved =                                         ParsePREDICATECLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: PREDICATECLAUSE
                                         If m_tree.Errors.Count > 0 Then
                                           If m_scanner.EndPos > Me.MaxDistance Then
@@ -34297,6 +34519,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
+                          max_tree.Optionals.AddRange(m_tree.Optionals)
                     
                      ' Concat Rule
                     lbProblemSolved =                             ParseMODELELEMENT(node) ' NonTerminal Rule: MODELELEMENT
@@ -34396,6 +34619,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
+                                          max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                         lbProblemSolved = True
                                                                         tok = m_scanner.Scan(TokenType.KEYWDIS) ' Terminal Rule: KEYWDIS
                                     n = node.CreateNode(tok, tok.ToString() )
@@ -34483,6 +34707,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
+                                          max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                         lbProblemSolved = True
                                                                         tok = m_scanner.Scan(TokenType.KEYWDIS) ' Terminal Rule: KEYWDIS
                                     n = node.CreateNode(tok, tok.ToString() )
@@ -34538,6 +34763,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
+                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                             lbProblemSolved =                                 ParsePREDICATECLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: PREDICATECLAUSE
                                 If m_tree.Errors.Count > 0 Then
                                   If m_scanner.EndPos > Me.MaxDistance Then
@@ -34606,6 +34832,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
+                  max_tree.Optionals.AddRange(m_tree.Optionals)
             
              ' Concat Rule
             lbProblemSolved =                     ParseMODELELEMENT(node) ' NonTerminal Rule: MODELELEMENT
@@ -34689,6 +34916,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
+                          max_tree.Optionals.AddRange(m_tree.Optionals)
                     lbProblemSolved =                         ParsePREDICATECLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: PREDICATECLAUSE
                         If m_tree.Errors.Count > 0 Then
                           If m_scanner.EndPos > Me.MaxDistance Then
@@ -34987,6 +35215,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
+                          max_tree.Optionals.AddRange(m_tree.Optionals)
                                         lbProblemSolved = True
                                         tok = m_scanner.Scan(TokenType.KEYWDDOES) ' Terminal Rule: KEYWDDOES
                     n = node.CreateNode(tok, tok.ToString() )
@@ -35156,6 +35385,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
+                          max_tree.Optionals.AddRange(m_tree.Optionals)
                     lbProblemSolved =                         ParseNODE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: NODE
                         If m_tree.Errors.Count > 0 Then
                           If m_scanner.EndPos > Me.MaxDistance Then
@@ -36898,6 +37128,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
+                          max_tree.Optionals.AddRange(m_tree.Optionals)
                                         lbProblemSolved = True
                                         tok = m_scanner.Scan(TokenType.KEYWDISA) ' Terminal Rule: KEYWDISA
                     n = node.CreateNode(tok, tok.ToString() )
@@ -37611,6 +37842,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
+                                          max_tree.Optionals.AddRange(m_tree.Optionals)
                                     lbProblemSolved =                                         ParseBINARYFACTTYPEMANYTOONEDEFINITIONSTMT(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: BINARYFACTTYPEMANYTOONEDEFINITIONSTMT
                                         If m_tree.Errors.Count > 0 Then
                                           If m_scanner.EndPos > Me.MaxDistance Then
@@ -37629,6 +37861,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
+                                          max_tree.Optionals.AddRange(m_tree.Optionals)
                                     
                                      ' Concat Rule
                                                                                 lbProblemSolved = True
@@ -37822,6 +38055,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
+                          max_tree.Optionals.AddRange(m_tree.Optionals)
                     lbProblemSolved =                         ParseENTITYTYPEISIDENTIFIEDBYITSCLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: ENTITYTYPEISIDENTIFIEDBYITSCLAUSE
                         If m_tree.Errors.Count > 0 Then
                           If m_scanner.EndPos > Me.MaxDistance Then
@@ -37840,6 +38074,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
+                          max_tree.Optionals.AddRange(m_tree.Optionals)
                     lbProblemSolved =                         ParseREFERENCEMODECLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: REFERENCEMODECLAUSE
                         If m_tree.Errors.Count > 0 Then
                           If m_scanner.EndPos > Me.MaxDistance Then
@@ -37858,6 +38093,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
+                          max_tree.Optionals.AddRange(m_tree.Optionals)
                     
                      ' Concat Rule
                                                 lbProblemSolved = True
@@ -38017,6 +38253,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
+                          max_tree.Optionals.AddRange(m_tree.Optionals)
                     
                      ' Concat Rule
                     lbProblemSolved =                             ParsePREDICATECLAUSE(node) ' NonTerminal Rule: PREDICATECLAUSE
@@ -38230,6 +38467,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
+                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                             lbProblemSolved =                                 ParseBINARYFACTTYPEMANYTOONEDEFINITIONSTMT(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: BINARYFACTTYPEMANYTOONEDEFINITIONSTMT
                                 If m_tree.Errors.Count > 0 Then
                                   If m_scanner.EndPos > Me.MaxDistance Then
@@ -38248,6 +38486,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
+                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                             
                              ' Concat Rule
                                                                 lbProblemSolved = True
@@ -38415,6 +38654,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
+                          max_tree.Optionals.AddRange(m_tree.Optionals)
                     lbProblemSolved =                         ParseSUBTYPECLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: SUBTYPECLAUSE
                         If m_tree.Errors.Count > 0 Then
                           If m_scanner.EndPos > Me.MaxDistance Then
@@ -39227,6 +39467,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
+                  max_tree.Optionals.AddRange(m_tree.Optionals)
             lbProblemSolved =                 ParseQUOTEDIDENTIFIER(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: QUOTEDIDENTIFIER
                 If m_tree.Errors.Count > 0 Then
                   If m_scanner.EndPos > Me.MaxDistance Then
@@ -40283,6 +40524,7 @@ lbProblemSolved =                         ParseINMODELSTMT(node) ' NonTerminal R
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
+                          max_tree.Optionals.AddRange(m_tree.Optionals)
                     lbProblemSolved =                         ParseMODELELEMENT(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: MODELELEMENT
                         If m_tree.Errors.Count > 0 Then
                           If m_scanner.EndPos > Me.MaxDistance Then
@@ -40490,6 +40732,7 @@ lbProblemSolved =                         ParseINMODELSTMT(node) ' NonTerminal R
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
+                          max_tree.Optionals.AddRange(m_tree.Optionals)
                     lbProblemSolved =                         ParseRETURNCLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: RETURNCLAUSE
                         If m_tree.Errors.Count > 0 Then
                           If m_scanner.EndPos > Me.MaxDistance Then
@@ -41998,6 +42241,7 @@ lbProblemSolved =                         ParseWHERESTMT(node) ' NonTerminal Rul
                                         Me.MaxDistance = m_scanner.StartPos
                                         max_tree = m_tree.clone
                                       End If
+                                      max_tree.Optionals.AddRange(m_tree.Optionals)
                                 
                                  ' Concat Rule
                                                                         lbProblemSolved = True
@@ -42913,6 +43157,7 @@ lbProblemSolved =                         ParseWHERESTMT(node) ' NonTerminal Rul
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
+                          max_tree.Optionals.AddRange(m_tree.Optionals)
                     lbProblemSolved =                         ParseDATATYPELENGTH(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: DATATYPELENGTH
                         If m_tree.Errors.Count > 0 Then
                           If m_scanner.EndPos > Me.MaxDistance Then
@@ -42931,6 +43176,7 @@ lbProblemSolved =                         ParseWHERESTMT(node) ' NonTerminal Rul
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
+                          max_tree.Optionals.AddRange(m_tree.Optionals)
                     lbProblemSolved =                         ParseDATATYPEPRECISION(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: DATATYPEPRECISION
                         If m_tree.Errors.Count > 0 Then
                           If m_scanner.EndPos > Me.MaxDistance Then
@@ -43294,6 +43540,7 @@ lbProblemSolved =                                         ParseRECURSIVECLAUSE(n
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
+                          max_tree.Optionals.AddRange(m_tree.Optionals)
                     
                      ' Concat Rule
                     lbProblemSolved =                             ParsePREDICATECLAUSE(node) ' NonTerminal Rule: PREDICATECLAUSE
@@ -43530,6 +43777,7 @@ lbProblemSolved =                                         ParseRECURSIVECLAUSE(n
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
+                          max_tree.Optionals.AddRange(m_tree.Optionals)
                     
                      ' Concat Rule
                     lbProblemSolved =                             ParsePREDICATECLAUSE(node) ' NonTerminal Rule: PREDICATECLAUSE
@@ -43757,6 +44005,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                                             Me.MaxDistance = m_scanner.StartPos
                                                             max_tree = m_tree.clone
                                                           End If
+                                                          max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                                         lbProblemSolved = True
                                                                                                         tok = m_scanner.Scan(TokenType.KEYWDIS) ' Terminal Rule: KEYWDIS
                                                     n = node.CreateNode(tok, tok.ToString() )
@@ -43844,6 +44093,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                                             Me.MaxDistance = m_scanner.StartPos
                                                             max_tree = m_tree.clone
                                                           End If
+                                                          max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                                         lbProblemSolved = True
                                                                                                         tok = m_scanner.Scan(TokenType.KEYWDIS) ' Terminal Rule: KEYWDIS
                                                     n = node.CreateNode(tok, tok.ToString() )
@@ -43899,6 +44149,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                             lbProblemSolved =                                                 ParsePREDICATECLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: PREDICATECLAUSE
                                                 If m_tree.Errors.Count > 0 Then
                                                   If m_scanner.EndPos > Me.MaxDistance Then
@@ -44034,6 +44285,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                                             Me.MaxDistance = m_scanner.StartPos
                                                             max_tree = m_tree.clone
                                                           End If
+                                                          max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                                         lbProblemSolved = True
                                                                                                         tok = m_scanner.Scan(TokenType.KEYWDIS) ' Terminal Rule: KEYWDIS
                                                     n = node.CreateNode(tok, tok.ToString() )
@@ -44121,6 +44373,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                                             Me.MaxDistance = m_scanner.StartPos
                                                             max_tree = m_tree.clone
                                                           End If
+                                                          max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                                         lbProblemSolved = True
                                                                                                         tok = m_scanner.Scan(TokenType.KEYWDIS) ' Terminal Rule: KEYWDIS
                                                     n = node.CreateNode(tok, tok.ToString() )
@@ -44176,6 +44429,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                             lbProblemSolved =                                                 ParsePREDICATECLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: PREDICATECLAUSE
                                                 If m_tree.Errors.Count > 0 Then
                                                   If m_scanner.EndPos > Me.MaxDistance Then
@@ -44231,6 +44485,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
+                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                             
                              ' Concat Rule
                             lbProblemSolved =                                     ParseMODELELEMENT(node) ' NonTerminal Rule: MODELELEMENT
@@ -44330,6 +44585,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                         lbProblemSolved = True
                                                                                         tok = m_scanner.Scan(TokenType.KEYWDIS) ' Terminal Rule: KEYWDIS
                                             n = node.CreateNode(tok, tok.ToString() )
@@ -44417,6 +44673,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                         lbProblemSolved = True
                                                                                         tok = m_scanner.Scan(TokenType.KEYWDIS) ' Terminal Rule: KEYWDIS
                                             n = node.CreateNode(tok, tok.ToString() )
@@ -44472,6 +44729,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
+                                          max_tree.Optionals.AddRange(m_tree.Optionals)
                                     lbProblemSolved =                                         ParsePREDICATECLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: PREDICATECLAUSE
                                         If m_tree.Errors.Count > 0 Then
                                           If m_scanner.EndPos > Me.MaxDistance Then
@@ -44616,6 +44874,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
+                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                             lbProblemSolved =                                 ParsePREDICATECLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: PREDICATECLAUSE
                                 If m_tree.Errors.Count > 0 Then
                                   If m_scanner.EndPos > Me.MaxDistance Then
@@ -44735,6 +44994,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
+                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                             lbProblemSolved =                                 ParsePREDICATECLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: PREDICATECLAUSE
                                 If m_tree.Errors.Count > 0 Then
                                   If m_scanner.EndPos > Me.MaxDistance Then
@@ -44792,6 +45052,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
+                  max_tree.Optionals.AddRange(m_tree.Optionals)
             
              ' Concat Rule
                                 lbProblemSolved = True
@@ -44946,6 +45207,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                         lbProblemSolved = True
                                                                                         tok = m_scanner.Scan(TokenType.KEYWDIS) ' Terminal Rule: KEYWDIS
                                             n = node.CreateNode(tok, tok.ToString() )
@@ -45033,6 +45295,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                         lbProblemSolved = True
                                                                                         tok = m_scanner.Scan(TokenType.KEYWDIS) ' Terminal Rule: KEYWDIS
                                             n = node.CreateNode(tok, tok.ToString() )
@@ -45088,6 +45351,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
+                                          max_tree.Optionals.AddRange(m_tree.Optionals)
                                     lbProblemSolved =                                         ParsePREDICATECLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: PREDICATECLAUSE
                                         If m_tree.Errors.Count > 0 Then
                                           If m_scanner.EndPos > Me.MaxDistance Then
@@ -45223,6 +45487,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                         lbProblemSolved = True
                                                                                         tok = m_scanner.Scan(TokenType.KEYWDIS) ' Terminal Rule: KEYWDIS
                                             n = node.CreateNode(tok, tok.ToString() )
@@ -45310,6 +45575,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                         lbProblemSolved = True
                                                                                         tok = m_scanner.Scan(TokenType.KEYWDIS) ' Terminal Rule: KEYWDIS
                                             n = node.CreateNode(tok, tok.ToString() )
@@ -45365,6 +45631,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
+                                          max_tree.Optionals.AddRange(m_tree.Optionals)
                                     lbProblemSolved =                                         ParsePREDICATECLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: PREDICATECLAUSE
                                         If m_tree.Errors.Count > 0 Then
                                           If m_scanner.EndPos > Me.MaxDistance Then
@@ -45420,6 +45687,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
+                          max_tree.Optionals.AddRange(m_tree.Optionals)
                     
                      ' Concat Rule
                     lbProblemSolved =                             ParseMODELELEMENT(node) ' NonTerminal Rule: MODELELEMENT
@@ -45519,6 +45787,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
+                                          max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                         lbProblemSolved = True
                                                                         tok = m_scanner.Scan(TokenType.KEYWDIS) ' Terminal Rule: KEYWDIS
                                     n = node.CreateNode(tok, tok.ToString() )
@@ -45606,6 +45875,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
+                                          max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                         lbProblemSolved = True
                                                                         tok = m_scanner.Scan(TokenType.KEYWDIS) ' Terminal Rule: KEYWDIS
                                     n = node.CreateNode(tok, tok.ToString() )
@@ -45661,6 +45931,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
+                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                             lbProblemSolved =                                 ParsePREDICATECLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: PREDICATECLAUSE
                                 If m_tree.Errors.Count > 0 Then
                                   If m_scanner.EndPos > Me.MaxDistance Then
@@ -45729,6 +46000,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
+                  max_tree.Optionals.AddRange(m_tree.Optionals)
             
              ' Concat Rule
             lbProblemSolved =                     ParseMODELELEMENT(node) ' NonTerminal Rule: MODELELEMENT
@@ -45812,6 +46084,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
+                          max_tree.Optionals.AddRange(m_tree.Optionals)
                     lbProblemSolved =                         ParsePREDICATECLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: PREDICATECLAUSE
                         If m_tree.Errors.Count > 0 Then
                           If m_scanner.EndPos > Me.MaxDistance Then
@@ -45968,6 +46241,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
+                              max_tree.Optionals.AddRange(m_tree.Optionals)
                                                 lbProblemSolved = True
                                                 tok = m_scanner.Scan(TokenType.KEYWDWHICH) ' Terminal Rule: KEYWDWHICH
                         n = node.CreateNode(tok, tok.ToString() )
@@ -45993,6 +46267,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
+                              max_tree.Optionals.AddRange(m_tree.Optionals)
                                                 lbProblemSolved = True
                                                 tok = m_scanner.Scan(TokenType.KEYWDWHEREALSO) ' Terminal Rule: KEYWDWHEREALSO
                         n = node.CreateNode(tok, tok.ToString() )
@@ -46259,6 +46534,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                                 Me.MaxDistance = m_scanner.StartPos
                                                                 max_tree = m_tree.clone
                                                               End If
+                                                              max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                                                 lbProblemSolved = True
                                                                                                                 tok = m_scanner.Scan(TokenType.KEYWDTHAT) ' Terminal Rule: KEYWDTHAT
                                                         n = node.CreateNode(tok, tok.ToString() )
@@ -46284,6 +46560,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                                 Me.MaxDistance = m_scanner.StartPos
                                                                 max_tree = m_tree.clone
                                                               End If
+                                                              max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                                                 lbProblemSolved = True
                                                                                                                 tok = m_scanner.Scan(TokenType.KEYWDAN) ' Terminal Rule: KEYWDAN
                                                         n = node.CreateNode(tok, tok.ToString() )
@@ -46309,6 +46586,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                                 Me.MaxDistance = m_scanner.StartPos
                                                                 max_tree = m_tree.clone
                                                               End If
+                                                              max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                                                 lbProblemSolved = True
                                                                                                                 tok = m_scanner.Scan(TokenType.KEYWDA) ' Terminal Rule: KEYWDA
                                                         n = node.CreateNode(tok, tok.ToString() )
@@ -46334,6 +46612,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                                 Me.MaxDistance = m_scanner.StartPos
                                                                 max_tree = m_tree.clone
                                                               End If
+                                                              max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                                                 lbProblemSolved = True
                                                                                                                 tok = m_scanner.Scan(TokenType.KEYWDNO) ' Terminal Rule: KEYWDNO
                                                         n = node.CreateNode(tok, tok.ToString() )
@@ -46359,6 +46638,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                                 Me.MaxDistance = m_scanner.StartPos
                                                                 max_tree = m_tree.clone
                                                               End If
+                                                              max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                                                 lbProblemSolved = True
                                                                                                                 tok = m_scanner.Scan(TokenType.KEYWDCOUNT) ' Terminal Rule: KEYWDCOUNT
                                                         n = node.CreateNode(tok, tok.ToString() )
@@ -46493,6 +46773,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                             Me.MaxDistance = m_scanner.StartPos
                                                             max_tree = m_tree.clone
                                                           End If
+                                                          max_tree.Optionals.AddRange(m_tree.Optionals)
                                                     lbProblemSolved =                                                         ParseNODE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: NODE
                                                         If m_tree.Errors.Count > 0 Then
                                                           If m_scanner.EndPos > Me.MaxDistance Then
@@ -46774,6 +47055,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                                 Me.MaxDistance = m_scanner.StartPos
                                                                 max_tree = m_tree.clone
                                                               End If
+                                                              max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                                                 lbProblemSolved = True
                                                                                                                 tok = m_scanner.Scan(TokenType.KEYWDTHAT) ' Terminal Rule: KEYWDTHAT
                                                         n = node.CreateNode(tok, tok.ToString() )
@@ -46799,6 +47081,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                                 Me.MaxDistance = m_scanner.StartPos
                                                                 max_tree = m_tree.clone
                                                               End If
+                                                              max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                                                 lbProblemSolved = True
                                                                                                                 tok = m_scanner.Scan(TokenType.KEYWDAN) ' Terminal Rule: KEYWDAN
                                                         n = node.CreateNode(tok, tok.ToString() )
@@ -46824,6 +47107,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                                 Me.MaxDistance = m_scanner.StartPos
                                                                 max_tree = m_tree.clone
                                                               End If
+                                                              max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                                                 lbProblemSolved = True
                                                                                                                 tok = m_scanner.Scan(TokenType.KEYWDA) ' Terminal Rule: KEYWDA
                                                         n = node.CreateNode(tok, tok.ToString() )
@@ -46849,6 +47133,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                                 Me.MaxDistance = m_scanner.StartPos
                                                                 max_tree = m_tree.clone
                                                               End If
+                                                              max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                                                 lbProblemSolved = True
                                                                                                                 tok = m_scanner.Scan(TokenType.KEYWDNO) ' Terminal Rule: KEYWDNO
                                                         n = node.CreateNode(tok, tok.ToString() )
@@ -46874,6 +47159,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                                 Me.MaxDistance = m_scanner.StartPos
                                                                 max_tree = m_tree.clone
                                                               End If
+                                                              max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                                                 lbProblemSolved = True
                                                                                                                 tok = m_scanner.Scan(TokenType.KEYWDCOUNT) ' Terminal Rule: KEYWDCOUNT
                                                         n = node.CreateNode(tok, tok.ToString() )
@@ -47008,6 +47294,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                             Me.MaxDistance = m_scanner.StartPos
                                                             max_tree = m_tree.clone
                                                           End If
+                                                          max_tree.Optionals.AddRange(m_tree.Optionals)
                                                     lbProblemSolved =                                                         ParseNODE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: NODE
                                                         If m_tree.Errors.Count > 0 Then
                                                           If m_scanner.EndPos > Me.MaxDistance Then
@@ -47289,6 +47576,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                                 Me.MaxDistance = m_scanner.StartPos
                                                                 max_tree = m_tree.clone
                                                               End If
+                                                              max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                                                 lbProblemSolved = True
                                                                                                                 tok = m_scanner.Scan(TokenType.KEYWDTHAT) ' Terminal Rule: KEYWDTHAT
                                                         n = node.CreateNode(tok, tok.ToString() )
@@ -47314,6 +47602,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                                 Me.MaxDistance = m_scanner.StartPos
                                                                 max_tree = m_tree.clone
                                                               End If
+                                                              max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                                                 lbProblemSolved = True
                                                                                                                 tok = m_scanner.Scan(TokenType.KEYWDAN) ' Terminal Rule: KEYWDAN
                                                         n = node.CreateNode(tok, tok.ToString() )
@@ -47339,6 +47628,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                                 Me.MaxDistance = m_scanner.StartPos
                                                                 max_tree = m_tree.clone
                                                               End If
+                                                              max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                                                 lbProblemSolved = True
                                                                                                                 tok = m_scanner.Scan(TokenType.KEYWDA) ' Terminal Rule: KEYWDA
                                                         n = node.CreateNode(tok, tok.ToString() )
@@ -47364,6 +47654,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                                 Me.MaxDistance = m_scanner.StartPos
                                                                 max_tree = m_tree.clone
                                                               End If
+                                                              max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                                                 lbProblemSolved = True
                                                                                                                 tok = m_scanner.Scan(TokenType.KEYWDNO) ' Terminal Rule: KEYWDNO
                                                         n = node.CreateNode(tok, tok.ToString() )
@@ -47389,6 +47680,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                                 Me.MaxDistance = m_scanner.StartPos
                                                                 max_tree = m_tree.clone
                                                               End If
+                                                              max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                                                 lbProblemSolved = True
                                                                                                                 tok = m_scanner.Scan(TokenType.KEYWDCOUNT) ' Terminal Rule: KEYWDCOUNT
                                                         n = node.CreateNode(tok, tok.ToString() )
@@ -47523,6 +47815,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                             Me.MaxDistance = m_scanner.StartPos
                                                             max_tree = m_tree.clone
                                                           End If
+                                                          max_tree.Optionals.AddRange(m_tree.Optionals)
                                                     lbProblemSolved =                                                         ParseNODE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: NODE
                                                         If m_tree.Errors.Count > 0 Then
                                                           If m_scanner.EndPos > Me.MaxDistance Then
@@ -47804,6 +48097,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                                 Me.MaxDistance = m_scanner.StartPos
                                                                 max_tree = m_tree.clone
                                                               End If
+                                                              max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                                                 lbProblemSolved = True
                                                                                                                 tok = m_scanner.Scan(TokenType.KEYWDTHAT) ' Terminal Rule: KEYWDTHAT
                                                         n = node.CreateNode(tok, tok.ToString() )
@@ -47829,6 +48123,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                                 Me.MaxDistance = m_scanner.StartPos
                                                                 max_tree = m_tree.clone
                                                               End If
+                                                              max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                                                 lbProblemSolved = True
                                                                                                                 tok = m_scanner.Scan(TokenType.KEYWDAN) ' Terminal Rule: KEYWDAN
                                                         n = node.CreateNode(tok, tok.ToString() )
@@ -47854,6 +48149,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                                 Me.MaxDistance = m_scanner.StartPos
                                                                 max_tree = m_tree.clone
                                                               End If
+                                                              max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                                                 lbProblemSolved = True
                                                                                                                 tok = m_scanner.Scan(TokenType.KEYWDA) ' Terminal Rule: KEYWDA
                                                         n = node.CreateNode(tok, tok.ToString() )
@@ -47879,6 +48175,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                                 Me.MaxDistance = m_scanner.StartPos
                                                                 max_tree = m_tree.clone
                                                               End If
+                                                              max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                                                 lbProblemSolved = True
                                                                                                                 tok = m_scanner.Scan(TokenType.KEYWDNO) ' Terminal Rule: KEYWDNO
                                                         n = node.CreateNode(tok, tok.ToString() )
@@ -47904,6 +48201,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                                 Me.MaxDistance = m_scanner.StartPos
                                                                 max_tree = m_tree.clone
                                                               End If
+                                                              max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                                                 lbProblemSolved = True
                                                                                                                 tok = m_scanner.Scan(TokenType.KEYWDCOUNT) ' Terminal Rule: KEYWDCOUNT
                                                         n = node.CreateNode(tok, tok.ToString() )
@@ -48038,6 +48336,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                             Me.MaxDistance = m_scanner.StartPos
                                                             max_tree = m_tree.clone
                                                           End If
+                                                          max_tree.Optionals.AddRange(m_tree.Optionals)
                                                     lbProblemSolved =                                                         ParseNODE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: NODE
                                                         If m_tree.Errors.Count > 0 Then
                                                           If m_scanner.EndPos > Me.MaxDistance Then
@@ -48319,6 +48618,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                                 Me.MaxDistance = m_scanner.StartPos
                                                                 max_tree = m_tree.clone
                                                               End If
+                                                              max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                                                 lbProblemSolved = True
                                                                                                                 tok = m_scanner.Scan(TokenType.KEYWDTHAT) ' Terminal Rule: KEYWDTHAT
                                                         n = node.CreateNode(tok, tok.ToString() )
@@ -48344,6 +48644,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                                 Me.MaxDistance = m_scanner.StartPos
                                                                 max_tree = m_tree.clone
                                                               End If
+                                                              max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                                                 lbProblemSolved = True
                                                                                                                 tok = m_scanner.Scan(TokenType.KEYWDAN) ' Terminal Rule: KEYWDAN
                                                         n = node.CreateNode(tok, tok.ToString() )
@@ -48369,6 +48670,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                                 Me.MaxDistance = m_scanner.StartPos
                                                                 max_tree = m_tree.clone
                                                               End If
+                                                              max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                                                 lbProblemSolved = True
                                                                                                                 tok = m_scanner.Scan(TokenType.KEYWDA) ' Terminal Rule: KEYWDA
                                                         n = node.CreateNode(tok, tok.ToString() )
@@ -48394,6 +48696,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                                 Me.MaxDistance = m_scanner.StartPos
                                                                 max_tree = m_tree.clone
                                                               End If
+                                                              max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                                                 lbProblemSolved = True
                                                                                                                 tok = m_scanner.Scan(TokenType.KEYWDNO) ' Terminal Rule: KEYWDNO
                                                         n = node.CreateNode(tok, tok.ToString() )
@@ -48419,6 +48722,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                                 Me.MaxDistance = m_scanner.StartPos
                                                                 max_tree = m_tree.clone
                                                               End If
+                                                              max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                                                 lbProblemSolved = True
                                                                                                                 tok = m_scanner.Scan(TokenType.KEYWDCOUNT) ' Terminal Rule: KEYWDCOUNT
                                                         n = node.CreateNode(tok, tok.ToString() )
@@ -48553,6 +48857,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                             Me.MaxDistance = m_scanner.StartPos
                                                             max_tree = m_tree.clone
                                                           End If
+                                                          max_tree.Optionals.AddRange(m_tree.Optionals)
                                                     lbProblemSolved =                                                         ParseNODE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: NODE
                                                         If m_tree.Errors.Count > 0 Then
                                                           If m_scanner.EndPos > Me.MaxDistance Then
@@ -48834,6 +49139,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                                 Me.MaxDistance = m_scanner.StartPos
                                                                 max_tree = m_tree.clone
                                                               End If
+                                                              max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                                                 lbProblemSolved = True
                                                                                                                 tok = m_scanner.Scan(TokenType.KEYWDTHAT) ' Terminal Rule: KEYWDTHAT
                                                         n = node.CreateNode(tok, tok.ToString() )
@@ -48859,6 +49165,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                                 Me.MaxDistance = m_scanner.StartPos
                                                                 max_tree = m_tree.clone
                                                               End If
+                                                              max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                                                 lbProblemSolved = True
                                                                                                                 tok = m_scanner.Scan(TokenType.KEYWDAN) ' Terminal Rule: KEYWDAN
                                                         n = node.CreateNode(tok, tok.ToString() )
@@ -48884,6 +49191,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                                 Me.MaxDistance = m_scanner.StartPos
                                                                 max_tree = m_tree.clone
                                                               End If
+                                                              max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                                                 lbProblemSolved = True
                                                                                                                 tok = m_scanner.Scan(TokenType.KEYWDA) ' Terminal Rule: KEYWDA
                                                         n = node.CreateNode(tok, tok.ToString() )
@@ -48909,6 +49217,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                                 Me.MaxDistance = m_scanner.StartPos
                                                                 max_tree = m_tree.clone
                                                               End If
+                                                              max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                                                 lbProblemSolved = True
                                                                                                                 tok = m_scanner.Scan(TokenType.KEYWDNO) ' Terminal Rule: KEYWDNO
                                                         n = node.CreateNode(tok, tok.ToString() )
@@ -48934,6 +49243,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                                 Me.MaxDistance = m_scanner.StartPos
                                                                 max_tree = m_tree.clone
                                                               End If
+                                                              max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                                                 lbProblemSolved = True
                                                                                                                 tok = m_scanner.Scan(TokenType.KEYWDCOUNT) ' Terminal Rule: KEYWDCOUNT
                                                         n = node.CreateNode(tok, tok.ToString() )
@@ -49068,6 +49378,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                             Me.MaxDistance = m_scanner.StartPos
                                                             max_tree = m_tree.clone
                                                           End If
+                                                          max_tree.Optionals.AddRange(m_tree.Optionals)
                                                     lbProblemSolved =                                                         ParseNODE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: NODE
                                                         If m_tree.Errors.Count > 0 Then
                                                           If m_scanner.EndPos > Me.MaxDistance Then
@@ -49349,6 +49660,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                                 Me.MaxDistance = m_scanner.StartPos
                                                                 max_tree = m_tree.clone
                                                               End If
+                                                              max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                                                 lbProblemSolved = True
                                                                                                                 tok = m_scanner.Scan(TokenType.KEYWDTHAT) ' Terminal Rule: KEYWDTHAT
                                                         n = node.CreateNode(tok, tok.ToString() )
@@ -49374,6 +49686,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                                 Me.MaxDistance = m_scanner.StartPos
                                                                 max_tree = m_tree.clone
                                                               End If
+                                                              max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                                                 lbProblemSolved = True
                                                                                                                 tok = m_scanner.Scan(TokenType.KEYWDAN) ' Terminal Rule: KEYWDAN
                                                         n = node.CreateNode(tok, tok.ToString() )
@@ -49399,6 +49712,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                                 Me.MaxDistance = m_scanner.StartPos
                                                                 max_tree = m_tree.clone
                                                               End If
+                                                              max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                                                 lbProblemSolved = True
                                                                                                                 tok = m_scanner.Scan(TokenType.KEYWDA) ' Terminal Rule: KEYWDA
                                                         n = node.CreateNode(tok, tok.ToString() )
@@ -49424,6 +49738,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                                 Me.MaxDistance = m_scanner.StartPos
                                                                 max_tree = m_tree.clone
                                                               End If
+                                                              max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                                                 lbProblemSolved = True
                                                                                                                 tok = m_scanner.Scan(TokenType.KEYWDNO) ' Terminal Rule: KEYWDNO
                                                         n = node.CreateNode(tok, tok.ToString() )
@@ -49449,6 +49764,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                                 Me.MaxDistance = m_scanner.StartPos
                                                                 max_tree = m_tree.clone
                                                               End If
+                                                              max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                                                 lbProblemSolved = True
                                                                                                                 tok = m_scanner.Scan(TokenType.KEYWDCOUNT) ' Terminal Rule: KEYWDCOUNT
                                                         n = node.CreateNode(tok, tok.ToString() )
@@ -49583,6 +49899,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                             Me.MaxDistance = m_scanner.StartPos
                                                             max_tree = m_tree.clone
                                                           End If
+                                                          max_tree.Optionals.AddRange(m_tree.Optionals)
                                                     lbProblemSolved =                                                         ParseNODE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: NODE
                                                         If m_tree.Errors.Count > 0 Then
                                                           If m_scanner.EndPos > Me.MaxDistance Then
@@ -49864,6 +50181,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                                 Me.MaxDistance = m_scanner.StartPos
                                                                 max_tree = m_tree.clone
                                                               End If
+                                                              max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                                                 lbProblemSolved = True
                                                                                                                 tok = m_scanner.Scan(TokenType.KEYWDTHAT) ' Terminal Rule: KEYWDTHAT
                                                         n = node.CreateNode(tok, tok.ToString() )
@@ -49889,6 +50207,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                                 Me.MaxDistance = m_scanner.StartPos
                                                                 max_tree = m_tree.clone
                                                               End If
+                                                              max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                                                 lbProblemSolved = True
                                                                                                                 tok = m_scanner.Scan(TokenType.KEYWDAN) ' Terminal Rule: KEYWDAN
                                                         n = node.CreateNode(tok, tok.ToString() )
@@ -49914,6 +50233,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                                 Me.MaxDistance = m_scanner.StartPos
                                                                 max_tree = m_tree.clone
                                                               End If
+                                                              max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                                                 lbProblemSolved = True
                                                                                                                 tok = m_scanner.Scan(TokenType.KEYWDA) ' Terminal Rule: KEYWDA
                                                         n = node.CreateNode(tok, tok.ToString() )
@@ -49939,6 +50259,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                                 Me.MaxDistance = m_scanner.StartPos
                                                                 max_tree = m_tree.clone
                                                               End If
+                                                              max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                                                 lbProblemSolved = True
                                                                                                                 tok = m_scanner.Scan(TokenType.KEYWDNO) ' Terminal Rule: KEYWDNO
                                                         n = node.CreateNode(tok, tok.ToString() )
@@ -49964,6 +50285,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                                 Me.MaxDistance = m_scanner.StartPos
                                                                 max_tree = m_tree.clone
                                                               End If
+                                                              max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                                                 lbProblemSolved = True
                                                                                                                 tok = m_scanner.Scan(TokenType.KEYWDCOUNT) ' Terminal Rule: KEYWDCOUNT
                                                         n = node.CreateNode(tok, tok.ToString() )
@@ -50098,6 +50420,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                             Me.MaxDistance = m_scanner.StartPos
                                                             max_tree = m_tree.clone
                                                           End If
+                                                          max_tree.Optionals.AddRange(m_tree.Optionals)
                                                     lbProblemSolved =                                                         ParseNODE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: NODE
                                                         If m_tree.Errors.Count > 0 Then
                                                           If m_scanner.EndPos > Me.MaxDistance Then
@@ -50379,6 +50702,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                                 Me.MaxDistance = m_scanner.StartPos
                                                                 max_tree = m_tree.clone
                                                               End If
+                                                              max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                                                 lbProblemSolved = True
                                                                                                                 tok = m_scanner.Scan(TokenType.KEYWDTHAT) ' Terminal Rule: KEYWDTHAT
                                                         n = node.CreateNode(tok, tok.ToString() )
@@ -50404,6 +50728,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                                 Me.MaxDistance = m_scanner.StartPos
                                                                 max_tree = m_tree.clone
                                                               End If
+                                                              max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                                                 lbProblemSolved = True
                                                                                                                 tok = m_scanner.Scan(TokenType.KEYWDAN) ' Terminal Rule: KEYWDAN
                                                         n = node.CreateNode(tok, tok.ToString() )
@@ -50429,6 +50754,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                                 Me.MaxDistance = m_scanner.StartPos
                                                                 max_tree = m_tree.clone
                                                               End If
+                                                              max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                                                 lbProblemSolved = True
                                                                                                                 tok = m_scanner.Scan(TokenType.KEYWDA) ' Terminal Rule: KEYWDA
                                                         n = node.CreateNode(tok, tok.ToString() )
@@ -50454,6 +50780,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                                 Me.MaxDistance = m_scanner.StartPos
                                                                 max_tree = m_tree.clone
                                                               End If
+                                                              max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                                                 lbProblemSolved = True
                                                                                                                 tok = m_scanner.Scan(TokenType.KEYWDNO) ' Terminal Rule: KEYWDNO
                                                         n = node.CreateNode(tok, tok.ToString() )
@@ -50479,6 +50806,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                                 Me.MaxDistance = m_scanner.StartPos
                                                                 max_tree = m_tree.clone
                                                               End If
+                                                              max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                                                 lbProblemSolved = True
                                                                                                                 tok = m_scanner.Scan(TokenType.KEYWDCOUNT) ' Terminal Rule: KEYWDCOUNT
                                                         n = node.CreateNode(tok, tok.ToString() )
@@ -50613,6 +50941,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                             Me.MaxDistance = m_scanner.StartPos
                                                             max_tree = m_tree.clone
                                                           End If
+                                                          max_tree.Optionals.AddRange(m_tree.Optionals)
                                                     lbProblemSolved =                                                         ParseNODE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: NODE
                                                         If m_tree.Errors.Count > 0 Then
                                                           If m_scanner.EndPos > Me.MaxDistance Then
@@ -50894,6 +51223,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                                 Me.MaxDistance = m_scanner.StartPos
                                                                 max_tree = m_tree.clone
                                                               End If
+                                                              max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                                                 lbProblemSolved = True
                                                                                                                 tok = m_scanner.Scan(TokenType.KEYWDTHAT) ' Terminal Rule: KEYWDTHAT
                                                         n = node.CreateNode(tok, tok.ToString() )
@@ -50919,6 +51249,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                                 Me.MaxDistance = m_scanner.StartPos
                                                                 max_tree = m_tree.clone
                                                               End If
+                                                              max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                                                 lbProblemSolved = True
                                                                                                                 tok = m_scanner.Scan(TokenType.KEYWDAN) ' Terminal Rule: KEYWDAN
                                                         n = node.CreateNode(tok, tok.ToString() )
@@ -50944,6 +51275,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                                 Me.MaxDistance = m_scanner.StartPos
                                                                 max_tree = m_tree.clone
                                                               End If
+                                                              max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                                                 lbProblemSolved = True
                                                                                                                 tok = m_scanner.Scan(TokenType.KEYWDA) ' Terminal Rule: KEYWDA
                                                         n = node.CreateNode(tok, tok.ToString() )
@@ -50969,6 +51301,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                                 Me.MaxDistance = m_scanner.StartPos
                                                                 max_tree = m_tree.clone
                                                               End If
+                                                              max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                                                 lbProblemSolved = True
                                                                                                                 tok = m_scanner.Scan(TokenType.KEYWDNO) ' Terminal Rule: KEYWDNO
                                                         n = node.CreateNode(tok, tok.ToString() )
@@ -50994,6 +51327,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                                 Me.MaxDistance = m_scanner.StartPos
                                                                 max_tree = m_tree.clone
                                                               End If
+                                                              max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                                                 lbProblemSolved = True
                                                                                                                 tok = m_scanner.Scan(TokenType.KEYWDCOUNT) ' Terminal Rule: KEYWDCOUNT
                                                         n = node.CreateNode(tok, tok.ToString() )
@@ -51128,6 +51462,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                             Me.MaxDistance = m_scanner.StartPos
                                                             max_tree = m_tree.clone
                                                           End If
+                                                          max_tree.Optionals.AddRange(m_tree.Optionals)
                                                     lbProblemSolved =                                                         ParseNODE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: NODE
                                                         If m_tree.Errors.Count > 0 Then
                                                           If m_scanner.EndPos > Me.MaxDistance Then
@@ -51409,6 +51744,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                                 Me.MaxDistance = m_scanner.StartPos
                                                                 max_tree = m_tree.clone
                                                               End If
+                                                              max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                                                 lbProblemSolved = True
                                                                                                                 tok = m_scanner.Scan(TokenType.KEYWDTHAT) ' Terminal Rule: KEYWDTHAT
                                                         n = node.CreateNode(tok, tok.ToString() )
@@ -51434,6 +51770,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                                 Me.MaxDistance = m_scanner.StartPos
                                                                 max_tree = m_tree.clone
                                                               End If
+                                                              max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                                                 lbProblemSolved = True
                                                                                                                 tok = m_scanner.Scan(TokenType.KEYWDAN) ' Terminal Rule: KEYWDAN
                                                         n = node.CreateNode(tok, tok.ToString() )
@@ -51459,6 +51796,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                                 Me.MaxDistance = m_scanner.StartPos
                                                                 max_tree = m_tree.clone
                                                               End If
+                                                              max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                                                 lbProblemSolved = True
                                                                                                                 tok = m_scanner.Scan(TokenType.KEYWDA) ' Terminal Rule: KEYWDA
                                                         n = node.CreateNode(tok, tok.ToString() )
@@ -51484,6 +51822,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                                 Me.MaxDistance = m_scanner.StartPos
                                                                 max_tree = m_tree.clone
                                                               End If
+                                                              max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                                                 lbProblemSolved = True
                                                                                                                 tok = m_scanner.Scan(TokenType.KEYWDNO) ' Terminal Rule: KEYWDNO
                                                         n = node.CreateNode(tok, tok.ToString() )
@@ -51509,6 +51848,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                                 Me.MaxDistance = m_scanner.StartPos
                                                                 max_tree = m_tree.clone
                                                               End If
+                                                              max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                                                 lbProblemSolved = True
                                                                                                                 tok = m_scanner.Scan(TokenType.KEYWDCOUNT) ' Terminal Rule: KEYWDCOUNT
                                                         n = node.CreateNode(tok, tok.ToString() )
@@ -51643,6 +51983,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                             Me.MaxDistance = m_scanner.StartPos
                                                             max_tree = m_tree.clone
                                                           End If
+                                                          max_tree.Optionals.AddRange(m_tree.Optionals)
                                                     lbProblemSolved =                                                         ParseNODE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: NODE
                                                         If m_tree.Errors.Count > 0 Then
                                                           If m_scanner.EndPos > Me.MaxDistance Then
@@ -51924,6 +52265,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                                 Me.MaxDistance = m_scanner.StartPos
                                                                 max_tree = m_tree.clone
                                                               End If
+                                                              max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                                                 lbProblemSolved = True
                                                                                                                 tok = m_scanner.Scan(TokenType.KEYWDTHAT) ' Terminal Rule: KEYWDTHAT
                                                         n = node.CreateNode(tok, tok.ToString() )
@@ -51949,6 +52291,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                                 Me.MaxDistance = m_scanner.StartPos
                                                                 max_tree = m_tree.clone
                                                               End If
+                                                              max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                                                 lbProblemSolved = True
                                                                                                                 tok = m_scanner.Scan(TokenType.KEYWDAN) ' Terminal Rule: KEYWDAN
                                                         n = node.CreateNode(tok, tok.ToString() )
@@ -51974,6 +52317,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                                 Me.MaxDistance = m_scanner.StartPos
                                                                 max_tree = m_tree.clone
                                                               End If
+                                                              max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                                                 lbProblemSolved = True
                                                                                                                 tok = m_scanner.Scan(TokenType.KEYWDA) ' Terminal Rule: KEYWDA
                                                         n = node.CreateNode(tok, tok.ToString() )
@@ -51999,6 +52343,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                                 Me.MaxDistance = m_scanner.StartPos
                                                                 max_tree = m_tree.clone
                                                               End If
+                                                              max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                                                 lbProblemSolved = True
                                                                                                                 tok = m_scanner.Scan(TokenType.KEYWDNO) ' Terminal Rule: KEYWDNO
                                                         n = node.CreateNode(tok, tok.ToString() )
@@ -52024,6 +52369,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                                 Me.MaxDistance = m_scanner.StartPos
                                                                 max_tree = m_tree.clone
                                                               End If
+                                                              max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                                                 lbProblemSolved = True
                                                                                                                 tok = m_scanner.Scan(TokenType.KEYWDCOUNT) ' Terminal Rule: KEYWDCOUNT
                                                         n = node.CreateNode(tok, tok.ToString() )
@@ -52158,6 +52504,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                             Me.MaxDistance = m_scanner.StartPos
                                                             max_tree = m_tree.clone
                                                           End If
+                                                          max_tree.Optionals.AddRange(m_tree.Optionals)
                                                     lbProblemSolved =                                                         ParseNODE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: NODE
                                                         If m_tree.Errors.Count > 0 Then
                                                           If m_scanner.EndPos > Me.MaxDistance Then
@@ -52439,6 +52786,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                                 Me.MaxDistance = m_scanner.StartPos
                                                                 max_tree = m_tree.clone
                                                               End If
+                                                              max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                                                 lbProblemSolved = True
                                                                                                                 tok = m_scanner.Scan(TokenType.KEYWDTHAT) ' Terminal Rule: KEYWDTHAT
                                                         n = node.CreateNode(tok, tok.ToString() )
@@ -52464,6 +52812,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                                 Me.MaxDistance = m_scanner.StartPos
                                                                 max_tree = m_tree.clone
                                                               End If
+                                                              max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                                                 lbProblemSolved = True
                                                                                                                 tok = m_scanner.Scan(TokenType.KEYWDAN) ' Terminal Rule: KEYWDAN
                                                         n = node.CreateNode(tok, tok.ToString() )
@@ -52489,6 +52838,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                                 Me.MaxDistance = m_scanner.StartPos
                                                                 max_tree = m_tree.clone
                                                               End If
+                                                              max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                                                 lbProblemSolved = True
                                                                                                                 tok = m_scanner.Scan(TokenType.KEYWDA) ' Terminal Rule: KEYWDA
                                                         n = node.CreateNode(tok, tok.ToString() )
@@ -52514,6 +52864,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                                 Me.MaxDistance = m_scanner.StartPos
                                                                 max_tree = m_tree.clone
                                                               End If
+                                                              max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                                                 lbProblemSolved = True
                                                                                                                 tok = m_scanner.Scan(TokenType.KEYWDNO) ' Terminal Rule: KEYWDNO
                                                         n = node.CreateNode(tok, tok.ToString() )
@@ -52539,6 +52890,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                                 Me.MaxDistance = m_scanner.StartPos
                                                                 max_tree = m_tree.clone
                                                               End If
+                                                              max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                                                 lbProblemSolved = True
                                                                                                                 tok = m_scanner.Scan(TokenType.KEYWDCOUNT) ' Terminal Rule: KEYWDCOUNT
                                                         n = node.CreateNode(tok, tok.ToString() )
@@ -52673,6 +53025,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                             Me.MaxDistance = m_scanner.StartPos
                                                             max_tree = m_tree.clone
                                                           End If
+                                                          max_tree.Optionals.AddRange(m_tree.Optionals)
                                                     lbProblemSolved =                                                         ParseNODE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: NODE
                                                         If m_tree.Errors.Count > 0 Then
                                                           If m_scanner.EndPos > Me.MaxDistance Then
@@ -52954,6 +53307,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                                 Me.MaxDistance = m_scanner.StartPos
                                                                 max_tree = m_tree.clone
                                                               End If
+                                                              max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                                                 lbProblemSolved = True
                                                                                                                 tok = m_scanner.Scan(TokenType.KEYWDTHAT) ' Terminal Rule: KEYWDTHAT
                                                         n = node.CreateNode(tok, tok.ToString() )
@@ -52979,6 +53333,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                                 Me.MaxDistance = m_scanner.StartPos
                                                                 max_tree = m_tree.clone
                                                               End If
+                                                              max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                                                 lbProblemSolved = True
                                                                                                                 tok = m_scanner.Scan(TokenType.KEYWDAN) ' Terminal Rule: KEYWDAN
                                                         n = node.CreateNode(tok, tok.ToString() )
@@ -53004,6 +53359,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                                 Me.MaxDistance = m_scanner.StartPos
                                                                 max_tree = m_tree.clone
                                                               End If
+                                                              max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                                                 lbProblemSolved = True
                                                                                                                 tok = m_scanner.Scan(TokenType.KEYWDA) ' Terminal Rule: KEYWDA
                                                         n = node.CreateNode(tok, tok.ToString() )
@@ -53029,6 +53385,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                                 Me.MaxDistance = m_scanner.StartPos
                                                                 max_tree = m_tree.clone
                                                               End If
+                                                              max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                                                 lbProblemSolved = True
                                                                                                                 tok = m_scanner.Scan(TokenType.KEYWDNO) ' Terminal Rule: KEYWDNO
                                                         n = node.CreateNode(tok, tok.ToString() )
@@ -53054,6 +53411,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                                 Me.MaxDistance = m_scanner.StartPos
                                                                 max_tree = m_tree.clone
                                                               End If
+                                                              max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                                                 lbProblemSolved = True
                                                                                                                 tok = m_scanner.Scan(TokenType.KEYWDCOUNT) ' Terminal Rule: KEYWDCOUNT
                                                         n = node.CreateNode(tok, tok.ToString() )
@@ -53188,6 +53546,7 @@ lbProblemSolved =                                             ParseWHICHTHATCLAU
                                                             Me.MaxDistance = m_scanner.StartPos
                                                             max_tree = m_tree.clone
                                                           End If
+                                                          max_tree.Optionals.AddRange(m_tree.Optionals)
                                                     lbProblemSolved =                                                         ParseNODE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: NODE
                                                         If m_tree.Errors.Count > 0 Then
                                                           If m_scanner.EndPos > Me.MaxDistance Then
@@ -53315,6 +53674,7 @@ lbProblemSolved =                                             ParseMATHCLAUSE(no
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
+                              max_tree.Optionals.AddRange(m_tree.Optionals)
                         
                          ' Concat Rule
                                                         tok = m_scanner.LookAhead({TokenType.KEYWDIS, TokenType.PREDICATE, TokenType.KEYWDTHAT, TokenType.PREBOUNDREADINGTEXT, TokenType.MODELELEMENTNAME}) ' Option Rule
@@ -53500,6 +53860,7 @@ lbProblemSolved =                                     ParseWHICHTHATCLAUSE(node)
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
+                                                      max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                                 lbProblemSolved = True
                                                                                                 tok = m_scanner.Scan(TokenType.KEYWDTHAT) ' Terminal Rule: KEYWDTHAT
                                                 n = node.CreateNode(tok, tok.ToString() )
@@ -53525,6 +53886,7 @@ lbProblemSolved =                                     ParseWHICHTHATCLAUSE(node)
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
+                                                      max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                                 lbProblemSolved = True
                                                                                                 tok = m_scanner.Scan(TokenType.KEYWDAN) ' Terminal Rule: KEYWDAN
                                                 n = node.CreateNode(tok, tok.ToString() )
@@ -53550,6 +53912,7 @@ lbProblemSolved =                                     ParseWHICHTHATCLAUSE(node)
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
+                                                      max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                                 lbProblemSolved = True
                                                                                                 tok = m_scanner.Scan(TokenType.KEYWDA) ' Terminal Rule: KEYWDA
                                                 n = node.CreateNode(tok, tok.ToString() )
@@ -53575,6 +53938,7 @@ lbProblemSolved =                                     ParseWHICHTHATCLAUSE(node)
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
+                                                      max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                                 lbProblemSolved = True
                                                                                                 tok = m_scanner.Scan(TokenType.KEYWDNO) ' Terminal Rule: KEYWDNO
                                                 n = node.CreateNode(tok, tok.ToString() )
@@ -53600,6 +53964,7 @@ lbProblemSolved =                                     ParseWHICHTHATCLAUSE(node)
                                                         Me.MaxDistance = m_scanner.StartPos
                                                         max_tree = m_tree.clone
                                                       End If
+                                                      max_tree.Optionals.AddRange(m_tree.Optionals)
                                                                                                 lbProblemSolved = True
                                                                                                 tok = m_scanner.Scan(TokenType.KEYWDCOUNT) ' Terminal Rule: KEYWDCOUNT
                                                 n = node.CreateNode(tok, tok.ToString() )
@@ -53734,6 +54099,7 @@ lbProblemSolved =                                     ParseWHICHTHATCLAUSE(node)
                                                     Me.MaxDistance = m_scanner.StartPos
                                                     max_tree = m_tree.clone
                                                   End If
+                                                  max_tree.Optionals.AddRange(m_tree.Optionals)
                                             lbProblemSolved =                                                 ParseNODE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: NODE
                                                 If m_tree.Errors.Count > 0 Then
                                                   If m_scanner.EndPos > Me.MaxDistance Then
@@ -53988,6 +54354,7 @@ lbProblemSolved =                                     ParseMATHCLAUSE(node) ' No
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
                               End If
+                              max_tree.Optionals.AddRange(m_tree.Optionals)
                                                 lbProblemSolved = True
                                                 tok = m_scanner.Scan(TokenType.KEYWDA) ' Terminal Rule: KEYWDA
                         n = node.CreateNode(tok, tok.ToString() )
@@ -54096,6 +54463,7 @@ lbProblemSolved =                                     ParseMATHCLAUSE(node) ' No
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
+                          max_tree.Optionals.AddRange(m_tree.Optionals)
                     lbProblemSolved =                         ParseNODEPROPERTYIDENTIFICATION(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: NODEPROPERTYIDENTIFICATION
                         If m_tree.Errors.Count > 0 Then
                           If m_scanner.EndPos > Me.MaxDistance Then
@@ -54221,6 +54589,7 @@ lbProblemSolved =                                     ParseMATHCLAUSE(node) ' No
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
+                  max_tree.Optionals.AddRange(m_tree.Optionals)
                         lbProblemSolved = True
                         tok = m_scanner.Scan(TokenType.KEYWDSHOWME) ' Terminal Rule: KEYWDSHOWME
             n = node.CreateNode(tok, tok.ToString() )
@@ -54399,6 +54768,7 @@ lbProblemSolved =                                     ParseMATHCLAUSE(node) ' No
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
+                                          max_tree.Optionals.AddRange(m_tree.Optionals)
                                     lbProblemSolved =                                         ParseMODELELEMENT(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: MODELELEMENT
                                         If m_tree.Errors.Count > 0 Then
                                           If m_scanner.EndPos > Me.MaxDistance Then
@@ -54550,6 +54920,7 @@ lbProblemSolved =                                     ParseMATHCLAUSE(node) ' No
                                             Me.MaxDistance = m_scanner.StartPos
                                             max_tree = m_tree.clone
                                           End If
+                                          max_tree.Optionals.AddRange(m_tree.Optionals)
                                     lbProblemSolved =                                         ParseMODELELEMENT(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: MODELELEMENT
                                         If m_tree.Errors.Count > 0 Then
                                           If m_scanner.EndPos > Me.MaxDistance Then
@@ -54616,6 +54987,7 @@ lbProblemSolved =                                     ParseMATHCLAUSE(node) ' No
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
+                          max_tree.Optionals.AddRange(m_tree.Optionals)
                     lbProblemSolved =                         ParseNODEPROPERTYIDENTIFICATION(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: NODEPROPERTYIDENTIFICATION
                         If m_tree.Errors.Count > 0 Then
                           If m_scanner.EndPos > Me.MaxDistance Then
@@ -55471,6 +55843,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
+                          max_tree.Optionals.AddRange(m_tree.Optionals)
                     lbProblemSolved =                         ParseDATATYPELENGTH(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: DATATYPELENGTH
                         If m_tree.Errors.Count > 0 Then
                           If m_scanner.EndPos > Me.MaxDistance Then
@@ -55489,6 +55862,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
+                          max_tree.Optionals.AddRange(m_tree.Optionals)
                     lbProblemSolved =                         ParseDATATYPEPRECISION(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: DATATYPEPRECISION
                         If m_tree.Errors.Count > 0 Then
                           If m_scanner.EndPos > Me.MaxDistance Then
@@ -55622,6 +55996,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
+                          max_tree.Optionals.AddRange(m_tree.Optionals)
                     lbProblemSolved =                         ParseFACTREADING(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: FACTREADING
                         If m_tree.Errors.Count > 0 Then
                           If m_scanner.EndPos > Me.MaxDistance Then
@@ -56350,6 +56725,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
+                  max_tree.Optionals.AddRange(m_tree.Optionals)
             lbProblemSolved =                 ParseADDFACTSTMT(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: ADDFACTSTMT
                 If m_tree.Errors.Count > 0 Then
                   If m_scanner.EndPos > Me.MaxDistance Then
@@ -56368,6 +56744,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
+                  max_tree.Optionals.AddRange(m_tree.Optionals)
             lbProblemSolved =                 ParseASSERTSTMT(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: ASSERTSTMT
                 If m_tree.Errors.Count > 0 Then
                   If m_scanner.EndPos > Me.MaxDistance Then
@@ -56386,6 +56763,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
+                  max_tree.Optionals.AddRange(m_tree.Optionals)
             lbProblemSolved =                 ParseCREATEDATABASESTMT(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: CREATEDATABASESTMT
                 If m_tree.Errors.Count > 0 Then
                   If m_scanner.EndPos > Me.MaxDistance Then
@@ -56404,6 +56782,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
+                  max_tree.Optionals.AddRange(m_tree.Optionals)
             lbProblemSolved =                 ParseCREATESTMT(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: CREATESTMT
                 If m_tree.Errors.Count > 0 Then
                   If m_scanner.EndPos > Me.MaxDistance Then
@@ -56422,6 +56801,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
+                  max_tree.Optionals.AddRange(m_tree.Optionals)
             lbProblemSolved =                 ParseDELETESTMT(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: DELETESTMT
                 If m_tree.Errors.Count > 0 Then
                   If m_scanner.EndPos > Me.MaxDistance Then
@@ -56440,6 +56820,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
+                  max_tree.Optionals.AddRange(m_tree.Optionals)
             lbProblemSolved =                 ParseDELETEALLSTMT(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: DELETEALLSTMT
                 If m_tree.Errors.Count > 0 Then
                   If m_scanner.EndPos > Me.MaxDistance Then
@@ -56458,6 +56839,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
+                  max_tree.Optionals.AddRange(m_tree.Optionals)
             lbProblemSolved =                 ParseDELETEFACTSTMT(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: DELETEFACTSTMT
                 If m_tree.Errors.Count > 0 Then
                   If m_scanner.EndPos > Me.MaxDistance Then
@@ -56476,6 +56858,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
+                  max_tree.Optionals.AddRange(m_tree.Optionals)
             lbProblemSolved =                 ParseDESCRIBESTMT(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: DESCRIBESTMT
                 If m_tree.Errors.Count > 0 Then
                   If m_scanner.EndPos > Me.MaxDistance Then
@@ -56494,6 +56877,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
+                  max_tree.Optionals.AddRange(m_tree.Optionals)
             lbProblemSolved =                 ParseDIDSELECTSTMT(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: DIDSELECTSTMT
                 If m_tree.Errors.Count > 0 Then
                   If m_scanner.EndPos > Me.MaxDistance Then
@@ -56512,6 +56896,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
+                  max_tree.Optionals.AddRange(m_tree.Optionals)
             lbProblemSolved =                 ParseSHOWSTMT(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: SHOWSTMT
                 If m_tree.Errors.Count > 0 Then
                   If m_scanner.EndPos > Me.MaxDistance Then
@@ -56530,6 +56915,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
+                  max_tree.Optionals.AddRange(m_tree.Optionals)
             lbProblemSolved =                 ParseCONSTRAINTEXTERNALSTMT(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: CONSTRAINTEXTERNALSTMT
                 If m_tree.Errors.Count > 0 Then
                   If m_scanner.EndPos > Me.MaxDistance Then
@@ -56548,6 +56934,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
+                  max_tree.Optionals.AddRange(m_tree.Optionals)
             lbProblemSolved =                 ParseCONSTRAINTEITHEROR(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: CONSTRAINTEITHEROR
                 If m_tree.Errors.Count > 0 Then
                   If m_scanner.EndPos > Me.MaxDistance Then
@@ -56566,6 +56953,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
+                  max_tree.Optionals.AddRange(m_tree.Optionals)
             lbProblemSolved =                 ParseDERIVEDFACTTYPESTMT(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: DERIVEDFACTTYPESTMT
                 If m_tree.Errors.Count > 0 Then
                   If m_scanner.EndPos > Me.MaxDistance Then
@@ -56584,6 +56972,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
+                  max_tree.Optionals.AddRange(m_tree.Optionals)
             lbProblemSolved =                 ParseENUMERATESTMT(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: ENUMERATESTMT
                 If m_tree.Errors.Count > 0 Then
                   If m_scanner.EndPos > Me.MaxDistance Then
@@ -56602,6 +56991,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
+                  max_tree.Optionals.AddRange(m_tree.Optionals)
             lbProblemSolved =                 ParseMATCHSELECTSTMT(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: MATCHSELECTSTMT
                 If m_tree.Errors.Count > 0 Then
                   If m_scanner.EndPos > Me.MaxDistance Then
@@ -56620,6 +57010,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
+                  max_tree.Optionals.AddRange(m_tree.Optionals)
             lbProblemSolved =                 ParseDERIVATIONSTMT(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: DERIVATIONSTMT
                 If m_tree.Errors.Count > 0 Then
                   If m_scanner.EndPos > Me.MaxDistance Then
@@ -56638,6 +57029,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
+                  max_tree.Optionals.AddRange(m_tree.Optionals)
             lbProblemSolved =                 ParseFACTTYPEPRODUCTION(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: FACTTYPEPRODUCTION
                 If m_tree.Errors.Count > 0 Then
                   If m_scanner.EndPos > Me.MaxDistance Then
@@ -56656,6 +57048,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
                   End If
+                  max_tree.Optionals.AddRange(m_tree.Optionals)
             
              ' Concat Rule
             lbProblemSolved =                     ParseWHICHSELECTSTMT(node) ' NonTerminal Rule: WHICHSELECTSTMT

@@ -5,11 +5,13 @@ Public Class frmAutoComplete
     'NB There is a DateTimePicker hidden under the listbox    
 
     Private zoTextEditor As RichTextBox
+    Public zrCallingForm As Object
+    Public zsIntellisenseBuffer As String
+    Public moBackgroundWorker As System.ComponentModel.BackgroundWorker
+
     Public OpacityValue As Single = 0.8
     Public TransparencyColour As System.Drawing.Color = Color.White
-    Public zrCallingForm As Object
 
-    Public zsIntellisenseBuffer As String
 
     Public Sub New(ByRef aoTextEditor As RichTextBox)
 
@@ -280,6 +282,18 @@ Public Class frmAutoComplete
 
         Me.ListBox.Refresh()
 
+        Dim lsMessage As String
+
+        If Me.ListBox.SelectedIndex < 0 Then Exit Sub
+
+        lsMessage = "Press [A] to add '" & Me.ListBox.SelectedItem.ToString & " A " & Me.ListBox.SelectedItem.ItemData & "'"
+        lsMessage &= vbCrLf & "Press [T] to add 'THAT " & Me.ListBox.SelectedItem.ToString & " A " & Me.ListBox.SelectedItem.ItemData & "'"
+        lsMessage &= vbCrLf & "Press [N] to add '" & Me.ListBox.SelectedItem.ToString & " (" & Me.ListBox.SelectedItem.ItemData & ":'"
+        lsMessage &= vbCrLf & "Press [W] to add '" & Me.ListBox.SelectedItem.ToString & " WHICH " & Me.ListBox.SelectedItem.ItemData & "'"
+
+        Dim lrProgressObject As New ProgressObject(False, lsMessage, True)
+        Me.moBackgroundWorker.ReportProgress(0, lrProgressObject)
+
     End Sub
 
     Private Sub ListBox_PreviewKeyDown(sender As Object, e As PreviewKeyDownEventArgs) Handles ListBox.PreviewKeyDown
@@ -350,4 +364,22 @@ Public Class frmAutoComplete
 
     End Sub
 
+    Private Sub ListBox_DoubleClick(sender As Object, e As EventArgs) Handles ListBox.DoubleClick
+
+        Try
+            Call Me.processKeyDown(publicConstantsAutoComplete.pcenumACActionType.None)
+            Me.zoTextEditor.Focus()
+
+            '========================================================
+            'DateTimePicker
+            'Just to be sure...hide and send to back.
+            Me.DateTimePicker.Visible = False
+            Me.DateTimePicker.SendToBack()
+
+        Catch ex As Exception
+
+        End Try
+
+
+    End Sub
 End Class

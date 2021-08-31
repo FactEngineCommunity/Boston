@@ -1840,8 +1840,6 @@ Namespace FBM
                 'CodeSafe
                 If Me.Loading Or Me.Loaded Then Exit Sub
 
-                'If Me.Name.StartsWith("ERD") Then Debugger.Break()
-
                 Me.Loading = True
                 '------------------------------------
                 'Get ValueTypes
