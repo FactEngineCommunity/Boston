@@ -1329,7 +1329,7 @@ Public Class frmFactEngine
                     Dim lastWord As String = Me.TextBoxInput.Text.Split(" ").ToList.FindLast(Function(x) x.Length > 0)
                     If e.KeyCode = Keys.Space And Me.zrTextHighlighter.Tree.Optionals.Find(Function(x) x.ExpectedToken = FEQL.TokenType.MODELELEMENTNAME.ToString) IsNot Nothing Then
                         If prApplication.WorkingModel.GetModelObjectByName(Viev.Strings.MakeCapCamelCase(lastWord)) IsNot Nothing Then
-                            Me.TextBoxInput.Text = Me.TextBoxInput.Text.Remove(Me.TextBoxInput.Text.Length - lastWord.Length)
+                            Me.TextBoxInput.Text = Trim(Me.TextBoxInput.Text).Remove(Trim(Me.TextBoxInput.Text).Length - lastWord.Length)
                             Me.TextBoxInput.Text &= Viev.Strings.MakeCapCamelCase(lastWord)
                             Me.TextBoxInput.SelectionStart = Me.TextBoxInput.Text.Length
                         End If
