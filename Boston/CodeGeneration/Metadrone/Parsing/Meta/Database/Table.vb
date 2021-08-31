@@ -96,10 +96,14 @@ Namespace Parser.Meta.Database
 
                             Dim liInd As Integer = SchemaRowIdx
                             Dim lsOriginColumnName As String = ""
+                            Dim lsOriginRoleName As String = ""
+                            Dim lsDestinationRoleName As String = ""
 
                             If lrRelation.DestinationColumns.Count = 1 Then
                                 lsOriginColumnName = lrRelation.OriginColumns(0).Name
+                                lsOriginRoleName = lrRelation.OriginColumns(0).Role.Name
                                 lsDestinationColumnName = lrRelation.DestinationColumns(0).Name
+                                lsDestinationRoleName = lrRelation.ResponsibleFactType.GetOtherRoleOfBinaryFactType(lrRelation.OriginColumns(0).Role.Id).Name
                             Else
                                 Dim lrOriginColumn As RDS.Column = lrRelation.OriginColumns.Find(Function(x) x.Id = aarSchemaRow(liInd).ColumnId)
                                 lsOriginColumnName = lrOriginColumn.Name
@@ -108,6 +112,8 @@ Namespace Parser.Meta.Database
                                     Throw New Exception("No destination column found for relationship with originating column:" & lrOriginColumn.Table.Name & "." & lrOriginColumn.Name)
                                 End If
                                 lsDestinationColumnName = lrDestinationColumn.Name
+                                lsOriginRoleName = lrOriginColumn.Role.Name
+                                lsDestinationRoleName = lrRelation.ResponsibleFactType.GetOtherRoleOfBinaryFactType(lrOriginColumn.Role.Id).Name
                             End If
 
                             If Me.Relation.Find(Function(x) x.Id = lrRelation.Id) Is Nothing Then
@@ -119,7 +125,10 @@ Namespace Parser.Meta.Database
                                                           lsOriginColumnName,
                                                           lrRelation.DestinationTable.Name,
                                                           lsDestinationColumnName,
-                                                          lrRelation.OriginColumns.Count))
+                                                          lrRelation.OriginColumns.Count,
+                                                          lrRelation.ResponsibleFactType.Id,
+                                                          lsOriginRoleName,
+                                                          lsDestinationRoleName))
                         Catch ex As Exception
                             Throw New Parser.Syntax.ExecException(ex.Message, 0)
                         End Try

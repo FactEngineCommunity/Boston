@@ -1542,11 +1542,15 @@ Public Class frmFactEngine
 
                                 If lrPredicateModelObject IsNot Nothing Then
 
-                                    Dim larFactTypeReading = lrPredicateModelObject.getOutgoingFactTypeReadings(2)
+                                    Dim larFactTypeReading As New List(Of FBM.FactTypeReading)
 
                                     If Me.zsIntellisenseBuffer.Length > 0 Then
                                         larFactTypeReading = larFactTypeReading.FindAll(Function(x) x.PredicatePart(0).PredicatePartText.StartsWith(Me.zsIntellisenseBuffer))
+                                    ElseIf lrLastWhichClause.PREDICATE.Count > 0 Then
+                                        larFactTypeReading = larFactTypeReading.FindAll(Function(x) x.PredicatePart(0).PredicatePartText.StartsWith(lrLastWhichClause.PREDICATE(0)))
                                     End If
+
+                                    larFactTypeReading.AddRange(lrPredicateModelObject.getOutgoingFactTypeReadings(2))
 
                                     For Each lrFactTypeReading In larFactTypeReading.OrderBy(Function(x) x.GetPredicateText)
 
@@ -1565,6 +1569,7 @@ Public Class frmFactEngine
                                     If Me.AutoComplete.Visible = False Then
                                         Me.showAutoCompleteForm()
                                     End If
+                                    'Exit Sub '20210901-VM-Something funky happens after here...might be removing what was put in above.
                                 End If
 
                             End If
@@ -2274,7 +2279,7 @@ Public Class frmFactEngine
     End Sub
 
     Private Sub TextBoxInput_LostFocus(sender As Object, e As EventArgs) Handles TextBoxInput.LostFocus
-        Me.LabelHelp.Text = ""
+        'Me.LabelHelp.Text = ""
     End Sub
 
     Private Sub HideToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles HideToolStripMenuItem.Click

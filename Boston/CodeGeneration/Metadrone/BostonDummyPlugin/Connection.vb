@@ -147,7 +147,7 @@ Namespace SourcePlugins.Boston
                             sr.Precision = lrColumn.getMetamodelDataTypePrecision
                             sr.Scale = 0
                             sr.Nullable = Not lrColumn.IsMandatory
-                            sr.IsIdentity = lrColumn.isPartOfPrimaryKey & lrTable.getPrimaryKeyColumns.Count = 1 '20210505-VM-Was ContributesToPrimaryKey
+                            sr.IsIdentity = lrColumn.isPartOfPrimaryKey And lrTable.getPrimaryKeyColumns.Count = 1 '20210505-VM-Was ContributesToPrimaryKey
                             sr.IsPrimaryKey = lrColumn.isPartOfPrimaryKey '20210505-VM-Was ContributesToPrimaryKey
                             sr.IsTable = True
                             sr.IsView = False
@@ -189,7 +189,7 @@ Namespace SourcePlugins.Boston
                             If lrTable.isPGSRelation Then
                                 sr.PGSEdgeName = lrTable.getPGSEdgeName
                             End If
-                            For Each lrRelation In lrColumn.Relation
+                            For Each lrRelation In lrColumn.OutgoingRelation '20210901-VM-Was just lrColumn.Relation
                                 sr.Relation.AddUnique(lrRelation)
                             Next
 

@@ -39,6 +39,9 @@ Namespace Parser.Syntax
         Public Const VARIABLE_ATTRIBUTE_LISTPOS As String = "listpos"
         Public Const VARIABLE_ATTRIBUTE_COLUMN As String = "column" 'At this stage, used for the set of Columns in an Index.
         Public Const VARIABLE_ATTRIBUTE_COLUMNCOUNT As String = "columncount"
+        Public Const VARIABLE_ATTRIBUTE_FBMFACTTYPENAME As String = "fbmfacttypename"
+        Public Const VARIABLE_ATTRIBUTE_REFERENCINGROLENAME As String = "referencingrolename"
+        Public Const VARIABLE_ATTRIBUTE_REFERENCEDROLENAME As String = "referencedrolename"
         Public Const VARIABLE_ATTRIBUTE_PKCOLUMNCOUNT As String = "pkcolumncount"
         Public Const VARIABLE_ATTRIBUTE_FKCOLUMNCOUNT As String = "fkcolumncount"
         Public Const VARIABLE_ATTRIBUTE_IDCOLUMNCOUNT As String = "idcolumncount"
@@ -247,6 +250,9 @@ Namespace Parser.Syntax
         Friend Shared DOCO_VARIABLE_ATTRIBUTE_SCALE As String = "Scale of field."
         Friend Shared DOCO_VARIABLE_ATTRIBUTE_COLUMN As String = "Set of Columns relating to an Index." 'At this stage, just for Indexes.  'Boston specific. Not part of original Metadrone.
         Friend Shared DOCO_VARIABLE_ATTRIBUTE_COLUMNCOUNT As String = "Number of columns in collection this variable refers to."
+        Friend Shared DOCO_VARIABLE_ATTRIBUTE_FBMFACTTYPENAME As String = "The Fact Type responsible for the Relation."
+        Friend Shared DOCO_VARIABLE_ATTRIBUTE_REFERENCINGROLENAME As String = "The Role Name of the Referencing Model Element for the Relation."
+        Friend Shared DOCO_VARIABLE_ATTRIBUTE_REFERENCEDROLENAME As String = "The Role Name for the Referenced Model Element for the Relation."
         Friend Shared DOCO_VARIABLE_ATTRIBUTE_PKCOLUMNCOUNT As String = "Number of primary key columns in collection this variable refers to."
         Friend Shared DOCO_VARIABLE_ATTRIBUTE_FKCOLUMNCOUNT As String = "Number of foreign key columns in collection this variable refers to."
         Friend Shared DOCO_VARIABLE_ATTRIBUTE_IDCOLUMNCOUNT As String = "Number of identity columns in collection this variable refers to."
@@ -380,6 +386,9 @@ Namespace Parser.Syntax
             If StrEq(value, VARIABLE_ATTRIBUTE_LISTPOS) Then Return True
             If StrEq(value, VARIABLE_ATTRIBUTE_COLUMN) Then Return True 'Boston specific. Not part of original Metadrone. Used just for Indexes at this stage.
             If StrEq(value, VARIABLE_ATTRIBUTE_COLUMNCOUNT) Then Return True
+            If StrEq(value, VARIABLE_ATTRIBUTE_FBMFACTTYPENAME) Then Return True
+            If StrEq(value, VARIABLE_ATTRIBUTE_REFERENCINGROLENAME) Then Return True
+            If StrEq(value, VARIABLE_ATTRIBUTE_REFERENCEDROLENAME) Then Return True
             If StrEq(value, VARIABLE_ATTRIBUTE_PKCOLUMNCOUNT) Then Return True
             If StrEq(value, VARIABLE_ATTRIBUTE_FKCOLUMNCOUNT) Then Return True
             If StrEq(value, VARIABLE_ATTRIBUTE_IDCOLUMNCOUNT) Then Return True

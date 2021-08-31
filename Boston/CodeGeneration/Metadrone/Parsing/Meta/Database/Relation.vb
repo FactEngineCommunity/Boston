@@ -20,9 +20,12 @@ Namespace Parser.Meta.Database
         Private mId As String
         Private mReferencingTableName As String
         Private mReferencingColumnName As String
+        Private mReferencingRoleName As String = ""
         Private mReferencedTableName As String
         Private mReferencedColumnName As String
+        Private mReferencedRoleName As String = ""
         Private mColumnCount As Integer = 0
+        Private mFBMFactTypeName As String = ""
         Private ReplaceAllList As New ReplaceAllList()
 
         Public Sub New()
@@ -33,13 +36,22 @@ Namespace Parser.Meta.Database
                        ByVal asReferencingColumnName As String,
                        ByVal asReferencedTableName As String,
                        ByVal asReferencedColumnName As String,
-                       ByVal aiColumnCount As Integer)
+                       ByVal aiColumnCount As Integer,
+                       ByVal asFBMFactTypeName As String,
+                       ByVal asReferencingRoleName As String,
+                       ByVal asReferencedRoleName As String)
+
             Me.mId = asId
             Me.mReferencingTableName = asReferencingTableName
             Me.mReferencingColumnName = asReferencingColumnName
+            Me.mReferencingRoleName = asReferencingRoleName
             Me.mReferencedTableName = asReferencedTableName
             Me.mReferencedColumnName = asReferencedColumnName
+            Me.mReferencedRoleName = asReferencedRoleName
             Me.mColumnCount = aiColumnCount
+            Me.mFBMFactTypeName = asFBMFactTypeName
+
+
         End Sub
 
         Public Sub SetAttributeValue(AttribName As String, value As Object) Implements IEntity.SetAttributeValue
@@ -88,6 +100,18 @@ Namespace Parser.Meta.Database
             ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_COLUMNCOUNT) And LookTransformsIfNotFound Then
                 Call Me.CheckParamsForPropertyCall(AttribName, Params)
                 Return Me.ColumnCount
+
+            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_FBMFACTTYPENAME) And LookTransformsIfNotFound Then
+                Call Me.CheckParamsForPropertyCall(AttribName, Params)
+                Return Me.FBMFactTypeName
+
+            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_REFERENCINGROLENAME) And LookTransformsIfNotFound Then
+                Call Me.CheckParamsForPropertyCall(AttribName, Params)
+                Return Me.ReferencingRoleName
+
+            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_REFERENCEDROLENAME) And LookTransformsIfNotFound Then
+                Call Me.CheckParamsForPropertyCall(AttribName, Params)
+                Return Me.ReferencedRoleName
 
                 'ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_ISIDENTITY) Then
                 '    'return isidentity
@@ -224,9 +248,13 @@ Namespace Parser.Meta.Database
 
             Me.mReferencingTableName = Me.mReferencingTableName
             Me.mReferencingColumnName = Me.mReferencingColumnName
+            Me.mReferencingRoleName = Me.mReferencingRoleName
             Me.mReferencedTableName = Me.mReferencedTableName
             Me.mReferencedColumnName = Me.mReferencedColumnName
+            Me.mReferencedRoleName = Me.mReferencedRoleName
             Me.mColumnCount = mColumnCount
+            Me.mFBMFactTypeName = Me.mFBMFactTypeName
+
             Return New List(Of IEntity)
         End Function
 
@@ -238,9 +266,12 @@ Namespace Parser.Meta.Database
                 rel.Id = .Id
                 rel.ReferencingTableName = .ReferencingTableName
                 rel.ReferencingColumnName = .mReferencingColumnName
+                rel.ReferencingRoleName = .mReferencingRoleName
                 rel.ReferencedTableName = .ReferencedTableName
                 rel.ReferencedColumnName = .mReferencedColumnName
+                rel.ReferencedRoleName = .mReferencedRoleName
                 rel.ColumnCount = .mColumnCount
+                rel.FBMFactTypeName = .mFBMFactTypeName
             End With
             'col.ListCount = Me.ListCount
             'col.ListPos = Me.ListPos
@@ -272,6 +303,33 @@ Namespace Parser.Meta.Database
             End Get
             Set(ByVal value As Integer)
                 Me.mColumnCount = value
+            End Set
+        End Property
+
+        Public Property FBMFactTypeName() As String
+            Get
+                Return Me.mFBMFactTypeName
+            End Get
+            Set(ByVal value As String)
+                Me.mFBMFactTypeName = value
+            End Set
+        End Property
+
+        Public Property ReferencingRoleName() As String
+            Get
+                Return Me.mReferencingRoleName
+            End Get
+            Set(ByVal value As String)
+                Me.mReferencingRoleName = value
+            End Set
+        End Property
+
+        Public Property ReferencedRoleName() As String
+            Get
+                Return Me.mReferencedRoleName
+            End Get
+            Set(ByVal value As String)
+                Me.mReferencedRoleName = value
             End Set
         End Property
 

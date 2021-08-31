@@ -46,17 +46,23 @@ Namespace Parser.Meta.Database
                         For Each lrDestinationColumn In lrRelation.DestinationColumns
 
                             Dim lsReferencedTableName As String = ""
+                            Dim lsOriginRoleName As String = ""
+                            Dim lsDestinationRoleName As String = ""
 
                             Dim lrOriginColumn As RDS.Column = lrRelation.OriginColumns.Find(Function(x) x.ActiveRole.Id = lrDestinationColumn.ActiveRole.Id) ' SchemaRow.ColumnId)
 
                             If lrOriginColumn Is Nothing Then Continue For
 
+                            lsOriginRoleName = lrOriginColumn.Role.Name
+
                             Dim lsDestinationColumnName As String = ""
                             If lrRelation.DestinationColumns.Count = 1 Then
                                 lsDestinationColumnName = lrRelation.DestinationColumns(0).Name
+                                lsDestinationRoleName = lrRelation.DestinationColumns(0).Role.Name
                             Else
                                 'Dim lrDestinationColumn As RDS.Column = lrRelation.DestinationColumns.Find(Function(x) x.ActiveRole.Id = lrOriginColumn.ActiveRole.Id)
                                 lsDestinationColumnName = lrDestinationColumn.Name
+                                lsDestinationRoleName = lrDestinationColumn.Role.Name
                             End If
 
                             Me.Relations.Add(New Relation(lrRelation.Id,
@@ -64,7 +70,10 @@ Namespace Parser.Meta.Database
                                                           Me.Value,
                                                           lrRelation.DestinationTable.Name,
                                                           lsDestinationColumnName,
-                                                          lrRelation.OriginColumns.Count))
+                                                          lrRelation.OriginColumns.Count,
+                                                          lrRelation.ResponsibleFactType.Id,
+                                                          lsOriginRoleName,
+                                                          lsDestinationRoleName))
 
                         Next
                     End If

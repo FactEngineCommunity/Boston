@@ -78,6 +78,18 @@ Namespace RDS
             End Get
         End Property
 
+        Public ReadOnly Property OutgoingRelations As List(Of RDS.Relation)
+            Get
+                Dim larRelation = From Column In Me.Column
+                                  From Relation In Column.Relation
+                                  Where Relation.OriginTable Is Me
+                                  Select Relation
+
+                Return larRelation.ToList
+            End Get
+        End Property
+
+
         Public Event ColumnRemoved(ByVal arColumn As RDS.Column)
         Public Event ColumnAdded(ByRef arColumn As RDS.Column)
         Public Event IndexAdded(ByRef arIndex As RDS.Index)
