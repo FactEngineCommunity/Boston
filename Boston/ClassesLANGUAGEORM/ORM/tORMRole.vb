@@ -41,9 +41,9 @@ Namespace FBM
         <XmlIgnore()> _
         <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
         Public _Mandatory As Boolean = False 'True, False
-        <CategoryAttribute("Role"), _
-             DefaultValueAttribute(False), _
-             DescriptionAttribute("True if the Role is a Mandatory Role, else False.")> _
+        <CategoryAttribute("Role"),
+             DefaultValueAttribute(False),
+             DescriptionAttribute("True if the Role is a Mandatory Role, else False.")>
         Public Property Mandatory() As Boolean
             Get
                 Return _Mandatory
@@ -52,6 +52,24 @@ Namespace FBM
                 _Mandatory = Value
             End Set
         End Property
+
+        <XmlIgnore()>
+        Public ReadOnly Property DerivedRoleName As String
+            Get
+                If Me.Name = "" Then
+                    If Me.FactType.allRolesJoinTheSameObject Then
+                        Return Me.JoinedORMObject.Id & Me.FactType.Id & Me.FactType.RoleGroup.IndexOf(Me)
+
+                    Else
+                        Return Me.JoinedORMObject.Id & Me.FactType.Id
+                    End If
+                Else
+                    Return Me.Name
+                End If
+            End Get
+        End Property
+
+
 
         <XmlIgnore()> _
         <DebuggerBrowsable(DebuggerBrowsableState.Never)> _

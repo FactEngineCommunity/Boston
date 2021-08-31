@@ -633,6 +633,25 @@ Namespace FBM
 
         End Function
 
+        Public Function allRolesJoinTheSameObject() As Boolean
+
+            Try
+                If Me.allRolesJoinSomething Then
+
+                    Dim larJoinedORMObject = (From Role In Me.RoleGroup
+                                              Select Role.JoinedORMObject).Distinct
+
+                    Return larJoinedORMObject.Count = 1
+                Else
+                    Return False
+                End If
+
+            Catch ex As Exception
+                Return False
+            End Try
+
+        End Function
+
         Public Function atLeasOneRoleJoinsAValueType() As Boolean
 
             Try

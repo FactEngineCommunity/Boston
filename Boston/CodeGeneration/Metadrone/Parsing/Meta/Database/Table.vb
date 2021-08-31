@@ -93,9 +93,7 @@ Namespace Parser.Meta.Database
 
                         Try
                             Dim lsReferencedTableName As String = ""
-
                             Dim lsDestinationColumnName As String = ""
-
                             Dim liInd As Integer = SchemaRowIdx
                             Dim lsOriginColumnName As String = ""
                             Dim lsOriginRoleName As String = ""
@@ -103,9 +101,9 @@ Namespace Parser.Meta.Database
 
                             If lrRelation.DestinationColumns.Count = 1 Then
                                 lsOriginColumnName = lrRelation.OriginColumns(0).Name
-                                lsOriginRoleName = lrRelation.OriginColumns(0).Role.Name
+                                lsOriginRoleName = lrRelation.OriginColumns(0).Role.DerivedRoleName
                                 lsDestinationColumnName = lrRelation.DestinationColumns(0).Name
-                                lsDestinationRoleName = lrRelation.ResponsibleFactType.GetOtherRoleOfBinaryFactType(lrRelation.OriginColumns(0).Role.Id).Name
+                                lsDestinationRoleName = lrRelation.ResponsibleFactType.GetOtherRoleOfBinaryFactType(lrRelation.OriginColumns(0).Role.Id).DerivedRoleName
                             Else
                                 Dim lrOriginColumn As RDS.Column = lrRelation.OriginColumns.Find(Function(x) x.Id = aarSchemaRow(liInd).ColumnId)
                                 lsOriginColumnName = lrOriginColumn.Name
@@ -114,8 +112,8 @@ Namespace Parser.Meta.Database
                                     Throw New Exception("No destination column found for relationship with originating column:" & lrOriginColumn.Table.Name & "." & lrOriginColumn.Name)
                                 End If
                                 lsDestinationColumnName = lrDestinationColumn.Name
-                                lsOriginRoleName = lrOriginColumn.Role.Name
-                                lsDestinationRoleName = lrRelation.ResponsibleFactType.GetOtherRoleOfBinaryFactType(lrOriginColumn.Role.Id).Name
+                                lsOriginRoleName = lrOriginColumn.Role.DerivedRoleName
+                                lsDestinationRoleName = lrRelation.ResponsibleFactType.GetOtherRoleOfBinaryFactType(lrOriginColumn.Role.Id).DerivedRoleName
                             End If
 
                             If Me.Relation.Find(Function(x) x.Id = lrRelation.Id) Is Nothing Then
@@ -150,20 +148,20 @@ Namespace Parser.Meta.Database
                             Dim lsDestinationRoleName As String = ""
 
                             If lrRelation.DestinationColumns.Count = 1 Then
-                                lsOriginColumnName = lrRelation.OriginColumns(0).Name
-                                lsOriginRoleName = lrRelation.OriginColumns(0).Role.Name
-                                lsDestinationColumnName = lrRelation.DestinationColumns(0).Name
-                                lsDestinationRoleName = lrRelation.ResponsibleFactType.GetOtherRoleOfBinaryFactType(lrRelation.OriginColumns(0).Role.Id).Name
+                                lsDestinationColumnName = lrRelation.OriginColumns(0).Name
+                                lsDestinationRoleName = lrRelation.OriginColumns(0).Role.DerivedRoleName
+                                lsOriginColumnName = lrRelation.DestinationColumns(0).Name
+                                lsOriginRoleName = lrRelation.ResponsibleFactType.GetOtherRoleOfBinaryFactType(lrRelation.OriginColumns(0).Role.Id).DerivedRoleName
                             Else
-                                Dim lrOriginColumn As RDS.Column = lrRelation.DestinationColumns.Find(Function(x) x.Id = aarSchemaRow(liInd).ColumnId)
-                                lsOriginColumnName = lrOriginColumn.Name
-                                Dim lrDestinationColumn As RDS.Column = lrRelation.OriginColumns.Find(Function(x) x.ActiveRole.Id = lrOriginColumn.ActiveRole.Id)
-                                If lrDestinationColumn Is Nothing Then
+                                Dim lrDestinationColumn As RDS.Column = lrRelation.DestinationColumns.Find(Function(x) x.Id = aarSchemaRow(liInd).ColumnId)
+                                lsDestinationColumnName = lrDestinationColumn.Name
+                                Dim lrOriginColumn As RDS.Column = lrRelation.DestinationColumns.Find(Function(x) x.ActiveRole.Id = lrDestinationColumn.ActiveRole.Id)
+                                If lrOriginColumn Is Nothing Then
                                     Throw New Exception("No destination column found for relationship with originating column:" & lrOriginColumn.Table.Name & "." & lrOriginColumn.Name)
                                 End If
-                                lsDestinationColumnName = lrDestinationColumn.Name
-                                lsOriginRoleName = lrOriginColumn.Role.Name
-                                lsDestinationRoleName = lrRelation.ResponsibleFactType.GetOtherRoleOfBinaryFactType(lrOriginColumn.Role.Id).Name
+                                lsOriginColumnName = lrOriginColumn.Name
+                                lsDestinationRoleName = lrDestinationColumn.Role.DerivedRoleName
+                                lsOriginRoleName = lrRelation.ResponsibleFactType.GetOtherRoleOfBinaryFactType(lrDestinationColumn.Role.Id).DerivedRoleName
                             End If
 
                             If Me.IncomingRelation.Find(Function(x) x.Id = lrRelation.Id) Is Nothing Then
