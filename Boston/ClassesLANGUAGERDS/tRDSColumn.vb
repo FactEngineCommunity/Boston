@@ -194,6 +194,16 @@ Namespace RDS
             End Get
         End Property
 
+        Public ReadOnly Property IncomingRelation As List(Of RDS.Relation)
+            Get
+                Dim larRelation = From Relation In Me.Relation
+                                  Where Relation.OriginTable IsNot Me.Table
+                                  Select Relation
+
+                Return larRelation.ToList
+            End Get
+        End Property
+
 
 #Region "FactEngine secific"
         ''' <summary>

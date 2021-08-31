@@ -46,8 +46,16 @@ Namespace Parser.Syntax
                     'Relation loop
                     Return Me.Process_Relation()
 
+                Case SyntaxNode.ExecForEntities.OBJECT_INCOMINGRELATIONS, SyntaxNode.ExecForEntities.OBJECT_INCOMINGRELATIONS 'Boston specific. Not part of original Metadrone.
+                    'Incoming Relation loop
+                    Return Me.Process_Relation()
+
                 Case SyntaxNode.ExecForEntities.OBJECT_RELATION, SyntaxNode.ExecForEntities.OBJECT_RELATION 'Boston specific. Not part of original Metadrone.
                     'Relation loop
+                    Return Me.Process_Relation()
+
+                Case SyntaxNode.ExecForEntities.OBJECT_INCOMINGRELATION, SyntaxNode.ExecForEntities.OBJECT_INCOMINGRELATION 'Boston specific. Not part of original Metadrone.
+                    'Incoming Relation loop
                     Return Me.Process_Relation()
 
                 Case SyntaxNode.ExecForEntities.OBJECT_INDEX, SyntaxNode.ExecForEntities.OBJECT_INDEX 'Boston specific. Not part of original Metadrone.

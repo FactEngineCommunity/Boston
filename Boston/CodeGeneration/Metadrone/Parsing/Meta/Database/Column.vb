@@ -18,8 +18,11 @@ Namespace Parser.Meta.Database
         Private ReplaceAllList As New ReplaceAllList()
 
         Friend Relations As New List(Of IEntity)
+        Friend IncomingRelations As New List(Of IEntity)
 
         Private FilteredRelations As New List(Of IEntity) 'Boston specific. For stepping through Relations for the Column.
+
+        Private FilteredIncomingRelations As New List(Of IEntity) 'Boston specific. For stepping through Incoming Relations for the Column.
 
         Private Transforms As Syntax.SourceTransforms = Nothing
 
@@ -106,6 +109,19 @@ Namespace Parser.Meta.Database
             End Get
             Set(ByVal value As List(Of RDS.Relation))
                 Me.SchemaRowVal.Relation = value
+            End Set
+        End Property
+
+        ''' <summary>
+        ''' Boston specific. Not originally part of Metadrone.
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property IncomingRelation() As List(Of RDS.Relation)
+            Get
+                Return Me.SchemaRowVal.IncomingRelation
+            End Get
+            Set(ByVal value As List(Of RDS.Relation))
+                Me.SchemaRowVal.IncomingRelation = value
             End Set
         End Property
 
@@ -262,9 +278,19 @@ Namespace Parser.Meta.Database
                     Me.Relations.Add(CType(lrIEntityRelation, Relation))
                 Next
 
+            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_INCOMINGRELATIONS) Then
+                'set Relation
+                For Each lrIEntityRelation In value
+                    Me.IncomingRelations.Add(CType(lrIEntityRelation, Relation))
+                Next
+
             ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_RELATION) Then
                 'set Relation
                 Me.Relation = CType(value, List(Of RDS.Relation))
+
+            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_INCOMINGRELATION) Then
+                'set Relation
+                Me.IncomingRelation = CType(value, List(Of RDS.Relation))
 
             ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_ALLOWZEROLENGTH) Then
                 'set allowZeroLength
@@ -392,10 +418,20 @@ Namespace Parser.Meta.Database
                     Call Me.CheckParamsForPropertyCall(AttribName, Params)
                     Return Me.Relations
 
+                ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_INCOMINGRELATIONS) Then 'Boston specific. Not part of original Metadrone.
+                    'return relation
+                    Call Me.CheckParamsForPropertyCall(AttribName, Params)
+                    Return Me.IncomingRelations
+
                 ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_RELATION) Then 'Boston specific. Not part of original Metadrone.
                     'return relation
                     Call Me.CheckParamsForPropertyCall(AttribName, Params)
                     Return Me.Relation
+
+                ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_INCOMINGRELATION) Then 'Boston specific. Not part of original Metadrone.
+                    'return relation
+                    Call Me.CheckParamsForPropertyCall(AttribName, Params)
+                    Return Me.IncomingRelation
 
                 ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_ALLOWZEROLENGTH) Then 'Boston specific. Not part of original Metadrone.
                     'return allowZeroLength
@@ -531,6 +567,17 @@ Namespace Parser.Meta.Database
                 liInd += 1
             Next
 
+            For Each lrRelation In Me.IncomingRelations
+                Try
+                    With CType(Me.IncomingRelations(liInd), Relation)
+                        Me.FilteredIncomingRelations.Add(.GetCopy)
+                    End With
+                Catch ex As Exception
+                    Throw New Parser.Syntax.ExecException("Column.InitEntities: " & ex.Message, 0)
+                End Try
+                liInd += 1
+            Next
+
         End Sub
 
         Public Function GetEntities(ByVal Entity As Syntax.SyntaxNode.ExecForEntities) As List(Of IEntity) Implements IEntity.GetEntities
@@ -538,6 +585,8 @@ Namespace Parser.Meta.Database
             Select Case Entity
                 Case Syntax.SyntaxNode.ExecForEntities.OBJECT_RELATION
                     Return Me.FilteredRelations
+                Case Syntax.SyntaxNode.ExecForEntities.OBJECT_INCOMINGRELATION
+                    Return Me.FilteredIncomingRelations
                 Case Else
                     Return New List(Of IEntity)
             End Select

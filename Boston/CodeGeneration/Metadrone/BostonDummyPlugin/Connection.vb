@@ -189,8 +189,13 @@ Namespace SourcePlugins.Boston
                             If lrTable.isPGSRelation Then
                                 sr.PGSEdgeName = lrTable.getPGSEdgeName
                             End If
+
                             For Each lrRelation In lrColumn.OutgoingRelation '20210901-VM-Was just lrColumn.Relation
                                 sr.Relation.AddUnique(lrRelation)
+                            Next
+
+                            For Each lrRelation In lrColumn.IncomingRelation
+                                sr.IncomingRelation.AddUnique(lrRelation)
                             Next
 
                             For Each lrIndex In lrTable.Index

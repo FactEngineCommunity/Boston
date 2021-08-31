@@ -233,8 +233,14 @@ Namespace Parser.Syntax
                     ElseIf StrEq(tokObject, OBJECT_RELATIONS) Then 'Boston specific. Not part of original Metadrone.
                         Me.ForEntity = ExecForEntities.OBJECT_RELATIONS
 
+                    ElseIf StrEq(tokObject, OBJECT_INCOMINGRELATIONS) Then 'Boston specific. Not part of original Metadrone.
+                        Me.ForEntity = ExecForEntities.OBJECT_INCOMINGRELATIONS
+
                     ElseIf StrEq(tokObject, OBJECT_RELATION) Then 'Boston specific. Not part of original Metadrone.
                         Me.ForEntity = ExecForEntities.OBJECT_RELATION
+
+                    ElseIf StrEq(tokObject, OBJECT_INCOMINGRELATION) Then 'Boston specific. Not part of original Metadrone.
+                        Me.ForEntity = ExecForEntities.OBJECT_INCOMINGRELATION
 
                     ElseIf StrEq(tokObject, OBJECT_INDEX) Then 'Boston specific. Not part of original Metadrone.
                         Me.ForEntity = ExecForEntities.OBJECT_INDEX
@@ -463,6 +469,8 @@ Namespace Parser.Syntax
             OBJECT_RELATION = 14 'Boston specific. Not part of original Metadrone. Used for RDS.Relations as Objects.
             OBJECT_RELATIONS = 15 'Boston specific. Not part of original Metadrone. Used for RDS.Relations as Objects.
             OBJECT_INDEX = 16 'Boston specific. Not part of original Metadrone. Used for RDS.Relations as Objects.
+            OBJECT_INCOMINGRELATION = 17 'Boston specific. Not part of original Metadrone. Used for RDS.Relations as Objects.
+            OBJECT_INCOMINGRELATIONS = 18 'Boston specific. Not part of original Metadrone. Used for RDS.Relations as Objects.
         End Enum
 
         Public Function GetCopy() As SyntaxNode

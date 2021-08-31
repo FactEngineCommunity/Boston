@@ -204,6 +204,9 @@ Namespace Parser.CodeCompletion
                         Case SyntaxNode.ExecForEntities.OBJECT_RELATION 'Boston specific. Not part of original metadrone.
                             Call Me.AddVar(AsMain, New Variable(ExecNode.Tokens(2).Text, Variable.Types.Relation, Me.varScopeDepth, sourceTag))
 
+                        Case SyntaxNode.ExecForEntities.OBJECT_INCOMINGRELATION 'Boston specific. Not part of original metadrone.
+                            Call Me.AddVar(AsMain, New Variable(ExecNode.Tokens(2).Text, Variable.Types.IncomingRelation, Me.varScopeDepth, sourceTag))
+
                         Case SyntaxNode.ExecForEntities.OBJECT_TABLE
                             Call Me.AddVar(AsMain, New Variable(ExecNode.Tokens(2).Text, Variable.Types.Table, Me.varScopeDepth, sourceTag))
 

@@ -35,6 +35,7 @@
         Private PredicateField As String
         Private PGSEdgeNameField As String
         Private RelationField As New List(Of RDS.Relation)  'Boston specific. The Relation to which the Column belongs if this SchemaRow record is for a Column
+        Private IncomingRelationField As New List(Of RDS.Relation)  'Boston specific. The Incoming Relation to which the Column belongs if this SchemaRow record is for a Column
         Private IndexField As New List(Of RDS.Index)  'Boston specific. The Relation to which the Column belongs if this SchemaRow record is for a Column
 
         Public Function GetCopy() As SchemaRow
@@ -66,6 +67,7 @@
                 .ColumnId = Me.ColumnId
                 .AllowZeroLength = Me.AllowZeroLength
                 .Relation = Me.Relation
+                .IncomingRelation = Me.IncomingRelation
                 .ShortDescription = Me.ShortDescription
                 .Predicate = Me.Predicate
             End With
@@ -88,7 +90,7 @@
         End Property
 
         ''' <summary>
-        ''' If the SchemaRow is for a Column and that Column is part of a Relation, the RDS.Relation associated with the Column
+        ''' If the SchemaRow is for a Column and that Column is part of a Relation, the outgoing RDS.Relation associated with the Column
         ''' </summary>
         ''' <returns></returns>
         Public Property Relation() As List(Of RDS.Relation)
@@ -97,6 +99,19 @@
             End Get
             Set(ByVal value As List(Of RDS.Relation))
                 Me.RelationField = value
+            End Set
+        End Property
+
+        ''' <summary>
+        ''' If the SchemaRow is for a Column and that Column is part of a Relation, the incoming RDS.Relation associated with the Column
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property IncomingRelation() As List(Of RDS.Relation)
+            Get
+                Return Me.IncomingRelationField
+            End Get
+            Set(ByVal value As List(Of RDS.Relation))
+                Me.IncomingRelationField = value
             End Set
         End Property
 

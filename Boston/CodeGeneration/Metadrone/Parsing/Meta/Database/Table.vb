@@ -23,8 +23,10 @@ Namespace Parser.Meta.Database
 
         Friend Indexes As New List(Of IEntity) 'Boston specific.
         Friend Relations As New List(Of IEntity) 'Boston specific I think.
+        Friend IncomingRelations As New List(Of IEntity) 'Boston specific.
 
         Private FilteredRelations As New List(Of IEntity) 'Boston specific. For stepping through Relations for the Table.
+        Private FilteredIncomingRelations As New List(Of IEntity) 'Boston specific. For stepping through Incoming Relations for the Table.
         Private FilteredIndexes As New List(Of IEntity) 'Boston specific. For stepping through Indexes for the Table. Can be List(Of Index) containing Columns
 
         Private mIsPGSRelation As Boolean = False 'Boston specific. True if the Table represents a Property Graph Schema Relation.
@@ -86,7 +88,7 @@ Namespace Parser.Meta.Database
                     Me.mIsPGSRelation = aarSchemaRow(SchemaRowIdx).IsPGSRelation
                     Me.mPGSEdgeName = aarSchemaRow(SchemaRowIdx).PGSEdgeName
 
-                    'Add Relations            
+                    'Add Outgoing Relations            
                     For Each lrRelation In aarSchemaRow(SchemaRowIdx).Relation
 
                         Try
@@ -129,6 +131,54 @@ Namespace Parser.Meta.Database
                                                           lrRelation.ResponsibleFactType.Id,
                                                           lsOriginRoleName,
                                                           lsDestinationRoleName))
+                        Catch ex As Exception
+                            Throw New Parser.Syntax.ExecException(ex.Message, 0)
+                        End Try
+                    Next
+
+                    'Add Incoming Relations            
+                    For Each lrRelation In aarSchemaRow(SchemaRowIdx).IncomingRelation
+
+                        Try
+                            Dim lsReferencedTableName As String = ""
+
+                            Dim lsDestinationColumnName As String = ""
+
+                            Dim liInd As Integer = SchemaRowIdx
+                            Dim lsOriginColumnName As String = ""
+                            Dim lsOriginRoleName As String = ""
+                            Dim lsDestinationRoleName As String = ""
+
+                            If lrRelation.DestinationColumns.Count = 1 Then
+                                lsOriginColumnName = lrRelation.OriginColumns(0).Name
+                                lsOriginRoleName = lrRelation.OriginColumns(0).Role.Name
+                                lsDestinationColumnName = lrRelation.DestinationColumns(0).Name
+                                lsDestinationRoleName = lrRelation.ResponsibleFactType.GetOtherRoleOfBinaryFactType(lrRelation.OriginColumns(0).Role.Id).Name
+                            Else
+                                Dim lrOriginColumn As RDS.Column = lrRelation.DestinationColumns.Find(Function(x) x.Id = aarSchemaRow(liInd).ColumnId)
+                                lsOriginColumnName = lrOriginColumn.Name
+                                Dim lrDestinationColumn As RDS.Column = lrRelation.OriginColumns.Find(Function(x) x.ActiveRole.Id = lrOriginColumn.ActiveRole.Id)
+                                If lrDestinationColumn Is Nothing Then
+                                    Throw New Exception("No destination column found for relationship with originating column:" & lrOriginColumn.Table.Name & "." & lrOriginColumn.Name)
+                                End If
+                                lsDestinationColumnName = lrDestinationColumn.Name
+                                lsOriginRoleName = lrOriginColumn.Role.Name
+                                lsDestinationRoleName = lrRelation.ResponsibleFactType.GetOtherRoleOfBinaryFactType(lrOriginColumn.Role.Id).Name
+                            End If
+
+                            If Me.IncomingRelation.Find(Function(x) x.Id = lrRelation.Id) Is Nothing Then
+                                Me.IncomingRelation.AddUnique(lrRelation)
+                            End If
+
+                            Me.IncomingRelations.Add(New Relation(lrRelation.Id,
+                                                                  lrRelation.OriginTable.Name,
+                                                                  lsOriginColumnName,
+                                                                  lrRelation.DestinationTable.Name,
+                                                                  lsDestinationColumnName,
+                                                                  lrRelation.OriginColumns.Count,
+                                                                  lrRelation.ResponsibleFactType.Id,
+                                                                  lsOriginRoleName,
+                                                                  lsDestinationRoleName))
                         Catch ex As Exception
                             Throw New Parser.Syntax.ExecException(ex.Message, 0)
                         End Try
@@ -236,6 +286,19 @@ Namespace Parser.Meta.Database
             End Set
         End Property
 
+        ''' <summary>
+        ''' Boston specific. Not originally part of Metadrone. The set of Relations associated with the Table.
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property IncomingRelation() As List(Of RDS.Relation)
+            Get
+                Return Me.SchemaRowVal.IncomingRelation
+            End Get
+            Set(ByVal value As List(Of RDS.Relation))
+                Me.SchemaRowVal.IncomingRelation = value
+            End Set
+        End Property
+
         Public Property Value() As Object
             Get
                 Return Me.mValue
@@ -292,9 +355,19 @@ Namespace Parser.Meta.Database
                     Me.Relations.Add(CType(lrIEntityRelation, Relation))
                 Next
 
+            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_INCOMINGRELATIONS) Then 'The set of Relations coming into the Table. Not at the Column level, but the Table level.
+                'set Relations
+                For Each lrIEntityRelation In value
+                    Me.IncomingRelations.Add(CType(lrIEntityRelation, Relation))
+                Next
+
             ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_RELATION) Then 'The set of Relations stemming from the Table at the Column level.
                 'set Relation
                 Me.Relation = CType(value, List(Of RDS.Relation))
+
+            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_INCOMINGRELATION) Then 'The set of Incoming Relations stemming from the Table at the Column level.
+                'set Relation
+                Me.IncomingRelation = CType(value, List(Of RDS.Relation))
 
             ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_INDEX) Then 'The set of Indexes for the Table.
                 'set Relation
@@ -407,10 +480,20 @@ Namespace Parser.Meta.Database
                 Call Me.CheckParamsForPropertyCall(AttribName, Params)
                 Return Me.Relations
 
+            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_INCOMINGRELATIONS) Then 'Boston specific. Not part of original Metadrone.
+                'return relation
+                Call Me.CheckParamsForPropertyCall(AttribName, Params)
+                Return Me.IncomingRelations
+
             ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_RELATION) Then 'Boston specific. Not part of original Metadrone.
                 'return relation
                 Call Me.CheckParamsForPropertyCall(AttribName, Params)
                 Return Me.Relation
+
+            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_INCOMINGRELATION) Then 'Boston specific. Not part of original Metadrone.
+                'return relation
+                Call Me.CheckParamsForPropertyCall(AttribName, Params)
+                Return Me.IncomingRelation
 
             ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_INDEX) Then 'Boston specific. Not part of original Metadrone.
                 'return relation
@@ -581,6 +664,7 @@ Namespace Parser.Meta.Database
             Me.FilteredPKColumns = New List(Of IEntity)
             Me.FilteredFKColumns = New List(Of IEntity)
             Me.FilteredRelations = New List(Of IEntity)
+            Me.FilteredIncomingRelations = New List(Of IEntity)
             Me.FilteredIndexes = New List(Of IEntity)
 
             Dim liInd As Integer = 0
@@ -600,6 +684,25 @@ Namespace Parser.Meta.Database
 
             Catch ex As Exception
                 Throw New Exception("Error initialising Relations for Table.")
+            End Try
+
+            liInd = 0
+            Try
+                For Each lrRelation In Me.IncomingRelations
+
+                    Dim lrEntityRelation = CType(Me.IncomingRelations(liInd), Relation)
+                    With lrEntityRelation
+                        Dim lsReferencedTableName = lrEntityRelation.GetAttributeValue("referencedtablename", Nothing, True, False)
+                        If Me.FilteredIncomingRelations.Find(Function(x) x.GetAttributeValue("referencedtablename", Nothing, True, False) =
+                                                             lsReferencedTableName) Is Nothing Then
+                            Me.FilteredIncomingRelations.Add(.GetCopy)
+                        End If
+                    End With
+                    liInd += 1
+                Next
+
+            Catch ex As Exception
+                Throw New Exception("Error initialising Incoming Relations for Table.")
             End Try
 
             Try
@@ -660,8 +763,14 @@ Namespace Parser.Meta.Database
                 Case Syntax.SyntaxNode.ExecForEntities.OBJECT_RELATIONS 'Boston specific. Not part of original Metadrone.
                     Return Me.Relations
 
+                Case Syntax.SyntaxNode.ExecForEntities.OBJECT_INCOMINGRELATIONS 'Boston specific. Not part of original Metadrone.
+                    Return Me.IncomingRelations
+
                 Case Syntax.SyntaxNode.ExecForEntities.OBJECT_RELATION 'Boston specific. Not part of original Metadrone.
                     Return Me.FilteredRelations
+
+                Case Syntax.SyntaxNode.ExecForEntities.OBJECT_INCOMINGRELATION 'Boston specific. Not part of original Metadrone.
+                    Return Me.FilteredIncomingRelations
 
                 Case Syntax.SyntaxNode.ExecForEntities.OBJECT_INDEX 'Boston specific. Not part of original Metadrone.
                     Return Me.FilteredIndexes

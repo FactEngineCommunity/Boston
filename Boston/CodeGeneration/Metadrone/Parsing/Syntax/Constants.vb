@@ -27,7 +27,9 @@ Namespace Parser.Syntax
         Public Const VARIABLE_ATTRIBUTE_PGSEDGENAME As String = "pgsedgename" 'Boston specific. Not part of original Metadrone.
         Public Const VARIABLE_ATTRIBUTE_ISPGSRELATION As String = "ispgsrelation" 'Boston specific. Not part of original Metadrone.
         Public Const VARIABLE_ATTRIBUTE_RELATIONS As String = "relations" 'Boston specific. Not part of original Metadrone.
+        Public Const VARIABLE_ATTRIBUTE_INCOMINGRELATIONS As String = "incomingrelations" 'Boston specific. Not part of original Metadrone.
         Public Const VARIABLE_ATTRIBUTE_RELATION As String = "relation" 'Boston specific. Not part of original Metadrone.
+        Public Const VARIABLE_ATTRIBUTE_INCOMINGRELATION As String = "incomingrelation" 'Boston specific. Not part of original Metadrone.
         Public Const VARIABLE_ATTRIBUTE_INDEX As String = "index" 'Boston specific. Not part of original Metadrone.
         Public Const VARIABLE_ATTRIBUTE_ALLOWZEROLENGTH As String = "allowzerolength" 'Boston specific. Not part of original Metadrone.
         Public Const VARIABLE_ATTRIBUTE_SHORTDESCRIPTION As String = "shortdescription" 'Boston specific. Not part of original Metadrone. The ShortDescription of the JoinedORMObject of the ActiveRole of the Column.
@@ -119,7 +121,9 @@ Namespace Parser.Syntax
         Public Const OBJECT_TABLE As String = "table"
         Public Const OBJECT_VIEW As String = "view"
         Public Const OBJECT_RELATIONS As String = "relations" 'Boston specific. Not part of original Metadrone. Used to get all Colum Relations for a Table
+        Public Const OBJECT_INCOMINGRELATIONS As String = "incomingrelations" 'Boston specific. Not part of original Metadrone. Used to get all Colum Relations for a Table
         Public Const OBJECT_RELATION As String = "relation" 'Boston specific. Not part of original Metadrone. Used to get individual RDS.Relations for a Table
+        Public Const OBJECT_INCOMINGRELATION As String = "incomingrelation" 'Boston specific. Not part of original Metadrone. Used to get individual RDS.Relations for a Table
         Public Const OBJECT_INDEX As String = "index" 'Boston specific. Not part of original Metadrone. Used to get individual Indexes for a Table
         Public Const OBJECT_COLUMN As String = "column"
         Public Const OBJECT_PKCOLUMN As String = "pkcolumn"
@@ -212,6 +216,7 @@ Namespace Parser.Syntax
         Friend Shared DOCO_OBJECT_FUNCTION As String = "Loop through functions in database connection."
         Friend Shared DOCO_OBJECT_FILE As String = "Loop through files in directory."
         Friend Shared DOCO_OBJECT_RELATION As String = "Loop through Relations specific to the Table/Column." 'Boston specific. Not in original Metadrone.
+        Friend Shared DOCO_OBJECT_INCOMINGRELATION As String = "Loop through Incoming Relations specific to the Table/Column." 'Boston specific. Not in original Metadrone.
         Friend Shared DOCO_OBJECT_INDEX As String = "Loop through Indexes specific to the Table." 'Boston specific. Not in original Metadrone.
         Friend Shared DOCO_OBJECT_COLUMN As String = "Loop through columns in the parent loop's current table/routine iteration."
         Friend Shared DOCO_OBJECT_PKCOLUMN As String = "Loop through primary key columns in the parent loop's current table/routine iteration."
@@ -240,7 +245,9 @@ Namespace Parser.Syntax
         Friend Shared DOCO_VARIABLE_ATTRIBUTE_PGSEDGENAME As String = "The name of the Edge if the Table is a Property Graph Schema Relation/Edge." 'Boston specific. Not part of original Metadrone.
         Friend Shared DOCO_VARIABLE_ATTRIBUTE_ISPGSRELATION As String = "True if the Table is a Property Graph Schema Relation/Edge." 'Boston specific. Not part of original Metadrone.
         Friend Shared DOCO_VARIABLE_ATTRIBUTE_RELATIONS As String = "Set of Relations relating to the Table." 'Boston specific. Not part of original Metadrone.
+        Friend Shared DOCO_VARIABLE_ATTRIBUTE_INCOMINGRELATIONS As String = "Set of Incoming Relations relating to the Table." 'Boston specific. Not part of original Metadrone.
         Friend Shared DOCO_VARIABLE_ATTRIBUTE_RELATION As String = "Set of Relations relating to the Column." 'Boston specific. Not part of original Metadrone.
+        Friend Shared DOCO_VARIABLE_ATTRIBUTE_INCOMINGRELATION As String = "Set of Incoming Relations relating to the Column." 'Boston specific. Not part of original Metadrone.
         Friend Shared DOCO_VARIABLE_ATTRIBUTE_INDEX As String = "Set of Relations relating to the Column." 'Boston specific. Not part of original Metadrone.
         Friend Shared DOCO_VARIABLE_ATTRIBUTE_ALLOWZEROLENGTH As String = "Field allows zero length." 'Boston specific. Not part of original Metadrone.
         Friend Shared DOCO_VARIABLE_ATTRIBUTE_SHORTDESCRIPTION As String = "Short Description of the Model Element for the field." 'Boston specific. Not part of original Metadrone.
@@ -334,6 +341,7 @@ Namespace Parser.Syntax
             If StrEq(value, RESERVED_PREPROC_SAFEEND) Then Return True
 
             If StrEq(value, OBJECT_RELATION) Then Return True 'Boston specific. Not part of the original Metadrone.
+            If StrEq(value, OBJECT_INCOMINGRELATION) Then Return True 'Boston specific. Not part of the original Metadrone.
             If StrEq(value, OBJECT_INDEX) Then Return True 'Boston specific. Not part of the original Metadrone.
             If StrEq(value, OBJECT_TABLE) Then Return True
             If StrEq(value, OBJECT_VIEW) Then Return True
@@ -374,7 +382,9 @@ Namespace Parser.Syntax
             If StrEq(value, VARIABLE_ATTRIBUTE_PGSEDGENAME) Then Return True 'Boston specific. Not part of original Metadrone.
             If StrEq(value, VARIABLE_ATTRIBUTE_ISPGSRELATION) Then Return True 'Boston specific. Not part of original Metadrone.
             If StrEq(value, VARIABLE_ATTRIBUTE_RELATIONS) Then Return True 'Boston specific. Not part of original Metadrone.
-            If StrEq(value, VARIABLE_ATTRIBUTE_RELATION) Then Return True 'Boston specific. Not part of original Metadrone.
+            If StrEq(value, VARIABLE_ATTRIBUTE_INCOMINGRELATIONS) Then Return True 'Boston specific. Not part of original Metadrone.
+            If StrEq(value, VARIABLE_ATTRIBUTE_RELATION) Then Return True 'Boston specific. Not part of original Metadrone.            
+            If StrEq(value, VARIABLE_ATTRIBUTE_INCOMINGRELATION) Then Return True 'Boston specific. Not part of original Metadrone.            
             If StrEq(value, VARIABLE_ATTRIBUTE_INDEX) Then Return True 'Boston specific. Not part of original Metadrone.
             If StrEq(value, VARIABLE_ATTRIBUTE_ALLOWZEROLENGTH) Then Return True 'Boston specific. Not part of original Metadrone.
             If StrEq(value, VARIABLE_ATTRIBUTE_SHORTDESCRIPTION) Then Return True 'Boston specific. Not part of original Metadrone. ShortDescription of the JoinedORMObject for the ActiveRole of the Column for a field.

@@ -51,6 +51,15 @@ Namespace Parser.Meta.Database
             End Set
         End Property
 
+        Public Property IncomingRelation As List(Of RDS.Relation) 'Boston specific. Not part of original Metadrone.
+            Get
+                Return Me.SchemaRowVal.IncomingRelation
+            End Get
+            Set(value As List(Of RDS.Relation))
+                Me.SchemaRowVal.IncomingRelation = value
+            End Set
+        End Property
+
         Public Property AllowZeroLength() As Boolean 'Boston specific. Not part of original Metadrone.
             Get
                 Return Me.SchemaRowVal.AllowZeroLength
@@ -189,6 +198,10 @@ Namespace Parser.Meta.Database
                 'set Relation
                 Me.Relation = CType(value, List(Of RDS.Relation))
 
+            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_INCOMINGRELATION) Then 'Boston specific. Not part of original Metadrone.
+                'set Relation
+                Me.IncomingRelation = CType(value, List(Of RDS.Relation))
+
             ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_ALLOWZEROLENGTH) Then 'Boston specific. Not part of original Metadrone.
                 'set allowZeroLength
                 Me.AllowZeroLength = Conv.ToBoolean(value)
@@ -274,6 +287,11 @@ Namespace Parser.Meta.Database
                 'return Relation
                 Call Me.CheckParamsForPropertyCall(AttribName, Params)
                 Return Me.Relation
+
+            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_INCOMINGRELATION) Then 'Boston specific. Not part of original Metadrone.
+                'return Relation
+                Call Me.CheckParamsForPropertyCall(AttribName, Params)
+                Return Me.IncomingRelation
 
             ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_ALLOWZEROLENGTH) Then 'Boston specific. Not part of original Metadrone.
                 'return allowZeroLength
