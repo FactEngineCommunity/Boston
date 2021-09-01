@@ -171,18 +171,25 @@ end!&gt;&gt;
 &lt;&lt;!"define"!&gt;&gt;
 
 &lt;&lt;!for table tbl in MainConn!&gt;&gt;
-
-&lt;&lt;!tbl + " sub entity,"!&gt;&gt;&lt;&lt;!set liInd = 1!&gt;&gt;
+&lt;&lt;!if tbl.ispgsrelation AND NOT tbl.isobjectified!&gt;&gt;&lt;&lt;!tbl + " sub relation,"!&gt;&gt;&lt;&lt;!else!&gt;&gt;&lt;&lt;!tbl + " sub entity,"!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!set liInd = 1!&gt;&gt;
 &lt;&lt;!for column col in tbl!&gt;&gt;
 &lt;&lt;!if liInd &gt; 1!&gt;&gt;&lt;&lt;!","!&gt;&gt;&lt;&lt;!end!&gt;&gt;
   &lt;&lt;!"owns " + col.value!&gt;&gt;&lt;&lt;!set liInd = liInd + 1!&gt;&gt;
 &lt;&lt;!end!&gt;&gt;
 
 &lt;&lt;!for relation rel in tbl!&gt;&gt;
-&lt;&lt;!"plays " + rel.fbmfacttypename + ":" + rel.referencingrolename!&gt;&gt;
+&lt;&lt;!if tbl.ispgsrelation AND NOT tbl.isobjectified!&gt;&gt;
+    &lt;&lt;!",relates " + rel.referencingrolename!&gt;&gt;  
+&lt;&lt;!else!&gt;&gt;
+    &lt;&lt;!",plays " + rel.fbmfacttypename + ":" + rel.referencingrolename!&gt;&gt;
+&lt;&lt;!end!&gt;&gt;
 &lt;&lt;!end!&gt;&gt;
 &lt;&lt;!for incomingrelations rel in tbl!&gt;&gt;
-&lt;&lt;!"hello plays " + rel.fbmfacttypename + ":" + rel.referencingrolename!&gt;&gt;
+&lt;&lt;!if tbl.ispgsrelation AND NOT tbl.isobjectified!&gt;&gt;
+      &lt;&lt;!",relates " + rel.referencingrolename!&gt;&gt;  
+&lt;&lt;!else!&gt;&gt;
+      &lt;&lt;!",plays " + rel.fbmfacttypename + ":" + rel.referencingrolename!&gt;&gt;
+&lt;&lt;!end!&gt;&gt;
 &lt;&lt;!end!&gt;&gt;
 &lt;&lt;!";"!&gt;&gt;
 
@@ -191,17 +198,19 @@ end!&gt;&gt;
 &lt;&lt;!for table tbl in MainConn!&gt;&gt;
 &lt;&lt;!for column col in tbl!&gt;&gt;
 
-  &lt;&lt;!col.value + " sub attribute,"!&gt;&gt;
+&lt;&lt;!col.value + " sub attribute,"!&gt;&gt;
   &lt;&lt;!"value " + col.datatype + ";"!&gt;&gt;  
 &lt;&lt;!end!&gt;&gt;
 &lt;&lt;!end!&gt;&gt;
 
 &lt;&lt;!for table tbl in MainConn!&gt;&gt;
+&lt;&lt;!if NOT (tbl.ispgsrelation AND NOT tbl.isobjectified)!&gt;&gt;
 &lt;&lt;!for relation rel in tbl!&gt;&gt;
 
-&lt;&lt;!"sub relation " + rel.fbmfacttypename!&gt;&gt;
+&lt;&lt;!rel.fbmfacttypename + " sub relation,"!&gt;&gt;
   &lt;&lt;!"relates " + rel.referencingrolename + ","!&gt;&gt;
   &lt;&lt;!"relates " + rel.referencedrolename + ";"!&gt;&gt;
+&lt;&lt;!end!&gt;&gt;
 &lt;&lt;!end!&gt;&gt;
 &lt;&lt;!end!&gt;&gt;
 </Text>

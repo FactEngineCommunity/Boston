@@ -26,6 +26,7 @@ Namespace Parser.Syntax
         Public Const VARIABLE_ATTRIBUTE_NULLABLE As String = "nullable"
         Public Const VARIABLE_ATTRIBUTE_PGSEDGENAME As String = "pgsedgename" 'Boston specific. Not part of original Metadrone.
         Public Const VARIABLE_ATTRIBUTE_ISPGSRELATION As String = "ispgsrelation" 'Boston specific. Not part of original Metadrone.
+        Public Const VARIABLE_ATTRIBUTE_ISOBJECTIFIED As String = "isobjectified" 'Boston specific. Not part of original Metadrone.
         Public Const VARIABLE_ATTRIBUTE_RELATIONS As String = "relations" 'Boston specific. Not part of original Metadrone.
         Public Const VARIABLE_ATTRIBUTE_INCOMINGRELATIONS As String = "incomingrelations" 'Boston specific. Not part of original Metadrone.
         Public Const VARIABLE_ATTRIBUTE_RELATION As String = "relation" 'Boston specific. Not part of original Metadrone.
@@ -244,6 +245,7 @@ Namespace Parser.Syntax
         Friend Shared DOCO_VARIABLE_ATTRIBUTE_DEFAULTVALUE As String = "Default value for field."
         Friend Shared DOCO_VARIABLE_ATTRIBUTE_PGSEDGENAME As String = "The name of the Edge if the Table is a Property Graph Schema Relation/Edge." 'Boston specific. Not part of original Metadrone.
         Friend Shared DOCO_VARIABLE_ATTRIBUTE_ISPGSRELATION As String = "True if the Table is a Property Graph Schema Relation/Edge." 'Boston specific. Not part of original Metadrone.
+        Friend Shared DOCO_VARIABLE_ATTRIBUTE_ISOBJECTIFIED As String = "True if the Fact Type for the Table is an Objectified Fact Type." 'Boston specific. Not part of original Metadrone.
         Friend Shared DOCO_VARIABLE_ATTRIBUTE_RELATIONS As String = "Set of Relations relating to the Table." 'Boston specific. Not part of original Metadrone.
         Friend Shared DOCO_VARIABLE_ATTRIBUTE_INCOMINGRELATIONS As String = "Set of Incoming Relations relating to the Table." 'Boston specific. Not part of original Metadrone.
         Friend Shared DOCO_VARIABLE_ATTRIBUTE_RELATION As String = "Set of Relations relating to the Column." 'Boston specific. Not part of original Metadrone.
@@ -381,6 +383,7 @@ Namespace Parser.Syntax
             If StrEq(value, VARIABLE_ATTRIBUTE_NULLABLE) Then Return True
             If StrEq(value, VARIABLE_ATTRIBUTE_PGSEDGENAME) Then Return True 'Boston specific. Not part of original Metadrone.
             If StrEq(value, VARIABLE_ATTRIBUTE_ISPGSRELATION) Then Return True 'Boston specific. Not part of original Metadrone.
+            If StrEq(value, VARIABLE_ATTRIBUTE_ISOBJECTIFIED) Then Return True 'Boston specific. Not part of original Metadrone.
             If StrEq(value, VARIABLE_ATTRIBUTE_RELATIONS) Then Return True 'Boston specific. Not part of original Metadrone.
             If StrEq(value, VARIABLE_ATTRIBUTE_INCOMINGRELATIONS) Then Return True 'Boston specific. Not part of original Metadrone.
             If StrEq(value, VARIABLE_ATTRIBUTE_RELATION) Then Return True 'Boston specific. Not part of original Metadrone.            

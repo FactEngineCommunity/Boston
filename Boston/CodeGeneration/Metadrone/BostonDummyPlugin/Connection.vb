@@ -186,6 +186,7 @@ Namespace SourcePlugins.Boston
                             End If
 
                             sr.IsPGSRelation = lrTable.isPGSRelation
+                            sr.IsObjectified = lrTable.FBMModelElement.IsObjectified
                             If lrTable.isPGSRelation Then
                                 sr.PGSEdgeName = lrTable.getPGSEdgeName
                             End If

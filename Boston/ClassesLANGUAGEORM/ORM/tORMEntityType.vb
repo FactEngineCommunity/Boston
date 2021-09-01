@@ -78,6 +78,16 @@ Namespace FBM
         End Property
 
 
+        Public Overrides Property IsObjectified() As Boolean
+            Get
+                Return False
+            End Get
+            Set(value As Boolean)
+                'Nothing to do here.
+            End Set
+        End Property
+
+
         <XmlIgnore()> _
         Public WithEvents ReferenceModeValueType As FBM.ValueType = Nothing
 

@@ -31,6 +31,7 @@
         Private ColumnIdField As String
         Private AllowZeroLengthField As Boolean
         Private IsPGSRelationField As Boolean
+        Private IsObjectifiedField As Boolean
         Private ShortDescriptionField As String
         Private PredicateField As String
         Private PGSEdgeNameField As String
@@ -138,7 +139,7 @@
         End Property
 
         ''' <summary>
-        ''' Boston specific. From DataType of ValueType
+        ''' Boston specific.
         ''' </summary>
         ''' <returns></returns>
         Public Property IsPGSRelation() As Boolean
@@ -147,6 +148,19 @@
             End Get
             Set(ByVal value As Boolean)
                 Me.IsPGSRelationField = value
+            End Set
+        End Property
+
+        ''' <summary>
+        ''' Boston specific.
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property IsObjectified() As Boolean
+            Get
+                Return Me.IsObjectifiedField
+            End Get
+            Set(ByVal value As Boolean)
+                Me.IsObjectifiedField = value
             End Set
         End Property
 

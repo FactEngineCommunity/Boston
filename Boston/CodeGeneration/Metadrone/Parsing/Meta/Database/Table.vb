@@ -30,6 +30,7 @@ Namespace Parser.Meta.Database
         Private FilteredIndexes As New List(Of IEntity) 'Boston specific. For stepping through Indexes for the Table. Can be List(Of Index) containing Columns
 
         Private mIsPGSRelation As Boolean = False 'Boston specific. True if the Table represents a Property Graph Schema Relation.
+        Private mIsObjectified As Boolean = False 'Boston specific. True if the Table represents a Property Graph Schema Relation.
         Private mPGSEdgeName As String = ""
 
         Friend Columns As New List(Of IEntity)
@@ -47,6 +48,8 @@ Namespace Parser.Meta.Database
         Friend IDColumnCount As Integer = -1
         Friend ListCount As Integer = -1
         Friend ListPos As Integer = -1
+
+
 
         Public Sub New()
 
@@ -79,13 +82,13 @@ Namespace Parser.Meta.Database
                 Throw New Parser.Syntax.ExecException(ex.Message, 0)
             End Try
 
-
             'Add columns
             While SchemaRowIdx < aarSchemaRow.Count
                 If aarSchemaRow(SchemaRowIdx).Name.Equals(Me.Value.ToString) Then
                     Me.AddCol(aarSchemaRow(SchemaRowIdx), Connection)
 
                     Me.mIsPGSRelation = aarSchemaRow(SchemaRowIdx).IsPGSRelation
+                    Me.mIsObjectified = aarSchemaRow(SchemaRowIdx).IsObjectified
                     Me.mPGSEdgeName = aarSchemaRow(SchemaRowIdx).PGSEdgeName
 
                     'Add Outgoing Relations            
@@ -229,6 +232,8 @@ Namespace Parser.Meta.Database
             Table.Owner = Me.Owner
             Table.ConnStr = Me.ConnStr
             Table.Transforms = Me.Transforms
+            Table.mIsPGSRelation = Me.mIsPGSRelation '202210901-VM-Keep if works.
+            Table.mIsObjectified = Me.mIsObjectified '202210901-VM-Keep if works.
             'For Each col In Me.Columns
             '    Table.Columns.Add(CType(col, Column).GetCopy)
             'Next
@@ -346,6 +351,10 @@ Namespace Parser.Meta.Database
             ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_ISPGSRELATION) Then
                 'set value
                 Me.mIsPGSRelation = value
+
+            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_ISOBJECTIFIED) Then
+                'set value
+                Me.mIsObjectified = value
 
             ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_RELATIONS) Then 'The set of Relations stemming from the Table. Not at the Column level, but the Table level.
                 'set Relations
@@ -469,9 +478,12 @@ Namespace Parser.Meta.Database
                 Return Me.mPGSEdgeName
 
             ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_ISPGSRELATION) Then 'Boston specific. Not part of original Metadrone.
-                'return mIsPGSRelation
                 Call Me.CheckParamsForPropertyCall(AttribName, Params)
                 Return Me.mIsPGSRelation
+
+            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_ISOBJECTIFIED) Then 'Boston specific. Not part of original Metadrone.
+                Call Me.CheckParamsForPropertyCall(AttribName, Params)
+                Return Me.mIsObjectified
 
             ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_RELATIONS) Then 'Boston specific. Not part of original Metadrone.
                 'return relation
