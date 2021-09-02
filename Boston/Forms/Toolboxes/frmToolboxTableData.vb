@@ -22,7 +22,7 @@ Public Class frmToolboxTableData
 
     Public Sub SetupForm()
 
-        'RemoveHandler Me.DataGridView.RowsRemoved, AddressOf DataGridView_RowsRemoved
+        'RemoveHandler Me.AdvancedDataGridView.RowsRemoved, AddressOf DataGridView_RowsRemoved
 
         Dim lsSQLQuery As String
 
@@ -34,88 +34,26 @@ Public Class frmToolboxTableData
                 Me.mrRecordset = prApplication.WorkingModel.DatabaseConnection.GO(lsSQLQuery)
 
                 Me.mrDataGridList = New ORMQL.RecordsetDataGridList(Me.mrRecordset, Me.mrTable)
-                Me.DataGridView.DataSource = Me.mrDataGridList
-
+                'Me.AdvancedDataGridView.DataSource = Me.mrDataGridList
+                Me.AdvancedDataGridView.DataSource = Me.mrDataGridList
             End If
         End If
 
         Me.ToolStripStatusLabel.Text = ""
 
-        Me.DataGridView.RowTemplate.Height = Me.DataGridView.Font.Height + 8
+        Me.AdvancedDataGridView.RowTemplate.Height = Me.AdvancedDataGridView.Font.Height + 8
 
         If Me.mrTable IsNot Nothing Then
             Me.GroupBox1.Text = "Table Name: " & Me.mrTable.Name
         End If
 
-        'AddHandler Me.DataGridView.RowsRemoved, AddressOf DataGridView_RowsRemoved
+        'AddHandler Me.AdvancedDataGridView.RowsRemoved, AddressOf DataGridView_RowsRemoved
 
     End Sub
 
     Private Sub frmToolboxTableData_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
 
         prApplication.ToolboxForms.RemoveAll(AddressOf Me.EqualsByName)
-
-    End Sub
-
-    Private Sub DataGridView_CellEndEdit(sender As Object, e As DataGridViewCellEventArgs) Handles DataGridView.CellEndEdit
-
-        Try
-            Me.mrRecordset.Facts(e.RowIndex)(Me.mrRecordset.Columns(e.ColumnIndex)).Data = Me.NewValue
-
-            If Me.mrRecordset.Facts(e.RowIndex).IsNewFact Then Exit Sub
-
-            Dim lrColumn As RDS.Column = Me.mrTable.Column.Find(Function(x) x.Name = Me.mrRecordset.Columns(e.ColumnIndex))
-
-            Dim larPKColumn As List(Of RDS.Column) = Me.mrTable.getPrimaryKeyColumns
-
-            Dim liColumnIndex As Integer
-            Dim lsValue As String
-            For Each lrPKColumn In larPKColumn
-                liColumnIndex = Me.mrRecordset.Columns.IndexOf(lrPKColumn.Name)
-                lsValue = Me.mrRecordset.Facts(e.RowIndex)(Me.mrRecordset.Columns(liColumnIndex)).Data
-                lrPKColumn.TemporaryData = lsValue
-            Next
-
-            Dim lrRecordset = prApplication.WorkingModel.DatabaseConnection.UpdateAttributeValue(Me.mrTable.Name, lrColumn, Me.NewValue, larPKColumn)
-
-            If Not lrRecordset.ErrorReturned Then
-                Me.ToolStripButtonCommit.Enabled = False
-                Me.ToolStripStatusLabel.Text = lrRecordset.ErrorString
-                Me.ToolStripStatusLabel.ForeColor = Color.Black
-            Else
-                Me.ToolStripStatusLabel.Text = lrRecordset.ErrorString
-                Me.ToolStripStatusLabel.ForeColor = Color.Red
-                Me.mrRecordset.Facts(e.RowIndex)(Me.mrRecordset.Columns(e.ColumnIndex)).Data = Me.OldValue
-            End If
-
-        Catch ex As Exception
-            Dim lsMessage As String
-            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
-
-            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
-            lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
-        End Try
-
-    End Sub
-
-    Private Sub DataGridView_CellBeginEdit(sender As Object, e As DataGridViewCellCancelEventArgs) Handles DataGridView.CellBeginEdit
-
-        Me.ToolStripStatusLabel.Text = ""
-
-        If e.RowIndex <= Me.mrRecordset.Facts.Count - 1 Then
-            Me.OldValue = Me.mrRecordset.Facts(e.RowIndex)(Me.mrRecordset.Columns(e.ColumnIndex)).Data
-        Else
-            Dim lrNewFact As FBM.Fact = Me.mrRecordset.Facts(0).Clone(Me.mrRecordset.Facts(0).FactType, True)
-            lrNewFact.Id = System.Guid.NewGuid.ToString
-            For Each lrFactData In lrNewFact.Data
-                lrFactData.setData("", pcenumConceptType.Value, False)
-            Next
-            lrNewFact.IsNewFact = True
-            Me.mrRecordset.Facts.Add(lrNewFact)
-            Me.ToolStripButtonCommit.Enabled = True
-            Me.ToolStripButtonUndo.Enabled = True
-        End If
 
     End Sub
 
@@ -187,8 +125,8 @@ Public Class frmToolboxTableData
 
             If lbNewFactRemoved Then
                 'Dim lrDataGridList As New ORMQL.RecordsetDataGridList(Me.mrRecordset, Me.mrTable)
-                Me.DataGridView.DataSource = Nothing
-                Me.DataGridView.DataSource = Me.mrDataGridList
+                Me.AdvancedDataGridView.DataSource = Nothing
+                Me.AdvancedDataGridView.DataSource = Me.mrDataGridList
             End If
 
             Me.ToolStripButtonUndo.Enabled = False
@@ -204,53 +142,107 @@ Public Class frmToolboxTableData
 
     End Sub
 
-    Private Sub DataGridView_CellValidating(sender As Object, e As DataGridViewCellValidatingEventArgs) Handles DataGridView.CellValidating
+    Private Sub AdvancedDataGridView1_CellBeginEdit(sender As Object, e As DataGridViewCellCancelEventArgs) Handles AdvancedDataGridView.CellBeginEdit
+
+        Me.ToolStripStatusLabel.Text = ""
+
+        If e.RowIndex <= Me.mrRecordset.Facts.Count - 1 Then
+            Me.OldValue = Me.mrRecordset.Facts(e.RowIndex)(Me.mrRecordset.Columns(e.ColumnIndex)).Data
+        Else
+            Dim lrNewFact As FBM.Fact = Me.mrRecordset.Facts(0).Clone(Me.mrRecordset.Facts(0).FactType, True)
+            lrNewFact.Id = System.Guid.NewGuid.ToString
+            For Each lrFactData In lrNewFact.Data
+                lrFactData.setData("", pcenumConceptType.Value, False)
+            Next
+            lrNewFact.IsNewFact = True
+            Me.mrRecordset.Facts.Add(lrNewFact)
+            Me.ToolStripButtonCommit.Enabled = True
+            Me.ToolStripButtonUndo.Enabled = True
+        End If
+
+    End Sub
+
+    Private Sub AdvancedDataGridView1_CellEndEdit(sender As Object, e As DataGridViewCellEventArgs) Handles AdvancedDataGridView.CellEndEdit
+
+        Try
+            Me.mrRecordset.Facts(e.RowIndex)(Me.mrRecordset.Columns(e.ColumnIndex)).Data = Me.NewValue
+
+
+            If Me.mrRecordset.Facts(e.RowIndex).IsNewFact Then Exit Sub
+
+            Dim lrColumn As RDS.Column = Me.mrTable.Column.Find(Function(x) x.Name = Me.mrRecordset.Columns(e.ColumnIndex))
+
+            Dim larPKColumn As List(Of RDS.Column) = Me.mrTable.getPrimaryKeyColumns
+
+            Dim liColumnIndex As Integer
+            Dim lsValue As String
+            For Each lrPKColumn In larPKColumn
+                liColumnIndex = Me.mrRecordset.Columns.IndexOf(lrPKColumn.Name)
+                lsValue = Me.mrRecordset.Facts(e.RowIndex)(Me.mrRecordset.Columns(liColumnIndex)).Data
+                lrPKColumn.TemporaryData = lsValue
+            Next
+
+            Dim lrRecordset = prApplication.WorkingModel.DatabaseConnection.UpdateAttributeValue(Me.mrTable.Name, lrColumn, Me.NewValue, larPKColumn)
+
+            If Not lrRecordset.ErrorReturned Then
+                Me.ToolStripButtonCommit.Enabled = False
+                Me.ToolStripStatusLabel.Text = lrRecordset.ErrorString
+                Me.ToolStripStatusLabel.ForeColor = Color.Black
+            Else
+                Me.ToolStripStatusLabel.Text = lrRecordset.ErrorString
+                Me.ToolStripStatusLabel.ForeColor = Color.Red
+                Me.mrRecordset.Facts(e.RowIndex)(Me.mrRecordset.Columns(e.ColumnIndex)).Data = Me.OldValue
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
+    Private Sub AdvancedDataGridView1_CellValidating(sender As Object, e As DataGridViewCellValidatingEventArgs) Handles AdvancedDataGridView.CellValidating
 
         Me.NewValue = e.FormattedValue
 
     End Sub
 
-
-    Private Sub DataGridView_KeyDown(sender As Object, e As KeyEventArgs) Handles DataGridView.KeyDown
-
-        If e.KeyCode = Keys.Delete Then
-            If Me.DataGridView.SelectedRows.Count > 0 Then
-                If MsgBox("Are you sure you want to delete this row from the database?", MsgBoxStyle.YesNo) = MsgBoxResult.Yes Then
-
-                    Dim lrFact As FBM.Fact = Me.mrRecordset.Facts(Me.DataGridView.SelectedRows(0).Index)
-                    '20210608-VM-Put in code here to remove the record from the database
-                    '=========================================================================
-                    Dim lsSQLQuery As String = ""
-                    lsSQLQuery.AppendString("DELETE FROM " & Me.mrTable.Name & vbCrLf & " WHERE ")
-                    Dim liInd = 0
-                    For Each lrColumn In Me.mrTable.getPrimaryKeyColumns
-                        If liInd > 0 Then lsSQLQuery &= " AND "
-                        lsSQLQuery.AppendString(lrColumn.Name & " = ")
-                        Dim liValueColumnIndex = mrRecordset.Columns.IndexOf(lrColumn.Name)
-                        lsSQLQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsText, "'", "")
-                        lsSQLQuery &= lrFact.Data(liValueColumnIndex).Data
-                        lsSQLQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsText, "'", "")
-                        liInd += 1
-                    Next
-                    Dim lrRecordset = Me.mrModel.DatabaseConnection.GONonQuery(lsSQLQuery)
-                    '=========================================================================
-                    'Remove the Fact
-                    Me.mrRecordset.Facts.RemoveAt(Me.DataGridView.SelectedRows(0).Index)
-
-                    Me.DataGridView.DataSource = Nothing
-                    Me.DataGridView.DataSource = Me.mrDataGridList
-                End If
-            End If
-        End If
-
-    End Sub
-
-    Private Sub DataGridView_UserDeletingRow(sender As Object, e As DataGridViewRowCancelEventArgs) Handles DataGridView.UserDeletingRow
+    Private Sub AdvancedDataGridView1_KeyDown(sender As Object, e As KeyEventArgs) Handles AdvancedDataGridView.KeyDown
 
         Try
+            If e.KeyCode = Keys.Delete Then
+                If Me.AdvancedDataGridView.SelectedRows.Count > 0 Then
+                    If MsgBox("Are you sure you want to delete this row from the database?", MsgBoxStyle.YesNo) = MsgBoxResult.Yes Then
 
+                        Dim lrFact As FBM.Fact = Me.mrRecordset.Facts(Me.AdvancedDataGridView.SelectedRows(0).Index)
+                        '20210608-VM-Put in code here to remove the record from the database
+                        '=========================================================================
+                        Dim lsSQLQuery As String = ""
+                        lsSQLQuery.AppendString("DELETE FROM " & Me.mrTable.Name & vbCrLf & " WHERE ")
+                        Dim liInd = 0
+                        For Each lrColumn In Me.mrTable.getPrimaryKeyColumns
+                            If liInd > 0 Then lsSQLQuery &= " AND "
+                            lsSQLQuery.AppendString(lrColumn.Name & " = ")
+                            Dim liValueColumnIndex = mrRecordset.Columns.IndexOf(lrColumn.Name)
+                            lsSQLQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsText, "'", "")
+                            lsSQLQuery &= lrFact.Data(liValueColumnIndex).Data
+                            lsSQLQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsText, "'", "")
+                            liInd += 1
+                        Next
+                        Dim lrRecordset = Me.mrModel.DatabaseConnection.GONonQuery(lsSQLQuery)
+                        '=========================================================================
+                        'Remove the Fact
+                        Me.mrRecordset.Facts.RemoveAt(Me.AdvancedDataGridView.SelectedRows(0).Index)
 
-
+                        Me.AdvancedDataGridView.DataSource = Nothing
+                        Me.AdvancedDataGridView.DataSource = Me.mrDataGridList
+                    End If
+                End If
+            End If
         Catch ex As Exception
             Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()

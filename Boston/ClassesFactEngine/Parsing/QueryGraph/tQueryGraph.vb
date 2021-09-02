@@ -922,7 +922,12 @@
                                 lsSQLQuery &= lrQueryEdge.getTargetSQLComparator
                                 Select Case lrColumn.getMetamodelDataType
                                     Case Is = pcenumORMDataType.TemporalDateAndTime
-                                        Dim lsDateTime As String = Me.Model.DatabaseConnection.FormatDateTime(lrQueryEdge.IdentifierList(0))
+                                        Dim lsUserDateTime = lrQueryEdge.IdentifierList(0)
+                                        Dim loDateTime As DateTime = Nothing
+                                        If Not DateTime.TryParse(lsUserDateTime, loDateTime) Then
+                                            Throw New Exception(lsUserDateTime & " is not a valid DateTime. Try entering a DateTime value in the FactEngine configuration format: " & My.Settings.FactEngineUserDateTimeFormat)
+                                        End If
+                                        Dim lsDateTime As String = Me.Model.DatabaseConnection.FormatDateTime(lsUserDateTime)
                                         lsSQLQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lsDateTime & Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
                                     Case Else
                                         lsSQLQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lrQueryEdge.IdentifierList(0) & Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
@@ -945,7 +950,12 @@
                                 lsSQLQuery &= lrQueryEdge.getTargetSQLComparator
                                 Select Case lrColumn.getMetamodelDataType
                                     Case Is = pcenumORMDataType.TemporalDateAndTime
-                                        Dim lsDateTime As String = Me.Model.DatabaseConnection.FormatDateTime(lrQueryEdge.IdentifierList(0))
+                                        Dim lsUserDateTime = lrQueryEdge.IdentifierList(0)
+                                        Dim loDateTime As DateTime = Nothing
+                                        If Not DateTime.TryParse(lsUserDateTime, loDateTime) Then
+                                            Throw New Exception(lsUserDateTime & " is not a valid DateTime. Try entering a DateTime value in the FactEngine configuration format: " & My.Settings.FactEngineUserDateTimeFormat)
+                                        End If
+                                        Dim lsDateTime As String = Me.Model.DatabaseConnection.FormatDateTime(lsUserDateTime)
                                         lsSQLQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lsDateTime & Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
                                     Case Else
                                         lsSQLQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lrQueryEdge.IdentifierList(0) & Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf

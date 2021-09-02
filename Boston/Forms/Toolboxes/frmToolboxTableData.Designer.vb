@@ -24,16 +24,16 @@ Partial Class frmToolboxTableData
     Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmToolboxTableData))
         Me.GroupBox1 = New System.Windows.Forms.GroupBox()
+        Me.AdvancedDataGridView = New ADGV.AdvancedDataGridView()
         Me.StatusStrip1 = New System.Windows.Forms.StatusStrip()
         Me.ToolStripStatusLabel = New System.Windows.Forms.ToolStripStatusLabel()
         Me.ToolStrip1 = New System.Windows.Forms.ToolStrip()
         Me.ToolStripButtonCommit = New System.Windows.Forms.ToolStripButton()
         Me.ToolStripButtonUndo = New System.Windows.Forms.ToolStripButton()
-        Me.DataGridView = New System.Windows.Forms.DataGridView()
         Me.GroupBox1.SuspendLayout()
+        CType(Me.AdvancedDataGridView, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.StatusStrip1.SuspendLayout()
         Me.ToolStrip1.SuspendLayout()
-        CType(Me.DataGridView, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'GroupBox1
@@ -41,17 +41,31 @@ Partial Class frmToolboxTableData
         Me.GroupBox1.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
             Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.GroupBox1.Controls.Add(Me.AdvancedDataGridView)
         Me.GroupBox1.Controls.Add(Me.StatusStrip1)
         Me.GroupBox1.Controls.Add(Me.ToolStrip1)
-        Me.GroupBox1.Controls.Add(Me.DataGridView)
         Me.GroupBox1.Location = New System.Drawing.Point(8, 8)
-        Me.GroupBox1.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.GroupBox1.Margin = New System.Windows.Forms.Padding(2)
         Me.GroupBox1.Name = "GroupBox1"
-        Me.GroupBox1.Padding = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.GroupBox1.Padding = New System.Windows.Forms.Padding(2)
         Me.GroupBox1.Size = New System.Drawing.Size(819, 343)
         Me.GroupBox1.TabIndex = 0
         Me.GroupBox1.TabStop = False
         Me.GroupBox1.Text = "TableName"
+        '
+        'AdvancedDataGridView
+        '
+        Me.AdvancedDataGridView.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.AdvancedDataGridView.AutoGenerateContextFilters = True
+        Me.AdvancedDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
+        Me.AdvancedDataGridView.DateWithTime = False
+        Me.AdvancedDataGridView.Location = New System.Drawing.Point(2, 38)
+        Me.AdvancedDataGridView.Name = "AdvancedDataGridView"
+        Me.AdvancedDataGridView.Size = New System.Drawing.Size(813, 278)
+        Me.AdvancedDataGridView.TabIndex = 3
+        Me.AdvancedDataGridView.TimeFilter = False
         '
         'StatusStrip1
         '
@@ -96,22 +110,8 @@ Partial Class frmToolboxTableData
         Me.ToolStripButtonUndo.Image = Global.Boston.My.Resources.Resources.Undo16x16
         Me.ToolStripButtonUndo.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ToolStripButtonUndo.Name = "ToolStripButtonUndo"
-        Me.ToolStripButtonUndo.Size = New System.Drawing.Size(28, 17)
+        Me.ToolStripButtonUndo.Size = New System.Drawing.Size(23, 22)
         Me.ToolStripButtonUndo.Text = "ToolStripButton1"
-        '
-        'DataGridView
-        '
-        Me.DataGridView.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-            Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.DataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        Me.DataGridView.Location = New System.Drawing.Point(4, 42)
-        Me.DataGridView.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
-        Me.DataGridView.Name = "DataGridView"
-        Me.DataGridView.RowHeadersWidth = 62
-        Me.DataGridView.RowTemplate.Height = 28
-        Me.DataGridView.Size = New System.Drawing.Size(811, 275)
-        Me.DataGridView.TabIndex = 0
         '
         'frmToolboxTableData
         '
@@ -119,25 +119,25 @@ Partial Class frmToolboxTableData
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(835, 358)
         Me.Controls.Add(Me.GroupBox1)
-        Me.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.Margin = New System.Windows.Forms.Padding(2)
         Me.Name = "frmToolboxTableData"
         Me.Text = "Database Table Data"
         Me.GroupBox1.ResumeLayout(False)
         Me.GroupBox1.PerformLayout()
+        CType(Me.AdvancedDataGridView, System.ComponentModel.ISupportInitialize).EndInit()
         Me.StatusStrip1.ResumeLayout(False)
         Me.StatusStrip1.PerformLayout()
         Me.ToolStrip1.ResumeLayout(False)
         Me.ToolStrip1.PerformLayout()
-        CType(Me.DataGridView, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
 
     End Sub
 
     Friend WithEvents GroupBox1 As GroupBox
-    Friend WithEvents DataGridView As DataGridView
     Friend WithEvents ToolStrip1 As ToolStrip
     Friend WithEvents ToolStripButtonCommit As ToolStripButton
     Friend WithEvents StatusStrip1 As StatusStrip
     Friend WithEvents ToolStripStatusLabel As ToolStripStatusLabel
     Friend WithEvents ToolStripButtonUndo As ToolStripButton
+    Friend WithEvents AdvancedDataGridView As ADGV.AdvancedDataGridView
 End Class

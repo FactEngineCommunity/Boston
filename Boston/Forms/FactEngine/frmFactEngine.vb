@@ -622,6 +622,7 @@ Public Class frmFactEngine
         End If
 
         Me.ToolStripStatusLabelCurrentProduction.Text = "FactEngine Statement"
+        Me.ToolStripStatusLabelError.Text = ""
 
     End Sub
 
@@ -1671,6 +1672,36 @@ Public Class frmFactEngine
                                 Call Me.AddEnterpriseAwareItem(lsValue,,,, True)
                             Next
                         End If
+
+                        Try
+                            If CType(lrModelElement, FBM.ValueType).DataType = pcenumORMDataType.TemporalDateAndTime And
+                                (Me.zrTextHighlighter.GetCurrentContext.Token.Type = FEQL.TokenType.IDENTIFIER) Then
+                                'DateTime
+                                Dim lsUserDateTime = Me.zrTextHighlighter.GetCurrentContext.Token.Text
+                                Dim loDateTime As DateTime = Nothing
+                                If Not DateTime.TryParse(lsUserDateTime, loDateTime) Then
+                                    Me.ToolStripStatusLabelError.Text = "Hint: " & lsUserDateTime & " is not a valid DateTime. The configured FactEngine DateTime format is: " & My.Settings.FactEngineUserDateTimeFormat
+                                Else
+                                    Me.ToolStripStatusLabelError.Text = "Hint: Expecting DateTime value in format: " & My.Settings.FactEngineUserDateTimeFormat
+                                End If
+                            ElseIf CType(lrModelElement, FBM.ValueType).DataType = pcenumORMDataType.TemporalDate And
+                                (Me.zrTextHighlighter.GetCurrentContext.Token.Type = FEQL.TokenType.IDENTIFIER) Then
+                                'Date
+                                Dim lsUserDateTime = Me.zrTextHighlighter.GetCurrentContext.Token.Text
+                                Dim loDateTime As DateTime = Nothing
+                                If Not DateTime.TryParse(lsUserDateTime, loDateTime) Then
+                                    Me.ToolStripStatusLabelError.Text = "Hint: " & lsUserDateTime & " is not a valid Date. The configured FactEngine Date format is: " & My.Settings.FactEngineUserDateTimeFormat
+                                Else
+                                    Me.ToolStripStatusLabelError.Text = "Hint: Expecting DateTime value in format: " & My.Settings.FactEngineUserDateFormat
+                                End If
+                            Else
+                                Me.ToolStripStatusLabelError.Text = ""
+                            End If
+                        Catch ex As Exception
+                            'Not a biggie. Don't abort.
+                        End Try
+
+
                     End If
 
                     Dim lsSQLQuery = "SELECT DISTINCT "
@@ -1776,6 +1807,10 @@ Public Class frmFactEngine
                                 lsString &= lrData.Data
                                 liInd += 1
                             Next
+                            Select Case CType(lrModelElement, FBM.ValueType).DataType
+                                Case Is = pcenumORMDataType.TemporalDateAndTime
+                                    lsString = String.Format("{0:" & My.Settings.FactEngineUserDateTimeFormat & "}", CDate(lsString))
+                            End Select
                             Call Me.AddEnterpriseAwareItem(lsString,,,, True)
                         Next
                     Catch ex As Exception

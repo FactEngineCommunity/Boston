@@ -72,7 +72,8 @@ Public Class frmCRUDBostonConfiguration
         'FactEngine
         Me.CheckBoxFactEngineShowDatabaseLogoModelExplorer.Checked = My.Settings.FactEngineShowDatabaseLogoInModelExplorer
         Me.CheckBoxFactEngineUseReferenceModeOnlyForSimpleReferenceSchemes.Checked = My.Settings.FactEngineUseReferenceModeOnlyForSimpleReferenceSchemes
-
+        Me.ComboBoxFactEngineUserDateFormat.Text = My.Settings.FactEngineUserDateFormat
+        Me.ComboBoxFactEngineUserDateTimeFormat.Text = My.Settings.FactEngineUserDateTimeFormat
 
         'ER Diagrams
         Me.CheckBoxHideUnknownPredicates.Checked = My.Settings.ERDViewHideUnknowPredicates

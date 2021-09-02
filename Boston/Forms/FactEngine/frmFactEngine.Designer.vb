@@ -60,13 +60,15 @@ Partial Class frmFactEngine
         Me.ToolStrip3 = New System.Windows.Forms.ToolStrip()
         Me.ToolStripButtonQueryGO = New System.Windows.Forms.ToolStripButton()
         Me.TabPageGraph = New System.Windows.Forms.TabPage()
-        Me.GraphView = New MindFusion.Diagramming.WinForms.DiagramView()
         Me.ContextMenuStripGraph = New System.Windows.Forms.ContextMenuStrip(Me.components)
         Me.LayoutToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ClearToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.Diagram = New MindFusion.Diagramming.Diagram()
         Me.Diagram1 = New MindFusion.Diagramming.Diagram()
         Me.BackgroundWorker = New System.ComponentModel.BackgroundWorker()
+        Me.ToolStripStatusLabelError = New System.Windows.Forms.ToolStripStatusLabel()
+        Me.GraphView = New MindFusion.Diagramming.WinForms.DiagramView()
+        Me.Diagram2 = New MindFusion.Diagramming.Diagram()
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SplitContainer1.Panel1.SuspendLayout()
         Me.SplitContainer1.Panel2.SuspendLayout()
@@ -270,7 +272,7 @@ Partial Class frmFactEngine
         'StatusStrip2
         '
         Me.StatusStrip2.ImageScalingSize = New System.Drawing.Size(24, 24)
-        Me.StatusStrip2.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripStatusLabelWorkingModelName, Me.ToolStripStatusLabelLookingFor, Me.ToolStripStatusLabelCurrentProduction, Me.ToolStripStatusLabelRequiresConnectionString, Me.ToolStripStatusLabelGOPrompt})
+        Me.StatusStrip2.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripStatusLabelWorkingModelName, Me.ToolStripStatusLabelLookingFor, Me.ToolStripStatusLabelCurrentProduction, Me.ToolStripStatusLabelRequiresConnectionString, Me.ToolStripStatusLabelGOPrompt, Me.ToolStripStatusLabelError})
         Me.StatusStrip2.Location = New System.Drawing.Point(0, 208)
         Me.StatusStrip2.Name = "StatusStrip2"
         Me.StatusStrip2.Padding = New System.Windows.Forms.Padding(1, 0, 9, 0)
@@ -420,24 +422,6 @@ Partial Class frmFactEngine
         Me.TabPageGraph.Text = "Graph"
         Me.TabPageGraph.UseVisualStyleBackColor = True
         '
-        'GraphView
-        '
-        Me.GraphView.Behavior = MindFusion.Diagramming.Behavior.LinkShapes
-        Me.GraphView.ContextMenuStrip = Me.ContextMenuStripGraph
-        Me.GraphView.ControlHandlesStyle = MindFusion.Diagramming.HandlesStyle.HatchHandles
-        Me.GraphView.ControlMouseAction = MindFusion.Diagramming.ControlMouseAction.SelectNode
-        Me.GraphView.DelKeyAction = MindFusion.Diagramming.DelKeyAction.DeleteSelectedItems
-        Me.GraphView.Diagram = Me.Diagram
-        Me.GraphView.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.GraphView.Location = New System.Drawing.Point(0, 0)
-        Me.GraphView.MiddleButtonActions = MindFusion.Diagramming.MouseButtonActions.None
-        Me.GraphView.ModificationStart = MindFusion.Diagramming.ModificationStart.SelectedOnly
-        Me.GraphView.Name = "GraphView"
-        Me.GraphView.RightButtonActions = MindFusion.Diagramming.MouseButtonActions.Cancel
-        Me.GraphView.Size = New System.Drawing.Size(814, 190)
-        Me.GraphView.TabIndex = 0
-        Me.GraphView.Text = "DiagramView1"
-        '
         'ContextMenuStripGraph
         '
         Me.ContextMenuStripGraph.ImageScalingSize = New System.Drawing.Size(24, 24)
@@ -467,6 +451,31 @@ Partial Class frmFactEngine
         'BackgroundWorker
         '
         Me.BackgroundWorker.WorkerReportsProgress = True
+        '
+        'ToolStripStatusLabelError
+        '
+        Me.ToolStripStatusLabelError.ForeColor = System.Drawing.Color.Coral
+        Me.ToolStripStatusLabelError.Name = "ToolStripStatusLabelError"
+        Me.ToolStripStatusLabelError.Size = New System.Drawing.Size(138, 17)
+        Me.ToolStripStatusLabelError.Text = "ToolStripStatusLabelError"
+        '
+        'GraphView
+        '
+        Me.GraphView.Behavior = MindFusion.Diagramming.Behavior.LinkShapes
+        Me.GraphView.ContextMenuStrip = Me.ContextMenuStripGraph
+        Me.GraphView.ControlHandlesStyle = MindFusion.Diagramming.HandlesStyle.HatchHandles
+        Me.GraphView.ControlMouseAction = MindFusion.Diagramming.ControlMouseAction.SelectNode
+        Me.GraphView.DelKeyAction = MindFusion.Diagramming.DelKeyAction.DeleteSelectedItems
+        Me.GraphView.Diagram = Me.Diagram
+        Me.GraphView.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.GraphView.Location = New System.Drawing.Point(0, 0)
+        Me.GraphView.MiddleButtonActions = MindFusion.Diagramming.MouseButtonActions.None
+        Me.GraphView.ModificationStart = MindFusion.Diagramming.ModificationStart.SelectedOnly
+        Me.GraphView.Name = "GraphView"
+        Me.GraphView.RightButtonActions = MindFusion.Diagramming.MouseButtonActions.Cancel
+        Me.GraphView.Size = New System.Drawing.Size(814, 190)
+        Me.GraphView.TabIndex = 0
+        Me.GraphView.Text = "DiagramView1"
         '
         'frmFactEngine
         '
@@ -546,4 +555,6 @@ Partial Class frmFactEngine
     Friend WithEvents Diagram1 As MindFusion.Diagramming.Diagram
     Friend WithEvents ClearToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents BackgroundWorker As System.ComponentModel.BackgroundWorker
+    Friend WithEvents ToolStripStatusLabelError As ToolStripStatusLabel
+    Friend WithEvents Diagram2 As MindFusion.Diagramming.Diagram
 End Class

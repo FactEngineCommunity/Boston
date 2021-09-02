@@ -325,6 +325,7 @@ Namespace FactEngine
 
             Try
 
+
                 Dim lsPattern As String = "yyyy-MM-dd HH:mm:ss"
 
                 Return Convert.ToDateTime(asOriginalDate, System.Threading.Thread.CurrentThread.CurrentUICulture).ToString(lsPattern)

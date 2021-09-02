@@ -629,6 +629,30 @@ Namespace My
                 Me("FactEngineUseReferenceModeOnlyForSimpleReferenceSchemes") = value
             End Set
         End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("dd/MM/yyyy HH:mm:ss")>  _
+        Public Property FactEngineUserDateTimeFormat() As String
+            Get
+                Return CType(Me("FactEngineUserDateTimeFormat"),String)
+            End Get
+            Set
+                Me("FactEngineUserDateTimeFormat") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("dd/MM/yyyy")>  _
+        Public Property FactEngineUserDateFormat() As String
+            Get
+                Return CType(Me("FactEngineUserDateFormat"),String)
+            End Get
+            Set
+                Me("FactEngineUserDateFormat") = value
+            End Set
+        End Property
     End Class
 End Namespace
 
