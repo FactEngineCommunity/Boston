@@ -3,7 +3,7 @@ Imports System.Reflection
 
 Namespace ORMQL
     Public Class RecordsetDataGridList
-        Implements IBindingList
+        Implements IBindingListView
 
         Public mrRecordset As ORMQL.Recordset
         Public mrTable As RDS.Table
@@ -135,6 +135,33 @@ Namespace ORMQL
             End Get
         End Property
 
+        Public Property Filter As String Implements IBindingListView.Filter
+            Get
+                Throw New NotImplementedException()
+            End Get
+            Set(value As String)
+                Throw New NotImplementedException()
+            End Set
+        End Property
+
+        Public ReadOnly Property SortDescriptions As ListSortDescriptionCollection Implements IBindingListView.SortDescriptions
+            Get
+                Throw New NotImplementedException()
+            End Get
+        End Property
+
+        Public ReadOnly Property SupportsAdvancedSorting As Boolean Implements IBindingListView.SupportsAdvancedSorting
+            Get
+                Throw New NotImplementedException()
+            End Get
+        End Property
+
+        Public ReadOnly Property SupportsFiltering As Boolean Implements IBindingListView.SupportsFiltering
+            Get
+                Throw New NotImplementedException()
+            End Get
+        End Property
+
         Public Event ListChanged As ListChangedEventHandler Implements IBindingList.ListChanged
 
         Public Sub AddIndex([property] As PropertyDescriptor) Implements IBindingList.AddIndex
@@ -196,5 +223,13 @@ Namespace ORMQL
         Public Function GetEnumerator() As IEnumerator Implements IEnumerable.GetEnumerator
             Throw New NotImplementedException()
         End Function
+
+        Public Sub ApplySort(sorts As ListSortDescriptionCollection) Implements IBindingListView.ApplySort
+            Throw New NotImplementedException()
+        End Sub
+
+        Public Sub RemoveFilter() Implements IBindingListView.RemoveFilter
+            Throw New NotImplementedException()
+        End Sub
     End Class
 End Namespace

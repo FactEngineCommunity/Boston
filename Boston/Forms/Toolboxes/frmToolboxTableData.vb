@@ -30,7 +30,8 @@ Public Class frmToolboxTableData
         Else
             If Me.mrTable Is Nothing Then
             Else
-                lsSQLQuery = "SELECT * FROM " & mrTable.Name
+                lsSQLQuery = "SELECT * FROM " & mrTable.DatabaseName & vbCrLf
+                lsSQLQuery &= " LIMIT 100"
                 Me.mrRecordset = prApplication.WorkingModel.DatabaseConnection.GO(lsSQLQuery)
 
                 Me.mrDataGridList = New ORMQL.RecordsetDataGridList(Me.mrRecordset, Me.mrTable)
@@ -243,6 +244,50 @@ Public Class frmToolboxTableData
                     End If
                 End If
             End If
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
+    Private Sub AdvancedDataGridView_FilterStringChanged(sender As Object, e As EventArgs) Handles AdvancedDataGridView.FilterStringChanged
+
+        Dim lsSQLQuery As String
+
+        Try
+            If prApplication.WorkingModel.DatabaseConnection Is Nothing Then
+            Else
+                If Me.mrTable Is Nothing Then
+                Else
+                    lsSQLQuery = "SELECT * FROM " & mrTable.DatabaseName & vbCrLf
+
+                    For liInd = 0 To Me.mrTable.Column.Count - 1
+                        Call Me.AdvancedDataGridView.EnableFilter(Me.AdvancedDataGridView.Columns(liInd))
+                    Next
+
+                    Dim lsFilterString As String
+                    lsFilterString = Me.AdvancedDataGridView.FilterString.Replace("[", "").Replace("]", "")
+                    'WHERE Clause                    
+                    If Trim(lsFilterString) <> "" Then
+                        lsSQLQuery &= " WHERE " & lsFilterString
+                    End If
+                    lsSQLQuery &= vbCrLf & " LIMIT 100"
+
+                        Me.mrRecordset = prApplication.WorkingModel.DatabaseConnection.GO(lsSQLQuery)
+
+                        Me.mrDataGridList = New ORMQL.RecordsetDataGridList(Me.mrRecordset, Me.mrTable)
+
+                        Me.AdvancedDataGridView.DataSource = Me.mrDataGridList
+                    End If
+                End If
+
+
+
         Catch ex As Exception
             Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
