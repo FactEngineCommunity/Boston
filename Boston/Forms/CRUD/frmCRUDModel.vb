@@ -37,6 +37,12 @@ Public Class frmCRUDModel
             Me.ButtonReverseEngineerDatabase.Enabled = True
         End If
 
+        Me.TextBoxServerName.Text = Me.zrModel.Server
+        Me.TextBoxDatabaseName.Text = Me.zrModel.Database
+        Me.TextBoxSchemaName.Text = Me.zrModel.Schema
+        Me.TextBoxWarehouseName.Text = Me.zrModel.Warehouse
+        Me.TextBoxRoleName.Text = Me.zrModel.DatabaseRole
+
     End Sub
 
     Private Sub frmCRUDModel_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
@@ -59,6 +65,12 @@ Public Class frmCRUDModel
             Me.zrModel.TargetDatabaseType = Me.ComboBoxDatabaseType.SelectedItem.Tag
             Me.zrModel.TargetDatabaseConnectionString = Trim(Me.TextBoxDatabaseConnectionString.Text)
             Me.zrModel.IsDatabaseSynchronised = Me.CheckBoxIsDatabaseSynchronised.Checked
+
+            Me.zrModel.Server = Trim(Me.TextBoxServerName.Text)
+            Me.zrModel.Database = Trim(Me.TextBoxDatabaseName.Text)
+            Me.zrModel.Schema = Trim(Me.TextBoxSchemaName.Text)
+            Me.zrModel.Warehouse = Trim(Me.TextBoxWarehouseName.Text)
+            Me.zrModel.DatabaseRole = Trim(Me.TextBoxRoleName.Text)
 
             Try
                 If Me.zrModel.TreeNode IsNot Nothing Then

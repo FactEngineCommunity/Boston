@@ -500,7 +500,7 @@ Namespace FactEngine
                 Dim lasToTableNames As New List(Of String)
 
                 'Not supported yet
-                Return larRelation
+                'Return larRelation
 
                 'While Not lrRecordset.EOF
                 'Columns (Snowflake)
@@ -522,59 +522,49 @@ Namespace FactEngine
                 'deferrability
                 'comment
 
-                lrDestinationTable = Me.FBMModel.RDS.getTableByName(lrRecordset("table").Data)
 
-                'Below for SQLite
-                '    While Not lrRecordset.EOF
 
-                '        lrOriginColumn = arTable.Column.Find(Function(x) x.Name = lrRecordset("from").Data)
-                '        lrDestinationColumn = lrDestinationTable.Column.Find(Function(x) x.Name = lrRecordset("to").Data)
-                '        If lrDestinationColumn Is Nothing Then
-                '            'Try and find the DestinationColumn another way.
-                '            If lrDestinationTable.Index.Find(Function(x) x.IsPrimaryKey) IsNot Nothing Then
-                '                If lrDestinationTable.Index.Find(Function(x) x.IsPrimaryKey).Column.Count = 1 Then
-                '                    lrDestinationColumn = lrDestinationTable.Index.Find(Function(x) x.IsPrimaryKey).Column.First
-                '                Else
-                '                    Throw New Exception("Foreign key from Table, '" & arTable.Name & "', to table, '" & lrDestinationTable.Name & "', has a Column that can not be found in the referenced table. Try making the Column in '" & lrDestinationTable.Name & "' match those in table, " & arTable.Name)
-                '                End If
-                '            End If
+                '=============================================================================================
+                'Work Around for now. 20210903-VM-Because I have no valid data to work from above, so use the below for now.
 
-                '        End If
+                Dim lsTableName As String = arTable.Name
+                Dim larNotTable = From Table In arTable.Model.Table
+                                  Where Table.Name <> lsTableName
+                                  Select Table
 
-                '        If Not lasToTableNames.Contains(lrRecordset("table").Data) Then
+                For Each lrColumn In arTable.Column
 
-                '            lrRelation = New RDS.Relation(System.Guid.NewGuid.ToString,
-                '                                  arTable,
-                '                                  pcenumCMMLMultiplicity.Many,
-                '                                  True,
-                '                                  lrOriginColumn.isPartOfPrimaryKey,
-                '                                  "involves",
-                '                                  lrDestinationTable,
-                '                                  pcenumCMMLMultiplicity.One,
-                '                                  lrDestinationColumn.IsMandatory,
-                '                                  "is involed in",
-                '                                  Nothing)
-                '            larRelation.Add(lrRelation)
-                '        End If
+                    For Each lrTable In larNotTable
 
-                '        lrOriginColumn.Relation.Add(lrRelation)
-                '        lrRelation.OriginColumns.Add(lrOriginColumn)
-                '        lrRelation.DestinationColumns.Add(lrDestinationColumn)
+                        If lrTable.getPrimaryKeyColumns.Find(Function(x) x.Name = lrColumn.Name) IsNot Nothing Then
+                            'Likely ForeignKey reference.
+                            lrOriginColumn = lrColumn
+                            lrDestinationColumn = lrTable.getPrimaryKeyColumns.Find(Function(x) x.Name = lrColumn.Name)
+                            lrDestinationTable = lrDestinationColumn.Table
 
-                '        lrRecordset.MoveNext()
+                            lrRelation = New RDS.Relation(System.Guid.NewGuid.ToString,
+                                                          arTable,
+                                                          pcenumCMMLMultiplicity.Many,
+                                                          True,
+                                                          False,
+                                                          "involves",
+                                                          lrDestinationTable,
+                                                          pcenumCMMLMultiplicity.One,
+                                                          lrDestinationColumn.IsMandatory,
+                                                          "is involed in",
+                                                          Nothing)
 
-                '        If Not lrRecordset.EOF Then
-                '            If lrRecordset("table").Data <> lrDestinationTable.Name Then
-                '                lasToTableNames.AddUnique(lrDestinationTable.Name)
-                '                lrRecordset.CurrentFactIndex -= 1
-                '                Exit While
-                '            End If
-                '        End If
+                            larRelation.Add(lrRelation)
 
-                '    End While
+                            lrOriginColumn.Relation.Add(lrRelation)
+                            lrRelation.OriginColumns.Add(lrOriginColumn)
+                            lrRelation.DestinationColumns.Add(lrDestinationColumn)
 
-                '    lrRecordset.MoveNext()
-                'End While
+                        End If
+
+                    Next
+
+                Next
 
                 Return larRelation
 
@@ -596,7 +586,9 @@ Namespace FactEngine
             Dim larColumn As New List(Of RDS.Column)
             Try
                 'E.g. "show columns in TABLE "SNOWFLAKE_SAMPLE_DATA"."TPCH_SF001"."CUSTOMER""
-                Dim lsSQL As String = "show columns in TABLE ""SNOWFLAKE_SAMPLE_DATA"".""TPCH_SF001"".""" & arTable.Name & """"
+                'E.g. also "DESCRIBE TABLE <TableName>"
+                'Database.Schema.Table
+                Dim lsSQL As String = "show columns in TABLE """ & arTable.Model.Model.Database & """.""" & arTable.Model.Model.Schema & """.""" & arTable.Name & """"
                 Dim lrRecordset As ORMQL.Recordset = Me.GO(lsSQL)
 
                 Dim lsColumnName As String
@@ -718,7 +710,7 @@ Namespace FactEngine
             Dim larIndex As New List(Of RDS.Index)
             Try
                 'DESCRIBE TABLE "SNOWFLAKE_SAMPLE_DATA"."TPCH_SF001"."ORDERS"
-                Dim lsSQL As String = "DESCRIBE TABLE ""SNOWFLAKE_SAMPLE_DATA"".""TPCH_SF001"".""" & arTable.Name & """"
+                Dim lsSQL As String = "DESCRIBE TABLE """ & arTable.Model.Model.Database & """.""" & arTable.Model.Model.Schema & """.""" & arTable.Name & """"
 
                 Dim lrRecordset As ORMQL.Recordset = Me.GO(lsSQL)
 
@@ -743,8 +735,8 @@ Namespace FactEngine
                 larColumn.Clear()
 
                 'NB Snowflake doesn't support Unique Keys as Indexes. Only use this for getting Primary Key if exists.                        
-
                 While Not lrRecordset.EOF
+#Region "Snowflake: Column Names for DECRIBE"
                     'name
                     'type
                     'kind
@@ -755,6 +747,7 @@ Namespace FactEngine
                     'check
                     'expression
                     'comment
+#End Region
 
                     If lrRecordset("primary key").Data = "Y" Then
                         lbIgnoreNulls = lrRecordset("null?").Data = "Y"
@@ -764,7 +757,23 @@ Namespace FactEngine
                     End If
 
                     lrRecordset.MoveNext()
+
                 End While
+
+                If larColumn.Count = 0 Then
+                    'Fallback...get the first Column as the PrimaryKey
+                    lrRecordset.MoveFirst()
+                    While Not lrRecordset.EOF
+
+                        lbIgnoreNulls = lrRecordset("null?").Data = "Y"
+                        lsColumnName = lrRecordset("name").Data
+                        lrColumn = arTable.Column.Find(Function(x) x.Name = lsColumnName)
+                        larColumn.Add(lrColumn)
+
+                        Exit While
+                    End While
+
+                End If
 
                 If larColumn.Count > 0 Then
                     lrIndex = New RDS.Index(arTable,

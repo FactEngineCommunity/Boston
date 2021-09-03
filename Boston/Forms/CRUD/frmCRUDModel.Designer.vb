@@ -57,6 +57,18 @@ Partial Class frmCRUDModel
         Me.TabPageReverseEngineering = New System.Windows.Forms.TabPage()
         Me.ButtonApply = New System.Windows.Forms.Button()
         Me.BackgroundWorker = New System.ComponentModel.BackgroundWorker()
+        Me.TabPageConnection = New System.Windows.Forms.TabPage()
+        Me.GroupBoxConnection = New System.Windows.Forms.GroupBox()
+        Me.LabelPromptServerName = New System.Windows.Forms.Label()
+        Me.TextBoxServerName = New System.Windows.Forms.TextBox()
+        Me.LabelPromptDatabaseName = New System.Windows.Forms.Label()
+        Me.TextBoxDatabaseName = New System.Windows.Forms.TextBox()
+        Me.LabelPromptSchemaName = New System.Windows.Forms.Label()
+        Me.TextBoxSchemaName = New System.Windows.Forms.TextBox()
+        Me.LabelPromptWarehouseName = New System.Windows.Forms.Label()
+        Me.TextBoxWarehouseName = New System.Windows.Forms.TextBox()
+        Me.LabelPromptRoleName = New System.Windows.Forms.Label()
+        Me.TextBoxRoleName = New System.Windows.Forms.TextBox()
         Me.GroupBox_main.SuspendLayout()
         Me.GroupBoxDatabase.SuspendLayout()
         Me.GroupBoxReverseEngineering.SuspendLayout()
@@ -66,6 +78,8 @@ Partial Class frmCRUDModel
         Me.Tab1.SuspendLayout()
         Me.Advanced.SuspendLayout()
         Me.TabPageReverseEngineering.SuspendLayout()
+        Me.TabPageConnection.SuspendLayout()
+        Me.GroupBoxConnection.SuspendLayout()
         Me.SuspendLayout()
         '
         'Button_Cancel
@@ -341,6 +355,7 @@ Partial Class frmCRUDModel
         Me.TabControl1.Controls.Add(Me.Tab1)
         Me.TabControl1.Controls.Add(Me.Advanced)
         Me.TabControl1.Controls.Add(Me.TabPageReverseEngineering)
+        Me.TabControl1.Controls.Add(Me.TabPageConnection)
         Me.TabControl1.Location = New System.Drawing.Point(8, 8)
         Me.TabControl1.Margin = New System.Windows.Forms.Padding(2)
         Me.TabControl1.Name = "TabControl1"
@@ -409,6 +424,123 @@ Partial Class frmCRUDModel
         '
         Me.BackgroundWorker.WorkerReportsProgress = True
         '
+        'TabPageConnection
+        '
+        Me.TabPageConnection.Controls.Add(Me.GroupBoxConnection)
+        Me.TabPageConnection.Location = New System.Drawing.Point(4, 22)
+        Me.TabPageConnection.Name = "TabPageConnection"
+        Me.TabPageConnection.Size = New System.Drawing.Size(621, 360)
+        Me.TabPageConnection.TabIndex = 3
+        Me.TabPageConnection.Text = "Connection"
+        Me.TabPageConnection.UseVisualStyleBackColor = True
+        '
+        'GroupBoxConnection
+        '
+        Me.GroupBoxConnection.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.GroupBoxConnection.Controls.Add(Me.TextBoxRoleName)
+        Me.GroupBoxConnection.Controls.Add(Me.LabelPromptRoleName)
+        Me.GroupBoxConnection.Controls.Add(Me.TextBoxWarehouseName)
+        Me.GroupBoxConnection.Controls.Add(Me.LabelPromptWarehouseName)
+        Me.GroupBoxConnection.Controls.Add(Me.TextBoxSchemaName)
+        Me.GroupBoxConnection.Controls.Add(Me.LabelPromptSchemaName)
+        Me.GroupBoxConnection.Controls.Add(Me.TextBoxDatabaseName)
+        Me.GroupBoxConnection.Controls.Add(Me.LabelPromptDatabaseName)
+        Me.GroupBoxConnection.Controls.Add(Me.TextBoxServerName)
+        Me.GroupBoxConnection.Controls.Add(Me.LabelPromptServerName)
+        Me.GroupBoxConnection.Location = New System.Drawing.Point(3, 3)
+        Me.GroupBoxConnection.Name = "GroupBoxConnection"
+        Me.GroupBoxConnection.Size = New System.Drawing.Size(615, 354)
+        Me.GroupBoxConnection.TabIndex = 0
+        Me.GroupBoxConnection.TabStop = False
+        Me.GroupBoxConnection.Text = "Connection Details:"
+        '
+        'LabelPromptServerName
+        '
+        Me.LabelPromptServerName.AutoSize = True
+        Me.LabelPromptServerName.Location = New System.Drawing.Point(7, 36)
+        Me.LabelPromptServerName.Name = "LabelPromptServerName"
+        Me.LabelPromptServerName.Size = New System.Drawing.Size(72, 13)
+        Me.LabelPromptServerName.TabIndex = 0
+        Me.LabelPromptServerName.Text = "Server Name:"
+        '
+        'TextBoxServerName
+        '
+        Me.TextBoxServerName.Location = New System.Drawing.Point(109, 33)
+        Me.TextBoxServerName.MaxLength = 255
+        Me.TextBoxServerName.Name = "TextBoxServerName"
+        Me.TextBoxServerName.Size = New System.Drawing.Size(457, 20)
+        Me.TextBoxServerName.TabIndex = 1
+        '
+        'LabelPromptDatabaseName
+        '
+        Me.LabelPromptDatabaseName.AutoSize = True
+        Me.LabelPromptDatabaseName.Location = New System.Drawing.Point(7, 65)
+        Me.LabelPromptDatabaseName.Name = "LabelPromptDatabaseName"
+        Me.LabelPromptDatabaseName.Size = New System.Drawing.Size(87, 13)
+        Me.LabelPromptDatabaseName.TabIndex = 2
+        Me.LabelPromptDatabaseName.Text = "Database Name:"
+        '
+        'TextBoxDatabaseName
+        '
+        Me.TextBoxDatabaseName.Location = New System.Drawing.Point(109, 62)
+        Me.TextBoxDatabaseName.MaxLength = 255
+        Me.TextBoxDatabaseName.Name = "TextBoxDatabaseName"
+        Me.TextBoxDatabaseName.Size = New System.Drawing.Size(457, 20)
+        Me.TextBoxDatabaseName.TabIndex = 3
+        '
+        'LabelPromptSchemaName
+        '
+        Me.LabelPromptSchemaName.AutoSize = True
+        Me.LabelPromptSchemaName.Location = New System.Drawing.Point(7, 96)
+        Me.LabelPromptSchemaName.Name = "LabelPromptSchemaName"
+        Me.LabelPromptSchemaName.Size = New System.Drawing.Size(80, 13)
+        Me.LabelPromptSchemaName.TabIndex = 4
+        Me.LabelPromptSchemaName.Text = "Schema Name:"
+        '
+        'TextBoxSchemaName
+        '
+        Me.TextBoxSchemaName.Location = New System.Drawing.Point(109, 93)
+        Me.TextBoxSchemaName.MaxLength = 255
+        Me.TextBoxSchemaName.Name = "TextBoxSchemaName"
+        Me.TextBoxSchemaName.Size = New System.Drawing.Size(457, 20)
+        Me.TextBoxSchemaName.TabIndex = 5
+        '
+        'LabelPromptWarehouseName
+        '
+        Me.LabelPromptWarehouseName.AutoSize = True
+        Me.LabelPromptWarehouseName.Location = New System.Drawing.Point(7, 124)
+        Me.LabelPromptWarehouseName.Name = "LabelPromptWarehouseName"
+        Me.LabelPromptWarehouseName.Size = New System.Drawing.Size(96, 13)
+        Me.LabelPromptWarehouseName.TabIndex = 6
+        Me.LabelPromptWarehouseName.Text = "Warehouse Name:"
+        '
+        'TextBoxWarehouseName
+        '
+        Me.TextBoxWarehouseName.Location = New System.Drawing.Point(109, 121)
+        Me.TextBoxWarehouseName.MaxLength = 255
+        Me.TextBoxWarehouseName.Name = "TextBoxWarehouseName"
+        Me.TextBoxWarehouseName.Size = New System.Drawing.Size(457, 20)
+        Me.TextBoxWarehouseName.TabIndex = 7
+        '
+        'LabelPromptRoleName
+        '
+        Me.LabelPromptRoleName.AutoSize = True
+        Me.LabelPromptRoleName.Location = New System.Drawing.Point(7, 153)
+        Me.LabelPromptRoleName.Name = "LabelPromptRoleName"
+        Me.LabelPromptRoleName.Size = New System.Drawing.Size(63, 13)
+        Me.LabelPromptRoleName.TabIndex = 8
+        Me.LabelPromptRoleName.Text = "Role Name:"
+        '
+        'TextBoxRoleName
+        '
+        Me.TextBoxRoleName.Location = New System.Drawing.Point(109, 153)
+        Me.TextBoxRoleName.MaxLength = 100
+        Me.TextBoxRoleName.Name = "TextBoxRoleName"
+        Me.TextBoxRoleName.Size = New System.Drawing.Size(179, 20)
+        Me.TextBoxRoleName.TabIndex = 9
+        '
         'frmCRUDModel
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -435,6 +567,9 @@ Partial Class frmCRUDModel
         Me.Advanced.ResumeLayout(False)
         Me.Advanced.PerformLayout()
         Me.TabPageReverseEngineering.ResumeLayout(False)
+        Me.TabPageConnection.ResumeLayout(False)
+        Me.GroupBoxConnection.ResumeLayout(False)
+        Me.GroupBoxConnection.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub
@@ -472,4 +607,16 @@ Partial Class frmCRUDModel
     Friend WithEvents BackgroundWorker As System.ComponentModel.BackgroundWorker
     Friend WithEvents RichTextBoxREErrorMessages As RichTextBox
     Friend WithEvents LabelPromptErrorMessages As Label
+    Friend WithEvents TabPageConnection As TabPage
+    Friend WithEvents GroupBoxConnection As GroupBox
+    Friend WithEvents TextBoxServerName As TextBox
+    Friend WithEvents LabelPromptServerName As Label
+    Friend WithEvents TextBoxDatabaseName As TextBox
+    Friend WithEvents LabelPromptDatabaseName As Label
+    Friend WithEvents TextBoxSchemaName As TextBox
+    Friend WithEvents LabelPromptSchemaName As Label
+    Friend WithEvents TextBoxRoleName As TextBox
+    Friend WithEvents LabelPromptRoleName As Label
+    Friend WithEvents TextBoxWarehouseName As TextBox
+    Friend WithEvents LabelPromptWarehouseName As Label
 End Class

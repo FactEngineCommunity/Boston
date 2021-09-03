@@ -559,6 +559,7 @@ Public Class ODBCDatabaseReverseEngineer
 
         Try
             For Each lrTable In Me.TempModel.RDS.Table
+                lrTable.Model = Me.TempModel.RDS
                 Dim larRelation As New List(Of RDS.Relation)
                 Try
                     larRelation = Me.TempModel.DatabaseConnection.getForeignKeyRelationshipsByTable(lrTable)
@@ -662,6 +663,7 @@ Public Class ODBCDatabaseReverseEngineer
                 larIndex = Me.TempModel.DatabaseConnection.getIndexesByTable(lrTable)
                 For Each lrIndex In larIndex
                     lrTable.Index.Add(lrIndex)
+                    Me.TempModel.RDS.Index.Add(lrIndex)
                 Next
 
                 If larIndex.FindAll(Function(x) x.IsPrimaryKey).Count = 0 Then

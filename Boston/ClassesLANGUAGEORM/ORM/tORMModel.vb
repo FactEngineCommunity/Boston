@@ -284,9 +284,29 @@ Namespace FBM
         <NonSerialized()> _
         <XmlIgnore()> _
         Private Parser As New TinyPG.Parser(New TinyPG.Scanner) 'Used to parse Text input into the Brain; especially for ORMQL.
-        <NonSerialized()> _
-        <XmlIgnore()> _
+        <NonSerialized()>
+        <XmlIgnore()>
         Private Parsetree As New TinyPG.ParseTree 'Used with the Parser, is populated during the parsing of text input into the Brain; especially ORMQL
+
+        <NonSerialized()>
+        <XmlIgnore()>
+        Public Server As String 'E.g. As needed by Snowflake for ODBC. See also the physical model.
+
+        <NonSerialized()>
+        <XmlIgnore()>
+        Public Database As String 'E.g. As needed by Snowflake for ODBC. See also the physical model.
+
+        <NonSerialized()>
+        <XmlIgnore()>
+        Public Schema As String 'E.g. As needed by Snowflake for ODBC. See also the physical model.
+
+        <NonSerialized()>
+        <XmlIgnore()>
+        Public Warehouse As String 'E.g. As needed by Snowflake for ODBC. See also the physical model.
+
+        <NonSerialized()>
+        <XmlIgnore()>
+        Public DatabaseRole As String 'E.g. As needed by Snowflake for ODBC. See also the physical model.
 
         <NonSerialized()>
         Public Event Deleting()

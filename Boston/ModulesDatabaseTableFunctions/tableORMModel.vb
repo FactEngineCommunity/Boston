@@ -33,6 +33,11 @@ Namespace TableModel
                 End If
                 lsSQLQuery &= " ,'" & ar_model.CreatedByUserId & "'"
                 lsSQLQuery &= " ,'" & ar_model.CoreVersionNumber & "'"
+                lsSQLQuery &= " ,'" & Trim(ar_model.Server) & "'"
+                lsSQLQuery &= " ,'" & Trim(ar_model.Database) & "'"
+                lsSQLQuery &= " ,'" & Trim(ar_model.Schema) & "'"
+                lsSQLQuery &= " ,'" & Trim(ar_model.Warehouse) & "'"
+                lsSQLQuery &= " ,'" & Trim(ar_model.DatabaseRole) & "'"
                 lsSQLQuery &= ")"
 
                 Call pdbConnection.Execute(lsSQLQuery)
@@ -162,6 +167,13 @@ Namespace TableModel
                     arModel.CreatedByUserId = NullVal(lREcordset("CreatedByUserId").Value, "")
 
                     arModel.CoreVersionNumber = Trim(lREcordset("CoreVersionNumber").Value)
+
+                    'ODBC etc
+                    arModel.Server = Trim(NullVal(lREcordset("Server").Value, ""))
+                    arModel.Database = Trim(NullVal(lREcordset("DatabaseName").Value, ""))
+                    arModel.Schema = Trim(NullVal(lREcordset("Schema").Value, ""))
+                    arModel.Warehouse = Trim(NullVal(lREcordset("Warehouse").Value, ""))
+                    arModel.DatabaseRole = Trim(NullVal(lREcordset("Role").Value, ""))
                 Else
 
                     lsMessage = "No Model returned for ModelId: '" & arModel.ModelId & "'"
@@ -235,6 +247,13 @@ Namespace TableModel
 
                     lrModel.CoreVersionNumber = Trim(lREcordset("CoreVersionNumber").Value)
 
+                    'ODBC etc
+                    lrModel.Server = Trim(NullVal(lREcordset("Server").Value, ""))
+                    lrModel.Database = Trim(NullVal(lREcordset("DatabaseName").Value, ""))
+                    lrModel.Schema = Trim(NullVal(lREcordset("Schema").Value, ""))
+                    lrModel.Warehouse = Trim(NullVal(lREcordset("Warehouse").Value, ""))
+                    lrModel.DatabaseRole = Trim(NullVal(lREcordset("Role").Value, ""))
+
                     GetModels.Add(lrModel)
                     lREcordset.MoveNext()
                 End While
@@ -283,6 +302,11 @@ Namespace TableModel
                 lsSQLQuery &= "       ,TargetDatabaseConnectionString = '" & Trim(ar_model.TargetDatabaseConnectionString) & "'"
                 lsSQLQuery &= "       ,CreatedByUserId = '" & NullVal(ar_model.CreatedByUserId, "") & "'"
                 lsSQLQuery &= "       ,CoreVersionNumber = '" & Trim(ar_model.CoreVersionNumber) & "'"
+                lsSQLQuery &= "       ,Server = '" & Trim(ar_model.Server) & "'"
+                lsSQLQuery &= "       ,DatabaseName = '" & Trim(ar_model.Database) & "'"
+                lsSQLQuery &= "       ,[Schema] = '" & Trim(ar_model.Schema) & "'"
+                lsSQLQuery &= "       ,Warehouse = '" & Trim(ar_model.Warehouse) & "'"
+                lsSQLQuery &= "       ,[Role] = '" & Trim(ar_model.DatabaseRole) & "'"
                 lsSQLQuery &= " WHERE ModelId = '" & Trim(ar_model.ModelId) & "'"
 
                 pdbConnection.BeginTrans()

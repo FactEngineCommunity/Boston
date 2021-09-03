@@ -247,6 +247,9 @@ Public Class frmToolboxEnterpriseExplorer
                 Case Is = pcenumDatabaseType.PostgreSQL
                     loNode.ImageIndex = 11
                     loNode.SelectedImageIndex = 11
+                Case Is = pcenumDatabaseType.Snowflake
+                    loNode.ImageIndex = 12
+                    loNode.SelectedImageIndex = 12
             End Select
         End If
 
@@ -1810,15 +1813,24 @@ Public Class frmToolboxEnterpriseExplorer
                         Case Is = pcenumDatabaseType.MongoDB
                             loNode.ImageIndex = 6
                             loNode.SelectedImageIndex = 6
-                        Case Is = pcenumDatabaseType.SQLServer
-                            loNode.ImageIndex = 9
-                            loNode.SelectedImageIndex = 9
                         Case Is = pcenumDatabaseType.MSJet
                             loNode.ImageIndex = 7
                             loNode.SelectedImageIndex = 7
                         Case Is = pcenumDatabaseType.SQLite
                             loNode.ImageIndex = 8
                             loNode.SelectedImageIndex = 8
+                        Case Is = pcenumDatabaseType.SQLServer
+                            loNode.ImageIndex = 9
+                            loNode.SelectedImageIndex = 9
+                        Case Is = pcenumDatabaseType.ODBC
+                            loNode.ImageIndex = 10
+                            loNode.SelectedImageIndex = 10
+                        Case Is = pcenumDatabaseType.PostgreSQL
+                            loNode.ImageIndex = 11
+                            loNode.SelectedImageIndex = 11
+                        Case Is = pcenumDatabaseType.Snowflake
+                            loNode.ImageIndex = 12
+                            loNode.SelectedImageIndex = 12
                     End Select
                 End If
             End If
@@ -3365,13 +3377,23 @@ Public Class frmToolboxEnterpriseExplorer
 
         Dim lrModel As FBM.Model
 
-        '-----------------------------------------
-        'Get the Model from the selected TreeNode
-        '-----------------------------------------
-        lrModel = New FBM.Model
-        lrModel = Me.TreeView.SelectedNode.Tag.Tag
+        Try
+            '-----------------------------------------
+            'Get the Model from the selected TreeNode
+            '-----------------------------------------
+            lrModel = New FBM.Model
+            lrModel = Me.TreeView.SelectedNode.Tag.Tag
 
-        Call frmMain.LoadCRUDModel(lrModel)
+            Call frmMain.LoadCRUDModel(lrModel)
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 
