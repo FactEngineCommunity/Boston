@@ -7576,6 +7576,49 @@ Public Class frmDiagramORM
                     Me.MorphVector(0).TargetZoomFactor = lrPage.DiagramView.ZoomFactor
                 End If
 
+                Dim lrEntity As ERD.Entity
+
+                '-------------------------------------------------------------------------------------
+                'Populate the MorphVector with each relevant ModelObjectInstance on the current Page
+                '  that is also on the destination Page.
+                '----------------------------------------------------------------------
+#Region "Additional MorphVectors"
+                Dim lrAdditionalShapeNode As ShapeNode = Nothing
+                Dim larConceptTypes = {pcenumConceptType.EntityType, pcenumConceptType.FactType}
+
+                For Each lrAdditionalObject In Me.zrPage.GetAllPageObjects.FindAll(Function(x) larConceptTypes.Contains(x.ConceptType))
+                    If lrAdditionalObject.Id = Me.zrPage.SelectedObject(0).Id Then
+                        '---------------------------------------------------------------------------------------------
+                        'Skip. Is already added to the MorphVector collection when the ContextMenu.Diagram as loaded
+                        '---------------------------------------------------------------------------------------------
+                    Else
+                        Dim larEntityList = From Entity In lrPage.ERDiagram.Entity
+                                            Where Entity.Name = lrAdditionalObject.Name
+                                            Select Entity
+
+                        For Each lrEntity In larEntityList
+                            Me.MorphVector.Add(New tMorphVector(lrAdditionalObject.X, lrAdditionalObject.Y, lrEntity.X, lrEntity.Y, 40))
+
+                            Dim lrAdditionalPageObject As FBM.PageObject = lrAdditionalObject.ClonePageObject
+                            lrAdditionalShapeNode = lrAdditionalPageObject.Shape.Clone(True)
+                            lrAdditionalShapeNode = New ShapeNode(lrAdditionalPageObject.Shape)
+                            lrAdditionalShapeNode.Text = lrAdditionalObject.Name
+                            lrAdditionalShapeNode.Visible = True
+
+                            'lrShapeNode = lrAdditionalObject.Shape
+                            'lrShapeNode = lrAdditionalObject.ClonePageObject 'Me.HiddenDiagram.Factory.CreateShapeNode(lrShapeNode.Bounds.X, lrShapeNode.Bounds.Y, lrShapeNode.Bounds.Width, lrShapeNode.Bounds.Height)
+                            ''lrShapeNode.Shape = Shapes.RoundRect
+                            'lrShapeNode.Text = lrAdditionalObject.Name
+
+                            Me.HiddenDiagram.Nodes.Add(lrAdditionalShapeNode)
+                            Me.MorphVector(Me.MorphVector.Count - 1).ModelElementId = lrEntity.Name
+                            Me.MorphVector(Me.MorphVector.Count - 1).Shape = lrAdditionalShapeNode
+                            Me.MorphVector(Me.MorphVector.Count - 1).Shape.Font = Me.zrPage.Diagram.Font
+                        Next
+                    End If
+                Next
+#End Region
+
                 Dim larFactDataInstance = From FactTypeInstance In lrPage.FactTypeInstance
                                           From FactInstance In FactTypeInstance.Fact
                                           From FactDataInstance In FactInstance.Data
@@ -7602,7 +7645,6 @@ Public Class frmDiagramORM
                 Me.MorphVector(0).StartSize = New Rectangle(0, 0, Me.MorphVector(0).Shape.Bounds.Width, Me.MorphVector(0).Shape.Bounds.Height)
 
                 '===========================================
-                Dim lrEntity As ERD.Entity
                 lrEntity = lrPage.ERDiagram.Entity.Find(Function(x) x.Name = lrPageObject.Name)
 
                 If lrEntity IsNot Nothing Then
