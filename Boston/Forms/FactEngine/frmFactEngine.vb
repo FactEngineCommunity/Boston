@@ -38,6 +38,42 @@ Public Class frmFactEngine
     <Out, MarshalAs(UnmanagedType.LPWStr)> ByVal pwszBuff As System.Text.StringBuilder, ByVal cchBuff As Integer, ByVal wFlags As UInteger, ByVal dwhkl As IntPtr) As Integer
     End Function
 
+    Private Sub frmFactEngine_Load(sender As Object, e As EventArgs) Handles Me.Load
+
+        Me.AutoComplete = New frmAutoComplete(Me.TextBoxInput)
+        Me.AutoComplete.Owner = Me
+        Me.AutoComplete.moBackgroundWorker = Me.BackgroundWorker
+
+        Me.TextBoxInput.AllowDrop = True
+
+        '-------------------------------------------------------
+        'Setup the Text Highlighter
+        '----------------------------
+        Me.zrTextHighlighter = New FEQL.TextHighlighter(Me.TextBoxInput,
+                                                        Me.zrScanner,
+                                                        Me.zrParser)
+
+        Me.TextMarker = New FEQL.Controls.TextMarker(Me.TextBoxInput)
+
+        Call Me.displayModelName()
+        Me.FEQLProcessor = New FEQL.Processor(prApplication.WorkingModel)
+
+        If prApplication.WorkingModel IsNot Nothing Then
+            If Trim(prApplication.WorkingModel.TargetDatabaseConnectionString) = "" Then
+                Me.ToolStripStatusLabelRequiresConnectionString.ForeColor = Color.Orange
+                Me.ToolStripStatusLabelRequiresConnectionString.Text = "Model requires a database connection string"
+            Else
+                Me.ToolStripStatusLabelRequiresConnectionString.Text = ""
+                Call Me.FEQLProcessor.DatabaseManager.establishConnection(prApplication.WorkingModel.TargetDatabaseType, prApplication.WorkingModel.TargetDatabaseConnectionString)
+            End If
+        End If
+
+        Me.ToolStripStatusLabelCurrentProduction.Text = "FactEngine Statement"
+        Me.ToolStripStatusLabelError.Text = ""
+
+    End Sub
+
+
     Public Function KeyCodeToUnicode(ByVal key As Keys) As String
         Dim keyboardState As Byte() = New Byte(254) {}
         Dim keyboardStateStatus As Boolean = GetKeyboardState(keyboardState)
@@ -591,41 +627,6 @@ Public Class frmFactEngine
 
     End Sub
 
-    Private Sub frmFactEngine_Load(sender As Object, e As EventArgs) Handles Me.Load
-
-        Me.AutoComplete = New frmAutoComplete(Me.TextBoxInput)
-        Me.AutoComplete.Owner = Me
-        Me.AutoComplete.moBackgroundWorker = Me.BackgroundWorker
-
-        Me.TextBoxInput.AllowDrop = True
-
-        '-------------------------------------------------------
-        'Setup the Text Highlighter
-        '----------------------------
-        Me.zrTextHighlighter = New FEQL.TextHighlighter(Me.TextBoxInput,
-                                                        Me.zrScanner,
-                                                        Me.zrParser)
-
-        Me.TextMarker = New FEQL.Controls.TextMarker(Me.TextBoxInput)
-
-        Call Me.displayModelName()
-        Me.FEQLProcessor = New FEQL.Processor(prApplication.WorkingModel)
-
-        If prApplication.WorkingModel IsNot Nothing Then
-            If Trim(prApplication.WorkingModel.TargetDatabaseConnectionString) = "" Then
-                Me.ToolStripStatusLabelRequiresConnectionString.ForeColor = Color.Orange
-                Me.ToolStripStatusLabelRequiresConnectionString.Text = "Model requires a database connection string"
-            Else
-                Me.ToolStripStatusLabelRequiresConnectionString.Text = ""
-                Call Me.FEQLProcessor.DatabaseManager.establishConnection(prApplication.WorkingModel.TargetDatabaseType, prApplication.WorkingModel.TargetDatabaseConnectionString)
-            End If
-        End If
-
-        Me.ToolStripStatusLabelCurrentProduction.Text = "FactEngine Statement"
-        Me.ToolStripStatusLabelError.Text = ""
-
-    End Sub
-
     Private Sub ToolStripButtonGO_Click(sender As Object, e As EventArgs) Handles ToolStripButtonGO.Click
 
         Try
@@ -967,6 +968,14 @@ Public Class frmFactEngine
             End With
 
             Call Me.hideAutoComplete()
+
+            If Me.ToolStripMenuItemDefaultToResultsTab.Checked Then
+                Me.TabControl1.SelectedTab = Me.TabPageResults
+            ElseIf Me.ToolStripMenuItemDefaultToQueryTab.Checked Then
+                Me.TabControl1.SelectedTab = Me.TabPageQuery
+            Else
+                Me.TabControl1.SelectedTab = Me.TabPageResults
+            End If
 
         Catch ex As Exception
             Dim lsMessage As String
@@ -2802,6 +2811,19 @@ Public Class frmFactEngine
         Catch ex As Exception
 
         End Try
+
+    End Sub
+
+    Private Sub ToolStripMenuItemDefaultToResultsTab_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItemDefaultToResultsTab.Click
+
+        ToolStripMenuItemDefaultToResultsTab.Checked = Not ToolStripMenuItemDefaultToResultsTab.Checked
+        ToolStripMenuItemDefaultToQueryTab.Checked = Not ToolStripMenuItemDefaultToResultsTab.Checked
+    End Sub
+
+    Private Sub ToolStripMenuItemDefaultToQueryTab_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItemDefaultToQueryTab.Click
+
+        ToolStripMenuItemDefaultToQueryTab.Checked = Not ToolStripMenuItemDefaultToQueryTab.Checked
+        ToolStripMenuItemDefaultToResultsTab.Checked = Not ToolStripMenuItemDefaultToQueryTab.Checked
 
     End Sub
 End Class

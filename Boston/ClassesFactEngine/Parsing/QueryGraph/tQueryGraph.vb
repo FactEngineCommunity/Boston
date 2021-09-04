@@ -66,6 +66,17 @@
             Dim lsSelectClause As String = ""
 
             Try
+                'Set the Node Aliases. E.g. If Lecturer occurs twice in the FROM clause, then Lecturer, Lecturer2 etc
+                Call Me.setNodeAliases()
+                Call Me.setQueryEdgeAliases()
+
+#Region "Get ProjectionColums"
+                liInd = 1
+                Dim larProjectionColumn = Me.getProjectionColumns(arWhichSelectStatement, abIsStraightDerivationClause, arDerivedModelElement)
+                Me.ProjectionColumn = larProjectionColumn
+#End Region
+
+
 #Region "FromClause"
 
                 Dim larFromNodes = Me.Nodes.FindAll(Function(x) x.FBMModelObject.ConceptType <> pcenumConceptType.ValueType)
@@ -88,7 +99,20 @@
 
                 liInd = 0
                 For Each lrQueryNode In larFromNodes.FindAll(Function(x) Not x.FBMModelObject.IsDerived)
-                    lsTDBQuery &= "$" & lrQueryNode.RDSTable.DatabaseName & Viev.NullVal(lrQueryNode.Alias, "") & " is a " & lrQueryNode.RDSTable.DatabaseName & ";" & vbCrLf
+                    lsTDBQuery &= "$" & lrQueryNode.RDSTable.DatabaseName & Viev.NullVal(lrQueryNode.Alias, "") & " is a " & lrQueryNode.RDSTable.DatabaseName
+
+                    '----------------------------------------------------
+                    'Return Columns
+                    Dim larReturnColumn = From Column In Me.ProjectionColumn
+                                          Where Column.Table.Name = lrQueryNode.RDSTable.Name
+                                          Select Column
+
+                    For Each lrReturnColumn In larReturnColumn
+                        lsTDBQuery &= ", has " & lrReturnColumn.Name & " $" & lrReturnColumn.Table.Name & lrReturnColumn.Name & lrReturnColumn.TemporaryAlias
+                    Next
+                    '----------------------------------------------------
+
+                    lsTDBQuery &= ";" & vbCrLf
                 Next
 #End Region
 
@@ -103,7 +127,7 @@
                 'WhereEdges are Where joins, rather than ConditionalQueryEdges which test for values by identifiers.
                 Dim larWhereEdges = larEdgesWithTargetNode.ToList.FindAll(Function(x) (x.TargetNode.FBMModelObject.ConceptType <> pcenumConceptType.ValueType And
                 x.BaseNode.FBMModelObject.ConceptType <> pcenumConceptType.ValueType) Or
-                x.isRDSTable Or x.IsDerived)
+                x.IsRDSTable Or x.IsDerived)
 
                 'Add special DerivedFactType WhereEdges
                 Dim larSpecialDerivedQueryEdges = From QueryEdge In Me.QueryEdges
@@ -125,7 +149,7 @@
                                                     Where QueryEdge.FBMFactType IsNot Nothing
                                                     Where QueryEdge.TargetNode Is Nothing And Not (QueryEdge.FBMFactType.IsDerived And QueryEdge.TargetNode.FBMModelObject.GetType Is GetType(FBM.ValueType))
                                                     Select QueryEdge
-                larConditionalQueryEdges.AddRange(larExtraConditionalQueryEdges.tolist)
+                larConditionalQueryEdges.AddRange(larExtraConditionalQueryEdges.ToList)
 
                 'ShortestPath conditionals are excluded.
                 '  E.g. For '(Account:1) made [SHORTEST PATH 0..10] WHICH Transaction THAT was made to (Account 2:4) '
@@ -311,11 +335,11 @@
 
                         Else
                             Dim larTargetColumn = lrQueryEdge.BaseNode.RDSTable.getPrimaryKeyColumns
-                            For Each lrColumn In larTargetColumn
-                                Dim lrOriginColumn = lrRelation.OriginColumns.Find(Function(x) x.ActiveRole Is lrColumn.ActiveRole)
-                                lsTDBQuery &= lrQueryEdge.TargetNode.RDSTable.DatabaseName & Viev.NullVal(lrQueryEdge.TargetNode.Alias, "") & "." & lrOriginColumn.Name
-                                lsTDBQuery &= " = " & lrQueryEdge.BaseNode.RDSTable.DatabaseName & "." & lrColumn.Name
-                            Next
+
+                            lsTDBQuery &= "($" & lrQueryEdge.TargetNode.RDSTable.DatabaseName & Viev.NullVal(lrQueryEdge.TargetNode.Alias, "") & ","
+                            lsTDBQuery &= "$" & lrQueryEdge.BaseNode.RDSTable.DatabaseName & ") " & " is a " & lrQueryEdge.FBMFactType.Id
+
+
                         End If
 #End Region
                     End If
@@ -328,6 +352,326 @@
                 Next
 
 #End Region
+
+#Region "WhereConditionals"
+                If Me.HeadNode.HasIdentifier And Not Me.QueryEdges(0).IsRecursive Then
+                    Dim lrTargetTable = Me.HeadNode.RDSTable
+                    For Each lrColumn In Me.HeadNode.RDSTable.getFirstUniquenessConstraintColumns
+                        lsTDBQuery &= lrTargetTable.DatabaseName & Viev.NullVal(Me.HeadNode.Alias, "") & "." & lrColumn.Name & " = '" & Me.HeadNode.IdentifierList(liInd) & "'" & vbCrLf
+                    Next
+                End If
+
+                For Each lrQueryEdge In larConditionalQueryEdges.FindAll(Function(x) Not (x.IsSubQueryLeader Or x.IsPartOfSubQuery))
+                    Select Case lrQueryEdge.WhichClauseSubType
+                        Case Is = FactEngine.Constants.pcenumWhichClauseType.IsPredicateNodePropertyIdentification
+                            Dim lrFactType As FBM.FactType = Nothing
+                            Select Case lrQueryEdge.BaseNode.FBMModelObject.GetType
+                                Case GetType(FBM.FactType)
+                                    If lrQueryEdge.WhichClauseType = pcenumWhichClauseType.WithClause Then
+                                        lrFactType = lrQueryEdge.FBMFactType
+                                    Else
+                                        lrFactType = CType(lrQueryEdge.BaseNode.FBMModelObject, FBM.FactType)
+                                    End If
+
+                                Case GetType(FBM.EntityType)
+                                    lrFactType = lrQueryEdge.FBMFactType
+                                Case GetType(FBM.ValueType)
+                                    If lrQueryEdge.IsPartialFactTypeMatch Then
+                                        lrFactType = lrQueryEdge.FBMFactType
+                                    Else
+                                        Throw New NotImplementedException("Unknown Conditional type in query. Contact support.")
+                                    End If
+                            End Select
+
+                            Dim lrPredicatePart As FBM.PredicatePart = Nothing
+
+                            If lrQueryEdge.FBMPredicatePart IsNot Nothing Then
+                                lrPredicatePart = lrQueryEdge.FBMPredicatePart
+                            Else
+
+                                Dim larPredicatePart As List(Of FBM.PredicatePart)
+                                If lrQueryEdge.Predicate = "" Then
+                                    'Likely a "WITH WHAT Rating" or "WITH (Rating:'8')" as in "WHICH Lecturer likes WHICH Lecturer WITH WHAT RATING"
+                                    larPredicatePart = (From FactTypeReading In lrFactType.FactTypeReading
+                                                        Select FactTypeReading.PredicatePart(0)).ToList
+                                Else
+                                    larPredicatePart = (From FactTypeReading In lrFactType.FactTypeReading
+                                                        From PredicatePart In FactTypeReading.PredicatePart
+                                                        Where PredicatePart.PredicatePartText = Trim(lrQueryEdge.Predicate)
+                                                        Select PredicatePart).ToList
+                                End If
+
+                                If larPredicatePart.Count = 0 Then
+
+                                    larPredicatePart = (From FactType In Me.Model.FactType
+                                                        From FactTypeReading In FactType.FactTypeReading
+                                                        From PredicatePart In FactTypeReading.PredicatePart
+                                                        Where FactType.RoleGroup.FindAll(Function(x) x.JoinedORMObject.Id = lrQueryEdge.BaseNode.Name _
+                                                           Or x.JoinedORMObject.Id = lrQueryEdge.TargetNode.Name).Count = 2
+                                                        Where PredicatePart.PredicatePartText = lrQueryEdge.Predicate
+                                                        Where lrQueryEdge.Predicate <> ""
+                                                        Select PredicatePart).ToList
+
+                                    If larPredicatePart.Count > 0 Then
+                                        lrPredicatePart = larPredicatePart.First
+                                        lrFactType = lrPredicatePart.FactTypeReading.FactType
+                                    Else
+                                        If lrFactType.IsObjectified Then
+                                            Dim larFactTypeReading = From FactType In lrFactType.getLinkFactTypes
+                                                                     From FactTypeReading In FactType.FactTypeReading
+                                                                     Where FactTypeReading.PredicatePart(0).Role.JoinedORMObject.Id = lrQueryEdge.BaseNode.Name
+                                                                     Where FactTypeReading.PredicatePart(1).Role.JoinedORMObject.Id = lrQueryEdge.TargetNode.Name
+                                                                     Select FactTypeReading
+                                            If larFactTypeReading.Count > 0 Then
+                                                lrFactType = larFactTypeReading.First.FactType
+                                            End If
+                                        End If
+                                    End If
+                                Else
+                                    If lrQueryEdge.FBMFactTypeReading IsNot Nothing Then
+                                        lrPredicatePart = larPredicatePart.Find(Function(x) x.FactTypeReading Is lrQueryEdge.FBMFactTypeReading)
+                                    Else
+                                        lrPredicatePart = larPredicatePart.First 'For now...need to consider PreboundReadingText/s
+                                    End If
+                                End If
+                            End If
+                            Dim lrResponsibleRole As FBM.Role
+
+                            If lrPredicatePart.Role.JoinedORMObject Is lrQueryEdge.BaseNode.FBMModelObject Then
+                                'Nothing to do here, because is the Predicate joined to the BaseNode that we want the Table for
+                            ElseIf Not lrPredicatePart.Role.JoinedORMObject Is lrQueryEdge.TargetNode.FBMModelObject Then
+
+                                'lrQueryEdge.Predicate = "is " & lrQueryEdge.Predicate
+                                '20200808-VM-Leave this breakpoint here. If hasn't been hit in years, get rid of this ElseIf
+                                lrPredicatePart = (From FactTypeReading In lrFactType.FactTypeReading
+                                                   From PredicatePart In FactTypeReading.PredicatePart
+                                                   Where PredicatePart.PredicatePartText = Trim(lrQueryEdge.Predicate)
+                                                   Select PredicatePart).First
+                            End If
+
+                            If lrPredicatePart Is Nothing Then
+                                Throw New Exception("There is no Predicate (Part) of Fact Type, '" & lrQueryEdge.FBMFactType.Id & "', that is '" & lrQueryEdge.Predicate & "'.")
+                            Else
+                                If lrFactType.IsLinkFactType Then
+                                    'Want the Role from the actual FactType
+                                    lrResponsibleRole = lrFactType.LinkFactTypeRole
+                                ElseIf lrQueryEdge.IsPartialFactTypeMatch Or lrQueryEdge.FBMFactType.isRDSTable Then
+                                    lrResponsibleRole = lrPredicatePart.FactTypeReading.PredicatePart(lrPredicatePart.SequenceNr).Role
+                                Else
+                                    lrResponsibleRole = lrPredicatePart.Role
+                                End If
+
+                            End If
+
+                            Dim lrTable As RDS.Table
+                            If lrQueryEdge.IsPartialFactTypeMatch Or lrQueryEdge.FBMFactType.isRDSTable Then
+                                lrTable = lrQueryEdge.FBMFactType.getCorrespondingRDSTable
+
+                                Dim lrColumn = (From Column In lrTable.Column
+                                                Where Column.Role Is lrResponsibleRole
+                                                Where Column.ActiveRole.JoinedORMObject Is lrQueryEdge.TargetNode.FBMModelObject
+                                                Select Column).First
+
+                                lsTDBQuery &= lrTable.DatabaseName & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrColumn.Name
+                                Select Case lrColumn.getMetamodelDataType
+                                    Case Is = pcenumORMDataType.TemporalDate,
+                                              pcenumORMDataType.TemporalDateAndTime
+                                        lsTDBQuery &= prApplication.WorkingModel.DatabaseConnection.dateToTextOperator
+                                End Select
+                                lsTDBQuery &= lrQueryEdge.getTargetSQLComparator
+                                Select Case lrColumn.getMetamodelDataType
+                                    Case Is = pcenumORMDataType.TemporalDateAndTime
+                                        Dim lsUserDateTime = lrQueryEdge.IdentifierList(0)
+                                        Dim loDateTime As DateTime = Nothing
+                                        If Not DateTime.TryParse(lsUserDateTime, loDateTime) Then
+                                            Throw New Exception(lsUserDateTime & " is not a valid DateTime. Try entering a DateTime value in the FactEngine configuration format: " & My.Settings.FactEngineUserDateTimeFormat)
+                                        End If
+                                        Dim lsDateTime As String = Me.Model.DatabaseConnection.FormatDateTime(lsUserDateTime)
+                                        lsTDBQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lsDateTime & Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
+                                    Case Else
+                                        lsTDBQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lrQueryEdge.IdentifierList(0) & Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
+                                End Select
+
+                            Else
+                                lrTable = lrQueryEdge.BaseNode.RDSTable
+
+                                Dim lrColumn = (From Column In lrTable.Column
+                                                Where Column.Role Is lrResponsibleRole
+                                                Where Column.ActiveRole.JoinedORMObject Is lrQueryEdge.TargetNode.FBMModelObject
+                                                Select Column).First
+
+                                lsTDBQuery &= "$" & lrQueryEdge.BaseNode.RDSTable.DatabaseName & Viev.NullVal(lrQueryEdge.BaseNode.Alias, "") & " has " & lrColumn.Name
+                                Select Case lrColumn.getMetamodelDataType
+                                    Case Is = pcenumORMDataType.TemporalDate,
+                                              pcenumORMDataType.TemporalDateAndTime
+                                        lsTDBQuery &= prApplication.WorkingModel.DatabaseConnection.dateToTextOperator
+                                End Select
+                                lsTDBQuery &= lrQueryEdge.getTargetSQLComparator
+                                Select Case lrColumn.getMetamodelDataType
+                                    Case Is = pcenumORMDataType.TemporalDateAndTime
+                                        Dim lsUserDateTime = lrQueryEdge.IdentifierList(0)
+                                        Dim loDateTime As DateTime = Nothing
+                                        If Not DateTime.TryParse(lsUserDateTime, loDateTime) Then
+                                            Throw New Exception(lsUserDateTime & " is not a valid DateTime. Try entering a DateTime value in the FactEngine configuration format: " & My.Settings.FactEngineUserDateTimeFormat)
+                                        End If
+                                        Dim lsDateTime As String = Me.Model.DatabaseConnection.FormatDateTime(lsUserDateTime)
+                                        lsTDBQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lsDateTime & Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
+                                    Case Else
+                                        lsTDBQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lrQueryEdge.IdentifierList(0) & Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
+                                End Select
+
+                            End If
+                        Case Else
+
+                            Select Case lrQueryEdge.WhichClauseType
+                                Case Is = pcenumWhichClauseType.BooleanPredicate
+
+                                    lsTDBQuery &= lrQueryEdge.BaseNode.RDSTable.DatabaseName & "."
+
+                                    Dim lrTargetTable = lrQueryEdge.BaseNode.RDSTable
+                                    Dim lrTargetColumn = lrTargetTable.Column.Find(Function(x) x.FactType Is lrQueryEdge.FBMFactType)
+
+                                    lsTDBQuery &= lrTargetColumn.Name & " = True"
+
+                                Case Else
+
+
+
+                                    If lrQueryEdge.TargetNode.MathFunction <> pcenumMathFunction.None Then
+
+                                        If lrQueryEdge.FBMFactType.IsDerived Then
+
+                                            lsTDBQuery &= lrQueryEdge.FBMFactType.Id &
+                                              Viev.NullVal(lrQueryEdge.TargetNode.Alias, "") &
+                                              "." &
+                                              CType(lrQueryEdge.TargetNode.PreboundText & lrQueryEdge.TargetNode.Name, String).Replace("-", "")
+
+                                            lsTDBQuery &= " " & Viev.GetEnumDescription(lrQueryEdge.TargetNode.MathFunction)
+                                            lsTDBQuery &= " " & lrQueryEdge.TargetNode.MathNumber.ToString & vbCrLf
+
+                                        Else
+
+
+                                            'Math function
+                                            Dim lrTargetTable = lrQueryEdge.BaseNode.RDSTable
+                                            Dim lrTargetColumn = lrTargetTable.Column.Find(Function(x) x.FactType Is lrQueryEdge.FBMFactType)
+                                            lsTDBQuery &= lrTargetTable.DatabaseName &
+                                              Viev.NullVal(lrQueryEdge.TargetNode.Alias, "") &
+                                              "." &
+                                              lrTargetColumn.Name
+
+                                            lsTDBQuery &= " " & Viev.GetEnumDescription(lrQueryEdge.TargetNode.MathFunction)
+                                            lsTDBQuery &= " " & lrQueryEdge.TargetNode.MathNumber.ToString & vbCrLf
+
+                                        End If
+                                    Else
+                                        Dim lrTargetTable As RDS.Table = Nothing
+                                        Dim lsAlias As String = ""
+
+                                        'Check for reciprocal reading. As in WHICH Person was armed by (Person 2:'David') rather than WHICH Person armed (Person 2:'Saul')
+                                        If lrQueryEdge.TargetNode.FBMModelObject.GetType = GetType(FBM.ValueType) Then
+                                            lrTargetTable = lrQueryEdge.BaseNode.RDSTable
+                                            lsAlias = Viev.NullVal(lrQueryEdge.BaseNode.Alias, "")
+                                            Dim lrColumn As RDS.Column
+                                            If lrQueryEdge.FBMFactType.IsLinkFactType Then
+                                                lrColumn = lrQueryEdge.BaseNode.RDSTable.Column.Find(Function(x) x.Role Is lrQueryEdge.FBMFactType.LinkFactTypeRole)
+                                                '20210820-VM-Added below. Was not hear for some reason.
+                                                lsTDBQuery &= lrQueryEdge.BaseNode.RDSTable.DatabaseName & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrColumn.Name & " = "
+                                                Select Case lrColumn.getMetamodelDataType
+                                                    Case Is = pcenumORMDataType.TemporalDateAndTime,
+                                                              pcenumORMDataType.TemporalDate
+                                                        Dim lsDateTime As String = Me.Model.DatabaseConnection.FormatDateTime(lrQueryEdge.IdentifierList(0))
+                                                        lsTDBQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lsDateTime & Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
+                                                    Case Else
+                                                        lsTDBQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lrQueryEdge.IdentifierList(0) & Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
+                                                End Select
+                                            Else
+                                                lrColumn = lrQueryEdge.BaseNode.RDSTable.Column.Find(Function(x) x.Role.FactType Is lrQueryEdge.FBMFactType)
+                                                lsTDBQuery &= lrQueryEdge.BaseNode.RDSTable.DatabaseName & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrColumn.Name
+                                                Select Case lrColumn.getMetamodelDataType
+                                                    Case Is = pcenumORMDataType.TemporalDate,
+                                                              pcenumORMDataType.TemporalDateAndTime
+                                                        lsTDBQuery &= prApplication.WorkingModel.DatabaseConnection.dateToTextOperator
+                                                End Select
+                                                lsTDBQuery &= lrQueryEdge.getTargetSQLComparator
+                                                Select Case lrColumn.getMetamodelDataType
+                                                    Case Is = pcenumORMDataType.TemporalDateAndTime,
+                                                              pcenumORMDataType.TemporalDate
+                                                        Dim lsDateTime As String = Me.Model.DatabaseConnection.FormatDateTime(lrQueryEdge.IdentifierList(0), True)
+                                                        lsTDBQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lsDateTime & Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
+                                                    Case Else
+                                                        lsTDBQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lrQueryEdge.IdentifierList(0) & Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
+                                                End Select
+                                            End If
+
+                                        Else
+                                            If lrQueryEdge.TargetNode.HasIdentifier Then
+                                                lrTargetTable = lrQueryEdge.TargetNode.RDSTable
+                                                lsAlias = Viev.NullVal(lrQueryEdge.TargetNode.Alias, "")
+                                            Else
+                                                lrTargetTable = lrQueryEdge.BaseNode.RDSTable
+                                                lsAlias = Viev.NullVal(lrQueryEdge.BaseNode.Alias, "")
+                                            End If
+
+                                            Dim larIndexColumns = lrTargetTable.getFirstUniquenessConstraintColumns
+
+                                            liInd = 0
+                                            For Each lsIdentifier In lrQueryEdge.IdentifierList
+                                                lsTDBQuery &= "$" & lrTargetTable.DatabaseName & lsAlias & " has " & larIndexColumns(liInd).Name & lrQueryEdge.getTargetSQLComparator & "'" & lsIdentifier & "';" & vbCrLf
+                                                liInd += 1
+                                            Next
+                                        End If
+
+                                    End If
+                            End Select
+                    End Select
+                    lbHasWhereClause = True
+                Next
+#End Region
+
+
+#End Region
+
+#Region "RETURN/GET Clause"
+
+                If Me.ProjectionColumn.Count > 0 Then
+                    lsTDBQuery &= " get "
+                End If
+
+                For Each lrProjectColumn In Me.ProjectionColumn.FindAll(Function(x) x IsNot Nothing)
+
+                    If lrProjectColumn.Role.FactType.IsDerived Then
+                        If lrProjectColumn.Role.JoinedORMObject.GetType = GetType(FBM.ValueType) Then
+                            'for now
+                            lsSelectClause &= "$" & lrProjectColumn.Name
+                        Else
+                            lsSelectClause &= "$" & lrProjectColumn.Role.FactType.Id & Viev.NullVal(lrProjectColumn.TemporaryAlias, "") & "." & lrProjectColumn.Name
+                        End If
+
+                    Else
+                        lsSelectClause &= "$" & lrProjectColumn.Table.DatabaseName & Viev.NullVal(lrProjectColumn.TemporaryAlias, "") & lrProjectColumn.Name
+                        If lrProjectColumn.AsName IsNot Nothing Then
+                            lsSelectClause &= " AS " & lrProjectColumn.AsName
+                        End If
+                    End If
+                    If liInd < larProjectionColumn.Count Then lsSelectClause &= ","
+                    liInd += 1
+                Next
+                lsTDBQuery &= lsSelectClause
+
+                If arWhichSelectStatement.RETURNCLAUSE IsNot Nothing Then
+                    Dim larCountStarColumn = From ReturnColumn In arWhichSelectStatement.RETURNCLAUSE.RETURNCOLUMN
+                                             Where ReturnColumn.KEYWDCOUNTSTAR IsNot Nothing
+                                             Select ReturnColumn
+
+                    If larCountStarColumn.Count > 0 Then
+                        lsTDBQuery &= ", COUNT(*)"
+                        If larCountStarColumn(0).ASCLAUSE IsNot Nothing Then
+                            lsTDBQuery &= " AS " & larCountStarColumn(0).ASCLAUSE.COLUMNNAMESTR
+                        End If
+                        lbRequiresGroupByClause = True
+                    End If
+                End If
 #End Region
 
                 Return lsTDBQuery
