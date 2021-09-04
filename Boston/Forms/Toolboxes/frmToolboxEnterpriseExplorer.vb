@@ -250,6 +250,9 @@ Public Class frmToolboxEnterpriseExplorer
                 Case Is = pcenumDatabaseType.Snowflake
                     loNode.ImageIndex = 12
                     loNode.SelectedImageIndex = 12
+                Case Is = pcenumDatabaseType.TypeDB
+                    loNode.ImageIndex = 13
+                    loNode.SelectedImageIndex = 13
             End Select
         End If
 
@@ -1831,6 +1834,9 @@ Public Class frmToolboxEnterpriseExplorer
                         Case Is = pcenumDatabaseType.Snowflake
                             loNode.ImageIndex = 12
                             loNode.SelectedImageIndex = 12
+                        Case Is = pcenumDatabaseType.TypeDB
+                            loNode.ImageIndex = 13
+                            loNode.SelectedImageIndex = 13
                     End Select
                 End If
             End If

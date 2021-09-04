@@ -15,7 +15,17 @@
 
                 '==========================================================================
                 'Get the records
-                lsSQLQuery = lrQueryGraph.generateSQL(Me.WHICHSELECTStatement)
+                'CodeSafe 
+                If Me.DatabaseManager.Connection Is Nothing Then
+                    Call Me.Model.connectToDatabase()
+                End If
+                Select Case Me.DatabaseManager.Connection.GetType
+                    Case Is = GetType(FactEngine.TypeDB.TypeDBConnection)
+                        lsSQLQuery = lrQueryGraph.generateTypeQL(Me.WHICHSELECTStatement)
+                    Case Else
+                        lsSQLQuery = lrQueryGraph.generateSQL(Me.WHICHSELECTStatement)
+                End Select
+
 
                 If Me.DatabaseManager.Connection Is Nothing Then
                     'Try and establish a connection
@@ -288,9 +298,11 @@
 
                 Next
 
-                'Richmond.WriteToStatusBar("Generating SQL", True)
+                'Richmond.WriteToStatusBar("Generating SQL", True)                
+                Dim larQueryEdgeTypes = {FactEngine.pcenumWhichClauseType.ISClause, FactEngine.pcenumWhichClauseType.ISNOTClause}
+
                 Dim larErroredQueryEdges = From QueryEdge In lrQueryGraph.QueryEdges
-                                           Where QueryEdge.ErrorMessage IsNot Nothing Or QueryEdge.FBMFactType Is Nothing
+                                           Where QueryEdge.ErrorMessage IsNot Nothing Or (QueryEdge.FBMFactType Is Nothing And Not larQueryEdgeTypes.Contains(QueryEdge.WhichClauseSubType))
                                            Select QueryEdge
 
                 If larErroredQueryEdges.Count > 0 Then
@@ -1330,13 +1342,12 @@
 
             'Set the TargetNode
             Me.MODELELEMENTCLAUSE = New FEQL.MODELELEMENTClause
-            Call Me.GetParseTreeTokensReflection(Me.MODELELEMENTCLAUSE, Me.WHICHCLAUSE.MODELELEMENT(1))
-            If Me.MODELELEMENTCLAUSE.MODELELEMENTSUFFIX Is Nothing Then
-                arQueryEdge.TargetNode = arQueryGraph.Nodes.Find(Function(x) x.Name = Me.MODELELEMENTCLAUSE.MODELELEMENTNAME)
+            If Me.WHICHCLAUSE.NODE(0).MODELELEMENTSUFFIX Is Nothing Then
+                arQueryEdge.TargetNode = arQueryGraph.Nodes.Find(Function(x) x.Name = Me.WHICHCLAUSE.NODE(0).MODELELEMENTNAME)
             Else
-                Dim lrFBMModelObject = Me.Model.GetModelObjectByName(Me.MODELELEMENTCLAUSE.MODELELEMENTNAME)
+                Dim lrFBMModelObject = Me.Model.GetModelObjectByName(Me.WHICHCLAUSE.NODE(0).MODELELEMENTNAME)
                 arQueryEdge.TargetNode = New FactEngine.QueryNode(lrFBMModelObject, arQueryEdge)
-                arQueryEdge.TargetNode.Alias = Me.MODELELEMENTCLAUSE.MODELELEMENTSUFFIX
+                arQueryEdge.TargetNode.Alias = Me.WHICHCLAUSE.NODE(0).MODELELEMENTSUFFIX
             End If
             arQueryGraph.Nodes.AddUnique(arQueryEdge.TargetNode)
 

@@ -107,6 +107,26 @@ Namespace FactEngine
         ''' </summary>
         Public InjectsQueryEdge As FactEngine.QueryEdge = Nothing
 
+        Public ReadOnly Property IsRDSTable As Boolean
+            Get
+                If Me.FBMFactType Is Nothing Then
+                    Return False
+                Else
+                    Return Me.FBMFactType.isRDSTable
+                End If
+            End Get
+        End Property
+
+        Public ReadOnly Property IsDerived As Boolean
+            Get
+                If Me.FBMFactType Is Nothing Then
+                    Return False
+                Else
+                    Return Me.FBMFactType.IsDerived
+                End If
+            End Get
+        End Property
+
         ''' <summary>
         ''' Paremeterless New
         ''' </summary>

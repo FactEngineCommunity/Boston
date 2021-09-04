@@ -89,6 +89,7 @@ Public Module publicConstants
         ODBC = 106
         PostgreSQL = 107
         Snowflake = 108
+        TypeDB = 109
     End Enum
 
     Public Enum pcenumDebugMode

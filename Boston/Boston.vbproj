@@ -388,6 +388,9 @@
     <Compile Include="ClassesFactEngine\DatabaseManager\DatabaseClasses\tPostgreSQL.vb" />
     <Compile Include="ClassesFactEngine\DatabaseManager\DatabaseClasses\tSnowflake.vb" />
     <Compile Include="ClassesFactEngine\DatabaseManager\DatabaseClasses\tSQLite.vb" />
+    <Compile Include="ClassesFactEngine\DatabaseManager\DatabaseClasses\TypeDB\publicTypeDBConstants.vb" />
+    <Compile Include="ClassesFactEngine\DatabaseManager\DatabaseClasses\TypeDB\tConceptMap.vb" />
+    <Compile Include="ClassesFactEngine\DatabaseManager\DatabaseClasses\TypeDB\tTypeDBconnection.vb" />
     <Compile Include="ClassesFactEngine\DatabaseManager\Interfaces\iDatabaseConnection.vb" />
     <Compile Include="ClassesFactEngine\DatabaseManager\tDatabaseConnection.vb" />
     <Compile Include="ClassesFactEngine\DatabaseManager\tDatabaseDataType.vb" />

@@ -7614,6 +7614,9 @@ Public Class frmDiagramORM
                             Me.MorphVector(Me.MorphVector.Count - 1).ModelElementId = lrEntity.Name
                             Me.MorphVector(Me.MorphVector.Count - 1).Shape = lrAdditionalShapeNode
                             Me.MorphVector(Me.MorphVector.Count - 1).Shape.Font = Me.zrPage.Diagram.Font
+                            Me.MorphVector(Me.MorphVector.Count - 1).Shape.TextFormat = New StringFormat(StringFormatFlags.NoFontFallback)
+                            Me.MorphVector(Me.MorphVector.Count - 1).Shape.TextFormat.Alignment = StringAlignment.Center
+                            Me.MorphVector(Me.MorphVector.Count - 1).Shape.TextFormat.LineAlignment = StringAlignment.Center
                         Next
                     End If
                 Next

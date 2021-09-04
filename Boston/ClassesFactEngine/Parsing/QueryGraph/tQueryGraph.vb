@@ -53,6 +53,294 @@
 
         End Function
 
+        Public Function generateTypeQL(ByRef arWhichSelectStatement As FEQL.WHICHSELECTStatement,
+                                       Optional ByVal abIsCountStarSubQuery As Boolean = False,
+                                       Optional ByVal abIsStraightDerivationClause As Boolean = False,
+                                       Optional ByRef arDerivedModelElement As FBM.ModelObject = Nothing,
+                                       Optional ByRef abIsSubQuery As Boolean = False) As String
+
+            Dim lsTDBQuery As String = "match "
+            Dim liInd As Integer
+            Dim larColumn As New List(Of RDS.Column)
+            Dim lbRequiresGroupByClause As Boolean = False
+            Dim lsSelectClause As String = ""
+
+            Try
+#Region "FromClause"
+
+                Dim larFromNodes = Me.Nodes.FindAll(Function(x) x.FBMModelObject.ConceptType <> pcenumConceptType.ValueType)
+
+                'Circular/Recursive QueryEdges/TargetNodes are treated differently. See Recursive region below.
+                Dim larNode As List(Of QueryNode) = (From Node In larFromNodes
+                                                     Where Node.QueryEdge IsNot Nothing
+                                                     Where Node.QueryEdge.IsRecursive
+                                                     Where (Node.QueryEdge.IsCircular Or
+                                                            Node.RDSTable.isCircularToTable(Node.QueryEdge.BaseNode.RDSTable))).ToList
+                larFromNodes.RemoveAll(Function(x) larNode.Contains(x))
+
+                Dim larSubQueryNodes As List(Of FactEngine.QueryNode) = (From Node In larFromNodes
+                                                                         Where Node.QueryEdge IsNot Nothing
+                                                                         Where (Node.QueryEdge.IsSubQueryLeader Or Node.QueryEdge.IsPartOfSubQuery)
+                                                                         Select Node
+                                                                        ).ToList
+
+                larFromNodes.RemoveAll(Function(x) larSubQueryNodes.Contains(x))
+
+                liInd = 0
+                For Each lrQueryNode In larFromNodes.FindAll(Function(x) Not x.FBMModelObject.IsDerived)
+                    lsTDBQuery &= "$" & lrQueryNode.RDSTable.DatabaseName & Viev.NullVal(lrQueryNode.Alias, "") & " is a " & lrQueryNode.RDSTable.DatabaseName & ";" & vbCrLf
+                Next
+#End Region
+
+
+#Region "WHERE Clauses"
+
+                'WHERE
+                Dim larEdgesWithTargetNode = From QueryEdge In Me.QueryEdges
+                                             Where QueryEdge.TargetNode IsNot Nothing
+                                             Select QueryEdge
+
+                'WhereEdges are Where joins, rather than ConditionalQueryEdges which test for values by identifiers.
+                Dim larWhereEdges = larEdgesWithTargetNode.ToList.FindAll(Function(x) (x.TargetNode.FBMModelObject.ConceptType <> pcenumConceptType.ValueType And
+                x.BaseNode.FBMModelObject.ConceptType <> pcenumConceptType.ValueType) Or
+                x.isRDSTable Or x.IsDerived)
+
+                'Add special DerivedFactType WhereEdges
+                Dim larSpecialDerivedQueryEdges = From QueryEdge In Me.QueryEdges
+                                                  Where QueryEdge.FBMFactType IsNot Nothing
+                                                  Where QueryEdge.FBMFactType.DerivationType = pcenumFEQLDerivationType.Count
+                                                  Select QueryEdge
+
+                larWhereEdges.AddRange(larSpecialDerivedQueryEdges.ToList)
+
+
+                Dim larConditionalQueryEdges As New List(Of FactEngine.QueryEdge)
+                larConditionalQueryEdges = larEdgesWithTargetNode.ToList.FindAll(Function(x) (x.IdentifierList.Count > 0 Or
+                                                                                              x.TargetNode.MathFunction <> pcenumMathFunction.None))
+                '20210826-VM-Removed
+                'And (Not (x.FBMFactType.IsDerived And x.TargetNode.FBMModelObject.GetType Is GetType(FBM.ValueType))))
+
+                'BooleanPredicate edges. E.g. Protein is enzyme
+                Dim larExtraConditionalQueryEdges = From QueryEdge In Me.QueryEdges
+                                                    Where QueryEdge.FBMFactType IsNot Nothing
+                                                    Where QueryEdge.TargetNode Is Nothing And Not (QueryEdge.FBMFactType.IsDerived And QueryEdge.TargetNode.FBMModelObject.GetType Is GetType(FBM.ValueType))
+                                                    Select QueryEdge
+                larConditionalQueryEdges.AddRange(larExtraConditionalQueryEdges.tolist)
+
+                'ShortestPath conditionals are excluded.
+                '  E.g. For '(Account:1) made [SHORTEST PATH 0..10] WHICH Transaction THAT was made to (Account 2:4) '
+                '  the second QueryEdge conditional is taken care of in the FROM clause processing for the recursive query.
+                larConditionalQueryEdges.RemoveAll(Function(x) x.TargetNode.IsExcludedConditional)
+
+                'Recursive NodePropertyIdentification conditionals are excluded.
+                larConditionalQueryEdges.RemoveAll(Function(x) x.TargetNode.IsExcludedConditional)
+
+                If larWhereEdges.Count = 0 And larConditionalQueryEdges.Count = 0 And (Not Me.HeadNode.HasIdentifier) Then
+                    If NullVal(My.Settings.FactEngineDefaultQueryResultLimit, 0) > 0 Then
+                        lsTDBQuery &= vbCrLf & "LIMIT " & My.Settings.FactEngineDefaultQueryResultLimit
+                    End If
+                    Return lsTDBQuery
+                End If
+
+#Region "WHERE Joins"
+                liInd = 1
+                Dim lbHasWhereClause As Boolean = False
+
+                For Each lrQueryEdge In larWhereEdges.FindAll(Function(x) Not (x.IsSubQueryLeader Or x.IsPartOfSubQuery))
+
+                    Dim lrOriginTable As RDS.Table
+
+                    If lrQueryEdge.IsPartialFactTypeMatch Then 'And lrQueryEdge.TargetNode.FBMModelObject.GetType IsNot GetType(FBM.ValueType) Then
+#Region "Partial FactType match"
+                        Dim lrNaryTable As RDS.Table = lrQueryEdge.FBMFactType.getCorrespondingRDSTable
+                        If lrQueryEdge.BaseNode.FBMModelObject.GetType IsNot GetType(FBM.ValueType) Then
+                            For Each lrColumn In lrQueryEdge.BaseNode.RDSTable.getPrimaryKeyColumns
+                                lsTDBQuery &= lrNaryTable.DatabaseName & "." & lrNaryTable.Column.Find(Function(x) x.ActiveRole Is lrColumn.ActiveRole).Name
+                                lsTDBQuery &= "=" & lrColumn.Table.DatabaseName & "." & lrColumn.Name & vbCrLf
+                            Next
+                        End If
+                        If lrQueryEdge.TargetNode.FBMModelObject.GetType <> GetType(FBM.ValueType) Then
+                            For Each lrColumn In lrQueryEdge.TargetNode.RDSTable.getPrimaryKeyColumns
+                                lsTDBQuery &= lrNaryTable.DatabaseName & "." & lrNaryTable.Column.Find(Function(x) x.ActiveRole Is lrColumn.ActiveRole).Name
+                                lsTDBQuery &= "=" & lrColumn.Table.Name & "." & lrColumn.Name & vbCrLf
+                            Next
+                        End If
+#End Region
+                    ElseIf lrQueryEdge.WhichClauseType = pcenumWhichClauseType.AndThatIdentityCompatitor Then
+                        'E.g. Of the type "Person 1 Is Not Person 2" or "Person 1 Is Person 2"
+#Region "AndThatIdentityComparitor. 'E.g. Of the type 'Person 1 Is Not Person 2' or 'Person 1 Is Person 2'"
+                        lsTDBQuery &= "$" & lrQueryEdge.BaseNode.RDSTable.DatabaseName & Viev.NullVal(lrQueryEdge.BaseNode.Alias, "")
+                        If lrQueryEdge.WhichClauseSubType = pcenumWhichClauseType.ISClause Then
+                            lsTDBQuery &= " = "
+                        Else
+                            lsTDBQuery &= " != "
+                        End If
+                        lsTDBQuery &= "$" & lrQueryEdge.TargetNode.RDSTable.DatabaseName & Viev.NullVal(lrQueryEdge.TargetNode.Alias, "")
+                        lsTDBQuery &= ";" & vbCrLf
+#End Region
+                    ElseIf lrQueryEdge.IsDerived Then
+
+                        lrOriginTable = lrQueryEdge.FBMFactType.getCorrespondingRDSTable(Nothing, True)
+
+                        If lrOriginTable Is Nothing Then
+                            lrOriginTable = New RDS.Table(Me.Model.RDS, lrQueryEdge.FBMFactType.Id, lrQueryEdge.FBMFactType)
+                        End If
+                        liInd = 0
+                        For Each lrRole In lrQueryEdge.FBMFactType.RoleGroup.FindAll(Function(x) x.JoinedORMObject.GetType <> GetType(FBM.ValueType))
+                            Dim lrDestinationTable As RDS.Table = lrRole.JoinedORMObject.getCorrespondingRDSTable
+
+                            Dim liInd2 As Integer = 0
+                            For Each lrColumn In lrDestinationTable.getPrimaryKeyColumns
+                                Dim lrOriginColumn As RDS.Column = lrOriginTable.Column.Find(Function(x) x.ActiveRole Is lrColumn.ActiveRole)
+                                If lrOriginColumn Is Nothing Then
+                                    lsTDBQuery &= lrOriginTable.Name & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrColumn.Name & " = "
+                                Else
+                                    lsTDBQuery &= lrOriginTable.Name & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrOriginColumn.Name & " = "
+                                End If
+                                lsTDBQuery &= lrDestinationTable.DatabaseName & Viev.NullVal(lrQueryEdge.BaseNode.Alias, "") & "." & lrColumn.Name & vbCrLf
+                                liInd2 += 1
+                            Next
+                            liInd += 1
+                        Next
+
+                    ElseIf (lrQueryEdge.FBMFactType.isRDSTable And lrQueryEdge.FBMFactType.Arity = 2) Then
+
+                        'RDSTable
+#Region "PGSNodeTable/RDSTable"
+
+                        lsTDBQuery &= "($" & lrQueryEdge.BaseNode.RDSTable.DatabaseName & Viev.NullVal(lrQueryEdge.BaseNode.Alias, "") & ","
+                        lsTDBQuery &= "$" & lrQueryEdge.TargetNode.RDSTable.DatabaseName & Viev.NullVal(lrQueryEdge.TargetNode.Alias, "") & ") is a " & lrQueryEdge.FBMFactType.Name & ";" & vbCrLf
+
+                        '20210904-VM-From SQL below. Might not be needed for TypeDB.
+                        'lrOriginTable = lrQueryEdge.FBMFactType.getCorrespondingRDSTable
+
+                        'Dim larRelation = lrOriginTable.getRelations
+
+                        'larRelation = larRelation.FindAll(Function(x) (x.DestinationTable.Name = lrQueryEdge.BaseNode.RelativeFBMModelObject.Id) Or
+                        '                                               (x.DestinationTable.Name = lrQueryEdge.TargetNode.Name)).OrderBy(Function(x) x.OriginColumns(0).OrdinalPosition).ToList
+
+                        'Dim liTempInd = 0
+                        'Dim liRelationCounter = 1
+
+                        ''Order the relations by the QueryEdge.FactTypeReading
+                        ''  This way 'Lecturer likes Lecturer' is different from 'Lecturer is liked by Lecturer'
+
+                        'Dim lrColumn = lrOriginTable.Column.Find(Function(x) x.Role Is lrQueryEdge.FBMFactTypeReading.PredicatePart(0).Role)
+                        'If Not larRelation(0).OriginColumns.Contains(lrColumn) Then
+                        '    larRelation.Reverse()
+                        'End If
+
+                        'For Each lrRelation In larRelation
+                        '    Dim liColumnCounter = 0
+                        '    For Each lrColumn In lrRelation.DestinationColumns
+                        '        If liTempInd > 0 Then lsTDBQuery &= "AND "
+
+                        '        Select Case liRelationCounter
+                        '            Case Is = 1
+                        '                Select Case lrQueryEdge.BaseNode.FBMModelObject.ConceptType
+                        '                    Case = pcenumConceptType.ValueType
+                        '                        'Nothing to do here
+                        '                    Case Else
+                        '                        lsTDBQuery &= lrRelation.OriginTable.DatabaseName & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrRelation.OriginColumns(liColumnCounter).Name & " = "
+                        '                        Dim lrTargetColumn = lrRelation.DestinationColumns.Find(Function(x) x.ActiveRole Is lrRelation.OriginColumns(liColumnCounter).ActiveRole)
+                        '                        lsTDBQuery &= lrRelation.DestinationTable.DatabaseName & Viev.NullVal(lrQueryEdge.BaseNode.Alias, "") & "." & lrTargetColumn.Name & vbCrLf
+                        '                End Select
+                        '            Case Else
+                        '                Select Case lrQueryEdge.TargetNode.FBMModelObject.ConceptType
+                        '                    Case = pcenumConceptType.ValueType
+                        '                        'Nothing to do here
+                        '                    Case Else
+                        '                        lsTDBQuery &= lrRelation.OriginTable.DatabaseName & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrRelation.OriginColumns(liColumnCounter).Name & " = "
+                        '                        Dim lrTargetColumn = lrRelation.DestinationColumns.Find(Function(x) x.ActiveRole Is lrRelation.OriginColumns(liColumnCounter).ActiveRole)
+                        '                        lsTDBQuery &= lrRelation.DestinationTable.DatabaseName & Viev.NullVal(lrQueryEdge.TargetNode.Alias, "") & "." & lrTargetColumn.Name & vbCrLf
+                        '                End Select
+                        '        End Select
+
+                        '        'lsTDBQuery &= lrQueryEdge.BaseNode.Name & Viev.NullVal(lrQueryEdge.BaseNode.Alias, "") & "." & lrColumn.Name & " = "
+                        '        'lsTDBQuery &= lrOriginTable.Name & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrTargetColumn.Name & vbCrLf 'lrOriginTable.getColumnByOrdingalPosition(1).Name & vbCrLf
+                        '        liTempInd += 1
+                        '        liColumnCounter += 1
+                        '    Next
+                        '    liRelationCounter += 1
+                        'Next
+#End Region
+                    ElseIf lrQueryEdge.FBMFactType.DerivationType = pcenumFEQLDerivationType.Count Then
+#Region "DerivationType = COUNT"
+                        Dim lrBaseNode, lrTargetNode As FactEngine.QueryNode
+                        lrBaseNode = lrQueryEdge.BaseNode
+                        lrTargetNode = New FactEngine.QueryNode(lrQueryEdge.FBMFactType, lrQueryEdge)
+
+                        lsTDBQuery &= lrBaseNode.RDSTable.DatabaseName & "." & lrBaseNode.RDSTable.getPrimaryKeyColumns.First.Name & " = " & lrTargetNode.RDSTable.DatabaseName & "." & lrBaseNode.RDSTable.getPrimaryKeyColumns.First.Name
+#End Region
+                    Else
+#Region "Other/Else"
+                        Dim lrBaseNode, lrTargetNode As FactEngine.QueryNode
+                        If lrQueryEdge.IsReciprocal Then
+                            lrBaseNode = lrQueryEdge.TargetNode
+                            lrTargetNode = lrQueryEdge.BaseNode
+                        ElseIf lrQueryEdge.IsPartialFactTypeMatch Then
+                            lrBaseNode = New FactEngine.QueryNode(lrQueryEdge.FBMFactType, lrQueryEdge, False)
+                            lrTargetNode = lrQueryEdge.TargetNode
+                        Else
+                            lrBaseNode = lrQueryEdge.BaseNode
+                            lrTargetNode = lrQueryEdge.TargetNode
+                        End If
+
+                        lrOriginTable = lrBaseNode.RDSTable
+                        Dim larModelObject = New List(Of FBM.ModelObject)
+                        larModelObject.Add(lrBaseNode.FBMModelObject)
+                        larModelObject.Add(lrTargetNode.FBMModelObject)
+                        Dim lrRelation = lrOriginTable.getRelationByFBMModelObjects(larModelObject, lrQueryEdge.FBMFactType, lrQueryEdge)
+
+                        Dim liInd2 = 1
+                        If lrRelation.OriginTable Is lrOriginTable Then
+                            Dim larOriginColumn As New List(Of RDS.Column)
+                            Dim larTargetColumn As New List(Of RDS.Column)
+                            'was  larTargetColumn = lrQueryEdge.TargetNode.RDSTable.getPrimaryKeyColumns ' FBMModelObject.getCorrespondingRDSTable.getPrimaryKeyColumns
+
+                            For Each lrColumn In lrRelation.OriginColumns
+                                larOriginColumn.Add(lrColumn.Clone(Nothing, Nothing))
+                            Next
+
+                            For Each lrColumn In lrRelation.DestinationColumns
+                                larTargetColumn.Add(lrColumn.Clone(Nothing, Nothing))
+                            Next
+
+                            lsTDBQuery &= "($" & lrQueryEdge.BaseNode.RDSTable.DatabaseName & Viev.NullVal(lrBaseNode.Alias, "") & ","
+                            lsTDBQuery &= "$" & lrQueryEdge.TargetNode.RDSTable.DatabaseName & Viev.NullVal(lrTargetNode.Alias, "") & ") is a " & lrQueryEdge.FBMFactType.Name & ";" & vbCrLf
+
+                        Else
+                            Dim larTargetColumn = lrQueryEdge.BaseNode.RDSTable.getPrimaryKeyColumns
+                            For Each lrColumn In larTargetColumn
+                                Dim lrOriginColumn = lrRelation.OriginColumns.Find(Function(x) x.ActiveRole Is lrColumn.ActiveRole)
+                                lsTDBQuery &= lrQueryEdge.TargetNode.RDSTable.DatabaseName & Viev.NullVal(lrQueryEdge.TargetNode.Alias, "") & "." & lrOriginColumn.Name
+                                lsTDBQuery &= " = " & lrQueryEdge.BaseNode.RDSTable.DatabaseName & "." & lrColumn.Name
+                            Next
+                        End If
+#End Region
+                    End If
+
+                    'CodeSafe Remove wayward ANDs           
+                    If Not lsTDBQuery.EndsWith(vbCrLf) Then lsTDBQuery &= vbCrLf
+
+                    liInd += 1
+                    lbHasWhereClause = True
+                Next
+
+#End Region
+#End Region
+
+                Return lsTDBQuery
+
+            Catch ex As Exception
+
+                Throw New Exception(ex.Message & vbCrLf & vbCrLf & lsTDBQuery)
+
+            End Try
+
+
+        End Function
+
         ''' <summary>
         ''' Generates SQL to run against the database for this QueryGraph
         ''' </summary>
@@ -160,7 +448,7 @@
                         lsSQLQuery &= lrQueryNode.RDSTable.DatabaseName  'FBMModelObject.getCorrespondingRDSTable.Name
                     Else
                         'FBMModelObject.getCorrespondingRDSTable.Name
-                        lsSQLQuery &= lrQueryNode.Name & " " & lrQueryNode.Name & Viev.NullVal(lrQueryNode.Alias, "")
+                        lsSQLQuery &= lrQueryNode.RDSTable.DatabaseName & " " & lrQueryNode.Name & Viev.NullVal(lrQueryNode.Alias, "")
                     End If
 
                     liInd += 1
@@ -504,17 +792,22 @@
                 'WhereEdges are Where joins, rather than ConditionalQueryEdges which test for values by identifiers.
                 Dim larWhereEdges = larEdgesWithTargetNode.ToList.FindAll(Function(x) (x.TargetNode.FBMModelObject.ConceptType <> pcenumConceptType.ValueType And
                                                                                        x.BaseNode.FBMModelObject.ConceptType <> pcenumConceptType.ValueType) Or
-                                                                                       x.FBMFactType.isRDSTable Or x.FBMFactType.IsDerived)
+                                                                                       x.IsRDSTable Or x.IsDerived)
                 'And
                 'Not (x.IsPartialFactTypeMatch And
                 'x.TargetNode.FBMModelObject.GetType Is GetType(FBM.ValueType))
                 ')
 
                 'Add special DerivedFactType WhereEdges
-                larWhereEdges.AddRange(Me.QueryEdges.FindAll(Function(x) x.FBMFactType.DerivationType = pcenumFEQLDerivationType.Count))
+                Dim larSpecialDerivedQueryEdges = From QueryEdge In Me.QueryEdges
+                                                  Where QueryEdge.FBMFactType IsNot Nothing
+                                                  Where QueryEdge.FBMFactType.DerivationType = pcenumFEQLDerivationType.Count
+                                                  Select QueryEdge
+
+                larWhereEdges.AddRange(larSpecialDerivedQueryEdges.tolist)
 
 
-                Dim larConditionalQueryEdges As New List(Of FactEngine.QueryEdge)
+                    Dim larConditionalQueryEdges As New List(Of FactEngine.QueryEdge)
                 larConditionalQueryEdges = larEdgesWithTargetNode.ToList.FindAll(Function(x) (x.IdentifierList.Count > 0 Or
                                                                                               x.TargetNode.MathFunction <> pcenumMathFunction.None))
                 '20210826-VM-Removed

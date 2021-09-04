@@ -211,6 +211,7 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.ImageList.Images.SetKeyName(10, "databaseODBC.jpg")
         Me.ImageList.Images.SetKeyName(11, "PostgeSQL.png")
         Me.ImageList.Images.SetKeyName(12, "Snowflake16x16.png")
+        Me.ImageList.Images.SetKeyName(13, "TypeDB16x16.png")
         '
         'CircularProgressBar
         '
