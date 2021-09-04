@@ -7790,12 +7790,55 @@ Public Class frmDiagramORM
                 Me.MorphVector(0).EnterpriseTreeView = lrEnterpriseView
                 prApplication.WorkingPage = lrEnterpriseView.Tag
 
+                Dim lrPage As New FBM.Page(lrEnterpriseView.Tag.Model)
+                lrPage = lrEnterpriseView.Tag
+                Dim lrNode As PGS.Node
+
+                '-------------------------------------------------------------------------------------
+                'Populate the MorphVector with each relevant ModelObjectInstance on the current Page
+                '  that is also on the destination Page.
+                '----------------------------------------------------------------------
+#Region "Additional MorphVectors"
+                Dim lrAdditionalShapeNode As ShapeNode = Nothing
+                Dim larConceptTypes = {pcenumConceptType.EntityType, pcenumConceptType.FactType}
+
+                For Each lrAdditionalObject In Me.zrPage.GetAllPageObjects.FindAll(Function(x) larConceptTypes.Contains(x.ConceptType))
+                    If lrAdditionalObject.Id = Me.zrPage.SelectedObject(0).Id Then
+                        '---------------------------------------------------------------------------------------------
+                        'Skip. Is already added to the MorphVector collection when the ContextMenu.Diagram as loaded
+                        '---------------------------------------------------------------------------------------------
+                    Else
+                        Dim larEntityList = (From Entity In lrPage.ERDiagram.Entity
+                                             Where Entity.Name = lrAdditionalObject.Name
+                                             Select Entity.ClonePGSNode(lrPage)).ToList
+
+                        For Each lrNode In larEntityList.FindAll(Function(x) x.NodeType <> pcenumPGSEntityType.Relationship And x.PGSRelation Is Nothing)
+                            Me.MorphVector.Add(New tMorphVector(lrAdditionalObject.X, lrAdditionalObject.Y, lrNode.Shape.Bounds.X, lrNode.Shape.Bounds.Y, 40))
+
+                            If lrNode.Name = "BookingHasSeat" Then Debugger.Break()
+
+                            Dim lrAdditionalPageObject As FBM.PageObject = lrAdditionalObject.ClonePageObject
+                            lrAdditionalShapeNode = lrAdditionalPageObject.Shape.Clone(True)
+                            lrAdditionalShapeNode = New ShapeNode(lrAdditionalPageObject.Shape)
+                            lrAdditionalShapeNode.Text = lrAdditionalObject.Name
+                            lrAdditionalShapeNode.Visible = True
+
+                            Me.HiddenDiagram.Nodes.Add(lrAdditionalShapeNode)
+                            Me.MorphVector(Me.MorphVector.Count - 1).ModelElementId = lrNode.Name
+                            Me.MorphVector(Me.MorphVector.Count - 1).Shape = lrAdditionalShapeNode
+                            Me.MorphVector(Me.MorphVector.Count - 1).Shape.Font = Me.zrPage.Diagram.Font
+                            Me.MorphVector(Me.MorphVector.Count - 1).Shape.TextFormat = New StringFormat(StringFormatFlags.NoFontFallback)
+                            Me.MorphVector(Me.MorphVector.Count - 1).Shape.TextFormat.Alignment = StringAlignment.Center
+                            Me.MorphVector(Me.MorphVector.Count - 1).Shape.TextFormat.LineAlignment = StringAlignment.Center
+                            Me.MorphVector(Me.MorphVector.Count - 1).TargetShape = pcenumTargetMorphShape.Circle
+                        Next
+                    End If
+                Next
+#End Region
+
                 '------------------------------------------------------------------
                 'Get the X,Y co-ordinates of the Actor/EntityType being morphed
                 '------------------------------------------------------------------
-                Dim lrPage As New FBM.Page(lrEnterpriseView.Tag.Model)
-                lrPage = lrEnterpriseView.Tag
-
                 Me.MorphVector(0).InitialZoomFactor = Me.DiagramView.ZoomFactor
                 If lrPage.DiagramView IsNot Nothing Then
                     Me.MorphVector(0).TargetZoomFactor = lrPage.DiagramView.ZoomFactor
@@ -7826,7 +7869,6 @@ Public Class frmDiagramORM
                 'Start size
                 Me.MorphVector(0).StartSize = New Rectangle(0, 0, Me.MorphVector(0).Shape.Bounds.Width, Me.MorphVector(0).Shape.Bounds.Height)
                 '===========================================
-                Dim lrNode As PGS.Node
 
                 lrNode = lrPage.ERDiagram.Entity.Find(Function(x) x.Name = lrPageObject.Name)
 

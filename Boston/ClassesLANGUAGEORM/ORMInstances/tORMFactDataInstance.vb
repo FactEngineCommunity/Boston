@@ -497,7 +497,7 @@ Namespace FBM
 
         End Function
 
-        Public Function ClonePGSNode(ByRef arPage As FBM.Page) As PGS.Node
+        Public Overridable Function ClonePGSNode(ByRef arPage As FBM.Page) As PGS.Node
 
             '-----------------------------------------------------
             'As in 'Entity' within an EntityRelationshipDiagram

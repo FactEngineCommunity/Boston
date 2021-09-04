@@ -127,6 +127,33 @@ Namespace PGS
 
         End Function
 
+        Public Overrides Function ClonePGSNode(ByRef arPage As FBM.Page) As PGS.Node
+
+            '-----------------------------------------------------
+            'As in 'Entity' within an EntityRelationshipDiagram
+            '-----------------------------------------------------
+
+            Dim lrPGSNode As New PGS.Node
+
+            With Me
+                lrPGSNode.Model = .Model
+                lrPGSNode.Page = arPage
+                lrPGSNode.FactData = Me.FactData
+                lrPGSNode.Name = .Concept.Symbol
+                lrPGSNode.FactDataInstance = Me
+                lrPGSNode.JoinedObjectType = Me.Role.JoinedORMObject
+                lrPGSNode.Concept = .Concept
+                lrPGSNode.Role = .Role
+                lrPGSNode.PGSRelation = .PGSRelation
+                lrPGSNode.Shape = .Shape
+                lrPGSNode.X = .X
+                lrPGSNode.Y = .Y
+            End With
+
+            Return lrPGSNode
+
+        End Function
+
 
         Public Shadows Function Equals(ByVal other As PGS.Node) As Boolean Implements System.IEquatable(Of PGS.Node).Equals
 
