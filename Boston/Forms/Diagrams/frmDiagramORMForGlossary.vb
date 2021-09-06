@@ -2156,7 +2156,7 @@ Public Class frmDiagramORMForGlossary
 
                     Call TableRoleConstraintRole.DeleteRoleConstraintRole(lrRoleConstraintRole)
                 End If
-            Case Is = pcenumConceptType.SubtypeConstraint
+            Case Is = pcenumConceptType.SubtypeRelationship
                 If MsgBox("Remove the Subtype from the Model?", MsgBoxStyle.YesNo) = MsgBoxResult.Yes Then
 
                     Dim lrSubtypeInstance As FBM.SubtypeRelationshipInstance = e.Link.Tag
@@ -2175,7 +2175,7 @@ Public Class frmDiagramORMForGlossary
 
         Try
             Select Case e.Link.Tag.ConceptType
-                Case Is = pcenumConceptType.SubtypeConstraint
+                Case Is = pcenumConceptType.SubtypeRelationship
                     Me.zrPage.SelectedObject.Add(e.Link.Tag)
                     Me.DiagramView.ContextMenuStrip = ContextMenuStrip_SubtypeRelationship
             End Select
@@ -5040,7 +5040,7 @@ Public Class frmDiagramORMForGlossary
                             End Select
                         Case Is = pcenumConceptType.ModelNote
                             Diagram.Links(liInd - 1).Pen.Color = Color.LightGray
-                        Case Is = pcenumConceptType.SubtypeConstraint
+                        Case Is = pcenumConceptType.SubtypeRelationship
                             Diagram.Links(liInd - 1).Pen.Color = Color.Purple
                         Case Else
                             Diagram.Links(liInd - 1).Pen.Color = Color.Black

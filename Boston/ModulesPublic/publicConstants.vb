@@ -199,8 +199,8 @@ Public Module publicConstants
         StateTransition
         StrategicGoal        
         SubjectArea
-        SubtypeConstraint
-        SubtypeLink
+        SubtypeRelationship
+        'SubtypeLink
         SystemBoundary
         TotalSubtype
         Value

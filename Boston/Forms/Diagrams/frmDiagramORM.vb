@@ -2462,7 +2462,7 @@ Public Class frmDiagramORM
 
         Try
             Select Case e.Link.Tag.ConceptType
-                Case Is = pcenumConceptType.SubtypeConstraint
+                Case Is = pcenumConceptType.SubtypeRelationship
                     Me.zrPage.SelectedObject.Add(e.Link.Tag)
                     Me.DiagramView.ContextMenuStrip = ContextMenuStrip_SubtypeRelationship
             End Select
@@ -3591,6 +3591,7 @@ Public Class frmDiagramORM
 
         Dim lo_point As System.Drawing.PointF
         Dim loNode As New ShapeNode
+        Dim loLink As DiagramLink
         Dim loSelectedNode As New Object
 
         Try
@@ -4032,6 +4033,38 @@ Public Class frmDiagramORM
 #End Region
                 Me.Diagram.Invalidate()
 
+            ElseIf IsSomething(Diagram.GetLinkAt(lo_point, 1, True)) Then
+                '----------------------------
+                'Mouse is over a Link
+                '----------------------------
+                loLink = Diagram.GetLinkAt(lo_point, 1, True)
+
+                Dim lrPropertyGridForm As frmToolboxProperties
+                lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
+
+                If IsSomething(lrPropertyGridForm) And IsSomething(loLink) Then
+
+                    Dim lrModelObject As FBM.ModelObject
+                    lrModelObject = loLink.Tag
+                    lrPropertyGridForm.PropertyGrid.BrowsableAttributes = Nothing
+                    lrPropertyGridForm.PropertyGrid.HiddenAttributes = Nothing
+
+                    Select Case lrModelObject.ConceptType
+
+
+                        Case Is = pcenumConceptType.SubtypeRelationship
+                            Dim lrSubtypeRelationshipRoleInstance As FBM.SubtypeRelationshipInstance
+                            lrSubtypeRelationshipRoleInstance = lrModelObject
+                            Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
+                            Dim loMiscFilterAttribute2 As Attribute = New System.ComponentModel.CategoryAttribute("Instances")
+                            Dim loMiscFilterAttribute3 As Attribute = New System.ComponentModel.CategoryAttribute("Name")
+                            Dim loMiscFilterAttribute4 As Attribute = New System.ComponentModel.CategoryAttribute("DBName")
+                            Dim loMiscFilterAttribute5 As Attribute = New System.ComponentModel.CategoryAttribute("Description (Informal)")
+                            lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() _
+                                {loMiscFilterAttribute, loMiscFilterAttribute2, loMiscFilterAttribute3, loMiscFilterAttribute4, loMiscFilterAttribute5})
+                            lrPropertyGridForm.PropertyGrid.SelectedObject = lrSubtypeRelationshipRoleInstance
+                    End Select
+                End If
             Else
                 '---------------------------------------------------
                 'MouseDown is on canvas (not on object).
@@ -6275,7 +6308,7 @@ Public Class frmDiagramORM
                             End Select
                         Case Is = pcenumConceptType.ModelNote
                             Diagram.Links(liInd - 1).Pen.Color = Color.LightGray
-                        Case Is = pcenumConceptType.SubtypeConstraint
+                        Case Is = pcenumConceptType.SubtypeRelationship
                             Diagram.Links(liInd - 1).Pen.Color = Color.Purple
                         Case Is = pcenumConceptType.StateTransition
                             'Leave it as it is

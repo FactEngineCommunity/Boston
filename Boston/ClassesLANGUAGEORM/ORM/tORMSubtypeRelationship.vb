@@ -11,7 +11,7 @@ Namespace FBM
         <XmlIgnore()>
         Public Overrides Property ConceptType As pcenumConceptType
             Get
-                Return pcenumConceptType.SubtypeConstraint
+                Return pcenumConceptType.SubtypeRelationship
             End Get
             Set(value As pcenumConceptType)
                 'Nothing to do here.
@@ -24,14 +24,28 @@ Namespace FBM
         <XmlIgnore()>
         Public parentEntityType As New FBM.ModelObject 'The Parent EntityType to Me.EntityType
 
-        Public IsPrimarySubtypeRelationship As Boolean = False
+        <XmlIgnore()>
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Public _IsPrimarySubtypeRelationship As Boolean = False
+
+        <XmlAttribute>
+        Public Property IsPrimarySubtypeRelationship As Boolean
+            Get
+                Return Me._IsPrimarySubtypeRelationship
+            End Get
+            Set(value As Boolean)
+                Me._IsPrimarySubtypeRelationship = value
+            End Set
+        End Property
 
         ''' <summary>
         ''' The corresponding FactType that represents this SubtypeConstraint.
         ''' </summary>
         ''' <remarks></remarks>
-        <XmlIgnore()> _
+        <XmlIgnore()>
         Public FactType As New FBM.FactType
+
+        Public Event IsPrimarySubtypeRelationshipChanged(ByVal abIsPrimarySubtypeRelationship As Boolean)
 
         Public Sub New()
 
@@ -86,7 +100,6 @@ Namespace FBM
 
             Try
                 With Me
-                    lrSubtypeConstraintInstance.ConceptType = pcenumConceptType.SubtypeConstraint
                     lrSubtypeConstraintInstance.Page = arPage
                     lrSubtypeConstraintInstance.Model = arPage.Model
 
@@ -102,6 +115,8 @@ Namespace FBM
                     End If
                     lrSubtypeConstraintInstance.FactType = lrFactTypeInstance
                     lrSubtypeConstraintInstance.FactType.SubtypeConstraintInstance = lrSubtypeConstraintInstance
+
+                    lrSubtypeConstraintInstance.IsPrimarySubtypeRelationship = .IsPrimarySubtypeRelationship
 
                     lrSubtypeConstraintInstance.SubtypeRelationship = Me
 
@@ -182,6 +197,15 @@ Namespace FBM
             End If
 
         End Sub
+
+        Public Sub setIsPrimarySubtypeRelationship(ByVal abIsPrimarySubtypeRelationship As Boolean)
+
+            Me.IsPrimarySubtypeRelationship = abIsPrimarySubtypeRelationship
+
+            RaiseEvent IsPrimarySubtypeRelationshipChanged(abIsPrimarySubtypeRelationship)
+
+        End Sub
+
 
         Public Sub Create() Implements iObjectRelationalMap(Of FBM.tSubtypeRelationship).Create
 

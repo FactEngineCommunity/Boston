@@ -1,6 +1,7 @@
 Imports MindFusion.Diagramming
 Imports System.Xml.Serialization
 Imports System.Reflection
+Imports System.ComponentModel
 
 Namespace FBM
     <Serializable()>
@@ -10,7 +11,14 @@ Namespace FBM
         Implements IEquatable(Of FBM.SubtypeRelationshipInstance)
 
         <XmlAttribute()>
-        Public Shadows ConceptType As pcenumConceptType = pcenumConceptType.SubtypeConstraint
+        Public Overrides Property ConceptType As pcenumConceptType
+            Get
+                Return pcenumConceptType.SubtypeRelationship
+            End Get
+            Set(value As pcenumConceptType)
+                'Nothing to do here
+            End Set
+        End Property
 
         ''' <summary>
         ''' The EntityType for which the SubTypeIstance (line) acts as View/Proxy.
@@ -25,7 +33,26 @@ Namespace FBM
         ''' <remarks></remarks>
         Public Shadows FactType As New FBM.FactTypeInstance
 
-        Public Shadows SubtypeRelationship As New FBM.tSubtypeRelationship
+        Public Shadows WithEvents SubtypeRelationship As New FBM.tSubtypeRelationship
+
+        <XmlIgnore>
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Private _IsPrimarySubtypeRelationship As Boolean = False
+
+        <XmlAttribute()>
+        <CategoryAttribute("Subtype Relationship"),
+        Browsable(True),
+        [ReadOnly](False),
+        DescriptionAttribute("True if the Primary Subtype Relationship for the Model Element."),
+        Editor(GetType(tStringCollectionEditor), GetType(System.Drawing.Design.UITypeEditor))>
+        Public Property IsPrimarySubtypeRelationship As Boolean
+            Get
+                Return Me._IsPrimarySubtypeRelationship
+            End Get
+            Set(value As Boolean)
+                Me._IsPrimarySubtypeRelationship = value
+            End Set
+        End Property
 
         <NonSerialized(),
         XmlIgnore()>
@@ -53,10 +80,10 @@ Namespace FBM
             End Set
         End Property
 
+        ''' <summary>
+        ''' Parameterless Constructor
+        ''' </summary>
         Public Sub New()
-
-            Me.ConceptType = pcenumConceptType.SubtypeLink
-
         End Sub
 
         Public Sub New(ByRef arPage As FBM.Page,
@@ -169,8 +196,16 @@ Namespace FBM
 
         End Sub
 
-        Public Shadows Sub RefreshShape(Optional ByVal aoChangedPropertyItem As PropertyValueChangedEventArgs = Nothing)
+        Public Sub RefreshShape(Optional ByVal aoChangedPropertyItem As PropertyValueChangedEventArgs = Nothing,
+                                Optional ByVal asSelectedGridItemLabel As String = "")
 
+            If IsSomething(aoChangedPropertyItem) Then
+                Select Case aoChangedPropertyItem.ChangedItem.PropertyDescriptor.Name
+                    Case Is = "IsPrimarySubtypeRelationship"
+                        Call Me.SubtypeRelationship.setIsPrimarySubtypeRelationship(Me.IsPrimarySubtypeRelationship)
+
+                End Select
+            End If
 
         End Sub
 
@@ -233,6 +268,15 @@ Namespace FBM
         Public Sub EnableSaveButton() Implements iPageObject.EnableSaveButton
             Throw New NotImplementedException()
         End Sub
+
+        Private Sub SubtypeRelationship_IsPrimarySubtypeRelationshipChanged(abIsPrimarySubtypeRelationship As Boolean) Handles SubtypeRelationship.IsPrimarySubtypeRelationshipChanged
+
+            Me.IsPrimarySubtypeRelationship = abIsPrimarySubtypeRelationship
+
+            Call Me.RefreshShape()
+
+        End Sub
+
     End Class
 
 End Namespace

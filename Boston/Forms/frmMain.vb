@@ -2536,7 +2536,7 @@ Public Class frmMain
                                 lrRoleConstraintInstance = lrRoleConstraintInstance.Clone(lrPage, lrRoleConstraintInstance.RoleConstraint.IsMDAModelElement)
                                 lrPage.RoleConstraintInstance.AddUnique(lrRoleConstraintInstance)
 
-                            Case Is = pcenumConceptType.SubtypeConstraint
+                            Case Is = pcenumConceptType.SubtypeRelationship
 
                                 Dim lrSubtypeRelationshipInstance As FBM.SubtypeRelationshipInstance = lrModelObject
 
