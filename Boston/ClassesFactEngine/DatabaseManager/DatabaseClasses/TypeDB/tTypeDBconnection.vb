@@ -42,6 +42,11 @@ Namespace FactEngine.TypeDB
 
             Return lrRecordset
 
+            'Test Grpc            
+            Dim lrTypeDBCallInvoker As New TypeDBGrpcCallInvoker()
+            Dim lrConnection As New GrpcServer.TypeDB.TypeDBClient(lrTypeDBCallInvoker)
+
+
         End Function
 
         Public Overrides Function GONonQuery(asQuery As String) As ORMQL.Recordset Implements iDatabaseConnection.GONonQuery

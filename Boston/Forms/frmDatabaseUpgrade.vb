@@ -132,8 +132,11 @@ Public Class frmDatabaseUpgrade
                     lrDatabaseUpgradeSQL.TableName = Trim(Viev.NullVal(lrRecordset("TableName").Value, ""))
                     lrDatabaseUpgradeSQL.FieldName = Trim(Viev.NullVal(lrRecordset("FieldName").Value, ""))
                     lrDatabaseUpgradeSQL.OrdinalPosition = Viev.NullVal(lrRecordset("OrdinalPosition").Value, 0)
-                    lsUpgradeSQL = Trim(Viev.NullVal(lrRecordset("SQLString").Value, ""))
                     lrDatabaseUpgradeSQL.CodeToExecute = Trim(Viev.NullVal(lrRecordset("CodeToExecute").Value, ""))
+                    lrDatabaseUpgradeSQL.AllowFail = CBool(lrRecordset("AllowFal").Value)
+
+                    lsUpgradeSQL = Trim(Viev.NullVal(lrRecordset("SQLString").Value, ""))
+
 
                     lsMessage = lrRecordset("SequenceNr").Value
                     lsMessage &= vbCrLf
@@ -162,15 +165,20 @@ Public Class frmDatabaseUpgrade
                                         command.Transaction = transaction
                                         Call command.ExecuteNonQuery()
                                     Catch ex As Exception
-                                        Dim lsMessage1 As String
-                                        Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
-                                        lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
-                                        lsMessage1 &= vbCrLf & lsCommand
-                                        lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                                        prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                                        If lrDatabaseUpgradeSQL.AllowFail Then
+                                            'Okay, nothing to do. Some INSERT statements, for instance, are allowed to fail because the data is already in the database.
+                                        Else
+                                            Dim lsMessage1 As String
+                                            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
-                                        GoTo error_handler
+                                            lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                                            lsMessage1 &= vbCrLf & lsCommand
+                                            lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                                            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+
+                                            GoTo error_handler
+                                        End If
                                     End Try
                                 End If
                             Next

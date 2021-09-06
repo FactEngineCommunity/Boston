@@ -99,7 +99,7 @@
 
                 liInd = 0
                 For Each lrQueryNode In larFromNodes.FindAll(Function(x) Not x.FBMModelObject.IsDerived)
-                    lsTDBQuery &= "$" & lrQueryNode.RDSTable.DatabaseName & Viev.NullVal(lrQueryNode.Alias, "") & " is a " & lrQueryNode.RDSTable.DatabaseName
+                    lsTDBQuery &= "$" & lrQueryNode.RDSTable.DatabaseName & Viev.NullVal(lrQueryNode.Alias, "") & " isa " & lrQueryNode.RDSTable.DatabaseName
 
                     '----------------------------------------------------
                     'Return Columns
@@ -233,7 +233,7 @@
 #Region "PGSNodeTable/RDSTable"
 
                         lsTDBQuery &= "($" & lrQueryEdge.BaseNode.RDSTable.DatabaseName & Viev.NullVal(lrQueryEdge.BaseNode.Alias, "") & ","
-                        lsTDBQuery &= "$" & lrQueryEdge.TargetNode.RDSTable.DatabaseName & Viev.NullVal(lrQueryEdge.TargetNode.Alias, "") & ") is a " & lrQueryEdge.FBMFactType.Name & ";" & vbCrLf
+                        lsTDBQuery &= "$" & lrQueryEdge.TargetNode.RDSTable.DatabaseName & Viev.NullVal(lrQueryEdge.TargetNode.Alias, "") & ") isa " & lrQueryEdge.FBMFactType.Name & ";" & vbCrLf
 
                         '20210904-VM-From SQL below. Might not be needed for TypeDB.
                         'lrOriginTable = lrQueryEdge.FBMFactType.getCorrespondingRDSTable
@@ -331,13 +331,13 @@
                             Next
 
                             lsTDBQuery &= "($" & lrQueryEdge.BaseNode.RDSTable.DatabaseName & Viev.NullVal(lrBaseNode.Alias, "") & ","
-                            lsTDBQuery &= "$" & lrQueryEdge.TargetNode.RDSTable.DatabaseName & Viev.NullVal(lrTargetNode.Alias, "") & ") is a " & lrQueryEdge.FBMFactType.Name & ";" & vbCrLf
+                            lsTDBQuery &= "$" & lrQueryEdge.TargetNode.RDSTable.DatabaseName & Viev.NullVal(lrTargetNode.Alias, "") & ") isa " & lrQueryEdge.FBMFactType.Name & ";" & vbCrLf
 
                         Else
                             Dim larTargetColumn = lrQueryEdge.BaseNode.RDSTable.getPrimaryKeyColumns
 
                             lsTDBQuery &= "($" & lrQueryEdge.TargetNode.RDSTable.DatabaseName & Viev.NullVal(lrQueryEdge.TargetNode.Alias, "") & ","
-                            lsTDBQuery &= "$" & lrQueryEdge.BaseNode.RDSTable.DatabaseName & ") " & " is a " & lrQueryEdge.FBMFactType.Id
+                            lsTDBQuery &= "$" & lrQueryEdge.BaseNode.RDSTable.DatabaseName & ") " & " isa " & lrQueryEdge.FBMFactType.Id
 
 
                         End If
@@ -517,7 +517,7 @@
                                         Dim lsDateTime As String = Me.Model.DatabaseConnection.FormatDateTime(lsUserDateTime)
                                         lsTDBQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lsDateTime & Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
                                     Case Else
-                                        lsTDBQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lrQueryEdge.IdentifierList(0) & Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
+                                        lsTDBQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lrQueryEdge.IdentifierList(0) & Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & ";" & vbCrLf
                                 End Select
 
                             End If
@@ -638,6 +638,7 @@
                     lsTDBQuery &= " get "
                 End If
 
+                liInd = 1
                 For Each lrProjectColumn In Me.ProjectionColumn.FindAll(Function(x) x IsNot Nothing)
 
                     If lrProjectColumn.Role.FactType.IsDerived Then

@@ -79,9 +79,9 @@ Namespace Database
                 lrRecordset.Open(lsSQLQuery)
 
                 If Not lrRecordset.EOF Then
-                    'pdbConnection.BeginTrans()
 
-                    transaction = pdb_OLEDB_connection.BeginTransaction()
+                    pdbConnection.BeginTrans()
+                    'transaction = pdb_OLEDB_connection.BeginTransaction()
 
                     While Not lrRecordset.EOF
 
@@ -95,6 +95,7 @@ Namespace Database
                         lrDatabaseUpgradeSQL.TableName = Trim(Viev.NullVal(lrRecordset("TableName").Value, ""))
                         lrDatabaseUpgradeSQL.FieldName = Trim(Viev.NullVal(lrRecordset("FieldName").Value, ""))
                         lrDatabaseUpgradeSQL.OrdinalPosition = Viev.NullVal(lrRecordset("OrdinalPosition").Value, 0)
+                        lrDatabaseUpgradeSQL.AllowFail = CBool(lrRecordset("AllowFail").Value)
                         lsUpgradeSQL = Trim(Viev.NullVal(lrRecordset("SQLString").Value, ""))
                         lrDatabaseUpgradeSQL.CodeToExecute = Trim(Viev.NullVal(lrRecordset("CodeToExecute").Value, ""))
 
@@ -122,26 +123,39 @@ Namespace Database
                                             'Call pdbConnection.Execute(lsCommand)
                                             Dim command As New OleDb.OleDbCommand(lsCommand)
                                             command.Connection = pdb_OLEDB_connection
-                                            command.Transaction = transaction
+                                            'command.Transaction = transaction
                                             Call command.ExecuteNonQuery()
                                         Catch ex As Exception
-                                            Dim lsMessage1 As String
-                                            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+                                            If lrDatabaseUpgradeSQL.AllowFail Then
+                                                'Nothing to do here. E.g. An INSERT need not fail if the data already exists.
+                                            Else
+                                                Dim lsMessage1 As String
+                                                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
-                                            lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
-                                            lsMessage1 &= vbCrLf & lsCommand
-                                            lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                                            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                                                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                                                lsMessage1 &= vbCrLf & lsCommand
+                                                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                                                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
 
-                                            GoTo error_handler
+                                                GoTo error_handler
+                                            End If
                                         End Try
                                     End If
                                 Next
 
-                            'pdbConnection.Execute(lsUpgradeSQL)
-
                             Case Is = 2 'SQL ADD COLUMN WITH ORDINAL POSITION OF FIELD
-                                pdbConnection.Execute(lsUpgradeSQL)
+
+                                Try
+                                    pdbConnection.Execute(lsUpgradeSQL)
+                                Catch ex As Exception
+
+                                    If lrDatabaseUpgradeSQL.AllowFail Then
+                                        'Nothing to do here. E.g. Some INSERT statements are okay to fail because the data already exists in the database.
+                                    Else
+                                        Throw New Exception(ex.Message, ex.InnerException)
+                                    End If
+                                End Try
+
 
                                 lsStallMessage = lsStallMessage & vbCrLf & "Stall: Successfully executed SQL"
                                 lsStallMessage = lsStallMessage & vbCrLf & "Stall: Successfully refreshed TableDef"
@@ -185,8 +199,9 @@ Namespace Database
 
                         lrRecordset.MoveNext()
                     End While
-                    'pdbConnection.CommitTrans() '(dbForceOSFlush)
-                    Call transaction.Commit()
+
+                    pdbConnection.CommitTrans()
+                    'Call transaction.Commit()
 
 
                     PerformNextRequiredDatabaseUpgrade = True
@@ -227,8 +242,8 @@ Namespace Database
 
 error_handler:
 
-            'pdbConnection.Rollback()
-            Call transaction.Rollback()
+            pdbConnection.Rollback()
+            'Call transaction.Rollback()
 
             lsErrorMessage = Err.Number & ", " & Err.Source & ", " & Err.Description
             lsMessage &= "Error Message: " & lsErrorMessage

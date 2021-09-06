@@ -18,5 +18,6 @@
         Public Required As Boolean
         Public AllowZeroLength As Boolean
         Public CodeToExecute As String
+        Public AllowFail As Boolean = False
     End Class
 End Namespace

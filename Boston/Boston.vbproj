@@ -134,6 +134,15 @@
     <Reference Include="Gios.Word">
       <HintPath>..\Dependencies\Gios.Word.dll</HintPath>
     </Reference>
+    <Reference Include="Grpc.Core.Api, Version=2.0.0.0, Culture=neutral, PublicKeyToken=d754f35622e28bad, processorArchitecture=MSIL">
+      <HintPath>..\packages\Grpc.Core.Api.2.39.1\lib\net45\Grpc.Core.Api.dll</HintPath>
+    </Reference>
+    <Reference Include="Grpc.Net.Client, Version=2.0.0.0, Culture=neutral, PublicKeyToken=d754f35622e28bad, processorArchitecture=MSIL">
+      <HintPath>..\packages\Grpc.Net.Client.2.39.0\lib\netstandard2.0\Grpc.Net.Client.dll</HintPath>
+    </Reference>
+    <Reference Include="Grpc.Net.Common, Version=2.0.0.0, Culture=neutral, PublicKeyToken=d754f35622e28bad, processorArchitecture=MSIL">
+      <HintPath>..\packages\Grpc.Net.Common.2.39.0\lib\netstandard2.0\Grpc.Net.Common.dll</HintPath>
+    </Reference>
     <Reference Include="ICSharpCode.TextEditor, Version=0.0.0.0, Culture=neutral, PublicKeyToken=4d61825e8dd49f1a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Dependencies\ICSharpCode.TextEditor.dll</HintPath>
@@ -161,6 +170,9 @@
       <HintPath>..\packages\Microsoft.Bcl.HashCode.1.1.0\lib\net461\Microsoft.Bcl.HashCode.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.Extensions.Logging.Abstractions, Version=3.0.3.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.Logging.Abstractions.3.0.3\lib\netstandard2.0\Microsoft.Extensions.Logging.Abstractions.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.SqlServer.ConnectionInfo, Version=10.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Dependencies\Microsoft.SqlServer.ConnectionInfo.dll</HintPath>
@@ -268,6 +280,9 @@
     </Reference>
     <Reference Include="System.Deployment" />
     <Reference Include="System.Design" />
+    <Reference Include="System.Diagnostics.DiagnosticSource, Version=4.0.3.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Diagnostics.DiagnosticSource.4.5.1\lib\net46\System.Diagnostics.DiagnosticSource.dll</HintPath>
+    </Reference>
     <Reference Include="System.Drawing" />
     <Reference Include="System.EnterpriseServices" />
     <Reference Include="System.Memory, Version=4.0.1.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
@@ -296,6 +311,9 @@
     <Reference Include="ToolBox, Version=1.0.4.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Dependencies\ToolBox.dll</HintPath>
+    </Reference>
+    <Reference Include="TypeDBGRPCClient">
+      <HintPath>..\Dependencies\TypeDBGRPCClient.dll</HintPath>
     </Reference>
     <Reference Include="Viev.FBM.Generic.Modules, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -390,6 +408,7 @@
     <Compile Include="ClassesFactEngine\DatabaseManager\DatabaseClasses\tSQLite.vb" />
     <Compile Include="ClassesFactEngine\DatabaseManager\DatabaseClasses\TypeDB\publicTypeDBConstants.vb" />
     <Compile Include="ClassesFactEngine\DatabaseManager\DatabaseClasses\TypeDB\tConceptMap.vb" />
+    <Compile Include="ClassesFactEngine\DatabaseManager\DatabaseClasses\TypeDB\tGrpcCallInvoker.vb" />
     <Compile Include="ClassesFactEngine\DatabaseManager\DatabaseClasses\TypeDB\tTypeDBconnection.vb" />
     <Compile Include="ClassesFactEngine\DatabaseManager\Interfaces\iDatabaseConnection.vb" />
     <Compile Include="ClassesFactEngine\DatabaseManager\tDatabaseConnection.vb" />
