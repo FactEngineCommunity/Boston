@@ -31,7 +31,12 @@ Namespace FBM
         <XmlAttribute>
         Public Property IsPrimarySubtypeRelationship As Boolean
             Get
-                Return Me._IsPrimarySubtypeRelationship
+                If Me.EntityType.SubtypeRelationship.Count = 1 Then
+                    Return True
+                Else
+                    Return Me._IsPrimarySubtypeRelationship
+                End If
+
             End Get
             Set(value As Boolean)
                 Me._IsPrimarySubtypeRelationship = value
@@ -199,6 +204,16 @@ Namespace FBM
         End Sub
 
         Public Sub setIsPrimarySubtypeRelationship(ByVal abIsPrimarySubtypeRelationship As Boolean)
+
+            If abIsPrimarySubtypeRelationship And Me.EntityType.SubtypeRelationship.Count > 1 Then
+                Dim larSubtypeRelationship = From SubtypeRelationship In Me.EntityType.SubtypeRelationship
+                                             Where SubtypeRelationship IsNot Me
+                                             Select SubtypeRelationship
+
+                For Each lrSubtypeReltionship In larSubtypeRelationship.ToList
+                    Call lrSubtypeReltionship.setIsPrimarySubtypeRelationship(False)
+                Next
+            End If
 
             Me.IsPrimarySubtypeRelationship = abIsPrimarySubtypeRelationship
 

@@ -595,6 +595,11 @@ Public Class frmDiagramERD
         Try
             Me.ContextMenuStrip_Entity.ImageScalingSize = New Drawing.Size(16, 16)
 
+            'Superuser Mode
+            If My.Settings.SuperuserMode Then
+                ToolStripMenuItemEntityIndexEditor.Visible = True
+            End If
+
 
             If Me.zrPage.SelectedObject.Count = 0 Then
                 Exit Sub
@@ -673,7 +678,7 @@ Public Class frmDiagramERD
             Me.MorphVector.Add(New tMorphVector(lrEntity.TableShape.Bounds.X, lrEntity.TableShape.Bounds.Y, 0, 0, 40))
 
             '-------------------------------------------------------------------------------
-            Me.DisplayDataIndexRelationInformationToolStripMenuItem.Checked = lrEntity.DisplayRDSData
+            Me.ToolStripMenuItemDisplayDataIndexRelationInformation.Checked = lrEntity.DisplayRDSData
 
             '--------------------------------------------------------------
             'Clear the list of ORMDiagrams that may relate to the EntityType
@@ -2990,7 +2995,7 @@ Public Class frmDiagramERD
 
     End Sub
 
-    Private Sub DisplayDataIndexRelationInformationToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles DisplayDataIndexRelationInformationToolStripMenuItem.Click
+    Private Sub DisplayDataIndexRelationInformationToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItemDisplayDataIndexRelationInformation.Click
 
         Dim lrTableNode As ERD.TableNode = Me.Diagram.Selection.Items(0)
         Dim lrEntity As New ERD.Entity
@@ -2999,8 +3004,8 @@ Public Class frmDiagramERD
         'Get the selected Entity        
         lrEntity = lrTableNode.Tag '(above lrTableNode = Me.Diagram.Selection.Items(0) )
 
-        Me.DisplayDataIndexRelationInformationToolStripMenuItem.Checked = Not Me.DisplayDataIndexRelationInformationToolStripMenuItem.Checked
-        lrEntity.DisplayRDSData = Me.DisplayDataIndexRelationInformationToolStripMenuItem.Checked
+        Me.ToolStripMenuItemDisplayDataIndexRelationInformation.Checked = Not Me.ToolStripMenuItemDisplayDataIndexRelationInformation.Checked
+        lrEntity.DisplayRDSData = Me.ToolStripMenuItemDisplayDataIndexRelationInformation.Checked
 
         For Each lrAttribute In lrEntity.Attribute
             Call lrAttribute.RefreshShape()
@@ -3065,7 +3070,7 @@ Public Class frmDiagramERD
         Call Me.DiagramView.Focus()
     End Sub
 
-    Private Sub IndexEditorToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles IndexEditorToolStripMenuItem.Click
+    Private Sub IndexEditorToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItemDiagramIndexEditor.Click
 
         Try
             Call frmMain.loadToolboxIndexEditor(Me.DockPanel.ActivePane)
@@ -3196,6 +3201,11 @@ Public Class frmDiagramERD
 
         Me.ContextMenuStrip_Diagram.ImageScalingSize = New Drawing.Size(16, 16)
 
+        'Superuser Made
+        If My.Settings.SuperuserMode Then
+            Me.ToolStripMenuItemDiagramIndexEditor.Visible = True
+        End If
+
     End Sub
 
     Private Sub ViewTableDataToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ViewTableDataToolStripMenuItem.Click
@@ -3319,4 +3329,36 @@ Public Class frmDiagramERD
 
     End Sub
 
+    Private Sub ToolStripMenuItemEntityIndexEditor_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItemEntityIndexEditor.Click
+
+        Try
+            Call frmMain.loadToolboxIndexEditor(Me.DockPanel.ActivePane)
+
+            'CodeSafe
+            If Me.Diagram.Selection.Items.Count = 0 Then Exit Sub
+
+            'Load the IndexEditor toolbox if Table selected
+            Select Case Me.Diagram.Selection.Items(0).Tag.ConceptType
+                Case Is = pcenumConceptType.Entity
+                    Dim lrEntity As ERD.Entity = Me.Diagram.Selection.Items(0).Tag
+                    'Call frmMain.loadToolboxIndexEditor(Me.DockPanel.ActivePane)
+
+                    Dim lrIndexEditorForm As frmToolboxIndexEditor
+                    lrIndexEditorForm = prApplication.GetToolboxForm(frmToolboxIndexEditor.Name)
+                    If lrIndexEditorForm IsNot Nothing Then
+                        lrIndexEditorForm.mrTable = lrEntity.RDSTable
+                        Call lrIndexEditorForm.SetupForm()
+                    End If
+            End Select
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
 End Class

@@ -11547,4 +11547,42 @@ Public Class frmDiagramORM
         End Try
 
     End Sub
+
+    Private Sub PropertiesToolStripMenuItem4_Click(sender As Object, e As EventArgs) Handles PropertiesToolStripMenuItem4.Click
+
+        Dim lrSubtypeRelationshipInstance As FBM.SubtypeRelationshipInstance = Nothing
+
+        Try
+            'CodeSafe
+            If Me.zrPage.SelectedObject.Count = 0 Then Exit Sub
+
+            lrSubtypeRelationshipInstance = Me.zrPage.SelectedObject(0)
+
+            Call frmMain.LoadToolboxPropertyWindow(Me.DockPanel.ActivePane)
+
+            Dim lrPropertyGridForm As frmToolboxProperties
+            lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
+
+            If IsSomething(lrPropertyGridForm) Then
+
+                Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
+                Dim loMiscFilterAttribute2 As Attribute = New System.ComponentModel.CategoryAttribute("Instances")
+                Dim loMiscFilterAttribute3 As Attribute = New System.ComponentModel.CategoryAttribute("Name")
+                Dim loMiscFilterAttribute4 As Attribute = New System.ComponentModel.CategoryAttribute("DBName")
+                Dim loMiscFilterAttribute5 As Attribute = New System.ComponentModel.CategoryAttribute("Description (Informal)")
+                lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() _
+                                {loMiscFilterAttribute, loMiscFilterAttribute2, loMiscFilterAttribute3, loMiscFilterAttribute4, loMiscFilterAttribute5})
+                lrPropertyGridForm.PropertyGrid.SelectedObject = lrSubtypeRelationshipInstance
+
+            End If
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
 End Class

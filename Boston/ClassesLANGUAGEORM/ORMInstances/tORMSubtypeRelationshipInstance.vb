@@ -179,8 +179,15 @@ Namespace FBM
                     lo_subtype_link.HeadPen.Color = Color.Purple
                     lo_subtype_link.Pen.Color = Color.Purple 'RGB(121, 0, 121)
                     lo_subtype_link.Pen.Width = 0.5
-                    lo_subtype_link.Tag = Me
 
+                    Select Case Me.IsPrimarySubtypeRelationship
+                        Case Is = True
+                            lo_subtype_link.Pen.DashStyle = Drawing2D.DashStyle.Solid
+                        Case Else
+                            lo_subtype_link.Pen.DashPattern = New Single() {2, 2, 2, 2}
+                    End Select
+
+                    lo_subtype_link.Tag = Me
                     Me.Link = lo_subtype_link
                     Me.EntityType.OutgoingLink.Add(lo_subtype_link)
                 End If
@@ -199,13 +206,36 @@ Namespace FBM
         Public Sub RefreshShape(Optional ByVal aoChangedPropertyItem As PropertyValueChangedEventArgs = Nothing,
                                 Optional ByVal asSelectedGridItemLabel As String = "")
 
-            If IsSomething(aoChangedPropertyItem) Then
-                Select Case aoChangedPropertyItem.ChangedItem.PropertyDescriptor.Name
-                    Case Is = "IsPrimarySubtypeRelationship"
-                        Call Me.SubtypeRelationship.setIsPrimarySubtypeRelationship(Me.IsPrimarySubtypeRelationship)
+            Try
+                'Managing changes to properties.
+                If IsSomething(aoChangedPropertyItem) Then
+                    Select Case aoChangedPropertyItem.ChangedItem.PropertyDescriptor.Name
+                        Case Is = "IsPrimarySubtypeRelationship"
+                            Call Me.SubtypeRelationship.setIsPrimarySubtypeRelationship(Me.IsPrimarySubtypeRelationship)
 
-                End Select
-            End If
+                    End Select
+                End If
+
+                'Drawing the object
+                If Me.Link IsNot Nothing Then
+                    Select Case Me.IsPrimarySubtypeRelationship
+                        Case Is = True
+                            Me.Link.Pen = New MindFusion.Drawing.Pen(Color.Purple, 0.5)
+                            'Me.Link.Pen.DashStyle = Drawing2D.DashStyle.Solid                            
+                        Case Else
+                            Me.Link.Pen.DashPattern = New Single() {2, 2, 2, 2}
+                    End Select
+                    Me.Page.Diagram.Invalidate()
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
         End Sub
 

@@ -280,19 +280,31 @@ Public Class frmAutoComplete
 
     Private Sub ListBox_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles ListBox.SelectedIndexChanged
 
-        Me.ListBox.Refresh()
+        Try
+            Me.ListBox.Refresh()
 
-        Dim lsMessage As String
+            Dim lsMessage As String
 
-        If Me.ListBox.SelectedIndex < 0 Then Exit Sub
+            If Me.ListBox.SelectedIndex < 0 Then Exit Sub
 
-        lsMessage = "Press [A] to add '" & Me.ListBox.SelectedItem.ToString & " A " & Me.ListBox.SelectedItem.ItemData & "'"
-        lsMessage &= vbCrLf & "Press [T] to add 'THAT " & Me.ListBox.SelectedItem.ToString & " A " & Me.ListBox.SelectedItem.ItemData & "'"
-        lsMessage &= vbCrLf & "Press [N] to add '" & Me.ListBox.SelectedItem.ToString & " (" & Me.ListBox.SelectedItem.ItemData & ":'"
-        lsMessage &= vbCrLf & "Press [W] to add '" & Me.ListBox.SelectedItem.ToString & " WHICH " & Me.ListBox.SelectedItem.ItemData & "'"
+            lsMessage = "Press [A] to add '" & Me.ListBox.SelectedItem.ToString & " A " & Me.ListBox.SelectedItem.ItemData & "'"
+            lsMessage &= vbCrLf & "Press [T] to add 'THAT " & Me.ListBox.SelectedItem.ToString & " A " & Me.ListBox.SelectedItem.ItemData & "'"
+            lsMessage &= vbCrLf & "Press [N] to add '" & Me.ListBox.SelectedItem.ToString & " (" & Me.ListBox.SelectedItem.ItemData & ":'"
+            lsMessage &= vbCrLf & "Press [W] to add '" & Me.ListBox.SelectedItem.ToString & " WHICH " & Me.ListBox.SelectedItem.ItemData & "'"
 
-        Dim lrProgressObject As New ProgressObject(False, lsMessage, True)
-        Me.moBackgroundWorker.ReportProgress(0, lrProgressObject)
+            If Me.moBackgroundWorker IsNot Nothing Then
+                Dim lrProgressObject As New ProgressObject(False, lsMessage, True)
+                Me.moBackgroundWorker.ReportProgress(0, lrProgressObject)
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 
