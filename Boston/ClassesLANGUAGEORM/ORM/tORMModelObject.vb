@@ -84,6 +84,12 @@ Namespace FBM
             End Set
         End Property
 
+        <XmlIgnore()>
+        Public ReadOnly Property DBVariableName As String
+            Get
+                Return Me.DBName.Replace(" ", "")
+            End Get
+        End Property
 
         ''' <summary>
         ''' FactEngine specific. Used to change names like 'Order' to '[Order]'. See Me.DatabaseName

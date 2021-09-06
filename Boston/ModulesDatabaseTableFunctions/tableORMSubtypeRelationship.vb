@@ -4,7 +4,7 @@ Namespace TableSubtypeRelationship
 
     Module Table_SubtypeRelationship
 
-        Sub add_parentEntityType(ByVal ar_subtype_constraint As FBM.tSubtypeRelationship)
+        Sub add_parentEntityType(ByVal arSubtypeRelationship As FBM.tSubtypeRelationship)
 
             Dim lsSQLQuery As String = ""
 
@@ -14,10 +14,11 @@ Namespace TableSubtypeRelationship
                 lsSQLQuery &= " VALUES ("
                 lsSQLQuery &= " #" & Now & "#"
                 lsSQLQuery &= " ,#" & Now & "#"
-                lsSQLQuery &= " ,'" & Trim(ar_subtype_constraint.Model.ModelId) & "'"
-                lsSQLQuery &= " ,'" & Trim(ar_subtype_constraint.EntityType.Id) & "'"
-                lsSQLQuery &= " ,'" & Trim(ar_subtype_constraint.parentEntityType.Id) & "'"
-                lsSQLQuery &= " ,'" & Trim(ar_subtype_constraint.FactType.Id) & "'"
+                lsSQLQuery &= " ,'" & Trim(arSubtypeRelationship.Model.ModelId) & "'"
+                lsSQLQuery &= " ,'" & Trim(arSubtypeRelationship.EntityType.Id) & "'"
+                lsSQLQuery &= " ,'" & Trim(arSubtypeRelationship.parentEntityType.Id) & "'"
+                lsSQLQuery &= " ,'" & Trim(arSubtypeRelationship.FactType.Id) & "'"
+                lsSQLQuery &= " ," & arSubtypeRelationship.IsPrimarySubtypeRelationship
                 lsSQLQuery &= ")"
 
                 Call pdbConnection.Execute(lsSQLQuery)
@@ -48,7 +49,7 @@ Namespace TableSubtypeRelationship
 
         End Sub
 
-        Public Function exists_parentEntityType(ByVal ar_subtype_constraint As FBM.tSubtypeRelationship) As Boolean
+        Public Function exists_parentEntityType(ByVal arSubtypeRelationship As FBM.tSubtypeRelationship) As Boolean
 
             Dim lsSQLQuery As String = ""
             Dim lREcordset As New ADODB.Recordset
@@ -64,9 +65,9 @@ Namespace TableSubtypeRelationship
 
                 lsSQLQuery = "SELECT COUNT(*)"
                 lsSQLQuery &= "  FROM MetaModelSubtypeRelationship"
-                lsSQLQuery &= " WHERE ModelId = '" & Trim(ar_subtype_constraint.Model.ModelId) & "'"
-                lsSQLQuery &= "   AND ObjectTypeId = '" & Trim(ar_subtype_constraint.EntityType.Id) & "'"
-                lsSQLQuery &= "   AND SupertypeObjectTypeId = '" & Trim(ar_subtype_constraint.parentEntityType.Id) & "'"
+                lsSQLQuery &= " WHERE ModelId = '" & Trim(arSubtypeRelationship.Model.ModelId) & "'"
+                lsSQLQuery &= "   AND ObjectTypeId = '" & Trim(arSubtypeRelationship.EntityType.Id) & "'"
+                lsSQLQuery &= "   AND SupertypeObjectTypeId = '" & Trim(arSubtypeRelationship.parentEntityType.Id) & "'"
 
 
                 lREcordset.Open(lsSQLQuery)
@@ -130,12 +131,12 @@ Namespace TableSubtypeRelationship
                     lsId = Trim(lrRecordset("SubtypingFactTypeId").Value)
                     lrFactType = arModel.FactType.Find(Function(x) x.Id = lsId)
 
-                    Dim lrSubtypeConstraint As New FBM.tSubtypeRelationship(lrEntityType, lrParentEntityType, lrFactType)
-                    lrSubtypeConstraint.isDirty = False
+                    Dim lrSubtypeRelationship As New FBM.tSubtypeRelationship(lrEntityType, lrParentEntityType, lrFactType)
+                    lrSubtypeRelationship.isDirty = False
+                    lrSubtypeRelationship.IsPrimarySubtypeRelationship = CBool(lrRecordset("IsPrimarySubtypeRelationship").Value)
+                    lrEntityType.SubtypeRelationship.Add(lrSubtypeRelationship)
 
-                    lrEntityType.SubtypeRelationship.Add(lrSubtypeConstraint)
-
-                    GetSubtypeRelationshipsByModel.Add(lrSubtypeConstraint)
+                    GetSubtypeRelationshipsByModel.Add(lrSubtypeRelationship)
 
                     lrRecordset.MoveNext()
                 End While
@@ -198,17 +199,18 @@ Namespace TableSubtypeRelationship
                             lrParentEntityTypeInstance = arPage.EntityTypeInstance.Find(Function(x) x.Id = lsId)
 
                             If IsSomething(lrParentEntityTypeInstance) Then
-                                Dim lrSubtypeConstraint As New FBM.tSubtypeRelationship
-                                lrSubtypeConstraint.EntityType = lrEntityTypeInstance.EntityType
-                                lrSubtypeConstraint.parentEntityType = lrParentEntityTypeInstance.EntityType
+                                Dim lrSubtypeRelationship As New FBM.tSubtypeRelationship
+                                lrSubtypeRelationship.EntityType = lrEntityTypeInstance.EntityType
+                                lrSubtypeRelationship.parentEntityType = lrParentEntityTypeInstance.EntityType
 
-                                lrSubtypeConstraint = lrEntityTypeInstance.EntityType.SubtypeRelationship.Find(AddressOf lrSubtypeConstraint.Equals)
+                                lrSubtypeRelationship = lrEntityTypeInstance.EntityType.SubtypeRelationship.Find(AddressOf lrSubtypeRelationship.Equals)
+                                lrSubtypeRelationship.IsPrimarySubtypeRelationship = CBool(lrRecordset("IsPrimarySubtypeRelationship").Value)
 
-                                Dim lrSubtypeConstraintInstance As FBM.SubtypeRelationshipInstance
+                                Dim lrSubtypeRelationshipInstance As FBM.SubtypeRelationshipInstance
 
-                                lrSubtypeConstraintInstance = lrSubtypeConstraint.CloneInstance(arPage, True)
+                                lrSubtypeRelationshipInstance = lrSubtypeRelationship.CloneInstance(arPage, True)
 
-                                lrEntityTypeInstance.SubtypeRelationship.Add(lrSubtypeConstraintInstance)
+                                lrEntityTypeInstance.SubtypeRelationship.Add(lrSubtypeRelationshipInstance)
                             End If
                         End If
                         lrRecordset.MoveNext()
@@ -252,7 +254,7 @@ Namespace TableSubtypeRelationship
 
         End Sub
 
-        Public Sub update_parentEntityType(ByVal ar_subtype_constraint As FBM.tSubtypeRelationship)
+        Public Sub update_parentEntityType(ByVal arSubtypeRelationship As FBM.tSubtypeRelationship)
 
             '--------------------------------------------------------------------------------------------------------
             'Updates to itself at the moment, but is placeholder for the future if more attributes are added to the
@@ -263,10 +265,11 @@ Namespace TableSubtypeRelationship
                 Dim lsSQLQuery As String
 
                 lsSQLQuery = " UPDATE MetaModelSubtypeRelationship"
-                lsSQLQuery &= "   SET ObjectTypeId = '" & Trim(ar_subtype_constraint.EntityType.Id) & "'"
-                lsSQLQuery &= "       ,SupertypeObjectTypeId = '" & Trim(ar_subtype_constraint.parentEntityType.Id) & "'"
-                lsSQLQuery &= " WHERE ObjectTypeId = '" & Trim(ar_subtype_constraint.EntityType.Id) & "'"
-                lsSQLQuery &= "   AND SupertypeObjectTypeId = '" & Trim(ar_subtype_constraint.parentEntityType.Id) & "'"
+                lsSQLQuery &= "   SET ObjectTypeId = '" & Trim(arSubtypeRelationship.EntityType.Id) & "'"
+                lsSQLQuery &= "       ,SupertypeObjectTypeId = '" & Trim(arSubtypeRelationship.parentEntityType.Id) & "'"
+                lsSQLQuery &= "       ,IsPrimarySubtypeRelationship = " & arSubtypeRelationship.IsPrimarySubtypeRelationship
+                lsSQLQuery &= " WHERE ObjectTypeId = '" & Trim(arSubtypeRelationship.EntityType.Id) & "'"
+                lsSQLQuery &= "   AND SupertypeObjectTypeId = '" & Trim(arSubtypeRelationship.parentEntityType.Id) & "'"
 
                 pdbConnection.BeginTrans()
                 pdbConnection.Execute(lsSQLQuery)

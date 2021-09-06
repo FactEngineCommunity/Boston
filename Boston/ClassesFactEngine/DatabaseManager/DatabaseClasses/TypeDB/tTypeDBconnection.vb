@@ -42,10 +42,6 @@ Namespace FactEngine.TypeDB
 
             Return lrRecordset
 
-            'Test Grpc            
-            Dim lrTypeDBCallInvoker As New TypeDBGrpcCallInvoker()
-            Dim lrConnection As New GrpcServer.TypeDB.TypeDBClient(lrTypeDBCallInvoker)
-
 
         End Function
 

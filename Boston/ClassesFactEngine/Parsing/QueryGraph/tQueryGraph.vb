@@ -99,7 +99,7 @@
 
                 liInd = 0
                 For Each lrQueryNode In larFromNodes.FindAll(Function(x) Not x.FBMModelObject.IsDerived)
-                    lsTDBQuery &= "$" & lrQueryNode.RDSTable.DatabaseName & Viev.NullVal(lrQueryNode.Alias, "") & " isa " & lrQueryNode.RDSTable.DatabaseName
+                    lsTDBQuery &= "$" & lrQueryNode.RDSTable.DBVariableName & Viev.NullVal(lrQueryNode.Alias, "") & " isa " & lrQueryNode.RDSTable.DatabaseName
 
                     '----------------------------------------------------
                     'Return Columns
@@ -108,7 +108,7 @@
                                           Select Column
 
                     For Each lrReturnColumn In larReturnColumn
-                        lsTDBQuery &= ", has " & lrReturnColumn.Name & " $" & lrReturnColumn.Table.Name & lrReturnColumn.Name & lrReturnColumn.TemporaryAlias
+                        lsTDBQuery &= ", has " & lrReturnColumn.Name & " $" & lrReturnColumn.Table.DBVariableName & lrReturnColumn.Name & lrReturnColumn.TemporaryAlias
                     Next
                     '----------------------------------------------------
 
@@ -193,13 +193,13 @@
                     ElseIf lrQueryEdge.WhichClauseType = pcenumWhichClauseType.AndThatIdentityCompatitor Then
                         'E.g. Of the type "Person 1 Is Not Person 2" or "Person 1 Is Person 2"
 #Region "AndThatIdentityComparitor. 'E.g. Of the type 'Person 1 Is Not Person 2' or 'Person 1 Is Person 2'"
-                        lsTDBQuery &= "$" & lrQueryEdge.BaseNode.RDSTable.DatabaseName & Viev.NullVal(lrQueryEdge.BaseNode.Alias, "")
+                        lsTDBQuery &= "$" & lrQueryEdge.BaseNode.RDSTable.DBVariableName & Viev.NullVal(lrQueryEdge.BaseNode.Alias, "")
                         If lrQueryEdge.WhichClauseSubType = pcenumWhichClauseType.ISClause Then
                             lsTDBQuery &= " = "
                         Else
                             lsTDBQuery &= " != "
                         End If
-                        lsTDBQuery &= "$" & lrQueryEdge.TargetNode.RDSTable.DatabaseName & Viev.NullVal(lrQueryEdge.TargetNode.Alias, "")
+                        lsTDBQuery &= "$" & lrQueryEdge.TargetNode.RDSTable.DBVariableName & Viev.NullVal(lrQueryEdge.TargetNode.Alias, "")
                         lsTDBQuery &= ";" & vbCrLf
 #End Region
                     ElseIf lrQueryEdge.IsDerived Then
@@ -232,8 +232,8 @@
                         'RDSTable
 #Region "PGSNodeTable/RDSTable"
 
-                        lsTDBQuery &= "($" & lrQueryEdge.BaseNode.RDSTable.DatabaseName & Viev.NullVal(lrQueryEdge.BaseNode.Alias, "") & ","
-                        lsTDBQuery &= "$" & lrQueryEdge.TargetNode.RDSTable.DatabaseName & Viev.NullVal(lrQueryEdge.TargetNode.Alias, "") & ") isa " & lrQueryEdge.FBMFactType.Name & ";" & vbCrLf
+                        lsTDBQuery &= "($" & lrQueryEdge.BaseNode.RDSTable.DBVariableName & Viev.NullVal(lrQueryEdge.BaseNode.Alias, "") & ","
+                        lsTDBQuery &= "$" & lrQueryEdge.TargetNode.RDSTable.DBVariableName & Viev.NullVal(lrQueryEdge.TargetNode.Alias, "") & ") isa " & lrQueryEdge.FBMFactType.Name & ";" & vbCrLf
 
                         '20210904-VM-From SQL below. Might not be needed for TypeDB.
                         'lrOriginTable = lrQueryEdge.FBMFactType.getCorrespondingRDSTable
@@ -330,14 +330,14 @@
                                 larTargetColumn.Add(lrColumn.Clone(Nothing, Nothing))
                             Next
 
-                            lsTDBQuery &= "($" & lrQueryEdge.BaseNode.RDSTable.DatabaseName & Viev.NullVal(lrBaseNode.Alias, "") & ","
-                            lsTDBQuery &= "$" & lrQueryEdge.TargetNode.RDSTable.DatabaseName & Viev.NullVal(lrTargetNode.Alias, "") & ") isa " & lrQueryEdge.FBMFactType.Name & ";" & vbCrLf
+                            lsTDBQuery &= "($" & lrQueryEdge.BaseNode.RDSTable.DBVariableName & Viev.NullVal(lrBaseNode.Alias, "") & ","
+                            lsTDBQuery &= "$" & lrQueryEdge.TargetNode.RDSTable.DBVariableName & Viev.NullVal(lrTargetNode.Alias, "") & ") isa " & lrQueryEdge.FBMFactType.Name & ";" & vbCrLf
 
                         Else
                             Dim larTargetColumn = lrQueryEdge.BaseNode.RDSTable.getPrimaryKeyColumns
 
-                            lsTDBQuery &= "($" & lrQueryEdge.TargetNode.RDSTable.DatabaseName & Viev.NullVal(lrQueryEdge.TargetNode.Alias, "") & ","
-                            lsTDBQuery &= "$" & lrQueryEdge.BaseNode.RDSTable.DatabaseName & ") " & " isa " & lrQueryEdge.FBMFactType.Id
+                            lsTDBQuery &= "($" & lrQueryEdge.TargetNode.RDSTable.DBVariableName & Viev.NullVal(lrQueryEdge.TargetNode.Alias, "") & ","
+                            lsTDBQuery &= "$" & lrQueryEdge.BaseNode.RDSTable.DBVariableName & ") " & " isa " & lrQueryEdge.FBMFactType.Id
 
 
                         End If
@@ -500,7 +500,7 @@
                                                 Where Column.ActiveRole.JoinedORMObject Is lrQueryEdge.TargetNode.FBMModelObject
                                                 Select Column).First
 
-                                lsTDBQuery &= "$" & lrQueryEdge.BaseNode.RDSTable.DatabaseName & Viev.NullVal(lrQueryEdge.BaseNode.Alias, "") & " has " & lrColumn.Name
+                                lsTDBQuery &= "$" & lrQueryEdge.BaseNode.RDSTable.DBVariableName & Viev.NullVal(lrQueryEdge.BaseNode.Alias, "") & " has " & lrColumn.Name
                                 Select Case lrColumn.getMetamodelDataType
                                     Case Is = pcenumORMDataType.TemporalDate,
                                               pcenumORMDataType.TemporalDateAndTime
@@ -617,7 +617,7 @@
 
                                             liInd = 0
                                             For Each lsIdentifier In lrQueryEdge.IdentifierList
-                                                lsTDBQuery &= "$" & lrTargetTable.DatabaseName & lsAlias & " has " & larIndexColumns(liInd).Name & lrQueryEdge.getTargetSQLComparator & "'" & lsIdentifier & "';" & vbCrLf
+                                                lsTDBQuery &= "$" & lrTargetTable.DBVariableName & lsAlias & " has " & larIndexColumns(liInd).Name & lrQueryEdge.getTargetSQLComparator & "'" & lsIdentifier & "';" & vbCrLf
                                                 liInd += 1
                                             Next
                                         End If
@@ -646,11 +646,11 @@
                             'for now
                             lsSelectClause &= "$" & lrProjectColumn.Name
                         Else
-                            lsSelectClause &= "$" & lrProjectColumn.Role.FactType.Id & Viev.NullVal(lrProjectColumn.TemporaryAlias, "") & "." & lrProjectColumn.Name
+                            lsSelectClause &= "$" & lrProjectColumn.Role.FactType.DBVariableName & Viev.NullVal(lrProjectColumn.TemporaryAlias, "") & "." & lrProjectColumn.Name
                         End If
 
                     Else
-                        lsSelectClause &= "$" & lrProjectColumn.Table.DatabaseName & Viev.NullVal(lrProjectColumn.TemporaryAlias, "") & lrProjectColumn.Name
+                        lsSelectClause &= "$" & lrProjectColumn.Table.DBVariableName & Viev.NullVal(lrProjectColumn.TemporaryAlias, "") & lrProjectColumn.Name
                         If lrProjectColumn.AsName IsNot Nothing Then
                             lsSelectClause &= " AS " & lrProjectColumn.AsName
                         End If

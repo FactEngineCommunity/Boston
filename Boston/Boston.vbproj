@@ -134,15 +134,6 @@
     <Reference Include="Gios.Word">
       <HintPath>..\Dependencies\Gios.Word.dll</HintPath>
     </Reference>
-    <Reference Include="Grpc.Core.Api, Version=2.0.0.0, Culture=neutral, PublicKeyToken=d754f35622e28bad, processorArchitecture=MSIL">
-      <HintPath>..\packages\Grpc.Core.Api.2.39.1\lib\net45\Grpc.Core.Api.dll</HintPath>
-    </Reference>
-    <Reference Include="Grpc.Net.Client, Version=2.0.0.0, Culture=neutral, PublicKeyToken=d754f35622e28bad, processorArchitecture=MSIL">
-      <HintPath>..\packages\Grpc.Net.Client.2.39.0\lib\netstandard2.0\Grpc.Net.Client.dll</HintPath>
-    </Reference>
-    <Reference Include="Grpc.Net.Common, Version=2.0.0.0, Culture=neutral, PublicKeyToken=d754f35622e28bad, processorArchitecture=MSIL">
-      <HintPath>..\packages\Grpc.Net.Common.2.39.0\lib\netstandard2.0\Grpc.Net.Common.dll</HintPath>
-    </Reference>
     <Reference Include="ICSharpCode.TextEditor, Version=0.0.0.0, Culture=neutral, PublicKeyToken=4d61825e8dd49f1a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Dependencies\ICSharpCode.TextEditor.dll</HintPath>
@@ -408,7 +399,6 @@
     <Compile Include="ClassesFactEngine\DatabaseManager\DatabaseClasses\tSQLite.vb" />
     <Compile Include="ClassesFactEngine\DatabaseManager\DatabaseClasses\TypeDB\publicTypeDBConstants.vb" />
     <Compile Include="ClassesFactEngine\DatabaseManager\DatabaseClasses\TypeDB\tConceptMap.vb" />
-    <Compile Include="ClassesFactEngine\DatabaseManager\DatabaseClasses\TypeDB\tGrpcCallInvoker.vb" />
     <Compile Include="ClassesFactEngine\DatabaseManager\DatabaseClasses\TypeDB\tTypeDBconnection.vb" />
     <Compile Include="ClassesFactEngine\DatabaseManager\Interfaces\iDatabaseConnection.vb" />
     <Compile Include="ClassesFactEngine\DatabaseManager\tDatabaseConnection.vb" />

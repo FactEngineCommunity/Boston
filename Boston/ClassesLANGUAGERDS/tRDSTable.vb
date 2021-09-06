@@ -37,6 +37,22 @@ Namespace RDS
                 Me._DatabaseName = value
             End Set
         End Property
+
+        Public ReadOnly Property DBVariableName As String
+            Get
+                If Me.FBMModelElement Is Nothing Then
+                    'Should only be used when reverse engineering and where the TempModel that is initially
+                    '  populated From the database does not have FBMModelElements.
+                    Return Me._DatabaseName.Replace(" ", "")
+                Else
+
+                    Return Me.FBMModelElement.DatabaseName.Replace(" ", "")
+
+                End If
+            End Get
+        End Property
+
+
         <XmlElement()>
         Public Column As New List(Of RDS.Column)
 

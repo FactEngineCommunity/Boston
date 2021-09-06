@@ -21,8 +21,10 @@ Namespace FBM
         <XmlIgnore()> _
         Public EntityType As New FBM.ModelObject 'The EntityType for which the SubtypeConstraint is applicable
 
-        <XmlIgnore()> _
+        <XmlIgnore()>
         Public parentEntityType As New FBM.ModelObject 'The Parent EntityType to Me.EntityType
+
+        Public IsPrimarySubtypeRelationship As Boolean = False
 
         ''' <summary>
         ''' The corresponding FactType that represents this SubtypeConstraint.
