@@ -810,6 +810,13 @@ Namespace FBM
                 Me.Shape.Move(Me.X, Me.Y)
                 Call Me.Shape.ZBottom()
 
+                'FactTypeName
+                Dim G As Graphics = Me.Page.Form.CreateGraphics
+                Dim StringSize As SizeF = Me.Page.Diagram.MeasureString(Trim(Me.FactType.Id), Me.Page.Diagram.Font, 1000, System.Drawing.StringFormat.GenericDefault)
+                If Me.FactTypeName.Shape IsNot Nothing Then
+                    Me.FactTypeName.Shape.Resize(StringSize.Width + 4, StringSize.Height)
+                End If
+
                 If Me.FactTypeReadingShape.Shape IsNot Nothing Then
                     Me.FactTypeReadingShape.Shape.Move(((Me.Shape.Bounds.Width / 2) + Me.Shape.Bounds.X) - (Me.FactTypeReadingShape.Shape.Bounds.Width / 2), (Me.Shape.Bounds.Y + Me.Shape.Bounds.Height) - 6) 'FactTypeReadingShape.Shape.Bounds.Y)
                 End If
