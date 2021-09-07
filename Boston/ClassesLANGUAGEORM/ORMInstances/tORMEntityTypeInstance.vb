@@ -661,34 +661,46 @@ Namespace FBM
 
             Dim lrSubtypeConstraint As New FBM.tSubtypeRelationship
 
-            If Not arParentEntityTypeInstance.HasPrimaryReferenceScheme Then
-                Dim lsMessage As String
-                lsMessage = "The selected Supertype, " & arParentEntityTypeInstance.Id & ", does not have a Primary Reference Scheme."
-                lsMessage &= vbCrLf & vbCrLf & "What you are asking Boston to do is create related Tables/Nodes that have no Primary Key."
-                lsMessage.AppendString(" While Boston can handle this, it makes no sense.")
-                If arParentEntityTypeInstance.getCorrespondingRDSTable.Column.Count = 0 Then
-                    lsMessage &= vbCrLf & vbCrLf & "Also, the related Table/Node for the Supertype model element, " & arParentEntityTypeInstance.Id & ", has no Columns/Attributes/Properties at all."
-                    If Not Me.EntityType.IsAbsorbed Then
-                        lsMessage.AppendString(" Because the model element, " & Me.Id & ", is not absorbed this means that no Columns/Attributes/Properties will be pulled down to the related Table/Node for this model element.")
+            Try
+
+                If Not arParentEntityTypeInstance.HasPrimaryReferenceScheme Then
+                    Dim lsMessage As String
+                    lsMessage = "The selected Supertype, " & arParentEntityTypeInstance.Id & ", does not have a Primary Reference Scheme."
+                    lsMessage &= vbCrLf & vbCrLf & "What you are asking Boston to do is create related Tables/Nodes that have no Primary Key."
+                    lsMessage.AppendString(" While Boston can handle this, it makes no sense.")
+                    If arParentEntityTypeInstance.getCorrespondingRDSTable.Column.Count = 0 Then
+                        lsMessage &= vbCrLf & vbCrLf & "Also, the related Table/Node for the Supertype model element, " & arParentEntityTypeInstance.Id & ", has no Columns/Attributes/Properties at all."
+                        If Not Me.EntityType.IsAbsorbed Then
+                            lsMessage.AppendString(" Because the model element, " & Me.Id & ", is not absorbed this means that no Columns/Attributes/Properties will be pulled down to the related Table/Node for this model element.")
+                        End If
+                    End If
+                    lsMessage.AppendDoubleLineBreak("Recommendation: Add suitable Fact Types linking to the Supertype to create Columns/Attributes/Properties in the related Table/Node before creating this Subtype Relationship.")
+                    lsMessage.AppendDoubleLineBreak("")
+                    lsMessage.AppendString("Would you like to proceed with creating the Subtype Relationship?")
+
+                    If MsgBox(lsMessage, MsgBoxStyle.Exclamation + MsgBoxStyle.YesNo + MessageBoxDefaultButton.Button2, "Warning") = MsgBoxResult.No Then
+                        Exit Sub
                     End If
                 End If
-                lsMessage.AppendDoubleLineBreak("Recommendation: Add suitable Fact Types linking to the Supertype to create Columns/Attributes/Properties in the related Table/Node before creating this Subtype Relationship.")
-                lsMessage.AppendDoubleLineBreak("")
-                lsMessage.AppendString("Would you like to proceed with creating the Subtype Relationship?")
 
-                If MsgBox(lsMessage, MsgBoxStyle.Exclamation + MsgBoxStyle.YesNo + MessageBoxDefaultButton.Button2, "Warning") = MsgBoxResult.No Then
-                    Exit Sub
-                End If
-            End If
+                '----------------------------------------
+                'Create a Model level SubtypeConstraint
+                '----------------------------------------
+                With New WaitCursor
+                    lrSubtypeConstraint = Me.EntityType.CreateSubtypeRelationship(arParentEntityTypeInstance.EntityType)
+                    Me.Model.Save(False)
 
-            '----------------------------------------
-            'Create a Model level SubtypeConstraint
-            '----------------------------------------
-            With New WaitCursor
-                lrSubtypeConstraint = Me.EntityType.CreateSubtypeRelationship(arParentEntityTypeInstance.EntityType)
-                Me.Model.Save(False)
+                End With
 
-            End With
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
         End Sub
 
         Public Sub DisplayAndAssociate()
