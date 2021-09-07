@@ -785,6 +785,7 @@ Namespace FBM
                                         Dim lsQualifier = lrTable.generateUniqueQualifier("PK")
                                         Dim lbIsPrimaryKey As Boolean = True
                                         Dim lsIndexName As String = lrTable.Name & "_" & Trim(lsQualifier)
+                                        lsIndexName = Me.RDS.createUniqueIndexName(lsIndexName, 0)
 
                                         'Add the new Index
                                         Dim lrIndex As New RDS.Index(lrTable,
@@ -945,6 +946,7 @@ Namespace FBM
                                         Dim lsQualifier As String = lrTable.generateUniqueQualifier("UC")
                                         Dim lbIsPrimaryKey As Boolean = False
                                         Dim lsIndexName As String = lrTable.Name & "_" & Trim(lsQualifier)
+                                        lsIndexName = Me.RDS.createUniqueIndexName(lsIndexName, 0)
 
                                         'Add the new Index
                                         Dim lrIndex As New RDS.Index(lrTable,
@@ -1068,8 +1070,8 @@ Namespace FBM
                                         lbIsPrimaryKey = False
                                     End If
 
-
                                     Dim lsIndexName As String = lrTable.Name & "_" & Trim(lsQualifier)
+                                    lsIndexName = Me.RDS.createUniqueIndexName(lsIndexName, 0)
 
                                     'Add the new Index
                                     Dim lrIndex As New RDS.Index(lrTable,
@@ -1261,7 +1263,7 @@ Namespace FBM
 
 
                                 Dim lsIndexName As String = lrTable.Name & "_" & Trim(lsQualifier)
-
+                                lsIndexName = Me.RDS.createUniqueIndexName(lsIndexName, 0)
 
                                 'Add the new Index
                                 Dim lrIndex As New RDS.Index(lrTable,

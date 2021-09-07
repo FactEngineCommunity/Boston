@@ -862,18 +862,6 @@ Public Class frmDiagramORM
 
                             Call lrEntityTypeInstance.showSubtypeRelationships()
 
-
-                            '======================================================================
-                            'Create an Error for the Entity Type
-                            Dim lsErrorMessage As String = "Entity Type Requires Reference Scheme Error - Entity Type '" & lrEntityTypeInstance.Id & "'."
-                            Dim lrModelError As New FBM.ModelError(pcenumModelErrors.EntityTypeRequiresReferenceSchemeError,
-                                                                    lsErrorMessage,
-                                                                    Nothing,
-                                                                    lrEntityType)
-
-                            lrEntityTypeInstance.EntityType.ModelError.Add(lrModelError)
-                            Me.zrPage.Model.AddModelError(lrModelError)
-
                             '======================================================================
                             'Save the Page
                             Me.zrPage.Save()
@@ -1110,6 +1098,7 @@ Public Class frmDiagramORM
                         Case Is = "Binary Fact Type"
                             Dim lsFactTypeName As String = ""
                             lsFactTypeName = Me.zrPage.Model.CreateUniqueFactTypeName("NewFactType", 0)
+
                             lrFactType = Me.zrPage.Model.CreateFactType(lsFactTypeName,
                                                                         Nothing,
                                                                         False,
@@ -1161,6 +1150,17 @@ Public Class frmDiagramORM
                             loDropPtF = New Point(loPt.X - 15, loPt.Y - 5)
                             lrEntityTypeInstance = Me.zrPage.DropEntityTypeAtPoint(lrEntityType, loDropPtF)
                             Me.zrPage.Save()
+
+                            '======================================================================
+                            'Create an Error for the Entity Type
+                            Dim lsErrorMessage As String = "Entity Type Requires Reference Scheme Error - Entity Type '" & lrEntityTypeInstance.Id & "'."
+                            Dim lrModelError As New FBM.ModelError(pcenumModelErrors.EntityTypeRequiresReferenceSchemeError,
+                                                                    lsErrorMessage,
+                                                                    Nothing,
+                                                                    lrEntityType)
+
+                            lrEntityTypeInstance.EntityType.ModelError.Add(lrModelError)
+                            Me.zrPage.Model.AddModelError(lrModelError)
 
                             Dim lrUserAction As New tUserAction(lrEntityTypeInstance, pcenumUserAction.AddNewPageObjectToPage, Me.zrPage)
                             lrUserAction.PreActionModelObject = lrEntityTypeInstance.Clone(Me.zrPage)
