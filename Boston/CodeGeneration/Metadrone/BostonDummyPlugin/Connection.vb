@@ -138,7 +138,7 @@ Namespace SourcePlugins.Boston
                     For Each lrColumn In lrTable.Column.OrderBy(Function(x) x.OrdinalPosition)
                         Try
                             sr = New SchemaRow()
-                            sr.Name = lrTable.Name
+                            sr.Name = lrTable.DatabaseName
                             sr.Type = "TABLE"
                             sr.Column_Name = lrColumn.Name
                             sr.Data_Type = lrColumn.getMetamodelDataType.ToString

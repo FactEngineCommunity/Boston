@@ -626,7 +626,9 @@ Namespace RDS
         Public Function isSimpleAttribute() As Boolean
 
             Try
-                If Me.FactType.IsManyTo1BinaryFactType Then
+                If Me.FactType Is Nothing Then
+                    Return False
+                ElseIf Me.FactType.IsManyTo1BinaryFactType Then
                     Return True
                 ElseIf Me.FactType.Is1To1BinaryFactType Then
                     Return True

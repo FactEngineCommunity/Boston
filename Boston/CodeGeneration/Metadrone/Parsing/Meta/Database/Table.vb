@@ -106,7 +106,12 @@ Namespace Parser.Meta.Database
                                 lsOriginColumnName = lrRelation.OriginColumns(0).Name
                                 lsOriginRoleName = lrRelation.OriginColumns(0).Role.DerivedRoleName
                                 lsDestinationColumnName = lrRelation.DestinationColumns(0).Name
-                                lsDestinationRoleName = lrRelation.ResponsibleFactType.GetOtherRoleOfBinaryFactType(lrRelation.OriginColumns(0).Role.Id).DerivedRoleName
+                                If lrRelation.ResponsibleFactType.Arity > 2 Then
+                                    lsDestinationRoleName = lsOriginRoleName
+                                Else
+                                    lsDestinationRoleName = lrRelation.ResponsibleFactType.GetOtherRoleOfBinaryFactType(lrRelation.OriginColumns(0).Role.Id).DerivedRoleName
+                                End If
+
                             Else
                                 Dim lrOriginColumn As RDS.Column = lrRelation.OriginColumns.Find(Function(x) x.Id = aarSchemaRow(liInd).ColumnId)
                                 lsOriginColumnName = lrOriginColumn.Name
@@ -123,13 +128,19 @@ Namespace Parser.Meta.Database
                                 Me.Relation.AddUnique(lrRelation)
                             End If
 
+                            Dim lsResponsibleFactTypeName As String = lrRelation.ResponsibleFactType.Id
+                            If lrRelation.ResponsibleFactType.IsObjectified Or (Not lrRelation.ResponsibleFactType.IsObjectified And lrRelation.ResponsibleFactType.getCorrespondingRDSTable(Nothing, True) IsNot Nothing) Then
+                                lsResponsibleFactTypeName = lrRelation.ResponsibleFactType.getCorrespondingRDSTable.DatabaseName
+                            End If
+
+
                             Me.Relations.Add(New Relation(lrRelation.Id,
                                                           lrRelation.OriginTable.Name,
                                                           lsOriginColumnName,
                                                           lrRelation.DestinationTable.Name,
                                                           lsDestinationColumnName,
                                                           lrRelation.OriginColumns.Count,
-                                                          lrRelation.ResponsibleFactType.Id,
+                                                          lsResponsibleFactTypeName,
                                                           lsOriginRoleName,
                                                           lsDestinationRoleName))
                         Catch ex As Exception
@@ -154,7 +165,12 @@ Namespace Parser.Meta.Database
                                 lsDestinationColumnName = lrRelation.OriginColumns(0).Name
                                 lsDestinationRoleName = lrRelation.OriginColumns(0).Role.DerivedRoleName
                                 lsOriginColumnName = lrRelation.DestinationColumns(0).Name
-                                lsOriginRoleName = lrRelation.ResponsibleFactType.GetOtherRoleOfBinaryFactType(lrRelation.OriginColumns(0).Role.Id).DerivedRoleName
+                                If lrRelation.ResponsibleFactType.Arity > 2 Then
+                                    lsOriginRoleName = lsDestinationRoleName
+                                Else
+                                    lsOriginRoleName = lrRelation.ResponsibleFactType.GetOtherRoleOfBinaryFactType(lrRelation.OriginColumns(0).Role.Id).DerivedRoleName
+                                End If
+
                             Else
                                 Dim lrDestinationColumn As RDS.Column = lrRelation.DestinationColumns.Find(Function(x) x.Id = aarSchemaRow(liInd).ColumnId)
                                 lsDestinationColumnName = lrDestinationColumn.Name
@@ -171,13 +187,18 @@ Namespace Parser.Meta.Database
                                 Me.IncomingRelation.AddUnique(lrRelation)
                             End If
 
+                            Dim lsResponsibleFactTypeName As String = lrRelation.ResponsibleFactType.Id
+                            If lrRelation.ResponsibleFactType.IsObjectified Or (Not lrRelation.ResponsibleFactType.IsObjectified And lrRelation.ResponsibleFactType.getCorrespondingRDSTable(Nothing, True) IsNot Nothing) Then
+                                lsResponsibleFactTypeName = lrRelation.ResponsibleFactType.getCorrespondingRDSTable.DatabaseName
+                            End If
+
                             Me.IncomingRelations.Add(New Relation(lrRelation.Id,
                                                                   lrRelation.OriginTable.Name,
                                                                   lsOriginColumnName,
                                                                   lrRelation.DestinationTable.Name,
                                                                   lsDestinationColumnName,
                                                                   lrRelation.OriginColumns.Count,
-                                                                  lrRelation.ResponsibleFactType.Id,
+                                                                  lsResponsibleFactTypeName,
                                                                   lsOriginRoleName,
                                                                   lsDestinationRoleName))
                         Catch ex As Exception

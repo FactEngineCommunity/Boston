@@ -3170,7 +3170,7 @@ Namespace FBM
                 Dim lrRole As FBM.Role
 
                 If Not Me.IsBinaryFactType() Then
-                    Throw New System.Exception("Error: FBM.tFactType.GetOtherRoleOfBinaryFactType: Non binary FactType for Role: aiRoleId: " & asRoleId)
+                    Throw New System.Exception("Error: FBM.tFactType.GetOtherRoleOfBinaryFactType: Non binary FactType for Fact Type, " & Me.Id & ", Role: aiRoleId: " & asRoleId)
                 End If
 
                 GetOtherRoleOfBinaryFactType = Nothing
