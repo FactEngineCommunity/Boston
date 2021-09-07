@@ -6762,8 +6762,11 @@ Public Class frmDiagramORM
                 If Me.zrPage.SelectedObject.Count = 1 Then
                     lrRoleInstance = Me.zrPage.SelectedObject(0)
                     If lrRoleInstance.FactType.Arity = 1 Then
-                        MsgBox("Unary Fact Types don't require an Internal Uniqueness Constraint.")
-                        Exit Sub
+                        ls_message = "Unary Fact Types don't require an Internal Uniqueness Constraint."
+                        ls_message.AppendDoubleLineBreak("Are you sure you want to add the Uniqueness Constraint to this Fact Type?")
+                        If MsgBox(ls_message, MsgBoxStyle.YesNo + MsgBoxStyle.DefaultButton2) = MsgBoxResult.No Then
+                            Exit Sub
+                        End If
                     End If
                 End If
 

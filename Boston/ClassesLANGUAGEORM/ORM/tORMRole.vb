@@ -801,7 +801,7 @@ Namespace FBM
                         Throw New Exception("Function called for a BinaryFactType where the other Role joins an ObjectifiedFactType.")
                     End If
                 End If
-                If Me.FactType.HasTotalRoleConstraint Or Me.FactType.HasPartialButMultiRoleConstraint Then
+                If (Me.FactType.HasTotalRoleConstraint Or Me.FactType.HasPartialButMultiRoleConstraint) And Me.FactType.Arity > 1 Then
                     Throw New Exception("Function called for a Role within a FactType that has a TotalRoleConstraint or has a PartialButMultiRoleConstriant.")
                 End If
 
