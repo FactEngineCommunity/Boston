@@ -38,6 +38,7 @@ Namespace TableModel
                 lsSQLQuery &= " ,'" & Trim(ar_model.Schema) & "'"
                 lsSQLQuery &= " ,'" & Trim(ar_model.Warehouse) & "'"
                 lsSQLQuery &= " ,'" & Trim(ar_model.DatabaseRole) & "'"
+                lsSQLQuery &= " ,'" & Trim(ar_model.Port) & "'"
                 lsSQLQuery &= ")"
 
                 Call pdbConnection.Execute(lsSQLQuery)
@@ -174,6 +175,7 @@ Namespace TableModel
                     arModel.Schema = Trim(NullVal(lREcordset("Schema").Value, ""))
                     arModel.Warehouse = Trim(NullVal(lREcordset("Warehouse").Value, ""))
                     arModel.DatabaseRole = Trim(NullVal(lREcordset("Role").Value, ""))
+                    arModel.Port = Trim(NullVal(lREcordset("Port").Value, ""))
                 Else
 
                     lsMessage = "No Model returned for ModelId: '" & arModel.ModelId & "'"
@@ -253,6 +255,7 @@ Namespace TableModel
                     lrModel.Schema = Trim(NullVal(lREcordset("Schema").Value, ""))
                     lrModel.Warehouse = Trim(NullVal(lREcordset("Warehouse").Value, ""))
                     lrModel.DatabaseRole = Trim(NullVal(lREcordset("Role").Value, ""))
+                    lrModel.Port = Trim(NullVal(lREcordset("Port").Value, ""))
 
                     GetModels.Add(lrModel)
                     lREcordset.MoveNext()
@@ -307,6 +310,7 @@ Namespace TableModel
                 lsSQLQuery &= "       ,[Schema] = '" & Trim(ar_model.Schema) & "'"
                 lsSQLQuery &= "       ,Warehouse = '" & Trim(ar_model.Warehouse) & "'"
                 lsSQLQuery &= "       ,[Role] = '" & Trim(ar_model.DatabaseRole) & "'"
+                lsSQLQuery &= "       ,Port = '" & Trim(ar_model.Port) & "'"
                 lsSQLQuery &= " WHERE ModelId = '" & Trim(ar_model.ModelId) & "'"
 
                 pdbConnection.BeginTrans()

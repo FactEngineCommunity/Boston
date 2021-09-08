@@ -39,6 +39,9 @@ Partial Class frmFactEngine
         Me.ToolStripMenuItemLightBackground = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItemDarkBackground = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItemHelpTips = New System.Windows.Forms.ToolStripMenuItem()
+        Me.DefaultAfterQueryToToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripMenuItemDefaultToResultsTab = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripMenuItemDefaultToQueryTab = New System.Windows.Forms.ToolStripMenuItem()
         Me.LabelHelp = New System.Windows.Forms.Label()
         Me.ContextMenuStripHelpLabel = New System.Windows.Forms.ContextMenuStrip(Me.components)
         Me.HideToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
@@ -69,9 +72,7 @@ Partial Class frmFactEngine
         Me.Diagram1 = New MindFusion.Diagramming.Diagram()
         Me.BackgroundWorker = New System.ComponentModel.BackgroundWorker()
         Me.Diagram2 = New MindFusion.Diagramming.Diagram()
-        Me.DefaultAfterQueryToToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.ToolStripMenuItemDefaultToResultsTab = New System.Windows.Forms.ToolStripMenuItem()
-        Me.ToolStripMenuItemDefaultToQueryTab = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripButton1 = New System.Windows.Forms.ToolStripButton()
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SplitContainer1.Panel1.SuspendLayout()
         Me.SplitContainer1.Panel2.SuspendLayout()
@@ -133,7 +134,7 @@ Partial Class frmFactEngine
         '
         Me.ContextMenuStripFactEngine.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ViewToolStripMenuItem, Me.ToolStripSeparator1, Me.BackgroundColourToolStripMenuItem, Me.ToolStripMenuItemHelpTips, Me.DefaultAfterQueryToToolStripMenuItem})
         Me.ContextMenuStripFactEngine.Name = "ContextMenuStripFactEngine"
-        Me.ContextMenuStripFactEngine.Size = New System.Drawing.Size(196, 128)
+        Me.ContextMenuStripFactEngine.Size = New System.Drawing.Size(196, 106)
         '
         'ViewToolStripMenuItem
         '
@@ -226,6 +227,27 @@ Partial Class frmFactEngine
         Me.ToolStripMenuItemHelpTips.Name = "ToolStripMenuItemHelpTips"
         Me.ToolStripMenuItemHelpTips.Size = New System.Drawing.Size(195, 22)
         Me.ToolStripMenuItemHelpTips.Text = "&Help Tips"
+        '
+        'DefaultAfterQueryToToolStripMenuItem
+        '
+        Me.DefaultAfterQueryToToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItemDefaultToResultsTab, Me.ToolStripMenuItemDefaultToQueryTab})
+        Me.DefaultAfterQueryToToolStripMenuItem.Name = "DefaultAfterQueryToToolStripMenuItem"
+        Me.DefaultAfterQueryToToolStripMenuItem.Size = New System.Drawing.Size(195, 22)
+        Me.DefaultAfterQueryToToolStripMenuItem.Text = "&Default after query to..."
+        '
+        'ToolStripMenuItemDefaultToResultsTab
+        '
+        Me.ToolStripMenuItemDefaultToResultsTab.Checked = True
+        Me.ToolStripMenuItemDefaultToResultsTab.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.ToolStripMenuItemDefaultToResultsTab.Name = "ToolStripMenuItemDefaultToResultsTab"
+        Me.ToolStripMenuItemDefaultToResultsTab.Size = New System.Drawing.Size(131, 22)
+        Me.ToolStripMenuItemDefaultToResultsTab.Text = "&Results tab"
+        '
+        'ToolStripMenuItemDefaultToQueryTab
+        '
+        Me.ToolStripMenuItemDefaultToQueryTab.Name = "ToolStripMenuItemDefaultToQueryTab"
+        Me.ToolStripMenuItemDefaultToQueryTab.Size = New System.Drawing.Size(131, 22)
+        Me.ToolStripMenuItemDefaultToQueryTab.Text = "&Query tab"
         '
         'LabelHelp
         '
@@ -404,7 +426,7 @@ Partial Class frmFactEngine
         'ToolStrip3
         '
         Me.ToolStrip3.ImageScalingSize = New System.Drawing.Size(24, 24)
-        Me.ToolStrip3.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButtonQueryGO})
+        Me.ToolStrip3.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButtonQueryGO, Me.ToolStripButton1})
         Me.ToolStrip3.Location = New System.Drawing.Point(2, 2)
         Me.ToolStrip3.Name = "ToolStrip3"
         Me.ToolStrip3.Padding = New System.Windows.Forms.Padding(0, 0, 2, 0)
@@ -479,26 +501,14 @@ Partial Class frmFactEngine
         '
         Me.BackgroundWorker.WorkerReportsProgress = True
         '
-        'DefaultAfterQueryToToolStripMenuItem
+        'ToolStripButton1
         '
-        Me.DefaultAfterQueryToToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItemDefaultToResultsTab, Me.ToolStripMenuItemDefaultToQueryTab})
-        Me.DefaultAfterQueryToToolStripMenuItem.Name = "DefaultAfterQueryToToolStripMenuItem"
-        Me.DefaultAfterQueryToToolStripMenuItem.Size = New System.Drawing.Size(195, 22)
-        Me.DefaultAfterQueryToToolStripMenuItem.Text = "&Default after query to..."
-        '
-        'ToolStripMenuItemDefaultToResultsTab
-        '
-        Me.ToolStripMenuItemDefaultToResultsTab.Checked = True
-        Me.ToolStripMenuItemDefaultToResultsTab.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.ToolStripMenuItemDefaultToResultsTab.Name = "ToolStripMenuItemDefaultToResultsTab"
-        Me.ToolStripMenuItemDefaultToResultsTab.Size = New System.Drawing.Size(180, 22)
-        Me.ToolStripMenuItemDefaultToResultsTab.Text = "&Results tab"
-        '
-        'ToolStripMenuItemDefaultToQueryTab
-        '
-        Me.ToolStripMenuItemDefaultToQueryTab.Name = "ToolStripMenuItemDefaultToQueryTab"
-        Me.ToolStripMenuItemDefaultToQueryTab.Size = New System.Drawing.Size(180, 22)
-        Me.ToolStripMenuItemDefaultToQueryTab.Text = "&Query tab"
+        Me.ToolStripButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.ToolStripButton1.Image = CType(resources.GetObject("ToolStripButton1.Image"), System.Drawing.Image)
+        Me.ToolStripButton1.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ToolStripButton1.Name = "ToolStripButton1"
+        Me.ToolStripButton1.Size = New System.Drawing.Size(28, 28)
+        Me.ToolStripButton1.Text = "ToolStripButton1"
         '
         'frmFactEngine
         '
@@ -583,4 +593,5 @@ Partial Class frmFactEngine
     Friend WithEvents DefaultAfterQueryToToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents ToolStripMenuItemDefaultToResultsTab As ToolStripMenuItem
     Friend WithEvents ToolStripMenuItemDefaultToQueryTab As ToolStripMenuItem
+    Friend WithEvents ToolStripButton1 As ToolStripButton
 End Class

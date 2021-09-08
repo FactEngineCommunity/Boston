@@ -42,6 +42,7 @@ Public Class frmCRUDModel
         Me.TextBoxSchemaName.Text = Me.zrModel.Schema
         Me.TextBoxWarehouseName.Text = Me.zrModel.Warehouse
         Me.TextBoxRoleName.Text = Me.zrModel.DatabaseRole
+        Me.TextBoxPort.Text = Me.zrModel.Port
 
     End Sub
 
@@ -71,6 +72,7 @@ Public Class frmCRUDModel
             Me.zrModel.Schema = Trim(Me.TextBoxSchemaName.Text)
             Me.zrModel.Warehouse = Trim(Me.TextBoxWarehouseName.Text)
             Me.zrModel.DatabaseRole = Trim(Me.TextBoxRoleName.Text)
+            Me.zrModel.Port = Trim(Me.TextBoxPort.Text)
 
             Try
                 If Me.zrModel.TreeNode IsNot Nothing Then

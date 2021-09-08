@@ -32,6 +32,18 @@ Namespace FactEngine
             End Get
         End Property
 
+        Public ReadOnly Property DBVariableName As String
+            Get
+                If Me.FBMModelObject.GetType = GetType(FBM.ValueType) Then
+                    Return Me.FBMModelObject.Id
+                ElseIf Me.RDSTable IsNot Nothing Then
+                    Return Me.RDSTable.DBVariableName
+                Else
+                    Return Me.FBMModelObject.DBName
+                End If
+            End Get
+        End Property
+
         Public HasIdentifier As Boolean = False
 
         Public [Alias] As String = Nothing

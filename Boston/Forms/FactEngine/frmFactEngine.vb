@@ -2346,10 +2346,14 @@ Public Class frmFactEngine
                 'Clear the Graph View because there is not enough information to create a graph.
                 Call Me.clearGraphView()
 
-                If prApplication.WorkingModel.TargetDatabaseConnectionString = "" Then
-                    Me.LabelError.ForeColor = Color.Orange
-                    Me.LabelError.Text = "The Model needs a database connection string."
-                    Exit Sub
+                'If prApplication.WorkingModel.TargetDatabaseConnectionString = "" Then
+                '    Me.LabelError.ForeColor = Color.Orange
+                '    Me.LabelError.Text = "The Model needs a database connection string."
+                '    Exit Sub
+                'End
+
+                If prApplication.WorkingModel.DatabaseConnection Is Nothing Then
+                    Call prApplication.WorkingModel.connectToDatabase()
                 End If
 
                 If Not prApplication.WorkingModel.DatabaseConnection.Connected Or prApplication.WorkingModel.DatabaseManager.Connection Is Nothing Then
@@ -2824,6 +2828,87 @@ Public Class frmFactEngine
 
         ToolStripMenuItemDefaultToQueryTab.Checked = Not ToolStripMenuItemDefaultToQueryTab.Checked
         ToolStripMenuItemDefaultToResultsTab.Checked = Not ToolStripMenuItemDefaultToQueryTab.Checked
+
+    End Sub
+
+    Private Async Sub ToolStripButton1_Click(sender As Object, e As EventArgs) Handles ToolStripButton1.Click
+
+
+        Dim lrRecordset As New ORMQL.Recordset
+
+        'this is the client we build in C# 
+        Dim client As TypeDBCustom.CoreClient = Nothing
+
+        Try
+            lrRecordset.Query = Me.TextBoxQuery.Text
+
+            Dim larFact As New List(Of FBM.Fact)
+            Dim lrFactType = New FBM.FactType(prApplication.WorkingModel, "DummyFactType", True)
+            Dim lrFact As FBM.Fact = Nothing
+
+            Dim lsColumnName As String = ""
+
+            'For liFieldInd = 0 To lrSQLiteDataReader.FieldCount - 1
+            '    lsColumnName = lrFactType.CreateUniqueRoleName(lrSQLiteDataReader.GetName(liFieldInd), 0)
+            '    Dim lrRole = New FBM.Role(lrFactType, lsColumnName, True, Nothing)
+            '    lrFactType.RoleGroup.AddUnique(lrRole)
+            '    lrRecordset.Columns.Add(lsColumnName)
+            'Next
+
+            '=================================================================================================================
+            'TypeDB specific.
+            'make connection to server
+            client = New TypeDBCustom.CoreClient(prApplication.WorkingModel.Server, CInt(prApplication.WorkingModel.Port))
+
+            'connect to selected database from combo box and create session + pulse automatically.
+            Call client.OpenDatabase(Trim(prApplication.WorkingModel.Database))
+
+            'this is how we setup a match query, for different query type you have to use different property of query object
+            Dim query As New GrpcServer.QueryManager.Types.Req()
+            query.MatchReq = New GrpcServer.QueryManager.Types.Match.Types.Req() With {.Query = Me.TextBoxQuery.Text}
+            query.Options = New GrpcServer.Options() With {.Parallel = True}
+
+            'clear the existing transactions if there are any.
+            client.transactionClient.Reqs.Clear()
+            'you can add multiple transaction queries at once
+            client.transactionClient.Reqs.Add(New GrpcServer.Transaction.Types.Req() With {.QueryManagerReq = query, .ReqId = client.SessionID})
+            'write the transaction to bi-directional stream
+            Await client.Transactions.RequestStream.WriteAsync(client.transactionClient)
+
+            Dim ServerResp As GrpcServer.Transaction.Types.Server = Nothing
+            'this is like an enumrator, you have to call MoveNext for every chunk of data you will receive
+            Do While Await client.Transactions.ResponseStream.MoveNext(Threading.CancellationToken.None)
+
+                ServerResp = client.Transactions.ResponseStream.Current 'set the current enumrator object to local so can access it shortly
+
+                'this is check if the stream have done sending the data and we exit the loop,
+                'if this miss you will stuck on MoveNext 
+                If ServerResp.ResPart.ResCase = GrpcServer.Transaction.Types.ResPart.ResOneofCase.StreamResPart AndAlso
+                    ServerResp.ResPart.StreamResPart.State = GrpcServer.Transaction.Types.Stream.Types.State.Done Then
+                    Exit Do
+                End If
+
+                'this will be different according to your scenario. you need to use breakpoint to see data
+                'to implement better logic here. "Answers" below is the array of ConceptMap
+                For Each itm In ServerResp.ResPart.QueryManagerResPart.MatchResPart.Answers.ToArray()
+                    Dim cncpt As GrpcServer.Concept = Nothing 'this will be used to get the concept from conceptMap so you can access values.
+                    itm.Map.TryGetValue("gen", cncpt) 'you can get the maping key from your query
+
+                    For Each loValue In itm.Map.Values
+                        Dim lsThing As String = loValue.Thing.ToString
+                        Dim lrQueryResult As Object = Nothing
+
+                        'loValue.Thing.[Type].Label.ToString)
+                        'loValue.Thing.Value.String
+                    Next
+                Next
+
+            Loop
+
+        Catch ex As Exception
+            lrRecordset.ErrorString = ex.Message
+        End Try
+
 
     End Sub
 End Class

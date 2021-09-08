@@ -100,6 +100,9 @@
     <Reference Include="CsvHelper, Version=26.0.0.0, Culture=neutral, PublicKeyToken=8c4959082be5c823, processorArchitecture=MSIL">
       <HintPath>..\packages\CsvHelper.26.0.1\lib\net47\CsvHelper.dll</HintPath>
     </Reference>
+    <Reference Include="DLLTypeDB">
+      <HintPath>..\Dependencies\DLLTypeDB.dll</HintPath>
+    </Reference>
     <Reference Include="DxfExport, Version=5.1.1.19449, Culture=neutral, PublicKeyToken=21bf4734c13246ea, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Dependencies\DxfExport.dll</HintPath>
@@ -133,6 +136,15 @@
     </Reference>
     <Reference Include="Gios.Word">
       <HintPath>..\Dependencies\Gios.Word.dll</HintPath>
+    </Reference>
+    <Reference Include="Google.Protobuf, Version=3.17.3.0, Culture=neutral, PublicKeyToken=a7d26565bac4d604, processorArchitecture=MSIL">
+      <HintPath>..\packages\Google.Protobuf.3.17.3\lib\net45\Google.Protobuf.dll</HintPath>
+    </Reference>
+    <Reference Include="Grpc.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=d754f35622e28bad, processorArchitecture=MSIL">
+      <HintPath>..\packages\Grpc.Core.2.40.0\lib\net45\Grpc.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Grpc.Core.Api, Version=2.0.0.0, Culture=neutral, PublicKeyToken=d754f35622e28bad, processorArchitecture=MSIL">
+      <HintPath>..\packages\Grpc.Core.Api.2.40.0\lib\net45\Grpc.Core.Api.dll</HintPath>
     </Reference>
     <Reference Include="ICSharpCode.TextEditor, Version=0.0.0.0, Culture=neutral, PublicKeyToken=4d61825e8dd49f1a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -303,9 +315,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Dependencies\ToolBox.dll</HintPath>
     </Reference>
-    <Reference Include="TypeDBGRPCClient">
-      <HintPath>..\Dependencies\TypeDBGRPCClient.dll</HintPath>
-    </Reference>
     <Reference Include="Viev.FBM.Generic.Modules, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Dependencies\Viev.FBM.Generic.Modules.dll</HintPath>
@@ -397,6 +406,7 @@
     <Compile Include="ClassesFactEngine\DatabaseManager\DatabaseClasses\tPostgreSQL.vb" />
     <Compile Include="ClassesFactEngine\DatabaseManager\DatabaseClasses\tSnowflake.vb" />
     <Compile Include="ClassesFactEngine\DatabaseManager\DatabaseClasses\tSQLite.vb" />
+    <Compile Include="ClassesFactEngine\DatabaseManager\DatabaseClasses\TypeDB\QueryResultClasses.vb" />
     <Compile Include="ClassesFactEngine\DatabaseManager\DatabaseClasses\TypeDB\publicTypeDBConstants.vb" />
     <Compile Include="ClassesFactEngine\DatabaseManager\DatabaseClasses\TypeDB\tConceptMap.vb" />
     <Compile Include="ClassesFactEngine\DatabaseManager\DatabaseClasses\TypeDB\tTypeDBconnection.vb" />
@@ -3071,9 +3081,11 @@
     <Error Condition="!Exists('..\packages\EntityFramework.6.3.0\build\EntityFramework.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\EntityFramework.6.3.0\build\EntityFramework.targets'))" />
     <Error Condition="!Exists('..\packages\System.Data.SQLite.Core.1.0.113.1\build\net46\System.Data.SQLite.Core.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\System.Data.SQLite.Core.1.0.113.1\build\net46\System.Data.SQLite.Core.targets'))" />
     <Error Condition="!Exists('..\packages\SQLite.3.13.0\build\net45\SQLite.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\SQLite.3.13.0\build\net45\SQLite.props'))" />
+    <Error Condition="!Exists('..\packages\Grpc.Core.2.40.0\build\net45\Grpc.Core.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Grpc.Core.2.40.0\build\net45\Grpc.Core.targets'))" />
   </Target>
   <Import Project="..\packages\EntityFramework.6.3.0\build\EntityFramework.targets" Condition="Exists('..\packages\EntityFramework.6.3.0\build\EntityFramework.targets')" />
   <Import Project="..\packages\System.Data.SQLite.Core.1.0.113.1\build\net46\System.Data.SQLite.Core.targets" Condition="Exists('..\packages\System.Data.SQLite.Core.1.0.113.1\build\net46\System.Data.SQLite.Core.targets')" />
+  <Import Project="..\packages\Grpc.Core.2.40.0\build\net45\Grpc.Core.targets" Condition="Exists('..\packages\Grpc.Core.2.40.0\build\net45\Grpc.Core.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

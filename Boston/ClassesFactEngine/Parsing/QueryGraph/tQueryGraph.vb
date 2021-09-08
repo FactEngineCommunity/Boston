@@ -159,13 +159,6 @@
                 'Recursive NodePropertyIdentification conditionals are excluded.
                 larConditionalQueryEdges.RemoveAll(Function(x) x.TargetNode.IsExcludedConditional)
 
-                If larWhereEdges.Count = 0 And larConditionalQueryEdges.Count = 0 And (Not Me.HeadNode.HasIdentifier) Then
-                    If NullVal(My.Settings.FactEngineDefaultQueryResultLimit, 0) > 0 Then
-                        lsTDBQuery &= vbCrLf & "LIMIT " & My.Settings.FactEngineDefaultQueryResultLimit
-                    End If
-                    Return lsTDBQuery
-                End If
-
 #Region "WHERE Joins"
                 liInd = 1
                 Dim lbHasWhereClause As Boolean = False
@@ -231,9 +224,9 @@
 
                         'RDSTable
 #Region "PGSNodeTable/RDSTable"
-
-                        lsTDBQuery &= "($" & lrQueryEdge.BaseNode.RDSTable.DBVariableName & Viev.NullVal(lrQueryEdge.BaseNode.Alias, "") & ","
-                        lsTDBQuery &= "$" & lrQueryEdge.TargetNode.RDSTable.DBVariableName & Viev.NullVal(lrQueryEdge.TargetNode.Alias, "") & ") isa " & lrQueryEdge.FBMFactType.Name & ";" & vbCrLf
+                        Dim lrOtherRole As FBM.Role = lrQueryEdge.FBMFactType.GetOtherRoleOfBinaryFactType(lrQueryEdge.FBMPredicatePart.Role.Id)
+                        lsTDBQuery &= "(" & lrQueryEdge.FBMPredicatePart.Role.Name & ": $" & lrQueryEdge.BaseNode.RDSTable.DBVariableName & Viev.NullVal(lrQueryEdge.BaseNode.Alias, "") & ","
+                        lsTDBQuery &= lrOtherRole.Name & ": $" & lrQueryEdge.FBMFactType.DBName & lrQueryEdge.TargetNode.DBVariableName & Viev.NullVal(lrQueryEdge.TargetNode.Alias, "") & ") isa " & lrQueryEdge.FBMFactType.DBName & ";" & vbCrLf
 
                         '20210904-VM-From SQL below. Might not be needed for TypeDB.
                         'lrOriginTable = lrQueryEdge.FBMFactType.getCorrespondingRDSTable
@@ -673,6 +666,7 @@
                         lbRequiresGroupByClause = True
                     End If
                 End If
+                lsTDBQuery &= ";"
 #End Region
 
                 Return lsTDBQuery

@@ -1,6 +1,7 @@
 ﻿Imports Boston.ORMQL
 Imports System.Data.SQLite
 Imports System.Reflection
+Imports System.Threading.Tasks
 
 Namespace FactEngine
 
@@ -918,7 +919,6 @@ Namespace FactEngine
         End Function
 
 
-
         Public Overrides Function GO(asQuery As String) As ORMQL.Recordset Implements iDatabaseConnection.GO
 
             Dim lrRecordset As New ORMQL.Recordset
@@ -940,7 +940,6 @@ Namespace FactEngine
                 Dim larFact As New List(Of FBM.Fact)
                 Dim lrFactType = New FBM.FactType(Me.FBMModel, "DummyFactType", True)
                 Dim lrFact As FBM.Fact
-                'Richmond.WriteToStatusBar("Reading results.", True)
 
                 '=====================================================
                 'Column Names   
@@ -1396,6 +1395,9 @@ Namespace FactEngine
 
         End Function
 
+        Private Function iDatabaseConnection_GOAsync(asQuery As String) As Task(Of Recordset) Implements iDatabaseConnection.GOAsync
+            Throw New NotImplementedException()
+        End Function
     End Class
 
 End Namespace

@@ -1,4 +1,5 @@
-﻿Imports Boston.ORMQL
+﻿Imports System.Threading.Tasks
+Imports Boston.ORMQL
 
 Namespace FactEngine
 
@@ -147,6 +148,10 @@ Namespace FactEngine
         End Function
 
         Private Function iDatabaseConnection_GONonQuery(asQuery As String) As Recordset Implements iDatabaseConnection.GONonQuery
+            Throw New NotImplementedException()
+        End Function
+
+        Private Function iDatabaseConnection_GOAsync(asQuery As String) As Task(Of Recordset) Implements iDatabaseConnection.GOAsync
             Throw New NotImplementedException()
         End Function
     End Class

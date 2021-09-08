@@ -278,9 +278,9 @@ Public Class frmToolboxTableData
                     End If
                     lsSQLQuery &= vbCrLf & " LIMIT 100"
 
-                        Me.mrRecordset = prApplication.WorkingModel.DatabaseConnection.GO(lsSQLQuery)
+                    Me.mrRecordset = prApplication.WorkingModel.DatabaseConnection.GO(lsSQLQuery)
 
-                        Me.mrDataGridList = New ORMQL.RecordsetDataGridList(Me.mrRecordset, Me.mrTable)
+                    Me.mrDataGridList = New ORMQL.RecordsetDataGridList(Me.mrRecordset, Me.mrTable)
 
                         Me.AdvancedDataGridView.DataSource = Me.mrDataGridList
                     End If

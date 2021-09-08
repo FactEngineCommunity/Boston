@@ -309,6 +309,10 @@ Namespace FBM
         Public DatabaseRole As String 'E.g. As needed by Snowflake for ODBC. See also the physical model.
 
         <NonSerialized()>
+        <XmlIgnore()>
+        Public Port As String 'E.g. As needed by TypeDB for a Session/Connection. See also the physical model.
+
+        <NonSerialized()>
         Public Event Deleting()
         <NonSerialized()> _
         Public Event FinishedErrorChecking()
