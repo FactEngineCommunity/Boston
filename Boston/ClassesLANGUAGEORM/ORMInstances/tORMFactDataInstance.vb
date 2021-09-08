@@ -497,6 +497,20 @@ Namespace FBM
 
         End Function
 
+        Public Overridable Function ClonePageObject() As FBM.PageObject
+
+            Dim lrPageObject As New FBM.PageObject
+
+            lrPageObject.Name = Me.Name
+            lrPageObject.Shape = Me.Shape
+            lrPageObject.X = Me.X
+            lrPageObject.Y = Me.Y
+
+            Return lrPageObject
+
+        End Function
+
+
         Public Overridable Function ClonePGSNode(ByRef arPage As FBM.Page) As PGS.Node
 
             '-----------------------------------------------------

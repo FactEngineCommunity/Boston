@@ -139,219 +139,223 @@ Public Class frmMain
             '  stop MS Access "An updatable query is required" errors, when the JetEngine can't access the database file.
             '  There's a problem storing the database in the C:\ProgramFiles\<ApplicationDirectory> because of hightened security 
             '  in later versions of MS Windows.
-            'NB Initially, testing to see if changing the database directory security permissions can be done here (see below).
-            'MsgBox(My.Computer.FileSystem.SpecialDirectories.AllUsersApplicationData )
-            publicAccessControl.AddDirectorySecurity(My.Computer.FileSystem.SpecialDirectories.AllUsersApplicationData,
+            'NB Initially, testing to see if changing the database directory security permissions can be done here (see below).          
+            Try
+                publicAccessControl.AddDirectorySecurity(My.Computer.FileSystem.SpecialDirectories.AllUsersApplicationData,
                                                      "Users",
                                                      FileSystemRights.FullControl,
                                                      AccessControlType.Allow)
+            Catch
+                'Not a biggie. But Boston does need to be written to C:\ProgramData. If that fails, the customer will have to get in touch.
+            End Try
+
 
             Dim lsDatabaseLocation As String = ""
-            Dim lsDatabaseName As String = ""
-            Dim lsDatabaseLocationDirectory As String = ""
-            Dim lsDatabaseType As String = "" 'Jet, SQLServer
+                Dim lsDatabaseName As String = ""
+                Dim lsDatabaseLocationDirectory As String = ""
+                Dim lsDatabaseType As String = "" 'Jet, SQLServer
 
-            Dim lsConnectionString As String
-            lsConnectionString = Trim(My.Settings.DatabaseConnectionString)
-            Dim lsCommonDatabaseFileLocation As String = ""
+                Dim lsConnectionString As String
+                lsConnectionString = Trim(My.Settings.DatabaseConnectionString)
+                Dim lsCommonDatabaseFileLocation As String = ""
 
-            Me.StatusLabelGeneralStatus.Text = "Checking Database availability"
-            If My.Settings.DatabaseType = pcenumDatabaseType.MSJet.ToString Then
-                Dim lrSQLConnectionStringBuilder As New System.Data.Common.DbConnectionStringBuilder(True)
-                lrSQLConnectionStringBuilder.ConnectionString = lsConnectionString
+                Me.StatusLabelGeneralStatus.Text = "Checking Database availability"
+                If My.Settings.DatabaseType = pcenumDatabaseType.MSJet.ToString Then
+                    Dim lrSQLConnectionStringBuilder As New System.Data.Common.DbConnectionStringBuilder(True)
+                    lrSQLConnectionStringBuilder.ConnectionString = lsConnectionString
 
-                lsDatabaseLocation = lrSQLConnectionStringBuilder("Data Source")
-                lsDatabaseName = Path.GetFileName(lsDatabaseLocation)
-                lsDatabaseLocationDirectory = Path.GetDirectoryName(lsDatabaseLocation)
-                lsDatabaseType = lrSQLConnectionStringBuilder("Provider")
+                    lsDatabaseLocation = lrSQLConnectionStringBuilder("Data Source")
+                    lsDatabaseName = Path.GetFileName(lsDatabaseLocation)
+                    lsDatabaseLocationDirectory = Path.GetDirectoryName(lsDatabaseLocation)
+                    lsDatabaseType = lrSQLConnectionStringBuilder("Provider")
 
-                If My.Settings.FirstRun = True Then
-                    '----------------------------------------------------------------------------------------
-                    'Move the database to My.Computer.FileSystem.SpecialDirectories.AllUsersApplicationData
-                    '  and update the ConnectionString for the database.
-                    '----------------------------------------------------------------------------------------
-                    lsCommonDatabaseFileLocation = My.Computer.FileSystem.SpecialDirectories.AllUsersApplicationData & "\database"
-                    IO.Directory.CreateDirectory(lsCommonDatabaseFileLocation)
+                    If My.Settings.FirstRun = True Then
+                        '----------------------------------------------------------------------------------------
+                        'Move the database to My.Computer.FileSystem.SpecialDirectories.AllUsersApplicationData
+                        '  and update the ConnectionString for the database.
+                        '----------------------------------------------------------------------------------------
+                        lsCommonDatabaseFileLocation = My.Computer.FileSystem.SpecialDirectories.AllUsersApplicationData & "\database"
+                        IO.Directory.CreateDirectory(lsCommonDatabaseFileLocation)
 
-                    Dim lsFirstRunDatabaseLocation As String = ""
-                    lsFirstRunDatabaseLocation = Richmond.MyPath & "\database\" & lsDatabaseName
-                    IO.File.Copy(lsFirstRunDatabaseLocation, lsCommonDatabaseFileLocation & "\" & lsDatabaseName)
+                        Dim lsFirstRunDatabaseLocation As String = ""
+                        lsFirstRunDatabaseLocation = Richmond.MyPath & "\database\" & lsDatabaseName
+                        IO.File.Copy(lsFirstRunDatabaseLocation, lsCommonDatabaseFileLocation & "\" & lsDatabaseName)
 
-                    lrSQLConnectionStringBuilder = New System.Data.Common.DbConnectionStringBuilder(True)
-                    lrSQLConnectionStringBuilder.Add("Provider", lsDatabaseType)
-                    lrSQLConnectionStringBuilder.Add("Data Source", lsCommonDatabaseFileLocation & "\" & lsDatabaseName)
+                        lrSQLConnectionStringBuilder = New System.Data.Common.DbConnectionStringBuilder(True)
+                        lrSQLConnectionStringBuilder.Add("Provider", lsDatabaseType)
+                        lrSQLConnectionStringBuilder.Add("Data Source", lsCommonDatabaseFileLocation & "\" & lsDatabaseName)
 
-                    My.Settings.DatabaseConnectionString = lrSQLConnectionStringBuilder.ConnectionString
+                        My.Settings.DatabaseConnectionString = lrSQLConnectionStringBuilder.ConnectionString
 
-                    My.Settings.FirstRun = False
-                    My.Settings.Save()
+                        My.Settings.FirstRun = False
+                        My.Settings.Save()
+
+                        If pbLogStartup Then
+                            lsMessage = "FirstRun-Moved database to " & lsCommonDatabaseFileLocation
+                            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Information)
+                        End If
+                    End If
+
+                End If
+
+                'DockPanel
+                'Dim configFile As String = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(Application.ExecutablePath), "DockPanel.config")            
+                Dim configFile As String = System.IO.Path.Combine(Richmond.MyPath, "DockPanel.config")
+
+                Me.IsMdiContainer = True
+
+                prApplication.ApplicationVersionNr = psApplicationApplicationVersionNr
+                'The database version required by the Boston application.
+                '  NB May be different from My.Settings.DatabaseVersionNumber, which is the actual version of the database installed.
+                prApplication.DatabaseVersionNr = psApplicationDatabaseVersionNr
+
+                Me.StatusLabelGeneralStatus.Text = "Opening Database"
+                If Richmond.OpenDatabase() Then
 
                     If pbLogStartup Then
-                        lsMessage = "FirstRun-Moved database to " & lsCommonDatabaseFileLocation
-                        prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Information)
+                        prApplication.ThrowErrorMessage("Successfully opened the database", pcenumErrorType.Information)
                     End If
-                End If
 
-            End If
+                    '----------------------------------------------------------------------------------------------------------------------
+                    'Check to see if the database is the correct version
+                    '  NB Change the culture of the Application to EN-US because the CDbl function (below) will error if the 
+                    '  users computer regional settings has a "," (comma) for a decimal separator.
+                    '  Setting the culture to EN-US will ensure the the string of the database version (which uses "." decimal separator)
+                    '  will correctly convert to a double precision number.
+                    '----------------------------------------------------------------------------------------------------------------------
 
-            'DockPanel
-            'Dim configFile As String = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(Application.ExecutablePath), "DockPanel.config")            
-            Dim configFile As String = System.IO.Path.Combine(Richmond.MyPath, "DockPanel.config")
+                    Application.CurrentCulture = New System.Globalization.CultureInfo("EN-US")
 
-            Me.IsMdiContainer = True
-
-            prApplication.ApplicationVersionNr = psApplicationApplicationVersionNr
-            'The database version required by the Boston application.
-            '  NB May be different from My.Settings.DatabaseVersionNumber, which is the actual version of the database installed.
-            prApplication.DatabaseVersionNr = psApplicationDatabaseVersionNr
-
-            Me.StatusLabelGeneralStatus.Text = "Opening Database"
-            If Richmond.OpenDatabase() Then
-
-                If pbLogStartup Then
-                    prApplication.ThrowErrorMessage("Successfully opened the database", pcenumErrorType.Information)
-                End If
-
-                '----------------------------------------------------------------------------------------------------------------------
-                'Check to see if the database is the correct version
-                '  NB Change the culture of the Application to EN-US because the CDbl function (below) will error if the 
-                '  users computer regional settings has a "," (comma) for a decimal separator.
-                '  Setting the culture to EN-US will ensure the the string of the database version (which uses "." decimal separator)
-                '  will correctly convert to a double precision number.
-                '----------------------------------------------------------------------------------------------------------------------
-
-                Application.CurrentCulture = New System.Globalization.CultureInfo("EN-US")
-
-                Dim lsDatabaseVersionNumber As String = ""
-                lsDatabaseVersionNumber = TableReferenceFieldValue.GetReferenceFieldValue(1, 1)
-                If CDbl(prApplication.DatabaseVersionNr) <> CDbl(lsDatabaseVersionNumber) Then
-                    '--------------------------------------------------------------------------------------
-                    'The Richmond application requires a different DatabaseVersion than the one installed
-                    '--------------------------------------------------------------------------------------
-                    If CDbl(prApplication.DatabaseVersionNr) > CDbl(lsDatabaseVersionNumber) Then
-                        If Me.PerformDatabaseUpgrade() Then
-                            '----------------------------------------------------
-                            'Great. The database upgrade finished successfully.
-                            '----------------------------------------------------
+                    Dim lsDatabaseVersionNumber As String = ""
+                    lsDatabaseVersionNumber = TableReferenceFieldValue.GetReferenceFieldValue(1, 1)
+                    If CDbl(prApplication.DatabaseVersionNr) <> CDbl(lsDatabaseVersionNumber) Then
+                        '--------------------------------------------------------------------------------------
+                        'The Richmond application requires a different DatabaseVersion than the one installed
+                        '--------------------------------------------------------------------------------------
+                        If CDbl(prApplication.DatabaseVersionNr) > CDbl(lsDatabaseVersionNumber) Then
+                            If Me.PerformDatabaseUpgrade() Then
+                                '----------------------------------------------------
+                                'Great. The database upgrade finished successfully.
+                                '----------------------------------------------------
+                            Else
+                                '---------------------------------------------------------------
+                                'Messages to the user handled within Me.PerformDatabaseUpgrade
+                                '---------------------------------------------------------------
+                                Me.Close()
+                                Me.Dispose()
+                                Exit Sub
+                            End If
                         Else
-                            '---------------------------------------------------------------
-                            'Messages to the user handled within Me.PerformDatabaseUpgrade
-                            '---------------------------------------------------------------
+                            '--------------------------------------------------------------------------------------------------------------
+                            'Real problems exist. The application requires a DatabaseVersionNumber 'less' than the one installed
+                            '--------------------------------------------------------------------------------------------------------------
+                            lsMessage = "Contact Viev support. This installation of Boston requires a Database Version Number less than the one installed"
+                            lsMessage &= vbCrLf & vbCrLf
+                            lsMessage &= "Database version required by software: " & prApplication.DatabaseVersionNr & vbCrLf
+                            lsMessage &= "Required database version (Configuration): " & My.Settings.DatabaseVersionNumber & vbCrLf
+                            lsMessage &= "Database version (actual database): " & lsDatabaseVersionNumber & vbCrLf
+                            lsMessage &= vbCrLf & vbCrLf
+                            lsMessage &= "Installed database location: " & vbCrLf
+                            lsMessage &= lsCommonDatabaseFileLocation
+                            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical)
                             Me.Close()
                             Me.Dispose()
                             Exit Sub
                         End If
-                    Else
-                        '--------------------------------------------------------------------------------------------------------------
-                        'Real problems exist. The application requires a DatabaseVersionNumber 'less' than the one installed
-                        '--------------------------------------------------------------------------------------------------------------
-                        lsMessage = "Contact Viev support. This installation of Boston requires a Database Version Number less than the one installed"
-                        lsMessage &= vbCrLf & vbCrLf
-                        lsMessage &= "Database version required by software: " & prApplication.DatabaseVersionNr & vbCrLf
-                        lsMessage &= "Required database version (Configuration): " & My.Settings.DatabaseVersionNumber & vbCrLf
-                        lsMessage &= "Database version (actual database): " & lsDatabaseVersionNumber & vbCrLf
-                        lsMessage &= vbCrLf & vbCrLf
-                        lsMessage &= "Installed database location: " & vbCrLf
-                        lsMessage &= lsCommonDatabaseFileLocation
-                        prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical)
-                        Me.Close()
-                        Me.Dispose()
-                        Exit Sub
                     End If
-                End If
 
-                Me.StatusLabelGeneralStatus.Text = "Database Opened Successfully"
+                    Me.StatusLabelGeneralStatus.Text = "Database Opened Successfully"
 
-                '======================================================
-                'Load the Core Model
-                '---------------------
-                ltThread = New Thread(AddressOf Me.LoadCoreModel)
-                ltThread.IsBackground = True
-                ltThread.Start()
-                '======================================================
+                    '======================================================
+                    'Load the Core Model
+                    '---------------------
+                    ltThread = New Thread(AddressOf Me.LoadCoreModel)
+                    ltThread.IsBackground = True
+                    ltThread.Start()
+                    '======================================================
 
-                '=======================================
-                Call TableModel.GetModelDetails(prApplication.Language.Model)
-                Call prApplication.Language.Model.Load()
+                    '=======================================
+                    Call TableModel.GetModelDetails(prApplication.Language.Model)
+                    Call prApplication.Language.Model.Load()
 
-                prApplication.Language.LanguagePhrase = Language.TableLanguagePhrase.GetLanguagePhrasesByLanguage
+                    prApplication.Language.LanguagePhrase = Language.TableLanguagePhrase.GetLanguagePhrasesByLanguage
 
-                If pbLogStartup Then
-                    prApplication.ThrowErrorMessage("Successfully loaded the Language Model", pcenumErrorType.Information)
-                End If
-                '=======================================
+                    If pbLogStartup Then
+                        prApplication.ThrowErrorMessage("Successfully loaded the Language Model", pcenumErrorType.Information)
+                    End If
+                    '=======================================
 
-                '==========================================
-                'Client/Server                
-                If My.Settings.UseClientServer _
+                    '==========================================
+                    'Client/Server                
+                    If My.Settings.UseClientServer _
                     And My.Settings.RequireLoginAtStartup _
                     And Not My.Settings.UseWindowsAuthenticationVirtualUI Then
-                    If frmLogin.ShowDialog() = Windows.Forms.DialogResult.OK Then
+                        If frmLogin.ShowDialog() = Windows.Forms.DialogResult.OK Then
 
-                        '------------------------------------------------------------------
-                        'LogIn from populates prApplication.User
-                        Call Me.logInUser(prApplication.User)
-                    Else
-                        Me.Close()
-                        Me.Dispose()
-                    End If
-                ElseIf My.Settings.RequireLoginAtStartup _
+                            '------------------------------------------------------------------
+                            'LogIn from populates prApplication.User
+                            Call Me.logInUser(prApplication.User)
+                        Else
+                            Me.Close()
+                            Me.Dispose()
+                        End If
+                    ElseIf My.Settings.RequireLoginAtStartup _
                     And Not My.Settings.UseWindowsAuthenticationVirtualUI Then
-                    If frmLogin.ShowDialog() = Windows.Forms.DialogResult.OK Then
+                        If frmLogin.ShowDialog() = Windows.Forms.DialogResult.OK Then
 
-                        '------------------------------------------------------------------
-                        'LogIn from populates prApplication.User
-                        Call Me.logInUser(prApplication.User)
-                    Else
-                        Me.Close()
-                        Me.Dispose()
-                    End If
-                End If
-
-                If My.Settings.UseClientServer = True Then
-                    If My.Settings.InitialiseClient Then
-                        Call Me.InitializeClient() 'Connects to the Boston Server Host
+                            '------------------------------------------------------------------
+                            'LogIn from populates prApplication.User
+                            Call Me.logInUser(prApplication.User)
+                        Else
+                            Me.Close()
+                            Me.Dispose()
+                        End If
                     End If
 
-                    If prUser IsNot Nothing Then
-                        Call Me.logInUser(prUser)
+                    If My.Settings.UseClientServer = True Then
+                        If My.Settings.InitialiseClient Then
+                            Call Me.InitializeClient() 'Connects to the Boston Server Host
+                        End If
+
+                        If prUser IsNot Nothing Then
+                            Call Me.logInUser(prUser)
+                        End If
                     End If
+
+                    Call Me.SetupForm()
+
+                    '=======================================================================================================================
+                    '-----------------------
+                    'Load the Startup Page
+                    '-----------------------
+                    Dim lrChildForm As New frmStartup
+                    lrChildForm.Show(Me.DockPanel, WeifenLuo.WinFormsUI.Docking.DockState.Document)
+                    Me.zfrmStartup = lrChildForm
+
+                    If pbLogStartup Then
+                        prApplication.ThrowErrorMessage("Successfully loaded the Startup page", pcenumErrorType.Information)
+                    End If
+                    '=======================================================================================================================
+
+                    If pbLogStartup Then
+                        prApplication.ThrowErrorMessage("Finished loading the Main form.", pcenumErrorType.Information)
+                    End If
+
+                    Cursor.Current = Cursors.Default
+
+                Else
+                    '-------------------------------------------------------------------
+                    'The database wasn't opened successfully, so close the application.
+                    '-------------------------------------------------------------------
+
+                    'Call Me.LoadCRUDRichmondConfiguration()
+
+                    Me.Close()
+                    Me.Dispose()
                 End If
 
-                Call Me.SetupForm()
-
-                '=======================================================================================================================
-                '-----------------------
-                'Load the Startup Page
-                '-----------------------
-                Dim lrChildForm As New frmStartup
-                lrChildForm.Show(Me.DockPanel, WeifenLuo.WinFormsUI.Docking.DockState.Document)
-                Me.zfrmStartup = lrChildForm
-
-                If pbLogStartup Then
-                    prApplication.ThrowErrorMessage("Successfully loaded the Startup page", pcenumErrorType.Information)
-                End If
-                '=======================================================================================================================
-
-                If pbLogStartup Then
-                    prApplication.ThrowErrorMessage("Finished loading the Main form.", pcenumErrorType.Information)
-                End If
-
-                Cursor.Current = Cursors.Default
-
-            Else
-                '-------------------------------------------------------------------
-                'The database wasn't opened successfully, so close the application.
-                '-------------------------------------------------------------------
-
-                'Call Me.LoadCRUDRichmondConfiguration()
-
-                Me.Close()
-                Me.Dispose()
-            End If
-
-        Catch ex As Exception
-            Dim lsMessage1 As String
+            Catch ex As Exception
+                Dim lsMessage1 As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name

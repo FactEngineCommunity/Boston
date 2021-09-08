@@ -169,7 +169,7 @@ Namespace ERD
 
         End Sub
 
-        Public Function ClonePageObject() As FBM.PageObject
+        Public Overrides Function ClonePageObject() As FBM.PageObject
 
             Dim lrPageObject As New FBM.PageObject
 

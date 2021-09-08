@@ -13,9 +13,6 @@ Namespace PGS
         Implements FBM.iPageObject
         Implements IEquatable(Of PGS.Node)
 
-        <XmlAttribute()>
-        Public NodeType As pcenumPGSEntityType = pcenumPGSEntityType.Node
-
         Public Shadows WithEvents FactData As New FBM.FactData
 
         <CategoryAttribute("Entity"),
@@ -42,6 +39,9 @@ Namespace PGS
 
         Public Attribute As New List(Of ERD.Attribute)
         Public Relation As New List(Of ERD.Relation)
+
+        <XmlAttribute()>
+        Public NodeType As pcenumPGSEntityType = pcenumPGSEntityType.Node
 
         ''' <summary>
         ''' A PGSRelation always has a corresponding Node, because but for the relations attached to the underlying FactType the PGSRelation is either a Link or a Node.
@@ -114,7 +114,7 @@ Namespace PGS
 
         End Sub
 
-        Public Function ClonePageObject() As FBM.PageObject
+        Public Overrides Function ClonePageObject() As FBM.PageObject
 
             Dim lrPageObject As New FBM.PageObject
 
