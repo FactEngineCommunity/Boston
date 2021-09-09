@@ -1575,13 +1575,13 @@ Public Class frmFactEngine
 
                                     Dim larFactTypeReading As New List(Of FBM.FactTypeReading)
 
+                                    larFactTypeReading.AddRange(lrPredicateModelObject.getOutgoingFactTypeReadings(2))
+
                                     If Me.zsIntellisenseBuffer.Length > 0 Then
-                                        larFactTypeReading = larFactTypeReading.FindAll(Function(x) x.PredicatePart(0).PredicatePartText.StartsWith(Me.zsIntellisenseBuffer))
+                                        larFactTypeReading.RemoveAll(Function(x) Not x.PredicatePart(0).PredicatePartText.StartsWith(Me.zsIntellisenseBuffer))
                                     ElseIf lrLastWhichClause.PREDICATE.Count > 0 Then
                                         larFactTypeReading = larFactTypeReading.FindAll(Function(x) x.PredicatePart(0).PredicatePartText.StartsWith(lrLastWhichClause.PREDICATE(0)))
                                     End If
-
-                                    larFactTypeReading.AddRange(lrPredicateModelObject.getOutgoingFactTypeReadings(2))
 
                                     For Each lrFactTypeReading In larFactTypeReading.OrderBy(Function(x) x.GetPredicateText)
 
@@ -1591,7 +1591,7 @@ Public Class frmFactEngine
                                             If lrFactTypeReading.PredicatePart(1).PreBoundText <> "" Then
                                                 lsPreboundReadingText = lrFactTypeReading.PredicatePart(1).PreBoundText
                                             End If
-                                            Call Me.AddEnterpriseAwareItem(lrFactTypeReading.GetPredicateText, FEQL.TokenType.PREDICATE, , lsPreboundReadingText & lrFactTypeReading.PredicatePart(1).Role.JoinedORMObject.Id)
+                                            Call Me.AddEnterpriseAwareItem(lrFactTypeReading.GetPredicateText, FEQL.TokenType.PREDICATE, , lsPreboundReadingText & lrFactTypeReading.PredicatePart(1).Role.JoinedORMObject.Id, True)
                                         Else
                                             Call Me.AddEnterpriseAwareItem(lrFactTypeReading.GetPredicateText, FEQL.TokenType.PREDICATE)
                                         End If
@@ -2006,7 +2006,8 @@ Public Class frmFactEngine
                         Case Is = FEQL.TokenType.PREDICATE,
                                   FEQL.TokenType.PREDICATESPACE
                             Me.AutoComplete.Enabled = True
-                            Call Me.AddFactTypeReadingsToEnterpriseAware()
+                            '20210909-VM-Removed
+                            'Call Me.AddFactTypeReadingsToEnterpriseAware()
                         Case Is = FEQL.TokenType.EOF
                             Dim lsModelElementName = Me.TextBoxInput.Text.Trim.Split(" ").Last
                             lrModelElement = prApplication.WorkingModel.GetModelObjectByName(lsModelElementName)
