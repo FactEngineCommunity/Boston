@@ -175,7 +175,7 @@ Namespace FactEngine
                 Dim lrFactTypeReading As FBM.FactTypeReading
                 Dim lrOriginalFactTypeReading As FBM.FactTypeReading
 
-                If Me.WhichClauseSubType = pcenumWhichClauseType.IsPredicateNodePropertyIdentification Then
+                If Me.WhichClauseSubType = pcenumWhichClauseType.IsPredicateNodePropertyIdentification And 1 = 2 Then
 #Region "With NodePropertyIdentification"
                     larModelObject.Add(arBaseNode.RelativeFBMModelObject)
                     larModelObject.Add(arTargetNode.FBMModelObject)
@@ -424,7 +424,7 @@ Namespace FactEngine
                                     Me.FBMFactType = lrFactTypeReading.FactType
                                     Me.FBMFactTypeReading = lrFactTypeReading
                                     Me.FBMPredicatePart = Me.FBMFactTypeReading.PredicatePart(0)
-                                    lrBaseNode = Me.QueryGraph.FindPreviousQueryEdgeBaseNodeByModelElementName(Me.FBMPredicatePart.Role.JoinedORMObject.Id)
+                                    lrBaseNode = Me.QueryGraph.FindPreviousQueryEdgeBaseNodeByModelElementName(Me.FBMPredicatePart.Role.JoinedORMObject.Id, Me.BaseNode)
                                     If lrBaseNode IsNot Nothing Then
                                         Me.BaseNode = lrBaseNode
                                     ElseIf lrBaseNode Is Nothing And abUsePreviousFoundBaseNodeIfFound Then
@@ -437,7 +437,7 @@ Namespace FactEngine
                                     End If
                                 End If
                                 Try
-                                    lrBaseNode = Me.QueryGraph.FindPreviousQueryEdgeBaseNodeByModelElementName(Me.FBMPredicatePart.Role.JoinedORMObject.Id)
+                                    lrBaseNode = Me.QueryGraph.FindPreviousQueryEdgeBaseNodeByModelElementName(Me.FBMPredicatePart.Role.JoinedORMObject.Id, Me.BaseNode)
                                 Catch
                                     lrBaseNode = Nothing
                                 End Try
@@ -518,8 +518,10 @@ Namespace FactEngine
                                     Me.FBMFactType = lrFactTypeReading.FactType
                                     Me.FBMPredicatePart = larPredicatePart(0)
                                     Me.FBMFactTypeReading = Me.FBMPredicatePart.FactTypeReading
+                                    '20210910-VM-Added isPartial... below. If this is wrong remove it.
+                                    Me.IsPartialFactTypeMatch = True
                                     'Set the new BaseNode because the original one was fruitless.
-                                    lrBaseNode = Me.QueryGraph.FindPreviousQueryEdgeBaseNodeByModelElementName(Me.FBMPredicatePart.Role.JoinedORMObject.Id)
+                                    lrBaseNode = Me.QueryGraph.FindPreviousQueryEdgeBaseNodeByModelElementName(Me.FBMPredicatePart.Role.JoinedORMObject.Id, Me.BaseNode)
                                     If lrBaseNode IsNot Nothing Then
                                         Me.BaseNode = lrBaseNode
                                     Else

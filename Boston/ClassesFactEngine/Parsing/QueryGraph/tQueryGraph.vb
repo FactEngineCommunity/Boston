@@ -34,16 +34,21 @@
             Me.Model = arFBMModel
         End Sub
 
-        Public Function FindPreviousQueryEdgeBaseNodeByModelElementName(ByVal asModelElementName As String) As FactEngine.QueryNode
+        Public Function FindPreviousQueryEdgeBaseNodeByModelElementName(ByVal asModelElementName As String,
+                                                                        ByRef arBaseNode As FactEngine.QueryNode) As FactEngine.QueryNode
 
             Try
                 Dim liInd As Integer = Me.QueryEdges.Count - 1
 
-                For Each lrQueryEdge In Me.QueryEdges.ToArray.Reverse
-                    If lrQueryEdge.BaseNode.Name = asModelElementName Then
-                        Return lrQueryEdge.BaseNode
-                    End If
-                Next
+                If Me.QueryEdges.Count = 0 Then
+                    Return arBaseNode
+                Else
+                    For Each lrQueryEdge In Me.QueryEdges.ToArray.Reverse
+                        If lrQueryEdge.BaseNode.Name = asModelElementName Then
+                            Return lrQueryEdge.BaseNode
+                        End If
+                    Next
+                End If
 
                 Return Nothing
 
@@ -123,6 +128,41 @@
 
                 Dim larPartialFTMatchFT = From Node In larPartialFTMatchNode
                                           Select Node.QueryEdge.FBMFactType Distinct
+
+                For Each lrFactType In larPartialFTMatchFT
+                    '------------------------------------------------------------------------------
+                    'Sample query
+                    '(student: $Email,school: $School_Name,course: $Course_Code) isa studentship;
+
+                    Dim larLinkedNodes = From Node In larFromNodes
+                                         Where Node.QueryEdge.FBMFactType Is lrFactType
+                                         Select Node
+
+                    lsTDBQuery &= "("
+                    liInd = 0
+                    For Each lrNode In larLinkedNodes
+                        If liInd > 0 Then lsTDBQuery.AppendString(",")
+
+                        Dim larPredicatePart = From PredicatePart In lrNode.QueryEdge.FBMFactTypeReading.PredicatePart
+                                               Where PredicatePart.Role.JoinedORMObject Is lrNode.FBMModelObject
+                                               Select PredicatePart
+
+                        lsTDBQuery &= larPredicatePart.First.Role.Name & ": $" & lrNode.RDSTable.DatabaseName
+                        liInd += 1
+                    Next
+                    lsTDBQuery &= ") isa " & lrFactType.getCorrespondingRDSTable.DatabaseName & ";" & vbCrLf
+
+                Next
+
+                '=================================================================================================
+                'Derived FactTypeReadingMatch - I.e. Joins on ManyToMany(..ToMany) tables
+                larPartialFTMatchNode = From Node In larFromNodes
+                                        Where Node.QueryEdge.IsPartialFactTypeMatch
+                                        Where Node.QueryEdge.FBMFactType.IsDerived
+                                        Select Node
+
+                larPartialFTMatchFT = From Node In larPartialFTMatchNode
+                                      Select Node.QueryEdge.FBMFactType Distinct
 
                 For Each lrFactType In larPartialFTMatchFT
                     '------------------------------------------------------------------------------
@@ -234,28 +274,31 @@
 #End Region
                     ElseIf lrQueryEdge.IsDerived Then
 
-                        lrOriginTable = lrQueryEdge.FBMFactType.getCorrespondingRDSTable(Nothing, True)
+                        '==================================================================================================
+                        'Taken care of in From section (above). 20210909.
 
-                        If lrOriginTable Is Nothing Then
-                            lrOriginTable = New RDS.Table(Me.Model.RDS, lrQueryEdge.FBMFactType.Id, lrQueryEdge.FBMFactType)
-                        End If
-                        liInd = 0
-                        For Each lrRole In lrQueryEdge.FBMFactType.RoleGroup.FindAll(Function(x) x.JoinedORMObject.GetType <> GetType(FBM.ValueType))
-                            Dim lrDestinationTable As RDS.Table = lrRole.JoinedORMObject.getCorrespondingRDSTable
+                        'lrOriginTable = lrQueryEdge.FBMFactType.getCorrespondingRDSTable(Nothing, True)
 
-                            Dim liInd2 As Integer = 0
-                            For Each lrColumn In lrDestinationTable.getPrimaryKeyColumns
-                                Dim lrOriginColumn As RDS.Column = lrOriginTable.Column.Find(Function(x) x.ActiveRole Is lrColumn.ActiveRole)
-                                If lrOriginColumn Is Nothing Then
-                                    lsTDBQuery &= lrOriginTable.Name & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrColumn.Name & " = "
-                                Else
-                                    lsTDBQuery &= lrOriginTable.Name & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrOriginColumn.Name & " = "
-                                End If
-                                lsTDBQuery &= lrDestinationTable.DatabaseName & Viev.NullVal(lrQueryEdge.BaseNode.Alias, "") & "." & lrColumn.Name & vbCrLf
-                                liInd2 += 1
-                            Next
-                            liInd += 1
-                        Next
+                        'If lrOriginTable Is Nothing Then
+                        '    lrOriginTable = New RDS.Table(Me.Model.RDS, lrQueryEdge.FBMFactType.Id, lrQueryEdge.FBMFactType)
+                        'End If
+                        'liInd = 0
+                        'For Each lrRole In lrQueryEdge.FBMFactType.RoleGroup.FindAll(Function(x) x.JoinedORMObject.GetType <> GetType(FBM.ValueType))
+                        '    Dim lrDestinationTable As RDS.Table = lrRole.JoinedORMObject.getCorrespondingRDSTable
+
+                        '    Dim liInd2 As Integer = 0
+                        '    For Each lrColumn In lrDestinationTable.getPrimaryKeyColumns
+                        '        Dim lrOriginColumn As RDS.Column = lrOriginTable.Column.Find(Function(x) x.ActiveRole Is lrColumn.ActiveRole)
+                        '        If lrOriginColumn Is Nothing Then
+                        '            lsTDBQuery &= lrOriginTable.Name & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrColumn.Name & " = "
+                        '        Else
+                        '            lsTDBQuery &= lrOriginTable.Name & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrOriginColumn.Name & " = "
+                        '        End If
+                        '        lsTDBQuery &= lrDestinationTable.DatabaseName & Viev.NullVal(lrQueryEdge.BaseNode.Alias, "") & "." & lrColumn.Name & vbCrLf
+                        '        liInd2 += 1
+                        '    Next
+                        '    liInd += 1
+                        'Next
 
                     ElseIf (lrQueryEdge.FBMFactType.isRDSTable And lrQueryEdge.FBMFactType.Arity = 2) Then
 
