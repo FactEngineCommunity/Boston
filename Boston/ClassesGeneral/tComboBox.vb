@@ -51,6 +51,13 @@ Public Class tComboboxItem
         End If
 
     End Function
+
+    Public Function EqualsAll(ByVal other As tComboboxItem) As Boolean
+
+        Return Me.ItemData = other.ItemData And Me.Text = other.Text
+
+    End Function
+
 End Class
 
 

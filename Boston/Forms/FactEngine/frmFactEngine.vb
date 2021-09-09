@@ -239,7 +239,15 @@ Public Class frmFactEngine
 
         Dim lrListItem = New tComboboxItem(asModelElementName, asEAItem, aoTagObject)
 
-        If (asEAItem <> "") And Not (Me.AutoComplete.ListBox.FindStringExact(asEAItem) >= 0) Then
+        Dim lbAlreadyExists As Boolean = False
+
+        Dim larExists = From Item In Me.AutoComplete.ListBox.Items
+                        Where lrListItem.EqualsAll(Item)
+                        Select Item
+
+        lbAlreadyExists = larExists.Count > 0
+
+        If (asEAItem <> "") And Not lbAlreadyExists Then
             If ab0Index Then
                 Me.AutoComplete.ListBox.Items.Insert(0, lrListItem)
             Else
@@ -1314,7 +1322,7 @@ Public Class frmFactEngine
 
                     '========================================                    
                     'Good FactEngine styling
-                    Dim lasToken As String() = {"A", "THAT"}
+                    Dim lasToken As String() = {"A", "THAT", "AND"}
 
                     For Each lsToken In lasToken
                         If lsPredicatePartText.EndsWith(" " & LCase(lsToken)) Then
@@ -1542,6 +1550,19 @@ Public Class frmFactEngine
                                 larPredicatePart = From FactTypeReading In larFactTypeReading2
                                                    From PredicatePart In FactTypeReading.PredicatePart
                                                    Where PredicatePart.Role.JoinedORMObject.Id = lrModelElement.Id
+                                                   Where PredicatePart.SequenceNr < FactTypeReading.PredicatePart.Count
+                                                   Select PredicatePart
+
+                                For Each lrPredicatePart In larPredicatePart
+                                    Dim lrNextPredicatePart = lrPredicatePart.FactTypeReading.PredicatePart(lrPredicatePart.SequenceNr)
+                                    Call Me.AddEnterpriseAwareItem(lrPredicatePart.PredicatePartText, FEQL.TokenType.PREDICATE, False, lrNextPredicatePart.Role.JoinedORMObject.Id, False)
+                                Next
+
+                                larFactTypeReading2 = lrFirstModelElement.getOutgoingFactTypeReadings()
+
+                                larPredicatePart = From FactTypeReading In larFactTypeReading2
+                                                   From PredicatePart In FactTypeReading.PredicatePart
+                                                   Where PredicatePart.Role.JoinedORMObject.Id = lrFirstModelElement.Id
                                                    Where PredicatePart.SequenceNr < FactTypeReading.PredicatePart.Count
                                                    Select PredicatePart
 
