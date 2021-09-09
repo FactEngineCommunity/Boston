@@ -140,8 +140,6 @@
 
                 lrQueryGraph.Nodes.Add(lrQueryGraph.HeadNode)
 
-
-
                 '----------------------------------
                 'Get the Edges for the QueryGraph
                 Dim lrPreviousTargetNode As FactEngine.QueryNode = Nothing
@@ -227,6 +225,10 @@
                             Throw New Exception("Unknown WhichClauseType.")
 
                     End Select
+
+                    If lrQueryEdge.BaseNode.QueryEdge Is Nothing Then
+                        lrQueryEdge.BaseNode.QueryEdge = lrQueryEdge
+                    End If
 
                     '-------------------------------------------------
                     'Add the QueryEdge to the QueryGraph

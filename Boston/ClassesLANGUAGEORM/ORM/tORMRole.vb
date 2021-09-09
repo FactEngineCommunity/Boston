@@ -1398,10 +1398,22 @@ Namespace FBM
 
                             If Me.JoinsEntityType.HasSimpleReferenceScheme Then
 
-                                aarCoveredRoles.AddUnique(CType(Me.JoinsEntityType.GetTopmostNonAbsorbedSupertype, FBM.EntityType).ReferenceModeFactType.RoleGroup(0))
-                                aarCoveredRoles.AddUnique(CType(Me.JoinsEntityType.GetTopmostNonAbsorbedSupertype, FBM.EntityType).ReferenceModeFactType.RoleGroup(1))
+                                Dim lrSupertype As FBM.ModelObject = Me.JoinsEntityType.GetTopmostNonAbsorbedSupertype
+                                If lrSupertype IsNot Me.JoinsEntityType Then
+                                    aarCoveredRoles.AddUnique(CType(Me.JoinsEntityType.GetTopmostNonAbsorbedSupertype, FBM.EntityType).ReferenceModeFactType.RoleGroup(0))
+                                    aarCoveredRoles.AddUnique(CType(Me.JoinsEntityType.GetTopmostNonAbsorbedSupertype, FBM.EntityType).ReferenceModeFactType.RoleGroup(1))
 
-                                larRolesToReturn.Add(CType(Me.JoinsEntityType.GetTopmostNonAbsorbedSupertype, FBM.EntityType).ReferenceModeFactType.RoleGroup(1))
+                                    larRolesToReturn.Add(CType(Me.JoinsEntityType.GetTopmostNonAbsorbedSupertype, FBM.EntityType).ReferenceModeFactType.RoleGroup(1))
+                                Else
+                                    If Me.JoinsEntityType.SubtypeRelationship.Count > 0 Then
+                                        lrSupertype = Me.JoinsEntityType.SubtypeRelationship.First.parentEntityType
+                                        aarCoveredRoles.AddUnique(CType(lrSupertype, FBM.EntityType).ReferenceModeFactType.RoleGroup(0))
+                                        aarCoveredRoles.AddUnique(CType(lrSupertype, FBM.EntityType).ReferenceModeFactType.RoleGroup(1))
+
+                                        larRolesToReturn.Add(CType(lrSupertype, FBM.EntityType).ReferenceModeFactType.RoleGroup(1))
+                                    End If
+
+                                End If
 
                             ElseIf Me.JoinsEntityType.HasCompoundReferenceMode Then
 

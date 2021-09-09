@@ -106,43 +106,52 @@ Namespace FactEngine.TypeDB
 
                     'this will be different according to your scenario. you need to use breakpoint to see data
                     'to implement better logic here. "Answers" below is the array of ConceptMap
-                    For Each itm In ServerResp.ResPart.QueryManagerResPart.MatchResPart.Answers.ToArray()
-                        Dim cncpt As Concept = Nothing 'this will be used to get the concept from conceptMap so you can access values.
-                        itm.Map.TryGetValue("gen", cncpt) 'you can get the maping key from your query
+                    Try
+                        For Each itm In ServerResp.ResPart.QueryManagerResPart.MatchResPart.Answers.ToArray()
+                            Dim cncpt As Concept = Nothing 'this will be used to get the concept from conceptMap so you can access values.
+                            itm.Map.TryGetValue("gen", cncpt) 'you can get the maping key from your query
 
-                        If lrRecordset.Columns.Count = 0 Then
+                            If lrRecordset.Columns.Count = 0 Then
+                                For Each loValue In itm.Map.Values
+                                    lsColumnName = lrFactType.CreateUniqueRoleName(loValue.Thing.[Type].Label.ToString, 0)
+                                    Dim lrRole = New FBM.Role(lrFactType, lsColumnName, True, Nothing)
+                                    lrFactType.RoleGroup.AddUnique(lrRole)
+                                    lrRecordset.Columns.Add(lsColumnName)
+                                Next
+                            End If
+
+                            lrFact = New FBM.Fact(lrFactType, False)
+                            Dim loFieldValue As Object = Nothing
+                            Dim liInd As Integer = 0
+
                             For Each loValue In itm.Map.Values
-                                lsColumnName = lrFactType.CreateUniqueRoleName(loValue.Thing.[Type].Label.ToString, 0)
-                                Dim lrRole = New FBM.Role(lrFactType, lsColumnName, True, Nothing)
-                                lrFactType.RoleGroup.AddUnique(lrRole)
-                                lrRecordset.Columns.Add(lsColumnName)
-                            Next
-                        End If
 
-                        lrFact = New FBM.Fact(lrFactType, False)
-                        Dim loFieldValue As Object = Nothing
-                        Dim liInd As Integer = 0
+                                Select Case loValue.Thing.Type.ValueType.ToString
+                                    Case Is = "Long"
+                                        loFieldValue = loValue.Thing.Value.Long
+                                    Case Else
+                                        loFieldValue = loValue.Thing.Value.String
+                                End Select
 
-                        For Each loValue In itm.Map.Values
 
-                            loFieldValue = loValue.Thing.Value.String
+                                Try
+                                    lrFact.Data.Add(New FBM.FactData(lrFactType.RoleGroup(liInd), New FBM.Concept(Viev.NullVal(loFieldValue, "")), lrFact))
+                                Catch
+                                    Throw New Exception("Tried to add a recordset Column that is not in the Project Columns. Column Index: " & liInd)
+                                End Try
+                                liInd += 1
+                            Next 'Column Value
 
-                            Try
-                                lrFact.Data.Add(New FBM.FactData(lrFactType.RoleGroup(liInd), New FBM.Concept(Viev.NullVal(loFieldValue, "")), lrFact))
-                            Catch
-                                Throw New Exception("Tried to add a recordset Column that is not in the Project Columns. Column Index: " & liInd)
-                            End Try
-                            liInd += 1
-                        Next 'Column Value
+                            larFact.Add(lrFact)
 
-                        larFact.Add(lrFact)
-
-                        If larFact.Count = Me.DefaultQueryLimit Then
-                            lrRecordset.Warning.Add("Query limit of " & Me.DefaultQueryLimit.ToString & " reached.")
-                            Exit For
-                        End If
-                    Next
-
+                            If larFact.Count = Me.DefaultQueryLimit Then
+                                lrRecordset.Warning.Add("Query limit of " & Me.DefaultQueryLimit.ToString & " reached.")
+                                Exit For
+                            End If
+                        Next
+                    Catch ex As Exception
+                        Exit Do 'Not a biggie at this stage.
+                    End Try
                 Loop
 
                 lrRecordset.Facts = larFact

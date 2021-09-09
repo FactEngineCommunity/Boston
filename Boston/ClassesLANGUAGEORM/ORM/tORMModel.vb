@@ -5011,7 +5011,6 @@ Namespace FBM
 
                     '================================================================================================
                     'Remove FactTypeInstances from Page where FactTypeIntance has RoleInstance that Joins nothing
-
                     Dim larFactTypeInstance = From Page In Me.Page
                                               From FactTypeInstance In Page.FactTypeInstance
                                               From RoleInstance In FactTypeInstance.RoleGroup
@@ -5021,6 +5020,48 @@ Namespace FBM
                     For Each lrFactTypeInstance In larFactTypeInstance.ToArray
                         Call lrFactTypeInstance.RemoveFromPage(True)
                     Next
+
+                    '================================================================================================================
+                    'RDSTables where the number of PrimaryKey columns does not match the number of Roles in the PreferredIdentifier
+                    Dim larTable = From Table In Me.RDS.Table
+                                   Where Table.FBMModelElement.GetType = GetType(FBM.FactType)
+                                   Select Table
+
+                    For Each lrTable In larTable
+
+                        If lrTable.getPreferredIdentifierRoleConstraint IsNot Nothing Then
+                            If lrTable.getPrimaryKeyColumns.Count < lrTable.getPreferredIdentifierRoleConstraint.Role.Count Then
+                                'Need to add a Column for the missing Role
+                                Dim larPrimaryKeyRole = From lrColumn In lrTable.getPrimaryKeyColumns
+                                                        Select lrColumn.Role
+
+                                For Each lrRole In lrTable.getPreferredIdentifierRoleConstraint.Role
+                                    If Not larPrimaryKeyRole.Contains(lrRole) Then
+                                        'Need to make a Column for that Role.
+
+                                        Dim larCoveredRole As New List(Of FBM.Role)
+                                        Dim larActiveRole As List(Of FBM.Role) = lrRole.getDownstreamRoleActiveRoles(larCoveredRole)
+                                        Dim lsColumnName As String
+                                        For Each lrActiveRole In larActiveRole
+                                            lsColumnName = lrTable.createUniqueColumnName(Nothing, lrActiveRole.JoinedORMObject.Id, 0)
+                                            Dim lrColumn As New RDS.Column(lrTable, lsColumnName, lrRole, lrActiveRole, True)
+                                            lrTable.addColumn(lrColumn)
+                                            Dim lrIndex As RDS.Index = lrTable.getPrimaryKeyIndex
+                                            If lrIndex IsNot Nothing Then
+                                                If Not lrIndex.Column.Contains(lrColumn) Then
+                                                    lrIndex.addColumn(lrColumn)
+                                                End If
+                                            End If
+                                        Next
+
+                                    End If
+                                Next
+
+                            End If
+                        End If
+
+                    Next
+
 
                 End With
 

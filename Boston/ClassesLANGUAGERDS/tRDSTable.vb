@@ -507,6 +507,35 @@ Namespace RDS
 
         End Function
 
+        Public Function getPreferredIdentifierRoleConstraint() As FBM.RoleConstraint
+
+            Try
+                If Me.FBMModelElement.GetType = GetType(FBM.EntityType) Then
+                    Return CType(Me.FBMModelElement, FBM.EntityType).ReferenceModeRoleConstraint
+                Else
+                    'FBModelElement must be a FactType
+                    Dim lrFactType As FBM.FactType = Me.FBMModelElement
+                    Dim lrRoleConstraint As FBM.RoleConstraint
+
+                    lrRoleConstraint = lrFactType.InternalUniquenessConstraint.Find(Function(x) x.IsPreferredIdentifier)
+
+                    Return lrRoleConstraint
+
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return Nothing
+            End Try
+
+        End Function
+
         Public Function getPrimaryKeyColumns() As List(Of RDS.Column)
 
             Try
@@ -527,6 +556,22 @@ Namespace RDS
                 Return New List(Of RDS.Column)
             End Try
 
+        End Function
+
+        Public Function getPrimaryKeyIndex() As RDS.Index
+
+            Try
+                Return Me.Index.Find(Function(x) x.IsPrimaryKey)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                Return Nothing
+            End Try
         End Function
 
         Public Function generateUniqueQualifier(ByVal asRootQualifier As String, Optional ByVal aiIndex As Integer = 0) As String

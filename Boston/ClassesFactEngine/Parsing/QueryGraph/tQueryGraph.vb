@@ -114,6 +114,42 @@
 
                     lsTDBQuery &= ";" & vbCrLf
                 Next
+
+                '=================================================================================================
+                'PartialFactTypeReadingMatch - I.e. Joins on ManyToMany(..ToMany) tables
+                Dim larPartialFTMatchNode = From Node In larFromNodes
+                                            Where Node.QueryEdge.IsPartialFactTypeMatch
+                                            Select Node
+
+                Dim larPartialFTMatchFT = From Node In larPartialFTMatchNode
+                                          Select Node.QueryEdge.FBMFactType Distinct
+
+                For Each lrFactType In larPartialFTMatchFT
+                    '------------------------------------------------------------------------------
+                    'Sample query
+                    '(student: $Email,school: $School_Name,course: $Course_Code) isa studentship;
+
+                    Dim larLinkedNodes = From Node In larFromNodes
+                                         Where Node.QueryEdge.FBMFactType Is lrFactType
+                                         Select Node
+
+                    lsTDBQuery &= "("
+                    liInd = 0
+                    For Each lrNode In larLinkedNodes
+                        If liInd > 0 Then lsTDBQuery.AppendString(",")
+
+                        Dim larPredicatePart = From PredicatePart In lrNode.QueryEdge.FBMFactTypeReading.PredicatePart
+                                               Where PredicatePart.Role.JoinedORMObject Is lrNode.FBMModelObject
+                                               Select PredicatePart
+
+                        lsTDBQuery &= larPredicatePart.First.Role.Name & ": $" & lrNode.RDSTable.DatabaseName
+                        liInd += 1
+                    Next
+                    lsTDBQuery &= ") isa " & lrFactType.getCorrespondingRDSTable.DatabaseName & ";" & vbCrLf
+
+                Next
+
+
 #End Region
 
 
@@ -169,19 +205,20 @@
 
                     If lrQueryEdge.IsPartialFactTypeMatch Then 'And lrQueryEdge.TargetNode.FBMModelObject.GetType IsNot GetType(FBM.ValueType) Then
 #Region "Partial FactType match"
-                        Dim lrNaryTable As RDS.Table = lrQueryEdge.FBMFactType.getCorrespondingRDSTable
-                        If lrQueryEdge.BaseNode.FBMModelObject.GetType IsNot GetType(FBM.ValueType) Then
-                            For Each lrColumn In lrQueryEdge.BaseNode.RDSTable.getPrimaryKeyColumns
-                                lsTDBQuery &= lrNaryTable.DatabaseName & "." & lrNaryTable.Column.Find(Function(x) x.ActiveRole Is lrColumn.ActiveRole).Name
-                                lsTDBQuery &= "=" & lrColumn.Table.DatabaseName & "." & lrColumn.Name & vbCrLf
-                            Next
-                        End If
-                        If lrQueryEdge.TargetNode.FBMModelObject.GetType <> GetType(FBM.ValueType) Then
-                            For Each lrColumn In lrQueryEdge.TargetNode.RDSTable.getPrimaryKeyColumns
-                                lsTDBQuery &= lrNaryTable.DatabaseName & "." & lrNaryTable.Column.Find(Function(x) x.ActiveRole Is lrColumn.ActiveRole).Name
-                                lsTDBQuery &= "=" & lrColumn.Table.Name & "." & lrColumn.Name & vbCrLf
-                            Next
-                        End If
+                        '==================================================================================================
+                        'Taken care of in From section (above). 20210909.
+                        'Dim lrNaryTable As RDS.Table = lrQueryEdge.FBMFactType.getCorrespondingRDSTable
+
+                        ''Dim lrOtherRole As FBM.Role = lrQueryEdge.FBMFactType.GetOtherRoleOfBinaryFactType(lrQueryEdge.FBMPredicatePart.Role.Id)
+                        'lsTDBQuery &= "("
+                        'liInd = 0
+                        'For Each lrColumn In lrNaryTable.getPrimaryKeyColumns
+                        '    If liInd > 0 Then lsTDBQuery.AppendString(",")
+                        '    lsTDBQuery &= lrColumn.Role.Name & ": $" & lrColumn.Name
+                        '    liInd += 1
+                        'Next
+                        'lsTDBQuery.AppendString(") isa " & lrQueryEdge.FBMFactType.getCorrespondingRDSTable.DatabaseName & ";" & vbCrLf)
+
 #End Region
                     ElseIf lrQueryEdge.WhichClauseType = pcenumWhichClauseType.AndThatIdentityCompatitor Then
                         'E.g. Of the type "Person 1 Is Not Person 2" or "Person 1 Is Person 2"
@@ -324,7 +361,7 @@
                             Next
 
                             lsTDBQuery &= "($" & lrQueryEdge.BaseNode.RDSTable.DBVariableName & Viev.NullVal(lrBaseNode.Alias, "") & ","
-                            lsTDBQuery &= "$" & lrQueryEdge.TargetNode.RDSTable.DBVariableName & Viev.NullVal(lrTargetNode.Alias, "") & ") isa " & lrQueryEdge.FBMFactType.Name & ";" & vbCrLf
+                            lsTDBQuery &= "$" & lrQueryEdge.TargetNode.RDSTable.DBVariableName & Viev.NullVal(lrTargetNode.Alias, "") & ") isa " & lrQueryEdge.FBMFactType.DatabaseName & ";" & vbCrLf
 
                         Else
                             Dim larTargetColumn = lrQueryEdge.BaseNode.RDSTable.getPrimaryKeyColumns
@@ -548,13 +585,15 @@
                                             'Math function
                                             Dim lrTargetTable = lrQueryEdge.BaseNode.RDSTable
                                             Dim lrTargetColumn = lrTargetTable.Column.Find(Function(x) x.FactType Is lrQueryEdge.FBMFactType)
-                                            lsTDBQuery &= lrTargetTable.DatabaseName &
-                                              Viev.NullVal(lrQueryEdge.TargetNode.Alias, "") &
-                                              "." &
-                                              lrTargetColumn.Name
+                                            lsTDBQuery &= "$" & lrTargetColumn.Table.DBVariableName & lrTargetColumn.Name & lrTargetColumn.TemporaryAlias
+
+                                            'lrTargetTable.DatabaseName &
+                                            '  Viev.NullVal(lrQueryEdge.TargetNode.Alias, "") &
+                                            '  "." &
+                                            '  lrTargetColumn.Name
 
                                             lsTDBQuery &= " " & Viev.GetEnumDescription(lrQueryEdge.TargetNode.MathFunction)
-                                            lsTDBQuery &= " " & lrQueryEdge.TargetNode.MathNumber.ToString & vbCrLf
+                                            lsTDBQuery &= " " & lrQueryEdge.TargetNode.MathNumber.ToString & ";" & vbCrLf
 
                                         End If
                                     Else
