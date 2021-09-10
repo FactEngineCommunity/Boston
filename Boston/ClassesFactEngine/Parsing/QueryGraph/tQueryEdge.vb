@@ -602,7 +602,7 @@ Namespace FactEngine
                         Case Else
 
                             lrReturnFactTypeReading = Nothing
-                            Dim lrPredicatePart As FBM.PredicatePart = Nothing
+                            lrPredicatePart = Nothing
 
                             Me.FBMFactType = Me.QueryGraph.Model.getFactTypeByModelObjectsFactTypeReading(larModelObject,
                                                                                                           lrFactTypeReading, False, lrReturnFactTypeReading, lrPredicatePart)

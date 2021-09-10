@@ -764,6 +764,8 @@ Namespace FBM
                     Return lrTable
                 End If
 
+                Return Nothing
+
             Catch ex As Exception
                 Dim lsMessage1 As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
@@ -2847,9 +2849,20 @@ Namespace FBM
                         'Is already from a higher type. Just remove the Column
                         lrSubtypeTable.removeColumn(lrColumn,, False)
                     Else
+                        'Move Origins of relevant Relations.
+                        Dim larRelation = From Relation In lrColumn.OutgoingRelation
+                                          Select Relation
+
+                        For Each lrRelation In larRelation.ToArray
+                            lrRelation.OriginTable = lrSupertypeTable
+                            Call Me.Model.updateRelationOriginTable(lrRelation, lrSupertypeTable)
+                        Next
+
+                        'Move the Column
+                        Dim lbModifyCMML As Boolean = lrSupertypeTable.Column.Find(Function(x) x.Id = lrColumn.Id) Is Nothing
+                        Call lrColumn.setTable(lrSupertypeTable, lbModifyCMML) 'Do this first, otherwise can't set the table.
                         Call lrSubtypeTable.removeColumn(lrColumn,, False)
-                        Call lrColumn.setTable(lrSupertypeTable)
-                        Call lrSupertypeTable.addColumn(lrColumn)
+                        Call lrSupertypeTable.addColumn(lrColumn,, False)
                     End If
                 Next
 

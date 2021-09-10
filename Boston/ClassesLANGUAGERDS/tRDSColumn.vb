@@ -187,7 +187,7 @@ Namespace RDS
         Public ReadOnly Property OutgoingRelation As List(Of RDS.Relation)
             Get
                 Dim larRelation = From Relation In Me.Relation
-                                  Where Relation.OriginTable Is Me.Table
+                                  Where Relation.OriginTable.Name Is Me.Table.Name
                                   Select Relation
 
                 Return larRelation.ToList
@@ -798,10 +798,14 @@ Namespace RDS
         ''' Sets the Table for a Column. Used particularly when changing 'IsAbsorbed' for a ModelObject.
         ''' </summary>
         ''' <param name="arTable"></param>
-        Public Sub setTable(ByRef arTable As RDS.Table)
+        ''' <param name="abModifyCMML">Don't want to modify CMML that is to be removed as part of Absorption.</param>
+        Public Sub setTable(ByRef arTable As RDS.Table,
+                            Optional ByVal abModifyCMML As Boolean = False)
 
             Try
-                Call Me.Model.Model.changeCMMLAttributeEntityForColumn(Me, arTable)
+                If abModifyCMML Then
+                    Call Me.Model.Model.changeCMMLAttributeEntityForColumn(Me, arTable)
+                End If
 
                 Me.Table = arTable
 

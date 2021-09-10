@@ -572,14 +572,16 @@ Partial Public Class tBrain
 
             lrValueTypeInstance = Me.Page.DropValueTypeAtPoint(lrValueType, New PointF(100, 100)) 'VM-20181329-Remove this commented-out code, if all okay. Me.Page.Form.CreateValueType(lsValueTypeName, True)
 
-            Call lrValueTypeInstance.RepellFromNeighbouringPageObjects(1, False)
-            Call lrValueTypeInstance.Move(lrValueTypeInstance.X, lrValueTypeInstance.Y, True)
+            If Me.Page.Diagram IsNot Nothing Then
+                Call lrValueTypeInstance.RepellFromNeighbouringPageObjects(1, False)
+                Call lrValueTypeInstance.Move(lrValueTypeInstance.X, lrValueTypeInstance.Y, True)
 
-            If Me.AutoLayoutOn Then
-                Me.Page.Form.AutoLayout()
+                If Me.AutoLayoutOn Then
+                    Me.Page.Form.AutoLayout()
+                End If
             End If
         Else
-            Me.Model.AddValueType(lrValueType, True, True, Nothing)
+                Me.Model.AddValueType(lrValueType, True, True, Nothing)
         End If
 
         Me.Timeout.Start()

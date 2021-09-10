@@ -220,6 +220,17 @@ Namespace RDS
 
             For Each lrTable In Me.getSupertypeTables
                 For Each lrColumn In lrTable.Column
+
+                    'Move Origins of relevant Relations.
+                    Dim larRelation = From Relation In lrColumn.OutgoingRelation
+                                      Select Relation
+
+                    For Each lrRelation In larRelation.ToArray
+                        lrRelation.OriginTable = Me
+                        Call Me.Model.Model.updateRelationOriginTable(lrRelation, Me)
+                    Next
+
+
                     Dim lrNewColumn = lrColumn.Clone(Me, Nothing)
                     lrNewColumn.Relation.AddRange(lrColumn.Relation)
 
@@ -238,7 +249,8 @@ Namespace RDS
         ''' <param name="arColumn"></param>
         ''' <param name="abAddToDatabase">True if the column is to be added to the connected database.</param>
         Public Sub addColumn(ByRef arColumn As RDS.Column,
-                             Optional abAddToDatabase As Boolean = False)
+                             Optional abAddToDatabase As Boolean = False,
+                             Optional abProcessCMML As Boolean = True)
 
             Try
                 Call arColumn.setOrdinalPosition(Me.Column.Count + 1)
@@ -284,7 +296,9 @@ Namespace RDS
 
                 '------------------------------------------------------------------------------
                 'CMML Code
-                Call Me.Model.Model.createCMMLAttribute(Me.Name, arColumn.Name, arColumn.Role, arColumn)
+                If abProcessCMML Then
+                    Call Me.Model.Model.createCMMLAttribute(Me.Name, arColumn.Name, arColumn.Role, arColumn)
+                End If
 
                 '------------------------------------------------------------------------------
                 'Database Synchronisation Code

@@ -5121,8 +5121,56 @@ Namespace FBM
 
                     Next
 
+                    '======================================================================================================
+                    'Duplicate Facts
+                    Dim larDuplicateFactFactType = From FactType In Me.FactType
+                                                   Where FactType.ModelError.FindAll(Function(x) x.ErrorId = 100).Count > 0
+                                                   Select FactType
+
+                    For Each lrFactType In larDuplicateFactFactType
+                        For Each lrInternalUniquenessConstraint In lrFactType.InternalUniquenessConstraint
+                            '---------------------------------------------------------------------------
+                            'Find the Count of Facts that have matching FactData for the span of Roles 
+                            '  in the InternalUniquenessConstraint
+                            '---------------------------------------------------------------------------
+                            For Each lrFact In lrFactType.Fact.ToArray
+
+                                Dim lrFactPredicate = New FBM.FactPredicate
+
+                                For Each lrRole In lrInternalUniquenessConstraint.Role
+
+                                    Dim lrFactData = lrFact.GetFactDataByRoleId(lrRole.Id)
+                                    If lrFactData Is Nothing Then
+                                        'No point continuing, abrt
+                                        Exit For
+                                    Else
+                                        Call lrFactData.ClearModelErrors()
+                                        Dim lsDataValue = lrFact.GetFactDataByRoleId(lrRole.Id).Data
+                                        lrFactData = New FBM.FactData(New FBM.Role(lrFactType, lrRole.Id, True), New FBM.Concept(lsDataValue))
+
+                                        lrFactPredicate.data.Add(lrFactData)
+                                    End If
+                                Next
+
+                                '--------------------------------------------------------------------
+                                'Retrieve all the Facts from the FactType that match the predicate.
+                                '--------------------------------------------------------------------                
+                                Dim lrFactList = lrFactType.Fact.FindAll(AddressOf lrFactPredicate.EqualsByRoleIdData)
+
+                                If lrFactList.Count > 1 Then
+                                    For Each lrDuplicateFact In lrFactList.ToArray
+                                        'Remove the first duplicate
+                                        Call lrFactType.RemoveFactById(lrDuplicateFact)
+                                        Exit For
+                                    Next
+                                End If
+                            Next
+                        Next
+                    Next
 
                 End With
+
+                MsgBox("Finished fixing errors.")
 
             Catch ex As Exception
                 Dim lsMessage As String

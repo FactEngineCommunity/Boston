@@ -317,8 +317,9 @@ Namespace ERD
                     End Try
                 End If
 
-
-                Me.Page.Diagram.Invalidate()
+                If Me.Page.Diagram IsNot Nothing Then
+                    Me.Page.Diagram.Invalidate()
+                End If
 
                 If IsSomething(aoChangedPropertyItem) Then
                     Select Case aoChangedPropertyItem.ChangedItem.PropertyDescriptor.Name

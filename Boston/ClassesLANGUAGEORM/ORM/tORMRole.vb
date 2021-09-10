@@ -1074,8 +1074,9 @@ Namespace FBM
                     Return Me.FactType.getCorrespondingRDSTable
                 ElseIf lasTableName.ToList.Contains(Me.JoinedORMObject.Id) Then
                     Return Me.JoinedORMObject.getCorrespondingRDSTable()
+                Else
+                    Return Me.JoinedORMObject.getCorrespondingRDSTable()
                 End If
-
 
             Catch ex As Exception
                 Dim lsMessage As String

@@ -657,6 +657,8 @@ Public Class frmDiagramORM
             End If
             Me.zrPage.Form = Nothing
             Me.zrPage.ReferencedForm = Nothing
+            Me.zrPage.Diagram = Nothing
+            Me.zrPage.DiagramView = Nothing
         End If
 
         For Each lrValueTypeInstance In Me.zrPage.ValueTypeInstance
