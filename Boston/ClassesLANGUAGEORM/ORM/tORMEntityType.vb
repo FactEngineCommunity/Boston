@@ -2854,8 +2854,7 @@ Namespace FBM
                                           Select Relation
 
                         For Each lrRelation In larRelation.ToArray
-                            lrRelation.OriginTable = lrSupertypeTable
-                            Call Me.Model.updateRelationOriginTable(lrRelation, lrSupertypeTable)
+                            Call lrRelation.setOriginTable(lrSupertypeTable)
                         Next
 
                         'Move the Column

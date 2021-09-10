@@ -68,6 +68,7 @@ Namespace RDS
         Public Event OriginMandatoryChanged(ByVal abOriginIsMandatory As Boolean)
         Public Event OriginMultiplicityChanged(ByVal aiOriginMultiplicity As pcenumCMMLMultiplicity)
         Public Event OriginPredicateChanged(ByVal asPredicate As String)
+        Public Event OriginTableChanged(ByRef arTable As RDS.Table)
         Public Event RemovedFromModel()
 
         ''' <summary>
@@ -351,6 +352,8 @@ Namespace RDS
 
                 'CMML
                 Call Me.Model.Model.updateRelationOriginTable(Me, arTable)
+
+                RaiseEvent OriginTableChanged(arTable)
 
             Catch ex As Exception
                 Dim lsMessage As String

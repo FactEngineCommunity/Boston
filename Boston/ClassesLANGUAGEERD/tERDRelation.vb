@@ -239,6 +239,36 @@ Namespace ERD
             End Try
         End Sub
 
+        Private Sub RDSRelation_OriginTableChanged(ByRef arTable As RDS.Table) Handles RDSRelation.OriginTableChanged
+
+            Try
+                If Me.Page.Diagram IsNot Nothing Then
+
+                    If Me.Link IsNot Nothing Then
+                        Dim lrTable As RDS.Table = arTable
+                        Dim lrERDLink As ERD.Link = Me.Link
+                        Dim lrEntity As ERD.Entity = Me.Page.ERDiagram.Entity.Find(Function(x) x.Name = lrTable.Name)
+
+                        If lrEntity IsNot Nothing Then
+                            lrERDLink.OriginModelElement = lrEntity
+                            lrERDLink.Link.Origin = lrERDLink.OriginModelElement.TableShape
+                        End If
+
+                    End If
+                End If
+
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
     End Class
 
 End Namespace

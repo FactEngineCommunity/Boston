@@ -437,8 +437,7 @@ Namespace RDS
 
             Try
                 Dim larOutgoingRelation = From Relation In Me.Model.Model.RDS.Relation
-                                          From Column In Relation.OriginColumns
-                                          Where Column.Table.Name = Me.Name
+                                          Where Relation.OriginTable.Name = Me.Name
                                           Select Relation Distinct
 
                 Return larOutgoingRelation.ToList
