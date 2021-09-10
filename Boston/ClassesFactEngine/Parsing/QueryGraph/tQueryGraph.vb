@@ -1174,7 +1174,7 @@
                                             Select QueryEdge).ToArray
 
                         lsSQLQuery &= "," & vbCrLf
-                        lsSQLQuery &= lrDerivationProcessor.processDerivationText((lrQueryEdge.FBMFactType.DerivationText).Replace(vbCr, " "),
+                        lsSQLQuery &= lrDerivationProcessor.processDerivationText((lrQueryEdge.FBMFactType.DerivationText).Replace(vbCr, " ").Replace(vbCrLf, " "),
                                                                                    lrQueryEdge.FBMFactType,
                                                                                    larQueryEdge)
 

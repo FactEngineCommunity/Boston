@@ -5,6 +5,7 @@
         ModelElement
         NodePropertyIdentification
         None
+        Space
         THAT
         WHICH
     End Enum

@@ -180,14 +180,7 @@ Namespace FEQL
                 'Return lsSQL
 
             Catch ex As Exception
-                Dim lsMessage As String
-                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
-
-                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
-                lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
-
-                Return lsSQL
+                Throw New Exception(ex.Message & vbCrLf & lsSQL)
             End Try
 
         End Function
@@ -423,11 +416,14 @@ Namespace FEQL
         ''' <returns></returns>
         Public Function getDerivationType(ByRef arDerivationClause As FEQL.DERIVATIONSTMT) As FactEngine.pcenumFEQLDerivationType
 
-            If arDerivationClause.DERIVATIONSUBCLAUSE.Count = 2 And
-               arDerivationClause.DERIVATIONSUBCLAUSE(0).FBMFactType IsNot Nothing Then
-                If arDerivationClause.DERIVATIONSUBCLAUSE(0).FBMFactType.hasTransitiveRingConstraint Then
+            If arDerivationClause.DERIVATIONSUBCLAUSE.Count = 2 Then
+                If arDerivationClause.DERIVATIONSUBCLAUSE(0).FBMFactType IsNot Nothing Then
+                    If arDerivationClause.DERIVATIONSUBCLAUSE(0).FBMFactType.hasTransitiveRingConstraint Then
 
-                    Return FactEngine.pcenumFEQLDerivationType.TransitiveRingConstraintJoin
+                        Return FactEngine.pcenumFEQLDerivationType.TransitiveRingConstraintJoin
+                    End If
+                Else
+                    Return FactEngine.pcenumFEQLDerivationType.None
                 End If
 
             ElseIf arDerivationClause.DERIVATIONSUBCLAUSE.Count = 1 And

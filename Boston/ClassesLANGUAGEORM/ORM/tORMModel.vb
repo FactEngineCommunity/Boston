@@ -4593,6 +4593,65 @@ Namespace FBM
 
         End Function
 
+        Public Function getFactTypeByPredicateNearSideModelElement(ByVal asPredicate As String,
+                                                                  ByVal arModelElement As FBM.ModelObject,
+                                                                  Optional ByVal abUseFastenshtein As Boolean = False,
+                                                                  Optional ByRef aarModelElement As List(Of FBM.ModelObject) = Nothing) As FBM.FactType
+
+            Try
+                Dim larFactType As List(Of FBM.FactType)
+
+                larFactType = (From FactType In Me.FactType
+                               From FactTypeReading In FactType.FactTypeReading
+                               Where FactType.Arity = 2
+                               Where FactTypeReading.PredicatePart.First.Role.JoinedORMObject.Id = arModelElement.Id
+                               Where FactTypeReading.PredicatePart(0).PredicatePartText = asPredicate
+                               Select FactType).ToList
+
+                If larFactType.Count = 0 And abUseFastenshtein Then
+
+
+                    larFactType = (From FactType In Me.FactType
+                                   From FactTypeReading In FactType.FactTypeReading
+                                   Where FactType.Arity = 2
+                                   Where FactTypeReading.PredicatePart.First.Role.JoinedORMObject.Id = arModelElement.Id
+                                   Where Fastenshtein.Levenshtein.Distance(FactTypeReading.PredicatePart(0).PredicatePartText, asPredicate) < 4
+                                   Select FactType).ToList
+
+                End If
+
+                If aarModelElement IsNot Nothing Then
+                    aarModelElement.AddUnique(arModelElement)
+                    'Used by FactEngine to make sure the ModelElement is in the QueryGraph
+                    For Each lrFactType In larFactType.ToArray
+                        If aarModelElement.Contains(lrFactType.FactTypeReading(0).RoleList(0).JoinedORMObject) And
+                           aarModelElement.Contains(lrFactType.FactTypeReading(0).RoleList(1).JoinedORMObject) Then
+                            'Nothing to do here.
+                        Else
+                            larFactType.Remove(lrFactType)
+                        End If
+                    Next
+                End If
+
+                If larFactType.Count = 0 Then
+                    Return Nothing
+                Else
+                    Return larFactType.First
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return Nothing
+            End Try
+
+        End Function
+
 
         ''' <summary>
         ''' Deprecates the Realisations for a DictionaryEntry in the ModelDictionary

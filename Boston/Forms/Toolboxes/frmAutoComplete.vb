@@ -123,6 +123,11 @@ Public Class frmAutoComplete
             End If
 
             Select Case e.KeyCode
+                Case Is = Keys.Space
+                    Call Me.processKeyDown(publicConstantsAutoComplete.pcenumACActionType.Space)
+                    e.Handled = True
+                    Me.zoTextEditor.Focus()
+
                 Case Is = Keys.Enter,
                           Keys.Space,
                           Keys.Tab
@@ -202,6 +207,8 @@ Public Class frmAutoComplete
                                     lsSelectedItem = Me.ListBox.SelectedItem.ToString & " (" & Trim(Me.ListBox.SelectedItem.ItemData) & ":'"
                                 End If
                             End If
+                        Case Is = publicConstantsAutoComplete.pcenumACActionType.Space
+                            lsSelectedItem = Me.ListBox.SelectedItem.ToString & " " & Trim(Me.ListBox.SelectedItem.ItemData) & " "
                         Case Is = publicConstantsAutoComplete.pcenumACActionType.THAT
                             lsSelectedItem = " THAT " & Me.ListBox.SelectedItem.ToString & " A " & Trim(Me.ListBox.SelectedItem.ItemData)
                         Case Is = publicConstantsAutoComplete.pcenumACActionType.WHICH

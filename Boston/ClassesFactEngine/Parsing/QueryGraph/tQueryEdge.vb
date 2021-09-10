@@ -154,6 +154,51 @@ Namespace FactEngine
         End Sub
 
         ''' <summary>
+        ''' Used for QueryEdge.getAndSetFBMFactType
+        ''' </summary>
+        ''' <param name="arBaseNode">The BaseNode for the FactTypeReading</param>
+        ''' <param name="arTargetNode">The TargetNode for he FactTypeReading</param>
+        ''' <param name="asPredicate">THe Predicate for the FactTypeReading</param>
+        ''' <param name="aarModelObject">The created list of ModelObjects</param>
+        ''' <param name="aarRole">The created list of Roles.</param>
+        ''' <returns></returns>
+        Private Function CreateFBMFactTypeReading(ByRef arBaseNode As FactEngine.QueryNode,
+                                                  ByRef arTargetNode As FactEngine.QueryNode,
+                                                  ByVal asPredicate As String,
+                                                  ByRef aarModelObject As List(Of FBM.ModelObject),
+                                                  ByRef aarRole As List(Of FBM.Role)) As FBM.FactTypeReading
+
+            Try
+                Dim larModelObject As New List(Of FBM.ModelObject)
+                Dim larRole As New List(Of FBM.Role)
+
+                larModelObject.Add(arBaseNode.RelativeFBMModelObject)
+
+                Dim lasPredicatePart As New List(Of String)
+                lasPredicatePart.Add(asPredicate)
+
+                If arTargetNode IsNot Nothing Then
+                    larModelObject.Add(arTargetNode.FBMModelObject)
+                    lasPredicatePart.Add("")
+                End If
+
+                Dim lrDummyFactType As New FBM.FactType
+                larRole.Add(New FBM.Role(lrDummyFactType, larModelObject(0)))
+                larRole.Add(New FBM.Role(lrDummyFactType, larModelObject(1)))
+
+                aarModelObject = larModelObject
+                aarRole = larRole
+
+                Return New FBM.FactTypeReading(lrDummyFactType, larRole, lasPredicatePart)
+
+            Catch ex As Exception
+                Throw New Exception(ex.Message)
+            End Try
+
+
+        End Function
+
+        ''' <summary>
         ''' 
         ''' </summary>
         ''' <param name="arBaseNode"></param>
@@ -170,35 +215,348 @@ Namespace FactEngine
 
             Dim lsMessage As String = ""
             Try
-                Dim larModelObject As New List(Of FBM.ModelObject)
-                Dim larRole As New List(Of FBM.Role)
                 Dim lrFactTypeReading As FBM.FactTypeReading
                 Dim lrOriginalFactTypeReading As FBM.FactTypeReading
+                Dim larModelObject As New List(Of FBM.ModelObject)
+                Dim larRole As New List(Of FBM.Role)
 
+
+                lrFactTypeReading = Me.CreateFBMFactTypeReading(arBaseNode, arTargetNode, asPredicate, larModelObject, larRole)
+                lrFactTypeReading.PredicatePart(1).PreBoundText = arTargetNode.PreboundText
+
+                '========================================================
+                Dim lrReturnFactTypeReading As FBM.FactTypeReading = Nothing
+                Dim lrReturnPredicatePart As FBM.PredicatePart = Nothing
+
+                Me.FBMFactType = Me.QueryGraph.Model.getFactTypeByModelObjectsFactTypeReading(larModelObject,
+                                                                                              lrFactTypeReading, False,
+                                                                                              lrReturnFactTypeReading,
+                                                                                              lrReturnPredicatePart)
+
+
+                '========================================================================================================================
+                'Straight clean find
+#Region "Straight clean find"
+                If Me.FBMFactType IsNot Nothing And lrReturnFactTypeReading IsNot Nothing And lrReturnPredicatePart IsNot Nothing Then
+
+                    Me.FBMFactTypeReading = lrReturnFactTypeReading
+                    Me.FBMPredicatePart = lrReturnPredicatePart
+
+                    Return Nothing
+                End If
+#End Region
+
+                '========================================================================================================================
+                'Fastenstein - Straight
+#Region "Fastenstein - Straight"
+                Me.FBMFactType = Me.QueryGraph.Model.getFactTypeByModelObjectsFactTypeReading(larModelObject,
+                                                                                              lrFactTypeReading, True,
+                                                                                              lrReturnFactTypeReading,
+                                                                                              lrReturnPredicatePart)
+
+                If Me.FBMFactType IsNot Nothing And lrReturnFactTypeReading IsNot Nothing And lrReturnPredicatePart IsNot Nothing Then
+
+                    Me.FBMFactTypeReading = lrReturnFactTypeReading
+                    Me.FBMPredicatePart = lrReturnPredicatePart
+
+                    Return Nothing
+                End If
+#End Region
+
+                '========================================================================================================================
+                'Ambiguity
+#Region "Ambiguity"
+                Dim larFactType As New List(Of FBM.FactType)
+
+                If larModelObject.Count > 1 Then
+
+                    Dim larAltFactTypeReading = From FactType In Me.QueryGraph.Model.FactType
+                                                From FactTypeReading In FactType.FactTypeReading
+                                                Where FactTypeReading.PredicatePart.Count = 2
+                                                Select FactTypeReading
+
+                    Dim larAltFactType = From FactTypeReading In larAltFactTypeReading
+                                         Where FactTypeReading.PredicatePart(0).Role.JoinedORMObject Is larModelObject(0)
+                                         Where FactTypeReading.PredicatePart(1).Role.JoinedORMObject Is larModelObject(1)
+                                         Where FactTypeReading.PredicatePart(0).PredicatePartText = asPredicate
+                                         Select FactTypeReading.FactType
+
+                    larFactType = larAltFactType.ToList
+                Else
+                    Dim larAltFactType = From FactType In Me.QueryGraph.Model.FactType
+                                         From FactTypeReading In FactType.FactTypeReading
+                                         From PredicatePart In FactTypeReading.PredicatePart
+                                         Where PredicatePart.Role.JoinedORMObject.Id = larModelObject(0).Id
+                                         Where PredicatePart.PredicatePartText = asPredicate
+                                         Select FactType
+
+                    larFactType = larAltFactType.ToList
+                End If
+
+
+                If larFactType.Count > 1 Then
+                    lsMessage = "There is more than one Fact Type Reading that is or starts, '" & arBaseNode.FBMModelObject.Id & " " & asPredicate & " " & arTargetNode.Name & "'"
+                    lsMessage &= "or there is no such Fact Type Reading."
+                    Me.AmbiguousFactTypeReading = lrFactTypeReading
+                    Throw New Exception(lsMessage)
+                ElseIf larFactType.Count = 1 Then
+                    Me.FBMFactType = larFactType.First
+                    'FactTypeReading, PredicatePart at end
+                End If
+#End Region
+
+                '====================================================================================================================
+                'Partial FactType matches
+#Region "Partial FactType matches"
+                Dim lrBaseNode As FactEngine.QueryNode = Nothing
+
+                lrOriginalFactTypeReading = lrFactTypeReading
+
+                Me.FBMPossibleFactTypes = Me.QueryGraph.Model.getFactTypeByPartialMatchModelObjectsFactTypeReading(larModelObject,
+                                                                                                                   lrFactTypeReading)
+
+                If Me.FBMPossibleFactTypes.Count = 1 Then
+                    '-----------------------------------------------------------------------
+                    'Is a partial match. E.g. The following is for a ternary FactType:
+                    '"WHICH Person visited (Country:'China') within the last 10 months"
+                    'Check if is PartialPredicate of a FactTypeReading with more than 2 PredicateParts
+                    Me.IsPartialFactTypeMatch = True
+                    If Me.FBMPossibleFactTypes.First.RoleGroup.Count > 2 Then
+                        Me.IsPartialFactTypeMatch = True
+                        Me.FBMFactType = Me.FBMPossibleFactTypes.First
+                        Dim lsModelElementId As String
+                        If arPreviousTargetNode Is Nothing Then
+                            lsModelElementId = larModelObject(0).Id
+                        Else
+                            lsModelElementId = arPreviousTargetNode.Name
+                        End If
+                        Me.FBMFactTypeReading = (From FactTypeReading In Me.FBMPossibleFactTypes(0).FactTypeReading
+                                                 From PredicatePart In FactTypeReading.PredicatePart
+                                                 Where PredicatePart.Role.JoinedORMObject.Id = lsModelElementId
+                                                 Where PredicatePart.PredicatePartText = asPredicate
+                                                 Select FactTypeReading
+                                                                    ).First
+
+                        Me.FBMPredicatePart = (From FactTypeReading In Me.FBMPossibleFactTypes(0).FactTypeReading
+                                               From PredicatePart In FactTypeReading.PredicatePart
+                                               Where PredicatePart.Role.JoinedORMObject.Id = lsModelElementId
+                                               Where PredicatePart.PredicatePartText = asPredicate
+                                               Select PredicatePart
+                                                                  ).First
+                    End If
+                ElseIf Me.FBMPossibleFactTypes.Count > 1 Then
+                    '--------------------------------------------------------------------
+                    'Is a partial match. E.g. The following is for a ternary FactType:
+                    '"WHICH Person visited (Country:'China') within the last 10 months"
+                    Me.IsPartialFactTypeMatch = True
+                    Me.AmbiguousFactTypeReading = lrFactTypeReading
+                    Me.AmbiguousFactTypeMatches = FBMPossibleFactTypes
+                    lsMessage = "Ambiguous predicate reading, '" & arBaseNode.FBMModelObject.Id & " " & asPredicate & " " & arTargetNode.Name & "'."
+                    lsMessage &= vbCrLf & vbCrLf & "There is more than one Fact Type with this predicate part."
+                    Me.ErrorMessage = lsMessage
+                    Throw New Exception(Me.ErrorMessage)
+                End If
+
+                'Return if successful
+                If Me.FBMFactType IsNot Nothing And Me.FBMFactTypeReading IsNot Nothing And Me.FBMPredicatePart IsNot Nothing Then
+                    Return Nothing
+                End If
+#End Region
+
+                '====================================================================================================================
+                'Previous QueryEdge BaseNode
+                '  [Model].getFactTypeReadingByPartialPredicateReading                                
+                '  [querygraph].FindPreviousQueryEdgeBaseNodeByModelElementName
+#Region "Previous QuerEdge BaseNode"
+                Dim larPredicatePart As New List(Of FBM.PredicatePart)
+                lrFactTypeReading = Me.QueryGraph.Model.getFactTypeReadingByPartialPredicateReading(asPredicate, Me.TargetNode.Name, larPredicatePart)
+
+                If lrFactTypeReading IsNot Nothing Then
+                    '-------------------------------------------------------------------------------------------
+                    Me.FBMFactType = lrFactTypeReading.FactType
+                    Me.FBMPredicatePart = larPredicatePart(0)
+                    Me.FBMFactTypeReading = Me.FBMPredicatePart.FactTypeReading
+
+                    '20210910-VM-Added isPartial... below. If this is wrong remove it.
+                    Me.IsPartialFactTypeMatch = True
+                    'Set the new BaseNode because the original one was fruitless.
+                    lrBaseNode = Me.QueryGraph.FindPreviousQueryEdgeBaseNodeByModelElementName(Me.FBMPredicatePart.Role.JoinedORMObject.Id, Me.BaseNode)
+                    If lrBaseNode IsNot Nothing Then
+                        Me.BaseNode = lrBaseNode
+                    End If
+                    '-------------------------------------------------------------------------------------------
+                End If
+                'Return if successful
+                If Me.FBMFactType IsNot Nothing And Me.FBMFactTypeReading IsNot Nothing And Me.FBMPredicatePart IsNot Nothing Then
+                    Return Nothing
+                End If
+#End Region
+
+                '==================================================================================================================
+                'Far Side ModelElement predicate
+#Region "Far Side ModelElement predicate"
+                Dim lrFactType As FBM.FactType
+                lrFactType = Me.QueryGraph.Model.getFactTypeByPredicateFarSideModelElement(asPredicate, arTargetNode.FBMModelObject, True, Me.QueryGraph.getNodeModelElementList)
+
+                If lrFactType IsNot Nothing Then
+                    Dim lrModelElement As FBM.ModelObject = arTargetNode.FBMModelObject
+                    Dim larFactTypeReading = From FactTypeReading In lrFactType.FactTypeReading
+                                             Where FactTypeReading.PredicatePart(1).Role.JoinedORMObject.Id = lrModelElement.Id
+                                             Select FactTypeReading
+
+                    lrFactTypeReading = larFactTypeReading.First
+                    Me.FBMFactType = lrFactTypeReading.FactType
+                    Me.FBMFactTypeReading = lrFactTypeReading
+                    Me.FBMPredicatePart = Me.FBMFactTypeReading.PredicatePart(0)
+                    lrBaseNode = Me.QueryGraph.FindPreviousQueryEdgeBaseNodeByModelElementName(Me.FBMPredicatePart.Role.JoinedORMObject.Id, Me.BaseNode)
+                    If lrBaseNode IsNot Nothing Then
+                        Me.BaseNode = lrBaseNode
+                    ElseIf lrBaseNode Is Nothing And abUsePreviousFoundBaseNodeIfFound Then
+                        Me.BaseNode = New FactEngine.QueryNode(Me.FBMFactTypeReading.PredicatePart(0).Role.JoinedORMObject, Me, False)
+                    Else
+                        Me.FBMFactType = Nothing
+                        Me.FBMFactTypeReading = Nothing
+                        'Me.FBMPredicatePart = Nothing
+                        lrFactTypeReading = Nothing
+                    End If
+
+                    Try
+                        lrBaseNode = Me.QueryGraph.FindPreviousQueryEdgeBaseNodeByModelElementName(Me.FBMPredicatePart.Role.JoinedORMObject.Id, Me.BaseNode)
+                    Catch
+                        lrBaseNode = Nothing
+                    End Try
+
+                    If lrBaseNode IsNot Nothing Then
+                        Me.BaseNode = lrBaseNode
+                    End If
+                End If
+
+                'Return if successful
+                If Me.FBMFactType IsNot Nothing And Me.FBMFactTypeReading IsNot Nothing And Me.FBMPredicatePart IsNot Nothing Then
+                    Return Nothing
+                End If
+#End Region
+
+                '===================================================================================================================================
+                'ReifiedFactType LinkFactType predicate requring an InjectedQueryEdge
+#Region "ReifiedFactType LinkFactType predicate requring an InjectedQueryEdge"
+                Dim lrPredicatePart As FBM.PredicatePart
+                Dim lrQueryEdge As New FactEngine.QueryEdge
+                lrQueryEdge.QueryGraph = Me.QueryGraph
+                lrQueryEdge.WhichClause = Me.WhichClause
+                lrQueryEdge.WhichClauseType = Me.WhichClauseType
+                lrFactType = Me.QueryGraph.Model.getFactTypeByPredicateFarSideModelElement(asPredicate, arTargetNode.FBMModelObject)
+                If lrFactType Is Nothing Then
+                    lrFactType = Me.QueryGraph.Model.getFactTypeByPredicateFarSideModelElement(asPredicate, arTargetNode.FBMModelObject, True)
+                End If
+
+                If lrFactType IsNot Nothing Then
+                    Dim lrCandidateBaseNode As FactEngine.QueryNode
+                    lrPredicatePart = (From FactTypeReading In lrFactType.FactTypeReading
+                                       From PredicatePart In FactTypeReading.PredicatePart
+                                       Where PredicatePart.PredicatePartText = asPredicate Or
+                                                                 Fastenshtein.Levenshtein.Distance(PredicatePart.PredicatePartText, asPredicate) < 4
+                                       Select PredicatePart).First
+
+                    lrCandidateBaseNode = New FactEngine.QueryNode(lrPredicatePart.Role.JoinedORMObject, lrQueryEdge)
+
+                    If Me.QueryGraph.Model.hasCountFactTypesBetweenModelElements(arBaseNode.FBMModelObject, lrCandidateBaseNode.FBMModelObject) = 0 Then
+                        If Me.QueryGraph.Model.hasCountFactTypesBetweenModelElements(arPreviousTargetNode.FBMModelObject, lrCandidateBaseNode.FBMModelObject) = 1 Then
+                            arBaseNode = arPreviousTargetNode
+                        End If
+                    End If
+
+                    If Me.QueryGraph.Model.hasCountFactTypesBetweenModelElements(arBaseNode.FBMModelObject, lrCandidateBaseNode.FBMModelObject) = 1 Then
+                        lrQueryEdge.BaseNode = lrCandidateBaseNode
+                        lrQueryEdge.TargetNode = New FactEngine.QueryNode(arTargetNode.FBMModelObject, lrQueryEdge, True)
+                        If arTargetNode.HasIdentifier Then
+                            lrQueryEdge.TargetNode.IdentifierList = arTargetNode.IdentifierList.ToList
+                            lrQueryEdge.TargetNode.HasIdentifier = True
+                        End If
+                        lrQueryEdge.FBMFactType = lrFactType
+                        lrQueryEdge.WhichClause = New FEQL.WHICHCLAUSE
+                        If Me.IdentifierList.Count > 0 Then
+                            lrQueryEdge.IdentifierList = Me.IdentifierList.ToList
+                            Me.IdentifierList.Clear()
+                        End If
+                        'Change the TargetNode to the lrCandidateBaseNode
+                        Me.TargetNode = New FactEngine.QueryNode(lrCandidateBaseNode.FBMModelObject, Me, True)
+                        'get the FactType
+                        lrOriginalFactTypeReading.PredicatePart.Last.Role.JoinedORMObject = arTargetNode.FBMModelObject
+                        larModelObject(1) = arTargetNode.FBMModelObject
+
+                        'Because is only one FactType
+                        Me.FBMFactTypeReading = (From FactTypeReading In Me.BaseNode.FBMModelObject.getOutgoingFactTypeReadings
+                                                 Where FactTypeReading.PredicatePart(0).Role.JoinedORMObject Is Me.BaseNode.FBMModelObject
+                                                 Where FactTypeReading.PredicatePart(1).Role.JoinedORMObject Is Me.TargetNode.FBMModelObject
+                                                 Select FactTypeReading).First
+
+                        Me.FBMFactType = Me.FBMFactTypeReading.FactType
+
+                        'SubQuery
+                        If Me.QueryGraph.QueryEdges.Count > 0 Then
+                            If Me.QueryGraph.QueryEdges.Last.IsPartOfSubQuery Or Me.QueryGraph.QueryEdges.Last.IsSubQueryLeader Then
+                                lrQueryEdge.IsPartOfSubQuery = True
+                                lrQueryEdge.SubQueryAlias = lrQueryEdge.QueryGraph.QueryEdges.Last.SubQueryAlias
+                            End If
+                        End If
+
+                        Me.InjectsQueryEdge = lrQueryEdge
+                    End If
+                End If
+
+                'Return if successful
+                If Me.FBMFactType IsNot Nothing And Me.FBMFactTypeReading IsNot Nothing And Me.FBMPredicatePart IsNot Nothing Then
+                    Return Nothing
+                End If
+#End Region
+
+                '====================================================================================================================
+                'Relative BaseNode - Uses GetTopmostNonAbsorbedSupertype
+                'Not yet implemented
+                '20210829-VM-Use the below for SubType predicates.
+                'FBM.ModelObject.hasModelElementAsDownstreamSubtype
+
+                larModelObject.Add(arBaseNode.RelativeFBMModelObject)
+
+                '====================================================================================================================
+                'Tidy up and final chance
+#Region "Tidy up and final chance"
+                If Me.FBMFactType Is Nothing Then
+                    Throw New Exception("There is not Fact Type, '" & arBaseNode.FBMModelObject.Id & " " & asPredicate & " " & arTargetNode.FBMModelObject.Id & "', in the Model.")
+                End If
+
+                If Me.FBMFactType IsNot Nothing And Me.FBMFactTypeReading Is Nothing Then
+                    Me.FBMFactTypeReading = Me.FBMFactType.FactTypeReading.Find(AddressOf lrFactTypeReading.EqualsByPredicatePartText)
+                    If Me.FBMFactTypeReading Is Nothing Then
+                        Me.FBMFactTypeReading = Me.FBMFactType.FactTypeReading.Find(Function(x) lrFactTypeReading.EqualsByPredicatePartText(x, True) And
+                                                                                                        lrFactTypeReading.EqualsByRoleJoinedModelObjectSequence(x))
+                    End If
+                    If Me.FBMPredicatePart Is Nothing And Me.FBMFactTypeReading IsNot Nothing Then
+                        larPredicatePart = From PredicatePart In Me.FBMFactTypeReading.PredicatePart
+                                           Where PredicatePart.PredicatePartText = asPredicate
+                                           Select PredicatePart
+
+                        If larPredicatePart.Count > 0 Then
+                            Me.FBMPredicatePart = larPredicatePart.First
+                        End If
+                    End If
+                End If
+#End Region
+
+                Return Nothing
+
+                '======================================================
+                'Old code, trying to get rid of this.
                 If Me.WhichClauseSubType = pcenumWhichClauseType.IsPredicateNodePropertyIdentification And 1 = 2 Then
 #Region "With NodePropertyIdentification"
-                    larModelObject.Add(arBaseNode.RelativeFBMModelObject)
-                    larModelObject.Add(arTargetNode.FBMModelObject)
-                    Dim lasPredicatePart As New List(Of String)
-                    lasPredicatePart.Add(asPredicate)
-                    lasPredicatePart.Add("")
 
-                    Dim lrDummyFactType As New FBM.FactType
-                    larRole.Add(New FBM.Role(lrDummyFactType, larModelObject(0)))
-                    larRole.Add(New FBM.Role(lrDummyFactType, larModelObject(1)))
 
-                    lrFactTypeReading = New FBM.FactTypeReading(lrDummyFactType, larRole, lasPredicatePart)
-                    lrFactTypeReading.PredicatePart(1).PreBoundText = arTargetNode.PreboundText
 
                     Select Case Me.BaseNode.FBMModelObject.GetType
                         Case Is = GetType(FBM.FactType)
 
                             '========================================================
-                            '20200802-VM-NB Can probably do the following regardless of whether is a FactType
-                            Me.FBMFactType = Me.QueryGraph.Model.getFactTypeByModelObjectsFactTypeReading(larModelObject,
-                                                                                                          lrFactTypeReading)
-                            '========================================================
-
                             If Me.FBMFactType Is Nothing Then
                                 'Thinks its an RDS Table query like "WHICH Lecturer likes WHICH Lecturer"
                                 Dim lrRDSFactType As FBM.FactType
@@ -243,7 +601,7 @@ Namespace FactEngine
                             End If
                         Case Else
 
-                            Dim lrReturnFactTypeReading = Nothing
+                            lrReturnFactTypeReading = Nothing
                             Dim lrPredicatePart As FBM.PredicatePart = Nothing
 
                             Me.FBMFactType = Me.QueryGraph.Model.getFactTypeByModelObjectsFactTypeReading(larModelObject,
@@ -274,8 +632,8 @@ Namespace FactEngine
                                     End If
                                 Next
 
-                                Dim larFactType = From FactTypeReading In larFinalFactTypeReading
-                                                  Select FactTypeReading.FactType Distinct
+                                larFactType = From FactTypeReading In larFinalFactTypeReading
+                                              Select FactTypeReading.FactType Distinct
 
                                 Me.FBMPossibleFactTypes = Me.QueryGraph.Model.getFactTypeByPartialMatchModelObjectsFactTypeReading(larModelObject,
                                                                                                                                lrFactTypeReading)
@@ -330,271 +688,6 @@ Namespace FactEngine
 
                     End Select
 #End Region
-                Else
-                    Dim lrDummyFactType As New FBM.FactType
-                    Dim lasPredicatePart As New List(Of String)
-
-                    larModelObject.Add(arBaseNode.RelativeFBMModelObject)
-
-                    lasPredicatePart.Add(asPredicate)
-
-                    larRole.Add(New FBM.Role(lrDummyFactType, larModelObject(0)))
-
-                    If arTargetNode IsNot Nothing Then
-                        larModelObject.Add(arTargetNode.FBMModelObject)
-                        lasPredicatePart.Add("")
-                        larRole.Add(New FBM.Role(lrDummyFactType, larModelObject(1)))
-                    End If
-
-                    lrFactTypeReading = New FBM.FactTypeReading(lrDummyFactType, larRole, lasPredicatePart)
-                    lrFactTypeReading.PredicatePart(1).PreBoundText = arTargetNode.PreboundText
-                    lrOriginalFactTypeReading = lrFactTypeReading
-
-                    '---------------------------------------------------------------------------------------------
-                    'Get the FactType
-                    Me.FBMFactType = Me.QueryGraph.Model.getFactTypeByModelObjectsFactTypeReading(larModelObject,
-                                                                                                  lrFactTypeReading)
-
-                    If Me.FBMFactType Is Nothing Then
-                        'Try Fastenshtein
-                        Me.FBMFactType = Me.QueryGraph.Model.getFactTypeByModelObjectsFactTypeReading(larModelObject,
-                                                                                                      lrFactTypeReading, True)
-                    End If
-
-                    If Me.FBMFactType Is Nothing Then
-
-                        Dim larFactType As New List(Of FBM.FactType)
-
-                        If larModelObject.Count > 1 Then
-
-                            Dim larAltFactTypeReading = From FactType In Me.QueryGraph.Model.FactType
-                                                        From FactTypeReading In FactType.FactTypeReading
-                                                        Where FactTypeReading.PredicatePart.Count = 2
-                                                        Select FactTypeReading
-
-                            Dim larAltFactType = From FactTypeReading In larAltFactTypeReading
-                                                 Where FactTypeReading.PredicatePart(0).Role.JoinedORMObject Is larModelObject(0)
-                                                 Where FactTypeReading.PredicatePart(1).Role.JoinedORMObject Is larModelObject(1)
-                                                 Where FactTypeReading.PredicatePart(0).PredicatePartText = asPredicate
-                                                 Select FactTypeReading.FactType
-
-                            larFactType = larAltFactType.ToList
-                        Else
-                            Dim larAltFactType = From FactType In Me.QueryGraph.Model.FactType
-                                                 From FactTypeReading In FactType.FactTypeReading
-                                                 From PredicatePart In FactTypeReading.PredicatePart
-                                                 Where PredicatePart.Role.JoinedORMObject.Id = larModelObject(0).Id
-                                                 Where PredicatePart.PredicatePartText = asPredicate
-                                                 Select FactType
-
-                            larFactType = larAltFactType.ToList
-                        End If
-                        Dim lrBaseNode As FactEngine.QueryNode = Nothing
-
-                        If larFactType.Count > 1 Then
-                            lsMessage = "There is more than one Fact Type Reading that is or starts, '" & arBaseNode.FBMModelObject.Id & " " & asPredicate & " " & arTargetNode.Name & "'"
-                            lsMessage &= "or there is no such Fact Type Reading."
-                            Throw New Exception(lsMessage)
-                        ElseIf larFactType.Count = 0 Then
-
-                            Me.FBMPossibleFactTypes = Me.QueryGraph.Model.getFactTypeByPartialMatchModelObjectsFactTypeReading(larModelObject,
-                                                                                                                               lrFactTypeReading)
-
-                            If Me.FBMPossibleFactTypes.Count = 0 Then
-                                '----------------------------------------------------------------
-                                'Try and get another BaseNode in the query using the followig:
-                                '  [querygraph].FindPreviousQueryEdgeBaseNodeByModelElementName
-                                '  [Model].getFactTypeReadingByPartialPredicateReading                                
-                                Dim larPredicatePart As New List(Of FBM.PredicatePart)
-                                lrFactTypeReading = Me.QueryGraph.Model.getFactTypeReadingByPartialPredicateReading(asPredicate, Me.TargetNode.Name, larPredicatePart)
-
-                                Dim lrFactType As FBM.FactType
-                                lrFactType = Me.QueryGraph.Model.getFactTypeByPredicateFarSideModelElement(asPredicate, arTargetNode.FBMModelObject, True, Me.QueryGraph.getNodeModelElementList)
-
-                                '20210829-VM-Use the below for SubType predicates.
-                                'FBM.ModelObject.hasModelElementAsDownstreamSubtype
-
-                                If lrFactType IsNot Nothing Then
-                                    Dim lrModelElement As FBM.ModelObject = arTargetNode.FBMModelObject
-                                    Dim larFactTypeReading = From FactTypeReading In lrFactType.FactTypeReading
-                                                             Where FactTypeReading.PredicatePart(1).Role.JoinedORMObject.Id = lrModelElement.Id
-                                                             Select FactTypeReading
-
-                                    lrFactTypeReading = larFactTypeReading.First
-                                    Me.FBMFactType = lrFactTypeReading.FactType
-                                    Me.FBMFactTypeReading = lrFactTypeReading
-                                    Me.FBMPredicatePart = Me.FBMFactTypeReading.PredicatePart(0)
-                                    lrBaseNode = Me.QueryGraph.FindPreviousQueryEdgeBaseNodeByModelElementName(Me.FBMPredicatePart.Role.JoinedORMObject.Id, Me.BaseNode)
-                                    If lrBaseNode IsNot Nothing Then
-                                        Me.BaseNode = lrBaseNode
-                                    ElseIf lrBaseNode Is Nothing And abUsePreviousFoundBaseNodeIfFound Then
-                                        Me.BaseNode = New FactEngine.QueryNode(Me.FBMFactTypeReading.PredicatePart(0).Role.JoinedORMObject, Me, False)
-                                    Else
-                                        Me.FBMFactType = Nothing
-                                        Me.FBMFactTypeReading = Nothing
-                                        'Me.FBMPredicatePart = Nothing
-                                        lrFactTypeReading = Nothing
-                                    End If
-                                End If
-                                Try
-                                    lrBaseNode = Me.QueryGraph.FindPreviousQueryEdgeBaseNodeByModelElementName(Me.FBMPredicatePart.Role.JoinedORMObject.Id, Me.BaseNode)
-                                Catch
-                                    lrBaseNode = Nothing
-                                End Try
-                                If lrBaseNode IsNot Nothing Then
-                                    Me.BaseNode = lrBaseNode
-                                End If
-
-                                If lrFactTypeReading Is Nothing Then
-                                    'See if it is a ReifiedFactType LinkFactType predicate requring an InjectedQueryEdge
-                                    Dim lrPredicatePart As FBM.PredicatePart
-                                    Dim lrQueryEdge As New FactEngine.QueryEdge
-                                    lrQueryEdge.QueryGraph = Me.QueryGraph
-                                    lrQueryEdge.WhichClause = Me.WhichClause
-                                    lrQueryEdge.WhichClauseType = Me.WhichClauseType
-                                    lrFactType = Me.QueryGraph.Model.getFactTypeByPredicateFarSideModelElement(asPredicate, arTargetNode.FBMModelObject)
-                                    If lrFactType Is Nothing Then
-                                        lrFactType = Me.QueryGraph.Model.getFactTypeByPredicateFarSideModelElement(asPredicate, arTargetNode.FBMModelObject, True)
-                                    End If
-                                    If lrFactType IsNot Nothing Then
-                                        Dim lrCandidateBaseNode As FactEngine.QueryNode
-                                        lrPredicatePart = (From FactTypeReading In lrFactType.FactTypeReading
-                                                           From PredicatePart In FactTypeReading.PredicatePart
-                                                           Where PredicatePart.PredicatePartText = asPredicate Or
-                                                                 Fastenshtein.Levenshtein.Distance(PredicatePart.PredicatePartText, asPredicate) < 4
-                                                           Select PredicatePart).First
-
-                                        lrCandidateBaseNode = New FactEngine.QueryNode(lrPredicatePart.Role.JoinedORMObject, lrQueryEdge)
-
-                                        If Me.QueryGraph.Model.hasCountFactTypesBetweenModelElements(arBaseNode.FBMModelObject, lrCandidateBaseNode.FBMModelObject) = 0 Then
-                                            If Me.QueryGraph.Model.hasCountFactTypesBetweenModelElements(arPreviousTargetNode.FBMModelObject, lrCandidateBaseNode.FBMModelObject) = 1 Then
-                                                arBaseNode = arPreviousTargetNode
-                                            End If
-                                        End If
-
-                                        If Me.QueryGraph.Model.hasCountFactTypesBetweenModelElements(arBaseNode.FBMModelObject, lrCandidateBaseNode.FBMModelObject) = 1 Then
-                                            lrQueryEdge.BaseNode = lrCandidateBaseNode
-                                            lrQueryEdge.TargetNode = New FactEngine.QueryNode(arTargetNode.FBMModelObject, lrQueryEdge, True)
-                                            If arTargetNode.HasIdentifier Then
-                                                lrQueryEdge.TargetNode.IdentifierList = arTargetNode.IdentifierList.ToList
-                                                lrQueryEdge.TargetNode.HasIdentifier = True
-                                            End If
-                                            lrQueryEdge.FBMFactType = lrFactType
-                                            lrQueryEdge.WhichClause = New FEQL.WHICHCLAUSE
-                                            If Me.IdentifierList.Count > 0 Then
-                                                lrQueryEdge.IdentifierList = Me.IdentifierList.ToList
-                                                Me.IdentifierList.Clear()
-                                            End If
-                                            'Change the TargetNode to the lrCandidateBaseNode
-                                            Me.TargetNode = New FactEngine.QueryNode(lrCandidateBaseNode.FBMModelObject, Me, True)
-                                            'get the FactType
-                                            lrOriginalFactTypeReading.PredicatePart.Last.Role.JoinedORMObject = arTargetNode.FBMModelObject
-                                            larModelObject(1) = arTargetNode.FBMModelObject
-
-                                            'Because is only one FactType
-                                            Me.FBMFactTypeReading = (From FactTypeReading In Me.BaseNode.FBMModelObject.getOutgoingFactTypeReadings
-                                                                     Where FactTypeReading.PredicatePart(0).Role.JoinedORMObject Is Me.BaseNode.FBMModelObject
-                                                                     Where FactTypeReading.PredicatePart(1).Role.JoinedORMObject Is Me.TargetNode.FBMModelObject
-                                                                     Select FactTypeReading).First
-
-                                            Me.FBMFactType = Me.FBMFactTypeReading.FactType
-
-                                            'SubQuery
-                                            If Me.QueryGraph.QueryEdges.Count > 0 Then
-                                                If Me.QueryGraph.QueryEdges.Last.IsPartOfSubQuery Or Me.QueryGraph.QueryEdges.Last.IsSubQueryLeader Then
-                                                    lrQueryEdge.IsPartOfSubQuery = True
-                                                    lrQueryEdge.SubQueryAlias = lrQueryEdge.QueryGraph.QueryEdges.Last.SubQueryAlias
-                                                End If
-                                            End If
-
-                                            Me.InjectsQueryEdge = lrQueryEdge
-                                        Else
-                                            Throw New Exception("There is not Fact Type, '" & arBaseNode.FBMModelObject.Id & " " & asPredicate & " " & arTargetNode.FBMModelObject.Id & "', in the Model.")
-                                        End If
-                                    Else
-                                        Throw New Exception("There is not Fact Type, '" & arBaseNode.FBMModelObject.Id & " " & asPredicate & " " & arTargetNode.FBMModelObject.Id & "', in the Model.")
-                                    End If
-                                ElseIf Me.FBMFactType Is Nothing Then
-                                    Me.FBMFactType = lrFactTypeReading.FactType
-                                    Me.FBMPredicatePart = larPredicatePart(0)
-                                    Me.FBMFactTypeReading = Me.FBMPredicatePart.FactTypeReading
-                                    '20210910-VM-Added isPartial... below. If this is wrong remove it.
-                                    Me.IsPartialFactTypeMatch = True
-                                    'Set the new BaseNode because the original one was fruitless.
-                                    lrBaseNode = Me.QueryGraph.FindPreviousQueryEdgeBaseNodeByModelElementName(Me.FBMPredicatePart.Role.JoinedORMObject.Id, Me.BaseNode)
-                                    If lrBaseNode IsNot Nothing Then
-                                        Me.BaseNode = lrBaseNode
-                                    Else
-                                        Throw New Exception("There is not Fact Type, '" & arBaseNode.FBMModelObject.Id & " " & asPredicate & " " & arTargetNode.FBMModelObject.Id & "', in the Model.")
-                                    End If
-                                End If
-
-                            ElseIf Me.FBMPossibleFactTypes.Count = 1 Then
-                                'Check if is PartialPredicate of a FactTypeReading with more than 2 PredicateParts
-                                If Me.FBMPossibleFactTypes.First.RoleGroup.Count > 2 Then
-                                    Me.IsPartialFactTypeMatch = True
-                                    Me.FBMFactType = Me.FBMPossibleFactTypes.First
-                                    Dim lsModelElementId As String
-                                    If arPreviousTargetNode Is Nothing Then
-                                        lsModelElementId = larModelObject(0).Id
-                                    Else
-                                        lsModelElementId = arPreviousTargetNode.Name
-                                    End If
-                                    Me.FBMFactTypeReading = (From FactTypeReading In Me.FBMPossibleFactTypes(0).FactTypeReading
-                                                             From PredicatePart In FactTypeReading.PredicatePart
-                                                             Where PredicatePart.Role.JoinedORMObject.Id = lsModelElementId
-                                                             Where PredicatePart.PredicatePartText = asPredicate
-                                                             Select FactTypeReading
-                                                            ).First
-
-                                    Me.FBMPredicatePart = (From FactTypeReading In Me.FBMPossibleFactTypes(0).FactTypeReading
-                                                           From PredicatePart In FactTypeReading.PredicatePart
-                                                           Where PredicatePart.Role.JoinedORMObject.Id = lsModelElementId
-                                                           Where PredicatePart.PredicatePartText = asPredicate
-                                                           Select PredicatePart
-                                                          ).First
-                                End If
-                            Else
-                                Me.AmbiguousFactTypeMatches = FBMPossibleFactTypes
-                                lsMessage = "Ambiguous predicate reading, '" & arBaseNode.FBMModelObject.Id & " " & asPredicate & " " & arTargetNode.Name & "'."
-                                lsMessage &= vbCrLf & vbCrLf & "There is more than one Fact Type with this predicate part."
-                                Me.ErrorMessage = lsMessage
-                            End If
-                        Else
-                            Me.FBMFactType = larFactType.First
-                        End If
-                    End If
-
-                    If Me.FBMFactType Is Nothing And Me.FBMPossibleFactTypes.Count = 0 Then
-                        Throw New Exception("There is not Fact Type, '" & arBaseNode.FBMModelObject.Id & " " & asPredicate & " " & arTargetNode.FBMModelObject.Id & "', in the Model.")
-                    ElseIf Me.FBMPossibleFactTypes.Count > 0 Then
-                        'Is only a partial match
-                        'E.g. The following is for a ternary FactType:
-                        '"WHICH Person visited (Country:'China') within the last 10 months"
-
-                        Me.IsPartialFactTypeMatch = True
-
-                    End If
-
-                    If Me.FBMFactTypeReading Is Nothing And Me.FBMFactType IsNot Nothing Then
-                        Me.FBMFactTypeReading = Me.FBMFactType.FactTypeReading.Find(AddressOf lrFactTypeReading.EqualsByPredicatePartText)
-                        If Me.FBMFactTypeReading Is Nothing Then
-                            Me.FBMFactTypeReading = Me.FBMFactType.FactTypeReading.Find(Function(x) lrFactTypeReading.EqualsByPredicatePartText(x, True) And
-                                                                                                    lrFactTypeReading.EqualsByRoleJoinedModelObjectSequence(x))
-                        End If
-                        If Me.FBMPredicatePart Is Nothing And Me.FBMFactTypeReading IsNot Nothing Then
-                            Dim larPredicatePart = From PredicatePart In Me.FBMFactTypeReading.PredicatePart
-                                                   Where PredicatePart.PredicatePartText = asPredicate
-                                                   Select PredicatePart
-
-                            If larPredicatePart.Count > 0 Then
-                                Me.FBMPredicatePart = larPredicatePart.First
-                            End If
-                        End If
-                    ElseIf Me.AmbiguousFactTypeMatches.Count > 0 Then
-                        Me.AmbiguousFactTypeReading = lrFactTypeReading
-                    End If
-
                 End If
 
             Catch ex As Exception

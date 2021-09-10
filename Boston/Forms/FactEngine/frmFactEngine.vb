@@ -1273,6 +1273,7 @@ Public Class frmFactEngine
 
             '=================================================================
             'Check valid ModelElement Names
+#Region "Text Marker"
             Dim lrParseNode As FEQL.ParseNode
             Dim larModelElementNameParseNode As New List(Of FEQL.ParseNode)
             Dim larModelPredicateClauseParseNode As New List(Of FEQL.ParseNode)
@@ -1391,6 +1392,8 @@ Public Class frmFactEngine
                 End If
 
             End If
+#End Region
+
             '=======================================
 
             Call Me.CheckStartProductions(Me.zrTextHighlighter.Tree)
