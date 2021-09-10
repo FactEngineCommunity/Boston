@@ -1524,6 +1524,52 @@ Public Class frmDiagramPGS
             'Start size
             Me.MorphVector(0).StartSize = New Rectangle(0, 0, Me.MorphVector(0).Shape.Bounds.Width, Me.MorphVector(0).Shape.Bounds.Height)
 
+            '-------------------------------------------------------------------------------------
+            'Populate the MorphVector with each relevant ModelObjectInstance on the current Page
+            '  that is also on the destination Page.
+            '----------------------------------------------------------------------
+#Region "Additional MorphVectors"
+            Dim lrAdditionalShapeNode As ShapeNode = Nothing
+            Dim larConceptTypes = {pcenumConceptType.EntityType, pcenumConceptType.FactType}
+
+            For Each lrAdditionalObject As PGS.Node In Me.zrPage.ERDiagram.Entity
+                If lrAdditionalObject.Id = Me.zrPage.SelectedObject(0).Id Then
+                    '---------------------------------------------------------------------------------------------
+                    'Skip. Is already added to the MorphVector collection when the ContextMenu.Diagram as loaded
+                    '---------------------------------------------------------------------------------------------
+                Else
+                    If lrAdditionalObject.NodeType <> pcenumPGSEntityType.Relationship And lrAdditionalObject.PGSRelation Is Nothing Then
+                        Dim larORMObjectList = From ModelObject In lrPage.GetAllPageObjects
+                                               Where ModelObject.Id = lrAdditionalObject.Name
+                                               Select ModelObject
+
+                        For Each lrModelObject As Object In larORMObjectList
+                            'Will only be one, but saves coding if...then...
+                            Me.MorphVector.Add(New tMorphVector(lrAdditionalObject.Shape.Bounds.X, lrAdditionalObject.Shape.Bounds.Y, lrModelObject.X, lrModelObject.Y, 40))
+
+                            Dim lrAdditionalPageObject As FBM.PageObject = lrAdditionalObject.ClonePageObject
+                            lrAdditionalShapeNode = lrAdditionalPageObject.Shape.Clone(True)
+                            lrAdditionalShapeNode = New ShapeNode(lrAdditionalPageObject.Shape)
+                            lrAdditionalShapeNode.Text = lrAdditionalObject.Name
+                            lrAdditionalShapeNode.Visible = True
+                            lrAdditionalShapeNode.Move(lrAdditionalPageObject.X, lrAdditionalPageObject.Y)
+                            lrAdditionalShapeNode.Shape = Shapes.Ellipse
+
+                            Me.HiddenDiagram.Nodes.Add(lrAdditionalShapeNode)
+                            Me.MorphVector(Me.MorphVector.Count - 1).ModelElementId = lrNode.Name
+                            Me.MorphVector(Me.MorphVector.Count - 1).Shape = lrAdditionalShapeNode
+                            Me.MorphVector(Me.MorphVector.Count - 1).Shape.Font = Me.zrPage.Diagram.Font
+                            Me.MorphVector(Me.MorphVector.Count - 1).Shape.TextFormat = New StringFormat(StringFormatFlags.NoFontFallback)
+                            Me.MorphVector(Me.MorphVector.Count - 1).Shape.TextFormat.Alignment = StringAlignment.Center
+                            Me.MorphVector(Me.MorphVector.Count - 1).Shape.TextFormat.LineAlignment = StringAlignment.Center
+                        Next
+
+                    End If
+                End If
+            Next
+#End Region
+
+
             If lrPage.Loaded Then
                 If IsSomething(lrFactTypeInstance) Then
                     Me.MorphVector(0).EndPoint = New Point(lrFactTypeInstance.X, lrFactTypeInstance.Y)
