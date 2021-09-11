@@ -1520,29 +1520,31 @@
                     Select Case lrQueryEdge.WhichClauseSubType
                         Case Is = FactEngine.Constants.pcenumWhichClauseType.IsPredicateNodePropertyIdentification
                             Dim lrFactType As FBM.FactType = Nothing
-                            Select Case lrQueryEdge.BaseNode.FBMModelObject.GetType
-                                Case GetType(FBM.FactType)
-                                    If lrQueryEdge.WhichClauseType = pcenumWhichClauseType.WithClause Then
-                                        lrFactType = lrQueryEdge.FBMFactType
-                                    Else
-                                        lrFactType = CType(lrQueryEdge.BaseNode.FBMModelObject, FBM.FactType)
-                                    End If
-
-                                Case GetType(FBM.EntityType)
-                                    lrFactType = lrQueryEdge.FBMFactType
-                                Case GetType(FBM.ValueType)
-                                    If lrQueryEdge.IsPartialFactTypeMatch Then
-                                        lrFactType = lrQueryEdge.FBMFactType
-                                    Else
-                                        Throw New NotImplementedException("Unknown Conditional type in query. Contact support.")
-                                    End If
-                            End Select
-
                             Dim lrPredicatePart As FBM.PredicatePart = Nothing
 
                             If lrQueryEdge.FBMPredicatePart IsNot Nothing Then
                                 lrPredicatePart = lrQueryEdge.FBMPredicatePart
+                                lrFactType = lrQueryEdge.FBMFactType
                             Else
+
+                                Select Case lrQueryEdge.BaseNode.FBMModelObject.GetType
+                                    Case GetType(FBM.FactType)
+                                        If lrQueryEdge.WhichClauseType = pcenumWhichClauseType.WithClause Then
+                                            lrFactType = lrQueryEdge.FBMFactType
+                                        Else
+                                            lrFactType = CType(lrQueryEdge.BaseNode.FBMModelObject, FBM.FactType)
+                                        End If
+
+                                    Case GetType(FBM.EntityType)
+                                        lrFactType = lrQueryEdge.FBMFactType
+                                    Case GetType(FBM.ValueType)
+                                        If lrQueryEdge.IsPartialFactTypeMatch Then
+                                            lrFactType = lrQueryEdge.FBMFactType
+                                        Else
+                                            Throw New NotImplementedException("Unknown Conditional type in query. Contact support.")
+                                        End If
+                                End Select
+
 
                                 Dim larPredicatePart As List(Of FBM.PredicatePart)
                                 If lrQueryEdge.Predicate = "" Then
@@ -1652,6 +1654,7 @@
 
                                 Dim lrColumn = (From Column In lrTable.Column
                                                 Where Column.Role Is lrResponsibleRole
+                                                Where Column.ActiveRole IsNot Nothing
                                                 Where Column.ActiveRole.JoinedORMObject Is lrQueryEdge.TargetNode.FBMModelObject
                                                 Select Column).First
 

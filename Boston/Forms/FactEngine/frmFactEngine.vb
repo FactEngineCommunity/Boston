@@ -1323,27 +1323,29 @@ Public Class frmFactEngine
 
                     '========================================                    
                     'Good FactEngine styling
-                    Dim lasToken As String() = {"A", "THAT", "AND"}
+                    Dim lasToken As String() = {"A", "THAT", "AND", "WHICH", "AN", "WHAT"}
 
-                    For Each lsToken In lasToken
-                        If lsPredicatePartText.EndsWith(" " & LCase(lsToken)) Then
-                            lsPredicatePartText &= " "
-                        End If
-                        If lsPredicatePartText = LCase(lsToken) Then
-                            lsPredicatePartText = lsToken
-                            lbMadeChanges = True
-                        ElseIf lsPredicatePartText.Contains(" " & LCase(lsToken) & " ") Then
-                            lsPredicatePartText = lsPredicatePartText.Replace(" " & LCase(lsToken) & " ", " " & lsToken & " ")
-                            lbMadeChanges = True
-                        End If
-                        If lbMadeChanges Then
-                            Dim lsText As String = Me.TextBoxInput.Text.Remove(lrParseNode.Token.StartPos, lrParseNode.Token.Length)
-                            Me.TextBoxInput.Text = lsText.Insert(lrParseNode.Token.StartPos, lsPredicatePartText)
-                            Me.TextBoxInput.Text = Me.TextBoxInput.Text.Replace("  ", " ")
-                            Me.TextBoxInput.SelectionStart = Me.TextBoxInput.Text.Length
-                            Exit Sub
-                        End If
-                    Next
+                    If Me.ToolStripMenuItemAutoCapitalise.Checked Then
+                        For Each lsToken In lasToken
+                            If lsPredicatePartText.EndsWith(" " & LCase(lsToken)) Then
+                                lsPredicatePartText &= " "
+                            End If
+                            If lsPredicatePartText = LCase(lsToken) Then
+                                lsPredicatePartText = lsToken
+                                lbMadeChanges = True
+                            ElseIf lsPredicatePartText.Contains(" " & LCase(lsToken) & " ") Then
+                                lsPredicatePartText = lsPredicatePartText.Replace(" " & LCase(lsToken) & " ", " " & lsToken & " ")
+                                lbMadeChanges = True
+                            End If
+                            If lbMadeChanges Then
+                                Dim lsText As String = Me.TextBoxInput.Text.Remove(lrParseNode.Token.StartPos, lrParseNode.Token.Length)
+                                Me.TextBoxInput.Text = lsText.Insert(lrParseNode.Token.StartPos, (" " & lsPredicatePartText).Replace("  ", " "))
+                                Me.TextBoxInput.Text = Me.TextBoxInput.Text.Replace("  ", " ")
+                                Me.TextBoxInput.SelectionStart = Me.TextBoxInput.Text.Length
+                                Exit Sub
+                            End If
+                        Next
+                    End If
 
                     Dim lastWord As String = Me.TextBoxInput.Text.Split(" ").ToList.FindLast(Function(x) x.Length > 0)
                     If e.KeyCode = Keys.Space And Me.zrTextHighlighter.Tree.Optionals.Find(Function(x) x.ExpectedToken = FEQL.TokenType.MODELELEMENTNAME.ToString) IsNot Nothing Then
