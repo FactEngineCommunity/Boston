@@ -155,9 +155,21 @@
                                     lsTDBQuery &= ", has " & lrColumn.Name & " $" & lrColumn.Table.DBVariableName & Viev.NullVal(lrQueryNode.Alias, "") & lrColumn.Name
                                 Next
                         End Select
-
                     Next
 
+                    'Columns on BaseNode
+                    Dim larBaseNodeColumn = From QueryEdge In Me.QueryEdges
+                                            Where QueryEdge.BaseNode Is lrQueryNode
+                                            From Table In Me.Model.RDS.Table
+                                            From Column In Table.Column
+                                            Where QueryEdge.FBMFactType Is Column.Role.FactType
+                                            Where Column.Table.Name = lrQueryNode.Name
+                                            Where Not larConditionalQueryEdges.FindAll(Function(x) x.TargetNode.Name = lrQueryNode.Name).Contains(QueryEdge)
+                                            Select Column
+
+                    For Each lrColumn In larBaseNodeColumn
+                        lsTDBQuery &= ", has " & lrColumn.Name & " $" & lrColumn.Table.DBVariableName & lrColumn.Name
+                    Next
                     '----------------------------------------------------
 
                     lsTDBQuery &= ";" & vbCrLf
@@ -178,9 +190,19 @@
                     'Sample query
                     '(student: $Email,school: $School_Name,course: $Course_Code) isa studentship;
 
-                    Dim larLinkedNodes = From Node In larFromNodes
-                                         Where Node.QueryEdge.FBMFactType Is lrFactType
-                                         Select Node
+                    Dim larLinkedNodes = (From Node In larFromNodes
+                                          Where Node.QueryEdge.FBMFactType Is lrFactType
+                                          Select Node).ToList
+
+                    'A Node may have been missed because it comes from earlier in the query.
+                    Dim larQueryEdge = From QueryEdge In Me.QueryEdges
+                                       Where QueryEdge.FBMFactType Is lrFactType
+                                       Select QueryEdge
+
+                    For Each lrQueryEdge In larQueryEdge
+                        larLinkedNodes.AddUnique(lrQueryEdge.BaseNode)
+                        larLinkedNodes.AddUnique(lrQueryEdge.TargetNode)
+                    Next
 
                     lsTDBQuery &= "("
                     liInd = 0
@@ -476,8 +498,10 @@
                 End If
                 If Me.HeadNode.HasIdentifier And Not lbFirstQueryEdgeIsRecursive Then
                     Dim lrTargetTable = Me.HeadNode.RDSTable
+                    liInd = 0
                     For Each lrColumn In Me.HeadNode.RDSTable.getFirstUniquenessConstraintColumns
-                        lsTDBQuery &= lrTargetTable.DatabaseName & Viev.NullVal(Me.HeadNode.Alias, "") & "." & lrColumn.Name & " = '" & Me.HeadNode.IdentifierList(liInd) & "'" & vbCrLf
+                        lsTDBQuery &= "$" & lrTargetTable.DatabaseName & Viev.NullVal(Me.HeadNode.Alias, "") & lrColumn.Name & " = '" & Me.HeadNode.IdentifierList(liInd) & "';" & vbCrLf
+                        liInd += 1
                     Next
                 End If
 
