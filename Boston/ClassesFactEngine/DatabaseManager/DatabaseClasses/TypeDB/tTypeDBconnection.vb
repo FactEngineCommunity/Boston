@@ -38,6 +38,22 @@ Namespace FactEngine.TypeDB
 
         End Sub
 
+        Public Overrides Function ComparitorOperator(ByVal aiFEQLComparitor As FEQL.pcenumFEQLComparitor) As String
+
+            Select Case aiFEQLComparitor
+                Case Is = FEQL.pcenumFEQLComparitor.Bang
+                    Return " <> "
+                Case Is = FEQL.pcenumFEQLComparitor.Colon,
+                          FEQL.pcenumFEQLComparitor.Carret
+                    Return " = "
+                Case Is = FEQL.pcenumFEQLComparitor.LikeComparitor
+                    Return " like "
+            End Select
+
+            Return " = "
+
+        End Function
+
         Public Overrides Function GO(asQuery As String) As ORMQL.Recordset Implements iDatabaseConnection.GO
 
             Dim lrRecordset As New ORMQL.Recordset

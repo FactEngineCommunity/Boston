@@ -1396,6 +1396,7 @@ Public Class frmFactEngine
             End If
 #End Region
 
+#Region "Main"
             '=======================================
 
             Call Me.CheckStartProductions(Me.zrTextHighlighter.Tree)
@@ -1681,6 +1682,7 @@ Public Class frmFactEngine
                 End If
 
             End If
+#End Region
 
 #Region "Identifier"
             If larModelElementNameParseNode.Count > 0 Then
@@ -1740,6 +1742,9 @@ Public Class frmFactEngine
                     End If
 
                     Dim lsSQLQuery = "SELECT DISTINCT "
+                    'FEQL Query
+                    Dim lsFEQLQuery As String = "WHICH "
+
                     Dim liInd As Integer
                     If lrModelElement.ConceptType = pcenumConceptType.ValueType Then
                         'Try and find the FactType that belongs to the PreviousModelElement/PredicateClause/ValueType
@@ -1778,23 +1783,35 @@ Public Class frmFactEngine
 
                                 If lrQueryEdge.IsPartialFactTypeMatch Then
                                     lsSQLQuery &= " FROM " & lrQueryEdge.FBMFactType.getCorrespondingRDSTable.DatabaseName
+                                    lsFEQLQuery &= lrQueryEdge.FBMFactType.getCorrespondingRDSTable.Name
                                 Else
                                     lsSQLQuery &= " FROM " & lrQueryEdge.BaseNode.RDSTable.DatabaseName
+                                    lsFEQLQuery &= lrQueryEdge.BaseNode.RDSTable.Name
                                 End If
 
                                 If (Me.zrTextHighlighter.GetCurrentContext.Token.Type = FEQL.TokenType.IDENTIFIER) Then 'Or laiExpectedToken.Contains(FEQL.TokenType.IDENTIFIER)
                                     Try
                                         Dim lsDatabaseWildcardOperator = Database.gerLikeWildcardOperator(prApplication.WorkingModel.TargetDatabaseType)
+
+                                        Dim lsFEQLQueryAddition As String = ""
+                                        lsFEQLQuery &= " " & lrQueryEdge.Predicate
                                         If lrColumn IsNot Nothing Then
                                             lsSQLQuery &= vbCrLf & "WHERE " & lrColumn.Name
+                                            lsFEQLQueryAddition &= lrColumn.ActiveRole.JoinedORMObject.Id
                                         Else
                                             lsSQLQuery &= vbCrLf & "WHERE " & lrModelElement.Id
+                                            lsFEQLQueryAddition &= lrModelElement.Id
                                         End If
+
                                         Dim larTemporalDataTypes = {pcenumORMDataType.TemporalDate, pcenumORMDataType.TemporalDateAndTime}
                                         If larTemporalDataTypes.Contains(CType(lrModelElement, FBM.ValueType).DataType) Then
                                             lsSQLQuery &= prApplication.WorkingModel.DatabaseConnection.dateToTextOperator
                                         End If
                                         lsSQLQuery &= " LIKE '" & Me.zrTextHighlighter.GetCurrentContext.Token.Text & lsDatabaseWildcardOperator & "'"
+                                        lsFEQLQuery &= " (" & lsFEQLQueryAddition & "~'" & Me.zrTextHighlighter.GetCurrentContext.Token.Text & lsDatabaseWildcardOperator & "')"
+                                        If lrColumn IsNot Nothing Then
+                                            lsFEQLQuery &= " RETURN " & lrColumn.Table.Name & "." & lrColumn.Name
+                                        End If
                                     Catch ex As Exception
                                         'Do nothing. Just don't add anything to the SQL.
                                     End Try
@@ -1804,7 +1821,6 @@ Public Class frmFactEngine
                                 Me.LabelError.Text = ex.Message
                             End Try
                         End If
-
                     Else
                         liInd = 0
 
@@ -1815,6 +1831,7 @@ Public Class frmFactEngine
                         Next
 
                         lsSQLQuery &= vbCrLf & "FROM " & lrModelElement.getCorrespondingRDSTable.DatabaseName
+                        lsFEQLQuery &= lrModelElement.getCorrespondingRDSTable.Name
 
                         If Me.zrTextHighlighter.GetCurrentContext.Token.Type = FEQL.TokenType.IDENTIFIER Then
                             Try
@@ -1832,7 +1849,13 @@ Public Class frmFactEngine
                     End If
                     Try
                         Dim lrRecordset As ORMQL.Recordset
-                        lrRecordset = Me.FEQLProcessor.DatabaseManager.GO(lsSQLQuery)
+                        '===================================================================================
+                        'FEQL
+                        lrRecordset = Me.FEQLProcessor.ProcessFEQLStatement(lsFEQLQuery, Nothing, Nothing)
+
+                        '===================================================================================
+                        'SQL
+                        'lrRecordset = Me.FEQLProcessor.DatabaseManager.GO(lsSQLQuery)
 
                         For Each lrFact In lrRecordset.Facts
                             Dim lsString As String = ""
@@ -1842,10 +1865,14 @@ Public Class frmFactEngine
                                 lsString &= lrData.Data
                                 liInd += 1
                             Next
-                            Select Case CType(lrModelElement, FBM.ValueType).DataType
-                                Case Is = pcenumORMDataType.TemporalDateAndTime
-                                    lsString = String.Format("{0:" & My.Settings.FactEngineUserDateTimeFormat & "}", CDate(lsString))
+                            Select Case lrModelElement.GetType
+                                Case Is = GetType(FBM.ValueType)
+                                    Select Case CType(lrModelElement, FBM.ValueType).DataType
+                                        Case Is = pcenumORMDataType.TemporalDateAndTime
+                                            lsString = String.Format("{0:" & My.Settings.FactEngineUserDateTimeFormat & "}", CDate(lsString))
+                                    End Select
                             End Select
+
                             Call Me.AddEnterpriseAwareItem(lsString,,,, True)
                         Next
                     Catch ex As Exception

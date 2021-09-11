@@ -34,6 +34,8 @@ Namespace Database
             Select Case aiDatabaseType
                 Case Is = pcenumDatabaseType.MSJet
                     Return "*"
+                Case Is = pcenumDatabaseType.TypeDB
+                    Return ".*"
                 Case Else
                     Return "%"
             End Select

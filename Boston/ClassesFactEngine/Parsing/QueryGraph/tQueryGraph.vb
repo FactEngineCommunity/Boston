@@ -82,6 +82,32 @@
 #End Region
 
 
+#Region "Conditionals for Match from clause"
+                Dim larEdgesWithTargetNode = From QueryEdge In Me.QueryEdges
+                                             Where QueryEdge.TargetNode IsNot Nothing
+                                             Select QueryEdge
+                Dim larConditionalQueryEdges As New List(Of FactEngine.QueryEdge)
+                larConditionalQueryEdges = larEdgesWithTargetNode.ToList.FindAll(Function(x) (x.IdentifierList.Count > 0 Or
+                                                                                              x.TargetNode.MathFunction <> pcenumMathFunction.None))
+                '20210826-VM-Removed
+                'And (Not (x.FBMFactType.IsDerived And x.TargetNode.FBMModelObject.GetType Is GetType(FBM.ValueType))))
+
+                'BooleanPredicate edges. E.g. Protein is enzyme
+                Dim larExtraConditionalQueryEdges = From QueryEdge In Me.QueryEdges
+                                                    Where QueryEdge.FBMFactType IsNot Nothing
+                                                    Where QueryEdge.TargetNode Is Nothing And Not (QueryEdge.FBMFactType.IsDerived And QueryEdge.TargetNode.FBMModelObject.GetType Is GetType(FBM.ValueType))
+                                                    Select QueryEdge
+                larConditionalQueryEdges.AddRange(larExtraConditionalQueryEdges.ToList)
+
+                'ShortestPath conditionals are excluded.
+                '  E.g. For '(Account:1) made [SHORTEST PATH 0..10] WHICH Transaction THAT was made to (Account 2:4) '
+                '  the second QueryEdge conditional is taken care of in the FROM clause processing for the recursive query.
+                larConditionalQueryEdges.RemoveAll(Function(x) x.TargetNode.IsExcludedConditional)
+
+                'Recursive NodePropertyIdentification conditionals are excluded.
+                larConditionalQueryEdges.RemoveAll(Function(x) x.TargetNode.IsExcludedConditional)
+#End Region
+
 #Region "FromClause"
 
                 Dim larFromNodes = Me.Nodes.FindAll(Function(x) x.FBMModelObject.ConceptType <> pcenumConceptType.ValueType)
@@ -110,11 +136,28 @@
                     'Return Columns
                     Dim larReturnColumn = From Column In Me.ProjectionColumn
                                           Where Column.Table.Name = lrQueryNode.RDSTable.Name
+                                          Where Column.TemporaryAlias = lrQueryNode.Alias
                                           Select Column
 
                     For Each lrReturnColumn In larReturnColumn
-                        lsTDBQuery &= ", has " & lrReturnColumn.Name & " $" & lrReturnColumn.Table.DBVariableName & lrReturnColumn.Name & lrReturnColumn.TemporaryAlias
+                        lsTDBQuery &= ", has " & lrReturnColumn.Name & " $" & lrReturnColumn.Table.DBVariableName & lrReturnColumn.TemporaryAlias & lrReturnColumn.Name
                     Next
+
+                    'Variable Columns
+                    For Each lrQueryEdge In larConditionalQueryEdges.FindAll(Function(x) x.TargetNode.Name = lrQueryNode.Name)
+                        Select Case lrQueryEdge.TargetNode.FBMModelObject.GetType
+                            Case Is = GetType(FBM.ValueType)
+                                Dim lrColumn As RDS.Column = lrQueryEdge.RDSColumn
+                                lsTDBQuery &= ", has " & lrColumn.Name & " $" & lrColumn.Table.DBVariableName & lrColumn.Name
+                            Case Is = GetType(FBM.EntityType)
+                                Dim larConditionalColumn As List(Of RDS.Column) = lrQueryEdge.TargetNode.FBMModelObject.getCorrespondingRDSTable.getFirstUniquenessConstraintColumns
+                                For Each lrColumn In larConditionalColumn
+                                    lsTDBQuery &= ", has " & lrColumn.Name & " $" & lrColumn.Table.DBVariableName & Viev.NullVal(lrQueryNode.Alias, "") & lrColumn.Name
+                                Next
+                        End Select
+
+                    Next
+
                     '----------------------------------------------------
 
                     lsTDBQuery &= ";" & vbCrLf
@@ -123,6 +166,7 @@
                 '=================================================================================================
                 'PartialFactTypeReadingMatch - I.e. Joins on ManyToMany(..ToMany) tables
                 Dim larPartialFTMatchNode = From Node In larFromNodes
+                                            Where Node.QueryEdge IsNot Nothing
                                             Where Node.QueryEdge.IsPartialFactTypeMatch
                                             Select Node
 
@@ -147,7 +191,8 @@
                                                Where PredicatePart.Role.JoinedORMObject Is lrNode.FBMModelObject
                                                Select PredicatePart
 
-                        lsTDBQuery &= larPredicatePart.First.Role.Name & ": $" & lrNode.RDSTable.DatabaseName
+                        lsTDBQuery &= larPredicatePart.First.Role.Name & ": $" & lrNode.RDSTable.DatabaseName & lrNode.Alias
+
                         liInd += 1
                     Next
                     lsTDBQuery &= ") isa " & lrFactType.getCorrespondingRDSTable.DatabaseName & ";" & vbCrLf
@@ -157,6 +202,7 @@
                 '=================================================================================================
                 'Derived FactTypeReadingMatch - I.e. Joins on ManyToMany(..ToMany) tables
                 larPartialFTMatchNode = From Node In larFromNodes
+                                        Where Node.QueryEdge IsNot Nothing
                                         Where Node.QueryEdge.IsPartialFactTypeMatch
                                         Where Node.QueryEdge.FBMFactType.IsDerived
                                         Select Node
@@ -196,10 +242,6 @@
 #Region "WHERE Clauses"
 
                 'WHERE
-                Dim larEdgesWithTargetNode = From QueryEdge In Me.QueryEdges
-                                             Where QueryEdge.TargetNode IsNot Nothing
-                                             Select QueryEdge
-
                 'WhereEdges are Where joins, rather than ConditionalQueryEdges which test for values by identifiers.
                 Dim larWhereEdges = larEdgesWithTargetNode.ToList.FindAll(Function(x) (x.TargetNode.FBMModelObject.ConceptType <> pcenumConceptType.ValueType And
                 x.BaseNode.FBMModelObject.ConceptType <> pcenumConceptType.ValueType) Or
@@ -214,26 +256,27 @@
                 larWhereEdges.AddRange(larSpecialDerivedQueryEdges.ToList)
 
 
-                Dim larConditionalQueryEdges As New List(Of FactEngine.QueryEdge)
-                larConditionalQueryEdges = larEdgesWithTargetNode.ToList.FindAll(Function(x) (x.IdentifierList.Count > 0 Or
-                                                                                              x.TargetNode.MathFunction <> pcenumMathFunction.None))
-                '20210826-VM-Removed
-                'And (Not (x.FBMFactType.IsDerived And x.TargetNode.FBMModelObject.GetType Is GetType(FBM.ValueType))))
+                '20210911-VM-Moved to top so that variables can be put in From clause.
+                'Dim larConditionalQueryEdges As New List(Of FactEngine.QueryEdge)
+                'larConditionalQueryEdges = larEdgesWithTargetNode.ToList.FindAll(Function(x) (x.IdentifierList.Count > 0 Or
+                '                                                                              x.TargetNode.MathFunction <> pcenumMathFunction.None))
+                ''20210826-VM-Removed
+                ''And (Not (x.FBMFactType.IsDerived And x.TargetNode.FBMModelObject.GetType Is GetType(FBM.ValueType))))
 
-                'BooleanPredicate edges. E.g. Protein is enzyme
-                Dim larExtraConditionalQueryEdges = From QueryEdge In Me.QueryEdges
-                                                    Where QueryEdge.FBMFactType IsNot Nothing
-                                                    Where QueryEdge.TargetNode Is Nothing And Not (QueryEdge.FBMFactType.IsDerived And QueryEdge.TargetNode.FBMModelObject.GetType Is GetType(FBM.ValueType))
-                                                    Select QueryEdge
-                larConditionalQueryEdges.AddRange(larExtraConditionalQueryEdges.ToList)
+                ''BooleanPredicate edges. E.g. Protein is enzyme
+                'Dim larExtraConditionalQueryEdges = From QueryEdge In Me.QueryEdges
+                '                                    Where QueryEdge.FBMFactType IsNot Nothing
+                '                                    Where QueryEdge.TargetNode Is Nothing And Not (QueryEdge.FBMFactType.IsDerived And QueryEdge.TargetNode.FBMModelObject.GetType Is GetType(FBM.ValueType))
+                '                                    Select QueryEdge
+                'larConditionalQueryEdges.AddRange(larExtraConditionalQueryEdges.ToList)
 
-                'ShortestPath conditionals are excluded.
-                '  E.g. For '(Account:1) made [SHORTEST PATH 0..10] WHICH Transaction THAT was made to (Account 2:4) '
-                '  the second QueryEdge conditional is taken care of in the FROM clause processing for the recursive query.
-                larConditionalQueryEdges.RemoveAll(Function(x) x.TargetNode.IsExcludedConditional)
+                ''ShortestPath conditionals are excluded.
+                ''  E.g. For '(Account:1) made [SHORTEST PATH 0..10] WHICH Transaction THAT was made to (Account 2:4) '
+                ''  the second QueryEdge conditional is taken care of in the FROM clause processing for the recursive query.
+                'larConditionalQueryEdges.RemoveAll(Function(x) x.TargetNode.IsExcludedConditional)
 
-                'Recursive NodePropertyIdentification conditionals are excluded.
-                larConditionalQueryEdges.RemoveAll(Function(x) x.TargetNode.IsExcludedConditional)
+                ''Recursive NodePropertyIdentification conditionals are excluded.
+                'larConditionalQueryEdges.RemoveAll(Function(x) x.TargetNode.IsExcludedConditional)
 
 #Region "WHERE Joins"
                 liInd = 1
@@ -427,7 +470,11 @@
 #End Region
 
 #Region "WhereConditionals"
-                If Me.HeadNode.HasIdentifier And Not Me.QueryEdges(0).IsRecursive Then
+                Dim lbFirstQueryEdgeIsRecursive As Boolean = False
+                If Me.QueryEdges.Count > 0 Then
+                    If Me.QueryEdges(0).IsRecursive Then lbFirstQueryEdgeIsRecursive = True
+                End If
+                If Me.HeadNode.HasIdentifier And Not lbFirstQueryEdgeIsRecursive Then
                     Dim lrTargetTable = Me.HeadNode.RDSTable
                     For Each lrColumn In Me.HeadNode.RDSTable.getFirstUniquenessConstraintColumns
                         lsTDBQuery &= lrTargetTable.DatabaseName & Viev.NullVal(Me.HeadNode.Alias, "") & "." & lrColumn.Name & " = '" & Me.HeadNode.IdentifierList(liInd) & "'" & vbCrLf
@@ -551,7 +598,7 @@
                                               pcenumORMDataType.TemporalDateAndTime
                                         lsTDBQuery &= prApplication.WorkingModel.DatabaseConnection.dateToTextOperator
                                 End Select
-                                lsTDBQuery &= lrQueryEdge.getTargetSQLComparator
+                                lsTDBQuery &= Me.Model.DatabaseConnection.ComparitorOperator(lrQueryEdge.TargetNode.Comparitor)
                                 Select Case lrColumn.getMetamodelDataType
                                     Case Is = pcenumORMDataType.TemporalDateAndTime
                                         Dim lsUserDateTime = lrQueryEdge.IdentifierList(0)
@@ -573,13 +620,13 @@
                                                 Where Column.ActiveRole.JoinedORMObject Is lrQueryEdge.TargetNode.FBMModelObject
                                                 Select Column).First
 
-                                lsTDBQuery &= "$" & lrQueryEdge.BaseNode.RDSTable.DBVariableName & Viev.NullVal(lrQueryEdge.BaseNode.Alias, "") & " has " & lrColumn.Name
+                                lsTDBQuery &= "$" & lrQueryEdge.BaseNode.RDSTable.DBVariableName & Viev.NullVal(lrQueryEdge.BaseNode.Alias, "") & lrColumn.Name
                                 Select Case lrColumn.getMetamodelDataType
                                     Case Is = pcenumORMDataType.TemporalDate,
                                               pcenumORMDataType.TemporalDateAndTime
                                         lsTDBQuery &= prApplication.WorkingModel.DatabaseConnection.dateToTextOperator
                                 End Select
-                                lsTDBQuery &= lrQueryEdge.getTargetSQLComparator
+                                lsTDBQuery &= Me.Model.DatabaseConnection.ComparitorOperator(lrQueryEdge.TargetNode.Comparitor)
                                 Select Case lrColumn.getMetamodelDataType
                                     Case Is = pcenumORMDataType.TemporalDateAndTime
                                         Dim lsUserDateTime = lrQueryEdge.IdentifierList(0)

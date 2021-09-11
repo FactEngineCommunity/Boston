@@ -282,7 +282,7 @@ Namespace FEQL
             Dim liTempMaxDistance As Integer = 0
             Dim liMaxDistance As Integer = Me.Token.EndPos
 
-            For Each lrNode In Me.Nodes.ToArray
+            For Each lrNode In Me.Nodes
                 liTempMaxDistance = lrNode.MaxDistance()
                 If liTempMaxDistance > liMaxDistance Then
                     liMaxDistance = liTempMaxDistance

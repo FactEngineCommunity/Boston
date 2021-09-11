@@ -177,7 +177,7 @@ Namespace FactEngine
                 Dim larModelObject As New List(Of FBM.ModelObject)
                 Dim larRole As New List(Of FBM.Role)
 
-                larModelObject.Add(arBaseNode.RelativeFBMModelObject)
+                larModelObject.Add(arBaseNode.FBMModelObject)
 
                 Dim lasPredicatePart As New List(Of String)
                 lasPredicatePart.Add(asPredicate)
@@ -846,6 +846,139 @@ FinalCleanup:
                 prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
                 Return Nothing
+            End Try
+
+        End Function
+
+        Public Function RDSColumn() As RDS.Column
+
+            Try
+                Dim lrColumn As RDS.Column = Nothing
+                Dim lrFactType As FBM.FactType = Nothing
+
+                Select Case Me.BaseNode.FBMModelObject.GetType
+                    Case GetType(FBM.FactType)
+                        If Me.WhichClauseType = pcenumWhichClauseType.WithClause Then
+                            lrFactType = Me.FBMFactType
+                        Else
+                            lrFactType = CType(Me.BaseNode.FBMModelObject, FBM.FactType)
+                        End If
+
+                    Case GetType(FBM.EntityType)
+                        lrFactType = Me.FBMFactType
+                    Case GetType(FBM.ValueType)
+                        If Me.IsPartialFactTypeMatch Then
+                            lrFactType = Me.FBMFactType
+                        Else
+                            Throw New NotImplementedException("Unknown Conditional type in query. Contact support.")
+                        End If
+                End Select
+
+                Dim lrPredicatePart As FBM.PredicatePart = Nothing
+
+                If Me.FBMPredicatePart IsNot Nothing Then
+                    lrPredicatePart = Me.FBMPredicatePart
+                Else
+
+                    Dim larPredicatePart As List(Of FBM.PredicatePart)
+                    If Me.Predicate = "" Then
+                        'Likely a "WITH WHAT Rating" or "WITH (Rating:'8')" as in "WHICH Lecturer likes WHICH Lecturer WITH WHAT RATING"
+                        larPredicatePart = (From FactTypeReading In lrFactType.FactTypeReading
+                                            Select FactTypeReading.PredicatePart(0)).ToList
+                    Else
+                        larPredicatePart = (From FactTypeReading In lrFactType.FactTypeReading
+                                            From PredicatePart In FactTypeReading.PredicatePart
+                                            Where PredicatePart.PredicatePartText = Trim(Me.Predicate)
+                                            Select PredicatePart).ToList
+                    End If
+
+                            If larPredicatePart.Count = 0 Then
+
+                        larPredicatePart = (From FactType In Me.QueryGraph.Model.FactType
+                                            From FactTypeReading In FactType.FactTypeReading
+                                            From PredicatePart In FactTypeReading.PredicatePart
+                                            Where FactType.RoleGroup.FindAll(Function(x) x.JoinedORMObject.Id = Me.BaseNode.Name _
+                                                           Or x.JoinedORMObject.Id = Me.TargetNode.Name).Count = 2
+                                            Where PredicatePart.PredicatePartText = Me.Predicate
+                                            Where Me.Predicate <> ""
+                                            Select PredicatePart).ToList
+
+                        If larPredicatePart.Count > 0 Then
+                                    lrPredicatePart = larPredicatePart.First
+                                    lrFactType = lrPredicatePart.FactTypeReading.FactType
+                                Else
+                                    If lrFactType.IsObjectified Then
+                                Dim larFactTypeReading = From FactType In lrFactType.getLinkFactTypes
+                                                         From FactTypeReading In FactType.FactTypeReading
+                                                         Where FactTypeReading.PredicatePart(0).Role.JoinedORMObject.Id = Me.BaseNode.Name
+                                                         Where FactTypeReading.PredicatePart(1).Role.JoinedORMObject.Id = Me.TargetNode.Name
+                                                         Select FactTypeReading
+                                If larFactTypeReading.Count > 0 Then
+                                    lrFactType = larFactTypeReading.First.FactType
+                                End If
+                                    End If
+                                End If
+                            Else
+                        If Me.FBMFactTypeReading IsNot Nothing Then
+                            lrPredicatePart = larPredicatePart.Find(Function(x) x.FactTypeReading Is Me.FBMFactTypeReading)
+                        Else
+                            lrPredicatePart = larPredicatePart.First 'For now...need to consider PreboundReadingText/s
+                                End If
+                            End If
+                        End If
+                        Dim lrResponsibleRole As FBM.Role
+
+                If lrPredicatePart.Role.JoinedORMObject Is Me.BaseNode.FBMModelObject Then
+                    'Nothing to do here, because is the Predicate joined to the BaseNode that we want the Table for
+                ElseIf Not lrPredicatePart.Role.JoinedORMObject Is Me.TargetNode.FBMModelObject Then
+
+                    'lrQueryEdge.Predicate = "is " & lrQueryEdge.Predicate
+                    '20200808-VM-Leave this breakpoint here. If hasn't been hit in years, get rid of this ElseIf
+                    lrPredicatePart = (From FactTypeReading In lrFactType.FactTypeReading
+                                       From PredicatePart In FactTypeReading.PredicatePart
+                                       Where PredicatePart.PredicatePartText = Trim(Me.Predicate)
+                                       Select PredicatePart).First
+                End If
+
+                If lrPredicatePart Is Nothing Then
+                    Throw New Exception("There is no Predicate (Part) of Fact Type, '" & Me.FBMFactType.Id & "', that is '" & Me.Predicate & "'.")
+                Else
+                    If lrFactType.IsLinkFactType Then
+                        'Want the Role from the actual FactType
+                        lrResponsibleRole = lrFactType.LinkFactTypeRole
+                    ElseIf Me.IsPartialFactTypeMatch Or Me.FBMFactType.isRDSTable Then
+                        lrResponsibleRole = lrPredicatePart.FactTypeReading.PredicatePart(lrPredicatePart.SequenceNr).Role
+                    Else
+                        lrResponsibleRole = lrPredicatePart.Role
+                    End If
+                End If
+
+                Dim lrTable As RDS.Table
+                If Me.IsPartialFactTypeMatch Or Me.FBMFactType.isRDSTable Then
+                    lrTable = Me.FBMFactType.getCorrespondingRDSTable
+
+                    lrColumn = (From Column In lrTable.Column
+                                Where Column.Role Is lrResponsibleRole
+                                Where Column.ActiveRole.JoinedORMObject Is Me.TargetNode.FBMModelObject
+                                Select Column).First
+
+                Else
+                    lrTable = Me.BaseNode.RDSTable
+
+                    Dim larColumn = From Column In lrTable.Column
+                                    Where Column.Role Is lrResponsibleRole
+                                    Where Column.ActiveRole.JoinedORMObject Is Me.TargetNode.FBMModelObject
+                                    Select Column
+
+                    If larColumn.count > 0 Then
+                        lrColumn = larColumn.First
+                    End If
+                End If
+
+                Return lrColumn
+
+            Catch ex As Exception
+                Throw New Exception(ex.Message)
             End Try
 
         End Function

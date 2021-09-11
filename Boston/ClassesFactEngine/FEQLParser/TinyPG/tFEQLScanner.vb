@@ -61,7 +61,7 @@ Namespace FEQL
             Patterns.Add(TokenType.COLON, regex)
             Tokens.Add(TokenType.COLON)
 
-            regex = new Regex("(([A-Z0-9][_a-z0-9]+)+[_|\s]?)+", RegexOptions.Compiled)
+            regex = new Regex("(([a-zA-Z0-9][_a-z0-9]+)+[_|\s]?)+", RegexOptions.Compiled)
             Patterns.Add(TokenType.COLUMNNAMESTR, regex)
             Tokens.Add(TokenType.COLUMNNAMESTR)
 
@@ -109,7 +109,7 @@ Namespace FEQL
             Patterns.Add(TokenType.FILELOCATIONNAME, regex)
             Tokens.Add(TokenType.FILELOCATIONNAME)
 
-            regex = new Regex("^(?!\s)[aA-zZ0-9%,&\.\(\) \-\:/]+", RegexOptions.Compiled)
+            regex = new Regex("^(?!\s)[aA-zZ0-9%\*,&\.\(\) \-\:/]+", RegexOptions.Compiled)
             Patterns.Add(TokenType.IDENTIFIER, regex)
             Tokens.Add(TokenType.IDENTIFIER)
 

@@ -12,7 +12,7 @@
 [Color(227, 143, 247)]	CLOSEPARENTHESIS	-> @"}";
 [Color(227, 143, 247)]	CLOSESQUAREBRACKET	-> @"]";
 [Color(94, 213, 165)]  COLON		-> ":";
-[Color(255, 171, 26)]	COLUMNNAMESTR -> @"(([A-Z0-9][_a-z0-9]+)+[_|\s]?)+";  //@"(([A-Z]+[a-z]+)+[_|\s]?)+";//@"[aA-zZ]+";
+[Color(255, 171, 26)]	COLUMNNAMESTR -> @"(([a-zA-Z0-9][_a-z0-9]+)+[_|\s]?)+";  //@"(([A-Z]+[a-z]+)+[_|\s]?)+";//@"[aA-zZ]+";
 ///COLUMNNAMESTR -> @"[aA-zZ0-9]+";
 [Color(135, 207, 243)]	COMMA         -> ",";
 CURLYBRACKETCLOSE -> @"\}+";
@@ -26,7 +26,7 @@ EOF           -> @"^$";
 FACTTYPENAME -> @"[aA-zZ]+";
 [Color(227, 143, 247)]  FILELOCATIONNAME	-> @"^[a-zA-Z]:\\((?:[^/]*/)*)([aA-zZ0-9\-\.]*)"; //@"^([aA-zZ]+)\/([^\/]+)$";
 FOLLOWINGREADINGTEXT -> PREDICATECLAUSE; //[Color(227, 143, 247)]  //@"([a-z]+[\s]?)+$";
-[Color(216, 127, 178)]	IDENTIFIER -> @"^(?!\s)[aA-zZ0-9%,&\.\(\) \-\:/]+";
+[Color(216, 127, 178)]	IDENTIFIER -> @"^(?!\s)[aA-zZ0-9%\*,&\.\(\) \-\:/]+";
 [Color(94, 213, 165)] LIKECOMPARITOR		-> "~";
 [Color(216, 127, 178)]	MATHFUNCTION -> @"<=|<|=|>=|>";
 MODELNAME     -> @"[aA-zZ]+";

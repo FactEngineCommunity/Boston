@@ -60,6 +60,10 @@
                                                   ByVal abIsMandatory As Boolean)
         End Sub
 
+        Public Overridable Function ComparitorOperator(ByVal aiFEQLComparitor As FEQL.pcenumFEQLComparitor) As String
+            Return " = "
+        End Function
+
         Public Overridable Function createDatabase(ByVal asDatabaseLocationName As String) As ORMQL.Recordset
             Return New ORMQL.Recordset
         End Function

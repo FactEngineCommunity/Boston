@@ -955,10 +955,24 @@ Namespace FEQL
         Private _IDENTIFIER As New List(Of String)
         Public Property IDENTIFIER As List(Of String)
             Get
-                Return Me._IDENTIFIER
+                '20210911-VM-If this causes problems revert to just returning Me._IDENTIFIER
+                Dim lasIdentifier As New List(Of String)
+                lasIdentifier.AddRange(Me._IDENTIFIER)
+                lasIdentifier.AddRange(Me._EMAILADDRESS)
+                Return lasIdentifier
             End Get
             Set(value As List(Of String))
                 Me._IDENTIFIER = value
+            End Set
+        End Property
+
+        Private _EMAILADDRESS As New List(Of String)
+        Public Property EMAILADDRESS As List(Of String)
+            Get
+                Return Me._EMAILADDRESS
+            End Get
+            Set(value As List(Of String))
+                Me._EMAILADDRESS = value
             End Set
         End Property
 
