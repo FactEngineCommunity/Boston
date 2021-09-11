@@ -676,6 +676,13 @@
                 arQueryEdge.BaseNode = arQueryGraph.HeadNode
             End If
 
+            'CodeSafe
+            If arQueryGraph.QueryEdges.Count > 0 Then
+                If arQueryGraph.QueryEdges.Last.IsPartialFactTypeMatch Then
+                    arQueryEdge.BaseNode = arPreviousTargetNode
+                End If
+            End If
+
             'Get the TargetNode                        
             'Me.MODELELEMENTCLAUSE = New FEQL.MODELELEMENTClause
             'Call Me.GetParseTreeTokensReflection(Me.MODELELEMENTCLAUSE, Me.WHICHCLAUSE.MODELELEMENT(0))

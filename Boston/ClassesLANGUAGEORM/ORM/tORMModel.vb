@@ -2074,7 +2074,7 @@ Namespace FBM
                 '------------------------------------------------------
                 'Check to see if the ModelObjects are in the FactType
                 Dim larFactType = From FactType In Me.FactType
-                                  Where FactType.RoleGroup.FindAll(Function(x) aarModelObject.Contains(x.JoinedORMObject)).Count = aarModelObject.Count
+                                  Where FactType.RoleGroup.FindAll(Function(x) aarModelObject.Contains(x.JoinedORMObject)).Count >= aarModelObject.Count
                                   Select FactType Distinct
 
                 '20210803-VM-Removed Where FactType.RoleGroup.Count = aarModelObject.Count
@@ -2097,7 +2097,7 @@ Namespace FBM
 
                             larFactType = From FactType In Me.FactType
                                           Where FactType.RoleGroup.Count > aarModelObject.Count
-                                          Where FactType.RoleGroup.FindAll(Function(x) aarModelObject.Contains(x.JoinedORMObject)).Count = aarModelObject.Count
+                                          Where FactType.RoleGroup.FindAll(Function(x) aarModelObject.Contains(x.JoinedORMObject)).Count >= aarModelObject.Count
                                           Select FactType Distinct
 
 

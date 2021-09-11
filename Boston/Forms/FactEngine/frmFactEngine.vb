@@ -2938,4 +2938,10 @@ Public Class frmFactEngine
 
 
     End Sub
+
+    Private Sub ToolStripMenuItemAutoCapitalise_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItemAutoCapitalise.Click
+
+        ToolStripMenuItemAutoCapitalise.Checked = Not ToolStripMenuItemAutoCapitalise.Checked
+
+    End Sub
 End Class

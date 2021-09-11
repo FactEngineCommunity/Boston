@@ -4,6 +4,7 @@ Namespace FactEngine
 
     <Serializable>
     Public Class QueryEdge
+        Implements IEquatable(Of FactEngine.QueryEdge)
 
         Public Id As String = System.Guid.NewGuid.ToString
 
@@ -153,6 +154,10 @@ Namespace FactEngine
 
         End Sub
 
+        Public Function Equals(other As QueryEdge) As Boolean Implements IEquatable(Of QueryEdge).Equals
+            Return Me.Id = other.Id
+        End Function
+
         ''' <summary>
         ''' Used for QueryEdge.getAndSetFBMFactType
         ''' </summary>
@@ -223,6 +228,7 @@ Namespace FactEngine
                 Dim lrQueryEdge As New FactEngine.QueryEdge
                 Dim larFactType As List(Of FBM.FactType)
                 Dim lrFactType As FBM.FactType
+                Dim lrBaseNode As FactEngine.QueryNode = Nothing
 
                 lrFactTypeReading = Me.CreateFBMFactTypeReading(arBaseNode, arTargetNode, asPredicate, larModelObject, larRole)
                 lrFactTypeReading.PredicatePart(1).PreBoundText = arTargetNode.PreboundText
@@ -409,6 +415,102 @@ Namespace FactEngine
                 End If
 #End Region
 
+                '====================================================================================================================
+                'Partial FactType matches
+#Region "Partial FactType matches"
+                lrBaseNode = Nothing
+
+                lrOriginalFactTypeReading = lrFactTypeReading
+
+                Me.FBMPossibleFactTypes = Me.QueryGraph.Model.getFactTypeByPartialMatchModelObjectsFactTypeReading(larModelObject,
+                                                                                                                   lrFactTypeReading)
+
+                Dim lbAmbiguousPreviousEdgeToResolve As Boolean = False
+                If Me.GetPreviousQueryEdge IsNot Nothing Then
+                    If Me.GetPreviousQueryEdge.AmbiguousFactTypeMatches.Count > 0 And
+                       Me.GetPreviousQueryEdge.IsPartialFactTypeMatch Then
+                        lbAmbiguousPreviousEdgeToResolve = True
+                    End If
+                End If
+
+                If Me.FBMPossibleFactTypes.Count = 1 Or (Me.FBMPossibleFactTypes.Count > 0 And lbAmbiguousPreviousEdgeToResolve) Then
+                    '-----------------------------------------------------------------------
+                    'Is a partial match. E.g. The following is for a ternary FactType:
+                    '"WHICH Person visited (Country:'China') within the last 10 months"
+                    'Check if is PartialPredicate of a FactTypeReading with more than 2 PredicateParts
+                    Me.IsPartialFactTypeMatch = True
+
+                    If Me.FBMPossibleFactTypes.First.RoleGroup.Count > 2 Then
+                        Me.IsPartialFactTypeMatch = True
+                        Me.FBMFactType = Me.FBMPossibleFactTypes.First
+                        Dim lsModelElementId As String
+                        If arPreviousTargetNode Is Nothing Then
+                            lsModelElementId = larModelObject(0).Id
+                        Else
+                            lsModelElementId = arPreviousTargetNode.Name
+                        End If
+                        Me.FBMFactTypeReading = (From FactTypeReading In Me.FBMPossibleFactTypes(0).FactTypeReading
+                                                 From PredicatePart In FactTypeReading.PredicatePart
+                                                 Where PredicatePart.Role.JoinedORMObject.Id = lsModelElementId
+                                                 Where PredicatePart.PredicatePartText = asPredicate
+                                                 Select FactTypeReading
+                                                                    ).First
+
+                        Me.FBMPredicatePart = (From FactTypeReading In Me.FBMPossibleFactTypes(0).FactTypeReading
+                                               From PredicatePart In FactTypeReading.PredicatePart
+                                               Where PredicatePart.Role.JoinedORMObject.Id = lsModelElementId
+                                               Where PredicatePart.PredicatePartText = asPredicate
+                                               Select PredicatePart
+                                                                  ).First
+                    End If
+
+                    If Me.FBMPossibleFactTypes.Count = 1 And lbAmbiguousPreviousEdgeToResolve Then
+                        'Resolve the previous QueryEdge FactType
+                        Dim lrPreviousQueryEdge As FactEngine.QueryEdge = Me.GetPreviousQueryEdge
+                        lrPreviousQueryEdge.FBMFactType = Me.FBMFactType
+                        lrPreviousQueryEdge.FBMFactTypeReading = Me.FBMFactTypeReading
+                        lrPreviousQueryEdge.FBMPredicatePart = (From FactTypeReading In Me.FBMPossibleFactTypes(0).FactTypeReading
+                                                                From PredicatePart In FactTypeReading.PredicatePart
+                                                                Where PredicatePart.Role.JoinedORMObject.Id = lrPreviousQueryEdge.BaseNode.FBMModelObject.Id
+                                                                Where PredicatePart.PredicatePartText = lrPreviousQueryEdge.Predicate
+                                                                Select PredicatePart
+                                                                ).First
+                        lrPreviousQueryEdge.AmbiguousFactTypeMatches = New List(Of FBM.FactType)
+                        lrPreviousQueryEdge.ErrorMessage = Nothing
+                    ElseIf Me.FBMPossibleFactTypes.Count > 1 Then
+                        Me.AmbiguousFactTypeReading = lrFactTypeReading
+                        Me.AmbiguousFactTypeMatches = Me.FBMPossibleFactTypes
+                    End If
+
+                ElseIf Me.FBMPossibleFactTypes.Count > 1 Then
+                    '--------------------------------------------------------------------
+                    'Is a partial match. E.g. The following is for a ternary FactType:
+                    '"WHICH Person visited (Country:'China') within the last 10 months"
+                    Me.IsPartialFactTypeMatch = True
+                    Me.AmbiguousFactTypeReading = lrFactTypeReading
+                    Me.AmbiguousFactTypeMatches = FBMPossibleFactTypes
+                    lsMessage = "Ambiguous predicate reading, '" & arBaseNode.FBMModelObject.Id & " " & asPredicate & " " & arTargetNode.Name & "'."
+                    lsMessage &= vbCrLf & vbCrLf & "There is more than one Fact Type with this predicate part."
+                    Me.ErrorMessage = lsMessage
+                    If Me.GetPreviousQueryEdge Is Nothing Then
+                        'Ambiguous, but might be resolved by the next PartialFactType match.
+                        Me.FBMFactType = Me.FBMPossibleFactTypes.First
+                        Return Nothing
+                    ElseIf Not Me.GetPreviousQueryEdge.IsPartialFactTypeMatch Then
+                        'Ambiguous, but might be resolved by the next PartialFactType match.
+                        Me.FBMFactType = Me.FBMPossibleFactTypes.First
+                        Return Nothing
+                    End If
+                    'Throw New Exception(Me.ErrorMessage)
+                End If
+
+                    'Return if successful
+                    If Me.FBMFactType IsNot Nothing And Me.FBMFactTypeReading IsNot Nothing And Me.FBMPredicatePart IsNot Nothing Then
+                    Me.IsPartialFactTypeMatch = True
+                    Return Nothing
+                End If
+#End Region
+
                 '========================================================================================================================
                 'Ambiguity
 #Region "Ambiguity"
@@ -455,66 +557,8 @@ Namespace FactEngine
 
                     GoTo FinalCleanup
                 End If
-
 #End Region
 
-                '====================================================================================================================
-                'Partial FactType matches
-#Region "Partial FactType matches"
-                Dim lrBaseNode As FactEngine.QueryNode = Nothing
-
-                lrOriginalFactTypeReading = lrFactTypeReading
-
-                Me.FBMPossibleFactTypes = Me.QueryGraph.Model.getFactTypeByPartialMatchModelObjectsFactTypeReading(larModelObject,
-                                                                                                                   lrFactTypeReading)
-
-                If Me.FBMPossibleFactTypes.Count = 1 Then
-                    '-----------------------------------------------------------------------
-                    'Is a partial match. E.g. The following is for a ternary FactType:
-                    '"WHICH Person visited (Country:'China') within the last 10 months"
-                    'Check if is PartialPredicate of a FactTypeReading with more than 2 PredicateParts
-                    Me.IsPartialFactTypeMatch = True
-                    If Me.FBMPossibleFactTypes.First.RoleGroup.Count > 2 Then
-                        Me.IsPartialFactTypeMatch = True
-                        Me.FBMFactType = Me.FBMPossibleFactTypes.First
-                        Dim lsModelElementId As String
-                        If arPreviousTargetNode Is Nothing Then
-                            lsModelElementId = larModelObject(0).Id
-                        Else
-                            lsModelElementId = arPreviousTargetNode.Name
-                        End If
-                        Me.FBMFactTypeReading = (From FactTypeReading In Me.FBMPossibleFactTypes(0).FactTypeReading
-                                                 From PredicatePart In FactTypeReading.PredicatePart
-                                                 Where PredicatePart.Role.JoinedORMObject.Id = lsModelElementId
-                                                 Where PredicatePart.PredicatePartText = asPredicate
-                                                 Select FactTypeReading
-                                                                    ).First
-
-                        Me.FBMPredicatePart = (From FactTypeReading In Me.FBMPossibleFactTypes(0).FactTypeReading
-                                               From PredicatePart In FactTypeReading.PredicatePart
-                                               Where PredicatePart.Role.JoinedORMObject.Id = lsModelElementId
-                                               Where PredicatePart.PredicatePartText = asPredicate
-                                               Select PredicatePart
-                                                                  ).First
-                    End If
-                ElseIf Me.FBMPossibleFactTypes.Count > 1 Then
-                    '--------------------------------------------------------------------
-                    'Is a partial match. E.g. The following is for a ternary FactType:
-                    '"WHICH Person visited (Country:'China') within the last 10 months"
-                    Me.IsPartialFactTypeMatch = True
-                    Me.AmbiguousFactTypeReading = lrFactTypeReading
-                    Me.AmbiguousFactTypeMatches = FBMPossibleFactTypes
-                    lsMessage = "Ambiguous predicate reading, '" & arBaseNode.FBMModelObject.Id & " " & asPredicate & " " & arTargetNode.Name & "'."
-                    lsMessage &= vbCrLf & vbCrLf & "There is more than one Fact Type with this predicate part."
-                    Me.ErrorMessage = lsMessage
-                    Throw New Exception(Me.ErrorMessage)
-                End If
-
-                'Return if successful
-                If Me.FBMFactType IsNot Nothing And Me.FBMFactTypeReading IsNot Nothing And Me.FBMPredicatePart IsNot Nothing Then
-                    Return Nothing
-                End If
-#End Region
 
                 '====================================================================================================================
                 'Previous QueryEdge BaseNode
@@ -544,6 +588,7 @@ Namespace FactEngine
                     Return Nothing
                 End If
 #End Region
+
 
                 '==================================================================================================================
                 'Far Side ModelElement predicate
@@ -737,8 +782,19 @@ FinalCleanup:
                 If Me.QueryGraph.QueryEdges.IndexOf(Me) > 0 Then
                     Return Me.QueryGraph.QueryEdges(Me.QueryGraph.QueryEdges.IndexOf(Me) - 1)
                 Else
-                    Return Nothing
+                    If Not Me.QueryGraph.QueryEdges.Contains(Me) Then
+                        'QueryEdge possibly hasn't been added to the QueryGraph yet
+                        If Me.QueryGraph.QueryEdges.Count > 0 Then
+                            Return Me.QueryGraph.QueryEdges.Last
+                        Else
+                            Return Nothing
+                        End If
+                    Else
+                        Return Nothing
+                    End If
                 End If
+
+                Return Nothing
 
             Catch ex As Exception
                 Dim lsMessage As String

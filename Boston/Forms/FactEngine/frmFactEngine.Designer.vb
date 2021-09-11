@@ -42,6 +42,7 @@ Partial Class frmFactEngine
         Me.DefaultAfterQueryToToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItemDefaultToResultsTab = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItemDefaultToQueryTab = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripMenuItemAutoCapitalise = New System.Windows.Forms.ToolStripMenuItem()
         Me.LabelHelp = New System.Windows.Forms.Label()
         Me.ContextMenuStripHelpLabel = New System.Windows.Forms.ContextMenuStrip(Me.components)
         Me.HideToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
@@ -73,7 +74,6 @@ Partial Class frmFactEngine
         Me.Diagram1 = New MindFusion.Diagramming.Diagram()
         Me.BackgroundWorker = New System.ComponentModel.BackgroundWorker()
         Me.Diagram2 = New MindFusion.Diagramming.Diagram()
-        Me.ToolStripMenuItemAutoCapitalise = New System.Windows.Forms.ToolStripMenuItem()
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SplitContainer1.Panel1.SuspendLayout()
         Me.SplitContainer1.Panel2.SuspendLayout()
@@ -241,14 +241,22 @@ Partial Class frmFactEngine
         Me.ToolStripMenuItemDefaultToResultsTab.Checked = True
         Me.ToolStripMenuItemDefaultToResultsTab.CheckState = System.Windows.Forms.CheckState.Checked
         Me.ToolStripMenuItemDefaultToResultsTab.Name = "ToolStripMenuItemDefaultToResultsTab"
-        Me.ToolStripMenuItemDefaultToResultsTab.Size = New System.Drawing.Size(180, 22)
+        Me.ToolStripMenuItemDefaultToResultsTab.Size = New System.Drawing.Size(131, 22)
         Me.ToolStripMenuItemDefaultToResultsTab.Text = "&Results tab"
         '
         'ToolStripMenuItemDefaultToQueryTab
         '
         Me.ToolStripMenuItemDefaultToQueryTab.Name = "ToolStripMenuItemDefaultToQueryTab"
-        Me.ToolStripMenuItemDefaultToQueryTab.Size = New System.Drawing.Size(180, 22)
+        Me.ToolStripMenuItemDefaultToQueryTab.Size = New System.Drawing.Size(131, 22)
         Me.ToolStripMenuItemDefaultToQueryTab.Text = "&Query tab"
+        '
+        'ToolStripMenuItemAutoCapitalise
+        '
+        Me.ToolStripMenuItemAutoCapitalise.Checked = True
+        Me.ToolStripMenuItemAutoCapitalise.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.ToolStripMenuItemAutoCapitalise.Name = "ToolStripMenuItemAutoCapitalise"
+        Me.ToolStripMenuItemAutoCapitalise.Size = New System.Drawing.Size(201, 22)
+        Me.ToolStripMenuItemAutoCapitalise.Text = "&Auto Capitalise"
         '
         'LabelHelp
         '
@@ -510,14 +518,6 @@ Partial Class frmFactEngine
         'BackgroundWorker
         '
         Me.BackgroundWorker.WorkerReportsProgress = True
-        '
-        'ToolStripMenuItemAutoCapitalise
-        '
-        Me.ToolStripMenuItemAutoCapitalise.Checked = True
-        Me.ToolStripMenuItemAutoCapitalise.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.ToolStripMenuItemAutoCapitalise.Name = "ToolStripMenuItemAutoCapitalise"
-        Me.ToolStripMenuItemAutoCapitalise.Size = New System.Drawing.Size(201, 22)
-        Me.ToolStripMenuItemAutoCapitalise.Text = "&Auto Capitalise"
         '
         'frmFactEngine
         '
