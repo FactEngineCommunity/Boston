@@ -49,6 +49,29 @@ Namespace VAQL
         End Property
     End Class
 
+    Public Class IsAValueTypeStatement
+
+        Private _MODELELEMENTNAME As String
+        Public Property MODELELEMENTNAME As String
+            Get
+                Return Me._MODELELEMENTNAME
+            End Get
+            Set(value As String)
+                Me._MODELELEMENTNAME = value
+            End Set
+        End Property
+
+        Private _KEYWDISAVALUETYPE As String
+        Public Property KEYWDISAVALUETYPE As String
+            Get
+                Return Me._KEYWDISAVALUETYPE
+            End Get
+            Set(value As String)
+                Me._KEYWDISAVALUETYPE = value
+            End Set
+        End Property
+    End Class
+
     Public Class IsAKindOfStatement
 
         Private _MODELELEMENTNAME As New List(Of String)
@@ -566,6 +589,7 @@ Namespace VAQL
 
         Public ISACONCEPTStatement As New VAQL.IsAConceptStatement
         Public ISANENTITYTYPEStatement As New VAQL.IsAnEntityTypeStatement
+        Public ISAVALUETYPEStatement As New VAQL.IsAValueTypeStatement
         Public ISAKINDOFStatement As New VAQL.IsAKindOfStatement
         Public ISWHEREStatement As New VAQL.IsWhereStatement
         Public ATMOSTONEStatement As New VAQL.AtMostOneStatement
@@ -1018,6 +1042,9 @@ Namespace VAQL
                         aoParseTree = Me.Parsetree
                     ElseIf Me.ParseTreeContainsTokenType(Me.Parsetree, TokenType.KEYWDISANENTITYTYPE) Then
                         aoTokenType = TokenType.KEYWDISANENTITYTYPE
+                        aoParseTree = Me.Parsetree
+                    ElseIf Me.ParseTreeContainsTokenType(Me.Parsetree, TokenType.KEYWDISAVALUETYPE) Then
+                        aoTokenType = TokenType.KEYWDISAVALUETYPE
                         aoParseTree = Me.Parsetree
                     ElseIf Me.ParseTreeContainsTokenType(Me.Parsetree, TokenType.KEYWDISWHERE) And
                            Me.ParseTreeContainsTokenType(Me.Parsetree, TokenType.FACTTYPESTMT) Then

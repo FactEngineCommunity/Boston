@@ -245,6 +245,8 @@ Partial Class frmDiagramORM
         Me.HideCorrespondingFactTypeToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripSeparator29 = New System.Windows.Forms.ToolStripSeparator()
         Me.RemoveSubtypeRelationshipFromTheModelToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripSeparator36 = New System.Windows.Forms.ToolStripSeparator()
+        Me.PropertiesToolStripMenuItem4 = New System.Windows.Forms.ToolStripMenuItem()
         Me.ContextMenuStrip_FrequencyConstraint = New System.Windows.Forms.ContextMenuStrip(Me.components)
         Me.ToolStripMenuItemModelErrorsFrequencyConstraint = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripSeparator26 = New System.Windows.Forms.ToolStripSeparator()
@@ -293,8 +295,6 @@ Partial Class frmDiagramORM
         Me.Diagram1 = New MindFusion.Diagramming.Diagram()
         Me.HiddenDiagramView = New MindFusion.Diagramming.WinForms.DiagramView()
         Me.Diagram2 = New MindFusion.Diagramming.Diagram()
-        Me.ToolStripSeparator36 = New System.Windows.Forms.ToolStripSeparator()
-        Me.PropertiesToolStripMenuItem4 = New System.Windows.Forms.ToolStripMenuItem()
         Me.ContextMenuStrip_Diagram.SuspendLayout()
         Me.ContextMenuStrip_shape_list.SuspendLayout()
         Me.ContextMenuStrip_Role.SuspendLayout()
@@ -1726,7 +1726,7 @@ Partial Class frmDiagramORM
         '
         Me.ContextMenuStrip_SubtypeRelationship.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItemSubtypeShowCorrespondingFactType, Me.HideCorrespondingFactTypeToolStripMenuItem, Me.ToolStripSeparator29, Me.RemoveSubtypeRelationshipFromTheModelToolStripMenuItem, Me.ToolStripSeparator36, Me.PropertiesToolStripMenuItem4})
         Me.ContextMenuStrip_SubtypeRelationship.Name = "ContextMenuStrip_SubtypeRelationship"
-        Me.ContextMenuStrip_SubtypeRelationship.Size = New System.Drawing.Size(236, 126)
+        Me.ContextMenuStrip_SubtypeRelationship.Size = New System.Drawing.Size(236, 104)
         '
         'ToolStripMenuItemSubtypeShowCorrespondingFactType
         '
@@ -1752,6 +1752,18 @@ Partial Class frmDiagramORM
         Me.RemoveSubtypeRelationshipFromTheModelToolStripMenuItem.Name = "RemoveSubtypeRelationshipFromTheModelToolStripMenuItem"
         Me.RemoveSubtypeRelationshipFromTheModelToolStripMenuItem.Size = New System.Drawing.Size(235, 22)
         Me.RemoveSubtypeRelationshipFromTheModelToolStripMenuItem.Text = "&Remove from Page && Model"
+        '
+        'ToolStripSeparator36
+        '
+        Me.ToolStripSeparator36.Name = "ToolStripSeparator36"
+        Me.ToolStripSeparator36.Size = New System.Drawing.Size(232, 6)
+        '
+        'PropertiesToolStripMenuItem4
+        '
+        Me.PropertiesToolStripMenuItem4.Image = Global.Boston.My.Resources.Resources.Properties216x16
+        Me.PropertiesToolStripMenuItem4.Name = "PropertiesToolStripMenuItem4"
+        Me.PropertiesToolStripMenuItem4.Size = New System.Drawing.Size(235, 22)
+        Me.PropertiesToolStripMenuItem4.Text = "&Properties"
         '
         'ContextMenuStrip_FrequencyConstraint
         '
@@ -2094,18 +2106,6 @@ Partial Class frmDiagramORM
         Me.HiddenDiagramView.Size = New System.Drawing.Size(890, 549)
         Me.HiddenDiagramView.TabIndex = 9
         Me.HiddenDiagramView.Text = "DiagramView1"
-        '
-        'ToolStripSeparator36
-        '
-        Me.ToolStripSeparator36.Name = "ToolStripSeparator36"
-        Me.ToolStripSeparator36.Size = New System.Drawing.Size(232, 6)
-        '
-        'PropertiesToolStripMenuItem4
-        '
-        Me.PropertiesToolStripMenuItem4.Image = Global.Boston.My.Resources.Resources.Properties216x16
-        Me.PropertiesToolStripMenuItem4.Name = "PropertiesToolStripMenuItem4"
-        Me.PropertiesToolStripMenuItem4.Size = New System.Drawing.Size(235, 22)
-        Me.PropertiesToolStripMenuItem4.Text = "&Properties"
         '
         'frmDiagramORM
         '

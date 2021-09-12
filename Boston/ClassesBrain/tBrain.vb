@@ -1941,6 +1941,9 @@ Public Class tBrain
             Case Is = Boston.VAQL.TokenType.KEYWDISANENTITYTYPE
                 Call Me.ProcessISANENTITYTYPECLAUSE()
                 Return True
+            Case Is = Boston.VAQL.TokenType.KEYWDISAVALUETYPE
+                Call Me.ProcessISAVALUETYPECLAUSE()
+                Return True
             Case Is = Boston.VAQL.TokenType.VALUETYPEISWRITTENASCLAUSE
                 Call Me.ProcessVALUETYPEISWRITTENASStatement()
                 Return True
@@ -3390,7 +3393,6 @@ Public Class tBrain
             lsMessage = "It is better to use a capital first letter for Entity Types, Value Types and Objectified Fact Types (e.g. '" & Viev.Strings.MakeCapCamelCase(lrModelElementWord) & "')"
             Me.send_data(lsMessage)
         End If
-
 
         Call Language.ProcessSentence(Me.CurrentSentence)
 

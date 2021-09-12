@@ -6,6 +6,7 @@
         NodePropertyIdentification
         None
         Space
+        Tab
         THAT
         WHICH
     End Enum

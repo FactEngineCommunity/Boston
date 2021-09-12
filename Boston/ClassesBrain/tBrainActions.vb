@@ -643,6 +643,61 @@ Partial Public Class tBrain
 
     End Sub
 
+    Private Sub ProcessISAVALUETYPECLAUSE()
+
+        Try
+            With New WaitCursor
+                Me.Model = prApplication.WorkingModel
+
+                Me.VAQL.ISAVALUETYPEStatement.KEYWDISAVALUETYPE = ""
+                Me.VAQL.ISAVALUETYPEStatement.MODELELEMENTNAME = ""
+
+                Call Me.VAQL.GetParseTreeTokensReflection(Me.VAQL.ISAVALUETYPEStatement, Me.VAQLParsetree.Nodes(0))
+
+                Me.Timeout.Stop()
+
+                Dim lsValueTypeName = Trim(Viev.Strings.MakeCapCamelCase(Me.VAQL.ISAVALUETYPEStatement.MODELELEMENTNAME))
+
+                If Me.Model.ExistsModelElement(lsValueTypeName) Then
+                    Me.send_data("There is already a Model Element with the name, '" & lsValueTypeName & "'. Try another name")
+                    Exit Sub
+                End If
+
+                If Me.Model.ModelDictionary.Find(Function(x) x.Symbol = lsValueTypeName And x.isValueType) IsNot Nothing Then
+                    Me.send_data("I know.")
+                    Exit Sub
+                End If
+
+                'Have already checked to see wither it is okay to create the EntityType above.
+                Dim lrValueType = Me.Model.CreateValueType(Trim(lsValueTypeName), True)
+
+                If Me.Page IsNot Nothing Then
+                    Dim lrValueTypeInstance = Me.Page.DropValueTypeAtPoint(lrValueType, New PointF(100, 10)) 'VM-20180329-Me.Page.Form.CreateEntityType(lsEntityTypeName, True)
+
+                    Call lrValueTypeInstance.RepellFromNeighbouringPageObjects(1, False)
+                    Call lrValueTypeInstance.Move(lrValueTypeInstance.X, lrValueTypeInstance.Y, True)
+
+                    If Me.AutoLayoutOn Then
+                        Me.Page.Form.AutoLayout()
+                    End If
+                End If
+
+                Me.send_data("Ok")
+
+                Me.Timeout.Start()
+            End With
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
     Private Sub ProcessISWHEREStatement(ByVal asOriginalSentence As String)
 
         Try

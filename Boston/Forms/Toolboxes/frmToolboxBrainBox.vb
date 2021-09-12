@@ -128,6 +128,7 @@ Public Class frmToolboxBrainBox
         'Me.TextMarker = New TinyPG.Controls.TextMarker(Me.TextBoxQuery)
 
         Me.AutoComplete = New frmAutoComplete(Me.TextBoxInput)
+        Me.AutoComplete.mbSpaceActionEqualsTabAction = True
 
         '==============================================================
         'Make the Brain useful/user-friendly

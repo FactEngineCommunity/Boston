@@ -73,6 +73,8 @@ Public Class frmToolboxORMReadingEditor
         '------------------------------------------------------------------------------------------------
 
         Me.AutoComplete = New frmAutoComplete(Me.TextboxReading)
+        Me.AutoComplete.mbSpaceActionEqualsTabAction = True
+
     End Sub
 
     Sub SetupForm()

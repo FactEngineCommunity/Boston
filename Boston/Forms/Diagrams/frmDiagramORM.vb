@@ -483,6 +483,38 @@ Public Class frmDiagramORM
 
         Call Me.ShowHideToolStripMenuItems()
 
+        Call Me.ResizeHelpTipsBox()
+
+    End Sub
+
+    Private Sub ResizeHelpTipsBox()
+
+        Try
+            Me.LabelHelp.Dock = DockStyle.None
+
+            Dim liHorizontalScrollBarHeight As Integer = 0
+            Dim liVerticalScrollBarWidth As Integer = 0
+
+            If Me.DiagramView.HScrollBar.Visible Then
+                liHorizontalScrollBarHeight = System.Windows.Forms.SystemInformation.HorizontalScrollBarHeight
+            End If
+
+            If Me.DiagramView.VScrollBar.Visible Then
+                liVerticalScrollBarWidth = System.Windows.Forms.SystemInformation.VerticalScrollBarWidth
+            End If
+
+            Me.LabelHelp.Top = Viev.Greater(Me.Height - Me.LabelHelp.Height - liHorizontalScrollBarHeight, 0)
+            Me.LabelHelp.Width = Me.Width - liVerticalScrollBarWidth
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
     End Sub
 
     Private Sub ShowHideToolStripMenuItems()
@@ -750,6 +782,11 @@ Public Class frmDiagramORM
             End If
         End If
         Me.zrSpecialDragMode.SpecialDragMode = pcenumSpecialDragMode.None
+
+        'Help Tip
+        Me.LabelHelp.Text &= "Hint: Hold the left mouse key down and drag to select multiple objects." & vbCrLf
+        Me.LabelHelp.Text &= "Hint: Hold the [Alt] key down and drag to to pan the diagram.."
+        Me.LabelHelp.Text &= vbCrLf
 
     End Sub
 
@@ -4497,6 +4534,14 @@ Public Class frmDiagramORM
                         If Not Me.zrPage.SelectedObject.Contains(e.Node.Tag) Then
                             Me.zrPage.SelectedObject.AddUnique(e.Node.Tag)
                         End If
+
+                        If e.Node.Tag.GetType = GetType(FBM.RoleInstance) Then
+                            Dim lrRoleInstance As FBM.RoleInstance = CType(e.Node.Tag, FBM.RoleInstance)
+                            Me.zrPage.SelectedObject.AddUnique(lrRoleInstance.FactType)
+                            lrRoleInstance.FactType.Shape.Selected = True
+                            lrRoleInstance.Shape.Selected = True
+                        End If
+
                     Case Is = pcenumConceptType.FactTypeName
                         'N/A
                     Case Is = pcenumConceptType.FactTypeReading
@@ -4620,6 +4665,7 @@ Public Class frmDiagramORM
                     Case Is = pcenumConceptType.FactType
                         Call lrToolboxForm.VerbaliseFactType(e.Node.Tag.FactType)
                     Case Is = pcenumConceptType.Role
+                        Call lrToolboxForm.VerbaliseFactType(e.Node.Tag.FactType, e.Node.Tag.Role)
                         If Control.ModifierKeys And Keys.Control Then
                             Call lrToolboxForm.verbaliseRole(e.Node.Tag.Role)
                         End If
@@ -5791,9 +5837,19 @@ Public Class frmDiagramORM
         Dim lsCommonTransaction As String = System.Guid.NewGuid.ToString
 
         For Each loORMObject In Me.zrPage.SelectedObject.ToArray
+            Select Case loORMObject.GetType
+                Case Is = GetType(FBM.RoleConstraintRoleInstance),
+                          GetType(FBM.RoleInstance),
+                          GetType(FBM.SubtypeRelationshipInstance)
+                    Me.zrPage.SelectedObject.Remove(loORMObject)
+            End Select
+        Next
 
+        For Each loORMObject In Me.zrPage.SelectedObject.ToArray
+
+            If loORMObject.GetType = GetType(FBM.FactTypeInstance) Then Debugger.Break()
             Dim lrUserAction As New tUserAction(loORMObject, pcenumUserAction.MoveModelObject, Me.zrPage, lsCommonTransaction)
-            lrUserAction.PreActionModelObject = New Boston.tUndoRedoObject(loORMObject.X, loORMObject.Y) 'loORMObject.Clone(Me.zrPage)
+            lrUserAction.PreActionModelObject = New Boston.tUndoRedoObject(loORMObject.X, loORMObject.Y)
 
             '---------------------------------------------
             'Set the X,Y Co-Ordinates of the ORM Object
@@ -5809,8 +5865,8 @@ Public Class frmDiagramORM
 
                         If loORMObject.ConceptType = pcenumConceptType.Role Then
                             lrFactTypeInstance = loORMObject.FactType
-                            lrFactTypeInstance.X = lrFactTypeInstance.Shape.Bounds.X
-                            lrFactTypeInstance.Y = lrFactTypeInstance.Shape.Bounds.Y
+                            lrFactTypeInstance.X = loORMObject.Shape.Bounds.X
+                            lrFactTypeInstance.Y = loORMObject.Shape.Bounds.Y
                         End If
 
                         '==============================================================================
@@ -5836,7 +5892,7 @@ Public Class frmDiagramORM
                     End Try
             End Select
 
-            lrUserAction.PostActionModelObject = New Boston.tUndoRedoObject(loORMObject.X, loORMObject.Y) 'loORMObject.Clone(Me.zrPage)
+            lrUserAction.PostActionModelObject = New Boston.tUndoRedoObject(loORMObject.X, loORMObject.Y)
             prApplication.AddUndoAction(lrUserAction)
             frmMain.ToolStripMenuItemUndo.Enabled = True
 
@@ -5858,6 +5914,9 @@ Public Class frmDiagramORM
                             loLink.Origin.Tag.FactType.SortRoleGroup()
                         End If
                     Next
+                Case pcenumConceptType.FactType
+                    lrFactTypeInstance = loORMObject
+                    Call lrFactTypeInstance.Moved()
 
             End Select
         Next
@@ -6751,6 +6810,8 @@ Public Class frmDiagramORM
         Dim liFactTypeCardinality As Integer = 0
         Dim lrFactTypeInstance As FBM.FactTypeInstance
         Dim lrRoleInstance As FBM.RoleInstance
+
+        Me.zrPage.SelectedObject.RemoveAll(Function(x) x.ConceptType = pcenumConceptType.FactType)
 
         If Me.zrPage.AreAllSelectedObjectsRoles Then
             If Me.zrPage.are_all_selected_roles_within_the_same_FactType Then
@@ -11588,6 +11649,14 @@ Public Class frmDiagramORM
             lsMessage &= vbCrLf & vbCrLf & ex.Message
             prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
+
+    End Sub
+
+    Private Sub frmDiagramORM_Resize(sender As Object, e As EventArgs) Handles Me.Resize
+
+        If Me.MenuItemHelpTips.Checked Then
+            Call Me.ResizeHelpTipsBox()
+        End If
 
     End Sub
 End Class

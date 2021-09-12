@@ -2214,7 +2214,8 @@ Public Class frmToolboxORMVerbalisation
 
     End Sub
 
-    Public Sub VerbaliseFactType(ByVal arFactType As FBM.FactType)
+    Public Sub VerbaliseFactType(ByVal arFactType As FBM.FactType,
+                                 Optional ByVal arRole As FBM.Role = Nothing)
         '------------------------------------------------------
         'PSEUDOCODE
         '  * Declare that the FactType(Name) is an FactType
@@ -2229,6 +2230,12 @@ Public Class frmToolboxORMVerbalisation
 
             Dim lrVerbaliser As New FBM.ORMVerbailser
             Call lrVerbaliser.Reset()
+
+            If arRole IsNot Nothing Then
+                lrVerbaliser.VerbaliseQuantifier("Role in Fact Type")
+                lrVerbaliser.HTW.WriteBreak()
+                lrVerbaliser.HTW.WriteBreak()
+            End If
 
             '------------------------------------------------------
             'Declare that the EntityType(Name) is an EntityType

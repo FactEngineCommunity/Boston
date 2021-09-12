@@ -5,7 +5,6 @@
 
 
     Public Sub New()
-
     End Sub
 
     Public Sub New(ByVal aiX As Integer, ByVal aiY As Integer)

@@ -107,89 +107,115 @@ Public Class tApplication
         Dim lrUserAction As tUserAction
         Dim lsLastTransactionId As String
 
-        If Me.UndoLog.Count > 0 Then
+        Try
 
-            lrUserAction = Me.UndoLog(Me.UndoLog.Count - 1)
-            lsLastTransactionId = lrUserAction.TransactionId
+            If Me.UndoLog.Count > 0 Then
 
-            Do
-                Select Case lrUserAction.Action
-                    Case Is = pcenumUserAction.MoveModelObject
-                        If lrUserAction.Page.FormLoaded Then
-                            Dim lrPageObject As Object
-                            lrPageObject = lrUserAction.ModelObject
-                            lrPageObject.Shape.Move(lrUserAction.PreActionModelObject.X, lrUserAction.PreActionModelObject.Y)
-                            lrPageObject.X = lrPageObject.Shape.Bounds.X
-                            lrPageObject.Y = lrPageObject.Shape.Bounds.Y
-                        End If
-                    Case Is = pcenumUserAction.RemovedPageObjectFromPage
-                        If lrUserAction.Page.FormLoaded Then
-                            Select Case lrUserAction.ModelObject.ConceptType
-                                Case Is = pcenumConceptType.EntityType
-                                    Dim loPt As New PointF(lrUserAction.ModelObject.X, lrUserAction.ModelObject.Y)
-                                    lrUserAction.ModelObject = lrUserAction.Page.DropEntityTypeAtPoint(lrUserAction.ModelObject.EntityType, loPt)
-                                Case Is = pcenumConceptType.ValueType
-                                    Dim loPt As New PointF(lrUserAction.ModelObject.X, lrUserAction.ModelObject.Y)
-                                    lrUserAction.ModelObject = lrUserAction.Page.DropValueTypeAtPoint(lrUserAction.ModelObject.ValueType, loPt)
-                                Case Is = pcenumConceptType.FactType
-                                    Dim loPt As New PointF(lrUserAction.ModelObject.X, lrUserAction.ModelObject.Y)
-                                    lrUserAction.ModelObject = lrUserAction.Page.DropFactTypeAtPoint(lrUserAction.ModelObject.FactType, loPt, False)
-                            End Select
-                        End If
+                lrUserAction = Me.UndoLog(Me.UndoLog.Count - 1)
+                lsLastTransactionId = lrUserAction.TransactionId
 
-                    Case Is = pcenumUserAction.AddPageObjectToPage
-                        If lrUserAction.Page.FormLoaded Then
-                            Select Case lrUserAction.ModelObject.ConceptType
-                                Case Is = pcenumConceptType.EntityType
-                                    Dim lrEntityTypeInstance As FBM.EntityTypeInstance
-                                    lrEntityTypeInstance = lrUserAction.ModelObject
-                                    lrEntityTypeInstance.RemoveFromPage(True)
-                                Case Is = pcenumConceptType.ValueType
-                                    Dim lrValueTypeInstance As FBM.ValueTypeInstance
-                                    lrValueTypeInstance = lrUserAction.ModelObject
-                                    lrValueTypeInstance.RemoveFromPage(True)
-                                Case Is = pcenumConceptType.FactType
-                                    Dim lrFactTypeInstance As FBM.FactTypeInstance
-                                    lrFactTypeInstance = lrUserAction.ModelObject
-                                    lrFactTypeInstance.RemoveFromPage(True)
-                                Case Is = pcenumConceptType.RoleConstraint
-                                    Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
-                                    lrRoleConstraintInstance = lrUserAction.ModelObject
-                                    lrRoleConstraintInstance.RemoveFromPage(True)
-                            End Select
-                        End If
-                    Case Is = pcenumUserAction.AddNewPageObjectToPage
-                        If lrUserAction.Page.FormLoaded Then
-                            Select Case lrUserAction.ModelObject.ConceptType
-                                Case Is = pcenumConceptType.EntityType
-                                    Dim lrEntityTypeInstance As FBM.EntityTypeInstance
-                                    lrEntityTypeInstance = lrUserAction.ModelObject
-                                    lrEntityTypeInstance.RemoveFromPage(True)
-                                    lrEntityTypeInstance.EntityType.RemoveFromModel(False)
-                                Case Is = pcenumConceptType.ValueType
-                                    Dim lrValueTypeInstance As New FBM.ValueTypeInstance
-                                    lrValueTypeInstance = lrUserAction.ModelObject
-                                    lrValueTypeInstance.RemoveFromPage(True)
-                                    lrValueTypeInstance.ValueType.RemoveFromModel()
-                            End Select
-                        End If
-                End Select
+                Do
+                    Select Case lrUserAction.Action
+                        Case Is = pcenumUserAction.MoveModelObject
+                            If lrUserAction.Page.FormLoaded Then
+                                Try
+                                    Dim lrPageObject As Object
+                                    lrPageObject = lrUserAction.ModelObject
 
-                Me.RedoLog.Add(lrUserAction)
-                Me.UndoLog.RemoveAt(Me.UndoLog.Count - 1)
+                                    Select Case lrPageObject.GetType
+                                        Case Is = GetType(FBM.RoleInstance),
+                                                  GetType(FBM.SubtypeRelationshipInstance),
+                                                  GetType(FBM.RoleConstraintRoleInstance)
+                                        Case Is = GetType(FBM.FactTypeInstance)
+                                            Dim lrFactTypeInstance As FBM.FactTypeInstance = CType(lrPageObject, FBM.FactTypeInstance)
+                                            Call lrFactTypeInstance.Move(lrUserAction.PreActionModelObject.X, lrUserAction.PreActionModelObject.Y, True)
+                                        Case Else
+                                            lrPageObject.Shape.Move(lrUserAction.PreActionModelObject.X, lrUserAction.PreActionModelObject.Y)
+                                            lrPageObject.X = lrPageObject.Shape.Bounds.X
+                                            lrPageObject.Y = lrPageObject.Shape.Bounds.Y
+                                    End Select
 
-                If Me.UndoLog.Count > 0 Then
-                    lrUserAction = Me.UndoLog(Me.UndoLog.Count - 1)
-                End If
-            Loop Until (Me.UndoLog.Count = 0) Or (lrUserAction.TransactionId <> lsLastTransactionId)
+                                Catch ex As Exception
+                                    'Not a biggie.
+                                End Try
+                            End If
+                        Case Is = pcenumUserAction.RemovedPageObjectFromPage
+                            If lrUserAction.Page.FormLoaded Then
+                                Select Case lrUserAction.ModelObject.ConceptType
+                                    Case Is = pcenumConceptType.EntityType
+                                        Dim loPt As New PointF(lrUserAction.ModelObject.X, lrUserAction.ModelObject.Y)
+                                        lrUserAction.ModelObject = lrUserAction.Page.DropEntityTypeAtPoint(lrUserAction.ModelObject.EntityType, loPt)
+                                    Case Is = pcenumConceptType.ValueType
+                                        Dim loPt As New PointF(lrUserAction.ModelObject.X, lrUserAction.ModelObject.Y)
+                                        lrUserAction.ModelObject = lrUserAction.Page.DropValueTypeAtPoint(lrUserAction.ModelObject.ValueType, loPt)
+                                    Case Is = pcenumConceptType.FactType
+                                        Dim loPt As New PointF(lrUserAction.ModelObject.X, lrUserAction.ModelObject.Y)
+                                        lrUserAction.ModelObject = lrUserAction.Page.DropFactTypeAtPoint(lrUserAction.ModelObject.FactType, loPt, False)
+                                End Select
+                            End If
+
+                        Case Is = pcenumUserAction.AddPageObjectToPage
+                            If lrUserAction.Page.FormLoaded Then
+                                Select Case lrUserAction.ModelObject.ConceptType
+                                    Case Is = pcenumConceptType.EntityType
+                                        Dim lrEntityTypeInstance As FBM.EntityTypeInstance
+                                        lrEntityTypeInstance = lrUserAction.ModelObject
+                                        lrEntityTypeInstance.RemoveFromPage(True)
+                                    Case Is = pcenumConceptType.ValueType
+                                        Dim lrValueTypeInstance As FBM.ValueTypeInstance
+                                        lrValueTypeInstance = lrUserAction.ModelObject
+                                        lrValueTypeInstance.RemoveFromPage(True)
+                                    Case Is = pcenumConceptType.FactType
+                                        Dim lrFactTypeInstance As FBM.FactTypeInstance
+                                        lrFactTypeInstance = lrUserAction.ModelObject
+                                        lrFactTypeInstance.RemoveFromPage(True)
+                                    Case Is = pcenumConceptType.RoleConstraint
+                                        Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
+                                        lrRoleConstraintInstance = lrUserAction.ModelObject
+                                        lrRoleConstraintInstance.RemoveFromPage(True)
+                                End Select
+                            End If
+                        Case Is = pcenumUserAction.AddNewPageObjectToPage
+                            If lrUserAction.Page.FormLoaded Then
+                                Select Case lrUserAction.ModelObject.ConceptType
+                                    Case Is = pcenumConceptType.EntityType
+                                        Dim lrEntityTypeInstance As FBM.EntityTypeInstance
+                                        lrEntityTypeInstance = lrUserAction.ModelObject
+                                        lrEntityTypeInstance.RemoveFromPage(True)
+                                        lrEntityTypeInstance.EntityType.RemoveFromModel(False)
+                                    Case Is = pcenumConceptType.ValueType
+                                        Dim lrValueTypeInstance As New FBM.ValueTypeInstance
+                                        lrValueTypeInstance = lrUserAction.ModelObject
+                                        lrValueTypeInstance.RemoveFromPage(True)
+                                        lrValueTypeInstance.ValueType.RemoveFromModel()
+                                End Select
+                            End If
+                    End Select
+
+                    Me.RedoLog.Add(lrUserAction)
+                    Me.UndoLog.RemoveAt(Me.UndoLog.Count - 1)
+
+                    If Me.UndoLog.Count > 0 Then
+                        lrUserAction = Me.UndoLog(Me.UndoLog.Count - 1)
+                    End If
+                Loop Until (Me.UndoLog.Count = 0) Or (lrUserAction.TransactionId <> lsLastTransactionId)
 
 
-            frmMain.ToolStripMenuItemUndo.Enabled = (Me.UndoLog.Count > 0)
-            frmMain.ToolStripMenuItemRedo.Enabled = (Me.RedoLog.Count > 0)
+                frmMain.ToolStripMenuItemUndo.Enabled = (Me.UndoLog.Count > 0)
+                frmMain.ToolStripMenuItemRedo.Enabled = (Me.RedoLog.Count > 0)
 
-            Call Me.SetUndoRedoMenuTexts()
+                Call Me.SetUndoRedoMenuTexts()
 
-        End If
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 

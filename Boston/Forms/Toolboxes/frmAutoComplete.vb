@@ -11,6 +11,7 @@ Public Class frmAutoComplete
 
     Public OpacityValue As Single = 0.8
     Public TransparencyColour As System.Drawing.Color = Color.White
+    Public mbSpaceActionEqualsTabAction As Boolean = False
 
 
     Public Sub New(ByRef aoTextEditor As RichTextBox)
@@ -172,10 +173,14 @@ Public Class frmAutoComplete
         End Try
     End Sub
 
-    Private Sub processKeyDown(Optional ByVal aiActionType As publicConstantsAutoComplete.pcenumACActionType = Nothing)
+    Private Sub processKeyDown(Optional ByRef aiActionType As publicConstantsAutoComplete.pcenumACActionType = Nothing)
 
         Try
-            If aiActionType <> pcenumACActionType.None And Me.Owner.GetType = frmToolboxBrainBox.GetType Then
+            If aiActionType = pcenumACActionType.Space Then
+                If Me.mbSpaceActionEqualsTabAction Then
+                    aiActionType = pcenumACActionType.Tab
+                End If
+            ElseIf aiActionType <> pcenumACActionType.None And Me.Owner.GetType = frmToolboxBrainBox.GetType Then
                 Exit Sub
             End If
 
@@ -209,6 +214,8 @@ Public Class frmAutoComplete
                             End If
                         Case Is = publicConstantsAutoComplete.pcenumACActionType.Space
                             lsSelectedItem = Me.ListBox.SelectedItem.ToString & " " & Trim(Me.ListBox.SelectedItem.ItemData) & " "
+                        Case Is = publicConstantsAutoComplete.pcenumACActionType.Tab
+                            lsSelectedItem = Me.ListBox.SelectedItem.ToString & " "
                         Case Is = publicConstantsAutoComplete.pcenumACActionType.THAT
                             lsSelectedItem = " THAT " & Me.ListBox.SelectedItem.ToString & " A " & Trim(Me.ListBox.SelectedItem.ItemData)
                         Case Is = publicConstantsAutoComplete.pcenumACActionType.WHICH
