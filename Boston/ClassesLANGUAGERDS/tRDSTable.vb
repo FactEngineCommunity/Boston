@@ -1113,6 +1113,36 @@ Namespace RDS
 
         End Function
 
+        Public Function isPGSNode() As Boolean
+
+            Try
+                If Me.FBMModelElement.GetType = GetType(FBM.FactType) Then
+
+                    Dim lrFactType = CType(Me.FBMModelElement, FBM.FactType)
+
+                    If Me.FBMModelElement.IsObjectified Then
+                        Return True
+                    ElseIf lrFactType.HasTotalRoleConstraint Or lrFactType.HasPartialButMultiRoleConstraint Then
+                        Return True
+                    Else
+                        Return False
+                    End If
+                Else
+                    Return False
+                End If
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return False
+            End Try
+
+        End Function
+
         ''' <summary>
         ''' Used when the User changes a Unique Index (that is not the existing Primary Key) to the Primary Key. Therefore, the existing Primary Key becomes simple a Unique Index (not Primary Key)
         ''' </summary>

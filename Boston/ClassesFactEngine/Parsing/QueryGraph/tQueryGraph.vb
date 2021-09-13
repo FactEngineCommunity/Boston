@@ -223,10 +223,13 @@
 
                 '=================================================================================================
                 'Derived FactTypeReadingMatch - I.e. Joins on ManyToMany(..ToMany) tables
+                Dim larCoveredFactTypes = larPartialFTMatchFT.ToList
+
                 larPartialFTMatchNode = From Node In larFromNodes
                                         Where Node.QueryEdge IsNot Nothing
                                         Where Node.QueryEdge.IsPartialFactTypeMatch
                                         Where Node.QueryEdge.FBMFactType.IsDerived
+                                        Where Not larCoveredFactTypes.Contains(Node.QueryEdge.FBMFactType)
                                         Select Node
 
                 larPartialFTMatchFT = From Node In larPartialFTMatchNode

@@ -776,7 +776,7 @@ Public Class frmDiagramORM
                     lrEntityType_2 = Me.zrPage.SelectedObject.Last
 
                     Call Me.zrSpecialDragMode.ResetSpecialDragMode()
-                    Call lrEntityType_1.AddSubtypeConstraint(lrEntityType_2)
+                    Call lrEntityType_1.AddSubtypeRelationship(lrEntityType_2)
 
                 End If
             End If
@@ -785,7 +785,8 @@ Public Class frmDiagramORM
 
         'Help Tip
         Me.LabelHelp.Text &= "Hint: Hold the left mouse key down and drag to select multiple objects." & vbCrLf
-        Me.LabelHelp.Text &= "Hint: Hold the [Alt] key down and drag to to pan the diagram.."
+        Me.LabelHelp.Text &= "Hint: Hold the [Alt] key down and drag to to pan the diagram." & vbCrLf
+        Me.LabelHelp.Text &= "Hint: Hold the [Ctrl] key down and use the arrow buttons on your keyboard to span using your keyboard."
         Me.LabelHelp.Text &= vbCrLf
 
     End Sub
@@ -3039,6 +3040,34 @@ Public Class frmDiagramORM
                 Call frmMain.LoadToolbox()
                 Call Me.SetToolbox()
                 Call Me.DiagramView.Focus()
+            Case Is = (e.Control And Keys.Right)
+                Try
+                    Me.DiagramView.ScrollTo(Me.HorizontalScroll.Value + 1, Me.VerticalScroll.Value)
+                    Me.HorizontalScroll.Value += 1
+                Catch ex As Exception
+                    'No a biggie
+                End Try
+            Case Is = (e.Control And Keys.Left)
+                Try
+                    Me.DiagramView.ScrollTo(Me.HorizontalScroll.Value - 1, Me.VerticalScroll.Value)
+                    Me.HorizontalScroll.Value -= 1
+                Catch ex As Exception
+                    'No a biggie
+                End Try
+            Case Is = (e.Control And Keys.Down)
+                Try
+                    Me.DiagramView.ScrollTo(Me.HorizontalScroll.Value, Me.VerticalScroll.Value + 1)
+                    Me.VerticalScroll.Value += 1
+                Catch ex As Exception
+                    'Not a biggie
+                End Try
+            Case Is = (e.Control And Keys.Up)
+                Try
+                    Me.DiagramView.ScrollTo(Me.HorizontalScroll.Value, Me.VerticalScroll.Value - 1)
+                    Me.VerticalScroll.Value -= 1
+                Catch ex As Exception
+                    'No a biggie
+                End Try
             Case Is = Keys.Right 'Right Arrow
                 If Me.zrPage.SelectedObject.Count > 0 Then
                     Dim loObject As Object
@@ -3048,6 +3077,8 @@ Public Class frmDiagramORM
                         End If
                     Next
                 End If
+
+
             Case Is = Keys.Left 'Left Arrow
                 If Me.zrPage.SelectedObject.Count > 0 Then
                     Dim loObject As Object
@@ -3447,7 +3478,7 @@ Public Class frmDiagramORM
                             lrEntityType_1 = Me.zrPage.SelectedObject(0)
                             lrEntityType_2 = Me.zrPage.SelectedObject(1)
 
-                            Call lrEntityType_1.AddSubtypeConstraint(lrEntityType_2)
+                            Call lrEntityType_1.AddSubtypeRelationship(lrEntityType_2)
                         Case Is = pcenumConceptType.FactType
 
                             lrFactTypeInstance = New FBM.FactTypeInstance
@@ -3457,7 +3488,7 @@ Public Class frmDiagramORM
                                 lrEntityType_1 = Me.zrPage.SelectedObject(0)
                                 lrEntityType_2 = lrFactTypeInstance.ObjectifyingEntityType
 
-                                Call lrEntityType_1.AddSubtypeConstraint(lrEntityType_2)
+                                Call lrEntityType_1.AddSubtypeRelationship(lrEntityType_2)
                             Else
                                 '--------------------------------------------------------------------------------------------------------
                                 'Ignore, can't create a Subtype Constraint to a Parent that is not an EntityType or ObjectifiedFactType
@@ -5847,7 +5878,6 @@ Public Class frmDiagramORM
 
         For Each loORMObject In Me.zrPage.SelectedObject.ToArray
 
-            If loORMObject.GetType = GetType(FBM.FactTypeInstance) Then Debugger.Break()
             Dim lrUserAction As New tUserAction(loORMObject, pcenumUserAction.MoveModelObject, Me.zrPage, lsCommonTransaction)
             lrUserAction.PreActionModelObject = New Boston.tUndoRedoObject(loORMObject.X, loORMObject.Y)
 
@@ -6799,6 +6829,18 @@ Public Class frmDiagramORM
     End Sub
 
     Private Sub AutoLayoutToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles AutoLayoutToolStripMenuItem.Click
+
+        Dim lsTransactionId As String = System.Guid.NewGuid.ToString
+
+        For Each lrModelObject In Me.zrPage.GetAllPageObjects
+            Dim lrPageObject As FBM.PageObject = lrModelObject.ClonePageObject
+            Dim lrUserAction As New tUserAction(lrModelObject,
+                                                pcenumUserAction.MoveModelObject,
+                                                Me.zrPage,
+                                                lsTransactionId)
+            lrUserAction.PreActionModelObject = New Boston.tUndoRedoObject(lrPageObject.X, lrPageObject.Y)
+            prApplication.AddUndoAction(lrUserAction)
+        Next
 
         Call Me.AutoLayout()
 
@@ -7913,8 +7955,6 @@ Public Class frmDiagramORM
 
                         For Each lrNode In larEntityList.FindAll(Function(x) x.NodeType <> pcenumPGSEntityType.Relationship And x.PGSRelation Is Nothing)
                             Me.MorphVector.Add(New tMorphVector(lrAdditionalObject.X, lrAdditionalObject.Y, lrNode.Shape.Bounds.X, lrNode.Shape.Bounds.Y, 40))
-
-                            If lrNode.Name = "BookingHasSeat" Then Debugger.Break()
 
                             Dim lrAdditionalPageObject As FBM.PageObject = lrAdditionalObject.ClonePageObject
                             lrAdditionalShapeNode = lrAdditionalPageObject.Shape.Clone(True)
@@ -11659,4 +11699,10 @@ Public Class frmDiagramORM
         End If
 
     End Sub
+
+    Private Sub DiagramView_ScrollChanged(sender As Object, e As EventArgs) Handles DiagramView.ScrollChanged
+
+        Call Me.ResizeHelpTipsBox()
+    End Sub
+
 End Class

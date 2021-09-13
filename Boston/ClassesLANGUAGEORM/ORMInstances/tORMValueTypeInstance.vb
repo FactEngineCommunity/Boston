@@ -248,6 +248,8 @@ Namespace FBM
 
             lrPageObject.Name = Me.Name
             lrPageObject.Shape = Me.Shape
+            lrPageObject.X = Me.Shape.Bounds.X
+            lrPageObject.Y = Me.Shape.Bounds.Y
 
             Return lrPageObject
 

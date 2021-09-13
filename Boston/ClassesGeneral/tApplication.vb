@@ -310,6 +310,7 @@ Public Class tApplication
         Me.UndoLog.Add(arUserAction)
 
         Call Me.SetUndoRedoMenuTexts()
+        frmMain.ToolStripMenuItemUndo.Enabled = True
 
     End Sub
 

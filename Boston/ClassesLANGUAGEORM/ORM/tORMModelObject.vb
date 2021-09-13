@@ -146,6 +146,7 @@ Namespace FBM
             End Set
         End Property
 
+
         <XmlIgnore()>
         <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public _IsDerived As Boolean = False

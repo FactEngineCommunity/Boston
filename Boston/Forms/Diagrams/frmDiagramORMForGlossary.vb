@@ -2501,7 +2501,7 @@ Public Class frmDiagramORMForGlossary
                         lrEntityType_1 = Me.zrPage.SelectedObject(0)
                         lrEntityType_2 = Me.zrPage.SelectedObject(1)
 
-                        Call lrEntityType_1.AddSubtypeConstraint(lrEntityType_2)
+                        Call lrEntityType_1.AddSubtypeRelationship(lrEntityType_2)
                         Call Me.zrSpecialDragMode.ResetSpecialDragMode()
                     End If
                 End If

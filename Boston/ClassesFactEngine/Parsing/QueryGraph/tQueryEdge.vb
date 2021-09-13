@@ -242,6 +242,9 @@ Namespace FactEngine
                                                                                               lrReturnFactTypeReading,
                                                                                               lrReturnPredicatePart)
 
+                'For use later in function.
+                Dim lrPreviousQueryEdge As FactEngine.QueryEdge = Me.GetPreviousQueryEdge
+
                 '======================================================
                 'Old code, trying to get rid of this.
 #Region "With NodePropertyIdentification"
@@ -401,6 +404,15 @@ Namespace FactEngine
                 '========================================================================================================================
                 'Fastenstein - Straight
 #Region "Fastenstein - Straight"
+                Me.FBMPossibleFactTypes = Me.QueryGraph.Model.getFactTypeByPartialMatchModelObjectsFactTypeReading(larModelObject,
+                                                                                                                   lrFactTypeReading)
+
+                If lrPreviousQueryEdge IsNot Nothing Then
+                    If Me.FBMPossibleFactTypes.Contains(lrPreviousQueryEdge.FBMFactType) And lrPreviousQueryEdge.IsPartialFactTypeMatch Then
+                        GoTo PartialFactTypeMatch
+                    End If
+                End If
+
                 Me.FBMFactType = Me.QueryGraph.Model.getFactTypeByModelObjectsFactTypeReading(larModelObject,
                                                                                               lrFactTypeReading, True,
                                                                                               lrReturnFactTypeReading,
@@ -415,6 +427,7 @@ Namespace FactEngine
                 End If
 #End Region
 
+PartialFactTypeMatch:
                 '====================================================================================================================
                 'Partial FactType matches
 #Region "Partial FactType matches"
@@ -465,8 +478,7 @@ Namespace FactEngine
                     End If
 
                     If Me.FBMPossibleFactTypes.Count = 1 And lbAmbiguousPreviousEdgeToResolve Then
-                        'Resolve the previous QueryEdge FactType
-                        Dim lrPreviousQueryEdge As FactEngine.QueryEdge = Me.GetPreviousQueryEdge
+                        'Resolve the previous QueryEdge FactType                        
                         lrPreviousQueryEdge.FBMFactType = Me.FBMFactType
                         lrPreviousQueryEdge.FBMFactTypeReading = Me.FBMFactTypeReading
                         lrPreviousQueryEdge.FBMPredicatePart = (From FactTypeReading In Me.FBMPossibleFactTypes(0).FactTypeReading

@@ -4956,9 +4956,13 @@ Namespace FBM
 
             Try
 
+                Dim larRelation As List(Of RDS.Relation)
+                Dim lrIndex As RDS.Index
+
                 With New WaitCursor
                     '----------------------------------------------------------
                     'Fatal Roles. Roles without JoinedORMObject
+#Region "Roles without JoinedORMObject"
                     Dim larFatalRole = From Role In Me.Role
                                        Where Role.JoinedORMObject Is Nothing
                                        Select Role
@@ -4966,14 +4970,16 @@ Namespace FBM
                     For Each lrRole In larFatalRole.ToArray
                         Call lrRole.RemoveFromModel(True, False)
                     Next
+#End Region
 
                     '----------------------------------------------------------
                     'Relations, Invalid ActiveRole on OriginColumns (OriginColumn.ActiveRole <> Destination.ActiveRole)
                     '           OriginColumn.Count <> DestinationColumn.Count
-                    Dim larRelation = (From Relation In Me.RDS.Relation
-                                       Where Relation.OriginColumns.Count > 0 'Is likely always, but CodeSafe
-                                       Where Relation.OriginColumns.Count <> Relation.DestinationColumns.Count
-                                       Select Relation).ToList
+#Region "Invalid ActiveRole on OriginColumns (OriginColumn.ActiveRole <> Destination.ActiveRole)"
+                    larRelation = (From Relation In Me.RDS.Relation
+                                   Where Relation.OriginColumns.Count > 0 'Is likely always, but CodeSafe
+                                   Where Relation.OriginColumns.Count <> Relation.DestinationColumns.Count
+                                   Select Relation).ToList
 
                     For Each lrRelation In larRelation.FindAll(Function(x) x.OriginColumns.Count > 0 And x.DestinationColumns.Count > 0)
                         Dim lrOriginColumn = (From Column In lrRelation.OriginColumns
@@ -4995,15 +5001,17 @@ Namespace FBM
                                     '  the ActiveRole of the first OriginColumn <> the ActiveRole of the first DestinationColumn,
                                     '  and is likely this way for all of the OriginColumns. It needs to be fixed.
                                     'Call lrRelation.triggerDestinationColumnsChanged
-                                    Dim lrIndex As RDS.Index = lrRelation.DestinationTable.Index.Find(Function(x) x.IsPrimaryKey)
+                                    lrIndex = lrRelation.DestinationTable.Index.Find(Function(x) x.IsPrimaryKey)
                                     Call lrRelation.DestinationTable_IndexModified(lrIndex)
                                 End If
                             End If
                         End If
                     Next
+#End Region
 
                     '----------------------------------------------------------
                     'Try and Fix. Columns where ActiveRole is Nothing.
+#Region "Columns where ActiveRole is Nothing."
                     Dim larFatalColumn = From Table In Me.RDS.Table
                                          From Column In Table.Column
                                          Where Column.ActiveRole Is Nothing
@@ -5016,9 +5024,11 @@ Namespace FBM
                             lrColumn.setActiveRole(larRole(0))
                         End If
                     Next
+#End Region
 
                     '----------------------------------------------------------
                     'Fatal Columns. Columns where ActiveRole is Nothing
+#Region "Columns where ActiveRole is Nothing"
                     larFatalColumn = From Table In Me.RDS.Table
                                      From Column In Table.Column
                                      Where Column.ActiveRole Is Nothing
@@ -5027,9 +5037,11 @@ Namespace FBM
                     For Each lrColumn In larFatalColumn.ToArray
                         Call lrColumn.Table.removeColumn(lrColumn)
                     Next
+#End Region
 
                     '---------------------------------------------------------
                     'InternalUniquenessConstraints, where LevelNumbers are not correct.
+#Region "InternalUniquenessConstraints, where LevelNumbers are not correct."
                     For Each lrFactType In Me.FactType
                         Dim liInternalUniquenessConstraintLevelNrSum = (From InternalUniquenessConstraint In lrFactType.InternalUniquenessConstraint
                                                                         Select InternalUniquenessConstraint.LevelNr).Sum
@@ -5038,9 +5050,11 @@ Namespace FBM
                             Call lrFactType.ResetInternalUniquenessConstraintLevelNumbers()
                         End If
                     Next
+#End Region
 
                     '-----------------------------------------------------------------
                     'Column Ordinal Positions
+#Region "Column Ordinal Positions"
                     For Each lrTable In Me.RDS.Table.FindAll(Function(x) Not x.isSubtype)
                         Dim liColumnOrdinalPositionSum = (From Column In lrTable.Column
                                                           Select Column.OrdinalPosition).Sum
@@ -5049,14 +5063,18 @@ Namespace FBM
                             Call lrTable.resetColumnOrdinalPositions()
                         End If
                     Next
+#End Region
 
                     '------------------------------------------------------------------
                     'RDS Tables with no Columns
+#Region "RDS Tables with no Columns"
                     For Each lrTable In Me.RDS.Table.FindAll(Function(x) x.Column.Count = 0)
                         Me.RDS.removeTable(lrTable)
                     Next
+#End Region
 
                     'RDS Columns that should be Mandatory (i.e. on Objectifed Fact Types).
+#Region "RDS Columns that should be Mandatory (i.e. on Objectifed Fact Types)."
                     Dim larColumn = From Table In Me.RDS.Table
                                     From Column In Table.Column
                                     Where Column.Role.FactType.IsObjectified And Column.Table.Name = Column.Role.FactType.Id And Not Column.IsMandatory
@@ -5067,9 +5085,11 @@ Namespace FBM
                         lrColumn.IsMandatory = True
                         Call lrColumn.triggerForceRefreshEvent()
                     Next
+#End Region
 
                     '================================================================================================
                     'Remove FactTypeInstances from Page where FactTypeIntance has RoleInstance that Joins nothing
+#Region "Remove FactTypeInstances from Page where FactTypeIntance has RoleInstance that Joins nothing"
                     Dim larFactTypeInstance = From Page In Me.Page
                                               From FactTypeInstance In Page.FactTypeInstance
                                               From RoleInstance In FactTypeInstance.RoleGroup
@@ -5079,9 +5099,11 @@ Namespace FBM
                     For Each lrFactTypeInstance In larFactTypeInstance.ToArray
                         Call lrFactTypeInstance.RemoveFromPage(True)
                     Next
+#End Region
 
                     '================================================================================================================
                     'RDSTables where the number of PrimaryKey columns does not match the number of Roles in the PreferredIdentifier
+#Region "RDSTables where the number of PrimaryKey columns does not match the number of Roles in the PreferredIdentifier"
                     Dim larTable = From Table In Me.RDS.Table
                                    Where Table.FBMModelElement.GetType = GetType(FBM.FactType)
                                    Select Table
@@ -5096,16 +5118,18 @@ Namespace FBM
 
                                 For Each lrRole In lrTable.getPreferredIdentifierRoleConstraint.Role
                                     If Not larPrimaryKeyRole.Contains(lrRole) Then
-                                        'Need to make a Column for that Role.
+                                        'Might need to make a Column for that Role.
+                                        'Or Add Column to Index.
 
                                         Dim larCoveredRole As New List(Of FBM.Role)
                                         Dim larActiveRole As List(Of FBM.Role) = lrRole.getDownstreamRoleActiveRoles(larCoveredRole)
+
                                         Dim lsColumnName As String
                                         For Each lrActiveRole In larActiveRole
                                             lsColumnName = lrTable.createUniqueColumnName(Nothing, lrActiveRole.JoinedORMObject.Id, 0)
                                             Dim lrColumn As New RDS.Column(lrTable, lsColumnName, lrRole, lrActiveRole, True)
                                             lrTable.addColumn(lrColumn)
-                                            Dim lrIndex As RDS.Index = lrTable.getPrimaryKeyIndex
+                                            lrIndex = lrTable.getPrimaryKeyIndex
                                             If lrIndex IsNot Nothing Then
                                                 If Not lrIndex.Column.Contains(lrColumn) Then
                                                     lrIndex.addColumn(lrColumn)
@@ -5115,14 +5139,15 @@ Namespace FBM
 
                                     End If
                                 Next
-
                             End If
                         End If
 
                     Next
+#End Region
 
                     '======================================================================================================
                     'Duplicate Facts
+#Region "Duplicate Facts"
                     Dim larDuplicateFactFactType = From FactType In Me.FactType
                                                    Where FactType.ModelError.FindAll(Function(x) x.ErrorId = 100).Count > 0
                                                    Select FactType
@@ -5169,6 +5194,73 @@ Namespace FBM
                     Next
 
                 End With
+#End Region
+
+                'PGSNodes (Tables of ObjectifiedFactTypes that are missing Relations
+#Region "PGSNodes (Tables of ObjectifiedFactTypes that are missing Relations"
+
+                For Each lrTable In Me.RDS.Table.FindAll(Function(x) x.FBMModelElement.IsObjectified Or x.isPGSNode)
+
+                    For Each lrColumn In lrTable.Column.FindAll(Function(x) Not x.Role.JoinedORMObject.GetType = GetType(FBM.ValueType) And x.OutgoingRelation.Count = 0)
+
+                        Dim lrRelation As New RDS.Relation(System.Guid.NewGuid.ToString,
+                                                           lrTable,
+                                                           pcenumCMMLMultiplicity.Many,
+                                                           True,
+                                                           lrColumn.Role.HasInternalUniquenessConstraint,
+                                                           "is involved in",
+                                                           lrColumn.Role.JoinedORMObject.getCorrespondingRDSTable,
+                                                           pcenumCMMLMultiplicity.One,
+                                                           False,
+                                                           "involves",
+                                                           lrTable.FBMModelElement
+                                                          )
+
+                        lrRelation.OriginColumns.Add(lrColumn)
+                        For Each lrDestinationPKColumn In lrColumn.Role.JoinedORMObject.getCorrespondingRDSTable.getPrimaryKeyColumns
+                            lrRelation.DestinationColumns.Add(lrDestinationPKColumn)
+                        Next
+                        lrColumn.Relation.Add(lrRelation)
+                            Call Me.RDS.addRelation(lrRelation)
+                        Next
+                    Next
+
+#End Region
+
+
+                'RDS Tables with more than one relation for the same FactType/Join
+#Region "RDS Tables with more than one relation for the same FactType/Join"
+
+                larRelation = (From Table In Me.RDS.Table
+                               From Column In Table.Column
+                               Where Column.OutgoingRelation.Count > 1
+                               Select Column.OutgoingRelation.First).ToList
+
+                For Each lrRelation In larRelation.ToArray
+
+                    Dim liCount = (From Relation In Me.RDS.Relation
+                                   Where Relation.OriginTable Is lrRelation.OriginTable
+                                   Where Relation.DestinationTable Is lrRelation.DestinationTable
+                                   Select Relation.Id Distinct).Count
+
+                    If liCount > 1 Then
+                        Call Me.RDS.removeRelation(lrRelation)
+                    End If
+                Next
+#End Region
+
+                'RDS Relations, that have no OriginColumns
+#Region "RDS Relations, that have no OriginColumns"
+
+                larRelation = (From Relation In Me.RDS.Relation
+                               Where Relation.OriginColumns.Count = 0
+                               Select Relation).ToList
+
+                For Each lrRelation In larRelation.ToArray
+                    Call Me.RDS.removeRelation(lrRelation)
+                Next
+#End Region
+
 
                 MsgBox("Finished fixing errors.")
 

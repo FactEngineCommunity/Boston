@@ -31,12 +31,7 @@ Namespace FBM
         <XmlAttribute>
         Public Property IsPrimarySubtypeRelationship As Boolean
             Get
-                If Me.EntityType.SubtypeRelationship.Count = 1 Then
-                    Return True
-                Else
-                    Return Me._IsPrimarySubtypeRelationship
-                End If
-
+                Return Me._IsPrimarySubtypeRelationship
             End Get
             Set(value As Boolean)
                 Me._IsPrimarySubtypeRelationship = value

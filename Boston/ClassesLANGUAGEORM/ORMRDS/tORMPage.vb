@@ -212,6 +212,10 @@ Namespace FBM
                 End If
 
                 lrOriginEntity = Me.ERDiagram.Entity.Find(Function(x) x.Name = lrRelation.OriginTable.Name)
+                'CodeSafe because the name of the Origin Table changes when reassigning a Role.
+                If lrOriginEntity Is Nothing Then
+                    lrOriginEntity = Me.ERDiagram.Entity.Find(Function(x) x.DatabaseName = lrRelation.OriginTable.Name)
+                End If
                 lrDestinationEntity = Me.ERDiagram.Entity.Find(Function(x) x.Name = lrRelation.DestinationTable.Name)
 
 

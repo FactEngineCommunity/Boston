@@ -1327,6 +1327,10 @@ Namespace FBM
                 lrFactTypeReading = New FBM.FactTypeReading(lrSubtypeRelationship.FactType, larRole, lasPredicatePart)
                 lrSubtypeRelationship.FactType.FactTypeReading.Add(lrFactTypeReading)
 
+                If Me.SubtypeRelationship.Count = 0 Then
+                    lrSubtypeRelationship.IsPrimarySubtypeRelationship = True
+                End If
+
                 Me.SubtypeRelationship.Add(lrSubtypeRelationship)
 
                 If Me.getCorrespondingRDSTable Is Nothing Then

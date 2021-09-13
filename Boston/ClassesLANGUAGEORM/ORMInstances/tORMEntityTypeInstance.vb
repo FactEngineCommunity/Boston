@@ -659,12 +659,11 @@ Namespace FBM
 
         End Sub
 
-        Public Overridable Overloads Sub AddSubtypeConstraint(ByVal arParentEntityTypeInstance As FBM.EntityTypeInstance)
+        Public Overridable Overloads Sub AddSubtypeRelationship(ByVal arParentEntityTypeInstance As FBM.EntityTypeInstance)
 
             Dim lrSubtypeConstraint As New FBM.tSubtypeRelationship
 
             Try
-
                 If Not arParentEntityTypeInstance.HasPrimaryReferenceScheme Then
                     Dim lsMessage As String
                     lsMessage = "The selected Supertype, " & arParentEntityTypeInstance.Id & ", does not have a Primary Reference Scheme."

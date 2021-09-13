@@ -56,6 +56,10 @@ Public Class frmMain
             'Configuration file ends up in something like: C:\Users\Viev\AppData\Local\Viev_Pty_Ltd\Boston.exe_Url_wd25rcgtvmds0ynngskc2ps2lwmmryie\2.5.0.0
             '------------------------------------------------------------------------------------------------------------------------
 
+            If My.Settings.DebugMode = pcenumDebugMode.Debug.ToString Then
+                prApplication.ThrowErrorMessage("Starting Boston", pcenumErrorType.Information)
+            End If
+
             Dim lsMessage As String = ""
 
             Me.MenuStrip_main.ImageScalingSize = New Drawing.Size(16, 16)
