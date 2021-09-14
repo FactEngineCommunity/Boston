@@ -39,15 +39,20 @@ Namespace Language
 
         Public Function WordIsNoun(ByVal asWord As String) As Boolean
 
-            Dim lbIsNoun As Boolean = False
-            Dim lrSearchSet As Wnlib.SearchSet = Nothing
-            Dim larArrayList As New ArrayList
+            Try
+                Dim lbIsNoun As Boolean = False
+                Dim lrSearchSet As Wnlib.SearchSet = Nothing
+                Dim larArrayList As New ArrayList
 
-            Me.hasmatch = False
+                Me.hasmatch = False
 
-            Call Me.OverviewFor(asWord, "noun", lbIsNoun, lrSearchSet, larArrayList)
+                Call Me.OverviewFor(asWord, "noun", lbIsNoun, lrSearchSet, larArrayList)
 
-            Return lbIsNoun
+                Return lbIsNoun
+
+            Catch ex As Exception
+                Return False
+            End Try
 
         End Function
 
@@ -81,13 +86,6 @@ Namespace Language
                 Return lbIsVerb
 
             Catch ex As Exception
-                Dim lsMessage As String
-                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
-
-                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
-                lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
-
                 Return False
             End Try
 
@@ -96,25 +94,36 @@ Namespace Language
 
         Public Function WordIsAdjective(ByVal asWord As String) As Boolean
 
-            Dim lbIsAdjective As Boolean = False
-            Dim lrSearchSet As Wnlib.SearchSet = Nothing
-            Dim larArrayList As New ArrayList
+            Try
+                Dim lbIsAdjective As Boolean = False
+                Dim lrSearchSet As Wnlib.SearchSet = Nothing
+                Dim larArrayList As New ArrayList
 
-            Call Me.OverviewFor(asWord, "adj", lbIsAdjective, lrSearchSet, larArrayList)
+                Call Me.OverviewFor(asWord, "adj", lbIsAdjective, lrSearchSet, larArrayList)
 
-            Return lbIsAdjective
+                Return lbIsAdjective
+
+            Catch ex As Exception
+                Return False
+            End Try
 
         End Function
 
         Public Function WordIsAdverb(ByVal asWord As String) As Boolean
 
-            Dim lbIsAdverb As Boolean = False
-            Dim lrSearchSet As Wnlib.SearchSet = Nothing
-            Dim larArrayList As New ArrayList
+            Try
 
-            Call Me.OverviewFor(asWord, "adv", lbIsAdverb, lrSearchSet, larArrayList)
+                Dim lbIsAdverb As Boolean = False
+                Dim lrSearchSet As Wnlib.SearchSet = Nothing
+                Dim larArrayList As New ArrayList
 
-            Return lbIsAdverb
+                Call Me.OverviewFor(asWord, "adv", lbIsAdverb, lrSearchSet, larArrayList)
+
+                Return lbIsAdverb
+
+            Catch ex As Exception
+                Return False
+            End Try
 
         End Function
 
@@ -136,12 +145,8 @@ Namespace Language
                     WordIsArticle = True
                 End If
             Catch ex As Exception
-                Dim lsMessage As String
-                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
-                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
-                lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                Return False
             End Try
 
         End Function
@@ -165,12 +170,7 @@ Namespace Language
                 End If
 
             Catch ex As Exception
-                Dim lsMessage As String
-                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
-
-                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
-                lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                Return False
             End Try
 
         End Function
@@ -194,12 +194,7 @@ Namespace Language
                 End If
 
             Catch ex As Exception
-                Dim lsMessage As String
-                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
-
-                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
-                lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                Return False
             End Try
 
         End Function
@@ -223,12 +218,7 @@ Namespace Language
                 End If
 
             Catch ex As Exception
-                Dim lsMessage As String
-                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
-
-                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
-                lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                Return False
             End Try
 
         End Function
@@ -252,12 +242,7 @@ Namespace Language
                 End If
 
             Catch ex As Exception
-                Dim lsMessage As String
-                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
-
-                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
-                lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                Return False
             End Try
 
         End Function
@@ -281,12 +266,7 @@ Namespace Language
                 End If
 
             Catch ex As Exception
-                Dim lsMessage As String
-                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
-
-                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
-                lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)                
+                Return False
             End Try
 
         End Function
@@ -310,12 +290,7 @@ Namespace Language
                 End If
 
             Catch ex As Exception
-                Dim lsMessage As String
-                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
-
-                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
-                lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                Return False
             End Try
 
         End Function
@@ -339,12 +314,7 @@ Namespace Language
                 End If
 
             Catch ex As Exception
-                Dim lsMessage As String
-                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
-
-                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
-                lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                Return False
             End Try
 
         End Function
@@ -368,12 +338,7 @@ Namespace Language
                 End If
 
             Catch ex As Exception
-                Dim lsMessage As String
-                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
-
-                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
-                lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                Return False
             End Try
 
         End Function
@@ -397,12 +362,7 @@ Namespace Language
                 End If
 
             Catch ex As Exception
-                Dim lsMessage As String
-                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
-
-                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
-                lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                Return False
             End Try
 
         End Function
@@ -426,12 +386,7 @@ Namespace Language
                 End If
 
             Catch ex As Exception
-                Dim lsMessage As String
-                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
-
-                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
-                lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                Return False
             End Try
 
         End Function
@@ -455,12 +410,7 @@ Namespace Language
                 End If
 
             Catch ex As Exception
-                Dim lsMessage As String
-                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
-
-                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
-                lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                Return False
             End Try
 
         End Function
@@ -484,12 +434,7 @@ Namespace Language
                 End If
 
             Catch ex As Exception
-                Dim lsMessage As String
-                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
-
-                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
-                lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                Return False
             End Try
 
         End Function
@@ -513,12 +458,7 @@ Namespace Language
                 End If
 
             Catch ex As Exception
-                Dim lsMessage As String
-                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
-
-                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
-                lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                Return False
             End Try
 
         End Function
@@ -542,12 +482,7 @@ Namespace Language
                 End If
 
             Catch ex As Exception
-                Dim lsMessage As String
-                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
-
-                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
-                lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                Return False
             End Try
 
         End Function
@@ -571,12 +506,7 @@ Namespace Language
                 End If
 
             Catch ex As Exception
-                Dim lsMessage As String
-                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
-
-                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
-                lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                Return False
             End Try
 
         End Function
@@ -600,12 +530,7 @@ Namespace Language
                 End If
 
             Catch ex As Exception
-                Dim lsMessage As String
-                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
-
-                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
-                lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                Return False
             End Try
 
         End Function
@@ -629,12 +554,7 @@ Namespace Language
                 End If
 
             Catch ex As Exception
-                Dim lsMessage As String
-                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
-
-                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
-                lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                Return False
             End Try
 
         End Function
@@ -658,12 +578,7 @@ Namespace Language
                 End If
 
             Catch ex As Exception
-                Dim lsMessage As String
-                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
-
-                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
-                lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                Return False
             End Try
 
         End Function
@@ -687,12 +602,7 @@ Namespace Language
                 End If
 
             Catch ex As Exception
-                Dim lsMessage As String
-                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
-
-                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
-                lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                Return False
             End Try
 
         End Function
@@ -716,12 +626,7 @@ Namespace Language
                 End If
 
             Catch ex As Exception
-                Dim lsMessage As String
-                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
-
-                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
-                lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                Return False
             End Try
 
         End Function
@@ -745,12 +650,7 @@ Namespace Language
                 End If
 
             Catch ex As Exception
-                Dim lsMessage As String
-                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
-
-                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
-                lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                Return False
             End Try
 
         End Function
@@ -774,12 +674,7 @@ Namespace Language
                 End If
 
             Catch ex As Exception
-                Dim lsMessage As String
-                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
-
-                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
-                lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                Return False
             End Try
 
         End Function
@@ -803,12 +698,7 @@ Namespace Language
                 End If
 
             Catch ex As Exception
-                Dim lsMessage As String
-                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
-
-                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
-                lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                Return False
             End Try
 
         End Function
@@ -832,12 +722,7 @@ Namespace Language
                 End If
 
             Catch ex As Exception
-                Dim lsMessage As String
-                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
-
-                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
-                lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                Return False
             End Try
 
         End Function
@@ -861,12 +746,7 @@ Namespace Language
                 End If
 
             Catch ex As Exception
-                Dim lsMessage As String
-                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
-
-                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
-                lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                Return False
             End Try
 
         End Function
@@ -890,12 +770,7 @@ Namespace Language
                 End If
 
             Catch ex As Exception
-                Dim lsMessage As String
-                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
-
-                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
-                lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                Return False
             End Try
 
         End Function
@@ -919,12 +794,7 @@ Namespace Language
                 End If
 
             Catch ex As Exception
-                Dim lsMessage As String
-                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
-
-                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
-                lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                Return False
             End Try
 
         End Function

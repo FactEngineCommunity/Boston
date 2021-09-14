@@ -56,6 +56,10 @@ Partial Class frmCRUDBostonConfiguration
         Me.CheckBoxEnableClientServer = New System.Windows.Forms.CheckBox()
         Me.TabPage3 = New System.Windows.Forms.TabPage()
         Me.GroupBoxFactEngine = New System.Windows.Forms.GroupBox()
+        Me.ComboBoxFactEngineUserDateTimeFormat = New System.Windows.Forms.ComboBox()
+        Me.ComboBoxFactEngineUserDateFormat = New System.Windows.Forms.ComboBox()
+        Me.LabelPromptFactEngineUserDateTimeFormat = New System.Windows.Forms.Label()
+        Me.LabelPromptFactEngineUserDateFormat = New System.Windows.Forms.Label()
         Me.CheckBoxFactEngineUseReferenceModeOnlyForSimpleReferenceSchemes = New System.Windows.Forms.CheckBox()
         Me.CheckBoxFactEngineShowDatabaseLogoModelExplorer = New System.Windows.Forms.CheckBox()
         Me.LabelFactEngineDefaultQueryResultLimit = New System.Windows.Forms.Label()
@@ -67,10 +71,8 @@ Partial Class frmCRUDBostonConfiguration
         Me.GroupBox4 = New System.Windows.Forms.GroupBox()
         Me.CheckBoxSuperuserMode = New System.Windows.Forms.CheckBox()
         Me.ErrorProvider = New System.Windows.Forms.ErrorProvider(Me.components)
-        Me.LabelPromptFactEngineUserDateFormat = New System.Windows.Forms.Label()
-        Me.LabelPromptFactEngineUserDateTimeFormat = New System.Windows.Forms.Label()
-        Me.ComboBoxFactEngineUserDateFormat = New System.Windows.Forms.ComboBox()
-        Me.ComboBoxFactEngineUserDateTimeFormat = New System.Windows.Forms.ComboBox()
+        Me.GroupBoxAutoComplete = New System.Windows.Forms.GroupBox()
+        Me.CheckBoxAutoCompleteSingleClickSelects = New System.Windows.Forms.CheckBox()
         Me.GroupBox_main.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
         Me.TableLayoutPanel1.SuspendLayout()
@@ -88,6 +90,7 @@ Partial Class frmCRUDBostonConfiguration
         Me.TabPage5.SuspendLayout()
         Me.GroupBox4.SuspendLayout()
         CType(Me.ErrorProvider, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.GroupBoxAutoComplete.SuspendLayout()
         Me.SuspendLayout()
         '
         'Button_Cancel
@@ -110,13 +113,14 @@ Partial Class frmCRUDBostonConfiguration
         '
         'GroupBox_main
         '
+        Me.GroupBox_main.Controls.Add(Me.GroupBoxAutoComplete)
         Me.GroupBox_main.Controls.Add(Me.GroupBox2)
         Me.GroupBox_main.Controls.Add(Me.GroupBox1)
         Me.GroupBox_main.Controls.Add(Me.GroupBoxDatabase)
         Me.GroupBox_main.Controls.Add(Me.GroupBoxDebugging)
         Me.GroupBox_main.Location = New System.Drawing.Point(6, 6)
         Me.GroupBox_main.Name = "GroupBox_main"
-        Me.GroupBox_main.Size = New System.Drawing.Size(595, 484)
+        Me.GroupBox_main.Size = New System.Drawing.Size(595, 571)
         Me.GroupBox_main.TabIndex = 6
         Me.GroupBox_main.TabStop = False
         '
@@ -327,7 +331,7 @@ Partial Class frmCRUDBostonConfiguration
         Me.TabControl1.Location = New System.Drawing.Point(12, 11)
         Me.TabControl1.Name = "TabControl1"
         Me.TabControl1.SelectedIndex = 0
-        Me.TabControl1.Size = New System.Drawing.Size(614, 528)
+        Me.TabControl1.Size = New System.Drawing.Size(614, 609)
         Me.TabControl1.TabIndex = 9
         '
         'TabPage1
@@ -335,8 +339,8 @@ Partial Class frmCRUDBostonConfiguration
         Me.TabPage1.Controls.Add(Me.GroupBox_main)
         Me.TabPage1.Location = New System.Drawing.Point(4, 22)
         Me.TabPage1.Name = "TabPage1"
-        Me.TabPage1.Padding = New System.Windows.Forms.Padding(3, 3, 3, 3)
-        Me.TabPage1.Size = New System.Drawing.Size(606, 502)
+        Me.TabPage1.Padding = New System.Windows.Forms.Padding(3)
+        Me.TabPage1.Size = New System.Drawing.Size(606, 583)
         Me.TabPage1.TabIndex = 0
         Me.TabPage1.Text = "General"
         Me.TabPage1.UseVisualStyleBackColor = True
@@ -346,7 +350,7 @@ Partial Class frmCRUDBostonConfiguration
         Me.TabPage2.Controls.Add(Me.GroupBox3)
         Me.TabPage2.Location = New System.Drawing.Point(4, 22)
         Me.TabPage2.Name = "TabPage2"
-        Me.TabPage2.Padding = New System.Windows.Forms.Padding(3, 3, 3, 3)
+        Me.TabPage2.Padding = New System.Windows.Forms.Padding(3)
         Me.TabPage2.Size = New System.Drawing.Size(606, 502)
         Me.TabPage2.TabIndex = 1
         Me.TabPage2.Text = "Client/Server"
@@ -424,6 +428,42 @@ Partial Class frmCRUDBostonConfiguration
         Me.GroupBoxFactEngine.Size = New System.Drawing.Size(597, 493)
         Me.GroupBoxFactEngine.TabIndex = 0
         Me.GroupBoxFactEngine.TabStop = False
+        '
+        'ComboBoxFactEngineUserDateTimeFormat
+        '
+        Me.ComboBoxFactEngineUserDateTimeFormat.FormattingEnabled = True
+        Me.ComboBoxFactEngineUserDateTimeFormat.Items.AddRange(New Object() {"dd/MM/yyyy HH:mm:ss", "MM/dd/yyyy HH:mm:ss"})
+        Me.ComboBoxFactEngineUserDateTimeFormat.Location = New System.Drawing.Point(154, 147)
+        Me.ComboBoxFactEngineUserDateTimeFormat.Name = "ComboBoxFactEngineUserDateTimeFormat"
+        Me.ComboBoxFactEngineUserDateTimeFormat.Size = New System.Drawing.Size(245, 21)
+        Me.ComboBoxFactEngineUserDateTimeFormat.TabIndex = 7
+        '
+        'ComboBoxFactEngineUserDateFormat
+        '
+        Me.ComboBoxFactEngineUserDateFormat.FormattingEnabled = True
+        Me.ComboBoxFactEngineUserDateFormat.Items.AddRange(New Object() {"dd/MM/yyyy", "MM/dd/yyyy"})
+        Me.ComboBoxFactEngineUserDateFormat.Location = New System.Drawing.Point(153, 117)
+        Me.ComboBoxFactEngineUserDateFormat.Name = "ComboBoxFactEngineUserDateFormat"
+        Me.ComboBoxFactEngineUserDateFormat.Size = New System.Drawing.Size(121, 21)
+        Me.ComboBoxFactEngineUserDateFormat.TabIndex = 6
+        '
+        'LabelPromptFactEngineUserDateTimeFormat
+        '
+        Me.LabelPromptFactEngineUserDateTimeFormat.AutoSize = True
+        Me.LabelPromptFactEngineUserDateTimeFormat.Location = New System.Drawing.Point(16, 147)
+        Me.LabelPromptFactEngineUserDateTimeFormat.Name = "LabelPromptFactEngineUserDateTimeFormat"
+        Me.LabelPromptFactEngineUserDateTimeFormat.Size = New System.Drawing.Size(113, 13)
+        Me.LabelPromptFactEngineUserDateTimeFormat.TabIndex = 5
+        Me.LabelPromptFactEngineUserDateTimeFormat.Text = "User DateTime format:"
+        '
+        'LabelPromptFactEngineUserDateFormat
+        '
+        Me.LabelPromptFactEngineUserDateFormat.AutoSize = True
+        Me.LabelPromptFactEngineUserDateFormat.Location = New System.Drawing.Point(16, 120)
+        Me.LabelPromptFactEngineUserDateFormat.Name = "LabelPromptFactEngineUserDateFormat"
+        Me.LabelPromptFactEngineUserDateFormat.Size = New System.Drawing.Size(93, 13)
+        Me.LabelPromptFactEngineUserDateFormat.TabIndex = 4
+        Me.LabelPromptFactEngineUserDateFormat.Text = "User Date Format:"
         '
         'CheckBoxFactEngineUseReferenceModeOnlyForSimpleReferenceSchemes
         '
@@ -503,7 +543,7 @@ Partial Class frmCRUDBostonConfiguration
         '
         Me.TabPage5.Controls.Add(Me.GroupBox4)
         Me.TabPage5.Location = New System.Drawing.Point(4, 22)
-        Me.TabPage5.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.TabPage5.Margin = New System.Windows.Forms.Padding(2)
         Me.TabPage5.Name = "TabPage5"
         Me.TabPage5.Size = New System.Drawing.Size(606, 502)
         Me.TabPage5.TabIndex = 4
@@ -518,9 +558,9 @@ Partial Class frmCRUDBostonConfiguration
         Me.GroupBox4.AutoSize = True
         Me.GroupBox4.Controls.Add(Me.CheckBoxSuperuserMode)
         Me.GroupBox4.Location = New System.Drawing.Point(10, 9)
-        Me.GroupBox4.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.GroupBox4.Margin = New System.Windows.Forms.Padding(2)
         Me.GroupBox4.Name = "GroupBox4"
-        Me.GroupBox4.Padding = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.GroupBox4.Padding = New System.Windows.Forms.Padding(2)
         Me.GroupBox4.Size = New System.Drawing.Size(583, 484)
         Me.GroupBox4.TabIndex = 0
         Me.GroupBox4.TabStop = False
@@ -529,7 +569,7 @@ Partial Class frmCRUDBostonConfiguration
         '
         Me.CheckBoxSuperuserMode.AutoSize = True
         Me.CheckBoxSuperuserMode.Location = New System.Drawing.Point(12, 16)
-        Me.CheckBoxSuperuserMode.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.CheckBoxSuperuserMode.Margin = New System.Windows.Forms.Padding(2)
         Me.CheckBoxSuperuserMode.Name = "CheckBoxSuperuserMode"
         Me.CheckBoxSuperuserMode.Size = New System.Drawing.Size(104, 17)
         Me.CheckBoxSuperuserMode.TabIndex = 0
@@ -540,47 +580,31 @@ Partial Class frmCRUDBostonConfiguration
         '
         Me.ErrorProvider.ContainerControl = Me
         '
-        'LabelPromptFactEngineUserDateFormat
+        'GroupBoxAutoComplete
         '
-        Me.LabelPromptFactEngineUserDateFormat.AutoSize = True
-        Me.LabelPromptFactEngineUserDateFormat.Location = New System.Drawing.Point(16, 120)
-        Me.LabelPromptFactEngineUserDateFormat.Name = "LabelPromptFactEngineUserDateFormat"
-        Me.LabelPromptFactEngineUserDateFormat.Size = New System.Drawing.Size(93, 13)
-        Me.LabelPromptFactEngineUserDateFormat.TabIndex = 4
-        Me.LabelPromptFactEngineUserDateFormat.Text = "User Date Format:"
+        Me.GroupBoxAutoComplete.Controls.Add(Me.CheckBoxAutoCompleteSingleClickSelects)
+        Me.GroupBoxAutoComplete.Location = New System.Drawing.Point(17, 484)
+        Me.GroupBoxAutoComplete.Name = "GroupBoxAutoComplete"
+        Me.GroupBoxAutoComplete.Size = New System.Drawing.Size(556, 69)
+        Me.GroupBoxAutoComplete.TabIndex = 15
+        Me.GroupBoxAutoComplete.TabStop = False
+        Me.GroupBoxAutoComplete.Text = "AutoComplete"
         '
-        'LabelPromptFactEngineUserDateTimeFormat
+        'CheckBoxAutoCompleteSingleClickSelects
         '
-        Me.LabelPromptFactEngineUserDateTimeFormat.AutoSize = True
-        Me.LabelPromptFactEngineUserDateTimeFormat.Location = New System.Drawing.Point(16, 147)
-        Me.LabelPromptFactEngineUserDateTimeFormat.Name = "LabelPromptFactEngineUserDateTimeFormat"
-        Me.LabelPromptFactEngineUserDateTimeFormat.Size = New System.Drawing.Size(113, 13)
-        Me.LabelPromptFactEngineUserDateTimeFormat.TabIndex = 5
-        Me.LabelPromptFactEngineUserDateTimeFormat.Text = "User DateTime format:"
-        '
-        'ComboBoxFactEngineUserDateFormat
-        '
-        Me.ComboBoxFactEngineUserDateFormat.FormattingEnabled = True
-        Me.ComboBoxFactEngineUserDateFormat.Items.AddRange(New Object() {"dd/MM/yyyy", "MM/dd/yyyy"})
-        Me.ComboBoxFactEngineUserDateFormat.Location = New System.Drawing.Point(153, 117)
-        Me.ComboBoxFactEngineUserDateFormat.Name = "ComboBoxFactEngineUserDateFormat"
-        Me.ComboBoxFactEngineUserDateFormat.Size = New System.Drawing.Size(121, 21)
-        Me.ComboBoxFactEngineUserDateFormat.TabIndex = 6
-        '
-        'ComboBoxFactEngineUserDateTimeFormat
-        '
-        Me.ComboBoxFactEngineUserDateTimeFormat.FormattingEnabled = True
-        Me.ComboBoxFactEngineUserDateTimeFormat.Items.AddRange(New Object() {"dd/MM/yyyy HH:mm:ss", "MM/dd/yyyy HH:mm:ss"})
-        Me.ComboBoxFactEngineUserDateTimeFormat.Location = New System.Drawing.Point(154, 147)
-        Me.ComboBoxFactEngineUserDateTimeFormat.Name = "ComboBoxFactEngineUserDateTimeFormat"
-        Me.ComboBoxFactEngineUserDateTimeFormat.Size = New System.Drawing.Size(245, 21)
-        Me.ComboBoxFactEngineUserDateTimeFormat.TabIndex = 7
+        Me.CheckBoxAutoCompleteSingleClickSelects.AutoSize = True
+        Me.CheckBoxAutoCompleteSingleClickSelects.Location = New System.Drawing.Point(25, 29)
+        Me.CheckBoxAutoCompleteSingleClickSelects.Name = "CheckBoxAutoCompleteSingleClickSelects"
+        Me.CheckBoxAutoCompleteSingleClickSelects.Size = New System.Drawing.Size(218, 17)
+        Me.CheckBoxAutoCompleteSingleClickSelects.TabIndex = 0
+        Me.CheckBoxAutoCompleteSingleClickSelects.Text = "Single click selects item in AutoComplete"
+        Me.CheckBoxAutoCompleteSingleClickSelects.UseVisualStyleBackColor = True
         '
         'frmCRUDBostonConfiguration
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(762, 561)
+        Me.ClientSize = New System.Drawing.Size(762, 632)
         Me.Controls.Add(Me.TabControl1)
         Me.Controls.Add(Me.Button_Cancel)
         Me.Controls.Add(Me.button_okay)
@@ -615,6 +639,8 @@ Partial Class frmCRUDBostonConfiguration
         Me.GroupBox4.ResumeLayout(False)
         Me.GroupBox4.PerformLayout()
         CType(Me.ErrorProvider, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.GroupBoxAutoComplete.ResumeLayout(False)
+        Me.GroupBoxAutoComplete.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub
@@ -666,4 +692,6 @@ Partial Class frmCRUDBostonConfiguration
     Friend WithEvents ComboBoxFactEngineUserDateFormat As ComboBox
     Friend WithEvents LabelPromptFactEngineUserDateTimeFormat As Label
     Friend WithEvents LabelPromptFactEngineUserDateFormat As Label
+    Friend WithEvents GroupBoxAutoComplete As GroupBox
+    Friend WithEvents CheckBoxAutoCompleteSingleClickSelects As CheckBox
 End Class

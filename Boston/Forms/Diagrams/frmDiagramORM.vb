@@ -785,8 +785,10 @@ Public Class frmDiagramORM
 
         'Help Tip
         Me.LabelHelp.Text &= "Hint: Hold the left mouse key down and drag to select multiple objects." & vbCrLf
-        Me.LabelHelp.Text &= "Hint: Hold the [Alt] key down and drag to to pan the diagram." & vbCrLf
-        Me.LabelHelp.Text &= "Hint: Hold the [Ctrl] key down and use the arrow buttons on your keyboard to span using your keyboard."
+        If Me.zrPage.SelectedObject.Count = 0 Then
+            Me.LabelHelp.Text &= "Hint: Hold the [Alt] key down and drag to to pan the diagram." & vbCrLf
+            Me.LabelHelp.Text &= "Hint: Hold the [Ctrl] key down and use the arrow buttons on your keyboard to pan using your keyboard."
+        End If
         Me.LabelHelp.Text &= vbCrLf
 
     End Sub
@@ -3126,6 +3128,16 @@ Public Class frmDiagramORM
 
             Case Is = Keys.R
 #Region "R-For Role"
+
+                Dim larSameFactType = From SelectedObject In Me.zrPage.SelectedObject
+                                      Where SelectedObject.GetType = GetType(FBM.RoleInstance)
+                                      Where Me.zrPage.SelectedObject.Contains(SelectedObject.FactType)
+                                      Select SelectedObject
+
+                If larSameFactType.Count > 0 Then
+                    Me.zrPage.SelectedObject.Remove(larSameFactType.First.FactType)
+                End If
+
                 '-----------------------------------------------------------
                 'The User has elected to add a Role to the Model.
                 'Create a FactType (RoleGroup) linking the selected Objects.
@@ -3799,6 +3811,7 @@ Public Class frmDiagramORM
                                     '-----------------------------------------------
                                     'Select the ShapeNode/ORMObject just clicked on
                                     '-----------------------------------------------                    
+                                    Me.zrPage.SelectedObject.AddUnique(loNode.Tag)
                                     loNode.Selected = True
                                     loNode.Pen.Color = Color.Blue
 
@@ -4865,6 +4878,9 @@ Public Class frmDiagramORM
                             Me.LabelHelp.Text &= "Hold down the [Control] key and Left Click on another Model Object to select more than one Model Object."
                         End If
                     Case Is = pcenumConceptType.ValueType
+                        If Me.zrPage.role_and_object_type_selected Then
+                            Me.LabelHelp.Text &= "Hint: Press the [R] key to add a Role to the Fact Type, with the new Role joined to the selected Model Object."
+                        End If
                         Me.LabelHelp.Text &= "Hint: Press the [P] key to see the Properties of the Value Type."
                         Me.LabelHelp.Text &= vbCrLf
                         Me.LabelHelp.Text &= "Hold down the [Control] key and Left Click on another Model Object to select more than one Model Object."

@@ -373,7 +373,12 @@ Public Class frmToolboxORMReadingEditor
                 '---------------------------------------------------------------------------------------------------
                 'Is either an incorrectly formatted FactTypeReading, or is not a FactTypeReading Statement at all.
                 '---------------------------------------------------------------------------------------------------
-                MsgBox("That's not a well formatted Fact Type Reading")
+                lsMessage = "That's not a well formatted Fact Type Reading."
+                lsMessage &= vbCrLf
+                lsMessage.AppendLine("The correct format to use is:")
+                lsMessage.AppendLine("Object Types, words start with a capital. E.g. Person")
+                lsMessage.AppendLine("Predicates are all lowercase. E.g. is married")
+                MsgBox(lsMessage)
                 Return False
             Else
                 Me.FTRProcessor.FACTTYPEREADINGStatement.FRONTREADINGTEXT = New List(Of String)
@@ -959,7 +964,7 @@ Public Class frmToolboxORMReadingEditor
 
     Private Sub TextboxReading_GotFocus(ByVal sender As Object, ByVal e As System.EventArgs) Handles TextboxReading.GotFocus
 
-        Me.LabelHelpTips.Text = "[.] (Period) button shows a list of the Object Types linked to the Roles of the selected Fact Type."
+        Me.LabelHelpTips.Text = "[V] Down arrow button on your keyboard shows a list of the Object Types linked to the Roles of the selected Fact Type."
         Me.LabelHelpTips.Text &= vbCrLf & "[Enter] button adds the Fact Type Reading to the list of Fact Type Readings for the selected Fact Type."
 
         If Me.TextboxReading.Text = "Enter a Fact Type Reading for the selected Fact Type here." Then
@@ -992,6 +997,9 @@ Public Class frmToolboxORMReadingEditor
                     End If
                 Case Is = Keys.Space, Keys.Escape
                     Me.zsIntellisenseBuffer = ""
+                    If Me.AutoComplete.ListBox.Items.Count = 1 Then
+                        Me.AutoComplete.ListBox.SelectedIndex = 0
+                    End If
             End Select
 
             If e.KeyCode = Keys.Enter Then
@@ -999,7 +1007,9 @@ Public Class frmToolboxORMReadingEditor
                 Call Me.processFactTypeReading()
             End If
 
-            Call Me.AutoComplete.Hide()
+            If Me.AutoComplete.ListBox.Items.Count = 0 Then
+                Call Me.AutoComplete.Hide()
+            End If
 
         Catch ex As Exception
             Dim lsMessage As String
@@ -1038,7 +1048,9 @@ Public Class frmToolboxORMReadingEditor
         '-------------------
         Me.zrTextHighlighter.Tree = Me.FTRParser.Parse(Me.TextboxReading.Text)
 
-        Me.AutoComplete.Hide()
+        If Me.AutoComplete.ListBox.Items.Count = 0 Then
+            Me.AutoComplete.Hide()
+        End If
         Me.AutoComplete.ListBox.Items.Clear()
 
         If (Me.zrTextHighlighter.Tree.Errors.Count > 0) Or (Me.zrTextHighlighter.Tree.Optionals.Count > 0) Then
@@ -1059,14 +1071,14 @@ Public Class frmToolboxORMReadingEditor
             Select Case liTokenType
                 Case Is = FTR.TokenType._NONE_
                     Me.AutoComplete.Visible = Me.CheckIfCanDisplayEnterpriseAwareBox
-                Case Is = FTR.TokenType.FOLLOWINGREADINGTEXT, _
+                Case Is = FTR.TokenType.FOLLOWINGREADINGTEXT,
                           FTR.TokenType.FRONTREADINGTEXT
                     'Don't add anything 
                 Case Is = FTR.TokenType.UNARYPREDICATEPART
                     'Don't add anything 
                 Case Is = FTR.TokenType.SUBSCRIPT
                     'Don't add anything 
-                Case Is = FTR.TokenType.PREBOUNDREADINGTEXT, _
+                Case Is = FTR.TokenType.PREBOUNDREADINGTEXT,
                           FTR.TokenType.POSTBOUNDREADINGTEXT
                     'Don't add anything 
                 Case Is = FTR.TokenType.PREDICATEPART
@@ -1091,7 +1103,7 @@ Public Class frmToolboxORMReadingEditor
                     Case Is = FTR.TokenType.MODELELEMENTNAME
                         Me.AutoComplete.Enabled = True
                         Call Me.PopulateEnterpriseAwareWithObjectTypes()
-                    Case Is = FTR.TokenType.PREDICATEPART, _
+                    Case Is = FTR.TokenType.PREDICATEPART,
                               FTR.TokenType.PREDICATESPACE
                         Me.AutoComplete.Enabled = True
                         'Call Me.AddFactTypePredicatePartsToEnterpriseAware()
@@ -1168,7 +1180,7 @@ Public Class frmToolboxORMReadingEditor
             If IsSomething(lsCurrentTokenType) And (Me.TextboxReading.Text.Length > 0) Then
                 lsCurrentTokenType = Me.zrTextHighlighter.GetCurrentContext.Token.Type.ToString
                 Select Case Me.zrTextHighlighter.GetCurrentContext.Token.Type
-                    Case Is = FTR.TokenType.PREDICATEPART, _
+                    Case Is = FTR.TokenType.PREDICATEPART,
                               FTR.TokenType.PREDICATESPACE
                         Me.AutoComplete.Enabled = True
                         'Call Me.AddFactTypeReadingsToEnterpriseAware()
@@ -1193,6 +1205,11 @@ Public Class frmToolboxORMReadingEditor
                 Me.TextboxReading.Focus()
             End If
 
+        End If
+
+        If Me.AutoComplete.ListBox.Items.Count > 0 Then
+            Me.LabelHelpTips.Text = ""
+            Me.LabelHelpTips.Text.Append("Press the [V] down arrow key on your keyboard to goto the AutoComplete box.")
         End If
 
     End Sub

@@ -179,9 +179,9 @@ Namespace TableConceptInstance
             lREcordset.Open(lsSQLQuery)
 
             If lREcordset(0).Value = 0 Then
-                Return False
+                ExistsConceptInstanceByModelPageConceptTypeRoleId = False
             Else
-                Return True
+                ExistsConceptInstanceByModelPageConceptTypeRoleId = True
             End If
 
             lREcordset.Close()

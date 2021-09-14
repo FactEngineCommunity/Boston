@@ -1621,7 +1621,11 @@ Public Class tBrain
                 '---------------------------------------------------------------------------------------------------
                 'Is either an incorrectly formatted FactTypeReading, or is not a FactTypeReading Statement at all.
                 '---------------------------------------------------------------------------------------------------
-                MsgBox("That's not a well formatted Fact Type Reading")
+                lsMessage = "That's not a well formatted Fact Type Reading."
+                lsMessage.AppendLine("The correct format to use is:")
+                lsMessage.AppendLine("Object Types, words start with a capital. E.g. Person")
+                lsMessage.AppendLine("Predicates are all lowercase. E.g. is married")
+                MsgBox(lsMessage)
                 Return False
             Else
                 Me.FTRProcessor.FACTTYPEREADINGStatement.FRONTREADINGTEXT = New List(Of String)

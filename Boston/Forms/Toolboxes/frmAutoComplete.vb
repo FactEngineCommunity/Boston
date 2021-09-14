@@ -408,4 +408,23 @@ Public Class frmAutoComplete
 
 
     End Sub
+
+    Private Sub ListBox_Click(sender As Object, e As EventArgs) Handles ListBox.Click
+
+        Try
+            If My.Settings.AutoCompleteSingleClickSelects Then
+                Call Me.processKeyDown(publicConstantsAutoComplete.pcenumACActionType.None)
+                Me.zoTextEditor.Focus()
+
+                '========================================================
+                'DateTimePicker
+                'Just to be sure...hide and send to back.
+                Me.DateTimePicker.Visible = False
+                Me.DateTimePicker.SendToBack()
+            End If
+
+        Catch ex As Exception
+
+        End Try
+    End Sub
 End Class

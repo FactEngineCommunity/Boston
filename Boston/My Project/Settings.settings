@@ -152,5 +152,8 @@
     <Setting Name="FactEngineUserDateFormat" Type="System.String" Scope="User">
       <Value Profile="(Default)">dd/MM/yyyy</Value>
     </Setting>
+    <Setting Name="AutoCompleteSingleClickSelects" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

@@ -510,21 +510,21 @@ Namespace FBM
 
         Function AreNoSelectedObjectsRoles() As Boolean
 
-            Dim liInd As Integer
-
             AreNoSelectedObjectsRoles = True
 
-            For liInd = 1 To Me.SelectedObject.Count
-                If Me.SelectedObject(liInd - 1).ConceptType = pcenumConceptType.Role Then
+            For Each lrSelectedObject In Me.SelectedObject
+                If lrSelectedObject.ConceptType = pcenumConceptType.Role Then
                     AreNoSelectedObjectsRoles = False
                 End If
-            Next liInd
+            Next
 
         End Function
 
         Function are_all_SelectedObjects_entity_types() As Boolean
 
             Dim lr_SelectedObject As Object
+
+            If Me.SelectedObject.FindAll(Function(x) x.GetType = GetType(FBM.RoleInstance)).Count > 0 Then Return False
 
             are_all_SelectedObjects_entity_types = True
 
@@ -535,9 +535,11 @@ Namespace FBM
                         'All Good.
                         '-----------
                     Case Else
-                        are_all_SelectedObjects_entity_types = False
+                        Return False
                 End Select
             Next
+
+            Return False
 
         End Function
 
@@ -579,25 +581,34 @@ Namespace FBM
             '  * Loop
             '-----------------------------------------------
 
-            Dim liInd As Integer
+            Try
+                Dim larSelectedRoleInstance = From SelectedObject In Me.SelectedObject
+                                              Where SelectedObject.GetType = GetType(FBM.RoleInstance)
+                                              Select SelectedObject
 
-            AreAllSelectedObjectsRoles = True
+                If larSelectedRoleInstance.Count = 0 Then
+                    Return False
+                Else
+                    Dim larTempSelectedObject = Me.SelectedObject.ToList
 
-            If (Me.SelectedObject.Count < 2) Or (Me.SelectedObject.Count = 0) Then
-                AreAllSelectedObjectsRoles = False
-                If (Me.SelectedObject.Count = 1) Then
-                    If (Me.SelectedObject(0).ConceptType = pcenumConceptType.Role) Then
-                        AreAllSelectedObjectsRoles = True
-                    End If
+                    For Each lrRoleInstance In larSelectedRoleInstance
+                        larTempSelectedObject.Remove(lrRoleInstance.FactType)
+                    Next
+
+                    Return larTempSelectedObject.FindAll(Function(x) x.GetType = GetType(FBM.RoleInstance)).Count = larTempSelectedObject.Count
+
                 End If
 
-            Else
-                For liInd = 1 To Me.SelectedObject.Count
-                    If Not (Me.SelectedObject(liInd - 1).ConceptType = pcenumConceptType.Role) Then
-                        AreAllSelectedObjectsRoles = False
-                    End If
-                Next liInd
-            End If
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return False
+            End Try
 
         End Function
 
@@ -605,76 +616,93 @@ Namespace FBM
 
             AreAllSelectedRolesJoinedToTheSameModelObject = True
 
-            Dim liInd As Integer
             Dim liFirstModelObjectId As String = ""
 
-            If Me.SelectedObject.Count = 0 Then
-                AreAllSelectedRolesJoinedToTheSameModelObject = False
-                Exit Function
-            ElseIf Me.SelectedObject.Count > 1 Then
+            Dim larSelectedRoleInstance = From SelectedObject In Me.SelectedObject
+                                          Where SelectedObject.GetType = GetType(FBM.RoleInstance)
+                                          Select SelectedObject
+            Dim larTempSelectedObject = Me.SelectedObject.ToList
+            For Each lrRoleInstance In larSelectedRoleInstance
+                larTempSelectedObject.Remove(lrRoleInstance.FactType)
+            Next
 
-                For liInd = 1 To Me.SelectedObject.Count
-                    If Me.SelectedObject(liInd - 1).ConceptType = pcenumConceptType.Role Then
-                        liFirstModelObjectId = Me.SelectedObject(liInd - 1).JoinedORMObject.Id
+            If larTempSelectedObject.Count = 0 Then
+                Return False
+            ElseIf larTempSelectedObject.Count > 1 Then
+
+                For Each lrSelectedObject In larTempSelectedObject
+                    If lrSelectedObject.ConceptType = pcenumConceptType.Role Then
+                        liFirstModelObjectId = lrSelectedObject.JoinedORMObject.Id
                         Exit For
                     End If
+                Next
 
-                Next liInd
-
-
-
-                For liInd = 1 To Me.SelectedObject.Count
-                    If Me.SelectedObject(liInd - 1).ConceptType = pcenumConceptType.Role Then
-                        If (liFirstModelObjectId = Me.SelectedObject(liInd - 1).JoinedORMObject.Id) Then
+                For Each lrSelectedObject In larTempSelectedObject
+                    If lrSelectedObject.ConceptType = pcenumConceptType.Role Then
+                        If (liFirstModelObjectId = lrSelectedObject.JoinedORMObject.Id) Then
                         Else
                             AreAllSelectedRolesJoinedToTheSameModelObject = False
                         End If
                     Else
                         AreAllSelectedRolesJoinedToTheSameModelObject = False
                     End If
-                Next liInd
+                Next
             End If
 
+            Return True
 
         End Function
 
         Function are_all_selected_roles_within_the_same_FactType() As Boolean
 
-            Dim liInd As Integer
             Dim liFirstFactTypeId As String = ""
 
-            If Me.SelectedObject.Count = 0 Then
-                are_all_selected_roles_within_the_same_FactType = False
-                Exit Function
+            Dim larSelectedRoleInstance = From SelectedObject In Me.SelectedObject
+                                          Where SelectedObject.GetType = GetType(FBM.RoleInstance)
+                                          Select SelectedObject
+            Dim larTempSelectedObject = Me.SelectedObject.ToList
+            For Each lrRoleInstance In larSelectedRoleInstance
+                larTempSelectedObject.Remove(lrRoleInstance.FactType)
+            Next
+
+            If larTempSelectedObject.Count = 0 Then
+                Return False
             Else
                 are_all_selected_roles_within_the_same_FactType = True
             End If
 
-            For liInd = 1 To Me.SelectedObject.Count
-                If Me.SelectedObject(liInd - 1).ConceptType = pcenumConceptType.Role Then
-                    liFirstFactTypeId = Me.SelectedObject(liInd - 1).factType.Id
+            For Each lrSelectedObject In larTempSelectedObject
+                If lrSelectedObject.ConceptType = pcenumConceptType.Role Then
+                    liFirstFactTypeId = lrSelectedObject.factType.Id
                     Exit For
                 End If
-            Next liInd
+            Next
 
-
-            For liInd = 1 To Me.SelectedObject.Count
-                If Me.SelectedObject(liInd - 1).ConceptType = pcenumConceptType.Role Then
-                    If Not (liFirstFactTypeId = Me.SelectedObject(liInd - 1).factType.Id) Then
+            For Each lrSelectedObject In larTempSelectedObject
+                If lrSelectedObject.ConceptType = pcenumConceptType.Role Then
+                    If Not liFirstFactTypeId = lrSelectedObject.factType.Id Then
                         are_all_selected_roles_within_the_same_FactType = False
                     End If
                 End If
-            Next liInd
+            Next
 
         End Function
 
         Public Function AreSelectedObjectsMultipleObjectTypes() As Boolean
 
+            Dim larSelectedRoleInstance = From SelectedObject In Me.SelectedObject
+                                          Where SelectedObject.GetType = GetType(FBM.RoleInstance)
+                                          Select SelectedObject
+            Dim larTempSelectedObject = Me.SelectedObject.ToList
+            For Each lrRoleInstance In larSelectedRoleInstance
+                larTempSelectedObject.Remove(lrRoleInstance.FactType)
+            Next
+
             Dim laiObjectTypes As Integer() = {pcenumConceptType.EntityType,
                                                pcenumConceptType.ValueType,
                                                pcenumConceptType.FactType}
 
-            Return Me.SelectedObject.FindAll(Function(x) laiObjectTypes.Contains(x.ConceptType)).Count > 1
+            Return larTempSelectedObject.FindAll(Function(x) laiObjectTypes.Contains(x.ConceptType)).Count > 1
 
         End Function
 
@@ -1388,28 +1416,53 @@ Namespace FBM
 
             role_and_object_type_selected = False
 
-            If Me.SelectedObject.Count > 3 Then
-                role_and_object_type_selected = False
-            Else
-                For liInd = 1 To Me.SelectedObject.Count
-                    Select Case Me.SelectedObject(liInd - 1).ConceptType
-                        Case Is = pcenumConceptType.EntityType,
-                                  pcenumConceptType.ValueType,
-                                  pcenumConceptType.FactType
-                            lb_object_type_selected = True
-                            liObjectTypeCount += 1
-                            If liObjectTypeCount > 1 Then
-                                lbMoreThanOneObjectTypeSelected = True
-                            End If
-                        Case Is = pcenumConceptType.Role
-                            lb_role_selected = True
-                    End Select
-                Next
+            Try
 
-                If lb_role_selected And lb_object_type_selected And Not lbMoreThanOneObjectTypeSelected And Not (liObjectTypeCount > 1) Then
-                    role_and_object_type_selected = True
+                Dim larSelectedRoleInstance = From SelectedObject In Me.SelectedObject
+                                              Where SelectedObject.GetType = GetType(FBM.RoleInstance)
+                                              Select SelectedObject
+
+                If larSelectedRoleInstance.Count > 1 Then
+                    Return False
+                ElseIf larSelectedRoleInstance.Count = 1 Then
+
+                    If Me.SelectedObject.Count > 3 Then
+                        Return False
+                    Else
+                        For liInd = 1 To Me.SelectedObject.Count
+                            Select Case Me.SelectedObject(liInd - 1).ConceptType
+                                Case Is = pcenumConceptType.EntityType,
+                                  pcenumConceptType.ValueType
+                                    lb_object_type_selected = True
+                                    liObjectTypeCount += 1
+                                    If liObjectTypeCount > 1 Then
+                                        lbMoreThanOneObjectTypeSelected = True
+                                    End If
+                                Case Is = pcenumConceptType.FactType
+                                    If Not larSelectedRoleInstance.First.FactType Is CType(Me.SelectedObject(liInd - 1), FBM.FactType) Then
+                                        lb_object_type_selected = True
+                                        liObjectTypeCount += 1
+                                        If liObjectTypeCount > 1 Then
+                                            lbMoreThanOneObjectTypeSelected = True
+                                        End If
+                                    End If
+                            End Select
+                        Next
+
+                        If lb_object_type_selected And Not lbMoreThanOneObjectTypeSelected And Not (liObjectTypeCount > 1) Then
+                            Return True
+                        End If
+                    End If
+
+                Else
+                    Return False
                 End If
-            End If
+
+            Catch ex As Exception
+                Return False
+            End Try
+
+            Return False
 
         End Function
 

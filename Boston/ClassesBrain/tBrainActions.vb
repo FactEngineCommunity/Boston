@@ -554,7 +554,7 @@ Partial Public Class tBrain
                 Me.CurrentQuestion.sentence.Sentence = Me.CurrentQuestion.sentence.Sentence.Replace(lsOldValueTypeName, lsValueTypeName)
                 Me.CurrentQuestion.sentence.ResetSentence()
 
-                Call Language.AnalyseSentence(Me.CurrentQuestion.sentence, Me.Model)
+                'Call Language.AnalyseSentence(Me.CurrentQuestion.sentence, Me.Model)
                 Call Language.ProcessSentence(Me.CurrentQuestion.sentence)
                 If Me.CurrentQuestion.sentence.AreAllWordsResolved Then
                     Call Language.ResolveSentence(Me.CurrentQuestion.sentence)

@@ -1480,7 +1480,7 @@ Namespace FBM
             If abRapidSave Then
                 Call TableConceptInstance.AddConceptInstance(lrConceptInstance)
             Else
-                If TableConceptInstance.ExistsConceptInstance(lrConceptInstance) Then
+                If TableConceptInstance.ExistsConceptInstance(lrConceptInstance, False) Then
                     Call TableConceptInstance.UpdateConceptInstance(lrConceptInstance)
                 Else
                     Call TableConceptInstance.AddConceptInstance(lrConceptInstance)
