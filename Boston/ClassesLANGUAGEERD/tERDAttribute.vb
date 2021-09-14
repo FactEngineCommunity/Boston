@@ -338,10 +338,15 @@ Namespace ERD
                     End Select
                 End If
 
-                Me.Entity.TableShape.ResizeToFitText(False)
+                Try
+                    Me.Entity.TableShape.ResizeToFitText(False)
+                Catch
+                    'Not a biggie.
+                End Try
+
 
             Catch ex As Exception
-                Dim lsMessage1 As String
+                    Dim lsMessage1 As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name

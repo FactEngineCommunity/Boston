@@ -1918,7 +1918,7 @@ Namespace FBM
                                    Where Column.Id = lrColumn.Id
                                    Select Index
 
-                    For Each lrIndex In larIndex
+                    For Each lrIndex In larIndex.ToArray
                         Call lrIndex.removeColumn(lrColumn)
                     Next
 
@@ -1957,7 +1957,7 @@ Namespace FBM
 
                 'All other ResponsibleColumns
                 If arRole.hasResponsibleColumns Then
-                    For Each lrColumn In arRole.getResponsibleColumns
+                    For Each lrColumn In arRole.getResponsibleColumns.ToArray
                         Call lrColumn.Table.removeColumn(lrColumn)
                     Next
                 End If

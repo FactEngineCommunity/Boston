@@ -1385,6 +1385,7 @@ Namespace RDS
                 For Each lrRoleConstraintRole In arRoleConstraint.RoleConstraintRole
 
                     Dim larColumn = From Column In Me.Column
+                                    Where lrRoleConstraintRole.Role.FactType.Arity = 2
                                     Where Column.Role.Id = lrRoleConstraintRole.Role.FactType.GetOtherRoleOfBinaryFactType(lrRoleConstraintRole.Role.Id).Id
                                     Select Column
 

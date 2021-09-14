@@ -161,7 +161,7 @@ Namespace Richmond
             Catch lo_ex As Exception
                 lsMessage = "Error: There was an error opening Richmond database: "
                 lsMessage &= vbCrLf & vbCrLf
-                lsMessage &= "'" & Trim(lo_ex.Message) & "'"
+                lsMessage &= "'" & Trim(lo_ex.Message) & "'" & vbCrLf & lo_ex.StackTrace
                 MsgBox(lsMessage)
                 Return False
             End Try

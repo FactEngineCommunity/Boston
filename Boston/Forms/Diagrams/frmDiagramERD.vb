@@ -3022,14 +3022,18 @@ Public Class frmDiagramERD
             Dim lrAttribute As ERD.Attribute
             For Each lrOriginColumn In lrERDLink.Relation.RDSRelation.OriginColumns
                 lrAttribute = Me.zrPage.ERDiagram.Attribute.Find(Function(x) x.Column.Id = lrOriginColumn.Id)
-                lrAttribute.Cell.TextColor = Color.Black
-                lrAttribute.Cell.Brush = New MindFusion.Drawing.SolidBrush(Color.White)
+                If lrAttribute IsNot Nothing Then
+                    lrAttribute.Cell.TextColor = Color.Black
+                    lrAttribute.Cell.Brush = New MindFusion.Drawing.SolidBrush(Color.White)
+                End If
             Next
 
             For Each lrDestinationColumn In lrERDLink.Relation.RDSRelation.DestinationColumns
                 lrAttribute = Me.zrPage.ERDiagram.Attribute.Find(Function(x) x.Column.Id = lrDestinationColumn.Id)
-                lrAttribute.Cell.TextColor = Color.Black
-                lrAttribute.Cell.Brush = New MindFusion.Drawing.SolidBrush(Color.White)
+                If lrAttribute IsNot Nothing Then
+                    lrAttribute.Cell.TextColor = Color.Black
+                    lrAttribute.Cell.Brush = New MindFusion.Drawing.SolidBrush(Color.White)
+                End If
             Next
 
         Catch ex As Exception

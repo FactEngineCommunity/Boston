@@ -5025,6 +5025,9 @@ Public Class frmDiagramORM
             '-----------------------------
             'Display the RoleConstraints
             '-----------------------------
+            'CodeSafe
+            Call Me.zrPage.removeRoleConstraintInstancesNoLongerInModel
+
             Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
             For Each lrRoleConstraintInstance In Me.zrPage.RoleConstraintInstance
                 '-------------------------

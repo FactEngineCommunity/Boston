@@ -2395,6 +2395,7 @@ Public Class frmToolboxORMVerbalisation
                     lrVerbaliser.HTW.WriteBreak()
 
                     lrRole = lrRoleConstraint.Role(0)
+                    larRole.Clear()
                     larRole.Add(lrRole)
 
                     For Each lrRole In arFactType.RoleGroup
@@ -2478,6 +2479,7 @@ Public Class frmToolboxORMVerbalisation
                         lrVerbaliser.HTW.WriteBreak()
                     End If
 
+                    lrVerbaliser.HTW.WriteBreak()
                     lrVerbaliser.HTW.WriteBreak()
                 Next
             Else

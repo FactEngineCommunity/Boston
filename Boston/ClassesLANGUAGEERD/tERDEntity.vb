@@ -353,7 +353,12 @@ Namespace ERD
                         Me.TableShape.Item(0, liInd).Tag = lrERAttribute 'lrERAttribute.Column.OrdinalPosition - 1
                         Call lrERAttribute.RefreshShape()
 
-                        Me.TableShape.ResizeToFitText(False)
+                        Try
+                            Me.TableShape.ResizeToFitText(False)
+                        Catch ex As Exception
+                            'Not a biggie.
+                        End Try
+
                         liInd += 1
                     Next
                 End If
@@ -627,7 +632,11 @@ Namespace ERD
                     Me.TableShape.Item(0, Me.TableShape.RowCount - 1).Tag = lrERAttribute
                     Call lrERAttribute.RefreshShape()
 
-                    Me.TableShape.ResizeToFitText(False)
+                    Try
+                        Me.TableShape.ResizeToFitText(False)
+                    Catch
+                        'Not a biggie.
+                    End Try
                 End If
 
                 Call Me.RefreshShape()

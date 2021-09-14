@@ -713,6 +713,10 @@ Namespace FBM
             Dim lrEntityTypeInstance As New FBM.EntityTypeInstance
 
             Try
+                'CodeSafe
+                If Not Me.Language = pcenumLanguage.ORMModel Then
+                    Return Nothing
+                End If
 
                 If Me.Diagram IsNot Nothing Then
                     Me.DiagramView.Cursor = Cursors.WaitCursor
@@ -885,20 +889,26 @@ Namespace FBM
             Dim lrFactType As New FBM.FactType
             Dim lrDroppedFactTypeInstance As New FBM.FactTypeInstance 'Used if arFactType is actually a FactTypeInstance (see Copy/Paste functions)
 
-            'Return failsafe
-            DropFactTypeAtPoint = Nothing
-
-            lrFactType = arFactType
-            'CodeSafe: Check to see if the FactType is already on the Page
-            If Me.FactTypeInstance.Find(Function(x) x.Id = lrFactType.Id) IsNot Nothing Then Exit Function
-
-
-            If Me.Diagram IsNot Nothing Then
-                Me.DiagramView.Cursor = Cursors.WaitCursor
-                Me.Diagram.Invalidate()
-            End If
-
             Try
+                'CodeSafe
+                If Not Me.Language = pcenumLanguage.ORMModel Then
+                    Return Nothing
+                End If
+
+                'Return failsafe
+                DropFactTypeAtPoint = Nothing
+
+                lrFactType = arFactType
+                'CodeSafe: Check to see if the FactType is already on the Page
+                If Me.FactTypeInstance.Find(Function(x) x.Id = lrFactType.Id) IsNot Nothing Then Exit Function
+
+
+                If Me.Diagram IsNot Nothing Then
+                    Me.DiagramView.Cursor = Cursors.WaitCursor
+                    Me.Diagram.Invalidate()
+                End If
+
+
                 '--------------------------------------------------------------------------------
                 'Check to see if the ModelObjects joined by the FactType are loaded on the Page
                 '--------------------------------------------------------------------------------
@@ -1212,69 +1222,86 @@ Namespace FBM
 
             Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
 
-            '-------------------------------------------------------------------------------------------------------
-            'Check to see that the relevant FactTypes referenced from the RoleConstraint are loaded onto the Page.
-            '-------------------------------------------------------------------------------------------------------
-            Dim lrRoleConstraintRole As FBM.RoleConstraintRole
-
-            For Each lrRoleConstraintRole In arRoleConstraint.RoleConstraintRole
-                If Me.FactTypeInstance.FindAll(Function(x) x.Id = lrRoleConstraintRole.Role.FactType.Id).Count = 0 Then
-                    Call Me.DropFactTypeAtPoint(lrRoleConstraintRole.Role.FactType, aoPoint, False)
+            Try
+                'CodeSafe
+                If Not Me.Language = pcenumLanguage.ORMModel Then
+                    Return Nothing
                 End If
-            Next
+                '-------------------------------------------------------------------------------------------------------
+                'Check to see that the relevant FactTypes referenced from the RoleConstraint are loaded onto the Page.
+                '-------------------------------------------------------------------------------------------------------
+                Dim lrRoleConstraintRole As FBM.RoleConstraintRole
 
-            If arRoleConstraint.Argument.Count > 1 Then
-                For Each lrArgument In arRoleConstraint.Argument
-                    For Each lrFactType In lrArgument.JoinPath.FactTypePath
-                        If Me.FactTypeInstance.FindAll(Function(x) x.Id = lrFactType.Id).Count = 0 Then
-                            Call Me.DropFactTypeAtPoint(lrFactType, aoPoint, False)
-                        End If
-                    Next
+                For Each lrRoleConstraintRole In arRoleConstraint.RoleConstraintRole
+                    If Me.FactTypeInstance.FindAll(Function(x) x.Id = lrRoleConstraintRole.Role.FactType.Id).Count = 0 Then
+                        Call Me.DropFactTypeAtPoint(lrRoleConstraintRole.Role.FactType, aoPoint, False)
+                    End If
                 Next
-            End If
 
-            '----------------------------------------------------------------------------------------
-            'Create a ConceptInstance that can be broadcast to other ClientServer Boston instances.
-            Dim lrConceptInstance As New FBM.ConceptInstance(Me.Model, Me, arRoleConstraint.Id, pcenumConceptType.EntityType)
-            lrConceptInstance.X = aoPoint.X
-            lrConceptInstance.Y = aoPoint.Y
+                If arRoleConstraint.Argument.Count > 1 Then
+                    For Each lrArgument In arRoleConstraint.Argument
+                        For Each lrFactType In lrArgument.JoinPath.FactTypePath
+                            If Me.FactTypeInstance.FindAll(Function(x) x.Id = lrFactType.Id).Count = 0 Then
+                                Call Me.DropFactTypeAtPoint(lrFactType, aoPoint, False)
+                            End If
+                        Next
+                    Next
+                End If
 
-            '----------------------------------------------------------------------------
-            'Add the RoleConstraint to the Model if it is not already within the Model.
-            '----------------------------------------------------------------------------
-            If Me.Model.RoleConstraint.Exists(AddressOf arRoleConstraint.Equals) Then
+                '----------------------------------------------------------------------------------------
+                'Create a ConceptInstance that can be broadcast to other ClientServer Boston instances.
+                Dim lrConceptInstance As New FBM.ConceptInstance(Me.Model, Me, arRoleConstraint.Id, pcenumConceptType.EntityType)
+                lrConceptInstance.X = aoPoint.X
+                lrConceptInstance.Y = aoPoint.Y
 
-                'Make sure the RoleConstraint is in the ModelDictionary
-                Call Me.Model.AddModelDictionaryEntry(New FBM.DictionaryEntry(Me.Model,
+                '----------------------------------------------------------------------------
+                'Add the RoleConstraint to the Model if it is not already within the Model.
+                '----------------------------------------------------------------------------
+                If Me.Model.RoleConstraint.Exists(AddressOf arRoleConstraint.Equals) Then
+
+                    'Make sure the RoleConstraint is in the ModelDictionary
+                    Call Me.Model.AddModelDictionaryEntry(New FBM.DictionaryEntry(Me.Model,
                                                                               arRoleConstraint.Id,
                                                                               pcenumConceptType.RoleConstraint),
                                                                               ,
                                                                               True)
 
-                '-----------------------------------------------------------------------------------------------------------------------
-                'Client/Server: Model.Add<ModelElement> would normally drop the ConceptInstance on the Page, but its not being called;
-                '  so we do the Client/Server broadcast processing here.
-                If My.Settings.UseClientServer And My.Settings.InitialiseClient And abBroadcastInterfaceEvent Then
-                    Call prDuplexServiceClient.BroadcastToDuplexService(Viev.FBM.Interface.pcenumBroadcastType.PageDropModelElementAtPoint,
+                    '-----------------------------------------------------------------------------------------------------------------------
+                    'Client/Server: Model.Add<ModelElement> would normally drop the ConceptInstance on the Page, but its not being called;
+                    '  so we do the Client/Server broadcast processing here.
+                    If My.Settings.UseClientServer And My.Settings.InitialiseClient And abBroadcastInterfaceEvent Then
+                        Call prDuplexServiceClient.BroadcastToDuplexService(Viev.FBM.Interface.pcenumBroadcastType.PageDropModelElementAtPoint,
                                                                         arRoleConstraint,
                                                                         lrConceptInstance)
+                    End If
+                Else
+                    Me.Model.AddRoleConstraint(arRoleConstraint, True, True, lrConceptInstance)
                 End If
-            Else
-                Me.Model.AddRoleConstraint(arRoleConstraint, True, True, lrConceptInstance)
-            End If
 
-            '-----------------------------------------------------------------------------------
-            'Create the RoleConstraintInstance and add the RoleConstraintInstance to the Page.
-            '-----------------------------------------------------------------------------------
-            lrRoleConstraintInstance = arRoleConstraint.CloneInstance(Me, True)
-            lrRoleConstraintInstance.X = aoPoint.X
-            lrRoleConstraintInstance.Y = aoPoint.Y
+                '-----------------------------------------------------------------------------------
+                'Create the RoleConstraintInstance and add the RoleConstraintInstance to the Page.
+                '-----------------------------------------------------------------------------------
+                lrRoleConstraintInstance = arRoleConstraint.CloneInstance(Me, True)
+                lrRoleConstraintInstance.X = aoPoint.X
+                lrRoleConstraintInstance.Y = aoPoint.Y
 
-            Call lrRoleConstraintInstance.DisplayAndAssociate()
+                Call lrRoleConstraintInstance.DisplayAndAssociate()
 
-            Call Me.MakeDirty()
+                Call Me.MakeDirty()
 
-            Return lrRoleConstraintInstance
+                Return lrRoleConstraintInstance
+
+            Catch ex As Exception
+
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return Nothing
+            End Try
 
         End Function
 
@@ -1286,6 +1313,11 @@ Namespace FBM
             Dim lrValueTypeInstance As New FBM.ValueTypeInstance
 
             Try
+                'CodeSafe
+                If Not Me.Language = pcenumLanguage.ORMModel Then
+                    Return Nothing
+                End If
+
                 lrValuetype = arValueType.Clone(Me.Model, False)
 
                 '----------------------------------------------------------------------------------------
@@ -2369,6 +2401,27 @@ Namespace FBM
                 prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
+        End Sub
+
+        Public Sub RemoveRoleConstraintInstancesNoLongerInModel()
+
+            Try
+                Dim larRoleConstraintsToRemove = From RoleConstraintInstance In Me.RoleConstraintInstance
+                                                 Where Not Me.Model.RoleConstraint.Contains(RoleConstraintInstance.RoleConstraint)
+                                                 Select RoleConstraintInstance
+
+                For Each lrRoleConstraintInstance In larRoleConstraintsToRemove.ToArray
+                    Call Me.RoleConstraintInstance.Remove(lrRoleConstraintInstance)
+                Next
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
         End Sub
 
         Public Sub RemoveValueTypeInstance(ByRef arValueTypeInstance As FBM.ValueTypeInstance, ByVal abBroadcastInterfaceEvent As Boolean)
