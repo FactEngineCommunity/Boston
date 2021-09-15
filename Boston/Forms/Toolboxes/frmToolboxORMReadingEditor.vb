@@ -672,7 +672,7 @@ Public Class frmToolboxORMReadingEditor
     Private Sub DataGrid_Readings_CellClick(sender As Object, e As DataGridViewCellEventArgs) Handles DataGrid_Readings.CellClick
 
         If e.ColumnIndex = 0 Then
-            Me.DataGrid_Readings.ContextMenuStrip = Nothing
+            'Me.DataGrid_Readings.ContextMenuStrip = Nothing
         ElseIf e.ColumnIndex = 1 Then
             Me.DataGrid_Readings.ContextMenuStrip = ContextMenuStripIsPreferred
             Me.DataGrid_Readings.Rows(e.RowIndex).Selected = True
@@ -834,12 +834,15 @@ Public Class frmToolboxORMReadingEditor
 
     Private Sub DataGrid_Readings_CellMouseDown(sender As Object, e As DataGridViewCellMouseEventArgs) Handles DataGrid_Readings.CellMouseDown
 
+
         If e.ColumnIndex = 0 Then
-            Me.DataGrid_Readings.ContextMenuStrip = Nothing
+            If Me.DataGrid_Readings.SelectedRows.Count > 0 Then
+                Me.DataGrid_Readings.ContextMenuStrip = ContextMenuFactTypeReading
+            End If
         ElseIf e.ColumnIndex = 1 Then
-            Me.DataGrid_Readings.ContextMenuStrip = ContextMenuStripIsPreferred
-        ElseIf e.ColumnIndex = 2 Then
-            Me.DataGrid_Readings.ContextMenuStrip = ContextMenuStripIsPreferredForPredicate
+                Me.DataGrid_Readings.ContextMenuStrip = ContextMenuStripIsPreferred
+            ElseIf e.ColumnIndex = 2 Then
+                Me.DataGrid_Readings.ContextMenuStrip = ContextMenuStripIsPreferredForPredicate
         End If
 
     End Sub
@@ -870,14 +873,6 @@ Public Class frmToolboxORMReadingEditor
         Me.LabelHelpTips.Text &= vbCrLf & "Select then press the [Delete] button to delete a selected Fact Type Reading"
         Me.Refresh()
     End Sub
-
-    Private Sub DataGrid_Readings_MouseClick(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles DataGrid_Readings.MouseClick
-        Me.LabelHelpTips.Text = "Double Click over a Fact Type Reading to edit the Fact Type Reading."
-        Me.LabelHelpTips.Text &= vbCrLf & "Select (Left Click leftmost column to highlight) a Fact Type Reading to Delete the selected Fact Type Reading."
-        Me.LabelHelpTips.Text &= vbCrLf & "Select then press the [Delete] button to delete a selected Fact Type Reading"
-        Me.Refresh()
-    End Sub
-
 
     Private Sub TextboxReading_KeyPress(sender As Object, e As KeyPressEventArgs) Handles TextboxReading.KeyPress
 
@@ -1532,4 +1527,88 @@ Public Class frmToolboxORMReadingEditor
 
     End Sub
 
+    Private Sub DeleteFactTypeReadingToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles DeleteFactTypeReadingToolStripMenuItem.Click
+
+        Try
+            Dim lsMessage As String = ""
+
+            Dim lrFactTypeReading As FBM.FactTypeReading
+
+            lrFactTypeReading = Me.DataGrid_Readings.SelectedRows(0).Tag
+
+            lsMessage = "Delete Fact Type Reading:" & vbCrLf & vbCrLf
+            lsMessage.AppendLine(lrFactTypeReading.GetReadingText)
+
+            If MsgBox(lsMessage, MsgBoxStyle.YesNo) = MsgBoxResult.Yes Then
+                Call Me.zrFactTypeInstance.FactType.RemoveFactTypeReading(lrFactTypeReading, True)
+                Call lrFactTypeReading.RemoveFromModel()
+                Call Me.PopulateDataGridWithFactTypeReadings()
+            End If
+
+
+        Catch ex As Exception
+
+        End Try
+
+    End Sub
+
+    Private Sub TextboxReading_MouseClick(sender As Object, e As MouseEventArgs) Handles TextboxReading.MouseClick
+
+        Me.LabelHelpTips.Text = "Double Click over a Fact Type Reading to edit the Fact Type Reading."
+        Me.LabelHelpTips.Text &= vbCrLf & "Select (Left Click leftmost column to highlight) a Fact Type Reading to Delete the selected Fact Type Reading."
+        Me.LabelHelpTips.Text &= vbCrLf & "Select then press the [Delete] button to delete a selected Fact Type Reading"
+        Me.Refresh()
+
+
+        Dim rowIndex As Integer = DataGrid_Readings.HitTest(e.Location.X, e.Location.Y).RowIndex
+
+        'If there was no DataGridViewRow under the cursor, return
+        If (rowIndex >= 0) Then
+
+            'Clear all other selections before making a New selection
+            DataGrid_Readings.ClearSelection()
+
+            'Select the found DataGridViewRow
+            DataGrid_Readings.Rows(rowIndex).Selected = True
+        End If
+
+    End Sub
+
+    Private Sub DataGrid_Readings_MouseClick(sender As Object, e As MouseEventArgs) Handles DataGrid_Readings.MouseClick
+
+        Dim rowIndex As Integer = DataGrid_Readings.HitTest(e.Location.X, e.Location.Y).RowIndex
+
+        'If there was no DataGridViewRow under the cursor, return
+        If (rowIndex >= 0) Then
+
+            'Clear all other selections before making a New selection
+            DataGrid_Readings.ClearSelection()
+
+            'Select the found DataGridViewRow
+            DataGrid_Readings.Rows(rowIndex).Selected = True
+        End If
+
+    End Sub
+
+    Private Sub DataGrid_Readings_CellMouseClick(sender As Object, e As DataGridViewCellMouseEventArgs) Handles DataGrid_Readings.CellMouseClick
+
+        Dim loPoint As Point = New Point(e.X, e.Y)
+
+        Dim rowIndex As Integer = DataGrid_Readings.HitTest(loPoint.X, loPoint.Y).RowIndex
+
+        'If there was no DataGridViewRow under the cursor, return
+        If (rowIndex >= 0) Then
+
+            'Clear all other selections before making a New selection
+            DataGrid_Readings.ClearSelection()
+
+            'Select the found DataGridViewRow
+            DataGrid_Readings.Rows(rowIndex).Selected = True
+
+        End If
+        If e.Button = MouseButtons.Right Then
+            Me.DataGrid_Readings.ContextMenuStrip = ContextMenuFactTypeReading
+        End If
+
+    End Sub
 End Class

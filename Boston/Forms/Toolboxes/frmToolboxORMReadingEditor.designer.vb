@@ -38,10 +38,13 @@ Partial Class frmToolboxORMReadingEditor
         Me.LabelFactTypeReadingEditor = New System.Windows.Forms.Label()
         Me.ContextMenuStripIsPreferredForPredicate = New System.Windows.Forms.ContextMenuStrip(Me.components)
         Me.ToolStripMenuItemIsPreferredForPredicate = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ContextMenuFactTypeReading = New System.Windows.Forms.ContextMenuStrip(Me.components)
+        Me.DeleteFactTypeReadingToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ContextMenuStrip_MoveTerms.SuspendLayout()
         CType(Me.DataGrid_Readings, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.ContextMenuStripIsPreferred.SuspendLayout()
         Me.ContextMenuStripIsPreferredForPredicate.SuspendLayout()
+        Me.ContextMenuFactTypeReading.SuspendLayout()
         Me.SuspendLayout()
         '
         'TextboxReading
@@ -159,6 +162,18 @@ Partial Class frmToolboxORMReadingEditor
         Me.ToolStripMenuItemIsPreferredForPredicate.Size = New System.Drawing.Size(203, 22)
         Me.ToolStripMenuItemIsPreferredForPredicate.Text = "Is Preferred for Predicate"
         '
+        'ContextMenuFactTypeReading
+        '
+        Me.ContextMenuFactTypeReading.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.DeleteFactTypeReadingToolStripMenuItem})
+        Me.ContextMenuFactTypeReading.Name = "ContextMenuFactTypeReading"
+        Me.ContextMenuFactTypeReading.Size = New System.Drawing.Size(206, 48)
+        '
+        'DeleteFactTypeReadingToolStripMenuItem
+        '
+        Me.DeleteFactTypeReadingToolStripMenuItem.Name = "DeleteFactTypeReadingToolStripMenuItem"
+        Me.DeleteFactTypeReadingToolStripMenuItem.Size = New System.Drawing.Size(205, 22)
+        Me.DeleteFactTypeReadingToolStripMenuItem.Text = "&Delete Fact Type Reading"
+        '
         'frmToolboxORMReadingEditor
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -180,6 +195,7 @@ Partial Class frmToolboxORMReadingEditor
         CType(Me.DataGrid_Readings, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ContextMenuStripIsPreferred.ResumeLayout(False)
         Me.ContextMenuStripIsPreferredForPredicate.ResumeLayout(False)
+        Me.ContextMenuFactTypeReading.ResumeLayout(False)
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -198,4 +214,6 @@ Partial Class frmToolboxORMReadingEditor
     Friend WithEvents ToolStripMenuItemIsPreferred As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents ContextMenuStripIsPreferredForPredicate As System.Windows.Forms.ContextMenuStrip
     Friend WithEvents ToolStripMenuItemIsPreferredForPredicate As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents ContextMenuFactTypeReading As ContextMenuStrip
+    Friend WithEvents DeleteFactTypeReadingToolStripMenuItem As ToolStripMenuItem
 End Class
