@@ -210,7 +210,8 @@
                         If liInd > 0 Then lsTDBQuery.AppendString(",")
 
                         Dim larPredicatePart = From PredicatePart In lrNode.QueryEdge.FBMFactTypeReading.PredicatePart
-                                               Where PredicatePart.Role.JoinedORMObject Is lrNode.FBMModelObject
+                                               Where (PredicatePart.Role.JoinedORMObject Is lrNode.FBMModelObject Or
+                                                      PredicatePart.Role.JoinedORMObject.isSubtypeOfModelElement(lrNode.FBMModelObject))
                                                Select PredicatePart
 
                         lsTDBQuery &= larPredicatePart.First.Role.Name & ": $" & lrNode.RDSTable.DatabaseName & lrNode.Alias

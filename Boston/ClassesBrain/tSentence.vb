@@ -217,24 +217,18 @@ Namespace Language
         ''' </summary>
         ''' <param name="asSentence"></param>
         ''' <remarks></remarks>
-        Private Function ReduceSpaces(ByVal asSentence As Object)
-
-            Dim li_position_of_double_space As Integer = 0
-            Dim lsNewSentence As String = ""
+        Private Function ReduceSpaces(ByVal asSentence As String) As String
 
             If asSentence.Contains("  ") Then
-                li_position_of_double_space = Me.Sentence.IndexOf("  ")
-                lsNewSentence = asSentence.Substring(0, li_position_of_double_space)
-                lsNewSentence &= asSentence.Substring(li_position_of_double_space + 1, (Me.Sentence.Length - lsNewSentence.Length) - 1)
-                Me.Sentence = lsNewSentence
-                If lsNewSentence.Contains("  ") Then
-                    Me.ReduceSpaces(lsNewSentence)
+                asSentence = asSentence.Replace("  ", " ")
+                If asSentence.Contains("  ") Then
+                    Me.ReduceSpaces(asSentence)
                 End If
             Else
                 Return asSentence
             End If
 
-            Return lsNewSentence
+            Return asSentence
 
         End Function
 

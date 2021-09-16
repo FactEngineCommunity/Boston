@@ -765,6 +765,31 @@ Namespace FBM
             End If
         End Function
 
+        Public Function isSubtypeOfModelElement(ByRef arModelElement As FBM.ModelObject) As Boolean
+
+            Try
+                For Each lrSubtypeRelationship In Me.SubtypeRelationship
+
+                    If lrSubtypeRelationship.parentEntityType Is arModelElement Then
+                        Return True
+                    ElseIf lrSubtypeRelationship.parentEntityType.isSubtypeOfModelElement(arModelElement) Then
+                        Return True
+                    End If
+                Next
+
+                Return False
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Function
+
         Public Function isReferenceModeValueType() As Boolean
 
             Try
