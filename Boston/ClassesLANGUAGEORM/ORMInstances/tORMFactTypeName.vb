@@ -103,7 +103,7 @@ Namespace FBM
                 If abRapidSave Then
                     Call TableConceptInstance.AddConceptInstance(lrConceptInstance)
                 Else
-                    If TableConceptInstance.ExistsConceptInstance(lrConceptInstance) Then
+                    If TableConceptInstance.ExistsConceptInstance(lrConceptInstance, False) Then
                         Call TableConceptInstance.UpdateConceptInstance(lrConceptInstance)
                     Else
                         Call TableConceptInstance.AddConceptInstance(lrConceptInstance)
@@ -121,6 +121,14 @@ Namespace FBM
 
         End Sub
 
+        Public Overrides Sub makeDirty()
+            MyBase.makeDirty()
+            Me.isDirty = True
+            Me.FactTypeInstance.isDirty = True
+            Me.Page.IsDirty = True
+            Me.Model.IsDirty = True
+        End Sub
+
         Public Sub MouseDown() Implements iPageObject.MouseDown
 
         End Sub
@@ -133,7 +141,11 @@ Namespace FBM
 
         End Sub
 
-        Public Sub Move(ByVal aiNewX As Integer, ByVal aiNewY As Integer, ByVal abBroadcastInterfaceEvent As Boolean) Implements iPageObject.Move
+        Public Overloads Sub Move(ByVal aiNewX As Integer, ByVal aiNewY As Integer, ByVal abBroadcastInterfaceEvent As Boolean) Implements iPageObject.Move
+
+            Me.X = aiNewX
+            Me.Y = aiNewY
+            Call Me.makeDirty()
 
         End Sub
 

@@ -206,15 +206,19 @@
 
                     lsTDBQuery &= "("
                     liInd = 0
+                    Dim larUsedPredicatePart As New List(Of FBM.PredicatePart)
                     For Each lrNode In larLinkedNodes
                         If liInd > 0 Then lsTDBQuery.AppendString(",")
 
                         Dim larPredicatePart = From PredicatePart In lrNode.QueryEdge.FBMFactTypeReading.PredicatePart
                                                Where (PredicatePart.Role.JoinedORMObject Is lrNode.FBMModelObject Or
                                                       PredicatePart.Role.JoinedORMObject.isSubtypeOfModelElement(lrNode.FBMModelObject))
+                                               Where Not larUsedPredicatePart.Contains(PredicatePart)
                                                Select PredicatePart
 
-                        lsTDBQuery &= larPredicatePart.First.Role.Name & ": $" & lrNode.RDSTable.DatabaseName & lrNode.Alias
+                        Dim lrPredicatePart = larPredicatePart.First
+                        larUsedPredicatePart.Add(lrPredicatePart)
+                        lsTDBQuery &= lrPredicatePart.Role.Name & ": $" & lrNode.RDSTable.DatabaseName & lrNode.Alias
 
                         liInd += 1
                     Next
@@ -375,7 +379,9 @@
 #Region "PGSNodeTable/RDSTable"
                         Dim lrOtherRole As FBM.Role = lrQueryEdge.FBMFactType.GetOtherRoleOfBinaryFactType(lrQueryEdge.FBMPredicatePart.Role.Id)
                         lsTDBQuery &= "(" & lrQueryEdge.FBMPredicatePart.Role.Name & ": $" & lrQueryEdge.BaseNode.RDSTable.DBVariableName & Viev.NullVal(lrQueryEdge.BaseNode.Alias, "") & ","
-                        lsTDBQuery &= lrOtherRole.Name & ": $" & lrQueryEdge.FBMFactType.DBName & lrQueryEdge.TargetNode.DBVariableName & Viev.NullVal(lrQueryEdge.TargetNode.Alias, "") & ") isa " & lrQueryEdge.FBMFactType.DBName & ";" & vbCrLf
+                        lsTDBQuery &= lrOtherRole.Name & ": $" & lrQueryEdge.TargetNode.DBVariableName & Viev.NullVal(lrQueryEdge.TargetNode.Alias, "") & ") isa " & lrQueryEdge.FBMFactType.DBName & ";" & vbCrLf
+
+                        '20210916-VM-This was in the line above lrQueryEdge.FBMFactType.DBName 
 
                         '20210904-VM-From SQL below. Might not be needed for TypeDB.
                         'lrOriginTable = lrQueryEdge.FBMFactType.getCorrespondingRDSTable

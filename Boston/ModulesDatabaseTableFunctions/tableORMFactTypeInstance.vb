@@ -166,6 +166,11 @@ Namespace TableFactTypeInstance
                             lrExistingFactTypeInstance.X = lrFactTypeInstance.X
                             lrExistingFactTypeInstance.Y = lrFactTypeInstance.Y
 
+                            For Each lrRoleInstance In lrExistingFactTypeInstance.RoleGroup
+                                lrRoleInstance.RoleName = New FBM.RoleName(lrRoleInstance, lrRoleInstance.Name)
+                                Call TableRoleName.GetRoleNameDetails(lrRoleInstance.RoleName)
+                            Next
+
                             Return lrExistingFactTypeInstance
                         Else
 

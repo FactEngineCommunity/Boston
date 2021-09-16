@@ -242,15 +242,19 @@ Namespace FBM
 
         End Sub
 
+        Public Overrides Sub makeDirty()
+            MyBase.makeDirty()
+
+            Me.isDirty = True
+            Me.RoleInstance.makeDirty()
+        End Sub
+
         Public Overloads Sub Move(ByVal aiNewX As Integer, ByVal aiNewY As Integer, ByVal abBroadcastInterfaceEvent As Boolean) Implements iPageObject.Move
 
             Try
                 Me.X = aiNewX
                 Me.Y = aiNewY
-
-                Me.isDirty = True
-                Me.RoleInstance.makeDirty()
-
+                Call Me.makeDirty()
             Catch ex As Exception
 
             End Try

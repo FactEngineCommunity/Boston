@@ -60,8 +60,6 @@
             lsSQLQuery &= "   AND ci.Symbol = et.RoleName_id"
             lsSQLQuery &= "   AND ci.ConceptType = '" & pcenumConceptType.RoleName.ToString & "'"
 
-
-
             lREcordset.Open(lsSQLQuery)
 
             getRoleName_instance_count_by_page = lREcordset(0).Value

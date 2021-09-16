@@ -539,7 +539,7 @@ Namespace FBM
                 End Select
             Next
 
-            Return False
+            Return True
 
         End Function
 

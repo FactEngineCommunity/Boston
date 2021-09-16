@@ -2312,14 +2312,19 @@ Namespace FBM
                         For Each lrDictionaryEntry In lrDictionary
 
                             lrColumn = New RDS.Column
-                            lrColumn = (From Table In Me.RDS.Table
-                                        From Column In Table.Column
-                                        Where Column.Table.Name = lrRelation.OriginTable.Name
-                                        Where Column.Id = lrDictionaryEntry.Value
-                                        Select Column).First
+                            Dim larOriginColumn = From Table In Me.RDS.Table
+                                                  From Column In Table.Column
+                                                  Where Column.Table.Name = lrRelation.OriginTable.Name
+                                                  Where Column.Id = lrDictionaryEntry.Value
+                                                  Select Column
 
-                            lrColumn.Relation.Add(lrRelation)
-                            lrRelation.OriginColumns.Add(lrColumn)
+                            If larOriginColumn.Count > 0 Then
+                                lrColumn = larOriginColumn.First
+                                lrColumn.Relation.Add(lrRelation)
+                                lrRelation.OriginColumns.Add(lrColumn)
+                            Else
+                                prApplication.ThrowErrorMessage("Relation: " & lrRelation.Id & ", had no origin column with " & lrDictionaryEntry.Value, pcenumErrorType.Warning, Nothing, False, False, False)
+                            End If
                         Next
 
                         'DestinationColumns

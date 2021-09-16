@@ -500,6 +500,8 @@ Public Class tApplication
                         End If
                     Case Is = pcenumErrorType.Warning
 
+                        Call prLogger.WriteToErrorLog(asErrorMessage, "", "Warning")
+
                         If abThrowtoMSGBox Then
                             MsgBox(asErrorMessage, MsgBoxStyle.Exclamation)
                         End If
