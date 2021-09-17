@@ -57,12 +57,16 @@ Namespace FBM
         Public Sub New(ByRef arModel As FBM.Model,
                        ByRef arPage As FBM.Page,
                        ByVal asSymbol As String,
-                       ByVal aiConceptType As pcenumConceptType)
+                       ByVal aiConceptType As pcenumConceptType,
+                       Optional ByVal aiX As Integer = 0,
+                       Optional ByVal aiY As Integer = 0)
 
             Me.ModelId = arModel.ModelId
             Me.PageId = arPage.PageId
             Me.Symbol = asSymbol
             Me.ConceptType = aiConceptType
+            Me.X = aiX
+            Me.Y = aiY
 
         End Sub
 

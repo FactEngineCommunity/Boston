@@ -190,7 +190,8 @@ Namespace TableRole
                                         lsMessage &= vbCrLf & vbCrLf
                                         lsMessage &= "To keep the show on the road, a Value Type with Id: " & lsMissingId & " will be created in the model."
                                         Dim lrValueType As New FBM.ValueType(arFactType.Model, pcenumLanguage.ORMModel, lsMissingId, True)
-                                        arFactType.Model.AddValueType(lrValueType, False, True, Nothing)
+                                        arFactType.Model.AddValueType(lrValueType, False, True, Nothing, True)
+                                        lrValueType.Save()
                                         lrRole.JoinedORMObject = lrValueType
                                         MsgBox(lsMessage)
                                     Else
@@ -200,9 +201,10 @@ Namespace TableRole
                                     End If
                                 Case Is = pcenumRoleJoinType.EntityType
                                     lsMessage &= vbCrLf & vbCrLf
-                                    lsMessage &= "To keep the show on the road, a Value Type with Id: " & lsMissingId & " will be created in the model."
+                                    lsMessage &= "To keep the show on the road, a Entity Type with Id: " & lsMissingId & " will be created in the model."
                                     Dim lrEntityType As New FBM.EntityType(arFactType.Model, pcenumLanguage.ORMModel, lsMissingId, lsMissingId, Nothing)
-                                    arFactType.Model.AddEntityType(lrEntityType, True, True, Nothing)
+                                    arFactType.Model.AddEntityType(lrEntityType, True, True, Nothing, True)
+                                    Call lrEntityType.Save()
                                     lrRole.JoinedORMObject = lrEntityType
                                     MsgBox(lsMessage)
                                 Case Is = pcenumRoleJoinType.FactType

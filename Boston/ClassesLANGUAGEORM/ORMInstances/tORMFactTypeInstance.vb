@@ -2634,7 +2634,12 @@ Namespace FBM
             lrConceptInstance = New FBM.ConceptInstance(Me.Model, Me.Page, Me.FactType.Id, pcenumConceptType.FactTypeName)
             Call TableConceptInstance.UpdateConceptInstanceByModelPageConceptTypeRoleId(lrConceptInstance, Me.Id)
 
-            lrConceptInstance = New FBM.ConceptInstance(Me.Model, Me.Page, Me.FactType.Id, pcenumConceptType.FactType)
+            lrConceptInstance = New FBM.ConceptInstance(Me.Model,
+                                                        Me.Page,
+                                                        Me.FactType.Id,
+                                                        pcenumConceptType.FactType,
+                                                        Me.X,
+                                                        Me.Y)
             Call TableConceptInstance.UpdateConceptInstanceByModelPageConceptTypeRoleId(lrConceptInstance, Me.Id)
 
             Me.Id = Me.FactType.Id

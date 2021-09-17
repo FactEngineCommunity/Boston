@@ -485,10 +485,11 @@ Namespace FBM
 
         End Function
 
-        Public Sub AddEntityType(ByRef arEntityType As FBM.EntityType, _
+        Public Sub AddEntityType(ByRef arEntityType As FBM.EntityType,
                                  Optional ByVal abMakeModelDirty As Boolean = False,
                                  Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
-                                 Optional arConceptInstance As FBM.ConceptInstance = Nothing)
+                                 Optional arConceptInstance As FBM.ConceptInstance = Nothing,
+                                 Optional abMakeDictionaryEntryDirty As Boolean = False)
 
             Dim lrDictionaryEntry As FBM.DictionaryEntry
 
@@ -499,6 +500,9 @@ Namespace FBM
 
             lrDictionaryEntry = Me.AddModelDictionaryEntry(New FBM.DictionaryEntry(Me, arEntityType.Id, pcenumConceptType.EntityType,,, abMakeModelDirty, abMakeModelDirty, arEntityType.DBName))
 
+            If abMakeDictionaryEntryDirty Then
+                lrDictionaryEntry.isDirty = True
+            End If
 
             arEntityType.Concept = lrDictionaryEntry.Concept
             arEntityType.ShortDescription = lrDictionaryEntry.ShortDescription
@@ -1466,7 +1470,8 @@ Namespace FBM
         Public Sub AddValueType(ByRef arValueType As FBM.ValueType,
                                 Optional ByVal abMakeModelDirty As Boolean = False,
                                 Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
-                                Optional arConceptInstance As FBM.ConceptInstance = Nothing)
+                                Optional arConceptInstance As FBM.ConceptInstance = Nothing,
+                                Optional abMakeModelDictionaryEntryDirty As Boolean = False)
 
             Try
                 Dim lrDictionaryEntry As FBM.DictionaryEntry
@@ -1475,13 +1480,10 @@ Namespace FBM
                 'Add a new DictionaryEntry to the ModelDictionary if the DictionaryEntry doesn't already exist.
                 '------------------------------------------------------------------------------------------------
                 lrDictionaryEntry = New FBM.DictionaryEntry(Me, arValueType.Id, pcenumConceptType.ValueType)
-                If Me.ModelDictionary.Exists(AddressOf lrDictionaryEntry.Equals) Then
-                    '-----------------------------------------------------------
-                    'The DictionaryEntry already exists in the ModelDictionary
-                    '-----------------------------------------------------------
-                    lrDictionaryEntry = Me.ModelDictionary.Find(AddressOf lrDictionaryEntry.Equals)            
-                Else
-                    lrDictionaryEntry = Me.AddModelDictionaryEntry(lrDictionaryEntry, True, abMakeModelDirty)
+                lrDictionaryEntry = Me.AddModelDictionaryEntry(lrDictionaryEntry, True, abMakeModelDirty)
+
+                If abMakeModelDictionaryEntryDirty Then
+                    lrDictionaryEntry.isDirty = True
                 End If
 
                 arValueType.Concept = lrDictionaryEntry.Concept

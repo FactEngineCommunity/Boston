@@ -2163,7 +2163,8 @@ Namespace FBM
             Dim lsMessage As String = ""
 
             Try
-                Dim lrDictionaryEntry = Me.Model.ModelDictionary.Find(Function(x) LCase(x.Symbol) = LCase(Me.Id))
+
+                Dim lrDictionaryEntry = Me.Model.ModelDictionary.Find(Function(x) LCase(x.Symbol) = LCase(Me.Id) And x.isEntityType)
 
                 '--------------------------------------------------------------------------------
                 'CodeSafe: If there is no dictionary entry for the EntityType, then create one.
@@ -2175,6 +2176,7 @@ Namespace FBM
                     prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning)
 
                     lrDictionaryEntry = New FBM.DictionaryEntry(Me.Model, Me.Id, pcenumConceptType.EntityType, Me.ShortDescription, Me.LongDescription)
+                    lrDictionaryEntry.isDirty = True
                 End If
 
                 lrDictionaryEntry.isEntityType = True
