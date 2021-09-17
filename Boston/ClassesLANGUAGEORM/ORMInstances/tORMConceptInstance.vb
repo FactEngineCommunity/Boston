@@ -44,13 +44,16 @@ Namespace FBM
             '-------------------
         End Sub
 
-        Public Sub New(ByRef arModel As FBM.Model, ByRef arPage As FBM.Page, ByVal asSymbol As String, Optional ByVal aiConceptType As pcenumConceptType = Nothing)
+        Public Sub New(ByRef arModel As FBM.Model,
+                       ByRef arPage As FBM.Page,
+                       ByVal asSymbol As String,
+                       Optional ByVal aiConceptType As pcenumConceptType = Nothing)
 
             Me.ModelId = arModel.ModelId
             Me.PageId = arPage.PageId
             Me.Symbol = asSymbol
 
-            If IsSomething(aiConceptType) Then
+            If aiConceptType IsNot Nothing Then
                 Me.ConceptType = aiConceptType
             End If
 

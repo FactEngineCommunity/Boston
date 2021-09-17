@@ -2626,13 +2626,15 @@ Namespace FBM
 
         Private Sub _FactType_NameChanged(ByVal asNewName As String) Handles _FactType.NameChanged
 
-            Dim lrConceptInstance As New FBM.ConceptInstance(Me.Model, Me.Page, Me.FactType.Id, pcenumConceptType.FactType)
-            Call TableConceptInstance.UpdateConceptInstanceByModelPageConceptTypeRoleId(lrConceptInstance, Me.Id)
+            Dim lrConceptInstance As FBM.ConceptInstance
 
             lrConceptInstance = New FBM.ConceptInstance(Me.Model, Me.Page, Me.FactType.Id, pcenumConceptType.FactTable)
             Call TableConceptInstance.UpdateConceptInstanceByModelPageConceptTypeRoleId(lrConceptInstance, Me.Id)
 
             lrConceptInstance = New FBM.ConceptInstance(Me.Model, Me.Page, Me.FactType.Id, pcenumConceptType.FactTypeName)
+            Call TableConceptInstance.UpdateConceptInstanceByModelPageConceptTypeRoleId(lrConceptInstance, Me.Id)
+
+            lrConceptInstance = New FBM.ConceptInstance(Me.Model, Me.Page, Me.FactType.Id, pcenumConceptType.FactType)
             Call TableConceptInstance.UpdateConceptInstanceByModelPageConceptTypeRoleId(lrConceptInstance, Me.Id)
 
             Me.Id = Me.FactType.Id
