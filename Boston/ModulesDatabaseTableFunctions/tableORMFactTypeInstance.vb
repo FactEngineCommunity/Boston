@@ -499,7 +499,8 @@ Namespace TableFactTypeInstance
                 lsSQLQuery &= "   SET Orientation = " & arFactTypeInstance.FactTypeOrientation
                 lsSQLQuery &= "       ,x = " & arFactTypeInstance.X
                 lsSQLQuery &= "       ,y = " & arFactTypeInstance.Y
-                lsSQLQuery &= " WHERE PageId = '" & Trim(arFactTypeInstance.Page.PageId) & "'"
+                lsSQLQuery &= " WHERE ModelId = '" & Trim(arFactTypeInstance.Model.ModelId) & "'"
+                lsSQLQuery &= "   AND PageId = '" & Trim(arFactTypeInstance.Page.PageId) & "'"
                 lsSQLQuery &= "   AND Symbol = '" & Replace(Trim(arFactTypeInstance.Id), "'", "`") & "'"
                 lsSQLQuery &= "   AND ConceptType = '" & pcenumConceptType.FactType.ToString & "'"
 

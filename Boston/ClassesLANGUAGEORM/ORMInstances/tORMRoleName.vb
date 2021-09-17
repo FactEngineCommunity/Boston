@@ -190,6 +190,7 @@ Namespace FBM
                 End If
 
                 Me.Shape.Move(Me.X, Me.Y)
+                Me.Move(Me.X, Me.Y, True)
 
             Catch ex As Exception
                 Dim lsMessage As String

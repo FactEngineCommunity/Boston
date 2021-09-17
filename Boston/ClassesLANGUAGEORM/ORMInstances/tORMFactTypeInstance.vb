@@ -1902,7 +1902,12 @@ Namespace FBM
                     StringSize.Height += 5
 
 
-                    loFactTypeName = Me.Page.Diagram.Factory.CreateShapeNode(Me.X, Me.Y - 7, StringSize.Width, StringSize.Height) 'Me.FactTypeName.X, Me.FactTypeName.Y, StringSize.Width, StringSize.Height)
+                    If Me.FactTypeName IsNot Nothing Then
+                        loFactTypeName = Me.Page.Diagram.Factory.CreateShapeNode(Me.FactTypeName.X, Me.FactTypeName.Y, StringSize.Width, StringSize.Height) 'Me.FactTypeName.X, Me.FactTypeName.Y, StringSize.Width, StringSize.Height)
+                    Else
+                        loFactTypeName = Me.Page.Diagram.Factory.CreateShapeNode(Me.X, Me.Y - 12, StringSize.Width, StringSize.Height) 'Me.FactTypeName.X, Me.FactTypeName.Y, StringSize.Width, StringSize.Height)
+                    End If
+
                     loFactTypeName.Shape = MindFusion.Diagramming.Shapes.Rectangle
                     loFactTypeName.HandlesStyle = HandlesStyle.InvisibleMove
                     loFactTypeName.Text = lsFactTypeName
