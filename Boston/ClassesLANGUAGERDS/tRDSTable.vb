@@ -610,7 +610,7 @@ Namespace RDS
                                                      Optional ByRef arQueryEdge As FactEngine.QueryEdge = Nothing) As RDS.Relation
 
             Try
-                Dim larRelation = From Relation In Me.getRelations
+                Dim larRelation = From Relation In Me.getOutgoingRelations
                                   Where aarFBMModelObject.Contains(Relation.DestinationTable.FBMModelElement)
                                   Where aarFBMModelObject.Contains(Relation.OriginTable.FBMModelElement)
                                   Where Relation.ResponsibleFactType.Id = arFactType.Id

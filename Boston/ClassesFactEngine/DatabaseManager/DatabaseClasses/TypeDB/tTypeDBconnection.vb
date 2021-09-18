@@ -146,7 +146,13 @@ Namespace FactEngine.TypeDB
                                     Case Is = "Long"
                                         loFieldValue = loValue.Thing.Value.Long
                                     Case Else
-                                        loFieldValue = loValue.Thing.Value.String
+                                        Try
+                                            loFieldValue = loValue.Thing.Value.String
+                                        Catch ex As Exception
+                                            loFieldValue = loValue.Thing.ToString
+                                            'Not a biggie at this stage.
+                                        End Try
+
                                 End Select
 
 
