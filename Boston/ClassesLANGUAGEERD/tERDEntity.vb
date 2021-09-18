@@ -589,6 +589,10 @@ Namespace ERD
 
                 lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
+                If lrRecordset.EOF Then Exit Sub 'Because may not have updated CMML
+
+                If Me.Page.Diagram Is Nothing Then Exit Sub 'No use adding an Entity that isn't loaded.
+
                 lrFactDataInstance = lrRecordset("Attribute").CloneInstance(Me.Page)
 
                 lrERAttribute = lrFactDataInstance.CloneAttribute(Me.Page)

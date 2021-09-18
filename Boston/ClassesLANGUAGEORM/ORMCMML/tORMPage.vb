@@ -2135,389 +2135,405 @@ Namespace FBM
             Dim lrRecordset1 As ORMQL.Recordset
             Dim lrRecordset2 As ORMQL.Recordset
 
-            Dim lrFactInstance As New FBM.FactInstance
+            Try
+                Dim lrFactInstance As New FBM.FactInstance
 
-            Dim lasRelationId As New List(Of String) 'List of the Relations loaded onto the Page. Used so that a relation that links an Entity to itself is not loaded twice.
+                Dim lasRelationId As New List(Of String) 'List of the Relations loaded onto the Page. Used so that a relation that links an Entity to itself is not loaded twice.
 
-            '20180609-VM-ToDo-lrFactInstance is used for a Link (below) but set to nothing in particular (above).
+                '20180609-VM-ToDo-lrFactInstance is used for a Link (below) but set to nothing in particular (above).
 
-            For liInd As Integer = 1 To 2
+                For liInd As Integer = 1 To 2
 
-                lsSQLQuery = "SELECT *"
-                If liInd = 1 Then
-                    lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreRelationIsForEntity.ToString
-                Else
-                    lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreRelationHasDestinationEntity.ToString
-                End If
-                lsSQLQuery &= " WHERE Entity = '" & arEntity.Name & "'"
-
-                lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-                Dim lrOrigingEREntity As ERD.Entity
-                Dim lrDestinationgEREntity As ERD.Entity
-                Dim lsRelationId As String = ""
-
-                While Not lrRecordset.EOF
-                    '------------------------
-                    'Find the Origin Entity
-                    '------------------------
-                    lsRelationId = lrRecordset("Relation").Data
-
+                    lsSQLQuery = "SELECT *"
                     If liInd = 1 Then
-                        lrOrigingEREntity = New ERD.Entity
-                        lrDestinationgEREntity = New ERD.Entity
-                        lrOrigingEREntity.Symbol = lrRecordset("Entity").Data
-                        lrOrigingEREntity = Me.ERDiagram.Entity.Find(AddressOf lrOrigingEREntity.EqualsBySymbol)
-
-                        '-----------------------------
-                        'Find the Destination Entity
-                        '-----------------------------
-                        lsSQLQuery = "SELECT *"
-                        lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreRelationHasDestinationEntity.ToString
-                        lsSQLQuery &= " WHERE Relation = '" & lsRelationId & "'"
-
-                        lrRecordset1 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-                        lrDestinationgEREntity.Symbol = lrRecordset1("Entity").Data
-
-                        lrDestinationgEREntity = Me.ERDiagram.Entity.Find(AddressOf lrDestinationgEREntity.EqualsBySymbol)
-                    Else '=2
-                        lrOrigingEREntity = New ERD.Entity
-                        lrDestinationgEREntity = New ERD.Entity
-                        lrDestinationgEREntity.Symbol = lrRecordset("Entity").Data
-                        lrDestinationgEREntity = Me.ERDiagram.Entity.Find(AddressOf lrDestinationgEREntity.EqualsBySymbol)
-
-                        '-----------------------------
-                        'Find the Destination Entity
-                        '-----------------------------
-                        lsSQLQuery = "SELECT *"
                         lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreRelationIsForEntity.ToString
-                        lsSQLQuery &= " WHERE Relation = '" & lsRelationId & "'"
-
-                        lrRecordset1 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-                        lrOrigingEREntity.Symbol = lrRecordset1("Entity").Data
-                        lrOrigingEREntity = Me.ERDiagram.Entity.Find(AddressOf lrOrigingEREntity.EqualsBySymbol)
+                    Else
+                        lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreRelationHasDestinationEntity.ToString
                     End If
+                    lsSQLQuery &= " WHERE Entity = '" & arEntity.Name & "'"
 
-                    If (lrOrigingEREntity IsNot Nothing) And (lrDestinationgEREntity IsNot Nothing) And Not lasRelationId.Contains(lsRelationId) Then
+                    lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
-                        lasRelationId.Add(lsRelationId)
+                    Dim lrOrigingEREntity As ERD.Entity
+                    Dim lrDestinationgEREntity As ERD.Entity
+                    Dim lsRelationId As String = ""
 
-                        Dim loOriginTableNode As ERD.TableNode = lrOrigingEREntity.TableShape
-                        Dim loDestinationTableNode As ERD.TableNode = lrDestinationgEREntity.TableShape
+                    While Not lrRecordset.EOF
+                        '------------------------
+                        'Find the Origin Entity
+                        '------------------------
+                        lsRelationId = lrRecordset("Relation").Data
 
-                        lsSQLQuery = "ADD FACT '" & lrRecordset.CurrentFact.Id & "'"
                         If liInd = 1 Then
-                            lsSQLQuery &= " TO " & pcenumCMMLRelations.CoreRelationIsForEntity.ToString
-                        Else
-                            lsSQLQuery &= " TO " & pcenumCMMLRelations.CoreRelationHasDestinationEntity.ToString
+                            lrOrigingEREntity = New ERD.Entity
+                            lrDestinationgEREntity = New ERD.Entity
+                            lrOrigingEREntity.Symbol = lrRecordset("Entity").Data
+                            lrOrigingEREntity = Me.ERDiagram.Entity.Find(AddressOf lrOrigingEREntity.EqualsBySymbol)
+
+                            '-----------------------------
+                            'Find the Destination Entity
+                            '-----------------------------
+                            lsSQLQuery = "SELECT *"
+                            lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreRelationHasDestinationEntity.ToString
+                            lsSQLQuery &= " WHERE Relation = '" & lsRelationId & "'"
+
+                            lrRecordset1 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                            lrDestinationgEREntity.Symbol = lrRecordset1("Entity").Data
+
+                            lrDestinationgEREntity = Me.ERDiagram.Entity.Find(AddressOf lrDestinationgEREntity.EqualsBySymbol)
+                        Else '=2
+                            lrOrigingEREntity = New ERD.Entity
+                            lrDestinationgEREntity = New ERD.Entity
+                            lrDestinationgEREntity.Symbol = lrRecordset("Entity").Data
+                            lrDestinationgEREntity = Me.ERDiagram.Entity.Find(AddressOf lrDestinationgEREntity.EqualsBySymbol)
+
+                            '-----------------------------
+                            'Find the Destination Entity
+                            '-----------------------------
+                            lsSQLQuery = "SELECT *"
+                            lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreRelationIsForEntity.ToString
+                            lsSQLQuery &= " WHERE Relation = '" & lsRelationId & "'"
+
+                            lrRecordset1 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                            If lrRecordset1.EOF Then
+                                Dim lsMessage = "Relation without a Origin Entity. Relation.Id: " & lsRelationId
+                                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning, Nothing, False, False, False)
+                                lrOrigingEREntity = Nothing
+                            Else
+                                lrOrigingEREntity.Symbol = lrRecordset1("Entity").Data
+                                lrOrigingEREntity = Me.ERDiagram.Entity.Find(AddressOf lrOrigingEREntity.EqualsBySymbol)
+                            End If
                         End If
-                        lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
 
-                        Call Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                        If (lrOrigingEREntity IsNot Nothing) And (lrDestinationgEREntity IsNot Nothing) And Not lasRelationId.Contains(lsRelationId) Then
 
-                        lsSQLQuery = "ADD FACT '" & lrRecordset1.CurrentFact.Id & "'"
-                        If liInd = 1 Then
-                            lsSQLQuery &= " TO " & pcenumCMMLRelations.CoreRelationHasDestinationEntity.ToString
+                            lasRelationId.Add(lsRelationId)
 
-                        Else
-                            lsSQLQuery &= " TO " & pcenumCMMLRelations.CoreRelationIsForEntity.ToString
-                        End If
-                        lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
+                            Dim loOriginTableNode As ERD.TableNode = lrOrigingEREntity.TableShape
+                            Dim loDestinationTableNode As ERD.TableNode = lrDestinationgEREntity.TableShape
 
-                        Call Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-                        lsSQLQuery = "SELECT *"
-                        lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreOriginMultiplicity.ToString  '(ERDEntity, Multiplicity)
-                        lsSQLQuery &= " WHERE ERDRelation = '" & lsRelationId & "'"
-
-                        lrRecordset2 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-                        Dim liOriginMultiplicity As pcenumCMMLMultiplicity
-                        Call liOriginMultiplicity.GetByDescription(lrRecordset2("Multiplicity").Data)
-
-                        lsSQLQuery = "ADD FACT '" & lrRecordset2.CurrentFact.Id & "'"
-                        lsSQLQuery &= " TO " & pcenumCMMLRelations.CoreOriginMultiplicity.ToString
-                        lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
-
-                        Call Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-                        lsSQLQuery = "SELECT *"
-                        lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreDestinationMultiplicity.ToString '(ERDEntity, Multiplicity)
-                        lsSQLQuery &= " WHERE ERDRelation = '" & lsRelationId & "'"
-
-                        lrRecordset2 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-                        Dim liDestinationMultiplicity As pcenumCMMLMultiplicity
-                        Call liDestinationMultiplicity.GetByDescription(lrRecordset2("Multiplicity").Data)
-
-                        lsSQLQuery = "ADD FACT '" & lrRecordset2.CurrentFact.Id & "'"
-                        lsSQLQuery &= " TO " & pcenumCMMLRelations.CoreDestinationMultiplicity.ToString
-                        lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
-
-                        Call Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-                        lsSQLQuery = "SELECT *"
-                        lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreRelationIsForFactType.ToString '(Relation, FactType)
-                        lsSQLQuery &= " WHERE Relation = '" & lsRelationId & "'"
-
-                        lrRecordset2 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-                        lsSQLQuery = "ADD FACT '" & lrRecordset2.CurrentFact.Id & "'"
-                        lsSQLQuery &= " TO " & pcenumCMMLRelations.CoreRelationIsForFactType.ToString
-                        lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
-
-                        Call Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-                        '===================================================================
-                        'Origin/Destination Mandatory requirements
-                        lsSQLQuery = "SELECT *"
-                        lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreOriginIsMandatory.ToString  '(Relation, Predicate)
-                        lsSQLQuery &= " WHERE OriginIsMandatory = '" & lsRelationId & "'"
-
-                        lrRecordset2 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-                        Dim lbRelationOriginIsMandatory As Boolean = lrRecordset2.Facts.Count > 0
-
-                        While Not lrRecordset2.EOF
-                            lsSQLQuery = "ADD FACT '" & lrRecordset2.CurrentFact.Id & "'"
-                            lsSQLQuery &= " TO " & pcenumCMMLRelations.CoreOriginIsMandatory.ToString
+                            lsSQLQuery = "ADD FACT '" & lrRecordset.CurrentFact.Id & "'"
+                            If liInd = 1 Then
+                                lsSQLQuery &= " TO " & pcenumCMMLRelations.CoreRelationIsForEntity.ToString
+                            Else
+                                lsSQLQuery &= " TO " & pcenumCMMLRelations.CoreRelationHasDestinationEntity.ToString
+                            End If
                             lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
 
                             Call Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
-                            lrRecordset2.MoveNext()
-                        End While
+                            lsSQLQuery = "ADD FACT '" & lrRecordset1.CurrentFact.Id & "'"
+                            If liInd = 1 Then
+                                lsSQLQuery &= " TO " & pcenumCMMLRelations.CoreRelationHasDestinationEntity.ToString
 
-                        lsSQLQuery = "SELECT *"
-                        lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreDestinationIsMandatory.ToString  '(Relation, Predicate)
-                        lsSQLQuery &= " WHERE DestinationIsMandatory = '" & lsRelationId & "'"
-
-                        lrRecordset2 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-                        Dim lbRelationDestinationIsMandatory As Boolean = lrRecordset2.Facts.Count > 0
-
-                        While Not lrRecordset2.EOF
-                            lsSQLQuery = "ADD FACT '" & lrRecordset2.CurrentFact.Id & "'"
-                            lsSQLQuery &= " TO " & pcenumCMMLRelations.CoreDestinationIsMandatory.ToString
+                            Else
+                                lsSQLQuery &= " TO " & pcenumCMMLRelations.CoreRelationIsForEntity.ToString
+                            End If
                             lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
 
                             Call Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
-                            lrRecordset2.MoveNext()
-                        End While
+                            lsSQLQuery = "SELECT *"
+                            lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreOriginMultiplicity.ToString  '(ERDEntity, Multiplicity)
+                            lsSQLQuery &= " WHERE ERDRelation = '" & lsRelationId & "'"
 
-                        '----------------------------------------------------------------------------
-                        'Create the Relation for the ERD
-                        'ToDo: Needs ' lbcontributestoprimarykey
-                        Dim lrRelation As New ERD.Relation(Me.Model,
-                                                           Me,
-                                                           lsRelationId,
-                                                           lrOrigingEREntity,
-                                                           liOriginMultiplicity,
-                                                           lbRelationOriginIsMandatory,
-                                                           False,
-                                                           lrDestinationgEREntity,
-                                                           liDestinationMultiplicity,
-                                                           lbRelationDestinationIsMandatory)
+                            lrRecordset2 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                            Dim liOriginMultiplicity As pcenumCMMLMultiplicity
+                            Call liOriginMultiplicity.GetByDescription(lrRecordset2("Multiplicity").Data)
 
-                        '=================================================================
-
-                        'Origin/Destination Predicates
-                        lsSQLQuery = "SELECT *"
-                        lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreOriginPredicate.ToString '(Relation, Predicate)
-                        lsSQLQuery &= " WHERE Relation = '" & lsRelationId & "'"
-
-                        lrRecordset2 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-                        lrRelation.OriginPredicate = lrRecordset2("Predicate").Data
-
-
-                        lsSQLQuery = "ADD FACT '" & lrRecordset2.CurrentFact.Id & "'"
-                        lsSQLQuery &= " TO " & pcenumCMMLRelations.CoreOriginPredicate.ToString
-                        lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
-
-                        Call Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-                        lsSQLQuery = "SELECT *"
-                        lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreDestinationPredicate.ToString  '(Relation, Predicate)
-                        lsSQLQuery &= " WHERE Relation = '" & lsRelationId & "'"
-
-                        lrRecordset2 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-                        lrRelation.DestinationPredicate = lrRecordset2("Predicate").Data
-
-                        If lrRecordset2.Facts.Count > 0 Then
                             lsSQLQuery = "ADD FACT '" & lrRecordset2.CurrentFact.Id & "'"
-                            lsSQLQuery &= " TO " & pcenumCMMLRelations.CoreDestinationPredicate.ToString
+                            lsSQLQuery &= " TO " & pcenumCMMLRelations.CoreOriginMultiplicity.ToString
                             lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
 
                             Call Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                            lsSQLQuery = "SELECT *"
+                            lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreDestinationMultiplicity.ToString '(ERDEntity, Multiplicity)
+                            lsSQLQuery &= " WHERE ERDRelation = '" & lsRelationId & "'"
+
+                            lrRecordset2 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                            Dim liDestinationMultiplicity As pcenumCMMLMultiplicity
+                            Call liDestinationMultiplicity.GetByDescription(lrRecordset2("Multiplicity").Data)
+
+                            lsSQLQuery = "ADD FACT '" & lrRecordset2.CurrentFact.Id & "'"
+                            lsSQLQuery &= " TO " & pcenumCMMLRelations.CoreDestinationMultiplicity.ToString
+                            lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
+
+                            Call Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                            lsSQLQuery = "SELECT *"
+                            lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreRelationIsForFactType.ToString '(Relation, FactType)
+                            lsSQLQuery &= " WHERE Relation = '" & lsRelationId & "'"
+
+                            lrRecordset2 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                            lsSQLQuery = "ADD FACT '" & lrRecordset2.CurrentFact.Id & "'"
+                            lsSQLQuery &= " TO " & pcenumCMMLRelations.CoreRelationIsForFactType.ToString
+                            lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
+
+                            Call Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                            '===================================================================
+                            'Origin/Destination Mandatory requirements
+                            lsSQLQuery = "SELECT *"
+                            lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreOriginIsMandatory.ToString  '(Relation, Predicate)
+                            lsSQLQuery &= " WHERE OriginIsMandatory = '" & lsRelationId & "'"
+
+                            lrRecordset2 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                            Dim lbRelationOriginIsMandatory As Boolean = lrRecordset2.Facts.Count > 0
+
+                            While Not lrRecordset2.EOF
+                                lsSQLQuery = "ADD FACT '" & lrRecordset2.CurrentFact.Id & "'"
+                                lsSQLQuery &= " TO " & pcenumCMMLRelations.CoreOriginIsMandatory.ToString
+                                lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
+
+                                Call Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                                lrRecordset2.MoveNext()
+                            End While
+
+                            lsSQLQuery = "SELECT *"
+                            lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreDestinationIsMandatory.ToString  '(Relation, Predicate)
+                            lsSQLQuery &= " WHERE DestinationIsMandatory = '" & lsRelationId & "'"
+
+                            lrRecordset2 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                            Dim lbRelationDestinationIsMandatory As Boolean = lrRecordset2.Facts.Count > 0
+
+                            While Not lrRecordset2.EOF
+                                lsSQLQuery = "ADD FACT '" & lrRecordset2.CurrentFact.Id & "'"
+                                lsSQLQuery &= " TO " & pcenumCMMLRelations.CoreDestinationIsMandatory.ToString
+                                lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
+
+                                Call Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                                lrRecordset2.MoveNext()
+                            End While
+
+                            '----------------------------------------------------------------------------
+                            'Create the Relation for the ERD
+                            'ToDo: Needs ' lbcontributestoprimarykey
+                            Dim lrRelation As New ERD.Relation(Me.Model,
+                                                               Me,
+                                                               lsRelationId,
+                                                               lrOrigingEREntity,
+                                                               liOriginMultiplicity,
+                                                               lbRelationOriginIsMandatory,
+                                                               False,
+                                                               lrDestinationgEREntity,
+                                                               liDestinationMultiplicity,
+                                                               lbRelationDestinationIsMandatory)
+
+                            '=================================================================
+
+                            'Origin/Destination Predicates
+                            lsSQLQuery = "SELECT *"
+                            lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreOriginPredicate.ToString '(Relation, Predicate)
+                            lsSQLQuery &= " WHERE Relation = '" & lsRelationId & "'"
+
+                            lrRecordset2 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                            lrRelation.OriginPredicate = lrRecordset2("Predicate").Data
+
+
+                            lsSQLQuery = "ADD FACT '" & lrRecordset2.CurrentFact.Id & "'"
+                            lsSQLQuery &= " TO " & pcenumCMMLRelations.CoreOriginPredicate.ToString
+                            lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
+
+                            Call Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                            lsSQLQuery = "SELECT *"
+                            lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreDestinationPredicate.ToString  '(Relation, Predicate)
+                            lsSQLQuery &= " WHERE Relation = '" & lsRelationId & "'"
+
+                            lrRecordset2 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                            lrRelation.DestinationPredicate = lrRecordset2("Predicate").Data
+
+                            If lrRecordset2.Facts.Count > 0 Then
+                                lsSQLQuery = "ADD FACT '" & lrRecordset2.CurrentFact.Id & "'"
+                                lsSQLQuery &= " TO " & pcenumCMMLRelations.CoreDestinationPredicate.ToString
+                                lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
+
+                                Call Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                            End If
+
+                            '-----------------------------------
+                            'Get the FactType for the Relation
+                            '-----------------------------------
+                            lsSQLQuery = "SELECT *"
+                            lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreRelationIsForFactType.ToString
+                            lsSQLQuery &= " WHERE Relation = '" & lrRecordset("Relation").Data & "'"
+
+                            lrRecordset2 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                            Dim lrFactType As New FBM.FactType(Me.Model, lrRecordset2("FactType").Data, True)
+                            lrFactType = Me.Model.FactType.Find(AddressOf lrFactType.Equals)
+                            lrRelation.RelationFactType = lrFactType
+
+                            lsSQLQuery = "ADD FACT '" & lrRecordset2.CurrentFact.Id & "'"
+                            lsSQLQuery &= " TO " & pcenumCMMLRelations.CoreRelationIsForFactType.ToString
+                            lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
+
+                            lrRelation.RDSRelation = Me.Model.RDS.Relation.Find(Function(x) x.Id = lsRelationId)
+
+                            Me.ERDiagram.Relation.Add(lrRelation)
+
+                            Dim lrLink As New ERD.Link(arEntity.Page, lrFactInstance, lrOrigingEREntity, lrDestinationgEREntity, Nothing, Nothing, lrRelation)
+                            lrLink.DisplayAndAssociate()
+
+                            '==========================================================================================================================
+                            '==========================================================================================================================
+                            'Dim loOriginTableNode As ERD.TableNode = lrOrigingEREntity.TableShape
+                            'Dim loDestinationTableNode As ERD.TableNode = lrDestinationgEREntity.TableShape
+
+                            ''================================
+                            'lsSQLQuery = "SELECT *"
+                            'lsSQLQuery &= " FROM CoreOriginMultiplicity"
+                            'lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
+                            'lsSQLQuery &= " WHERE ERDRelation = '" & lrRecordset("Relation").Data & "'"
+
+                            'lrRecordset1 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                            'Dim lsOriginMultiplicity As String = lrRecordset1("Multiplicity").Data
+
+                            'Dim liOriginMultiplicity As pcenumCMMLMultiplicity
+                            'Select Case lsOriginMultiplicity
+                            '    Case Is = pcenumCMMLMultiplicity.One.ToString
+                            '        liOriginMultiplicity = pcenumCMMLMultiplicity.One
+                            '    Case Is = pcenumCMMLMultiplicity.Many.ToString
+                            '        liOriginMultiplicity = pcenumCMMLMultiplicity.Many
+                            'End Select
+
+                            'lsSQLQuery = "SELECT COUNT(*)"
+                            'lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreOriginIsMandatory.ToString
+                            'lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
+                            'lsSQLQuery &= " WHERE OriginIsMandatory = '" & lrRecordset("Relation").Data & "'"
+
+                            'lrRecordset1 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                            'Dim lbRelationOriginIsMandatory As Boolean = False
+                            'If CInt(lrRecordset1("Count").Data) > 0 Then
+                            '    lbRelationOriginIsMandatory = True
+                            'End If
+
+                            ''================================
+                            'lsSQLQuery = "SELECT *"
+                            'lsSQLQuery &= " FROM CoreDestinationMultiplicity"
+                            'lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
+                            'lsSQLQuery &= " WHERE ERDRelation = '" & lrRecordset("Relation").Data & "'"
+
+                            'lrRecordset1 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                            'Dim lsDestinationMultiplicity As String = lrRecordset1("Multiplicity").Data
+
+                            'Dim liDestinationMultiplicity As pcenumCMMLMultiplicity
+                            'Select Case lsDestinationMultiplicity
+                            '    Case Is = pcenumCMMLMultiplicity.One.ToString
+                            '        liDestinationMultiplicity = pcenumCMMLMultiplicity.One
+                            '    Case Is = pcenumCMMLMultiplicity.Many.ToString
+                            '        liDestinationMultiplicity = pcenumCMMLMultiplicity.Many
+                            'End Select
+
+                            'lsSQLQuery = "SELECT COUNT(*)"
+                            'lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreDestinationIsMandatory.ToString
+                            'lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
+                            'lsSQLQuery &= " WHERE DestinationIsMandatory = '" & lrRecordset("Relation").Data & "'"
+
+                            'lrRecordset1 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                            'Dim lbRelationDestinationIsMandatory As Boolean = False
+                            'If CInt(lrRecordset1("Count").Data) > 0 Then
+                            '    lbRelationDestinationIsMandatory = True
+                            'End If
+
+                            ''-------------------------------------------------------------------------------
+                            ''Check to see whether the Relation contributes to the PrimaryKey of the Entity
+                            ''-------------------------------------------------------------------------------
+                            'lsSQLQuery = "SELECT COUNT(*)"
+                            'lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreContributesToPrimaryKey.ToString
+                            'lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
+                            'lsSQLQuery &= " WHERE " & pcenumCMMLRelations.CoreContributesToPrimaryKey.ToString & " = '" & lrRecordset("Relation").Data & "'"
+
+                            'lrRecordset1 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                            'Dim lbContributesToPrimaryKey As Boolean = False
+
+                            'If CInt(lrRecordset1("Count").Data) > 0 Then
+                            '    lbContributesToPrimaryKey = True
+                            'End If
+
+                            'Dim lrRelation As New ERD.Relation(Me.Model,
+                            '                                   lrRecordset("Relation").Data,
+                            '                                   lrOrigingEREntity, _
+                            '                                   liOriginMultiplicity, _
+                            '                                   lbRelationOriginIsMandatory, _
+                            '                                   lbContributesToPrimaryKey, _
+                            '                                   lrDestinationgEREntity, _
+                            '                                   liDestinationMultiplicity, _
+                            '                                   lbRelationDestinationIsMandatory)
+
+                            ''-------------------------------------
+                            ''Get the Predicates for the Relation
+                            ''-------------------------------------
+                            'lsSQLQuery = "SELECT *"
+                            'lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreOriginPredicate.ToString
+                            'lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
+                            'lsSQLQuery &= " WHERE Relation = '" & lrRecordset("Relation").Data & "'"
+
+                            'lrRecordset1 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                            'If Not lrRecordset1.EOF Then
+                            '    lrRelation.OriginPredicate = lrRecordset1("Predicate").Data
+                            'End If
+
+
+                            'lsSQLQuery = "SELECT *"
+                            'lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreDestinationPredicate.ToString
+                            'lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
+                            'lsSQLQuery &= " WHERE Relation = '" & lrRecordset("Relation").Data & "'"
+
+                            'lrRecordset1 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                            'If Not lrRecordset1.EOF Then
+                            '    lrRelation.DestinationPredicate = lrRecordset1("Predicate").Data
+                            'End If
+
+                            ''-----------------------------------
+                            ''Get the FactType for the Relation
+                            ''-----------------------------------
+                            'lsSQLQuery = "SELECT *"
+                            'lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreRelationIsForFactType.ToString
+                            'lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
+                            'lsSQLQuery &= " WHERE Relation = '" & lrRecordset("Relation").Data & "'"
+
+                            'lrRecordset1 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                            'Dim lrFactType As New FBM.FactType(Me.Model, lrRecordset1("FactType").Data, True)
+                            'lrFactType = Me.Model.FactType.Find(AddressOf lrFactType.Equals)
+                            'lrRelation.RelationFactType = lrFactType
+
+                            'Me.ERDiagram.Relation.Add(lrRelation)
+
+                            'Dim lrLink As New ERD.Link(arEntity.Page, lrFactInstance, lrOrigingEREntity, lrDestinationgEREntity, Nothing, Nothing, lrRelation)
+                            'lrLink.DisplayAndAssociate()
                         End If
 
-                        '-----------------------------------
-                        'Get the FactType for the Relation
-                        '-----------------------------------
-                        lsSQLQuery = "SELECT *"
-                        lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreRelationIsForFactType.ToString
-                        lsSQLQuery &= " WHERE Relation = '" & lrRecordset("Relation").Data & "'"
+                        lrRecordset.MoveNext()
+                    End While
 
-                        lrRecordset2 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                Next 'From/To arEntity
 
-                        Dim lrFactType As New FBM.FactType(Me.Model, lrRecordset2("FactType").Data, True)
-                        lrFactType = Me.Model.FactType.Find(AddressOf lrFactType.Equals)
-                        lrRelation.RelationFactType = lrFactType
+                Call Me.MakeDirty()
+                If abSavePage Then
+                    Call Me.Save()
+                End If
 
-                        lsSQLQuery = "ADD FACT '" & lrRecordset2.CurrentFact.Id & "'"
-                        lsSQLQuery &= " TO " & pcenumCMMLRelations.CoreRelationIsForFactType.ToString
-                        lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
-                        lrRelation.RDSRelation = Me.Model.RDS.Relation.Find(Function(x) x.Id = lsRelationId)
-
-                        Me.ERDiagram.Relation.Add(lrRelation)
-
-                        Dim lrLink As New ERD.Link(arEntity.Page, lrFactInstance, lrOrigingEREntity, lrDestinationgEREntity, Nothing, Nothing, lrRelation)
-                        lrLink.DisplayAndAssociate()
-
-                        '==========================================================================================================================
-                        '==========================================================================================================================
-                        'Dim loOriginTableNode As ERD.TableNode = lrOrigingEREntity.TableShape
-                        'Dim loDestinationTableNode As ERD.TableNode = lrDestinationgEREntity.TableShape
-
-                        ''================================
-                        'lsSQLQuery = "SELECT *"
-                        'lsSQLQuery &= " FROM CoreOriginMultiplicity"
-                        'lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
-                        'lsSQLQuery &= " WHERE ERDRelation = '" & lrRecordset("Relation").Data & "'"
-
-                        'lrRecordset1 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-                        'Dim lsOriginMultiplicity As String = lrRecordset1("Multiplicity").Data
-
-                        'Dim liOriginMultiplicity As pcenumCMMLMultiplicity
-                        'Select Case lsOriginMultiplicity
-                        '    Case Is = pcenumCMMLMultiplicity.One.ToString
-                        '        liOriginMultiplicity = pcenumCMMLMultiplicity.One
-                        '    Case Is = pcenumCMMLMultiplicity.Many.ToString
-                        '        liOriginMultiplicity = pcenumCMMLMultiplicity.Many
-                        'End Select
-
-                        'lsSQLQuery = "SELECT COUNT(*)"
-                        'lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreOriginIsMandatory.ToString
-                        'lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
-                        'lsSQLQuery &= " WHERE OriginIsMandatory = '" & lrRecordset("Relation").Data & "'"
-
-                        'lrRecordset1 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-                        'Dim lbRelationOriginIsMandatory As Boolean = False
-                        'If CInt(lrRecordset1("Count").Data) > 0 Then
-                        '    lbRelationOriginIsMandatory = True
-                        'End If
-
-                        ''================================
-                        'lsSQLQuery = "SELECT *"
-                        'lsSQLQuery &= " FROM CoreDestinationMultiplicity"
-                        'lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
-                        'lsSQLQuery &= " WHERE ERDRelation = '" & lrRecordset("Relation").Data & "'"
-
-                        'lrRecordset1 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-                        'Dim lsDestinationMultiplicity As String = lrRecordset1("Multiplicity").Data
-
-                        'Dim liDestinationMultiplicity As pcenumCMMLMultiplicity
-                        'Select Case lsDestinationMultiplicity
-                        '    Case Is = pcenumCMMLMultiplicity.One.ToString
-                        '        liDestinationMultiplicity = pcenumCMMLMultiplicity.One
-                        '    Case Is = pcenumCMMLMultiplicity.Many.ToString
-                        '        liDestinationMultiplicity = pcenumCMMLMultiplicity.Many
-                        'End Select
-
-                        'lsSQLQuery = "SELECT COUNT(*)"
-                        'lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreDestinationIsMandatory.ToString
-                        'lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
-                        'lsSQLQuery &= " WHERE DestinationIsMandatory = '" & lrRecordset("Relation").Data & "'"
-
-                        'lrRecordset1 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-                        'Dim lbRelationDestinationIsMandatory As Boolean = False
-                        'If CInt(lrRecordset1("Count").Data) > 0 Then
-                        '    lbRelationDestinationIsMandatory = True
-                        'End If
-
-                        ''-------------------------------------------------------------------------------
-                        ''Check to see whether the Relation contributes to the PrimaryKey of the Entity
-                        ''-------------------------------------------------------------------------------
-                        'lsSQLQuery = "SELECT COUNT(*)"
-                        'lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreContributesToPrimaryKey.ToString
-                        'lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
-                        'lsSQLQuery &= " WHERE " & pcenumCMMLRelations.CoreContributesToPrimaryKey.ToString & " = '" & lrRecordset("Relation").Data & "'"
-
-                        'lrRecordset1 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-                        'Dim lbContributesToPrimaryKey As Boolean = False
-
-                        'If CInt(lrRecordset1("Count").Data) > 0 Then
-                        '    lbContributesToPrimaryKey = True
-                        'End If
-
-                        'Dim lrRelation As New ERD.Relation(Me.Model,
-                        '                                   lrRecordset("Relation").Data,
-                        '                                   lrOrigingEREntity, _
-                        '                                   liOriginMultiplicity, _
-                        '                                   lbRelationOriginIsMandatory, _
-                        '                                   lbContributesToPrimaryKey, _
-                        '                                   lrDestinationgEREntity, _
-                        '                                   liDestinationMultiplicity, _
-                        '                                   lbRelationDestinationIsMandatory)
-
-                        ''-------------------------------------
-                        ''Get the Predicates for the Relation
-                        ''-------------------------------------
-                        'lsSQLQuery = "SELECT *"
-                        'lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreOriginPredicate.ToString
-                        'lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
-                        'lsSQLQuery &= " WHERE Relation = '" & lrRecordset("Relation").Data & "'"
-
-                        'lrRecordset1 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-                        'If Not lrRecordset1.EOF Then
-                        '    lrRelation.OriginPredicate = lrRecordset1("Predicate").Data
-                        'End If
-
-
-                        'lsSQLQuery = "SELECT *"
-                        'lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreDestinationPredicate.ToString
-                        'lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
-                        'lsSQLQuery &= " WHERE Relation = '" & lrRecordset("Relation").Data & "'"
-
-                        'lrRecordset1 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-                        'If Not lrRecordset1.EOF Then
-                        '    lrRelation.DestinationPredicate = lrRecordset1("Predicate").Data
-                        'End If
-
-                        ''-----------------------------------
-                        ''Get the FactType for the Relation
-                        ''-----------------------------------
-                        'lsSQLQuery = "SELECT *"
-                        'lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreRelationIsForFactType.ToString
-                        'lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
-                        'lsSQLQuery &= " WHERE Relation = '" & lrRecordset("Relation").Data & "'"
-
-                        'lrRecordset1 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-                        'Dim lrFactType As New FBM.FactType(Me.Model, lrRecordset1("FactType").Data, True)
-                        'lrFactType = Me.Model.FactType.Find(AddressOf lrFactType.Equals)
-                        'lrRelation.RelationFactType = lrFactType
-
-                        'Me.ERDiagram.Relation.Add(lrRelation)
-
-                        'Dim lrLink As New ERD.Link(arEntity.Page, lrFactInstance, lrOrigingEREntity, lrDestinationgEREntity, Nothing, Nothing, lrRelation)
-                        'lrLink.DisplayAndAssociate()
-                    End If
-
-                    lrRecordset.MoveNext()
-                End While
-
-            Next 'From/To arEntity
-
-            Call Me.MakeDirty()
-            If abSavePage Then
-                Call Me.Save()
-            End If
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
         End Sub
 

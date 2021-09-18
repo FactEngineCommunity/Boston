@@ -1051,10 +1051,10 @@ Namespace RDS
             End If
 
             If arColumn Is Nothing Then
-                If Me.Column.FindAll(Function(x) x.Name = lsUniqueColumnName).Count > 0 Then
+                If Me.Column.FindAll(Function(x) LCase(x.Name) = LCase(lsUniqueColumnName)).Count > 0 Then
                     lsUniqueColumnName = Me.createUniqueColumnName(arColumn, asColumnName, aiStartingInd + 1)
                 End If
-            ElseIf Me.Column.FindAll(Function(x) x.Name = lsUniqueColumnName And x.Id <> arColumn.Id).Count > 0 Then
+            ElseIf Me.Column.FindAll(Function(x) LCase(x.Name) = LCase(lsUniqueColumnName) And x.Id <> arColumn.Id).Count > 0 Then
                 lsUniqueColumnName = Me.createUniqueColumnName(arColumn, asColumnName, aiStartingInd + 1)
             End If
 

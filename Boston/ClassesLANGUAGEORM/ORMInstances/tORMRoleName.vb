@@ -178,7 +178,7 @@ Namespace FBM
                 Me.Shape.ZTop()
 
                 If Me.Y < 0 Then
-                    Me.Y = Me.RoleInstance.Shape.Bounds.Y - 5
+                    Me.Y = Me.RoleInstance.Shape.Bounds.Y - 8
                 End If
 
                 If Math.Abs(Me.X - Me.RoleInstance.X) > (15 + StringSize.Width) Then
@@ -186,9 +186,10 @@ Namespace FBM
                 End If
 
                 If Math.Abs(Me.Y - Me.RoleInstance.Y) > 15 Then
-                    Me.Y = Me.RoleInstance.Y - 5
+                    Me.Y = Me.RoleInstance.Y - 8
                 End If
 
+                Me.Shape.AllowOutgoingLinks = False
                 Me.Shape.Move(Me.X, Me.Y)
                 Me.Move(Me.X, Me.Y, True)
 
