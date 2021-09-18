@@ -663,14 +663,17 @@ Namespace ERD
 
                 lrAttribute = Me.Attribute.Find(Function(x) x.Id = arColumn.Id)
 
-                Me.Attribute.Remove(lrAttribute)
-                Me.Page.ERDiagram.Attribute.RemoveAll(Function(x) x.Id = lrAttribute.Id)
+                If lrAttribute IsNot Nothing Then
 
-                If Me.TableShape IsNot Nothing Then
-                    Me.TableShape.DeleteRow(lrAttribute.OrdinalPosition - 1)
+                    Me.Attribute.Remove(lrAttribute)
+                    Me.Page.ERDiagram.Attribute.RemoveAll(Function(x) x.Id = lrAttribute.Id)
+
+                    If Me.TableShape IsNot Nothing Then
+                        Me.TableShape.DeleteRow(lrAttribute.OrdinalPosition - 1)
+                    End If
+
+                    Call Me.RefreshShape()
                 End If
-
-                Call Me.RefreshShape()
 
             Catch ex As Exception
                 Dim lsMessage1 As String
