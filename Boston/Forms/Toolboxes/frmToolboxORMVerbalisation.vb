@@ -2221,6 +2221,8 @@ Public Class frmToolboxORMVerbalisation
         '  * Declare that the FactType(Name) is an FactType
         '------------------------------------------------------
 
+        Dim lrVerbaliser As New FBM.ORMVerbailser
+
         Try
             Dim lrFactTypeReading As FBM.FactTypeReading
             Dim liInd As Integer = 0
@@ -2228,8 +2230,12 @@ Public Class frmToolboxORMVerbalisation
             Dim lrRole As FBM.Role
             Dim lrRoleConstraint As FBM.RoleConstraint
 
-            Dim lrVerbaliser As New FBM.ORMVerbailser
             Call lrVerbaliser.Reset()
+
+            'CodeSafe
+            If arFactType.GetType = GetType(FBM.FactTypeInstance) Then
+                arFactType = CType(arFactType, FBM.FactTypeInstance).FactType
+            End If
 
             If arRole IsNot Nothing Then
                 lrVerbaliser.VerbaliseQuantifier("Role in Fact Type")
@@ -2551,6 +2557,7 @@ Public Class frmToolboxORMVerbalisation
 
                 Dim larFactType = From FactType In arFactType.Model.FactType
                                   From Role In FactType.RoleGroup
+                                  Where Role.JoinedORMObject IsNot Nothing
                                   Where Role.JoinedORMObject.Id = arFactType.Id
                                   Where FactType.IsLinkFactType = False
                                   Select FactType
@@ -2569,7 +2576,10 @@ Public Class frmToolboxORMVerbalisation
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+            lrVerbaliser.VerbaliseBlackText(lsMessage)
+
+            Me.WebBrowser.DocumentText = lrVerbaliser.Verbalise
         End Try
 
     End Sub

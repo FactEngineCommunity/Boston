@@ -5150,6 +5150,7 @@ Public Class frmDiagramORM
         Try
             Dim larSupertypeEntityType = From FactType In Me.zrPage.Model.FactType
                                          From Role In FactType.RoleGroup
+                                         Where Role.JoinedORMObject IsNot Nothing
                                          Where FactType.IsSubtypeStateControlling = True _
                                          And Role.JoinedORMObject.ConceptType = pcenumConceptType.EntityType
                                          Select Role.JoinedORMObject

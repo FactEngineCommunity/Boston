@@ -1148,6 +1148,7 @@ Namespace FBM
                 Dim larColumn = From Table In Me.Model.RDS.Table
                                 From Column In Table.Column
                                 Where Column.ActiveRole.JoinedORMObject Is Me
+                                Where Not Column.Table.FBMModelElement Is Me
                                 Select Column
 
                 For Each lrColumn In larColumn.ToList
@@ -2456,10 +2457,11 @@ Namespace FBM
             Try
                 Dim larFactType = From FactType In Me.Model.FactType
                                   From Role In FactType.RoleGroup
+                                  Where Role.JoinedORMObject IsNot Nothing
                                   Where Role.JoinedORMObject.Id = Me.Id
                                   Select FactType
 
-                For Each lrFactType In larFactType
+                For Each lrFactType In larFactType.ToArray
                     Dim lrFact As New FBM.Fact(lrFactType)
                     Dim lrRole As New FBM.Role
 

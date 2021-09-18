@@ -771,6 +771,10 @@
 
                                             Dim larIndexColumns = lrTargetTable.getFirstUniquenessConstraintColumns
 
+                                            If larIndexColumns.Count = 0 Then
+                                                larIndexColumns = lrTargetTable.getPrimaryKeyColumns
+                                            End If
+
                                             liInd = 0
                                             For Each lsIdentifier In lrQueryEdge.IdentifierList
                                                 lsTDBQuery &= "$" & lrTargetTable.DBVariableName & lsAlias & " has " & larIndexColumns(liInd).Name & lrQueryEdge.getTargetSQLComparator & "'" & lsIdentifier & "';" & vbCrLf
@@ -836,7 +840,7 @@
 
             Catch ex As Exception
 
-                Throw New Exception(ex.Message & vbCrLf & vbCrLf & lsTDBQuery)
+                Throw New Exception("QueryGraph.generateTypeQL" & vbCrLf & ex.Message & vbCrLf & vbCrLf & lsTDBQuery)
 
             End Try
 
