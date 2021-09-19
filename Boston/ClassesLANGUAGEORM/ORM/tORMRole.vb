@@ -856,46 +856,27 @@ Namespace FBM
 
                         ElseIf Me.FactType.IsUnaryFactType Then
                             lrActiveRole = Me
-                            If Me.FactType.FactTypeReading.Count > 0 Then
+                            If arTable.FBMModelElement Is Me.FactType Then
+                                Select Case Me.JoinedORMObject.GetType
+                                    Case Is = GetType(FBM.EntityType)
+                                        If Me.JoinsEntityType.HasSimpleReferenceScheme Then
+                                            lsColumnName = Me.JoinsEntityType.ReferenceModeValueType.Id
+                                        ElseIf Me.JoinsEntityType.HasCompoundReferenceMode Then
+                                            Throw New Exception("Called for Entity Type with Compound Reference Scheme.")
+                                        Else
+                                            lsColumnName = Me.JoinedORMObject.Id
+                                        End If
+                                    Case Is = GetType(FBM.FactType)
+                                        Throw New Exception("Called for Role that joins a Fact Type.")
+                                End Select
+                            ElseIf Me.FactType.FactTypeReading.Count > 0 Then
                                 lsColumnName = Viev.Strings.RemoveWhiteSpace(Viev.Strings.MakeCapCamelCase(Me.FactType.FactTypeReading(0).PredicatePart(0).PredicatePartText))
                             Else
                                 lsColumnName = "ErrorNeedFactTypeReadingForUnaryFactType"
                             End If
                         Else
-                            Throw New Exception("Not caterd for. Contact www.viev.com")
+                                Throw New Exception("Not caterd for. Contact www.viev.com")
                         End If
-                        'Case Is = pcenumConceptType.FactType
-                        '    'Slightly different processing for a Role within a FactType. 
-                        '    ' ActiveRole is initially me, unless the Role joins to an EntityType with a SimplReferenceScheme
-                        '    lrActiveRole = Me
-
-                        '    Select Case Me.JoinedORMObject.ConceptType
-                        '        Case Is = pcenumConceptType.EntityType
-                        '            Dim lrEntityType As FBM.EntityType
-                        '            lrEntityType = Me.JoinedORMObject
-
-                        '            If lrEntityType.HasSimpleReferenceScheme Then
-                        '                lrActiveRole = lrEntityType.ReferenceModeFactType.RoleGroup(1)
-                        '                lsColumnName = lrEntityType.ReferenceModeValueType.Id
-                        '            Else
-                        '                lsColumnName = lrEntityType.Id
-                        '            End If
-
-                        '        Case Is = pcenumConceptType.ValueType
-
-                        '            lsColumnName = Me.JoinedORMObject.Id
-                        '    End Select
-
-                        '    'ToDo: Need to fix this to get a PreboundText from the relevant LinkFactType.
-                        '    'larRole = New List(Of FBM.Role)
-                        '    'larRole.Add(Me)
-                        '    'larRole.Add(lrActiveRole)
-                        '    'lrFactTypeReading = Me.FactType.FindSuitableFactTypeReadingByRoles(larRole, True)
-                        '    'If lrFactTypeReading IsNot Nothing Then
-                        '    '    lsColumnName = lrFactTypeReading.PredicatePart(1).PreBoundText.Replace("-", "") & lsColumnName
-                        '    'End If
-
-                        '    lsColumnName = Me.JoinedORMObject.Id
 
                     Case Is = pcenumConceptType.ValueType
                         lrActiveRole = Me

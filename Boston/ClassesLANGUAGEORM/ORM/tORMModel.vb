@@ -901,7 +901,6 @@ Namespace FBM
                                     End If
 #End Region
 
-
                                     'Relation
                                     If lrRole.FactType.Arity = 1 Then
 
