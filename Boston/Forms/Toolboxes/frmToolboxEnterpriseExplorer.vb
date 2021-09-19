@@ -2710,10 +2710,8 @@ Public Class frmToolboxEnterpriseExplorer
                     lrSaveFileDialog.RestoreDirectory = True
                     lrSaveFileDialog.FileName = lsFileLocationName
 
-                    If (lrSaveFileDialog.ShowDialog() = DialogResult.OK) Then
-                        If Not System.IO.File.Exists(lrSaveFileDialog.FileName()) Then
-                            lsFileLocationName = lrSaveFileDialog.FileName
-                        End If
+                    If lrSaveFileDialog.ShowDialog() = DialogResult.OK Then
+                        lsFileLocationName = lrSaveFileDialog.FileName
                     Else
                         Exit Sub
                     End If
