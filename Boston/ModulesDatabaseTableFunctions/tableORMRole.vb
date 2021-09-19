@@ -164,6 +164,7 @@ Namespace TableRole
                                 'lrFactType.Id = lrRole.JoinsFactType.Id
                                 'lrRole.JoinsFactType = arFactType.Model.FactType.Find(AddressOf lrFactType.Equals)
                                 If lrRole.JoinedORMObject Is Nothing Then
+                                    If lrRole.FactType.Id = lsId Then Exit Select
                                     lrRole.JoinedORMObject = New FBM.FactType(lrRole.Model, lsId, True) ' Trim(Viev.NullVal(lREcordset("JoinsNestedFactTypeId").Value, "")), True)
                                     TableFactType.GetFactTypeDetailsByModel(lrRole.JoinsFactType, True)
                                 End If

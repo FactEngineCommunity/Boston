@@ -1896,6 +1896,10 @@ Namespace FBM
                 '  * 
 
                 '------------------------------------------------------------
+
+                'CodeSafe
+                If arNewJoinedModelObject Is Me.FactType Then Exit Sub
+
                 'Get the originally joined ModelObject
                 Dim lrOriginallyJoinedModelObject As FBM.ModelObject = Me.JoinedORMObject
 

@@ -734,7 +734,7 @@ Namespace FBM
                         End Select
 
 
-                        loDroppedNode.Resize(7, 7)
+                        loDroppedNode.Resize(8, 8)
                         loDroppedNode.Pen = New MindFusion.Drawing.Pen(Color.White)
                         loDroppedNode.Visible = True
                         loDroppedNode.ImageAlign = ImageAlign.Stretch

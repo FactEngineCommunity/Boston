@@ -2050,17 +2050,51 @@ Public Class tBrain
                 lasSymbol = New List(Of String)
                 lasSymbol.Add(Trim(lsModelElementName))
                 'NB Brain can answer its own questions, so if the ValueType already exists, the following creates no problem.
-                lrQuestion = New tQuestion("Would you like me to create a Value Type for '" & lasSymbol(0) & "'?", _
-                                                 pcenumQuestionType.CreateValueType, _
-                                                  True, _
-                                                 lasSymbol, _
-                                                 lrSentence, _
-                                                 Nothing, _
-                                                 lrPlan, _
+                lrQuestion = New tQuestion("Would you like me to create a Value Type for '" & lasSymbol(0) & "'?",
+                                                 pcenumQuestionType.CreateValueType,
+                                                  True,
+                                                 lasSymbol,
+                                                 lrSentence,
+                                                 Nothing,
+                                                 lrPlan,
                                                  lrSecondStep)
 
-                Dim lrValueType As New FBM.ValueType(Me.Model, pcenumLanguage.ORMModel, lsModelElementName, True)
-                lrQuestion.ValueType.Add(lrValueType)
+                Dim lsDataTypeName As String = ""
+                Dim liDataTypeLength As Integer = 0
+                Dim liDataTypePrecision As Integer = 0
+                Dim liDataType As pcenumORMDataType = pcenumORMDataType.DataTypeNotSet
+                If VAQL.ATMOSTONEStatement.MODELELEMENTTYPE(VAQL.ATMOSTONEStatement.MODELELEMENTTYPE.Count - 1).KEYWDWRITTENAS IsNot Nothing Then
+
+                    VAQL.VALUETYPEWRITTENASClause = VAQL.ATMOSTONEStatement.MODELELEMENTTYPE(VAQL.ATMOSTONEStatement.MODELELEMENTTYPE.Count - 1).VALUETYPEWRITTENASCLAUSE
+
+                    If Me.VAQL.VALUETYPEWRITTENASClause.DATATYPE IsNot Nothing Then
+                        lsDataTypeName = Me.VAQL.VALUETYPEWRITTENASClause.DATATYPE.Nodes(0).Token.Text
+                    ElseIf Me.VAQL.VALUETYPEWRITTENASClause.DATATYPELENGTH IsNot Nothing Then
+                        lsDataTypeName = Me.VAQL.VALUETYPEWRITTENASClause.DATATYPELENGTH.Nodes(0).Token.Text
+                        liDataTypeLength = CInt(Me.VAQL.VALUETYPEWRITTENASClause.NUMBER)
+                    ElseIf Me.VAQL.VALUETYPEWRITTENASClause.DATATYPEPRECISION IsNot Nothing Then
+                        lsDataTypeName = Me.VAQL.VALUETYPEWRITTENASClause.DATATYPEPRECISION.Nodes(0).Token.Text
+                        liDataTypePrecision = CInt(Me.VAQL.VALUETYPEWRITTENASClause.NUMBER)
+                    End If
+
+                    lsDataTypeName = DataTypeAttribute.Get(GetType(pcenumORMDataType), lsDataTypeName)
+                    If lsDataTypeName Is Nothing Then
+                        Me.send_data("That's not a valid Data Type.")
+                        Exit Sub
+                    End If
+
+                    Try
+                        liDataType = DirectCast([Enum].Parse(GetType(pcenumORMDataType), lsDataTypeName), pcenumORMDataType)
+                    Catch ex As Exception
+                        Me.send_data("That's not a valid Data Type.")
+                        Exit Sub
+                    End Try
+
+                    lrQuestion.ValueType(0).DataType = liDataType
+                    lrQuestion.ValueType(0).DataTypeLength = liDataTypeLength
+                    lrQuestion.ValueType(0).DataTypePrecision = liDataTypePrecision
+
+                End If
 
                 If Me.QuestionHasBeenRaised(lrQuestion) Then
                     '------------------------------------------------------------

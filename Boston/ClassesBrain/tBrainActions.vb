@@ -546,7 +546,7 @@ Partial Public Class tBrain
 
         Else
 
-
+            Dim lrDummyValueType As FBM.ValueType = Me.CurrentQuestion.ValueType(0)
             lsOldValueTypeName = Me.CurrentQuestion.ValueType(0).Id
             lsValueTypeName = Viev.Strings.MakeCapCamelCase(Me.CurrentQuestion.ValueType(0).Id)
 
@@ -561,7 +561,11 @@ Partial Public Class tBrain
                 End If
             End If
 
-            lrValueType = Me.Model.CreateValueType(lsValueTypeName, False)
+            lrValueType = Me.Model.CreateValueType(lsValueTypeName,
+                                                   False,
+                                                   lrDummyValueType.DataType,
+                                                   lrDummyValueType.DataTypeLength,
+                                                   lrDummyValueType.DataTypePrecision)
 
         End If
 
