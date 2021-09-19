@@ -1034,7 +1034,7 @@ Namespace FBM
                 Select Case lrOtherRole.JoinedORMObject.ConceptType
                     Case Is = pcenumConceptType.ValueType
                         'We don't generate Relations for ManyToOneFactTypes that join to a ValueType
-                    Case Is = pcenumConceptType.EntityType, _
+                    Case Is = pcenumConceptType.EntityType,
                               pcenumConceptType.FactType
 
                         lrOriginTable = Me.RDS.Table.Find(Function(x) x.Name = lrRole.JoinedORMObject.Id)
@@ -1120,15 +1120,15 @@ Namespace FBM
                         'Create the Relation
                         '--------------------------------------------------------------------                        
                         Dim lrRelation As New RDS.Relation(System.Guid.NewGuid.ToString,
-                                                           lrOriginTable, _
-                                                           pcenumCMMLMultiplicity.One, _
-                                                           arRole.Mandatory, _
-                                                           lbContributesToPrimaryKey, _
-                                                           lsOriginPredicate, _
-                                                           lrDestinationTable, _
-                                                            pcenumCMMLMultiplicity.One, _
-                                                           arRole.FactType.GetOtherRoleOfBinaryFactType(arRole.Id).Mandatory, _
-                                                           lsDestinationPredicate, _
+                                                           lrOriginTable,
+                                                           pcenumCMMLMultiplicity.One,
+                                                           arRole.Mandatory,
+                                                           lbContributesToPrimaryKey,
+                                                           lsOriginPredicate,
+                                                           lrDestinationTable,
+                                                            pcenumCMMLMultiplicity.One,
+                                                           arRole.FactType.GetOtherRoleOfBinaryFactType(arRole.Id).Mandatory,
+                                                           lsDestinationPredicate,
                                                            arRole.FactType)
 
                         '--------------------------------------------------------------------------
@@ -1169,6 +1169,164 @@ Namespace FBM
                 End Select 'GetOtherRoleOfBinaryFactType(lrRoleInstance.Id).JoinedORMObject.ConceptType
 
                 '==================================================================
+
+            Catch ex As Exception
+                Dim lsMessage1 As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
+        Public Sub generateRelationManyTo1ForUnaryFactType(ByRef arRole As FBM.Role)
+
+            Try
+                '====================
+                'RDS
+                Dim lrOriginTable As RDS.Table = Nothing
+                Dim lrDestinationTable As RDS.Table = Nothing
+                Dim lbContributesToPrimaryKey As Boolean = False
+
+                Dim lrRole As FBM.Role = arRole
+
+                Select Case lrRole.JoinedORMObject.ConceptType
+                    Case Is = pcenumConceptType.ValueType
+                        'We don't generate Relations for ManyToOneFactTypes that join to a ValueType
+                    Case Is = pcenumConceptType.EntityType,
+                              pcenumConceptType.FactType
+
+                        Dim larTable = From Table In Me.RDS.Table
+                                       From Column In Table.Column
+                                       Where Column.Role Is lrRole
+                                       Where Column.ActiveRole Is lrRole
+                                       Where Column.Role.JoinedORMObject.Id <> Table.Name
+                                       Where Table.FBMModelElement Is lrRole.FactType
+                                       Select Table
+
+                        lrOriginTable = larTable.First
+                        lrDestinationTable = Me.RDS.Table.Find(Function(x) x.Name = lrRole.JoinedORMObject.Id)
+
+                        If (lrOriginTable Is Nothing) Or (lrDestinationTable Is Nothing) Then Exit Sub
+
+                        '------------------------------------------------------------------------------------------
+                        'If the OriginEntity is a Subtype of another Entity, then need to set the OriginEntity to
+                        '  the topmost Supertype.
+                        '------------------------------------------------------------------------------------------
+                        Dim lrOriginModelObject As FBM.ModelObject
+                        lrOriginModelObject = Me.GetModelObjectByName(lrOriginTable.Name)
+                        Dim lrEntityType As FBM.EntityType
+                        Select Case lrOriginModelObject.ConceptType
+                            Case Is = pcenumConceptType.EntityType
+                                lrEntityType = lrOriginModelObject
+                                If lrEntityType.IsAbsorbed Then
+                                    lrOriginTable = Me.RDS.Table.Find(Function(x) x.Name = lrEntityType.GetTopmostSupertype.Id)
+                                Else
+                                    'Leave the lsOriginEntityName the same
+                                End If
+                            Case Else
+                                '20171104-VM-Keep the lsOriginEntityName the same for now.
+                                'Need to update this code when FactTypes can have supertypes in Boston.
+                        End Select
+
+
+                        '---------------------------------------------------------------------------------------------------
+                        'If the DestinationEntity is a Subtype of another Entity, then need to set the DestinationTable to
+                        '  the topmost Supertype.
+                        '---------------------------------------------------------------------------------------------------                                
+                        Dim lrDestinationModelObject As FBM.ModelObject = Me.GetModelObjectByName(lrDestinationTable.Name)
+                        lrEntityType = New FBM.EntityType
+                        Select Case lrDestinationModelObject.ConceptType
+                            Case Is = pcenumConceptType.EntityType
+                                lrEntityType = lrDestinationModelObject
+                                If lrEntityType.IsAbsorbed Then
+                                    lrDestinationTable = Me.RDS.Table.Find(Function(x) x.Name = lrEntityType.GetTopmostSupertype.Id)
+                                Else
+                                    'Leave the lsOriginEntityName the same
+                                End If
+                            Case Else
+                                '20171104-VM-Keep the lsOriginEntityName the same for now.
+                                'Need to update this code when FactTypes can have supertypes in Boston.
+                        End Select
+
+                        If (lrOriginTable Is Nothing) Or (lrDestinationTable Is Nothing) Then Exit Sub
+
+                        Dim larRelation = From Relation In Me.RDS.Relation
+                                          Where Relation.ResponsibleFactType IsNot Nothing
+                                          Where Relation.ResponsibleFactType.Id = lrRole.FactType.Id _
+                                          And Relation.OriginTable Is lrOriginTable _
+                                          And Relation.DestinationTable Is lrDestinationTable
+                                          Select Relation
+
+                        If larRelation.Count > 0 Then
+                            Exit Sub
+                        End If
+
+
+                        '=================================================================
+                        'Origin/Destination Predicates
+                        Dim lsOriginPredicate As String = "Involves"
+                        Dim lsDestinationPredicate As String = "Is involved in"
+
+
+                        '--------------------------------------------------------------------
+                        'Create the Relation
+                        '--------------------------------------------------------------------                        
+                        Richmond.WriteToStatusBar("Creating Relationship between Entities, '" & lrOriginTable.Name & "', and , '" & lrDestinationTable.Name & "'", True)
+
+                        Dim lrRelation As New RDS.Relation(System.Guid.NewGuid.ToString,
+                                                           lrOriginTable,
+                                                           pcenumCMMLMultiplicity.Many,
+                                                           arRole.Mandatory,
+                                                           lbContributesToPrimaryKey,
+                                                           lsOriginPredicate,
+                                                           lrDestinationTable,
+                                                            pcenumCMMLMultiplicity.One,
+                                                           True,
+                                                           lsDestinationPredicate,
+                                                           arRole.FactType)
+
+                        '--------------------------------------------------------------------------
+                        'Get the Origin/Destination Columns
+                        Dim larDestinationColumn As New List(Of RDS.Column)
+                        Select Case lrDestinationModelObject.ConceptType
+                            Case Is = pcenumConceptType.EntityType
+                                larDestinationColumn = lrDestinationTable.Column.FindAll(Function(x) x.isPartOfPrimaryKey = True)
+                            Case Else 'FactType by enlcosing IF
+                                larDestinationColumn = lrDestinationTable.Column
+                        End Select
+
+                        lrRelation.DestinationColumns = larDestinationColumn
+
+                        Dim larOriginColumn As New List(Of RDS.Column)
+
+                        larOriginColumn.Add(lrOriginTable.Column.Find(Function(x) x.Role Is lrRole))
+
+                        'CodeSafe
+                        'Get rid of Columns that are Nothing
+                        larOriginColumn.RemoveAll(Function(x) x Is Nothing)
+
+                        'Origin Columns
+                        lrRelation.OriginColumns = larOriginColumn
+
+                        For Each lrColumn In lrRelation.OriginColumns
+                            lrColumn.Relation.Add(lrRelation) 'Only need to do this on the Origin side. The Origin Column 'has' the Relation.
+                        Next
+
+                        If lrRelation.OriginColumns.Count = 0 Then
+                            'CodeSafe. Destination Table has no PrimaryKey most likely,
+                            '  but can get Origin Column from the arRole
+                            Dim lrColumn = arRole.JoinedORMObject.getCorrespondingRDSTable.Column.Find(Function(x) x.Role.Id = lrRole.Id)
+                            lrColumn.Relation.Add(lrRelation)
+                            lrRelation.OriginColumns.Add(lrColumn)
+                        End If
+
+                        Me.RDS.addRelation(lrRelation)
+
+                End Select 'GetOtherRoleOfBinaryFactType(lrRoleInstance.Id).JoinedORMObject.ConceptType
+
 
             Catch ex As Exception
                 Dim lsMessage1 As String

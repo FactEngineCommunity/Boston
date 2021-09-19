@@ -902,8 +902,12 @@ Namespace FBM
 #End Region
 
 
-                                        'Relation
-                                        If lrRole.FactType.Arity = 2 _
+                                    'Relation
+                                    If lrRole.FactType.Arity = 1 Then
+
+                                        Call Me.generateRelationManyTo1ForUnaryFactType(lrRole)
+
+                                    ElseIf lrRole.FactType.Arity = 2 _
                                         And lrRole.FactType.InternalUniquenessConstraint.Count = 1 _
                                         And Not (lrRole.FactType.GetOtherRoleOfBinaryFactType(lrRole.Id).ConceptType = pcenumConceptType.ValueType) Then
 
