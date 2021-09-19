@@ -1250,12 +1250,26 @@ Namespace RDS
                                 Optional abRemoveResidualCMML As Boolean = True)
 
             Try
+                Dim lrColumn As RDS.Column = arColumn
                 Me.Column.Remove(arColumn)
 
                 Dim lrRemovedColumn As RDS.Column = arColumn
                 For Each lrColumn In Me.Column.FindAll(Function(x) x.OrdinalPosition > lrRemovedColumn.OrdinalPosition)
                     lrColumn.OrdinalPosition -= 1
                     Call Me.Model.Model.setCMMLAttributeOrdinalPosition(lrColumn.Id, lrColumn.OrdinalPosition)
+                Next
+
+                '------------------------------------------------------------------------------------------------------
+                'Relations
+                Dim larRelation = From Relation In Me.getOutgoingRelations
+                                  Where Relation.OriginColumns.Contains(lrColumn)
+                                  Select Relation
+
+                For Each lrRelation In larRelation.ToArray
+                    lrRelation.OriginColumns.Remove(arColumn)
+                    If lrRelation.OriginColumns.Count = 0 Then
+                        Call Me.Model.removeRelation(lrRelation)
+                    End If
                 Next
 
                 RaiseEvent ColumnRemoved(arColumn)

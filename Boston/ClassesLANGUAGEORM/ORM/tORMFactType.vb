@@ -3674,7 +3674,6 @@ Namespace FBM
                     End If
                 Next
 
-
                 '--------------
                 'LinkFactType
                 If arRole.FactType.IsObjectified Then

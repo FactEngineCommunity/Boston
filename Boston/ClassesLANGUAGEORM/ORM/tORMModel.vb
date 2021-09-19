@@ -3345,12 +3345,14 @@ Namespace FBM
                                 'Remove the Table from the RDSModel/Database                                
 
                                 '--------------------------------------------------------------------
-                                'CodeSafe: Don't progress if there is not table.
+                                'CodeSafe: Don't progress if there is no table.
                                 If lrTable Is Nothing Then Exit Sub
 
                                 For Each lrRole In arRoleConstraint.RoleConstraintRole(0).Role.FactType.RoleGroup
                                     lrColumn = lrTable.Column.Find(Function(x) x.Role.Id = lrRole.Id)
-                                    Call lrTable.removeColumn(lrColumn, Me.IsDatabaseSynchronised)
+                                    If lrColumn IsNot Nothing Then
+                                        Call lrTable.removeColumn(lrColumn, Me.IsDatabaseSynchronised)
+                                    End If
                                 Next
 
                                 Dim larIncomingRelations As New List(Of RDS.Relation)

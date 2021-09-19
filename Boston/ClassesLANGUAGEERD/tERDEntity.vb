@@ -675,6 +675,12 @@ Namespace ERD
                     Call Me.RefreshShape()
                 End If
 
+                If Me.TableShape IsNot Nothing Then
+                    If Me.TableShape.Rows.Count = 0 Then
+                        Call Me.RemoveFromPage()
+                    End If
+                End If
+
             Catch ex As Exception
                 Dim lsMessage1 As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()

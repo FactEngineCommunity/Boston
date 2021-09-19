@@ -794,76 +794,75 @@ Partial Class frmDiagramORM
         '
         'ContextMenuStrip_Role
         '
-        Me.ContextMenuStrip_Role.ImageScalingSize = New System.Drawing.Size(24, 24)
         Me.ContextMenuStrip_Role.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuOption_Mandatory, Me.mnuOption_AddUniquenessConstraint, Me.DeonticToolStripMenuItem, Me.ToolStripSeparator8, Me.SetNameFromHostingObjectTypeToolStripMenuItem, Me.ToolStripSeparator23, Me.RemovefromPageAndModelToolStripMenuItem1, Me.ToolStripSeparator25, Me.ToolStripMenuItemShowLinkFactType, Me.mnuOption_ViewReadingEditor, Me.PropertiesToolStripMenuItem1})
         Me.ContextMenuStrip_Role.Name = "ContextMenuStrip_Role"
-        Me.ContextMenuStrip_Role.Size = New System.Drawing.Size(273, 262)
+        Me.ContextMenuStrip_Role.Size = New System.Drawing.Size(265, 220)
         '
         'mnuOption_Mandatory
         '
         Me.mnuOption_Mandatory.Image = Global.Boston.My.Resources.ORMShapes.mandatory
         Me.mnuOption_Mandatory.Name = "mnuOption_Mandatory"
-        Me.mnuOption_Mandatory.Size = New System.Drawing.Size(272, 30)
+        Me.mnuOption_Mandatory.Size = New System.Drawing.Size(264, 22)
         Me.mnuOption_Mandatory.Text = "&Mandatory"
         '
         'mnuOption_AddUniquenessConstraint
         '
         Me.mnuOption_AddUniquenessConstraint.Image = Global.Boston.My.Resources.ORMShapes.uniqueness
         Me.mnuOption_AddUniquenessConstraint.Name = "mnuOption_AddUniquenessConstraint"
-        Me.mnuOption_AddUniquenessConstraint.Size = New System.Drawing.Size(272, 30)
+        Me.mnuOption_AddUniquenessConstraint.Size = New System.Drawing.Size(264, 22)
         Me.mnuOption_AddUniquenessConstraint.Text = "Add &Uniqueness Constraint"
         '
         'DeonticToolStripMenuItem
         '
         Me.DeonticToolStripMenuItem.Name = "DeonticToolStripMenuItem"
-        Me.DeonticToolStripMenuItem.Size = New System.Drawing.Size(272, 30)
+        Me.DeonticToolStripMenuItem.Size = New System.Drawing.Size(264, 22)
         Me.DeonticToolStripMenuItem.Text = "&Deontic"
         '
         'ToolStripSeparator8
         '
         Me.ToolStripSeparator8.Name = "ToolStripSeparator8"
-        Me.ToolStripSeparator8.Size = New System.Drawing.Size(269, 6)
+        Me.ToolStripSeparator8.Size = New System.Drawing.Size(261, 6)
         '
         'SetNameFromHostingObjectTypeToolStripMenuItem
         '
         Me.SetNameFromHostingObjectTypeToolStripMenuItem.Name = "SetNameFromHostingObjectTypeToolStripMenuItem"
-        Me.SetNameFromHostingObjectTypeToolStripMenuItem.Size = New System.Drawing.Size(272, 30)
+        Me.SetNameFromHostingObjectTypeToolStripMenuItem.Size = New System.Drawing.Size(264, 22)
         Me.SetNameFromHostingObjectTypeToolStripMenuItem.Text = "&Set Name from Hosting Object Type"
         '
         'ToolStripSeparator23
         '
         Me.ToolStripSeparator23.Name = "ToolStripSeparator23"
-        Me.ToolStripSeparator23.Size = New System.Drawing.Size(269, 6)
+        Me.ToolStripSeparator23.Size = New System.Drawing.Size(261, 6)
         '
         'RemovefromPageAndModelToolStripMenuItem1
         '
         Me.RemovefromPageAndModelToolStripMenuItem1.Name = "RemovefromPageAndModelToolStripMenuItem1"
-        Me.RemovefromPageAndModelToolStripMenuItem1.Size = New System.Drawing.Size(272, 30)
+        Me.RemovefromPageAndModelToolStripMenuItem1.Size = New System.Drawing.Size(264, 22)
         Me.RemovefromPageAndModelToolStripMenuItem1.Text = "Remove &from Page and Model"
         '
         'ToolStripSeparator25
         '
         Me.ToolStripSeparator25.Name = "ToolStripSeparator25"
-        Me.ToolStripSeparator25.Size = New System.Drawing.Size(269, 6)
+        Me.ToolStripSeparator25.Size = New System.Drawing.Size(261, 6)
         '
         'ToolStripMenuItemShowLinkFactType
         '
         Me.ToolStripMenuItemShowLinkFactType.Name = "ToolStripMenuItemShowLinkFactType"
-        Me.ToolStripMenuItemShowLinkFactType.Size = New System.Drawing.Size(272, 30)
+        Me.ToolStripMenuItemShowLinkFactType.Size = New System.Drawing.Size(264, 22)
         Me.ToolStripMenuItemShowLinkFactType.Text = "Show &Link Fact Type"
         '
         'mnuOption_ViewReadingEditor
         '
         Me.mnuOption_ViewReadingEditor.Image = Global.Boston.My.Resources.MenuImages.FactTypeReading16x16
         Me.mnuOption_ViewReadingEditor.Name = "mnuOption_ViewReadingEditor"
-        Me.mnuOption_ViewReadingEditor.Size = New System.Drawing.Size(272, 30)
+        Me.mnuOption_ViewReadingEditor.Size = New System.Drawing.Size(264, 22)
         Me.mnuOption_ViewReadingEditor.Text = "&View Reading Editor"
         '
         'PropertiesToolStripMenuItem1
         '
         Me.PropertiesToolStripMenuItem1.Image = Global.Boston.My.Resources.MenuImages.Properties216x16
         Me.PropertiesToolStripMenuItem1.Name = "PropertiesToolStripMenuItem1"
-        Me.PropertiesToolStripMenuItem1.Size = New System.Drawing.Size(272, 30)
+        Me.PropertiesToolStripMenuItem1.Size = New System.Drawing.Size(264, 22)
         Me.PropertiesToolStripMenuItem1.Text = "&Properties"
         '
         'ContextMenuStrip_EntityType
