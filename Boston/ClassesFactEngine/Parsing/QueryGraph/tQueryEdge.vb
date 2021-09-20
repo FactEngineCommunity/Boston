@@ -719,6 +719,29 @@ PartialFactTypeMatch:
 #End Region
 
                 '====================================================================================================================
+                'By Predicate FarSideModelElement Subtype
+#Region "By Predicate FarSideModelElement SUbtype"
+                lrFactType = Me.QueryGraph.Model.getFactTypeByPredicateFarSideModelElement(asPredicate,
+                                                                                           arTargetNode.FBMModelObject,
+                                                                                           True,
+                                                                                           Me.QueryGraph.getNodeModelElementList(True))
+
+                If lrFactType IsNot Nothing Then
+                    Dim lrModelElement As FBM.ModelObject = arTargetNode.FBMModelObject
+                    Dim larFactTypeReading = From FactTypeReading In lrFactType.FactTypeReading
+                                             Where FactTypeReading.PredicatePart(1).Role.JoinedORMObject.Id = lrModelElement.Id
+                                             Select FactTypeReading
+
+                    lrFactTypeReading = larFactTypeReading.First
+                    Me.FBMFactType = lrFactTypeReading.FactType
+                    Me.FBMFactTypeReading = lrFactTypeReading
+                    Me.FBMPredicatePart = Me.FBMFactTypeReading.PredicatePart(0)
+
+                End If
+
+#End Region
+
+                '====================================================================================================================
                 'Relative BaseNode - Uses GetTopmostNonAbsorbedSupertype
                 'Not yet implemented
                 '20210829-VM-Use the below for SubType predicates.

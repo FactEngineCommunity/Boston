@@ -2006,11 +2006,14 @@
 
         End Function
 
-        Public Function getNodeModelElementList() As List(Of FBM.ModelObject)
+        Public Function getNodeModelElementList(Optional abGetSupertypeModelElements As Boolean = False) As List(Of FBM.ModelObject)
 
             Dim larModelElement As New List(Of FBM.ModelObject)
 
             Try
+                If Me.HeadNode IsNot Nothing Then
+                    larModelElement.AddUnique(Me.HeadNode.FBMModelObject)
+                End If
                 For Each lrQueryEdge In Me.QueryEdges
                     If lrQueryEdge.BaseNode.FBMModelObject IsNot Nothing Then
                         larModelElement.AddUnique(lrQueryEdge.BaseNode.FBMModelObject)
@@ -2019,6 +2022,12 @@
                         larModelElement.AddUnique(lrQueryEdge.TargetNode.FBMModelObject)
                     End If
                 Next
+
+                If abGetSupertypeModelElements Then
+                    For Each lrModelElement In larModelElement.ToArray
+                        larModelElement.AddRange(lrModelElement.getSupertypes)
+                    Next
+                End If
 
                 Return larModelElement
 

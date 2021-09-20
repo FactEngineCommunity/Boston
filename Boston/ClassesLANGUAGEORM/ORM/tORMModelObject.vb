@@ -718,6 +718,29 @@ Namespace FBM
             Return New List(Of ModelObject)
         End Function
 
+        Public Function getSupertypes() As List(Of FBM.ModelObject)
+
+            Dim larModelElement As New List(Of FBM.ModelObject)
+            Try
+                For Each lrSubtypeRelationship In Me.SubtypeRelationship
+                    larModelElement.AddUnique(lrSubtypeRelationship.parentEntityType)
+                    larModelElement.AddRange(lrSubtypeRelationship.parentEntityType.getSupertypes)
+                Next
+
+                Return larModelElement
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return New List(Of FBM.ModelObject)
+            End Try
+
+        End Function
+
         Public Overridable Function hasPredicateToModelElement(ByVal asPredicate As String,
                                                                ByVal arModelElement As FBM.ModelObject) As Boolean
 
