@@ -177,7 +177,7 @@ Namespace TablePage
                             If abLoadPage Then
                                 lrPage = ar_model.Page.Find(AddressOf lrPage.Equals)
                                 If Not lrPage.Loaded Then
-                                    If abUseThreading Or (ar_model.Page.FindAll(Function(x) x.Loaded).Count > 30 And abThreadAfter30pages) Then
+                                    If abUseThreading Or (ar_model.Page.FindAll(Function(x) x.Loaded).Count > 40 And abThreadAfter30pages) Then
                                         loPageLoadThread = New System.Threading.Thread(AddressOf lrPage.Load)
                                         loPageLoadThread.Start(False)
                                     Else

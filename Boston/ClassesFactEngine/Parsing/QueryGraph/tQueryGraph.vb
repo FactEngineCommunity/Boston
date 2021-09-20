@@ -220,20 +220,26 @@
                                                 Where Not larUsedPredicatePart.Contains(PredicatePart)
                                                 Select PredicatePart).ToList
                         Else
-                            If lrPrimaryQueryEdge.FBMPredicatePart IsNot Nothing Then
-                                larPredicatePart.Insert(0, lrPrimaryQueryEdge.FBMPredicatePart)
-                            Else
-                                larPredicatePart = (From PredicatePart In lrPrimaryQueryEdge.FBMFactTypeReading.PredicatePart
-                                                    Where (PredicatePart.Role.JoinedORMObject Is lrNode.FBMModelObject Or
-                                                    PredicatePart.Role.JoinedORMObject.isSubtypeOfModelElement(lrNode.FBMModelObject))
-                                                    Where Not larUsedPredicatePart.Contains(PredicatePart)
-                                                    Select PredicatePart).ToList
-                            End If
+                            'If lrPrimaryQueryEdge.FBMPredicatePart IsNot Nothing Then
+                            'larPredicatePart.Insert(0, lrPrimaryQueryEdge.FBMPredicatePart)
+                            'Else
+                            larPredicatePart = (From PredicatePart In lrPrimaryQueryEdge.FBMFactTypeReading.PredicatePart
+                                                Where (PredicatePart.Role.JoinedORMObject Is lrNode.FBMModelObject Or
+                                                       PredicatePart.Role.JoinedORMObject.isSubtypeOfModelElement(lrNode.FBMModelObject))
+                                                Where Not larUsedPredicatePart.Contains(PredicatePart)
+                                                Select PredicatePart).ToList
+                            'End If
                         End If
 
                         Dim lrPredicatePart = larPredicatePart.First
                         larUsedPredicatePart.Add(lrPredicatePart)
-                        lsTDBQuery &= lrPredicatePart.Role.Name & ": $" & lrNode.RDSTable.DatabaseName & lrNode.Alias
+                        Select Case lrNode.FBMModelObject.GetType
+                            Case Is = GetType(FBM.ValueType)
+                                lsTDBQuery &= lrPredicatePart.Role.Name & ": $" & lrNode.DBVariableName & lrNode.Alias
+                            Case Else
+                                lsTDBQuery &= lrPredicatePart.Role.Name & ": $" & lrNode.RDSTable.DatabaseName & lrNode.Alias
+                        End Select
+
 
                         liInd += 1
                     Next
@@ -394,7 +400,13 @@
 #Region "PGSNodeTable/RDSTable"
                         Dim lrOtherRole As FBM.Role = lrQueryEdge.FBMFactType.GetOtherRoleOfBinaryFactType(lrQueryEdge.FBMPredicatePart.Role.Id)
                         lsTDBQuery &= "(" & lrQueryEdge.FBMPredicatePart.Role.Name & ": $" & lrQueryEdge.BaseNode.RDSTable.DBVariableName & Viev.NullVal(lrQueryEdge.BaseNode.Alias, "") & ","
-                        lsTDBQuery &= lrOtherRole.Name & ": $" & lrQueryEdge.TargetNode.DBVariableName & Viev.NullVal(lrQueryEdge.TargetNode.Alias, "") & ") isa " & lrQueryEdge.FBMFactType.DBName & ";" & vbCrLf
+                        Select Case lrQueryEdge.TargetNode.FBMModelObject.GetType
+                            Case Is = GetType(FBM.ValueType)
+                                lsTDBQuery &= lrOtherRole.Name & ": $" & lrQueryEdge.FBMFactType.DBName & lrQueryEdge.TargetNode.DBVariableName & Viev.NullVal(lrQueryEdge.TargetNode.Alias, "") & ") isa " & lrQueryEdge.FBMFactType.DBName & ";" & vbCrLf
+                            Case Else
+                                lsTDBQuery &= lrOtherRole.Name & ": $" & lrQueryEdge.TargetNode.DBVariableName & Viev.NullVal(lrQueryEdge.TargetNode.Alias, "") & ") isa " & lrQueryEdge.FBMFactType.DBName & ";" & vbCrLf
+                        End Select
+
 
                         '20210916-VM-This was in the line above lrQueryEdge.FBMFactType.DBName 
 
@@ -641,7 +653,7 @@
                                                 Where Column.ActiveRole.JoinedORMObject Is lrQueryEdge.TargetNode.FBMModelObject
                                                 Select Column).First
 
-                                lsTDBQuery &= lrTable.DatabaseName & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrColumn.Name
+                                lsTDBQuery &= "$" & lrTable.DatabaseName & Viev.NullVal(lrQueryEdge.Alias, "") & lrColumn.Name
                                 Select Case lrColumn.getMetamodelDataType
                                     Case Is = pcenumORMDataType.TemporalDate,
                                               pcenumORMDataType.TemporalDateAndTime
@@ -658,7 +670,7 @@
                                         Dim lsDateTime As String = Me.Model.DatabaseConnection.FormatDateTime(lsUserDateTime)
                                         lsTDBQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lsDateTime & Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
                                     Case Else
-                                        lsTDBQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lrQueryEdge.IdentifierList(0) & Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
+                                        lsTDBQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lrQueryEdge.IdentifierList(0) & Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & ";" & vbCrLf
                                 End Select
 
                             Else

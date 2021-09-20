@@ -145,6 +145,8 @@ Namespace FactEngine.TypeDB
                                 Select Case loValue.Thing.Type.ValueType.ToString
                                     Case Is = "Long"
                                         loFieldValue = loValue.Thing.Value.Long
+                                    Case Is = "Datetime"
+                                        loFieldValue = loValue.Thing.Value.DateTime.ToString
                                     Case Else
                                         Try
                                             loFieldValue = loValue.Thing.Value.String

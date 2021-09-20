@@ -1781,6 +1781,17 @@ Public Class frmFactEngine
                                     lsSQLQuery &= lrModelElement.Id
                                 End If
 
+                                If lrColumn Is Nothing Then
+                                    Dim larColumn = From Table In Me.FEQLProcessor.Model.RDS.Table
+                                                    From Column In Table.Column
+                                                    Where Column.FactType Is lrQueryEdge.FBMFactType
+                                                    Select Column
+
+                                    If larColumn.Count > 0 Then
+                                        lrColumn = larColumn.First
+                                    End If
+                                End If
+
                                 If lrQueryEdge.IsPartialFactTypeMatch Then
                                     lsSQLQuery &= " FROM " & lrQueryEdge.FBMFactType.getCorrespondingRDSTable.DatabaseName
                                     lsFEQLQuery &= lrQueryEdge.FBMFactType.getCorrespondingRDSTable.Name
@@ -1836,9 +1847,21 @@ Public Class frmFactEngine
                         If Me.zrTextHighlighter.GetCurrentContext.Token.Type = FEQL.TokenType.IDENTIFIER Then
                             Try
                                 If lrModelElement.getCorrespondingRDSTable.getFirstUniquenessConstraintColumns.Count > 0 Then
+                                    Dim lsCurrentTokenText As String = Me.zrTextHighlighter.GetCurrentContext.Token.Text
                                     Dim lsDatabaseWildcardOperator = Database.gerLikeWildcardOperator(prApplication.WorkingModel.TargetDatabaseType)
-                                    Dim lsCurrentToken As String = Trim(Me.zrTextHighlighter.GetCurrentContext.Token.Text)
+                                    Dim lsCurrentToken As String = Trim(lsCurrentTokenText)
                                     lsSQLQuery &= vbCrLf & "WHERE " & lrModelElement.getCorrespondingRDSTable.getFirstUniquenessConstraintColumns(0).Name & " LIKE '" & lsCurrentToken & lsDatabaseWildcardOperator & "'"
+
+                                    For Each lrColumn In lrModelElement.getCorrespondingRDSTable.getFirstUniquenessConstraintColumns
+
+                                        Try
+                                            Dim lrPredicatePart As FBM.PredicatePart = lrColumn.FactType.FactTypeReading.Find(Function(x) x.PredicatePart(0).Role Is lrColumn.Role).PredicatePart(0)
+                                            lsFEQLQuery &= " " & lrPredicatePart.PredicatePartText & " (" & lrColumn.ActiveRole.JoinedORMObject.Id & "~'" & lsCurrentTokenText & lsDatabaseWildcardOperator & "')"
+                                        Catch ex As Exception
+                                            'Not a biggie
+                                        End Try
+                                    Next
+
                                 End If
                             Catch ex As Exception
                                 'Do nothing. Just don't add anything to the SQL.

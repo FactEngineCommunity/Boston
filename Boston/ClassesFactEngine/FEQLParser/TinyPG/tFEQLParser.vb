@@ -27,7 +27,7 @@ Namespace FEQL
 
         Public Function Parse(ByVal input As String, ByVal tree As ParseTree) As ParseTree
             m_scanner.Init(input)
-
+            MaxDistance = 0
             m_tree = tree
             ParseStart(m_tree)
             m_tree.Skipped = m_scanner.Skipped
