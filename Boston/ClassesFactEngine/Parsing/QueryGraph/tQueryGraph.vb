@@ -183,20 +183,25 @@
                                             Select Node
 
                 Dim larPartialFTMatchFT = From Node In larPartialFTMatchNode
-                                          Select Node.QueryEdge.FBMFactType Distinct
+                                          Group Node By Node.QueryEdge.FBMFactType, Node.QueryEdge.Alias Into grp = Group
 
-                For Each lrFactType In larPartialFTMatchFT
+
+                For Each lrFactTypeMatch In larPartialFTMatchFT
+
+                    Dim lrFactType As FBM.FactType = lrFactTypeMatch.FBMFactType
                     '------------------------------------------------------------------------------
                     'Sample query
                     '(student: $Email,school: $School_Name,course: $Course_Code) isa studentship;
 
                     Dim larLinkedNodes = (From Node In larFromNodes
                                           Where Node.QueryEdge.FBMFactType Is lrFactType
+                                          Where Node.QueryEdge.Alias = lrFactTypeMatch.Alias
                                           Select Node).ToList
 
                     'A Node may have been missed because it comes from earlier in the query.
                     Dim larQueryEdge = From QueryEdge In Me.QueryEdges
                                        Where QueryEdge.FBMFactType Is lrFactType
+                                       Where QueryEdge.Alias = lrFactTypeMatch.Alias
                                        Select QueryEdge
 
                     Dim lrPrimaryQueryEdge As FactEngine.QueryEdge = Nothing 'The QueryEdge that we are talking about
@@ -249,19 +254,20 @@
 
                 '=================================================================================================
                 'Derived FactTypeReadingMatch - I.e. Joins on ManyToMany(..ToMany) tables
-                Dim larCoveredFactTypes = larPartialFTMatchFT.ToList
+                Dim larCoveredFactTypes = (From FactTypeMatch In larPartialFTMatchFT
+                                           Select FactTypeMatch.FBMFactType).ToList
 
-                larPartialFTMatchNode = From Node In larFromNodes
-                                        Where Node.QueryEdge IsNot Nothing
-                                        Where Node.QueryEdge.IsPartialFactTypeMatch
-                                        Where Node.QueryEdge.FBMFactType.IsDerived
-                                        Where Not larCoveredFactTypes.Contains(Node.QueryEdge.FBMFactType)
-                                        Select Node
+                larPartialFTMatchNode = (From Node In larFromNodes
+                                         Where Node.QueryEdge IsNot Nothing
+                                         Where Node.QueryEdge.IsPartialFactTypeMatch
+                                         Where Node.QueryEdge.FBMFactType.IsDerived
+                                         Where Not larCoveredFactTypes.Contains(Node.QueryEdge.FBMFactType)
+                                         Select Node).ToList
 
-                larPartialFTMatchFT = From Node In larPartialFTMatchNode
-                                      Select Node.QueryEdge.FBMFactType Distinct
+                Dim larPartialFTMatchFT2 = From Node In larPartialFTMatchNode
+                                           Select Node.QueryEdge.FBMFactType Distinct
 
-                For Each lrFactType In larPartialFTMatchFT
+                For Each lrFactType In larPartialFTMatchFT2
                     '------------------------------------------------------------------------------
                     'Sample query
                     '(student: $Email,school: $School_Name,course: $Course_Code) isa studentship;
@@ -2368,8 +2374,12 @@
                             If larRDSTableQueryEdge(liInd2).Alias Is Nothing Then
                                 If larRDSTableQueryEdge(liInd2).GetPreviousQueryEdge IsNot Nothing Then
                                     If larRDSTableQueryEdge(liInd2).IsPartialFactTypeMatch And
-                                       larRDSTableQueryEdge(liInd2).GetPreviousQueryEdge.FBMFactType Is larRDSTableQueryEdge(liInd2).FBMFactType Then
+                                       larRDSTableQueryEdge(liInd2).GetPreviousQueryEdge.FBMFactType Is larRDSTableQueryEdge(liInd2).FBMFactType And
+                                       larRDSTableQueryEdge(liInd2).GetPreviousQueryEdge.FBMPredicatePart IsNot larRDSTableQueryEdge(liInd2).FBMPredicatePart Then
                                         larRDSTableQueryEdge(liInd2).Alias = larRDSTableQueryEdge(liInd2).GetPreviousQueryEdge.Alias
+                                    Else
+                                        Dim lrTemplQueryEdge = Me.QueryEdges.Find(Function(x) x.Id = larRDSTableQueryEdge(liInd2).Id)
+                                        lrTemplQueryEdge.Alias = (liInd + 1).ToString
                                     End If
                                 Else
                                     Dim lrTemplQueryEdge = Me.QueryEdges.Find(Function(x) x.Id = larRDSTableQueryEdge(liInd2).Id)
