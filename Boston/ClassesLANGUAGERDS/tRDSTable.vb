@@ -1113,6 +1113,32 @@ Namespace RDS
 
         End Function
 
+        Public Function IsPartOfPrimarySubtypeRelationshipPath(ByRef arTable As RDS.Table) As Boolean
+
+            Try
+                If arTable Is Me Then
+                    Return True
+                Else
+                    For Each lrSubtypeRelationship In arTable.FBMModelElement.SubtypeRelationship.FindAll(Function(x) x.IsPrimarySubtypeRelationship)
+                        If lrSubtypeRelationship.parentEntityType Is Me.FBMModelElement Then
+                            Return True
+                        End If
+                        Return lrSubtypeRelationship.parentEntityType.getCorrespondingRDSTable.IsPartOfPrimarySubtypeRelationshipPath(arTable)
+                    Next
+                End If
+
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Function
+
         Public Function isPGSNode() As Boolean
 
             Try

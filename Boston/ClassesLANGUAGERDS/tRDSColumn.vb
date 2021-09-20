@@ -603,7 +603,12 @@ Namespace RDS
                         lrTable = Me.Role.JoinedORMObject.getCorrespondingRDSTable
                     End If
 
-                    Return lrTable.Index.Find(Function(x) x.IsPrimaryKey And (x.Column.Find(Function(y) y.Id = Me.Id) IsNot Nothing)) IsNot Nothing
+                    If Not lrTable.IsPartOfPrimarySubtypeRelationshipPath(Me.Table) Then
+                        Return False
+                    Else
+                        Return lrTable.Index.Find(Function(x) x.IsPrimaryKey And (x.Column.Find(Function(y) y.Id = Me.Id) IsNot Nothing)) IsNot Nothing
+                    End If
+
                 Catch ex1 As Exception
                     Try
                         Return Me.Table.Index.Find(Function(x) x.IsPrimaryKey And (x.Column.Find(Function(y) y.Id = Me.Id) IsNot Nothing)) IsNot Nothing

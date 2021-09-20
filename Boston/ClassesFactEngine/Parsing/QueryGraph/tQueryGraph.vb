@@ -199,7 +199,9 @@
                                        Where QueryEdge.FBMFactType Is lrFactType
                                        Select QueryEdge
 
+                    Dim lrPrimaryQueryEdge As FactEngine.QueryEdge = Nothing 'The QueryEdge that we are talking about
                     For Each lrQueryEdge In larQueryEdge
+                        lrPrimaryQueryEdge = lrQueryEdge
                         larLinkedNodes.AddUnique(lrQueryEdge.BaseNode)
                         larLinkedNodes.AddUnique(lrQueryEdge.TargetNode)
                     Next
@@ -210,11 +212,24 @@
                     For Each lrNode In larLinkedNodes
                         If liInd > 0 Then lsTDBQuery.AppendString(",")
 
-                        Dim larPredicatePart = From PredicatePart In lrNode.QueryEdge.FBMFactTypeReading.PredicatePart
-                                               Where (PredicatePart.Role.JoinedORMObject Is lrNode.FBMModelObject Or
-                                                      PredicatePart.Role.JoinedORMObject.isSubtypeOfModelElement(lrNode.FBMModelObject))
-                                               Where Not larUsedPredicatePart.Contains(PredicatePart)
-                                               Select PredicatePart
+                        Dim larPredicatePart As New List(Of FBM.PredicatePart)
+                        If lrNode.QueryEdge Is lrPrimaryQueryEdge Then
+                            larPredicatePart = (From PredicatePart In lrNode.QueryEdge.FBMFactTypeReading.PredicatePart
+                                                Where (PredicatePart.Role.JoinedORMObject Is lrNode.FBMModelObject Or
+                                                PredicatePart.Role.JoinedORMObject.isSubtypeOfModelElement(lrNode.FBMModelObject))
+                                                Where Not larUsedPredicatePart.Contains(PredicatePart)
+                                                Select PredicatePart).ToList
+                        Else
+                            If lrPrimaryQueryEdge.FBMPredicatePart IsNot Nothing Then
+                                larPredicatePart.Insert(0, lrPrimaryQueryEdge.FBMPredicatePart)
+                            Else
+                                larPredicatePart = (From PredicatePart In lrPrimaryQueryEdge.FBMFactTypeReading.PredicatePart
+                                                    Where (PredicatePart.Role.JoinedORMObject Is lrNode.FBMModelObject Or
+                                                    PredicatePart.Role.JoinedORMObject.isSubtypeOfModelElement(lrNode.FBMModelObject))
+                                                    Where Not larUsedPredicatePart.Contains(PredicatePart)
+                                                    Select PredicatePart).ToList
+                            End If
+                        End If
 
                         Dim lrPredicatePart = larPredicatePart.First
                         larUsedPredicatePart.Add(lrPredicatePart)
