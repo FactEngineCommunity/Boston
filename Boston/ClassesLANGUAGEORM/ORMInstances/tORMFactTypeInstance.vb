@@ -830,7 +830,7 @@ Namespace FBM
                 If Me.FactTypeName IsNot Nothing Then
                     If Me.FactTypeName.Shape IsNot Nothing Then
                         If Me.FactTypeName.Shape.Bounds.Y.isBetween(Me.Y - 3, Me.Y + 3) Then
-                            Me.FactTypeName.Shape.Move(Me.FactTypeName.Shape.Bounds.X, Me.Y - 8)
+                            Me.FactTypeName.Shape.Move(Me.FactTypeName.Shape.Bounds.X, Me.Y - 10)
                         End If
                     End If
                 End If
@@ -1922,6 +1922,10 @@ Namespace FBM
                     Me.Page.Diagram.Nodes.Add(Me.FactTypeName.Shape)
                     loFactTypeName.Tag = Me.FactTypeName
 
+                    'CodeSafe-Use Experience
+                    If Math.Abs(Me.FactTypeNameShape.Bounds.X - Me.Shape.Bounds.X) > 20 Or Math.Abs(Me.FactTypeNameShape.Bounds.Y - Me.Shape.Bounds.Y) > 20 Then
+                        Me.FactTypeNameShape.Move(Me.Shape.Bounds.X - 5, Me.Shape.Bounds.Y - 12)
+                    End If
 
                     '---------------------------------------------------------------------------
                     'Attach the FactTypeName ShapeNode to the FactTypeInstance ShapeNode
@@ -2237,8 +2241,8 @@ Namespace FBM
                 If Me.Shape IsNot Nothing Then
 
                     If Me.ShowFactTypeName Then
-                        If Math.Abs(Me.FactTypeNameShape.Bounds.X - Me.Shape.Bounds.X) > 20 Or Math.Abs(Me.FactTypeNameShape.Bounds.Y - Me.Shape.Bounds.Y) > 20 Then
-                            Me.FactTypeNameShape.Move(Me.Shape.Bounds.X - 5, Me.Shape.Bounds.Y - 10)
+                        If Math.Abs(Me.FactTypeNameShape.Bounds.X - Me.Shape.Bounds.X) > 30 Or Math.Abs(Me.FactTypeNameShape.Bounds.Y - Me.Shape.Bounds.Y) > 30 Then
+                            Me.FactTypeNameShape.Move(Me.Shape.Bounds.X - 5, Me.Shape.Bounds.Y - 12)
                         End If
                     End If
 

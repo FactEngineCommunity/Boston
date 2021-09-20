@@ -2500,7 +2500,7 @@ Public Class frmDiagramERD
             Next
 
             For Each lrDestinationColumn In lrERDLink.Relation.RDSRelation.DestinationColumns
-                lrAttribute = Me.zrPage.ERDiagram.Attribute.Find(Function(x) x.Column.Id = lrDestinationColumn.Id)
+                lrAttribute = Me.zrPage.ERDiagram.Attribute.Find(Function(x) x.Column.Id = lrDestinationColumn.Id And x.Column.Table Is lrERDLink.Relation.RDSRelation.DestinationTable)
                 Try
                     lrAttribute.Cell.TextColor = Color.White
                     lrAttribute.Cell.Brush = New MindFusion.Drawing.SolidBrush(Color.LightGray)

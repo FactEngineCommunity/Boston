@@ -5081,6 +5081,9 @@ Public Class frmDiagramORM
                 Call lrModelNoteInstance.DisplayAndAssociate()
             Next
 
+            'CodeSaf-User Experience
+            Call Me.zrPage.RepellOverlappingFactTypeInstances()
+
             '-------------------------------------------------------------------
             'Load any State Transitions that relate to EntityTypes on the Page
             '-------------------------------------------------------------------
@@ -8820,9 +8823,16 @@ Public Class frmDiagramORM
 
             lrFactTypeInstance = Me.zrPage.SelectedObject(0)
 
-            Using loWaitCursor As New WaitCursor
-                Call lrFactTypeInstance.FactType.RemoveFromModel(True, , True)
-            End Using
+            If lrFactTypeInstance.FactType.UserCanSafelyRemoveFromModel Then
+
+                Using loWaitCursor As New WaitCursor
+                    Call lrFactTypeInstance.FactType.RemoveFromModel(True, , True)
+                End Using
+            Else
+                Dim lsMessage As String = "You cannot remove the Fact Type while there are other Fact Types that join the Fact Type."
+                lsMessage.AppendDoubleLineBreak("Check the Fact Type in the Diagram Spy to see what other Fact Types join to the Fact Type.")
+                MsgBox(lsMessage)
+            End If
 
         Catch ex As Exception
 
@@ -11725,4 +11735,25 @@ Public Class frmDiagramORM
         Call Me.ResizeHelpTipsBox()
     End Sub
 
+    Private Sub ToolStripMenuItem14_Click_1(sender As Object, e As EventArgs) Handles ToolStripMenuItem14.Click
+
+        Try
+            Dim lrFactTypeInstance As FBM.FactTypeInstance
+            lrFactTypeInstance = Me.zrPage.SelectedObject(0)
+            Dim lrDiagramSpyPage As New FBM.DiagramSpyPage(Me.zrPage.Model, "123", "Diagram Spy", pcenumLanguage.ORMModel)
+
+            Call frmMain.LoadDiagramSpy(lrDiagramSpyPage, lrFactTypeInstance.FactType)
+
+        Catch ex As Exception
+
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+        End Try
+
+    End Sub
 End Class

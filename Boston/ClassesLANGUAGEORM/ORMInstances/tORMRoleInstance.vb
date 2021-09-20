@@ -832,6 +832,13 @@ Namespace FBM
                 End If
 
                 Me.Page.RoleInstance.Remove(Me)
+
+                If Me.RoleName IsNot Nothing Then
+                    If Me.RoleName.Shape IsNot Nothing Then
+                        Call Me.Page.Diagram.Nodes.Remove(Me.RoleName.Shape)
+                    End If
+                End If
+
             End If
 
         End Sub

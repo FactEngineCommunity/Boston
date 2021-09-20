@@ -2507,6 +2507,45 @@ Namespace FBM
 
         End Sub
 
+
+        ''' <summary>
+        ''' PRECONDITION: Page.Diagram IsNot Nothing.
+        ''' </summary>
+        Public Sub RepellOverlappingFactTypeInstances()
+
+            Try
+                'CodeSafe
+                If Me.Diagram Is Nothing Then Exit Sub
+
+                Dim larOverlappingFactTypeInstances As New List(Of FBM.FactTypeInstance)
+
+                For Each lrFactTypeInstance In Me.FactTypeInstance
+
+                    Dim larOverlappingFactTypeInstance = (From FactTypeInstance In Me.FactTypeInstance
+                                                          Where FactTypeInstance IsNot lrFactTypeInstance
+                                                          Where FactTypeInstance.X = lrFactTypeInstance.X
+                                                          Where FactTypeInstance.Y = lrFactTypeInstance.Y
+                                                          Select FactTypeInstance).ToList
+
+                    larOverlappingFactTypeInstances.AddRange(larOverlappingFactTypeInstance)
+                Next
+
+                For Each lrFactTypeInstance In larOverlappingFactTypeInstances
+                    Call lrFactTypeInstance.RepellFromNeighbouringPageObjects(5, True)
+                Next
+
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
         Public Sub ResetFactTypeInstancesForLoading()
 
             Dim lrFactTypeInstance As FBM.FactTypeInstance

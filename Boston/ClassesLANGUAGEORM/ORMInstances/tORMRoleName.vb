@@ -101,6 +101,10 @@ Namespace FBM
             Me.X = Me.Shape.Bounds.X
             Me.Y = Me.Shape.Bounds.Y
 
+            If Math.Abs(Me.Shape.Bounds.X - arRoleInstance.Shape.Bounds.X) > 20 Or Math.Abs(Me.Shape.Bounds.Y - arRoleInstance.Shape.Bounds.Y) > 20 Then
+                Me.Move(arRoleInstance.Shape.Bounds.X - 2, arRoleInstance.Shape.Bounds.Y - 10, True)
+            End If
+
         End Sub
 
         Public Overrides Sub Save(Optional ByVal abRapidSave As Boolean = False)
@@ -256,6 +260,8 @@ Namespace FBM
             Try
                 Me.X = aiNewX
                 Me.Y = aiNewY
+
+                Me.Shape.Move(Me.X, Me.Y)
                 Call Me.makeDirty()
             Catch ex As Exception
 

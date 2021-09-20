@@ -4196,7 +4196,7 @@ Namespace FBM
 
         End Function
 
-        Function TypeOfBinaryFactType() As Integer
+        Public Function TypeOfBinaryFactType() As Integer
             'This Function returns one of the following values
             '0- If the FactType has no mandatory roles
             '1- if the FactType only has one manatory role
@@ -4211,6 +4211,28 @@ Namespace FBM
                     TypeOfBinaryFactType += 1
                 End If
             Next
+
+        End Function
+
+        Public Function UserCanSafelyRemoveFromModel() As Boolean
+
+            Try
+                Dim larRoles = From FactType In Me.Model.FactType
+                               From Role In FactType.RoleGroup
+                               Where Role.TypeOfJoin = pcenumRoleJoinType.FactType _
+                                 And Role.JoinsFactType Is Me
+                               Select Role
+
+                Return larRoles.Count = 0
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
         End Function
 
