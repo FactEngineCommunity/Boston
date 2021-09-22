@@ -123,13 +123,19 @@ Namespace FactEngine.TypeDB
                     'this will be different according to your scenario. you need to use breakpoint to see data
                     'to implement better logic here. "Answers" below is the array of ConceptMap
                     Try
-                        For Each itm In ServerResp.ResPart.QueryManagerResPart.MatchResPart.Answers.ToArray()
+                        Dim laoMap As List(Of ConceptMap) = ServerResp.ResPart.QueryManagerResPart.MatchResPart.Answers.ToList
+                        For Each itm In laoMap
                             Dim cncpt As Concept = Nothing 'this will be used to get the concept from conceptMap so you can access values.
                             itm.Map.TryGetValue("gen", cncpt) 'you can get the maping key from your query
 
                             If lrRecordset.Columns.Count = 0 Then
                                 For Each loValue In itm.Map.Values
-                                    lsColumnName = lrFactType.CreateUniqueRoleName(loValue.Thing.[Type].Label.ToString, 0)
+                                    Try
+                                        lsColumnName = lrFactType.CreateUniqueRoleName(loValue.Thing.[Type].Label.ToString, 0)
+                                    Catch ex As Exception
+                                        lsColumnName = lrFactType.CreateUniqueRoleName(loValue.[Type].Label.ToString, 0)
+                                    End Try
+
                                     Dim lrRole = New FBM.Role(lrFactType, lsColumnName, True, Nothing)
                                     lrFactType.RoleGroup.AddUnique(lrRole)
                                     lrRecordset.Columns.Add(lsColumnName)
@@ -142,21 +148,37 @@ Namespace FactEngine.TypeDB
 
                             For Each loValue In itm.Map.Values
 
-                                Select Case loValue.Thing.Type.ValueType.ToString
-                                    Case Is = "Long"
-                                        loFieldValue = loValue.Thing.Value.Long
-                                    Case Is = "Datetime"
-                                        loFieldValue = DateTimeOffset.FromUnixTimeMilliseconds(loValue.Thing.Value.DateTime).ToString
-                                    Case Else
+                                Select Case loValue.ConceptCase
+                                    Case Is = Concept.ConceptOneofCase.Thing
+
+                                        Select Case loValue.Thing.Type.ValueType.ToString
+                                            Case Is = "Long"
+                                                loFieldValue = loValue.Thing.Value.Long
+                                            Case Is = "Datetime"
+                                                loFieldValue = DateTimeOffset.FromUnixTimeMilliseconds(loValue.Thing.Value.DateTime).ToString
+                                            Case Else
+                                                Try
+                                                    loFieldValue = loValue.Thing.Value.String
+                                                Catch ex As Exception
+                                                    loFieldValue = loValue.Thing.ToString
+                                                    'Not a biggie at this stage.
+                                                End Try
+                                        End Select
+                                    Case Is = Concept.ConceptOneofCase.Type
+                                        loFieldValue = loValue.Type.Label
                                         Try
-                                            loFieldValue = loValue.Thing.Value.String
+                                            Dim loEncoding As String = loValue.Type.Encoding.ToString
+                                            Dim loValueType As String = loValue.Type.ValueType.ToString
+                                            If Not (loEncoding.StartsWith("Attribute") Or loEncoding.StartsWith("Relation")) Then
+                                                Debugger.Break()
+                                            End If
+
                                         Catch ex As Exception
-                                            loFieldValue = loValue.Thing.ToString
                                             'Not a biggie at this stage.
                                         End Try
-
+                                    Case Else
+                                        Debugger.Break()
                                 End Select
-
 
                                 Try
                                     lrFact.Data.Add(New FBM.FactData(lrFactType.RoleGroup(liInd), New FBM.Concept(Viev.NullVal(loFieldValue, "")), lrFact))
