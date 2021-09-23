@@ -235,7 +235,8 @@ Public Class frmFactEngine
                                        Optional ByVal aoTagObject As Object = Nothing,
                                        Optional abSetSelectedIndex As Boolean = False,
                                        Optional asModelElementName As String = "",
-                                       Optional ab0Index As Boolean = False)
+                                       Optional ab0Index As Boolean = False,
+                                       Optional abOverrideAlreadyExists As Boolean = False)
 
         Dim lrListItem = New tComboboxItem(asModelElementName, asEAItem, aoTagObject)
 
@@ -247,7 +248,7 @@ Public Class frmFactEngine
 
         lbAlreadyExists = larExists.Count > 0
 
-        If (asEAItem <> "") And Not lbAlreadyExists Then
+        If (asEAItem <> "") And (Not lbAlreadyExists Or abOverrideAlreadyExists) Then
             If ab0Index Then
                 Me.AutoComplete.ListBox.Items.Insert(0, lrListItem)
             Else
@@ -1561,7 +1562,7 @@ Public Class frmFactEngine
 
                                 For Each lrPredicatePart In larPredicatePart
                                     Dim lrNextPredicatePart = lrPredicatePart.FactTypeReading.PredicatePart(lrPredicatePart.SequenceNr)
-                                    Call Me.AddEnterpriseAwareItem(lrPredicatePart.PredicatePartText, FEQL.TokenType.PREDICATE, False, lrNextPredicatePart.Role.JoinedORMObject.Id, False)
+                                    Call Me.AddEnterpriseAwareItem(lrPredicatePart.PredicatePartText, FEQL.TokenType.PREDICATE, False, lrNextPredicatePart.Role.JoinedORMObject.Id, True)
                                 Next
 
                                 larFactTypeReading2 = lrFirstModelElement.getOutgoingFactTypeReadings()
@@ -1574,7 +1575,12 @@ Public Class frmFactEngine
 
                                 For Each lrPredicatePart In larPredicatePart
                                     Dim lrNextPredicatePart = lrPredicatePart.FactTypeReading.PredicatePart(lrPredicatePart.SequenceNr)
-                                    Call Me.AddEnterpriseAwareItem(lrPredicatePart.PredicatePartText, FEQL.TokenType.PREDICATE, False, lrNextPredicatePart.Role.JoinedORMObject.Id, False)
+                                    If lrPredicatePart.PredicatePartText.StartsWith(Me.zsIntellisenseBuffer) Then
+                                        Call Me.AddEnterpriseAwareItem(lrPredicatePart.PredicatePartText, FEQL.TokenType.PREDICATE, False, lrNextPredicatePart.Role.JoinedORMObject.Id, True, True)
+                                    Else
+                                        Call Me.AddEnterpriseAwareItem(lrPredicatePart.PredicatePartText, FEQL.TokenType.PREDICATE, False, lrNextPredicatePart.Role.JoinedORMObject.Id, False)
+                                    End If
+
                                 Next
 
                                 If lrPredicateModelObject IsNot Nothing Then

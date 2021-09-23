@@ -144,11 +144,15 @@
                     Next
 
                     'Variable Columns
-                    For Each lrQueryEdge In larConditionalQueryEdges.FindAll(Function(x) x.TargetNode.Name = lrQueryNode.Name)
+                    For Each lrQueryEdge In larConditionalQueryEdges.FindAll(Function(x) (x.TargetNode.Name = lrQueryNode.Name And x.TargetNode.Alias = lrQueryNode.Alias) Or
+                                                                                        (x.TargetNode.FBMModelObject.GetType = GetType(FBM.ValueType) And
+                                                                                         x.BaseNode.Name = lrQueryNode.Name And
+                                                                                         x.BaseNode.Alias = lrQueryNode.Alias))
                         Select Case lrQueryEdge.TargetNode.FBMModelObject.GetType
                             Case Is = GetType(FBM.ValueType)
                                 Dim lrColumn As RDS.Column = lrQueryEdge.RDSColumn
-                                lsTDBQuery &= ", has " & lrColumn.Name & " $" & lrColumn.Table.DBVariableName & lrColumn.Name
+                                If lrColumn.Table.Name <> lrQueryNode.Name Then Exit Select
+                                lsTDBQuery &= ", has " & lrColumn.Name & " $" & lrColumn.Table.DBVariableName & Viev.NullVal(lrQueryNode.Alias, "") & lrColumn.Name
                             Case Is = GetType(FBM.EntityType)
                                 Dim larConditionalColumn As List(Of RDS.Column) = lrQueryEdge.TargetNode.FBMModelObject.getCorrespondingRDSTable.getFirstUniquenessConstraintColumns
                                 For Each lrColumn In larConditionalColumn

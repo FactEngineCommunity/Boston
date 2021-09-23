@@ -166,8 +166,9 @@ Namespace FactEngine.TypeDB
                                         End Select
                                     Case Is = Concept.ConceptOneofCase.Type
                                         loFieldValue = loValue.Type.Label
+                                        'Dim loObject As Object = GrpcServer.Transaction.
                                         Try
-                                            Dim loEncoding As String = loValue.Type.Encoding.ToString
+                                        Dim loEncoding As String = loValue.Type.Encoding.ToString
                                             Dim loValueType As String = loValue.Type.ValueType.ToString
                                             If Not (loEncoding.StartsWith("Attribute") Or loEncoding.StartsWith("Relation")) Then
                                                 Debugger.Break()
