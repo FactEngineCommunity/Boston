@@ -3220,6 +3220,7 @@ Public Class frmDiagramORM
                         Dim lo_point As PointF = Me.zrPage.GetMidOfSelectedObjects
 
                         If lrFactType.Arity = 2 Then
+#Region "New Role/FactType Arity = 2"
                             '---------------------------------------------------------
                             'See if optimal placement of the FactType can be found.
                             '  i.e. Make the FactTypeInstance on the same Y-axis as
@@ -3271,6 +3272,7 @@ Public Class frmDiagramORM
 
                                 lrFactType.AddFactTypeReading(lrFactTypeReading, True, True)
                             End If
+#End Region
                         ElseIf lrFactType.Arity = 1 Then
                             'Create a dummy FactTypeReading for the FactType so that a Attribute can be created for the Table in the RDS.
 
@@ -3292,6 +3294,10 @@ Public Class frmDiagramORM
                         Dim loFactTypeInstancePt As New PointF(lo_point.X - 15, lo_point.Y)
 
                         lrFactTypeInstance = Me.zrPage.DropFactTypeAtPoint(lrFactType, loFactTypeInstancePt, Me.ViewFactTablesToolStripMenuItem.Checked)
+
+                        If lrFactTypeInstance.Arity = 1 Then
+                            Call lrFactTypeInstance.RepellFromNeighbouringPageObjects(4, True)
+                        End If
 
                         '------------------------------------------------------------------------------------
                         'Have just created a FactType so if frmToolboxModelDictionary is loaded then

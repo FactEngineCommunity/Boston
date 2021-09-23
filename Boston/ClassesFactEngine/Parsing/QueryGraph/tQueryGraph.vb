@@ -152,11 +152,15 @@
                             Case Is = GetType(FBM.ValueType)
                                 Dim lrColumn As RDS.Column = lrQueryEdge.RDSColumn
                                 If lrColumn.Table.Name <> lrQueryNode.Name Then Exit Select
-                                lsTDBQuery &= ", has " & lrColumn.Name & " $" & lrColumn.Table.DBVariableName & Viev.NullVal(lrQueryNode.Alias, "") & lrColumn.Name
+                                If larReturnColumn.ToList.Find(AddressOf lrColumn.Equals) Is Nothing Then
+                                    lsTDBQuery &= ", has " & lrColumn.Name & " $" & lrColumn.Table.DBVariableName & Viev.NullVal(lrQueryNode.Alias, "") & lrColumn.Name
+                                End If
                             Case Is = GetType(FBM.EntityType)
                                 Dim larConditionalColumn As List(Of RDS.Column) = lrQueryEdge.TargetNode.FBMModelObject.getCorrespondingRDSTable.getFirstUniquenessConstraintColumns
                                 For Each lrColumn In larConditionalColumn
-                                    lsTDBQuery &= ", has " & lrColumn.Name & " $" & lrColumn.Table.DBVariableName & Viev.NullVal(lrQueryNode.Alias, "") & lrColumn.Name
+                                    If larReturnColumn.ToList.Find(AddressOf lrColumn.Equals) Is Nothing Then
+                                        lsTDBQuery &= ", has " & lrColumn.Name & " $" & lrColumn.Table.DBVariableName & Viev.NullVal(lrQueryNode.Alias, "") & lrColumn.Name
+                                    End If
                                 Next
                         End Select
                     Next
@@ -172,7 +176,9 @@
                                             Select Column
 
                     For Each lrColumn In larBaseNodeColumn
-                        lsTDBQuery &= ", has " & lrColumn.Name & " $" & lrColumn.Table.DBVariableName & lrColumn.Name
+                        If larReturnColumn.ToList.Find(AddressOf lrColumn.Equals) Is Nothing Then
+                            lsTDBQuery &= ", has " & lrColumn.Name & " $" & lrColumn.Table.DBVariableName & lrColumn.Name
+                        End If
                     Next
                     '----------------------------------------------------
 
@@ -412,11 +418,23 @@
                         lsTDBQuery &= "(" & lrQueryEdge.FBMPredicatePart.Role.Name & ": $" & lrQueryEdge.BaseNode.RDSTable.DBVariableName & Viev.NullVal(lrQueryEdge.BaseNode.Alias, "") & ","
                         Select Case lrQueryEdge.TargetNode.FBMModelObject.GetType
                             Case Is = GetType(FBM.ValueType)
-                                lsTDBQuery &= lrOtherRole.Name & ": $" & lrQueryEdge.FBMFactType.DBName & lrQueryEdge.TargetNode.DBVariableName & Viev.NullVal(lrQueryEdge.TargetNode.Alias, "") & ") isa " & lrQueryEdge.FBMFactType.DBName & ";" & vbCrLf
+                                lsTDBQuery &= lrOtherRole.Name & ": $" & lrQueryEdge.FBMFactType.DBName & lrQueryEdge.TargetNode.DBVariableName & Viev.NullVal(lrQueryEdge.TargetNode.Alias, "") & ") isa " & lrQueryEdge.FBMFactType.DBName
                             Case Else
-                                lsTDBQuery &= lrOtherRole.Name & ": $" & lrQueryEdge.TargetNode.DBVariableName & Viev.NullVal(lrQueryEdge.TargetNode.Alias, "") & ") isa " & lrQueryEdge.FBMFactType.DBName & ";" & vbCrLf
+                                lsTDBQuery &= lrOtherRole.Name & ": $" & lrQueryEdge.TargetNode.DBVariableName & Viev.NullVal(lrQueryEdge.TargetNode.Alias, "") & ") isa " & lrQueryEdge.FBMFactType.DBName
                         End Select
 
+                        '----------------------------------------------------
+                        'Return Columns
+                        Dim larReturnColumn = From Column In Me.ProjectionColumn
+                                              Where Column.Table.Name = lrQueryEdge.FBMFactType.getCorrespondingRDSTable.Name
+                                              Where Column.TemporaryAlias = lrQueryEdge.Alias
+                                              Select Column
+
+                        For Each lrReturnColumn In larReturnColumn
+                            lsTDBQuery &= ", has " & lrReturnColumn.Name & " $" & lrReturnColumn.Table.DBVariableName & lrReturnColumn.TemporaryAlias & lrReturnColumn.Name
+                        Next
+
+                        lsTDBQuery &= ";" & vbCrLf
 
                         '20210916-VM-This was in the line above lrQueryEdge.FBMFactType.DBName 
 
@@ -780,7 +798,7 @@
                                                 End Select
                                             Else
                                                 lrColumn = lrQueryEdge.BaseNode.RDSTable.Column.Find(Function(x) x.Role.FactType Is lrQueryEdge.FBMFactType)
-                                                lsTDBQuery &= lrQueryEdge.BaseNode.RDSTable.DatabaseName & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrColumn.Name
+                                                lsTDBQuery &= "$" & lrQueryEdge.BaseNode.RDSTable.DatabaseName & Viev.NullVal(lrQueryEdge.Alias, "") & lrColumn.Name
                                                 Select Case lrColumn.getMetamodelDataType
                                                     Case Is = pcenumORMDataType.TemporalDate,
                                                               pcenumORMDataType.TemporalDateAndTime
@@ -793,7 +811,7 @@
                                                         Dim lsDateTime As String = Me.Model.DatabaseConnection.FormatDateTime(lrQueryEdge.IdentifierList(0), True)
                                                         lsTDBQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lsDateTime & Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
                                                     Case Else
-                                                        lsTDBQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lrQueryEdge.IdentifierList(0) & Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
+                                                        lsTDBQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lrQueryEdge.IdentifierList(0) & Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & ";" & vbCrLf
                                                 End Select
                                             End If
 

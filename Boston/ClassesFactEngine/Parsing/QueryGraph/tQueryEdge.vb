@@ -646,6 +646,37 @@ PartialFactTypeMatch:
                 End If
 #End Region
 
+                '==================================================================================================================
+                'Near Side ModelElement predicate
+#Region "Near Side ModelElement predicate"
+                lrFactType = Me.QueryGraph.Model.getFactTypeByPredicateNearSideModelElement(asPredicate, arTargetNode.FBMModelObject, True, Me.QueryGraph.getNodeModelElementList)
+
+                If lrFactType IsNot Nothing Then
+                    Dim lrModelElement As FBM.ModelObject = arBaseNode.FBMModelObject
+                    Dim larFactTypeReading = From FactTypeReading In lrFactType.FactTypeReading
+                                             Where FactTypeReading.PredicatePart(0).Role.JoinedORMObject.Id = lrModelElement.Id
+                                             Select FactTypeReading
+
+                    lrFactTypeReading = larFactTypeReading.First
+
+                    If Me.TargetNode.FBMModelObject.isSubtypeOfModelElement(lrFactTypeReading.PredicatePart(1).Role.JoinedORMObject) Then
+
+                        Me.FBMFactType = lrFactTypeReading.FactType
+                        Me.FBMFactTypeReading = lrFactTypeReading
+                        Me.FBMPredicatePart = Me.FBMFactTypeReading.PredicatePart(0)
+                    Else
+                        Me.FBMFactType = Nothing
+                        Me.FBMFactTypeReading = Nothing
+                        Me.FBMPredicatePart = Nothing
+                    End If
+                End If
+
+                    'Return if successful
+                    If Me.FBMFactType IsNot Nothing And Me.FBMFactTypeReading IsNot Nothing And Me.FBMPredicatePart IsNot Nothing Then
+                    Return Nothing
+                End If
+#End Region
+
                 '===================================================================================================================================
                 'ReifiedFactType LinkFactType predicate requring an InjectedQueryEdge
 #Region "ReifiedFactType LinkFactType predicate requring an InjectedQueryEdge"

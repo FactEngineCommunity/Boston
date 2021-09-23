@@ -1830,8 +1830,15 @@ Public Class frmFactEngine
                                             lsFEQLQuery &= " RETURN " & lrColumn.Table.Name & "." & lrColumn.Name
                                         End If
                                     Catch ex As Exception
+                                        If lrColumn IsNot Nothing Then
+                                            lsFEQLQuery &= " RETURN " & lrColumn.Table.Name & "." & lrColumn.Name
+                                        End If
                                         'Do nothing. Just don't add anything to the SQL.
                                     End Try
+                                Else
+                                    If lrColumn IsNot Nothing Then
+                                        lsFEQLQuery &= " RETURN " & lrColumn.Table.Name & "." & lrColumn.Name
+                                    End If
                                 End If
                                 lsSQLQuery &= vbCrLf & " LIMIT 20"
                             Catch ex As Exception

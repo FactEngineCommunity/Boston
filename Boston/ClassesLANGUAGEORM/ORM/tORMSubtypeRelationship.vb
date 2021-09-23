@@ -200,19 +200,48 @@ Namespace FBM
 
         Public Sub setIsPrimarySubtypeRelationship(ByVal abIsPrimarySubtypeRelationship As Boolean)
 
-            If abIsPrimarySubtypeRelationship And Me.EntityType.SubtypeRelationship.Count > 1 Then
-                Dim larSubtypeRelationship = From SubtypeRelationship In Me.EntityType.SubtypeRelationship
-                                             Where SubtypeRelationship IsNot Me
-                                             Select SubtypeRelationship
+            Try
 
-                For Each lrSubtypeReltionship In larSubtypeRelationship.ToList
-                    Call lrSubtypeReltionship.setIsPrimarySubtypeRelationship(False)
-                Next
-            End If
+                If abIsPrimarySubtypeRelationship And Me.EntityType.SubtypeRelationship.Count > 1 Then
+                    Dim larSubtypeRelationship = From SubtypeRelationship In Me.EntityType.SubtypeRelationship
+                                                 Where SubtypeRelationship IsNot Me
+                                                 Select SubtypeRelationship
 
-            Me.IsPrimarySubtypeRelationship = abIsPrimarySubtypeRelationship
+                    For Each lrSubtypeReltionship In larSubtypeRelationship.ToList
+                        Call lrSubtypeReltionship.setIsPrimarySubtypeRelationship(False)
+                    Next
+                End If
 
-            RaiseEvent IsPrimarySubtypeRelationshipChanged(abIsPrimarySubtypeRelationship)
+                '====================================================================================
+                'RDS
+                If Not abIsPrimarySubtypeRelationship And Me.IsPrimarySubtypeRelationship Then
+                    'Remove the PrimaryKey from the supertype
+                    Try
+                        Dim larSupertypePKColumn = Me.parentEntityType.getCorrespondingRDSTable.getPrimaryKeyColumns
+
+                        For Each lrColumn In larSupertypePKColumn
+                            Dim lrSubtypeTable = Me.EntityType.getCorrespondingRDSTable
+                            Dim lrSubtypeColumn As RDS.Column = lrSubtypeTable.Column.Find(Function(x) x.Role Is lrColumn.Role)
+                            Me.EntityType.getCorrespondingRDSTable.removeColumn(lrSubtypeColumn)
+                        Next
+
+                    Catch ex As Exception
+                        'Not a biggie if Fails.
+                    End Try
+                End If
+
+                Me.IsPrimarySubtypeRelationship = abIsPrimarySubtypeRelationship
+
+                RaiseEvent IsPrimarySubtypeRelationshipChanged(abIsPrimarySubtypeRelationship)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
         End Sub
 
