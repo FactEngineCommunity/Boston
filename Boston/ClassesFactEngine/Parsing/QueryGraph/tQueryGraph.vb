@@ -63,8 +63,13 @@
                                        Optional ByVal abIsStraightDerivationClause As Boolean = False,
                                        Optional ByRef arDerivedModelElement As FBM.ModelObject = Nothing,
                                        Optional ByRef abIsSubQuery As Boolean = False) As String
+            Dim lsTDBQuery As String
+            If abIsSubQuery Then
+                lsTDBQuery = " not {"
+            Else
+                lsTDBQuery = "match "
+            End If
 
-            Dim lsTDBQuery As String = "match "
             Dim liInd As Integer
             Dim larColumn As New List(Of RDS.Column)
             Dim lbRequiresGroupByClause As Boolean = False
@@ -123,6 +128,7 @@
                 Dim larSubQueryNodes As List(Of FactEngine.QueryNode) = (From Node In larFromNodes
                                                                          Where Node.QueryEdge IsNot Nothing
                                                                          Where (Node.QueryEdge.IsSubQueryLeader Or Node.QueryEdge.IsPartOfSubQuery)
+                                                                         Where Not (Node.QueryEdge.BaseNode Is Node And Node.QueryEdge.IsSubQueryLeader)
                                                                          Select Node
                                                                         ).ToList
 
@@ -135,7 +141,8 @@
                     '----------------------------------------------------
                     'Return Columns
                     Dim larReturnColumn = From Column In Me.ProjectionColumn
-                                          Where Column.Table.Name = lrQueryNode.RDSTable.Name
+                                          Where (Column.Table.Name = lrQueryNode.RDSTable.Name Or
+                                                 lrQueryNode.FBMModelObject.isSubtypeOfModelElement(Column.Table.FBMModelElement))
                                           Where Column.TemporaryAlias = lrQueryNode.Alias
                                           Select Column
 
@@ -193,6 +200,7 @@
                                             Select Node
 
                 Dim larPartialFTMatchFT = From Node In larPartialFTMatchNode
+                                          Where Not Node.QueryEdge.IsSubQueryLeader
                                           Group Node By Node.QueryEdge.FBMFactType, Node.QueryEdge.Alias Into grp = Group
 
 
@@ -436,60 +444,6 @@
 
                         lsTDBQuery &= ";" & vbCrLf
 
-                        '20210916-VM-This was in the line above lrQueryEdge.FBMFactType.DBName 
-
-                        '20210904-VM-From SQL below. Might not be needed for TypeDB.
-                        'lrOriginTable = lrQueryEdge.FBMFactType.getCorrespondingRDSTable
-
-                        'Dim larRelation = lrOriginTable.getRelations
-
-                        'larRelation = larRelation.FindAll(Function(x) (x.DestinationTable.Name = lrQueryEdge.BaseNode.RelativeFBMModelObject.Id) Or
-                        '                                               (x.DestinationTable.Name = lrQueryEdge.TargetNode.Name)).OrderBy(Function(x) x.OriginColumns(0).OrdinalPosition).ToList
-
-                        'Dim liTempInd = 0
-                        'Dim liRelationCounter = 1
-
-                        ''Order the relations by the QueryEdge.FactTypeReading
-                        ''  This way 'Lecturer likes Lecturer' is different from 'Lecturer is liked by Lecturer'
-
-                        'Dim lrColumn = lrOriginTable.Column.Find(Function(x) x.Role Is lrQueryEdge.FBMFactTypeReading.PredicatePart(0).Role)
-                        'If Not larRelation(0).OriginColumns.Contains(lrColumn) Then
-                        '    larRelation.Reverse()
-                        'End If
-
-                        'For Each lrRelation In larRelation
-                        '    Dim liColumnCounter = 0
-                        '    For Each lrColumn In lrRelation.DestinationColumns
-                        '        If liTempInd > 0 Then lsTDBQuery &= "AND "
-
-                        '        Select Case liRelationCounter
-                        '            Case Is = 1
-                        '                Select Case lrQueryEdge.BaseNode.FBMModelObject.ConceptType
-                        '                    Case = pcenumConceptType.ValueType
-                        '                        'Nothing to do here
-                        '                    Case Else
-                        '                        lsTDBQuery &= lrRelation.OriginTable.DatabaseName & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrRelation.OriginColumns(liColumnCounter).Name & " = "
-                        '                        Dim lrTargetColumn = lrRelation.DestinationColumns.Find(Function(x) x.ActiveRole Is lrRelation.OriginColumns(liColumnCounter).ActiveRole)
-                        '                        lsTDBQuery &= lrRelation.DestinationTable.DatabaseName & Viev.NullVal(lrQueryEdge.BaseNode.Alias, "") & "." & lrTargetColumn.Name & vbCrLf
-                        '                End Select
-                        '            Case Else
-                        '                Select Case lrQueryEdge.TargetNode.FBMModelObject.ConceptType
-                        '                    Case = pcenumConceptType.ValueType
-                        '                        'Nothing to do here
-                        '                    Case Else
-                        '                        lsTDBQuery &= lrRelation.OriginTable.DatabaseName & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrRelation.OriginColumns(liColumnCounter).Name & " = "
-                        '                        Dim lrTargetColumn = lrRelation.DestinationColumns.Find(Function(x) x.ActiveRole Is lrRelation.OriginColumns(liColumnCounter).ActiveRole)
-                        '                        lsTDBQuery &= lrRelation.DestinationTable.DatabaseName & Viev.NullVal(lrQueryEdge.TargetNode.Alias, "") & "." & lrTargetColumn.Name & vbCrLf
-                        '                End Select
-                        '        End Select
-
-                        '        'lsTDBQuery &= lrQueryEdge.BaseNode.Name & Viev.NullVal(lrQueryEdge.BaseNode.Alias, "") & "." & lrColumn.Name & " = "
-                        '        'lsTDBQuery &= lrOriginTable.Name & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrTargetColumn.Name & vbCrLf 'lrOriginTable.getColumnByOrdingalPosition(1).Name & vbCrLf
-                        '        liTempInd += 1
-                        '        liColumnCounter += 1
-                        '    Next
-                        '    liRelationCounter += 1
-                        'Next
 #End Region
                     ElseIf lrQueryEdge.FBMFactType.DerivationType = pcenumFEQLDerivationType.Count Then
 #Region "DerivationType = COUNT"
@@ -847,48 +801,98 @@
 
 #End Region
 
+#Region "Subqueries"
+                '=====================================================================================
+                'SubQueries
+                Dim lasSubQueryAlias = From QueryEdge In Me.QueryEdges
+                                       Where QueryEdge.IsSubQueryLeader Or QueryEdge.IsPartOfSubQuery
+                                       Select QueryEdge.SubQueryAlias Distinct
+
+                For Each lsSubQueryAlias In lasSubQueryAlias
+                    Dim larSubQueryEdge = Me.QueryEdges.FindAll(Function(x) x.SubQueryAlias = lsSubQueryAlias)
+
+                    Dim lrSubQueryGraph = New FactEngine.QueryGraph(Me.Model)
+
+                    lrSubQueryGraph.HeadNode = larSubQueryEdge.First.BaseNode
+                    lrSubQueryGraph.QueryEdges.AddRange(larSubQueryEdge)
+                    lrSubQueryGraph.QueryEdges.ForEach(Sub(x) x.IsSubQueryLeader = False)
+                    lrSubQueryGraph.QueryEdges.ForEach(Sub(x) x.IsPartOfSubQuery = False)
+
+                    For Each lrQueryEdge In lrSubQueryGraph.QueryEdges
+                        lrSubQueryGraph.Nodes.Add(lrQueryEdge.TargetNode)
+                    Next
+
+                    '----------------------------------------------------------------------------------------------
+                    'Remove Nodes that clearly are correlated. E.g. Session in 
+                    '"WHICH Cinema is showing (Film:'Rocky') at (DateTime:'1/5/2021 10:00') 
+                    '"AND contains WHICH Row THAT contains A Seat THAT has NO Booking THAT Is for THAT Session "
+                    Dim lrNode As FactEngine.QueryNode
+                    Dim lbKeep As Boolean = False
+                    For liInd = 0 To lrSubQueryGraph.Nodes.Count - 1
+                        lrNode = lrSubQueryGraph.Nodes(liInd)
+                        If lrNode.IsThatReferencedTargetNode And liInd > 0 Then
+                            For liInd2 = 0 To liInd - 1
+                                If lrSubQueryGraph.Nodes(liInd2).Name = lrNode.Name And lrSubQueryGraph.Nodes(liInd2).Alias = lrNode.Alias Then
+                                    lbKeep = True
+                                End If
+                            Next
+                            If Not lbKeep Then lrSubQueryGraph.Nodes.Remove(lrNode)
+                        End If
+                    Next
+                    'lrSubQueryGraph.Nodes.RemoveAll(Function(x) x.IsThatReferencedTargetNode)
+                    lsTDBQuery &= lrSubQueryGraph.generateTypeQL(arWhichSelectStatement, True,,, True)
+                    lsTDBQuery &= "};"
+                Next
+                '=====================================================================================
+#End Region
+
+
 #Region "RETURN/GET Clause"
 
-                If Me.ProjectionColumn.Count > 0 Then
+                If Not abIsSubQuery Then
+                    If Me.ProjectionColumn.Count > 0 Then
                     lsTDBQuery &= " get "
                 End If
 
                 liInd = 1
-                For Each lrProjectColumn In Me.ProjectionColumn.FindAll(Function(x) x IsNot Nothing)
+                    For Each lrProjectColumn In Me.ProjectionColumn.FindAll(Function(x) x IsNot Nothing)
 
-                    If lrProjectColumn.Role.FactType.IsDerived Then
-                        If lrProjectColumn.Role.JoinedORMObject.GetType = GetType(FBM.ValueType) Then
-                            'for now
-                            lsSelectClause &= "$" & lrProjectColumn.Name
+                        If lrProjectColumn.Role.FactType.IsDerived Then
+                            If lrProjectColumn.Role.JoinedORMObject.GetType = GetType(FBM.ValueType) Then
+                                'for now
+                                lsSelectClause &= "$" & lrProjectColumn.Name
+                            Else
+                                lsSelectClause &= "$" & lrProjectColumn.Role.FactType.DBVariableName & Viev.NullVal(lrProjectColumn.TemporaryAlias, "") & "." & lrProjectColumn.Name
+                            End If
+
                         Else
-                            lsSelectClause &= "$" & lrProjectColumn.Role.FactType.DBVariableName & Viev.NullVal(lrProjectColumn.TemporaryAlias, "") & "." & lrProjectColumn.Name
+                            lsSelectClause &= "$" & lrProjectColumn.Table.DBVariableName & Viev.NullVal(lrProjectColumn.TemporaryAlias, "") & lrProjectColumn.Name
+                            If lrProjectColumn.AsName IsNot Nothing Then
+                                lsSelectClause &= " AS " & lrProjectColumn.AsName
+                            End If
                         End If
+                        If liInd < larProjectionColumn.Count Then lsSelectClause &= ","
+                        liInd += 1
+                    Next
 
-                    Else
-                        lsSelectClause &= "$" & lrProjectColumn.Table.DBVariableName & Viev.NullVal(lrProjectColumn.TemporaryAlias, "") & lrProjectColumn.Name
-                        If lrProjectColumn.AsName IsNot Nothing Then
-                            lsSelectClause &= " AS " & lrProjectColumn.AsName
+                    lsTDBQuery &= lsSelectClause
+
+                    If arWhichSelectStatement.RETURNCLAUSE IsNot Nothing Then
+                        Dim larCountStarColumn = From ReturnColumn In arWhichSelectStatement.RETURNCLAUSE.RETURNCOLUMN
+                                                 Where ReturnColumn.KEYWDCOUNTSTAR IsNot Nothing
+                                                 Select ReturnColumn
+
+                        If larCountStarColumn.Count > 0 Then
+                            lsTDBQuery &= ", COUNT(*)"
+                            If larCountStarColumn(0).ASCLAUSE IsNot Nothing Then
+                                lsTDBQuery &= " AS " & larCountStarColumn(0).ASCLAUSE.COLUMNNAMESTR
+                            End If
+                            lbRequiresGroupByClause = True
                         End If
                     End If
-                    If liInd < larProjectionColumn.Count Then lsSelectClause &= ","
-                    liInd += 1
-                Next
-                lsTDBQuery &= lsSelectClause
 
-                If arWhichSelectStatement.RETURNCLAUSE IsNot Nothing Then
-                    Dim larCountStarColumn = From ReturnColumn In arWhichSelectStatement.RETURNCLAUSE.RETURNCOLUMN
-                                             Where ReturnColumn.KEYWDCOUNTSTAR IsNot Nothing
-                                             Select ReturnColumn
-
-                    If larCountStarColumn.Count > 0 Then
-                        lsTDBQuery &= ", COUNT(*)"
-                        If larCountStarColumn(0).ASCLAUSE IsNot Nothing Then
-                            lsTDBQuery &= " AS " & larCountStarColumn(0).ASCLAUSE.COLUMNNAMESTR
-                        End If
-                        lbRequiresGroupByClause = True
-                    End If
+                    lsTDBQuery &= ";"
                 End If
-                lsTDBQuery &= ";"
 #End Region
 
                 Return lsTDBQuery
