@@ -252,6 +252,40 @@ Namespace ERD
                         If lrEntity IsNot Nothing Then
                             lrERDLink.OriginModelElement = lrEntity
                             lrERDLink.Link.Origin = lrERDLink.OriginModelElement.TableShape
+                        Else
+                            Me.Page.Diagram.Links.Remove(lrERDLink.Link)
+                        End If
+
+                    End If
+                End If
+
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
+        Private Sub RDSRelation_DestinationTableChanged(ByRef arTable As RDS.Table) Handles RDSRelation.DestinationTableChanged
+
+            Try
+                If Me.Page.Diagram IsNot Nothing Then
+
+                    If Me.Link IsNot Nothing Then
+                        Dim lrTable As RDS.Table = arTable
+                        Dim lrERDLink As ERD.Link = Me.Link
+                        Dim lrEntity As ERD.Entity = Me.Page.ERDiagram.Entity.Find(Function(x) x.Name = lrTable.Name)
+
+                        If lrEntity IsNot Nothing Then
+                            lrERDLink.DestinationModelElement = lrEntity
+                            lrERDLink.Link.Destination = lrERDLink.DestinationModelElement.TableShape
+                        Else
+                            Me.Page.Diagram.Links.Remove(lrERDLink.Link)
                         End If
 
                     End If

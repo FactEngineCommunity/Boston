@@ -65,6 +65,7 @@ Namespace RDS
         Public Event DestinationMultiplicityChanged(ByVal aiDestinationMultiplicity As pcenumCMMLMultiplicity)
         Public Event ResponsibleFactTypeChanged(ByRef arNewResponsibleFactType As FBM.FactType)
         Public Event DestinationPredicateChanged(ByVal asPredicate As String)
+        Public Event DestinationTableChanged(ByRef arTable As RDS.Table)
         Public Event OriginMandatoryChanged(ByVal abOriginIsMandatory As Boolean)
         Public Event OriginMultiplicityChanged(ByVal aiOriginMultiplicity As pcenumCMMLMultiplicity)
         Public Event OriginPredicateChanged(ByVal asPredicate As String)
@@ -313,6 +314,27 @@ Namespace RDS
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
                 prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
+        Public Sub setDestinationTable(ByVal arTable As RDS.Table)
+
+            Try
+                Me.DestinationTable = arTable
+
+                'CMML
+                Call Me.Model.Model.updateRelationDestinationTable(Me, arTable)
+
+                RaiseEvent DestinationTableChanged(arTable)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub

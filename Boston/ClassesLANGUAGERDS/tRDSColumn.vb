@@ -187,7 +187,7 @@ Namespace RDS
         Public ReadOnly Property OutgoingRelation As List(Of RDS.Relation)
             Get
                 Dim larRelation = From Relation In Me.Relation
-                                  Where Relation.OriginTable.Name Is Me.Table.Name
+                                  Where Relation.OriginTable.Name Is Me.Role.getCorrespondingRDSTable.Name
                                   Select Relation
 
                 Return larRelation.ToList
@@ -196,11 +196,19 @@ Namespace RDS
 
         Public ReadOnly Property IncomingRelation As List(Of RDS.Relation)
             Get
-                Dim larRelation = From Relation In Me.Relation
-                                  Where Relation.OriginTable IsNot Me.Table
-                                  Select Relation
+                Dim larRelation = (From Relation In Me.Relation
+                                   Where Relation.OriginTable IsNot Me.Role.getCorrespondingRDSTable
+                                   Select Relation).ToList
 
-                Return larRelation.ToList
+                Dim larGlobalRelation = From Relation In Me.Model.Relation
+                                        Where Relation.DestinationColumns.Contains(Me)
+                                        Select Relation
+
+                For Each lrRelation In larGlobalRelation
+                    larRelation.AddUnique(lrRelation)
+                Next
+
+                Return larRelation
             End Get
         End Property
 

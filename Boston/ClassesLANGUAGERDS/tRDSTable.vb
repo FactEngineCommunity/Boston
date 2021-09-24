@@ -230,6 +230,17 @@ Namespace RDS
                         Call Me.Model.Model.updateRelationOriginTable(lrRelation, Me)
                     Next
 
+                    'Move Destinations of relevant Relations.
+                    larRelation = From Relation In lrColumn.IncomingRelation
+                                  Select Relation
+
+                    For Each lrRelation In larRelation.ToArray
+                        If lrRelation.ResponsibleFactType.PointsToTable.Contains(Me) Then
+                            Call Me.Model.Model.updateRelationDestinationTable(lrRelation, Me)
+                            Call lrRelation.setDestinationTable(Me)
+                        End If
+                    Next
+
 
                     Dim lrNewColumn = lrColumn.Clone(Me, Nothing)
                     lrNewColumn.Relation.AddRange(lrColumn.Relation)

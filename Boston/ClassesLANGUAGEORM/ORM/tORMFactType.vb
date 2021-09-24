@@ -1278,6 +1278,49 @@ Namespace FBM
 
         End Function
 
+        ''' <summary>
+        ''' Used for when reassigning DestinationTables on RDS Relations.
+        ''' </summary>
+        ''' <returns></returns>
+        Public Function PointsToTable() As List(Of RDS.Table)
+
+            Dim larTable As New List(Of RDS.Table)
+            Dim lrRole As FBM.Role
+            Try
+                If Me.IsManyTo1BinaryFactType Or Me.Is1To1BinaryFactType Then
+                    lrRole = Me.RoleGroup.Find(Function(x) x.HasInternalUniquenessConstraint)
+                    larTable.AddUnique(lrRole.JoinedORMObject.getCorrespondingRDSTable)
+                    lrRole = Me.GetOtherRoleOfBinaryFactType(lrRole.Id)
+                    Select Case lrRole.JoinedORMObject.GetType
+                        Case Is = GetType(FBM.ValueType)
+                        Case Else
+                            larTable.AddUnique(lrRole.getCorrespondingRDSTable)
+                    End Select
+                ElseIf Me.HasTotalRoleConstraint Or Me.HasPartialButMultiRoleConstraint Then
+                    For Each lrRole In Me.RoleGroup
+                        Select Case lrRole.JoinedORMObject.GetType
+                            Case Is = GetType(FBM.ValueType)
+                            Case Else
+                                larTable.AddUnique(lrRole.JoinedORMObject.getCorrespondingRDSTable)
+                        End Select
+                    Next
+                End If
+
+                Return larTable
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return larTable
+            End Try
+
+        End Function
+
         Public Sub RemoveFactByData(ByVal arFact As FBM.Fact, ByVal ab_delete_all As Boolean)
 
             '---------------------------------------------------------------------------------------

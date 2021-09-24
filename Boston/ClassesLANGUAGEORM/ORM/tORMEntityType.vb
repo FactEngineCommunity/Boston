@@ -2856,6 +2856,7 @@ Namespace FBM
                        lrColumn.Role.JoinedORMObject Is lrSupertypeTable Then
                         'Is already from a higher type. Just remove the Column
                         lrSubtypeTable.removeColumn(lrColumn,, False)
+
                     Else
                         'Move Origins of relevant Relations.
                         Dim larRelation = From Relation In lrColumn.OutgoingRelation
@@ -2863,6 +2864,14 @@ Namespace FBM
 
                         For Each lrRelation In larRelation.ToArray
                             Call lrRelation.setOriginTable(lrSupertypeTable)
+                        Next
+
+                        'Move Destinations of relevant Relations.
+                        larRelation = From Relation In lrColumn.IncomingRelation
+                                      Select Relation
+
+                        For Each lrRelation In larRelation.ToArray
+                            Call lrRelation.setDestinationTable(lrSupertypeTable)
                         Next
 
                         'Move the Column

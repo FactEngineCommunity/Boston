@@ -1480,6 +1480,18 @@ Namespace FBM
 
         End Sub
 
+        Public Sub updateRelationDestinationTable(ByRef arRelation As RDS.Relation, ByRef arTable As RDS.Table)
+
+            Dim lsSQLQuery As String = ""
+
+            lsSQLQuery = "UPDATE " & pcenumCMMLRelations.CoreRelationHasDestinationEntity.ToString
+            lsSQLQuery &= " SET Entity = '" & arTable.Name & "'"
+            lsSQLQuery &= " WHERE Relation= '" & arRelation.Id & "'"
+
+            Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+        End Sub
+
         Public Sub updateRelationOriginTable(ByRef arRelation As RDS.Relation, ByRef arTable As RDS.Table)
 
             Dim lsSQLQuery As String = ""
