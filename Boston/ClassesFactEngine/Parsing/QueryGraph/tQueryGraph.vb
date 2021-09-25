@@ -266,7 +266,21 @@
 
                         liInd += 1
                     Next
-                    lsTDBQuery &= ") isa " & lrFactType.getCorrespondingRDSTable.DatabaseName & ";" & vbCrLf
+                    lsTDBQuery &= ") isa " & lrFactType.getCorrespondingRDSTable.DatabaseName
+
+                    '----------------------------------------------------
+                    'Return Columns
+                    Dim larReturnColumn = From Column In Me.ProjectionColumn
+                                          Where (Column.Table.Name = lrFactType.getCorrespondingRDSTable.Name Or
+                                                 lrFactType.isSubtypeOfModelElement(Column.Table.FBMModelElement))
+                                          Where Column.TemporaryAlias = lrFactTypeMatch.Alias
+                                          Select Column
+
+                    For Each lrReturnColumn In larReturnColumn
+                        lsTDBQuery &= ", has " & lrReturnColumn.Name & " $" & lrReturnColumn.Table.DBVariableName & lrReturnColumn.TemporaryAlias & lrReturnColumn.Name
+                    Next
+
+                    lsTDBQuery &= ";" & vbCrLf
 
                 Next
 

@@ -6110,11 +6110,18 @@ Public Class frmDiagramORM
                 Case Is = False
                     '--------------------------------------------
                     'Remove the objectification of the FactType
-                    '--------------------------------------------        
-                    If lrFactTypeInstance.FactType.hasAssociatedFactTypes Then
+                    '--------------------------------------------   
+                    Dim larAssociatedFactType As New List(Of FBM.FactType)
+                    If lrFactTypeInstance.FactType.hasAssociatedFactTypes(larAssociatedFactType) Then
                         Dim lsMessage As String = "Remove all links to Fact Types linked to this Fact Type before removing the objectification of this Fact Type."
                         lsMessage &= vbCrLf & vbCrLf
                         lsMessage &= "Hint: See the list of associated Fact Types in the ORM Verbalisation toolbox to choose which Fact Types to remove or modify in the model before removing the objectification of this Fact Type."
+                        lsMessage &= vbCrLf & vbCrLf
+                        lsMessage &= "Associated Fact Types include:" & vbCrLf
+                        For Each lrFactType In larAssociatedFactType
+                            lsMessage &= lrFactType.Id & vbCrLf
+                        Next
+
                         MsgBox(lsMessage)
 
                         'Sample Code to find the linked FactTypes. Can extend message above to show the FactType Names to remove.

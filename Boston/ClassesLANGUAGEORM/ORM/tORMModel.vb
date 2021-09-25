@@ -1201,18 +1201,40 @@ Namespace FBM
                                             larColumn = lrRole.getColumns(lrTable, lrRole)
 
                                             For Each lrColumn In larColumn
-
+                                                Dim lbFailed As Boolean = False
                                                 If Not lrTable.Column.Exists(Function(x) x.Role.Id = lrRole.Id And x.ActiveRole.Id = lrColumn.ActiveRole.Id) Then
                                                     'There is no existing Column in the Table for lrColumn.
                                                     lrColumn.Name = lrTable.createUniqueColumnName(lrColumn, lrColumn.Name, 0)
                                                     If arRoleConstraint.Role.Contains(lrRole) Then
                                                         lrColumn.IsMandatory = True
-                                                        '20210505-VM-No longer needed. IsPartOfPrimaryKey uses Table Indexes to determine.
-                                                        'If lrFactType.InternalUniquenessConstraint.Count = 1 Then
-                                                        '    lrColumn.ContributesToPrimaryKey = True
-                                                        'End If
                                                     End If
                                                     lrTable.addColumn(lrColumn, Me.IsDatabaseSynchronised)
+                                                Else
+                                                    lbFailed = True
+                                                End If
+
+                                                If lbFailed Then
+                                                    'Could be a good reason why it Failed but shouldn't have.
+                                                    'E.g.The joined FactType has more than on Role in PK pointing to the same EntityType
+                                                    Try
+                                                        If lrRole.JoinedORMObject.getCorrespondingRDSTable IsNot Nothing Then
+
+                                                            Dim larDownstreamColumn = From Column In lrRole.JoinedORMObject.getCorrespondingRDSTable.getPrimaryKeyColumns
+                                                                                      Where Column.ActiveRole Is lrColumn.ActiveRole
+                                                                                      Select Column
+
+                                                            If larDownstreamColumn.Count > 1 Then
+                                                                'Add the Column anyway.
+                                                                lrColumn.Name = lrTable.createUniqueColumnName(lrColumn, lrColumn.Name, 0)
+                                                                If arRoleConstraint.Role.Contains(lrRole) Then
+                                                                    lrColumn.IsMandatory = True
+                                                                End If
+                                                                lrTable.addColumn(lrColumn, Me.IsDatabaseSynchronised)
+                                                            End If
+                                                        End If
+                                                    Catch ex As Exception
+                                                        'Not a biggie, but will be problematic.
+                                                    End Try
                                                 End If
                                             Next
                                     End Select

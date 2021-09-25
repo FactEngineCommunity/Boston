@@ -1189,15 +1189,31 @@ Namespace FBM
 
         End Sub
 
-        Public Function hasAssociatedFactTypes() As Boolean
+        Public Function hasAssociatedFactTypes(Optional ByRef aarAssociatedFactType As List(Of FBM.FactType) = Nothing) As Boolean
 
-            Dim liFactTypeInstanceCount = Aggregate FactType In Me.Model.FactType
-                                               From Role In FactType.RoleGroup
-                                              Where Role.JoinedORMObject.Id = Me.Id
-                                              Where FactType.IsLinkFactType = False
-                                               Into Count()
+            Try
+                Dim larFactType = From FactType In Me.Model.FactType
+                                  From Role In FactType.RoleGroup
+                                  Where Role.JoinedORMObject IsNot Nothing
+                                  Where Role.JoinedORMObject.Id = Me.Id
+                                  Where FactType.IsLinkFactType = False
+                                  Select FactType
 
-            Return liFactTypeInstanceCount > 0
+                If aarAssociatedFactType IsNot Nothing Then
+                    aarAssociatedFactType = larFactType.ToList
+                End If
+
+                Return larFactType.Count > 0
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                Return True
+            End Try
 
         End Function
 
