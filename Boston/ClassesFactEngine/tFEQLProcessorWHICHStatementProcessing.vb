@@ -115,7 +115,7 @@
 
                 If lrFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & Me.WHICHSELECTStatement.MODELELEMENTNAME(0) & "'.")
                 lrQueryGraph.HeadNode = New FactEngine.QueryNode(lrFBMModelObject)
-                If Me.WHICHSELECTStatement.NODEPROPERTYIDENTIFICATION IsNot Nothing Then
+                If Me.WHICHSELECTStatement.NODEPROPERTYIDENTIFICATION.Count > 0 Then
                     lrQueryGraph.HeadNode.Alias = Me.WHICHSELECTStatement.NODEPROPERTYIDENTIFICATION(0).MODELELEMENTSUFFIX
                 Else
                     lrQueryGraph.HeadNode.Alias = Me.WHICHSELECTStatement.NODE(0).MODELELEMENTSUFFIX

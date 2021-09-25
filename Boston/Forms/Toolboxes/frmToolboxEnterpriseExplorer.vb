@@ -4375,11 +4375,24 @@ Public Class frmToolboxEnterpriseExplorer
 
     Private Sub HideAllotherModelsToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles HideAllotherModelsToolStripMenuItem.Click
 
-        For Each lrNode As cTreeNode In Me.TreeView.Nodes(0).Nodes
-            If lrNode IsNot Me.TreeView.SelectedNode Then
-                lrNode.Hidden(False, False) = True
-            End If
-        Next
+        Try
+
+            For Each lrNode As cTreeNode In Me.TreeView.Nodes(0).Nodes
+                If lrNode IsNot Me.TreeView.SelectedNode Then
+                    lrNode.Hidden(False, False) = True
+                End If
+            Next
+
+            Me.TreeView.SelectedNode.EnsureVisible()
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 

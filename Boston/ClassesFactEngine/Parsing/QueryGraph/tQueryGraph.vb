@@ -274,6 +274,7 @@
                                           Where (Column.Table.Name = lrFactType.getCorrespondingRDSTable.Name Or
                                                  lrFactType.isSubtypeOfModelElement(Column.Table.FBMModelElement))
                                           Where Column.TemporaryAlias = lrFactTypeMatch.Alias
+                                          Where Not Column.isPartOfPrimaryKey
                                           Select Column
 
                     For Each lrReturnColumn In larReturnColumn
@@ -450,6 +451,7 @@
                         Dim larReturnColumn = From Column In Me.ProjectionColumn
                                               Where Column.Table.Name = lrQueryEdge.FBMFactType.getCorrespondingRDSTable.Name
                                               Where Column.TemporaryAlias = lrQueryEdge.Alias
+                                              Where Not Column.isPartOfPrimaryKey
                                               Select Column
 
                         For Each lrReturnColumn In larReturnColumn
