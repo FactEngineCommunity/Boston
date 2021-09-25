@@ -15,6 +15,10 @@ Namespace FBM
         <XmlIgnore()>
         Public Shape As New ShapeNode
 
+        <NonSerialized>
+        <XmlIgnore()>
+        Public TableShape As New MindFusion.Diagramming.TableNode
+
         Public X As Integer
         Public Y As Integer
 
