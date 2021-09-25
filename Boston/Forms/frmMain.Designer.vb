@@ -156,7 +156,6 @@ Partial Class frmMain
         '
         'MenuStrip_main
         '
-        Me.MenuStrip_main.ImageScalingSize = New System.Drawing.Size(24, 24)
         Me.MenuStrip_main.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnu_Session, Me.ToolStripMenuItemPage, Me.ToolStripMenuItemEdit, Me.ToolStripMenuItemView, Me.ToolStripMenuItemBoston, Me.ToolStripMenuItemUser, Me.ToolStripMenuItemProject, Me.HelpToolStripMenuItem, Me.ToolStripMenuItemTestClientServer, Me.TestNotificationToolStripMenuItem})
         Me.MenuStrip_main.Location = New System.Drawing.Point(0, 0)
         Me.MenuStrip_main.Name = "MenuStrip_main"
@@ -176,73 +175,73 @@ Partial Class frmMain
         '
         Me.SaveToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.Save16x16
         Me.SaveToolStripMenuItem.Name = "SaveToolStripMenuItem"
-        Me.SaveToolStripMenuItem.Size = New System.Drawing.Size(202, 30)
+        Me.SaveToolStripMenuItem.Size = New System.Drawing.Size(194, 22)
         Me.SaveToolStripMenuItem.Text = "&Save"
         '
         'SaveAllToolStripMenuItem
         '
         Me.SaveAllToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.SaveAll16x16
         Me.SaveAllToolStripMenuItem.Name = "SaveAllToolStripMenuItem"
-        Me.SaveAllToolStripMenuItem.Size = New System.Drawing.Size(202, 30)
+        Me.SaveAllToolStripMenuItem.Size = New System.Drawing.Size(194, 22)
         Me.SaveAllToolStripMenuItem.Text = "Save &All"
         '
         'ToolStripSeparator10
         '
         Me.ToolStripSeparator10.Name = "ToolStripSeparator10"
-        Me.ToolStripSeparator10.Size = New System.Drawing.Size(199, 6)
+        Me.ToolStripSeparator10.Size = New System.Drawing.Size(191, 6)
         '
         'ToolStripMenuItemNewModel
         '
         Me.ToolStripMenuItemNewModel.Image = Global.Boston.My.Resources.Resources.ModelAdd16x16
         Me.ToolStripMenuItemNewModel.Name = "ToolStripMenuItemNewModel"
-        Me.ToolStripMenuItemNewModel.Size = New System.Drawing.Size(202, 30)
+        Me.ToolStripMenuItemNewModel.Size = New System.Drawing.Size(194, 22)
         Me.ToolStripMenuItemNewModel.Text = "&New Model"
         '
         'ToolStripMenuItem2
         '
         Me.ToolStripMenuItem2.Image = Global.Boston.My.Resources.Resources.XML16x16
         Me.ToolStripMenuItem2.Name = "ToolStripMenuItem2"
-        Me.ToolStripMenuItem2.Size = New System.Drawing.Size(202, 30)
+        Me.ToolStripMenuItem2.Size = New System.Drawing.Size(194, 22)
         Me.ToolStripMenuItem2.Text = "&Import .fbm File"
         '
         'ToolStripSeparator5
         '
         Me.ToolStripSeparator5.Name = "ToolStripSeparator5"
-        Me.ToolStripSeparator5.Size = New System.Drawing.Size(199, 6)
+        Me.ToolStripSeparator5.Size = New System.Drawing.Size(191, 6)
         '
         'ToolStripMenuItemRecentNodes
         '
         Me.ToolStripMenuItemRecentNodes.Name = "ToolStripMenuItemRecentNodes"
-        Me.ToolStripMenuItemRecentNodes.Size = New System.Drawing.Size(202, 30)
+        Me.ToolStripMenuItemRecentNodes.Size = New System.Drawing.Size(194, 22)
         Me.ToolStripMenuItemRecentNodes.Text = "Recent Models / Pages"
         '
         'ToolStripSeparator11
         '
         Me.ToolStripSeparator11.Name = "ToolStripSeparator11"
-        Me.ToolStripSeparator11.Size = New System.Drawing.Size(199, 6)
+        Me.ToolStripSeparator11.Size = New System.Drawing.Size(191, 6)
         '
         'ToolStripMenuItemLogIn
         '
         Me.ToolStripMenuItemLogIn.Name = "ToolStripMenuItemLogIn"
-        Me.ToolStripMenuItemLogIn.Size = New System.Drawing.Size(202, 30)
+        Me.ToolStripMenuItemLogIn.Size = New System.Drawing.Size(194, 22)
         Me.ToolStripMenuItemLogIn.Text = "&Log in"
         '
         'ToolStripMenuItemLogOut
         '
         Me.ToolStripMenuItemLogOut.Name = "ToolStripMenuItemLogOut"
-        Me.ToolStripMenuItemLogOut.Size = New System.Drawing.Size(202, 30)
+        Me.ToolStripMenuItemLogOut.Size = New System.Drawing.Size(194, 22)
         Me.ToolStripMenuItemLogOut.Text = "Log &out"
         Me.ToolStripMenuItemLogOut.Visible = False
         '
         'ToolStripSeparator6
         '
         Me.ToolStripSeparator6.Name = "ToolStripSeparator6"
-        Me.ToolStripSeparator6.Size = New System.Drawing.Size(199, 6)
+        Me.ToolStripSeparator6.Size = New System.Drawing.Size(191, 6)
         '
         'mnuOption_EndSession
         '
         Me.mnuOption_EndSession.Name = "mnuOption_EndSession"
-        Me.mnuOption_EndSession.Size = New System.Drawing.Size(202, 30)
+        Me.mnuOption_EndSession.Size = New System.Drawing.Size(194, 22)
         Me.mnuOption_EndSession.Text = "&End Session"
         '
         'ToolStripMenuItemPage
@@ -431,57 +430,57 @@ Partial Class frmMain
         '
         Me.ConfigurationToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.Properties216x16
         Me.ConfigurationToolStripMenuItem.Name = "ConfigurationToolStripMenuItem"
-        Me.ConfigurationToolStripMenuItem.Size = New System.Drawing.Size(188, 30)
+        Me.ConfigurationToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
         Me.ConfigurationToolStripMenuItem.Text = "&Configuration"
         '
         'ToolStripSeparator14
         '
         Me.ToolStripSeparator14.Name = "ToolStripSeparator14"
-        Me.ToolStripSeparator14.Size = New System.Drawing.Size(185, 6)
+        Me.ToolStripSeparator14.Size = New System.Drawing.Size(177, 6)
         '
         'PluginViewerToolStripMenuItem
         '
         Me.PluginViewerToolStripMenuItem.Name = "PluginViewerToolStripMenuItem"
-        Me.PluginViewerToolStripMenuItem.Size = New System.Drawing.Size(188, 30)
+        Me.PluginViewerToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
         Me.PluginViewerToolStripMenuItem.Text = "&Plugin Viewer"
         '
         'ToolStripSeparator2
         '
         Me.ToolStripSeparator2.Name = "ToolStripSeparator2"
-        Me.ToolStripSeparator2.Size = New System.Drawing.Size(185, 6)
+        Me.ToolStripSeparator2.Size = New System.Drawing.Size(177, 6)
         '
         'DatabaseToolStripMenuItem
         '
         Me.DatabaseToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.BackupDatabaseToolStripMenuItem, Me.CompactAndRepairToolStripMenuItem, Me.RemoveUnneededConceptsToolStripMenuItem})
         Me.DatabaseToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.Database16x16
         Me.DatabaseToolStripMenuItem.Name = "DatabaseToolStripMenuItem"
-        Me.DatabaseToolStripMenuItem.Size = New System.Drawing.Size(188, 30)
+        Me.DatabaseToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
         Me.DatabaseToolStripMenuItem.Text = "&Database"
         '
         'BackupDatabaseToolStripMenuItem
         '
         Me.BackupDatabaseToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.backup16x16
         Me.BackupDatabaseToolStripMenuItem.Name = "BackupDatabaseToolStripMenuItem"
-        Me.BackupDatabaseToolStripMenuItem.Size = New System.Drawing.Size(234, 30)
+        Me.BackupDatabaseToolStripMenuItem.Size = New System.Drawing.Size(226, 22)
         Me.BackupDatabaseToolStripMenuItem.Text = "&Backup Database"
         '
         'CompactAndRepairToolStripMenuItem
         '
         Me.CompactAndRepairToolStripMenuItem.Name = "CompactAndRepairToolStripMenuItem"
-        Me.CompactAndRepairToolStripMenuItem.Size = New System.Drawing.Size(234, 30)
+        Me.CompactAndRepairToolStripMenuItem.Size = New System.Drawing.Size(226, 22)
         Me.CompactAndRepairToolStripMenuItem.Text = "&Compact and repair"
         '
         'RemoveUnneededConceptsToolStripMenuItem
         '
         Me.RemoveUnneededConceptsToolStripMenuItem.Name = "RemoveUnneededConceptsToolStripMenuItem"
-        Me.RemoveUnneededConceptsToolStripMenuItem.Size = New System.Drawing.Size(234, 30)
+        Me.RemoveUnneededConceptsToolStripMenuItem.Size = New System.Drawing.Size(226, 22)
         Me.RemoveUnneededConceptsToolStripMenuItem.Text = "&Remove unneeded Concepts"
         '
         'LogFileToolStripMenuItem
         '
         Me.LogFileToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.DeleteLogFileToolStripMenuItem})
         Me.LogFileToolStripMenuItem.Name = "LogFileToolStripMenuItem"
-        Me.LogFileToolStripMenuItem.Size = New System.Drawing.Size(188, 30)
+        Me.LogFileToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
         Me.LogFileToolStripMenuItem.Text = "&Log File"
         '
         'DeleteLogFileToolStripMenuItem

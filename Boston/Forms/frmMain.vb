@@ -3046,10 +3046,21 @@ Public Class frmMain
             'Define the location of database
             '------------------------------------------------
             lsNewDatabaseAndPath = Path.GetDirectoryName(ls_db_location)
-            lsNewDatabaseAndPath = String.Format(lsNewDatabaseAndPath & "\Boston{0:yyyyMMddHHmmss}.mdb", Now)
+            lsNewDatabaseAndPath = String.Format(lsNewDatabaseAndPath & "\boston{0:yyyyMMddHHmmss}.vdb", Now)
 
-            File.Copy(ls_db_location, lsNewDatabaseAndPath, True)
-            MsgBox("Created database backup at :" & lsNewDatabaseAndPath)
+            Dim lrSaveFileDialog As New SaveFileDialog()
+
+            lrSaveFileDialog.InitialDirectory = Path.GetDirectoryName(ls_db_location)
+            lrSaveFileDialog.Filter = "Boston Databaes File (*.vdb)|*.vdb"
+            lrSaveFileDialog.FilterIndex = 0
+            lrSaveFileDialog.RestoreDirectory = True
+            lrSaveFileDialog.FileName = lsNewDatabaseAndPath
+
+            If lrSaveFileDialog.ShowDialog() = DialogResult.OK Then
+                lsNewDatabaseAndPath = lrSaveFileDialog.FileName
+                File.Copy(ls_db_location, lsNewDatabaseAndPath, True)
+                MsgBox("Created database backup at :" & lsNewDatabaseAndPath)
+            End If
 
         Catch ex As Exception
             Dim lsMessage As String
