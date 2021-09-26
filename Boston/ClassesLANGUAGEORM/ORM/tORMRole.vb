@@ -1167,8 +1167,9 @@ Namespace FBM
 
 
         ''' <summary>
-        ''' Returns a list of the Columns that are ultimately responsible for an ActiveRole, or the ReferenceModeFactType.RoleGroup(0) of the JoinedORMObject (EntityType) of that Role.
-        '''  Most likely will return just one table, but will return all Columns of all Tables that fit the bill.
+        ''' Returns a list of the Columns that are ultimately responsible for an ActiveRole,
+        '''   or the ReferenceModeFactType.RoleGroup(0) of the JoinedORMObject (EntityType) of that Role.
+        '''   Most likely will return just one table, but will return all Columns of all Tables that fit the bill.
         '''   See the TimetableBookings page of the University model.
         ''' </summary>
         ''' <returns></returns>
@@ -1239,11 +1240,13 @@ Namespace FBM
 
                             'larReturnColumns.Add(lrTable.Column.Find(Function(x) x.Role Is Me))
 
-                            larDownstreamActiveRoles = Me.getDownstreamRoleActiveRoles(larCoveredRoles) 'Returns all Roles joined ObjectifiedFactTypes and their Roles' JoinedORMObjects (recursively).
+                            'Returns all Roles joined ObjectifiedFactTypes and their Roles' JoinedORMObjects (recursively).
+                            larDownstreamActiveRoles = Me.getDownstreamRoleActiveRoles(larCoveredRoles)
 
                             Dim larFurtherUpstreamColumns = From Table In Me.Model.RDS.Table
                                                             From Column In Table.Column
                                                             Where larDownstreamActiveRoles.Contains(Column.ActiveRole) _
+                                                            And Column.Role.getDownstreamRolePaths(Me, larCoveredRoles).Contains(Me) _
                                                             And Not larCoveredRoles.Contains(Column.Role)
                                                             Select Column
 
